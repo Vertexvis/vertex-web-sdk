@@ -194,30 +194,12 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.load, () => {
-    it('loads a scene', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      await viewer.load('urn:vertexvis:eedc:file:file-id');
-      const scene = await viewer.scene();
-      expect(scene).toBeDefined();
-    });
-
-    it('throws exception if scene cannot be loaded', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      viewer.registerCommand('stream.connect', () => () => {
-        throw 'oops';
-      });
-      expect(viewer.load('urn:vertexvis:eedc:file:file-id')).rejects.toThrow();
-    });
-  });
-
   describe('resize', () => {
     it('calls the resize-stream command', async () => {
       const viewerPage = await createViewerPage(
         `<vertex-viewer></vertex-viewer`
       );
       const viewer = await createViewerSpec(viewerPage);
-      await viewer.load('urn:vertexvis:eedc:file:file-id');
       const commandPromise = new Promise(resolve => {
         viewer.registerCommand('stream.resize-stream', dimensions => {
           return ({ stream }) => {
@@ -225,6 +207,7 @@ describe('vertex-viewer', () => {
           };
         });
       });
+      await viewer.load('urn:vertexvis:eedc:file:file-id');
 
       window.dispatchEvent(new Event('resize'));
 
@@ -238,6 +221,43 @@ describe('vertex-viewer', () => {
       });
     });
   });
+
+  describe(Viewer.prototype.load, () => {
+    it('loads an eedc scene', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      await viewer.load('urn:vertexvis:eedc:file:file-id');
+      const scene = await viewer.scene();
+      expect(scene).toBeDefined();
+    });
+
+    it('loads a platform scene', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const startPromise = new Promise(resolve => {
+        viewer.registerCommand('stream.start', dimensions => {
+          return ({ stream }) => {
+            resolve(dimensions);
+          };
+        });
+      });
+      await viewer.load('urn:vertexvis:platform:scene:scene-id');
+      expect(await startPromise).toMatchObject({
+        width: expect.any(Number),
+        height: expect.any(Number),
+      });
+    });
+
+    it('throws exception if scene cannot be loaded', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const command = await viewer.registerCommand(
+        'stream.connect',
+        () => () => {
+          throw 'oops';
+        }
+      );
+      expect(viewer.load('urn:vertexvis:eedc:file:file-id')).rejects.toThrow();
+      command.dispose();
+    });
+  });
 });
 
 async function createViewerPage(html: string): Promise<SpecPage> {
@@ -245,6 +265,9 @@ async function createViewerPage(html: string): Promise<SpecPage> {
   const viewer = page.rootInstance as Viewer;
 
   viewer.registerCommand('stream.connect', () => () => Promise.resolve());
+  viewer.registerCommand('stream.start', () => () =>
+    Promise.resolve({ sceneId: 'scene-id' })
+  );
   viewer.registerCommand('stream.load-model', () => () =>
     Promise.resolve({ sceneStateId: 'scene-state-id' })
   );

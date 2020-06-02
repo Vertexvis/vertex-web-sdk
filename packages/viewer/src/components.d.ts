@@ -12,11 +12,11 @@ import { Credentials, } from "./credentials/credentials";
 import { TapEventDetails, } from "./interactions/tapEventDetails";
 import { FrameAttributes, } from "./image-streaming-client";
 import { Disposable, } from "./utils";
+import { StreamingClient, } from "./streaming-client";
 import { CommandFactory, } from "./commands/command";
 import { InteractionHandler, } from "./interactions/interactionHandler";
 import { SceneBuilder, } from "./scenes/sceneBuilder";
 import { Scene, } from "./scenes/scene";
-import { LoadModelResponse, } from "./commands/streamCommands";
 export namespace Components {
     interface SvgIcon {
     }
@@ -57,12 +57,12 @@ export namespace Components {
          */
         "httpClient": HttpClient.HttpClient;
         /**
-          * Loads the given resource into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`
+          * Loads the given resource into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`   * `urn:vertexvis:platform:scene:<sceneid>`
           * @param resource The URN of the resource to load.
          */
         "load": (resource: string) => Promise<void>;
         /**
-          * A URN of the model resource to load when the component is mounted in the DOM tree. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`
+          * A URN of the model resource to load when the component is mounted in the DOM tree. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`   * `urn:vertexvis:platform:scene:<sceneid>`
          */
         "model"?: string;
         /**
@@ -74,7 +74,7 @@ export namespace Components {
           * Internal API.
           * @private
          */
-        "registerCommand": <R, T>(id: string, factory: CommandFactory<R>, thisArg?: T) => Promise<Disposable>;
+        "registerCommand": <R, T, S extends StreamingClient<any, any>>(id: string, factory: CommandFactory<R, S>, thisArg?: T) => Promise<Disposable>;
         /**
           * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
           * @example class CustomInteractionHandler extends InteractionHandler {   private element: HTMLElement;   private api: InteractionApi;    public dispose(): void {     this.element.removeEventListener('click', this.handleElementClick);   }    public initialize(element: HTMLElement, api: InteractionApi): void {     this.api = api;     this.element = element;     this.element.addEventListener('click', this.handleElementClick);   }    private handleElementClick = (event: MouseEvent) => {     api.tap({ x: event.clientX, y: event.clientY });   } }  const viewer = document.querySelector("vertex-viewer"); viewer.registerInteractionHandler(new CustomInteractionHandler);
@@ -264,7 +264,7 @@ declare namespace LocalJSX {
          */
         "httpClient": HttpClient.HttpClient;
         /**
-          * A URN of the model resource to load when the component is mounted in the DOM tree. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`
+          * A URN of the model resource to load when the component is mounted in the DOM tree. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`   * `urn:vertexvis:platform:scene:<sceneid>`
          */
         "model"?: string;
         /**

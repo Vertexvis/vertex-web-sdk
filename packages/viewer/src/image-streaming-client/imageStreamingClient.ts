@@ -1,7 +1,6 @@
-import { WebSocketClient } from './webSocketClient';
+import { WebSocketClient } from '../websocket-client';
 import { UUID } from '@vertexvis/utils';
 import { Camera } from '@vertexvis/graphics3d';
-import { Disposable, EventDispatcher } from '../utils';
 import { Operation, LoadSceneStateOperation } from './operations';
 import {
   FrameResponse,
@@ -9,15 +8,13 @@ import {
   Response,
   JsonResponse,
 } from './responses';
-import { UrlProvider } from './url';
 import {
   AttemptReconnect,
   isReconnectMessage,
   toReconnectMessage,
 } from './reconnect';
 import { BoundingBox, Dimensions } from '@vertexvis/geometry';
-
-type ResponseHandler = (response: Response) => void;
+import { StreamingClient } from '../streaming-client';
 
 export type AnimationEasing =
   | 'linear'
@@ -27,38 +24,23 @@ export type AnimationEasing =
   | 'ease-out-sine'
   | 'ease-out-expo';
 
-export class ImageStreamingClient {
-  private onResponseDispatcher = new EventDispatcher<Response>();
-  private messageSubscription?: Disposable;
+export class ImageStreamingClient extends StreamingClient<Operation, Response> {
+  public constructor(websocket: WebSocketClient = new WebSocketClient()) {
+    super(
+      request => JSON.stringify(request),
+      message => {
+        const response = parseResponse(message);
 
-  private isInteractive: Promise<boolean> = Promise.resolve(false);
+        if (isReconnectMessage(response)) {
+          this.reopen(toReconnectMessage(response as JsonResponse));
+        }
 
-  private isInteractiveResolve: VoidFunction;
-  private isInteractiveTimeout: any;
-
-  public constructor(
-    private websocket: WebSocketClient = new WebSocketClient()
-  ) {
-    this.endInteraction = this.endInteraction.bind(this);
-    this.initializeInteractive = this.initializeInteractive.bind(this);
-    this.resetInteractive = this.resetInteractive.bind(this);
-  }
-
-  public async connect(urlProvider: UrlProvider): Promise<Disposable> {
-    await this.websocket.connect(urlProvider);
-    this.messageSubscription = this.websocket.onMessage(message =>
-      this.handleMessage(message)
+        return response;
+      },
+      websocket
     );
-    return { dispose: () => this.dispose() };
-  }
 
-  public dispose(): void {
-    this.websocket.close();
-    this.messageSubscription?.dispose();
-  }
-
-  public onResponse(handler: ResponseHandler): Disposable {
-    return this.onResponseDispatcher.on(handler);
+    this.endInteraction = this.endInteraction.bind(this);
   }
 
   public loadSceneState(
@@ -78,8 +60,7 @@ export class ImageStreamingClient {
       operationId: UUID.create(),
     };
 
-    clearTimeout(this.isInteractiveTimeout);
-    this.initializeInteractive();
+    super.startInteractionTimer();
 
     return this.send(op);
   }
@@ -87,7 +68,7 @@ export class ImageStreamingClient {
   public endInteraction(): Promise<FrameResponse> {
     const op = { type: 'EndInteractionOperation', operationId: UUID.create() };
 
-    this.isInteractiveTimeout = setTimeout(this.resetInteractive, 2000);
+    super.stopInteractionTimer();
 
     return this.send(op);
   }
@@ -160,7 +141,7 @@ export class ImageStreamingClient {
     this.websocket.close();
   }
 
-  private send(operation: Operation): Promise<FrameResponse> {
+  protected send(operation: Operation): Promise<FrameResponse> {
     return new Promise(resolve => {
       const subscription = this.onResponse(response => {
         if (
@@ -175,31 +156,5 @@ export class ImageStreamingClient {
       });
       this.websocket.send(JSON.stringify(operation));
     });
-  }
-
-  private handleMessage(message: MessageEvent): void {
-    const response = parseResponse(message);
-
-    if (isReconnectMessage(response)) {
-      this.reopen(toReconnectMessage(response as JsonResponse));
-    }
-
-    this.onResponseDispatcher.emit(response);
-  }
-
-  private initializeInteractive(): void {
-    if (this.isInteractiveResolve == null) {
-      this.isInteractive = new Promise(resolve => {
-        this.isInteractiveResolve = resolve;
-      });
-    }
-  }
-
-  private resetInteractive(): void {
-    if (this.isInteractiveResolve != null) {
-      this.isInteractiveResolve();
-    }
-    this.isInteractiveResolve = null;
-    this.isInteractive = Promise.resolve(false);
   }
 }

@@ -1,8 +1,8 @@
-import { ImageStreamingClient } from '../image-streaming-client';
 import { Scene, Camera } from '@vertexvis/graphics3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
+import { StreamingClient } from '../streaming-client';
 
 type SceneProvider = () => Scene.Scene;
 
@@ -19,7 +19,7 @@ export class InteractionApi {
   private currentCamera?: Camera.Camera;
 
   public constructor(
-    private stream: ImageStreamingClient,
+    private stream: StreamingClient,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>
   ) {}

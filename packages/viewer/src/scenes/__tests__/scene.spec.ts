@@ -4,10 +4,8 @@ import { HttpRequest, HttpResponse } from '@vertexvis/network';
 import { AuthToken } from '@vertexvis/vertex-api';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { defaultConfig } from '../../config/config';
-import {
-  ImageStreamingClient,
-  WebSocketClient,
-} from '../../image-streaming-client';
+import { ImageStreamingClient } from '../../image-streaming-client';
+import { WebSocketClient } from '../../websocket-client';
 import { httpBulkBomOperationExecutor, Scene } from '../scene';
 import { SelectorBuilder } from '../selectors';
 import { Disposable } from '../../utils';

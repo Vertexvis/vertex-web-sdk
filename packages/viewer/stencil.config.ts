@@ -6,6 +6,21 @@ export const config: Config = {
   nodeResolve: {
     browser: true,
   },
+  commonjs: {
+    namedExports: {
+      'protobufjs/minimal': [
+        'build',
+        'Writer',
+        'BufferWriter',
+        'Reader',
+        'BufferReader',
+        'util',
+        'rpc',
+        'roots',
+        'configure',
+      ],
+    },
+  },
   plugins: [copyright()],
   globalStyle: 'src/global/index.css',
   outputTargets: [

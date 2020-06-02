@@ -34,12 +34,14 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@types/classnames": "2.2.3",
-    "classnames": "2.2.6",
+    "@vertexvis/frame-stream-protos": "^0.0.8",
     "@vertexvis/geometry": "0.3.2",
     "@vertexvis/graphics3d": "0.1.1",
     "@vertexvis/network": "0.1.1",
     "@vertexvis/utils": "0.6.1",
     "@vertexvis/vertex-api": "0.6.2",
+    "classnames": "2.2.6",
+    "protobufjs": "^6.9.0",
     "zen-3d": "^0.0.1",
     "zen-3d-addons": "^0.0.3"
   },
