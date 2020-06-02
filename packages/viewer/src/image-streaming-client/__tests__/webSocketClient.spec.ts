@@ -1,4 +1,4 @@
-import { WebSocketClient } from '../webSocketClient';
+import { WebSocketClient } from '../../websocket-client/webSocketClient';
 import {
   WebSocketMock,
   addEventListenerMock,

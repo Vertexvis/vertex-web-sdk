@@ -2,11 +2,16 @@ import { UUID, Uri, Color } from '@vertexvis/utils';
 import { CommandContext, Command } from './command';
 import { Disposable } from '../utils';
 import { Dimensions, BoundingBox } from '@vertexvis/geometry';
-import { FrameResponse, AnimationEasing } from '../image-streaming-client';
+import {
+  FrameResponse,
+  AnimationEasing,
+  ImageStreamingClient,
+} from '../image-streaming-client';
 import { CommandRegistry } from './commandRegistry';
 import { Camera } from '@vertexvis/graphics3d';
 import { Model } from '../types';
 import { Files, SceneStates } from '@vertexvis/vertex-api';
+import { UrlDescriptor } from '../websocket-client';
 
 export interface ConnectOptions {
   backgroundColor?: Color.Color;
@@ -19,11 +24,11 @@ export interface LoadModelResponse {
 
 export function connect({
   backgroundColor = Color.create(255, 255, 255),
-}: ConnectOptions = {}): Command<Promise<Disposable>> {
+}: ConnectOptions = {}): Command<Promise<Disposable>, ImageStreamingClient> {
   return ({ stream, config, credentialsProvider }) => {
     const streamId = UUID.create();
 
-    const urlProvider = (): string => {
+    const urlProvider = (): UrlDescriptor => {
       const credentials = credentialsProvider();
       const renderingParams: object = {
         token:
@@ -54,7 +59,7 @@ export function connect({
         )
       );
 
-      return Uri.toString(uri);
+      return { url: Uri.toString(uri) };
     };
 
     return stream.connect(urlProvider);
@@ -64,9 +69,12 @@ export function connect({
 export function loadModel(
   urn: string,
   dimensions: Dimensions.Dimensions
-): Command<Promise<LoadModelResponse>> {
-  return async ({ stream, httpClient }: CommandContext) => {
-    let model = Model.fromUrn(urn);
+): Command<Promise<LoadModelResponse>, ImageStreamingClient> {
+  return async ({
+    stream,
+    httpClient,
+  }: CommandContext<ImageStreamingClient>) => {
+    let model = Model.fromEedcUrn(urn);
 
     if (model.type === 'file') {
       let fileId = model.fileId;
@@ -108,8 +116,8 @@ export function loadModel(
 
 export function replaceCamera(
   camera: Camera.Camera
-): Command<Promise<FrameResponse>> {
-  return ({ stream }: CommandContext) => {
+): Command<Promise<FrameResponse>, ImageStreamingClient> {
+  return ({ stream }: CommandContext<ImageStreamingClient>) => {
     return stream.replaceCamera(camera);
   };
 }
@@ -119,16 +127,16 @@ export function flyToCamera(
   bounds: BoundingBox.BoundingBox,
   durationInMs = 500,
   easing: AnimationEasing = 'ease-out-cubic'
-): Command<Promise<FrameResponse>> {
-  return ({ stream }: CommandContext) => {
+): Command<Promise<FrameResponse>, ImageStreamingClient> {
+  return ({ stream }: CommandContext<ImageStreamingClient>) => {
     return stream.flyToCamera(camera, bounds, durationInMs, easing);
   };
 }
 
 export function resizeStream(
   dimensions: Dimensions.Dimensions
-): Command<Promise<FrameResponse>> {
-  return ({ stream }: CommandContext) => {
+): Command<Promise<FrameResponse>, ImageStreamingClient> {
+  return ({ stream }: CommandContext<ImageStreamingClient>) => {
     return stream.resizeStream(dimensions);
   };
 }

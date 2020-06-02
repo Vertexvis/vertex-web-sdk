@@ -1,4 +1,4 @@
-import { WebSocketClient } from '../webSocketClient';
+import { WebSocketClient } from '../../websocket-client/webSocketClient';
 import * as AttemptReconnect from '../reconnect';
 import { ImageStreamingClient } from '../imageStreamingClient';
 import { WebSocketMock } from '../__mocks__/webSocketMock';
@@ -52,7 +52,7 @@ describe('ImageStreamingClient', () => {
     });
 
     it('closes the websocket if the window end time is reached', async () => {
-      await websocketClient.connect(() => 'some-url');
+      await websocketClient.connect(() => ({ url: 'some-url' }));
       await imageStreamingClient.reopen(
         AttemptReconnect.create('5000', `${start}`, `${end}`),
         now,
