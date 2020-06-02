@@ -4,7 +4,11 @@ import { UrlProvider } from './url';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
-type SendData = string | ArrayBufferLike | Blob | ArrayBufferView;
+export type WebSocketSendData =
+  | string
+  | ArrayBufferLike
+  | Blob
+  | ArrayBufferView;
 
 type MessageHandler = (event: MessageEvent) => void;
 
@@ -22,7 +26,11 @@ export class WebSocketClient {
   }
 
   public async connect(urlProvider: UrlProvider): Promise<void> {
-    this.webSocket = new WebSocket(urlProvider());
+    const urlAndProtocol = urlProvider();
+    this.webSocket = new WebSocket(
+      urlAndProtocol.url,
+      urlAndProtocol.protocols
+    );
     this.webSocket.binaryType = 'arraybuffer';
 
     return new Promise((resolve, reject) => {
@@ -60,7 +68,7 @@ export class WebSocketClient {
     return this.onMessageDispatcher.on(handler);
   }
 
-  public send(data: SendData): void {
+  public send(data: WebSocketSendData): void {
     if (this.webSocket != null) {
       this.webSocket.send(data);
     }
