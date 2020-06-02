@@ -1,0 +1,20 @@
+:host {
+  --vertex-viewer-toolbar-group-background-color: rgba(245, 245, 245, 0.95);
+  --vertex-viewer-toolbar-group-box-shadow: -1px 0 2px rgba(0, 0, 0, 0.12),
+    1px 0 2px rgba(0, 0, 0, 0.13);
+  --vertex-viewer-toolbar-group-padding: 0 var(--abs-padding-1);
+  --vertex-viewer-toolbar-group-margin: 0 var(--abs-padding-1);
+  --vertex-viewer-toolbar-group-height: 2.25rem;
+}
+
+.viewer-toolbar-group-root {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: var(--vertex-viewer-toolbar-group-padding);
+  margin: var(--vertex-viewer-toolbar-group-margin);
+  height: var(--vertex-viewer-toolbar-group-height);
+  background-color: var(--vertex-viewer-toolbar-group-background-color);
+  border-radius: 4px;
+  box-shadow: var(--vertex-viewer-toolbar-group-box-shadow);
+}

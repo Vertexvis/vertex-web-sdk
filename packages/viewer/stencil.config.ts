@@ -1,0 +1,36 @@
+import { Config } from '@stencil/core';
+import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
+
+export const config: Config = {
+  namespace: 'viewer',
+  nodeResolve: {
+    browser: true,
+  },
+  plugins: [copyright()],
+  globalStyle: 'src/global/index.css',
+  outputTargets: [
+    {
+      type: 'dist',
+      esmLoaderPath: '../loader',
+    },
+    {
+      type: 'docs-readme',
+    },
+    {
+      type: 'www',
+      serviceWorker: null, // disable service workers
+    },
+  ],
+  testing: {
+    collectCoverageFrom: ['**/src/**/*.{ts,tsx}'],
+    coverageThreshold: {
+      global: {
+        branches: 50,
+        functions: 60,
+        lines: 70,
+        statements: 70,
+      },
+    },
+    roots: ['<rootDir>/src/'],
+  },
+};

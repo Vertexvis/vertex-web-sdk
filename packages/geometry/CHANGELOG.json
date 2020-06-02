@@ -1,0 +1,111 @@
+{
+  "name": "@vertexvis/geometry",
+  "entries": [
+    {
+      "version": "0.3.2",
+      "tag": "@vertexvis/geometry_v0.3.2",
+      "date": "Thu, 05 Mar 2020 22:32:00 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@vertexvis/build-tools\" from `0.7.0` to `0.7.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.1",
+      "tag": "@vertexvis/geometry_v0.3.1",
+      "date": "Thu, 23 Jan 2020 06:20:16 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@vertexvis/jest-config-vertexvis\" from `0.3.1` to `0.4.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.3.0",
+      "tag": "@vertexvis/geometry_v0.3.0",
+      "date": "Tue, 07 Jan 2020 00:00:40 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Upgrade to TypeScript 3.7",
+            "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+            "commit": "522a9f5177800f18c9f7a2b25512069b75127d00"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@vertexvis/build-tools\" from `0.6.1` to `0.7.0`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/eslint-config-vertexvis-typescript\" from `0.1.3` to `0.2.0`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/jest-config-vertexvis\" from `0.3.0` to `0.3.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.0",
+      "tag": "@vertexvis/geometry_v0.2.0",
+      "date": "Mon, 30 Dec 2019 20:50:39 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add test coverage script",
+            "author": "Jeff Murray <jeff.murray@vertexvis.com>",
+            "commit": "be5463208e98f4baa90ed774195c8ffb072dc532"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@vertexvis/build-tools\" from `0.6.0` to `0.6.1`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/eslint-config-vertexvis-typescript\" from `0.1.2` to `0.1.3`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/jest-config-vertexvis\" from `0.2.1` to `0.3.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.1",
+      "tag": "@vertexvis/geometry_v0.1.1",
+      "date": "Mon, 30 Dec 2019 19:04:27 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@vertexvis/build-tools\" from `0.5.0` to `0.6.0`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/jest-config-vertexvis\" from `0.2.0` to `0.2.1`"
+          },
+          {
+            "comment": "Updating dependency \"@vertexvis/typescript-config-vertexvis\" from `0.1.0` to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.0",
+      "tag": "@vertexvis/geometry_v0.1.0",
+      "date": "Fri, 13 Dec 2019 18:39:45 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Initial release of geometry package",
+            "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+            "commit": "d16b2f775b1a13f66a81808f0840fca66a371463"
+          }
+        ]
+      }
+    }
+  ]
+}
