@@ -6,12 +6,11 @@ libraries and sdks at Vertex.
 ## Structure
 
 - `./packages`: The packages to be made available on NPM. This directory contains
-  subdirectories that represent different categories of packages:
-  - `./libs`: The libs directory contains libraries that are intended to be
-    reusable across other applications and/or libraries. These are normally
-    published to our private NPM repository.
-  - `./sdks`: The sdks directory contains NPM packages for Vertex's public facing
-    SDKs.
+  subdirectories that represent different individual packages and fall under two different categories:
+  - `libraries`: These are packages that are intended to be
+    reusable across other applications and/or libraries. These are typically
+    intended to be used internally.
+  - `sdks`: Vertex's public facing SDKs.
 
 - `./scripts`: The scripts directory contains Bash scripts for managing the
   project.
