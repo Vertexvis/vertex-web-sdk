@@ -34,7 +34,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@types/classnames": "2.2.3",
-    "@vertexvis/frame-stream-protos": "^0.0.8",
+    "@vertexvis/frame-stream-protos": "^0.0.11",
     "@vertexvis/geometry": "0.3.2",
     "@vertexvis/graphics3d": "0.1.1",
     "@vertexvis/network": "0.1.1",

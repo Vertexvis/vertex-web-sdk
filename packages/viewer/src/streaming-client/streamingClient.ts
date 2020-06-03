@@ -8,7 +8,6 @@ import { Camera } from '@vertexvis/graphics3d';
 import { NoImplementationFoundError } from '../errors';
 
 type ResponseHandler<T> = (response: T) => void;
-type RequestEncoder<T> = (request: T) => WebSocketSendData;
 type MessageParser<T> = (message: MessageEvent) => T;
 
 export class StreamingClient<ReqT = any, RespT = any> {
@@ -21,7 +20,6 @@ export class StreamingClient<ReqT = any, RespT = any> {
   protected isInteractiveTimeout: any;
 
   public constructor(
-    protected requestEncoder: RequestEncoder<ReqT>,
     protected messageParser: MessageParser<RespT>,
     protected websocket: WebSocketClient = new WebSocketClient()
   ) {
