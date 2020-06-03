@@ -239,15 +239,15 @@ export class Viewer {
       <Host>
         <div class="viewer-container">
           <div
-            ref={ref => (this.containerElement = ref)}
+            ref={(ref) => (this.containerElement = ref)}
             class="canvas-container"
           >
             <canvas
-              ref={ref => (this.canvasElement = ref)}
+              ref={(ref) => (this.canvasElement = ref)}
               class="canvas"
               width={this.dimensions != null ? this.dimensions.width : 0}
               height={this.dimensions != null ? this.dimensions.height : 0}
-              onContextMenu={event => event.preventDefault()}
+              onContextMenu={(event) => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -438,7 +438,7 @@ export class Viewer {
   private injectViewerApi(): void {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
-      .forEach(result => {
+      .forEach((result) => {
         (result as any).viewer = this.hostElement;
       });
   }
@@ -469,7 +469,8 @@ export class Viewer {
       this.drawImage(
         image,
         frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect
+        frame.imageAttributes.imageRect,
+        frame.imageAttributes.scaleFactor
       );
     }
 
@@ -479,7 +480,8 @@ export class Viewer {
   private drawImage(
     image: LoadedImage,
     sceneViewport: vertexvis.protobuf.stream.IDimensions,
-    imagePosition: vertexvis.protobuf.stream.IRectangle
+    imagePosition: vertexvis.protobuf.stream.IRectangle,
+    scaleFactor: number
   ): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
@@ -502,8 +504,8 @@ export class Viewer {
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleX,
-          image.image.height * scaleY
+          image.image.width * scaleFactor,
+          image.image.height * scaleFactor
         );
       }
     }
@@ -607,10 +609,11 @@ export class Viewer {
             'Cannot retrieve scene. Frame has not been rendered'
           );
         }
+
         return this.frameAttributes.scene;
       },
       this.tap
-    );
+    )
   }
 
   /**

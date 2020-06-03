@@ -59,9 +59,9 @@ export class FrameStreamingClient {
     throw new NoImplementationFoundError('Begin interaction not implemented.');
   }
 
-  public replaceCamera(
-    camera: Camera.Camera
-  ): Promise<vertexvis.protobuf.stream.IFrameResult> {
+  public replaceCamera({
+    camera
+  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<vertexvis.protobuf.stream.IFrameResult> {
     throw new NoImplementationFoundError('Replace camera not implemented.');
   }
 
@@ -72,8 +72,8 @@ export class FrameStreamingClient {
   private send(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return new Promise(resolve => {
-      const subscription = this.onResponse(response => {
+    return new Promise((resolve) => {
+      const subscription = this.onResponse((response) => {
         if (response.frame != null) {
           resolve(response);
           subscription.dispose();

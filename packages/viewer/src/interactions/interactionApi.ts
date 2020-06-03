@@ -1,14 +1,16 @@
-import { Scene, Camera } from '@vertexvis/graphics3d';
+import { Camera, Scene } from '@vertexvis/graphics3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { FrameStreamingClient } from '../frame-streaming-client';
+import { vertexvis } from '@vertexvis/frame-stream-protos';
 
 type SceneProvider = () => Scene.Scene;
 
 type CameraTransform = (
-  camera: Camera.Camera,
-  viewport: Dimensions.Dimensions
+  cameraPosition: Camera.Camera,
+  viewport: Dimensions.Dimensions,
+  fovy: number
 ) => Camera.Camera;
 
 /**
@@ -16,7 +18,7 @@ type CameraTransform = (
  * the internal state of an interaction.
  */
 export class InteractionApi {
-  private currentCamera?: Camera.Camera;
+  private currentCameraPosition?: Camera.Camera;
 
   public constructor(
     private stream: FrameStreamingClient,
@@ -52,7 +54,7 @@ export class InteractionApi {
    */
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
-      this.currentCamera = this.getScene().camera;
+      this.currentCameraPosition = this.getScene().camera;
       await this.stream.beginInteraction();
     }
   }
@@ -66,9 +68,15 @@ export class InteractionApi {
    */
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
-      const viewport = this.getScene().viewport;
-      this.currentCamera = t(this.currentCamera, viewport);
-      await this.stream.replaceCamera(this.currentCamera);
+      const { camera, viewport } = this.getScene();
+      this.currentCameraPosition = t(
+        this.currentCameraPosition,
+        viewport,
+        camera.fovy
+      );
+      await this.stream.replaceCamera({
+        camera: this.currentCameraPosition,
+      });
     }
   }
 
@@ -80,13 +88,13 @@ export class InteractionApi {
    *  viewer.
    */
   public async panCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera((camera, viewport, fovy) => {
       const vv = Camera.viewVector(camera);
 
       const u = Vector3.normalize(camera.upvector);
       const v = Vector3.normalize(vv);
 
-      const d = Vector3.magnitude(vv) * Math.tan(camera.fovy);
+      const d = Vector3.magnitude(vv) * Math.tan(fovy);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
@@ -160,7 +168,7 @@ export class InteractionApi {
    */
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
-      this.currentCamera = null;
+      this.currentCameraPosition = null;
       await this.stream.endInteraction();
     }
   }
@@ -169,6 +177,6 @@ export class InteractionApi {
    * Indicates if the API is in an interacting state.
    */
   public isInteracting(): boolean {
-    return this.currentCamera != null;
+    return this.currentCameraPosition != null;
   }
 }
