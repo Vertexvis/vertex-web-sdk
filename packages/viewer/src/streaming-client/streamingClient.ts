@@ -1,8 +1,6 @@
 import { WebSocketClient, UrlProvider } from '../websocket-client';
 import { Disposable, EventDispatcher } from '../utils';
-import { Camera } from '@vertexvis/graphics3d';
 import { NoImplementationFoundError } from '../errors';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
 
 type ResponseHandler<T> = (response: T) => void;
 type MessageParser<T> = (message: MessageEvent) => T;
@@ -40,38 +38,6 @@ export class StreamingClient<ReqT = any, RespT = any> {
 
   public onResponse(handler: ResponseHandler<RespT>): Disposable {
     return this.onResponseDispatcher.on(handler);
-  }
-
-  public cameraToPlatform(
-    camera: Camera.CameraPosition
-  ): vertexvis.protobuf.stream.ICamera {
-    return {
-      position: camera.position,
-      lookAt: camera.lookat,
-      up: camera.upvector,
-    };
-  }
-
-  public cameraToEedc(
-    camera: vertexvis.protobuf.stream.ICamera
-  ): Camera.CameraPosition {
-    return {
-      position: {
-        x: camera.position.x || 0,
-        y: camera.position.y || 0,
-        z: camera.position.z || 0,
-      },
-      lookat: {
-        x: camera.lookAt.x || 0,
-        y: camera.lookAt.y || 0,
-        z: camera.lookAt.z || 0,
-      },
-      upvector: {
-        x: camera.up.x || 0,
-        y: camera.up.y || 0,
-        z: camera.up.z || 0,
-      },
-    };
   }
 
   public beginInteraction(data?: any): Promise<RespT> {

@@ -76,6 +76,7 @@ import {
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { StreamingClient } from '../../streaming-client';
+import { cameraToEedc } from '../../cameras';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -162,18 +163,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<
-    FrameAttributes | EedcFrameAttributes
-  >;
+  @Event() public frameReceived!: EventEmitter<FrameAttributes>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<
-    FrameAttributes | EedcFrameAttributes
-  >;
+  @Event() public frameDrawn!: EventEmitter<FrameAttributes>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -492,8 +489,12 @@ export class Viewer {
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<EedcFrameAttributes | undefined> {
-    return this.eedcFrameAttributes;
+  public async getFrameAttributes(): Promise<FrameAttributes | undefined> {
+    if (this.frameAttributes != null) {
+      return this.frameAttributes;
+    } else if (this.eedcFrameAttributes != null) {
+      return fromEedcFrameAttributes(this.eedcFrameAttributes);
+    }
   }
 
   /**
@@ -598,20 +599,29 @@ export class Viewer {
     }
   }
 
-  private handleFrameStreamResponse(
+  private async handleFrameStreamResponse(
     response: vertexvis.protobuf.stream.IStreamResponse
-  ): void {
+  ): Promise<void> {
     if (response.frame != null) {
-      this.drawFrame(response.frame, response.frame.image);
+      this.frameReceived?.emit(response.frame);
+
+      const frameWasDrawn = await this.drawFrame(
+        response.frame,
+        response.frame.image
+      );
+
+      if (frameWasDrawn) {
+        this.frameAttributes = response.frame;
+        this.frameDrawn?.emit(this.frameAttributes);
+      }
     }
   }
 
   private async handleFrameResponse(response: FrameResponse): Promise<void> {
-    this.frameReceived?.emit(response.frame.frameAttributes);
-
     const platformFrameAttributes = fromEedcFrameAttributes(
       response.frame.frameAttributes
     );
+    this.frameReceived?.emit(platformFrameAttributes);
     const frameWasDrawn = await this.drawFrame(
       platformFrameAttributes,
       response.frame.imageBytes
@@ -620,7 +630,7 @@ export class Viewer {
     if (frameWasDrawn) {
       this.frameAttributes = platformFrameAttributes;
       this.eedcFrameAttributes = response.frame.frameAttributes;
-      this.frameDrawn?.emit(this.eedcFrameAttributes);
+      this.frameDrawn?.emit(platformFrameAttributes);
     }
   }
 
@@ -635,7 +645,6 @@ export class Viewer {
     const isNewerFrame = frameNumber > this.lastFrameNumber;
     if (isNewerFrame) {
       this.lastFrameNumber = frameNumber;
-      this.imageAttributes = frame.imageAttributes;
       this.frameAttributes = frame;
 
       this.drawImage(
@@ -792,9 +801,7 @@ export class Viewer {
       verifyAttributes(() =>
         this.eedcFrameAttributes != null
           ? this.eedcFrameAttributes.scene.camera
-          : this.stream.cameraToEedc(
-              this.frameAttributes?.sceneAttributes?.camera
-            )
+          : cameraToEedc(this.frameAttributes?.sceneAttributes?.camera)
       ),
       verifyAttributes(() =>
         this.eedcFrameAttributes != null

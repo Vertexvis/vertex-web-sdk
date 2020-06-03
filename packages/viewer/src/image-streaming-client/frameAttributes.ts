@@ -1,6 +1,7 @@
 import { Scene } from '@vertexvis/graphics3d';
 import { Dimensions, BoundingBox } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { cameraToPlatform } from '../cameras';
 
 export type FrameAttributes = Pick<
   vertexvis.protobuf.stream.IFrameResult,
@@ -28,7 +29,7 @@ export function fromEedcFrameAttributes(
       scaleFactor: 1,
     },
     sceneAttributes: {
-      camera: frameAttributes.scene.camera,
+      camera: cameraToPlatform(frameAttributes.scene.camera),
     },
     sequenceNumber: -1,
   };

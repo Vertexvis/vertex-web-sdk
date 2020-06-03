@@ -5,6 +5,7 @@ import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamingClient } from '../streaming-client';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { FrameStreamingClient } from '../frame-streaming-client';
+import { cameraToPlatform } from '../cameras';
 
 type CameraPositionProvider = () => Camera.CameraPosition;
 type ViewportProvider = () => Dimensions.Dimensions;
@@ -84,7 +85,7 @@ export class InteractionApi {
       );
       if (this.stream instanceof FrameStreamingClient) {
         await this.stream.replaceCamera({
-          camera: this.stream.cameraToPlatform(this.currentCameraPosition),
+          camera: cameraToPlatform(this.currentCameraPosition),
         });
       } else {
         await this.stream.replaceCamera(this.currentCameraPosition);

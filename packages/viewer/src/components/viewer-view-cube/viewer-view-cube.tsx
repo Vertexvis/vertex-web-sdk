@@ -8,10 +8,11 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { EedcFrameAttributes } from '../../image-streaming-client';
+import { FrameAttributes } from '../../image-streaming-client';
 import { Vector3, Point } from '@vertexvis/geometry';
 import { Camera } from '@vertexvis/graphics3d';
 import { ViewCubeRenderer } from './utils/viewCubeRenderer';
+import { vertexvis } from '@vertexvis/frame-stream-protos';
 
 @Component({
   tag: 'vertex-viewer-view-cube',
@@ -90,20 +91,20 @@ export class ViewerViewCube {
       newViewer.addEventListener('frameReceived', this.handleFrameChanged);
 
       const frame = await newViewer.getFrameAttributes();
-      if (frame != null) {
+      if (frame != null && frame) {
         this.viewCube.show();
-        this.updateWebGlCamera(frame.scene.camera);
+        this.updateWebGlCamera(frame.sceneAttributes.camera);
       }
     }
   }
 
-  private handleFrameChanged(event: CustomEvent<EedcFrameAttributes>): void {
-    const { camera } = event.detail.scene;
+  private handleFrameChanged(event: CustomEvent<FrameAttributes>): void {
+    const { camera } = event.detail.sceneAttributes;
     this.viewCube.show();
     this.updateWebGlCamera(camera);
   }
 
-  private updateWebGlCamera(camera: Camera.Camera): void {
+  private updateWebGlCamera(camera: vertexvis.protobuf.stream.ICamera): void {
     this.viewCube.positionCamera(camera);
     this.renderWebGl();
   }

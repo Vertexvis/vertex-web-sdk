@@ -10,7 +10,7 @@ import { Environment } from "./config/environment";
 import { HttpClient } from "@vertexvis/network";
 import { Credentials } from "./credentials/credentials";
 import { TapEventDetails } from "./interactions/tapEventDetails";
-import { EedcFrameAttributes, FrameAttributes } from "./image-streaming-client";
+import { FrameAttributes } from "./image-streaming-client";
 import { Disposable } from "./utils";
 import { StreamingClient } from "./streaming-client";
 import { CommandFactory } from "./commands/command";
@@ -50,7 +50,7 @@ export namespace Components {
           * The token for an Oauth2 credentials flow. Property is ignored if `credentialsClientId` has not been set.
          */
         "credentialsToken"?: string;
-        "getFrameAttributes": () => Promise<EedcFrameAttributes | undefined>;
+        "getFrameAttributes": () => Promise<FrameAttributes | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
           * @private Used internally for testing.
@@ -270,11 +270,11 @@ declare namespace LocalJSX {
         /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
-        "onFrameDrawn"?: (event: CustomEvent<FrameAttributes | EedcFrameAttributes>) => void;
+        "onFrameDrawn"?: (event: CustomEvent<FrameAttributes>) => void;
         /**
           * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
-        "onFrameReceived"?: (event: CustomEvent<FrameAttributes | EedcFrameAttributes>) => void;
+        "onFrameReceived"?: (event: CustomEvent<FrameAttributes>) => void;
         /**
           * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click, which can be used to perform an operation on the bom item at that position.
          */
