@@ -239,15 +239,15 @@ export class Viewer {
       <Host>
         <div class="viewer-container">
           <div
-            ref={(ref) => (this.containerElement = ref)}
+            ref={ref => (this.containerElement = ref)}
             class="canvas-container"
           >
             <canvas
-              ref={(ref) => (this.canvasElement = ref)}
+              ref={ref => (this.canvasElement = ref)}
               class="canvas"
               width={this.dimensions != null ? this.dimensions.width : 0}
               height={this.dimensions != null ? this.dimensions.height : 0}
-              onContextMenu={(event) => event.preventDefault()}
+              onContextMenu={event => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -438,7 +438,7 @@ export class Viewer {
   private injectViewerApi(): void {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
-      .forEach((result) => {
+      .forEach(result => {
         (result as any).viewer = this.hostElement;
       });
   }
