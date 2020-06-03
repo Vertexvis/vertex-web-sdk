@@ -27,7 +27,6 @@ export type AnimationEasing =
 export class ImageStreamingClient extends StreamingClient<Operation, Response> {
   public constructor(websocket: WebSocketClient = new WebSocketClient()) {
     super(
-      request => JSON.stringify(request),
       message => {
         const response = parseResponse(message);
 

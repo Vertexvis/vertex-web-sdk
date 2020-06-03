@@ -8,12 +8,7 @@ export class FrameStreamingClient extends StreamingClient<
   vertexvis.protobuf.stream.IStreamResponse
 > {
   public constructor(websocket: WebSocketClient = new WebSocketClient()) {
-    super(
-      request =>
-        vertexvis.protobuf.stream.StreamRequest.encode(request).finish(),
-      message => parseResponse(message.data),
-      websocket
-    );
+    super(message => parseResponse(message.data), websocket);
   }
 
   public startStream(
@@ -37,7 +32,7 @@ export class FrameStreamingClient extends StreamingClient<
         }
       });
       this.websocket.send(
-        vertexvis.protobuf.stream.StreamRequest.encode(request).finish()
+        vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
       );
     });
   }
