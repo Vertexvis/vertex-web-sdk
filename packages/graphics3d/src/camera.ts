@@ -9,7 +9,6 @@ export interface Camera {
   far: number;
   fovy: number;
 }
-export type CameraPosition = Pick<Camera, 'position' | 'lookat' | 'upvector'>;
 
 const PI_OVER_360 = 0.008726646259972;
 
@@ -31,14 +30,11 @@ export const create = (options: Partial<Camera> = {}): Camera => {
  * Returns a new camera where its position and lookat are offset by the given
  * `delta`.
  */
-export const offset = (
-  delta: Vector3.Vector3,
-  cameraPosition: CameraPosition
-): CameraPosition => {
+export const offset = (delta: Vector3.Vector3, camera: Camera): Camera => {
   return {
-    ...cameraPosition,
-    position: Vector3.add(cameraPosition.position, delta),
-    lookat: Vector3.add(cameraPosition.lookat, delta),
+    ...camera,
+    position: Vector3.add(camera.position, delta),
+    lookat: Vector3.add(camera.lookat, delta),
   };
 };
 
@@ -73,31 +69,29 @@ export const fitToBoundingBox = (
 export const rotateAroundAxis = (
   angleInRadians: number,
   axis: Vector3.Vector3,
-  cameraPosition: CameraPosition
-): CameraPosition => {
+  camera: Camera
+): Camera => {
   const newUpVector = Vector3.rotateAboutAxis(
     angleInRadians,
-    cameraPosition.upvector,
+    camera.upvector,
     axis,
     Vector3.origin()
   );
   const newPosition = Vector3.rotateAboutAxis(
     angleInRadians,
-    cameraPosition.position,
+    camera.position,
     axis,
-    cameraPosition.lookat
+    camera.lookat
   );
-  return { ...cameraPosition, position: newPosition, upvector: newUpVector };
+  return { ...camera, position: newPosition, upvector: newUpVector };
 };
 
 export const translateScreenToWorld = (
-  cameraPosition: CameraPosition,
+  camera: Camera,
   point: Point.Point
 ): Vector3.Vector3 => {
-  const u = Vector3.normalize(cameraPosition.upvector);
-  const v = Vector3.normalize(
-    Vector3.subtract(cameraPosition.lookat, cameraPosition.position)
-  );
+  const u = Vector3.normalize(camera.upvector);
+  const v = Vector3.normalize(Vector3.subtract(camera.lookat, camera.position));
 
   const crossX = Vector3.cross(u, v);
   const crossY = Vector3.cross(v, crossX);
@@ -112,5 +106,5 @@ export const update = (data: Partial<Camera>, camera: Camera): Camera => {
   return { ...camera, ...data };
 };
 
-export const viewVector = (cameraPosition: CameraPosition): Vector3.Vector3 =>
-  Vector3.subtract(cameraPosition.lookat, cameraPosition.position);
+export const viewVector = (camera: Camera): Vector3.Vector3 =>
+  Vector3.subtract(camera.lookat, camera.position);
