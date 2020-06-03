@@ -30,7 +30,7 @@
 
 ## Methods
 
-### `getFrameAttributes() => Promise<FrameAttributes>`
+### `getFrameAttributes() => Promise<FrameAttributes | undefined>`
 
 
 
