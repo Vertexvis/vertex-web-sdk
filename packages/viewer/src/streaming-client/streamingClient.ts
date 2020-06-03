@@ -6,6 +6,7 @@ import {
 import { Disposable, EventDispatcher } from '../utils';
 import { Camera } from '@vertexvis/graphics3d';
 import { NoImplementationFoundError } from '../errors';
+import { vertexvis } from '@vertexvis/frame-stream-protos';
 
 type ResponseHandler<T> = (response: T) => void;
 type MessageParser<T> = (message: MessageEvent) => T;
@@ -30,7 +31,7 @@ export class StreamingClient<ReqT = any, RespT = any> {
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
     await this.websocket.connect(urlProvider);
-    this.messageSubscription = this.websocket.onMessage(message =>
+    this.messageSubscription = this.websocket.onMessage((message) =>
       this.handleMessage(message)
     );
     return { dispose: () => this.dispose() };
@@ -45,26 +46,58 @@ export class StreamingClient<ReqT = any, RespT = any> {
     return this.onResponseDispatcher.on(handler);
   }
 
-  public beginInteraction(): Promise<RespT> {
+  public cameraToPlatform(
+    camera: Camera.CameraPosition
+  ): vertexvis.protobuf.stream.ICamera {
+    return {
+      position: camera.position,
+      lookAt: camera.lookat,
+      up: camera.upvector,
+    };
+  }
+
+  public cameraToEedc(
+    camera: vertexvis.protobuf.stream.ICamera
+  ): Camera.CameraPosition {
+    return {
+      position: {
+        x: camera.position.x || 0,
+        y: camera.position.y || 0,
+        z: camera.position.z || 0,
+      },
+      lookat: {
+        x: camera.lookAt.x || 0,
+        y: camera.lookAt.y || 0,
+        z: camera.lookAt.z || 0,
+      },
+      upvector: {
+        x: camera.up.x || 0,
+        y: camera.up.y || 0,
+        z: camera.up.z || 0,
+      },
+    };
+  }
+
+  public beginInteraction(data?: any): Promise<RespT> {
     throw new NoImplementationFoundError(
       `No implementation found for 'beginInteraction'.`
     );
   }
 
-  public endInteraction(): Promise<RespT> {
+  public endInteraction(data?: any): Promise<RespT> {
     throw new NoImplementationFoundError(
       `No implementation found for 'endInteraction'.`
     );
   }
 
-  public replaceCamera(camera: Camera.Camera): Promise<RespT> {
+  public replaceCamera(data?: any): Promise<RespT> {
     throw new NoImplementationFoundError(
       `No implementation found for 'replaceCamera'.`
     );
   }
 
   protected send(request: any): Promise<RespT> {
-    return new Promise(resolve => resolve());
+    return new Promise((resolve) => resolve());
   }
 
   protected startInteractionTimer(): void {
@@ -84,7 +117,7 @@ export class StreamingClient<ReqT = any, RespT = any> {
 
   private initializeInteractive(): void {
     if (this.isInteractiveResolve == null) {
-      this.isInteractive = new Promise(resolve => {
+      this.isInteractive = new Promise((resolve) => {
         this.isInteractiveResolve = resolve;
       });
     }

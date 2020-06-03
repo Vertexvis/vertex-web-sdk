@@ -8,7 +8,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { FrameAttributes } from '../../image-streaming-client';
+import { FrameAttributes, EedcFrameAttributes } from '../../image-streaming-client';
 import { Vector3, Point } from '@vertexvis/geometry';
 import { Camera } from '@vertexvis/graphics3d';
 import { ViewCubeRenderer } from './utils/viewCubeRenderer';
@@ -97,7 +97,7 @@ export class ViewerViewCube {
     }
   }
 
-  private handleFrameChanged(event: CustomEvent<FrameAttributes>): void {
+  private handleFrameChanged(event: CustomEvent<EedcFrameAttributes>): void {
     const { camera } = event.detail.scene;
     this.viewCube.show();
     this.updateWebGlCamera(camera);

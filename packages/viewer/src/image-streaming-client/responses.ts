@@ -1,4 +1,4 @@
-import { FrameAttributes } from './frameAttributes';
+import { EedcFrameAttributes } from './frameAttributes';
 import { BinaryReader } from '@vertexvis/utils';
 
 export interface FrameResponse {
@@ -8,7 +8,7 @@ export interface FrameResponse {
 
 export interface Frame {
   imageBytes: Int8Array;
-  frameAttributes: FrameAttributes;
+  frameAttributes: EedcFrameAttributes;
 }
 
 export interface MetaBufferResponse {

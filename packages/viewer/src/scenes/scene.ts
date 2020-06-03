@@ -2,7 +2,7 @@ import { Vector3, BoundingBox, Point } from '@vertexvis/geometry';
 import { Camera, Scene as GraphicsScene } from '@vertexvis/graphics3d';
 import { BomItems, BomItem, HitDetection } from '@vertexvis/vertex-api';
 import { CommandRegistry } from '../commands/commandRegistry';
-import { FrameAttributes } from '../image-streaming-client';
+import { EedcFrameAttributes } from '../image-streaming-client';
 import {
   createBulkBomOperationFromDefinition,
   dedupBulkBomOperations,
@@ -30,7 +30,7 @@ export type PickExecutor = (
   body: HitsByPixelBody
 ) => Promise<SceneItemExecutionResponse>;
 
-type Frame = Pick<FrameAttributes, 'scene' | 'visibleBoundingBox'>;
+type Frame = Pick<EedcFrameAttributes, 'scene' | 'visibleBoundingBox'>;
 
 interface SceneCameraExecutionOptions {
   animate?: boolean;

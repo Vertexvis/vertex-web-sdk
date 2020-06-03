@@ -11,7 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Rectangle, Vector3 } from '@vertexvis/geometry';
 import {
   Response,
   FrameResponse,
@@ -20,6 +20,8 @@ import { Disposable } from '../../utils';
 import {
   FrameAttributes,
   ImageStreamingClient,
+  fromEedcFrameAttributes,
+  EedcFrameAttributes,
 } from '../../image-streaming-client';
 import { FrameStreamingClient } from '../../frame-streaming-client';
 import { WebSocketClient } from '../../websocket-client';
@@ -160,14 +162,18 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<FrameAttributes>;
+  @Event() public frameReceived!: EventEmitter<
+    FrameAttributes | EedcFrameAttributes
+  >;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<FrameAttributes>;
+  @Event() public frameDrawn!: EventEmitter<
+    FrameAttributes | EedcFrameAttributes
+  >;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -188,8 +194,12 @@ export class Viewer {
   private loadedSceneId?: Promise<UUID.UUID>;
   private activeCredentials: Credentials = AuthToken.unauthorized();
 
-  private frameAttributes?: FrameAttributes;
+  private eedcFrameAttributes?: EedcFrameAttributes;
   private imageAttributes?: vertexvis.protobuf.stream.IImageAttributes;
+  private frameAttributes?: Pick<
+    vertexvis.protobuf.stream.IFrameResult,
+    'imageAttributes' | 'sceneAttributes' | 'sequenceNumber'
+  >;
   private mutationObserver?: MutationObserver;
   private lastFrameNumber = 0;
 
@@ -220,17 +230,17 @@ export class Viewer {
     let registerCommands: (commands: CommandRegistry) => CommandRegistry;
     if (config.network.streamingClient === 'platform') {
       this.stream = new FrameStreamingClient(new WebSocketClient());
-      this.stream.onResponse(response =>
+      this.stream.onResponse((response) =>
         this.handleFrameStreamResponse(response)
       );
-      registerCommands = commands => {
+      registerCommands = (commands) => {
         registerFrameStreamCommands(commands);
         return commands;
       };
     } else {
       this.stream = new ImageStreamingClient(new WebSocketClient());
-      this.stream.onResponse(response => this.handleStreamResponse(response));
-      registerCommands = commands => {
+      this.stream.onResponse((response) => this.handleStreamResponse(response));
+      registerCommands = (commands) => {
         registerStreamCommands(commands);
         return commands;
       };
@@ -283,15 +293,15 @@ export class Viewer {
       <Host>
         <div class="viewer-container">
           <div
-            ref={ref => (this.containerElement = ref)}
+            ref={(ref) => (this.containerElement = ref)}
             class="canvas-container"
           >
             <canvas
-              ref={ref => (this.canvasElement = ref)}
+              ref={(ref) => (this.canvasElement = ref)}
               class="canvas"
               width={this.dimensions != null ? this.dimensions.width : 0}
               height={this.dimensions != null ? this.dimensions.height : 0}
-              onContextMenu={event => event.preventDefault()}
+              onContextMenu={(event) => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -433,7 +443,7 @@ export class Viewer {
       httpBulkBomOperationExecutor(() => this.httpClient, sceneStateId),
       httpPickExecutor(() => this.httpClient, sceneStateId),
       this.commands,
-      () => this.frameAttributes
+      () => this.eedcFrameAttributes
     );
   }
 
@@ -482,8 +492,8 @@ export class Viewer {
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<FrameAttributes | undefined> {
-    return this.frameAttributes;
+  public async getFrameAttributes(): Promise<EedcFrameAttributes | undefined> {
+    return this.eedcFrameAttributes;
   }
 
   /**
@@ -527,7 +537,7 @@ export class Viewer {
   private connectToPlatformClient(resource: string): Promise<string> {
     const scene = SceneResource.fromPlatformUrn(resource);
 
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
       await this.connectToStreamingClient({ sceneId: scene.id });
 
       await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
@@ -573,7 +583,7 @@ export class Viewer {
   private injectViewerApi(): void {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
-      .forEach(result => {
+      .forEach((result) => {
         (result as any).viewer = this.hostElement;
       });
   }
@@ -592,49 +602,47 @@ export class Viewer {
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
     if (response.frame != null) {
-      this.drawFrame(response.frame);
+      this.drawFrame(response.frame, response.frame.image);
     }
   }
 
   private async handleFrameResponse(response: FrameResponse): Promise<void> {
     this.frameReceived?.emit(response.frame.frameAttributes);
 
+    const platformFrameAttributes = fromEedcFrameAttributes(
+      response.frame.frameAttributes
+    );
     const frameWasDrawn = await this.drawFrame(
-      {
-        imageAttributes: {
-          frameDimensions: response.frame.frameAttributes.scene.viewport,
-          imageRect: {
-            x: response.frame.frameAttributes.renderedBoundingBox.min.x,
-            y: response.frame.frameAttributes.renderedBoundingBox.min.y,
-          },
-        },
-      },
+      platformFrameAttributes,
       response.frame.imageBytes
     );
 
     if (frameWasDrawn) {
-      this.frameAttributes = response.frame.frameAttributes;
-      this.frameDrawn?.emit(this.frameAttributes);
+      this.frameAttributes = platformFrameAttributes;
+      this.eedcFrameAttributes = response.frame.frameAttributes;
+      this.frameDrawn?.emit(this.eedcFrameAttributes);
     }
   }
 
   private async drawFrame(
-    frame: vertexvis.protobuf.stream.IFrameResult,
-    bytes?: Uint8Array | Int8Array
+    frame: FrameAttributes,
+    bytes: Uint8Array | Int8Array
   ): Promise<boolean> {
     const frameNumber = this.lastFrameNumber + 1;
 
-    const image = await this.loadImageBytes(bytes || frame.image);
+    const image = await this.loadImageBytes(bytes);
 
     const isNewerFrame = frameNumber > this.lastFrameNumber;
     if (isNewerFrame) {
       this.lastFrameNumber = frameNumber;
       this.imageAttributes = frame.imageAttributes;
+      this.frameAttributes = frame;
 
       this.drawImage(
         image,
         frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect
+        frame.imageAttributes.imageRect,
+        frame.imageAttributes.scaleFactor
       );
     }
 
@@ -646,7 +654,8 @@ export class Viewer {
   private drawImage(
     image: LoadedImage,
     sceneViewport: vertexvis.protobuf.stream.IDimensions,
-    imagePosition: vertexvis.protobuf.stream.IRectangle
+    imagePosition: vertexvis.protobuf.stream.IRectangle,
+    scaleFactor: number
   ): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
@@ -669,8 +678,8 @@ export class Viewer {
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleX,
-          image.image.height * scaleY
+          image.image.width * scaleFactor,
+          image.image.height * scaleFactor
         );
       }
     }
@@ -766,16 +775,39 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(
-      this.stream,
-      () => {
-        if (this.frameAttributes == null) {
+    const verifyAttributes = <T extends {}>(f: () => T): (() => T) => {
+      return () => {
+        if (this.frameAttributes == null && this.eedcFrameAttributes == null) {
           throw new IllegalStateError(
             'Cannot retrieve scene. Frame has not been rendered'
           );
         }
-        return this.frameAttributes.scene;
-      },
+
+        return f();
+      };
+    };
+
+    return new InteractionApi(
+      this.stream,
+      verifyAttributes(() =>
+        this.frameAttributes != null &&
+        this.frameAttributes.sceneAttributes != null
+          ? this.stream.cameraToEedc(
+              this.frameAttributes.sceneAttributes.camera
+            )
+          : this.eedcFrameAttributes?.scene.camera
+      ),
+      verifyAttributes(() =>
+        this.frameAttributes != null
+          ? (this.frameAttributes.imageAttributes
+              ?.frameDimensions as Dimensions.Dimensions)
+          : this.eedcFrameAttributes?.scene.viewport
+      ),
+      verifyAttributes(() =>
+        this.frameAttributes != null
+          ? 45
+          : this.eedcFrameAttributes?.scene.camera.fovy
+      ),
       this.tap
     );
   }

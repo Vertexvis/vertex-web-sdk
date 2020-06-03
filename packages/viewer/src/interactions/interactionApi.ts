@@ -1,26 +1,33 @@
-import { Scene, Camera } from '@vertexvis/graphics3d';
+import { Camera } from '@vertexvis/graphics3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamingClient } from '../streaming-client';
+import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { FrameStreamingClient } from '../frame-streaming-client';
 
-type SceneProvider = () => Scene.Scene;
+type CameraPositionProvider = () => Camera.CameraPosition;
+type ViewportProvider = () => Dimensions.Dimensions;
+type FovyProvider = () => number;
 
-type CameraTransform = (
-  camera: Camera.Camera,
-  viewport: Dimensions.Dimensions
-) => Camera.Camera;
+type CameraPositionTransform = (
+  cameraPosition: Camera.CameraPosition,
+  viewport: Dimensions.Dimensions,
+  fovy: number
+) => Camera.CameraPosition;
 
 /**
  * The `InteractionApi` provides methods that API developers can use to modify
  * the internal state of an interaction.
  */
 export class InteractionApi {
-  private currentCamera?: Camera.Camera;
+  private currentCameraPosition?: Camera.CameraPosition;
 
   public constructor(
     private stream: StreamingClient,
-    private getScene: SceneProvider,
+    private getCamera: CameraPositionProvider,
+    private getViewport: ViewportProvider,
+    private getFovy: FovyProvider,
     private tapEmitter: EventEmitter<TapEventDetails>
   ) {}
 
@@ -50,10 +57,12 @@ export class InteractionApi {
    * performing any additional interaction operations. Use `endInteraction()` to
    * mark the end of an interaction.
    */
-  public async beginInteraction(): Promise<void> {
+  public async beginInteraction(
+    data?: vertexvis.protobuf.stream.IBeginInteractionPayload
+  ): Promise<void> {
     if (!this.isInteracting()) {
-      this.currentCamera = this.getScene().camera;
-      await this.stream.beginInteraction();
+      this.currentCameraPosition = this.getCamera();
+      await this.stream.beginInteraction(data);
     }
   }
 
@@ -64,11 +73,22 @@ export class InteractionApi {
    * @param t A function to transform the camera. Function will be passed the
    *  camera and scene viewport and is expected to return an updated camera.
    */
-  public async transformCamera(t: CameraTransform): Promise<void> {
+  public async transformCamera(t: CameraPositionTransform): Promise<void> {
     if (this.isInteracting()) {
-      const viewport = this.getScene().viewport;
-      this.currentCamera = t(this.currentCamera, viewport);
-      await this.stream.replaceCamera(this.currentCamera);
+      const viewport = this.getViewport();
+      const fovy = this.getFovy();
+      this.currentCameraPosition = t(
+        this.currentCameraPosition,
+        viewport,
+        fovy
+      );
+      if (this.stream instanceof FrameStreamingClient) {
+        await this.stream.replaceCamera({
+          camera: this.stream.cameraToPlatform(this.currentCameraPosition),
+        });
+      } else {
+        await this.stream.replaceCamera(this.currentCameraPosition);
+      }
     }
   }
 
@@ -80,13 +100,13 @@ export class InteractionApi {
    *  viewer.
    */
   public async panCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera((camera, viewport, fovy) => {
       const vv = Camera.viewVector(camera);
 
       const u = Vector3.normalize(camera.upvector);
       const v = Vector3.normalize(vv);
 
-      const d = Vector3.magnitude(vv) * Math.tan(camera.fovy);
+      const d = Vector3.magnitude(vv) * Math.tan(fovy);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
@@ -158,10 +178,12 @@ export class InteractionApi {
   /**
    * Marks the end of an interaction.
    */
-  public async endInteraction(): Promise<void> {
+  public async endInteraction(
+    data?: vertexvis.protobuf.stream.IEndInteractionPayload
+  ): Promise<void> {
     if (this.isInteracting()) {
-      this.currentCamera = null;
-      await this.stream.endInteraction();
+      this.currentCameraPosition = null;
+      await this.stream.endInteraction(data);
     }
   }
 
@@ -169,6 +191,6 @@ export class InteractionApi {
    * Indicates if the API is in an interacting state.
    */
   public isInteracting(): boolean {
-    return this.currentCamera != null;
+    return this.currentCameraPosition != null;
   }
 }
