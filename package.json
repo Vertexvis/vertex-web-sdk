@@ -1,0 +1,22 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "lerna": "^3.21.0",
+    "typescript": "^3.7.4"
+  },
+  "scripts": {
+    "postinstall": "yarn generate:vscode-workspace",
+    "generate:vscode-workspace": "./scripts/generate_vscode_workspace.sh",
+    "build": "lerna run build",
+    "change": "lerna version --no-push --no-git-tag-version --exact",
+    "release": "./scripts/release.sh",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "format": "lerna run format",
+    "clean": "lerna clean",
+    "bootstrap": "lerna bootstrap",
+    "validate": "yarn build && yarn test && yarn lint"
+  }
+}
