@@ -3,7 +3,6 @@ import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { Disposable, EventDispatcher } from '../utils';
 import { NoImplementationFoundError } from '../errors';
-import { Camera } from '@vertexvis/graphics3d';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
@@ -55,25 +54,37 @@ export class FrameStreamingClient {
     });
   }
 
-  public beginInteraction(): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('Begin interaction not implemented.');
+  public beginInteraction(): Promise<
+    vertexvis.protobuf.stream.IStreamResponse
+  > {
+    return this.send({
+      beginInteraction: {},
+    });
   }
 
   public replaceCamera({
-    camera
-  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('Replace camera not implemented.');
+    camera,
+  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<
+    vertexvis.protobuf.stream.IStreamResponse
+  > {
+    return this.send({
+      updateCamera: {
+        camera,
+      },
+    });
   }
 
-  public endInteraction(): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('End interaction not implemented.');
+  public endInteraction(): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.send({
+      endInteraction: {},
+    });
   }
 
   private send(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return new Promise((resolve) => {
-      const subscription = this.onResponse((response) => {
+    return new Promise(resolve => {
+      const subscription = this.onResponse(response => {
         if (response.frame != null) {
           resolve(response);
           subscription.dispose();

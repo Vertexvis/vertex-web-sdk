@@ -504,8 +504,8 @@ export class Viewer {
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleFactor,
-          image.image.height * scaleFactor
+          image.image.width * scaleFactor * scaleX,
+          image.image.height * scaleFactor * scaleY
         );
       }
     }
