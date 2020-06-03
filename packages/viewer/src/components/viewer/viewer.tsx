@@ -76,6 +76,7 @@ import {
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { StreamingClient } from '../../streaming-client';
+import { Camera } from '@vertexvis/graphics3d';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -678,8 +679,8 @@ export class Viewer {
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleFactor,
-          image.image.height * scaleFactor
+          image.image.width * scaleFactor * scaleX,
+          image.image.height * scaleFactor * scaleY
         );
       }
     }
@@ -790,23 +791,22 @@ export class Viewer {
     return new InteractionApi(
       this.stream,
       verifyAttributes(() =>
-        this.frameAttributes != null &&
-        this.frameAttributes.sceneAttributes != null
-          ? this.stream.cameraToEedc(
-              this.frameAttributes.sceneAttributes.camera
+        this.eedcFrameAttributes != null
+          ? this.eedcFrameAttributes.scene.camera
+          : this.stream.cameraToEedc(
+              this.frameAttributes?.sceneAttributes?.camera
             )
-          : this.eedcFrameAttributes?.scene.camera
       ),
       verifyAttributes(() =>
-        this.frameAttributes != null
-          ? (this.frameAttributes.imageAttributes
+        this.eedcFrameAttributes != null
+          ? this.eedcFrameAttributes.scene.viewport
+          : (this.frameAttributes?.imageAttributes
               ?.frameDimensions as Dimensions.Dimensions)
-          : this.eedcFrameAttributes?.scene.viewport
       ),
       verifyAttributes(() =>
-        this.frameAttributes != null
-          ? 45
-          : this.eedcFrameAttributes?.scene.camera.fovy
+        this.eedcFrameAttributes != null
+          ? this.eedcFrameAttributes.scene.camera.fovy
+          : 45
       ),
       this.tap
     );

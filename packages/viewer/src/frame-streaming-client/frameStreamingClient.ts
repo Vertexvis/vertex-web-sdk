@@ -42,7 +42,7 @@ export class FrameStreamingClient extends StreamingClient<
   }
 
   public replaceCamera(
-    data: vertexvis.protobuf.stream.IUpdateCameraPayload,
+    data: vertexvis.protobuf.stream.IUpdateCameraPayload
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.send({
       updateCamera: {
@@ -54,8 +54,8 @@ export class FrameStreamingClient extends StreamingClient<
   protected send(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return new Promise((resolve) => {
-      const subscription = this.onResponse((response) => {
+    return new Promise(resolve => {
+      const subscription = this.onResponse(response => {
         if (response.frame != null) {
           resolve(response);
           subscription.dispose();

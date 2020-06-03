@@ -1,5 +1,5 @@
 import { Viewer } from '../viewer/viewer';
-import { CameraTools } from '../viewer-toolbar-camera-tools/viewer-toolbar-camera-tools';
+import { CameraTools } from './viewer-toolbar-camera-tools';
 import { Group } from '../viewer-toolbar-group/viewer-toolbar-group';
 import { RotateTool } from '../viewer-toolbar-rotate-tool/viewer-toolbar-rotate-tool';
 import { PanTool } from '../viewer-toolbar-pan-tool/viewer-toolbar-pan-tool';

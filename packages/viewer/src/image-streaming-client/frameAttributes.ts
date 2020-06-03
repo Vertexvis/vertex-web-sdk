@@ -19,7 +19,8 @@ export function fromEedcFrameAttributes(frameAttributes: EedcFrameAttributes): F
       imageRect: {
         x: frameAttributes.renderedBoundingBox.min.x,
         y: frameAttributes.renderedBoundingBox.min.y,
-      }
+      },
+      scaleFactor: 1
     },
     sceneAttributes: {
       camera: frameAttributes.scene.camera

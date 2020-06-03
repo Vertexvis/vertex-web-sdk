@@ -20,23 +20,23 @@
 
 ## Events
 
-| Event           | Description                                                                                                                                                                                                | Type                           |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                             | `CustomEvent<FrameAttributes>` |
-| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                   | `CustomEvent<FrameAttributes>` |
-| `tap`           | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click, which can be used to perform an operation on the bom item at that position. | `CustomEvent<TapEventDetails>` |
-| `tokenExpired`  | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.                                   | `CustomEvent<void>`            |
+| Event           | Description                                                                                                                                                                                                | Type                                                                                                                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                             | `CustomEvent<EedcFrameAttributes \| { imageAttributes?: IImageAttributes; sceneAttributes?: ISceneAttributes; sequenceNumber?: number; }>` |
+| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                   | `CustomEvent<EedcFrameAttributes \| { imageAttributes?: IImageAttributes; sceneAttributes?: ISceneAttributes; sequenceNumber?: number; }>` |
+| `tap`           | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click, which can be used to perform an operation on the bom item at that position. | `CustomEvent<TapEventDetails>`                                                                                                             |
+| `tokenExpired`  | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.                                   | `CustomEvent<void>`                                                                                                                        |
 
 
 ## Methods
 
-### `getFrameAttributes() => Promise<FrameAttributes | undefined>`
+### `getFrameAttributes() => Promise<EedcFrameAttributes | undefined>`
 
 
 
 #### Returns
 
-Type: `Promise<FrameAttributes>`
+Type: `Promise<EedcFrameAttributes>`
 
 
 
