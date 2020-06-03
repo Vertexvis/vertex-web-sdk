@@ -1,8 +1,4 @@
-import {
-  WebSocketClient,
-  UrlProvider,
-  WebSocketSendData,
-} from '../websocket-client';
+import { WebSocketClient, UrlProvider } from '../websocket-client';
 import { Disposable, EventDispatcher } from '../utils';
 import { Camera } from '@vertexvis/graphics3d';
 import { NoImplementationFoundError } from '../errors';
@@ -31,7 +27,7 @@ export class StreamingClient<ReqT = any, RespT = any> {
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
     await this.websocket.connect(urlProvider);
-    this.messageSubscription = this.websocket.onMessage((message) =>
+    this.messageSubscription = this.websocket.onMessage(message =>
       this.handleMessage(message)
     );
     return { dispose: () => this.dispose() };
@@ -97,7 +93,7 @@ export class StreamingClient<ReqT = any, RespT = any> {
   }
 
   protected send(request: any): Promise<RespT> {
-    return new Promise((resolve) => resolve());
+    return new Promise(resolve => resolve());
   }
 
   protected startInteractionTimer(): void {
@@ -117,7 +113,7 @@ export class StreamingClient<ReqT = any, RespT = any> {
 
   private initializeInteractive(): void {
     if (this.isInteractiveResolve == null) {
-      this.isInteractive = new Promise((resolve) => {
+      this.isInteractive = new Promise(resolve => {
         this.isInteractiveResolve = resolve;
       });
     }

@@ -11,7 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions, Rectangle, Vector3 } from '@vertexvis/geometry';
+import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import {
   Response,
   FrameResponse,
@@ -76,7 +76,6 @@ import {
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { StreamingClient } from '../../streaming-client';
-import { Camera } from '@vertexvis/graphics3d';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -196,11 +195,11 @@ export class Viewer {
   private activeCredentials: Credentials = AuthToken.unauthorized();
 
   private eedcFrameAttributes?: EedcFrameAttributes;
-  private imageAttributes?: vertexvis.protobuf.stream.IImageAttributes;
   private frameAttributes?: Pick<
     vertexvis.protobuf.stream.IFrameResult,
     'imageAttributes' | 'sceneAttributes' | 'sequenceNumber'
   >;
+
   private mutationObserver?: MutationObserver;
   private lastFrameNumber = 0;
 
@@ -231,17 +230,17 @@ export class Viewer {
     let registerCommands: (commands: CommandRegistry) => CommandRegistry;
     if (config.network.streamingClient === 'platform') {
       this.stream = new FrameStreamingClient(new WebSocketClient());
-      this.stream.onResponse((response) =>
+      this.stream.onResponse(response =>
         this.handleFrameStreamResponse(response)
       );
-      registerCommands = (commands) => {
+      registerCommands = commands => {
         registerFrameStreamCommands(commands);
         return commands;
       };
     } else {
       this.stream = new ImageStreamingClient(new WebSocketClient());
-      this.stream.onResponse((response) => this.handleStreamResponse(response));
-      registerCommands = (commands) => {
+      this.stream.onResponse(response => this.handleStreamResponse(response));
+      registerCommands = commands => {
         registerStreamCommands(commands);
         return commands;
       };
@@ -294,15 +293,15 @@ export class Viewer {
       <Host>
         <div class="viewer-container">
           <div
-            ref={(ref) => (this.containerElement = ref)}
+            ref={ref => (this.containerElement = ref)}
             class="canvas-container"
           >
             <canvas
-              ref={(ref) => (this.canvasElement = ref)}
+              ref={ref => (this.canvasElement = ref)}
               class="canvas"
               width={this.dimensions != null ? this.dimensions.width : 0}
               height={this.dimensions != null ? this.dimensions.height : 0}
-              onContextMenu={(event) => event.preventDefault()}
+              onContextMenu={event => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -538,7 +537,7 @@ export class Viewer {
   private connectToPlatformClient(resource: string): Promise<string> {
     const scene = SceneResource.fromPlatformUrn(resource);
 
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       await this.connectToStreamingClient({ sceneId: scene.id });
 
       await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
@@ -584,7 +583,7 @@ export class Viewer {
   private injectViewerApi(): void {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
-      .forEach((result) => {
+      .forEach(result => {
         (result as any).viewer = this.hostElement;
       });
   }

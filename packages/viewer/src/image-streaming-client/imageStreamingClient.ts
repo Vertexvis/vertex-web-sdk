@@ -26,18 +26,15 @@ export type AnimationEasing =
 
 export class ImageStreamingClient extends StreamingClient<Operation, Response> {
   public constructor(websocket: WebSocketClient = new WebSocketClient()) {
-    super(
-      message => {
-        const response = parseResponse(message);
+    super(message => {
+      const response = parseResponse(message);
 
-        if (isReconnectMessage(response)) {
-          this.reopen(toReconnectMessage(response as JsonResponse));
-        }
+      if (isReconnectMessage(response)) {
+        this.reopen(toReconnectMessage(response as JsonResponse));
+      }
 
-        return response;
-      },
-      websocket
-    );
+      return response;
+    }, websocket);
 
     this.endInteraction = this.endInteraction.bind(this);
   }

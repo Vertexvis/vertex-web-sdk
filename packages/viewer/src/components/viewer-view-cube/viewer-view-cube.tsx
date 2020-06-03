@@ -8,7 +8,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { FrameAttributes, EedcFrameAttributes } from '../../image-streaming-client';
+import { EedcFrameAttributes } from '../../image-streaming-client';
 import { Vector3, Point } from '@vertexvis/geometry';
 import { Camera } from '@vertexvis/graphics3d';
 import { ViewCubeRenderer } from './utils/viewCubeRenderer';

@@ -57,7 +57,11 @@ export class ViewCubeRenderer {
     return this.viewCube.highlight(point, this.scene, this.camera) != null;
   }
 
-  public positionCamera({ position, lookat, upvector }: Camera.CameraPosition): void {
+  public positionCamera({
+    position,
+    lookat,
+    upvector,
+  }: Camera.CameraPosition): void {
     const newPosition = Vector3.scale(
       6,
       Vector3.normalize(Vector3.subtract(position, lookat))

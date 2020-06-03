@@ -2,7 +2,10 @@ import { Scene } from '@vertexvis/graphics3d';
 import { Dimensions, BoundingBox } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 
-export type FrameAttributes = Pick<vertexvis.protobuf.stream.IFrameResult, 'imageAttributes' | 'sceneAttributes' | 'sequenceNumber'>;
+export type FrameAttributes = Pick<
+  vertexvis.protobuf.stream.IFrameResult,
+  'imageAttributes' | 'sceneAttributes' | 'sequenceNumber'
+>;
 
 export interface EedcFrameAttributes {
   operationIds: string[];
@@ -12,7 +15,9 @@ export interface EedcFrameAttributes {
   renderedBoundingBox: BoundingBox.BoundingBox;
 }
 
-export function fromEedcFrameAttributes(frameAttributes: EedcFrameAttributes): FrameAttributes {
+export function fromEedcFrameAttributes(
+  frameAttributes: EedcFrameAttributes
+): FrameAttributes {
   return {
     imageAttributes: {
       frameDimensions: frameAttributes.scene.viewport,
@@ -20,11 +25,11 @@ export function fromEedcFrameAttributes(frameAttributes: EedcFrameAttributes): F
         x: frameAttributes.renderedBoundingBox.min.x,
         y: frameAttributes.renderedBoundingBox.min.y,
       },
-      scaleFactor: 1
+      scaleFactor: 1,
     },
     sceneAttributes: {
-      camera: frameAttributes.scene.camera
+      camera: frameAttributes.scene.camera,
     },
-    sequenceNumber: -1
-  }
+    sequenceNumber: -1,
+  };
 }

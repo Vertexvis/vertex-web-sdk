@@ -9,6 +9,7 @@ export interface Camera {
   far: number;
   fovy: number;
 }
+
 export type CameraPosition = Pick<Camera, 'position' | 'lookat' | 'upvector'>;
 
 const PI_OVER_360 = 0.008726646259972;
