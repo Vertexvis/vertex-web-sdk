@@ -14,6 +14,9 @@ describe(InteractionApi, () => {
   const scene = Scene.create(Camera.create(), Dimensions.create(200, 100));
 
   const sceneProvider = (): Scene.Scene => scene;
+  const cameraProvider = (): Camera.Camera => scene.camera;
+  const viewportProvider = (): Dimensions.Dimensions => scene.viewport;
+  const fovyProvider = (): number => scene.camera.fovy;
   const emit = jest.fn();
   const stream = new ImageStreamingClientMock();
 
@@ -23,7 +26,7 @@ describe(InteractionApi, () => {
     jest.clearAllMocks();
     jest.resetAllMocks();
 
-    api = new InteractionApi(stream, sceneProvider, {
+    api = new InteractionApi(stream, cameraProvider, viewportProvider, fovyProvider, {
       emit,
     });
   });
@@ -98,7 +101,7 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(stream, sceneProvider, {
+      api = new InteractionApi(stream, cameraProvider, viewportProvider, fovyProvider, {
         emit,
       });
     });
