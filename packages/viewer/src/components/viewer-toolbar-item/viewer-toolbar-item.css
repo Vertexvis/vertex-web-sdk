@@ -1,0 +1,37 @@
+:host {
+  --vertex-viewer-toolbar-item-color: var(--neutral-800);
+  --vertex-viewer-toolbar-item-selected-color: var(--blue-700);
+  --vertex-viewer-toolbar-item-hovered-background-color: var(--neutral-300);
+  --vertex-viewer-toolbar-item-content-width: 24px;
+  --vertex-viewer-toolbar-item-content-height: 24px;
+}
+
+.viewer-toolbar-item-root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: var(--abs-padding-1) var(--abs-padding-2);
+  margin-bottom: 1px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.viewer-toolbar-item-root:hover {
+  background-color: var(--vertex-viewer-toolbar-item-hovered-background-color);
+}
+
+.viewer-toolbar-icon-container {
+  position: relative;
+  width: var(--vertex-viewer-toolbar-item-content-width);
+  height: var(--vertex-viewer-toolbar-item-content-height);
+  color: var(--vertex-viewer-toolbar-item-color);
+  font-size: var(--vertex-viewer-toolbar-item-content-width);
+}
+
+.viewer-toolbar-icon-container.selected {
+  color: var(--vertex-viewer-toolbar-item-selected-color);
+}
