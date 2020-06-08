@@ -49,3 +49,4 @@ jobs:
           packages-config-file: "lerna.json"
           npm-registry: "npm.ops.vertexvis.io"
           npm-auth-token: ${{ secrets.PRIVATE_NPM_AUTH_TOKEN }}
+          dry-run: "true"
