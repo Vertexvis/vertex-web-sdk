@@ -5,18 +5,18 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Config, } from "./config/config";
-import { Environment, } from "./config/environment";
-import { HttpClient, } from "@vertexvis/network";
-import { Credentials, } from "./credentials/credentials";
-import { TapEventDetails, } from "./interactions/tapEventDetails";
-import { FrameAttributes, } from "./image-streaming-client";
-import { Disposable, } from "./utils";
-import { CommandFactory, } from "./commands/command";
-import { InteractionHandler, } from "./interactions/interactionHandler";
-import { SceneBuilder, } from "./scenes/sceneBuilder";
-import { Scene, } from "./scenes/scene";
-import { LoadModelResponse, } from "./commands/streamCommands";
+import { Config } from "./config/config";
+import { Environment } from "./config/environment";
+import { HttpClient } from "@vertexvis/network";
+import { Credentials } from "./credentials/credentials";
+import { TapEventDetails } from "./interactions/tapEventDetails";
+import { FrameAttributes } from "./image-streaming-client";
+import { Disposable } from "./utils";
+import { CommandFactory } from "./commands/command";
+import { InteractionHandler } from "./interactions/interactionHandler";
+import { SceneBuilder } from "./scenes/sceneBuilder";
+import { Scene } from "./scenes/scene";
+import { LoadModelResponse } from "./commands/streamCommands";
 export namespace Components {
     interface SvgIcon {
     }
@@ -50,7 +50,7 @@ export namespace Components {
           * The token for an Oauth2 credentials flow. Property is ignored if `credentialsClientId` has not been set.
          */
         "credentialsToken"?: string;
-        "getFrameAttributes": () => Promise<FrameAttributes>;
+        "getFrameAttributes": () => Promise<FrameAttributes | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
           * @private Used internally for testing.

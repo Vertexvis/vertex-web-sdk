@@ -1,17 +1,20 @@
-import { UUID } from '@vertexvis/utils';
-import { parseUrnComponents } from './resource';
+import { UUID, Uri } from '@vertexvis/utils';
 
 interface Scene {
   id: UUID.UUID;
 }
 
-export function fromPlatformUrn(urn: string): Scene {
-  const { vertexScheme, resourceType, resourceId } = parseUrnComponents(urn);
+export function fromUrn(urn: string): Scene {
+  const uri = Uri.parse(urn);
 
-  if (vertexScheme !== 'platform') {
-    throw new Error(
-      'Invalid URN. Expected URN to contain platform vertex scheme'
-    );
+  if (uri.scheme !== 'urn') {
+    throw new Error('Invalid URN. Expected URN scheme.');
+  }
+
+  const [nid, resourceType, resourceId] = uri.path.split(':');
+
+  if (nid !== 'vertexvis') {
+    throw new Error('Invalid URN. Expected URN to be vertexvis namespace');
   }
 
   if (resourceType === 'scene') {
