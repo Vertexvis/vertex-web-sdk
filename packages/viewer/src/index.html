@@ -34,38 +34,7 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        viewer.addEventListener('tap', async function(event) {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          const raycaster = await scene.raycaster();
-
-          const { bomItems } = await raycaster.intersectItems(position).execute();
-
-          if (bomItems.length == 0) {
-            scene.clearAllHighlights().execute();
-          } else {
-            const [item] = bomItems;
-            scene
-              .clearAllHighlights()
-              .highlight('#ff0000', (s) => s.withItemId(item.id))
-              .execute();
-          }
-        });
-
-        // const newScene = await viewer.newScene();
-        // newScene
-        //   .from('urn:vertexvis:eedc:file:cd78e291-760e-4bf5-8b77-c9c981847d0e')
-        //   .hide(selector =>
-        //     selector
-        //       .withMetadata('Name', 'valve_body')
-        //       .or()
-        //       .withMetadata('Name', 'cover')
-        //   )
-        //   .highlight('#ff0000', selector =>
-        //     selector.withMetadata('Name', 'arm_SOLID_SOLIDS')
-        //   )
-        //   .execute()
-        //   .then(scene => viewer.load(scene));
+        // await viewer.load('urn:vertexvis:scene:cd78e291-760e-4bf5-8b77-c9c981847d0e')
 
         // viewer.credentials = {
         //   strategy: 'oauth2',
@@ -75,26 +44,9 @@
 
       }
     </script>
-
-    <style>
-      .viewer-toolbar,
-      .viewer-toolbar viewer-toolbar-group,
-      .viewer-toolbar viewer-toolbar-item {
-        --vertex-viewer-toolbar-group-background-color: black;
-        --vertex-viewer-toolbar-item-color: white;
-        --vertex-viewer-toolbar-item-hovered-background-color: #555;
-        --vertex-viewer-toolbar-content-width: 32px;
-      }
-    </style>
   </head>
 
   <body>
-    <vertex-viewer id="viewer" camera-controls="true">
-      <vertex-viewer-toolbar
-        class="viewer-toolbar"
-        data-viewer="viewer"
-      ></vertex-viewer-toolbar>
-      <vertex-viewer-view-cube data-viewer="viewer" />
-    </vertex-viewer>
+    <vertex-viewer id="viewer" camera-controls="true"></vertex-viewer>
   </body>
 </html>
