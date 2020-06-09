@@ -17,7 +17,7 @@ export const defaultConfig: DeepPartial<Config> = {};
 const platdevConfig: Config = {
   network: {
     apiHost: 'https://platform.platdev.vertexvis.io',
-    renderingHost: 'wss://stream.platdev.vertexvis.io'
+    renderingHost: 'wss://stream.platdev.vertexvis.io',
   },
 };
 

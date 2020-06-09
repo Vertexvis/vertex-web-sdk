@@ -13,7 +13,10 @@ import {
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '../../utils';
-import { FrameAttributes, FrameStreamingClient } from '../../frame-streaming-client';
+import {
+  FrameAttributes,
+  FrameStreamingClient,
+} from '../../frame-streaming-client';
 import { WebSocketClient } from '../../websocket-client';
 import { Color, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
@@ -48,7 +51,6 @@ import {
   ComponentInitializationError,
   ImageLoadError,
   IllegalStateError,
-  InvalidResourceUrnError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 
@@ -188,9 +190,7 @@ export class Viewer {
     }
 
     this.stream = new FrameStreamingClient(new WebSocketClient());
-    this.stream.onResponse(response =>
-      this.handleStreamResponse(response)
-    );
+    this.stream.onResponse(response => this.handleStreamResponse(response));
 
     this.interactionApi = this.createInteractionApi();
 
@@ -375,7 +375,9 @@ export class Viewer {
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<FrameAttributes.FrameAttributes | undefined> {
+  public async getFrameAttributes(): Promise<
+    FrameAttributes.FrameAttributes | undefined
+  > {
     return this.frameAttributes;
   }
 
@@ -398,24 +400,24 @@ export class Viewer {
 
     return new Promise(async resolve => {
       try {
-      await this.commands.execute('stream.connect', { sceneId: scene.id });
-    } catch (e) {
-      if (credentialsAreExpired(this.activeCredentials)) {
-        this.errorMessage =
-          'Error loading model. Could not open websocket due to the provided credentials being expired.';
+        await this.commands.execute('stream.connect', { sceneId: scene.id });
+      } catch (e) {
+        if (credentialsAreExpired(this.activeCredentials)) {
+          this.errorMessage =
+            'Error loading model. Could not open websocket due to the provided credentials being expired.';
 
-        throw new ExpiredCredentialsError(
-          'Error loading model. Could not open websocket due to the provided credentials being expired.',
-          e
-        );
-      } else {
-        this.errorMessage = 'Error loading model. Could not open websocket.';
-        throw new WebsocketConnectionError(
-          'Error loading model. Could not open websocket.',
-          e
-        );
+          throw new ExpiredCredentialsError(
+            'Error loading model. Could not open websocket due to the provided credentials being expired.',
+            e
+          );
+        } else {
+          this.errorMessage = 'Error loading model. Could not open websocket.';
+          throw new WebsocketConnectionError(
+            'Error loading model. Could not open websocket.',
+            e
+          );
+        }
       }
-    }
 
       await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
         'stream.start',
