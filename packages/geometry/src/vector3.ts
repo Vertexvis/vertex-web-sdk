@@ -9,11 +9,35 @@ export interface Vector3 {
 }
 
 /**
- * Returns a new `Vector3` with the given values on x, y, z dimensions.
+ * Returns a new `Vector3` either with the provided x, y, and z dimensions,
+ * or from the provided `Partial<Vector3>` object populated with zeroes
+ * wherever a component is missing.
+ * 
+ * Providing no values to this function will result in a zero-length vector.
  */
-export const create = (x: number, y: number, z: number): Vector3 => {
-  return { x, y, z };
-};
+export function create(x: number, y: number, z: number): Vector3;
+export function create(partialVector: Partial<Vector3>): Vector3;
+export function create(...args: any[]): Vector3 {
+  if (args.length === 1) {
+    return {
+      x: args[0].x || 0,
+      y: args[0].y || 0,
+      z: args[0].z || 0
+    }
+  } else if (args.length === 3) {
+    return {
+      x: args[0],
+      y: args[1],
+      z: args[2]
+    }
+  }
+
+  return {
+    x: 0,
+    y: 0,
+    z: 0
+  }
+}
 
 /**
  * Checks if each component of the given vector is populated with a numeric
