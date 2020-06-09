@@ -5,10 +5,15 @@ import { Disposable, EventDispatcher } from '../utils';
 import { NoImplementationFoundError } from '../errors';
 import { Camera } from '@vertexvis/graphics3d';
 
-type ResponseHandler = (response: vertexvis.protobuf.stream.IStreamResponse) => void;
+type ResponseHandler = (
+  response: vertexvis.protobuf.stream.IStreamResponse
+) => void;
 
 export class FrameStreamingClient {
-  private onResponseDispatcher = new EventDispatcher<vertexvis.protobuf.stream.IStreamResponse>();
+  private onResponseDispatcher = new EventDispatcher<
+    vertexvis.protobuf.stream.IStreamResponse
+  >();
+
   private messageSubscription?: Disposable;
 
   private isInteractive: Promise<boolean> = Promise.resolve(false);
@@ -49,12 +54,14 @@ export class FrameStreamingClient {
       },
     });
   }
-  
+
   public beginInteraction(): Promise<vertexvis.protobuf.stream.IFrameResult> {
     throw new NoImplementationFoundError('Begin interaction not implemented.');
   }
 
-  public replaceCamera(camera: Camera.Camera): Promise<vertexvis.protobuf.stream.IFrameResult> {
+  public replaceCamera(
+    camera: Camera.Camera
+  ): Promise<vertexvis.protobuf.stream.IFrameResult> {
     throw new NoImplementationFoundError('Replace camera not implemented.');
   }
 

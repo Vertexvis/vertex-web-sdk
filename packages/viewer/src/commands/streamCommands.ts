@@ -39,9 +39,7 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 
 export function startStream(
   dimensions: Dimensions.Dimensions
-): Command<
-  Promise<vertexvis.protobuf.stream.IStreamResponse>
-> {
+): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
     return stream.startStream({
       width: dimensions.width,

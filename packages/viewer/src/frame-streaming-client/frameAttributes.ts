@@ -6,6 +6,7 @@ export interface FrameAttributes {
   operationIds: string[];
   imageSize: Dimensions.Dimensions;
   scene: Scene.Scene;
+  sequenceNumber: number;
 }
 
 export const create = (
@@ -30,5 +31,6 @@ export const create = (
         imageAttributes.frameDimensions.height
       )
     ),
+    sequenceNumber,
   };
 };

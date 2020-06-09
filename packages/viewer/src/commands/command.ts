@@ -10,10 +10,6 @@ export interface CommandContext {
   credentialsProvider: CredentialsProvider;
 }
 
-export type CommandFactory<T> = (
-  ...args: any[]
-) => Command<T>;
+export type CommandFactory<T> = (...args: any[]) => Command<T>;
 
-export type Command<T> = (
-  context: CommandContext
-) => T | Promise<T>;
+export type Command<T> = (context: CommandContext) => T | Promise<T>;
