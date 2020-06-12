@@ -504,7 +504,7 @@
 
 "@vertexvis/build-tools@0.7.2":
   version "0.7.2"
-  resolved "https://npm.ops.vertexvis.io/@vertexvis%2fbuild-tools/-/build-tools-0.7.2.tgz#23c3be4585f4278676b2775e47db61416b25f3c0"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2fbuild-tools/-/build-tools-0.7.2.tgz#23c3be4585f4278676b2775e47db61416b25f3c0"
   integrity sha512-8VLGtzXvnX8Xj0FeexAPkHrUXF+g7tia0CVNDEI9xcxrTCK1jpGLGarikDq0wRWLL9aKCYAzRSycFnkZB4l+tw==
   dependencies:
     rollup "^1.19.4"
@@ -517,7 +517,7 @@
 
 "@vertexvis/eslint-config-vertexvis-typescript@0.2.1":
   version "0.2.1"
-  resolved "https://npm.ops.vertexvis.io/@vertexvis%2feslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.1.tgz#2e287f93eaf7a7477bff66f021faa47656b95944"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2feslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.1.tgz#2e287f93eaf7a7477bff66f021faa47656b95944"
   integrity sha512-N3RqsDpd0wO2EqFJiLcRYynYYHwLl3PBobcO76ePv95E4mRiBq9CnpqXYrv65WIAN9lTo2dPuYSe0tlMyPXC3Q==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^2.1.0"
@@ -528,7 +528,7 @@
 
 "@vertexvis/eslint-config-vertexvis@0.4.1":
   version "0.4.1"
-  resolved "https://npm.ops.vertexvis.io/@vertexvis%2feslint-config-vertexvis/-/eslint-config-vertexvis-0.4.1.tgz#d8c1505f2d90a61f43cba44b5bf4f1864d0adca9"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2feslint-config-vertexvis/-/eslint-config-vertexvis-0.4.1.tgz#d8c1505f2d90a61f43cba44b5bf4f1864d0adca9"
   integrity sha512-Ot8hSl/Ar1lzGGZoqMNRZxybOxeUHHPyiSqS2R497c5C4BG/Dgfx0paFY6jI/Cp54cjiZV6xBmwKGa8F18LdXg==
   dependencies:
     eslint-config-prettier "^6.0.0"
@@ -537,12 +537,12 @@
 
 "@vertexvis/jest-config-vertexvis@0.4.1":
   version "0.4.1"
-  resolved "https://npm.ops.vertexvis.io/@vertexvis%2fjest-config-vertexvis/-/jest-config-vertexvis-0.4.1.tgz#12ed701dc10d9ce5725e7b16bcbc5b33ce4d09f4"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2fjest-config-vertexvis/-/jest-config-vertexvis-0.4.1.tgz#12ed701dc10d9ce5725e7b16bcbc5b33ce4d09f4"
   integrity sha512-Tsl6v0O3+TzwBjoaI89EZoVq6EpeVFVTwoFeN2g7KsXmgE8VfU+QY6vRbeJCdm5hzpI0sJi/dWAL6+7AQxfXGw==
 
 "@vertexvis/typescript-config-vertexvis@1.0.1":
   version "1.0.1"
-  resolved "https://npm.ops.vertexvis.io/@vertexvis%2ftypescript-config-vertexvis/-/typescript-config-vertexvis-1.0.1.tgz#12a59082fed2a19011db5844560ef57622f8a479"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2ftypescript-config-vertexvis/-/typescript-config-vertexvis-1.0.1.tgz#12a59082fed2a19011db5844560ef57622f8a479"
   integrity sha512-zEQovD921cgLlQxUkJfC8IJBMwD/9Gmq/9QjoLsBZdYtNriXutVLLizh0YhRb5ZOmTpzdJlYVeSesPQvzcOKdA==
 
 abab@^2.0.0:
