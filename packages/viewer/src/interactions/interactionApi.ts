@@ -3,7 +3,6 @@ import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { FrameStreamingClient } from '../frame-streaming-client';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
 
 type SceneProvider = () => Scene.Scene;
 
@@ -74,8 +73,13 @@ export class InteractionApi {
         viewport,
         camera.fovy
       );
+
       await this.stream.replaceCamera({
-        camera: this.currentCameraPosition,
+        camera: {
+          position: this.currentCameraPosition?.position,
+          up: this.currentCameraPosition?.upvector,
+          lookAt: this.currentCameraPosition?.lookat,
+        },
       });
     }
   }

@@ -75,6 +75,12 @@ export namespace Components {
          */
         "scene"?: string;
     }
+    interface VertexViewerViewCube {
+        /**
+          * @private
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
 }
 declare global {
     interface HTMLSvgIconElement extends Components.SvgIcon, HTMLStencilElement {
@@ -89,9 +95,16 @@ declare global {
         prototype: HTMLVertexViewerElement;
         new (): HTMLVertexViewerElement;
     };
+    interface HTMLVertexViewerViewCubeElement extends Components.VertexViewerViewCube, HTMLStencilElement {
+    }
+    var HTMLVertexViewerViewCubeElement: {
+        prototype: HTMLVertexViewerViewCubeElement;
+        new (): HTMLVertexViewerViewCubeElement;
+    };
     interface HTMLElementTagNameMap {
         "svg-icon": HTMLSvgIconElement;
         "vertex-viewer": HTMLVertexViewerElement;
+        "vertex-viewer-view-cube": HTMLVertexViewerViewCubeElement;
     }
 }
 declare namespace LocalJSX {
@@ -152,9 +165,16 @@ declare namespace LocalJSX {
          */
         "scene"?: string;
     }
+    interface VertexViewerViewCube {
+        /**
+          * @private
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;
         "vertex-viewer": VertexViewer;
+        "vertex-viewer-view-cube": VertexViewerViewCube;
     }
 }
 export { LocalJSX as JSX };
@@ -163,6 +183,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "svg-icon": LocalJSX.SvgIcon & JSXBase.HTMLAttributes<HTMLSvgIconElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
+            "vertex-viewer-view-cube": LocalJSX.VertexViewerViewCube & JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
         }
     }
 }

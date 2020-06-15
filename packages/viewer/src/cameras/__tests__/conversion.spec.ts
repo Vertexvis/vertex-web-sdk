@@ -30,6 +30,6 @@ describe('camera conversions', () => {
         up: { x: 0, y: 1, z: 0 },
         lookAt: { x: 1, y: 1, z: 1 },
       });
-    })
-  })
+    });
+  });
 });

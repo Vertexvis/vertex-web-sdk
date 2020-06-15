@@ -2,11 +2,12 @@ import { WebSocketClient, UrlProvider } from '../websocket-client';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-stream-protos';
 import { Disposable, EventDispatcher } from '../utils';
-import { NoImplementationFoundError } from '../errors';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
 ) => void;
+
+type RecursiveRequired<T> = { [P in keyof T]-?: RecursiveRequired<T[P]> };
 
 export class FrameStreamingClient {
   private onResponseDispatcher = new EventDispatcher<
@@ -45,7 +46,7 @@ export class FrameStreamingClient {
   }
 
   public startStream(
-    data: vertexvis.protobuf.stream.IStartStreamPayload
+    data: RecursiveRequired<vertexvis.protobuf.stream.IStartStreamPayload>
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.send({
       startStream: {
@@ -64,9 +65,9 @@ export class FrameStreamingClient {
 
   public replaceCamera({
     camera,
-  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<
-    vertexvis.protobuf.stream.IStreamResponse
-  > {
+  }: RecursiveRequired<
+    vertexvis.protobuf.stream.IUpdateCameraPayload
+  >): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.send({
       updateCamera: {
         camera,

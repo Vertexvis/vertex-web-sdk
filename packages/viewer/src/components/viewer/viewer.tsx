@@ -472,6 +472,8 @@ export class Viewer {
         frame.imageAttributes.imageRect,
         frame.imageAttributes.scaleFactor
       );
+
+      this.frameReceived?.emit(this.frameAttributes);
     }
 
     image.dispose();
@@ -613,7 +615,7 @@ export class Viewer {
         return this.frameAttributes.scene;
       },
       this.tap
-    )
+    );
   }
 
   /**
