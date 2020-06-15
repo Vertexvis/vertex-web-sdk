@@ -1,5 +1,5 @@
 {
-  "name": "@vertexvis/viewer-eedc",
+  "name": "@vertexvis/poc-viewer",
   "version": "0.3.3",
   "description": "The Vertex SDK for viewing models.",
   "main": "dist/index.js",
