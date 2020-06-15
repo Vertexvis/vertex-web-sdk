@@ -83,7 +83,7 @@ You can also install our components as an NPM dependency to your project.
       id="viewer"
       credentials-client-id="client-id"
       credentials-token="token"
-      model="urn:vertexvis:eedc:scenestate:123"
+      scene="urn:vertexvis:scene:123"
     >
       <vertex-viewer-toolbar data-viewer="viewer"></vertex-viewer-toolbar>
     </vertex-viewer>

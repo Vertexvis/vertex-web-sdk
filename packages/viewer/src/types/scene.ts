@@ -1,6 +1,7 @@
 import { UUID, Uri } from '@vertexvis/utils';
 
 interface Scene {
+  type: 'scene';
   id: UUID.UUID;
 }
 
@@ -18,7 +19,7 @@ export function fromUrn(urn: string): Scene {
   }
 
   if (resourceType === 'scene') {
-    return { id: resourceId };
+    return { type: 'scene', id: resourceId };
   } else {
     throw new Error('Invalid URN. Unknown resource type');
   }
