@@ -1,9 +1,9 @@
 import { Disposable } from '../utils';
-import { ImageStreamingClient } from '../image-streaming-client';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
 import { CredentialsProvider } from '../credentials/credentials';
 import { HttpClientProvider } from '../api-client/httpClient';
+import { FrameStreamingClient } from '../frame-streaming-client';
 
 interface CommandDefinition<R> {
   factory: CommandFactory<R>;
@@ -14,7 +14,7 @@ export class CommandRegistry {
   private commands: Record<string, CommandDefinition<any>> = {};
 
   public constructor(
-    private stream: ImageStreamingClient,
+    private stream: FrameStreamingClient,
     private httpClientProvider: HttpClientProvider,
     private configProvider: ConfigProvider,
     private credentialsProvider: CredentialsProvider
@@ -50,9 +50,9 @@ export class CommandRegistry {
     }
   }
 
-  private getCommandDefinition<R>(
+  private getCommandDefinition(
     id: string
-  ): CommandDefinition<R> | undefined {
+  ): CommandDefinition<FrameStreamingClient> | undefined {
     return this.commands[id];
   }
 }

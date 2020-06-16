@@ -2,7 +2,6 @@ import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
-import { createHttpClientMock } from '../../testing/httpClient';
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -26,23 +25,8 @@ describe('vertex-viewer', () => {
 
       expect(viewer.getConfig()).toMatchObject({
         network: {
-          apiHost: 'https://api.prod.vertexvis.io',
-          renderingHost: 'wss://rendering.prod.vertexvis.io',
-        },
-      });
-    });
-  });
-
-  describe('configEnv', () => {
-    it('uses environment defaults', async () => {
-      const viewer = await createViewerSpec(
-        `<vertex-viewer config-env="staging"></vertex-viewer>`
-      );
-
-      expect(viewer.getConfig()).toMatchObject({
-        network: {
-          apiHost: 'https://api.staging.vertexvis.io',
-          renderingHost: 'wss://rendering.staging.vertexvis.io',
+          apiHost: 'https://platform.platdev.vertexvis.io',
+          renderingHost: 'wss://stream.platdev.vertexvis.io',
         },
       });
     });
@@ -152,72 +136,12 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.newScene, () => {
-    it('returns new scene builder with http client', async () => {
-      const mockHttpClient = createHttpClientMock({
-        sceneStateId: 'scene-state-id',
-      });
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
-      viewer.httpClient = mockHttpClient;
-
-      const newScene = await viewer.newScene();
-      const scene = await newScene
-        .from('urn:vertexvis:eedc:file:file-id')
-        .execute();
-
-      expect(scene).toContain('scene-state-id');
-    });
-  });
-
-  describe(Viewer.prototype.scene, () => {
-    it("throws an error if a scene hasn't been loaded", async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
-      expect(viewer.scene()).rejects.toThrow();
-    });
-
-    it('returns scene for loaded scene', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
-      const mockHttpClient = createHttpClientMock({
-        sceneStateId: 'scene-state-id',
-      });
-      viewer.httpClient = mockHttpClient;
-
-      await viewer.load('urn:vertexvis:eedc:scenestate:scene-state-id');
-      const scene = await viewer.scene();
-      await scene.clearAllHighlights().execute();
-
-      expect(mockHttpClient).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: `/scene_states/scene-state-id/bulk_bom_items`,
-        })
-      );
-    });
-  });
-
-  describe(Viewer.prototype.load, () => {
-    it('loads a scene', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      await viewer.load('urn:vertexvis:eedc:file:file-id');
-      const scene = await viewer.scene();
-      expect(scene).toBeDefined();
-    });
-
-    it('throws exception if scene cannot be loaded', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      viewer.registerCommand('stream.connect', () => () => {
-        throw 'oops';
-      });
-      expect(viewer.load('urn:vertexvis:eedc:file:file-id')).rejects.toThrow();
-    });
-  });
-
   describe('resize', () => {
     it('calls the resize-stream command', async () => {
       const viewerPage = await createViewerPage(
         `<vertex-viewer></vertex-viewer`
       );
       const viewer = await createViewerSpec(viewerPage);
-      await viewer.load('urn:vertexvis:eedc:file:file-id');
       const commandPromise = new Promise(resolve => {
         viewer.registerCommand('stream.resize-stream', dimensions => {
           return ({ stream }) => {
@@ -225,6 +149,7 @@ describe('vertex-viewer', () => {
           };
         });
       });
+      await viewer.load('urn:vertexvis:scene:scene-id');
 
       window.dispatchEvent(new Event('resize'));
 
@@ -238,6 +163,36 @@ describe('vertex-viewer', () => {
       });
     });
   });
+
+  describe(Viewer.prototype.load, () => {
+    it('loads a scene', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const startPromise = new Promise(resolve => {
+        viewer.registerCommand('stream.start', dimensions => {
+          return ({ stream }) => {
+            resolve(dimensions);
+          };
+        });
+      });
+      await viewer.load('urn:vertexvis:scene:scene-id');
+      expect(await startPromise).toMatchObject({
+        width: expect.any(Number),
+        height: expect.any(Number),
+      });
+    });
+
+    it('throws exception if scene cannot be loaded', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const command = await viewer.registerCommand(
+        'stream.connect',
+        () => () => {
+          throw 'oops';
+        }
+      );
+      expect(viewer.load('urn:vertexvis:scene:scene-id')).rejects.toThrow();
+      command.dispose();
+    });
+  });
 });
 
 async function createViewerPage(html: string): Promise<SpecPage> {
@@ -245,6 +200,9 @@ async function createViewerPage(html: string): Promise<SpecPage> {
   const viewer = page.rootInstance as Viewer;
 
   viewer.registerCommand('stream.connect', () => () => Promise.resolve());
+  viewer.registerCommand('stream.start', () => () =>
+    Promise.resolve({ sceneId: 'scene-id' })
+  );
   viewer.registerCommand('stream.load-model', () => () =>
     Promise.resolve({ sceneStateId: 'scene-state-id' })
   );

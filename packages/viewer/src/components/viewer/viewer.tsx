@@ -11,24 +11,17 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions, Rectangle, BoundingBox } from '@vertexvis/geometry';
-import {
-  Response,
-  FrameResponse,
-  Frame,
-} from '../../image-streaming-client/responses';
+import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '../../utils';
 import {
   FrameAttributes,
-  ImageStreamingClient,
-  WebSocketClient,
-} from '../../image-streaming-client';
+  FrameStreamingClient,
+} from '../../frame-streaming-client';
+import { WebSocketClient } from '../../websocket-client';
 import { Color, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import {
-  registerCommands as registerStreamCommands,
-  LoadModelResponse,
-} from '../../commands/streamCommands';
+import { Scene } from '../../types';
+import { registerCommands } from '../../commands/streamCommands';
 import { HttpClient, httpWebClient } from '@vertexvis/network';
 import {
   VertexApiOptions,
@@ -47,21 +40,11 @@ import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
-import {
-  SceneBuilder,
-  httpSceneBuilderExecutor,
-} from '../../scenes/sceneBuilder';
-import {
-  Scene,
-  httpBulkBomOperationExecutor,
-  httpPickExecutor,
-} from '../../scenes/scene';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
   ExpiredCredentialsError,
   WebsocketConnectionError,
-  SceneRenderError,
   ViewerInitializationError,
   UnsupportedOperationError,
   InteractionHandlerError,
@@ -69,6 +52,7 @@ import {
   ImageLoadError,
   IllegalStateError,
 } from '../../errors';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -81,14 +65,12 @@ interface LoadedImage extends Disposable {
 })
 export class Viewer {
   /**
-   * A URN of the model resource to load when the component is mounted in the
-   * DOM tree. The specified resource is a URN in one of the following formats:
+   * A URN of the scene resource to load when the component is mounted in the
+   * DOM tree. The specified resource is a URN in the following format:
    *
-   *  * `urn:vertexvis:eedc:file:<fileid>`
-   *  * `urn:vertexvis:eedc:scenestate:<scenestateid>`
-   *  * `urn:vertexvis:eedc:file?externalId=<externalId>`
+   *  * `urn:vertexvis:scene:<sceneid>`
    */
-  @Prop() public model?: string;
+  @Prop() public scene?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -104,7 +86,7 @@ export class Viewer {
    *
    * @see Viewer.config
    */
-  @Prop() public configEnv: Environment = 'prod';
+  @Prop() public configEnv: Environment = 'platdev';
 
   /**
    * @private Used internally for testing.
@@ -144,8 +126,7 @@ export class Viewer {
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
-   * The event includes the location of the tap or click, which can be used
-   * to perform an operation on the bom item at that position.
+   * The event includes the location of the tap or click.
    */
   @Event() public tap!: EventEmitter<TapEventDetails>;
 
@@ -154,14 +135,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<FrameAttributes>;
+  @Event() public frameReceived!: EventEmitter<FrameAttributes.FrameAttributes>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<FrameAttributes>;
+  @Event() public frameDrawn!: EventEmitter<FrameAttributes.FrameAttributes>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -177,11 +158,11 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
-  private stream!: ImageStreamingClient;
-  private loadedSceneStateId?: Promise<UUID.UUID>;
+  private stream!: FrameStreamingClient;
+  private loadedSceneId?: Promise<UUID.UUID>;
   private activeCredentials: Credentials = AuthToken.unauthorized();
 
-  private frameAttributes?: FrameAttributes;
+  private frameAttributes?: FrameAttributes.FrameAttributes;
   private mutationObserver?: MutationObserver;
   private lastFrameNumber = 0;
 
@@ -208,7 +189,7 @@ export class Viewer {
       this.httpClient = vertexApiClient(options, httpWebClient());
     }
 
-    this.stream = new ImageStreamingClient(new WebSocketClient());
+    this.stream = new FrameStreamingClient(new WebSocketClient());
     this.stream.onResponse(response => this.handleStreamResponse(response));
 
     this.interactionApi = this.createInteractionApi();
@@ -219,12 +200,12 @@ export class Viewer {
       () => this.getConfig(),
       () => this.activeCredentials
     );
-    registerStreamCommands(this.commands);
+    registerCommands(this.commands);
 
     this.calculateComponentDimensions();
 
-    if (this.model != null) {
-      this.load(this.model);
+    if (this.scene != null) {
+      this.load(this.scene);
     }
 
     if (this.cameraControls) {
@@ -359,136 +340,41 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
-  /**
-   * Returns a `SceneBuilder` that is used to create a scene before viewing. A
-   * `SceneBuilder` provides a fluent interface to specify what file or scene to
-   * base the new scene off of, as well as operations to modify the new scene.
-   *
-   * @example
-   *
-   * const viewer = document.querySelector(".viewer");
-   *
-   * const newScene = await viewer.newScene();
-   * newScene.from('urn:vertexvis:eedc:file:123)
-   *   .highlight('#ff0000', s => s.withMetadata('Name', 'arm_SOLID_SOLIDS'))
-   *   .execute()
-   *   .then(scene => viewer.load(scene));
-   */
-  @Method()
-  public async newScene(): Promise<SceneBuilder> {
-    return new SceneBuilder(httpSceneBuilderExecutor(() => this.httpClient));
-  }
-
-  /**
-   * Returns a `Scene` that contains methods for performing operations on the
-   * loaded scene. If a scene has not been loaded, then this method will throw
-   * an exception.
-   *
-   * @example
-   *
-   * const viewer = document.querySelector(".viewer");
-   *
-   * const scene = await viewer.scene();
-   * scene
-   *   .highlight('#ff0000', s => s.withMetadata('Name', 'arm_SOLID_SOLIDS'))
-   *   .execute()
-   */
-  @Method()
-  public async scene(): Promise<Scene> {
-    if (this.commands == null) {
-      throw new ViewerInitializationError('Viewer has not been initialized.');
-    }
-
-    if (this.loadedSceneStateId == null) {
-      throw new IllegalStateError('Scene has not been loaded.');
-    }
-
-    const sceneStateId = await this.loadedSceneStateId;
-    return new Scene(
-      httpBulkBomOperationExecutor(() => this.httpClient, sceneStateId),
-      httpPickExecutor(() => this.httpClient, sceneStateId),
-      this.commands,
-      () => this.frameAttributes
-    );
-  }
-
-  @Watch('model')
-  public handleModelChanged(model: string | undefined): void {
-    if (model != null) {
-      this.load(model);
+  @Watch('scene')
+  public handleSceneChanged(scene: string | undefined): void {
+    if (scene != null) {
+      this.load(scene);
     } else {
       this.unload();
     }
   }
 
   /**
-   * Loads the given resource into the viewer and return a `Promise` that
-   * resolves when the scene has been loaded. The specified resource is a URN in
-   * one of the following formats:
+   * Loads the given scene into the viewer and return a `Promise` that
+   * resolves when the scene has been loaded. The specified scene is
+   * provided as a URN in the following format:
    *
-   *  * `urn:vertexvis:eedc:file:<fileid>`
-   *  * `urn:vertexvis:eedc:scenestate:<scenestateid>`
-   *  * `urn:vertexvis:eedc:file?externalId=<externalId>`
+   *  * `urn:vertexvis:scene:<sceneid>`
    *
    * @param resource The URN of the resource to load.
    */
   @Method()
   public async load(resource: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      const backgroundColor = this.getBackgroundColor();
+      this.loadedSceneId = this.connectStreamingClient(resource);
 
-      this.loadedSceneStateId = new Promise(async (resolve, reject) => {
-        try {
-          await this.commands.execute('stream.connect', { backgroundColor });
-        } catch (e) {
-          if (credentialsAreExpired(this.activeCredentials)) {
-            this.errorMessage =
-              'Error loading model. Could not open websocket due to the provided credentials being expired.';
-            reject(
-              new ExpiredCredentialsError(
-                'Error loading model. Could not open websocket due to the provided credentials being expired.',
-                e
-              )
-            );
-          } else {
-            this.errorMessage =
-              'Error loading model. Could not open websocket.';
-            reject(
-              new WebsocketConnectionError(
-                'Error loading model. Could not open websocket.',
-                e
-              )
-            );
-          }
-        }
-
-        try {
-          const response = await this.commands.execute<LoadModelResponse>(
-            'stream.load-model',
-            resource,
-            this.dimensions
-          );
-          resolve(response.sceneStateId);
-        } catch (e) {
-          reject(
-            new SceneRenderError(
-              'Error loading model. Could not load or render scene.',
-              e
-            )
-          );
-        }
-      });
-
-      await this.loadedSceneStateId;
+      await this.loadedSceneId;
     } else {
       throw new ViewerInitializationError(
-        'Cannot load model. Viewer has not been initialized.'
+        'Cannot load scene. Viewer has not been initialized.'
       );
     }
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<FrameAttributes | undefined> {
+  public async getFrameAttributes(): Promise<
+    FrameAttributes.FrameAttributes | undefined
+  > {
     return this.frameAttributes;
   }
 
@@ -504,6 +390,38 @@ export class Viewer {
    */
   public getCredentials(): Credentials {
     return this.activeCredentials;
+  }
+
+  private connectStreamingClient(resource: string): Promise<string> {
+    const scene = Scene.fromUrn(resource);
+
+    return new Promise(async resolve => {
+      try {
+        await this.commands.execute('stream.connect', { sceneId: scene.id });
+      } catch (e) {
+        if (credentialsAreExpired(this.activeCredentials)) {
+          this.errorMessage =
+            'Error loading scene. Could not open websocket due to the provided credentials being expired.';
+
+          throw new ExpiredCredentialsError(
+            'Error loading scene. Could not open websocket due to the provided credentials being expired.',
+            e
+          );
+        } else {
+          this.errorMessage = 'Error loading scene. Could not open websocket.';
+          throw new WebsocketConnectionError(
+            'Error loading scene. Could not open websocket.',
+            e
+          );
+        }
+      }
+
+      await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
+        'stream.start',
+        this.dimensions
+      );
+      resolve(scene.id);
+    });
   }
 
   private handleWindowResize(event: UIEvent): void {
@@ -526,34 +444,30 @@ export class Viewer {
     throw new UnsupportedOperationError('Unsupported operation.');
   }
 
-  private handleStreamResponse(response: Response): void {
-    if (response.type === 'frame') {
-      this.handleFrameResponse(response);
+  private handleStreamResponse(
+    response: vertexvis.protobuf.stream.IStreamResponse
+  ): void {
+    if (response.frame != null) {
+      this.drawFrame(response.frame);
     }
   }
 
-  private handleFrameResponse(response: FrameResponse): void {
-    this.frameReceived?.emit(response.frame.frameAttributes);
-
-    this.drawFrame(response.frame);
-  }
-
-  private async drawFrame(frame: Frame): Promise<void> {
+  private async drawFrame(
+    frame: vertexvis.protobuf.stream.IFrameResult
+  ): Promise<void> {
     const frameNumber = this.lastFrameNumber + 1;
 
-    const image = await this.loadImageBytes(frame.imageBytes);
+    const image = await this.loadImageBytes(frame.image);
 
     if (frameNumber > this.lastFrameNumber) {
       this.lastFrameNumber = frameNumber;
-      this.frameAttributes = frame.frameAttributes;
+      this.frameAttributes = FrameAttributes.create(frame);
 
       this.drawImage(
         image,
-        frame.frameAttributes.scene.viewport,
-        this.frameAttributes.renderedBoundingBox
+        frame.imageAttributes.frameDimensions,
+        frame.imageAttributes.imageRect
       );
-
-      this.frameDrawn?.emit(this.frameAttributes);
     }
 
     image.dispose();
@@ -561,22 +475,24 @@ export class Viewer {
 
   private drawImage(
     image: LoadedImage,
-    sceneViewport: Dimensions.Dimensions,
-    renderedBoundingBox: BoundingBox.BoundingBox
+    sceneViewport: vertexvis.protobuf.stream.IDimensions,
+    imagePosition: vertexvis.protobuf.stream.IRectangle
   ): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
 
       if (context != null && this.dimensions != null) {
-        const imageRect = Rectangle.fromDimensions(sceneViewport);
+        const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
+          sceneViewport
+        );
         const fitTo = Rectangle.fromDimensions(this.dimensions);
         const fit = Rectangle.containFit(fitTo, imageRect);
 
         const scaleX = fit.width / imageRect.width;
         const scaleY = fit.height / imageRect.height;
 
-        const startXPos = renderedBoundingBox.min.x * scaleX;
-        const startYPos = renderedBoundingBox.min.y * scaleY;
+        const startXPos = imagePosition.x * scaleX;
+        const startYPos = imagePosition.y * scaleY;
 
         context.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         context.drawImage(
@@ -590,7 +506,9 @@ export class Viewer {
     }
   }
 
-  private loadImageBytes(imageBytes: Int8Array): Promise<LoadedImage> {
+  private loadImageBytes(
+    imageBytes: Int8Array | Uint8Array
+  ): Promise<LoadedImage> {
     if (window.createImageBitmap != null) {
       return this.loadImageBytesAsImageBitmap(imageBytes);
     } else {
@@ -599,7 +517,7 @@ export class Viewer {
   }
 
   private loadImageBytesAsImageElement(
-    imageData: Int8Array
+    imageData: Int8Array | Uint8Array
   ): Promise<LoadedImage> {
     return new Promise((resolve, reject) => {
       const blob = new Blob([imageData]);
@@ -620,7 +538,7 @@ export class Viewer {
   }
 
   private async loadImageBytesAsImageBitmap(
-    imageData: Int8Array
+    imageData: Int8Array | Uint8Array
   ): Promise<LoadedImage> {
     const blob = new Blob([imageData]);
     const bitmap = await window.createImageBitmap(blob);
