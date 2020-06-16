@@ -52,7 +52,7 @@ import {
   ImageLoadError,
   IllegalStateError,
 } from '../../errors';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;

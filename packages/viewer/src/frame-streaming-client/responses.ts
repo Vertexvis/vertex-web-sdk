@@ -1,4 +1,4 @@
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 export function parseResponse(
   buffer: ArrayBuffer

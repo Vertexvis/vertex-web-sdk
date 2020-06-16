@@ -1,6 +1,6 @@
 import { Scene, Camera } from '@vertexvis/graphics3d';
 import { Dimensions, Vector3 } from '@vertexvis/geometry';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 export interface FrameAttributes {
   operationIds: string[];

@@ -3,7 +3,7 @@ import { CommandContext, Command } from './command';
 import { Disposable } from '../utils';
 import { Dimensions } from '@vertexvis/geometry';
 import { CommandRegistry } from './commandRegistry';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { UrlDescriptor } from '../websocket-client';
 import { InvalidCredentialsError } from '../errors';
 

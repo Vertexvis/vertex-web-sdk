@@ -1,6 +1,6 @@
 import { WebSocketClient, UrlProvider } from '../websocket-client';
 import { parseResponse } from './responses';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher } from '../utils';
 import { NoImplementationFoundError } from '../errors';
 import { Camera } from '@vertexvis/graphics3d';
