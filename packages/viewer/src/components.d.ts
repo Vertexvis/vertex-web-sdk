@@ -54,7 +54,7 @@ export namespace Components {
          */
         "httpClient": HttpClient.HttpClient;
         /**
-          * Loads the given resource into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`   * `urn:vertexvis:platform:scene:<sceneid>`
+          * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param resource The URN of the resource to load.
          */
         "load": (resource: string) => Promise<void>;
@@ -75,12 +75,6 @@ export namespace Components {
          */
         "scene"?: string;
     }
-    interface VertexViewerViewCube {
-        /**
-          * @private
-         */
-        "viewer"?: HTMLVertexViewerElement;
-    }
 }
 declare global {
     interface HTMLSvgIconElement extends Components.SvgIcon, HTMLStencilElement {
@@ -95,16 +89,9 @@ declare global {
         prototype: HTMLVertexViewerElement;
         new (): HTMLVertexViewerElement;
     };
-    interface HTMLVertexViewerViewCubeElement extends Components.VertexViewerViewCube, HTMLStencilElement {
-    }
-    var HTMLVertexViewerViewCubeElement: {
-        prototype: HTMLVertexViewerViewCubeElement;
-        new (): HTMLVertexViewerViewCubeElement;
-    };
     interface HTMLElementTagNameMap {
         "svg-icon": HTMLSvgIconElement;
         "vertex-viewer": HTMLVertexViewerElement;
-        "vertex-viewer-view-cube": HTMLVertexViewerViewCubeElement;
     }
 }
 declare namespace LocalJSX {
@@ -165,16 +152,9 @@ declare namespace LocalJSX {
          */
         "scene"?: string;
     }
-    interface VertexViewerViewCube {
-        /**
-          * @private
-         */
-        "viewer"?: HTMLVertexViewerElement;
-    }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;
         "vertex-viewer": VertexViewer;
-        "vertex-viewer-view-cube": VertexViewerViewCube;
     }
 }
 export { LocalJSX as JSX };
@@ -183,7 +163,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "svg-icon": LocalJSX.SvgIcon & JSXBase.HTMLAttributes<HTMLSvgIconElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
-            "vertex-viewer-view-cube": LocalJSX.VertexViewerViewCube & JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
         }
     }
 }

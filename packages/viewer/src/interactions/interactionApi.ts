@@ -1,4 +1,4 @@
-import { Camera, Scene } from '@vertexvis/graphics3d';
+import { Scene, Camera } from '@vertexvis/graphics3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';

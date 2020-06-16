@@ -52,7 +52,7 @@ import {
   ImageLoadError,
   IllegalStateError,
 } from '../../errors';
-import { vertexvis } from '@vertexvis/frame-stream-protos';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -350,14 +350,11 @@ export class Viewer {
   }
 
   /**
-   * Loads the given resource into the viewer and return a `Promise` that
-   * resolves when the scene has been loaded. The specified resource is a URN in
-   * one of the following formats:
+   * Loads the given scene into the viewer and return a `Promise` that
+   * resolves when the scene has been loaded. The specified scene is
+   * provided as a URN in the following format:
    *
-   *  * `urn:vertexvis:eedc:file:<fileid>`
-   *  * `urn:vertexvis:eedc:scenestate:<scenestateid>`
-   *  * `urn:vertexvis:eedc:file?externalId=<externalId>`
-   *  * `urn:vertexvis:platform:scene:<sceneid>`
+   *  * `urn:vertexvis:scene:<sceneid>`
    *
    * @param resource The URN of the resource to load.
    */
@@ -369,7 +366,7 @@ export class Viewer {
       await this.loadedSceneId;
     } else {
       throw new ViewerInitializationError(
-        'Cannot load model. Viewer has not been initialized.'
+        'Cannot load scene. Viewer has not been initialized.'
       );
     }
   }
@@ -404,16 +401,16 @@ export class Viewer {
       } catch (e) {
         if (credentialsAreExpired(this.activeCredentials)) {
           this.errorMessage =
-            'Error loading model. Could not open websocket due to the provided credentials being expired.';
+            'Error loading scene. Could not open websocket due to the provided credentials being expired.';
 
           throw new ExpiredCredentialsError(
-            'Error loading model. Could not open websocket due to the provided credentials being expired.',
+            'Error loading scene. Could not open websocket due to the provided credentials being expired.',
             e
           );
         } else {
-          this.errorMessage = 'Error loading model. Could not open websocket.';
+          this.errorMessage = 'Error loading scene. Could not open websocket.';
           throw new WebsocketConnectionError(
-            'Error loading model. Could not open websocket.',
+            'Error loading scene. Could not open websocket.',
             e
           );
         }
@@ -472,7 +469,7 @@ export class Viewer {
         frame.imageAttributes.imageRect,
         frame.imageAttributes.scaleFactor
       );
-
+        
       this.frameReceived?.emit(this.frameAttributes);
     }
 
