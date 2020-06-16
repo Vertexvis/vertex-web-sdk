@@ -9,7 +9,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { FrameAttributes } from '../../image-streaming-client';
-import { Vector3, Point } from '@vertexvis/geometry';
+import { Point, Vector3 } from '@vertexvis/geometry';
 import { Camera } from '@vertexvis/graphics3d';
 import { ViewCubeRenderer } from './utils/viewCubeRenderer';
 

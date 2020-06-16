@@ -2,12 +2,12 @@ import { WebSocketClient, UrlProvider } from '../websocket-client';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher } from '../utils';
-import { NoImplementationFoundError } from '../errors';
-import { Camera } from '@vertexvis/graphics3d';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
 ) => void;
+
+type RecursiveRequired<T> = { [P in keyof T]-?: RecursiveRequired<T[P]> };
 
 export class FrameStreamingClient {
   private onResponseDispatcher = new EventDispatcher<
@@ -46,7 +46,7 @@ export class FrameStreamingClient {
   }
 
   public startStream(
-    data: vertexvis.protobuf.stream.IStartStreamPayload
+    data: RecursiveRequired<vertexvis.protobuf.stream.IStartStreamPayload>
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.send({
       startStream: {
@@ -55,18 +55,30 @@ export class FrameStreamingClient {
     });
   }
 
-  public beginInteraction(): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('Begin interaction not implemented.');
+  public beginInteraction(): Promise<
+    vertexvis.protobuf.stream.IStreamResponse
+  > {
+    return this.send({
+      beginInteraction: {},
+    });
   }
 
-  public replaceCamera(
-    camera: Camera.Camera
-  ): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('Replace camera not implemented.');
+  public replaceCamera({
+    camera,
+  }: RecursiveRequired<
+    vertexvis.protobuf.stream.IUpdateCameraPayload
+  >): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.send({
+      updateCamera: {
+        camera,
+      },
+    });
   }
 
-  public endInteraction(): Promise<vertexvis.protobuf.stream.IFrameResult> {
-    throw new NoImplementationFoundError('End interaction not implemented.');
+  public endInteraction(): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.send({
+      endInteraction: {},
+    });
   }
 
   private send(

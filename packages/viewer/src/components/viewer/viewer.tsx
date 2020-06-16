@@ -466,8 +466,11 @@ export class Viewer {
       this.drawImage(
         image,
         frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect
+        frame.imageAttributes.imageRect,
+        frame.imageAttributes.scaleFactor
       );
+
+      this.frameReceived?.emit(this.frameAttributes);
     }
 
     image.dispose();
@@ -476,7 +479,8 @@ export class Viewer {
   private drawImage(
     image: LoadedImage,
     sceneViewport: vertexvis.protobuf.stream.IDimensions,
-    imagePosition: vertexvis.protobuf.stream.IRectangle
+    imagePosition: vertexvis.protobuf.stream.IRectangle,
+    scaleFactor: number
   ): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
@@ -499,8 +503,8 @@ export class Viewer {
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleX,
-          image.image.height * scaleY
+          image.image.width * scaleFactor * scaleX,
+          image.image.height * scaleFactor * scaleY
         );
       }
     }
@@ -604,6 +608,7 @@ export class Viewer {
             'Cannot retrieve scene. Frame has not been rendered'
           );
         }
+
         return this.frameAttributes.scene;
       },
       this.tap

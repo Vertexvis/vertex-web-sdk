@@ -54,7 +54,7 @@ export namespace Components {
          */
         "httpClient": HttpClient.HttpClient;
         /**
-          * Loads the given resource into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified resource is a URN in one of the following formats:    * `urn:vertexvis:eedc:file:<fileid>`   * `urn:vertexvis:eedc:scenestate:<scenestateid>`   * `urn:vertexvis:eedc:file?externalId=<externalId>`   * `urn:vertexvis:platform:scene:<sceneid>`
+          * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param resource The URN of the resource to load.
          */
         "load": (resource: string) => Promise<void>;
