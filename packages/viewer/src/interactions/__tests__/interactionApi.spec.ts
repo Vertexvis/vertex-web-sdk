@@ -98,13 +98,9 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(
-        stream,
-        sceneProvider,
-        {
-          emit,
-        }
-      );
+      api = new InteractionApi(stream, sceneProvider, {
+        emit,
+      });
     });
 
     it('emits a tap event', async () => {
