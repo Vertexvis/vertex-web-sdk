@@ -13,7 +13,7 @@ describe('streamCommands', () => {
   const stream = createFrameStreamingClientMock();
   const credentialsProvider = (): AuthToken.AuthToken =>
     AuthToken.oauth2('client-id', 'token');
-  const config = { ...defaultConfig, streamingClient: 'platform' } as Config;
+  const config = defaultConfig as Config;
   const dimensions = Dimensions.create(100, 100);
 
   describe('startStream', () => {
