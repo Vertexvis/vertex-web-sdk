@@ -1,4 +1,4 @@
-import { startStream } from '../frameStreamCommands';
+import { startStream } from '../streamCommands';
 import { Dimensions } from '@vertexvis/geometry';
 import {
   createHttpClientMock,

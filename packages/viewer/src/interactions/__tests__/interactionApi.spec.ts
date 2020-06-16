@@ -100,9 +100,7 @@ describe(InteractionApi, () => {
     beforeEach(() => {
       api = new InteractionApi(
         stream,
-        cameraProvider,
-        viewportProvider,
-        fovyProvider,
+        sceneProvider,
         {
           emit,
         }
