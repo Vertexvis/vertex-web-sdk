@@ -469,7 +469,7 @@ export class Viewer {
         frame.imageAttributes.imageRect,
         frame.imageAttributes.scaleFactor
       );
-        
+
       this.frameReceived?.emit(this.frameAttributes);
     }
 

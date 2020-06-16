@@ -26,11 +26,7 @@ export class WebSocketClient {
   }
 
   public async connect(urlProvider: UrlProvider): Promise<void> {
-    const urlAndProtocol = urlProvider();
-    this.webSocket = new WebSocket(
-      urlAndProtocol.url,
-      urlAndProtocol.protocols
-    );
+    this.webSocket = new WebSocket(urlProvider());
     this.webSocket.binaryType = 'arraybuffer';
 
     return new Promise((resolve, reject) => {

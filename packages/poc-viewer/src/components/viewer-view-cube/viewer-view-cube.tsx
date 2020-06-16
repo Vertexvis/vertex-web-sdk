@@ -8,8 +8,8 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { FrameAttributes } from '../../frame-streaming-client';
-import { Point } from '@vertexvis/geometry';
+import { FrameAttributes } from '../../image-streaming-client';
+import { Point, Vector3 } from '@vertexvis/geometry';
 import { Camera } from '@vertexvis/graphics3d';
 import { ViewCubeRenderer } from './utils/viewCubeRenderer';
 
@@ -97,9 +97,7 @@ export class ViewerViewCube {
     }
   }
 
-  private handleFrameChanged(
-    event: CustomEvent<FrameAttributes.FrameAttributes>
-  ): void {
+  private handleFrameChanged(event: CustomEvent<FrameAttributes>): void {
     const { camera } = event.detail.scene;
     this.viewCube.show();
     this.updateWebGlCamera(camera);
@@ -182,14 +180,13 @@ export class ViewerViewCube {
   private async updateCamera(
     data: Pick<Camera.Camera, 'position' | 'upvector'>
   ): Promise<void> {
-    // TODO (jeff): Re-enable this when we add back support for camera transforms
-    // if (this.viewer != null) {
-    //   const scene = await this.viewer.scene();
-    //   scene
-    //     .camera()
-    //     .set({ ...data, lookat: Vector3.origin() })
-    //     .viewAll()
-    //     .execute({ animate: true });
-    // }
+    if (this.viewer != null) {
+      const scene = await this.viewer.scene();
+      scene
+        .camera()
+        .set({ ...data, lookat: Vector3.origin() })
+        .viewAll()
+        .execute({ animate: true });
+    }
   }
 }
