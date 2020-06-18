@@ -95,6 +95,7 @@ export class VideoWebRtcConnection {
                 console.log(
                   '------------------- failed to add ice candidate -------------------'
                 );
+                console.log(e);
                 console.log(candidateEvent.candidate);
                 // ignore
               });
@@ -130,34 +131,35 @@ export class VideoWebRtcConnection {
     );
     this.mediaStream = remoteStream;
 
+    console.log(this.videoElement);
     if (this.videoElement != null) {
       this.videoElement.srcObject = remoteStream;
     }
     this.video.srcObject = remoteStream;
 
-    if (this.canvasElement != null) {
-      const updateCanvas = () => {
-        const context = this.canvasElement.getContext('2d');
+    // if (this.canvasElement != null) {
+    //   const updateCanvas = () => {
+    //     const context = this.canvasElement.getContext('2d');
 
-        if (context != null) {
-          context.drawImage(this.videoElement!, 0, 0);
+    //     if (context != null) {
+    //       context.drawImage(this.videoElement!, 0, 0);
 
-          // const rgbaFrame = context.getImageData(0, 0, 300, 300);
+    //       // const rgbaFrame = context.getImageData(0, 0, 300, 300);
 
-          // const code = jsQr(rgbaFrame.data, rgbaFrame.width, rgbaFrame.height, {
-          //   inversionAttempts: 'dontInvert'
-          // });
+    //       // const code = jsQr(rgbaFrame.data, rgbaFrame.width, rgbaFrame.height, {
+    //       //   inversionAttempts: 'dontInvert'
+    //       // });
 
-          // if (code != null) {
-          //   window.dispatchEvent(new CustomEvent("metadata", { detail: JSON.parse(code.data) }));
-          // }
-        }
+    //       // if (code != null) {
+    //       //   window.dispatchEvent(new CustomEvent("metadata", { detail: JSON.parse(code.data) }));
+    //       // }
+    //     }
 
-        window.requestAnimationFrame(updateCanvas);
-      };
+    //     window.requestAnimationFrame(updateCanvas);
+    //   };
 
-      window.requestAnimationFrame(updateCanvas);
-    }
+    //   window.requestAnimationFrame(updateCanvas);
+    // }
 
     const commandChannelPromise = new Promise((resolve, reject) => {
       this.peerConnection!.addEventListener('datachannel', channelEvent => {
@@ -190,8 +192,18 @@ export class VideoWebRtcConnection {
 
     console.log(this.peerConnection.localDescription.sdp);
 
+    // await new Promise(resolve => {
+    //   let timeout = setTimeout(resolve, 500);
+    //   this.peerConnection.addEventListener('icecandidate', () => {
+    //     clearTimeout(timeout);
+    //     timeout = null;
+
+    //     timeout = setTimeout(resolve, 500);
+    //   });
+    // });
     await new Promise(resolve => this.peerConnection.addEventListener('icegatheringstatechange', (event: any) => event.target.iceGatheringState === 'complete' && resolve()))
 
+    console.log('POSTING');
     await fetch(`${url}/connection/${connection.id}`, {
       method: 'POST',
       body: JSON.stringify(this.peerConnection.localDescription),
@@ -224,6 +236,10 @@ export class VideoWebRtcConnection {
       this.latestMetadata = parsed;
 
       window.dispatchEvent(new CustomEvent('metadata', { detail: parsed }));
+    } else {
+      console.log(parsed);
+
+
     }
   }
 }

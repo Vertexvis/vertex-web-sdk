@@ -254,19 +254,31 @@ export class Viewer {
               onContextMenu={event => event.preventDefault()}
             ></canvas>
             <video
+              id="video"
               ref={ref => (this.videoElement = ref)}
               autoPlay={true}
               class="video"
               style={{
-                width:  `${this.dimensions != null ? this.dimensions.width : 0}px`,
-                height:  `${this.dimensions != null ? this.dimensions.height : 0}px`
+                width: `${
+                  this.dimensions != null ? this.dimensions.width : 0
+                }px`,
+                height: `${
+                  this.dimensions != null ? this.dimensions.height : 0
+                }px`,
               }}
             ></video>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
             ) : null}
           </div>
-          <button onClick={() => this.videoRtcConnection?.send({ type: 'play-video' })}>Play</button>
+          <button
+            onClick={() => {
+              this.videoRtcConnection?.send({ type: 'play-video' });
+              this.videoElement!.play();
+            }}
+          >
+            Play
+          </button>
           <slot></slot>
         </div>
       </Host>
@@ -374,7 +386,7 @@ export class Viewer {
    */
   @Method()
   public async load(resource: string): Promise<void> {
-    await this.connectWebrtc("http://localhost:8100");
+    await this.connectWebrtc('http://localhost:8100');
 
     if (this.commands != null && this.dimensions != null) {
       this.loadedSceneId = this.connectStreamingClient(resource);
@@ -464,11 +476,11 @@ export class Viewer {
 
     console.log('awaiting connection finalize');
     await this.videoRtcConnection.connect(url);
-    console.log('attempting to play video');
-    this.videoRtcConnection.send({
-      type: 'play-video',
-    });
-    console.log('done');
+    // console.log('attempting to play video');
+    // this.videoRtcConnection.send({
+    //   type: 'play-video',
+    // });
+    // console.log('done');
   }
 
   private unload(): void {
@@ -479,8 +491,8 @@ export class Viewer {
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
     if (response.frame != null) {
-      console.log('ignoring frame');
-      // this.drawFrame(response.frame);
+      // console.log('ignoring frame');
+      this.drawFrame(response.frame);
     }
   }
 
@@ -495,12 +507,13 @@ export class Viewer {
       this.lastFrameNumber = frameNumber;
       this.frameAttributes = FrameAttributes.create(frame);
 
-      this.drawImage(
-        image,
-        frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect,
-        frame.imageAttributes.scaleFactor
-      );
+      // console.log(frame);
+      // this.drawImage(
+      //   image,
+      //   frame.imageAttributes.frameDimensions,
+      //   frame.imageAttributes.imageRect,
+      //   frame.imageAttributes.scaleFactor
+      // );
 
       this.frameReceived?.emit(this.frameAttributes);
     }
@@ -529,6 +542,8 @@ export class Viewer {
 
         const startXPos = imagePosition.x * scaleX;
         const startYPos = imagePosition.y * scaleY;
+
+        console.log(imagePosition.x);
 
         context.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         context.drawImage(
