@@ -42,6 +42,7 @@ import { TouchInteractionHandler } from '../../interactions/touchInteractionHand
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
+import { VideoWebRtcConnection } from '../../webrtc';
 import {
   ExpiredCredentialsError,
   WebsocketConnectionError,
@@ -156,6 +157,7 @@ export class Viewer {
   @Element() private hostElement!: HTMLElement;
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
+  private videoElement?: HTMLVideoElement;
 
   private commands!: CommandRegistry;
   private stream!: FrameStreamingClient;
@@ -170,6 +172,8 @@ export class Viewer {
   private interactionApi!: InteractionApi;
 
   private isResizing?: boolean;
+
+  private videoRtcConnection?: VideoWebRtcConnection.VideoWebRtcConnection;
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -249,10 +253,20 @@ export class Viewer {
               height={this.dimensions != null ? this.dimensions.height : 0}
               onContextMenu={event => event.preventDefault()}
             ></canvas>
+            <video
+              ref={ref => (this.videoElement = ref)}
+              autoPlay={true}
+              class="video"
+              style={{
+                width:  `${this.dimensions != null ? this.dimensions.width : 0}px`,
+                height:  `${this.dimensions != null ? this.dimensions.height : 0}px`
+              }}
+            ></video>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
             ) : null}
           </div>
+          <button onClick={() => this.videoRtcConnection?.send({ type: 'play-video' })}>Play</button>
           <slot></slot>
         </div>
       </Host>
@@ -360,6 +374,8 @@ export class Viewer {
    */
   @Method()
   public async load(resource: string): Promise<void> {
+    await this.connectWebrtc("http://localhost:8100");
+
     if (this.commands != null && this.dimensions != null) {
       this.loadedSceneId = this.connectStreamingClient(resource);
 
@@ -440,6 +456,21 @@ export class Viewer {
       });
   }
 
+  private async connectWebrtc(url: string): Promise<void> {
+    this.videoRtcConnection = new VideoWebRtcConnection.VideoWebRtcConnection(
+      this.canvasElement,
+      this.videoElement
+    );
+
+    console.log('awaiting connection finalize');
+    await this.videoRtcConnection.connect(url);
+    console.log('attempting to play video');
+    this.videoRtcConnection.send({
+      type: 'play-video',
+    });
+    console.log('done');
+  }
+
   private unload(): void {
     throw new UnsupportedOperationError('Unsupported operation.');
   }
@@ -448,7 +479,8 @@ export class Viewer {
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
     if (response.frame != null) {
-      this.drawFrame(response.frame);
+      console.log('ignoring frame');
+      // this.drawFrame(response.frame);
     }
   }
 
