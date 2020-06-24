@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "Vertex library for 3D graphics types.",
   "author": "Dan Schultz (https://github.com/danschultz)",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",

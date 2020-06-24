@@ -2,6 +2,7 @@
   "name": "@vertexvis/viewer",
   "version": "0.3.3",
   "description": "The Vertex SDK for viewing models.",
+  "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "es2015": "dist/esm/index.mjs",
@@ -31,7 +32,6 @@
     "generate:docs": "./scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs"
   },
-  "license": "UNLICENSED",
   "dependencies": {
     "@types/classnames": "2.2.3",
     "@vertexvis/frame-streaming-protos": "^0.0.16",

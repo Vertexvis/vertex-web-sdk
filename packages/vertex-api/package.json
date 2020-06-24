@@ -3,7 +3,7 @@
   "version": "0.6.2",
   "description": "Client for interacting with Vertex's RESTful API.",
   "author": "Dan Schultz (https://github.com/danschultz)",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",

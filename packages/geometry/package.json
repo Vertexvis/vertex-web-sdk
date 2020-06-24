@@ -3,7 +3,7 @@
   "version": "0.3.2",
   "description": "Library for 2D and 3D geometric types.",
   "author": "Dan Schultz (https://github.com/danschultz)",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",
