@@ -8,6 +8,13 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: "Install"
         run: "yarn install"
       - name: "Bootstrap"
