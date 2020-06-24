@@ -1,6 +1,6 @@
 import { Vector3, BoundingBox, Point } from '@vertexvis/geometry';
 import { Camera, Scene as GraphicsScene } from '@vertexvis/graphics3d';
-import { BomItems, BomItem, HitDetection } from '@vertexvis/vertex-api';
+import { BomItems, BomItem, HitDetection } from '@vertexvis/vertex-api-poc';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { FrameAttributes } from '../image-streaming-client';
 import {
@@ -16,7 +16,7 @@ import {
 } from './operations';
 import { HttpClientProvider } from '../api-client/httpClient';
 import { Raycaster } from './raycaster';
-import { HitsByPixelBody } from '@vertexvis/vertex-api/dist/endpoints/hitDetection';
+import { HitsByPixelBody } from '@vertexvis/vertex-api-poc/dist/endpoints/hitDetection';
 
 export interface SceneItemExecutionResponse {
   bomItems: BomItem.BomItem[];

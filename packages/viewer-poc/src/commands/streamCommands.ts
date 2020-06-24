@@ -6,7 +6,7 @@ import { FrameResponse, AnimationEasing } from '../image-streaming-client';
 import { CommandRegistry } from './commandRegistry';
 import { Camera } from '@vertexvis/graphics3d';
 import { Model } from '../types';
-import { Files, SceneStates } from '@vertexvis/vertex-api';
+import { Files, SceneStates } from '@vertexvis/vertex-api-poc';
 
 export interface ConnectOptions {
   backgroundColor?: Color.Color;

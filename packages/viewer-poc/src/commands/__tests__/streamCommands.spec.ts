@@ -4,7 +4,7 @@ import {
   createHttpClientMock,
   createImageStreamingClientMock,
 } from '../../testing';
-import { AuthToken } from '@vertexvis/vertex-api';
+import { AuthToken } from '@vertexvis/vertex-api-poc';
 import { defaultConfig, Config } from '../../config/config';
 
 describe('streamCommands', () => {

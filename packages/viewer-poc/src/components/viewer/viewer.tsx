@@ -34,7 +34,7 @@ import {
   VertexApiOptions,
   vertexApiClient,
   AuthToken,
-} from '@vertexvis/vertex-api';
+} from '@vertexvis/vertex-api-poc';
 import {
   Credentials,
   parseCredentials,

@@ -1,4 +1,4 @@
-import { BomItemQuery } from '@vertexvis/vertex-api';
+import { BomItemQuery } from '@vertexvis/vertex-api-poc';
 import {
   createBomItemQuery,
   createBulkBomOperationFromDefinition,

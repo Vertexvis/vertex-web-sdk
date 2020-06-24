@@ -25,15 +25,15 @@ published JS bundle.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer-poc@{{version}}/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer-poc@{{version}}/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer-poc@{{version}}/dist/viewer.js"
     ></script>
   </head>
 </html>

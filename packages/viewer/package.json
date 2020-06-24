@@ -39,7 +39,7 @@
     "@vertexvis/graphics3d": "0.1.1",
     "@vertexvis/network": "0.1.1",
     "@vertexvis/utils": "0.6.1",
-    "@vertexvis/vertex-api": "0.6.2",
+    "@vertexvis/vertex-api-poc": "0.6.2",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
     "zen-3d": "^0.0.1",

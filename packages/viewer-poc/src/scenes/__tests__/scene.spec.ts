@@ -1,7 +1,7 @@
 import { BoundingBox, Dimensions, Vector3, Point } from '@vertexvis/geometry';
 import { Camera, Scene as GraphicsScene } from '@vertexvis/graphics3d';
 import { HttpRequest, HttpResponse } from '@vertexvis/network';
-import { AuthToken } from '@vertexvis/vertex-api';
+import { AuthToken } from '@vertexvis/vertex-api-poc';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { defaultConfig } from '../../config/config';
 import {

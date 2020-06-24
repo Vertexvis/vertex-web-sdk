@@ -1,5 +1,5 @@
 import { Point, Dimensions } from '@vertexvis/geometry';
-import { HitDetection } from '@vertexvis/vertex-api';
+import { HitDetection } from '@vertexvis/vertex-api-poc';
 import { Camera } from '@vertexvis/graphics3d';
 
 interface MetadataSelector {

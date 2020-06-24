@@ -1,4 +1,4 @@
-import { SceneStates } from '@vertexvis/vertex-api';
+import { SceneStates } from '@vertexvis/vertex-api-poc';
 import {
   createBulkBomOperationFromDefinition,
   dedupBulkBomOperations,

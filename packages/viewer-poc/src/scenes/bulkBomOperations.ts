@@ -1,4 +1,4 @@
-import { BomItemQuery, BulkBomOperation } from '@vertexvis/vertex-api';
+import { BomItemQuery, BulkBomOperation } from '@vertexvis/vertex-api-poc';
 import {
   ItemOperation,
   OperationDefinition,

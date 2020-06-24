@@ -1,4 +1,4 @@
-import { AuthToken, Jwt } from '@vertexvis/vertex-api';
+import { AuthToken, Jwt } from '@vertexvis/vertex-api-poc';
 import { InvalidCredentialsError } from '../errors';
 
 export type Credentials = AuthToken.AuthToken;
