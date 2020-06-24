@@ -7,7 +7,7 @@
     "typescript": "^3.7.4"
   },
   "scripts": {
-    "postinstall": "yarn generate:vscode-workspace",
+    "postinstall": "yarn generate:vscode-workspace && yarn bootstrap",
     "generate:vscode-workspace": "./scripts/generate_vscode_workspace.sh",
     "build": "lerna run build",
     "change": "lerna version --no-push --no-git-tag-version --exact",
