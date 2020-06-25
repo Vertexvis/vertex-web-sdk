@@ -7,7 +7,6 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
-import { HttpClient } from "@vertexvis/network";
 import { Credentials } from "./credentials/credentials";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { FrameAttributes } from "./frame-streaming-client";
@@ -49,10 +48,6 @@ export namespace Components {
         "credentialsToken"?: string;
         "getFrameAttributes": () => Promise<FrameAttributes.FrameAttributes | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
-        /**
-          * @private Used internally for testing.
-         */
-        "httpClient": HttpClient.HttpClient;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param resource The URN of the resource to load.
@@ -127,10 +122,6 @@ declare namespace LocalJSX {
           * The token for an Oauth2 credentials flow. Property is ignored if `credentialsClientId` has not been set.
          */
         "credentialsToken"?: string;
-        /**
-          * @private Used internally for testing.
-         */
-        "httpClient": HttpClient.HttpClient;
         /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */

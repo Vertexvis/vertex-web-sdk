@@ -22,12 +22,7 @@ import { Color, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Scene } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
-import { HttpClient, httpWebClient } from '@vertexvis/network';
-import {
-  VertexApiOptions,
-  vertexApiClient,
-  AuthToken,
-} from '@vertexvis/poc-vertex-api';
+import { AuthToken } from '@vertexvis/poc-vertex-api';
 import {
   Credentials,
   parseCredentials,
@@ -87,11 +82,6 @@ export class Viewer {
    * @see Viewer.config
    */
   @Prop() public configEnv: Environment = 'platdev';
-
-  /**
-   * @private Used internally for testing.
-   */
-  @Prop() public httpClient!: HttpClient.HttpClient;
 
   /**
    * A `Credentials` object or JSON encoded string of a `Credentials` object.
@@ -178,17 +168,6 @@ export class Viewer {
   public componentDidLoad(): void {
     this.initializeCredentials();
 
-    if (this.httpClient == null) {
-      const options = (): VertexApiOptions => {
-        const config = this.getConfig();
-        return {
-          baseUrl: config.network.apiHost,
-          auth: this.activeCredentials,
-        };
-      };
-      this.httpClient = vertexApiClient(options, httpWebClient());
-    }
-
     this.stream = new FrameStreamingClient(new WebSocketClient());
     this.stream.onResponse(response => this.handleStreamResponse(response));
 
@@ -196,7 +175,6 @@ export class Viewer {
 
     this.commands = new CommandRegistry(
       this.stream,
-      () => this.httpClient,
       () => this.getConfig(),
       () => this.activeCredentials
     );
@@ -594,7 +572,7 @@ export class Viewer {
   }
 
   private createInteractionApi(): InteractionApi {
-    if (this.stream == null || this.httpClient == null) {
+    if (this.stream == null) {
       throw new ComponentInitializationError(
         'Cannot create interaction API. Component has not been initialized.'
       );
