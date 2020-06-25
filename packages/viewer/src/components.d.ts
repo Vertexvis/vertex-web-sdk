@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
-import { Credentials } from "./credentials/credentials";
+import { Token } from "./credentials/token";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { FrameAttributes } from "./frame-streaming-client";
 import { Disposable } from "./utils";
@@ -30,22 +30,6 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
-        /**
-          * A `Credentials` object or JSON encoded string of a `Credentials` object. The viewer must set this property or a combination of `credentialsClientId`, `credentialsToken` and `credentialsApiKey`. This property will take precedence.
-         */
-        "credentials"?: Credentials | string;
-        /**
-          * The api key for a user token credentials flow.
-         */
-        "credentialsApiKey"?: string;
-        /**
-          * The client ID for an Oauth2 credentials flow. `credentialsToken` must also be set.
-         */
-        "credentialsClientId"?: string;
-        /**
-          * The token for an Oauth2 credentials flow. Property is ignored if `credentialsClientId` has not been set.
-         */
-        "credentialsToken"?: string;
         "getFrameAttributes": () => Promise<FrameAttributes.FrameAttributes | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
@@ -69,6 +53,10 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "scene"?: string;
+        /**
+          * An authentication token used to grant access to Vertex.
+         */
+        "token"?: Token;
     }
 }
 declare global {
@@ -107,22 +95,6 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         /**
-          * A `Credentials` object or JSON encoded string of a `Credentials` object. The viewer must set this property or a combination of `credentialsClientId`, `credentialsToken` and `credentialsApiKey`. This property will take precedence.
-         */
-        "credentials"?: Credentials | string;
-        /**
-          * The api key for a user token credentials flow.
-         */
-        "credentialsApiKey"?: string;
-        /**
-          * The client ID for an Oauth2 credentials flow. `credentialsToken` must also be set.
-         */
-        "credentialsClientId"?: string;
-        /**
-          * The token for an Oauth2 credentials flow. Property is ignored if `credentialsClientId` has not been set.
-         */
-        "credentialsToken"?: string;
-        /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
         "onFrameDrawn"?: (event: CustomEvent<FrameAttributes.FrameAttributes>) => void;
@@ -142,6 +114,10 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "scene"?: string;
+        /**
+          * An authentication token used to grant access to Vertex.
+         */
+        "token"?: Token;
     }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;

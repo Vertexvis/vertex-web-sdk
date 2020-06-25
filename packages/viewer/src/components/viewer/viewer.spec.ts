@@ -32,49 +32,6 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe('credentials', () => {
-    it('should decode JSON credentials string', async () => {
-      const json = JSON.stringify({ strategy: 'api-key', token: 'token' });
-
-      const viewer = await createViewerSpec(
-        `<vertex-viewer credentials=${json}></vertex-viewer>`
-      );
-
-      expect(viewer.getCredentials()).toEqual({
-        strategy: 'api-key',
-        token: 'token',
-      });
-    });
-
-    it('should set credentials from oauth2 properties', async () => {
-      const clientId = 'client-id';
-      const token = 'token';
-
-      const viewer = await createViewerSpec(
-        `<vertex-viewer credentials-client-id="${clientId}" credentials-token="${token}"></vertex-viewer>`
-      );
-
-      expect(viewer.getCredentials()).toEqual({
-        strategy: 'oauth2',
-        clientId: clientId,
-        token: 'token',
-      });
-    });
-
-    it('should set credentials from api key properties', async () => {
-      const apiKey = 'apiKey';
-
-      const viewer = await createViewerSpec(
-        `<vertex-viewer credentials-api-key="${apiKey}"></vertex-viewer>`
-      );
-
-      expect(viewer.getCredentials()).toEqual({
-        strategy: 'api-key',
-        token: apiKey,
-      });
-    });
-  });
-
   describe('when camera-controls prop is not set', () => {
     it('registers camera and touch interaction handlers by default', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
@@ -165,19 +122,24 @@ describe('vertex-viewer', () => {
   });
 
   describe(Viewer.prototype.load, () => {
-    it('loads a scene', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+    it('loads a scene with auth token', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer token="token"></vertex-viewer`
+      );
       const startPromise = new Promise(resolve => {
         viewer.registerCommand('stream.start', dimensions => {
-          return ({ stream }) => {
-            resolve(dimensions);
+          return ({ tokenProvider }) => {
+            resolve({ dimensions, token: tokenProvider() });
           };
         });
       });
       await viewer.load('urn:vertexvis:scene:scene-id');
       expect(await startPromise).toMatchObject({
-        width: expect.any(Number),
-        height: expect.any(Number),
+        dimensions: {
+          width: expect.any(Number),
+          height: expect.any(Number),
+        },
+        token: 'token',
       });
     });
 

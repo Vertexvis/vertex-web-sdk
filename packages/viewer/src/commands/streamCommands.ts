@@ -14,11 +14,11 @@ export interface ConnectOptions {
 export function connect({ sceneId }: ConnectOptions = {}): Command<
   Promise<Disposable>
 > {
-  return ({ stream, config, credentialsProvider }) => {
+  return ({ stream, config, tokenProvider: tokenProvider }) => {
     const urlProvider = (): UrlDescriptor => {
-      const credentials = credentialsProvider();
+      const token = tokenProvider();
 
-      if (sceneId != null && credentials.strategy === 'oauth2') {
+      if (sceneId != null && token != null) {
         const uri = Uri.appendPath(
           `/scenes/${sceneId}/stream`,
           Uri.parse(config.network.renderingHost)
@@ -26,7 +26,7 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 
         return {
           url: Uri.toString(uri),
-          protocols: [`${credentials.token}+ws.vertexvis.com`],
+          protocols: [`${token}+ws.vertexvis.com`],
         };
       } else {
         throw new InvalidCredentialsError(`Provided credentials are invalid.`);

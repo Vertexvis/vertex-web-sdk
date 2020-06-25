@@ -1,7 +1,7 @@
 import { Disposable } from '../utils';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
-import { CredentialsProvider } from '../credentials/credentials';
+import { TokenProvider } from '../credentials/token';
 import { FrameStreamingClient } from '../frame-streaming-client';
 
 interface CommandDefinition<R> {
@@ -15,7 +15,7 @@ export class CommandRegistry {
   public constructor(
     private stream: FrameStreamingClient,
     private configProvider: ConfigProvider,
-    private credentialsProvider: CredentialsProvider
+    private tokenProvider: TokenProvider
   ) {}
 
   public register<R, T>(
@@ -39,7 +39,7 @@ export class CommandRegistry {
         command({
           stream: this.stream,
           config: this.configProvider(),
-          credentialsProvider: this.credentialsProvider,
+          tokenProvider: this.tokenProvider,
         }) as any
       );
     } else {
