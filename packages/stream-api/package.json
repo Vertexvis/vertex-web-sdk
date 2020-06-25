@@ -1,0 +1,47 @@
+{
+  "name": "@vertexvis/stream-api",
+  "version": "0.1.0",
+  "description": "A websocket client for interacting with Vertex's stream API.",
+  "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
+  "main": "./dist/bundle.cjs.js",
+  "module": "./dist/bundle.esm.js",
+  "typings": "./dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.ops.vertexvis.io/"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/*",
+    "!dist/**/__tests__"
+  ],
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "./node_modules/@vertexvis/build-tools/bin/build-web.sh",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
+    "start": "jest --watch",
+    "test": "jest",
+    "test:coverage": "yarn test --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@vertexvis/build-tools": "0.7.2",
+    "@vertexvis/eslint-config-vertexvis-typescript": "0.2.1",
+    "@vertexvis/jest-config-vertexvis": "0.4.1",
+    "@vertexvis/typescript-config-vertexvis": "1.0.1",
+    "eslint": "^6.1.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.7.4"
+  }
+}
