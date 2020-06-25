@@ -7,7 +7,7 @@ API.
 
 Add `@vertexvis/poc-vertex-api` as an NPM dev dependency to your project. The
 project depends on `@vertexvis/utils` for common helpers and
-`@vertexvis/network` for its networking client. Your consuming project is
+`@vertexvis/poc-network` for its networking client. Your consuming project is
 expected to include this as a dependency in your package.json file. If you're
 building a shared library, consider making these peer dependency instead.
 
@@ -15,7 +15,7 @@ building a shared library, consider making these peer dependency instead.
 // package.json
 {
   "dependencies": {
-    "@vertexvis/network": "0.0.0",
+    "@vertexvis/poc-network": "0.0.0",
     "@vertexvis/utils": "0.0.0",
     "@vertexvis/poc-vertex-api": "0.0.0"
   }
@@ -27,7 +27,7 @@ building a shared library, consider making these peer dependency instead.
 **Example:** Creating an API Client
 
 ```ts
-import { httpWebClient, HitDetection } from '@vertexvis/network';
+import { httpWebClient, HitDetection } from '@vertexvis/poc-network';
 import { AuthToken } from '@vertexvis/poc-vertex-api';
 
 const config = {

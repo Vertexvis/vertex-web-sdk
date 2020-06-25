@@ -1,4 +1,4 @@
-import { HttpHeaders } from '@vertexvis/network';
+import { HttpHeaders } from '@vertexvis/poc-network';
 
 interface BearerToken {
   strategy: 'bearer';

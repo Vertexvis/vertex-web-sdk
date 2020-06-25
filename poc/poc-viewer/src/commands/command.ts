@@ -1,7 +1,7 @@
 import { ImageStreamingClient } from '../image-streaming-client';
 import { Config } from '../config/config';
 import { CredentialsProvider } from '../credentials/credentials';
-import { HttpClient } from '@vertexvis/network';
+import { HttpClient } from '@vertexvis/poc-network';
 
 export interface CommandContext {
   stream: ImageStreamingClient;

@@ -22,18 +22,7 @@ import { Color, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Scene } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
-import { HttpClient, httpWebClient } from '@vertexvis/network';
-import {
-  VertexApiOptions,
-  vertexApiClient,
-  AuthToken,
-} from '@vertexvis/poc-vertex-api';
-import {
-  Credentials,
-  parseCredentials,
-  waitForTokenExpiry,
-  credentialsAreExpired,
-} from '../../credentials/credentials';
+import { Token, parseToken } from '../../credentials/token';
 import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
@@ -43,7 +32,6 @@ import { TapInteractionHandler } from '../../interactions/tapInteractionHandler'
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
-  ExpiredCredentialsError,
   WebsocketConnectionError,
   ViewerInitializationError,
   UnsupportedOperationError,
@@ -89,34 +77,9 @@ export class Viewer {
   @Prop() public configEnv: Environment = 'platdev';
 
   /**
-   * @private Used internally for testing.
+   * An authentication token used to grant access to Vertex.
    */
-  @Prop() public httpClient!: HttpClient.HttpClient;
-
-  /**
-   * A `Credentials` object or JSON encoded string of a `Credentials` object.
-   * The viewer must set this property or a combination of
-   * `credentialsClientId`, `credentialsToken` and `credentialsApiKey`. This
-   * property will take precedence.
-   */
-  @Prop() public credentials?: Credentials | string;
-
-  /**
-   * The client ID for an Oauth2 credentials flow. `credentialsToken` must also
-   * be set.
-   */
-  @Prop() public credentialsClientId?: string;
-
-  /**
-   * The token for an Oauth2 credentials flow. Property is ignored if
-   * `credentialsClientId` has not been set.
-   */
-  @Prop() public credentialsToken?: string;
-
-  /**
-   * The api key for a user token credentials flow.
-   */
-  @Prop() public credentialsApiKey?: string;
+  @Prop() public token?: Token;
 
   /**
    * Enables or disables the default mouse and touch interactions provided by
@@ -160,7 +123,7 @@ export class Viewer {
   private commands!: CommandRegistry;
   private stream!: FrameStreamingClient;
   private loadedSceneId?: Promise<UUID.UUID>;
-  private activeCredentials: Credentials = AuthToken.unauthorized();
+  private activeCredentials: Token;
 
   private frameAttributes?: FrameAttributes.FrameAttributes;
   private mutationObserver?: MutationObserver;
@@ -178,17 +141,6 @@ export class Viewer {
   public componentDidLoad(): void {
     this.initializeCredentials();
 
-    if (this.httpClient == null) {
-      const options = (): VertexApiOptions => {
-        const config = this.getConfig();
-        return {
-          baseUrl: config.network.apiHost,
-          auth: this.activeCredentials,
-        };
-      };
-      this.httpClient = vertexApiClient(options, httpWebClient());
-    }
-
     this.stream = new FrameStreamingClient(new WebSocketClient());
     this.stream.onResponse(response => this.handleStreamResponse(response));
 
@@ -196,7 +148,6 @@ export class Viewer {
 
     this.commands = new CommandRegistry(
       this.stream,
-      () => this.httpClient,
       () => this.getConfig(),
       () => this.activeCredentials
     );
@@ -259,10 +210,7 @@ export class Viewer {
     );
   }
 
-  @Watch('credentials')
-  @Watch('credentialsToken')
-  @Watch('credentialsClientId')
-  @Watch('credentialsApiKey')
+  @Watch('token')
   public async handleCredentialsChanged(): Promise<void> {
     this.initializeCredentials();
   }
@@ -385,13 +333,6 @@ export class Viewer {
     return parseConfig(this.configEnv, this.config);
   }
 
-  /**
-   * @private Used for internals or testing.
-   */
-  public getCredentials(): Credentials {
-    return this.activeCredentials;
-  }
-
   private connectStreamingClient(resource: string): Promise<string> {
     const scene = Scene.fromUrn(resource);
 
@@ -399,21 +340,9 @@ export class Viewer {
       try {
         await this.commands.execute('stream.connect', { sceneId: scene.id });
       } catch (e) {
-        if (credentialsAreExpired(this.activeCredentials)) {
-          this.errorMessage =
-            'Error loading scene. Could not open websocket due to the provided credentials being expired.';
-
-          throw new ExpiredCredentialsError(
-            'Error loading scene. Could not open websocket due to the provided credentials being expired.',
-            e
-          );
-        } else {
-          this.errorMessage = 'Error loading scene. Could not open websocket.';
-          throw new WebsocketConnectionError(
-            'Error loading scene. Could not open websocket.',
-            e
-          );
-        }
+        this.errorMessage =
+          "Error loading scene. Check that you've supplied a valid scene and token";
+        throw new WebsocketConnectionError(this.errorMessage, e);
       }
 
       await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
@@ -594,7 +523,7 @@ export class Viewer {
   }
 
   private createInteractionApi(): InteractionApi {
-    if (this.stream == null || this.httpClient == null) {
+    if (this.stream == null) {
       throw new ComponentInitializationError(
         'Cannot create interaction API. Component has not been initialized.'
       );
@@ -615,47 +544,8 @@ export class Viewer {
     );
   }
 
-  /**
-   * Initializes credential properties from `credentials-client-id`,
-   * `credentials-token` and `credentials-api-key` component properties.
-   */
   private initializeCredentials(): void {
-    if (this.credentials == null) {
-      if (this.credentialsClientId != null && this.credentialsToken != null) {
-        this.activeCredentials = AuthToken.oauth2(
-          this.credentialsClientId,
-          this.credentialsToken
-        );
-      } else if (this.credentialsApiKey != null) {
-        this.activeCredentials = AuthToken.apiKey(this.credentialsApiKey);
-      }
-    } else if (typeof this.credentials === 'string') {
-      this.activeCredentials = parseCredentials(this.credentials);
-    } else {
-      this.activeCredentials = this.credentials;
-    }
-
-    if (this.activeCredentials.strategy !== 'unauthorized') {
-      this.watchCredentialsExpiration();
-    }
-  }
-
-  private async watchCredentialsExpiration(): Promise<void> {
-    if (credentialsAreExpired(this.activeCredentials)) {
-      throw new ExpiredCredentialsError(
-        'Provided credentials are expired, please provide valid credentials.'
-      );
-    }
-
-    try {
-      await waitForTokenExpiry(this.activeCredentials, 5000);
-
-      this.tokenExpired.emit();
-    } catch (e) {
-      console.debug(
-        'Token provided did not have an expiration timestamp, so no token expiry warning event will be emitted.'
-      );
-    }
+    this.activeCredentials = parseToken(this.token);
   }
 
   private getBackgroundColor(): Color.Color | undefined {

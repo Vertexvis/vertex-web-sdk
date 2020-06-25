@@ -1,5 +1,5 @@
 import { parseResponse, parseJson } from '../parser';
-import { HttpResponse, HttpRequest } from '@vertexvis/network';
+import { HttpResponse, HttpRequest } from '@vertexvis/poc-network';
 
 describe(parseResponse, () => {
   const body = JSON.stringify({ a: 1 });

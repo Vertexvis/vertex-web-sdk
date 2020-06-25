@@ -1,5 +1,5 @@
 import { SceneBuilder, httpSceneBuilderExecutor } from '../sceneBuilder';
-import { HttpRequest, HttpResponse } from '@vertexvis/network';
+import { HttpRequest, HttpResponse } from '@vertexvis/poc-network';
 
 describe(SceneBuilder, () => {
   const executor = jest.fn().mockReturnValue(Promise.resolve('resource'));

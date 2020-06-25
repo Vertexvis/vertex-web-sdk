@@ -1,8 +1,7 @@
 import { Disposable } from '../utils';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
-import { CredentialsProvider } from '../credentials/credentials';
-import { HttpClientProvider } from '../api-client/httpClient';
+import { TokenProvider } from '../credentials/token';
 import { FrameStreamingClient } from '../frame-streaming-client';
 
 interface CommandDefinition<R> {
@@ -15,9 +14,8 @@ export class CommandRegistry {
 
   public constructor(
     private stream: FrameStreamingClient,
-    private httpClientProvider: HttpClientProvider,
     private configProvider: ConfigProvider,
-    private credentialsProvider: CredentialsProvider
+    private tokenProvider: TokenProvider
   ) {}
 
   public register<R, T>(
@@ -40,9 +38,8 @@ export class CommandRegistry {
       return Promise.resolve(
         command({
           stream: this.stream,
-          httpClient: this.httpClientProvider(),
           config: this.configProvider(),
-          credentialsProvider: this.credentialsProvider,
+          tokenProvider: this.tokenProvider,
         }) as any
       );
     } else {

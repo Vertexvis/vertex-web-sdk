@@ -1,4 +1,4 @@
-import { HttpRequest, HttpResponse } from '@vertexvis/network';
+import { HttpRequest, HttpResponse } from '@vertexvis/poc-network';
 
 export function createHttpClientMock(
   responseBody?: object

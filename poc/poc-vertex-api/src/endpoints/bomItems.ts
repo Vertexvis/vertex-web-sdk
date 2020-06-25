@@ -1,6 +1,6 @@
 import { UUID, Uri } from '@vertexvis/utils';
 import { parseJson, parseResponse } from '../parser';
-import { HttpClient, HttpRequest } from '@vertexvis/network';
+import { HttpClient, HttpRequest } from '@vertexvis/poc-network';
 import { BulkBomOperation, BomItem } from '../types';
 
 interface BulkBomOperationBody {

@@ -1,4 +1,4 @@
-import { HttpClient, HttpRequest } from '@vertexvis/network';
+import { HttpClient, HttpRequest } from '@vertexvis/poc-network';
 import { UUID, Uri } from '@vertexvis/utils';
 import { Point, Dimensions } from '@vertexvis/geometry';
 import { HitResult, CrossSection } from '../types';

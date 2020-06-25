@@ -7,7 +7,7 @@ networking clients.
 
 ## Usage
 
-Add `@vertexvis/network` as an NPM dev dependency to your project. The project
+Add `@vertexvis/poc-network` as an NPM dev dependency to your project. The project
 depends on `@vertexvis/utils` for common helpers, and your consuming project is
 expected to include this as a dependency in your package.json file. If you're
 building a shared library, consider making `@vertexvis/utils` a peer dependency
@@ -17,7 +17,7 @@ instead.
 // package.json
 {
   "dependencies": {
-    "@vertexvis/network": "0.0.0",
+    "@vertexvis/poc-network": "0.0.0",
     "@vertexvis/utils": "0.0.0"
   }
 }
@@ -28,7 +28,7 @@ instead.
 **Example:** Making a simple network request
 
 ```js
-import { httpWebClient, HttpRequestMethod } from '@vertexvis/network';
+import { httpWebClient, HttpRequestMethod } from '@vertexvis/poc-network';
 
 const fetch = httpWebClient();
 const request = {
@@ -49,7 +49,7 @@ import {
   httpWebClient,
   HttpClient,
   HttpRequestMethod,
-} from '@vertexvis/network';
+} from '@vertexvis/poc-network';
 
 const delay = (seconds: number, fetch: HttpClient): HttpClient => {
   return request => {

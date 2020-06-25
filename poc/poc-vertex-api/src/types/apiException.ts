@@ -1,4 +1,4 @@
-import { HttpResponse } from '@vertexvis/network';
+import { HttpResponse } from '@vertexvis/poc-network';
 
 export class ApiException extends Error {
   public constructor(public response: HttpResponse.HttpResponse) {
