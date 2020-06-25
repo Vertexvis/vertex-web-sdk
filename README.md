@@ -1,12 +1,12 @@
-# Vertex Web Monorepo
+# Vertex Web SDK
 
-Welcome to the Vertex Web repo. This is a monorepo that contains our front-end
-libraries and sdks at Vertex.
+Welcome to the Vertex Web SDK repo. This is a monorepo containing SDKs for the
+web platform.
 
 ## Structure
 
-- `./packages`: Contains our platform SDK packages that are published to NPM.
-- `./poc`: Contains our proof-of-concept or experimental SDK packages.
+- `./packages`: Contains platform SDK packages that are published to NPM.
+- `./poc`: Contains proof-of-concept or experimental SDK packages.
 - `./scripts`: Contains Bash scripts for managing the project.
 
 ## Setup & Installing
@@ -24,7 +24,7 @@ features like Jest debugging still work.
 The workspace file will be created automatically when running `yarn install`.
 Otherwise you can generate the file manually by running `yarn generate:vscode-workspace`.
 
-Running `code ./vertex-web-sdks.code-workspace` will open VS Code workspace.
+Running `code ./vertex-web-sdk.code-workspace` will open VS Code workspace.
 
 ## Building
 
