@@ -1,4 +1,4 @@
-import { Scene, Camera } from '@vertexvis/graphics3d';
+import { Scene, Camera } from '@vertexvis/poc-graphics-3d';
 import { Dimensions, Vector3 } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
