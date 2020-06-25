@@ -1,5 +1,5 @@
 import { vertexApiClient } from '../vertexApiClient';
-import { HttpRequest, HttpResponse } from '@vertexvis/network';
+import { HttpRequest, HttpResponse } from '@vertexvis/poc-network';
 import { AuthToken } from '..';
 
 describe(vertexApiClient, () => {

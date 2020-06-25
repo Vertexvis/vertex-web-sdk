@@ -1,4 +1,4 @@
-import { HttpClient, HttpRequest } from '@vertexvis/network';
+import { HttpClient, HttpRequest } from '@vertexvis/poc-network';
 import { UUID, Uri } from '@vertexvis/utils';
 import * as AuthToken from './authToken';
 

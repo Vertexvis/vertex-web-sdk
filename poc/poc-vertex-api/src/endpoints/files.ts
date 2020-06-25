@@ -1,4 +1,4 @@
-import { HttpClient, HttpRequest } from '@vertexvis/network';
+import { HttpClient, HttpRequest } from '@vertexvis/poc-network';
 import { Uri } from '@vertexvis/utils';
 import { parseResponse, parseJson } from '../parser';
 import { File } from '../types/file';

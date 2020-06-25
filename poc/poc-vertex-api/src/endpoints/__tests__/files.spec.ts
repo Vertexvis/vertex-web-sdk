@@ -1,6 +1,6 @@
 import * as Files from '../files';
 import { EndpointTest } from '../../__test-utils__/endpointTest';
-import { HttpRequestMethod } from '@vertexvis/network';
+import { HttpRequestMethod } from '@vertexvis/poc-network';
 
 describe(Files.getFile, () => {
   it('does a GET request to the correct url', () => {

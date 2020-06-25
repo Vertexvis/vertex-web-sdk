@@ -29,7 +29,7 @@ import {
   registerCommands as registerStreamCommands,
   LoadModelResponse,
 } from '../../commands/streamCommands';
-import { HttpClient, httpWebClient } from '@vertexvis/network';
+import { HttpClient, httpWebClient } from '@vertexvis/poc-network';
 import {
   VertexApiOptions,
   vertexApiClient,

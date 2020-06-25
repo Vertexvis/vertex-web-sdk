@@ -35,7 +35,7 @@
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.1",
     "@vertexvis/jest-config-vertexvis": "0.4.1",
     "@vertexvis/typescript-config-vertexvis": "1.0.1",
-    "@vertexvis/network": "0.1.1",
+    "@vertexvis/poc-network": "0.1.1",
     "@vertexvis/utils": "0.6.1",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
@@ -44,7 +44,7 @@
     "tslib": "^1.10.0"
   },
   "peerDependencies": {
-    "@vertexvis/network": "0.1.1",
+    "@vertexvis/poc-network": "0.1.1",
     "@vertexvis/utils": "0.6.1"
   }
 }

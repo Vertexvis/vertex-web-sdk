@@ -4,7 +4,7 @@ import {
   HttpResponse,
   HttpClient,
   HttpHeaders,
-} from '@vertexvis/network';
+} from '@vertexvis/poc-network';
 import { Uri } from '@vertexvis/utils';
 
 type Assertion<T> = (data: T) => void;

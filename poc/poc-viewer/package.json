@@ -37,7 +37,7 @@
     "classnames": "2.2.6",
     "@vertexvis/geometry": "0.3.2",
     "@vertexvis/poc-graphics-3d": "0.1.1",
-    "@vertexvis/network": "0.1.1",
+    "@vertexvis/poc-network": "0.1.1",
     "@vertexvis/utils": "0.6.1",
     "@vertexvis/poc-vertex-api": "0.6.2",
     "zen-3d": "^0.0.1",

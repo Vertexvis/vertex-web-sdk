@@ -1,5 +1,5 @@
 import * as HitDetection from '../hitDetection';
-import { HttpRequestMethod } from '@vertexvis/network';
+import { HttpRequestMethod } from '@vertexvis/poc-network';
 import { Point, Dimensions, Vector3 } from '@vertexvis/geometry';
 import { HitResult } from '../../types';
 import { EndpointTest } from '../../__test-utils__/endpointTest';

@@ -1,6 +1,6 @@
 import * as SceneStates from '../sceneStates';
 import { EndpointTest } from '../../__test-utils__/endpointTest';
-import { HttpRequestMethod } from '@vertexvis/network';
+import { HttpRequestMethod } from '@vertexvis/poc-network';
 
 describe(SceneStates.create, () => {
   it('should make a POST request with the correct URL and body', () => {

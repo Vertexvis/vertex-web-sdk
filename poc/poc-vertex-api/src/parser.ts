@@ -1,5 +1,5 @@
 import { ApiException } from './types';
-import { HttpResponse } from '@vertexvis/network';
+import { HttpResponse } from '@vertexvis/poc-network';
 
 export type Parser<T> = (data: string) => T;
 
