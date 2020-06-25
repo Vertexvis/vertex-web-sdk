@@ -20,7 +20,7 @@ import {
 import { WebSocketClient } from '../../websocket-client';
 import { Color, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import { Scene } from '../../types';
+import { SceneResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { Token, parseToken } from '../../credentials/token';
 import { InteractionHandler } from '../../interactions/interactionHandler';
@@ -334,7 +334,7 @@ export class Viewer {
   }
 
   private connectStreamingClient(resource: string): Promise<string> {
-    const scene = Scene.fromUrn(resource);
+    const scene = SceneResource.fromUrn(resource);
 
     return new Promise(async resolve => {
       try {

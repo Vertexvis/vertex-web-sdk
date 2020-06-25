@@ -1,11 +1,11 @@
 import { UUID, Uri } from '@vertexvis/utils';
 
-interface Scene {
+interface SceneResource {
   type: 'scene';
   id: UUID.UUID;
 }
 
-export function fromUrn(urn: string): Scene {
+export function fromUrn(urn: string): SceneResource {
   const uri = Uri.parse(urn);
 
   if (uri.scheme !== 'urn') {

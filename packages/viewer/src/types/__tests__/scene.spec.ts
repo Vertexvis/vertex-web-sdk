@@ -1,24 +1,21 @@
-import * as Scene from '../scene';
+import * as SceneResource from '../sceneResource';
 
-describe(Scene.fromUrn, () => {
+describe(SceneResource.fromUrn, () => {
   it('throws error if scheme is not a urn', () => {
-    expect(() => Scene.fromUrn('foo:123')).toThrow();
+    expect(() => SceneResource.fromUrn('foo:123')).toThrow();
   });
 
   it('throws if nid is not vertexvis', () => {
-    expect(() => Scene.fromUrn('urn:isbn')).toThrow();
+    expect(() => SceneResource.fromUrn('urn:isbn')).toThrow();
   });
 
   it('throws if vertex scheme is not eedc', () => {
-    expect(() => Scene.fromUrn('urn:vertexvis:foo')).toThrow();
+    expect(() => SceneResource.fromUrn('urn:vertexvis:foo')).toThrow();
   });
 
   it('parses URN for a scene', () => {
     const urn = 'urn:vertexvis:scene:123';
-    const scene = Scene.fromUrn(urn);
-    expect(scene).toEqual({
-      type: 'scene',
-      id: '123',
-    });
+    const scene = SceneResource.fromUrn(urn);
+    expect(scene).toEqual({ type: 'scene', id: '123' });
   });
 });

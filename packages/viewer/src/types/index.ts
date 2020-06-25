@@ -1,3 +1,3 @@
-import * as Scene from './scene';
+import * as SceneResource from './sceneResource';
 
-export { Scene };
+export { SceneResource };
