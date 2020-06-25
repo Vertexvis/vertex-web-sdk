@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "Networking library for Vertex JS projects",
   "author": "Dan Schultz (https://github.com/danschultz)",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",

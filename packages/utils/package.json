@@ -1,7 +1,7 @@
 {
   "name": "@vertexvis/utils",
   "version": "0.6.1",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",

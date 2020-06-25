@@ -52,14 +52,11 @@ Type: `Promise<InteractionHandler[]>`
 
 ### `load(resource: string) => Promise<void>`
 
-Loads the given resource into the viewer and return a `Promise` that
-resolves when the scene has been loaded. The specified resource is a URN in
-one of the following formats:
+Loads the given scene into the viewer and return a `Promise` that
+resolves when the scene has been loaded. The specified scene is
+provided as a URN in the following format:
 
-  * `urn:vertexvis:eedc:file:<fileid>`
-  * `urn:vertexvis:eedc:scenestate:<scenestateid>`
-  * `urn:vertexvis:eedc:file?externalId=<externalId>`
-  * `urn:vertexvis:platform:scene:<sceneid>`
+  * `urn:vertexvis:scene:<sceneid>`
 
 #### Returns
 
