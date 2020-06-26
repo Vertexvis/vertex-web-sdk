@@ -593,10 +593,10 @@
     eslint-plugin-prettier "^3.1.0"
     prettier "^1.19.1"
 
-"@vertexvis/frame-streaming-protos@^0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@vertexvis%2fframe-streaming-protos/-/frame-streaming-protos-0.0.16.tgz#a534347e5923e78bc2463ef1f6c7598462b097a2"
-  integrity sha512-H1kxC7QZ1kfQt7KvnwRo3oYDNrw7okPXwBrtoDY4tvFkwA+Jkb65X6vmDelA1ZJZKEA16FefI245s9Ti7DGLSA==
+"@vertexvis/frame-streaming-protos@^0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2fframe-streaming-protos/-/frame-streaming-protos-0.0.18.tgz#59aab9615da30dec52bf85eee2bcfc6a084fc423"
+  integrity sha512-LRDoQ5WFipFiNbTm9XVTZAjWtHY3FmjH/j/G1MDXDZInV+Ya++s3Bs+09a9sFinafvDVKUfFckyGYepQ8+WE+A==
 
 "@vertexvis/rollup-plugin-vertexvis-copyright@0.1.1":
   version "0.1.1"

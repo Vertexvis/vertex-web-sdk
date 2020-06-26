@@ -1,23 +1,22 @@
-import { Scene, Camera } from '@vertexvis/poc-graphics-3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
+import { Scene, Camera } from '../scenes';
 
-type SceneProvider = () => Scene.Scene;
+type SceneProvider = () => Scene;
 
 type CameraTransform = (
-  cameraPosition: Camera.Camera,
-  viewport: Dimensions.Dimensions,
-  fovy: number
-) => Camera.Camera;
+  camera: Camera,
+  viewport: Dimensions.Dimensions
+) => Camera;
 
 /**
  * The `InteractionApi` provides methods that API developers can use to modify
  * the internal state of an interaction.
  */
 export class InteractionApi {
-  private currentCameraPosition?: Camera.Camera;
+  private currentCamera?: Camera;
 
   public constructor(
     private stream: StreamApi,
@@ -53,7 +52,7 @@ export class InteractionApi {
    */
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
-      this.currentCameraPosition = this.getScene().camera;
+      this.currentCamera = this.getScene().camera();
       await this.stream.beginInteraction();
     }
   }
@@ -67,20 +66,10 @@ export class InteractionApi {
    */
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
-      const { camera, viewport } = this.getScene();
-      this.currentCameraPosition = t(
-        this.currentCameraPosition,
-        viewport,
-        camera.fovy
-      );
+      const scene = this.getScene();
+      this.currentCamera = t(this.currentCamera, scene.viewport());
 
-      await this.stream.replaceCamera({
-        camera: {
-          position: this.currentCameraPosition?.position,
-          up: this.currentCameraPosition?.upvector,
-          lookAt: this.currentCameraPosition?.lookat,
-        },
-      });
+      await this.currentCamera?.render();
     }
   }
 
@@ -92,13 +81,13 @@ export class InteractionApi {
    *  viewer.
    */
   public async panCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera((camera, viewport, fovy) => {
-      const vv = Camera.viewVector(camera);
+    return this.transformCamera((camera, viewport) => {
+      const vv = camera.viewVector();
 
-      const u = Vector3.normalize(camera.upvector);
+      const u = Vector3.normalize(camera.up);
       const v = Vector3.normalize(vv);
 
-      const d = Vector3.magnitude(vv) * Math.tan(fovy);
+      const d = Vector3.magnitude(vv) * Math.tan(camera.fovY);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
@@ -110,7 +99,7 @@ export class InteractionApi {
         Vector3.scale(epsilonY, yvec)
       );
 
-      return Camera.offset(offset, camera);
+      return camera.moveBy(offset);
     });
   }
 
@@ -123,9 +112,9 @@ export class InteractionApi {
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
     return this.transformCamera((camera, viewport) => {
-      const upVector = Vector3.normalize(camera.upvector);
+      const upVector = Vector3.normalize(camera.up);
       const lookAt = Vector3.normalize(
-        Vector3.subtract(camera.lookat, camera.position)
+        Vector3.subtract(camera.lookAt, camera.position)
       );
 
       const crossX = Vector3.cross(upVector, lookAt);
@@ -143,7 +132,7 @@ export class InteractionApi {
       const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
-      return Camera.rotateAroundAxis(angle, rotationAxis, camera);
+      return camera.rotateAroundAxis(angle, rotationAxis);
     });
   }
 
@@ -156,14 +145,14 @@ export class InteractionApi {
    */
   public async zoomCamera(delta: number): Promise<void> {
     return this.transformCamera((camera, viewport) => {
-      const vv = Camera.viewVector(camera);
+      const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
       const distance = Vector3.magnitude(vv);
       const epsilon = (3 * distance * delta) / viewport.height;
 
       const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
-      return { ...camera, position };
+      return camera.update({ position });
     });
   }
 
@@ -172,7 +161,7 @@ export class InteractionApi {
    */
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
-      this.currentCameraPosition = null;
+      this.currentCamera = null;
       await this.stream.endInteraction();
     }
   }
@@ -181,6 +170,6 @@ export class InteractionApi {
    * Indicates if the API is in an interacting state.
    */
   public isInteracting(): boolean {
-    return this.currentCameraPosition != null;
+    return this.currentCamera != null;
   }
 }

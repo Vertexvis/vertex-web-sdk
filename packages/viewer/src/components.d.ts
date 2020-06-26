@@ -13,6 +13,7 @@ import { Frame } from "./types";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
+import { Scene } from "./scenes/scene";
 export namespace Components {
     interface SvgIcon {
     }
@@ -49,10 +50,11 @@ export namespace Components {
           * @returns - A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
+        "scene": () => Promise<Scene>;
         /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
-        "scene"?: string;
+        "src"?: string;
         /**
           * An authentication token used to grant access to Vertex.
          */
@@ -113,7 +115,7 @@ declare namespace LocalJSX {
         /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
-        "scene"?: string;
+        "src"?: string;
         /**
           * An authentication token used to grant access to Vertex.
          */

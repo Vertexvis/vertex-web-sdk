@@ -317,7 +317,13 @@ export class Viewer {
 
   @Method()
   public async scene(): Promise<Scene> {
-    return new Scene(this.stream);
+    if (this.frameAttributes != null) {
+      return new Scene(this.stream, this.frameAttributes);
+    } else {
+      throw new IllegalStateError(
+        'Cannot retrieve scene. Frame has not been rendered'
+      );
+    }
   }
 
   @Method()
@@ -536,8 +542,7 @@ export class Viewer {
             'Cannot retrieve scene. Frame has not been rendered'
           );
         }
-
-        return this.frameAttributes.scene;
+        return new Scene(this.stream, this.frameAttributes);
       },
       this.tap
     );
