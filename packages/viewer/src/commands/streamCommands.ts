@@ -1,10 +1,10 @@
 import { Uri } from '@vertexvis/utils';
 import { CommandContext, Command } from './command';
-import { Disposable } from '../utils';
+import { Disposable } from '@vertexvis/utils';
 import { Dimensions } from '@vertexvis/geometry';
 import { CommandRegistry } from './commandRegistry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { UrlDescriptor } from '../websocket-client';
+import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
 
 export interface ConnectOptions {

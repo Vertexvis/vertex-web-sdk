@@ -3,11 +3,19 @@ import * as Angle from '../angle';
 
 describe(Vector3.create, () => {
   it('creates a vector with x, y, z', () => {
-    expect(Vector3.create(1, 2, 3)).toMatchObject({
+    expect(Vector3.create(1, 2, 3)).toMatchObject({ x: 1, y: 2, z: 3 });
+  });
+
+  it('creates a vector from obj', () => {
+    expect(Vector3.create({ x: 1, y: 2, z: 3 })).toMatchObject({
       x: 1,
       y: 2,
       z: 3,
     });
+  });
+
+  it('creates a origin vector if no arg', () => {
+    expect(Vector3.create()).toMatchObject({ x: 0, y: 0, z: 0 });
   });
 });
 

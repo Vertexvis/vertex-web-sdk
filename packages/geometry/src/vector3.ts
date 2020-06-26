@@ -8,6 +8,7 @@ export interface Vector3 {
   z: number;
 }
 
+/* eslint-disable padding-line-between-statements */
 /**
  * Returns a new `Vector3` either with the provided x, y, and z dimensions,
  * or from the provided `Partial<Vector3>` object populated with zeroes
@@ -15,10 +16,10 @@ export interface Vector3 {
  *
  * Providing no values to this function will result in a zero-length vector.
  */
+
 export function create(x: number, y: number, z: number): Vector3;
-
 export function create(partialVector: Partial<Vector3>): Vector3;
-
+export function create(): Vector3;
 export function create(...args: any[]): Vector3 {
   if (args.length === 1) {
     return {
@@ -40,6 +41,7 @@ export function create(...args: any[]): Vector3 {
     z: 0,
   };
 }
+/* eslint-enable padding-line-between-statements */
 
 /**
  * Checks if each component of the given vector is populated with a numeric

@@ -12,15 +12,9 @@ import {
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
-import { Disposable } from '../../utils';
-import {
-  FrameAttributes,
-  FrameStreamingClient,
-} from '../../frame-streaming-client';
-import { WebSocketClient } from '../../websocket-client';
-import { Color, UUID } from '@vertexvis/utils';
+import { Color, Disposable, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import { Scene } from '../../types';
+import { Frame, SceneResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { Token, parseToken } from '../../credentials/token';
 import { InteractionHandler } from '../../interactions/interactionHandler';
@@ -41,6 +35,7 @@ import {
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -98,14 +93,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<FrameAttributes.FrameAttributes>;
+  @Event() public frameReceived!: EventEmitter<Frame.Frame>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<FrameAttributes.FrameAttributes>;
+  @Event() public frameDrawn!: EventEmitter<Frame.Frame>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -121,11 +116,11 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
-  private stream!: FrameStreamingClient;
+  private stream!: StreamApi;
   private loadedSceneId?: Promise<UUID.UUID>;
   private activeCredentials: Token;
 
-  private frameAttributes?: FrameAttributes.FrameAttributes;
+  private frameAttributes?: Frame.Frame;
   private mutationObserver?: MutationObserver;
   private lastFrameNumber = 0;
 
@@ -141,7 +136,7 @@ export class Viewer {
   public componentDidLoad(): void {
     this.initializeCredentials();
 
-    this.stream = new FrameStreamingClient(new WebSocketClient());
+    this.stream = new StreamApi(new WebSocketClient());
     this.stream.onResponse(response => this.handleStreamResponse(response));
 
     this.interactionApi = this.createInteractionApi();
@@ -320,9 +315,7 @@ export class Viewer {
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<
-    FrameAttributes.FrameAttributes | undefined
-  > {
+  public async getFrameAttributes(): Promise<Frame.Frame | undefined> {
     return this.frameAttributes;
   }
 
@@ -334,7 +327,7 @@ export class Viewer {
   }
 
   private connectStreamingClient(resource: string): Promise<string> {
-    const scene = Scene.fromUrn(resource);
+    const scene = SceneResource.fromUrn(resource);
 
     return new Promise(async resolve => {
       try {
@@ -390,7 +383,7 @@ export class Viewer {
 
     if (frameNumber > this.lastFrameNumber) {
       this.lastFrameNumber = frameNumber;
-      this.frameAttributes = FrameAttributes.create(frame);
+      this.frameAttributes = Frame.fromProto(frame);
 
       this.drawImage(
         image,

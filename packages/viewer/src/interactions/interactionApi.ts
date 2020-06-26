@@ -2,7 +2,7 @@ import { Scene, Camera } from '@vertexvis/poc-graphics-3d';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
-import { FrameStreamingClient } from '../frame-streaming-client';
+import { StreamApi } from '@vertexvis/stream-api';
 
 type SceneProvider = () => Scene.Scene;
 
@@ -20,7 +20,7 @@ export class InteractionApi {
   private currentCameraPosition?: Camera.Camera;
 
   public constructor(
-    private stream: FrameStreamingClient,
+    private stream: StreamApi,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>
   ) {}

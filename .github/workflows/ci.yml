@@ -1,4 +1,4 @@
-name: Branch
+name: CI
 
 on: [push]
 

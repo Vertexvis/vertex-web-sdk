@@ -8,4 +8,8 @@ import * as UUID from './uuid';
 
 export * from './mappedTypes';
 
+export * from './disposable';
+
+export * from './eventDispatcher';
+
 export { BinaryReader, Color, Objects, Range, Strings, Uri, UUID };
