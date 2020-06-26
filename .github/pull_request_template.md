@@ -21,7 +21,3 @@
 ## Dependencies
 
 <!-- Link to other PRs or tickets. -->
-
-## Feedback
-
-<!-- Mention the people or team you'd like to get feedback from. Explain the type of feedback you're looking for. -->
