@@ -1,8 +1,8 @@
-import { Disposable } from '../utils';
+import { Disposable } from '@vertexvis/utils';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
 import { TokenProvider } from '../credentials/token';
-import { FrameStreamingClient } from '../frame-streaming-client';
+import { StreamApi } from '@vertexvis/stream-api';
 
 interface CommandDefinition<R> {
   factory: CommandFactory<R>;
@@ -13,7 +13,7 @@ export class CommandRegistry {
   private commands: Record<string, CommandDefinition<any>> = {};
 
   public constructor(
-    private stream: FrameStreamingClient,
+    private stream: StreamApi,
     private configProvider: ConfigProvider,
     private tokenProvider: TokenProvider
   ) {}
@@ -49,7 +49,7 @@ export class CommandRegistry {
 
   private getCommandDefinition(
     id: string
-  ): CommandDefinition<FrameStreamingClient> | undefined {
+  ): CommandDefinition<StreamApi> | undefined {
     return this.commands[id];
   }
 }

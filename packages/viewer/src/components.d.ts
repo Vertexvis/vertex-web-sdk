@@ -9,8 +9,8 @@ import { Config } from "./config/config";
 import { Environment } from "./config/environment";
 import { Token } from "./credentials/token";
 import { TapEventDetails } from "./interactions/tapEventDetails";
-import { FrameAttributes } from "./frame-streaming-client";
-import { Disposable } from "./utils";
+import { Frame } from "./types";
+import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 export namespace Components {
@@ -30,7 +30,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
-        "getFrameAttributes": () => Promise<FrameAttributes.FrameAttributes | undefined>;
+        "getFrameAttributes": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
@@ -97,11 +97,11 @@ declare namespace LocalJSX {
         /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
-        "onFrameDrawn"?: (event: CustomEvent<FrameAttributes.FrameAttributes>) => void;
+        "onFrameDrawn"?: (event: CustomEvent<Frame.Frame>) => void;
         /**
           * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
-        "onFrameReceived"?: (event: CustomEvent<FrameAttributes.FrameAttributes>) => void;
+        "onFrameReceived"?: (event: CustomEvent<Frame.Frame>) => void;
         /**
           * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
          */

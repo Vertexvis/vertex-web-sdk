@@ -2,16 +2,16 @@ import { Scene, Camera } from '@vertexvis/poc-graphics-3d';
 import { Dimensions, Vector3 } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
-export interface FrameAttributes {
+export interface Frame {
   operationIds: string[];
   imageSize: Dimensions.Dimensions;
   scene: Scene.Scene;
   sequenceNumber: number;
 }
 
-export const create = (
+export const fromProto = (
   frameResult: vertexvis.protobuf.stream.IFrameResult
-): FrameAttributes => {
+): Frame => {
   const { imageAttributes, sceneAttributes, sequenceNumber } = frameResult;
 
   return {

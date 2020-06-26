@@ -1,7 +1,7 @@
 import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
-import { EventDispatcher, Disposable, Listener } from '../utils';
+import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import {
   RotateInteraction,
   ZoomInteraction,

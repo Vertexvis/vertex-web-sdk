@@ -1,7 +1,8 @@
-import { WebSocketClient, UrlProvider } from '../websocket-client';
+import { WebSocketClient } from './webSocketClient';
+import { UrlProvider } from './url';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, EventDispatcher } from '../utils';
+import { Disposable, EventDispatcher } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
@@ -9,24 +10,16 @@ type ResponseHandler = (
 
 type RecursiveRequired<T> = { [P in keyof T]-?: RecursiveRequired<T[P]> };
 
-export class FrameStreamingClient {
+export class StreamApi {
   private onResponseDispatcher = new EventDispatcher<
     vertexvis.protobuf.stream.IStreamResponse
   >();
 
   private messageSubscription?: Disposable;
 
-  private isInteractive: Promise<boolean> = Promise.resolve(false);
-
-  private isInteractiveResolve: VoidFunction;
-  private isInteractiveTimeout: any;
-
   public constructor(
     private websocket: WebSocketClient = new WebSocketClient()
-  ) {
-    this.initializeInteractive = this.initializeInteractive.bind(this);
-    this.resetInteractive = this.resetInteractive.bind(this);
-  }
+  ) {}
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
     await this.websocket.connect(urlProvider);
@@ -97,34 +90,11 @@ export class FrameStreamingClient {
     });
   }
 
-  protected startInteractionTimer(): void {
-    clearTimeout(this.isInteractiveTimeout);
-    this.initializeInteractive();
-  }
-
-  protected stopInteractionTimer(): void {
-    this.isInteractiveTimeout = setTimeout(this.resetInteractive, 2000);
-  }
-
   private handleMessage(message: MessageEvent): void {
     const response = parseResponse(message.data);
 
-    this.onResponseDispatcher.emit(response);
-  }
-
-  private initializeInteractive(): void {
-    if (this.isInteractiveResolve == null) {
-      this.isInteractive = new Promise(resolve => {
-        this.isInteractiveResolve = resolve;
-      });
+    if (response != null) {
+      this.onResponseDispatcher.emit(response);
     }
-  }
-
-  private resetInteractive(): void {
-    if (this.isInteractiveResolve != null) {
-      this.isInteractiveResolve();
-    }
-    this.isInteractiveResolve = null;
-    this.isInteractive = Promise.resolve(false);
   }
 }

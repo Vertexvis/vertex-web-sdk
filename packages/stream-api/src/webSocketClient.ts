@@ -1,5 +1,4 @@
-import { Disposable } from '../utils/disposable';
-import { EventDispatcher } from '../utils';
+import { Disposable, EventDispatcher } from '@vertexvis/utils';
 import { UrlProvider } from './url';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];

@@ -1,3 +1,4 @@
+import * as Frame from './frame';
 import * as SceneResource from './sceneResource';
 
-export { SceneResource };
+export { Frame, SceneResource };

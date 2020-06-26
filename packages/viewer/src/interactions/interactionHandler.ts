@@ -1,4 +1,4 @@
-import { Disposable } from '../utils';
+import { Disposable } from '@vertexvis/utils';
 import { InteractionApi } from './interactionApi';
 
 /**

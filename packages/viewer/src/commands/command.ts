@@ -1,9 +1,9 @@
 import { Config } from '../config/config';
 import { TokenProvider } from '../credentials/token';
-import { FrameStreamingClient } from '../frame-streaming-client';
+import { StreamApi } from '@vertexvis/stream-api';
 
 export interface CommandContext {
-  stream: FrameStreamingClient;
+  stream: StreamApi;
   config: Config;
   tokenProvider: TokenProvider;
 }

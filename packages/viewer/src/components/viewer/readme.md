@@ -18,21 +18,21 @@
 
 | Event           | Description                                                                                                                                                                    | Type                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
-| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene. | `CustomEvent<FrameAttributes>` |
-| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.       | `CustomEvent<FrameAttributes>` |
+| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene. | `CustomEvent<Frame>`           |
+| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.       | `CustomEvent<Frame>`           |
 | `tap`           | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.                                                 | `CustomEvent<TapEventDetails>` |
 | `tokenExpired`  | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.       | `CustomEvent<void>`            |
 
 
 ## Methods
 
-### `getFrameAttributes() => Promise<FrameAttributes.FrameAttributes | undefined>`
+### `getFrameAttributes() => Promise<Frame.Frame | undefined>`
 
 
 
 #### Returns
 
-Type: `Promise<FrameAttributes>`
+Type: `Promise<Frame>`
 
 
 
