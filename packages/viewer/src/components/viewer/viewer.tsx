@@ -36,6 +36,7 @@ import {
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
+import { Scene } from '../../scenes/scene';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -53,7 +54,7 @@ export class Viewer {
    *
    *  * `urn:vertexvis:scene:<sceneid>`
    */
-  @Prop() public scene?: string;
+  @Prop() public src?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -150,8 +151,8 @@ export class Viewer {
 
     this.calculateComponentDimensions();
 
-    if (this.scene != null) {
-      this.load(this.scene);
+    if (this.src != null) {
+      this.load(this.src);
     }
 
     if (this.cameraControls) {
@@ -283,8 +284,8 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
-  @Watch('scene')
-  public handleSceneChanged(scene: string | undefined): void {
+  @Watch('src')
+  public handleSrcChanged(scene: string | undefined): void {
     if (scene != null) {
       this.load(scene);
     } else {
@@ -312,6 +313,11 @@ export class Viewer {
         'Cannot load scene. Viewer has not been initialized.'
       );
     }
+  }
+
+  @Method()
+  public async scene(): Promise<Scene> {
+    return new Scene(this.stream);
   }
 
   @Method()
