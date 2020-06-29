@@ -1,6 +1,7 @@
-import { Scene, Camera } from '@vertexvis/poc-graphics-3d';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Scene } from '../../scenes';
+import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
+import { frame } from '../../types/__fixtures__';
 
 describe(InteractionApi, () => {
   const ImageStreamingClientMock = jest.fn().mockImplementation(() => {
@@ -11,11 +12,10 @@ describe(InteractionApi, () => {
     };
   });
 
-  const scene = Scene.create(Camera.create(), Dimensions.create(200, 100));
-
-  const sceneProvider = (): Scene.Scene => scene;
   const emit = jest.fn();
   const stream = new ImageStreamingClientMock();
+  const scene = new Scene(stream, frame);
+  const sceneProvider = (): Scene => scene;
 
   let api: InteractionApi;
 

@@ -8,8 +8,6 @@ type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
 ) => void;
 
-type RecursiveRequired<T> = { [P in keyof T]-?: RecursiveRequired<T[P]> };
-
 export class StreamApi {
   private onResponseDispatcher = new EventDispatcher<
     vertexvis.protobuf.stream.IStreamResponse
@@ -39,9 +37,9 @@ export class StreamApi {
   }
 
   public startStream(
-    data: RecursiveRequired<vertexvis.protobuf.stream.IStartStreamPayload>
+    data: vertexvis.protobuf.stream.IStartStreamPayload
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.send({
+    return this.sendRequest({
       startStream: {
         ...data,
       },
@@ -51,17 +49,17 @@ export class StreamApi {
   public beginInteraction(): Promise<
     vertexvis.protobuf.stream.IStreamResponse
   > {
-    return this.send({
+    return this.sendRequest({
       beginInteraction: {},
     });
   }
 
   public replaceCamera({
     camera,
-  }: RecursiveRequired<
-    vertexvis.protobuf.stream.IUpdateCameraPayload
-  >): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.send({
+  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<
+    vertexvis.protobuf.stream.IStreamResponse
+  > {
+    return this.sendRequest({
       updateCamera: {
         camera,
       },
@@ -69,12 +67,12 @@ export class StreamApi {
   }
 
   public endInteraction(): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.send({
+    return this.sendRequest({
       endInteraction: {},
     });
   }
 
-  private send(
+  private sendRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return new Promise(resolve => {
