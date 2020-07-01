@@ -66,6 +66,18 @@ export class StreamApi {
     });
   }
 
+  public hitItems({
+    point,
+  }: vertexvis.protobuf.stream.IHitItemsPayload): Promise<
+    vertexvis.protobuf.stream.IStreamResponse
+  > {
+    return this.sendRequest({
+      hitItems: {
+        point,
+      },
+    });
+  }
+
   public endInteraction(): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({
       endInteraction: {},
