@@ -91,21 +91,23 @@ export class StreamApi {
   private sendRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return new Promise(resolve => {
-      const subscription = this.onResponse(response => {
-        if (
-          response.frame != null ||
-          (request.requestId?.value != null &&
-            request.requestId?.value === response.requestId?.value)
-        ) {
-          resolve(response);
-          subscription.dispose();
-        }
+    this.websocket.send(
+      vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
+    );
+    if (request.requestId?.value != null) {
+      return new Promise(resolve => {
+        const subscription = this.onResponse(response => {
+          if (
+            request.requestId?.value != null &&
+            request.requestId?.value === response.requestId?.value
+          ) {
+            resolve(response);
+            subscription.dispose();
+          }
+        });
       });
-      this.websocket.send(
-        vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
-      );
-    });
+    }
+    return Promise.resolve({});
   }
 
   private handleMessage(message: MessageEvent): void {
