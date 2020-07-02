@@ -40,7 +40,7 @@ export class StreamApi {
 
   public startStream(
     data: vertexvis.protobuf.stream.IStartStreamPayload
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+  ): Promise<void> {
     return this.sendRequest({
       startStream: {
         ...data,
@@ -48,9 +48,7 @@ export class StreamApi {
     });
   }
 
-  public beginInteraction(): Promise<
-    vertexvis.protobuf.stream.IStreamResponse
-  > {
+  public beginInteraction(): Promise<void> {
     return this.sendRequest({
       beginInteraction: {},
     });
@@ -58,9 +56,7 @@ export class StreamApi {
 
   public replaceCamera({
     camera,
-  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<
-    vertexvis.protobuf.stream.IStreamResponse
-  > {
+  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<void> {
     return this.sendRequest({
       updateCamera: {
         camera,
@@ -72,7 +68,7 @@ export class StreamApi {
     requestId: string,
     { point }: vertexvis.protobuf.stream.IHitItemsPayload
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest({
+    return this.sendRequestWithId({
       requestId: {
         value: requestId,
       },
@@ -82,7 +78,7 @@ export class StreamApi {
     });
   }
 
-  public endInteraction(): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+  public endInteraction(): Promise<void> {
     return this.sendRequest({
       endInteraction: {},
     });
@@ -90,24 +86,27 @@ export class StreamApi {
 
   private sendRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+  ): Promise<void> {
     this.websocket.send(
       vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
     );
-    if (request.requestId?.value != null) {
-      return new Promise(resolve => {
-        const subscription = this.onResponse(response => {
-          if (
-            request.requestId?.value != null &&
-            request.requestId?.value === response.requestId?.value
-          ) {
-            resolve(response);
-            subscription.dispose();
-          }
-        });
+    return Promise.resolve();
+  }
+
+  private sendRequestWithId(
+    request: vertexvis.protobuf.stream.IStreamRequest
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return new Promise(resolve => {
+      const subscription = this.onResponse(response => {
+        if (
+          request.requestId?.value != null &&
+          request.requestId?.value === response.requestId?.value
+        ) {
+          resolve(response);
+          subscription.dispose();
+        }
       });
-    }
-    return Promise.resolve({});
+    });
   }
 
   private handleMessage(message: MessageEvent): void {

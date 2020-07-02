@@ -16,7 +16,6 @@ describe(StreamApi, () => {
   const url = (): UrlDescriptor => ({
     url: 'ws://foo.com',
   });
-  const frame = { frame: {} };
 
   beforeEach(() => {
     restoreMocks();
