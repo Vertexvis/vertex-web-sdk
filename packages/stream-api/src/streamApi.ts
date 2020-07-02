@@ -2,7 +2,7 @@ import { WebSocketClient } from './webSocketClient';
 import { UrlProvider } from './url';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
+import { Disposable, EventDispatcher } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
