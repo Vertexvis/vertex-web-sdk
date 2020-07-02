@@ -15,6 +15,8 @@ export class StreamApi {
 
   private messageSubscription?: Disposable;
 
+  private requestSubscriptions: { [requestId: string]: Disposable } = {};
+
   public constructor(
     private websocket: WebSocketClient = new WebSocketClient()
   ) {}
@@ -91,7 +93,11 @@ export class StreamApi {
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return new Promise(resolve => {
       const subscription = this.onResponse(response => {
-        if (response.frame != null || response.hitItems) {
+        if (
+          response.frame != null ||
+          (request.requestId?.value != null &&
+            request.requestId?.value === response.requestId?.value)
+        ) {
           resolve(response);
           subscription.dispose();
         }
