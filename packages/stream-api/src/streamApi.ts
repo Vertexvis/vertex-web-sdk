@@ -2,7 +2,7 @@ import { WebSocketClient } from './webSocketClient';
 import { UrlProvider } from './url';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
@@ -66,12 +66,14 @@ export class StreamApi {
     });
   }
 
-  public hitItems({
-    point,
-  }: vertexvis.protobuf.stream.IHitItemsPayload): Promise<
-    vertexvis.protobuf.stream.IStreamResponse
-  > {
+  public hitItems(
+    requestId: string,
+    { point }: vertexvis.protobuf.stream.IHitItemsPayload
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({
+      requestId: {
+        value: requestId,
+      },
       hitItems: {
         point,
       },
@@ -89,7 +91,7 @@ export class StreamApi {
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return new Promise(resolve => {
       const subscription = this.onResponse(response => {
-        if (response.frame != null) {
+        if (response.frame != null || response.hitItems) {
           resolve(response);
           subscription.dispose();
         }
