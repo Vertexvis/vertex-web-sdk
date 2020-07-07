@@ -7,14 +7,15 @@ import {
 } from '../__mocks__/webSocketClient';
 import { StreamApi } from '../streamApi';
 import { UrlDescriptor } from '../url';
+import { UUID } from '@vertexvis/utils';
 
 describe(StreamApi, () => {
+  jest.setTimeout(100);
   const ws = new WebSocketClient();
   const api = new StreamApi(ws);
   const url = (): UrlDescriptor => ({
     url: 'ws://foo.com',
   });
-  const frame = { frame: {} };
 
   beforeEach(() => {
     restoreMocks();
@@ -36,9 +37,20 @@ describe(StreamApi, () => {
   describe('send request', () => {
     beforeEach(() => api.connect(url));
 
-    it('should complete promise when response is received', () => {
+    it('should complete promise immediately when no requestId is provided', () => {
       const result = api.beginInteraction();
-      simulateResponse(frame);
+      return result;
+    });
+
+    it('should complete promise when response is received with requestId matching request', () => {
+      const requestId = UUID.create();
+      const result = api.hitItems(requestId, {
+        point: { x: 10, y: 10 },
+      });
+      simulateResponse({
+        requestId: { value: requestId },
+        hitItems: {},
+      });
       return result;
     });
   });

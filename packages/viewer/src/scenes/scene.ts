@@ -2,6 +2,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
+import { Raycaster } from './raycaster';
 
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
@@ -21,6 +22,13 @@ export class Scene {
       Dimensions.aspectRatio(this.viewport()),
       this.frame.sceneAttributes.camera
     );
+  }
+
+  /**
+   * Raycaster to request items that intersect a point.
+   */
+  public raycaster(): Raycaster {
+    return new Raycaster(this.stream);
   }
 
   /**

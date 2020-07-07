@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/stream-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A websocket client for interacting with Vertex's stream API.",
   "author": "Dan Schultz <dan.schultz@vertexvis.com>",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
@@ -34,7 +34,7 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.0.16",
+    "@vertexvis/frame-streaming-protos": "^0.0.19",
     "@vertexvis/utils": "0.6.1"
   },
   "devDependencies": {
