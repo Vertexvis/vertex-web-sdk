@@ -15,8 +15,6 @@ export class StreamApi {
 
   private messageSubscription?: Disposable;
 
-  private requestSubscriptions: { [requestId: string]: Disposable } = {};
-
   public constructor(
     private websocket: WebSocketClient = new WebSocketClient()
   ) {}
