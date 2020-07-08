@@ -2,6 +2,7 @@ import {
   WebSocketClient,
   connectMock,
   restoreMocks,
+  sendMock,
   simulateResponse,
   closeMock,
 } from '../__mocks__/webSocketClient';
@@ -39,6 +40,7 @@ describe(StreamApi, () => {
 
     it('should complete promise immediately when no requestId is provided', () => {
       const result = api.beginInteraction();
+      expect(sendMock).toHaveBeenCalled();
       return result;
     });
 
@@ -51,6 +53,7 @@ describe(StreamApi, () => {
         requestId: { value: requestId },
         hitItems: {},
       });
+      expect(sendMock).toHaveBeenCalled();
       return result;
     });
   });
