@@ -104,6 +104,9 @@ export class StreamApi {
           subscription.dispose();
         }
       });
+      this.websocket.send(
+        vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
+      );
     });
   }
 
