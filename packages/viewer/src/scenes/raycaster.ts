@@ -17,7 +17,9 @@ export class Raycaster {
    */
   public async hitItems(
     point: Point.Point
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.stream.hitItems(UUID.create(), { point });
+  ): Promise<vertexvis.protobuf.stream.IHitItemsResult> {
+    return this.stream
+      .hitItems(UUID.create(), { point })
+      .then(resp => resp.hitItems);
   }
 }
