@@ -1,16 +1,25 @@
 import { WebSocketClient } from './webSocketClient';
 import { UrlProvider } from './url';
 import { parseResponse } from './responses';
-import { vertexvis, google } from '@vertexvis/frame-streaming-protos';
+import {
+  HitItemsPayload,
+  ReplaceCameraPayload,
+  StartStreamPayload,
+} from './types';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
 ) => void;
 
-interface ParseArgsRequest {
-  requestId?: google.protobuf.IStringValue;
-  data: any;
+interface StringValue {
+  value?: string;
+}
+
+interface ParseArgsRequest<T> {
+  requestId?: StringValue;
+  data: T;
 }
 
 export class StreamApi {
@@ -41,22 +50,20 @@ export class StreamApi {
     return this.onResponseDispatcher.on(handler);
   }
 
-  public startStream(
-    data: vertexvis.protobuf.stream.IStartStreamPayload
-  ): Promise<void>;
+  public startStream(data: StartStreamPayload): Promise<void>;
 
   public startStream(
     requestId: UUID.UUID,
-    data: vertexvis.protobuf.stream.IStartStreamPayload
-  ): Promise<vertexvis.protobuf.stream.IStartStreamResult>;
+    data: StartStreamPayload
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public startStream(...args: unknown[]): unknown {
-    const request = this.parseArgs(args);
+    const request = this.parseArgs<
+      vertexvis.protobuf.stream.StartStreamPayload
+    >(args);
     return this.sendRequest({
-      ...request.requestId,
-      startStream: {
-        ...request.data,
-      },
+      requestId: request.requestId,
+      startStream: { ...request.data },
     });
   }
 
@@ -64,52 +71,50 @@ export class StreamApi {
 
   public beginInteraction(
     requestId: UUID.UUID
-  ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult>;
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public beginInteraction(...args: unknown[]): unknown {
-    const request = this.parseArgs(args);
+    const request = this.parseArgs<
+      vertexvis.protobuf.stream.BeginInteractionPayload
+    >(args);
     return this.sendRequest({
-      ...request.requestId,
-      beginInteraction: {},
+      requestId: request.requestId,
+      beginInteraction: { ...request.data },
     });
   }
 
-  public replaceCamera({
-    camera,
-  }: vertexvis.protobuf.stream.IUpdateCameraPayload): Promise<void>;
+  public replaceCamera({ camera }: ReplaceCameraPayload): Promise<void>;
 
   public replaceCamera(
     requestId: UUID.UUID,
-    { camera }: vertexvis.protobuf.stream.IUpdateCameraPayload
-  ): Promise<vertexvis.protobuf.stream.IUpdateCameraResult>;
+    { camera }: ReplaceCameraPayload
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public replaceCamera(...args: unknown[]): unknown {
-    const request = this.parseArgs(args);
+    const request = this.parseArgs<
+      vertexvis.protobuf.stream.IUpdateCameraPayload
+    >(args);
     const requestPayload = {
-      ...request.requestId,
-      updateCamera: {
-        camera: request.data as vertexvis.protobuf.stream.ICamera,
-      },
+      requestId: request.requestId,
+      updateCamera: { ...request.data },
     };
     return this.sendRequest(requestPayload);
   }
 
-  public hitItems({
-    point,
-  }: vertexvis.protobuf.stream.IHitItemsPayload): Promise<void>;
+  public hitItems({ point }: HitItemsPayload): Promise<void>;
 
   public hitItems(
     requestId: string,
-    { point }: vertexvis.protobuf.stream.IHitItemsPayload
+    { point }: HitItemsPayload
   ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public hitItems(...args: unknown[]): unknown {
-    const request = this.parseArgs(args);
+    const request = this.parseArgs<vertexvis.protobuf.stream.IHitItemsPayload>(
+      args
+    );
     return this.sendRequest({
-      ...request.requestId,
-      hitItems: {
-        point: request.data as vertexvis.protobuf.stream.IPoint,
-      },
+      requestId: request.requestId,
+      hitItems: { ...request.data },
     });
   }
 
@@ -122,17 +127,18 @@ export class StreamApi {
   public endInteraction(...args: unknown[]): unknown {
     const request = this.parseArgs(args);
     return this.sendRequest({
-      ...request.requestId,
+      requestId: request.requestId,
       endInteraction: {},
     });
   }
 
-  private parseArgs(args: unknown[]): ParseArgsRequest {
+  private parseArgs<T>(args: unknown[]): ParseArgsRequest<T> {
     const requestId =
-      typeof args[0] === 'string' ? { requestId: { value: args[0] } } : {};
-    const request = {
-      ...requestId,
-      data: typeof args[0] === 'object' ? args[0] : args[1],
+      typeof args[0] === 'string' ? { value: args[0] } : undefined;
+    const data = (typeof args[0] === 'object' ? args[0] : args[1]) as T;
+    const request: ParseArgsRequest<T> = {
+      requestId,
+      data,
     };
     return request;
   }

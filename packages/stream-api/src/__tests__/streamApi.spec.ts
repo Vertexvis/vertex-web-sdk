@@ -57,4 +57,24 @@ describe(StreamApi, () => {
       return result;
     });
   });
+
+  describe('replace camera', () => {
+    beforeEach(() => api.connect(url));
+    it('should complete promise with updated camera when requestId provided', () => {
+      const requestId = UUID.create();
+      const result = api.replaceCamera(requestId, {
+        camera: {
+          position: { x: 0, y: 0, z: 0 },
+          lookAt: { x: 0, y: 0, z: 0 },
+          up: { x: 0, y: 0, z: 0 },
+        },
+      });
+      simulateResponse({
+        requestId: { value: requestId },
+        updateCamera: {},
+      });
+      expect(sendMock).toHaveBeenCalled();
+      return result;
+    });
+  });
 });
