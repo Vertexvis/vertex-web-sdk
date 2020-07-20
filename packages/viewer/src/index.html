@@ -35,7 +35,7 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        viewer.token = 'OFQkyrmGbOVSs560k4doTfZQ2b_LRckgNYBRMW3tRt8.fDKosxo468Wi_z3ig75Q5cOsXIAVP5omJWGC-3znwfs'
+        viewer.token = 'gaEUGlqnHZoz_C_VnImAJaKe-vJX0bUQD7io94gM1rU.pb42UH1cTcD-O17D3bDvJe2tFx0HyxNpVJMuXD32deE'
         await viewer.load('urn:vertexvis:scene:51ba5e31-82c6-4f64-bcf5-349ec5802425');
 
         viewer.addEventListener('tap', async function(event) {
@@ -43,19 +43,14 @@
           const { position } = event.detail;
           const scene = await viewer.scene();
           const raycaster = await scene.raycaster();
-
-          // const test = scene.material("1234").material("1111").execute();
-
+          
           const abc = scene
             .itemOperation()
-            .where(q => q.itemId('abc').or().q.suppliedId('123'))
+            .where(q => q.withItemId('test').or().withItemId('abc123').or().withItemId('111'))
+            .materialOverrideFromHex('#1144ff')
             .show()
-            .material("blue")
             .execute();
 
-          console.log('abc: ', abc)
-          const { bomItems } = await raycaster.hitItems(position);
-          console.log('bomItems: ', bomItems);
           if (bomItems.length == 0) {
             scene.clearAllHighlights().execute();
           } else {

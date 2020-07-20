@@ -2,7 +2,7 @@ import { WebSocketClient } from './webSocketClient';
 import { UrlProvider } from './url';
 import { parseResponse } from './responses';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
@@ -20,7 +20,6 @@ export class StreamApi {
   ) {}
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
-    console.log('connecting to stream');
     await this.websocket.connect(urlProvider);
     this.messageSubscription = this.websocket.onMessage(message =>
       this.handleMessage(message)
@@ -39,9 +38,11 @@ export class StreamApi {
 
   public startStream(
     data: vertexvis.protobuf.stream.IStartStreamPayload
-  ): Promise<void> {
-    console.log('start stream: ', data);
-    return this.sendRequest({
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequestWithId({
+      requestId: {
+        value: UUID.create(),
+      },
       startStream: {
         ...data,
       },
@@ -74,6 +75,20 @@ export class StreamApi {
       },
       hitItems: {
         point,
+      },
+    });
+  }
+
+  public createSceneAlteration(
+    requestId: string,
+    request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequestWithId({
+      requestId: {
+        value: requestId,
+      },
+      createSceneAlteration: {
+        ...request,
       },
     });
   }
@@ -113,11 +128,9 @@ export class StreamApi {
   }
 
   private handleMessage(message: MessageEvent): void {
-    console.log('message: ', message);
     const response = parseResponse(message.data);
 
     if (response != null) {
-      console.log('fss response: ', response);
       this.onResponseDispatcher.emit(response);
     }
   }

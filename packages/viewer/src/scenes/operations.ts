@@ -1,5 +1,5 @@
 import { SceneItemOperationsExecutor } from './scene';
-
+import { ColorMaterial } from './colorMaterial';
 interface ShowItemOperation {
   type: 'show';
 }
@@ -21,7 +21,7 @@ interface ItemIdSelector {
 /**
  * A selector builder that matches at an item level.
  */
-export class ItemSelectorBuilder implements SelectorBuilder<ItemSelector> {
+export class ItemSelectorBuilder implements Selector<ItemSelector> {
   private query?: ItemSelector;
 
   public build(): ItemSelector {
@@ -31,11 +31,11 @@ export class ItemSelectorBuilder implements SelectorBuilder<ItemSelector> {
     return this.query;
   }
 
-  public or(): SelectorBuilder<OrSelector> {
+  public or(): Selector<OrSelector> {
     return new OrSelectorBuilder(this);
   }
 
-  public and(): SelectorBuilder<AndSelector> {
+  public and(): Selector<AndSelector> {
     return new AndSelectorBuilder(this);
   }
 
@@ -50,28 +50,26 @@ export class ItemSelectorBuilder implements SelectorBuilder<ItemSelector> {
   }
 }
 
+export type AnySelector = ItemSelector | AndSelector | OrSelector;
+
 /**
  * A selector builder to perform boolean `or` operations.
  */
-export class OrSelectorBuilder implements SelectorBuilder<OrSelector> {
-  private builders?: SelectorBuilder<ItemSelector>[] = [];
+export class OrSelectorBuilder implements Selector<OrSelector> {
+  private builders: Selector<AnySelector>[] = [];
+  private parent: Selector<ItemSelector>;
 
-  private parent: SelectorBuilder<ItemSelector>;
-  public constructor(parent: SelectorBuilder<ItemSelector>) {
+  public constructor(parent: Selector<ItemSelector>) {
     this.builders.push(parent);
     this.parent = parent;
   }
 
-  public or(): SelectorBuilder<OrSelector> {
+  public or(): Selector<OrSelector> {
     return this;
   }
 
-  public and(): SelectorBuilder<AndSelector> {
+  public and(): Selector<AndSelector> {
     return new AndSelectorBuilder(this.parent);
-  }
-
-  public build(): OrSelector {
-    return { type: 'or', selectors: this.builders.map(q => q.build()) };
   }
 
   public withSuppliedId(suppliedId: string): this {
@@ -88,24 +86,21 @@ export class OrSelectorBuilder implements SelectorBuilder<OrSelector> {
 /**
  * A selector builder to perform boolean `and` operations.
  */
-export class AndSelectorBuilder implements SelectorBuilder<AndSelector> {
-  private builders?: SelectorBuilder<ItemSelector>[] = [];
-  private parent: SelectorBuilder<ItemSelector>;
-  public constructor(parent: SelectorBuilder<ItemSelector>) {
+export class AndSelectorBuilder implements Selector<AndSelector> {
+  private builders: Selector<AnySelector>[] = [];
+  private parent: Selector<AnySelector>;
+
+  public constructor(parent: Selector<AnySelector>) {
     this.builders.push(parent);
     this.parent = parent;
   }
 
-  public or(): SelectorBuilder<OrSelector> {
+  public or(): Selector<OrSelector> {
     return new OrSelectorBuilder(this.parent);
   }
 
-  public and(): SelectorBuilder<AndSelector> {
+  public and(): Selector<AndSelector> {
     return this;
-  }
-
-  public build(): AndSelector {
-    return { type: 'and', selectors: this.builders.map(q => q.build()) };
   }
 
   public withSuppliedId(suppliedId: string): this {
@@ -136,24 +131,26 @@ interface AndSelector {
 }
 
 export interface OperationDefinition {
-  operation: ItemOperation | SceneOperation;
+  operation: ItemOperation;
 }
 
-export interface SelectorBuilder<T> {
+export interface SelectorBuilder<T> extends Selector<T> {
   /**
    * Returns the built selector.
    */
   build(): T;
+}
+
+export interface Selector<T> {
+  /**
+   * Returns a conditional builder to perform an `or` operation.
+   */
+  or(): Selector<OrSelector>;
 
   /**
    * Returns a conditional builder to perform an `or` operation.
    */
-  or(): SelectorBuilder<OrSelector>;
-
-  /**
-   * Returns a conditional builder to perform an `or` operation.
-   */
-  and(): SelectorBuilder<AndSelector>;
+  and(): Selector<AndSelector>;
 
   /**
    * Selects a item that has the given Customer facing ID
@@ -172,24 +169,39 @@ export interface SelectorBuilder<T> {
 
 interface ChangeMaterialOperation {
   type: 'change-material';
-  color: string;
+  color: ColorMaterial;
 }
 
-export type SceneOperation = ChangeMaterialOperation;
-
-export type ItemOperation = ShowItemOperation | HideItemOperation;
+export type ItemOperation =
+  | ShowItemOperation
+  | HideItemOperation
+  | ChangeMaterialOperation;
 
 export interface SceneItemQuery {
   where(
-    query: SelectorBuilder<ItemSelectorBuilder>
+    query: (
+      clientBuilder: Selector<ItemSelector>
+    ) => SelectorBuilder<ItemSelector>
   ): SceneItemOperationsExecutor;
 }
 
 export interface SceneItemOperations<T> {
-  material(color: string): T;
+  materialOverride(color: ColorMaterial): T;
   show(): T;
   hide(): T;
 }
+
+export const selectorToBuilder = (
+  selector: Selector<ItemSelector>
+): SelectorBuilder<ItemSelector> => {
+  throw new Error('Not Yet Implemented');
+  // return {
+  //   ...selector,
+  //   build: () => {
+  //     selector.
+  //   }
+  // }
+};
 
 export class SceneOperationBuilder
   implements SceneItemOperations<SceneOperationBuilder> {
@@ -203,7 +215,7 @@ export class SceneOperationBuilder
     return this.operations.concat();
   }
 
-  public material(color: string): SceneOperationBuilder {
+  public materialOverride(color: ColorMaterial): SceneOperationBuilder {
     return this.operation({ type: 'change-material', color });
   }
 
@@ -215,7 +227,6 @@ export class SceneOperationBuilder
     return this.operation({ type: 'hide' });
   }
 
-  private operation(operation: SceneOperation): SceneOperationBuilder;
   private operation(operation: ItemOperation): SceneOperationBuilder;
 
   private operation(...args: any[]): this {
@@ -226,16 +237,5 @@ export class SceneOperationBuilder
       this.operations.push({ operation });
     }
     return this;
-  }
-}
-
-export class SceneQueryBuilder implements SceneItemQuery {
-  private query: SelectorBuilder<ItemSelectorBuilder> | undefined;
-
-  public where(
-    _query: SelectorBuilder<ItemSelectorBuilder>
-  ): SceneItemOperationsExecutor {
-    this.query = _query;
-    return new SceneItemOperationsExecutor(null, this.query);
   }
 }

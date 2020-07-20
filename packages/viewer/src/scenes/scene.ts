@@ -3,30 +3,34 @@ import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
+import { ColorMaterial, fromHex } from './colorMaterial';
 import {
   SceneItemOperations,
   SceneOperationBuilder,
-  SelectorBuilder,
   ItemSelectorBuilder,
   SceneItemQuery,
+  SelectorBuilder,
+  ItemSelector,
+  Selector,
 } from './operations';
+import { CommandRegistry } from '../commands/commandRegistry';
+import { UUID } from '@vertexvis/utils';
 
 export class SceneItemOperationsExecutor
   implements SceneItemOperations<SceneItemOperationsExecutor> {
   protected builder = new SceneOperationBuilder();
-  private queryExecutor: SceneItemQueryExecutor;
   public constructor(
-    queryExecutor?: SceneItemQueryExecutor,
-    query?: SelectorBuilder<ItemSelectorBuilder>
-  ) {
-    this.queryExecutor = queryExecutor || new SceneItemQueryExecutor();
-    if (query != null) {
-      queryExecutor.where(query);
-    }
+    private sceneViewId: UUID.UUID,
+    private commands: CommandRegistry,
+    private query: ItemSelectorBuilder
+  ) {}
+
+  public materialOverrideFromHex(color: string): SceneItemOperationsExecutor {
+    return this.materialOverride(fromHex(color));
   }
 
-  public material(color: string): SceneItemOperationsExecutor {
-    this.builder.material(color);
+  public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
+    this.builder.materialOverride(color);
     return this;
   }
 
@@ -42,17 +46,29 @@ export class SceneItemOperationsExecutor
 
   public execute(): void {
     const operations = this.builder.build();
-    console.log('operations: ', operations);
+    this.commands.execute('stream.createSceneAlteration', {
+      sceneViewId: this.sceneViewId,
+      operations,
+    });
   }
 }
 
 export class SceneItemQueryExecutor implements SceneItemQuery {
-  protected builder = new SceneOperationBuilder();
+  public constructor(
+    private sceneViewId: UUID.UUID,
+    private commands: CommandRegistry
+  ) {}
+
   public where(
-    query: SelectorBuilder<ItemSelectorBuilder>
+    query: (
+      clientBuilder: Selector<ItemSelector>
+    ) => SelectorBuilder<ItemSelector>
   ): SceneItemOperationsExecutor {
-    console.log(query);
-    return new SceneItemOperationsExecutor(this);
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      query(new ItemSelectorBuilder())
+    );
   }
 }
 
@@ -63,17 +79,15 @@ export class SceneItemQueryExecutor implements SceneItemQuery {
  * the scene.
  */
 export class Scene {
-  private operationBuilder = new SceneOperationBuilder();
-  private queryBuilder = new SceneOperationBuilder();
-  public constructor(private stream: StreamApi, private frame: Frame.Frame) {}
-
-  // public execute(): void {
-  //   const operations = this.operationBuilder.build();
-  //   console.log(operations);
-  // }
+  public constructor(
+    private stream: StreamApi,
+    private frame: Frame.Frame,
+    private commands: CommandRegistry,
+    private sceneViewId: UUID.UUID
+  ) {}
 
   public itemOperation(): SceneItemQueryExecutor {
-    return new SceneItemQueryExecutor();
+    return new SceneItemQueryExecutor(this.sceneViewId, this.commands);
   }
 
   /**
