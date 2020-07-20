@@ -20,6 +20,7 @@ export class StreamApi {
   ) {}
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
+    console.log('connecting to stream');
     await this.websocket.connect(urlProvider);
     this.messageSubscription = this.websocket.onMessage(message =>
       this.handleMessage(message)
@@ -39,6 +40,7 @@ export class StreamApi {
   public startStream(
     data: vertexvis.protobuf.stream.IStartStreamPayload
   ): Promise<void> {
+    console.log('start stream: ', data);
     return this.sendRequest({
       startStream: {
         ...data,
@@ -111,9 +113,11 @@ export class StreamApi {
   }
 
   private handleMessage(message: MessageEvent): void {
+    console.log('message: ', message);
     const response = parseResponse(message.data);
 
     if (response != null) {
+      console.log('fss response: ', response);
       this.onResponseDispatcher.emit(response);
     }
   }

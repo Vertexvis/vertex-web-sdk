@@ -40,6 +40,7 @@ export function startStream(
   dimensions: Dimensions.Dimensions
 ): Command<Promise<void>> {
   return ({ stream }: CommandContext) => {
+    console.log('startStream: ', dimensions);
     return stream.startStream({
       width: dimensions.width,
       height: dimensions.height,

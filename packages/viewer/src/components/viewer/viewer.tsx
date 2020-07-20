@@ -350,6 +350,8 @@ export class Viewer {
         throw new WebsocketConnectionError(this.errorMessage, e);
       }
 
+      console.log('test');
+
       await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
         'stream.start',
         this.dimensions
@@ -381,6 +383,7 @@ export class Viewer {
   private handleStreamResponse(
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
+    console.log('response fss', response);
     if (response.frame != null) {
       this.drawFrame(response.frame);
     }
