@@ -54,112 +54,72 @@ export class StreamApi {
 
   public startStream(
     data: StartStreamPayload,
-    withResponse: boolean
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
-
-  public startStream(...args: unknown[]): unknown {
-    const request = this.parseArgs<
-      vertexvis.protobuf.stream.StartStreamPayload
-    >(args);
-    return this.sendRequest({
-      requestId: request.requestId,
-      startStream: { ...request.data },
-    });
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+    return this.sendRequest(
+      {
+        startStream: data,
+      },
+      withResponse
+    );
   }
-
-  public beginInteraction(): Promise<void>;
 
   public beginInteraction(
-    withResponse: boolean
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
-
-  public beginInteraction(...args: unknown[]): unknown {
-    const request = this.parseArgs<
-      vertexvis.protobuf.stream.BeginInteractionPayload
-    >(args);
-    return this.sendRequest({
-      requestId: request.requestId,
-      beginInteraction: { ...request.data },
-    });
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+    return this.sendRequest(
+      {
+        beginInteraction: {},
+      },
+      withResponse
+    );
   }
-
-  public replaceCamera({ camera }: ReplaceCameraPayload): Promise<void>;
 
   public replaceCamera(
     { camera }: ReplaceCameraPayload,
-    withResponse: boolean
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
-
-  public replaceCamera(...args: unknown[]): unknown {
-    const request = this.parseArgs<
-      vertexvis.protobuf.stream.IUpdateCameraPayload
-    >(args);
-    const requestPayload = {
-      requestId: request.requestId,
-      updateCamera: { ...request.data },
-    };
-    return this.sendRequest(requestPayload);
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+    return this.sendRequest({ updateCamera: { camera } }, withResponse);
   }
-
-  public hitItems({ point }: HitItemsPayload): Promise<void>;
 
   public hitItems(
     { point }: HitItemsPayload,
-    withResponse: boolean
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
-
-  public hitItems(...args: unknown[]): unknown {
-    const request = this.parseArgs<vertexvis.protobuf.stream.IHitItemsPayload>(
-      args
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+    return this.sendRequest(
+      {
+        hitItems: { point },
+      },
+      withResponse
     );
-    return this.sendRequest({
-      requestId: request.requestId,
-      hitItems: { ...request.data },
-    });
   }
-
-  public endInteraction(): Promise<void>;
 
   public endInteraction(
-    withResponse: boolean
-  ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult>;
-
-  public endInteraction(...args: unknown[]): unknown {
-    const request = this.parseArgs<
-      vertexvis.protobuf.stream.IBeginInteractionPayload
-    >(args);
-    return this.sendRequest({
-      requestId: request.requestId,
-      endInteraction: {},
-    });
-  }
-
-  private parseArgs<T>(args: unknown[]): ParseArgsRequest<T> {
-    // assumption is that withResponse always the last argument
-    const withResponseIndex = args.findIndex(args => typeof args === 'boolean');
-    const dataIndex = args.findIndex(args => typeof args === 'object');
-    const requestId =
-      withResponseIndex > -1 && args[withResponseIndex]
-        ? { value: UUID.create() }
-        : undefined;
-    const data = dataIndex > -1 ? (args[dataIndex] as T) : undefined;
-    const request: ParseArgsRequest<T> = {
-      requestId,
-      data,
-    };
-    return request;
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult | void> {
+    return this.sendRequest(
+      {
+        endInteraction: {},
+      },
+      withResponse
+    );
   }
 
   private sendRequest(
-    request: vertexvis.protobuf.stream.IStreamRequest
+    request: vertexvis.protobuf.stream.IStreamRequest,
+    withResponse: boolean
   ): Promise<void | vertexvis.protobuf.stream.IStreamResponse> {
-    if (request.requestId?.value != null) {
+    if (withResponse) {
+      const requestId = UUID.create();
+      request = {
+        requestId: {
+          value: requestId,
+        },
+        ...request,
+      };
       return new Promise(resolve => {
         const subscription = this.onResponse(response => {
-          if (
-            request.requestId?.value != null &&
-            request.requestId?.value === response.requestId?.value
-          ) {
+          if (requestId === response.requestId?.value) {
             resolve(response);
             subscription.dispose();
           }

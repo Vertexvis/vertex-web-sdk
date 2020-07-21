@@ -16,7 +16,13 @@ export class Raycaster {
    */
   public async hitItems(
     point: Point.Point
-  ): Promise<vertexvis.protobuf.stream.IHitItemsResult> {
-    return this.stream.hitItems({ point }, true).then(resp => resp.hitItems);
+  ): Promise<vertexvis.protobuf.stream.IHitItemsResult | void> {
+    return this.stream
+      .hitItems({ point }, true)
+      .then(
+        (...args: unknown[]) =>
+          args.length === 1 &&
+          (args[0] as vertexvis.protobuf.stream.IStreamResponse).hitItems
+      );
   }
 }

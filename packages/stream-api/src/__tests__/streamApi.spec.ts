@@ -49,7 +49,7 @@ describe(StreamApi, () => {
     beforeEach(() => api.connect(url));
 
     it('should complete promise immediately when no requestId is provided', () => {
-      const result = api.beginInteraction();
+      const result = api.beginInteraction(false);
       expect(sendMock).toHaveBeenCalled();
       return result;
     });
