@@ -1,7 +1,6 @@
 import { StreamApi } from '@vertexvis/stream-api';
 import { Point } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { UUID } from '@vertexvis/utils';
 
 /**
  * The `Raycaster` class is here.
@@ -18,8 +17,6 @@ export class Raycaster {
   public async hitItems(
     point: Point.Point
   ): Promise<vertexvis.protobuf.stream.IHitItemsResult> {
-    return this.stream
-      .hitItems(UUID.create(), { point })
-      .then(resp => resp.hitItems);
+    return this.stream.hitItems({ point }, true).then(resp => resp.hitItems);
   }
 }

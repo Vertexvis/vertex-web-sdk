@@ -19,7 +19,7 @@ interface StringValue {
 
 interface ParseArgsRequest<T> {
   requestId?: StringValue;
-  data: T;
+  data?: T;
 }
 
 export class StreamApi {
@@ -35,9 +35,9 @@ export class StreamApi {
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
     await this.websocket.connect(urlProvider);
-    this.messageSubscription = this.websocket.onMessage(message =>
-      this.handleMessage(message)
-    );
+    this.messageSubscription = this.websocket.onMessage(message => {
+      this.handleMessage(message);
+    });
     return { dispose: () => this.dispose() };
   }
 
@@ -53,8 +53,8 @@ export class StreamApi {
   public startStream(data: StartStreamPayload): Promise<void>;
 
   public startStream(
-    requestId: UUID.UUID,
-    data: StartStreamPayload
+    data: StartStreamPayload,
+    withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public startStream(...args: unknown[]): unknown {
@@ -70,7 +70,7 @@ export class StreamApi {
   public beginInteraction(): Promise<void>;
 
   public beginInteraction(
-    requestId: UUID.UUID
+    withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public beginInteraction(...args: unknown[]): unknown {
@@ -86,8 +86,8 @@ export class StreamApi {
   public replaceCamera({ camera }: ReplaceCameraPayload): Promise<void>;
 
   public replaceCamera(
-    requestId: UUID.UUID,
-    { camera }: ReplaceCameraPayload
+    { camera }: ReplaceCameraPayload,
+    withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public replaceCamera(...args: unknown[]): unknown {
@@ -104,8 +104,8 @@ export class StreamApi {
   public hitItems({ point }: HitItemsPayload): Promise<void>;
 
   public hitItems(
-    requestId: string,
-    { point }: HitItemsPayload
+    { point }: HitItemsPayload,
+    withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse>;
 
   public hitItems(...args: unknown[]): unknown {
@@ -121,11 +121,13 @@ export class StreamApi {
   public endInteraction(): Promise<void>;
 
   public endInteraction(
-    requestId: UUID.UUID
+    withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult>;
 
   public endInteraction(...args: unknown[]): unknown {
-    const request = this.parseArgs(args);
+    const request = this.parseArgs<
+      vertexvis.protobuf.stream.IBeginInteractionPayload
+    >(args);
     return this.sendRequest({
       requestId: request.requestId,
       endInteraction: {},
@@ -133,9 +135,14 @@ export class StreamApi {
   }
 
   private parseArgs<T>(args: unknown[]): ParseArgsRequest<T> {
+    // assumption is that withResponse always the last argument
+    const withResponseIndex = args.findIndex(args => typeof args === 'boolean');
+    const dataIndex = args.findIndex(args => typeof args === 'object');
     const requestId =
-      typeof args[0] === 'string' ? { value: args[0] } : undefined;
-    const data = (typeof args[0] === 'object' ? args[0] : args[1]) as T;
+      withResponseIndex > -1 && args[withResponseIndex]
+        ? { value: UUID.create() }
+        : undefined;
+    const data = dataIndex > -1 ? (args[dataIndex] as T) : undefined;
     const request: ParseArgsRequest<T> = {
       requestId,
       data,
