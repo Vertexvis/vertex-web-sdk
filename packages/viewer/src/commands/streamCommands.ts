@@ -1,10 +1,10 @@
-import { Uri } from '@vertexvis/utils';
-import { CommandContext, Command } from './command';
-import { Disposable } from '@vertexvis/utils';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
-import { CommandRegistry } from './commandRegistry';
+import { Disposable, Uri } from '@vertexvis/utils';
 import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
+import { CommandContext, Command } from './command';
+import { CommandRegistry } from './commandRegistry';
 
 export interface ConnectOptions {
   sceneId?: string;
@@ -38,7 +38,7 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 
 export function startStream(
   dimensions: Dimensions.Dimensions
-): Command<Promise<void>> {
+): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
     return stream.startStream({
       width: dimensions.width,
