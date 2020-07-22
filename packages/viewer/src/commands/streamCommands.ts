@@ -6,11 +6,8 @@ import { CommandRegistry } from './commandRegistry';
 import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import {
-  OperationDefinition,
-  BuiltQuery,
-  ItemSelector,
-} from '../scenes/operations';
+import { OperationDefinition } from '../scenes/operations';
+import { BuiltQuery, ItemSelector } from '../scenes/selectors';
 
 export interface ConnectOptions {
   sceneId?: string;
@@ -116,7 +113,15 @@ function buildSceneItemQuery(
 function buildQueryCollection(
   query: BuiltQuery
 ): vertexvis.protobuf.stream.IQueryCollection {
-  throw new Error('not Implemented');
+  return query.items != null
+    ? {
+        queries: query.items.map((query: ItemSelector) => {
+          return {
+            sceneItemQuery: buildSceneItemQuery(query),
+          };
+        }),
+      }
+    : {};
 }
 
 function buildOperationTypes(

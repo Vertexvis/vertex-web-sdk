@@ -4,14 +4,13 @@ import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
 import { ColorMaterial, fromHex } from './colorMaterial';
+import { SceneItemOperations, SceneOperationBuilder } from './operations';
 import {
-  SceneItemOperations,
-  SceneOperationBuilder,
   SceneItemQuery,
   ItemSelector,
   Selector,
   ItemSelectorBuilder,
-} from './operations';
+} from './selectors';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 
