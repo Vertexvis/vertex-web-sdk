@@ -18,31 +18,51 @@ interface ItemIdSelector {
   value: string;
 }
 
-export class ItemSelectorBuilder implements SelectorBuilder<AnySelector> {
-  private query?: ItemSelector;
-  private andOr?: Selector<OrSelector | AndSelector>;
+export type SelectorType =
+  | 'and-selector'
+  | 'or-selector'
+  | 'internal-item-selector'
+  | 'client-item-selector';
 
-  public build(): ItemSelector {
-    console.log('andOr in item selector: ', this.andOr);
-    console.log('this.query: ', this.query);
-    if (this.query == null) {
-      throw new Error('Cannot build selector. A selector has not been defined');
+export interface BuiltQuery {
+  items?: ItemSelector[];
+  selectorType: SelectorType;
+  query?: ItemSelector;
+}
+
+export class ItemSelectorBuilder implements SelectorBuilder<BuiltQuery> {
+  private query?: ItemSelector;
+  private orAndSelector?: ConditionSelectorBuilder<
+    OrSelectorBuilder | AndSelectorBuilder
+  >;
+
+  public build(): BuiltQuery {
+    if (this.orAndSelector != null) {
+      return {
+        selectorType: this.orAndSelector.getSelectorType(),
+        items: this.orAndSelector
+          .getBuilders()
+          .map(itemBuilder => itemBuilder.build().query),
+      };
+    } else if (this.query != null) {
+      return {
+        query: this.query,
+        selectorType: 'internal-item-selector',
+      };
     }
-    return this.query;
+    throw new Error('Cannot build selector. A selector has not been defined');
   }
 
   public or(): Selector<OrSelector> {
-    const orSelector = new OrSelectorBuilder(this);
-    this.andOr = orSelector;
-    // this.builders.push(orSelector);
-    return orSelector;
+    this.orAndSelector = this.getItemSelectorBuilder('or');
+    this.query = undefined;
+    return this.orAndSelector as Selector<OrSelector>;
   }
 
   public and(): Selector<AndSelector> {
-    const andSelector = new AndSelectorBuilder(this);
-    // this.builders.push(andSelector);
-    this.andOr = andSelector;
-    return andSelector;
+    this.orAndSelector = this.getItemSelectorBuilder('and');
+    this.query = undefined;
+    return this.orAndSelector as Selector<AndSelector>;
   }
 
   public withSuppliedId(suppliedId: string): this {
@@ -54,18 +74,38 @@ export class ItemSelectorBuilder implements SelectorBuilder<AnySelector> {
     this.query = { type: 'item-id', value: itemId };
     return this;
   }
-}
 
-export type AnySelector = ItemSelector | AndSelector | OrSelector;
+  public getSelectorType(): SelectorType {
+    return 'internal-item-selector';
+  }
+
+  private getItemSelectorBuilder(
+    type: string
+  ): ConditionSelectorBuilder<OrSelectorBuilder | AndSelectorBuilder> {
+    const itemSelectorCopy =
+      this.query != null
+        ? this.query.type === 'item-id'
+          ? new ItemSelectorBuilder().withItemId(this.query.value)
+          : new ItemSelectorBuilder().withSuppliedId(this.query.value)
+        : this;
+    if (type === 'and') {
+      return new AndSelectorBuilder(itemSelectorCopy);
+    } else if (type === 'or') {
+      return new OrSelectorBuilder(itemSelectorCopy);
+    }
+
+    throw new Error('No type specified');
+  }
+}
 
 /**
  * A selector builder to perform boolean `or` operations.
  */
 
-export class OrSelectorBuilder implements Selector<OrSelector> {
-  private builders: Selector<ItemSelector>[] = [];
+export class OrSelectorBuilder implements ConditionSelectorBuilder<OrSelector> {
+  private builders: ItemSelectorBuilder[] = [];
 
-  public constructor(parent: Selector<ItemSelector>) {
+  public constructor(parent: ItemSelectorBuilder) {
     this.builders.push(parent);
   }
 
@@ -82,28 +122,29 @@ export class OrSelectorBuilder implements Selector<OrSelector> {
     return this;
   }
 
-  public build(): OrSelector {
-    return { type: 'or', selectors: this.builders.map(q => q.build()) };
-  }
-
   public withItemId(partId: string): this {
     this.builders.push(new ItemSelectorBuilder().withItemId(partId));
     return this;
+  }
+
+  public getSelectorType(): SelectorType {
+    return 'or-selector';
+  }
+
+  public getBuilders(): ItemSelectorBuilder[] {
+    return this.builders;
   }
 }
 
 /**
  * A selector builder to perform boolean `and` operations.
  */
-export class AndSelectorBuilder implements Selector<AndSelector> {
-  private builders: Selector<ItemSelector>[] = [];
+export class AndSelectorBuilder
+  implements ConditionSelectorBuilder<AndSelector> {
+  private builders: ItemSelectorBuilder[] = [];
 
-  public constructor(parent: Selector<ItemSelector>) {
+  public constructor(parent: ItemSelectorBuilder) {
     this.builders.push(parent);
-  }
-
-  public build(): AndSelector {
-    return { type: 'and', selectors: this.builders.map(q => q.build()) };
   }
 
   public or(): Selector<OrSelector> {
@@ -123,6 +164,14 @@ export class AndSelectorBuilder implements Selector<AndSelector> {
     this.builders.push(new ItemSelectorBuilder().withItemId(partId));
     return this;
   }
+
+  public getSelectorType(): SelectorType {
+    return 'and-selector';
+  }
+
+  public getBuilders(): ItemSelectorBuilder[] {
+    return this.builders;
+  }
 }
 
 /**
@@ -130,11 +179,6 @@ export class AndSelectorBuilder implements Selector<AndSelector> {
  * attribute of a scene item.
  */
 export type ItemSelector = SuppliedIdSelector | ItemIdSelector;
-
-export interface BuiltQuery {
-  builders: Selector<AnySelector>[];
-  query: ItemSelector;
-}
 
 interface OrSelector {
   type: 'or';
@@ -155,6 +199,13 @@ export interface SelectorBuilder<T> extends Partial<Selector<T>> {
    * Returns the built selector.
    */
   build(): T;
+}
+
+export interface ConditionSelectorBuilder<T> extends Partial<Selector<T>> {
+  /**
+   * Returns the itemSelectors within the selector
+   */
+  getBuilders(): ItemSelectorBuilder[];
 }
 
 export interface Selector<T> {
@@ -182,7 +233,10 @@ export interface Selector<T> {
    */
   withItemId(itemId: string): this;
 
-  build(): T;
+  /**
+   * Returns the type of Selector so that the selector is defined by a type
+   */
+  getSelectorType(): SelectorType;
 }
 
 export interface ChangeMaterialOperation {
@@ -208,18 +262,6 @@ export interface SceneItemOperations<T> {
   show(): T;
   hide(): T;
 }
-
-export const selectorToBuilder = (
-  selector: Selector<ItemSelector>
-): SelectorBuilder<ItemSelector> => {
-  throw new Error('Not Yet Implemented');
-  // return {
-  //   ...selector,
-  //   build: () => {
-  //     selector.
-  //   }
-  // }
-};
 
 export class SceneOperationBuilder
   implements SceneItemOperations<SceneOperationBuilder> {

@@ -45,14 +45,7 @@ export class SceneItemOperationsExecutor
 
   public execute(): void {
     const operations = this.builder.build();
-    console.log('query: ', this.query);
     const builtQuery = this.query.build();
-
-    console.log('builtQuery: ', builtQuery);
-
-    // if(builtQuery.builderQuery != null ){
-    //   builtQuery.builderQuery.
-    // }
     this.commands.execute(
       'stream.createSceneAlteration',
       this.sceneViewId,

@@ -35,18 +35,17 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        viewer.token = 'aOUe-63Zr6d5nr-QaCEGzAumcJUozp7AfNjkbwuKhQA.d_wV-ZvKv_w_lst0hTLLhUSH6TECXNfedX16tDWfzLM';
+        viewer.token = 'MGVXVo6pigYTLpxDdBu-Z8237QO1Vot2SHpUsHCFoq4.u2cu1rQk29nKgt8F6KjGx-PHZ7ig4A4PunpvTd20G_4';
         await viewer.load('urn:vertexvis:scene:51ba5e31-82c6-4f64-bcf5-349ec5802425');
 
         viewer.addEventListener('tap', async function(event) {
           const { position } = event.detail;
           const scene = await viewer.scene();
           const raycaster = await scene.raycaster();
-          
-          const abc = scene
+          scene
             .itemOperation()
-            .where(q => q.withItemId('02176fa0-1f1e-4b79-b1c5-bf84903bd6a1').and().withItemId('abc123').and().withItemId('123456'))
-            .materialOverrideFromHex('#a85632')
+            .where(q => q.withItemId('02176fa0-1f1e-4b79-b1c5-bf84903bd6a1'))
+            .materialOverrideFromHex('#c9919f')
             .show()
             .execute();
         });

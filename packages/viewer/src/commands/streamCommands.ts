@@ -7,10 +7,9 @@ import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
-  ItemSelector,
   OperationDefinition,
-  AnySelector,
-  ChangeMaterialOperation,
+  BuiltQuery,
+  ItemSelector,
 } from '../scenes/operations';
 
 export interface ConnectOptions {
@@ -45,42 +44,13 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
-  selector: AnySelector,
+  query: BuiltQuery,
   operations: OperationDefinition[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    console.log('query in sceneAlteration: ', selector);
-    console.log('operations: ', operations);
-    console.log('sceneviewId in alteration: ', sceneViewId);
-    console.log('The actual Item ID: ', (selector as ItemSelector).value);
-
-    const colorOp: ChangeMaterialOperation = operations[0]
-      .operation as ChangeMaterialOperation;
     const requestId: UUID.UUID = UUID.create();
     const pbOperations: vertexvis.protobuf.stream.ISceneOperation[] = [
-      {
-        item: {
-          sceneItemQuery: {
-            id: new vertexvis.protobuf.core.Uuid({
-              hex: (selector as ItemSelector).value,
-            }),
-          },
-        },
-        operationTypes: [
-          {
-            changeMaterial: {
-              material: {
-                d: colorOp.color.opacity,
-                ns: colorOp.color.glossiness,
-                ka: colorOp.color.ambient,
-                kd: colorOp.color.diffuse,
-                ks: colorOp.color.specular,
-                ke: colorOp.color.emissive,
-              },
-            },
-          },
-        ],
-      },
+      buildSceneOperation(query, operations),
     ];
     const request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest = {
       sceneViewId: new vertexvis.protobuf.core.Uuid({
@@ -91,6 +61,98 @@ export function createSceneAlteration(
 
     return stream.createSceneAlteration(requestId, request);
   };
+}
+
+function buildSceneOperation(
+  query: BuiltQuery,
+  operations: OperationDefinition[]
+): vertexvis.protobuf.stream.ISceneOperation {
+  const operationTypes: vertexvis.protobuf.stream.IOperationType[] = buildOperationTypes(
+    operations
+  );
+
+  switch (query.selectorType) {
+    case 'and-selector':
+      return {
+        and: buildQueryCollection(query),
+        operationTypes,
+      };
+    case 'or-selector':
+      return {
+        or: buildQueryCollection(query),
+        operationTypes,
+      };
+    case 'internal-item-selector':
+      return {
+        item: {
+          sceneItemQuery: buildSceneItemQuery(query.query),
+        },
+        operationTypes,
+      };
+    default:
+      return {};
+  }
+}
+
+function buildSceneItemQuery(
+  item?: ItemSelector
+): vertexvis.protobuf.stream.ISceneItemQuery {
+  switch (item.type) {
+    case 'item-id':
+      return {
+        id: new vertexvis.protobuf.core.Uuid({
+          hex: item.value,
+        }),
+      };
+    case 'supplied-id':
+      return {
+        suppliedId: item.value,
+      };
+    default:
+      return {};
+  }
+}
+
+function buildQueryCollection(
+  query: BuiltQuery
+): vertexvis.protobuf.stream.IQueryCollection {
+  throw new Error('not Implemented');
+}
+
+function buildOperationTypes(
+  operations: OperationDefinition[]
+): vertexvis.protobuf.stream.IOperationType[] {
+  return operations.map(op => {
+    switch (op.operation.type) {
+      case 'change-material':
+        return {
+          changeMaterial: {
+            material: {
+              d: op.operation.color.opacity,
+              ns: op.operation.color.glossiness,
+              ka: op.operation.color.ambient,
+              kd: op.operation.color.diffuse,
+              ks: op.operation.color.specular,
+              ke: op.operation.color.emissive,
+            },
+          },
+        };
+      case 'hide':
+        return {
+          changeVisibility: {
+            visible: false,
+          },
+        };
+      case 'show':
+        return {
+          changeVisibility: {
+            visible: true,
+          },
+        };
+      default:
+        return {};
+    }
+  });
 }
 
 export function startStream(
