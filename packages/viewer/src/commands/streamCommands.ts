@@ -1,11 +1,10 @@
-import { Uri, UUID } from '@vertexvis/utils';
-import { CommandContext, Command } from './command';
-import { Disposable } from '@vertexvis/utils';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
-import { CommandRegistry } from './commandRegistry';
+import { Disposable, Uri, UUID } from '@vertexvis/utils';
 import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { CommandContext, Command } from './command';
+import { CommandRegistry } from './commandRegistry';
 import { OperationDefinition } from '../scenes/operations';
 import { BuiltQuery, ItemSelector } from '../scenes/selectors';
 
@@ -39,14 +38,23 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
   };
 }
 
+export function startStream(
+  dimensions: Dimensions.Dimensions
+): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
+  return ({ stream }: CommandContext) => {
+    return stream.startStream({
+      width: dimensions.width,
+      height: dimensions.height,
+    });
+  };
+}
+
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   query: BuiltQuery,
-  operations: OperationDefinition[],
-  givenRequestId?: UUID.UUID
+  operations: OperationDefinition[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    const requestId: UUID.UUID = givenRequestId || UUID.create();
     const pbOperations: vertexvis.protobuf.stream.ISceneOperation[] = [
       buildSceneOperation(query, operations),
     ];
@@ -57,7 +65,7 @@ export function createSceneAlteration(
       operations: pbOperations,
     };
 
-    return stream.createSceneAlteration(requestId, request);
+    return stream.createSceneAlteration(request);
   };
 }
 
@@ -159,18 +167,6 @@ function buildOperationTypes(
         return {};
     }
   });
-}
-
-export function startStream(
-  dimensions: Dimensions.Dimensions
-): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
-  return async ({ stream }: CommandContext) => {
-    const startStream = await stream.startStream({
-      width: dimensions.width,
-      height: dimensions.height,
-    });
-    return Promise.resolve(startStream);
-  };
 }
 
 export function registerCommands(commands: CommandRegistry): void {

@@ -57,12 +57,10 @@ describe('streamCommands', () => {
           },
         },
       ];
-      const requestId = UUID.create();
       await createSceneAlteration(
         sceneViewId,
         builtQuery,
-        operations,
-        requestId
+        operations
       )({
         stream,
         tokenProvider: tokenProvider,
@@ -70,8 +68,7 @@ describe('streamCommands', () => {
       });
 
       expect(stream.createSceneAlteration).toHaveBeenCalledWith(
-        requestId.toString(),
-        {
+        expect.objectContaining({
           operations: [
             {
               and: {
@@ -102,7 +99,7 @@ describe('streamCommands', () => {
             },
           ],
           sceneViewId: { hex: sceneViewId.toString() },
-        }
+        })
       );
     });
   });
