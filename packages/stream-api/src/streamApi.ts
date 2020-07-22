@@ -50,12 +50,10 @@ export class StreamApi {
     return this.onResponseDispatcher.on(handler);
   }
 
-  public startStream(data: StartStreamPayload): Promise<void>;
-
   public startStream(
     data: StartStreamPayload,
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest(
       {
         startStream: data,
@@ -66,7 +64,7 @@ export class StreamApi {
 
   public beginInteraction(
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest(
       {
         beginInteraction: {},
@@ -78,14 +76,14 @@ export class StreamApi {
   public replaceCamera(
     { camera }: ReplaceCameraPayload,
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ updateCamera: { camera } }, withResponse);
   }
 
   public hitItems(
     { point }: HitItemsPayload,
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse | void> {
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest(
       {
         hitItems: { point },
@@ -96,7 +94,7 @@ export class StreamApi {
 
   public endInteraction(
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult | void> {
+  ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult> {
     return this.sendRequest(
       {
         endInteraction: {},
@@ -108,7 +106,7 @@ export class StreamApi {
   private sendRequest(
     request: vertexvis.protobuf.stream.IStreamRequest,
     withResponse: boolean
-  ): Promise<void | vertexvis.protobuf.stream.IStreamResponse> {
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     if (withResponse) {
       const requestId = UUID.create();
       request = {
@@ -132,7 +130,7 @@ export class StreamApi {
     this.websocket.send(
       vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
     );
-    return Promise.resolve();
+    return Promise.resolve({});
   }
 
   private handleMessage(message: MessageEvent): void {
