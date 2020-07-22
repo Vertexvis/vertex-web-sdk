@@ -1,8 +1,12 @@
-import { startStream } from '../streamCommands';
+import { startStream, createSceneAlteration } from '../streamCommands';
 import { Dimensions } from '@vertexvis/geometry';
 import { createFrameStreamingClientMock } from '../../testing';
 import { defaultConfig, Config } from '../../config/config';
 import { Token } from '../../credentials/token';
+import { UUID } from '@vertexvis/utils';
+import { BuiltQuery } from '../../scenes/selectors';
+import { OperationDefinition } from '../../scenes/operations';
+import { fromHex } from '../../scenes/colorMaterial';
 
 describe('streamCommands', () => {
   const stream = createFrameStreamingClientMock();
@@ -19,6 +23,87 @@ describe('streamCommands', () => {
       });
 
       expect(stream.startStream).toHaveBeenCalledWith({ ...dimensions });
+    });
+  });
+
+  describe('createSceneAlteration', () => {
+    it('sends a create alteration request with the given params', async () => {
+      const sceneViewId: UUID.UUID = UUID.create();
+      const sceneItemId: UUID.UUID = UUID.create();
+      const suppliedId = 'some-suppliedId';
+      const builtQuery: BuiltQuery = {
+        selectorType: 'and-selector',
+        items: [
+          {
+            type: 'supplied-id',
+            value: suppliedId,
+          },
+          {
+            type: 'item-id',
+            value: sceneItemId.toString(),
+          },
+        ],
+      };
+      const operations: OperationDefinition[] = [
+        {
+          operation: {
+            type: 'show',
+          },
+        },
+        {
+          operation: {
+            type: 'change-material',
+            color: fromHex('#FF00AA'),
+          },
+        },
+      ];
+      const requestId = UUID.create();
+      await createSceneAlteration(
+        sceneViewId,
+        builtQuery,
+        operations,
+        requestId
+      )({
+        stream,
+        tokenProvider: tokenProvider,
+        config,
+      });
+
+      expect(stream.createSceneAlteration).toHaveBeenCalledWith(
+        requestId.toString(),
+        {
+          operations: [
+            {
+              and: {
+                queries: [
+                  { sceneItemQuery: { suppliedId: 'some-suppliedId' } },
+                  {
+                    sceneItemQuery: {
+                      id: { hex: sceneItemId.toString() },
+                    },
+                  },
+                ],
+              },
+              operationTypes: [
+                { changeVisibility: { visible: true } },
+                {
+                  changeMaterial: {
+                    material: {
+                      d: 100,
+                      ka: { a: 255, b: 170, g: 0, r: 255 },
+                      kd: { a: 255, b: 170, g: 0, r: 255 },
+                      ke: { a: 255, b: 170, g: 0, r: 255 },
+                      ks: { a: 255, b: 170, g: 0, r: 255 },
+                      ns: 10,
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+          sceneViewId: { hex: sceneViewId.toString() },
+        }
+      );
     });
   });
 });

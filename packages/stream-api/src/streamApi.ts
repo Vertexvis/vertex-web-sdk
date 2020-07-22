@@ -91,7 +91,6 @@ export class StreamApi {
         ...request,
       },
     };
-    console.log('request to fss: ', givenReq);
     return this.sendRequestWithId(givenReq);
   }
 

@@ -42,10 +42,11 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   query: BuiltQuery,
-  operations: OperationDefinition[]
+  operations: OperationDefinition[],
+  givenRequestId?: UUID.UUID
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    const requestId: UUID.UUID = UUID.create();
+    const requestId: UUID.UUID = givenRequestId || UUID.create();
     const pbOperations: vertexvis.protobuf.stream.ISceneOperation[] = [
       buildSceneOperation(query, operations),
     ];

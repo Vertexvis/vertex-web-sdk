@@ -9,6 +9,7 @@ import {
 import { StreamApi } from '../streamApi';
 import { UrlDescriptor } from '../url';
 import { UUID } from '@vertexvis/utils';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 describe(StreamApi, () => {
   jest.setTimeout(100);
@@ -32,6 +33,17 @@ describe(StreamApi, () => {
       const disposable = await api.connect(url);
       disposable.dispose();
       expect(closeMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('send createSceneAlteration', () => {
+    beforeEach(() => api.connect(url));
+
+    it('should send a request with Id', () => {
+      const requestId = UUID.create();
+      const request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest = {};
+      api.createSceneAlteration(requestId.toString(), request);
+      expect(sendMock).toHaveBeenCalled();
     });
   });
 
