@@ -6,7 +6,12 @@ import { CommandRegistry } from './commandRegistry';
 import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { ItemSelector, OperationDefinition } from '../scenes/operations';
+import {
+  ItemSelector,
+  OperationDefinition,
+  AnySelector,
+  ChangeMaterialOperation,
+} from '../scenes/operations';
 
 export interface ConnectOptions {
   sceneId?: string;
@@ -40,19 +45,51 @@ export function connect({ sceneId }: ConnectOptions = {}): Command<
 
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
-  query: ItemSelector,
+  selector: AnySelector,
   operations: OperationDefinition[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    console.log('query in sceneAlteration: ', query);
+    console.log('query in sceneAlteration: ', selector);
     console.log('operations: ', operations);
+    console.log('sceneviewId in alteration: ', sceneViewId);
+    console.log('The actual Item ID: ', (selector as ItemSelector).value);
+
+    const colorOp: ChangeMaterialOperation = operations[0]
+      .operation as ChangeMaterialOperation;
     const requestId: UUID.UUID = UUID.create();
-    return stream.createSceneAlteration(requestId, {
+    const pbOperations: vertexvis.protobuf.stream.ISceneOperation[] = [
+      {
+        item: {
+          sceneItemQuery: {
+            id: new vertexvis.protobuf.core.Uuid({
+              hex: (selector as ItemSelector).value,
+            }),
+          },
+        },
+        operationTypes: [
+          {
+            changeMaterial: {
+              material: {
+                d: colorOp.color.opacity,
+                ns: colorOp.color.glossiness,
+                ka: colorOp.color.ambient,
+                kd: colorOp.color.diffuse,
+                ks: colorOp.color.specular,
+                ke: colorOp.color.emissive,
+              },
+            },
+          },
+        ],
+      },
+    ];
+    const request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest = {
       sceneViewId: new vertexvis.protobuf.core.Uuid({
         hex: sceneViewId,
       }),
-      operations: [], // todo madison need to map these operations to proto
-    });
+      operations: pbOperations,
+    };
+
+    return stream.createSceneAlteration(requestId, request);
   };
 }
 

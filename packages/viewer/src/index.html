@@ -35,31 +35,20 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        viewer.token = 'gaEUGlqnHZoz_C_VnImAJaKe-vJX0bUQD7io94gM1rU.pb42UH1cTcD-O17D3bDvJe2tFx0HyxNpVJMuXD32deE'
+        viewer.token = 'aOUe-63Zr6d5nr-QaCEGzAumcJUozp7AfNjkbwuKhQA.d_wV-ZvKv_w_lst0hTLLhUSH6TECXNfedX16tDWfzLM';
         await viewer.load('urn:vertexvis:scene:51ba5e31-82c6-4f64-bcf5-349ec5802425');
 
         viewer.addEventListener('tap', async function(event) {
-          console.log('tapping: ', event);
           const { position } = event.detail;
           const scene = await viewer.scene();
           const raycaster = await scene.raycaster();
           
           const abc = scene
             .itemOperation()
-            .where(q => q.withItemId('test').or().withItemId('abc123').or().withItemId('111'))
-            .materialOverrideFromHex('#1144ff')
+            .where(q => q.withItemId('02176fa0-1f1e-4b79-b1c5-bf84903bd6a1').and().withItemId('abc123').and().withItemId('123456'))
+            .materialOverrideFromHex('#a85632')
             .show()
             .execute();
-
-          if (bomItems.length == 0) {
-            scene.clearAllHighlights().execute();
-          } else {
-            const [item] = bomItems;
-            // scene
-            //   .clearAllHighlights()
-            //   .highlight('#ff0000', (s) => s.withItemId(item.id))
-            //   .execute();
-          }
         });
 
       }

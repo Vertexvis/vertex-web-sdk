@@ -7,11 +7,10 @@ import { ColorMaterial, fromHex } from './colorMaterial';
 import {
   SceneItemOperations,
   SceneOperationBuilder,
-  ItemSelectorBuilder,
   SceneItemQuery,
-  SelectorBuilder,
   ItemSelector,
   Selector,
+  ItemSelectorBuilder,
 } from './operations';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
@@ -46,10 +45,20 @@ export class SceneItemOperationsExecutor
 
   public execute(): void {
     const operations = this.builder.build();
-    this.commands.execute('stream.createSceneAlteration', {
-      sceneViewId: this.sceneViewId,
-      operations,
-    });
+    console.log('query: ', this.query);
+    const builtQuery = this.query.build();
+
+    console.log('builtQuery: ', builtQuery);
+
+    // if(builtQuery.builderQuery != null ){
+    //   builtQuery.builderQuery.
+    // }
+    this.commands.execute(
+      'stream.createSceneAlteration',
+      this.sceneViewId,
+      builtQuery,
+      operations
+    );
   }
 }
 
@@ -60,14 +69,14 @@ export class SceneItemQueryExecutor implements SceneItemQuery {
   ) {}
 
   public where(
-    query: (
-      clientBuilder: Selector<ItemSelector>
-    ) => SelectorBuilder<ItemSelector>
+    query: (clientBuilder: Selector<ItemSelector>) => void
   ): SceneItemOperationsExecutor {
+    const builder = new ItemSelectorBuilder();
+    query(builder);
     return new SceneItemOperationsExecutor(
       this.sceneViewId,
       this.commands,
-      query(new ItemSelectorBuilder())
+      builder
     );
   }
 }

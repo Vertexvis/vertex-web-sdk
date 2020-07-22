@@ -18,13 +18,13 @@ interface ItemIdSelector {
   value: string;
 }
 
-/**
- * A selector builder that matches at an item level.
- */
-export class ItemSelectorBuilder implements Selector<ItemSelector> {
+export class ItemSelectorBuilder implements SelectorBuilder<AnySelector> {
   private query?: ItemSelector;
+  private andOr?: Selector<OrSelector | AndSelector>;
 
   public build(): ItemSelector {
+    console.log('andOr in item selector: ', this.andOr);
+    console.log('this.query: ', this.query);
     if (this.query == null) {
       throw new Error('Cannot build selector. A selector has not been defined');
     }
@@ -32,11 +32,17 @@ export class ItemSelectorBuilder implements Selector<ItemSelector> {
   }
 
   public or(): Selector<OrSelector> {
-    return new OrSelectorBuilder(this);
+    const orSelector = new OrSelectorBuilder(this);
+    this.andOr = orSelector;
+    // this.builders.push(orSelector);
+    return orSelector;
   }
 
   public and(): Selector<AndSelector> {
-    return new AndSelectorBuilder(this);
+    const andSelector = new AndSelectorBuilder(this);
+    // this.builders.push(andSelector);
+    this.andOr = andSelector;
+    return andSelector;
   }
 
   public withSuppliedId(suppliedId: string): this {
@@ -55,13 +61,12 @@ export type AnySelector = ItemSelector | AndSelector | OrSelector;
 /**
  * A selector builder to perform boolean `or` operations.
  */
+
 export class OrSelectorBuilder implements Selector<OrSelector> {
-  private builders: Selector<AnySelector>[] = [];
-  private parent: Selector<ItemSelector>;
+  private builders: Selector<ItemSelector>[] = [];
 
   public constructor(parent: Selector<ItemSelector>) {
     this.builders.push(parent);
-    this.parent = parent;
   }
 
   public or(): Selector<OrSelector> {
@@ -69,12 +74,16 @@ export class OrSelectorBuilder implements Selector<OrSelector> {
   }
 
   public and(): Selector<AndSelector> {
-    return new AndSelectorBuilder(this.parent);
+    throw new Error('Cannot use "and" in this context');
   }
 
   public withSuppliedId(suppliedId: string): this {
     this.builders.push(new ItemSelectorBuilder().withSuppliedId(suppliedId));
     return this;
+  }
+
+  public build(): OrSelector {
+    return { type: 'or', selectors: this.builders.map(q => q.build()) };
   }
 
   public withItemId(partId: string): this {
@@ -87,16 +96,18 @@ export class OrSelectorBuilder implements Selector<OrSelector> {
  * A selector builder to perform boolean `and` operations.
  */
 export class AndSelectorBuilder implements Selector<AndSelector> {
-  private builders: Selector<AnySelector>[] = [];
-  private parent: Selector<AnySelector>;
+  private builders: Selector<ItemSelector>[] = [];
 
-  public constructor(parent: Selector<AnySelector>) {
+  public constructor(parent: Selector<ItemSelector>) {
     this.builders.push(parent);
-    this.parent = parent;
+  }
+
+  public build(): AndSelector {
+    return { type: 'and', selectors: this.builders.map(q => q.build()) };
   }
 
   public or(): Selector<OrSelector> {
-    return new OrSelectorBuilder(this.parent);
+    throw new Error('Cannot use "or" in this context');
   }
 
   public and(): Selector<AndSelector> {
@@ -120,6 +131,11 @@ export class AndSelectorBuilder implements Selector<AndSelector> {
  */
 export type ItemSelector = SuppliedIdSelector | ItemIdSelector;
 
+export interface BuiltQuery {
+  builders: Selector<AnySelector>[];
+  query: ItemSelector;
+}
+
 interface OrSelector {
   type: 'or';
   selectors: ItemSelector[];
@@ -134,7 +150,7 @@ export interface OperationDefinition {
   operation: ItemOperation;
 }
 
-export interface SelectorBuilder<T> extends Selector<T> {
+export interface SelectorBuilder<T> extends Partial<Selector<T>> {
   /**
    * Returns the built selector.
    */
@@ -165,9 +181,11 @@ export interface Selector<T> {
    * @param itemId The ID of the item to match.
    */
   withItemId(itemId: string): this;
+
+  build(): T;
 }
 
-interface ChangeMaterialOperation {
+export interface ChangeMaterialOperation {
   type: 'change-material';
   color: ColorMaterial;
 }

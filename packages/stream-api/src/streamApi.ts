@@ -83,14 +83,16 @@ export class StreamApi {
     requestId: string,
     request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequestWithId({
+    const givenReq = {
       requestId: {
         value: requestId,
       },
       createSceneAlteration: {
         ...request,
       },
-    });
+    };
+    console.log('request to fss: ', givenReq);
+    return this.sendRequestWithId(givenReq);
   }
 
   public endInteraction(): Promise<void> {
