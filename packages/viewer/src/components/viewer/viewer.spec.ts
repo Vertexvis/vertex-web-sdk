@@ -122,25 +122,20 @@ describe('vertex-viewer', () => {
   });
 
   describe(Viewer.prototype.load, () => {
-    it('loads a scene with auth token', async () => {
+    it('loads a scene with auth token and should start the stream.', async () => {
+      const mockfn = jest.fn();
       const viewer = await createViewerSpec(
         `<vertex-viewer token="token"></vertex-viewer`
       );
-      const startPromise = new Promise(resolve => {
-        viewer.registerCommand('stream.start', dimensions => {
-          return ({ tokenProvider }) => {
-            resolve({ dimensions, token: tokenProvider() });
-          };
-        });
+
+      viewer.registerCommand('stream.start', () => () => {
+        mockfn();
+        return Promise.resolve({ sceneId: 'scene-id' });
       });
+
       await viewer.load('urn:vertexvis:scene:scene-id');
-      expect(await startPromise).toMatchObject({
-        dimensions: {
-          width: expect.any(Number),
-          height: expect.any(Number),
-        },
-        token: 'token',
-      });
+
+      expect(mockfn).toHaveBeenCalled();
     });
 
     it('throws exception if scene cannot be loaded', async () => {
