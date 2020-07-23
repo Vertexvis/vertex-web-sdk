@@ -29,8 +29,6 @@ describe(Scene, () => {
     });
   });
 
-  // describe(Scene.prototype.itemOperation)
-
   describe(Scene.prototype.viewport, () => {
     it('should return dimensions of latest frame', () => {
       expect(scene.viewport()).toEqual(Dimensions.create(100, 50));

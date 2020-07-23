@@ -358,10 +358,13 @@ export class Viewer {
         throw new WebsocketConnectionError(this.errorMessage, e);
       }
 
-      await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
-        'stream.start',
-        this.dimensions
-      );
+      const streamResponse = await this.commands.execute<
+        vertexvis.protobuf.stream.IStreamResponse
+      >('stream.start', this.dimensions);
+
+      if (streamResponse.startStream != null) {
+        this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+      }
       resolve(scene.id);
     });
   }
@@ -386,15 +389,14 @@ export class Viewer {
     throw new UnsupportedOperationError('Unsupported operation.');
   }
 
+  /**
+   * @deprecated responses from the stream can be handled directly.
+   */
   private handleStreamResponse(
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
     if (response.frame != null) {
       this.drawFrame(response.frame);
-    }
-
-    if (response.startStream != null) {
-      this.sceneViewId = response.startStream.sceneViewId.hex;
     }
   }
 

@@ -24,9 +24,7 @@ export interface BuiltQuery {
 
 export class ItemSelectorBuilder implements SelectorBuilder<BuiltQuery> {
   private query?: ItemSelector;
-  private orAndSelector?: ConditionSelectorBuilder<
-    OrSelectorBuilder | AndSelectorBuilder
-  >;
+  private orAndSelector?: ConditionSelectorBuilder;
 
   public build(): BuiltQuery {
     if (this.orAndSelector != null) {
@@ -45,16 +43,16 @@ export class ItemSelectorBuilder implements SelectorBuilder<BuiltQuery> {
     throw new Error('Cannot build selector. A selector has not been defined');
   }
 
-  public or(): Selector<OrSelector> {
+  public or(): Selector {
     this.orAndSelector = this.getItemSelectorBuilder('or');
     this.query = undefined;
-    return this.orAndSelector as Selector<OrSelector>;
+    return this.orAndSelector as Selector;
   }
 
-  public and(): Selector<AndSelector> {
+  public and(): Selector {
     this.orAndSelector = this.getItemSelectorBuilder('and');
     this.query = undefined;
-    return this.orAndSelector as Selector<AndSelector>;
+    return this.orAndSelector as Selector;
   }
 
   public withSuppliedId(suppliedId: string): this {
@@ -71,9 +69,7 @@ export class ItemSelectorBuilder implements SelectorBuilder<BuiltQuery> {
     return 'internal-item-selector';
   }
 
-  private getItemSelectorBuilder(
-    type: string
-  ): ConditionSelectorBuilder<OrSelectorBuilder | AndSelectorBuilder> {
+  private getItemSelectorBuilder(type: string): ConditionSelectorBuilder {
     const itemSelectorCopy =
       this.query != null
         ? this.query.type === 'item-id'
@@ -94,18 +90,18 @@ export class ItemSelectorBuilder implements SelectorBuilder<BuiltQuery> {
  * A selector builder to perform boolean `or` operations.
  */
 
-export class OrSelectorBuilder implements ConditionSelectorBuilder<OrSelector> {
+export class OrSelectorBuilder implements ConditionSelectorBuilder {
   private builders: ItemSelectorBuilder[] = [];
 
   public constructor(parent: ItemSelectorBuilder) {
     this.builders.push(parent);
   }
 
-  public or(): Selector<OrSelector> {
+  public or(): Selector {
     return this;
   }
 
-  public and(): Selector<AndSelector> {
+  public and(): Selector {
     throw new Error('Cannot use "and" in this context');
   }
 
@@ -131,19 +127,18 @@ export class OrSelectorBuilder implements ConditionSelectorBuilder<OrSelector> {
 /**
  * A selector builder to perform boolean `and` operations.
  */
-export class AndSelectorBuilder
-  implements ConditionSelectorBuilder<AndSelector> {
+export class AndSelectorBuilder implements ConditionSelectorBuilder {
   private builders: ItemSelectorBuilder[] = [];
 
   public constructor(parent: ItemSelectorBuilder) {
     this.builders.push(parent);
   }
 
-  public or(): Selector<OrSelector> {
+  public or(): Selector {
     throw new Error('Cannot use "or" in this context');
   }
 
-  public and(): Selector<AndSelector> {
+  public and(): Selector {
     return this;
   }
 
@@ -184,36 +179,34 @@ interface AndSelector {
 
 export interface SceneItemQuery {
   where(
-    query: (
-      clientBuilder: Selector<ItemSelector>
-    ) => SelectorBuilder<ItemSelector>
+    query: (clientBuilder: Selector) => SelectorBuilder<ItemSelector>
   ): SceneItemOperationsExecutor;
 }
 
-export interface SelectorBuilder<T> extends Partial<Selector<T>> {
+export interface SelectorBuilder<T> extends Selector {
   /**
    * Returns the built selector.
    */
   build(): T;
 }
 
-export interface ConditionSelectorBuilder<T> extends Partial<Selector<T>> {
+export interface ConditionSelectorBuilder extends Partial<Selector> {
   /**
    * Returns the itemSelectors within the selector
    */
   getBuilders(): ItemSelectorBuilder[];
 }
 
-export interface Selector<T> {
+export interface Selector {
   /**
    * Returns a conditional builder to perform an `or` operation.
    */
-  or(): Selector<OrSelector>;
+  or(): Selector;
 
   /**
    * Returns a conditional builder to perform an `or` operation.
    */
-  and(): Selector<AndSelector>;
+  and(): Selector;
 
   /**
    * Selects a item that has the given Customer facing ID

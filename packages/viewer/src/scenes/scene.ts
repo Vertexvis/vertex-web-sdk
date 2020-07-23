@@ -3,29 +3,21 @@ import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
-import { ColorMaterial, fromHex } from './colorMaterial';
+import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperations, SceneOperationBuilder } from './operations';
-import {
-  SceneItemQuery,
-  ItemSelector,
-  Selector,
-  ItemSelectorBuilder,
-} from './selectors';
+import { SceneItemQuery, Selector, ItemSelectorBuilder } from './selectors';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 
 export class SceneItemOperationsExecutor
   implements SceneItemOperations<SceneItemOperationsExecutor> {
   protected builder = new SceneOperationBuilder();
+
   public constructor(
     private sceneViewId: UUID.UUID,
     private commands: CommandRegistry,
     private query: ItemSelectorBuilder
   ) {}
-
-  public materialOverrideFromHex(color: string): SceneItemOperationsExecutor {
-    return this.materialOverride(fromHex(color));
-  }
 
   public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
     this.builder.materialOverride(color);
@@ -61,7 +53,7 @@ export class SceneItemQueryExecutor implements SceneItemQuery {
   ) {}
 
   public where(
-    query: (clientBuilder: Selector<ItemSelector>) => void
+    query: (clientBuilder: Selector) => void
   ): SceneItemOperationsExecutor {
     const builder = new ItemSelectorBuilder();
     query(builder);
@@ -87,7 +79,7 @@ export class Scene {
     private sceneViewId: UUID.UUID
   ) {}
 
-  public itemOperation(): SceneItemQueryExecutor {
+  public items(): SceneItemQueryExecutor {
     return new SceneItemQueryExecutor(this.sceneViewId, this.commands);
   }
 

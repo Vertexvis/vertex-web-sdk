@@ -93,13 +93,14 @@ export class StreamApi {
   }
 
   public createSceneAlteration(
-    request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest
+    request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest,
+    withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest(
       {
         createSceneAlteration: request,
       },
-      true
+      withResponse
     );
   }
 

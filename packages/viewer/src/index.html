@@ -35,21 +35,8 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        viewer.token = 'O9hEUAIIXzjEwBzPpMrVYKzOBDDwMyyWObLyu3PPqUs.L7zwra36Gaz40DKUstcd7ZGlPF-wNIKwu1AMgZ7EMR8';
-        await viewer.load('urn:vertexvis:scene:b9e39e5e-8e27-4d97-b1a3-ba5ada11ada5');
-
-        viewer.addEventListener('tap', async function(event) {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          const raycaster = await scene.raycaster();
-          scene
-            .itemOperation()
-            .where(q => q.withItemId('a885f431-d39f-4293-b9d1-cb97a8573840'))
-            .materialOverrideFromHex('#c9919f')
-            .show()
-            .execute();
-        });
-
+        // viewer.token = 'my-token'
+        // await viewer.load('urn:vertexvis:scene:cd78e291-760e-4bf5-8b77-c9c981847d0e')
       }
     </script>
   </head>
