@@ -4,7 +4,7 @@ import { createFrameStreamingClientMock } from '../../testing';
 import { defaultConfig, Config } from '../../config/config';
 import { Token } from '../../credentials/token';
 import { UUID } from '@vertexvis/utils';
-import { BuiltQuery } from '../../scenes/selectors';
+import { QueryExpression } from '../../scenes/queries';
 import { OperationDefinition } from '../../scenes/operations';
 import { fromHex } from '../../scenes/colorMaterial';
 
@@ -31,9 +31,9 @@ describe('streamCommands', () => {
       const sceneViewId: UUID.UUID = UUID.create();
       const sceneItemId: UUID.UUID = UUID.create();
       const suppliedId = 'some-suppliedId';
-      const builtQuery: BuiltQuery = {
-        selectorType: 'and-selector',
-        items: [
+      const builtQuery: QueryExpression = {
+        type: 'and',
+        expressions: [
           {
             type: 'supplied-id',
             value: suppliedId,
