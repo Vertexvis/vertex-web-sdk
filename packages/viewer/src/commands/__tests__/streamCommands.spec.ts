@@ -67,6 +67,8 @@ describe('streamCommands', () => {
         config,
       });
 
+      console.log(fromHex('#FF00AA'));
+
       expect(stream.createSceneAlteration).toHaveBeenCalledWith(
         expect.objectContaining({
           operations: [
@@ -87,10 +89,10 @@ describe('streamCommands', () => {
                   changeMaterial: {
                     material: {
                       d: 100,
-                      ka: { a: 255, b: 170, g: 0, r: 255 },
+                      ka: { r: 0.7, g: 0.75, b: 0, a: 1 },
                       kd: { a: 255, b: 170, g: 0, r: 255 },
-                      ke: { a: 255, b: 170, g: 0, r: 255 },
-                      ks: { a: 255, b: 170, g: 0, r: 255 },
+                      ke: { r: 0.1, g: 0, b: 0.1, a: 1 },
+                      ks: { r: 0.2, g: 0.2, b: 0.2, a: 64 },
                       ns: 10,
                     },
                   },
