@@ -5,10 +5,15 @@ import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
 import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperations, SceneOperationBuilder } from './operations';
-import { SceneItemQuery, Selector, ItemSelectorBuilder } from './selectors';
+import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 
+/**
+ * A class that is responsible for building operations for a specific scene.
+ * This executor requires a query, and expects `execute()` to be invoked in order
+ * for the changes to take effect.
+ */
 export class SceneItemOperationsExecutor
   implements SceneItemOperations<SceneItemOperationsExecutor> {
   protected builder = new SceneOperationBuilder();
@@ -16,7 +21,7 @@ export class SceneItemOperationsExecutor
   public constructor(
     private sceneViewId: UUID.UUID,
     private commands: CommandRegistry,
-    private query: ItemSelectorBuilder
+    private query: QueryExpression
   ) {}
 
   public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
@@ -36,31 +41,11 @@ export class SceneItemOperationsExecutor
 
   public execute(): void {
     const operations = this.builder.build();
-    const builtQuery = this.query.build();
     this.commands.execute(
       'stream.createSceneAlteration',
       this.sceneViewId,
-      builtQuery,
+      this.query,
       operations
-    );
-  }
-}
-
-export class SceneItemQueryExecutor implements SceneItemQuery {
-  public constructor(
-    private sceneViewId: UUID.UUID,
-    private commands: CommandRegistry
-  ) {}
-
-  public where(
-    query: (clientBuilder: Selector) => void
-  ): SceneItemOperationsExecutor {
-    const builder = new ItemSelectorBuilder();
-    query(builder);
-    return new SceneItemOperationsExecutor(
-      this.sceneViewId,
-      this.commands,
-      builder
     );
   }
 }

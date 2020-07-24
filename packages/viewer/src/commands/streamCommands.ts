@@ -6,7 +6,7 @@ import { InvalidCredentialsError } from '../errors';
 import { CommandContext, Command } from './command';
 import { CommandRegistry } from './commandRegistry';
 import { OperationDefinition } from '../scenes/operations';
-import { BuiltQuery, ItemSelector } from '../scenes/selectors';
+import { QueryExpression } from '../scenes/queries';
 
 export interface ConnectOptions {
   sceneId?: string;
@@ -51,7 +51,7 @@ export function startStream(
 
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
-  query: BuiltQuery,
+  query: QueryExpression,
   operations: OperationDefinition[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
@@ -70,28 +70,29 @@ export function createSceneAlteration(
 }
 
 function buildSceneOperation(
-  query: BuiltQuery,
+  query: QueryExpression,
   operations: OperationDefinition[]
 ): vertexvis.protobuf.stream.ISceneOperation {
   const operationTypes: vertexvis.protobuf.stream.IOperationType[] = buildOperationTypes(
     operations
   );
 
-  switch (query.selectorType) {
-    case 'and-selector':
+  switch (query.type) {
+    case 'and':
       return {
         and: buildQueryCollection(query),
         operationTypes,
       };
-    case 'or-selector':
+    case 'or':
       return {
         or: buildQueryCollection(query),
         operationTypes,
       };
-    case 'internal-item-selector':
+    case 'item-id':
+    case 'supplied-id':
       return {
         item: {
-          sceneItemQuery: buildSceneItemQuery(query.query),
+          sceneItemQuery: buildSceneItemQuery(query),
         },
         operationTypes,
       };
@@ -101,7 +102,7 @@ function buildSceneOperation(
 }
 
 function buildSceneItemQuery(
-  item?: ItemSelector
+  item: QueryExpression
 ): vertexvis.protobuf.stream.ISceneItemQuery {
   switch (item.type) {
     case 'item-id':
@@ -120,17 +121,21 @@ function buildSceneItemQuery(
 }
 
 function buildQueryCollection(
-  query: BuiltQuery
+  query: QueryExpression
 ): vertexvis.protobuf.stream.IQueryCollection {
-  return query.items != null
-    ? {
-        queries: query.items.map((query: ItemSelector) => {
+  switch (query.type) {
+    case 'and':
+    case 'or':
+      return {
+        queries: query.expressions.map((expQuery: QueryExpression) => {
           return {
-            sceneItemQuery: buildSceneItemQuery(query),
+            sceneItemQuery: buildSceneItemQuery(expQuery),
           };
         }),
-      }
-    : {};
+      };
+    default:
+      return {};
+  }
 }
 
 function buildOperationTypes(

@@ -28,6 +28,9 @@ export interface SceneItemOperations<T> {
   hide(): T;
 }
 
+/**
+ * A class to handle the building of operations for a scene.
+ */
 export class SceneOperationBuilder
   implements SceneItemOperations<SceneOperationBuilder> {
   private operations: OperationDefinition[] = [];
