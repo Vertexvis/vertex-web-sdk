@@ -2,37 +2,6 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { ItemOperation } from '../scenes/operations';
 import { QueryExpression } from '../scenes/queries';
 
-// export function buildSceneOperation(
-//   query: QueryExpression,
-//   operations: ItemOperation[]
-// ): vertexvis.protobuf.stream.ISceneOperation {
-//   const operationTypes: vertexvis.protobuf.stream.IOperationType[] = buildOperationTypes(
-//     operations
-//   );
-
-//   switch (query.type) {
-//     case 'and':
-//       return {
-//         and: buildQueryCollection(query),
-//         operationTypes,
-//       };
-//     case 'or':
-//       return {
-//         or: buildQueryCollection(query),
-//         operationTypes,
-//       };
-//     case 'item-id':
-//     case 'supplied-id':
-//       return {
-//         item: {
-//           sceneItemQuery: buildSceneItemQuery(query),
-//         },
-//         operationTypes,
-//       };
-//     default:
-//       return {};
-//   }
-// }
 export function buildSceneOperation(
   query: QueryExpression,
   operations: ItemOperation[]
