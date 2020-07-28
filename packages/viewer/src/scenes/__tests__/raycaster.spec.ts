@@ -15,10 +15,10 @@ describe(Raycaster, () => {
     it('returns hit items', () => {
       raycaster.hitItems(Point.create(10, 10));
       expect(api.hitItems).toHaveBeenCalledWith(
-        expect.anything(),
         expect.objectContaining({
           point: Point.create(10, 10),
-        })
+        }),
+        true
       );
     });
   });

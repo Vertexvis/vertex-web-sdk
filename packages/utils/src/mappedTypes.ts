@@ -15,3 +15,40 @@
 export type DeepPartial<T> = T extends object
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : T;
+
+/**
+ * A type that recursively makes each property of `T` required.
+ * Optionally excluding a nested path specified by a list of keys.
+ *
+ * @example
+ * type Foo = { a?: { c?: number }, b?: string };
+ * type Bar = { foo: Foo };
+ * type Baz = DeepRequired<Bar, []>; // { foo: { a: { c: number }, b: string } }
+ * type Baz = DeepRequired<Bar, ['a', 'c']>; // { foo: { a: { c?: number }, b: string } }
+ */
+// https://stackoverflow.com/a/57837897
+export type DeepRequired<T, P extends string[]> = T extends object
+  ? Pick<T, Extract<keyof T, P[0]>> &
+      Required<
+        {
+          [K in Exclude<keyof T, P[0]>]: NonNullable<
+            DeepRequired<T[K], ShiftUnion<K, P>>
+          >;
+        }
+      >
+  : T;
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Shift<T extends any[]> = ((...t: T) => any) extends (
+  first: any,
+  ...rest: infer Rest
+) => any
+  ? Rest
+  : never;
+
+type ShiftUnion<P extends PropertyKey, T extends any[]> = T extends any[]
+  ? T[0] extends P
+    ? Shift<T>
+    : never
+  : never;
+/* eslint-enable @typescript-eslint/no-explicit-any */
