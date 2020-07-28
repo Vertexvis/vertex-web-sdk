@@ -18,7 +18,6 @@ jest.mock('@vertexvis/utils', () => {
   };
 });
 import { UUID } from '@vertexvis/utils';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 describe(StreamApi, () => {
   const requestId = UUID.create();
@@ -50,7 +49,7 @@ describe(StreamApi, () => {
     beforeEach(() => api.connect(url));
 
     it('should send a request with Id', () => {
-      const request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest = {};
+      const request = {};
       api.createSceneAlteration(request);
       expect(sendMock).toHaveBeenCalled();
     });

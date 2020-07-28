@@ -7,14 +7,14 @@ describe(SceneOperationBuilder, () => {
     const builder = new SceneOperationBuilder();
     const definitions = builder.hide().build();
 
-    expect(definitions).toEqual([{ operation: { type: 'hide' } }]);
+    expect(definitions).toEqual([{ type: 'hide' }]);
   });
 
   it('creates a show operation', () => {
     const builder = new SceneOperationBuilder();
     const definitions = builder.show().build();
 
-    expect(definitions).toEqual([{ operation: { type: 'show' } }]);
+    expect(definitions).toEqual([{ type: 'show' }]);
   });
 
   it('creates a change-material operation', () => {
@@ -30,7 +30,7 @@ describe(SceneOperationBuilder, () => {
     const definitions = builder.materialOverride(materialOverride).build();
 
     expect(definitions).toEqual([
-      { operation: { type: 'change-material', color: materialOverride } },
+      { type: 'change-material', color: materialOverride },
     ]);
   });
 });

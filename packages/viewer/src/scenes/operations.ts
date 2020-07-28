@@ -8,10 +8,6 @@ interface HideItemOperation {
   type: 'hide';
 }
 
-export interface OperationDefinition {
-  operation: ItemOperation;
-}
-
 export interface ChangeMaterialOperation {
   type: 'change-material';
   color: ColorMaterial;
@@ -33,13 +29,13 @@ export interface SceneItemOperations<T> {
  */
 export class SceneOperationBuilder
   implements SceneItemOperations<SceneOperationBuilder> {
-  private operations: OperationDefinition[] = [];
+  private operations: ItemOperation[] = [];
 
   /**
    * Constructs the scene operations and returns a definition describing each
    * operation.
    */
-  public build(): OperationDefinition[] {
+  public build(): ItemOperation[] {
     return this.operations.concat();
   }
 
@@ -60,9 +56,9 @@ export class SceneOperationBuilder
   private operation(...args: any[]): this {
     const operation = args[0];
     if (args.length === 1) {
-      this.operations.push({ operation });
+      this.operations.push(operation);
     } else if (args.length === 2) {
-      this.operations.push({ operation });
+      this.operations.push(operation);
     }
     return this;
   }

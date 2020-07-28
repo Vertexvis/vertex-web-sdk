@@ -5,7 +5,7 @@ import { defaultConfig, Config } from '../../config/config';
 import { Token } from '../../credentials/token';
 import { UUID } from '@vertexvis/utils';
 import { QueryExpression } from '../../scenes/queries';
-import { OperationDefinition } from '../../scenes/operations';
+import { ItemOperation } from '../../scenes/operations';
 import { fromHex } from '../../scenes/colorMaterial';
 
 describe('streamCommands', () => {
@@ -28,7 +28,7 @@ describe('streamCommands', () => {
 
   describe('createSceneAlteration', () => {
     it('sends a create alteration request with the given params', async () => {
-      const sceneViewId: UUID.UUID = UUID.create();
+      const sceneViewId = UUID.create();
       const sceneItemId: UUID.UUID = UUID.create();
       const suppliedId = 'some-suppliedId';
       const builtQuery: QueryExpression = {
@@ -44,17 +44,13 @@ describe('streamCommands', () => {
           },
         ],
       };
-      const operations: OperationDefinition[] = [
+      const operations: ItemOperation[] = [
         {
-          operation: {
-            type: 'show',
-          },
+          type: 'show',
         },
         {
-          operation: {
-            type: 'change-material',
-            color: fromHex('#FF00AA'),
-          },
+          type: 'change-material',
+          color: fromHex('#FF00AA'),
         },
       ];
       await createSceneAlteration(
@@ -66,8 +62,6 @@ describe('streamCommands', () => {
         tokenProvider: tokenProvider,
         config,
       });
-
-      console.log(fromHex('#FF00AA'));
 
       expect(stream.createSceneAlteration).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -89,10 +83,10 @@ describe('streamCommands', () => {
                   changeMaterial: {
                     material: {
                       d: 100,
-                      ka: { r: 0.7, g: 0.75, b: 0, a: 1 },
+                      ka: { r: 0, g: 0, b: 0, a: 0 },
                       kd: { a: 255, b: 170, g: 0, r: 255 },
-                      ke: { r: 0.1, g: 0, b: 0.1, a: 1 },
-                      ks: { r: 0.2, g: 0.2, b: 0.2, a: 64 },
+                      ke: { r: 0, g: 0, b: 0, a: 0 },
+                      ks: { r: 0, g: 0, b: 0, a: 0 },
                       ns: 10,
                     },
                   },

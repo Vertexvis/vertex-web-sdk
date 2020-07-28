@@ -5,8 +5,9 @@ import { UrlDescriptor } from '@vertexvis/stream-api';
 import { InvalidCredentialsError } from '../errors';
 import { CommandContext, Command } from './command';
 import { CommandRegistry } from './commandRegistry';
-import { OperationDefinition } from '../scenes/operations';
+import { ItemOperation } from '../scenes/operations';
 import { QueryExpression } from '../scenes/queries';
+import { buildSceneOperation } from './streamCommandsMapper';
 
 export interface ConnectOptions {
   sceneId?: string;
@@ -52,13 +53,11 @@ export function startStream(
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   query: QueryExpression,
-  operations: OperationDefinition[]
+  operations: ItemOperation[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    const pbOperations: vertexvis.protobuf.stream.ISceneOperation[] = [
-      buildSceneOperation(query, operations),
-    ];
-    const request: vertexvis.protobuf.stream.ICreateSceneAlterationRequest = {
+    const pbOperations = [buildSceneOperation(query, operations)];
+    const request = {
       sceneViewId: new vertexvis.protobuf.core.Uuid({
         hex: sceneViewId,
       }),
@@ -67,111 +66,6 @@ export function createSceneAlteration(
 
     return stream.createSceneAlteration(request);
   };
-}
-
-function buildSceneOperation(
-  query: QueryExpression,
-  operations: OperationDefinition[]
-): vertexvis.protobuf.stream.ISceneOperation {
-  const operationTypes: vertexvis.protobuf.stream.IOperationType[] = buildOperationTypes(
-    operations
-  );
-
-  switch (query.type) {
-    case 'and':
-      return {
-        and: buildQueryCollection(query),
-        operationTypes,
-      };
-    case 'or':
-      return {
-        or: buildQueryCollection(query),
-        operationTypes,
-      };
-    case 'item-id':
-    case 'supplied-id':
-      return {
-        item: {
-          sceneItemQuery: buildSceneItemQuery(query),
-        },
-        operationTypes,
-      };
-    default:
-      return {};
-  }
-}
-
-function buildSceneItemQuery(
-  item: QueryExpression
-): vertexvis.protobuf.stream.ISceneItemQuery {
-  switch (item.type) {
-    case 'item-id':
-      return {
-        id: new vertexvis.protobuf.core.Uuid({
-          hex: item.value,
-        }),
-      };
-    case 'supplied-id':
-      return {
-        suppliedId: item.value,
-      };
-    default:
-      return {};
-  }
-}
-
-function buildQueryCollection(
-  query: QueryExpression
-): vertexvis.protobuf.stream.IQueryCollection {
-  switch (query.type) {
-    case 'and':
-    case 'or':
-      return {
-        queries: query.expressions.map((expQuery: QueryExpression) => {
-          return {
-            sceneItemQuery: buildSceneItemQuery(expQuery),
-          };
-        }),
-      };
-    default:
-      return {};
-  }
-}
-
-function buildOperationTypes(
-  operations: OperationDefinition[]
-): vertexvis.protobuf.stream.IOperationType[] {
-  return operations.map(op => {
-    switch (op.operation.type) {
-      case 'change-material':
-        return {
-          changeMaterial: {
-            material: {
-              d: op.operation.color.opacity,
-              ns: op.operation.color.glossiness,
-              ka: op.operation.color.ambient,
-              kd: op.operation.color.diffuse,
-              ks: op.operation.color.specular,
-              ke: op.operation.color.emissive,
-            },
-          },
-        };
-      case 'hide':
-        return {
-          changeVisibility: {
-            visible: false,
-          },
-        };
-      case 'show':
-        return {
-          changeVisibility: {
-            visible: true,
-          },
-        };
-      default:
-        return {};
-    }
-  });
 }
 
 export function registerCommands(commands: CommandRegistry): void {

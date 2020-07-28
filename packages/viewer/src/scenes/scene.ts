@@ -16,7 +16,7 @@ import { UUID } from '@vertexvis/utils';
  */
 export class SceneItemOperationsExecutor
   implements SceneItemOperations<SceneItemOperationsExecutor> {
-  protected builder = new SceneOperationBuilder();
+  private builder = new SceneOperationBuilder();
 
   public constructor(
     private sceneViewId: UUID.UUID,

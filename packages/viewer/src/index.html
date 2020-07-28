@@ -8,6 +8,7 @@
     />
     <title>Stencil Component Starter</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <script type="module" src="/build/viewer.esm.js"></script>
     <script nomodule src="/build/viewer.js"></script>
     <link rel="stylesheet" href="/build/viewer.css" />
@@ -28,6 +29,7 @@
     </style>
 
     <script type="module">
+      import {ColorMaterial} from './build/index.esm.js';
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
@@ -35,13 +37,53 @@
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        // viewer.token = 'my-token'
-        // await viewer.load('urn:vertexvis:scene:cd78e291-760e-4bf5-8b77-c9c981847d0e')
+      /*
+      bf1b9917-e13f-4842-a918-8e064fe88ed9
+      572a30b6-1d1b-4ca9-a0bb-800206171ffa
+      d8152e02-e2b6-415c-9c0a-4e722e60b4fc
+      d40d0074-83e8-45e3-bddc-5024083d8ddb
+      a0c4da20-5e87-4984-a26b-68d9dcdc20bc
+      73eb38f3-3969-480b-bab8-c5607217198a
+      e6f7a108-015b-4393-998b-4ab2ff225dcd
+      dee78686-e8f5-42c4-b796-d2420e73b355
+      e8ac8a48-07c5-4ffd-99a4-2aea9089d9d2
+      441306f3-f1e6-45cc-9946-3ea4ff67498a
+      c37dfa46-78c5-4b28-94b1-a6b9c00d598f
+      4da8a234-cec6-4abe-9733-73eed82806a7
+      */
+        viewer.token = 'hn9sbY90s6CRULUmgY5T7pMpxzy3AvlviXbHFpAK_jc.2bWRb9zDnS0UcRJ-80rSV76Pf2Eqw-Bo7DopMAQZpXE';
+        await viewer.load('urn:vertexvis:scene:d99542b3-84ea-4323-bcaa-8fc80aae3a6c');
+
+        let color;
+        var colorPicker = new window.iro.ColorPicker("#picker", {
+          // Set the size of the color picker
+          width: 320,
+          // Set the initial color to pure red
+          color: "#f00"
+        });
+
+        colorPicker.on('color:change', async (givenColor) => {
+          color = givenColor;
+        });
+        viewer.addEventListener('tap', async function(event) {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+          const hitItems = await raycaster.hitItems(position);
+          scene
+            .items()  
+            .where(q => q.withItemId(hitItems.hits[0].itemId.hex))
+            .materialOverride(ColorMaterial.fromHex(color.hexString))
+            .execute();
+        });
+
       }
     </script>
   </head>
 
-  <body>
+  <body style="display:flex;">
+      <div id="picker"></div>
     <vertex-viewer id="viewer" camera-controls="true"></vertex-viewer>
   </body>
 </html>
+
