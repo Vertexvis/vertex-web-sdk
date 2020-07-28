@@ -16,27 +16,46 @@ import { UUID } from '@vertexvis/utils';
  */
 export class SceneItemOperationsExecutor
   implements SceneItemOperations<SceneItemOperationsExecutor> {
-  private builder = new SceneOperationBuilder();
+  private builder: SceneOperationBuilder;
 
   public constructor(
     private sceneViewId: UUID.UUID,
     private commands: CommandRegistry,
-    private query: QueryExpression
-  ) {}
+    private query: QueryExpression,
+    givenBuilder?: SceneOperationBuilder
+  ) {
+    this.builder =
+      givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
+  }
 
   public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
     this.builder.materialOverride(color);
-    return this;
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      this.query,
+      this.builder
+    );
   }
 
   public hide(): SceneItemOperationsExecutor {
     this.builder.hide();
-    return this;
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      this.query,
+      this.builder
+    );
   }
 
   public show(): SceneItemOperationsExecutor {
     this.builder.show();
-    return this;
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      this.query,
+      this.builder
+    );
   }
 
   public execute(): void {

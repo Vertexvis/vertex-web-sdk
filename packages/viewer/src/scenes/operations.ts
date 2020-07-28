@@ -31,6 +31,10 @@ export class SceneOperationBuilder
   implements SceneItemOperations<SceneOperationBuilder> {
   private operations: ItemOperation[] = [];
 
+  public constructor(operations: ItemOperation[] = []) {
+    this.operations = operations;
+  }
+
   /**
    * Constructs the scene operations and returns a definition describing each
    * operation.
@@ -40,26 +44,20 @@ export class SceneOperationBuilder
   }
 
   public materialOverride(color: ColorMaterial): SceneOperationBuilder {
-    return this.operation({ type: 'change-material', color });
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'change-material', color }])
+    );
   }
 
   public show(): SceneOperationBuilder {
-    return this.operation({ type: 'show' });
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'show' }])
+    );
   }
 
   public hide(): SceneOperationBuilder {
-    return this.operation({ type: 'hide' });
-  }
-
-  private operation(operation: ItemOperation): SceneOperationBuilder;
-
-  private operation(...args: any[]): this {
-    const operation = args[0];
-    if (args.length === 1) {
-      this.operations.push(operation);
-    } else if (args.length === 2) {
-      this.operations.push(operation);
-    }
-    return this;
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'hide' }])
+    );
   }
 }
