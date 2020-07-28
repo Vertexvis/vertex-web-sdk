@@ -29,32 +29,29 @@ export class SceneItemOperationsExecutor
   }
 
   public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
-    this.builder.materialOverride(color);
     return new SceneItemOperationsExecutor(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder
+      this.builder.materialOverride(color)
     );
   }
 
   public hide(): SceneItemOperationsExecutor {
-    this.builder.hide();
     return new SceneItemOperationsExecutor(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder
+      this.builder.hide()
     );
   }
 
   public show(): SceneItemOperationsExecutor {
-    this.builder.show();
     return new SceneItemOperationsExecutor(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder
+      this.builder.show()
     );
   }
 
