@@ -45,6 +45,16 @@ describe(StreamApi, () => {
     });
   });
 
+  describe('send createSceneAlteration', () => {
+    beforeEach(() => api.connect(url));
+
+    it('should send a request with Id', () => {
+      const request = {};
+      api.createSceneAlteration(request);
+      expect(sendMock).toHaveBeenCalled();
+    });
+  });
+
   describe('send request', () => {
     beforeEach(() => api.connect(url));
 

@@ -129,6 +129,7 @@ export class Viewer {
   private interactionApi!: InteractionApi;
 
   private isResizing?: boolean;
+  private sceneViewId?: UUID.UUID;
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -317,8 +318,13 @@ export class Viewer {
 
   @Method()
   public async scene(): Promise<Scene> {
-    if (this.frameAttributes != null) {
-      return new Scene(this.stream, this.frameAttributes);
+    if (this.frameAttributes != null && this.sceneViewId != null) {
+      return new Scene(
+        this.stream,
+        this.frameAttributes,
+        this.commands,
+        this.sceneViewId
+      );
     } else {
       throw new IllegalStateError(
         'Cannot retrieve scene. Frame has not been rendered'
@@ -343,17 +349,22 @@ export class Viewer {
 
     return new Promise(async resolve => {
       try {
-        await this.commands.execute('stream.connect', { sceneId: scene.id });
+        await this.commands.execute('stream.connect', {
+          sceneId: scene.id,
+        });
       } catch (e) {
         this.errorMessage =
           "Error loading scene. Check that you've supplied a valid scene and token";
         throw new WebsocketConnectionError(this.errorMessage, e);
       }
 
-      await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
-        'stream.start',
-        this.dimensions
-      );
+      const streamResponse = await this.commands.execute<
+        vertexvis.protobuf.stream.IStreamResponse
+      >('stream.start', this.dimensions);
+
+      if (streamResponse.startStream != null) {
+        this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+      }
       resolve(scene.id);
     });
   }
@@ -378,6 +389,9 @@ export class Viewer {
     throw new UnsupportedOperationError('Unsupported operation.');
   }
 
+  /**
+   * @deprecated responses from the stream can be handled directly.
+   */
   private handleStreamResponse(
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
@@ -537,12 +551,17 @@ export class Viewer {
     return new InteractionApi(
       this.stream,
       () => {
-        if (this.frameAttributes == null) {
+        if (this.frameAttributes == null || this.sceneViewId == null) {
           throw new IllegalStateError(
-            'Cannot retrieve scene. Frame has not been rendered'
+            'Cannot retrieve scene. Frame has not been rendered or start stream has not yet responded'
           );
         }
-        return new Scene(this.stream, this.frameAttributes);
+        return new Scene(
+          this.stream,
+          this.frameAttributes,
+          this.commands,
+          this.sceneViewId
+        );
       },
       this.tap
     );

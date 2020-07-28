@@ -4,6 +4,7 @@ export function createFrameStreamingClientMock(): any {
   return {
     connect: mockConnect(),
     startStream: mockStartStream(),
+    createSceneAlteration: mockCreateSceneAlteration(),
   };
 }
 
@@ -17,4 +18,8 @@ function mockStartStream(): jest.Mock<any, any> {
   };
 
   return jest.fn().mockResolvedValue(frameResponse);
+}
+
+function mockCreateSceneAlteration(): jest.Mock<any, any> {
+  return jest.fn().mockResolvedValue({});
 }

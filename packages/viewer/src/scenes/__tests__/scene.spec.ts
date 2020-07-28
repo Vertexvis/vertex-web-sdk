@@ -2,9 +2,16 @@ import { Scene } from '../scene';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Dimensions } from '@vertexvis/geometry';
 import { frame } from '../../types/__fixtures__';
+import { CommandRegistry } from '../../commands/commandRegistry';
+import { UUID } from '@vertexvis/utils';
 
 describe(Scene, () => {
-  const scene = new Scene(new StreamApi(), frame);
+  const executeMock = jest.fn();
+  const commandRegistry = ({
+    execute: executeMock,
+  } as unknown) as CommandRegistry;
+  const sceneViewId: UUID.UUID = UUID.create();
+  const scene = new Scene(new StreamApi(), frame, commandRegistry, sceneViewId);
 
   describe(Scene.prototype.camera, () => {
     const camera = scene.camera();
