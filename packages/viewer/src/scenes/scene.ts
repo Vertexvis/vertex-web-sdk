@@ -55,6 +55,15 @@ export class SceneItemOperationsExecutor
     );
   }
 
+  public clear(): SceneItemOperationsExecutor {
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      this.query,
+      this.builder.clear()
+    );
+  }
+
   public execute(): void {
     const operations = this.builder.build();
     this.commands.execute(

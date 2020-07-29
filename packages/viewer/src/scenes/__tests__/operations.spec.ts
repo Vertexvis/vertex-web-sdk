@@ -10,6 +10,13 @@ describe(SceneOperationBuilder, () => {
     expect(definitions).toEqual([{ type: 'hide' }]);
   });
 
+  it('creates a clear operation', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.clear().build();
+
+    expect(definitions).toEqual([{ type: 'clear' }]);
+  });
+
   it('creates a show operation', () => {
     const builder = new SceneOperationBuilder();
     const definitions = builder.show().build();
