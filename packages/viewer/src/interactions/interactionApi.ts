@@ -1,7 +1,6 @@
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
-import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
 import { StreamProvider } from '../commands/commandRegistry';
 
