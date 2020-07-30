@@ -140,12 +140,7 @@ export class Viewer {
     this.initializeCredentials();
 
     this.stream = new StreamApi(new WebSocketClient());
-    this.streamDisposables.push(
-      this.stream.onResponse(response => this.handleStreamResponse(response))
-    );
-    this.streamDisposables.push(
-      this.stream.onRequest(request => this.handleStreamRequest(request))
-    );
+    this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
@@ -386,12 +381,8 @@ export class Viewer {
       new WebSocketClient(),
       this.stream.getUrlProvider()
     );
-    this.streamDisposables.push(
-      this.stream.onResponse(response => this.handleStreamResponse(response))
-    );
-    this.streamDisposables.push(
-      this.stream.onRequest(request => this.handleStreamRequest(request))
-    );
+    this.setupStreamListeners();
+
     return new Promise(async resolve => {
       try {
         const dispose = await this.commands.execute<Disposable>(
@@ -591,6 +582,15 @@ export class Viewer {
     handler.initialize(this.canvasElement, this.interactionApi);
   }
 
+  private setupStreamListeners(): void {
+    this.streamDisposables.push(
+      this.stream.onResponse(response => this.handleStreamResponse(response))
+    );
+    this.streamDisposables.push(
+      this.stream.onRequest(request => this.handleStreamRequest(request))
+    );
+  }
+
   private createInteractionApi(): InteractionApi {
     if (this.stream == null) {
       throw new ComponentInitializationError(
@@ -619,12 +619,5 @@ export class Viewer {
 
   private initializeCredentials(): void {
     this.activeCredentials = parseToken(this.token);
-  }
-
-  private getBackgroundColor(): Color.Color | undefined {
-    if (this.containerElement != null) {
-      const colorString = window.getComputedStyle(this.containerElement);
-      return Color.fromCss(colorString.backgroundColor);
-    }
   }
 }
