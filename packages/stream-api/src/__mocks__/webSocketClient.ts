@@ -23,16 +23,6 @@ export function simulateResponse(
   messageCallbacks.forEach(c => c(event));
 }
 
-export function simulateRequest(
-  request: vertexvis.protobuf.stream.IStreamRequest
-): void {
-  const serialized = vertexvis.protobuf.stream.StreamMessage.encode({
-    request,
-  }).finish();
-  const event = new MessageEvent('message', { data: serialized });
-  messageCallbacks.forEach(c => c(event));
-}
-
 export function restoreMocks(): void {
   jest.restoreAllMocks();
   jest.clearAllMocks();
