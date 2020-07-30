@@ -12,9 +12,9 @@ describe(SceneOperationBuilder, () => {
 
   it('creates a clear operation', () => {
     const builder = new SceneOperationBuilder();
-    const definitions = builder.clear().build();
+    const definitions = builder.clearMaterialOverrides().build();
 
-    expect(definitions).toEqual([{ type: 'clear' }]);
+    expect(definitions).toEqual([{ type: 'clear-override' }]);
   });
 
   it('creates a show operation', () => {

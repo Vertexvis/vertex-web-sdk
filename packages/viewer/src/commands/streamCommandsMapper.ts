@@ -74,7 +74,7 @@ function buildOperationTypes(
             },
           },
         };
-      case 'clear':
+      case 'clear-override':
         return {
           changeMaterial: {},
         };

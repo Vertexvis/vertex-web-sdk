@@ -9,7 +9,7 @@ interface HideItemOperation {
 }
 
 interface ClearItemOperation {
-  type: 'clear';
+  type: 'clear-override';
 }
 
 export interface ChangeMaterialOperation {
@@ -27,7 +27,7 @@ export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
   show(): T;
   hide(): T;
-  clear(): T;
+  clearMaterialOverrides(): T;
 }
 
 /**
@@ -67,9 +67,9 @@ export class SceneOperationBuilder
     );
   }
 
-  public clear(): SceneOperationBuilder {
+  public clearMaterialOverrides(): SceneOperationBuilder {
     return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'clear' }])
+      this.operations.concat([{ type: 'clear-override' }])
     );
   }
 }

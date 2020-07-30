@@ -149,15 +149,15 @@ export class SceneItemQueryExecutor {
     );
   }
 
-  public all(): SceneItemOperationsExecutor {
-    const allExpresion: QueryExpression = {
-      type: 'all',
-    };
+  // public all(): SceneItemOperationsExecutor {
+  //   const allExpresion: QueryExpression = {
+  //     type: 'all',
+  //   };
 
-    return new SceneItemOperationsExecutor(
-      this.sceneViewId,
-      this.commands,
-      allExpresion
-    );
-  }
+  //   return new SceneItemOperationsExecutor(
+  //     this.sceneViewId,
+  //     this.commands,
+  //     allExpresion
+  //   );
+  // }
 }

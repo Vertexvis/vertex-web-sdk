@@ -106,7 +106,7 @@ describe('streamCommands', () => {
       };
       const operations: ItemOperation[] = [
         {
-          type: 'clear',
+          type: 'clear-override',
         },
       ];
       await createSceneAlteration(

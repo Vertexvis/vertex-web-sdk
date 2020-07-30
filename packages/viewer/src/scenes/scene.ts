@@ -55,12 +55,12 @@ export class SceneItemOperationsExecutor
     );
   }
 
-  public clear(): SceneItemOperationsExecutor {
+  public clearMaterialOverrides(): SceneItemOperationsExecutor {
     return new SceneItemOperationsExecutor(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder.clear()
+      this.builder.clearMaterialOverrides()
     );
   }
 
