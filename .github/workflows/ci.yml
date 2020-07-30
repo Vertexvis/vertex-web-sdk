@@ -23,13 +23,16 @@ jobs:
         run: "yarn test"
       - name: "Lint"
         run: "yarn lint"
-      - name: "Prepare build artifacts"
-        run: "./scripts/pre_upload_artifacts.sh"
       - name: "Upload build artifacts"
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: build-artifact
+          path: |
+            packages/*/dist
+            packages/*/package.json
+            packages/*/LICENSE
+            packages/*/README.md
+            lerna.json
   publish:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -42,8 +45,8 @@ jobs:
       - name: "Pull build artifacts"
         uses: actions/download-artifact@v1
         with:
-          name: dist
-          path: dist
+          name: build-artifact
+          path: build
       - name: "Prepare build artifacts"
         run: "./scripts/post_download_artifacts.sh"
       - name: "Publish changes"
