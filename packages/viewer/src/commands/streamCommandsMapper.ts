@@ -27,6 +27,11 @@ export function buildSceneOperation(
         },
         operationTypes,
       };
+    case 'all':
+      return {
+        all: {},
+        operationTypes,
+      };
     default:
       return {};
   }
@@ -68,6 +73,10 @@ function buildOperationTypes(
               ke: op.color.emissive,
             },
           },
+        };
+      case 'clear-override':
+        return {
+          changeMaterial: {},
         };
       case 'hide':
         return {

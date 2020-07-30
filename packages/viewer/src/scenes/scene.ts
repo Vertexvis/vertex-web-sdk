@@ -55,6 +55,15 @@ export class SceneItemOperationsExecutor
     );
   }
 
+  public clearMaterialOverrides(): SceneItemOperationsExecutor {
+    return new SceneItemOperationsExecutor(
+      this.sceneViewId,
+      this.commands,
+      this.query,
+      this.builder.clearMaterialOverrides()
+    );
+  }
+
   public execute(): void {
     const operations = this.builder.build();
     this.commands.execute(

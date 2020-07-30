@@ -23,6 +23,14 @@ describe(RootQuery, () => {
     });
   });
 
+  it('should support query by all', () => {
+    const itemQueryBuilder = new RootQuery().all();
+
+    expect(itemQueryBuilder.build()).toEqual({
+      type: 'all',
+    });
+  });
+
   it('should support single or multiple queries', () => {
     const itemQueryBuilder = new RootQuery()
       .withItemId(itemId.toString())

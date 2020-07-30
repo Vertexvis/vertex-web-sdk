@@ -8,6 +8,10 @@ interface HideItemOperation {
   type: 'hide';
 }
 
+interface ClearItemOperation {
+  type: 'clear-override';
+}
+
 export interface ChangeMaterialOperation {
   type: 'change-material';
   color: ColorMaterial;
@@ -16,12 +20,14 @@ export interface ChangeMaterialOperation {
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
-  | ChangeMaterialOperation;
+  | ChangeMaterialOperation
+  | ClearItemOperation;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
   show(): T;
   hide(): T;
+  clearMaterialOverrides(): T;
 }
 
 /**
@@ -58,6 +64,12 @@ export class SceneOperationBuilder
   public hide(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'hide' }])
+    );
+  }
+
+  public clearMaterialOverrides(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'clear-override' }])
     );
   }
 }

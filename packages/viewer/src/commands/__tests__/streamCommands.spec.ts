@@ -98,5 +98,42 @@ describe('streamCommands', () => {
         })
       );
     });
+
+    it('sends a create alteration request for all with clear', async () => {
+      const sceneViewId = UUID.create();
+      const builtQuery: QueryExpression = {
+        type: 'all',
+      };
+      const operations: ItemOperation[] = [
+        {
+          type: 'clear-override',
+        },
+      ];
+      await createSceneAlteration(
+        sceneViewId,
+        builtQuery,
+        operations
+      )({
+        stream,
+        tokenProvider: tokenProvider,
+        config,
+      });
+
+      expect(stream.createSceneAlteration).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operations: [
+            {
+              all: {},
+              operationTypes: [
+                {
+                  changeMaterial: {},
+                },
+              ],
+            },
+          ],
+          sceneViewId: { hex: sceneViewId.toString() },
+        })
+      );
+    });
   });
 });
