@@ -1,8 +1,9 @@
 import { WebSocketClient } from './webSocketClient';
 import { UrlProvider } from './url';
-import { parseResponse } from './responses';
+import { parseStreamMessage } from './responses';
 import {
   HitItemsPayload,
+  ReconnectPayload,
   ReplaceCameraPayload,
   StartStreamPayload,
 } from './types';
@@ -11,6 +12,10 @@ import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 
 type ResponseHandler = (
   response: vertexvis.protobuf.stream.IStreamResponse
+) => void;
+
+type RequestHandler = (
+  request: vertexvis.protobuf.stream.IStreamRequest
 ) => void;
 
 interface StringValue {
@@ -27,13 +32,22 @@ export class StreamApi {
     vertexvis.protobuf.stream.IStreamResponse
   >();
 
+  private onRequestDispatcher = new EventDispatcher<
+    vertexvis.protobuf.stream.IStreamRequest
+  >();
+
   private messageSubscription?: Disposable;
+  private urlProvider?: UrlProvider;
 
   public constructor(
-    private websocket: WebSocketClient = new WebSocketClient()
-  ) {}
+    private websocket: WebSocketClient = new WebSocketClient(),
+    urlProvider?: UrlProvider
+  ) {
+    this.urlProvider = urlProvider;
+  }
 
   public async connect(urlProvider: UrlProvider): Promise<Disposable> {
+    this.urlProvider = urlProvider;
     await this.websocket.connect(urlProvider);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
@@ -46,8 +60,16 @@ export class StreamApi {
     this.messageSubscription?.dispose();
   }
 
+  public getUrlProvider(): UrlProvider | undefined {
+    return this.urlProvider;
+  }
+
   public onResponse(handler: ResponseHandler): Disposable {
     return this.onResponseDispatcher.on(handler);
+  }
+
+  public onRequest(handler: RequestHandler): Disposable {
+    return this.onRequestDispatcher.on(handler);
   }
 
   public startStream(
@@ -57,6 +79,25 @@ export class StreamApi {
     return this.sendRequest(
       {
         startStream: data,
+      },
+      withResponse
+    );
+  }
+
+  public async reconnect(
+    data: ReconnectPayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    if (this.urlProvider == null) {
+      throw new Error('Unable to connect as no Url provider has been set');
+    }
+    await this.websocket.connect(this.urlProvider);
+    this.messageSubscription = this.websocket.onMessage(message => {
+      this.handleMessage(message);
+    });
+    return this.sendRequest(
+      {
+        reconnect: data,
       },
       withResponse
     );
@@ -146,10 +187,14 @@ export class StreamApi {
   }
 
   private handleMessage(message: MessageEvent): void {
-    const response = parseResponse(message.data);
+    const messagePayload = parseStreamMessage(message.data);
 
-    if (response != null) {
-      this.onResponseDispatcher.emit(response);
+    if (messagePayload != null && messagePayload.response != null) {
+      this.onResponseDispatcher.emit(messagePayload.response);
+    }
+
+    if (messagePayload != null && messagePayload.request != null) {
+      this.onRequestDispatcher.emit(messagePayload.request);
     }
   }
 }

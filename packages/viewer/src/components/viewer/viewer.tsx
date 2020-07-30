@@ -140,11 +140,12 @@ export class Viewer {
 
     this.stream = new StreamApi(new WebSocketClient());
     this.stream.onResponse(response => this.handleStreamResponse(response));
+    this.stream.onRequest(request => this.handleStreamRequest(request));
 
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(
-      this.stream,
+      () => this.stream,
       () => this.getConfig(),
       () => this.activeCredentials
     );
@@ -369,6 +370,30 @@ export class Viewer {
     });
   }
 
+  private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
+    this.stream.dispose();
+    this.stream = new StreamApi(
+      new WebSocketClient(),
+      this.stream.getUrlProvider()
+    );
+    this.stream.onResponse(response => this.handleStreamResponse(response));
+    this.stream.onRequest(request => this.handleStreamRequest(request));
+    return new Promise(async resolve => {
+      try {
+        await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
+          'stream.reconnect',
+          streamId,
+          this.dimensions
+        );
+        resolve(streamId);
+      } catch (e) {
+        this.errorMessage = 'Unable to maintain connection to Vertex';
+        throw new WebsocketConnectionError(this.errorMessage, e);
+      }
+      resolve(streamId);
+    });
+  }
+
   private handleWindowResize(event: UIEvent): void {
     if (!this.isResizing) {
       this.isResizing = true;
@@ -397,6 +422,16 @@ export class Viewer {
   ): void {
     if (response.frame != null) {
       this.drawFrame(response.frame);
+    }
+  }
+
+  private async handleStreamRequest(
+    request: vertexvis.protobuf.stream.IStreamRequest
+  ): Promise<void> {
+    if (request.gracefulReconnection != null) {
+      await this.reconnectStreamingClient(
+        request.gracefulReconnection.streamId.hex
+      );
     }
   }
 

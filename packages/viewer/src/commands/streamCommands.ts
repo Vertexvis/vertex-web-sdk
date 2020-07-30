@@ -50,6 +50,20 @@ export function startStream(
   };
 }
 
+export function reconnect(
+  streamId: UUID.UUID,
+  dimensions: Dimensions.Dimensions
+): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
+  return ({ stream }: CommandContext) => {
+    return stream.reconnect({
+      streamId: new vertexvis.protobuf.core.Uuid({
+        hex: streamId,
+      }),
+      dimensions,
+    });
+  };
+}
+
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   query: QueryExpression,
@@ -71,5 +85,6 @@ export function createSceneAlteration(
 export function registerCommands(commands: CommandRegistry): void {
   commands.register('stream.connect', connect);
   commands.register('stream.start', startStream);
+  commands.register('stream.reconnect', reconnect);
   commands.register('stream.createSceneAlteration', createSceneAlteration);
 }

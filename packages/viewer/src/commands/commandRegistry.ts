@@ -9,11 +9,13 @@ interface CommandDefinition<R> {
   thisArg: any | undefined;
 }
 
+export type StreamProvider = () => StreamApi;
+
 export class CommandRegistry {
   private commands: Record<string, CommandDefinition<any>> = {};
 
   public constructor(
-    private stream: StreamApi,
+    private streamProvider: StreamProvider,
     private configProvider: ConfigProvider,
     private tokenProvider: TokenProvider
   ) {}
@@ -37,7 +39,7 @@ export class CommandRegistry {
 
       return Promise.resolve(
         command({
-          stream: this.stream,
+          stream: this.streamProvider(),
           config: this.configProvider(),
           tokenProvider: this.tokenProvider,
         }) as any

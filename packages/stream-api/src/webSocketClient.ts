@@ -15,11 +15,13 @@ export class WebSocketClient {
   private webSocket?: WebSocket;
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
+  private retryDisabled = false;
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
   public close(): void {
     if (this.webSocket != null) {
+      this.retryDisabled = true;
       this.webSocket.close();
     }
   }
@@ -42,8 +44,8 @@ export class WebSocketClient {
         removeWebSocketListeners();
       };
       const onClose = (): void => {
-        this.handleClose(urlProvider);
         removeWebSocketListeners();
+        this.handleClose(urlProvider);
       };
       const removeWebSocketListeners = (): void => {
         if (this.webSocket != null) {
@@ -89,7 +91,9 @@ export class WebSocketClient {
     this.reopenAttempt += 1;
 
     try {
-      await this.connect(urlProvider);
+      if (!this.retryDisabled) {
+        await this.connect(urlProvider);
+      }
     } catch (e) {
       // Failed connection attempt here will be handled, and this exception can be ignored
     }
