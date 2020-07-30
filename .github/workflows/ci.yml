@@ -33,6 +33,26 @@ jobs:
             packages/*/LICENSE
             packages/*/README.md
             lerna.json
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    needs: [build-and-analyze]
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: "Pull build artifacts"
+        uses: actions/download-artifact@v1
+        with:
+          name: build-artifact
+          path: publish-temp
+      - name: Prepare publish directory
+        run: |
+          cp package.json publish-temp/package.json
+          cd publish-temp
+          yarn install
+      - name: Display artifacts
+        run: ls -R
   publish:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
