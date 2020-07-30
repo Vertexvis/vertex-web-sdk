@@ -148,16 +148,4 @@ export class SceneItemQueryExecutor {
       expression
     );
   }
-
-  // public all(): SceneItemOperationsExecutor {
-  //   const allExpresion: QueryExpression = {
-  //     type: 'all',
-  //   };
-
-  //   return new SceneItemOperationsExecutor(
-  //     this.sceneViewId,
-  //     this.commands,
-  //     allExpresion
-  //   );
-  // }
 }
