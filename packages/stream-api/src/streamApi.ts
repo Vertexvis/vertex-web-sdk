@@ -87,7 +87,7 @@ export class StreamApi {
   public async reconnect(
     data: ReconnectPayload,
     withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+  ): Promise<Disposable> {
     if (this.urlProvider == null) {
       throw new Error('Unable to connect as no Url provider has been set');
     }
@@ -95,12 +95,13 @@ export class StreamApi {
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
     });
-    return this.sendRequest(
+    await this.sendRequest(
       {
         reconnect: data,
       },
       withResponse
     );
+    return { dispose: () => this.dispose() };
   }
 
   public beginInteraction(

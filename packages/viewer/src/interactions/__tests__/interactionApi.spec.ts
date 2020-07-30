@@ -23,7 +23,7 @@ describe(InteractionApi, () => {
     jest.clearAllMocks();
     jest.resetAllMocks();
 
-    api = new InteractionApi(stream, sceneProvider, {
+    api = new InteractionApi(() => stream, sceneProvider, {
       emit,
     });
   });

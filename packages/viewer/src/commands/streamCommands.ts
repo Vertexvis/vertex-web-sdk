@@ -53,7 +53,7 @@ export function startStream(
 export function reconnect(
   streamId: UUID.UUID,
   dimensions: Dimensions.Dimensions
-): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
+): Command<Promise<Disposable>> {
   return ({ stream }: CommandContext) => {
     return stream.reconnect({
       streamId: new vertexvis.protobuf.core.Uuid({

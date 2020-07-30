@@ -130,6 +130,7 @@ export class Viewer {
 
   private isResizing?: boolean;
   private sceneViewId?: UUID.UUID;
+  private streamDisposables: Disposable[] = [];
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -139,8 +140,12 @@ export class Viewer {
     this.initializeCredentials();
 
     this.stream = new StreamApi(new WebSocketClient());
-    this.stream.onResponse(response => this.handleStreamResponse(response));
-    this.stream.onRequest(request => this.handleStreamRequest(request));
+    this.streamDisposables.push(
+      this.stream.onResponse(response => this.handleStreamResponse(response))
+    );
+    this.streamDisposables.push(
+      this.stream.onRequest(request => this.handleStreamRequest(request))
+    );
 
     this.interactionApi = this.createInteractionApi();
 
@@ -350,9 +355,13 @@ export class Viewer {
 
     return new Promise(async resolve => {
       try {
-        await this.commands.execute('stream.connect', {
-          sceneId: scene.id,
-        });
+        const dispose: Disposable = await this.commands.execute(
+          'stream.connect',
+          {
+            sceneId: scene.id,
+          }
+        );
+        this.streamDisposables.push(dispose);
       } catch (e) {
         this.errorMessage =
           "Error loading scene. Check that you've supplied a valid scene and token";
@@ -371,20 +380,26 @@ export class Viewer {
   }
 
   private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
-    this.stream.dispose();
+    this.streamDisposables.forEach(d => d.dispose());
+    this.streamDisposables = [];
     this.stream = new StreamApi(
       new WebSocketClient(),
       this.stream.getUrlProvider()
     );
-    this.stream.onResponse(response => this.handleStreamResponse(response));
-    this.stream.onRequest(request => this.handleStreamRequest(request));
+    this.streamDisposables.push(
+      this.stream.onResponse(response => this.handleStreamResponse(response))
+    );
+    this.streamDisposables.push(
+      this.stream.onRequest(request => this.handleStreamRequest(request))
+    );
     return new Promise(async resolve => {
       try {
-        await this.commands.execute<vertexvis.protobuf.stream.IStreamResponse>(
+        const dispose = await this.commands.execute<Disposable>(
           'stream.reconnect',
           streamId,
           this.dimensions
         );
+        this.streamDisposables.push(dispose);
         resolve(streamId);
       } catch (e) {
         this.errorMessage = 'Unable to maintain connection to Vertex';
@@ -584,7 +599,7 @@ export class Viewer {
     }
 
     return new InteractionApi(
-      this.stream,
+      () => this.stream,
       () => {
         if (this.frameAttributes == null || this.sceneViewId == null) {
           throw new IllegalStateError(
