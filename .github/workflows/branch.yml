@@ -1,0 +1,40 @@
+name: Branch
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  build-and-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: "Install"
+        run: "yarn install"
+      - name: "Build"
+        run: "yarn build"
+      - name: "Test"
+        run: "yarn test"
+      - name: "Lint"
+        run: "yarn lint"
+      - name: "Upload build artifacts"
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: |
+            packages/*/dist
+            packages/*/package.json
+            packages/*/yarn.lock
+            packages/*/LICENSE
+            packages/*/README.md
+            lerna.json
+            yarn.lock

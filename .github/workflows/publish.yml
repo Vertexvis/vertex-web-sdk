@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: "Install"
+        run: "yarn install"
+      - name: "Build"
+        run: "yarn build"
+      - name: "Test"
+        run: "yarn test"
+      - name: "Upload publish artifacts"
+        uses: actions/upload-artifact@v2
+        with:
+          name: publish-artifact
+          path: |
+            packages/*/dist
+            packages/*/package.json
+            packages/*/yarn.lock
+            packages/*/LICENSE
+            packages/*/README.md
+            lerna.json
+            yarn.lock
+      - name: "Publish to NPM"
+        env:
+          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: "./scripts/publish.sh"
