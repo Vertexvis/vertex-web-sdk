@@ -12,7 +12,7 @@ import {
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
-import { Color, Disposable, UUID } from '@vertexvis/utils';
+import { Disposable, UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, SceneResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
