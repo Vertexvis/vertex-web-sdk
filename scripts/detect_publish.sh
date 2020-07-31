@@ -4,7 +4,6 @@
 
 set -e
 
-sha=$(git rev-parse HEAD)
 version=v`jq -r '.version' ./lerna.json`
 
 git fetch --tags
