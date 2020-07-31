@@ -23,6 +23,7 @@ export const config: Config = {
   },
   plugins: [copyright()],
   globalStyle: 'src/global/index.css',
+  buildEs5: false,
   outputTargets: [
     {
       type: 'dist',
