@@ -4,20 +4,11 @@
 
 set -e
 
-sha=$(git rev-parse HEAD)
-version=v`jq -r '.version' ./lerna.json`
+npx lerna publish from-package --yes
 
-git fetch --tags
-
-if test -z `git tag --list $version`
-then
-  echo "Detected release for $version"
-
-  npx lerna publish from-package --yes
-
-  curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
-    -H "Authorization: token $GITHUB_TOKEN" \
-    -d @- <<EOF
+curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
+-H "Authorization: token $GITHUB_TOKEN" \
+-d @- <<EOF
 {
   "tag_name": "$version",
   "target_commitish": "$sha",
@@ -27,6 +18,3 @@ then
   "prelease": false
 }
 EOF
-else
-  echo "Skipping publish of $version"
-fi
