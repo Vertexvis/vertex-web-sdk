@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-and-analyze:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout changes"
@@ -18,23 +18,71 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: "Install"
         run: "yarn install"
       - name: "Build"
         run: "yarn build"
-      - name: "Test"
-        run: "yarn test"
-      - name: "Lint"
-        run: "yarn lint"
       - name: "Upload build artifacts"
         uses: actions/upload-artifact@v2
         with:
           name: build-artifact
+          path: packages/*/dist
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
           path: |
-            packages/*/dist
-            packages/*/package.json
-            packages/*/yarn.lock
-            packages/*/LICENSE
-            packages/*/README.md
-            lerna.json
-            yarn.lock
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "Install"
+        run: "yarn install"
+      - name: "Lint"
+        run: "yarn lint"
+  test:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+      - name: "Download build artifacts"
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+          path: packages
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "Install"
+        run: "yarn install"
+      - name: "Test"
+        run: "yarn test"
