@@ -38,25 +38,25 @@ jobs:
         with:
           name: build-artifact
           path: packages/*/dist
-  detect-release:
+  detect-publish:
     runs-on: ubuntu-latest
     outputs:
-      release: ${{ steps.detect_release.outputs.release }}
+      publish: ${{ steps.detect_publish.outputs.publish }}
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
-      - name: "Detect release"
-        id: "detect_release"
+      - name: "Detect publish"
+        id: "detect_publish"
         run: |
-          result=`./scripts/detect_release.sh`
+          result=`./scripts/detect_publish.sh`
           echo $result
-          echo ::set-output name=release::$result
+          echo ::set-output name=publish::$result
   publish:
     runs-on: ubuntu-latest
-    needs: [build, detect-release]
-    if: needs.detect-release.outputs.release == 1
+    needs: [build, detect-publish]
+    if: needs.detect-publish.outputs.publish == 1
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
