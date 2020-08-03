@@ -1,10 +1,12 @@
 #!/bin/sh
 
+. "$(pwd)"/scripts/utils.sh
+
 # Internal script used by CI to detect if we need to publish packages to NPM.
 
 set -e
 
-version=v`jq -r '.version' ./lerna.json`
+version=v$(get_version)
 
 git fetch --tags
 
