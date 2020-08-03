@@ -4,6 +4,11 @@
 
 set -e
 
+. "$(pwd)"/scripts/utils.sh
+
+version="v$(get_version)"
+sha="$(git rev-parse HEAD)"
+
 npx lerna publish from-package --yes
 
 curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
