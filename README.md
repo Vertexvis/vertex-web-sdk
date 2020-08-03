@@ -52,23 +52,17 @@ to execute any NPM `test` scripts present for each package.
 Additionally, the project exposes a top-level script to check code coverage
 (`yarn test:coverage`).
 
-## Publishing NPM packages
+## Releasing
 
-Changes to packages are not automatically released based on the initial PR that
-introduces them. In order to release a set of changes, the
-`./scripts/release.sh` script can be used (from master) to update package
-versions. This script will run `yarn release`, which will use a CLI wizard
-provided through `lerna version` to allow you to perform the version updates to
-each changed package.
+To create a release, run the `yarn release` NPM script. This script will verify
+that your working directory, ask for the next version, generate documentation,
+and push a release branch to GitHub.
 
-Once the version changes have been configured, the script will push up a release
-branch. The branch will be named `release-{{ timestamp }}`, and contain a single
-"Release Changes" commit, which will indicate the versions that will be changed
-when merged.
+Once you're PR has been approved and merged, the CI pipeline will automatically
+publish packages to NPM, tag the release, and create a release in Github.
 
-This branch can then be merged into master, and uses
-https://github.com/Vertexvis/npm-publish-action to publish changed packages to
-NPM, in addition to pushing up a new tag for each version change.
+If for some reason publish fails, open a PR with any fixes and merge your
+changes. CI will attempt to republish the previous release that failed.
 
 ## Semver
 
