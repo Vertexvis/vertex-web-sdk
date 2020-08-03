@@ -37,21 +37,24 @@ export class StreamApi {
   >();
 
   private messageSubscription?: Disposable;
-  private urlProvider?: UrlProvider;
 
   public constructor(
     private websocket: WebSocketClient = new WebSocketClient(),
-    urlProvider?: UrlProvider
-  ) {
-    this.urlProvider = urlProvider;
-  }
+    private urlProvider?: UrlProvider
+  ) {}
 
-  public async connect(urlProvider: UrlProvider): Promise<Disposable> {
-    this.urlProvider = urlProvider;
-    await this.websocket.connect(urlProvider);
+  public async connect(urlProvider?: UrlProvider): Promise<Disposable> {
+    if (urlProvider != null) {
+      this.urlProvider = urlProvider;
+    }
+    if (this.urlProvider == null) {
+      throw new Error('Unable to connect as no Url provider has been set');
+    }
+    await this.websocket.connect(this.urlProvider);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
     });
+
     return { dispose: () => this.dispose() };
   }
 
@@ -84,24 +87,23 @@ export class StreamApi {
     );
   }
 
-  public async reconnect(
-    data: ReconnectPayload,
-    withResponse = true
-  ): Promise<Disposable> {
+  public async reconnectWebSocket(): Promise<Disposable> {
     if (this.urlProvider == null) {
       throw new Error('Unable to connect as no Url provider has been set');
     }
-    await this.websocket.connect(this.urlProvider);
-    this.messageSubscription = this.websocket.onMessage(message => {
-      this.handleMessage(message);
-    });
-    await this.sendRequest(
+    return this.connect(this.urlProvider);
+  }
+
+  public async reconnect(
+    data: ReconnectPayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest(
       {
         reconnect: data,
       },
       withResponse
     );
-    return { dispose: () => this.dispose() };
   }
 
   public beginInteraction(

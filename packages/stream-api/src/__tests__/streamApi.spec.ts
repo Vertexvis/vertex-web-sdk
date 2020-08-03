@@ -47,6 +47,7 @@ describe(StreamApi, () => {
 
   describe('reconnect', () => {
     beforeEach(() => streamApi.connect(url));
+
     it('should open a ws connection', () => {
       const reconnectPayload = {
         streamId: {

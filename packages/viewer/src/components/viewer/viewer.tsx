@@ -12,7 +12,7 @@ import {
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
-import { Disposable, UUID } from '@vertexvis/utils';
+import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, SceneResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
@@ -35,7 +35,7 @@ import {
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
+import { StreamApi, WebSocketClient, UrlProvider } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 
 interface LoadedImage extends Disposable {
@@ -350,13 +350,9 @@ export class Viewer {
 
     return new Promise(async resolve => {
       try {
-        const dispose: Disposable = await this.commands.execute(
-          'stream.connect',
-          {
-            sceneId: scene.id,
-          }
-        );
-        this.streamDisposables.push(dispose);
+        await this.commands.execute('stream.connect', {
+          sceneId: scene.id,
+        });
       } catch (e) {
         this.errorMessage =
           "Error loading scene. Check that you've supplied a valid scene and token";
@@ -376,26 +372,23 @@ export class Viewer {
 
   private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
     this.streamDisposables.forEach(d => d.dispose());
-    this.streamDisposables = [];
+
     this.stream = new StreamApi(
       new WebSocketClient(),
       this.stream.getUrlProvider()
     );
+    this.streamDisposables = [];
     this.setupStreamListeners();
-
     return new Promise(async resolve => {
-      try {
-        const dispose = await this.commands.execute<Disposable>(
-          'stream.reconnect',
-          streamId,
-          this.dimensions
-        );
-        this.streamDisposables.push(dispose);
-        resolve(streamId);
-      } catch (e) {
-        this.errorMessage = 'Unable to maintain connection to Vertex';
-        throw new WebsocketConnectionError(this.errorMessage, e);
-      }
+      const disposable: Disposable = await this.commands.execute(
+        'stream.reconnectWebSocket'
+      );
+      this.streamDisposables.push(disposable);
+      await this.commands.execute(
+        'stream.reconnect',
+        streamId,
+        this.dimensions
+      );
       resolve(streamId);
     });
   }
@@ -619,5 +612,17 @@ export class Viewer {
 
   private initializeCredentials(): void {
     this.activeCredentials = parseToken(this.token);
+  }
+
+  /**
+   * This function is currently not in use, but will required
+   * when we want to automatically configure the background color of
+   * JPEG images.
+   */
+  private getBackgroundColor(): Color.Color | undefined {
+    if (this.containerElement != null) {
+      const colorString = window.getComputedStyle(this.containerElement);
+      return Color.fromCss(colorString.backgroundColor);
+    }
   }
 }
