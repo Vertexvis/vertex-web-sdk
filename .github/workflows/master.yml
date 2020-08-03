@@ -82,4 +82,4 @@ jobs:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-        run: "echo PUBLISH!"
+        run: "./scripts/publish.sh"
