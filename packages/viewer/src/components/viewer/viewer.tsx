@@ -35,7 +35,7 @@ import {
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { StreamApi, WebSocketClient, UrlProvider } from '@vertexvis/stream-api';
+import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 
 interface LoadedImage extends Disposable {
