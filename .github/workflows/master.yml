@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       - name: Set Node Version
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
@@ -45,8 +43,6 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       - name: "Detect publish"
         id: "detect_publish"
         run: |
@@ -60,8 +56,6 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       - name: "Download build artifacts"
         uses: actions/download-artifact@v2
         with:
@@ -88,4 +82,4 @@ jobs:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-        run: "./scripts/publish.sh"
+        run: "echo PUBLISH!"
