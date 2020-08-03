@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Internal script to publish packages to NPM.
 
