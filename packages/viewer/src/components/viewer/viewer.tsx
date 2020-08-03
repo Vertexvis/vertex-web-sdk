@@ -349,15 +349,11 @@ export class Viewer {
     const scene = SceneResource.fromUrn(resource);
 
     return new Promise(async resolve => {
-      try {
-        await this.commands.execute('stream.connect', {
+      await this.connectStream(
+        this.commands.execute('stream.connect', {
           sceneId: scene.id,
-        });
-      } catch (e) {
-        this.errorMessage =
-          "Error loading scene. Check that you've supplied a valid scene and token";
-        throw new WebsocketConnectionError(this.errorMessage, e);
-      }
+        })
+      );
 
       const streamResponse = await this.commands.execute<
         vertexvis.protobuf.stream.IStreamResponse
@@ -367,6 +363,19 @@ export class Viewer {
         this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
       }
       resolve(scene.id);
+    });
+  }
+
+  private connectStream(connection: Promise<Disposable>): Promise<void> {
+    return new Promise(async resolve => {
+      try {
+        const dispose = await connection;
+        this.streamDisposables.push(dispose);
+        resolve();
+      } catch (e) {
+        this.errorMessage = 'Unable to maintain connection to Vertex';
+        throw new WebsocketConnectionError(this.errorMessage, e);
+      }
     });
   }
 
@@ -380,10 +389,9 @@ export class Viewer {
     this.streamDisposables = [];
     this.setupStreamListeners();
     return new Promise(async resolve => {
-      const disposable: Disposable = await this.commands.execute(
-        'stream.reconnectWebSocket'
+      await this.connectStream(
+        this.commands.execute('stream.reconnectWebSocket')
       );
-      this.streamDisposables.push(disposable);
       await this.commands.execute(
         'stream.reconnect',
         streamId,
