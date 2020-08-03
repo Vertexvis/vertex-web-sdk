@@ -4,7 +4,7 @@ set -e
 
 . "$(pwd)"/scripts/utils.sh
 
-if test "$(git rev-parse --abbrev-ref HEAD) != master"
+if test "$(git rev-parse --abbrev-ref HEAD)" != "master"
 then
   echo "Cannot release from non-master branch"
   exit 1
