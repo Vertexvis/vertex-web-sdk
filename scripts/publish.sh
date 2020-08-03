@@ -1,8 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 # Internal script to publish packages to NPM.
 
 set -e
+
+. "$(pwd)"/scripts/utils.sh
+
+version="v$(get_version)"
+sha="$(git rev-parse HEAD)"
 
 npx lerna publish from-package --yes
 

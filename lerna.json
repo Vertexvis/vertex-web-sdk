@@ -1,12 +1,12 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "npmClient": "yarn",
   "packages": [
     "packages/*"
   ],
   "command": {
     "version": {
-      "allowBranch": "master"
+      "allowBranch": "release-temp/*"
     }
   }
 }
