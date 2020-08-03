@@ -6,7 +6,6 @@ web platform.
 ## Structure
 
 - `./packages`: Contains platform SDK packages that are published to NPM.
-- `./poc`: Contains proof-of-concept or experimental SDK packages.
 - `./scripts`: Contains Bash scripts for managing the project.
 
 ## Setup & Installing
