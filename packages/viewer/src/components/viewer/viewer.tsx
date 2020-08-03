@@ -384,6 +384,7 @@ export class Viewer {
       await this.connectStream(
         this.commands.execute('stream.connect', {
           sceneId: this.loadedSceneId,
+          reconnect: true,
         })
       );
       this.stream.reconnect({
