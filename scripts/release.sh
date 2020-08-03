@@ -24,20 +24,24 @@ then
   exit 1
 fi
 
+# Create temp branch to run release scripts
 timestamp=$(date "+%s")
 local_branch=release-temp/$timestamp
 git checkout -tb $local_branch
 
+# Bump version and generate docs with updated versions
 npx lerna version --no-push --no-git-tag-version --exact
+yarn generate:docs
 
 version="v$(get_version)"
 remote_branch="release/$version"
 
-message="Release Changes\n"
-
+# Push branch to upstream
 git commit -a -m "Release $version"
 git push origin $local_branch:$remote_branch
 git checkout master
+
+# Cleanup
 git branch -D $local_branch
 
 echo "Pushed $remote_branch. Open a PR and merge to publish the release."
