@@ -39,18 +39,11 @@ export class StreamApi {
   private messageSubscription?: Disposable;
 
   public constructor(
-    private websocket: WebSocketClient = new WebSocketClient(),
-    private urlProvider?: UrlProvider
+    private websocket: WebSocketClient = new WebSocketClient()
   ) {}
 
-  public async connect(urlProvider?: UrlProvider): Promise<Disposable> {
-    if (urlProvider != null) {
-      this.urlProvider = urlProvider;
-    }
-    if (this.urlProvider == null) {
-      throw new Error('Unable to connect as no Url provider has been set');
-    }
-    await this.websocket.connect(this.urlProvider);
+  public async connect(urlProvider: UrlProvider): Promise<Disposable> {
+    await this.websocket.connect(urlProvider);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
     });
@@ -61,10 +54,6 @@ export class StreamApi {
   public dispose(): void {
     this.websocket.close();
     this.messageSubscription?.dispose();
-  }
-
-  public getUrlProvider(): UrlProvider | undefined {
-    return this.urlProvider;
   }
 
   public onResponse(handler: ResponseHandler): Disposable {
@@ -85,13 +74,6 @@ export class StreamApi {
       },
       withResponse
     );
-  }
-
-  public async reconnectWebSocket(): Promise<Disposable> {
-    if (this.urlProvider == null) {
-      throw new Error('Unable to connect as no Url provider has been set');
-    }
-    return this.connect(this.urlProvider);
   }
 
   public async reconnect(

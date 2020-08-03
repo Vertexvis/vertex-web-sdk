@@ -118,7 +118,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
-  private loadedSceneId?: Promise<UUID.UUID>;
+  private loadedSceneId?: UUID.UUID;
   private activeCredentials: Token;
 
   private frameAttributes?: Frame.Frame;
@@ -130,7 +130,7 @@ export class Viewer {
 
   private isResizing?: boolean;
   private sceneViewId?: UUID.UUID;
-  private streamDisposables: Disposable[] = [];
+  private streamDisposable?: Disposable;
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -145,7 +145,7 @@ export class Viewer {
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(
-      () => this.stream,
+      this.stream,
       () => this.getConfig(),
       () => this.activeCredentials
     );
@@ -307,9 +307,9 @@ export class Viewer {
   @Method()
   public async load(resource: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      this.loadedSceneId = this.connectStreamingClient(resource);
+      const sceneId = this.connectStreamingClient(resource);
 
-      await this.loadedSceneId;
+      this.loadedSceneId = await sceneId;
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -369,8 +369,7 @@ export class Viewer {
   private connectStream(connection: Promise<Disposable>): Promise<void> {
     return new Promise(async resolve => {
       try {
-        const dispose = await connection;
-        this.streamDisposables.push(dispose);
+        this.streamDisposable = await connection;
         resolve();
       } catch (e) {
         this.errorMessage = 'Unable to maintain connection to Vertex';
@@ -380,23 +379,17 @@ export class Viewer {
   }
 
   private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
-    this.streamDisposables.forEach(d => d.dispose());
-
-    this.stream = new StreamApi(
-      new WebSocketClient(),
-      this.stream.getUrlProvider()
-    );
-    this.streamDisposables = [];
-    this.setupStreamListeners();
+    this.streamDisposable.dispose();
     return new Promise(async resolve => {
       await this.connectStream(
-        this.commands.execute('stream.reconnectWebSocket')
+        this.commands.execute('stream.connect', {
+          sceneId: this.loadedSceneId,
+        })
       );
-      await this.commands.execute(
-        'stream.reconnect',
-        streamId,
-        this.dimensions
-      );
+      this.stream.reconnect({
+        streamId: { hex: streamId },
+        dimensions: this.dimensions,
+      });
       resolve(streamId);
     });
   }
@@ -569,6 +562,12 @@ export class Viewer {
     }
   }
 
+  private setupStreamListeners(): void {
+    this.stream.onResponse(response => this.handleStreamResponse(response));
+
+    this.stream.onRequest(request => this.handleStreamRequest(request));
+  }
+
   private initializeInteractionHandler(handler: InteractionHandler): void {
     if (this.canvasElement == null) {
       throw new InteractionHandlerError(
@@ -583,15 +582,6 @@ export class Viewer {
     handler.initialize(this.canvasElement, this.interactionApi);
   }
 
-  private setupStreamListeners(): void {
-    this.streamDisposables.push(
-      this.stream.onResponse(response => this.handleStreamResponse(response))
-    );
-    this.streamDisposables.push(
-      this.stream.onRequest(request => this.handleStreamRequest(request))
-    );
-  }
-
   private createInteractionApi(): InteractionApi {
     if (this.stream == null) {
       throw new ComponentInitializationError(
@@ -600,7 +590,7 @@ export class Viewer {
     }
 
     return new InteractionApi(
-      () => this.stream,
+      this.stream,
       () => {
         if (this.frameAttributes == null || this.sceneViewId == null) {
           throw new IllegalStateError(

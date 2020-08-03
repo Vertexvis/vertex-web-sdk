@@ -1,8 +1,8 @@
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
+import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
-import { StreamProvider } from '../commands/commandRegistry';
 
 type SceneProvider = () => Scene;
 
@@ -19,7 +19,7 @@ export class InteractionApi {
   private currentCamera?: Camera;
 
   public constructor(
-    private streamProvider: StreamProvider,
+    private stream: StreamApi,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>
   ) {}
@@ -53,7 +53,7 @@ export class InteractionApi {
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
       this.currentCamera = this.getScene().camera();
-      await this.streamProvider().beginInteraction();
+      await this.stream.beginInteraction();
     }
   }
 
@@ -162,7 +162,7 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = null;
-      await this.streamProvider().endInteraction();
+      await this.stream.endInteraction();
     }
   }
 
