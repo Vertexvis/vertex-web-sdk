@@ -3,6 +3,8 @@
 Welcome to the Vertex Web SDK repo. This is a monorepo containing SDKs for the
 web platform.
 
+qweqeqwe
+
 ## Structure
 
 - `./packages`: Contains platform SDK packages that are published to NPM.
