@@ -42,14 +42,7 @@ export class StreamApi {
     private websocket: WebSocketClient = new WebSocketClient()
   ) {}
 
-  public async connect(
-    urlProvider: UrlProvider,
-    reconnect?: boolean
-  ): Promise<Disposable> {
-    if (reconnect) {
-      console.log('creating a new websocket client');
-      this.websocket = new WebSocketClient();
-    }
+  public async connect(urlProvider: UrlProvider): Promise<Disposable> {
     await this.websocket.connect(urlProvider);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);

@@ -15,13 +15,13 @@ export class WebSocketClient {
   private webSocket?: WebSocket;
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
-  private retryDisabled = false;
+  private urlProvider?: UrlProvider;
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
   public close(): void {
     if (this.webSocket != null) {
-      this.retryDisabled = true;
+      this.removeWebSocketListeners();
       this.webSocket.close();
     }
   }
@@ -33,34 +33,14 @@ export class WebSocketClient {
       urlAndProtocol.protocols
     );
     this.webSocket.binaryType = 'arraybuffer';
+    this.urlProvider = urlProvider;
 
-    return new Promise((resolve, reject) => {
-      const onOpen = (): void => {
-        this.reopenAttempt = 0;
-        resolve();
-      };
-      const onError = (): void => {
-        reject();
-        removeWebSocketListeners();
-      };
-      const onClose = (): void => {
-        removeWebSocketListeners();
-        this.handleClose(urlProvider);
-      };
-      const removeWebSocketListeners = (): void => {
-        if (this.webSocket != null) {
-          this.webSocket.removeEventListener('message', this.handleMessage);
-          this.webSocket.removeEventListener('open', onOpen);
-          this.webSocket.removeEventListener('error', onError);
-          this.webSocket.removeEventListener('close', onClose);
-        }
-      };
-
+    return new Promise((resolve: VoidFunction, reject) => {
       if (this.webSocket != null) {
         this.webSocket.addEventListener('message', this.handleMessage);
-        this.webSocket.addEventListener('open', onOpen);
+        this.webSocket.addEventListener('open', () => this.onOpen(resolve));
         this.webSocket.addEventListener('error', () => reject());
-        this.webSocket.addEventListener('close', onClose);
+        this.webSocket.addEventListener('close', this.onClose);
       }
     });
   }
@@ -91,11 +71,34 @@ export class WebSocketClient {
     this.reopenAttempt += 1;
 
     try {
-      if (!this.retryDisabled) {
-        await this.connect(urlProvider);
-      }
+      await this.connect(urlProvider);
     } catch (e) {
       // Failed connection attempt here will be handled, and this exception can be ignored
+    }
+  }
+
+  private onError(reject: VoidFunction): void {
+    this.removeWebSocketListeners();
+    reject();
+  }
+
+  private onClose(): void {
+    this.removeWebSocketListeners();
+    if (this.urlProvider != null) {
+      this.handleClose(this.urlProvider);
+    }
+  }
+
+  private removeWebSocketListeners(): void {
+    if (this.webSocket != null) {
+      this.webSocket.removeEventListener('message', this.handleMessage);
+      this.webSocket.removeEventListener('open', () =>
+        this.onOpen(Promise.resolve)
+      );
+      this.webSocket.removeEventListener('error', () =>
+        this.onError(Promise.reject)
+      );
+      this.webSocket.removeEventListener('close', this.onClose);
     }
   }
 
@@ -106,4 +109,9 @@ export class WebSocketClient {
   private handleClose = (urlProvider: UrlProvider): void => {
     this.reconnect(urlProvider);
   };
+
+  private onOpen(resolve: VoidFunction): void {
+    this.reopenAttempt = 0;
+    resolve();
+  }
 }

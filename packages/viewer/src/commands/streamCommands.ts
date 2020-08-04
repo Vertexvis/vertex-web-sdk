@@ -11,13 +11,11 @@ import { buildSceneOperation } from './streamCommandsMapper';
 
 export interface ConnectOptions {
   sceneId?: string;
-  reconnect?: boolean;
 }
 
-export function connect({ sceneId, reconnect }: ConnectOptions = {}): Command<
+export function connect({ sceneId }: ConnectOptions = {}): Command<
   Promise<Disposable>
 > {
-  console.log('sceneId, ', sceneId, 'reconnect, ', reconnect);
   return ({ stream, config, tokenProvider: tokenProvider }) => {
     const urlProvider = (): UrlDescriptor => {
       const token = tokenProvider();
@@ -37,7 +35,7 @@ export function connect({ sceneId, reconnect }: ConnectOptions = {}): Command<
       }
     };
 
-    return stream.connect(urlProvider, reconnect);
+    return stream.connect(urlProvider);
   };
 }
 

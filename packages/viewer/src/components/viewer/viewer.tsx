@@ -307,9 +307,7 @@ export class Viewer {
   @Method()
   public async load(resource: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      const sceneId = this.connectStreamingClient(resource);
-
-      this.loadedSceneId = await sceneId;
+      this.loadedSceneId = await this.connectStreamingClient(resource);
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
