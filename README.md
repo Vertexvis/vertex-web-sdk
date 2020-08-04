@@ -54,14 +54,15 @@ Additionally, the project exposes a top-level script to check code coverage
 ## Releasing
 
 To create a release, run the `yarn release` NPM script. This script will verify
-that your working directory, ask for the next version, generate documentation,
-and push a release branch to GitHub.
+that your working directory is clean, is up-to-date with master, ask for the
+release version, generate documentation, and push a release branch to GitHub.
 
-Once you're PR has been approved and merged, the CI pipeline will automatically
-publish packages to NPM, tag the release, and create a release in Github.
+You can then create a PR from the release branch. Once your PR has been approved
+and merged, the CI pipeline will automatically publish packages to NPM, tag the
+release, and create a release in Github.
 
-If for some reason publish fails, open a PR with any fixes and merge your
-changes. CI will attempt to republish the previous release that failed.
+If the publishing, open a new PR with any fixes and merge your changes. CI will
+attempt to republish the previous release that failed.
 
 ## Semver
 
