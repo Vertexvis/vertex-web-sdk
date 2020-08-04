@@ -16,6 +16,7 @@ export class WebSocketClient {
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
   private urlProvider?: UrlProvider;
+  private timer?: NodeJS.Timer;
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
@@ -23,6 +24,9 @@ export class WebSocketClient {
     if (this.webSocket != null) {
       this.removeWebSocketListeners();
       this.webSocket.close();
+      if (this.timer != null) {
+        clearTimeout(this.timer);
+      }
     }
   }
 
@@ -59,14 +63,14 @@ export class WebSocketClient {
    * @private Used for internals or testing.
    */
   public async reconnect(urlProvider: UrlProvider): Promise<void> {
-    await new Promise(resolve =>
-      setTimeout(
+    await new Promise(resolve => {
+      this.timer = setTimeout(
         resolve,
         this.reconnectDelays[
           Math.min(this.reopenAttempt, this.reconnectDelays.length - 1)
         ]
-      )
-    );
+      );
+    });
 
     this.reopenAttempt += 1;
 
