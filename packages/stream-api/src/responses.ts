@@ -1,10 +1,10 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
-export function parseResponse(
+export function parseStreamMessage(
   buffer: ArrayBuffer
-): vertexvis.protobuf.stream.IStreamResponse | null | undefined {
+): vertexvis.protobuf.stream.IStreamMessage {
   const bytes = new Uint8Array(buffer);
   const message = vertexvis.protobuf.stream.StreamMessage.decode(bytes);
 
-  return message.response;
+  return message;
 }

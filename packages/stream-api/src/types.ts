@@ -6,6 +6,11 @@ export type StartStreamPayload = DeepRequired<
   ['frameCorrelationId']
 >;
 
+export type ReconnectPayload = DeepRequired<
+  vertexvis.protobuf.stream.IReconnectPayload,
+  ['frameCorrelationId']
+>;
+
 export type ReplaceCameraPayload = DeepRequired<
   vertexvis.protobuf.stream.IUpdateCameraPayload,
   ['frameCorrelationId']

@@ -12,7 +12,7 @@ import {
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
-import { Color, Disposable, UUID } from '@vertexvis/utils';
+import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, SceneResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
@@ -118,7 +118,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
-  private loadedSceneId?: Promise<UUID.UUID>;
+  private loadedSceneId?: UUID.UUID;
   private activeCredentials: Token;
 
   private frameAttributes?: Frame.Frame;
@@ -130,6 +130,7 @@ export class Viewer {
 
   private isResizing?: boolean;
   private sceneViewId?: UUID.UUID;
+  private streamDisposable?: Disposable;
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
@@ -139,7 +140,7 @@ export class Viewer {
     this.initializeCredentials();
 
     this.stream = new StreamApi(new WebSocketClient());
-    this.stream.onResponse(response => this.handleStreamResponse(response));
+    this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
@@ -306,9 +307,7 @@ export class Viewer {
   @Method()
   public async load(resource: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      this.loadedSceneId = this.connectStreamingClient(resource);
-
-      await this.loadedSceneId;
+      this.loadedSceneId = await this.connectStreamingClient(resource);
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -348,15 +347,11 @@ export class Viewer {
     const scene = SceneResource.fromUrn(resource);
 
     return new Promise(async resolve => {
-      try {
-        await this.commands.execute('stream.connect', {
+      await this.connectStream(
+        this.commands.execute('stream.connect', {
           sceneId: scene.id,
-        });
-      } catch (e) {
-        this.errorMessage =
-          "Error loading scene. Check that you've supplied a valid scene and token";
-        throw new WebsocketConnectionError(this.errorMessage, e);
-      }
+        })
+      );
 
       const streamResponse = await this.commands.execute<
         vertexvis.protobuf.stream.IStreamResponse
@@ -366,6 +361,35 @@ export class Viewer {
         this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
       }
       resolve(scene.id);
+    });
+  }
+
+  private connectStream(connection: Promise<Disposable>): Promise<void> {
+    return new Promise(async resolve => {
+      try {
+        this.streamDisposable = await connection;
+        resolve();
+      } catch (e) {
+        this.errorMessage = 'Unable to maintain connection to Vertex';
+        throw new WebsocketConnectionError(this.errorMessage, e);
+      }
+    });
+  }
+
+  private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
+    this.streamDisposable.dispose();
+    return new Promise(async resolve => {
+      await this.connectStream(
+        this.commands.execute('stream.connect', {
+          sceneId: this.loadedSceneId,
+          reconnect: true,
+        })
+      );
+      this.stream.reconnect({
+        streamId: { hex: streamId },
+        dimensions: this.dimensions,
+      });
+      resolve(streamId);
     });
   }
 
@@ -397,6 +421,16 @@ export class Viewer {
   ): void {
     if (response.frame != null) {
       this.drawFrame(response.frame);
+    }
+  }
+
+  private async handleStreamRequest(
+    request: vertexvis.protobuf.stream.IStreamRequest
+  ): Promise<void> {
+    if (request.gracefulReconnection != null) {
+      await this.reconnectStreamingClient(
+        request.gracefulReconnection.streamId.hex
+      );
     }
   }
 
@@ -527,6 +561,12 @@ export class Viewer {
     }
   }
 
+  private setupStreamListeners(): void {
+    this.stream.onResponse(response => this.handleStreamResponse(response));
+
+    this.stream.onRequest(request => this.handleStreamRequest(request));
+  }
+
   private initializeInteractionHandler(handler: InteractionHandler): void {
     if (this.canvasElement == null) {
       throw new InteractionHandlerError(
@@ -571,6 +611,11 @@ export class Viewer {
     this.activeCredentials = parseToken(this.token);
   }
 
+  /**
+   * This function is currently not in use, but will required
+   * when we want to automatically configure the background color of
+   * JPEG images.
+   */
   private getBackgroundColor(): Color.Color | undefined {
     if (this.containerElement != null) {
       const colorString = window.getComputedStyle(this.containerElement);

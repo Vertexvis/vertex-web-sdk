@@ -15,12 +15,19 @@ export class WebSocketClient {
   private webSocket?: WebSocket;
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
+  private urlProvider?: UrlProvider;
+  private timer?: number;
+  private listeners?: Disposable;
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
   public close(): void {
     if (this.webSocket != null) {
+      this.removeWebSocketListeners();
       this.webSocket.close();
+      if (this.timer != null) {
+        window.clearTimeout(this.timer);
+      }
     }
   }
 
@@ -31,34 +38,15 @@ export class WebSocketClient {
       urlAndProtocol.protocols
     );
     this.webSocket.binaryType = 'arraybuffer';
+    this.urlProvider = urlProvider;
 
     return new Promise((resolve, reject) => {
-      const onOpen = (): void => {
-        this.reopenAttempt = 0;
-        resolve();
-      };
-      const onError = (): void => {
-        reject();
-        removeWebSocketListeners();
-      };
-      const onClose = (): void => {
-        this.handleClose(urlProvider);
-        removeWebSocketListeners();
-      };
-      const removeWebSocketListeners = (): void => {
-        if (this.webSocket != null) {
-          this.webSocket.removeEventListener('message', this.handleMessage);
-          this.webSocket.removeEventListener('open', onOpen);
-          this.webSocket.removeEventListener('error', onError);
-          this.webSocket.removeEventListener('close', onClose);
-        }
-      };
-
       if (this.webSocket != null) {
-        this.webSocket.addEventListener('message', this.handleMessage);
-        this.webSocket.addEventListener('open', onOpen);
-        this.webSocket.addEventListener('error', () => reject());
-        this.webSocket.addEventListener('close', onClose);
+        this.listeners = this.addWebSocketListeners(
+          this.webSocket,
+          resolve,
+          reject
+        );
       }
     });
   }
@@ -77,14 +65,14 @@ export class WebSocketClient {
    * @private Used for internals or testing.
    */
   public async reconnect(urlProvider: UrlProvider): Promise<void> {
-    await new Promise(resolve =>
-      setTimeout(
+    await new Promise(resolve => {
+      this.timer = window.setTimeout(
         resolve,
         this.reconnectDelays[
           Math.min(this.reopenAttempt, this.reconnectDelays.length - 1)
         ]
-      )
-    );
+      );
+    });
 
     this.reopenAttempt += 1;
 
@@ -95,6 +83,39 @@ export class WebSocketClient {
     }
   }
 
+  private onClose(): void {
+    this.removeWebSocketListeners();
+    if (this.urlProvider != null) {
+      this.handleClose(this.urlProvider);
+    }
+  }
+
+  private addWebSocketListeners = (
+    ws: WebSocket,
+    resolve: VoidFunction,
+    reject: VoidFunction
+  ): Disposable => {
+    const onOpen = (): void => this.onOpen(resolve);
+    const onError = (): void => reject();
+    ws.addEventListener('message', this.handleMessage);
+    ws.addEventListener('open', onOpen);
+    ws.addEventListener('error', onError);
+    ws.addEventListener('close', this.onClose);
+
+    return {
+      dispose: () => {
+        ws.removeEventListener('message', this.handleMessage);
+        ws.removeEventListener('open', onOpen);
+        ws.removeEventListener('error', onError);
+        ws.removeEventListener('close', this.onClose);
+      },
+    };
+  };
+
+  private removeWebSocketListeners(): void {
+    this.listeners?.dispose();
+  }
+
   private handleMessage = (event: MessageEvent): void => {
     this.onMessageDispatcher.emit(event);
   };
@@ -102,4 +123,9 @@ export class WebSocketClient {
   private handleClose = (urlProvider: UrlProvider): void => {
     this.reconnect(urlProvider);
   };
+
+  private onOpen(resolve: VoidFunction): void {
+    this.reopenAttempt = 0;
+    resolve();
+  }
 }

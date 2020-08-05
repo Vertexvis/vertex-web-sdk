@@ -58,9 +58,9 @@ export function createSceneAlteration(
   return ({ stream }: CommandContext) => {
     const pbOperations = [buildSceneOperation(query, operations)];
     const request = {
-      sceneViewId: new vertexvis.protobuf.core.Uuid({
+      sceneViewId: {
         hex: sceneViewId,
-      }),
+      },
       operations: pbOperations,
     };
 
