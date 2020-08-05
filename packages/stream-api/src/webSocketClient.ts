@@ -16,7 +16,8 @@ export class WebSocketClient {
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
   private urlProvider?: UrlProvider;
-  private timer?: NodeJS.Timer;
+  private timer?: number;
+  private listeners?: Disposable;
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
@@ -25,7 +26,7 @@ export class WebSocketClient {
       this.removeWebSocketListeners();
       this.webSocket.close();
       if (this.timer != null) {
-        clearTimeout(this.timer);
+        window.clearTimeout(this.timer);
       }
     }
   }
@@ -39,12 +40,13 @@ export class WebSocketClient {
     this.webSocket.binaryType = 'arraybuffer';
     this.urlProvider = urlProvider;
 
-    return new Promise((resolve: VoidFunction, reject) => {
+    return new Promise((resolve, reject) => {
       if (this.webSocket != null) {
-        this.webSocket.addEventListener('message', this.handleMessage);
-        this.webSocket.addEventListener('open', () => this.onOpen(resolve));
-        this.webSocket.addEventListener('error', () => reject());
-        this.webSocket.addEventListener('close', this.onClose);
+        this.listeners = this.addWebSocketListeners(
+          this.webSocket,
+          resolve,
+          reject
+        );
       }
     });
   }
@@ -64,7 +66,7 @@ export class WebSocketClient {
    */
   public async reconnect(urlProvider: UrlProvider): Promise<void> {
     await new Promise(resolve => {
-      this.timer = setTimeout(
+      this.timer = window.setTimeout(
         resolve,
         this.reconnectDelays[
           Math.min(this.reopenAttempt, this.reconnectDelays.length - 1)
@@ -81,11 +83,6 @@ export class WebSocketClient {
     }
   }
 
-  private onError(reject: VoidFunction): void {
-    this.removeWebSocketListeners();
-    reject();
-  }
-
   private onClose(): void {
     this.removeWebSocketListeners();
     if (this.urlProvider != null) {
@@ -93,17 +90,30 @@ export class WebSocketClient {
     }
   }
 
+  private addWebSocketListeners = (
+    ws: WebSocket,
+    resolve: VoidFunction,
+    reject: VoidFunction
+  ): Disposable => {
+    const onOpen = (): void => this.onOpen(resolve);
+    const onError = (): void => reject();
+    ws.addEventListener('message', this.handleMessage);
+    ws.addEventListener('open', onOpen);
+    ws.addEventListener('error', onError);
+    ws.addEventListener('close', this.onClose);
+
+    return {
+      dispose: () => {
+        ws.removeEventListener('message', this.handleMessage);
+        ws.removeEventListener('open', onOpen);
+        ws.removeEventListener('error', onError);
+        ws.removeEventListener('close', this.onClose);
+      },
+    };
+  };
+
   private removeWebSocketListeners(): void {
-    if (this.webSocket != null) {
-      this.webSocket.removeEventListener('message', this.handleMessage);
-      this.webSocket.removeEventListener('open', () =>
-        this.onOpen(Promise.resolve)
-      );
-      this.webSocket.removeEventListener('error', () =>
-        this.onError(Promise.reject)
-      );
-      this.webSocket.removeEventListener('close', this.onClose);
-    }
+    this.listeners?.dispose();
   }
 
   private handleMessage = (event: MessageEvent): void => {
