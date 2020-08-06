@@ -1,5 +1,5 @@
 import * as FrameCamera from './frameCamera';
 import * as Frame from './frame';
-import * as SceneResource from './sceneResource';
+import * as LoadableResource from './loadableResource';
 
-export { Frame, FrameCamera, SceneResource };
+export { Frame, FrameCamera, LoadableResource };

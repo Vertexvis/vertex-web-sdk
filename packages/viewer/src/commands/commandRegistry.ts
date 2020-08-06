@@ -1,7 +1,6 @@
 import { Disposable } from '@vertexvis/utils';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
-import { TokenProvider } from '../credentials/token';
 import { StreamApi } from '@vertexvis/stream-api';
 
 interface CommandDefinition<R> {
@@ -14,8 +13,7 @@ export class CommandRegistry {
 
   public constructor(
     private stream: StreamApi,
-    private configProvider: ConfigProvider,
-    private tokenProvider: TokenProvider
+    private configProvider: ConfigProvider
   ) {}
 
   public register<R, T>(
@@ -39,7 +37,6 @@ export class CommandRegistry {
         command({
           stream: this.stream,
           config: this.configProvider(),
-          tokenProvider: this.tokenProvider,
         }) as any
       );
     } else {

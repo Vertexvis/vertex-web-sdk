@@ -10,25 +10,23 @@ import { QueryExpression } from '../scenes/queries';
 import { buildSceneOperation } from './streamCommandsMapper';
 
 export interface ConnectOptions {
-  sceneId?: string;
+  streamKey?: string;
 }
 
-export function connect({ sceneId }: ConnectOptions = {}): Command<
+export function connect({ streamKey }: ConnectOptions = {}): Command<
   Promise<Disposable>
 > {
-  return ({ stream, config, tokenProvider: tokenProvider }) => {
+  return ({ stream, config }) => {
     const urlProvider = (): UrlDescriptor => {
-      const token = tokenProvider();
-
-      if (sceneId != null && token != null) {
+      if (streamKey != null) {
         const uri = Uri.appendPath(
-          `/scenes/${sceneId}/stream`,
+          `/stream-keys/${streamKey}/session`,
           Uri.parse(config.network.renderingHost)
         );
 
         return {
           url: Uri.toString(uri),
-          protocols: [`${token}+ws.vertexvis.com`],
+          protocols: ['ws.vertexvis.com'],
         };
       } else {
         throw new InvalidCredentialsError(`Provided credentials are invalid.`);
