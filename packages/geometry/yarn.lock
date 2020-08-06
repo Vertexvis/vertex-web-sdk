@@ -497,10 +497,10 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@vertexvis/build-tools@0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis/build-tools/-/build-tools-0.7.2.tgz#23c3be4585f4278676b2775e47db61416b25f3c0"
-  integrity sha512-8VLGtzXvnX8Xj0FeexAPkHrUXF+g7tia0CVNDEI9xcxrTCK1jpGLGarikDq0wRWLL9aKCYAzRSycFnkZB4l+tw==
+"@vertexvis/build-tools@0.7.3":
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2fbuild-tools/-/build-tools-0.7.3.tgz#35610943d25d233fe9b49c6eafae567a2b782248"
+  integrity sha512-wXgnksrXETAaq8VjAKyK2YXxjlILzIuXmDjkrMF9S46HFTSC3DdL+Z7+L47X6tRmgeuGPpYATGuLemW7+nyqqA==
   dependencies:
     rollup "^1.19.4"
     rollup-plugin-auto-external "^2.0.0"
@@ -510,35 +510,35 @@
     rollup-plugin-terser "^5.1.1"
     rollup-plugin-typescript2 "^0.22.1"
 
-"@vertexvis/eslint-config-vertexvis-typescript@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/eslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.1.tgz#2e287f93eaf7a7477bff66f021faa47656b95944"
-  integrity sha512-N3RqsDpd0wO2EqFJiLcRYynYYHwLl3PBobcO76ePv95E4mRiBq9CnpqXYrv65WIAN9lTo2dPuYSe0tlMyPXC3Q==
+"@vertexvis/eslint-config-vertexvis-typescript@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2feslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.2.tgz#4ef601940aad3be9690f7f959c5c1331dd063c14"
+  integrity sha512-6qoHADyqbI+JPYQKDeBBo4bB1VrtxdKp6iql6TtPzHG2MSRTtJOb4UTLtFGqYRjmZqTWG/AqTqSOgUEhBqPC+A==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^2.1.0"
     "@typescript-eslint/parser" "^2.1.0"
-    "@vertexvis/eslint-config-vertexvis" "0.4.1"
+    "@vertexvis/eslint-config-vertexvis" "0.4.2"
     eslint-config-prettier "^6.0.0"
     eslint-plugin-prettier "^3.1.0"
 
-"@vertexvis/eslint-config-vertexvis@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/eslint-config-vertexvis/-/eslint-config-vertexvis-0.4.1.tgz#d8c1505f2d90a61f43cba44b5bf4f1864d0adca9"
-  integrity sha512-Ot8hSl/Ar1lzGGZoqMNRZxybOxeUHHPyiSqS2R497c5C4BG/Dgfx0paFY6jI/Cp54cjiZV6xBmwKGa8F18LdXg==
+"@vertexvis/eslint-config-vertexvis@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2feslint-config-vertexvis/-/eslint-config-vertexvis-0.4.2.tgz#33a8d91f328b3f8a27dfb61c0e2e86914372d066"
+  integrity sha512-0GMzCqY6N4jrh62h4lXcUjxbdRLRTZ5+UUiAztylEUnH0fPiYq32xbNQv2OEiihIlbrkV27iPC+ZXhanO8K+Rg==
   dependencies:
     eslint-config-prettier "^6.0.0"
     eslint-plugin-prettier "^3.1.0"
     prettier "^1.19.1"
 
-"@vertexvis/jest-config-vertexvis@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/jest-config-vertexvis/-/jest-config-vertexvis-0.4.1.tgz#12ed701dc10d9ce5725e7b16bcbc5b33ce4d09f4"
-  integrity sha512-Tsl6v0O3+TzwBjoaI89EZoVq6EpeVFVTwoFeN2g7KsXmgE8VfU+QY6vRbeJCdm5hzpI0sJi/dWAL6+7AQxfXGw==
+"@vertexvis/jest-config-vertexvis@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2fjest-config-vertexvis/-/jest-config-vertexvis-0.4.2.tgz#0760734efdb5a1e08fba77e191a1ba7ded1ccd2d"
+  integrity sha512-Se7dh/ONYSC6VyGYx71P55q+PMNsspIO0gq5H7TvfsHi6xzAo1LbyfRbA0XvXPGd+mCUNFkVBtThMMKHdvLxZg==
 
-"@vertexvis/typescript-config-vertexvis@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/typescript-config-vertexvis/-/typescript-config-vertexvis-1.0.1.tgz#12a59082fed2a19011db5844560ef57622f8a479"
-  integrity sha512-zEQovD921cgLlQxUkJfC8IJBMwD/9Gmq/9QjoLsBZdYtNriXutVLLizh0YhRb5ZOmTpzdJlYVeSesPQvzcOKdA==
+"@vertexvis/typescript-config-vertexvis@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis%2ftypescript-config-vertexvis/-/typescript-config-vertexvis-1.0.2.tgz#46eb84404861ef2ba4454187fbef8970a2e4b90c"
+  integrity sha512-4CiA3ITwSFNp+YnHNAxE2UHFSsDTLd6KS7tG2yfyKQlgNIkMyFiyW/xERAElC5uuEsjFtMvz9L3y7pTlspfrmQ==
 
 abab@^2.0.0:
   version "2.0.3"
