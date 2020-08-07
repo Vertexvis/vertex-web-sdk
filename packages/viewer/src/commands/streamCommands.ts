@@ -2,25 +2,26 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { Disposable, Uri, UUID } from '@vertexvis/utils';
 import { UrlDescriptor } from '@vertexvis/stream-api';
-import { InvalidCredentialsError } from '../errors';
 import { CommandContext, Command } from './command';
 import { CommandRegistry } from './commandRegistry';
 import { ItemOperation } from '../scenes/operations';
 import { QueryExpression } from '../scenes/queries';
 import { buildSceneOperation } from './streamCommandsMapper';
+import { LoadableResource } from '../types';
+import { InvalidCredentialsError } from '../errors';
 
 export interface ConnectOptions {
-  streamKey?: string;
+  resource: LoadableResource.LoadableResource;
 }
 
-export function connect({ streamKey }: ConnectOptions = {}): Command<
-  Promise<Disposable>
-> {
+export function connect({
+  resource,
+}: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
-    const urlProvider = (): UrlDescriptor => {
-      if (streamKey != null) {
+    if (resource.type === 'stream-key') {
+      const urlProvider = (): UrlDescriptor => {
         const uri = Uri.appendPath(
-          `/stream-keys/${streamKey}/session`,
+          `/stream-keys/${resource.id}/session`,
           Uri.parse(config.network.renderingHost)
         );
 
@@ -28,12 +29,14 @@ export function connect({ streamKey }: ConnectOptions = {}): Command<
           url: Uri.toString(uri),
           protocols: ['ws.vertexvis.com'],
         };
-      } else {
-        throw new InvalidCredentialsError(`Provided credentials are invalid.`);
-      }
-    };
+      };
 
-    return stream.connect(urlProvider);
+      return stream.connect(urlProvider);
+    } else {
+      throw new InvalidCredentialsError(
+        `Cannot load resource. Invalid type ${resource.type}`
+      );
+    }
   };
 }
 

@@ -112,7 +112,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
-  private loadedSceneId?: UUID.UUID;
+  private resource?: LoadableResource.LoadableResource;
 
   private frameAttributes?: Frame.Frame;
   private mutationObserver?: MutationObserver;
@@ -284,12 +284,13 @@ export class Viewer {
    *
    *  * `urn:vertexvis:scene:<sceneid>`
    *
-   * @param resource The URN of the resource to load.
+   * @param urn The URN of the resource to load.
    */
   @Method()
-  public async load(resource: string): Promise<void> {
+  public async load(urn: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      this.loadedSceneId = await this.connectStreamingClient(resource);
+      this.resource = LoadableResource.fromUrn(urn);
+      await this.connectStreamingClient(this.resource);
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -325,53 +326,41 @@ export class Viewer {
     return parseConfig(this.configEnv, this.config);
   }
 
-  private connectStreamingClient(urn: string): Promise<string> {
-    const resource = LoadableResource.fromUrn(urn);
+  private async connectStreamingClient(
+    resource: LoadableResource.LoadableResource
+  ): Promise<void> {
+    this.streamDisposable = await this.connectStream(resource);
 
-    return new Promise(async resolve => {
-      await this.connectStream(
-        this.commands.execute('stream.connect', {
-          streamKey: resource.id,
-        })
-      );
+    const streamResponse = await this.commands.execute<
+      vertexvis.protobuf.stream.IStreamResponse
+    >('stream.start', this.dimensions);
 
-      const streamResponse = await this.commands.execute<
-        vertexvis.protobuf.stream.IStreamResponse
-      >('stream.start', this.dimensions);
-
-      if (streamResponse.startStream != null) {
-        this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
-      }
-      resolve(resource.id);
-    });
+    if (streamResponse.startStream != null) {
+      this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+    }
   }
 
-  private connectStream(connection: Promise<Disposable>): Promise<void> {
-    return new Promise(async resolve => {
-      try {
-        this.streamDisposable = await connection;
-        resolve();
-      } catch (e) {
-        this.errorMessage = 'Unable to maintain connection to Vertex';
-        throw new WebsocketConnectionError(this.errorMessage, e);
-      }
-    });
+  private async connectStream(
+    resource: LoadableResource.LoadableResource
+  ): Promise<Disposable> {
+    try {
+      return await this.commands.execute('stream.connect', { resource });
+    } catch (e) {
+      this.errorMessage = 'Unable to maintain connection to Vertex';
+      throw new WebsocketConnectionError(this.errorMessage, e);
+    }
   }
 
-  private reconnectStreamingClient(streamId: UUID.UUID): Promise<string> {
+  private async reconnectStreamingClient(
+    resource: LoadableResource.LoadableResource,
+    streamId: UUID.UUID
+  ): Promise<void> {
     this.streamDisposable.dispose();
-    return new Promise(async resolve => {
-      await this.connectStream(
-        this.commands.execute('stream.connect', {
-          sceneId: this.loadedSceneId,
-          reconnect: true,
-        })
-      );
-      this.stream.reconnect({
-        streamId: { hex: streamId },
-        dimensions: this.dimensions,
-      });
-      resolve(streamId);
+
+    this.streamDisposable = await this.connectStream(resource);
+    this.stream.reconnect({
+      streamId: { hex: streamId },
+      dimensions: this.dimensions,
     });
   }
 
@@ -411,6 +400,7 @@ export class Viewer {
   ): Promise<void> {
     if (request.gracefulReconnection != null) {
       await this.reconnectStreamingClient(
+        this.resource,
         request.gracefulReconnection.streamId.hex
       );
     }

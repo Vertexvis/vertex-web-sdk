@@ -34,9 +34,9 @@ export namespace Components {
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
-          * @param resource The URN of the resource to load.
+          * @param urn The URN of the resource to load.
          */
-        "load": (resource: string) => Promise<void>;
+        "load": (urn: string) => Promise<void>;
         /**
           * Internal API.
           * @private
