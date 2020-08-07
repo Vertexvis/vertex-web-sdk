@@ -27,6 +27,7 @@ export class WebSocketClient {
       this.webSocket.close();
       if (this.timer != null) {
         window.clearTimeout(this.timer);
+        this.webSocket = undefined;
       }
     }
   }
@@ -83,13 +84,6 @@ export class WebSocketClient {
     }
   }
 
-  private onClose(): void {
-    this.removeWebSocketListeners();
-    if (this.urlProvider != null) {
-      this.handleClose(this.urlProvider);
-    }
-  }
-
   private addWebSocketListeners = (
     ws: WebSocket,
     resolve: VoidFunction,
@@ -100,14 +94,14 @@ export class WebSocketClient {
     ws.addEventListener('message', this.handleMessage);
     ws.addEventListener('open', onOpen);
     ws.addEventListener('error', onError);
-    ws.addEventListener('close', this.onClose);
+    ws.addEventListener('close', this.handleClose);
 
     return {
       dispose: () => {
         ws.removeEventListener('message', this.handleMessage);
         ws.removeEventListener('open', onOpen);
         ws.removeEventListener('error', onError);
-        ws.removeEventListener('close', this.onClose);
+        ws.removeEventListener('close', this.handleClose);
       },
     };
   };
@@ -120,8 +114,11 @@ export class WebSocketClient {
     this.onMessageDispatcher.emit(event);
   };
 
-  private handleClose = (urlProvider: UrlProvider): void => {
-    this.reconnect(urlProvider);
+  private handleClose = (): void => {
+    this.removeWebSocketListeners();
+    if (this.urlProvider != null) {
+      this.reconnect(this.urlProvider);
+    }
   };
 
   private onOpen(resolve: VoidFunction): void {
