@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/geometry",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Library for 2D and 3D geometric types.",
   "author": "Dan Schultz (https://github.com/danschultz)",
   "license": "MIT",
