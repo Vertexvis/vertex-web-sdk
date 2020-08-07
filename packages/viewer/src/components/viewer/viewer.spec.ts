@@ -106,7 +106,7 @@ describe('vertex-viewer', () => {
           };
         });
       });
-      await viewer.load('urn:vertexvis:scene:scene-id');
+      await viewer.load('urn:vertexvis:stream-key:123');
 
       window.dispatchEvent(new Event('resize'));
 
@@ -122,18 +122,16 @@ describe('vertex-viewer', () => {
   });
 
   describe(Viewer.prototype.load, () => {
-    it('loads a scene with auth token and should start the stream.', async () => {
+    it('loads the scene view for a stream key', async () => {
       const mockfn = jest.fn();
-      const viewer = await createViewerSpec(
-        `<vertex-viewer token="token"></vertex-viewer`
-      );
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
 
       viewer.registerCommand('stream.start', () => () => {
         mockfn();
-        return Promise.resolve({ sceneId: 'scene-id' });
+        return Promise.resolve({ streamKeyId: '123' });
       });
 
-      await viewer.load('urn:vertexvis:scene:scene-id');
+      await viewer.load('urn:vertexvis:stream-key:123');
 
       expect(mockfn).toHaveBeenCalled();
     });
@@ -146,7 +144,7 @@ describe('vertex-viewer', () => {
           throw 'oops';
         }
       );
-      expect(viewer.load('urn:vertexvis:scene:scene-id')).rejects.toThrow();
+      expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
       command.dispose();
     });
   });

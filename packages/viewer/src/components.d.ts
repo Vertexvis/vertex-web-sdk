@@ -7,7 +7,6 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
-import { Token } from "./credentials/token";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { Disposable } from "@vertexvis/utils";
@@ -55,10 +54,6 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
-        /**
-          * An authentication token used to grant access to Vertex.
-         */
-        "token"?: Token;
     }
 }
 declare global {
@@ -116,10 +111,6 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
-        /**
-          * An authentication token used to grant access to Vertex.
-         */
-        "token"?: Token;
     }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;

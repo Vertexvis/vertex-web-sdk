@@ -14,9 +14,8 @@ import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import { Frame, SceneResource } from '../../types';
+import { Frame, LoadableResource } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
-import { Token, parseToken } from '../../credentials/token';
 import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
@@ -73,11 +72,6 @@ export class Viewer {
   @Prop() public configEnv: Environment = 'platdev';
 
   /**
-   * An authentication token used to grant access to Vertex.
-   */
-  @Prop() public token?: Token;
-
-  /**
    * Enables or disables the default mouse and touch interactions provided by
    * the viewer. Enabled by default.
    */
@@ -119,7 +113,6 @@ export class Viewer {
   private commands!: CommandRegistry;
   private stream!: StreamApi;
   private loadedSceneId?: UUID.UUID;
-  private activeCredentials: Token;
 
   private frameAttributes?: Frame.Frame;
   private mutationObserver?: MutationObserver;
@@ -137,18 +130,12 @@ export class Viewer {
   }
 
   public componentDidLoad(): void {
-    this.initializeCredentials();
-
     this.stream = new StreamApi(new WebSocketClient());
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
-    this.commands = new CommandRegistry(
-      this.stream,
-      () => this.getConfig(),
-      () => this.activeCredentials
-    );
+    this.commands = new CommandRegistry(this.stream, () => this.getConfig());
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
@@ -206,11 +193,6 @@ export class Viewer {
         </div>
       </Host>
     );
-  }
-
-  @Watch('token')
-  public async handleCredentialsChanged(): Promise<void> {
-    this.initializeCredentials();
   }
 
   /**
@@ -343,13 +325,13 @@ export class Viewer {
     return parseConfig(this.configEnv, this.config);
   }
 
-  private connectStreamingClient(resource: string): Promise<string> {
-    const scene = SceneResource.fromUrn(resource);
+  private connectStreamingClient(urn: string): Promise<string> {
+    const resource = LoadableResource.fromUrn(urn);
 
     return new Promise(async resolve => {
       await this.connectStream(
         this.commands.execute('stream.connect', {
-          sceneId: scene.id,
+          streamKey: resource.id,
         })
       );
 
@@ -360,7 +342,7 @@ export class Viewer {
       if (streamResponse.startStream != null) {
         this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
       }
-      resolve(scene.id);
+      resolve(resource.id);
     });
   }
 
@@ -605,10 +587,6 @@ export class Viewer {
       },
       this.tap
     );
-  }
-
-  private initializeCredentials(): void {
-    this.activeCredentials = parseToken(this.token);
   }
 
   /**
