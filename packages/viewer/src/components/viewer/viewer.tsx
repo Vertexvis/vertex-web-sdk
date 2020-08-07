@@ -344,9 +344,7 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
     try {
-      return await this.commands.execute('stream.connect', {
-        streamKey: resource.id,
-      });
+      return await this.commands.execute('stream.connect', { resource });
     } catch (e) {
       this.errorMessage = 'Unable to maintain connection to Vertex';
       throw new WebsocketConnectionError(this.errorMessage, e);

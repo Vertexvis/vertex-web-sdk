@@ -7,28 +7,36 @@ import { CommandRegistry } from './commandRegistry';
 import { ItemOperation } from '../scenes/operations';
 import { QueryExpression } from '../scenes/queries';
 import { buildSceneOperation } from './streamCommandsMapper';
+import { LoadableResource } from '../types';
+import { InvalidCredentialsError } from '../errors';
 
 export interface ConnectOptions {
-  streamKey: string;
+  resource: LoadableResource.LoadableResource;
 }
 
 export function connect({
-  streamKey,
+  resource,
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
-    const urlProvider = (): UrlDescriptor => {
-      const uri = Uri.appendPath(
-        `/stream-keys/${streamKey}/session`,
-        Uri.parse(config.network.renderingHost)
-      );
+    if (resource.type === 'stream-key') {
+      const urlProvider = (): UrlDescriptor => {
+        const uri = Uri.appendPath(
+          `/stream-keys/${resource.id}/session`,
+          Uri.parse(config.network.renderingHost)
+        );
 
-      return {
-        url: Uri.toString(uri),
-        protocols: ['ws.vertexvis.com'],
+        return {
+          url: Uri.toString(uri),
+          protocols: ['ws.vertexvis.com'],
+        };
       };
-    };
 
-    return stream.connect(urlProvider);
+      return stream.connect(urlProvider);
+    } else {
+      throw new InvalidCredentialsError(
+        `Cannot load resource. Invalid type ${resource.type}`
+      );
+    }
   };
 }
 
