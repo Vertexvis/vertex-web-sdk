@@ -288,6 +288,9 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
+    if (this.streamDisposable != null) {
+      this.streamDisposable.dispose();
+    }
     if (this.commands != null && this.dimensions != null) {
       this.resource = LoadableResource.fromUrn(urn);
       await this.connectStreamingClient(this.resource);
