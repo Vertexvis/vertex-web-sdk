@@ -69,7 +69,7 @@ export class Viewer {
    *
    * @see Viewer.config
    */
-  @Prop() public configEnv: Environment = 'platdev';
+  @Prop() public configEnv: Environment = 'platprod';
 
   /**
    * Enables or disables the default mouse and touch interactions provided by

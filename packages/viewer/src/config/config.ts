@@ -21,12 +21,25 @@ const platdevConfig: Config = {
   },
 };
 
+const platprodConfig: Config = {
+  network: {
+    apiHost: 'https://platform.platprod.vertexvis.io',
+    renderingHost: 'wss://stream.platprod.vertexvis.io',
+  },
+};
+
 function getEnvironmentConfig(environment: Environment): Config {
-  return platdevConfig;
+  switch (environment) {
+    case 'platdev':
+      return platdevConfig;
+    case 'platprod':
+    default:
+      return platprodConfig;
+  }
 }
 
 export function parseConfig(
-  environment: Environment = 'platdev',
+  environment: Environment = 'platprod',
   config?: string | DeepPartial<Config>
 ): Config {
   if (typeof config === 'string') {
