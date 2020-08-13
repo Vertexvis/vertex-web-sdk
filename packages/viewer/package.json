@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "The Vertex SDK for viewing models.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -35,9 +35,9 @@
   "dependencies": {
     "@types/classnames": "2.2.3",
     "@vertexvis/frame-streaming-protos": "^0.0.21",
-    "@vertexvis/geometry": "0.5.2",
-    "@vertexvis/stream-api": "0.5.2",
-    "@vertexvis/utils": "0.5.2",
+    "@vertexvis/geometry": "0.6.0",
+    "@vertexvis/stream-api": "0.6.0",
+    "@vertexvis/utils": "0.6.0",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
     "zen-3d": "^0.0.1",
