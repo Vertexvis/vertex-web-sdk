@@ -25,15 +25,15 @@ published JS bundle.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer.js"
     ></script>
   </head>
 </html>
@@ -54,15 +54,15 @@ You can also install our components as an NPM dependency to your project.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.5.2/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.6.0/dist/viewer.js"
     ></script>
 
     <script>
