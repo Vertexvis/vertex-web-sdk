@@ -32,7 +32,6 @@ function getEnvironmentConfig(environment: Environment): Config {
   switch (environment) {
     case 'platdev':
       return platdevConfig;
-    case 'platprod':
     default:
       return platprodConfig;
   }
