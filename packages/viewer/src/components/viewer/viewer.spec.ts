@@ -25,6 +25,17 @@ describe('vertex-viewer', () => {
 
       expect(viewer.getConfig()).toMatchObject({
         network: {
+          apiHost: 'https://platform.platprod.vertexvis.io',
+          renderingHost: 'wss://stream.platprod.vertexvis.io',
+        },
+      });
+    });
+
+    it('allows for platdev via the config route', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
+      viewer.configEnv = 'platdev';
+      expect(viewer.getConfig()).toMatchObject({
+        network: {
           apiHost: 'https://platform.platdev.vertexvis.io',
           renderingHost: 'wss://stream.platdev.vertexvis.io',
         },
