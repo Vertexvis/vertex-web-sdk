@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@vertexvis/typescript-config-vertexvis/tsconfig-web",
+  "compilerOptions": {
+    "importHelpers": true
+  },
+  "exclude": ["dist", "node_modules"]
+}

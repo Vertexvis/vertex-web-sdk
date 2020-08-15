@@ -21,6 +21,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
     "format": "yarn lint --fix",
@@ -40,18 +42,21 @@
     "@vertexvis/utils": "0.6.0",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
+    "tslib": "^2.0.1",
     "zen-3d": "^0.0.1",
     "zen-3d-addons": "^0.0.3"
   },
   "devDependencies": {
-    "@stencil/core": "^1.8.1",
+    "@stencil/core": "^1.17.3",
     "@types/jest": "^24.0.23",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
     "@vertexvis/rollup-plugin-vertexvis-copyright": "0.1.2",
     "@vertexvis/typescript-config-vertexvis": "1.0.2",
+    "@vertexwebsdk/build": "^0.6.0",
     "eslint": "^6.1.0",
     "eslint-plugin-react": "^7.17.0",
     "jest": "^24.9.0",
+    "rollup": "^1.19.4",
     "typescript": "^3.7.4"
   }
 }

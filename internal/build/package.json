@@ -1,0 +1,30 @@
+{
+  "name": "@vertexwebsdk/build",
+  "version": "0.6.0",
+  "description": "Private repo for shared build tooling.",
+  "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "license": "ISC",
+  "private": true,
+  "files": [
+    "dist/*",
+    "tsconfig.json",
+    "tsconfig-web.json"
+  ],
+  "main": "./dist/bundle.cjs.js",
+  "module": "./dist/bundle.esm.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "rollup --config ./rollup.config.js --silent"
+  },
+  "dependencies": {
+    "@vertexvis/build-tools": "0.7.3",
+    "@vertexvis/typescript-config-vertexvis": "1.0.2",
+    "tslib": "^2.0.1"
+  },
+  "peerDependencies": {
+    "rollup": "^1.19.4"
+  }
+}

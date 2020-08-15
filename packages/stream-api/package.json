@@ -27,7 +27,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "./node_modules/@vertexvis/build-tools/bin/build-web.sh",
+    "build": "rollup --config ./rollup.config.js --silent",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
@@ -40,13 +40,13 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
-    "@vertexvis/build-tools": "0.7.3",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
     "@vertexvis/jest-config-vertexvis": "0.4.2",
-    "@vertexvis/typescript-config-vertexvis": "1.0.2",
+    "@vertexwebsdk/build": "^0.6.0",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
     "protobufjs": "^6.9.0",
+    "rollup": "^1.19.4",
     "ts-jest": "^24.0.2",
     "typescript": "^3.7.4"
   },
