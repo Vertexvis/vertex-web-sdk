@@ -33,7 +33,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-artifact
-          path: packages/*/dist
+          path: |
+            packages/*/dist
+            packages/viewer/loader
   lint:
     runs-on: ubuntu-latest
     steps:
