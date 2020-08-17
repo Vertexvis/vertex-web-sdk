@@ -41,7 +41,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
-    "@vertexvis/jest-config-vertexvis": "0.4.2",
+    "@vertexvis/jest-config-vertexvis": "0.4.4",
     "@vertexwebsdk/build": "^0.6.0",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",

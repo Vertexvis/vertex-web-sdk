@@ -510,10 +510,17 @@
     eslint-plugin-prettier "^3.1.0"
     prettier "^1.19.1"
 
-"@vertexvis/jest-config-vertexvis@0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis%2fjest-config-vertexvis/-/jest-config-vertexvis-0.4.2.tgz#0760734efdb5a1e08fba77e191a1ba7ded1ccd2d"
-  integrity sha512-Se7dh/ONYSC6VyGYx71P55q+PMNsspIO0gq5H7TvfsHi6xzAo1LbyfRbA0XvXPGd+mCUNFkVBtThMMKHdvLxZg==
+"@vertexvis/jest-config-vertexvis@0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@vertexvis/jest-config-vertexvis/-/jest-config-vertexvis-0.4.4.tgz#1a0dc429664b441fb7739b5ed318787dfab3136d"
+  integrity sha512-TWJQAyL/8NlYaeG+kmntKg7fqK4WNE+gbME9tUJWpHhlOj4cUeUuX20cqiXHoof/VRrS3p788CSG9QOGy1kGww==
+  dependencies:
+    "@vertexvis/typescript-config-vertexvis" "1.0.2"
+
+"@vertexvis/typescript-config-vertexvis@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis/typescript-config-vertexvis/-/typescript-config-vertexvis-1.0.2.tgz#46eb84404861ef2ba4454187fbef8970a2e4b90c"
+  integrity sha512-4CiA3ITwSFNp+YnHNAxE2UHFSsDTLd6KS7tG2yfyKQlgNIkMyFiyW/xERAElC5uuEsjFtMvz9L3y7pTlspfrmQ==
 
 abab@^2.0.0:
   version "2.0.3"
