@@ -17,8 +17,8 @@ automatically be used.
 
 ### Script Tag
 
-To get started, add a `<script>` tag to your HTML file that references our
-published JS bundle.
+The easiest way to get started is by including a `<script>` tag in your HTML
+file that references our published JS bundles from a CDN.
 
 ```html
 <html>
@@ -36,60 +36,64 @@ published JS bundle.
       src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer.js"
     ></script>
   </head>
-</html>
-```
 
-### Node Modules
-
-You can also install our components as an NPM dependency to your project.
-
-- Run `npm install my-component --save`
-- Put a script tag similar to this `<script src='node_modules/my-component/dist/mycomponent.js'></script>` in the head of your index.html
-- Then you can use the element anywhere in your template, JSX, html etc
-
-## Usage
-
-```html
-<html>
-  <head>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer/viewer.css"
-    />
-    <script
-      type="module"
-      src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer/viewer.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer.js"
-    ></script>
-
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        main();
-      });
-
-      function main() {
-        const viewer = document.querySelector('#viewer');
-        viewer.addEventListener('pick', event => {
-          console.log('picked parts', event.details.hitResults);
-        });
-      }
-    </script>
-  </head>
   <body>
-    <vertex-viewer
-      id="viewer"
-      credentials-client-id="client-id"
-      credentials-token="token"
-      scene="urn:vertexvis:scene:123"
-    >
-      <vertex-viewer-toolbar data-viewer="viewer"></vertex-viewer-toolbar>
-    </vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123"></vertex-viewer>
   </body>
 </html>
 ```
 
+### NPM Dependency
+
+Our components can also be installed as an NPM dependency and imported through a
+bundler such as Webpack or Rollup. First, add `@vertexvis/viewer` as an NPM
+dependency to your `package.json`:
+
+```json
+{
+  "dependencies": {
+    "@vertexvis/viewer": ^{{version}}
+  }
+}
+```
+
+Next, import `defineCustomElements` from the loader that is included as part of
+the package. Calling the loader will analyze the components defined in your HTML
+and load any components it finds. The returned promise will resolve once the
+components are loaded.
+
+```js
+import { defineCustomElements } from '@vertexvis/viewer/loader';
+
+async function main() {
+  const viewer = document.querySelector("viewer");
+  await viewer.load("urn:vertexvis:stream-key:123");
+  console.log("Loaded!");
+}
+
+definedCustomElement(window).then(() => main());
+```
+
+If you plan on targeting IE <= 11 or Edge <= 18, you'll need to supply polyfills
+for the API's used by Web Components (Custom Elements, Shadow DOM, CSS
+Variables, etc). To include the polyfills, import `applyPolyfills` from the
+loader.
+
+```js
+import { applyPolyfills, defineCustomElements } from '@vertexvis/viewer/loader';
+
+function main() {
+  console.log("Loaded!");
+}
+
+applyPolyfills().then(() => definedCustomElement(window)).then(() => main());
+```
+
+## Examples
+
+Check out our [examples] repository for more in-depth examples of how to use
+Vertex's Viewer SDK.
+
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
+[examples]: https://github.com/Vertexvis/web-sdk-examples
