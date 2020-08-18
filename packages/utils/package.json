@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/utils",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
@@ -34,7 +34,7 @@
     "@types/jest": "^24.0.23",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
     "@vertexvis/jest-config-vertexvis": "0.4.4",
-    "@vertexwebsdk/build": "^0.6.0",
+    "@vertexwebsdk/build": "0.6.1",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
     "rollup": "^1.19.4",
