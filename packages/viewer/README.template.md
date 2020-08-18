@@ -71,7 +71,7 @@ async function main() {
   console.log("Loaded!");
 }
 
-definedCustomElement(window).then(() => main());
+defineCustomElements(window).then(() => main());
 ```
 
 If you plan on targeting IE <= 11 or Edge <= 18, you'll need to supply polyfills
@@ -86,7 +86,7 @@ function main() {
   console.log("Loaded!");
 }
 
-applyPolyfills().then(() => definedCustomElement(window)).then(() => main());
+applyPolyfills().then(() => defineCustomElements(window)).then(() => main());
 ```
 
 ## Examples
