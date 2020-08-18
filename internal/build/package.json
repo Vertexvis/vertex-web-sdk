@@ -1,20 +1,20 @@
 {
-  "name": "@vertexvis/utils",
+  "name": "@vertexwebsdk/build",
   "version": "0.6.0",
-  "license": "MIT",
+  "description": "Private repo for shared build tooling.",
+  "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "license": "ISC",
+  "private": true,
+  "files": [
+    "dist/*",
+    "!dist/**/__tests__",
+    "tsconfig.json",
+    "tsconfig-web.json"
+  ],
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",
-  "browser": "./dist/browser.esm.js",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org",
-    "access": "public"
-  },
-  "sideEffects": false,
-  "files": [
-    "dist/*",
-    "!dist/**/__tests__"
-  ],
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
@@ -26,20 +26,19 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@types/uuid": "^3.4.3",
-    "is-plain-object": "^3.0.0",
-    "uuid": "^3.3.2"
+    "@vertexvis/build-tools": "0.7.3",
+    "@vertexvis/typescript-config-vertexvis": "1.0.2",
+    "tslib": "^2.0.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
     "@vertexvis/jest-config-vertexvis": "0.4.4",
-    "@vertexwebsdk/build": "^0.6.0",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
-    "rollup": "^1.19.4",
-    "ts-jest": "^24.0.2",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "ts-jest": "^24.0.2"
+  },
+  "peerDependencies": {
+    "rollup": "^1.19.4"
   }
 }

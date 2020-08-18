@@ -5,12 +5,12 @@
 
 ## Properties
 
-| Property         | Attribute         | Description                                                                                                                                                                      | Type               | Default     |
-| ---------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----------- |
-| `cameraControls` | `camera-controls` | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                         | `boolean`          | `true`      |
-| `config`         | `config`          | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string` | `undefined` |
-| `configEnv`      | `config-env`      | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev"`        | `'platdev'` |
-| `src`            | `src`             | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string`           | `undefined` |
+| Property         | Attribute         | Description                                                                                                                                                                      | Type                      | Default      |
+| ---------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------------ |
+| `cameraControls` | `camera-controls` | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                         | `boolean`                 | `true`       |
+| `config`         | `config`          | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string`        | `undefined`  |
+| `configEnv`      | `config-env`      | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev" \| "platprod"` | `'platprod'` |
+| `src`            | `src`             | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string`                  | `undefined`  |
 
 
 ## Events

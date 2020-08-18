@@ -1,9 +1,3 @@
-import {
-  config,
-  typescript,
-  minify,
-  output,
-  input,
-} from '@vertexvis/build-tools';
+import { rollupConfig } from '@vertexwebsdk/build';
 
-export default config(input('src/index.ts'), typescript(), output(), minify());
+export default rollupConfig();
