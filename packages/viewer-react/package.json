@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",
@@ -27,8 +27,9 @@
     "prebuild": "yarn clean",
     "build": "rollup --config ./rollup.config.js",
     "format": "yarn lint --fix",
-    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore --ignore-pattern 'src/generated' .",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
+    "test": "echo 'No unit tests defined'",
+    "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
     "@vertexvis/viewer": "^0.6.0"
