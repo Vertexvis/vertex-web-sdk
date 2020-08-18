@@ -8,6 +8,7 @@
   "private": true,
   "files": [
     "dist/*",
+    "!dist/**/__tests__",
     "tsconfig.json",
     "tsconfig-web.json"
   ],
@@ -17,12 +18,25 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js --silent"
+    "build": "rollup --config ./rollup.config.js --silent",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
+    "start": "jest --watch",
+    "test": "jest",
+    "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
     "@vertexvis/build-tools": "0.7.3",
     "@vertexvis/typescript-config-vertexvis": "1.0.2",
     "tslib": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
+    "@vertexvis/jest-config-vertexvis": "0.4.4",
+    "eslint": "^6.1.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2"
   },
   "peerDependencies": {
     "rollup": "^1.19.4"

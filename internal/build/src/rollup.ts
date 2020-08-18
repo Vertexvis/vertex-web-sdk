@@ -9,14 +9,14 @@ import {
   RollupConfig,
 } from '@vertexvis/build-tools';
 
-type Config = {
+interface Config {
   /**
    * Indicates if the generated config will output both Node and browser
    * bundles. This is useful for library projects that need to support both
    * environments.
    */
   isMultiPlatform?: boolean;
-};
+}
 
 export function rollupConfig({ isMultiPlatform = false }: Config = {}):
   | RollupConfig
