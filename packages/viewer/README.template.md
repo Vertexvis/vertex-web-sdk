@@ -52,7 +52,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": ^{{version}}
+    "@vertexvis/viewer": "^{{version}}"
   }
 }
 ```

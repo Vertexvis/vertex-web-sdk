@@ -1,6 +1,6 @@
 {
   "name": "@vertexwebsdk/build",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Private repo for shared build tooling.",
   "author": "Dan Schultz <dan.schultz@vertexvis.com>",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
