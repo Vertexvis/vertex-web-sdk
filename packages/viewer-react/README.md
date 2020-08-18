@@ -24,7 +24,7 @@ function main() {
 main();
 ```
 
-If you plan on targeting IE <= 11 or Edge <= 18, you'll also need to supply
+If you plan on targeting IE11 or Edge <= 18, you'll also need to supply
 polyfills for the Web Components APIs (Custom Elements, Shadow DOM, CSS
 Variables, etc). To include the polyfills, import `applyPolyfills` from the
 loader.
@@ -57,5 +57,7 @@ export function App() {
 
 ## Documentation
 
-See [@vertexvis/viewer](../viewer/src/components) for a full list of components
-and their documentation.
+See [@vertexvis/viewer][component docs] for a full list of components and their
+documentation.
+
+[component docs]: https://github.com/Vertexvis/vertex-web-sdk/tree/master/packages/viewer/src/components

@@ -3,6 +3,15 @@
   "version": "0.6.1",
   "description": "The Vertex SDK for viewing models.",
   "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "es2015": "dist/esm/index.mjs",
