@@ -57,5 +57,7 @@ export function App() {
 
 ## Documentation
 
-See [@vertexvis/viewer](../viewer/src/components) for a full list of components
-and their documentation.
+See [@vertexvis/viewer][component docs] for a full list of components and their
+documentation.
+
+[component docs]: https://github.com/Vertexvis/vertex-web-sdk/tree/master/packages/viewer/src/components

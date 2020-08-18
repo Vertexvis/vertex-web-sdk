@@ -2,9 +2,9 @@
   "name": "@vertexvis/stream-api",
   "version": "0.6.1",
   "description": "A websocket client for interacting with Vertex's stream API.",
-  "author": "Dan Schultz <dan.schultz@vertexvis.com>",
-  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"

@@ -2,16 +2,16 @@
   "name": "@vertexvis/viewer-react",
   "version": "0.6.1",
   "description": "React bindings for the Vertex Viewer SDK.",
-  "author": "Dan Schultz <dan.schultz@vertexvis.com>",
+  "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
-  "bugs": {
-    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
   },
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",

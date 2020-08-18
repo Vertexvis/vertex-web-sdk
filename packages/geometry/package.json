@@ -2,8 +2,16 @@
   "name": "@vertexvis/geometry",
   "version": "0.6.1",
   "description": "Library for 2D and 3D geometric types.",
-  "author": "Dan Schultz (https://github.com/danschultz)",
   "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",
