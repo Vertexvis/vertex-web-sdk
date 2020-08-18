@@ -74,8 +74,8 @@ async function main() {
 defineCustomElements(window).then(() => main());
 ```
 
-If you plan on targeting IE <= 11 or Edge <= 18, you'll need to supply polyfills
-for the API's used by Web Components (Custom Elements, Shadow DOM, CSS
+If you plan on targeting IE <= 11 or Edge <= 18, you'll also need to supply
+polyfills for the Web Components APIs (Custom Elements, Shadow DOM, CSS
 Variables, etc). To include the polyfills, import `applyPolyfills` from the
 loader.
 
