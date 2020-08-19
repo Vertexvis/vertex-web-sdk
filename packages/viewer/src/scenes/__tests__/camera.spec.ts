@@ -70,13 +70,14 @@ describe(Camera, () => {
     (api.replaceCamera as jest.Mock).mockResolvedValue(undefined);
 
     it('should render using camera', async () => {
-      camera.render();
+      camera.render(true);
       expect(api.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-        })
+        }),
+        true
       );
     });
   });

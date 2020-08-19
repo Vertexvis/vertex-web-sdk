@@ -66,10 +66,14 @@ export class Camera implements FrameCamera.FrameCamera {
   /**
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is rendered that contains this camera.
+   *
+   * @param waitResponse Indicates if the returned promise should resolve when
+   *  the server has acknowledged the request. It's recommended to disable
+   *  responses for performance critical situations, such as interactions.
    */
-  public render(): Promise<void> {
+  public render(waitResponse = true): Promise<void> {
     return this.stream
-      .replaceCamera({ camera: this.data })
+      .replaceCamera({ camera: this.data }, waitResponse)
       .then(_ => undefined);
   }
 
