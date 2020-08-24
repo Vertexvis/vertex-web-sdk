@@ -16,7 +16,7 @@ describe('streamCommands', () => {
     it('starts a stream with the provided dimensions', async () => {
       await startStream(dimensions)({ stream, config });
 
-      expect(stream.startStream).toHaveBeenCalledWith({ ...dimensions });
+      expect(stream.startStream).toHaveBeenCalledWith({ dimensions });
     });
   });
 

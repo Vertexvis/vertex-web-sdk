@@ -44,10 +44,7 @@ export function startStream(
   dimensions: Dimensions.Dimensions
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    return stream.startStream({
-      width: dimensions.width,
-      height: dimensions.height,
-    });
+    return stream.startStream({ dimensions });
   };
 }
 
