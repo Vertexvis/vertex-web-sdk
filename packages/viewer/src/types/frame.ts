@@ -20,14 +20,14 @@ export interface SceneAttributes {
 }
 
 export const fromProto = (
-  frameResult: vertexvis.protobuf.stream.IFrameResult
+  payload: vertexvis.protobuf.stream.IDrawFramePayload
 ): Frame => {
   const {
     frameCorrelationIds,
     imageAttributes,
     sceneAttributes,
     sequenceNumber,
-  } = frameResult;
+  } = payload;
 
   return {
     correlationIds: frameCorrelationIds || [],

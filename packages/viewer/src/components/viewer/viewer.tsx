@@ -387,21 +387,12 @@ export class Viewer {
     throw new UnsupportedOperationError('Unsupported operation.');
   }
 
-  /**
-   * @deprecated responses from the stream can be handled directly.
-   */
-  private handleStreamResponse(
-    response: vertexvis.protobuf.stream.IStreamResponse
-  ): void {
-    if (response.frame != null) {
-      this.drawFrame(response.frame);
-    }
-  }
-
   private async handleStreamRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<void> {
-    if (request.gracefulReconnection != null) {
+    if (request.drawFrame != null) {
+      this.drawFrame(request.drawFrame);
+    } else if (request.gracefulReconnection != null) {
       await this.reconnectStreamingClient(
         this.resource,
         request.gracefulReconnection.streamId.hex
@@ -410,7 +401,7 @@ export class Viewer {
   }
 
   private async drawFrame(
-    frame: vertexvis.protobuf.stream.IFrameResult
+    frame: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
     const frameNumber = this.lastFrameNumber + 1;
 
@@ -537,8 +528,6 @@ export class Viewer {
   }
 
   private setupStreamListeners(): void {
-    this.stream.onResponse(response => this.handleStreamResponse(response));
-
     this.stream.onRequest(request => this.handleStreamRequest(request));
   }
 

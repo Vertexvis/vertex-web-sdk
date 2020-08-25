@@ -13,11 +13,12 @@ function mockConnect(): jest.Mock<any, any> {
 }
 
 function mockStartStream(): jest.Mock<any, any> {
-  const frameResponse: vertexvis.protobuf.stream.IFrameResult = {
-    image: new Uint8Array(100),
+  const result: vertexvis.protobuf.stream.IStartStreamResult = {
+    streamId: { hex: 'stream-id' },
+    sceneViewId: { hex: 'scene-view-id' },
   };
 
-  return jest.fn().mockResolvedValue(frameResponse);
+  return jest.fn().mockResolvedValue(result);
 }
 
 function mockCreateSceneAlteration(): jest.Mock<any, any> {
