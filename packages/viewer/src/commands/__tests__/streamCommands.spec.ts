@@ -1,5 +1,4 @@
-import { startStream, createSceneAlteration } from '../streamCommands';
-import { Dimensions } from '@vertexvis/geometry';
+import { createSceneAlteration } from '../streamCommands';
 import { createFrameStreamingClientMock } from '../../testing';
 import { defaultConfig, Config } from '../../config/config';
 import { UUID } from '@vertexvis/utils';
@@ -10,15 +9,6 @@ import { fromHex } from '../../scenes/colorMaterial';
 describe('streamCommands', () => {
   const stream = createFrameStreamingClientMock();
   const config = defaultConfig as Config;
-  const dimensions = Dimensions.create(100, 100);
-
-  describe('startStream', () => {
-    it('starts a stream with the provided dimensions', async () => {
-      await startStream(dimensions)({ stream, config });
-
-      expect(stream.startStream).toHaveBeenCalledWith({ dimensions });
-    });
-  });
 
   describe('createSceneAlteration', () => {
     it('sends a create alteration request with the given params', async () => {

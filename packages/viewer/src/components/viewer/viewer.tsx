@@ -36,6 +36,10 @@ import {
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
+import {
+  getElementBackgroundColor,
+  getElementBoundingClientRect,
+} from './utils';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -329,14 +333,22 @@ export class Viewer {
     return parseConfig(this.configEnv, this.config);
   }
 
+  /**
+   * @private Used for testing.
+   */
+  public getStreamApi(): StreamApi {
+    return this.stream;
+  }
+
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
     this.streamDisposable = await this.connectStream(resource);
 
-    const streamResponse = await this.commands.execute<
-      vertexvis.protobuf.stream.IStreamResponse
-    >('stream.start', this.dimensions);
+    const streamResponse = await this.stream.startStream({
+      dimensions: this.dimensions,
+      frameBackgroundColor: this.getBackgroundColor(),
+    });
 
     if (streamResponse.startStream != null) {
       this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
@@ -364,6 +376,7 @@ export class Viewer {
     this.stream.reconnect({
       streamId: { hex: streamId },
       dimensions: this.dimensions,
+      frameBackgroundColor: this.getBackgroundColor(),
     });
   }
 
@@ -523,7 +536,7 @@ export class Viewer {
 
   private getBounds(): ClientRect | undefined {
     if (this.hostElement != null) {
-      return this.hostElement.getBoundingClientRect();
+      return getElementBoundingClientRect(this.hostElement);
     }
   }
 
@@ -578,8 +591,7 @@ export class Viewer {
    */
   private getBackgroundColor(): Color.Color | undefined {
     if (this.containerElement != null) {
-      const colorString = window.getComputedStyle(this.containerElement);
-      return Color.fromCss(colorString.backgroundColor);
+      return getElementBackgroundColor(this.containerElement);
     }
   }
 }
