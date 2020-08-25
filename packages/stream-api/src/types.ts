@@ -3,12 +3,12 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 export type StartStreamPayload = DeepRequired<
   vertexvis.protobuf.stream.IStartStreamPayload,
-  ['frameCorrelationId']
+  ['frameCorrelationId'] | ['frameBackgroundColor']
 >;
 
 export type ReconnectPayload = DeepRequired<
   vertexvis.protobuf.stream.IReconnectPayload,
-  ['frameCorrelationId']
+  ['frameCorrelationId'] | ['frameBackgroundColor']
 >;
 
 export type ReplaceCameraPayload = DeepRequired<

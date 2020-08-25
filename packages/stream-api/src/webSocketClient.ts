@@ -1,5 +1,5 @@
 import { Disposable, EventDispatcher } from '@vertexvis/utils';
-import { UrlProvider } from './url';
+import { ConnectionDescriptor } from './connection';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -15,7 +15,7 @@ export class WebSocketClient {
   private webSocket?: WebSocket;
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
-  private urlProvider?: UrlProvider;
+  private descriptor?: ConnectionDescriptor;
   private timer?: number;
   private listeners?: Disposable;
 
@@ -32,14 +32,10 @@ export class WebSocketClient {
     }
   }
 
-  public async connect(urlProvider: UrlProvider): Promise<void> {
-    const urlAndProtocol = urlProvider();
-    this.webSocket = new WebSocket(
-      urlAndProtocol.url,
-      urlAndProtocol.protocols
-    );
+  public async connect(descriptor: ConnectionDescriptor): Promise<void> {
+    this.webSocket = new WebSocket(descriptor.url, descriptor.protocols);
     this.webSocket.binaryType = 'arraybuffer';
-    this.urlProvider = urlProvider;
+    this.descriptor = descriptor;
 
     return new Promise((resolve, reject) => {
       if (this.webSocket != null) {
@@ -65,7 +61,7 @@ export class WebSocketClient {
   /**
    * @private Used for internals or testing.
    */
-  public async reconnect(urlProvider: UrlProvider): Promise<void> {
+  public async reconnect(descriptor: ConnectionDescriptor): Promise<void> {
     await new Promise(resolve => {
       this.timer = window.setTimeout(
         resolve,
@@ -78,7 +74,7 @@ export class WebSocketClient {
     this.reopenAttempt += 1;
 
     try {
-      await this.connect(urlProvider);
+      await this.connect(descriptor);
     } catch (e) {
       // Failed connection attempt here will be handled, and this exception can be ignored
     }
@@ -116,8 +112,8 @@ export class WebSocketClient {
 
   private handleClose = (): void => {
     this.removeWebSocketListeners();
-    if (this.urlProvider != null) {
-      this.reconnect(this.urlProvider);
+    if (this.descriptor != null) {
+      this.reconnect(this.descriptor);
     }
   };
 

@@ -1,5 +1,5 @@
 import { WebSocketClient } from './webSocketClient';
-import { UrlProvider } from './url';
+import { ConnectionDescriptor } from './connection';
 import { parseStreamMessage } from './responses';
 import {
   HitItemsPayload,
@@ -44,7 +44,7 @@ export class StreamApi {
    * @param descriptor A function that returns a description of how to establish
    * a WS connection.
    */
-  public async connect(descriptor: UrlProvider): Promise<Disposable> {
+  public async connect(descriptor: ConnectionDescriptor): Promise<Disposable> {
     await this.websocket.connect(descriptor);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
