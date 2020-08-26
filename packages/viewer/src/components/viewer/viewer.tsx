@@ -27,7 +27,6 @@ import { Environment } from '../../config/environment';
 import {
   WebsocketConnectionError,
   ViewerInitializationError,
-  UnsupportedOperationError,
   InteractionHandlerError,
   ComponentInitializationError,
   ImageLoadError,
@@ -118,9 +117,9 @@ export class Viewer {
   private stream!: StreamApi;
   private resource?: LoadableResource.LoadableResource;
 
-  private frameAttributes?: Frame.Frame;
+  private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
-  private lastFrameNumber = 0;
+  private lastFrameNumber?: number;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -292,9 +291,8 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    if (this.streamDisposable != null) {
-      this.streamDisposable.dispose();
-    }
+    await this.unload();
+
     if (this.commands != null && this.dimensions != null) {
       this.resource = LoadableResource.fromUrn(urn);
       await this.connectStreamingClient(this.resource);
@@ -305,12 +303,26 @@ export class Viewer {
     }
   }
 
+  /**
+   * Disconnects the websocket and removes any internal state associated with
+   * the scene.
+   */
+  @Method()
+  public async unload(): Promise<void> {
+    if (this.streamDisposable != null) {
+      this.streamDisposable.dispose();
+      this.lastFrame = undefined;
+      this.lastFrameNumber = undefined;
+      this.sceneViewId = undefined;
+    }
+  }
+
   @Method()
   public async scene(): Promise<Scene> {
-    if (this.frameAttributes != null && this.sceneViewId != null) {
+    if (this.lastFrame != null && this.sceneViewId != null) {
       return new Scene(
         this.stream,
-        this.frameAttributes,
+        this.lastFrame,
         this.commands,
         this.sceneViewId
       );
@@ -322,8 +334,8 @@ export class Viewer {
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<Frame.Frame | undefined> {
-    return this.frameAttributes;
+  public async getFrame(): Promise<Frame.Frame | undefined> {
+    return this.lastFrame;
   }
 
   /**
@@ -371,6 +383,7 @@ export class Viewer {
     streamId: UUID.UUID
   ): Promise<void> {
     this.streamDisposable.dispose();
+    this.lastFrameNumber = undefined;
 
     this.streamDisposable = await this.connectStream(resource);
     this.stream.reconnect({
@@ -396,59 +409,48 @@ export class Viewer {
       });
   }
 
-  private unload(): void {
-    throw new UnsupportedOperationError('Unsupported operation.');
-  }
-
   private async handleStreamRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<void> {
     if (request.drawFrame != null) {
-      this.drawFrame(request.drawFrame);
+      this.handleFrame(request.drawFrame);
     } else if (request.gracefulReconnection != null) {
-      await this.reconnectStreamingClient(
-        this.resource,
-        request.gracefulReconnection.streamId.hex
-      );
+      this.handleGracefulReconnect(request.gracefulReconnection);
     }
   }
 
-  private async drawFrame(
-    frame: vertexvis.protobuf.stream.IDrawFramePayload
+  private handleGracefulReconnect(
+    payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
+  ): void {
+    this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+  }
+
+  private async handleFrame(
+    payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
-    const frameNumber = this.lastFrameNumber + 1;
+    const frame = Frame.fromProto(payload);
+    const frameNumber = frame.sequenceNumber;
+    this.frameReceived?.emit(frame);
 
-    const image = await this.loadImageBytes(frame.image);
+    const image = await this.loadImageBytes(payload.image);
 
-    if (frameNumber > this.lastFrameNumber) {
+    if (this.lastFrameNumber == null || frameNumber > this.lastFrameNumber) {
       this.lastFrameNumber = frameNumber;
-      this.frameAttributes = Frame.fromProto(frame);
-
-      this.drawImage(
-        image,
-        frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect,
-        frame.imageAttributes.scaleFactor
-      );
-
-      this.frameReceived?.emit(this.frameAttributes);
+      this.lastFrame = frame;
+      this.drawImage(image, frame);
     }
 
     image.dispose();
   }
 
-  private drawImage(
-    image: LoadedImage,
-    sceneViewport: vertexvis.protobuf.stream.IDimensions,
-    imagePosition: vertexvis.protobuf.stream.IRectangle,
-    scaleFactor: number
-  ): void {
+  private drawImage(image: LoadedImage, frame: Frame.Frame): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
 
       if (context != null && this.dimensions != null) {
+        const { imageAttributes } = frame;
         const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
-          sceneViewport
+          imageAttributes.frameDimensions
         );
         const fitTo = Rectangle.fromDimensions(this.dimensions);
         const fit = Rectangle.containFit(fitTo, imageRect);
@@ -456,17 +458,19 @@ export class Viewer {
         const scaleX = fit.width / imageRect.width;
         const scaleY = fit.height / imageRect.height;
 
-        const startXPos = imagePosition.x * scaleX;
-        const startYPos = imagePosition.y * scaleY;
+        const startXPos = imageAttributes.imageRect.x * scaleX;
+        const startYPos = imageAttributes.imageRect.y * scaleY;
 
         context.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         context.drawImage(
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleFactor * scaleX,
-          image.image.height * scaleFactor * scaleY
+          image.image.width * imageAttributes.scaleFactor * scaleX,
+          image.image.height * imageAttributes.scaleFactor * scaleY
         );
+
+        this.frameDrawn.emit(frame);
       }
     }
   }
@@ -568,14 +572,14 @@ export class Viewer {
     return new InteractionApi(
       this.stream,
       () => {
-        if (this.frameAttributes == null || this.sceneViewId == null) {
+        if (this.lastFrame == null || this.sceneViewId == null) {
           throw new IllegalStateError(
             'Cannot retrieve scene. Frame has not been rendered or start stream has not yet responded'
           );
         }
         return new Scene(
           this.stream,
-          this.frameAttributes,
+          this.lastFrame,
           this.commands,
           this.sceneViewId
         );
