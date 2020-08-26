@@ -9,9 +9,17 @@ export type WebSocketSendData =
   | Blob
   | ArrayBufferView;
 
-type MessageHandler = (event: MessageEvent) => void;
+export type MessageHandler = (event: MessageEvent) => void;
 
-export class WebSocketClient {
+export interface WebSocketClient {
+  close(): void;
+  connect(descriptor: ConnectionDescriptor): Promise<void>;
+  onMessage(handler: MessageHandler): Disposable;
+  send(data: WebSocketSendData): void;
+  reconnect(descriptor: ConnectionDescriptor): Promise<void>;
+}
+
+export class WebSocketClientImpl implements WebSocketClient {
   private webSocket?: WebSocket;
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;

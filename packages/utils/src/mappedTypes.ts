@@ -53,3 +53,18 @@ type ShiftUnion<P extends PropertyKey, T extends any[]> = T extends any[]
     : never
   : never;
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+/**
+ * A type that extends `Required` that in addition to making fields
+ * not undefined, also makes them not nullable.
+ *
+ * @example
+ *
+ *type Foo = { a?: number | null };
+ *type Bar = RequiredAndNonNullable<Bar>; // { a: number }
+ */
+export type RequiredAndNonNullable<T> = Required<
+  {
+    [P in keyof T]: NonNullable<T[P]>;
+  }
+>;
