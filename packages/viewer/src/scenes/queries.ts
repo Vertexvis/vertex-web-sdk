@@ -1,4 +1,4 @@
-import { SceneItemOperationsExecutor } from './scene';
+import { SceneItemOperationsBuilder } from './scene';
 import { UUID } from '@vertexvis/utils';
 import { CommandRegistry } from '../commands/commandRegistry';
 
@@ -139,10 +139,10 @@ export class SceneItemQueryExecutor {
 
   public where(
     query: (q: RootQuery) => TerminalQuery
-  ): SceneItemOperationsExecutor {
+  ): SceneItemOperationsBuilder {
     const expression: QueryExpression = query(new RootQuery()).build();
 
-    return new SceneItemOperationsExecutor(
+    return new SceneItemOperationsBuilder(
       this.sceneViewId,
       this.commands,
       expression

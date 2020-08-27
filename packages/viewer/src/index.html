@@ -8,6 +8,7 @@
     />
     <title>Stencil Component Starter</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <script type="module" src="/build/viewer.esm.js"></script>
     <script nomodule src="/build/viewer.js"></script>
     <link rel="stylesheet" href="/build/viewer.css" />
@@ -22,25 +23,138 @@
       }
 
       #viewer {
-        width: 100%;
-        height: 100%;
+        width: 50%;
+        height: 50%;
+      }
+
+      #viewer-2 {
+        width: 50%;
+        height: 50%;
       }
     </style>
 
     <script type="module">
+      import {ColorMaterial} from './build/index.esm.js';
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
 
-      async function main() {
+      // let color;
+
+      // const model1 = 'Mg0yhY3fbO4SR_WEenLXIk1SvxzWu80Pcw==';
+      const model1 = 'Fjj2XlRw2d3WN4Epss6cr2AvdjarnufQhw==';
+      const model2 = 'VrXkq_6XpDlIksUOvGqFcC3CwGA5tSVZhw==';
+      let currentModel = model1;
+
+      // const clearAllButton = document.querySelector('#clear-all');
+      const switchModelButton = document.querySelector('#switch-model');
+
+
+      switchModelButton.addEventListener('click', async _ => {
         const viewer = document.querySelector('#viewer');
 
-        // await viewer.load('urn:vertexvis:stream-key:key');
+        if (currentModel === model1) {
+          currentModel = model2;
+        } else {
+          currentModel = model1;
+        }
+        await viewer.load(`urn:vertexvis:stream-key:${currentModel}`)
+      });
+
+      async function main() {
+        const viewer = document.querySelector('#viewer');
+        viewer.configEnv = 'platdev';
+/*
+bf1b9917-e13f-4842-a918-8e064fe88ed9
+572a30b6-1d1b-4ca9-a0bb-800206171ffa
+d8152e02-e2b6-415c-9c0a-4e722e60b4fc
+d40d0074-83e8-45e3-bddc-5024083d8ddb
+a0c4da20-5e87-4984-a26b-68d9dcdc20bc
+73eb38f3-3969-480b-bab8-c5607217198a
+e6f7a108-015b-4393-998b-4ab2ff225dcd
+dee78686-e8f5-42c4-b796-d2420e73b355
+e8ac8a48-07c5-4ffd-99a4-2aea9089d9d2
+441306f3-f1e6-45cc-9946-3ea4ff67498a
+c37dfa46-78c5-4b28-94b1-a6b9c00d598f
+4da8a234-cec6-4abe-9733-73eed82806a7
+*/
+        // viewer.token = 'Oe860aTcQbxU8U-Zm0Cp-NPunsQzu6B0fMwUIBxcWxY.RE9BA7JEFy0C3JiKEruih_M46Au8ztfvC9cyA7vaj5E';
+        // await viewer.load('urn:vertexvis:stream-keys:Jm_xUgf-xhOAGui2_x9WmU_M8CfqFKUcdw==');
+
+        function timeout(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        await viewer.load(`urn:vertexvis:stream-key:${currentModel}`);
+        // const scene = await viewer.scene();
+        // await scene
+        //       .items()
+        //       .where(q => q.all())
+        //       .materialOverride(ColorMaterial.fromHex("#ede5af"))
+        //       .execute();
+
+
+
+        
+        // await viewer2.load(`urn:vertexvis:stream-key:${currentModel}`);
+        // const scene2 = await viewer2.scene();
+        // await timeout(500);
+        // await scene2.items().where(q => q.all()).hide().execute();
+        
+        // VrXkq_6XpDlIksUOvGqFcC3CwGA5tSVZhw==
+        // Mg0yhY3fbO4SR_WEenLXIk1SvxzWu80Pcw==
+
+      // GREY FOR ALL #828282
+        viewer.addEventListener('tap', async function(event) {
+          const { position } = event.detail;
+          // const viewer2 = document.querySelector('#viewer-2');
+          // viewer2.configEnv = 'platdev';
+
+          const scene = await viewer.scene();
+          // const scene2 = await viewer2.scene();
+          const raycaster = await scene.raycaster();
+          const hitItems = await raycaster.hitItems(position);
+          // console.log(hitItems);
+          // console.log(scene);
+
+          // await scene
+          //   .items(op => 
+          //     [op.where(q => q.all()).hide()]
+          //   )
+          //   .execute();
+
+            await scene
+              .items(op => 
+                [
+                  op.where(q => q.all()).hide(),
+                  op.where(q => q.withItemId(hitItems.hits[0].itemId.hex)).show(),
+                  op.where(q => q.all()).materialOverride(ColorMaterial.fromHex("#ede5af"))
+                ]
+              )
+              .execute();
+          // await scene
+          //     .items()
+          //     .where(q => q.withItemId(hitItems.hits[0].itemId.hex))
+          //     .materialOverride(ColorMaterial.fromHex("#ede5af"))
+          //     .execute();
+        });
+
       }
     </script>
   </head>
 
-  <body>
+  <body style="display:flex;">
+    <!-- <div id="picker"></div> -->
+    <div>
+
+        <button id="switch-model">Switch Model</button>
+      <!-- <button id="clear-all">Clear All</button>
+      <button id="paint-all">Paint All</button>
+      <button id="hide-all">Hide All</button>
+      <button id="show-all">Show All</button> -->
+    </div>
+    
     <vertex-viewer id="viewer" camera-controls="true"></vertex-viewer>
+    <vertex-viewer id="viewer-2" camera-controls="true"></vertex-viewer>
   </body>
 </html>
+

@@ -4,7 +4,7 @@ import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
 import { ColorMaterial } from './colorMaterial';
-import { SceneItemOperations, SceneOperationBuilder } from './operations';
+import { SceneItemOperations, SceneOperationBuilder, ItemOperation } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
@@ -14,66 +14,94 @@ import { UUID } from '@vertexvis/utils';
  * This executor requires a query, and expects `execute()` to be invoked in order
  * for the changes to take effect.
  */
-export class SceneItemOperationsExecutor
-  implements SceneItemOperations<SceneItemOperationsExecutor> {
+export class SceneItemOperationsBuilder
+  implements SceneItemOperations<SceneItemOperationsBuilder> {
   private builder: SceneOperationBuilder;
+  private queryOperations: QueryOperation[];
 
   public constructor(
     private sceneViewId: UUID.UUID,
     private commands: CommandRegistry,
     private query: QueryExpression,
-    givenBuilder?: SceneOperationBuilder
+    givenBuilder?: SceneOperationBuilder,
+    queryOperations?: QueryOperation[]
   ) {
     this.builder =
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
+
+    this.queryOperations = queryOperations != null ? queryOperations : [];
   }
 
-  public materialOverride(color: ColorMaterial): SceneItemOperationsExecutor {
-    return new SceneItemOperationsExecutor(
+  public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder.materialOverride(color)
+      this.builder.materialOverride(color),
+      this.queryOperations,
     );
   }
 
-  public hide(): SceneItemOperationsExecutor {
-    return new SceneItemOperationsExecutor(
+  public hide(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder.hide()
+      this.builder.hide(),
+      this.queryOperations,
     );
   }
 
-  public show(): SceneItemOperationsExecutor {
-    return new SceneItemOperationsExecutor(
+  public show(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder.show()
+      this.builder.show(),
+      this.queryOperations,
     );
   }
 
-  public clearMaterialOverrides(): SceneItemOperationsExecutor {
-    return new SceneItemOperationsExecutor(
+  public clearMaterialOverrides(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
       this.sceneViewId,
       this.commands,
       this.query,
-      this.builder.clearMaterialOverrides()
+      this.builder.clearMaterialOverrides(),
+      this.queryOperations
     );
   }
+
+  public build(): QueryOperation {
+    return {
+      query: this.query,
+      operations: this.builder.build(),
+    };
+  }
+}
+
+export interface QueryOperation {
+  query: QueryExpression;
+  operations: ItemOperation[];
+}
+
+export class ItemsOperationExecutor {
+  public constructor(
+    private sceneViewId: UUID.UUID,
+    private commands: CommandRegistry,
+    private queryOperations: QueryOperation[]
+  ) {}
 
   public execute(): void {
-    const operations = this.builder.build();
     this.commands.execute(
       'stream.createSceneAlteration',
       this.sceneViewId,
-      this.query,
-      operations
+      this.queryOperations
     );
   }
 }
+
+export type TerminalItemOperationBuilder = SceneItemOperationsBuilder | SceneItemOperationsBuilder[];
 
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
@@ -89,8 +117,20 @@ export class Scene {
     private sceneViewId: UUID.UUID
   ) {}
 
-  public items(): SceneItemQueryExecutor {
-    return new SceneItemQueryExecutor(this.sceneViewId, this.commands);
+
+  /**
+   * Returns an executor that accepts a function as a parameter that contains one or many operations to apply
+   * to the scene view. The operations will be applied transactionally.
+   * @param operations 
+   */
+  public items(operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder): ItemsOperationExecutor {
+    const sceneOperations: TerminalItemOperationBuilder = operations(new SceneItemQueryExecutor(this.sceneViewId, this.commands));
+    if (Array.isArray(sceneOperations)) {
+      const operationList = sceneOperations.reduce((acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()), []);
+      return new ItemsOperationExecutor(this.sceneViewId, this.commands, operationList)
+    } else {
+      return new ItemsOperationExecutor(this.sceneViewId, this.commands, [sceneOperations.build()]);
+    }
   }
 
   /**
