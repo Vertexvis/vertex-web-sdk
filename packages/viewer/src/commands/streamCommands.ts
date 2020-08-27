@@ -2,8 +2,6 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, Uri, UUID } from '@vertexvis/utils';
 import { CommandContext, Command } from './command';
 import { CommandRegistry } from './commandRegistry';
-import { ItemOperation } from '../scenes/operations';
-import { QueryExpression } from '../scenes/queries';
 import { buildSceneOperation } from './streamCommandsMapper';
 import { LoadableResource } from '../types';
 import { InvalidCredentialsError } from '../errors';
@@ -42,7 +40,9 @@ export function createSceneAlteration(
   queryOperations: QueryOperation[]
 ): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
   return ({ stream }: CommandContext) => {
-    const pbOperations = queryOperations.map(op => buildSceneOperation(op.query, op.operations));
+    const pbOperations = queryOperations.map(op =>
+      buildSceneOperation(op.query, op.operations)
+    );
     const request = {
       sceneViewId: {
         hex: sceneViewId,

@@ -40,17 +40,21 @@ describe(Scene, () => {
       scene.items(op => op.where(q => q.withItemId(itemId)).hide()).execute();
       expect(executeMock).toHaveBeenCalled();
       expect(executeMock).toHaveBeenCalledWith(
-        "stream.createSceneAlteration",
+        'stream.createSceneAlteration',
         sceneViewId,
-        [{
-          operations: [{
-            type: "hide"
-          }],
-          query: {
-            type: "item-id",
-            value: itemId
-          }
-        }]
+        [
+          {
+            operations: [
+              {
+                type: 'hide',
+              },
+            ],
+            query: {
+              type: 'item-id',
+              value: itemId,
+            },
+          },
+        ]
       );
     });
 
@@ -58,81 +62,95 @@ describe(Scene, () => {
       const itemId = UUID.create();
       const suppliedId = UUID.create();
       scene
-        .items(
-          op => [
-            op.where(q => q.all()).hide(),
-            op.where(q => q.withItemId(itemId).or().withSuppliedId(suppliedId)).show(),
-            op.where(q => q.all()).materialOverride(ColorMaterial.fromHex("#ff1122"))
-          ])
+        .items(op => [
+          op.where(q => q.all()).hide(),
+          op
+            .where(q =>
+              q
+                .withItemId(itemId)
+                .or()
+                .withSuppliedId(suppliedId)
+            )
+            .show(),
+          op
+            .where(q => q.all())
+            .materialOverride(ColorMaterial.fromHex('#ff1122')),
+        ])
         .execute();
       expect(executeMock).toHaveBeenCalled();
       expect(executeMock).toHaveBeenCalledWith(
-        "stream.createSceneAlteration",
+        'stream.createSceneAlteration',
         sceneViewId,
-        [{
-          operations: [{
-            type: "hide"
-          }],
-          query: {
-            type: "all"
-          }
-        },
-        {
-          operations: [{
-            type: "show"
-          }],
-          query: {
-            expressions: [
+        [
+          {
+            operations: [
               {
-                type: "item-id",
-                value: itemId
+                type: 'hide',
               },
-              {
-                type: "supplied-id",
-                value: suppliedId
-              }
             ],
-            type: "or"
-          }
-        },
-        {
-          operations: [
-            {
-              color: {
-                ambient: {
-                  a: 0,
-                  b: 0,
-                  g: 0,
-                  r: 0
-                },
-                diffuse: {
-                  a: 255,
-                  b: 34,
-                  g: 17,
-                  r: 255
-                },
-                emissive: {
-                  a: 0,
-                  b: 0,
-                  g: 0,
-                  r: 0
-                },
-                specular: {
-                  a: 0,
-                  b: 0,
-                  g: 0,
-                  r: 0
-                },
-                glossiness: 10,
-                opacity: 100
+            query: {
+              type: 'all',
+            },
+          },
+          {
+            operations: [
+              {
+                type: 'show',
               },
-              type: "change-material"
-            }
-          ],
-          query: {
-            type: "all"
-          }
-        }]
+            ],
+            query: {
+              expressions: [
+                {
+                  type: 'item-id',
+                  value: itemId,
+                },
+                {
+                  type: 'supplied-id',
+                  value: suppliedId,
+                },
+              ],
+              type: 'or',
+            },
+          },
+          {
+            operations: [
+              {
+                color: {
+                  ambient: {
+                    a: 0,
+                    b: 0,
+                    g: 0,
+                    r: 0,
+                  },
+                  diffuse: {
+                    a: 255,
+                    b: 34,
+                    g: 17,
+                    r: 255,
+                  },
+                  emissive: {
+                    a: 0,
+                    b: 0,
+                    g: 0,
+                    r: 0,
+                  },
+                  specular: {
+                    a: 0,
+                    b: 0,
+                    g: 0,
+                    r: 0,
+                  },
+                  glossiness: 10,
+                  opacity: 100,
+                },
+                type: 'change-material',
+              },
+            ],
+            query: {
+              type: 'all',
+            },
+          },
+        ]
       );
     });
   });

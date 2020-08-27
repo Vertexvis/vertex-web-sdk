@@ -37,8 +37,7 @@ describe('streamCommands', () => {
     },
   ];
 
-  const expectedOperationResult = 
-  {
+  const expectedOperationResult = {
     and: {
       queries: [
         { sceneItemQuery: { suppliedId: 'some-suppliedId' } },
@@ -64,12 +63,14 @@ describe('streamCommands', () => {
         },
       },
     ],
-  }
+  };
 
-  const queryOperations: QueryOperation[] = [{
-    query: builtQueryForPart,
-    operations: operationsForShowAndChangeColor,
-  }]
+  const queryOperations: QueryOperation[] = [
+    {
+      query: builtQueryForPart,
+      operations: operationsForShowAndChangeColor,
+    },
+  ];
 
   describe('createSceneAlteration', () => {
     it('sends a create alteration request with the given params', async () => {
@@ -96,10 +97,12 @@ describe('streamCommands', () => {
           type: 'clear-override',
         },
       ];
-      const queryOperations: QueryOperation[] = [{
-        query,
-        operations,
-      }]
+      const queryOperations: QueryOperation[] = [
+        {
+          query,
+          operations,
+        },
+      ];
 
       await createSceneAlteration(
         sceneViewId,
@@ -141,9 +144,9 @@ describe('streamCommands', () => {
         },
         {
           query: builtQueryForPart,
-          operations: operationsForShowAndChangeColor
-        }
-      ]
+          operations: operationsForShowAndChangeColor,
+        },
+      ];
 
       await createSceneAlteration(
         sceneViewId,
@@ -161,7 +164,7 @@ describe('streamCommands', () => {
                 },
               ],
             },
-            expectedOperationResult
+            expectedOperationResult,
           ],
           sceneViewId: { hex: sceneViewId.toString() },
         })
