@@ -7,7 +7,6 @@ import {
   closeMock,
 } from '../__mocks__/webSocketClient';
 import { StreamApi } from '../streamApi';
-import { UrlDescriptor } from '../url';
 jest.mock('@vertexvis/utils', () => {
   const utils = jest.requireActual('@vertexvis/utils');
   return {
@@ -24,9 +23,7 @@ describe(StreamApi, () => {
   jest.setTimeout(100);
   const ws = new WebSocketClient();
   const streamApi = new StreamApi(ws);
-  const url = (): UrlDescriptor => ({
-    url: 'ws://foo.com',
-  });
+  const descriptor = { url: 'ws://foo.com' };
 
   beforeEach(() => {
     restoreMocks();
@@ -34,29 +31,24 @@ describe(StreamApi, () => {
 
   describe('connect', () => {
     it('should open a ws connection', () => {
-      streamApi.connect(url);
+      streamApi.connect(descriptor);
       expect(connectMock).toHaveBeenCalled();
     });
 
     it('should close ws when returned disposable is called', async () => {
-      const disposable = await streamApi.connect(url);
+      const disposable = await streamApi.connect(descriptor);
       disposable.dispose();
       expect(closeMock).toHaveBeenCalled();
     });
   });
 
   describe('reconnect', () => {
-    beforeEach(() => streamApi.connect(url));
+    beforeEach(() => streamApi.connect(descriptor));
 
     it('should open a ws connection', () => {
       const reconnectPayload = {
-        streamId: {
-          hex: UUID.create(),
-        },
-        dimensions: {
-          width: 500,
-          height: 500,
-        },
+        streamId: { hex: UUID.create() },
+        dimensions: { width: 500, height: 500 },
       };
       streamApi.reconnect(reconnectPayload);
       expect(connectMock).toHaveBeenCalled();
@@ -64,13 +56,8 @@ describe(StreamApi, () => {
 
     it('should throw if the url provider is not set', async () => {
       const reconnectPayload = {
-        streamId: {
-          hex: UUID.create(),
-        },
-        dimensions: {
-          width: 500,
-          height: 500,
-        },
+        streamId: { hex: UUID.create() },
+        dimensions: { width: 500, height: 500 },
       };
       const newStreamApi = new StreamApi(ws);
 
@@ -85,7 +72,7 @@ describe(StreamApi, () => {
   });
 
   describe('send createSceneAlteration', () => {
-    beforeEach(() => streamApi.connect(url));
+    beforeEach(() => streamApi.connect(descriptor));
 
     it('should send a request with Id', () => {
       const request = {};
@@ -95,7 +82,7 @@ describe(StreamApi, () => {
   });
 
   describe('send request', () => {
-    beforeEach(() => streamApi.connect(url));
+    beforeEach(() => streamApi.connect(descriptor));
 
     it('should complete promise immediately when no requestId is provided', () => {
       const result = streamApi.beginInteraction(false);
@@ -122,7 +109,7 @@ describe(StreamApi, () => {
   });
 
   describe('replace camera', () => {
-    beforeEach(() => streamApi.connect(url));
+    beforeEach(() => streamApi.connect(descriptor));
     it('should complete promise with updated camera when requestId provided', () => {
       const result = streamApi
         .replaceCamera(

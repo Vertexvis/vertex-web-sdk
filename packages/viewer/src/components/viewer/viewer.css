@@ -1,14 +1,14 @@
 :host {
   /**
-   * @prop --canvas-background: The background color of the rendered image. Defaults to
-   * #FFFFFF.
+   * @prop --image-background: The background color of the rendered image.
+   * Defaults to `--viewer-background`.
    */
-  --canvas-background: var(--canvas-background);
+  --image-background: var(--image-background);
 
   /**
-   * @prop --viewer-background: The background color of the viewer bounds. This will be visible 
-   * if the size of the viewer becomes greater than the maximum image size of 1280x1280. 
-   * Defaults to #FFFFFF.
+   * @prop --viewer-background: The background color of the viewer component.
+   * This will be visible if the size of the viewer becomes greater than the
+   * maximum image size of 1280x1280. Defaults to #FFFFFF.
    */
   --viewer-background: var(--viewer-background);
 
@@ -25,7 +25,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  background: var(--canvas-background, #ffffff);
+  background: var(--image-background, var(--viewer-background, #ffffff));
 }
 
 .viewer-container {

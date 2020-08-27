@@ -1,14 +1,30 @@
+jest.mock('./utils');
+
 import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import { newSpecPage } from '@stencil/core/testing';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  jest.resetAllMocks();
-});
+import {
+  getElementBackgroundColor,
+  getElementBoundingClientRect,
+} from './utils';
+import { Color } from '@vertexvis/utils';
 
 describe('vertex-viewer', () => {
+  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+    left: 0,
+    top: 0,
+    bottom: 150,
+    right: 200,
+    width: 200,
+    height: 150,
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
   beforeAll(() => {
     /* eslint-disable */
     (global as any).MutationObserver = class {
@@ -104,82 +120,53 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe('resize', () => {
-    it('calls the resize-stream command', async () => {
-      const viewerPage = await createViewerPage(
-        `<vertex-viewer></vertex-viewer`
-      );
-      const viewer = await createViewerSpec(viewerPage);
-      const commandPromise = new Promise(resolve => {
-        viewer.registerCommand('stream.resize-stream', dimensions => {
-          return ({ stream }) => {
-            resolve(dimensions);
-          };
-        });
-      });
-      await viewer.load('urn:vertexvis:stream-key:123');
-
-      window.dispatchEvent(new Event('resize'));
-
-      await viewerPage.waitForChanges();
-
-      expect(await commandPromise).toMatchObject({
-        dimensions: {
-          width: 0,
-          height: 0,
-        },
-      });
-    });
-  });
-
   describe(Viewer.prototype.load, () => {
-    it('loads the scene view for a stream key', async () => {
-      const mockfn = jest.fn();
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+    const startResult = { startStream: { sceneViewId: 'scene-view-id' } };
 
-      viewer.registerCommand('stream.start', () => () => {
-        mockfn();
-        return Promise.resolve({ streamKeyId: '123' });
-      });
+    it('loads the scene view for a stream key', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const api = viewer.getStreamApi();
+      (api.startStream as jest.Mock).mockResolvedValue(startResult);
 
       await viewer.load('urn:vertexvis:stream-key:123');
 
-      expect(mockfn).toHaveBeenCalled();
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining('/stream-keys/123/session'),
+        })
+      );
+      expect(api.startStream).toHaveBeenCalled();
+    });
+
+    it('starts a stream with a frame background color of the viewer', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const api = viewer.getStreamApi();
+
+      (api.startStream as jest.Mock).mockResolvedValue(startResult);
+      (getElementBackgroundColor as jest.Mock).mockReturnValue(
+        Color.fromHexString('#0000ff')
+      );
+
+      await viewer.load('urn:vertexvis:stream-key:123');
+
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          frameBackgroundColor: expect.objectContaining({ r: 0, g: 0, b: 255 }),
+        })
+      );
     });
 
     it('throws exception if scene cannot be loaded', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      const command = await viewer.registerCommand(
-        'stream.connect',
-        () => () => {
-          throw 'oops';
-        }
+      (viewer.getStreamApi().connect as jest.Mock).mockRejectedValue(
+        new Error('Failed')
       );
       expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
-      command.dispose();
     });
   });
 });
 
-async function createViewerPage(html: string): Promise<SpecPage> {
+async function createViewerSpec(html: string): Promise<Viewer> {
   const page = await newSpecPage({ components: [Viewer], html });
-  const viewer = page.rootInstance as Viewer;
-
-  viewer.registerCommand('stream.connect', () => () => Promise.resolve());
-  viewer.registerCommand('stream.start', () => () =>
-    Promise.resolve({ sceneId: 'scene-id' })
-  );
-  viewer.registerCommand('stream.load-model', () => () =>
-    Promise.resolve({ sceneStateId: 'scene-state-id' })
-  );
-
-  return page;
-}
-
-async function createViewerSpec(specPage: SpecPage): Promise<Viewer>;
-async function createViewerSpec(html: string): Promise<Viewer>;
-async function createViewerSpec(arg: any): Promise<Viewer> {
-  const page = typeof arg === 'string' ? await createViewerPage(arg) : arg;
-
   return page.rootInstance as Viewer;
 }
