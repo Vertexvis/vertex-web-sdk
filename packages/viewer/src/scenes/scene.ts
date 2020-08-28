@@ -23,8 +23,6 @@ export class SceneItemOperationsBuilder
   private builder: SceneOperationBuilder;
 
   public constructor(
-    private sceneViewId: UUID.UUID,
-    private commands: CommandRegistry,
     private query: QueryExpression,
     givenBuilder?: SceneOperationBuilder
   ) {
@@ -34,35 +32,21 @@ export class SceneItemOperationsBuilder
 
   public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
-      this.sceneViewId,
-      this.commands,
       this.query,
       this.builder.materialOverride(color)
     );
   }
 
   public hide(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(
-      this.sceneViewId,
-      this.commands,
-      this.query,
-      this.builder.hide()
-    );
+    return new SceneItemOperationsBuilder(this.query, this.builder.hide());
   }
 
   public show(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(
-      this.sceneViewId,
-      this.commands,
-      this.query,
-      this.builder.show()
-    );
+    return new SceneItemOperationsBuilder(this.query, this.builder.show());
   }
 
   public clearMaterialOverrides(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
-      this.sceneViewId,
-      this.commands,
       this.query,
       this.builder.clearMaterialOverrides()
     );
@@ -123,25 +107,20 @@ export class Scene {
   public items(
     operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
   ): ItemsOperationExecutor {
-    const sceneOperations: TerminalItemOperationBuilder = operations(
-      new SceneItemQueryExecutor(this.sceneViewId, this.commands)
+    const sceneOperations = operations(new SceneItemQueryExecutor());
+
+    const ops = Array.isArray(sceneOperations)
+      ? sceneOperations
+      : [sceneOperations];
+    const operationList = ops.reduce(
+      (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
+      [] as QueryOperation[]
     );
-    if (Array.isArray(sceneOperations)) {
-      const operationList = sceneOperations.reduce(
-        (acc, builder: SceneItemOperationsBuilder) =>
-          acc.concat(builder.build()),
-        []
-      );
-      return new ItemsOperationExecutor(
-        this.sceneViewId,
-        this.commands,
-        operationList
-      );
-    } else {
-      return new ItemsOperationExecutor(this.sceneViewId, this.commands, [
-        sceneOperations.build(),
-      ]);
-    }
+    return new ItemsOperationExecutor(
+      this.sceneViewId,
+      this.commands,
+      operationList
+    );
   }
 
   /**

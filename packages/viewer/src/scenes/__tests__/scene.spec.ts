@@ -38,7 +38,6 @@ describe(Scene, () => {
     it('should execute commands and query by itemId', () => {
       const itemId = UUID.create();
       scene.items(op => op.where(q => q.withItemId(itemId)).hide()).execute();
-      expect(executeMock).toHaveBeenCalled();
       expect(executeMock).toHaveBeenCalledWith(
         'stream.createSceneAlteration',
         sceneViewId,
@@ -77,7 +76,6 @@ describe(Scene, () => {
             .materialOverride(ColorMaterial.fromHex('#ff1122')),
         ])
         .execute();
-      expect(executeMock).toHaveBeenCalled();
       expect(executeMock).toHaveBeenCalledWith(
         'stream.createSceneAlteration',
         sceneViewId,

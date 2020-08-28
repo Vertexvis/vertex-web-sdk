@@ -1,6 +1,4 @@
 import { SceneItemOperationsBuilder } from './scene';
-import { UUID } from '@vertexvis/utils';
-import { CommandRegistry } from '../commands/commandRegistry';
 
 interface AllQueryExpression {
   type: 'all';
@@ -132,20 +130,11 @@ export class AndQuery implements TerminalQuery, ItemQuery<AndQuery> {
 }
 
 export class SceneItemQueryExecutor {
-  public constructor(
-    private sceneViewId: UUID.UUID,
-    private commands: CommandRegistry
-  ) {}
-
   public where(
     query: (q: RootQuery) => TerminalQuery
   ): SceneItemOperationsBuilder {
     const expression: QueryExpression = query(new RootQuery()).build();
 
-    return new SceneItemOperationsBuilder(
-      this.sceneViewId,
-      this.commands,
-      expression
-    );
+    return new SceneItemOperationsBuilder(expression);
   }
 }
