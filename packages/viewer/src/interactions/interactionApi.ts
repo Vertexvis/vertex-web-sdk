@@ -69,7 +69,7 @@ export class InteractionApi {
       const scene = this.getScene();
       this.currentCamera = t(this.currentCamera, scene.viewport());
 
-      await this.currentCamera?.render(!this.isInteracting());
+      await this.currentCamera?.render();
     }
   }
 

@@ -1,5 +1,7 @@
 jest.mock('./utils');
+jest.mock('@vertexvis/stream-api');
 
+import '../../testing/domMocks';
 import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
 import { newSpecPage } from '@stencil/core/testing';
@@ -9,6 +11,7 @@ import {
   getElementBoundingClientRect,
 } from './utils';
 import { Color } from '@vertexvis/utils';
+import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -23,16 +26,6 @@ describe('vertex-viewer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
-  });
-
-  beforeAll(() => {
-    /* eslint-disable */
-    (global as any).MutationObserver = class {
-      constructor(callback) {}
-      disconnect() {}
-      observe(element, init) {}
-    };
-    /* eslint-enable */
   });
 
   describe('config', () => {
@@ -183,14 +176,17 @@ async function createViewerSpec(html: string): Promise<Viewer> {
 }
 
 async function createViewerWithLoadedStream(key: string): Promise<Viewer> {
-  const startResult = { startStream: { sceneViewId: 'scene-view-id' } };
+  const startStream = { startStream: { sceneViewId: 'scene-view-id' } };
+  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
+
   const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
   const api = viewer.getStreamApi();
 
   (api.connect as jest.Mock).mockResolvedValue({
     dispose: () => api.dispose(),
   });
-  (api.startStream as jest.Mock).mockResolvedValue(startResult);
+  (api.startStream as jest.Mock).mockResolvedValue(startStream);
+  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
   await viewer.load(`urn:vertexvis:stream-key:${key}`);
   return viewer;

@@ -14,7 +14,7 @@ import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import { Frame, LoadableResource } from '../../types';
+import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
@@ -33,12 +33,18 @@ import {
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
+import {
+  StreamApi,
+  WebSocketClientImpl,
+  currentDateAsProtoTimestamp,
+  protoToDate,
+} from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
+import { Renderer, createRenderer } from '../../rendering/renderer';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -115,6 +121,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
+  private renderer!: Renderer;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
@@ -128,12 +135,15 @@ export class Viewer {
   private sceneViewId?: UUID.UUID;
   private streamDisposable?: Disposable;
 
+  private clock?: SynchronizedClock;
+
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
   }
 
   public componentDidLoad(): void {
-    this.stream = new StreamApi(new WebSocketClient());
+    this.stream = new StreamApi(new WebSocketClientImpl());
+    this.renderer = createRenderer(this.stream, this.clock);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -314,23 +324,13 @@ export class Viewer {
       this.lastFrame = undefined;
       this.lastFrameNumber = undefined;
       this.sceneViewId = undefined;
+      this.clock = undefined;
     }
   }
 
   @Method()
   public async scene(): Promise<Scene> {
-    if (this.lastFrame != null && this.sceneViewId != null) {
-      return new Scene(
-        this.stream,
-        this.lastFrame,
-        this.commands,
-        this.sceneViewId
-      );
-    } else {
-      throw new IllegalStateError(
-        'Cannot retrieve scene. Frame has not been rendered'
-      );
-    }
+    return this.createScene();
   }
 
   @Method()
@@ -371,10 +371,25 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
     try {
-      return await this.commands.execute('stream.connect', { resource });
+      const connection = await this.commands.execute<Disposable>(
+        'stream.connect',
+        { resource }
+      );
+      this.clock = await this.synchronizeTime();
+      return connection;
     } catch (e) {
-      this.errorMessage = 'Unable to maintain connection to Vertex';
+      this.errorMessage = 'Unable to establish connection to Vertex.';
       throw new WebsocketConnectionError(this.errorMessage, e);
+    }
+  }
+
+  private async synchronizeTime(): Promise<SynchronizedClock | undefined> {
+    const resp = await this.stream.syncTime({
+      requestTime: currentDateAsProtoTimestamp(),
+    });
+    const remoteTime = protoToDate(resp.syncTime?.replyTime);
+    if (remoteTime != null) {
+      return new SynchronizedClock(remoteTime);
     }
   }
 
@@ -384,6 +399,7 @@ export class Viewer {
   ): Promise<void> {
     this.streamDisposable.dispose();
     this.lastFrameNumber = undefined;
+    this.clock = undefined;
 
     this.streamDisposable = await this.connectStream(resource);
     this.stream.reconnect({
@@ -545,7 +561,7 @@ export class Viewer {
   }
 
   private setupStreamListeners(): void {
-    this.stream.onRequest(request => this.handleStreamRequest(request));
+    this.stream.onRequest(msg => this.handleStreamRequest(msg.request));
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
@@ -569,23 +585,23 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(
-      this.stream,
-      () => {
-        if (this.lastFrame == null || this.sceneViewId == null) {
-          throw new IllegalStateError(
-            'Cannot retrieve scene. Frame has not been rendered or start stream has not yet responded'
-          );
-        }
-        return new Scene(
-          this.stream,
-          this.lastFrame,
-          this.commands,
-          this.sceneViewId
-        );
-      },
-      this.tap
-    );
+    return new InteractionApi(this.stream, () => this.createScene(), this.tap);
+  }
+
+  private createScene(): Scene {
+    if (this.lastFrame == null || this.sceneViewId == null) {
+      throw new IllegalStateError(
+        'Cannot create scene. Frame has not been rendered or stream not initialized.'
+      );
+    } else {
+      return new Scene(
+        this.stream,
+        this.renderer,
+        this.lastFrame,
+        this.commands,
+        this.sceneViewId
+      );
+    }
   }
 
   /**

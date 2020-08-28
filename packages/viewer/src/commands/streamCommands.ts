@@ -35,6 +35,9 @@ export function connect({
   };
 }
 
+/**
+ * @deprecated Call StreamApi.createSceneAlteration directly.
+ */
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   queryOperations: QueryOperation[]

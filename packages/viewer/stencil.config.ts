@@ -45,10 +45,10 @@ export const config: Config = {
     collectCoverageFrom: ['**/src/**/*.{ts,tsx}'],
     coverageThreshold: {
       global: {
-        branches: 50,
-        functions: 60,
-        lines: 70,
-        statements: 70,
+        branches: 60,
+        functions: 70,
+        lines: 80,
+        statements: 78,
       },
     },
     roots: ['<rootDir>/src/'],
