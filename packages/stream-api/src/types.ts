@@ -34,6 +34,11 @@ export type DrawFramePayload = DeepRequired<
   []
 >;
 
+export type GracefulReconnectPayload = DeepRequired<
+  vertexvis.protobuf.stream.IGracefulReconnectionPayload,
+  []
+>;
+
 export type SyncTimePayload = DeepRequired<
   vertexvis.protobuf.stream.ISyncTimePayload,
   []

@@ -1,60 +1,27 @@
 import { Async, UUID } from '@vertexvis/utils';
-import { FrameCamera, Frame, SynchronizedClock } from '../types';
-import { StreamApi, toProtoDuration, protoToDate } from '@vertexvis/stream-api';
-import { google } from '@vertexvis/frame-streaming-protos';
+import { FrameCamera, Frame } from '../types';
+import { StreamApi, protoToDate } from '@vertexvis/stream-api';
 
 const DEFAULT_TIMEOUT_IN_MS = 15 * 1000; // 15s
 
-interface FrameRequest {
+export interface FrameRequest {
   correlationId?: string;
   camera: FrameCamera.FrameCamera;
   timeoutInMs?: number;
 }
 
-interface FrameResponse {
+export interface FrameResponse {
   id: string | undefined;
   sentAt: Date;
   frame: Frame.Frame;
 }
 
-export type Renderer = (req: FrameRequest) => Promise<FrameResponse>;
+/**
+ * An asynchronous function that generates a frame from a request object.
+ */
+export type FrameRenderer = (req: FrameRequest) => Promise<FrameResponse>;
 
-function calculateSendToReceiveDuration(
-  clock: SynchronizedClock | undefined,
-  response: FrameResponse
-): google.protobuf.IDuration | undefined {
-  if (clock != null) {
-    const sentAt = clock.localTime(response.sentAt);
-    const receivedAt = new Date(Date.now());
-    return toProtoDuration(sentAt, receivedAt);
-  }
-}
-
-function timeRender(
-  api: StreamApi,
-  clock: SynchronizedClock | undefined,
-  renderer: Renderer
-): Renderer {
-  return async req => {
-    const resp = await renderer(req);
-    const sendToReceiveDuration = calculateSendToReceiveDuration(clock, resp);
-
-    if (resp.id != null) {
-      api.replyResult(resp.id, {
-        drawFrame: {
-          timing: {
-            sequenceNumber: resp.frame.sequenceNumber,
-            sendToReceiveDuration,
-          },
-        },
-      });
-    }
-
-    return resp;
-  };
-}
-
-function requestFrame(api: StreamApi): Renderer {
+function requestFrame(api: StreamApi): FrameRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
 
   api.onRequest(msg => {
@@ -93,9 +60,12 @@ function requestFrame(api: StreamApi): Renderer {
   };
 }
 
-export function createRenderer(
-  api: StreamApi,
-  clock?: SynchronizedClock
-): Renderer {
-  return timeRender(api, clock, requestFrame(api));
+/**
+ * Returns a new `FrameRenderer` that issues requests to render a frame through
+ * our streaming client API.
+ *
+ * @param api The API client to request frames through.
+ */
+export function createStreamApiRenderer(api: StreamApi): FrameRenderer {
+  return requestFrame(api);
 }

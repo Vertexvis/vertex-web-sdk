@@ -44,7 +44,11 @@ import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
-import { Renderer, createRenderer } from '../../rendering/renderer';
+import {
+  FrameRenderer,
+  createStreamApiRenderer,
+  acknowledgeFrameRequests,
+} from '../../rendering';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -121,7 +125,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
-  private renderer!: Renderer;
+  private renderer!: FrameRenderer;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
@@ -143,7 +147,7 @@ export class Viewer {
 
   public componentDidLoad(): void {
     this.stream = new StreamApi(new WebSocketClientImpl());
-    this.renderer = createRenderer(this.stream, this.clock);
+    this.renderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -554,14 +558,11 @@ export class Viewer {
     }
   }
 
-  private getBounds(): ClientRect | undefined {
-    if (this.hostElement != null) {
-      return getElementBoundingClientRect(this.hostElement);
-    }
-  }
-
   private setupStreamListeners(): void {
     this.stream.onRequest(msg => this.handleStreamRequest(msg.request));
+    this.stream.onRequest(
+      acknowledgeFrameRequests(this.stream, () => this.clock)
+    );
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
@@ -612,6 +613,12 @@ export class Viewer {
   private getBackgroundColor(): Color.Color | undefined {
     if (this.containerElement != null) {
       return getElementBackgroundColor(this.containerElement);
+    }
+  }
+
+  private getBounds(): ClientRect | undefined {
+    if (this.hostElement != null) {
+      return getElementBoundingClientRect(this.hostElement);
     }
   }
 }

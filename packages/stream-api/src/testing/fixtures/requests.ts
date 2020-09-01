@@ -1,6 +1,10 @@
-import { RequestMessage, DrawFramePayload } from '../../types';
+import {
+  RequestMessage,
+  DrawFramePayload,
+  GracefulReconnectPayload,
+} from '../../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Objects } from '@vertexvis/utils';
+import { Objects, UUID } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '../../time';
 
 type Metadata = Partial<Pick<RequestMessage, 'sentAtTime'>>;
@@ -18,6 +22,9 @@ interface Payload<P> {
 
 type DrawFrameRequest = RequestId &
   Payload<vertexvis.protobuf.stream.IDrawFramePayload>;
+
+type GracefulReconnectRequest = RequestId &
+  Payload<vertexvis.protobuf.stream.GracefulReconnectionPayload>;
 
 function request(req: Request, meta?: Metadata): RequestMessage {
   return {
@@ -55,6 +62,23 @@ export function drawFrame(
     {
       requestId: req.requestId,
       payload: { drawFrame: Objects.defaults(req.payload, def) },
+    },
+    meta
+  );
+}
+
+export function gracefulReconnect(
+  req: GracefulReconnectRequest = {},
+  meta?: Metadata
+): RequestMessage {
+  const def: GracefulReconnectPayload = {
+    streamId: { hex: UUID.create() },
+    timeToReconnectDuration: { seconds: 1, nanos: 0 },
+  };
+  return request(
+    {
+      requestId: req.requestId,
+      payload: { reconnect: Objects.defaults(req.payload, def) },
     },
     meta
   );

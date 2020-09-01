@@ -12,7 +12,7 @@ import {
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
-import { Renderer } from '../rendering/renderer';
+import { FrameRenderer } from '../rendering/renderer';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -95,7 +95,7 @@ export type TerminalItemOperationBuilder =
 export class Scene {
   public constructor(
     private stream: StreamApi,
-    private renderer: Renderer,
+    private renderer: FrameRenderer,
     private frame: Frame.Frame,
     private commands: CommandRegistry,
     private sceneViewId: UUID.UUID
