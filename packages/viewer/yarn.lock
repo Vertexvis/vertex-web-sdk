@@ -578,10 +578,10 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@vertexvis/eslint-config-vertexvis-typescript@0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis/eslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.2.tgz#4ef601940aad3be9690f7f959c5c1331dd063c14"
-  integrity sha512-6qoHADyqbI+JPYQKDeBBo4bB1VrtxdKp6iql6TtPzHG2MSRTtJOb4UTLtFGqYRjmZqTWG/AqTqSOgUEhBqPC+A==
+"@vertexvis/eslint-config-vertexvis-typescript@0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@vertexvis/eslint-config-vertexvis-typescript/-/eslint-config-vertexvis-typescript-0.2.3.tgz#f2c76766446c712911e7bb1be92660d2a8e4d578"
+  integrity sha512-+1674N0GDm+aOahvsLZw8n1mr5UiGCa3ktg89aj7Rd7SGQJvJVyuj6WcvHeuYFEfrYyhWcpmRIxjBDZ55KO8+A==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^2.1.0"
     "@typescript-eslint/parser" "^2.1.0"
@@ -603,10 +603,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.1.4.tgz#14d56d8745b1ad556f32fd8e4dfcae23a390720a"
   integrity sha512-DTp0Cn50Kfkfq68OlW8WPbMP99k7xrIRUInSRmnWO5rTDBIw63esQWqvZ3xJb/vMfnoJMUCM6rIXyHz6rDfC8Q==
 
-"@vertexvis/rollup-plugin-vertexvis-copyright@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-vertexvis-copyright/-/rollup-plugin-vertexvis-copyright-0.1.2.tgz#ad3071848c9e7cebc17bd253123f8b7b479422bf"
-  integrity sha512-XoTF4kx/leY3ckX1gjuVY+7a7TKo2Gjs26jVp9yWCjbzS1x4Fzfzs/flWEeTcpeluUUlf9hrnZt/qAYsJfM9ag==
+"@vertexvis/rollup-plugin-vertexvis-copyright@0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-vertexvis-copyright/-/rollup-plugin-vertexvis-copyright-0.1.3.tgz#8da5db5170f6b34230c82a91e6a75eeb43ebd3ac"
+  integrity sha512-3Pgv6o6tmY1zrLWDHkDmWOL1y+Jc4QuYgwhrGEeXyiHdP0uhvtQ6qjGoSt659GCdw6sDwDBXpW32kXQevVIBmg==
   dependencies:
     rollup "^1.19.4"
 
@@ -3983,10 +3983,10 @@ typescript@3.9.7:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
   integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
 
-typescript@^3.7.4:
-  version "3.9.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.5.tgz#586f0dba300cde8be52dd1ac4f7e1009c1b13f36"
-  integrity sha512-hSAifV3k+i6lEoCJ2k6R2Z/rp/H3+8sdmcn5NrS3/3kE7+RyZXm9aqvxWqjEXHAd8b0pShatpcdMTvEdvAJltQ==
+typescript@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.2.tgz#7ea7c88777c723c681e33bf7988be5d008d05ac2"
+  integrity sha512-e4ERvRV2wb+rRZ/IQeb3jm2VxBsirQLpQhdxplZ2MEzGvDkkMmPglecnNDfSUBivMjP93vRbngYYDQqQ/78bcQ==
 
 union-value@^1.0.0:
   version "1.0.1"

@@ -59,14 +59,14 @@
     "@stencil/core": "^1.17.3",
     "@stencil/react-output-target": "^0.0.9",
     "@types/jest": "^24.0.23",
-    "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
-    "@vertexvis/rollup-plugin-vertexvis-copyright": "0.1.2",
+    "@vertexvis/eslint-config-vertexvis-typescript": "0.2.3",
+    "@vertexvis/rollup-plugin-vertexvis-copyright": "0.1.3",
     "@vertexvis/typescript-config-vertexvis": "1.0.2",
     "@vertexwebsdk/build": "0.9.0",
     "eslint": "^6.1.0",
     "eslint-plugin-react": "^7.17.0",
     "jest": "^24.9.0",
     "rollup": "^1.19.4",
-    "typescript": "^3.7.4"
+    "typescript": "^4.0.2"
   }
 }
