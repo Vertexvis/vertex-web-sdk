@@ -39,20 +39,17 @@ export type DeepRequired<T, P extends string[]> = T extends object
       >
   : T;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type Shift<T extends any[]> = ((...t: T) => any) extends (
-  first: any,
+type Shift<T extends unknown[]> = ((...t: T) => unknown) extends (
+  first: unknown,
   ...rest: infer Rest
-) => any
+) => unknown
   ? Rest
   : never;
 
-type ShiftUnion<P extends PropertyKey, T extends any[]> = T extends any[]
-  ? T[0] extends P
-    ? Shift<T>
-    : never
-  : never;
-/* eslint-enable @typescript-eslint/no-explicit-any */
+type ShiftUnion<
+  P extends PropertyKey,
+  T extends unknown[]
+> = T extends unknown[] ? (T[0] extends P ? Shift<T> : never) : never;
 
 /**
  * A type that extends `Required` that in addition to making fields

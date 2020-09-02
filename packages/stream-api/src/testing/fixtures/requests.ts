@@ -24,7 +24,7 @@ type DrawFrameRequest = RequestId &
   Payload<vertexvis.protobuf.stream.IDrawFramePayload>;
 
 type GracefulReconnectRequest = RequestId &
-  Payload<vertexvis.protobuf.stream.GracefulReconnectionPayload>;
+  Payload<vertexvis.protobuf.stream.IGracefulReconnectionPayload>;
 
 function request(req: Request, meta?: Metadata): RequestMessage {
   return {

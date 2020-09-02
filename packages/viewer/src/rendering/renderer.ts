@@ -1,8 +1,9 @@
 import { Async, UUID } from '@vertexvis/utils';
 import { FrameCamera, Frame } from '../types';
 import { StreamApi, protoToDate } from '@vertexvis/stream-api';
+import { ifDrawFrame } from './utils';
 
-const DEFAULT_TIMEOUT_IN_MS = 15 * 1000; // 15s
+const DEFAULT_TIMEOUT_IN_MS = 10 * 1000; // 10 seconds
 
 export interface FrameRequest {
   correlationId?: string;
@@ -24,23 +25,25 @@ export type FrameRenderer = (req: FrameRequest) => Promise<FrameResponse>;
 function requestFrame(api: StreamApi): FrameRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
 
-  api.onRequest(msg => {
-    const resp = {
-      id: msg.request.requestId?.value,
-      sentAt: protoToDate({
-        seconds: msg.sentAtTime.seconds || 0,
-        nanos: msg.sentAtTime.nanos || 0,
-      }),
-      frame: Frame.fromProto(msg.request.drawFrame),
-    };
+  api.onRequest(
+    ifDrawFrame(frame => msg => {
+      const resp = {
+        id: msg.request.requestId?.value,
+        sentAt: protoToDate({
+          seconds: msg.sentAtTime.seconds || 0,
+          nanos: msg.sentAtTime.nanos || 0,
+        }),
+        frame: Frame.fromProto(frame),
+      };
 
-    msg.request.drawFrame?.frameCorrelationIds?.forEach(id => {
-      const callback = requests.get(id);
-      if (callback != null) {
-        callback(resp);
-      }
-    });
-  });
+      frame.frameCorrelationIds.forEach(id => {
+        const callback = requests.get(id);
+        if (callback != null) {
+          callback(resp);
+        }
+      });
+    })
+  );
 
   return req => {
     const corrId = req.correlationId || UUID.create();

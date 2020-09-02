@@ -1,6 +1,6 @@
 import { createSceneAlteration } from '../streamCommands';
 import { createFrameStreamingClientMock } from '../../testing';
-import { defaultConfig, Config } from '../../config/config';
+import { parseConfig } from '../../config/config';
 import { UUID } from '@vertexvis/utils';
 import { QueryExpression } from '../../scenes/queries';
 import { ItemOperation } from '../../scenes/operations';
@@ -9,7 +9,7 @@ import { QueryOperation } from '../../scenes';
 
 describe('streamCommands', () => {
   const stream = createFrameStreamingClientMock();
-  const config = defaultConfig as Config;
+  const config = parseConfig();
   const suppliedId = 'some-suppliedId';
   const sceneItemId: UUID.UUID = UUID.create();
   const sceneViewId = UUID.create();

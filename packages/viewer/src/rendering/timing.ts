@@ -6,7 +6,7 @@ import {
   StreamApi,
 } from '@vertexvis/stream-api';
 import { google } from '@vertexvis/frame-streaming-protos';
-import { DrawFramePayload } from '@vertexvis/stream-api/dist/types';
+import { ifRequestId, ifDrawFrame } from './utils';
 
 function calculateSendToReceiveDuration(
   clock: SynchronizedClock | undefined,
@@ -16,29 +16,6 @@ function calculateSendToReceiveDuration(
     const receivedAt = new Date(Date.now());
     return toProtoDuration(sentAt, receivedAt);
   }
-}
-
-function ifRequestId(
-  f: (id: string) => RequestMessageHandler
-): RequestMessageHandler {
-  return req => {
-    const reqId = req.request.requestId?.value;
-    if (reqId != null) {
-      f(reqId)(req);
-    }
-  };
-}
-
-function ifDrawFrame(
-  f: (frame: DrawFramePayload) => RequestMessageHandler
-): RequestMessageHandler {
-  return req => {
-    const { drawFrame } = req.request;
-
-    if (drawFrame != null) {
-      f(drawFrame as DrawFramePayload)(req);
-    }
-  };
 }
 
 /**

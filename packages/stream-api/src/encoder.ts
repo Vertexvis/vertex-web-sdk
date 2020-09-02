@@ -7,7 +7,11 @@ export function encode(
 }
 
 export function decode(
-  bytes: Uint8Array
+  bufferOrBytes: ArrayBuffer | Uint8Array
 ): vertexvis.protobuf.stream.IStreamMessage {
+  const bytes =
+    bufferOrBytes instanceof ArrayBuffer
+      ? new Uint8Array(bufferOrBytes)
+      : bufferOrBytes;
   return vertexvis.protobuf.stream.StreamMessage.decode(bytes);
 }

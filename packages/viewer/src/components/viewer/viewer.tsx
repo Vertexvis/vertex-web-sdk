@@ -379,7 +379,7 @@ export class Viewer {
         'stream.connect',
         { resource }
       );
-      this.clock = await this.synchronizeTime();
+      this.synchronizeTime();
       return connection;
     } catch (e) {
       this.errorMessage = 'Unable to establish connection to Vertex.';
@@ -552,9 +552,8 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      this.commands.execute('stream.resize-stream', {
-        dimensions: this.dimensions,
-      });
+      // TODO(dan): Need to add and invoke message for resizing the image
+      // stream. https://vertexvis.atlassian.net/browse/SDK-921
     }
   }
 
