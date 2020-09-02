@@ -11,8 +11,15 @@ describe(Scene, () => {
   const commandRegistry = ({
     execute: executeMock,
   } as unknown) as CommandRegistry;
+  const renderer = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
-  const scene = new Scene(new StreamApi(), frame, commandRegistry, sceneViewId);
+  const scene = new Scene(
+    new StreamApi(),
+    renderer,
+    frame,
+    commandRegistry,
+    sceneViewId
+  );
 
   afterEach(() => {
     executeMock.mockReset();

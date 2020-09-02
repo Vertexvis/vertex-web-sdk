@@ -1,39 +1,35 @@
-import { WebSocketClient } from './webSocketClient';
+import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
 import { ConnectionDescriptor } from './connection';
-import { parseStreamMessage } from './responses';
 import {
   HitItemsPayload,
   ReconnectPayload,
   ReplaceCameraPayload,
   StartStreamPayload,
+  ResponseResult,
+  ResponseError,
+  RequestMessage,
+  ResponseMessage,
+  SyncTimePayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
+import { currentDateAsProtoTimestamp } from './time';
+import { encode, decode } from './encoder';
 
-type ResponseMessageHandler = (
-  response: vertexvis.protobuf.stream.IStreamResponse
-) => void;
+export type RequestMessageHandler = (msg: RequestMessage) => void;
 
-type RequestMessageHandler = (
-  request: vertexvis.protobuf.stream.IStreamRequest
-) => void;
+export type ResponseMessageHandler = (msg: ResponseMessage) => void;
 
 /**
  * The API client to interact with Vertex's streaming API.
  */
 export class StreamApi {
-  private onResponseDispatcher = new EventDispatcher<
-    vertexvis.protobuf.stream.IStreamResponse
-  >();
-
-  private onRequestDispatcher = new EventDispatcher<
-    vertexvis.protobuf.stream.IStreamRequest
-  >();
-
+  private onResponseDispatcher = new EventDispatcher<ResponseMessage>();
+  private onRequestDispatcher = new EventDispatcher<RequestMessage>();
   private messageSubscription?: Disposable;
 
   public constructor(
-    private websocket: WebSocketClient = new WebSocketClient()
+    private websocket: WebSocketClient = new WebSocketClientImpl()
   ) {}
 
   /**
@@ -83,20 +79,15 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
+   * @param payload The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
   public startStream(
-    data: StartStreamPayload,
+    payload: StartStreamPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest(
-      {
-        startStream: data,
-      },
-      withResponse
-    );
+    return this.sendRequest({ startStream: payload }, withResponse);
   }
 
   /**
@@ -111,20 +102,15 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
+   * @param payload The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
   public async reconnect(
-    data: ReconnectPayload,
+    payload: ReconnectPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest(
-      {
-        reconnect: data,
-      },
-      withResponse
-    );
+    return this.sendRequest({ reconnect: payload }, withResponse);
   }
 
   /**
@@ -145,12 +131,7 @@ export class StreamApi {
   public beginInteraction(
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest(
-      {
-        beginInteraction: {},
-      },
-      withResponse
-    );
+    return this.sendRequest({ beginInteraction: {} }, withResponse);
   }
 
   /**
@@ -165,15 +146,15 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
+   * @param payload The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
   public replaceCamera(
-    { camera }: ReplaceCameraPayload,
+    payload: ReplaceCameraPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest({ updateCamera: { camera } }, withResponse);
+    return this.sendRequest({ updateCamera: payload }, withResponse);
   }
 
   /**
@@ -183,20 +164,15 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
+   * @param payload The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
   public hitItems(
-    { point }: HitItemsPayload,
+    payload: HitItemsPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest(
-      {
-        hitItems: { point },
-      },
-      withResponse
-    );
+    return this.sendRequest({ hitItems: payload }, withResponse);
   }
 
   /**
@@ -207,7 +183,7 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
+   * @param payload The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
@@ -215,12 +191,7 @@ export class StreamApi {
     payload: vertexvis.protobuf.stream.ICreateSceneAlterationPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest(
-      {
-        createSceneAlteration: payload,
-      },
-      withResponse
-    );
+    return this.sendRequest({ createSceneAlteration: payload }, withResponse);
   }
 
   /**
@@ -231,60 +202,99 @@ export class StreamApi {
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.
    *
-   * @param data The payload of the request.
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
   public endInteraction(
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult> {
-    return this.sendRequest(
-      {
-        endInteraction: {},
-      },
-      withResponse
-    );
+    return this.sendRequest({ endInteraction: {} }, withResponse);
+  }
+
+  /**
+   * Sends a request to sync the clocks between the client and server.
+   *
+   * Use `withResponse` to indicate if the server should reply with a response.
+   * If `false`, the returned promise will complete immediately. Otherwise,
+   * it'll complete when a response is received.
+   *
+   * @param payload The request payload.
+   * @param withResponse Indicates if the server should reply with a response.
+   * Defaults to `true`.
+   */
+  public syncTime(
+    payload: SyncTimePayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ syncTime: payload }, withResponse);
+  }
+
+  /**
+   * Acknowledges a successful request by sending a reply back to the server
+   * with an optional result body.
+   *
+   * @param reqId The ID of the received request.
+   * @param result A result to reply with.
+   */
+  public replyResult(reqId: string, result: ResponseResult): void {
+    this.sendResponse({ requestId: { value: reqId }, ...result });
+  }
+
+  /**
+   * Acknowledges a failed request by sending a reply back to the server.
+   *
+   * @param reqId The ID of the received request.
+   * @param error An error to reply with.
+   */
+  public replyError(reqId: string, error: ResponseError): void {
+    this.sendResponse({ requestId: { value: reqId }, error });
   }
 
   private sendRequest(
-    request: vertexvis.protobuf.stream.IStreamRequest,
+    req: vertexvis.protobuf.stream.IStreamRequest,
     withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     if (withResponse) {
+      const sentAtTime = currentDateAsProtoTimestamp();
       const requestId = UUID.create();
-      request = {
-        requestId: {
-          value: requestId,
-        },
-        ...request,
-      };
+      const request = { ...req, requestId: { value: requestId } };
+
       return new Promise(resolve => {
-        const subscription = this.onResponse(response => {
-          if (requestId === response.requestId?.value) {
-            resolve(response);
+        const subscription = this.onResponse(msg => {
+          if (requestId === msg.response.requestId?.value) {
+            resolve(msg.response);
             subscription.dispose();
           }
         });
-        this.websocket.send(
-          vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
-        );
+        this.websocket.send(encode({ request, sentAtTime }));
       });
     }
-    this.websocket.send(
-      vertexvis.protobuf.stream.StreamMessage.encode({ request }).finish()
-    );
+    this.websocket.send(encode({ request: req }));
     return Promise.resolve({});
   }
 
-  private handleMessage(message: MessageEvent): void {
-    const messagePayload = parseStreamMessage(message.data);
+  private sendResponse(
+    response: vertexvis.protobuf.stream.IStreamResponse
+  ): void {
+    const sentAtTime = currentDateAsProtoTimestamp();
+    this.websocket.send(encode({ response, sentAtTime }));
+  }
 
-    if (messagePayload?.response != null) {
-      this.onResponseDispatcher.emit(messagePayload.response);
+  private handleMessage(message: MessageEvent): void {
+    const msg = decode(message.data);
+
+    if (msg?.sentAtTime != null && msg?.response != null) {
+      this.onResponseDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        response: msg.response,
+      });
     }
 
-    if (messagePayload?.request != null) {
-      this.onRequestDispatcher.emit(messagePayload.request);
+    if (msg?.sentAtTime != null && msg?.request != null) {
+      this.onRequestDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        request: msg.request,
+      });
     }
   }
 

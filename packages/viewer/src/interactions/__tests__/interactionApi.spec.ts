@@ -1,43 +1,46 @@
+jest.mock('@vertexvis/stream-api');
+
 import { Scene } from '../../scenes';
 import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
 import { frame } from '../../types/__fixtures__';
+import { StreamApi } from '@vertexvis/stream-api';
+import { CommandRegistry } from '../../commands/commandRegistry';
 
 describe(InteractionApi, () => {
-  const ImageStreamingClientMock = jest.fn().mockImplementation(() => {
-    return {
-      beginInteraction: jest.fn(),
-      endInteraction: jest.fn(),
-      replaceCamera: jest.fn(),
-    };
-  });
-
   const emit = jest.fn();
-  const stream = new ImageStreamingClientMock();
-  const scene = new Scene(stream, frame);
+  const streamApi = new StreamApi();
+  const renderer = jest.fn();
+  const config = {
+    network: {
+      apiHost: 'https://testing.io',
+      renderingHost: 'wss://testing.io',
+    },
+  };
+  const sceneViewId = 'scene-view-id';
+  const commands = new CommandRegistry(streamApi, () => config);
+  const scene = new Scene(streamApi, renderer, frame, commands, sceneViewId);
   const sceneProvider = (): Scene => scene;
 
   let api: InteractionApi;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.resetAllMocks();
+    jest.restoreAllMocks();
 
-    api = new InteractionApi(stream, sceneProvider, {
-      emit,
-    });
+    api = new InteractionApi(streamApi, sceneProvider, { emit });
   });
 
   describe(InteractionApi.prototype.beginInteraction, () => {
     it('begins interaction on the stream', () => {
       api.beginInteraction();
-      expect(stream.beginInteraction).toHaveBeenCalledTimes(1);
+      expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
     });
 
     it('does not begin interaction if in interaction state', () => {
       api.beginInteraction();
       api.beginInteraction();
-      expect(stream.beginInteraction).toHaveBeenCalledTimes(1);
+      expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -45,12 +48,12 @@ describe(InteractionApi, () => {
     it('ends interaction on stream if interacting', () => {
       api.beginInteraction();
       api.endInteraction();
-      expect(stream.endInteraction).toHaveBeenCalledTimes(1);
+      expect(streamApi.endInteraction).toHaveBeenCalledTimes(1);
     });
 
     it('does not end interaction if not interacting', () => {
       api.endInteraction();
-      expect(stream.endInteraction).not.toHaveBeenCalled();
+      expect(streamApi.endInteraction).not.toHaveBeenCalled();
     });
   });
 
@@ -59,12 +62,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.panCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(stream.replaceCamera).toHaveBeenCalledTimes(1);
+      expect(renderer).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.panCamera(Point.create(10, 0));
-      expect(stream.replaceCamera).not.toHaveBeenCalled();
+      expect(renderer).not.toHaveBeenCalled();
     });
   });
 
@@ -73,12 +76,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.rotateCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(stream.replaceCamera).toHaveBeenCalledTimes(1);
+      expect(renderer).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.rotateCamera(Point.create(10, 0));
-      expect(stream.replaceCamera).not.toHaveBeenCalled();
+      expect(renderer).not.toHaveBeenCalled();
     });
   });
 
@@ -87,18 +90,18 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.zoomCamera(1);
       api.endInteraction();
-      expect(stream.replaceCamera).toHaveBeenCalledTimes(1);
+      expect(renderer).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.zoomCamera(1);
-      expect(stream.replaceCamera).not.toHaveBeenCalled();
+      expect(renderer).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(stream, sceneProvider, {
+      api = new InteractionApi(streamApi, sceneProvider, {
         emit,
       });
     });

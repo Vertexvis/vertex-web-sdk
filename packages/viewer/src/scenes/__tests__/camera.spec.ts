@@ -1,12 +1,9 @@
-jest.mock('@vertexvis/stream-api');
-
-import { StreamApi } from '@vertexvis/stream-api';
 import { Camera } from '../camera';
 import { FrameCamera } from '../../types';
 import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
 
 describe(Camera, () => {
-  const api = new StreamApi();
+  const renderer = jest.fn();
   const data = FrameCamera.create({ position: Vector3.create(1, 2, 3) });
 
   beforeEach(() => {
@@ -16,7 +13,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.fitToBoundingBox, () => {
     describe('when aspect ratio < 1', () => {
-      const camera = new Camera(api, 0.5, data);
+      const camera = new Camera(renderer, 0.5, data);
 
       it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
         const updatedCamera = camera.fitToBoundingBox(
@@ -30,7 +27,10 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.rotateAroundAxis, () => {
-    const camera = new Camera(api, 1, { ...data, position: Vector3.back() });
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.back(),
+    });
 
     it('returns camera with position rotated around axis', () => {
       const degrees = Angle.toRadians(90);
@@ -44,7 +44,10 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.moveBy, () => {
-    const camera = new Camera(api, 1, { ...data, position: Vector3.origin() });
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.origin(),
+    });
 
     it('shifts the position and lookat by the given delta', () => {
       const delta = Vector3.right();
@@ -57,7 +60,10 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.viewVector, () => {
-    const camera = new Camera(api, 1, { ...data, position: Vector3.forward() });
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.forward(),
+    });
 
     it('returns the vector between the position and lookat', () => {
       const viewVector = camera.viewVector();
@@ -66,18 +72,19 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.render, () => {
-    const camera = new Camera(api, 1, { ...data, position: Vector3.forward() });
-    (api.replaceCamera as jest.Mock).mockResolvedValue(undefined);
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.forward(),
+    });
 
     it('should render using camera', async () => {
-      camera.render(true);
-      expect(api.replaceCamera).toHaveBeenCalledWith(
+      camera.render();
+      expect(renderer).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-        }),
-        true
+        })
       );
     });
   });

@@ -1,3 +1,4 @@
+import * as Async from './async';
 import * as BinaryReader from './binaryReader';
 import * as Color from './color';
 import * as Objects from './objects';
@@ -12,4 +13,4 @@ export * from './disposable';
 
 export * from './eventDispatcher';
 
-export { BinaryReader, Color, Objects, Range, Strings, Uri, UUID };
+export { Async, BinaryReader, Color, Objects, Range, Strings, Uri, UUID };

@@ -16,9 +16,18 @@ export function connect({
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
     if (resource.type === 'stream-key') {
-      const uri = Uri.appendPath(
-        `/stream-keys/${resource.id}/session`,
-        Uri.parse(config.network.renderingHost)
+      const params = {
+        'frame-delivery.buffer-enabled':
+          config.flags?.bufferFrameDelivery === true ? 'on' : 'off',
+      };
+      // const params = {};
+
+      const uri = Uri.addQueryParams(
+        params,
+        Uri.appendPath(
+          `/stream-keys/${resource.id}/session`,
+          Uri.parse(config.network.renderingHost)
+        )
       );
 
       const descriptor = {
@@ -35,6 +44,9 @@ export function connect({
   };
 }
 
+/**
+ * @deprecated Call StreamApi.createSceneAlteration directly.
+ */
 export function createSceneAlteration(
   sceneViewId: UUID.UUID,
   queryOperations: QueryOperation[]

@@ -30,7 +30,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
-        "getFrameAttributes": () => Promise<Frame.Frame | undefined>;
+        "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
@@ -54,6 +54,10 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        /**
+          * Disconnects the websocket and removes any internal state associated with the scene.
+         */
+        "unload": () => Promise<void>;
     }
 }
 declare global {

@@ -1,5 +1,6 @@
 import { Objects, DeepPartial } from '@vertexvis/utils';
 import { Environment } from './environment';
+import { Flags } from '../types';
 
 interface NetworkConfig {
   apiHost: string;
@@ -8,17 +9,19 @@ interface NetworkConfig {
 
 export interface Config {
   network: NetworkConfig;
+  flags: Flags.Flags;
 }
 
-export type ConfigProvider = () => Config;
+type PartialConfig = DeepPartial<Config>;
 
-export const defaultConfig: DeepPartial<Config> = {};
+export type ConfigProvider = () => Config;
 
 const platdevConfig: Config = {
   network: {
     apiHost: 'https://platform.platdev.vertexvis.io',
     renderingHost: 'wss://stream.platdev.vertexvis.io',
   },
+  flags: Flags.defaultFlags,
 };
 
 const platprodConfig: Config = {
@@ -26,6 +29,7 @@ const platprodConfig: Config = {
     apiHost: 'https://platform.platprod.vertexvis.io',
     renderingHost: 'wss://stream.platprod.vertexvis.io',
   },
+  flags: Flags.defaultFlags,
 };
 
 function getEnvironmentConfig(environment: Environment): Config {
@@ -39,21 +43,17 @@ function getEnvironmentConfig(environment: Environment): Config {
 
 export function parseConfig(
   environment: Environment = 'platprod',
-  config?: string | DeepPartial<Config>
+  config?: string | PartialConfig
 ): Config {
   if (typeof config === 'string') {
-    config = JSON.parse(config) as Config;
+    config = JSON.parse(config) as PartialConfig;
   }
 
-  const environmentConfig = getEnvironmentConfig(environment);
-  const defaultWithEnvConfig = Objects.defaults(
-    environmentConfig,
-    defaultConfig
-  );
+  const envConfig = getEnvironmentConfig(environment);
 
   if (config == null) {
-    return defaultWithEnvConfig;
+    return envConfig;
   } else {
-    return Objects.defaults({ ...config }, defaultWithEnvConfig);
+    return Objects.defaults({ ...config }, envConfig);
   }
 }

@@ -14,7 +14,7 @@ import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
-import { Frame, LoadableResource } from '../../types';
+import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
@@ -27,19 +27,28 @@ import { Environment } from '../../config/environment';
 import {
   WebsocketConnectionError,
   ViewerInitializationError,
-  UnsupportedOperationError,
   InteractionHandlerError,
   ComponentInitializationError,
   ImageLoadError,
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { StreamApi, WebSocketClient } from '@vertexvis/stream-api';
+import {
+  StreamApi,
+  WebSocketClientImpl,
+  currentDateAsProtoTimestamp,
+  protoToDate,
+} from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
+import {
+  FrameRenderer,
+  createStreamApiRenderer,
+  acknowledgeFrameRequests,
+} from '../../rendering';
 
 interface LoadedImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
@@ -116,11 +125,12 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
+  private renderer!: FrameRenderer;
   private resource?: LoadableResource.LoadableResource;
 
-  private frameAttributes?: Frame.Frame;
+  private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
-  private lastFrameNumber = 0;
+  private lastFrameNumber?: number;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -129,12 +139,15 @@ export class Viewer {
   private sceneViewId?: UUID.UUID;
   private streamDisposable?: Disposable;
 
+  private clock?: SynchronizedClock;
+
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
   }
 
   public componentDidLoad(): void {
-    this.stream = new StreamApi(new WebSocketClient());
+    this.stream = new StreamApi(new WebSocketClientImpl());
+    this.renderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -292,9 +305,8 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    if (this.streamDisposable != null) {
-      this.streamDisposable.dispose();
-    }
+    await this.unload();
+
     if (this.commands != null && this.dimensions != null) {
       this.resource = LoadableResource.fromUrn(urn);
       await this.connectStreamingClient(this.resource);
@@ -305,25 +317,29 @@ export class Viewer {
     }
   }
 
+  /**
+   * Disconnects the websocket and removes any internal state associated with
+   * the scene.
+   */
   @Method()
-  public async scene(): Promise<Scene> {
-    if (this.frameAttributes != null && this.sceneViewId != null) {
-      return new Scene(
-        this.stream,
-        this.frameAttributes,
-        this.commands,
-        this.sceneViewId
-      );
-    } else {
-      throw new IllegalStateError(
-        'Cannot retrieve scene. Frame has not been rendered'
-      );
+  public async unload(): Promise<void> {
+    if (this.streamDisposable != null) {
+      this.streamDisposable.dispose();
+      this.lastFrame = undefined;
+      this.lastFrameNumber = undefined;
+      this.sceneViewId = undefined;
+      this.clock = undefined;
     }
   }
 
   @Method()
-  public async getFrameAttributes(): Promise<Frame.Frame | undefined> {
-    return this.frameAttributes;
+  public async scene(): Promise<Scene> {
+    return this.createScene();
+  }
+
+  @Method()
+  public async getFrame(): Promise<Frame.Frame | undefined> {
+    return this.lastFrame;
   }
 
   /**
@@ -359,10 +375,25 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
     try {
-      return await this.commands.execute('stream.connect', { resource });
+      const connection = await this.commands.execute<Disposable>(
+        'stream.connect',
+        { resource }
+      );
+      this.synchronizeTime();
+      return connection;
     } catch (e) {
-      this.errorMessage = 'Unable to maintain connection to Vertex';
+      this.errorMessage = 'Unable to establish connection to Vertex.';
       throw new WebsocketConnectionError(this.errorMessage, e);
+    }
+  }
+
+  private async synchronizeTime(): Promise<SynchronizedClock | undefined> {
+    const resp = await this.stream.syncTime({
+      requestTime: currentDateAsProtoTimestamp(),
+    });
+    const remoteTime = protoToDate(resp.syncTime?.replyTime);
+    if (remoteTime != null) {
+      return new SynchronizedClock(remoteTime);
     }
   }
 
@@ -371,6 +402,8 @@ export class Viewer {
     streamId: UUID.UUID
   ): Promise<void> {
     this.streamDisposable.dispose();
+    this.lastFrameNumber = undefined;
+    this.clock = undefined;
 
     this.streamDisposable = await this.connectStream(resource);
     this.stream.reconnect({
@@ -396,59 +429,48 @@ export class Viewer {
       });
   }
 
-  private unload(): void {
-    throw new UnsupportedOperationError('Unsupported operation.');
-  }
-
   private async handleStreamRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
   ): Promise<void> {
     if (request.drawFrame != null) {
-      this.drawFrame(request.drawFrame);
+      this.handleFrame(request.drawFrame);
     } else if (request.gracefulReconnection != null) {
-      await this.reconnectStreamingClient(
-        this.resource,
-        request.gracefulReconnection.streamId.hex
-      );
+      this.handleGracefulReconnect(request.gracefulReconnection);
     }
   }
 
-  private async drawFrame(
-    frame: vertexvis.protobuf.stream.IDrawFramePayload
+  private handleGracefulReconnect(
+    payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
+  ): void {
+    this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+  }
+
+  private async handleFrame(
+    payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
-    const frameNumber = this.lastFrameNumber + 1;
+    const frame = Frame.fromProto(payload);
+    const frameNumber = frame.sequenceNumber;
+    this.frameReceived?.emit(frame);
 
-    const image = await this.loadImageBytes(frame.image);
+    const image = await this.loadImageBytes(payload.image);
 
-    if (frameNumber > this.lastFrameNumber) {
+    if (this.lastFrameNumber == null || frameNumber > this.lastFrameNumber) {
       this.lastFrameNumber = frameNumber;
-      this.frameAttributes = Frame.fromProto(frame);
-
-      this.drawImage(
-        image,
-        frame.imageAttributes.frameDimensions,
-        frame.imageAttributes.imageRect,
-        frame.imageAttributes.scaleFactor
-      );
-
-      this.frameReceived?.emit(this.frameAttributes);
+      this.lastFrame = frame;
+      this.drawImage(image, frame);
     }
 
     image.dispose();
   }
 
-  private drawImage(
-    image: LoadedImage,
-    sceneViewport: vertexvis.protobuf.stream.IDimensions,
-    imagePosition: vertexvis.protobuf.stream.IRectangle,
-    scaleFactor: number
-  ): void {
+  private drawImage(image: LoadedImage, frame: Frame.Frame): void {
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
 
       if (context != null && this.dimensions != null) {
+        const { imageAttributes } = frame;
         const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
-          sceneViewport
+          imageAttributes.frameDimensions
         );
         const fitTo = Rectangle.fromDimensions(this.dimensions);
         const fit = Rectangle.containFit(fitTo, imageRect);
@@ -456,17 +478,19 @@ export class Viewer {
         const scaleX = fit.width / imageRect.width;
         const scaleY = fit.height / imageRect.height;
 
-        const startXPos = imagePosition.x * scaleX;
-        const startYPos = imagePosition.y * scaleY;
+        const startXPos = imageAttributes.imageRect.x * scaleX;
+        const startYPos = imageAttributes.imageRect.y * scaleY;
 
         context.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         context.drawImage(
           image.image,
           startXPos,
           startYPos,
-          image.image.width * scaleFactor * scaleX,
-          image.image.height * scaleFactor * scaleY
+          image.image.width * imageAttributes.scaleFactor * scaleX,
+          image.image.height * imageAttributes.scaleFactor * scaleY
         );
+
+        this.frameDrawn.emit(frame);
       }
     }
   }
@@ -528,20 +552,16 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      this.commands.execute('stream.resize-stream', {
-        dimensions: this.dimensions,
-      });
-    }
-  }
-
-  private getBounds(): ClientRect | undefined {
-    if (this.hostElement != null) {
-      return getElementBoundingClientRect(this.hostElement);
+      // TODO(dan): Need to add and invoke message for resizing the image
+      // stream. https://vertexvis.atlassian.net/browse/SDK-921
     }
   }
 
   private setupStreamListeners(): void {
-    this.stream.onRequest(request => this.handleStreamRequest(request));
+    this.stream.onRequest(msg => this.handleStreamRequest(msg.request));
+    this.stream.onRequest(
+      acknowledgeFrameRequests(this.stream, () => this.clock)
+    );
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
@@ -565,23 +585,23 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(
-      this.stream,
-      () => {
-        if (this.frameAttributes == null || this.sceneViewId == null) {
-          throw new IllegalStateError(
-            'Cannot retrieve scene. Frame has not been rendered or start stream has not yet responded'
-          );
-        }
-        return new Scene(
-          this.stream,
-          this.frameAttributes,
-          this.commands,
-          this.sceneViewId
-        );
-      },
-      this.tap
-    );
+    return new InteractionApi(this.stream, () => this.createScene(), this.tap);
+  }
+
+  private createScene(): Scene {
+    if (this.lastFrame == null || this.sceneViewId == null) {
+      throw new IllegalStateError(
+        'Cannot create scene. Frame has not been rendered or stream not initialized.'
+      );
+    } else {
+      return new Scene(
+        this.stream,
+        this.renderer,
+        this.lastFrame,
+        this.commands,
+        this.sceneViewId
+      );
+    }
   }
 
   /**
@@ -592,6 +612,12 @@ export class Viewer {
   private getBackgroundColor(): Color.Color | undefined {
     if (this.containerElement != null) {
       return getElementBackgroundColor(this.containerElement);
+    }
+  }
+
+  private getBounds(): ClientRect | undefined {
+    if (this.hostElement != null) {
+      return getElementBoundingClientRect(this.hostElement);
     }
   }
 }

@@ -25,7 +25,7 @@
 
 ## Methods
 
-### `getFrameAttributes() => Promise<Frame.Frame | undefined>`
+### `getFrame() => Promise<Frame.Frame | undefined>`
 
 
 
@@ -94,13 +94,24 @@ Type: `Promise<Scene>`
 
 
 
+### `unload() => Promise<void>`
+
+Disconnects the websocket and removes any internal state associated with
+the scene.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 
 ## CSS Custom Properties
 
-| Name                  | Description                                                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `--canvas-background` | The background color of the rendered image. Defaults to #FFFFFF.                                                                                                         |
-| `--viewer-background` | The background color of the viewer bounds. This will be visible if the size of the viewer becomes greater than the maximum image size of 1280x1280. Defaults to #FFFFFF. |
+| Name                  | Description                                                                                                                                                                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--image-background`  | The background color of the rendered image. Defaults to `--viewer-background`.                                                                                              |
+| `--viewer-background` | The background color of the viewer component. This will be visible if the size of the viewer becomes greater than the maximum image size of 1280x1280. Defaults to #FFFFFF. |
 
 
 ----------------------------------------------

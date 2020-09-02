@@ -1,5 +1,7 @@
 jest.mock('./utils');
+jest.mock('@vertexvis/stream-api');
 
+import '../../testing/domMocks';
 import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
 import { newSpecPage } from '@stencil/core/testing';
@@ -9,6 +11,7 @@ import {
   getElementBoundingClientRect,
 } from './utils';
 import { Color } from '@vertexvis/utils';
+import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -23,16 +26,6 @@ describe('vertex-viewer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
-  });
-
-  beforeAll(() => {
-    /* eslint-disable */
-    (global as any).MutationObserver = class {
-      constructor(callback) {}
-      disconnect() {}
-      observe(element, init) {}
-    };
-    /* eslint-enable */
   });
 
   describe('config', () => {
@@ -62,7 +55,6 @@ describe('vertex-viewer', () => {
   describe('when camera-controls prop is not set', () => {
     it('registers camera and touch interaction handlers by default', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
-
       const handlers = await viewer.getInteractionHandlers();
 
       expect(handlers).toEqual(
@@ -79,7 +71,6 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer camera-controls="false"></vertex-viewer>`
       );
-
       const handlers = await viewer.getInteractionHandlers();
 
       expect(handlers).not.toEqual(
@@ -121,15 +112,9 @@ describe('vertex-viewer', () => {
   });
 
   describe(Viewer.prototype.load, () => {
-    const startResult = { startStream: { sceneViewId: 'scene-view-id' } };
-
     it('loads the scene view for a stream key', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const viewer = await createViewerWithLoadedStream('123');
       const api = viewer.getStreamApi();
-      (api.startStream as jest.Mock).mockResolvedValue(startResult);
-
-      await viewer.load('urn:vertexvis:stream-key:123');
-
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/stream-keys/123/session'),
@@ -139,19 +124,20 @@ describe('vertex-viewer', () => {
     });
 
     it('starts a stream with a frame background color of the viewer', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      const api = viewer.getStreamApi();
-
-      (api.startStream as jest.Mock).mockResolvedValue(startResult);
       (getElementBackgroundColor as jest.Mock).mockReturnValue(
         Color.fromHexString('#0000ff')
       );
 
-      await viewer.load('urn:vertexvis:stream-key:123');
+      const viewer = await createViewerWithLoadedStream('123');
+      const api = viewer.getStreamApi();
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          frameBackgroundColor: expect.objectContaining({ r: 0, g: 0, b: 255 }),
+          frameBackgroundColor: expect.objectContaining({
+            r: 0,
+            g: 0,
+            b: 255,
+          }),
         })
       );
     });
@@ -164,9 +150,44 @@ describe('vertex-viewer', () => {
       expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
     });
   });
+
+  describe(Viewer.prototype.unload, () => {
+    it('should disconnect the WS', async () => {
+      const viewer = await createViewerWithLoadedStream('123');
+      const api = viewer.getStreamApi();
+
+      viewer.unload();
+      expect(api.dispose).toHaveBeenCalled();
+    });
+
+    it('should clear scene and received frame data', async () => {
+      const viewer = await createViewerWithLoadedStream('123');
+      viewer.unload();
+
+      const frame = await viewer.getFrame();
+      expect(frame).toBeUndefined();
+    });
+  });
 });
 
 async function createViewerSpec(html: string): Promise<Viewer> {
   const page = await newSpecPage({ components: [Viewer], html });
   return page.rootInstance as Viewer;
+}
+
+async function createViewerWithLoadedStream(key: string): Promise<Viewer> {
+  const startStream = { startStream: { sceneViewId: 'scene-view-id' } };
+  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
+
+  const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+  const api = viewer.getStreamApi();
+
+  (api.connect as jest.Mock).mockResolvedValue({
+    dispose: () => api.dispose(),
+  });
+  (api.startStream as jest.Mock).mockResolvedValue(startStream);
+  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
+
+  await viewer.load(`urn:vertexvis:stream-key:${key}`);
+  return viewer;
 }
