@@ -1,6 +1,9 @@
 declare module 'zen-3d' {
   // CORE
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
   export class EventDispatcher {}
 
   export class Raycaster {
@@ -1203,7 +1206,7 @@ declare module 'zen-3d' {
      * Array of user-specified mipmaps (optional).
      * @default []
      */
-    public mipmaps: HTMLImageElement[] | object[];
+    public mipmaps: HTMLImageElement[] | Record<string, unknown>[];
 
     /**
      * WebGLTexture border.
@@ -1306,7 +1309,7 @@ declare module 'zen-3d' {
      * Image data for this texture.
      * @default null
      */
-    public image: HTMLImageElement | object | null;
+    public image: HTMLImageElement | Record<string, unknown> | null;
 
     /**
      * How much a single repetition of the texture is offset from the beginning,
@@ -1560,3 +1563,6 @@ declare module 'zen-3d' {
 
   export class DirectionalLightShadow {}
 }
+
+/* eslint-enable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -12,7 +12,7 @@
  * type Bar = { foo: Foo };
  * type Baz = DeepPartial<Bar>; // { foo?: { a?: number } }
  */
-export type DeepPartial<T> = T extends object
+export type DeepPartial<T> = T extends Record<string, unknown>
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : T;
 
@@ -30,7 +30,7 @@ export type DeepPartial<T> = T extends object
 // https://stackoverflow.com/a/57837897
 export type DeepRequired<T, P extends string[]> = T extends unknown[]
   ? T
-  : T extends object
+  : T extends Record<string, unknown>
   ? Pick<T, Extract<keyof T, P[0]>> &
       Required<
         {

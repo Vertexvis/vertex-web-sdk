@@ -2,7 +2,7 @@ import { Disposable } from '@vertexvis/utils';
 import { CommandFactory } from './command';
 import { ConfigProvider } from '../config/config';
 import { StreamApi } from '@vertexvis/stream-api';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface CommandDefinition<R> {
   factory: CommandFactory<R>;
   thisArg: any | undefined;
@@ -50,3 +50,4 @@ export class CommandRegistry {
     return this.commands[id];
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

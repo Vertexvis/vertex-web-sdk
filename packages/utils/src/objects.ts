@@ -1,6 +1,7 @@
 import isSimpleObject from 'is-plain-object';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable padding-line-between-statements */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /**
  * Returns a new object where any enumerable property from `other` are
  * recursively applied to `a`. Once a property is set, it will not be
@@ -79,7 +80,9 @@ export const isPlainObject = (obj: any): boolean => {
  */
 export function toPairs<T>(obj: Record<string, T>): Array<[string, T]>;
 export function toPairs<T>(obj: T[]): Array<[string, T]>;
-export function toPairs(obj: object | null | undefined): Array<[string, any]>;
+export function toPairs(
+  obj: Record<string, unknown> | null | undefined
+): Array<[string, any]>;
 export function toPairs(obj: any): Array<[string, any]> {
   if (obj != null) {
     return Object.keys(obj).map(key => [key, obj[key]]);
@@ -109,4 +112,6 @@ export function fromPairs(pairs: any): Record<string, any> {
     return {};
   }
 }
+/* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-enable padding-line-between-statements */
+/* eslint-enable @typescript-eslint/no-explicit-any */

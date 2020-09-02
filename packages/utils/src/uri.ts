@@ -11,6 +11,7 @@ export interface Uri {
   fragment?: string;
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type QueryMap = Record<string, string>;
 type QueryEntry = [string, string];
 
@@ -43,7 +44,10 @@ export const parse = (uri: string): Uri => {
  * @param base
  * @param params
  */
-export const parseAndAddParams = (baseStr: string, params?: object): Uri => {
+export const parseAndAddParams = (
+  baseStr: string,
+  params?: Record<string, unknown>
+): Uri => {
   const base = parse(baseStr);
   return params ? addQueryParams(params, base) : base;
 };
@@ -186,3 +190,5 @@ const mapAsEntries = (map: Record<string, any>): QueryEntry[] => {
 const sortByQueryName = (entries: QueryEntry[]): QueryEntry[] => {
   return entries.concat().sort(Sort.head(Sort.asc));
 };
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

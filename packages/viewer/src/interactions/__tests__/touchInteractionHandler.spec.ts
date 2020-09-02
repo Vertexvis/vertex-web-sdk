@@ -1,6 +1,6 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TouchInteractionHandler } from '../touchInteractionHandler';
 import { InteractionApi } from '../interactionApi';
 import { Point } from '@vertexvis/geometry';
@@ -98,3 +98,5 @@ describe(TouchInteractionHandler, () => {
     });
   });
 });
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

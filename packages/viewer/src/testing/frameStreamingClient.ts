@@ -1,5 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function createFrameStreamingClientMock(): any {
   return {
     connect: mockConnect(),
@@ -24,3 +25,4 @@ function mockStartStream(): jest.Mock<any, any> {
 function mockCreateSceneAlteration(): jest.Mock<any, any> {
   return jest.fn().mockResolvedValue({});
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

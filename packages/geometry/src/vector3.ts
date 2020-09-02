@@ -7,7 +7,7 @@ export interface Vector3 {
   y: number;
   z: number;
 }
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable padding-line-between-statements */
 /**
  * Returns a new `Vector3` either with the provided x, y, and z dimensions,
@@ -41,6 +41,7 @@ export function create(...args: any[]): Vector3 {
     z: 0,
   };
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 /* eslint-enable padding-line-between-statements */
 
 /**

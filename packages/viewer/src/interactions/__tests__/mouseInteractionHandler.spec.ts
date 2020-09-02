@@ -1,6 +1,6 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MouseInteractionHandler } from '../mouseInteractionHandler';
 import { InteractionApi } from '../interactionApi';
 import {
@@ -172,3 +172,4 @@ describe(MouseInteractionHandler, () => {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 });
+/* eslint-enable @typescript-eslint/no-explicit-any */
