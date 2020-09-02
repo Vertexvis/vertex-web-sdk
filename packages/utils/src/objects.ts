@@ -62,7 +62,7 @@ export function defaults(...objects: any[]): any {
 export const isPlainObject = (obj: any): boolean => {
   return isSimpleObject(obj);
 };
-
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable padding-line-between-statements */
 /**
  * Returns an array of key-value pairs for each enumerable key in `obj`.
@@ -80,9 +80,7 @@ export const isPlainObject = (obj: any): boolean => {
  */
 export function toPairs<T>(obj: Record<string, T>): Array<[string, T]>;
 export function toPairs<T>(obj: T[]): Array<[string, T]>;
-export function toPairs(
-  obj: Record<string, unknown> | null | undefined
-): Array<[string, any]>;
+export function toPairs(obj: object | null | undefined): Array<[string, any]>;
 export function toPairs(obj: any): Array<[string, any]> {
   if (obj != null) {
     return Object.keys(obj).map(key => [key, obj[key]]);
@@ -91,6 +89,7 @@ export function toPairs(obj: any): Array<[string, any]> {
   }
 }
 /* eslint-enable padding-line-between-statements */
+/* eslint-enable @typescript-eslint/ban-types */
 
 /* eslint-disable padding-line-between-statements */
 export function fromPairs<T>(
