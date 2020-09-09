@@ -30,7 +30,7 @@ export function acknowledgeFrameRequests(
   clockProvider: () => SynchronizedClock | undefined
 ): RequestMessageHandler {
   return ifRequestId(reqId =>
-    ifDrawFrame(frame => req => {
+    ifDrawFrame(_ => req => {
       const sendToReceiveDuration = calculateSendToReceiveDuration(
         clockProvider(),
         protoToDate(req.sentAtTime)
@@ -38,10 +38,7 @@ export function acknowledgeFrameRequests(
 
       api.replyResult(reqId, {
         drawFrame: {
-          timing: {
-            sequenceNumber: frame.sequenceNumber,
-            sendToReceiveDuration,
-          },
+          sendToReceiveDuration,
         },
       });
     })

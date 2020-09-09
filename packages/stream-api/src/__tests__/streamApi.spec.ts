@@ -140,16 +140,10 @@ describe(StreamApi, () => {
     const end = new Date('2020-08-01T18:01:00.100Z');
 
     const sendToReceiveDuration = toProtoDuration(start, end);
-    const receiveToPaintDuration = toProtoDuration(start, end);
 
     it('should send result on the websocket', () => {
       const send = jest.spyOn(ws, 'send');
-      const timing = {
-        sequenceNumber: 1,
-        sendToReceiveDuration,
-        receiveToPaintDuration,
-      };
-      streamApi.replyResult('123', { drawFrame: { timing } });
+      streamApi.replyResult('123', { drawFrame: { sendToReceiveDuration } });
       expect(send).toHaveBeenCalled();
     });
   });
