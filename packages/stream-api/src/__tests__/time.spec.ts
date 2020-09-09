@@ -16,13 +16,19 @@ describe(toProtoTimestamp, () => {
 describe(toProtoDuration, () => {
   const start = new Date('2020-08-01T18:00:00.000Z');
   const end = new Date('2020-08-01T18:01:00.100Z');
+  const millis = 1000;
 
-  it('returns a Google PB Duration', () => {
+  it('returns a start and end date as Google PB Duration', () => {
     const duration = toProtoDuration(start, end);
     expect(duration).toMatchObject({
       seconds: 60,
       nanos: 100000000,
     });
+  });
+
+  it('returns milliseconds as Google PB Duration', () => {
+    const duration = toProtoDuration(millis);
+    expect(duration).toMatchObject({ seconds: 1, nanos: 0 });
   });
 });
 

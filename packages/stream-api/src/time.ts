@@ -29,6 +29,13 @@ export function currentDateAsProtoTimestamp(): google.protobuf.Timestamp {
 }
 
 /**
+ * Converts the given milliseconds into a `google.protobuf.Duration`.
+ *
+ * @param ms The milliseconds to convert.
+ */
+export function toProtoDuration(ms: number): google.protobuf.Duration;
+
+/**
  * Converts the two dates into a `google.protobuf.Duration`, where the duration
  * is `end - start`. If `end` is before `start`, then the duration will be
  * negative.
@@ -39,9 +46,20 @@ export function currentDateAsProtoTimestamp(): google.protobuf.Timestamp {
 export function toProtoDuration(
   start: Date,
   end: Date
-): google.protobuf.Duration {
-  const millis = end.getTime() - start.getTime();
-  return google.protobuf.Duration.create(parseEpochMillis(millis));
+): google.protobuf.Duration;
+
+export function toProtoDuration(...args: unknown[]): google.protobuf.Duration {
+  if (args.length === 2) {
+    const start = args[0] as Date;
+    const end = args[1] as Date;
+    const millis = end.getTime() - start.getTime();
+    return google.protobuf.Duration.create(parseEpochMillis(millis));
+  } else if (args.length === 1) {
+    const millis = args[0] as number;
+    return google.protobuf.Duration.create(parseEpochMillis(millis));
+  } else {
+    throw new Error('Expected input to be a number or start and end date.');
+  }
 }
 
 /* eslint-disable padding-line-between-statements */

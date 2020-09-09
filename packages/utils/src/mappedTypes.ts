@@ -28,7 +28,9 @@ export type DeepPartial<T> = T extends object
  * type Baz = DeepRequired<Bar, ['a'] | ['b']>; // { foo: { a: { c?: number }, b?: string } }
  */
 // https://stackoverflow.com/a/57837897
-export type DeepRequired<T, P extends string[]> = T extends object
+export type DeepRequired<T, P extends string[]> = T extends unknown[]
+  ? T
+  : T extends object
   ? Pick<T, Extract<keyof T, P[0]>> &
       Required<
         {

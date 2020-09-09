@@ -2,96 +2,78 @@ jest.mock('@vertexvis/utils', () => {
   const utils = jest.requireActual('@vertexvis/utils');
   return {
     ...utils,
-    UUID: {
-      create: jest.fn().mockReturnValue('11111111-0000-1111-1111-111111111111'),
-    },
+    UUID: { create: jest.fn() },
   };
 });
 
 import { StreamApi } from '../streamApi';
 import { UUID } from '@vertexvis/utils';
-import { toProtoDuration } from '../time';
+import { toProtoDuration, currentDateAsProtoTimestamp } from '../time';
 import { WebSocketClientMock } from '../testing';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { decode } from '../encoder';
 
 describe(StreamApi, () => {
-  const requestId = UUID.create();
   const ws = new WebSocketClientMock();
   const streamApi = new StreamApi(ws);
   const descriptor = { url: 'ws://foo.com' };
 
+  const connect = jest.spyOn(ws, 'connect');
+  const close = jest.spyOn(ws, 'close');
+  const send = jest.spyOn(ws, 'send');
+
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.restoreAllMocks();
+    ws.reset();
   });
 
   describe('connect', () => {
-    it('should open a ws connection', () => {
-      const connect = jest.spyOn(ws, 'connect');
+    it('opens a ws connection', () => {
       streamApi.connect(descriptor);
       expect(connect).toHaveBeenCalled();
     });
 
-    it('should close ws when returned disposable is called', async () => {
-      const close = jest.spyOn(ws, 'close');
+    it('closes ws when returned disposable is called', async () => {
       const disposable = await streamApi.connect(descriptor);
       disposable.dispose();
       expect(close).toHaveBeenCalled();
     });
   });
 
-  describe('reconnect', () => {
-    beforeEach(() => streamApi.connect(descriptor));
-
-    it('should send a ws message to reconnect', () => {
-      const send = jest.spyOn(ws, 'send');
-      const reconnectPayload = {
-        streamId: { hex: UUID.create() },
-        dimensions: { width: 500, height: 500 },
-      };
-      streamApi.reconnect(reconnectPayload, false);
-      expect(send).toHaveBeenCalled();
-    });
-
-    it('should throw if the url provider is not set', async () => {
-      const reconnectPayload = {
-        streamId: { hex: UUID.create() },
-        dimensions: { width: 500, height: 500 },
-      };
-      const newStreamApi = new StreamApi(ws);
-
-      try {
-        newStreamApi.reconnect(reconnectPayload);
-      } catch (e) {
-        expect(e).toEqual(
-          new Error('Unable to connect as no Url provider has been set')
-        );
-      }
-    });
-  });
-
-  describe('send createSceneAlteration', () => {
-    beforeEach(() => streamApi.connect(descriptor));
-
-    it('should send a request with id', () => {
-      const send = jest.spyOn(ws, 'send');
-      const request = {};
-      streamApi.createSceneAlteration(request);
-      expect(send).toHaveBeenCalled();
-    });
-  });
-
   describe('send request', () => {
-    beforeEach(() => streamApi.connect(descriptor));
+    beforeEach(async () => {
+      await streamApi.connect(descriptor);
+    });
 
-    it('should complete promise immediately when no requestId is provided', async () => {
-      const send = jest.spyOn(ws, 'send');
+    it('resolves immediately when no requestId is provided', async () => {
       await streamApi.beginInteraction(false);
       expect(send).toHaveBeenCalled();
     });
 
-    it('should complete promise when response is received with requestId matching request', async () => {
-      const send = jest.spyOn(ws, 'send');
+    it('includes sent at time for requests with responses', async () => {
+      const requestId = mockRequestId();
+      const request = streamApi.endInteraction(true);
+      ws.receiveMessage(
+        vertexvis.protobuf.stream.StreamMessage.encode({
+          sentAtTime: { seconds: 0, nanos: 0 },
+          response: { requestId: { value: requestId }, endInteraction: {} },
+        }).finish()
+      );
+      await request;
+      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+        sentAtTime: expect.anything(),
+      });
+    });
+
+    it('includes sent at time for requests without responses', () => {
+      streamApi.syncTime({ requestTime: currentDateAsProtoTimestamp() }, false);
+      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+        sentAtTime: expect.anything(),
+      });
+    });
+
+    it('resolves when response is received with matching request id', async () => {
+      const requestId = mockRequestId();
       const result = streamApi.hitItems({ point: { x: 10, y: 10 } });
 
       ws.receiveMessage(
@@ -106,32 +88,19 @@ describe(StreamApi, () => {
       expect(resp).toBeDefined();
       expect(send).toHaveBeenCalled();
     });
-  });
 
-  describe('replace camera', () => {
-    const camera = {
-      position: { x: 0, y: 0, z: 0 },
-      lookAt: { x: 0, y: 0, z: 0 },
-      up: { x: 0, y: 0, z: 0 },
-    };
-
-    beforeEach(() => streamApi.connect(descriptor));
-
-    it('should complete promise with updated camera when requestId provided', async () => {
-      const send = jest.spyOn(ws, 'send');
-      const result = streamApi.replaceCamera({ camera });
+    it('rejects when response is an error', async () => {
+      const requestId = mockRequestId();
+      const result = streamApi.recordPerformance({ timings: [] }, true);
 
       ws.receiveMessage(
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
-          response: { requestId: { value: requestId } },
+          response: { requestId: { value: requestId }, error: {} },
         }).finish()
       );
 
-      const resp = await result;
-
-      expect(send).toHaveBeenCalled();
-      expect(resp).toBeDefined();
+      await expect(result).rejects.toThrowError();
     });
   });
 
@@ -141,18 +110,42 @@ describe(StreamApi, () => {
 
     const sendToReceiveDuration = toProtoDuration(start, end);
 
-    it('should send result on the websocket', () => {
-      const send = jest.spyOn(ws, 'send');
+    it('sends result on the websocket', () => {
       streamApi.replyResult('123', { drawFrame: { sendToReceiveDuration } });
-      expect(send).toHaveBeenCalled();
+      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+        sentAtTime: expect.anything(),
+      });
     });
   });
 
   describe(StreamApi.prototype.replyError, () => {
-    it('should send error on the websocket', () => {
-      const send = jest.spyOn(ws, 'send');
+    it('sends error on the websocket', () => {
       streamApi.replyError('123', {});
-      expect(send).toHaveBeenCalled();
+      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+        sentAtTime: expect.anything(),
+      });
+    });
+  });
+
+  describe(StreamApi.prototype.onRequest, () => {
+    beforeEach(() => streamApi.connect(descriptor));
+
+    it('invokes callback when request is received', () => {
+      const handler = jest.fn();
+      streamApi.onRequest(handler);
+      ws.receiveMessage(
+        vertexvis.protobuf.stream.StreamMessage.encode({
+          sentAtTime: { seconds: 0, nanos: 0 },
+          request: { drawFrame: {} },
+        }).finish()
+      );
+      expect(handler).toHaveBeenCalled();
     });
   });
 });
+
+function mockRequestId(): string {
+  const requestId = (Math.random() * 100000).toString();
+  (UUID.create as jest.Mock).mockReturnValueOnce(requestId);
+  return requestId;
+}
