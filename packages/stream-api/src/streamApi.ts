@@ -309,8 +309,8 @@ export class StreamApi {
   }
 
   private sendMessage(msg: vertexvis.protobuf.stream.IStreamMessage): void {
-    this.log('Sending WS message', msg);
     this.websocket.send(encode(msg));
+    this.log('WS message sent', msg);
   }
 
   private sendResponse(
@@ -322,7 +322,6 @@ export class StreamApi {
 
   private handleMessage(message: MessageEvent): void {
     const msg = decode(message.data);
-
     this.log('WS message received', msg);
 
     if (msg?.sentAtTime != null && msg?.response != null) {

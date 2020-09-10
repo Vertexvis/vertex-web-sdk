@@ -11,4 +11,5 @@ export const frame: Frame.Frame = {
   },
   sceneAttributes: { camera: FrameCamera.create() },
   sequenceNumber: 1,
+  image: new Uint8Array(),
 };

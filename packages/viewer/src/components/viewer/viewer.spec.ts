@@ -88,7 +88,7 @@ describe('vertex-viewer', () => {
       initialize: jest.fn(),
     };
 
-    it('should initialize interaction handler', async () => {
+    it('initializes interaction handler', async () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer camera-controls="false"></vertex-viewer>`
       );
@@ -152,7 +152,7 @@ describe('vertex-viewer', () => {
   });
 
   describe(Viewer.prototype.unload, () => {
-    it('should disconnect the WS', async () => {
+    it('disconnects the WS', async () => {
       const viewer = await createViewerWithLoadedStream('123');
       const api = viewer.getStreamApi();
 
@@ -160,7 +160,7 @@ describe('vertex-viewer', () => {
       expect(api.dispose).toHaveBeenCalled();
     });
 
-    it('should clear scene and received frame data', async () => {
+    it('clears scene and received frame data', async () => {
       const viewer = await createViewerWithLoadedStream('123');
       viewer.unload();
 
