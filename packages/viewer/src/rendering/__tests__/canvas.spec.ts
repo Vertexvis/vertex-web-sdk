@@ -12,6 +12,7 @@ import { loadImageBytes } from '../imageLoaders';
 import { StreamApi, WebSocketClientMock } from '@vertexvis/stream-api';
 import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../metrics';
+import Long from 'long';
 
 const canvas = new HTMLCanvasElement().getContext('2d');
 const image = {
@@ -96,7 +97,7 @@ describe(measureCanvasRenderer, () => {
         timings: expect.arrayContaining([
           expect.objectContaining({
             receiveToPaintDuration: {
-              seconds: 1,
+              seconds: Long.fromNumber(1, true),
               nanos: 0,
             },
           }),

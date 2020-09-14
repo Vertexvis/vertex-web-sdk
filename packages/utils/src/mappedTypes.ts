@@ -41,12 +41,14 @@ export type DeepRequired<T, P extends string[]> = T extends unknown[]
       >
   : T;
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 type Shift<T extends unknown[]> = ((...t: T) => unknown) extends (
   first: unknown,
   ...rest: infer Rest
 ) => unknown
   ? Rest
   : never;
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 type ShiftUnion<
   P extends PropertyKey,
