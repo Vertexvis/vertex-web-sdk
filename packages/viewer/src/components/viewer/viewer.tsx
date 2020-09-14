@@ -11,7 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions, Rectangle } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import { Disposable, UUID, Color } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
@@ -29,7 +29,6 @@ import {
   ViewerInitializationError,
   InteractionHandlerError,
   ComponentInitializationError,
-  ImageLoadError,
   IllegalStateError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
@@ -45,14 +44,14 @@ import {
   getElementBoundingClientRect,
 } from './utils';
 import {
-  FrameRenderer,
   createStreamApiRenderer,
   acknowledgeFrameRequests,
+  RemoteRenderer,
+  CanvasRenderer,
+  createCanvasRenderer,
+  measureCanvasRenderer,
 } from '../../rendering';
-
-interface LoadedImage extends Disposable {
-  image: HTMLImageElement | ImageBitmap;
-}
+import * as Metrics from '../../metrics';
 
 @Component({
   tag: 'vertex-viewer',
@@ -125,12 +124,12 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: StreamApi;
-  private renderer!: FrameRenderer;
+  private remoteRenderer!: RemoteRenderer;
+  private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
-  private lastFrameNumber?: number;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -146,8 +145,11 @@ export class Viewer {
   }
 
   public componentDidLoad(): void {
-    this.stream = new StreamApi(new WebSocketClientImpl());
-    this.renderer = createStreamApiRenderer(this.stream);
+    this.stream = new StreamApi(
+      new WebSocketClientImpl(),
+      this.getConfig().flags.logWsMessages
+    );
+    this.remoteRenderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -326,7 +328,6 @@ export class Viewer {
     if (this.streamDisposable != null) {
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
-      this.lastFrameNumber = undefined;
       this.sceneViewId = undefined;
       this.clock = undefined;
     }
@@ -359,41 +360,51 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
-    this.streamDisposable = await this.connectStream(resource);
+    try {
+      this.streamDisposable = await this.connectStream(resource);
 
-    const streamResponse = await this.stream.startStream({
-      dimensions: this.dimensions,
-      frameBackgroundColor: this.getBackgroundColor(),
-    });
+      const streamResponse = await this.stream.startStream({
+        dimensions: this.dimensions,
+        frameBackgroundColor: this.getBackgroundColor(),
+      });
 
-    if (streamResponse.startStream != null) {
-      this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+      if (streamResponse.startStream != null) {
+        this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+      }
+    } catch (e) {
+      this.errorMessage = 'Unable to establish connection to Vertex.';
+      console.error('Failed to establish WS connection', e);
+      throw new WebsocketConnectionError(this.errorMessage, e);
     }
   }
 
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
-    try {
-      const connection = await this.commands.execute<Disposable>(
-        'stream.connect',
-        { resource }
-      );
-      this.synchronizeTime();
-      return connection;
-    } catch (e) {
-      this.errorMessage = 'Unable to establish connection to Vertex.';
-      throw new WebsocketConnectionError(this.errorMessage, e);
-    }
+    const connection = await this.commands.execute<Disposable>(
+      'stream.connect',
+      { resource }
+    );
+    this.synchronizeTime();
+    this.canvasRenderer = measureCanvasRenderer(
+      this.stream,
+      Metrics.paintTime,
+      createCanvasRenderer()
+    );
+    return connection;
   }
 
-  private async synchronizeTime(): Promise<SynchronizedClock | undefined> {
-    const resp = await this.stream.syncTime({
-      requestTime: currentDateAsProtoTimestamp(),
-    });
-    const remoteTime = protoToDate(resp.syncTime?.replyTime);
-    if (remoteTime != null) {
-      return new SynchronizedClock(remoteTime);
+  private async synchronizeTime(): Promise<void> {
+    try {
+      const resp = await this.stream.syncTime({
+        requestTime: currentDateAsProtoTimestamp(),
+      });
+      const remoteTime = protoToDate(resp.syncTime?.replyTime);
+      if (remoteTime != null) {
+        this.clock = new SynchronizedClock(remoteTime);
+      }
+    } catch (e) {
+      console.error('Failed to synchronize clock', e);
     }
   }
 
@@ -401,16 +412,21 @@ export class Viewer {
     resource: LoadableResource.LoadableResource,
     streamId: UUID.UUID
   ): Promise<void> {
-    this.streamDisposable.dispose();
-    this.lastFrameNumber = undefined;
-    this.clock = undefined;
+    try {
+      this.streamDisposable.dispose();
+      this.clock = undefined;
 
-    this.streamDisposable = await this.connectStream(resource);
-    this.stream.reconnect({
-      streamId: { hex: streamId },
-      dimensions: this.dimensions,
-      frameBackgroundColor: this.getBackgroundColor(),
-    });
+      this.streamDisposable = await this.connectStream(resource);
+      this.stream.reconnect({
+        streamId: { hex: streamId },
+        dimensions: this.dimensions,
+        frameBackgroundColor: this.getBackgroundColor(),
+      });
+    } catch (e) {
+      this.errorMessage = 'Unable to establish connection to Vertex.';
+      console.error('Failed to establish WS connection', e);
+      throw new WebsocketConnectionError(this.errorMessage, e);
+    }
   }
 
   private handleWindowResize(event: UIEvent): void {
@@ -448,97 +464,21 @@ export class Viewer {
   private async handleFrame(
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
-    const frame = Frame.fromProto(payload);
-    const frameNumber = frame.sequenceNumber;
-    this.frameReceived?.emit(frame);
+    if (this.canvasElement != null && this.dimensions != null) {
+      const frame = Frame.fromProto(payload);
+      const canvas = this.canvasElement.getContext('2d');
+      const dimensions = this.dimensions;
+      const data = { canvas, dimensions, frame };
 
-    const image = await this.loadImageBytes(payload.image);
-
-    if (this.lastFrameNumber == null || frameNumber > this.lastFrameNumber) {
-      this.lastFrameNumber = frameNumber;
-      this.lastFrame = frame;
-      this.drawImage(image, frame);
+      const drawnFrame = await this.canvasRenderer(data);
+      this.lastFrame = drawnFrame;
     }
-
-    image.dispose();
-  }
-
-  private drawImage(image: LoadedImage, frame: Frame.Frame): void {
-    if (this.canvasElement != null) {
-      const context = this.canvasElement.getContext('2d');
-
-      if (context != null && this.dimensions != null) {
-        const { imageAttributes } = frame;
-        const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
-          imageAttributes.frameDimensions
-        );
-        const fitTo = Rectangle.fromDimensions(this.dimensions);
-        const fit = Rectangle.containFit(fitTo, imageRect);
-
-        const scaleX = fit.width / imageRect.width;
-        const scaleY = fit.height / imageRect.height;
-
-        const startXPos = imageAttributes.imageRect.x * scaleX;
-        const startYPos = imageAttributes.imageRect.y * scaleY;
-
-        context.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
-        context.drawImage(
-          image.image,
-          startXPos,
-          startYPos,
-          image.image.width * imageAttributes.scaleFactor * scaleX,
-          image.image.height * imageAttributes.scaleFactor * scaleY
-        );
-
-        this.frameDrawn.emit(frame);
-      }
-    }
-  }
-
-  private loadImageBytes(
-    imageBytes: Int8Array | Uint8Array
-  ): Promise<LoadedImage> {
-    if (window.createImageBitmap != null) {
-      return this.loadImageBytesAsImageBitmap(imageBytes);
-    } else {
-      return this.loadImageBytesAsImageElement(imageBytes);
-    }
-  }
-
-  private loadImageBytesAsImageElement(
-    imageData: Int8Array | Uint8Array
-  ): Promise<LoadedImage> {
-    return new Promise((resolve, reject) => {
-      const blob = new Blob([imageData]);
-      const blobUrl = URL.createObjectURL(blob);
-
-      const image = new Image();
-      image.addEventListener('load', () => {
-        resolve({ image, dispose: () => undefined });
-        URL.revokeObjectURL(blobUrl);
-      });
-      image.addEventListener('error', () => {
-        reject(new ImageLoadError('Failed to load image data'));
-        URL.revokeObjectURL(blobUrl);
-      });
-
-      image.src = blobUrl;
-    });
-  }
-
-  private async loadImageBytesAsImageBitmap(
-    imageData: Int8Array | Uint8Array
-  ): Promise<LoadedImage> {
-    const blob = new Blob([imageData]);
-    const bitmap = await window.createImageBitmap(blob);
-    return { image: bitmap, dispose: () => bitmap.close() };
   }
 
   private calculateComponentDimensions(): void {
     const maxViewport = Dimensions.square(1280);
     const bounds = this.getBounds();
     const measuredViewport = Dimensions.create(bounds.width, bounds.height);
-
     const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
 
     this.dimensions =
@@ -596,7 +536,7 @@ export class Viewer {
     } else {
       return new Scene(
         this.stream,
-        this.renderer,
+        this.remoteRenderer,
         this.lastFrame,
         this.commands,
         this.sceneViewId

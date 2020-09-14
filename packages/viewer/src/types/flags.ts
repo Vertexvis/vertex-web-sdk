@@ -9,10 +9,16 @@ export interface Flags {
    * Enables or disables a buffer for delivery of images over websockets.
    */
   bufferFrameDelivery: boolean;
+
+  /**
+   * Enables or disables logging of WS message payloads.
+   */
+  logWsMessages: boolean;
 }
 
 export const defaultFlags: Flags = {
   bufferFrameDelivery: false,
+  logWsMessages: false,
 };
 
 export function createFlags(

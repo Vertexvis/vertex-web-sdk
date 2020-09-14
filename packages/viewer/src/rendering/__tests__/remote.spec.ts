@@ -1,4 +1,4 @@
-import { createStreamApiRenderer } from '../renderer';
+import { createStreamApiRenderer } from '../remote';
 import { FrameCamera } from '../../types';
 import {
   StreamApi,

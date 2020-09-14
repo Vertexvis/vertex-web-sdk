@@ -44,6 +44,11 @@ export type SyncTimePayload = DeepRequired<
   []
 >;
 
+export type RecordPerformancePayload = DeepRequired<
+  vertexvis.protobuf.stream.IRecordPerformancePayload,
+  []
+>;
+
 export type DrawFrameResult = DeepRequired<
   Pick<vertexvis.protobuf.stream.IStreamResponse, 'drawFrame'>,
   | ['drawFrame', 'timing', 'receiveToPaintDuration']

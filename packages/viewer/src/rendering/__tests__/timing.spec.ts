@@ -47,15 +47,12 @@ describe(acknowledgeFrameRequests, () => {
     expect(frame).toMatchObject({
       response: expect.objectContaining({
         requestId: { value: 'req-id' },
-        drawFrame: {
-          timing: expect.objectContaining({
-            sequenceNumber: 1,
-            sendToReceiveDuration: {
-              seconds: new Long(1, 0, false),
-              nanos: 0,
-            },
-          }),
-        },
+        drawFrame: expect.objectContaining({
+          sendToReceiveDuration: {
+            seconds: new Long(1, 0, false),
+            nanos: 0,
+          },
+        }),
       }),
     });
   });

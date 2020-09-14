@@ -1,6 +1,6 @@
 import { FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
-import { FrameRenderer } from '../rendering/renderer';
+import { RemoteRenderer } from '../rendering';
 
 const PI_OVER_360 = 0.008726646259972;
 
@@ -16,7 +16,7 @@ const PI_OVER_360 = 0.008726646259972;
  */
 export class Camera implements FrameCamera.FrameCamera {
   public constructor(
-    private renderer: FrameRenderer,
+    private renderer: RemoteRenderer,
     private aspect: number,
     private data: FrameCamera.FrameCamera
   ) {}

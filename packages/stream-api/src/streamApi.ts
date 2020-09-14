@@ -10,11 +10,13 @@ import {
   RequestMessage,
   ResponseMessage,
   SyncTimePayload,
+  RecordPerformancePayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from './time';
 import { encode, decode } from './encoder';
+import { StreamRequestError } from './errors';
 
 export type RequestMessageHandler = (msg: RequestMessage) => void;
 
@@ -29,7 +31,8 @@ export class StreamApi {
   private messageSubscription?: Disposable;
 
   public constructor(
-    private websocket: WebSocketClient = new WebSocketClientImpl()
+    private websocket: WebSocketClient = new WebSocketClientImpl(),
+    private loggingEnabled = false
   ) {}
 
   /**
@@ -230,6 +233,26 @@ export class StreamApi {
   }
 
   /**
+   * Sends a request to record performance timings that were measured in the
+   * client. The server may use these timings as hints to optimize the rendering
+   * performance to provide a better experience.
+   *
+   * Use `withResponse` to indicate if the server should reply with a response.
+   * If `false`, the returned promise will complete immediately. Otherwise,
+   * it'll complete when a response is received.
+   *
+   * @param payload The request payload
+   * @param withResponse Indicates if the server should reply with a response.
+   * Defaults to `true`.
+   */
+  public recordPerformance(
+    payload: RecordPerformancePayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ recordPerformance: payload }, withResponse);
+  }
+
+  /**
    * Acknowledges a successful request by sending a reply back to the server
    * with an optional result body.
    *
@@ -254,34 +277,52 @@ export class StreamApi {
     req: vertexvis.protobuf.stream.IStreamRequest,
     withResponse: boolean
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    const sentAtTime = currentDateAsProtoTimestamp();
     if (withResponse) {
-      const sentAtTime = currentDateAsProtoTimestamp();
       const requestId = UUID.create();
       const request = { ...req, requestId: { value: requestId } };
 
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         const subscription = this.onResponse(msg => {
           if (requestId === msg.response.requestId?.value) {
-            resolve(msg.response);
+            if (msg.response.error == null) {
+              resolve(msg.response);
+            } else {
+              const { message: summary, details } = msg.response.error;
+              reject(
+                new StreamRequestError(
+                  requestId,
+                  req,
+                  summary?.value,
+                  details?.value
+                )
+              );
+            }
             subscription.dispose();
           }
         });
-        this.websocket.send(encode({ request, sentAtTime }));
+        this.sendMessage({ sentAtTime, request });
       });
     }
-    this.websocket.send(encode({ request: req }));
+    this.sendMessage({ sentAtTime, request: req });
     return Promise.resolve({});
+  }
+
+  private sendMessage(msg: vertexvis.protobuf.stream.IStreamMessage): void {
+    this.websocket.send(encode(msg));
+    this.log('WS message sent', msg);
   }
 
   private sendResponse(
     response: vertexvis.protobuf.stream.IStreamResponse
   ): void {
     const sentAtTime = currentDateAsProtoTimestamp();
-    this.websocket.send(encode({ response, sentAtTime }));
+    this.websocket.send(encode({ sentAtTime, response }));
   }
 
   private handleMessage(message: MessageEvent): void {
     const msg = decode(message.data);
+    this.log('WS message received', msg);
 
     if (msg?.sentAtTime != null && msg?.response != null) {
       this.onResponseDispatcher.emit({
@@ -300,5 +341,11 @@ export class StreamApi {
 
   private onResponse(handler: ResponseMessageHandler): Disposable {
     return this.onResponseDispatcher.on(handler);
+  }
+
+  private log(msg: string, ...other: unknown[]): void {
+    if (this.loggingEnabled) {
+      console.debug(msg, ...other);
+    }
   }
 }

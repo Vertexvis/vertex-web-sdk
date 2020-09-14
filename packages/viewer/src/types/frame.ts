@@ -7,6 +7,7 @@ export interface Frame {
   imageAttributes: ImageAttributes;
   sceneAttributes: SceneAttributes;
   sequenceNumber: number;
+  image: Uint8Array;
 }
 
 export interface ImageAttributes {
@@ -27,6 +28,7 @@ export const fromProto = (
     imageAttributes,
     sceneAttributes,
     sequenceNumber,
+    image,
   } = payload;
 
   return {
@@ -52,5 +54,6 @@ export const fromProto = (
       }),
     },
     sequenceNumber,
+    image,
   };
 };
