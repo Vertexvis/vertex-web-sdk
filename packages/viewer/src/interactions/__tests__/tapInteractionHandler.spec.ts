@@ -1,7 +1,6 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TapInteractionHandler } from '../tapInteractionHandler';
 import { InteractionApi } from '../interactionApi';
 import { Point } from '@vertexvis/geometry';
@@ -32,10 +31,10 @@ describe(TapInteractionHandler, () => {
   });
   const touchStart = new Event('touchstart', {
     touches: [{ clientX: 10, clientY: 10, identifier: 1 }],
-  } as any);
+  } as unknown);
   const touchEnd = new Event('touchend', {
     touches: [{ clientX: 10, clientY: 10, identifier: 1 }],
-  } as any);
+  } as unknown);
 
   const handler = new TapInteractionHandler();
 
@@ -71,4 +70,3 @@ describe(TapInteractionHandler, () => {
     expect(api.tap).not.toHaveBeenCalledWith(Point.create(15, 15), keyDetails);
   });
 });
-/* eslint-enable @typescript-eslint/no-explicit-any */

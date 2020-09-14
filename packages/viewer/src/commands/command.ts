@@ -6,8 +6,6 @@ export interface CommandContext {
   config: Config;
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export type CommandFactory<T> = (...args: any[]) => Command<T>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
+export type CommandFactory<T> = (...args: unknown[]) => Command<T>;
 
 export type Command<T> = (context: CommandContext) => T | Promise<T>;

@@ -1,6 +1,6 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MouseInteractionHandler } from '../mouseInteractionHandler';
 import { InteractionApi } from '../interactionApi';
 import {
@@ -57,7 +57,10 @@ describe(MouseInteractionHandler, () => {
     buttons: 1,
     bubbles: true,
   });
-  const wheelEvent = new Event('wheel', { deltaY: 100, deltaMode: 0 } as any);
+  const wheelEvent = new Event('wheel', {
+    deltaY: 100,
+    deltaMode: 0,
+  } as unknown);
 
   const handler = new MouseInteractionHandler(
     rotateInteraction,
@@ -172,4 +175,3 @@ describe(MouseInteractionHandler, () => {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 });
-/* eslint-enable @typescript-eslint/no-explicit-any */

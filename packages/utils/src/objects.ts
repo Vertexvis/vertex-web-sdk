@@ -1,7 +1,6 @@
 import isSimpleObject from 'is-plain-object';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable padding-line-between-statements */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /**
  * Returns a new object where any enumerable property from `other` are
  * recursively applied to `a`. Once a property is set, it will not be
@@ -17,8 +16,10 @@ export function defaults<A>(a: A): A;
 export function defaults<A, B>(a: A, b: B): A & B;
 export function defaults<A, B, C>(a: A, b: B, c: C): A & B & C;
 export function defaults<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D;
-export function defaults<A, R>(a: A, ...other: any[]): R;
-export function defaults(...objects: any[]): any {
+export function defaults<A, R>(a: A, ...other: Record<string, unknown>[]): R;
+export function defaults(
+  ...objects: Record<string, unknown>[]
+): Record<string, unknown> {
   const [a, ...other] = objects;
   const result = { ...a };
 
@@ -36,7 +37,7 @@ export function defaults(...objects: any[]): any {
 
     return result;
   } else {
-    return other.reduce((result: any, next: any) => defaults(result, next), a);
+    return other.reduce((result, next) => defaults(result, next), a);
   }
 }
 /* eslint-enable padding-line-between-statements */
@@ -59,11 +60,14 @@ export function defaults(...objects: any[]): any {
  * isPlainObject(null); //=> false
  * isPlainObject(Object.create(null)); //=> false
  */
-export const isPlainObject = (obj: any): boolean => {
+export const isPlainObject = (obj: unknown): boolean => {
   return isSimpleObject(obj);
 };
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable padding-line-between-statements */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /**
  * Returns an array of key-value pairs for each enumerable key in `obj`.
  *
@@ -90,15 +94,17 @@ export function toPairs(obj: any): Array<[string, any]> {
 }
 /* eslint-enable padding-line-between-statements */
 /* eslint-enable @typescript-eslint/ban-types */
+/* eslint-enable @typescript-eslint/no-explicit-any */
+/* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 
 /* eslint-disable padding-line-between-statements */
 export function fromPairs<T>(
   pairs: Array<[string, T]> | undefined | null
 ): Record<string, T>;
 export function fromPairs(
-  pairs: Array<any[]> | undefined | null
-): Record<string, any>;
-export function fromPairs(pairs: any): Record<string, any> {
+  pairs: Array<unknown[]> | undefined | null
+): Record<string, unknown>;
+export function fromPairs(pairs: unknown): Record<string, unknown> {
   if (Array.isArray(pairs)) {
     return pairs.reduce((result, pair) => {
       if (pair != null) {
@@ -111,6 +117,4 @@ export function fromPairs(pairs: any): Record<string, any> {
     return {};
   }
 }
-/* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-enable padding-line-between-statements */
-/* eslint-enable @typescript-eslint/no-explicit-any */

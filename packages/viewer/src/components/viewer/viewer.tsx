@@ -437,15 +437,14 @@ export class Viewer {
     }
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   private injectViewerApi(): void {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
       .forEach(result => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (result as any).viewer = this.hostElement;
       });
   }
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   private async handleStreamRequest(
     request: vertexvis.protobuf.stream.IStreamRequest
