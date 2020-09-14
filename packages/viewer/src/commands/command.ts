@@ -6,6 +6,6 @@ export interface CommandContext {
   config: Config;
 }
 
-export type CommandFactory<T> = (...args: any[]) => Command<T>;
+export type CommandFactory<T> = (...args: unknown[]) => Command<T>;
 
 export type Command<T> = (context: CommandContext) => T | Promise<T>;

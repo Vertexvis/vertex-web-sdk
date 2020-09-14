@@ -89,12 +89,13 @@ export class WebSocketClientMock implements WebSocketClient {
    * ws.nextSent(); // "2"
    */
   public nextSent(): WebSocketSendData;
-  public nextSent(...args: any): any {
+  public nextSent<T>(
+    decoder?: (data: WebSocketSendData) => T
+  ): T | WebSocketSendData {
     const next = this.sentMessages.shift();
     if (next != null) {
-      const decoder = args[0];
-      if (typeof decoder === 'function') {
-        return args[0](next);
+      if (decoder != null) {
+        return decoder(next);
       } else {
         return next;
       }

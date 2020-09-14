@@ -57,7 +57,10 @@ describe(MouseInteractionHandler, () => {
     buttons: 1,
     bubbles: true,
   });
-  const wheelEvent = new Event('wheel', { deltaY: 100, deltaMode: 0 } as any);
+  const wheelEvent = new Event('wheel', {
+    deltaY: 100,
+    deltaMode: 0,
+  } as unknown);
 
   const handler = new MouseInteractionHandler(
     rotateInteraction,

@@ -33,17 +33,17 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/build-tools": "0.7.3",
-    "@vertexvis/typescript-config-vertexvis": "1.0.2",
+    "@vertexvis/build-tools": "0.8.0",
+    "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "tslib": "^2.0.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
-    "@vertexvis/eslint-config-vertexvis-typescript": "0.2.2",
-    "@vertexvis/jest-config-vertexvis": "0.4.4",
+    "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
+    "@vertexvis/jest-config-vertexvis": "0.5.0",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "26.3.0"
   },
   "peerDependencies": {
     "rollup": "^1.19.4"
