@@ -441,6 +441,7 @@ export class Viewer {
     document
       .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
       .forEach(result => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (result as any).viewer = this.hostElement;
       });
   }

@@ -13,23 +13,23 @@ describe(TouchInteractionHandler, () => {
 
   const touchStart1 = new Event('touchstart', {
     touches: [{ screenX: 20, screenY: 10, identifier: 1 }],
-  } as any);
+  } as unknown);
   const touchStart2 = new Event('touchstart', {
     touches: [
       { screenX: 20, screenY: 10, identifier: 1 },
       { screenX: 40, screenY: 20, identifier: 2 },
     ],
-  } as any);
+  } as unknown);
   const touchMoveWithOneFingerTouch = new Event('touchmove', {
     touches: [{ screenX: 25, screenY: 15, identifier: 1 }],
-  } as any);
+  } as unknown);
   const touchMoveWithTwoFingerTouch = new Event('touchmove', {
     touches: [
       { screenX: 25, screenY: 15, identifier: 1 },
       { screenX: 45, screenY: 25, identifier: 2 },
     ],
-  } as any);
-  const touchEnd1 = new Event('touchend', { touches: [] } as any);
+  } as unknown);
+  const touchEnd1 = new Event('touchend', { touches: [] } as unknown);
 
   const handler = new TouchInteractionHandler();
 
@@ -57,7 +57,7 @@ describe(TouchInteractionHandler, () => {
   it('ignores rotate interaction with movement less than 2 pixels', () => {
     const touchMove = new Event('touchmove', {
       touches: [{ screenX: 21, screenY: 11, identifier: 1 }],
-    } as any);
+    } as unknown);
     div.dispatchEvent(touchStart1);
     window.dispatchEvent(touchMove);
     window.dispatchEvent(touchEnd1);

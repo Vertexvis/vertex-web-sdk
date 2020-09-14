@@ -37,7 +37,7 @@ export async function delay(...args: unknown[]): Promise<unknown> {
  *
  * @param ms A duration in milliseconds.
  */
-export function timeout<T>(ms: number): Promise<void>;
+export function timeout(ms: number): Promise<void>;
 
 /**
  * Assigns a timeout to the given promise, where if the promise doesn't complete

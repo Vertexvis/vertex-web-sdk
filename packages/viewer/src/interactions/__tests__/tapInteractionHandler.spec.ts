@@ -31,10 +31,10 @@ describe(TapInteractionHandler, () => {
   });
   const touchStart = new Event('touchstart', {
     touches: [{ clientX: 10, clientY: 10, identifier: 1 }],
-  } as any);
+  } as unknown);
   const touchEnd = new Event('touchend', {
     touches: [{ clientX: 10, clientY: 10, identifier: 1 }],
-  } as any);
+  } as unknown);
 
   const handler = new TapInteractionHandler();
 

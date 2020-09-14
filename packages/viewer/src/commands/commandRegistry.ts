@@ -5,11 +5,11 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 interface CommandDefinition<R> {
   factory: CommandFactory<R>;
-  thisArg: any | undefined;
+  thisArg: unknown | undefined;
 }
 
 export class CommandRegistry {
-  private commands: Record<string, CommandDefinition<any>> = {};
+  private commands: Record<string, CommandDefinition<unknown>> = {};
 
   public constructor(
     private stream: StreamApi,
@@ -25,7 +25,7 @@ export class CommandRegistry {
     return { dispose: () => delete this.commands[id] };
   }
 
-  public execute<R>(id: string, ...args: any[]): Promise<R> {
+  public execute<R>(id: string, ...args: unknown[]): Promise<R> {
     const commandDefinition = this.getCommandDefinition(id);
     if (commandDefinition != null) {
       const command = commandDefinition.factory.apply(
@@ -37,7 +37,7 @@ export class CommandRegistry {
         command({
           stream: this.stream,
           config: this.configProvider(),
-        }) as any
+        })
       );
     } else {
       throw new Error(`Command not registered for \`${id}\``);
@@ -47,6 +47,6 @@ export class CommandRegistry {
   private getCommandDefinition(
     id: string
   ): CommandDefinition<StreamApi> | undefined {
-    return this.commands[id];
+    return this.commands[id] as CommandDefinition<StreamApi>;
   }
 }
