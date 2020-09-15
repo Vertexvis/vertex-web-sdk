@@ -130,6 +130,7 @@ export class Viewer {
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
+  private resizeObserver?: ResizeObserver;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -142,6 +143,7 @@ export class Viewer {
 
   public constructor() {
     this.handleWindowResize = this.handleWindowResize.bind(this);
+    this.handleElementResize = this.handleElementResize.bind(this);
   }
 
   public componentDidLoad(): void {
@@ -171,6 +173,8 @@ export class Viewer {
     this.registerInteractionHandler(new TapInteractionHandler());
 
     this.injectViewerApi();
+
+    this.resizeObserver.observe(this.containerElement);
   }
 
   public connectedCallback(): void {
@@ -181,12 +185,15 @@ export class Viewer {
       childList: true,
       subtree: true,
     });
+
+    this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
   public disconnectedCallback(): void {
     window.removeEventListener('resize', this.handleWindowResize);
 
     this.mutationObserver?.disconnect();
+    this.resizeObserver?.disconnect();
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -429,12 +436,20 @@ export class Viewer {
     }
   }
 
-  private handleWindowResize(event: UIEvent): void {
+  private handleResize(): void {
     if (!this.isResizing) {
       this.isResizing = true;
 
       window.requestAnimationFrame(() => this.recalculateComponentDimensions());
     }
+  }
+
+  private handleWindowResize(event: UIEvent): void {
+    this.handleResize();
+  }
+
+  private handleElementResize(entries: ResizeObserverEntry[]): void {
+    this.handleResize();
   }
 
   private injectViewerApi(): void {
@@ -493,8 +508,7 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      // TODO(dan): Need to add and invoke message for resizing the image
-      // stream. https://vertexvis.atlassian.net/browse/SDK-921
+      this.stream.updateDimensions({ dimensions: this.dimensions} );
     }
   }
 

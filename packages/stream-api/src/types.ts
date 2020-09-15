@@ -24,6 +24,11 @@ export type ReplaceCameraPayload = DeepRequired<
   ['frameCorrelationId']
 >;
 
+export type UpdateDimensionsPayload = DeepRequired<
+  vertexvis.protobuf.stream.IUpdateDimensionsPayload,
+  ['frameCorrelationId']
+>;
+
 export type HitItemsPayload = DeepRequired<
   vertexvis.protobuf.stream.IHitItemsPayload,
   []
