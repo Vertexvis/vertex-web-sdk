@@ -508,7 +508,7 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      this.stream.updateDimensions({ dimensions: this.dimensions} );
+      this.stream.updateDimensions({ dimensions: this.dimensions });
     }
   }
 
