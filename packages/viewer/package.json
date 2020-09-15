@@ -51,6 +51,7 @@
     "@vertexvis/utils": "0.9.0",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
+    "resize-observer-polyfill": "^1.5.1",
     "tslib": "^2.0.1",
     "zen-3d": "^0.0.1",
     "zen-3d-addons": "^0.0.3"
@@ -59,7 +60,6 @@
     "@stencil/core": "^1.17.3",
     "@stencil/react-output-target": "^0.0.9",
     "@types/jest": "^24.0.23",
-    "@types/resize-observer-browser": "^0.1.3",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
     "@vertexvis/rollup-plugin-vertexvis-copyright": "0.2.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",

@@ -10,6 +10,7 @@ import {
   Event,
   EventEmitter,
 } from '@stencil/core';
+import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
 import { Disposable, UUID, Color } from '@vertexvis/utils';
