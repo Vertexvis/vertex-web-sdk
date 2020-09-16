@@ -308,22 +308,17 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    await this.unload();
     if (this.commands != null && this.dimensions != null) {
       const loadableResource = LoadableResource.fromUrn(urn);
-
-      const isCurrentlyLoadingResource =
-        this.connectingPromise != null &&
+      const isSameResource =
         this.resource != null &&
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
-
-      if (!isCurrentlyLoadingResource) {
+      if (!isSameResource) {
+        await this.unload();
         this.resource = loadableResource;
-        this.connectingPromise = this.connectStreamingClient(this.resource);
-
-        await this.connectingPromise;
-        this.connectingPromise = undefined;
+        await this.connectStreamingClient(this.resource);
+      } else {
       }
     } else {
       throw new ViewerInitializationError(
@@ -344,7 +339,6 @@ export class Viewer {
       this.sceneViewId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
-      this.connectingPromise = undefined;
       this.resource = undefined;
     }
   }
