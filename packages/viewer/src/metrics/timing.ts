@@ -1,3 +1,5 @@
+import { isPromise } from '../types';
+
 interface Timing {
   startTime: number;
   duration: number;
@@ -38,7 +40,7 @@ export class TimingMeter {
    */
   public measure<T>(target: Promise<T>): Promise<T>;
   public measure<T>(target: (() => T) | Promise<T>): T | Promise<T> {
-    if (target instanceof Promise) {
+    if (isPromise(target)) {
       const mark = this.begin();
       return target.finally(() => this.end(mark));
     } else if (typeof target === 'function') {

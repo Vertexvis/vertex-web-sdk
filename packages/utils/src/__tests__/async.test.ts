@@ -22,7 +22,7 @@ describe(timeout, () => {
   });
 
   it('resolves promise if completed within timeout', async () => {
-    const result = timeout(20, delay(10, Promise.resolve(1)));
+    const result = timeout(50, delay(10, Promise.resolve(1)));
     expect(await result).toBe(1);
   });
 });
