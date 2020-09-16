@@ -313,12 +313,15 @@ export class Viewer {
     if (this.commands != null && this.dimensions != null) {
       const loadableResource = LoadableResource.fromUrn(urn);
 
-      const isCurrentlyLoadingResource = this.connectingPromise != null && this.resource != null && this.resource.id === loadableResource.id
+      const isCurrentlyLoadingResource =
+        this.connectingPromise != null &&
+        this.resource != null &&
+        this.resource.id === loadableResource.id;
       if (isCurrentlyLoadingResource) {
         return;
       }
-      this.resource = loadableResource
-      
+      this.resource = loadableResource;
+
       this.connectingPromise = this.connectStreamingClient(this.resource);
 
       await this.connectingPromise;
