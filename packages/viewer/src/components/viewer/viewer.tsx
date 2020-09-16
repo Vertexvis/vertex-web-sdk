@@ -322,7 +322,6 @@ export class Viewer {
 
         await this.connectingPromise;
         this.connectingPromise = undefined;
-      } else {
       }
     } else {
       throw new ViewerInitializationError(
