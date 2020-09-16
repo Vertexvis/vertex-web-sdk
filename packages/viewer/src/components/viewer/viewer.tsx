@@ -309,7 +309,6 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     await this.unload();
-
     if (this.commands != null && this.dimensions != null) {
       const loadableResource = LoadableResource.fromUrn(urn);
 
@@ -345,6 +344,7 @@ export class Viewer {
       this.clock = undefined;
       this.errorMessage = undefined;
       this.connectingPromise = undefined;
+      this.resource = undefined;
     }
   }
 
