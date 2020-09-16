@@ -318,12 +318,12 @@ export class Viewer {
         this.resource != null &&
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
-      
+
       if (!isCurrentlyLoadingResource) {
         this.resource = loadableResource;
 
         this.connectingPromise = this.connectStreamingClient(this.resource);
-  
+
         await this.connectingPromise;
         this.connectingPromise = undefined;
       }
