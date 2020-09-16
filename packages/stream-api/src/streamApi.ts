@@ -181,7 +181,6 @@ export class StreamApi {
     payload: UpdateDimensionsPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    console.log('dimensions', payload);
     return this.sendRequest({ updateDimensions: payload }, withResponse);
   }
 
