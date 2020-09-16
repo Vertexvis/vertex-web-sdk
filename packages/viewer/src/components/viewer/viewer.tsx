@@ -127,6 +127,7 @@ export class Viewer {
   private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
+  private connectingPromise?: Promise<void>;
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
@@ -310,8 +311,18 @@ export class Viewer {
     await this.unload();
 
     if (this.commands != null && this.dimensions != null) {
-      this.resource = LoadableResource.fromUrn(urn);
-      await this.connectStreamingClient(this.resource);
+      const loadableResource = LoadableResource.fromUrn(urn);
+
+      const isCurrentlyLoadingResource = this.connectingPromise != null && this.resource != null && this.resource.id === loadableResource.id
+      if (isCurrentlyLoadingResource) {
+        return;
+      }
+      this.resource = loadableResource
+      
+      this.connectingPromise = this.connectStreamingClient(this.resource);
+
+      await this.connectingPromise;
+      this.connectingPromise = undefined;
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
