@@ -308,8 +308,6 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    await this.unload();
-
     if (this.commands != null && this.dimensions != null) {
       const loadableResource = LoadableResource.fromUrn(urn);
 
@@ -318,14 +316,13 @@ export class Viewer {
         this.resource != null &&
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
-
       if (!isCurrentlyLoadingResource) {
         this.resource = loadableResource;
-
         this.connectingPromise = this.connectStreamingClient(this.resource);
 
         await this.connectingPromise;
         this.connectingPromise = undefined;
+      } else {
       }
     } else {
       throw new ViewerInitializationError(
@@ -377,6 +374,7 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
+    await this.unload();
     try {
       this.streamDisposable = await this.connectStream(resource);
 
