@@ -316,16 +316,17 @@ export class Viewer {
       const isCurrentlyLoadingResource =
         this.connectingPromise != null &&
         this.resource != null &&
+        this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
-      if (isCurrentlyLoadingResource) {
-        return;
+      
+      if (!isCurrentlyLoadingResource) {
+        this.resource = loadableResource;
+
+        this.connectingPromise = this.connectStreamingClient(this.resource);
+  
+        await this.connectingPromise;
+        this.connectingPromise = undefined;
       }
-      this.resource = loadableResource;
-
-      this.connectingPromise = this.connectStreamingClient(this.resource);
-
-      await this.connectingPromise;
-      this.connectingPromise = undefined;
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -345,6 +346,7 @@ export class Viewer {
       this.sceneViewId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
+      this.connectingPromise = undefined;
     }
   }
 
