@@ -330,6 +330,7 @@ export class Viewer {
       this.lastFrame = undefined;
       this.sceneViewId = undefined;
       this.clock = undefined;
+      this.errorMessage = undefined;
     }
   }
 
