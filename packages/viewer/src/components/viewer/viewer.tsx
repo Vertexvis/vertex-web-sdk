@@ -314,10 +314,9 @@ export class Viewer {
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
       if (!isSameResource) {
-        await this.unload();
+        this.unload();
         this.resource = loadableResource;
         await this.connectStreamingClient(this.resource);
-      } else {
       }
     } else {
       throw new ViewerInitializationError(
