@@ -308,6 +308,8 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
+    await this.unload();
+
     if (this.commands != null && this.dimensions != null) {
       const loadableResource = LoadableResource.fromUrn(urn);
 
@@ -373,7 +375,6 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
-    await this.unload();
     try {
       this.streamDisposable = await this.connectStream(resource);
 
