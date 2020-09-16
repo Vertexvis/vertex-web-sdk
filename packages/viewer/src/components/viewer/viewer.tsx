@@ -127,7 +127,6 @@ export class Viewer {
   private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
-  private connectingPromise?: Promise<void>;
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
