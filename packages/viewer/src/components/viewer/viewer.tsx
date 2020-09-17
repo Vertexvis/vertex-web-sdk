@@ -143,7 +143,6 @@ export class Viewer {
   private clock?: SynchronizedClock;
 
   public constructor() {
-    this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleElementResize = this.handleElementResize.bind(this);
   }
 
@@ -179,8 +178,6 @@ export class Viewer {
   }
 
   public connectedCallback(): void {
-    window.addEventListener('resize', this.handleWindowResize);
-
     this.mutationObserver = new MutationObserver(() => this.injectViewerApi());
     this.mutationObserver.observe(document.body, {
       childList: true,
@@ -191,8 +188,6 @@ export class Viewer {
   }
 
   public disconnectedCallback(): void {
-    window.removeEventListener('resize', this.handleWindowResize);
-
     this.mutationObserver?.disconnect();
     this.resizeObserver?.disconnect();
   }
@@ -437,20 +432,12 @@ export class Viewer {
     }
   }
 
-  private handleResize(): void {
+  private handleElementResize(entries: ResizeObserverEntry[]): void {
     if (!this.isResizing) {
       this.isResizing = true;
 
       window.requestAnimationFrame(() => this.recalculateComponentDimensions());
     }
-  }
-
-  private handleWindowResize(event: UIEvent): void {
-    this.handleResize();
-  }
-
-  private handleElementResize(entries: ResizeObserverEntry[]): void {
-    this.handleResize();
   }
 
   private injectViewerApi(): void {
