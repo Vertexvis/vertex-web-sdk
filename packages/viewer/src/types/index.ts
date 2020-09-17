@@ -5,4 +5,6 @@ import * as LoadableResource from './loadableResource';
 
 export * from './synchronizedClock';
 
+export * from './typeGuards';
+
 export { Flags, Frame, FrameCamera, LoadableResource };

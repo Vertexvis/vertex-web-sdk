@@ -34,13 +34,15 @@
 
       async function main() {
         const viewer = document.querySelector('#viewer');
-
-        // await viewer.load('urn:vertexvis:stream-key:key');
       }
     </script>
   </head>
 
   <body>
-    <vertex-viewer id="viewer" camera-controls="true"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      config-env="platdev"
+      src="urn:vertexvis:stream-key:key"
+    ></vertex-viewer>
   </body>
 </html>

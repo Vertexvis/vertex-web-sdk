@@ -310,11 +310,17 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    await this.unload();
-
     if (this.commands != null && this.dimensions != null) {
-      this.resource = LoadableResource.fromUrn(urn);
-      await this.connectStreamingClient(this.resource);
+      const loadableResource = LoadableResource.fromUrn(urn);
+      const isSameResource =
+        this.resource != null &&
+        this.resource.type === loadableResource.type &&
+        this.resource.id === loadableResource.id;
+      if (!isSameResource) {
+        this.unload();
+        this.resource = loadableResource;
+        await this.connectStreamingClient(this.resource);
+      }
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -333,6 +339,8 @@ export class Viewer {
       this.lastFrame = undefined;
       this.sceneViewId = undefined;
       this.clock = undefined;
+      this.errorMessage = undefined;
+      this.resource = undefined;
     }
   }
 
