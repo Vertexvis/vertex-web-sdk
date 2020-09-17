@@ -173,8 +173,6 @@ export class Viewer {
     this.registerInteractionHandler(new TapInteractionHandler());
 
     this.injectViewerApi();
-
-    this.resizeObserver.observe(this.containerElement);
   }
 
   public connectedCallback(): void {
@@ -402,6 +400,7 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer()
     );
+    this.resizeObserver.observe(this.containerElement);
     return connection;
   }
 
@@ -441,7 +440,10 @@ export class Viewer {
   }
 
   private handleElementResize(entries: ResizeObserverEntry[]): void {
-    if (!this.isResizing) {
+    const dimensionsHaveChanged =
+      entries.length >= 0 &&
+      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
+    if (dimensionsHaveChanged && !this.isResizing) {
       this.isResizing = true;
 
       window.requestAnimationFrame(() => this.recalculateComponentDimensions());
