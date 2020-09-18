@@ -12,6 +12,7 @@ import {
 } from './utils';
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
+import * as Fixtures from '../../types/__fixtures__';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -188,6 +189,9 @@ async function createViewerWithLoadedStream(key: string): Promise<Viewer> {
   (api.startStream as jest.Mock).mockResolvedValue(startStream);
   (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
-  await viewer.load(`urn:vertexvis:stream-key:${key}`);
+  const loading = viewer.load(`urn:vertexvis:stream-key:${key}`);
+  // Emit frame drawn on next event loop
+  setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
+  await loading;
   return viewer;
 }
