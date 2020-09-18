@@ -13,7 +13,13 @@ import {
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
-import { Disposable, UUID, Color } from '@vertexvis/utils';
+import {
+  Disposable,
+  UUID,
+  Color,
+  Async,
+  EventDispatcher,
+} from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
@@ -140,6 +146,8 @@ export class Viewer {
   private sceneViewId?: UUID.UUID;
   private streamDisposable?: Disposable;
 
+  private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
+
   private clock?: SynchronizedClock;
 
   public constructor() {
@@ -227,6 +235,14 @@ export class Viewer {
     thisArg?: T
   ): Promise<Disposable> {
     return this.commands.register(id, factory, thisArg);
+  }
+
+  /**
+   * @private For internal use only.
+   */
+  public dispatchFrameDrawn(frame: Frame.Frame): void {
+    this.internalFrameDrawnDispatcher.emit(frame);
+    this.frameDrawn.emit(frame);
   }
 
   /**
@@ -372,14 +388,16 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
-      const streamResponse = await this.stream.startStream({
+      const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
       });
 
-      if (streamResponse.startStream != null) {
-        this.sceneViewId = streamResponse.startStream.sceneViewId.hex;
+      if (result.startStream != null) {
+        this.sceneViewId = result.startStream.sceneViewId.hex;
       }
+
+      await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
       this.errorMessage = 'Unable to establish connection to Vertex.';
       console.error('Failed to establish WS connection', e);
@@ -427,7 +445,7 @@ export class Viewer {
       this.clock = undefined;
 
       this.streamDisposable = await this.connectStream(resource);
-      this.stream.reconnect({
+      await this.stream.reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -484,9 +502,22 @@ export class Viewer {
       const dimensions = this.dimensions;
       const data = { canvas, dimensions, frame };
 
+      this.frameReceived.emit(frame);
       const drawnFrame = await this.canvasRenderer(data);
       this.lastFrame = drawnFrame;
+      this.dispatchFrameDrawn(drawnFrame);
     }
+  }
+
+  private waitNextDrawnFrame(timeout?: number): Promise<Frame.Frame> {
+    const frame = new Promise<Frame.Frame>(resolve => {
+      const disposable = this.internalFrameDrawnDispatcher.on(frame => {
+        resolve(frame);
+        disposable.dispose();
+      });
+    });
+
+    return timeout != null ? Async.timeout(timeout, frame) : frame;
   }
 
   private calculateComponentDimensions(): void {
