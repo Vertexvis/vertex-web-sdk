@@ -56,6 +56,7 @@
     "zen-3d-addons": "^0.0.3"
   },
   "devDependencies": {
+    "@stencil/angular-output-target": "^0.0.5",
     "@stencil/core": "^1.17.3",
     "@stencil/react-output-target": "^0.0.9",
     "@types/jest": "^24.0.23",

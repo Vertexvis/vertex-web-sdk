@@ -1,0 +1,76 @@
+{
+  "name": "@vertexvis/viewer-angular",
+  "version": "0.9.3",
+  "description": "Angular bindings for the Vertex Viewer SDK.",
+  "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
+  "main": "./dist/bundle.cjs.js",
+  "module": "./dist/bundle.esm.js",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "rollup --config ./rollup.config.js",
+    "prebuild-ng": "yarn clean",
+    "build-ng": "ng-packagr -p package.json",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
+    "test": "echo 'No unit tests defined'",
+    "test:coverage": "echo 'No unit tests defined'"
+  },
+  "dependencies": {
+    "@vertexvis/viewer": "0.9.3"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "^10.1.2",
+    "@angular-devkit/schematics": "^10.1.2",
+    "@angular/common": "^10.1.2",
+    "@angular/compiler": "^10.1.2",
+    "@angular/compiler-cli": "^10.1.2",
+    "@angular/core": "^10.1.2",
+    "@angular/forms": "^10.1.2",
+    "@angular/platform-browser": "^10.1.2",
+    "@angular/platform-browser-dynamic": "^10.1.2",
+    "@angular/router": "^10.1.2",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.3.0",
+    "@vertexwebsdk/build": "0.9.3",
+    "eslint": "^6.1.0",
+    "ng-packagr": "^10.1.0",
+    "rollup": "^1.19.4"
+  },
+  "peerDependencies": {
+    "@angular-devkit/core": "^10",
+    "@angular-devkit/schematics": "^10",
+    "@angular/common": "^10",
+    "@angular/compiler": "^10",
+    "@angular/compiler-cli": "^10",
+    "@angular/core": "^10",
+    "@angular/forms": "^10",
+    "@angular/platform-browser": "^10",
+    "@angular/platform-browser-dynamic": "^10",
+    "@angular/router": "^10"
+  },
+  "ngPackage": {
+    "lib": {
+      "entryFile": "src/index.ts"
+    },
+    "whitelistedNonPeerDependencies": [
+      "@vertexvis/viewer"
+    ]
+  }
+}

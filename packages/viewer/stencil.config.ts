@@ -1,6 +1,7 @@
 import { Config } from '@stencil/core';
 import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { angularOutputTarget } from '@stencil/angular-output-target';
 
 export const config: Config = {
   namespace: 'viewer',
@@ -29,6 +30,20 @@ export const config: Config = {
       componentCorePackage: '@vertexvis/viewer',
       proxiesFile: '../viewer-react/src/generated/components.ts',
     }),
+    // angularOutputTarget({
+    //   componentCorePackage: '@vertexvis/viewer',
+    //   directivesProxyFile: '../viewer-angular/src/generated/proxies.ts',
+    // }),
+    {
+      type: 'angular',
+      componentCorePackage: '@vertexvis/viewer',
+      directivesProxyFile:
+        '../viewer-angular/src/generated/directives/proxies.ts',
+      directivesUtilsFile:
+        '../viewer-angular/src/generated/directives/proxies-utils.ts',
+      directivesArrayFile:
+        '../viewer-angular/src/generated/directives/proxies-list.ts',
+    },
     {
       type: 'dist',
       esmLoaderPath: '../loader',
