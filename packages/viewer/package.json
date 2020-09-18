@@ -45,12 +45,13 @@
   },
   "dependencies": {
     "@types/classnames": "2.2.3",
-    "@vertexvis/frame-streaming-protos": "^0.1.4",
+    "@vertexvis/frame-streaming-protos": "^0.1.5",
     "@vertexvis/geometry": "0.9.3",
     "@vertexvis/stream-api": "0.9.3",
     "@vertexvis/utils": "0.9.3",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
+    "resize-observer-polyfill": "^1.5.1",
     "tslib": "^2.0.1",
     "zen-3d": "^0.0.1",
     "zen-3d-addons": "^0.0.3"

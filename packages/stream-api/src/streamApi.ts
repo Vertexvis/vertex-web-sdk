@@ -11,6 +11,7 @@ import {
   ResponseMessage,
   SyncTimePayload,
   RecordPerformancePayload,
+  UpdateDimensionsPayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
@@ -158,6 +159,29 @@ export class StreamApi {
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ updateCamera: payload }, withResponse);
+  }
+
+  /**
+   * Sends a request to update the dimensions of the frame.
+   *
+   * The payload accepts an optional `frameCorrelationId` that will be sent
+   * back on the frame that is associated to this request. Use `onRequest` to
+   * add a callback that'll be invoked when the server sends a request to draw
+   * the frame.
+   *
+   * Use `withResponse` to indicate if the server should reply with a response.
+   * If `false`, the returned promise will complete immediately. Otherwise,
+   * it'll complete when a response is received.
+   *
+   * @param payload The payload of the request.
+   * @param withResponse Indicates if the server should reply with a response.
+   * Defaults to `true`.
+   */
+  public updateDimensions(
+    payload: UpdateDimensionsPayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ updateDimensions: payload }, withResponse);
   }
 
   /**

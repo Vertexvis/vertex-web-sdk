@@ -13,3 +13,9 @@
   disconnect() {}
   observe(element, init) {}
 };
+
+(global as any).ResizeObserver = class {
+  constructor(callback) {}
+  disconnect() {}
+  observe(element, init) {}
+};

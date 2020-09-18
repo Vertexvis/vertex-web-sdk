@@ -10,6 +10,7 @@ import {
   Event,
   EventEmitter,
 } from '@stencil/core';
+import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
 import {
@@ -136,6 +137,7 @@ export class Viewer {
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
+  private resizeObserver?: ResizeObserver;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -149,7 +151,7 @@ export class Viewer {
   private clock?: SynchronizedClock;
 
   public constructor() {
-    this.handleWindowResize = this.handleWindowResize.bind(this);
+    this.handleElementResize = this.handleElementResize.bind(this);
   }
 
   public componentDidLoad(): void {
@@ -182,19 +184,18 @@ export class Viewer {
   }
 
   public connectedCallback(): void {
-    window.addEventListener('resize', this.handleWindowResize);
-
     this.mutationObserver = new MutationObserver(() => this.injectViewerApi());
     this.mutationObserver.observe(document.body, {
       childList: true,
       subtree: true,
     });
+
+    this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
   public disconnectedCallback(): void {
-    window.removeEventListener('resize', this.handleWindowResize);
-
     this.mutationObserver?.disconnect();
+    this.resizeObserver?.disconnect();
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -417,6 +418,7 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer()
     );
+    this.resizeObserver.observe(this.containerElement);
     return connection;
   }
 
@@ -455,8 +457,11 @@ export class Viewer {
     }
   }
 
-  private handleWindowResize(event: UIEvent): void {
-    if (!this.isResizing) {
+  private handleElementResize(entries: ResizeObserverEntry[]): void {
+    const dimensionsHaveChanged =
+      entries.length >= 0 &&
+      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
+    if (dimensionsHaveChanged && !this.isResizing) {
       this.isResizing = true;
 
       window.requestAnimationFrame(() => this.recalculateComponentDimensions());
@@ -532,8 +537,7 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      // TODO(dan): Need to add and invoke message for resizing the image
-      // stream. https://vertexvis.atlassian.net/browse/SDK-921
+      this.stream.updateDimensions({ dimensions: this.dimensions });
     }
   }
 
