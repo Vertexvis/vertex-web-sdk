@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 export function isPromise<T>(obj: unknown): obj is Promise<T> {
   return (
     obj != null &&
@@ -10,3 +11,4 @@ export function isPromise<T>(obj: unknown): obj is Promise<T> {
     obj['finally'] instanceof Function
   );
 }
+/* eslint-enable @typescript-eslint/ban-ts-comment */

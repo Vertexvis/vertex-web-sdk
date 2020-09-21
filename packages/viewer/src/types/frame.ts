@@ -57,10 +57,13 @@ export const fromProto = (
     },
     sceneAttributes: {
       camera: FrameCamera.create({
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         //@ts-ignore
         position: Vector3.create(sceneAttributes.camera.position),
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         //@ts-ignore
         lookAt: Vector3.create(sceneAttributes.camera.lookAt!),
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         //@ts-ignore
         up: Vector3.create(sceneAttributes.camera.up!),
       }),

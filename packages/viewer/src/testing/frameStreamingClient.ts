@@ -1,6 +1,7 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function createFrameStreamingClientMock(): any {
   return {
     connect: mockConnect(),
@@ -10,6 +11,7 @@ export function createFrameStreamingClientMock(): any {
 }
 
 function mockConnect(): jest.Mock {
+  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
   //@ts-ignore
   return jest.fn().mockResolvedValue({ dispose: () => this.dispose() });
 }

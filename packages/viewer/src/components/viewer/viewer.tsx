@@ -393,8 +393,11 @@ export class Viewer {
         frameBackgroundColor: this.getBackgroundColor(),
       });
 
-      if (result.startStream != null) {
-        this.sceneViewId = result.startStream.sceneViewId?.hex!;
+      if (
+        result.startStream != null &&
+        result.startStream.sceneViewId?.hex != null
+      ) {
+        this.sceneViewId = result.startStream.sceneViewId?.hex;
       }
 
       await this.waitNextDrawnFrame(15 * 1000);
@@ -408,10 +411,9 @@ export class Viewer {
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
-    const connection = await this.commands.execute(
-      'stream.connect',
-      { resource }
-    );
+    const connection = await this.commands.execute('stream.connect', {
+      resource,
+    });
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       this.stream,
@@ -427,9 +429,12 @@ export class Viewer {
       const resp = await this.stream.syncTime({
         requestTime: currentDateAsProtoTimestamp(),
       });
-      const remoteTime = protoToDate(resp.syncTime?.replyTime!);
-      if (remoteTime != null) {
-        this.clock = new SynchronizedClock(remoteTime);
+
+      if (resp.syncTime?.replyTime != null) {
+        const remoteTime = protoToDate(resp.syncTime?.replyTime);
+        if (remoteTime != null) {
+          this.clock = new SynchronizedClock(remoteTime);
+        }
       }
     } catch (e) {
       console.error('Failed to synchronize clock', e);
@@ -490,7 +495,9 @@ export class Viewer {
   private handleGracefulReconnect(
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
-    this.reconnectStreamingClient(this.resource!, payload.streamId?.hex!);
+    if (payload.streamId?.hex != null) {
+      this.reconnectStreamingClient(this.resource!, payload.streamId?.hex);
+    }
   }
 
   private async handleFrame(
@@ -523,13 +530,15 @@ export class Viewer {
   private calculateComponentDimensions(): void {
     const maxViewport = Dimensions.square(1280);
     const bounds = this.getBounds();
-    const measuredViewport = Dimensions.create(bounds?.width!, bounds?.height!);
-    const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
+    if (bounds?.width != null && bounds?.height != null) {
+      const measuredViewport = Dimensions.create(bounds?.width, bounds?.height);
+      const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
 
-    this.dimensions =
-      trimmedViewport != null
-        ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
-        : undefined;
+      this.dimensions =
+        trimmedViewport != null
+          ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
+          : undefined;
+    }
   }
 
   private recalculateComponentDimensions(): void {

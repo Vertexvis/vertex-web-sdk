@@ -67,8 +67,10 @@ export function createSceneAlteration(
 }
 
 export function registerCommands(commands: CommandRegistry): void {
+  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
   //@ts-ignore
   commands.register('stream.connect', connect);
+  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
   //@ts-ignore
   commands.register('stream.createSceneAlteration', createSceneAlteration);
 }
