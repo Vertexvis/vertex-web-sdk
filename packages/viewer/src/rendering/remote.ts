@@ -26,7 +26,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   api.onRequest(
     ifDrawFrame(frame => msg => {
       const resp = {
-        id: msg.request.requestId?.value,
+        id: msg.request.requestId?.value!,
         sentAt: protoToDate({
           seconds: msg.sentAtTime.seconds || 0,
           nanos: msg.sentAtTime.nanos || 0,
@@ -34,12 +34,14 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         frame: Frame.fromProto(frame),
       };
 
-      frame.frameCorrelationIds.forEach(id => {
-        const callback = requests.get(id);
-        if (callback != null) {
-          callback(resp);
-        }
-      });
+      if (frame.frameCorrelationIds) {
+        frame.frameCorrelationIds.forEach(id => {
+          const callback = requests.get(id);
+          if (callback != null) {
+            callback(resp);
+          }
+        });
+      }
     })
   );
 

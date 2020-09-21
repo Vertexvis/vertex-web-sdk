@@ -67,7 +67,7 @@ export class InteractionApi {
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
       const scene = this.getScene();
-      this.currentCamera = t(this.currentCamera, scene.viewport());
+      this.currentCamera = t(this.currentCamera!, scene.viewport());
 
       await this.currentCamera?.render();
     }
@@ -161,7 +161,7 @@ export class InteractionApi {
    */
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
-      this.currentCamera = null;
+      this.currentCamera = undefined;
       await this.stream.endInteraction();
     }
   }

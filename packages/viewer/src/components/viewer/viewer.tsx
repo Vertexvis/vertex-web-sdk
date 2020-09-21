@@ -394,7 +394,7 @@ export class Viewer {
       });
 
       if (result.startStream != null) {
-        this.sceneViewId = result.startStream.sceneViewId.hex;
+        this.sceneViewId = result.startStream.sceneViewId?.hex!;
       }
 
       await this.waitNextDrawnFrame(15 * 1000);
@@ -408,7 +408,7 @@ export class Viewer {
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
-    const connection = await this.commands.execute<Disposable>(
+    const connection = await this.commands.execute(
       'stream.connect',
       { resource }
     );
@@ -418,7 +418,7 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer()
     );
-    this.resizeObserver.observe(this.containerElement);
+    this.resizeObserver?.observe(this.containerElement!);
     return connection;
   }
 
@@ -427,7 +427,7 @@ export class Viewer {
       const resp = await this.stream.syncTime({
         requestTime: currentDateAsProtoTimestamp(),
       });
-      const remoteTime = protoToDate(resp.syncTime?.replyTime);
+      const remoteTime = protoToDate(resp.syncTime?.replyTime!);
       if (remoteTime != null) {
         this.clock = new SynchronizedClock(remoteTime);
       }
@@ -441,7 +441,7 @@ export class Viewer {
     streamId: UUID.UUID
   ): Promise<void> {
     try {
-      this.streamDisposable.dispose();
+      this.streamDisposable?.dispose();
       this.clock = undefined;
 
       this.streamDisposable = await this.connectStream(resource);
@@ -460,7 +460,7 @@ export class Viewer {
   private handleElementResize(entries: ResizeObserverEntry[]): void {
     const dimensionsHaveChanged =
       entries.length >= 0 &&
-      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
+      !Dimensions.isEqual(entries[0].contentRect, this.dimensions!);
     if (dimensionsHaveChanged && !this.isResizing) {
       this.isResizing = true;
 
@@ -490,7 +490,7 @@ export class Viewer {
   private handleGracefulReconnect(
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
-    this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+    this.reconnectStreamingClient(this.resource!, payload.streamId?.hex!);
   }
 
   private async handleFrame(
@@ -498,7 +498,7 @@ export class Viewer {
   ): Promise<void> {
     if (this.canvasElement != null && this.dimensions != null) {
       const frame = Frame.fromProto(payload);
-      const canvas = this.canvasElement.getContext('2d');
+      const canvas = this.canvasElement.getContext('2d')!;
       const dimensions = this.dimensions;
       const data = { canvas, dimensions, frame };
 
@@ -523,7 +523,7 @@ export class Viewer {
   private calculateComponentDimensions(): void {
     const maxViewport = Dimensions.square(1280);
     const bounds = this.getBounds();
-    const measuredViewport = Dimensions.create(bounds.width, bounds.height);
+    const measuredViewport = Dimensions.create(bounds?.width!, bounds?.height!);
     const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
 
     this.dimensions =

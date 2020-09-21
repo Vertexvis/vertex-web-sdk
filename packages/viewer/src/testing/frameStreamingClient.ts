@@ -10,6 +10,7 @@ export function createFrameStreamingClientMock(): any {
 }
 
 function mockConnect(): jest.Mock {
+  //@ts-ignore
   return jest.fn().mockResolvedValue({ dispose: () => this.dispose() });
 }
 

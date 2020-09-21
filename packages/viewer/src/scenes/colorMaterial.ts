@@ -72,7 +72,7 @@ export const create = (
  * @param opacity
  */
 export const fromHex = (hex: string, opacity?: number): ColorMaterial => {
-  const color: Color.Color = Color.fromHexString(hex);
+  const color: Color.Color = Color.fromHexString(hex)!;
 
   return {
     ...defaultColor,

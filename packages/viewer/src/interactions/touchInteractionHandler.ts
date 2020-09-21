@@ -17,7 +17,7 @@ export class TouchInteractionHandler implements InteractionHandler {
 
   public dispose(): void {
     this.element?.removeEventListener('touchstart', this.handleTouchStart);
-    this.element = null;
+    this.element = undefined;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {

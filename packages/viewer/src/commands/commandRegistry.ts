@@ -25,7 +25,7 @@ export class CommandRegistry {
     return { dispose: () => delete this.commands[id] };
   }
 
-  public execute<R>(id: string, ...args: unknown[]): Promise<R> {
+  public execute(id: string, ...args: unknown[]): Promise<StreamApi> {
     const commandDefinition = this.getCommandDefinition(id);
     if (commandDefinition != null) {
       const command = commandDefinition.factory.apply(

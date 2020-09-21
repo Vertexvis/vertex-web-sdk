@@ -67,6 +67,8 @@ export function createSceneAlteration(
 }
 
 export function registerCommands(commands: CommandRegistry): void {
+  //@ts-ignore
   commands.register('stream.connect', connect);
+  //@ts-ignore
   commands.register('stream.createSceneAlteration', createSceneAlteration);
 }

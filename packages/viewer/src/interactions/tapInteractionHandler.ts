@@ -20,7 +20,7 @@ export class TapInteractionHandler implements InteractionHandler {
   public dispose(): void {
     this.element?.removeEventListener('mousedown', this.handleMouseDown);
     this.element?.removeEventListener('touchstart', this.handleTouchStart);
-    this.element = null;
+    this.element = undefined;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -60,7 +60,7 @@ export class TapInteractionHandler implements InteractionHandler {
         if (Point.distance(position, this.pointerDownPosition) >= 2) {
           // Ignore touch end events for this associated touch start
           // since the distance from the start is large enough
-          this.pointerDownPosition = null;
+          this.pointerDownPosition = undefined;
         }
       }
     }
@@ -72,7 +72,7 @@ export class TapInteractionHandler implements InteractionHandler {
       this.emitTap(this.pointerDownPosition);
     }
 
-    this.pointerDownPosition = null;
+    this.pointerDownPosition = undefined;
   }
 
   private handleMouseUp(event: MouseEvent): void {
@@ -87,16 +87,16 @@ export class TapInteractionHandler implements InteractionHandler {
       });
     }
 
-    this.pointerDownPosition = null;
+    this.pointerDownPosition = undefined;
   }
 
   private emitTap(
     pointerUpPosition: Point.Point,
     keyDetails: Partial<TapEventKeys> = {}
   ): void {
-    if (Point.distance(this.pointerDownPosition, pointerUpPosition) <= 1) {
+    if (Point.distance(this.pointerDownPosition!, pointerUpPosition) <= 1) {
       this.interactionApi?.tap(
-        this.getCanvasPosition(pointerUpPosition),
+        this.getCanvasPosition(pointerUpPosition!)!,
         keyDetails
       );
     }

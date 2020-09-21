@@ -1526,6 +1526,7 @@ declare module 'zen-3d' {
   export class ShadowMapPass {}
 
   class ColorBuffer {
+    //@ts-ignore
     public setClear(
       r: number,
       g: number,

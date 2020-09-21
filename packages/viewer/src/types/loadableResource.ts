@@ -10,7 +10,7 @@ export type LoadableResource = StreamKeyResource;
 export function fromUrn(urn: string): LoadableResource {
   const uri = Uri.parse(urn);
 
-  if (uri.scheme !== 'urn') {
+  if (uri.scheme !== 'urn' || uri.path == null) {
     throw new Error('Invalid URN. Expected URN scheme.');
   }
 

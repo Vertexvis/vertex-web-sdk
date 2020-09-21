@@ -33,7 +33,7 @@ export function acknowledgeFrameRequests(
     ifDrawFrame(_ => req => {
       const sendToReceiveDuration = calculateSendToReceiveDuration(
         clockProvider(),
-        protoToDate(req.sentAtTime)
+        protoToDate(req.sentAtTime)!
       );
 
       api.replyResult(reqId, {
