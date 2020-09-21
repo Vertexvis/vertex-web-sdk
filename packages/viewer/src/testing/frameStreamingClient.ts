@@ -10,7 +10,8 @@ export function createFrameStreamingClientMock(): any {
 }
 
 function mockConnect(): jest.Mock {
-  return jest.fn().mockResolvedValue({ dispose: () => {}});
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  return jest.fn().mockResolvedValue({ dispose: () => {} });
 }
 
 function mockStartStream(): jest.Mock {

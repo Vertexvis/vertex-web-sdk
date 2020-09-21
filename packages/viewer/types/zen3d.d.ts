@@ -1527,14 +1527,13 @@ declare module 'zen-3d' {
 
   class ColorBuffer {
     /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-    //@ts-ignore
     public setClear(
       r: number,
       g: number,
       b: number,
       a: number,
       premultipliedAlpha?: boolean
-    );
+    ): void;
   }
 
   // LIGHTING

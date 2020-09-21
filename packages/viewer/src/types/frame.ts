@@ -60,17 +60,17 @@ export const fromProto = (
         position: Vector3.create({
           x: sceneAttributes.camera.position?.x || undefined,
           y: sceneAttributes.camera.position?.y || undefined,
-          z: sceneAttributes.camera.position?.z || undefined
+          z: sceneAttributes.camera.position?.z || undefined,
         }),
         lookAt: Vector3.create({
           x: sceneAttributes.camera.lookAt?.x || undefined,
           y: sceneAttributes.camera.lookAt?.y || undefined,
-          z: sceneAttributes.camera.lookAt?.z || undefined
+          z: sceneAttributes.camera.lookAt?.z || undefined,
         }),
         up: Vector3.create({
           x: sceneAttributes.camera.up?.x || undefined,
           y: sceneAttributes.camera.up?.y || undefined,
-          z: sceneAttributes.camera.up?.z || undefined
+          z: sceneAttributes.camera.up?.z || undefined,
         }),
       }),
     },
