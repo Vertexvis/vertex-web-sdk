@@ -10,17 +10,13 @@
 
 
 (global as any).MutationObserver = class {
-  //@ts-ignore
-  constructor(callback) {}
+  constructor() {}
   disconnect() {}
-  //@ts-ignore
-  observe(element, init) {}
+  observe() {}
 };
 
 (global as any).ResizeObserver = class {
-  //@ts-ignore
-  constructor(callback) {}
+  constructor() {}
   disconnect() {}
-  //@ts-ignore
-  observe(element, init) {}
+  observe() {}
 };
