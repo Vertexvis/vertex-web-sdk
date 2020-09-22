@@ -420,7 +420,9 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer()
     );
-    this.resizeObserver?.observe(this.containerElement!);
+    if (this.containerElement != null) {
+      this.resizeObserver?.observe(this.containerElement);
+    }
     return connection;
   }
 
@@ -465,7 +467,8 @@ export class Viewer {
   private handleElementResize(entries: ResizeObserverEntry[]): void {
     const dimensionsHaveChanged =
       entries.length >= 0 &&
-      !Dimensions.isEqual(entries[0].contentRect, this.dimensions!);
+      this.dimensions != null &&
+      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
     if (dimensionsHaveChanged && !this.isResizing) {
       this.isResizing = true;
 
@@ -505,14 +508,16 @@ export class Viewer {
   ): Promise<void> {
     if (this.canvasElement != null && this.dimensions != null) {
       const frame = Frame.fromProto(payload);
-      const canvas = this.canvasElement.getContext('2d')!;
+      const canvas = this.canvasElement.getContext('2d');
       const dimensions = this.dimensions;
-      const data = { canvas, dimensions, frame };
+      if (canvas != null) {
+        const data = { canvas, dimensions, frame };
 
-      this.frameReceived.emit(frame);
-      const drawnFrame = await this.canvasRenderer(data);
-      this.lastFrame = drawnFrame;
-      this.dispatchFrameDrawn(drawnFrame);
+        this.frameReceived.emit(frame);
+        const drawnFrame = await this.canvasRenderer(data);
+        this.lastFrame = drawnFrame;
+        this.dispatchFrameDrawn(drawnFrame);
+      }
     }
   }
 

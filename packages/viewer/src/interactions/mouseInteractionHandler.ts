@@ -125,20 +125,20 @@ export class MouseInteractionHandler implements InteractionHandler {
       this.draggingInteraction = this.panInteraction;
     }
 
-    if (this.draggingInteraction != null) {
-      this.draggingInteraction.beginDrag(event, this.interactionApi!);
+    if (this.draggingInteraction != null && this.interactionApi != null) {
+      this.draggingInteraction.beginDrag(event, this.interactionApi);
     }
   }
 
   private drag(event: MouseEvent): void {
-    if (this.draggingInteraction != null) {
-      this.draggingInteraction.drag(event, this.interactionApi!);
+    if (this.draggingInteraction != null && this.interactionApi != null) {
+      this.draggingInteraction.drag(event, this.interactionApi);
     }
   }
 
   private endDrag(event: MouseEvent): void {
-    if (this.draggingInteraction != null) {
-      this.draggingInteraction.endDrag(event, this.interactionApi!);
+    if (this.draggingInteraction != null && this.interactionApi != null) {
+      this.draggingInteraction.endDrag(event, this.interactionApi);
       this.draggingInteraction = undefined;
     }
   }
@@ -149,7 +149,9 @@ export class MouseInteractionHandler implements InteractionHandler {
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
 
       window.setTimeout(() => {
-        this.zoomInteraction.zoom(delta * percentage, this.interactionApi!);
+        if (this.interactionApi != null) {
+          this.zoomInteraction.zoom(delta * percentage, this.interactionApi);
+        }
       }, index * 2);
     });
   }
