@@ -35,10 +35,10 @@ export class CommandRegistry {
 
       return new Promise<R>((resolve, _) => {
         resolve(
-          (command({
+          command({
             stream: this.stream,
             config: this.configProvider(),
-          }) as unknown) as R
+          }) as R
         );
       });
     } else {
@@ -48,7 +48,7 @@ export class CommandRegistry {
 
   private getCommandDefinition(
     id: string
-  ): CommandDefinition<StreamApi> | undefined {
-    return this.commands[id] as CommandDefinition<StreamApi>;
+  ): CommandDefinition<unknown> | undefined {
+    return this.commands[id];
   }
 }
