@@ -52,6 +52,14 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     return new AllQuery();
   }
 
+  public withItemIds(ids: string[]): BulkQuery {
+    return new BulkQuery(ids, 'item-id');
+  }
+
+  public withSuppliedIds(ids: string[]): BulkQuery {
+    return new BulkQuery(ids, 'supplied-id');
+  }
+
   public withItemId(id: string): SingleQuery {
     return new SingleQuery({ type: 'item-id', value: id });
   }
@@ -64,6 +72,25 @@ export class RootQuery implements ItemQuery<SingleQuery> {
 export class AllQuery implements TerminalQuery {
   public build(): QueryExpression {
     return { type: 'all' };
+  }
+}
+
+export class BulkQuery implements TerminalQuery {
+  public constructor(
+    private ids: string[],
+    private type: 'item-id' | 'supplied-id'
+  ) {}
+
+  public build(): QueryExpression {
+    return {
+      type: 'or',
+      expressions: this.ids.map(id => {
+        return {
+          type: this.type,
+          value: id,
+        };
+      }),
+    };
   }
 }
 

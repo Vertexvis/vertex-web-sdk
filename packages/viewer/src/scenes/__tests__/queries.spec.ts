@@ -72,4 +72,50 @@ describe(RootQuery, () => {
       ],
     });
   });
+
+  it('should support bulk queries', () => {
+    const itemQueryBuilder = new RootQuery().withItemIds([
+      itemId.toString(),
+      itemId.toString(),
+    ]);
+
+    /*
+
+              {
+          value: suppliedId,
+          type: 'supplied-id',
+        },
+      */
+    expect(itemQueryBuilder.build()).toEqual({
+      type: 'or',
+      expressions: [
+        {
+          type: 'item-id',
+          value: itemId.toString(),
+        },
+        {
+          type: 'item-id',
+          value: itemId.toString(),
+        },
+      ],
+    });
+
+    const itemQuerySuppliedBuilder = new RootQuery().withSuppliedIds([
+      suppliedId.toString(),
+      suppliedId.toString(),
+    ]);
+    expect(itemQuerySuppliedBuilder.build()).toEqual({
+      type: 'or',
+      expressions: [
+        {
+          value: suppliedId,
+          type: 'supplied-id',
+        },
+        {
+          value: suppliedId,
+          type: 'supplied-id',
+        },
+      ],
+    });
+  });
 });
