@@ -1,11 +1,8 @@
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, Uri, UUID } from '@vertexvis/utils';
-import { CommandContext, Command } from './command';
+import { Disposable, Uri } from '@vertexvis/utils';
+import { Command } from './command';
 import { CommandRegistry } from './commandRegistry';
-import { buildSceneOperation } from './streamCommandsMapper';
 import { LoadableResource } from '../types';
 import { InvalidCredentialsError } from '../errors';
-import { QueryOperation } from '../scenes';
 
 export interface ConnectOptions {
   resource: LoadableResource.LoadableResource;
@@ -20,7 +17,6 @@ export function connect({
         'frame-delivery.buffer-enabled':
           config.flags?.bufferFrameDelivery === true ? 'on' : 'off',
       };
-      // const params = {};
 
       const uri = Uri.addQueryParams(
         params,
@@ -44,29 +40,6 @@ export function connect({
   };
 }
 
-/**
- * @deprecated Call StreamApi.createSceneAlteration directly.
- */
-export function createSceneAlteration(
-  sceneViewId: UUID.UUID,
-  queryOperations: QueryOperation[]
-): Command<Promise<vertexvis.protobuf.stream.IStreamResponse>> {
-  return ({ stream }: CommandContext) => {
-    const pbOperations = queryOperations.map(op =>
-      buildSceneOperation(op.query, op.operations)
-    );
-    const request = {
-      sceneViewId: {
-        hex: sceneViewId,
-      },
-      operations: pbOperations,
-    };
-
-    return stream.createSceneAlteration(request);
-  };
-}
-
 export function registerCommands(commands: CommandRegistry): void {
-  commands.register('stream.connect', connect);
-  commands.register('stream.createSceneAlteration', createSceneAlteration);
+  commands.register('stream.connect', opts => connect(opts as ConnectOptions));
 }

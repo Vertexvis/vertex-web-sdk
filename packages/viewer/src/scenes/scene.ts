@@ -13,6 +13,7 @@ import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
+import { buildSceneOperation } from '../commands/streamCommandsMapper';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -69,16 +70,21 @@ export interface QueryOperation {
 export class ItemsOperationExecutor {
   public constructor(
     private sceneViewId: UUID.UUID,
-    private commands: CommandRegistry,
+    private stream: StreamApi,
     private queryOperations: QueryOperation[]
   ) {}
 
-  public execute(): void {
-    this.commands.execute(
-      'stream.createSceneAlteration',
-      this.sceneViewId,
-      this.queryOperations
+  public async execute(): Promise<void> {
+    const pbOperations = this.queryOperations.map(op =>
+      buildSceneOperation(op.query, op.operations)
     );
+    const request = {
+      sceneViewId: {
+        hex: this.sceneViewId,
+      },
+      operations: pbOperations,
+    };
+    await this.stream.createSceneAlteration(request);
   }
 }
 
@@ -120,7 +126,7 @@ export class Scene {
     );
     return new ItemsOperationExecutor(
       this.sceneViewId,
-      this.commands,
+      this.stream,
       operationList
     );
   }

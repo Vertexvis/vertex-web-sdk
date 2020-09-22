@@ -393,7 +393,10 @@ export class Viewer {
         frameBackgroundColor: this.getBackgroundColor(),
       });
 
-      if (result.startStream != null) {
+      if (
+        result.startStream != null &&
+        result.startStream.sceneViewId?.hex != null
+      ) {
         this.sceneViewId = result.startStream.sceneViewId.hex;
       }
 
@@ -410,7 +413,9 @@ export class Viewer {
   ): Promise<Disposable> {
     const connection = await this.commands.execute<Disposable>(
       'stream.connect',
-      { resource }
+      {
+        resource,
+      }
     );
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
@@ -418,7 +423,9 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer()
     );
-    this.resizeObserver.observe(this.containerElement);
+    if (this.containerElement != null) {
+      this.resizeObserver?.observe(this.containerElement);
+    }
     return connection;
   }
 
@@ -427,9 +434,12 @@ export class Viewer {
       const resp = await this.stream.syncTime({
         requestTime: currentDateAsProtoTimestamp(),
       });
-      const remoteTime = protoToDate(resp.syncTime?.replyTime);
-      if (remoteTime != null) {
-        this.clock = new SynchronizedClock(remoteTime);
+
+      if (resp.syncTime?.replyTime != null) {
+        const remoteTime = protoToDate(resp.syncTime.replyTime);
+        if (remoteTime != null) {
+          this.clock = new SynchronizedClock(remoteTime);
+        }
       }
     } catch (e) {
       console.error('Failed to synchronize clock', e);
@@ -441,7 +451,7 @@ export class Viewer {
     streamId: UUID.UUID
   ): Promise<void> {
     try {
-      this.streamDisposable.dispose();
+      this.streamDisposable?.dispose();
       this.clock = undefined;
 
       this.streamDisposable = await this.connectStream(resource);
@@ -460,6 +470,7 @@ export class Viewer {
   private handleElementResize(entries: ResizeObserverEntry[]): void {
     const dimensionsHaveChanged =
       entries.length >= 0 &&
+      this.dimensions != null &&
       !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
     if (dimensionsHaveChanged && !this.isResizing) {
       this.isResizing = true;
@@ -490,7 +501,9 @@ export class Viewer {
   private handleGracefulReconnect(
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
-    this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+    if (payload.streamId?.hex != null && this.resource != null) {
+      this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+    }
   }
 
   private async handleFrame(
@@ -500,12 +513,14 @@ export class Viewer {
       const frame = Frame.fromProto(payload);
       const canvas = this.canvasElement.getContext('2d');
       const dimensions = this.dimensions;
-      const data = { canvas, dimensions, frame };
+      if (canvas != null) {
+        const data = { canvas, dimensions, frame };
 
-      this.frameReceived.emit(frame);
-      const drawnFrame = await this.canvasRenderer(data);
-      this.lastFrame = drawnFrame;
-      this.dispatchFrameDrawn(drawnFrame);
+        this.frameReceived.emit(frame);
+        const drawnFrame = await this.canvasRenderer(data);
+        this.lastFrame = drawnFrame;
+        this.dispatchFrameDrawn(drawnFrame);
+      }
     }
   }
 
@@ -523,13 +538,15 @@ export class Viewer {
   private calculateComponentDimensions(): void {
     const maxViewport = Dimensions.square(1280);
     const bounds = this.getBounds();
-    const measuredViewport = Dimensions.create(bounds.width, bounds.height);
-    const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
+    if (bounds?.width != null && bounds?.height != null) {
+      const measuredViewport = Dimensions.create(bounds.width, bounds.height);
+      const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
 
-    this.dimensions =
-      trimmedViewport != null
-        ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
-        : undefined;
+      this.dimensions =
+        trimmedViewport != null
+          ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
+          : undefined;
+    }
   }
 
   private recalculateComponentDimensions(): void {

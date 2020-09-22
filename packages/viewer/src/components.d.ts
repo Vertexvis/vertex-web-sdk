@@ -41,7 +41,7 @@ export namespace Components {
           * Internal API.
           * @private
          */
-        "registerCommand": <R, T>(id: string, factory: CommandFactory<R>, thisArg?: T) => Promise<Disposable>;
+        "registerCommand": <R, T>(id: string, factory: CommandFactory<R>, thisArg?: T | undefined) => Promise<Disposable>;
         /**
           * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
           * @example class CustomInteractionHandler extends InteractionHandler {   private element: HTMLElement;   private api: InteractionApi;    public dispose(): void {     this.element.removeEventListener('click', this.handleElementClick);   }    public initialize(element: HTMLElement, api: InteractionApi): void {     this.api = api;     this.element = element;     this.element.addEventListener('click', this.handleElementClick);   }    private handleElementClick = (event: MouseEvent) => {     api.tap({ x: event.clientX, y: event.clientY });   } }  const viewer = document.querySelector("vertex-viewer"); viewer.registerInteractionHandler(new CustomInteractionHandler);

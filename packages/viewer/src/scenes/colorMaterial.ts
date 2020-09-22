@@ -72,14 +72,12 @@ export const create = (
  * @param opacity
  */
 export const fromHex = (hex: string, opacity?: number): ColorMaterial => {
-  const color: Color.Color = Color.fromHexString(hex);
+  const color = Color.fromHexString(hex);
 
   return {
     ...defaultColor,
     opacity: opacity || 100,
     glossiness: opacity || 10,
-    diffuse: {
-      ...color,
-    },
+    diffuse: color != null ? { ...color } : { ...defaultColor.diffuse },
   };
 };

@@ -1532,7 +1532,7 @@ declare module 'zen-3d' {
       b: number,
       a: number,
       premultipliedAlpha?: boolean
-    );
+    ): void;
   }
 
   // LIGHTING

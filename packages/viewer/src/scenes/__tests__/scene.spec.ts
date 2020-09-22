@@ -13,8 +13,11 @@ describe(Scene, () => {
   } as unknown) as CommandRegistry;
   const renderer = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
+  const streamApi = {
+    createSceneAlteration: jest.fn(),
+  };
   const scene = new Scene(
-    new StreamApi(),
+    streamApi as StreamApi,
     renderer,
     frame,
     commandRegistry,
@@ -23,6 +26,7 @@ describe(Scene, () => {
 
   afterEach(() => {
     executeMock.mockReset();
+    streamApi.createSceneAlteration.mockReset();
   });
 
   describe(Scene.prototype.camera, () => {
@@ -44,24 +48,31 @@ describe(Scene, () => {
   describe(Scene.prototype.items, () => {
     it('should execute commands and query by itemId', () => {
       const itemId = UUID.create();
+
       scene.items(op => op.where(q => q.withItemId(itemId)).hide()).execute();
-      expect(executeMock).toHaveBeenCalledWith(
-        'stream.createSceneAlteration',
-        sceneViewId,
-        [
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
           {
-            operations: [
+            item: {
+              sceneItemQuery: {
+                id: {
+                  hex: itemId.toString(),
+                },
+              },
+            },
+            operationTypes: [
               {
-                type: 'hide',
+                changeVisibility: {
+                  visible: false,
+                },
               },
             ],
-            query: {
-              type: 'item-id',
-              value: itemId,
-            },
           },
-        ]
-      );
+        ],
+      });
     });
 
     it('should support passing multiple operations in one request', () => {
@@ -83,80 +94,86 @@ describe(Scene, () => {
             .materialOverride(ColorMaterial.fromHex('#ff1122')),
         ])
         .execute();
-      expect(executeMock).toHaveBeenCalledWith(
-        'stream.createSceneAlteration',
-        sceneViewId,
-        [
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
           {
-            operations: [
+            all: {},
+            operationTypes: [
               {
-                type: 'hide',
+                changeVisibility: {
+                  visible: false,
+                },
               },
             ],
-            query: {
-              type: 'all',
-            },
           },
           {
-            operations: [
-              {
-                type: 'show',
-              },
-            ],
-            query: {
-              expressions: [
+            or: {
+              queries: [
                 {
-                  type: 'item-id',
-                  value: itemId,
+                  sceneItemQuery: {
+                    id: {
+                      hex: itemId.toString(),
+                    },
+                  },
                 },
                 {
-                  type: 'supplied-id',
-                  value: suppliedId,
+                  sceneItemQuery: {
+                    suppliedId,
+                  },
                 },
               ],
-              type: 'or',
             },
-          },
-          {
-            operations: [
+            operationTypes: [
               {
-                color: {
-                  ambient: {
-                    a: 0,
-                    b: 0,
-                    g: 0,
-                    r: 0,
-                  },
-                  diffuse: {
-                    a: 255,
-                    b: 34,
-                    g: 17,
-                    r: 255,
-                  },
-                  emissive: {
-                    a: 0,
-                    b: 0,
-                    g: 0,
-                    r: 0,
-                  },
-                  specular: {
-                    a: 0,
-                    b: 0,
-                    g: 0,
-                    r: 0,
-                  },
-                  glossiness: 10,
-                  opacity: 100,
+                changeVisibility: {
+                  visible: true,
                 },
-                type: 'change-material',
               },
             ],
-            query: {
-              type: 'all',
-            },
           },
-        ]
-      );
+          {
+            all: {},
+            operationTypes: [
+              {
+                changeMaterial: {
+                  material: {
+                    d: 100,
+                    ka: {
+                      a: 0,
+                      b: 0,
+                      g: 0,
+                      r: 0,
+                    },
+                    kd: {
+                      a: 255,
+                      b: 34,
+                      g: 17,
+                      r: 255,
+                    },
+                    ke: {
+                      a: 0,
+                      b: 0,
+                      g: 0,
+                      r: 0,
+                    },
+                    ks: {
+                      a: 0,
+                      b: 0,
+                      g: 0,
+                      r: 0,
+                    },
+                    ns: 10,
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      });
     });
   });
 

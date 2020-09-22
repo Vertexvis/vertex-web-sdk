@@ -30,6 +30,24 @@ export const fromProto = (
     sequenceNumber,
     image,
   } = payload;
+  if (
+    imageAttributes == null ||
+    imageAttributes.frameDimensions == null ||
+    imageAttributes.imageRect == null ||
+    sceneAttributes == null ||
+    sceneAttributes.camera == null ||
+    imageAttributes.frameDimensions.width == null ||
+    imageAttributes.frameDimensions.height == null ||
+    imageAttributes.imageRect.x == null ||
+    imageAttributes.imageRect.y == null ||
+    imageAttributes.imageRect.width == null ||
+    imageAttributes.imageRect.height == null ||
+    imageAttributes.scaleFactor == null ||
+    sequenceNumber == null ||
+    image == null
+  ) {
+    throw new Error('Invalid payload');
+  }
 
   return {
     correlationIds: frameCorrelationIds || [],
@@ -48,12 +66,24 @@ export const fromProto = (
     },
     sceneAttributes: {
       camera: FrameCamera.create({
-        position: Vector3.create(sceneAttributes.camera.position),
-        lookAt: Vector3.create(sceneAttributes.camera.lookAt),
-        up: Vector3.create(sceneAttributes.camera.up),
+        position: Vector3.create({
+          x: sceneAttributes.camera.position?.x || undefined,
+          y: sceneAttributes.camera.position?.y || undefined,
+          z: sceneAttributes.camera.position?.z || undefined,
+        }),
+        lookAt: Vector3.create({
+          x: sceneAttributes.camera.lookAt?.x || undefined,
+          y: sceneAttributes.camera.lookAt?.y || undefined,
+          z: sceneAttributes.camera.lookAt?.z || undefined,
+        }),
+        up: Vector3.create({
+          x: sceneAttributes.camera.up?.x || undefined,
+          y: sceneAttributes.camera.up?.y || undefined,
+          z: sceneAttributes.camera.up?.z || undefined,
+        }),
       }),
     },
-    sequenceNumber,
-    image,
+    sequenceNumber: sequenceNumber,
+    image: image,
   };
 };

@@ -33,12 +33,14 @@ export class CommandRegistry {
         args
       );
 
-      return Promise.resolve(
-        command({
-          stream: this.stream,
-          config: this.configProvider(),
-        })
-      );
+      return new Promise<R>((resolve, _) => {
+        resolve(
+          command({
+            stream: this.stream,
+            config: this.configProvider(),
+          }) as R
+        );
+      });
     } else {
       throw new Error(`Command not registered for \`${id}\``);
     }
@@ -46,7 +48,7 @@ export class CommandRegistry {
 
   private getCommandDefinition(
     id: string
-  ): CommandDefinition<StreamApi> | undefined {
-    return this.commands[id] as CommandDefinition<StreamApi>;
+  ): CommandDefinition<unknown> | undefined {
+    return this.commands[id];
   }
 }

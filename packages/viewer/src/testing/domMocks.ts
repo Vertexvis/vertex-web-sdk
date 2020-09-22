@@ -4,18 +4,19 @@
 
   public constructor(type: string, initDict?: MessageEventInit) {
     super(type);
-    this.data = initDict.data;
+    this.data = initDict?.data;
   }
 };
 
+
 (global as any).MutationObserver = class {
-  constructor(callback) {}
+  constructor() {}
   disconnect() {}
-  observe(element, init) {}
+  observe() {}
 };
 
 (global as any).ResizeObserver = class {
-  constructor(callback) {}
+  constructor() {}
   disconnect() {}
-  observe(element, init) {}
+  observe() {}
 };

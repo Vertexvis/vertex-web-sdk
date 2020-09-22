@@ -1,4 +1,4 @@
-export function isPromise<T>(obj: unknown): obj is Promise<T> {
+export function isPromise<T>(obj: any): obj is Promise<T> {
   return (
     obj != null &&
     obj['then'] instanceof Function &&

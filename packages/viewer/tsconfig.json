@@ -1,19 +1,13 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false,
-    "declaration": false,
+    "inlineSourceMap": true,
     "experimentalDecorators": true,
-    "lib": ["dom", "es2017"],
-    "moduleResolution": "node",
-    "module": "esnext",
-    "target": "es2017",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "target": "es2017",
   },
   "include": ["src", "types/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["dist", "node_modules"]
 }
