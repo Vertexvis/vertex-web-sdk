@@ -31,16 +31,19 @@ export function acknowledgeFrameRequests(
 ): RequestMessageHandler {
   return ifRequestId(reqId =>
     ifDrawFrame(_ => req => {
-      const sendToReceiveDuration = calculateSendToReceiveDuration(
-        clockProvider(),
-        protoToDate(req.sentAtTime)!
-      );
+      const protoDate = protoToDate(req.sentAtTime);
+      if (protoDate != null) {
+        const sendToReceiveDuration = calculateSendToReceiveDuration(
+          clockProvider(),
+          protoDate
+        );
 
-      api.replyResult(reqId, {
-        drawFrame: {
-          sendToReceiveDuration,
-        },
-      });
+        api.replyResult(reqId, {
+          drawFrame: {
+            sendToReceiveDuration,
+          },
+        });
+      }
     })
   );
 }

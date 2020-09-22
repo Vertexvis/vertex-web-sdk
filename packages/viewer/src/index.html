@@ -7,18 +7,11 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
     <title>Stencil Component Starter</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.9.3/dist/viewer/viewer.css"
-    />
-    <script
-      type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.9.3/dist/viewer/viewer.esm.js"
-    ></script> 
-    <script
-      nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.9.3/dist/viewer.js"
-    ></script> 
+
+    <script type="module" src="/build/viewer.esm.js"></script>
+    <script nomodule src="/build/viewer.js"></script>
+    <link rel="stylesheet" href="/build/viewer.css" />
+
     <style>
       html,
       body {
@@ -27,66 +20,29 @@
         padding: 0;
         margin: 0;
       }
+
       #viewer {
         width: 100%;
         height: 100%;
       }
     </style>
+
     <script type="module">
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
+
       async function main() {
         const viewer = document.querySelector('#viewer');
-          let streamKey = `8z8SIkjYGrWOUUlizmUVT7x4s-hqMcegAXIK`;
-          await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
-          const scene = await viewer.scene();
-          // await scene.items(op => 
-      
-          // ).execute();
-
-
-        var index = 3;
-        const items = [
-            "5285ebd3-7028-403f-862a-c384da7ec687",
-            "91d46792-83dd-45e6-a08e-19c00a15151d",
-            "2836ac74-c2f4-4930-a4e4-9b4a2739f0e7",
-            "2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8",
-            "431a7821-a395-4f63-8a8f-76dced649f06",
-            "6810ea77-0df0-442c-a2d5-3a033e304ba1",
-            "858f4c38-7018-480f-b748-b3f14f7ea2d2",
-            "9d9c1df6-4453-4a50-b153-9399f0987ec0",
-            "3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f",
-            "45ecbf55-2648-4d19-b154-948995d352e4",
-            "dc173751-caf4-4875-8af1-60e25219f712",
-            "9a7b9526-81ae-4faa-a08f-b9ac2b7f73a2"
-          ];
-        viewer.addEventListener('tap', async event => {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          await scene.items(op => 
-              [
-                op.where(q => q.all()).hide().clearMaterialOverrides(),
-                op.where(q => 
-                {
-                    const itemsToIterateOn = items.slice(0, index++);
-                    const queryBuilder = q.withItemId(itemsToIterateOn[0])
-                    return itemsToIterateOn.slice(1).reduce((prev, id) => {
-                      return prev.or().withItemId(id)
-                    }, queryBuilder);
-                }
-                )
-                .show()
-              ]
-          ).execute();
-          if (index === items.length) {
-            index = 3;
-          }
-        });
       }
     </script>
   </head>
+
   <body>
-    <vertex-viewer id="viewer" camera-controls="true"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      config-env="platdev"
+      src="urn:vertexvis:stream-key:key"
+    ></vertex-viewer>
   </body>
 </html>

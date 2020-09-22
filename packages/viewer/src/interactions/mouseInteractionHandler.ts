@@ -93,7 +93,8 @@ export class MouseInteractionHandler implements InteractionHandler {
     let didBeginDrag = false;
 
     if (
-      Point.distance(mousePosition, this.mouseDownPosition!) >= 2 &&
+      this.mouseDownPosition != null &&
+      Point.distance(mousePosition, this.mouseDownPosition) >= 2 &&
       !this.isDragging
     ) {
       this.beginDrag(event);

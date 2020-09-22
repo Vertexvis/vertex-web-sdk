@@ -35,7 +35,16 @@ export const fromProto = (
     imageAttributes.frameDimensions == null ||
     imageAttributes.imageRect == null ||
     sceneAttributes == null ||
-    sceneAttributes.camera == null
+    sceneAttributes.camera == null ||
+    imageAttributes.frameDimensions.width == null ||
+    imageAttributes.frameDimensions.height == null ||
+    imageAttributes.imageRect.x == null ||
+    imageAttributes.imageRect.y == null ||
+    imageAttributes.imageRect.width == null ||
+    imageAttributes.imageRect.height == null ||
+    imageAttributes.scaleFactor == null ||
+    sequenceNumber == null ||
+    image == null
   ) {
     throw new Error('Invalid payload');
   }
@@ -44,16 +53,16 @@ export const fromProto = (
     correlationIds: frameCorrelationIds || [],
     imageAttributes: {
       frameDimensions: Dimensions.create(
-        imageAttributes.frameDimensions.width!,
-        imageAttributes.frameDimensions.height!
+        imageAttributes.frameDimensions.width,
+        imageAttributes.frameDimensions.height
       ),
       imageRect: Rectangle.create(
-        imageAttributes.imageRect.x!,
-        imageAttributes.imageRect.y!,
-        imageAttributes.imageRect.width!,
-        imageAttributes.imageRect.height!
+        imageAttributes.imageRect.x,
+        imageAttributes.imageRect.y,
+        imageAttributes.imageRect.width,
+        imageAttributes.imageRect.height
       ),
-      scaleFactor: imageAttributes.scaleFactor!,
+      scaleFactor: imageAttributes.scaleFactor,
     },
     sceneAttributes: {
       camera: FrameCamera.create({
@@ -74,7 +83,7 @@ export const fromProto = (
         }),
       }),
     },
-    sequenceNumber: sequenceNumber!,
-    image: image!,
+    sequenceNumber: sequenceNumber,
+    image: image,
   };
 };

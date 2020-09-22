@@ -498,8 +498,8 @@ export class Viewer {
   private handleGracefulReconnect(
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
-    if (payload.streamId?.hex != null) {
-      this.reconnectStreamingClient(this.resource!, payload.streamId?.hex);
+    if (payload.streamId?.hex != null && this.resource != null) {
+      this.reconnectStreamingClient(this.resource, payload.streamId?.hex);
     }
   }
 
