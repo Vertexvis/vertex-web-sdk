@@ -397,7 +397,7 @@ export class Viewer {
         result.startStream != null &&
         result.startStream.sceneViewId?.hex != null
       ) {
-        this.sceneViewId = result.startStream.sceneViewId?.hex;
+        this.sceneViewId = result.startStream.sceneViewId.hex;
       }
 
       await this.waitNextDrawnFrame(15 * 1000);
@@ -411,9 +411,12 @@ export class Viewer {
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
-    const connection = await this.commands.execute('stream.connect', {
-      resource,
-    });
+    const connection = await this.commands.execute<Disposable>(
+      'stream.connect',
+      {
+        resource,
+      }
+    );
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       this.stream,
@@ -433,7 +436,7 @@ export class Viewer {
       });
 
       if (resp.syncTime?.replyTime != null) {
-        const remoteTime = protoToDate(resp.syncTime?.replyTime);
+        const remoteTime = protoToDate(resp.syncTime.replyTime);
         if (remoteTime != null) {
           this.clock = new SynchronizedClock(remoteTime);
         }
@@ -499,7 +502,7 @@ export class Viewer {
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
     if (payload.streamId?.hex != null && this.resource != null) {
-      this.reconnectStreamingClient(this.resource, payload.streamId?.hex);
+      this.reconnectStreamingClient(this.resource, payload.streamId.hex);
     }
   }
 
@@ -536,7 +539,7 @@ export class Viewer {
     const maxViewport = Dimensions.square(1280);
     const bounds = this.getBounds();
     if (bounds?.width != null && bounds?.height != null) {
-      const measuredViewport = Dimensions.create(bounds?.width, bounds?.height);
+      const measuredViewport = Dimensions.create(bounds.width, bounds.height);
       const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
 
       this.dimensions =

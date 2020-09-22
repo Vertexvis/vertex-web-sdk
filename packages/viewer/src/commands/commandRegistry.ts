@@ -25,7 +25,7 @@ export class CommandRegistry {
     return { dispose: () => delete this.commands[id] };
   }
 
-  public execute(id: string, ...args: unknown[]): Promise<StreamApi> {
+  public execute<R>(id: string, ...args: unknown[]): Promise<R> {
     const commandDefinition = this.getCommandDefinition(id);
     if (commandDefinition != null) {
       const command = commandDefinition.factory.apply(
@@ -33,12 +33,14 @@ export class CommandRegistry {
         args
       );
 
-      return Promise.resolve(
-        command({
-          stream: this.stream,
-          config: this.configProvider(),
-        })
-      );
+      return new Promise<R>((resolve, _) => {
+        resolve(
+          (command({
+            stream: this.stream,
+            config: this.configProvider(),
+          }) as unknown) as R
+        );
+      });
     } else {
       throw new Error(`Command not registered for \`${id}\``);
     }

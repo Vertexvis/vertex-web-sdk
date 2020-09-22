@@ -1526,7 +1526,6 @@ declare module 'zen-3d' {
   export class ShadowMapPass {}
 
   class ColorBuffer {
-    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     public setClear(
       r: number,
       g: number,

@@ -4,7 +4,6 @@
   "compilerOptions": {
     "inlineSourceMap": true,
     "experimentalDecorators": true,
-    "strictFunctionTypes": false,
     "jsx": "react",
     "jsxFactory": "h",
     "target": "es2017",

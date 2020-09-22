@@ -41,5 +41,5 @@ export function connect({
 }
 
 export function registerCommands(commands: CommandRegistry): void {
-  commands.register('stream.connect', connect);
+  commands.register('stream.connect', opts => connect(opts as ConnectOptions));
 }

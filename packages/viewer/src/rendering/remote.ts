@@ -28,7 +28,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
       const resp = {
         id:
           msg.request.requestId?.value != null
-            ? msg.request.requestId?.value
+            ? msg.request.requestId.value
             : undefined,
         sentAt: protoToDate({
           seconds: msg.sentAtTime.seconds || 0,
