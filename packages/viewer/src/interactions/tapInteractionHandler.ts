@@ -98,7 +98,7 @@ export class TapInteractionHandler implements InteractionHandler {
       this.pointerDownPosition != null &&
       Point.distance(this.pointerDownPosition, pointerUpPosition) <= 1
     ) {
-      const position = this.getCanvasPosition(pointerUpPosition!);
+      const position = this.getCanvasPosition(pointerUpPosition);
       if (position != null) {
         this.interactionApi?.tap(position, keyDetails);
       }

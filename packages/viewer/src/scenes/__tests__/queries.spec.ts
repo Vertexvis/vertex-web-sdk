@@ -79,13 +79,6 @@ describe(RootQuery, () => {
       itemId.toString(),
     ]);
 
-    /*
-
-              {
-          value: suppliedId,
-          type: 'supplied-id',
-        },
-      */
     expect(itemQueryBuilder.build()).toEqual({
       type: 'or',
       expressions: [

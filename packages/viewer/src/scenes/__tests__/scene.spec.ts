@@ -17,7 +17,7 @@ describe(Scene, () => {
     createSceneAlteration: jest.fn(),
   };
   const scene = new Scene(
-    (streamApi as unknown) as StreamApi,
+    streamApi as StreamApi,
     renderer,
     frame,
     commandRegistry,
