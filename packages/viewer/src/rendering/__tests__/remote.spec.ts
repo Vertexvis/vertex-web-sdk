@@ -41,6 +41,6 @@ describe(createStreamApiRenderer, () => {
 
   it('should not throw an exception ', async () => {
     const req = render({ correlationId, camera });
-    await expect(req).not.toThrow
+    await expect(req).not.toThrow;
   });
 });
