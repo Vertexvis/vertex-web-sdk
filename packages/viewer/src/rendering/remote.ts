@@ -1,10 +1,8 @@
-import { Async, UUID } from '@vertexvis/utils';
+import { UUID } from '@vertexvis/utils';
 import { FrameCamera, Frame } from '../types';
 import { StreamApi, protoToDate } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
-
-const DEFAULT_TIMEOUT_IN_MS = 10 * 1000; // 10 seconds
 
 export interface FrameRequest {
   correlationId?: string;
@@ -50,7 +48,6 @@ function requestFrame(api: StreamApi): RemoteRenderer {
 
   return req => {
     const corrId = req.correlationId || UUID.create();
-    const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);
 
@@ -60,9 +57,9 @@ function requestFrame(api: StreamApi): RemoteRenderer {
       );
     });
 
-    return Async.timeout(timeout, update).finally(() =>
-      requests.delete(corrId)
-    );
+    return update.finally(() => {
+      requests.delete(corrId);
+    });
   };
 }
 
