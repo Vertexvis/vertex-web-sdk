@@ -402,9 +402,11 @@ export class Viewer {
 
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
-      this.errorMessage = 'Unable to establish connection to Vertex.';
-      console.error('Failed to establish WS connection', e);
-      throw new WebsocketConnectionError(this.errorMessage, e);
+      if (this.lastFrame == null) {
+        this.errorMessage = 'Unable to establish connection to Vertex.';
+        console.error('Failed to establish WS connection', e);
+        throw new WebsocketConnectionError(this.errorMessage, e);
+      }
     }
   }
 

@@ -53,7 +53,6 @@ function requestFrame(api: StreamApi): RemoteRenderer {
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);
-
       api.replaceCamera(
         { camera: req.camera, frameCorrelationId: { value: corrId } },
         false
