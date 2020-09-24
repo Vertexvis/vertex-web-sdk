@@ -39,8 +39,8 @@ describe(createStreamApiRenderer, () => {
     expect(resp.frame.sequenceNumber).toBe(1);
   });
 
-  it('should not throw an exception ', async () => {
-    const req = render({ correlationId, camera });
-    await expect(req).not.toThrow;
+  it('throws exception if render times out', async () => {
+    const req = render({ correlationId, camera, timeoutInMs: 10 });
+    await expect(req).rejects.toThrow();
   });
 });
