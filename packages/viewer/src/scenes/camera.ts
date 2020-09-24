@@ -68,7 +68,11 @@ export class Camera implements FrameCamera.FrameCamera {
    * promise will resolve when a frame is received that contains this camera.
    */
   public async render(): Promise<void> {
-    await this.renderer({ camera: this.data });
+    try {
+      await this.renderer({ camera: this.data });
+    } catch (e) {
+      console.warn('Error when requesting new frame: ', e);
+    }
   }
 
   /**
