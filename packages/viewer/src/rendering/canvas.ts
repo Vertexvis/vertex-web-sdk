@@ -46,7 +46,11 @@ function reportTimings(api: StreamApi, meter: TimingMeter): void {
     .map(t => ({ receiveToPaintDuration: toProtoDuration(t.duration) }));
 
   if (timings.length > 0) {
-    api.recordPerformance({ timings: timings }, false);
+    try {
+      api.recordPerformance({ timings: timings }, false);
+    } catch (e) {
+      console.warn('Unable to record performance: ', e);
+    }
   }
 }
 
