@@ -18,9 +18,6 @@ export interface FrameResponse {
   frame: Frame.Frame;
 }
 
-let count = 0;
-let recievedCount = 0;
-
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
 
 function requestFrame(api: StreamApi): RemoteRenderer {
@@ -39,9 +36,8 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         }),
         frame: Frame.fromProto(frame),
       };
+
       if (frame.frameCorrelationIds) {
-        recievedCount++;
-        console.log('sent: ', count, 'recieved: ', recievedCount);
         frame.frameCorrelationIds.forEach(id => {
           const callback = requests.get(id);
           if (callback != null) {
@@ -57,7 +53,6 @@ function requestFrame(api: StreamApi): RemoteRenderer {
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);
-      count++;
       api.replaceCamera(
         { camera: req.camera, frameCorrelationId: { value: corrId } },
         false
