@@ -10,6 +10,14 @@ export interface Flags {
    */
   bufferFrameDelivery: boolean;
 
+  bufferVariationThreshold: number;
+
+  bufferHistoryMaxSize: number;
+
+  bufferFrameTimeout: string;
+
+  bufferFrameTimeoutThreshold: number;
+
   /**
    * Enables or disables logging of WS message payloads.
    */
@@ -19,6 +27,10 @@ export interface Flags {
 export const defaultFlags: Flags = {
   bufferFrameDelivery: false,
   logWsMessages: false,
+  bufferVariationThreshold: 0.3,
+  bufferHistoryMaxSize: 10,
+  bufferFrameTimeout: '500ms',
+  bufferFrameTimeoutThreshold: 0.5,
 };
 
 export function createFlags(

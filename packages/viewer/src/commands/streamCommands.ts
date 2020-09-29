@@ -19,6 +19,13 @@ export function connect({
       const params = {
         'frame-delivery.buffer-enabled':
           config.flags?.bufferFrameDelivery === true ? 'on' : 'off',
+        'frame-delivery.buffer-variation-threshold':
+          config.flags?.bufferVariationThreshold ?? 0.3,
+        'frame-delivery.buffer-history-max-size':
+          config.flags?.bufferHistoryMaxSize ?? 10,
+        'frame-delivery.timeout': config.flags?.bufferFrameTimeout ?? '500ms',
+        'frame-delivery.buffer-timeout-threshold':
+          config.flags?.bufferFrameTimeoutThreshold ?? 0.5,
       };
       // const params = {};
 

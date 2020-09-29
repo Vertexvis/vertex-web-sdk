@@ -21,9 +21,10 @@
         margin: 0;
       }
 
-      #viewer {
-        width: 100%;
-        height: 100%;
+      .viewer {
+        width: 1000px;
+        height: 1000px;
+        display: inline-block;
       }
     </style>
 
@@ -33,16 +34,43 @@
       });
 
       async function main() {
-        const viewer = document.querySelector('#viewer');
+        const viewer1 = document.querySelector('#viewer1');
+        const viewer2 = document.querySelector('#viewer2');
+
+        viewer1.config = {
+          flags: {
+            bufferFrameDelivery: true,
+            bufferVariationThreshold: 0.1,
+            bufferHistoryMaxSize: 15,
+            bufferFrameTimeout: '500ms',
+            bufferFrameTimeoutThreshold: 0.25,
+          },
+        };
+
+        // viewer1.addEventListener('frameReceived', async event => {
+        //   const camera = event.detail.sceneAttributes.camera;
+        //   const scene = await viewer2.scene();
+        //   scene
+        //     .camera()
+        //     .update(camera)
+        //     .render();
+        // });
       }
     </script>
   </head>
 
   <body>
     <vertex-viewer
-      id="viewer"
+      id="viewer1"
+      class="viewer"
       config-env="platdev"
-      src="urn:vertexvis:stream-key:key"
+      src="urn:vertexvis:stream-key:GYHCyFkAxEoPcNNDaK3YTnJL2pXNMysFnxep"
+    ></vertex-viewer>
+    <vertex-viewer
+      id="viewer2"
+      class="viewer"
+      config-env="platdev"
+      src="urn:vertexvis:stream-key:GYHCyFkAxEoPcNNDaK3YTnJL2pXNMysFnxep"
     ></vertex-viewer>
   </body>
 </html>
