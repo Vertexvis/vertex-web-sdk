@@ -18,6 +18,7 @@ import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from './time';
 import { encode, decode } from './encoder';
 import { StreamRequestError } from './errors';
+import { appendSettingsToUrl, Settings } from './settings';
 
 export type RequestMessageHandler = (msg: RequestMessage) => void;
 
@@ -43,9 +44,17 @@ export class StreamApi {
    *
    * @param descriptor A function that returns a description of how to establish
    * a WS connection.
+   * @param settings A configuration to use when initializing the WS connection.
    */
-  public async connect(descriptor: ConnectionDescriptor): Promise<Disposable> {
-    await this.websocket.connect(descriptor);
+  public async connect(
+    descriptor: ConnectionDescriptor,
+    settings: Settings = {}
+  ): Promise<Disposable> {
+    const desc = {
+      ...descriptor,
+      url: appendSettingsToUrl(descriptor.url, settings),
+    };
+    await this.websocket.connect(desc);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
     });

@@ -119,7 +119,8 @@ describe('vertex-viewer', () => {
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/stream-keys/123/session'),
-        })
+        }),
+        expect.anything()
       );
       expect(api.startStream).toHaveBeenCalled();
     });
