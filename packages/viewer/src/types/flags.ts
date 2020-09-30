@@ -1,23 +1,25 @@
 import { Objects } from '@vertexvis/utils';
 
-/**
- * A set of experimental features that can be enabled through the viewer's
- * config.
- */
-export interface Flags {
+type Flag =
   /**
-   * Enables or disables a buffer for delivery of images over websockets.
+   * Enables or disables a throttling of image delivery based on detected
+   * network conditions.
    */
-  bufferFrameDelivery: boolean;
+  | 'throttleFrameDelivery'
 
   /**
    * Enables or disables logging of WS message payloads.
    */
-  logWsMessages: boolean;
-}
+  | 'logWsMessages';
+
+/**
+ * A set of experimental features that can be enabled through the viewer's
+ * config.
+ */
+export type Flags = { [K in Flag]: boolean };
 
 export const defaultFlags: Flags = {
-  bufferFrameDelivery: false,
+  throttleFrameDelivery: false,
   logWsMessages: false,
 };
 

@@ -3,6 +3,7 @@ import { Command } from './command';
 import { CommandRegistry } from './commandRegistry';
 import { LoadableResource } from '../types';
 import { InvalidCredentialsError } from '../errors';
+import { Settings } from '@vertexvis/stream-api';
 
 export interface ConnectOptions {
   resource: LoadableResource.LoadableResource;
@@ -13,17 +14,9 @@ export function connect({
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
     if (resource.type === 'stream-key') {
-      const params = {
-        'frame-delivery.buffer-enabled':
-          config.flags?.bufferFrameDelivery === true ? 'on' : 'off',
-      };
-
-      const uri = Uri.addQueryParams(
-        params,
-        Uri.appendPath(
-          `/stream-keys/${resource.id}/session`,
-          Uri.parse(config.network.renderingHost)
-        )
+      const uri = Uri.appendPath(
+        `/stream-keys/${resource.id}/session`,
+        Uri.parse(config.network.renderingHost)
       );
 
       const descriptor = {
@@ -31,7 +24,14 @@ export function connect({
         protocols: ['ws.vertexvis.com'],
       };
 
-      return stream.connect(descriptor);
+      const settings: Settings = {
+        EXPERIMENTAL_frameDelivery: {
+          ...config.EXPERIMENTAL_frameDelivery,
+          rateLimitingEnabled: config.flags.throttleFrameDelivery,
+        },
+      };
+
+      return stream.connect(descriptor, settings);
     } else {
       throw new InvalidCredentialsError(
         `Cannot load resource. Invalid type ${resource.type}`
