@@ -8,6 +8,12 @@ type Flag =
   | 'throttleFrameDelivery'
 
   /**
+   * Enables or disables automatic quality adjustments of rendered frames to
+   * improve the performance of delivering frames to the client.
+   */
+  | 'adaptiveRendering'
+
+  /**
    * Enables or disables logging of WS message payloads.
    */
   | 'logWsMessages';
@@ -20,6 +26,7 @@ export type Flags = { [K in Flag]: boolean };
 
 export const defaultFlags: Flags = {
   throttleFrameDelivery: false,
+  adaptiveRendering: false,
   logWsMessages: false,
 };
 

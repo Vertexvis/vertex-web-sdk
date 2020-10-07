@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "es2017",
+    "target": "es2017"
   },
   "include": ["src", "types/*.d.ts"],
   "exclude": ["dist", "node_modules"]

@@ -29,6 +29,13 @@ export function connect({
           ...config.EXPERIMENTAL_frameDelivery,
           rateLimitingEnabled: config.flags.throttleFrameDelivery,
         },
+        EXPERIMENTAL_adaptiveRendering: {
+          ...config.EXPERIMENTAL_adaptiveRendering,
+          enabled: config.flags.adaptiveRendering,
+        },
+        EXPERIMENTAL_qualityOfService: {
+          ...config.EXPERIMENTAL_qualityOfService,
+        },
       };
 
       return stream.connect(descriptor, settings);

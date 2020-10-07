@@ -2,6 +2,10 @@ import { Objects, DeepPartial } from '@vertexvis/utils';
 import { Environment } from './environment';
 import { Flags } from '../types';
 import { FrameDeliverySettings } from '@vertexvis/stream-api';
+import {
+  AdaptiveRenderingSettings,
+  QualityOfServiceSettings,
+} from '@vertexvis/stream-api';
 
 interface NetworkConfig {
   apiHost: string;
@@ -15,6 +19,8 @@ export interface Config {
     FrameDeliverySettings,
     'rateLimitingEnabled'
   >;
+  EXPERIMENTAL_adaptiveRendering: Omit<AdaptiveRenderingSettings, 'enabled'>;
+  EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
 }
 
 type PartialConfig = DeepPartial<Config>;
@@ -28,6 +34,8 @@ const platdevConfig: Config = {
   },
   flags: Flags.defaultFlags,
   EXPERIMENTAL_frameDelivery: {},
+  EXPERIMENTAL_adaptiveRendering: {},
+  EXPERIMENTAL_qualityOfService: {},
 };
 
 const platprodConfig: Config = {
@@ -37,6 +45,8 @@ const platprodConfig: Config = {
   },
   flags: Flags.defaultFlags,
   EXPERIMENTAL_frameDelivery: {},
+  EXPERIMENTAL_adaptiveRendering: {},
+  EXPERIMENTAL_qualityOfService: {},
 };
 
 function getEnvironmentConfig(environment: Environment): Config {
