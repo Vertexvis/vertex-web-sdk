@@ -44,5 +44,8 @@
     "rollup": "^1.19.4",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "tslib": "^1.10.0"
   }
 }
