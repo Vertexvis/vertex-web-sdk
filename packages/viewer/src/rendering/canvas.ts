@@ -2,8 +2,7 @@ import { FrameRenderer } from './renderer';
 import { Frame } from '../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Rectangle, Dimensions } from '@vertexvis/geometry';
-import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
-import { TimingMeter } from '../metrics';
+import { Timing, TimingMeter } from '../metrics';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 
 const REPORTING_INTERVAL_MS = 1000;
@@ -15,6 +14,8 @@ export interface DrawFrame {
 }
 
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
+
+export type ReportTimingsCallback = (timing: Timing[]) => void;
 
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const { imageAttributes } = data.frame;
@@ -40,24 +41,21 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
   );
 }
 
-function reportTimings(api: StreamApi, meter: TimingMeter): void {
-  const timings = meter
-    .takeMeasurements()
-    .map(t => ({ receiveToPaintDuration: toProtoDuration(t.duration) }));
+function reportTimings(
+  meter: TimingMeter,
+  callback: ReportTimingsCallback
+): void {
+  const timings = meter.takeMeasurements();
 
   if (timings.length > 0) {
-    try {
-      api.recordPerformance({ timings: timings }, false);
-    } catch (e) {
-      console.warn('Unable to record performance: ', e);
-    }
+    callback(timings);
   }
 }
 
 export function measureCanvasRenderer(
-  api: StreamApi,
   meter: TimingMeter,
   renderer: CanvasRenderer,
+  callback: ReportTimingsCallback,
   intervalMs: number = REPORTING_INTERVAL_MS
 ): CanvasRenderer {
   let timer: number | undefined;
@@ -67,7 +65,7 @@ export function measureCanvasRenderer(
     renderCount++;
     if (timer == null) {
       timer = window.setInterval(() => {
-        reportTimings(api, meter);
+        reportTimings(meter, callback);
         if (renderCount === 0) {
           clearTimer();
         }

@@ -9,11 +9,11 @@ import {
 import { Dimensions } from '@vertexvis/geometry';
 import * as Fixtures from '../../types/__fixtures__';
 import { loadImageBytes } from '../imageLoaders';
-import { StreamApi, WebSocketClientMock } from '@vertexvis/stream-api';
 import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../metrics';
 
-const canvas = new HTMLCanvasElement().getContext('2d');
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const canvas = new HTMLCanvasElement().getContext('2d')!;
 const image = {
   image: { width: 100, height: 50, close: jest.fn() },
   dispose: jest.fn(),
@@ -70,11 +70,9 @@ describe(measureCanvasRenderer, () => {
   const frame = Fixtures.frame;
   const renderer: CanvasRenderer = () =>
     Async.delay(renderDelayInMs, Promise.resolve(frame));
-  const api = new StreamApi(new WebSocketClientMock());
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
-
-  const recordPerformance = jest.spyOn(api, 'recordPerformance');
+  const callback = jest.fn();
 
   jest.spyOn(meter, 'takeMeasurements').mockReturnValue([measurement]);
 
@@ -82,35 +80,25 @@ describe(measureCanvasRenderer, () => {
 
   it('reports timings to api', async () => {
     const render = measureCanvasRenderer(
-      api,
       meter,
       renderer,
+      callback,
       reportIntervalInMs
     );
 
     await render(drawFrame1);
     await Async.delay(reportIntervalInMs);
 
-    expect(recordPerformance).toHaveBeenCalledWith(
-      expect.objectContaining({
-        timings: expect.arrayContaining([
-          expect.objectContaining({
-            receiveToPaintDuration: {
-              seconds: 1,
-              nanos: 0,
-            },
-          }),
-        ]),
-      }),
-      false
+    expect(callback).toHaveBeenCalledWith(
+      expect.arrayContaining([measurement])
     );
   });
 
   it('stops reporting timer after last render', async () => {
     const render = measureCanvasRenderer(
-      api,
       meter,
       renderer,
+      callback,
       reportIntervalInMs
     );
 
@@ -118,6 +106,6 @@ describe(measureCanvasRenderer, () => {
     await render(drawFrame2);
     await Async.delay(reportIntervalInMs * 2);
 
-    expect(recordPerformance).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 });

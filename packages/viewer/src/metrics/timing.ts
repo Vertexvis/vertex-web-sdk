@@ -1,6 +1,6 @@
 import { isPromise } from '../types';
 
-interface Timing {
+export interface Timing {
   startTime: number;
   duration: number;
 }
