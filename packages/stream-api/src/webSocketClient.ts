@@ -11,6 +11,8 @@ export type WebSocketSendData =
 
 export type MessageHandler = (event: MessageEvent) => void;
 
+export type CloseHandler = (event: CloseEvent) => void;
+
 export interface WebSocketClient {
   close(): void;
   connect(descriptor: ConnectionDescriptor): Promise<void>;
@@ -21,11 +23,13 @@ export interface WebSocketClient {
 
 export class WebSocketClientImpl implements WebSocketClient {
   private webSocket?: WebSocket;
-  private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private reopenAttempt = 0;
   private descriptor?: ConnectionDescriptor;
   private timer?: number;
   private listeners?: Disposable;
+
+  private onMessageDispatcher = new EventDispatcher<MessageEvent>();
+  private onCloseDispatcher = new EventDispatcher<CloseEvent>();
 
   public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
 
@@ -33,6 +37,12 @@ export class WebSocketClientImpl implements WebSocketClient {
     if (this.webSocket != null) {
       this.removeWebSocketListeners();
       this.webSocket.close();
+
+      // Manually emit a close event, because we've removed the WS listeners
+      // that are responsible for retries. Use code 1000 which represents the WS
+      // closed normally.
+      this.onCloseDispatcher.emit(new CloseEvent('close', { code: 1000 }));
+
       if (this.timer != null) {
         window.clearTimeout(this.timer);
         this.webSocket = undefined;
@@ -58,6 +68,10 @@ export class WebSocketClientImpl implements WebSocketClient {
 
   public onMessage(handler: MessageHandler): Disposable {
     return this.onMessageDispatcher.on(handler);
+  }
+
+  public onClose(handler: CloseHandler): Disposable {
+    return this.onCloseDispatcher.on(handler);
   }
 
   public send(data: WebSocketSendData): void {
@@ -95,6 +109,7 @@ export class WebSocketClientImpl implements WebSocketClient {
   ): Disposable => {
     const onOpen = (): void => this.onOpen(resolve);
     const onError = (): void => reject();
+
     ws.addEventListener('message', this.handleMessage);
     ws.addEventListener('open', onOpen);
     ws.addEventListener('error', onError);
@@ -118,7 +133,8 @@ export class WebSocketClientImpl implements WebSocketClient {
     this.onMessageDispatcher.emit(event);
   };
 
-  private handleClose = (): void => {
+  private handleClose = (event: CloseEvent): void => {
+    this.onCloseDispatcher.emit(event);
     this.removeWebSocketListeners();
     if (this.descriptor != null) {
       this.reconnect(this.descriptor);

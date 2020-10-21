@@ -44,6 +44,7 @@ import {
   WebSocketClientImpl,
   currentDateAsProtoTimestamp,
   protoToDate,
+  toProtoDuration,
 } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
@@ -59,6 +60,7 @@ import {
   measureCanvasRenderer,
 } from '../../rendering';
 import * as Metrics from '../../metrics';
+import { Timing } from '../../metrics';
 
 @Component({
   tag: 'vertex-viewer',
@@ -145,6 +147,7 @@ export class Viewer {
   private isResizing?: boolean;
   private sceneViewId?: UUID.UUID;
   private streamDisposable?: Disposable;
+  private isStreamStarted = false;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
 
@@ -155,10 +158,10 @@ export class Viewer {
   }
 
   public componentDidLoad(): void {
-    this.stream = new StreamApi(
-      new WebSocketClientImpl(),
-      this.getConfig().flags.logWsMessages
-    );
+    const ws = new WebSocketClientImpl();
+    ws.onClose(() => this.handleWebSocketClose());
+
+    this.stream = new StreamApi(ws, this.getConfig().flags.logWsMessages);
     this.remoteRenderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
@@ -398,6 +401,7 @@ export class Viewer {
         result.startStream.sceneViewId?.hex != null
       ) {
         this.sceneViewId = result.startStream.sceneViewId.hex;
+        this.isStreamStarted = true;
       }
 
       await this.waitNextDrawnFrame(15 * 1000);
@@ -421,9 +425,9 @@ export class Viewer {
     );
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
-      this.stream,
       Metrics.paintTime,
-      createCanvasRenderer()
+      createCanvasRenderer(),
+      timings => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
       this.resizeObserver?.observe(this.containerElement);
@@ -462,6 +466,7 @@ export class Viewer {
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
       });
+      this.isStreamStarted = true;
     } catch (e) {
       this.errorMessage = 'Unable to establish connection to Vertex.';
       console.error('Failed to establish WS connection', e);
@@ -488,6 +493,10 @@ export class Viewer {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (result as any).viewer = this.hostElement;
       });
+  }
+
+  private handleWebSocketClose(): void {
+    this.isStreamStarted = false;
   }
 
   private async handleStreamRequest(
@@ -556,7 +565,20 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      this.stream.updateDimensions({ dimensions: this.dimensions });
+      if (this.isStreamStarted) {
+        this.stream.updateDimensions({ dimensions: this.dimensions });
+      }
+    }
+  }
+
+  private reportPerformance(timings: Timing[]): void {
+    if (this.isStreamStarted) {
+      const payload = {
+        timings: timings.map(t => ({
+          receiveToPaintDuration: toProtoDuration(t.duration),
+        })),
+      };
+      this.stream.recordPerformance(payload, false);
     }
   }
 
