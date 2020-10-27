@@ -328,17 +328,22 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
+      console.log(`SDK load urn [urn=${urn}]`);
       const loadableResource = LoadableResource.fromUrn(urn);
       const isSameResource =
         this.resource != null &&
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
       if (!isSameResource) {
+        console.log(`SDK detected different resource [urn=${urn}]`);
         this.unload();
         this.resource = loadableResource;
         await this.connectStreamingClient(this.resource);
       }
     } else {
+      console.log(
+        `SDK cannot load urn [urn=${urn}, commands=${this.commands}, dimensions=${this.dimensions}]`
+      );
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
       );
@@ -391,6 +396,8 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
+      console.log(`SDK connecting WS [resource=${resource}]`);
+
       const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -400,6 +407,9 @@ export class Viewer {
         result.startStream != null &&
         result.startStream.sceneViewId?.hex != null
       ) {
+        console.log(
+          `SDK ws connected [scene-view=${result.startStream.sceneViewId.hex}]`
+        );
         this.sceneViewId = result.startStream.sceneViewId.hex;
         this.isStreamStarted = true;
       }
