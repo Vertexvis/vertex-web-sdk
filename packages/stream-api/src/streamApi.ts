@@ -40,7 +40,7 @@ export class StreamApi {
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
     private loggingEnabled = false,
-    private uninteractiveThreshold: number = 75 * 1000
+    private uninteractiveThreshold: number = 60 * 1000
   ) {}
 
   /**
@@ -72,9 +72,10 @@ export class StreamApi {
    * Closes any open WS connections and disposes of resources.
    */
   public dispose(): void {
+    this.clearUninteractiveTimeout();
+    this.uninteractiveTimeout = undefined;
     this.websocket.close();
     this.messageSubscription?.dispose();
-    this.uninteractiveTimeout = undefined;
   }
 
   /**
@@ -386,14 +387,17 @@ export class StreamApi {
   }
 
   private restartUninteractiveTimeout(): void {
-    if (this.uninteractiveTimeout != null) {
-      window.clearTimeout(this.uninteractiveTimeout);
-    }
-
+    this.clearUninteractiveTimeout();
     this.uninteractiveTimeout = window.setTimeout(() => {
       this.log('Disposing of StreamApi due to lack of interactivity.');
       this.dispose();
     }, this.uninteractiveThreshold);
+  }
+
+  private clearUninteractiveTimeout(): void {
+    if (this.uninteractiveTimeout != null) {
+      window.clearTimeout(this.uninteractiveTimeout);
+    }
   }
 
   private log(msg: string, ...other: unknown[]): void {
