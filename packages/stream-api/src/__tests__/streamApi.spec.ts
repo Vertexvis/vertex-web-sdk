@@ -13,9 +13,11 @@ import { WebSocketClientMock } from '../testing';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { decode } from '../encoder';
 
+jest.useFakeTimers();
+
 describe(StreamApi, () => {
   const ws = new WebSocketClientMock();
-  const streamApi = new StreamApi(ws);
+  const streamApi = new StreamApi(ws, false, 1);
   const descriptor = { url: 'ws://foo.com' };
 
   const connect = jest.spyOn(ws, 'connect');
@@ -140,6 +142,14 @@ describe(StreamApi, () => {
         }).finish()
       );
       expect(handler).toHaveBeenCalled();
+    });
+  });
+
+  describe('when uninteractive', () => {
+    it('disposes of its resources', async () => {
+      await streamApi.connect(descriptor);
+      jest.advanceTimersByTime(1);
+      expect(close).toHaveBeenCalled();
     });
   });
 });

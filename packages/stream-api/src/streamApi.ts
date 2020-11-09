@@ -35,7 +35,7 @@ export class StreamApi {
   // Tracks a period of time with no interaction (requests or responses)
   // indicating that we have lost connection, and the websocket client
   // used will no longer function as expected
-  private uninteractiveTimeout?: NodeJS.Timeout;
+  private uninteractiveTimeout?: number;
 
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
@@ -387,10 +387,10 @@ export class StreamApi {
 
   private restartUninteractiveTimeout(): void {
     if (this.uninteractiveTimeout != null) {
-      clearTimeout(this.uninteractiveTimeout);
+      window.clearTimeout(this.uninteractiveTimeout);
     }
 
-    this.uninteractiveTimeout = setTimeout(() => {
+    this.uninteractiveTimeout = window.setTimeout(() => {
       this.log('Disposing of StreamApi due to lack of interactivity.');
       this.dispose();
     }, this.uninteractiveThreshold);
