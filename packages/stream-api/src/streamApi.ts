@@ -32,8 +32,14 @@ export class StreamApi {
   private onRequestDispatcher = new EventDispatcher<RequestMessage>();
   private messageSubscription?: Disposable;
 
+  // Tracks a period of time with no interaction (requests or responses)
+  // indicating that we have lost connection, and the websocket client
+  // used will no longer function as expected
+  private uninteractiveTimeout?: NodeJS.Timeout;
+
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
+    private uninteractiveThreshold: number = 60 * 1000,
     private loggingEnabled = false
   ) {}
 
@@ -68,6 +74,7 @@ export class StreamApi {
   public dispose(): void {
     this.websocket.close();
     this.messageSubscription?.dispose();
+    this.uninteractiveTimeout = undefined;
   }
 
   /**
@@ -357,6 +364,8 @@ export class StreamApi {
     const msg = decode(message.data);
     this.log('WS message received', msg);
 
+    this.restartUninteractiveTimeout();
+
     if (msg?.sentAtTime != null && msg?.response != null) {
       this.onResponseDispatcher.emit({
         sentAtTime: msg.sentAtTime,
@@ -374,6 +383,17 @@ export class StreamApi {
 
   private onResponse(handler: ResponseMessageHandler): Disposable {
     return this.onResponseDispatcher.on(handler);
+  }
+
+  private restartUninteractiveTimeout(): void {
+    if (this.uninteractiveTimeout != null) {
+      clearTimeout(this.uninteractiveTimeout);
+    }
+
+    this.uninteractiveTimeout = setTimeout(() => {
+      this.log('Disposing of StreamApi due to lack of interactivity.');
+      this.dispose();
+    }, this.uninteractiveThreshold);
   }
 
   private log(msg: string, ...other: unknown[]): void {

@@ -62,7 +62,6 @@ import {
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 
-const WS_CONNECT_GRACE_PERIOD = 5000;
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
 @Component({
