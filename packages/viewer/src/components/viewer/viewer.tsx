@@ -459,7 +459,7 @@ export class Viewer {
   private async reconnectStreamingClient(
     resource: LoadableResource.LoadableResource,
     streamId: UUID.UUID,
-    isReopen: boolean = false
+    isReopen = false
   ): Promise<void> {
     try {
       this.streamDisposable?.dispose();
@@ -486,7 +486,7 @@ export class Viewer {
   private async reconnectWebSocket(
     resource: LoadableResource.LoadableResource,
     streamId: UUID.UUID,
-    attempt: number = 0
+    attempt = 0
   ): Promise<void> {
     try {
       await this.reconnectStreamingClient(resource, streamId, true);

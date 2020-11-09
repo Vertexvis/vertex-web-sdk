@@ -39,8 +39,8 @@ export class StreamApi {
 
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
-    private uninteractiveThreshold: number = 60 * 1000,
-    private loggingEnabled = false
+    private loggingEnabled = false,
+    private uninteractiveThreshold: number = 60 * 1000
   ) {}
 
   /**
