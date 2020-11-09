@@ -62,6 +62,9 @@ import {
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 
+const WS_CONNECT_GRACE_PERIOD = 5000;
+const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
+
 @Component({
   tag: 'vertex-viewer',
   styleUrl: 'viewer.css',
@@ -145,7 +148,9 @@ export class Viewer {
   private interactionApi!: InteractionApi;
 
   private isResizing?: boolean;
+  private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
+  private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private isStreamStarted = false;
 
@@ -396,12 +401,12 @@ export class Viewer {
         frameBackgroundColor: this.getBackgroundColor(),
       });
 
-      if (
-        result.startStream != null &&
-        result.startStream.sceneViewId?.hex != null
-      ) {
+      if (result.startStream?.sceneViewId?.hex != null) {
         this.sceneViewId = result.startStream.sceneViewId.hex;
         this.isStreamStarted = true;
+      }
+      if (result.startStream?.streamId?.hex != null) {
+        this.streamId = result.startStream.streamId.hex;
       }
 
       await this.waitNextDrawnFrame(15 * 1000);
@@ -454,7 +459,8 @@ export class Viewer {
 
   private async reconnectStreamingClient(
     resource: LoadableResource.LoadableResource,
-    streamId: UUID.UUID
+    streamId: UUID.UUID,
+    isReopen: boolean = false
   ): Promise<void> {
     try {
       this.streamDisposable?.dispose();
@@ -467,10 +473,30 @@ export class Viewer {
         frameBackgroundColor: this.getBackgroundColor(),
       });
       this.isStreamStarted = true;
+      this.isReconnecting = false;
     } catch (e) {
-      this.errorMessage = 'Unable to establish connection to Vertex.';
-      console.error('Failed to establish WS connection', e);
-      throw new WebsocketConnectionError(this.errorMessage, e);
+      const message = 'Unable to establish connection to Vertex.';
+      if (!isReopen) {
+        this.errorMessage = message;
+        console.error('Failed to establish WS connection', e);
+      }
+      throw new WebsocketConnectionError(message, e);
+    }
+  }
+
+  private async reconnectWebSocket(
+    resource: LoadableResource.LoadableResource,
+    streamId: UUID.UUID,
+    attempt: number = 0
+  ): Promise<void> {
+    try {
+      await this.reconnectStreamingClient(resource, streamId, true);
+    } catch (e) {
+      // Keep trying as failures are expected in loss of network connection.
+      setTimeout(
+        () => this.reconnectWebSocket(resource, streamId, attempt + 1),
+        WS_RECONNECT_DELAYS[Math.min(attempt, WS_RECONNECT_DELAYS.length - 1)]
+      );
     }
   }
 
@@ -495,8 +521,18 @@ export class Viewer {
       });
   }
 
-  private handleWebSocketClose(): void {
-    this.isStreamStarted = false;
+  private async handleWebSocketClose(): Promise<void> {
+    if (this.isStreamStarted) {
+      this.isStreamStarted = false;
+
+      if (
+        this.streamId != null &&
+        this.resource != null &&
+        !this.isReconnecting
+      ) {
+        await this.reconnectWebSocket(this.resource, this.streamId);
+      }
+    }
   }
 
   private async handleStreamRequest(
@@ -513,6 +549,7 @@ export class Viewer {
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
     if (payload.streamId?.hex != null && this.resource != null) {
+      this.isReconnecting = true;
       this.reconnectStreamingClient(this.resource, payload.streamId.hex);
     }
   }
