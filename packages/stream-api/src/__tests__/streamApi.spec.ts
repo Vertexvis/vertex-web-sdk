@@ -17,7 +17,7 @@ jest.useFakeTimers();
 
 describe(StreamApi, () => {
   const ws = new WebSocketClientMock();
-  const streamApi = new StreamApi(ws, false, 1);
+  const streamApi = new StreamApi(ws, false, 1, 1);
   const descriptor = { url: 'ws://foo.com' };
 
   const connect = jest.spyOn(ws, 'connect');
@@ -148,6 +148,15 @@ describe(StreamApi, () => {
   describe('when uninteractive', () => {
     it('disposes of its resources', async () => {
       await streamApi.connect(descriptor);
+      jest.advanceTimersByTime(1);
+      expect(close).toHaveBeenCalled();
+    });
+  });
+
+  describe('after the client goes offline for a period of time', () => {
+    it('disposes of its resources', async () => {
+      await streamApi.connect(descriptor);
+      window.dispatchEvent(new Event('offline'));
       jest.advanceTimersByTime(1);
       expect(close).toHaveBeenCalled();
     });

@@ -33,15 +33,23 @@ export class StreamApi {
   private messageSubscription?: Disposable;
 
   // Tracks a period of time with no interaction (requests or responses)
-  // indicating that we have lost connection, and the websocket client
-  // used will no longer function as expected
+  // indicating that the client has stopped sending or receiving messages
+  // and the websocket should be reconnected
   private uninteractiveTimeout?: number;
+
+  // Tracks a period of time after the browser has detected the client
+  // has lost internet connection and the websocket should be reconnected
+  private offlineTimeout?: number;
 
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
     private loggingEnabled = false,
-    private uninteractiveThreshold: number = 60 * 1000
-  ) {}
+    private uninteractiveThreshold: number = 75 * 1000,
+    private offlineThreshold: number = 30 * 1000
+  ) {
+    this.handleOffline = this.handleOffline.bind(this);
+    this.handleOnline = this.handleOnline.bind(this);
+  }
 
   /**
    * Initiates a websocket connection to Vertex's streaming API. Returns a
@@ -60,6 +68,8 @@ export class StreamApi {
       ...descriptor,
       url: appendSettingsToUrl(descriptor.url, settings),
     };
+    window.addEventListener('offline', this.handleOffline);
+    window.addEventListener('online', this.handleOnline);
     await this.websocket.connect(desc);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
@@ -72,8 +82,12 @@ export class StreamApi {
    * Closes any open WS connections and disposes of resources.
    */
   public dispose(): void {
+    window.removeEventListener('offline', this.handleOffline);
+    window.removeEventListener('online', this.handleOnline);
     this.clearUninteractiveTimeout();
     this.uninteractiveTimeout = undefined;
+    this.clearOfflineTimeout();
+    this.offlineTimeout = undefined;
     this.websocket.close();
     this.messageSubscription?.dispose();
   }
@@ -384,6 +398,28 @@ export class StreamApi {
 
   private onResponse(handler: ResponseMessageHandler): Disposable {
     return this.onResponseDispatcher.on(handler);
+  }
+
+  private handleOffline(): void {
+    this.restartOfflineTimeout();
+  }
+
+  private handleOnline(): void {
+    this.clearOfflineTimeout();
+  }
+
+  private restartOfflineTimeout(): void {
+    this.clearOfflineTimeout();
+    this.offlineTimeout = window.setTimeout(() => {
+      this.log('Disposing of StreamApi due to loss of network connection.');
+      this.dispose();
+    }, this.offlineThreshold);
+  }
+
+  private clearOfflineTimeout(): void {
+    if (this.offlineTimeout != null) {
+      window.clearTimeout(this.offlineTimeout);
+    }
   }
 
   private restartUninteractiveTimeout(): void {
