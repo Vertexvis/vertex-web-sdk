@@ -7,7 +7,7 @@ import {
   RequestMessage,
   ResponseMessage,
 } from '@vertexvis/stream-api';
-import { Disposable } from '../../../vertex-api/node_modules/@vertexvis/utils/dist';
+import { Disposable } from '@vertexvis/utils';
 
 export class ViewerStreamApi extends StreamApi {
   // Tracks a period of time with no interaction (requests or responses)
