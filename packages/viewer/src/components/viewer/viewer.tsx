@@ -40,7 +40,6 @@ import {
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
-  StreamApi,
   WebSocketClientImpl,
   currentDateAsProtoTimestamp,
   protoToDate,
@@ -61,6 +60,7 @@ import {
 } from '../../rendering';
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
+import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -134,7 +134,7 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
-  private stream!: StreamApi;
+  private stream!: ViewerStreamApi;
   private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
@@ -165,7 +165,7 @@ export class Viewer {
     const ws = new WebSocketClientImpl();
     ws.onClose(() => this.handleWebSocketClose());
 
-    this.stream = new StreamApi(ws, this.getConfig().flags.logWsMessages);
+    this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.remoteRenderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
@@ -385,7 +385,7 @@ export class Viewer {
   /**
    * @private Used for testing.
    */
-  public getStreamApi(): StreamApi {
+  public getStreamApi(): ViewerStreamApi {
     return this.stream;
   }
 

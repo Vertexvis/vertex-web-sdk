@@ -1,7 +1,5 @@
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import { ConnectionDescriptor } from './connection';
-
-const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
 export type WebSocketSendData =
   | string
@@ -22,39 +20,27 @@ export interface WebSocketClient {
 
 export class WebSocketClientImpl implements WebSocketClient {
   private webSocket?: WebSocket;
-  private timer?: number;
-  private listeners?: Disposable;
+  private listeners: Record<UUID.UUID, Disposable> = {};
 
   private onMessageDispatcher = new EventDispatcher<MessageEvent>();
   private onCloseDispatcher = new EventDispatcher<CloseEvent>();
 
-  public constructor(private reconnectDelays: number[] = WS_RECONNECT_DELAYS) {}
-
   public close(): void {
     if (this.webSocket != null) {
-      this.removeWebSocketListeners();
       this.webSocket.close();
-
-      // Manually emit a close event, because we've removed the WS listeners
-      // that are responsible for retries. Use code 1000 which represents the WS
-      // closed normally.
-      this.onCloseDispatcher.emit(new CloseEvent('close', { code: 1000 }));
-
-      if (this.timer != null) {
-        window.clearTimeout(this.timer);
-        this.webSocket = undefined;
-      }
     }
   }
 
   public async connect(descriptor: ConnectionDescriptor): Promise<void> {
+    const id = UUID.create();
     this.webSocket = new WebSocket(descriptor.url, descriptor.protocols);
     this.webSocket.binaryType = 'arraybuffer';
 
     return new Promise((resolve, reject) => {
       if (this.webSocket != null) {
-        this.listeners = this.addWebSocketListeners(
+        this.listeners[id] = this.addWebSocketListeners(
           this.webSocket,
+          id,
           resolve,
           reject
         );
@@ -78,38 +64,40 @@ export class WebSocketClientImpl implements WebSocketClient {
 
   private addWebSocketListeners = (
     ws: WebSocket,
+    wsId: UUID.UUID,
     resolve: VoidFunction,
     reject: VoidFunction
   ): Disposable => {
     const onOpen = (): void => this.onOpen(resolve);
     const onError = (): void => reject();
+    const onClose = (event: CloseEvent): void => this.handleClose(event, wsId);
 
     ws.addEventListener('message', this.handleMessage);
     ws.addEventListener('open', onOpen);
     ws.addEventListener('error', onError);
-    ws.addEventListener('close', this.handleClose);
+    ws.addEventListener('close', onClose);
 
     return {
       dispose: () => {
         ws.removeEventListener('message', this.handleMessage);
         ws.removeEventListener('open', onOpen);
         ws.removeEventListener('error', onError);
-        ws.removeEventListener('close', this.handleClose);
+        ws.removeEventListener('close', onClose);
       },
     };
   };
 
-  private removeWebSocketListeners(): void {
-    this.listeners?.dispose();
+  private removeWebSocketListeners(webSocketId: UUID.UUID): void {
+    this.listeners[webSocketId]?.dispose();
   }
 
   private handleMessage = (event: MessageEvent): void => {
     this.onMessageDispatcher.emit(event);
   };
 
-  private handleClose = (event: CloseEvent): void => {
+  private handleClose = (event: CloseEvent, webSocketId: UUID.UUID): void => {
     this.onCloseDispatcher.emit(event);
-    this.removeWebSocketListeners();
+    this.removeWebSocketListeners(webSocketId);
   };
 
   private onOpen(resolve: VoidFunction): void {

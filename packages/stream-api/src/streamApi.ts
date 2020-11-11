@@ -32,24 +32,10 @@ export class StreamApi {
   private onRequestDispatcher = new EventDispatcher<RequestMessage>();
   private messageSubscription?: Disposable;
 
-  // Tracks a period of time with no interaction (requests or responses)
-  // indicating that the client has stopped sending or receiving messages
-  // and the websocket should be reconnected
-  private uninteractiveTimeout?: number;
-
-  // Tracks a period of time after the browser has detected the client
-  // has lost internet connection and the websocket should be reconnected
-  private offlineTimeout?: number;
-
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
-    private loggingEnabled = false,
-    private uninteractiveThreshold: number = 75 * 1000,
-    private offlineThreshold: number = 30 * 1000
-  ) {
-    this.handleOffline = this.handleOffline.bind(this);
-    this.handleOnline = this.handleOnline.bind(this);
-  }
+    private loggingEnabled = false
+  ) {}
 
   /**
    * Initiates a websocket connection to Vertex's streaming API. Returns a
@@ -68,8 +54,6 @@ export class StreamApi {
       ...descriptor,
       url: appendSettingsToUrl(descriptor.url, settings),
     };
-    window.addEventListener('offline', this.handleOffline);
-    window.addEventListener('online', this.handleOnline);
     await this.websocket.connect(desc);
     this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
@@ -82,12 +66,6 @@ export class StreamApi {
    * Closes any open WS connections and disposes of resources.
    */
   public dispose(): void {
-    window.removeEventListener('offline', this.handleOffline);
-    window.removeEventListener('online', this.handleOnline);
-    this.clearUninteractiveTimeout();
-    this.uninteractiveTimeout = undefined;
-    this.clearOfflineTimeout();
-    this.offlineTimeout = undefined;
     this.websocket.close();
     this.messageSubscription?.dispose();
   }
@@ -328,6 +306,35 @@ export class StreamApi {
     this.sendResponse({ requestId: { value: reqId }, error });
   }
 
+  protected handleMessage(message: MessageEvent): void {
+    const msg = decode(message.data);
+    this.log('WS message received', msg);
+
+    if (msg?.sentAtTime != null && msg?.response != null) {
+      this.onResponseDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        response: msg.response,
+      });
+    }
+
+    if (msg?.sentAtTime != null && msg?.request != null) {
+      this.onRequestDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        request: msg.request,
+      });
+    }
+  }
+
+  protected onResponse(handler: ResponseMessageHandler): Disposable {
+    return this.onResponseDispatcher.on(handler);
+  }
+
+  protected log(msg: string, ...other: unknown[]): void {
+    if (this.loggingEnabled) {
+      console.debug(msg, ...other);
+    }
+  }
+
   private sendRequest(
     req: vertexvis.protobuf.stream.IStreamRequest,
     withResponse: boolean
@@ -373,72 +380,5 @@ export class StreamApi {
   ): void {
     const sentAtTime = currentDateAsProtoTimestamp();
     this.websocket.send(encode({ sentAtTime, response }));
-  }
-
-  private handleMessage(message: MessageEvent): void {
-    const msg = decode(message.data);
-    this.log('WS message received', msg);
-
-    this.restartUninteractiveTimeout();
-
-    if (msg?.sentAtTime != null && msg?.response != null) {
-      this.onResponseDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        response: msg.response,
-      });
-    }
-
-    if (msg?.sentAtTime != null && msg?.request != null) {
-      this.onRequestDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        request: msg.request,
-      });
-    }
-  }
-
-  private onResponse(handler: ResponseMessageHandler): Disposable {
-    return this.onResponseDispatcher.on(handler);
-  }
-
-  private handleOffline(): void {
-    this.restartOfflineTimeout();
-  }
-
-  private handleOnline(): void {
-    this.clearOfflineTimeout();
-  }
-
-  private restartOfflineTimeout(): void {
-    this.clearOfflineTimeout();
-    this.offlineTimeout = window.setTimeout(() => {
-      this.log('Disposing of StreamApi due to loss of network connection.');
-      this.dispose();
-    }, this.offlineThreshold);
-  }
-
-  private clearOfflineTimeout(): void {
-    if (this.offlineTimeout != null) {
-      window.clearTimeout(this.offlineTimeout);
-    }
-  }
-
-  private restartUninteractiveTimeout(): void {
-    this.clearUninteractiveTimeout();
-    this.uninteractiveTimeout = window.setTimeout(() => {
-      this.log('Disposing of StreamApi due to lack of interactivity.');
-      this.dispose();
-    }, this.uninteractiveThreshold);
-  }
-
-  private clearUninteractiveTimeout(): void {
-    if (this.uninteractiveTimeout != null) {
-      window.clearTimeout(this.uninteractiveTimeout);
-    }
-  }
-
-  private log(msg: string, ...other: unknown[]): void {
-    if (this.loggingEnabled) {
-      console.debug(msg, ...other);
-    }
   }
 }
