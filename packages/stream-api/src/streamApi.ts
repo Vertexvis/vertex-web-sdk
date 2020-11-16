@@ -306,6 +306,35 @@ export class StreamApi {
     this.sendResponse({ requestId: { value: reqId }, error });
   }
 
+  protected handleMessage(message: MessageEvent): void {
+    const msg = decode(message.data);
+    this.log('WS message received', msg);
+
+    if (msg?.sentAtTime != null && msg?.response != null) {
+      this.onResponseDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        response: msg.response,
+      });
+    }
+
+    if (msg?.sentAtTime != null && msg?.request != null) {
+      this.onRequestDispatcher.emit({
+        sentAtTime: msg.sentAtTime,
+        request: msg.request,
+      });
+    }
+  }
+
+  protected onResponse(handler: ResponseMessageHandler): Disposable {
+    return this.onResponseDispatcher.on(handler);
+  }
+
+  protected log(msg: string, ...other: unknown[]): void {
+    if (this.loggingEnabled) {
+      console.debug(msg, ...other);
+    }
+  }
+
   private sendRequest(
     req: vertexvis.protobuf.stream.IStreamRequest,
     withResponse: boolean
@@ -351,34 +380,5 @@ export class StreamApi {
   ): void {
     const sentAtTime = currentDateAsProtoTimestamp();
     this.websocket.send(encode({ sentAtTime, response }));
-  }
-
-  private handleMessage(message: MessageEvent): void {
-    const msg = decode(message.data);
-    this.log('WS message received', msg);
-
-    if (msg?.sentAtTime != null && msg?.response != null) {
-      this.onResponseDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        response: msg.response,
-      });
-    }
-
-    if (msg?.sentAtTime != null && msg?.request != null) {
-      this.onRequestDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        request: msg.request,
-      });
-    }
-  }
-
-  private onResponse(handler: ResponseMessageHandler): Disposable {
-    return this.onResponseDispatcher.on(handler);
-  }
-
-  private log(msg: string, ...other: unknown[]): void {
-    if (this.loggingEnabled) {
-      console.debug(msg, ...other);
-    }
   }
 }
