@@ -25,15 +25,15 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.9.10/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.9.11/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.9.10/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.11/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.9.10/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.11/dist/viewer.js"
     ></script>
   </head>
 
@@ -52,7 +52,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^0.9.10"
+    "@vertexvis/viewer": "^0.9.11"
   }
 }
 ```
