@@ -356,6 +356,7 @@ export class Viewer {
   @Method()
   public async unload(): Promise<void> {
     if (this.streamDisposable != null) {
+      this.streamId = undefined;
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
       this.sceneViewId = undefined;
@@ -387,6 +388,23 @@ export class Viewer {
    */
   public getStreamApi(): ViewerStreamApi {
     return this.stream;
+  }
+
+  /**
+   * @private Used for testing.
+   */
+  public async handleWebSocketClose(): Promise<void> {
+    if (this.isStreamStarted) {
+      this.isStreamStarted = false;
+
+      if (
+        this.streamId != null &&
+        this.resource != null &&
+        !this.isReconnecting
+      ) {
+        await this.reconnectWebSocket(this.resource, this.streamId);
+      }
+    }
   }
 
   private async connectStreamingClient(
@@ -518,20 +536,6 @@ export class Viewer {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (result as any).viewer = this.hostElement;
       });
-  }
-
-  private async handleWebSocketClose(): Promise<void> {
-    if (this.isStreamStarted) {
-      this.isStreamStarted = false;
-
-      if (
-        this.streamId != null &&
-        this.resource != null &&
-        !this.isReconnecting
-      ) {
-        await this.reconnectWebSocket(this.resource, this.streamId);
-      }
-    }
   }
 
   private async handleStreamRequest(
