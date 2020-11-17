@@ -170,6 +170,22 @@ describe('vertex-viewer', () => {
       expect(frame).toBeUndefined();
     });
   });
+
+  describe('loading a second model', () => {
+    it('properly starts the stream, and does not attempt to reconnect the old stream', async () => {
+      let viewer: Viewer = await createViewerWithLoadedStream('123', () =>
+        viewer.handleWebSocketClose()
+      );
+      let api = viewer.getStreamApi();
+      viewer = await loadNewModelForViewer(
+        viewer,
+        `urn:vertexvis:stream-key:234`
+      );
+      api = viewer.getStreamApi();
+
+      expect(api.reconnect).not.toHaveBeenCalled();
+    });
+  });
 });
 
 async function createViewerSpec(html: string): Promise<Viewer> {
@@ -177,20 +193,41 @@ async function createViewerSpec(html: string): Promise<Viewer> {
   return page.rootInstance as Viewer;
 }
 
-async function createViewerWithLoadedStream(key: string): Promise<Viewer> {
-  const startStream = { startStream: { sceneViewId: 'scene-view-id' } };
-  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-
+async function createViewerWithLoadedStream(
+  key: string,
+  dispose?: () => void
+): Promise<Viewer> {
   const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-  const api = viewer.getStreamApi();
 
+  return loadNewModelForViewer(viewer, key, dispose);
+}
+
+async function loadNewModelForViewer(
+  viewer: Viewer,
+  key: string,
+  dispose?: () => void
+): Promise<Viewer> {
+  const startStream = {
+    startStream: {
+      sceneViewId: { hex: 'scene-view-id' },
+      streamId: { hex: 'stream-id' },
+    },
+  };
+  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
+  const api = viewer.getStreamApi();
   (api.connect as jest.Mock).mockResolvedValue({
-    dispose: () => api.dispose(),
+    dispose: () => {
+      if (dispose != null) {
+        dispose();
+      }
+      api.dispose();
+    },
   });
   (api.startStream as jest.Mock).mockResolvedValue(startStream);
   (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
   const loading = viewer.load(`urn:vertexvis:stream-key:${key}`);
+
   // Emit frame drawn on next event loop
   setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
   await loading;
