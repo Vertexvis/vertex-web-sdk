@@ -359,6 +359,7 @@ export class Viewer {
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
       this.sceneViewId = undefined;
+      this.streamId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
       this.resource = undefined;
