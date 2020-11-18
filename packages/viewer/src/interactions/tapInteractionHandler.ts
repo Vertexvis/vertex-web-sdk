@@ -3,11 +3,18 @@ import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 import { TapEventKeys } from './tapEventDetails';
 
+type TapEmitter = (
+  position: Point.Point,
+  keyDetails?: Partial<TapEventKeys>
+) => Promise<void> | void;
+
 export class TapInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
   private interactionApi?: InteractionApi;
 
-  private pointerDownPosition?: Point.Point;
+  private firstPointerDownPosition?: Point.Point;
+  private secondPointerDownPosition?: Point.Point;
+  private doubleTapTimer?: number;
 
   public constructor() {
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -15,6 +22,10 @@ export class TapInteractionHandler implements InteractionHandler {
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    this.emitTap = this.emitTap.bind(this);
+    this.restartDoubleTapTimer = this.restartDoubleTapTimer.bind(this);
+    this.clearDoubleTapTimer = this.clearDoubleTapTimer.bind(this);
+    this.setPointerPositions = this.setPointerPositions.bind(this);
   }
 
   public dispose(): void {
@@ -33,9 +44,8 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
-      this.pointerDownPosition = Point.create(
-        event.touches[0].clientX,
-        event.touches[0].clientY
+      this.setPointerPositions(
+        Point.create(event.touches[0].clientX, event.touches[0].clientY)
       );
 
       window.addEventListener('touchend', this.handleTouchEnd);
@@ -44,7 +54,7 @@ export class TapInteractionHandler implements InteractionHandler {
   }
 
   private handleMouseDown(event: MouseEvent): void {
-    this.pointerDownPosition = Point.create(event.clientX, event.clientY);
+    this.setPointerPositions(Point.create(event.clientX, event.clientY));
 
     window.addEventListener('mouseup', this.handleMouseUp);
   }
@@ -56,53 +66,73 @@ export class TapInteractionHandler implements InteractionHandler {
         event.touches[0].clientY
       );
 
-      if (this.pointerDownPosition != null) {
-        if (Point.distance(position, this.pointerDownPosition) >= 2) {
+      if (this.firstPointerDownPosition != null) {
+        if (Point.distance(position, this.firstPointerDownPosition) >= 2) {
           // Ignore touch end events for this associated touch start
           // since the distance from the start is large enough
-          this.pointerDownPosition = undefined;
+          this.firstPointerDownPosition = undefined;
         }
       }
     }
   }
 
   private handleTouchEnd(event: TouchEvent): void {
-    if (this.pointerDownPosition != null) {
+    if (this.firstPointerDownPosition != null) {
       window.removeEventListener('touchend', this.handleTouchEnd);
-      this.emitTap(this.pointerDownPosition);
-    }
 
-    this.pointerDownPosition = undefined;
+      if (
+        this.doubleTapTimer != null &&
+        this.secondPointerDownPosition != null
+      ) {
+        this.emitTap(this.interactionApi?.doubleTap)(
+          this.firstPointerDownPosition
+        );
+        this.clearDoubleTapTimer();
+      } else {
+        this.emitTap(this.interactionApi?.tap)(this.firstPointerDownPosition);
+      }
+    }
   }
 
   private handleMouseUp(event: MouseEvent): void {
-    if (this.pointerDownPosition != null) {
+    if (this.firstPointerDownPosition != null) {
       window.removeEventListener('mouseup', this.handleMouseUp);
 
-      this.emitTap(Point.create(event.clientX, event.clientY), {
+      const tapPoint = Point.create(event.clientX, event.clientY);
+      const eventKeys = {
         altKey: event.altKey,
         ctrlKey: event.ctrlKey,
         metaKey: event.metaKey,
         shiftKey: event.shiftKey,
-      });
-    }
+      };
 
-    this.pointerDownPosition = undefined;
-  }
-
-  private emitTap(
-    pointerUpPosition: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
-  ): void {
-    if (
-      this.pointerDownPosition != null &&
-      Point.distance(this.pointerDownPosition, pointerUpPosition) <= 1
-    ) {
-      const position = this.getCanvasPosition(pointerUpPosition);
-      if (position != null) {
-        this.interactionApi?.tap(position, keyDetails);
+      if (
+        this.doubleTapTimer != null &&
+        this.secondPointerDownPosition != null
+      ) {
+        this.emitTap(this.interactionApi?.doubleTap)(tapPoint, eventKeys);
+        this.clearDoubleTapTimer();
+      } else {
+        this.emitTap(this.interactionApi?.tap)(tapPoint, eventKeys);
       }
     }
+  }
+
+  private emitTap(emitter?: TapEmitter): TapEmitter {
+    return (
+      pointerUpPosition: Point.Point,
+      keyDetails: Partial<TapEventKeys> = {}
+    ): void => {
+      if (
+        this.firstPointerDownPosition != null &&
+        Point.distance(this.firstPointerDownPosition, pointerUpPosition) <= 1
+      ) {
+        const position = this.getCanvasPosition(pointerUpPosition);
+        if (position != null && emitter != null) {
+          emitter(position, keyDetails);
+        }
+      }
+    };
   }
 
   private getCanvasPosition(point: Point.Point): Point.Point | undefined {
@@ -115,5 +145,31 @@ export class TapInteractionHandler implements InteractionHandler {
     return canvasOffset != null
       ? Point.subtract(Point.create(point.x, point.y), canvasOffset)
       : undefined;
+  }
+
+  private clearDoubleTapTimer(): void {
+    if (this.doubleTapTimer != null) {
+      window.clearTimeout(this.doubleTapTimer);
+    }
+    this.doubleTapTimer = undefined;
+    this.firstPointerDownPosition = undefined;
+    this.secondPointerDownPosition = undefined;
+  }
+
+  private restartDoubleTapTimer(): void {
+    this.clearDoubleTapTimer();
+    this.doubleTapTimer = window.setTimeout(
+      () => this.clearDoubleTapTimer(),
+      1000
+    );
+  }
+
+  private setPointerPositions(point: Point.Point): void {
+    if (this.firstPointerDownPosition == null) {
+      this.restartDoubleTapTimer();
+      this.firstPointerDownPosition = point;
+    } else {
+      this.secondPointerDownPosition = point;
+    }
   }
 }

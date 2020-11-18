@@ -21,8 +21,12 @@ export class InteractionApi {
   public constructor(
     private stream: StreamApi,
     private getScene: SceneProvider,
-    private tapEmitter: EventEmitter<TapEventDetails>
-  ) {}
+    private tapEmitter: EventEmitter<TapEventDetails>,
+    private doubleTapEmitter: EventEmitter<TapEventDetails>
+  ) {
+    this.tap = this.tap.bind(this);
+    this.doubleTap = this.doubleTap.bind(this);
+  }
 
   /**
    * Emits a tap event with the provided position relative to the viewer
@@ -43,6 +47,25 @@ export class InteractionApi {
       shiftKey = false,
     } = keyDetails;
     this.tapEmitter.emit({ position, altKey, ctrlKey, metaKey, shiftKey });
+  }
+
+  public async doubleTap(
+    position: Point.Point,
+    keyDetails: Partial<TapEventKeys> = {}
+  ): Promise<void> {
+    const {
+      altKey = false,
+      ctrlKey = false,
+      metaKey = false,
+      shiftKey = false,
+    } = keyDetails;
+    this.doubleTapEmitter.emit({
+      position,
+      altKey,
+      ctrlKey,
+      metaKey,
+      shiftKey,
+    });
   }
 
   /**

@@ -107,6 +107,12 @@ export class Viewer {
   @Event() public tap!: EventEmitter<TapEventDetails>;
 
   /**
+   * Emits an event whenever the user double taps or clicks a location in the viewer.
+   * The event includes the location of the first tap or click.
+   */
+  @Event() public doubletap!: EventEmitter<TapEventDetails>;
+
+  /**
    * Emits an event when a frame has been received by the viewer. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
@@ -650,7 +656,12 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(this.stream, () => this.createScene(), this.tap);
+    return new InteractionApi(
+      this.stream,
+      () => this.createScene(),
+      this.tap,
+      this.doubletap
+    );
   }
 
   private createScene(): Scene {

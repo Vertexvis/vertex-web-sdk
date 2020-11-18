@@ -96,6 +96,10 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         /**
+          * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
+         */
+        "onDoubletap"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
         "onFrameDrawn"?: (event: CustomEvent<Frame.Frame>) => void;
