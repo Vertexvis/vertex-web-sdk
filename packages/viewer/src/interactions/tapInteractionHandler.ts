@@ -5,16 +5,22 @@ import { TapEventKeys } from './tapEventDetails';
 
 type TapEmitter = (
   position: Point.Point,
-  keyDetails?: Partial<TapEventKeys>
+  keyDetails?: Partial<TapEventKeys>,
+  downPosition?: Point.Point
 ) => Promise<void> | void;
 
 export class TapInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
   private interactionApi?: InteractionApi;
 
+  private pointerDownPosition?: Point.Point;
+
+  // Double tap positions
   private firstPointerDownPosition?: Point.Point;
   private secondPointerDownPosition?: Point.Point;
+
   private doubleTapTimer?: number;
+  private longPressTimer?: number;
 
   public constructor() {
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -22,10 +28,12 @@ export class TapInteractionHandler implements InteractionHandler {
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
-    this.emitTap = this.emitTap.bind(this);
     this.restartDoubleTapTimer = this.restartDoubleTapTimer.bind(this);
     this.clearDoubleTapTimer = this.clearDoubleTapTimer.bind(this);
+    this.restartLongPressTimer = this.restartLongPressTimer.bind(this);
+    this.clearLongPressTimer = this.clearLongPressTimer.bind(this);
     this.setPointerPositions = this.setPointerPositions.bind(this);
+    this.emit = this.emit.bind(this);
   }
 
   public dispose(): void {
@@ -48,6 +56,14 @@ export class TapInteractionHandler implements InteractionHandler {
         Point.create(event.touches[0].clientX, event.touches[0].clientY)
       );
 
+      const eventKeys = {
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      };
+      this.restartLongPressTimer(eventKeys);
+
       window.addEventListener('touchend', this.handleTouchEnd);
       window.addEventListener('touchmove', this.handleTouchMove);
     }
@@ -55,6 +71,8 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private handleMouseDown(event: MouseEvent): void {
     this.setPointerPositions(Point.create(event.clientX, event.clientY));
+
+    this.restartLongPressTimer();
 
     window.addEventListener('mouseup', this.handleMouseUp);
   }
@@ -66,36 +84,43 @@ export class TapInteractionHandler implements InteractionHandler {
         event.touches[0].clientY
       );
 
-      if (this.firstPointerDownPosition != null) {
-        if (Point.distance(position, this.firstPointerDownPosition) >= 2) {
+      if (this.pointerDownPosition != null) {
+        if (Point.distance(position, this.pointerDownPosition) >= 2) {
           // Ignore touch end events for this associated touch start
           // since the distance from the start is large enough
-          this.firstPointerDownPosition = undefined;
+          this.pointerDownPosition = undefined;
         }
       }
     }
   }
 
   private handleTouchEnd(event: TouchEvent): void {
-    if (this.firstPointerDownPosition != null) {
+    if (this.pointerDownPosition != null) {
       window.removeEventListener('touchend', this.handleTouchEnd);
 
       if (
         this.doubleTapTimer != null &&
+        this.firstPointerDownPosition != null &&
         this.secondPointerDownPosition != null
       ) {
-        this.emitTap(this.interactionApi?.doubleTap)(
+        this.emit(this.interactionApi?.doubleTap)(
+          this.pointerDownPosition,
+          undefined,
           this.firstPointerDownPosition
         );
         this.clearDoubleTapTimer();
-      } else {
-        this.emitTap(this.interactionApi?.tap)(this.firstPointerDownPosition);
+      } else if (this.longPressTimer != null) {
+        this.emit(this.interactionApi?.tap)(this.pointerDownPosition);
       }
     }
+
+    this.pointerDownPosition = undefined;
+
+    this.clearLongPressTimer();
   }
 
   private handleMouseUp(event: MouseEvent): void {
-    if (this.firstPointerDownPosition != null) {
+    if (this.pointerDownPosition != null) {
       window.removeEventListener('mouseup', this.handleMouseUp);
 
       const tapPoint = Point.create(event.clientX, event.clientY);
@@ -110,22 +135,32 @@ export class TapInteractionHandler implements InteractionHandler {
         this.doubleTapTimer != null &&
         this.secondPointerDownPosition != null
       ) {
-        this.emitTap(this.interactionApi?.doubleTap)(tapPoint, eventKeys);
+        this.emit(this.interactionApi?.doubleTap)(
+          tapPoint,
+          eventKeys,
+          this.firstPointerDownPosition
+        );
         this.clearDoubleTapTimer();
-      } else {
-        this.emitTap(this.interactionApi?.tap)(tapPoint, eventKeys);
+      } else if (this.longPressTimer != null) {
+        this.emit(this.interactionApi?.tap)(tapPoint, eventKeys);
       }
     }
+
+    this.pointerDownPosition = undefined;
+
+    this.clearLongPressTimer();
   }
 
-  private emitTap(emitter?: TapEmitter): TapEmitter {
+  private emit(emitter?: TapEmitter): TapEmitter {
     return (
       pointerUpPosition: Point.Point,
-      keyDetails: Partial<TapEventKeys> = {}
+      keyDetails: Partial<TapEventKeys> = {},
+      pointerDownPosition?: Point.Point
     ): void => {
+      const downPosition = pointerDownPosition || this.pointerDownPosition;
       if (
-        this.firstPointerDownPosition != null &&
-        Point.distance(this.firstPointerDownPosition, pointerUpPosition) <= 1
+        downPosition != null &&
+        Point.distance(downPosition, pointerUpPosition) <= 1
       ) {
         const position = this.getCanvasPosition(pointerUpPosition);
         if (position != null && emitter != null) {
@@ -164,7 +199,28 @@ export class TapInteractionHandler implements InteractionHandler {
     );
   }
 
+  private clearLongPressTimer(): void {
+    if (this.longPressTimer != null) {
+      window.clearTimeout(this.longPressTimer);
+    }
+    this.longPressTimer = undefined;
+  }
+
+  private restartLongPressTimer(eventKeys: Partial<TapEventKeys> = {}): void {
+    this.clearLongPressTimer();
+    this.longPressTimer = window.setTimeout(() => {
+      if (this.pointerDownPosition) {
+        this.emit(this.interactionApi?.longPress)(
+          this.pointerDownPosition,
+          eventKeys
+        );
+      }
+      this.clearLongPressTimer();
+    }, 1000);
+  }
+
   private setPointerPositions(point: Point.Point): void {
+    this.pointerDownPosition = point;
     if (this.firstPointerDownPosition == null) {
       this.restartDoubleTapTimer();
       this.firstPointerDownPosition = point;

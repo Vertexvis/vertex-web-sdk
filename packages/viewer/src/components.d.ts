@@ -108,6 +108,10 @@ declare namespace LocalJSX {
          */
         "onFrameReceived"?: (event: CustomEvent<Frame.Frame>) => void;
         /**
+          * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
+         */
+        "onLongpress"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
           * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
          */
         "onTap"?: (event: CustomEvent<TapEventDetails>) => void;

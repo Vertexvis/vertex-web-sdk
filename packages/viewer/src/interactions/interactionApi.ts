@@ -22,10 +22,13 @@ export class InteractionApi {
     private stream: StreamApi,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>,
-    private doubleTapEmitter: EventEmitter<TapEventDetails>
+    private doubleTapEmitter: EventEmitter<TapEventDetails>,
+    private longPressEmitter: EventEmitter<TapEventDetails>
   ) {
     this.tap = this.tap.bind(this);
     this.doubleTap = this.doubleTap.bind(this);
+    this.longPress = this.longPress.bind(this);
+    this.emitTapEvent = this.emitTapEvent.bind(this);
   }
 
   /**
@@ -40,32 +43,21 @@ export class InteractionApi {
     position: Point.Point,
     keyDetails: Partial<TapEventKeys> = {}
   ): Promise<void> {
-    const {
-      altKey = false,
-      ctrlKey = false,
-      metaKey = false,
-      shiftKey = false,
-    } = keyDetails;
-    this.tapEmitter.emit({ position, altKey, ctrlKey, metaKey, shiftKey });
+    this.emitTapEvent(this.tapEmitter.emit, position, keyDetails);
   }
 
   public async doubleTap(
     position: Point.Point,
     keyDetails: Partial<TapEventKeys> = {}
   ): Promise<void> {
-    const {
-      altKey = false,
-      ctrlKey = false,
-      metaKey = false,
-      shiftKey = false,
-    } = keyDetails;
-    this.doubleTapEmitter.emit({
-      position,
-      altKey,
-      ctrlKey,
-      metaKey,
-      shiftKey,
-    });
+    this.emitTapEvent(this.doubleTapEmitter.emit, position, keyDetails);
+  }
+
+  public async longPress(
+    position: Point.Point,
+    keyDetails: Partial<TapEventKeys> = {}
+  ): Promise<void> {
+    this.emitTapEvent(this.longPressEmitter.emit, position, keyDetails);
   }
 
   /**
@@ -197,5 +189,25 @@ export class InteractionApi {
    */
   public isInteracting(): boolean {
     return this.currentCamera != null;
+  }
+
+  private emitTapEvent(
+    emit: (details: TapEventDetails) => void,
+    position: Point.Point,
+    keyDetails: Partial<TapEventKeys> = {}
+  ): void {
+    const {
+      altKey = false,
+      ctrlKey = false,
+      metaKey = false,
+      shiftKey = false,
+    } = keyDetails;
+    emit({
+      position,
+      altKey,
+      ctrlKey,
+      metaKey,
+      shiftKey,
+    });
   }
 }

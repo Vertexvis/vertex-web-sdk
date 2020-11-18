@@ -113,6 +113,13 @@ export class Viewer {
   @Event() public doubletap!: EventEmitter<TapEventDetails>;
 
   /**
+   * Emits an event whenever the user taps or clicks a location in the viewer and the
+   * configured amount of time passes without receiving a mouseup or touchend.
+   * The event includes the location of the tap or click.
+   */
+  @Event() public longpress!: EventEmitter<TapEventDetails>;
+
+  /**
    * Emits an event when a frame has been received by the viewer. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
@@ -660,7 +667,8 @@ export class Viewer {
       this.stream,
       () => this.createScene(),
       this.tap,
-      this.doubletap
+      this.doubletap,
+      this.longpress
     );
   }
 
