@@ -6,6 +6,7 @@ export class TouchInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
   private interactionApi?: InteractionApi;
 
+  private isInteracting?: boolean;
   private currentPosition1?: Point.Point;
   private currentPosition2?: Point.Point;
 
@@ -60,6 +61,8 @@ export class TouchInteractionHandler implements InteractionHandler {
   private handleTouchEnd(event: TouchEvent): void {
     this.interactionApi?.endInteraction();
 
+    this.isInteracting = false;
+
     window.removeEventListener('touchmove', this.handleTouchMove);
     window.removeEventListener('touchend', this.handleTouchEnd);
   }
@@ -70,9 +73,10 @@ export class TouchInteractionHandler implements InteractionHandler {
     if (this.currentPosition1 != null) {
       const delta = Point.subtract(position, this.currentPosition1);
 
-      if (Point.distance(position, this.currentPosition1) >= 2) {
+      if (Point.distance(position, this.currentPosition1) >= 2 || this.isInteracting) {
         this.interactionApi?.beginInteraction();
         this.interactionApi?.rotateCamera(delta);
+        this.isInteracting = true;
       }
     }
 

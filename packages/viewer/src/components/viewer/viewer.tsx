@@ -198,7 +198,9 @@ export class Viewer {
       this.registerInteractionHandler(new TouchInteractionHandler());
     }
 
-    this.registerInteractionHandler(new TapInteractionHandler());
+    this.registerInteractionHandler(
+      new TapInteractionHandler(() => this.getConfig())
+    );
 
     this.injectViewerApi();
   }
