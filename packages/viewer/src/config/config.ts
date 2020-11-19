@@ -42,7 +42,7 @@ const platdevConfig: Config = {
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
-  EXPERIMENTAL_ghosting: {}
+  EXPERIMENTAL_ghosting: {},
 };
 
 const platprodConfig: Config = {
@@ -54,7 +54,7 @@ const platprodConfig: Config = {
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
-  EXPERIMENTAL_ghosting: {}
+  EXPERIMENTAL_ghosting: {},
 };
 
 function getEnvironmentConfig(environment: Environment): Config {
