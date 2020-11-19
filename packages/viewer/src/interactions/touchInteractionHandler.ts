@@ -73,7 +73,10 @@ export class TouchInteractionHandler implements InteractionHandler {
     if (this.currentPosition1 != null) {
       const delta = Point.subtract(position, this.currentPosition1);
 
-      if (Point.distance(position, this.currentPosition1) >= 2 || this.isInteracting) {
+      if (
+        Point.distance(position, this.currentPosition1) >= 2 ||
+        this.isInteracting
+      ) {
         this.interactionApi?.beginInteraction();
         this.interactionApi?.rotateCamera(delta);
         this.isInteracting = true;

@@ -20,8 +20,8 @@ export class TapInteractionHandler implements InteractionHandler {
   private firstPointerDownPosition?: Point.Point;
   private secondPointerDownPosition?: Point.Point;
 
-  private doubleTapTimer?: number;
-  private longPressTimer?: number;
+  private doubleTapTimer?: any;
+  private longPressTimer?: any;
 
   public constructor(private getConfig: ConfigProvider) {
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -45,6 +45,9 @@ export class TapInteractionHandler implements InteractionHandler {
     this.element?.removeEventListener('mousedown', this.handleMouseDown);
     this.element?.removeEventListener('touchstart', this.handleTouchStart);
     this.element = undefined;
+
+    this.clearDoubleTapTimer();
+    this.clearLongPressTimer();
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -61,13 +64,7 @@ export class TapInteractionHandler implements InteractionHandler {
         Point.create(event.touches[0].clientX, event.touches[0].clientY)
       );
 
-      const eventKeys = {
-        altKey: event.altKey,
-        ctrlKey: event.ctrlKey,
-        metaKey: event.metaKey,
-        shiftKey: event.shiftKey,
-      };
-      this.restartLongPressTimer(eventKeys);
+      this.restartLongPressTimer();
 
       window.addEventListener('touchend', this.handleTouchEnd);
       window.addEventListener('touchmove', this.handleTouchMove);
@@ -77,7 +74,13 @@ export class TapInteractionHandler implements InteractionHandler {
   private handleMouseDown(event: MouseEvent): void {
     this.setPointerPositions(Point.create(event.clientX, event.clientY));
 
-    this.restartLongPressTimer();
+    const eventKeys = {
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+    };
+    this.restartLongPressTimer(eventKeys);
 
     window.addEventListener('mouseup', this.handleMouseUp);
     window.addEventListener('mousemove', this.handleMouseMove);
@@ -198,7 +201,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private clearDoubleTapTimer(): void {
     if (this.doubleTapTimer != null) {
-      window.clearTimeout(this.doubleTapTimer);
+      clearTimeout(this.doubleTapTimer);
     }
     this.doubleTapTimer = undefined;
     this.firstPointerDownPosition = undefined;
@@ -207,7 +210,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private restartDoubleTapTimer(): void {
     this.clearDoubleTapTimer();
-    this.doubleTapTimer = window.setTimeout(
+    this.doubleTapTimer = setTimeout(
       () => this.clearDoubleTapTimer(),
       this.getConfig().events.doubleTapThreshold
     );
@@ -215,14 +218,14 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private clearLongPressTimer(): void {
     if (this.longPressTimer != null) {
-      window.clearTimeout(this.longPressTimer);
+      clearTimeout(this.longPressTimer);
     }
     this.longPressTimer = undefined;
   }
 
   private restartLongPressTimer(eventKeys: Partial<TapEventKeys> = {}): void {
     this.clearLongPressTimer();
-    this.longPressTimer = window.setTimeout(() => {
+    this.longPressTimer = setTimeout(() => {
       if (this.pointerDownPosition) {
         this.emit(this.interactionApi?.longPress)(
           this.pointerDownPosition,
