@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Config } from "./config/config";
+import { Config, GhostingConfig } from "./config/config";
 import { Environment } from "./config/environment";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
@@ -30,6 +30,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
+        "experimentalGhostingConfig"?: GhostingConfig | string;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
@@ -95,6 +96,7 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        "experimentalGhostingConfig"?: GhostingConfig | string;
         /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */

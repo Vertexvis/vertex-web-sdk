@@ -11,7 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
-import { Config, parseConfig } from '../../config/config';
+import { Config, GhostingConfig, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
 import {
   Disposable,
@@ -99,6 +99,8 @@ export class Viewer {
    * the viewer. Enabled by default.
    */
   @Prop() public cameraControls = true;
+
+  @Prop() public experimentalGhostingConfig?: GhostingConfig | string;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -424,6 +426,15 @@ export class Viewer {
       }
       if (result.startStream?.streamId?.hex != null) {
         this.streamId = result.startStream.streamId.hex;
+      }
+
+      if (this.experimentalGhostingConfig != null) {
+        await this.stream.updateStream({
+          experimentalGhosting:
+            typeof this.experimentalGhostingConfig === 'string'
+              ? JSON.parse(this.experimentalGhostingConfig)
+              : this.experimentalGhostingConfig,
+        });
       }
 
       await this.waitNextDrawnFrame(15 * 1000);

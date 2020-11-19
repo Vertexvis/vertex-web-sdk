@@ -12,6 +12,11 @@ interface NetworkConfig {
   renderingHost: string;
 }
 
+export interface GhostingConfig {
+  enabled?: boolean;
+  opacity?: number;
+}
+
 export interface Config {
   network: NetworkConfig;
   flags: Flags.Flags;
@@ -21,6 +26,7 @@ export interface Config {
   >;
   EXPERIMENTAL_adaptiveRendering: Omit<AdaptiveRenderingSettings, 'enabled'>;
   EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
+  EXPERIMENTAL_ghosting: GhostingConfig;
 }
 
 type PartialConfig = DeepPartial<Config>;
@@ -36,6 +42,7 @@ const platdevConfig: Config = {
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
+  EXPERIMENTAL_ghosting: {}
 };
 
 const platprodConfig: Config = {
@@ -47,6 +54,7 @@ const platprodConfig: Config = {
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
+  EXPERIMENTAL_ghosting: {}
 };
 
 function getEnvironmentConfig(environment: Environment): Config {
