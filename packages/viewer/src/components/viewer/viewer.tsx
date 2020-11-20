@@ -107,6 +107,19 @@ export class Viewer {
   @Event() public tap!: EventEmitter<TapEventDetails>;
 
   /**
+   * Emits an event whenever the user double taps or clicks a location in the viewer.
+   * The event includes the location of the first tap or click.
+   */
+  @Event() public doubletap!: EventEmitter<TapEventDetails>;
+
+  /**
+   * Emits an event whenever the user taps or clicks a location in the viewer and the
+   * configured amount of time passes without receiving a mouseup or touchend.
+   * The event includes the location of the tap or click.
+   */
+  @Event() public longpress!: EventEmitter<TapEventDetails>;
+
+  /**
    * Emits an event when a frame has been received by the viewer. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
@@ -185,7 +198,9 @@ export class Viewer {
       this.registerInteractionHandler(new TouchInteractionHandler());
     }
 
-    this.registerInteractionHandler(new TapInteractionHandler());
+    this.registerInteractionHandler(
+      new TapInteractionHandler(() => this.getConfig())
+    );
 
     this.injectViewerApi();
   }
@@ -650,7 +665,13 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(this.stream, () => this.createScene(), this.tap);
+    return new InteractionApi(
+      this.stream,
+      () => this.createScene(),
+      this.tap,
+      this.doubletap,
+      this.longpress
+    );
   }
 
   private createScene(): Scene {
