@@ -1,7 +1,7 @@
 import { Objects, DeepPartial } from '@vertexvis/utils';
 import { Environment } from './environment';
 import { Flags } from '../types';
-import { FrameDeliverySettings } from '@vertexvis/stream-api';
+import { FrameDeliverySettings, StreamAttributes } from '@vertexvis/stream-api';
 import {
   AdaptiveRenderingSettings,
   QualityOfServiceSettings,
@@ -12,21 +12,16 @@ interface NetworkConfig {
   renderingHost: string;
 }
 
-export interface GhostingConfig {
-  enabled?: boolean;
-  opacity?: number;
-}
-
 export interface Config {
   network: NetworkConfig;
   flags: Flags.Flags;
+  streamAttributes: StreamAttributes;
   EXPERIMENTAL_frameDelivery: Omit<
     FrameDeliverySettings,
     'rateLimitingEnabled'
   >;
   EXPERIMENTAL_adaptiveRendering: Omit<AdaptiveRenderingSettings, 'enabled'>;
   EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
-  EXPERIMENTAL_ghosting: GhostingConfig;
 }
 
 type PartialConfig = DeepPartial<Config>;
@@ -39,10 +34,10 @@ const platdevConfig: Config = {
     renderingHost: 'wss://stream.platdev.vertexvis.io',
   },
   flags: Flags.defaultFlags,
+  streamAttributes: {},
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
-  EXPERIMENTAL_ghosting: {},
 };
 
 const platprodConfig: Config = {
@@ -51,10 +46,10 @@ const platprodConfig: Config = {
     renderingHost: 'wss://stream.platprod.vertexvis.io',
   },
   flags: Flags.defaultFlags,
+  streamAttributes: {},
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
-  EXPERIMENTAL_ghosting: {},
 };
 
 function getEnvironmentConfig(environment: Environment): Config {

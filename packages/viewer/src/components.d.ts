@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Config, GhostingConfig } from "./config/config";
+import { Config } from "./config/config";
 import { Environment } from "./config/environment";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
@@ -13,6 +13,7 @@ import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 import { Scene } from "./scenes/scene";
+import { StreamAttributes } from "@vertexvis/stream-api";
 export namespace Components {
     interface SvgIcon {
     }
@@ -30,7 +31,6 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
-        "experimentalGhostingConfig"?: GhostingConfig | string;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
@@ -59,6 +59,7 @@ export namespace Components {
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
         "unload": () => Promise<void>;
+        "updateStream": (attributes: StreamAttributes) => Promise<void>;
     }
 }
 declare global {
@@ -96,7 +97,6 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
-        "experimentalGhostingConfig"?: GhostingConfig | string;
         /**
           * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */

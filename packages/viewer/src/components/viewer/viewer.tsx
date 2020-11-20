@@ -11,7 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
-import { Config, GhostingConfig, parseConfig } from '../../config/config';
+import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
 import {
   Disposable,
@@ -44,6 +44,7 @@ import {
   currentDateAsProtoTimestamp,
   protoToDate,
   toProtoDuration,
+  StreamAttributes,
 } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
@@ -99,8 +100,6 @@ export class Viewer {
    * the viewer. Enabled by default.
    */
   @Prop() public cameraControls = true;
-
-  @Prop() public experimentalGhostingConfig?: GhostingConfig | string;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -378,6 +377,15 @@ export class Viewer {
     return this.lastFrame;
   }
 
+  @Method()
+  public async updateStream(attributes: StreamAttributes): Promise<void> {
+    // return this.stream.updateStream({
+    //   streamAttributes: {
+    //     ghostingAttributes: attributes.EXPERIMENTAL_ghostingAttributes
+    //   }
+    // });
+  }
+
   /**
    * @private Used for internals or testing.
    */
@@ -413,11 +421,13 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
     try {
+      const config = this.getConfig();
       this.streamDisposable = await this.connectStream(resource);
 
       const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
+        streamAttributes: config.streamAttributes,
       });
 
       if (result.startStream?.sceneViewId?.hex != null) {
@@ -428,12 +438,9 @@ export class Viewer {
         this.streamId = result.startStream.streamId.hex;
       }
 
-      if (this.experimentalGhostingConfig != null) {
+      if (config.streamAttributes != null) {
         await this.stream.updateStream({
-          experimentalGhosting:
-            typeof this.experimentalGhostingConfig === 'string'
-              ? JSON.parse(this.experimentalGhostingConfig)
-              : this.experimentalGhostingConfig,
+          streamAttributes: config.streamAttributes,
         });
       }
 
@@ -491,6 +498,7 @@ export class Viewer {
     isReopen = false
   ): Promise<void> {
     try {
+      const config = this.getConfig();
       this.streamDisposable?.dispose();
       this.clock = undefined;
 
@@ -499,6 +507,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
+        streamAttributes: config.streamAttributes,
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
