@@ -379,11 +379,9 @@ export class Viewer {
 
   @Method()
   public async updateStream(attributes: StreamAttributes): Promise<void> {
-    // return this.stream.updateStream({
-    //   streamAttributes: {
-    //     ghostingAttributes: attributes.EXPERIMENTAL_ghostingAttributes
-    //   }
-    // });
+    this.stream.updateStream({
+      streamAttributes: attributes
+    });
   }
 
   /**
