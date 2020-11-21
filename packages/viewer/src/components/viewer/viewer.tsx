@@ -436,12 +436,6 @@ export class Viewer {
         this.streamId = result.startStream.streamId.hex;
       }
 
-      if (config.streamAttributes != null) {
-        await this.stream.updateStream({
-          streamAttributes: config.streamAttributes,
-        });
-      }
-
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
       if (this.lastFrame == null) {
