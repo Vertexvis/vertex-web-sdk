@@ -7,13 +7,13 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
+import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 import { Scene } from "./scenes/scene";
-import { StreamAttributes } from "@vertexvis/stream-api";
 export namespace Components {
     interface SvgIcon {
     }
@@ -33,10 +33,6 @@ export namespace Components {
         "configEnv": Environment;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
-        /**
-          * Returns the set of currently applied stream attributes.
-         */
-        "getStreamAttributes": () => Promise<StreamAttributes>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
@@ -60,14 +56,13 @@ export namespace Components {
          */
         "src"?: string;
         /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "streamAttributes"?: StreamAttributes | string;
+        /**
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
         "unload": () => Promise<void>;
-        /**
-          * Updates the viewer stream with a set of customizable `StreamAttributes`.
-          * @param attributes The set of attributes to update the stream with.
-         */
-        "updateStream": (attributes: StreamAttributes) => Promise<void>;
     }
 }
 declare global {
@@ -133,6 +128,10 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "streamAttributes"?: StreamAttributes | string;
     }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;

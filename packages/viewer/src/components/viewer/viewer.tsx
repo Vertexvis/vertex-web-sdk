@@ -102,6 +102,12 @@ export class Viewer {
   @Prop() public cameraControls = true;
 
   /**
+   * An object or JSON encoded string that defines configuration settings for
+   * the viewer.
+   */
+  @Prop() public streamAttributes?: StreamAttributes | string;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    */
@@ -152,7 +158,6 @@ export class Viewer {
   private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
-  private streamAttributes?: StreamAttributes;
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
@@ -337,6 +342,17 @@ export class Viewer {
     }
   }
 
+  @Watch('streamAttributes')
+  public handleStreamAttributesChanged(
+    streamAttributes: StreamAttributes | undefined
+  ): void {
+    if (streamAttributes != null && this.isStreamStarted) {
+      this.stream.updateStream({
+        streamAttributes,
+      });
+    }
+  }
+
   /**
    * Loads the given scene into the viewer and return a `Promise` that
    * resolves when the scene has been loaded. The specified scene is
@@ -394,32 +410,20 @@ export class Viewer {
   }
 
   /**
-   * Updates the viewer stream with a set of customizable `StreamAttributes`.
-   *
-   * @param attributes The set of attributes to update the stream with.
+   * @private Used for internals or testing.
    */
-  @Method()
-  public async updateStream(attributes: StreamAttributes): Promise<void> {
-    this.streamAttributes = attributes;
-
-    this.stream.updateStream({
-      streamAttributes: attributes,
-    });
-  }
-
-  /**
-   * Returns the set of currently applied stream attributes.
-   */
-  @Method()
-  public async getStreamAttributes(): Promise<StreamAttributes> {
-    return this.streamAttributes || this.getConfig().streamAttributes;
+  public getConfig(): Config {
+    return parseConfig(this.configEnv, this.config);
   }
 
   /**
    * @private Used for internals or testing.
    */
-  public getConfig(): Config {
-    return parseConfig(this.configEnv, this.config);
+  public getStreamAttributes(): StreamAttributes {
+    return this.streamAttributes != null &&
+      typeof this.streamAttributes === 'string'
+      ? JSON.parse(this.streamAttributes)
+      : { ...this.streamAttributes };
   }
 
   /**
@@ -450,13 +454,12 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
     try {
-      const config = this.getConfig();
       this.streamDisposable = await this.connectStream(resource);
 
       const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.streamAttributes || config.streamAttributes,
+        streamAttributes: this.getStreamAttributes(),
       });
 
       if (result.startStream?.sceneViewId?.hex != null) {
@@ -521,7 +524,6 @@ export class Viewer {
     isReopen = false
   ): Promise<void> {
     try {
-      const config = this.getConfig();
       this.streamDisposable?.dispose();
       this.clock = undefined;
 
@@ -530,7 +532,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.streamAttributes || config.streamAttributes,
+        streamAttributes: this.getStreamAttributes(),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
