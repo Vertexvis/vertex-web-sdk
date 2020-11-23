@@ -380,7 +380,7 @@ export class Viewer {
 
   /**
    * Updates the viewer stream with a set of customizable `StreamAttributes`.
-   * 
+   *
    * @param attributes The set of attributes to update the stream with.
    */
   @Method()
@@ -388,7 +388,7 @@ export class Viewer {
     this.streamAttributes = attributes;
 
     this.stream.updateStream({
-      streamAttributes: attributes
+      streamAttributes: attributes,
     });
   }
 
