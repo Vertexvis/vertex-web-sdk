@@ -139,6 +139,7 @@ export class Viewer {
   private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
+  private streamAttributes?: StreamAttributes;
 
   private lastFrame?: Frame.Frame;
   private mutationObserver?: MutationObserver;
@@ -377,8 +378,15 @@ export class Viewer {
     return this.lastFrame;
   }
 
+  /**
+   * Updates the viewer stream with a set of customizable `StreamAttributes`.
+   * 
+   * @param attributes The set of attributes to update the stream with.
+   */
   @Method()
   public async updateStream(attributes: StreamAttributes): Promise<void> {
+    this.streamAttributes = attributes;
+
     this.stream.updateStream({
       streamAttributes: attributes
     });
@@ -425,7 +433,7 @@ export class Viewer {
       const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: config.streamAttributes,
+        streamAttributes: this.streamAttributes || config.streamAttributes,
       });
 
       if (result.startStream?.sceneViewId?.hex != null) {
@@ -499,7 +507,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: config.streamAttributes,
+        streamAttributes: this.streamAttributes || config.streamAttributes,
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;

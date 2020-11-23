@@ -59,6 +59,10 @@ export namespace Components {
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
         "unload": () => Promise<void>;
+        /**
+          * Updates the viewer stream with a set of customizable `StreamAttributes`.
+          * @param attributes The set of attributes to update the stream with.
+         */
         "updateStream": (attributes: StreamAttributes) => Promise<void>;
     }
 }

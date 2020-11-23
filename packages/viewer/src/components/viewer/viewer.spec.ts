@@ -13,6 +13,7 @@ import {
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../types/__fixtures__';
+import { Config } from '../../config/config';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -184,6 +185,72 @@ describe('vertex-viewer', () => {
       api = viewer.getStreamApi();
 
       expect(api.reconnect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('stream attributes', () => {
+    const attributes = {
+      experimentalGhosting: {
+        enabled: { value: true },
+        opacity: { value: 0.7 },
+      },
+    };
+
+    it('maintains configured attributes after being updated', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const api = viewer.getStreamApi();
+      viewer.config = {
+        streamAttributes: attributes,
+      } as Config;
+      await loadNewModelForViewer(viewer, '123');
+      const updatedAttributes = {
+        experimentalGhosting: {
+          ...attributes.experimentalGhosting,
+          enabled: { value: false },
+        },
+      };
+
+      viewer.updateStream(updatedAttributes);
+
+      await viewer.handleWebSocketClose();
+
+      expect(api.reconnect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: updatedAttributes,
+        })
+      );
+    });
+
+    it('sends configured stream attributes on stream start', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const api = viewer.getStreamApi();
+      viewer.config = {
+        streamAttributes: attributes,
+      } as Config;
+      await loadNewModelForViewer(viewer, '123');
+
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: attributes,
+        })
+      );
+    });
+
+    it('sends configured stream attributes on reconnect', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const api = viewer.getStreamApi();
+      viewer.config = {
+        streamAttributes: attributes,
+      } as Config;
+      await loadNewModelForViewer(viewer, '123');
+
+      await viewer.handleWebSocketClose();
+
+      expect(api.reconnect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: attributes,
+        })
+      );
     });
   });
 });
