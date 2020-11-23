@@ -408,6 +408,14 @@ export class Viewer {
   }
 
   /**
+   * Returns the set of currently applied stream attributes.
+   */
+  @Method()
+  public async getStreamAttributes(): Promise<StreamAttributes> {
+    return this.streamAttributes || this.getConfig().streamAttributes;
+  }
+
+  /**
    * @private Used for internals or testing.
    */
   public getConfig(): Config {

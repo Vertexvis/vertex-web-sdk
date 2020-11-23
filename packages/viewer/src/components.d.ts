@@ -34,6 +34,10 @@ export namespace Components {
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
+          * Returns the set of currently applied stream attributes.
+         */
+        "getStreamAttributes": () => Promise<StreamAttributes>;
+        /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
          */
