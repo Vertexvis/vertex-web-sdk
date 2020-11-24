@@ -44,6 +44,7 @@ import {
   currentDateAsProtoTimestamp,
   protoToDate,
   toProtoDuration,
+  StreamAttributes,
 } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
@@ -99,6 +100,12 @@ export class Viewer {
    * the viewer. Enabled by default.
    */
   @Prop() public cameraControls = true;
+
+  /**
+   * An object or JSON encoded string that defines configuration settings for
+   * the viewer.
+   */
+  @Prop() public streamAttributes?: StreamAttributes | string;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -335,6 +342,17 @@ export class Viewer {
     }
   }
 
+  @Watch('streamAttributes')
+  public handleStreamAttributesChanged(
+    streamAttributes: StreamAttributes | undefined
+  ): void {
+    if (streamAttributes != null && this.isStreamStarted) {
+      this.stream.updateStream({
+        streamAttributes,
+      });
+    }
+  }
+
   /**
    * Loads the given scene into the viewer and return a `Promise` that
    * resolves when the scene has been loaded. The specified scene is
@@ -399,6 +417,16 @@ export class Viewer {
   }
 
   /**
+   * @private Used for internals or testing.
+   */
+  public getStreamAttributes(): StreamAttributes {
+    return this.streamAttributes != null &&
+      typeof this.streamAttributes === 'string'
+      ? JSON.parse(this.streamAttributes)
+      : { ...this.streamAttributes };
+  }
+
+  /**
    * @private Used for testing.
    */
   public getStreamApi(): ViewerStreamApi {
@@ -431,6 +459,7 @@ export class Viewer {
       const result = await this.stream.startStream({
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
+        streamAttributes: this.getStreamAttributes(),
       });
 
       if (result.startStream?.sceneViewId?.hex != null) {
@@ -503,6 +532,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
+        streamAttributes: this.getStreamAttributes(),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;

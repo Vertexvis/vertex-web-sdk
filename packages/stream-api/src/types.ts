@@ -9,6 +9,8 @@ export type ResponseMessage = RequiredAndNonNullable<
   Pick<vertexvis.protobuf.stream.IStreamMessage, 'response' | 'sentAtTime'>
 >;
 
+export type StreamAttributes = vertexvis.protobuf.stream.IStreamAttributes;
+
 export type StartStreamPayload = DeepRequired<
   vertexvis.protobuf.stream.IStartStreamPayload,
   ['frameCorrelationId'] | ['frameBackgroundColor']
@@ -18,6 +20,8 @@ export type ReconnectPayload = DeepRequired<
   vertexvis.protobuf.stream.IReconnectPayload,
   ['frameCorrelationId'] | ['frameBackgroundColor']
 >;
+
+export type UpdateStreamPayload = vertexvis.protobuf.stream.IUpdateStreamPayload;
 
 export type ReplaceCameraPayload = DeepRequired<
   vertexvis.protobuf.stream.IUpdateCameraPayload,

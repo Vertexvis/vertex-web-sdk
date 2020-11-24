@@ -7,6 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
+import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { Disposable } from "@vertexvis/utils";
@@ -54,6 +55,10 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "streamAttributes"?: StreamAttributes | string;
         /**
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
@@ -123,6 +128,10 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "streamAttributes"?: StreamAttributes | string;
     }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;

@@ -12,6 +12,7 @@ import {
   SyncTimePayload,
   RecordPerformancePayload,
   UpdateDimensionsPayload,
+  UpdateStreamPayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
@@ -124,6 +125,13 @@ export class StreamApi {
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ reconnect: payload }, withResponse);
+  }
+
+  public async updateStream(
+    payload: UpdateStreamPayload,
+    withResponse = false
+  ): Promise<vertexvis.protobuf.stream.IUpdateStreamResult> {
+    return this.sendRequest({ updateStream: payload }, withResponse);
   }
 
   /**
