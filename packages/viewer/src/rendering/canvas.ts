@@ -123,10 +123,18 @@ export function createCanvasRenderer(): CanvasRenderer {
   return async data => {
     const frameNumber = data.frame.sequenceNumber;
     const image = await loadImageBytes(data.frame.image);
+    // const depth =
+    //   data.frame.depth != null
+    //     ? await loadImageBytes(data.frame.depth)
+    //     : undefined;
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
       drawImage(image, data);
+
+      // if (depth != null) {
+      //   drawImage(depth, data);
+      // }
     }
 
     image.dispose();

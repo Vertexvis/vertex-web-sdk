@@ -12,7 +12,8 @@ export interface Frame {
   imageAttributes: ImageAttributes;
   sceneAttributes: SceneAttributes;
   sequenceNumber: number;
-  image: Uint8Array;
+  image: Uint8Array | Int8Array;
+  depth: Uint8Array | undefined;
 }
 
 export interface ImageAttributes {
@@ -54,6 +55,29 @@ export const fromProto = (
   ) {
     throw new Error('Invalid payload');
   }
+
+  const view = new DataView(image.buffer);
+  view.setInt8(0, image[0]);
+  view.setInt8(1, image[1]);
+  view.setInt8(2, image[2]);
+  view.setInt8(3, image[3]);
+
+  const imageLen = view.getInt32(0);
+  const jpeg = image.slice(4, imageLen + 4);
+  const depth = image.slice(4 + imageLen);
+
+  console.log('payload len', image.byteLength);
+  console.log('image len', imageLen);
+  console.log('jpeg len', jpeg.length);
+  console.log('depth len', depth.length);
+
+  const jpegBlob = new Blob([jpeg], { type: 'image/png' });
+  const jpegUrl = URL.createObjectURL(jpegBlob);
+  console.log('jpeg url', jpegUrl);
+
+  const blob = new Blob([depth], { type: 'image/png' });
+  const url = URL.createObjectURL(blob);
+  console.log('depth url', url);
 
   return {
     correlationIds: frameCorrelationIds || [],
@@ -102,6 +126,7 @@ export const fromProto = (
       ),
     },
     sequenceNumber: sequenceNumber,
-    image: image,
+    image: jpeg,
+    depth: depth,
   };
 };

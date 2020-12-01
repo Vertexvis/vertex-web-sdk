@@ -1,46 +1,50 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Stencil Component Starter</title>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-  <title>Stencil Component Starter</title>
+    <script type="module" src="/build/viewer.esm.js"></script>
+    <script nomodule src="/build/viewer.js"></script>
+    <link rel="stylesheet" href="/build/viewer.css" />
 
-  <script type="module" src="/build/viewer.esm.js"></script>
-  <script nomodule src="/build/viewer.js"></script>
-  <link rel="stylesheet" href="/build/viewer.css" />
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
 
-  <style>
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
 
-    #viewer {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    <script type="module">
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
 
-  <script type="module">
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+        const viewer = document.querySelector('#viewer');
+      }
+    </script>
+  </head>
 
-    window.addEventListener('DOMContentLoaded', () => {
-      main();
-    });
-
-    async function main() {
-      await window.customElements.whenDefined('vertex-viewer');
-      const viewer = document.querySelector('#viewer');
-    }
-  </script>
-</head>
-
-<body>
-  <vertex-viewer id="viewer" config-env="platdev" client-id="clientId" src="urn:vertexvis:stream-key:key">
-  </vertex-viewer>
-</body>
-
+  <body>
+    <vertex-viewer
+      id="viewer"
+      config-env="platdev"
+      client-id="clientId"
+      src="urn:vertexvis:stream-key:key"
+    ></vertex-viewer>
+  </body>
 </html>
