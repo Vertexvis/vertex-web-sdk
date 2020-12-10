@@ -14,8 +14,13 @@ export function connect({
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
     if (resource.type === 'stream-key') {
+      // const uri = Uri.appendPath(
+      //   `/stream-keys/${resource.id}/session`,
+      //   Uri.parse(config.network.renderingHost)
+      // );
+
       const uri = Uri.appendPath(
-        `/stream-keys/${resource.id}/session`,
+        '/session',
         Uri.parse(config.network.renderingHost)
       );
 

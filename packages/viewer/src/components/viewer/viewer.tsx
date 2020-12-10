@@ -463,19 +463,17 @@ export class Viewer {
       try {
         this.streamDisposable = await this.connectStream(resource);
 
-        const sessionResult = this.stream.startSession({
-          clientId: { hex: this.clientId }
-        });
-
-        if ((sessionResult as any).startSession?.sessionId?.hex != null) {
-          this.sessionId = (sessionResult as any).startSession.sessionId.hex;
-        }
-
         const result = await this.stream.startStream({
+          // clientId: this.clientId,
+          // streamKey: { value: this.resource },
           dimensions: this.dimensions,
           frameBackgroundColor: this.getBackgroundColor(),
           streamAttributes: this.getStreamAttributes(),
         });
+
+        if ((result as any).startSession?.sessionId?.hex != null) {
+          this.sessionId = (result as any).startSession.sessionId.hex;
+        }
 
         if (result.startStream?.sceneViewId?.hex != null) {
           this.sceneViewId = result.startStream.sceneViewId.hex;

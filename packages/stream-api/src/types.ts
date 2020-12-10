@@ -16,14 +16,6 @@ export type StartStreamPayload = DeepRequired<
   ['frameCorrelationId'] | ['frameBackgroundColor']
 >;
 
-export interface StartSessionPayload {
-  clientId: { hex: string };
-}
-// export type StartSessionPayload = DeepRequired<
-//   vertexvis.protobuf.stream.IStartSessionPayload,
-//   ['clientId']
-// >;
-
 export type ReconnectPayload = DeepRequired<
   vertexvis.protobuf.stream.IReconnectPayload,
   ['frameCorrelationId'] | ['frameBackgroundColor']

@@ -106,26 +106,6 @@ export class StreamApi {
   }
 
   /**
-   * Sends a request to prepare a streaming session.
-   * 
-   * The payload contains a required `clientId` that is associated with the
-   * application that will be billed for the streaming session. Call `startStream`
-   * with the `sessionId` that is returned from this request to initiate the
-   * rendering session.
-   * 
-   * @param payload The payload of the request.
-   * @param withResponse Indicates if the server should reply with a response.
-   * Defaults to `true`.
-   */
-  public startSession(
-    payload: StartSessionPayload,
-    withResponse = true
-  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest({ endInteraction: {} }, withResponse);
-    // return this.sendRequest({ startSession: payload }, withResponse);
-  }
-
-  /**
    * Sends a request to reconnect to an existing streaming session.
    *
    * The payload accepts an optional `frameCorrelationId` that will be sent
