@@ -23,6 +23,10 @@ export namespace Components {
          */
         "cameraControls": boolean;
         /**
+          * The Client ID associated with your Vertex Application.
+         */
+        "clientId"?: string;
+        /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
         "config"?: Config | string;
@@ -91,6 +95,10 @@ declare namespace LocalJSX {
           * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
          */
         "cameraControls"?: boolean;
+        /**
+          * The Client ID associated with your Vertex Application.
+         */
+        "clientId"?: string;
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */

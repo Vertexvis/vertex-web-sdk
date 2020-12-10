@@ -80,6 +80,11 @@ export class Viewer {
   @Prop() public src?: string;
 
   /**
+   * The Client ID associated with your Vertex Application.
+   */
+  @Prop() public clientId?: string;
+
+  /**
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
@@ -169,6 +174,7 @@ export class Viewer {
   private isResizing?: boolean;
   private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
+  private sessionId?: UUID.UUID;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private isStreamStarted = false;
@@ -453,30 +459,44 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
-    try {
-      this.streamDisposable = await this.connectStream(resource);
+    if (this.clientId != null) {
+      try {
+        this.streamDisposable = await this.connectStream(resource);
 
-      const result = await this.stream.startStream({
-        dimensions: this.dimensions,
-        frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
-      });
+        const sessionResult = this.stream.startSession({
+          clientId: { hex: this.clientId }
+        });
 
-      if (result.startStream?.sceneViewId?.hex != null) {
-        this.sceneViewId = result.startStream.sceneViewId.hex;
-        this.isStreamStarted = true;
-      }
-      if (result.startStream?.streamId?.hex != null) {
-        this.streamId = result.startStream.streamId.hex;
-      }
+        if ((sessionResult as any).startSession?.sessionId?.hex != null) {
+          this.sessionId = (sessionResult as any).startSession.sessionId.hex;
+        }
 
-      await this.waitNextDrawnFrame(15 * 1000);
-    } catch (e) {
-      if (this.lastFrame == null) {
-        this.errorMessage = 'Unable to establish connection to Vertex.';
-        console.error('Failed to establish WS connection', e);
-        throw new WebsocketConnectionError(this.errorMessage, e);
+        const result = await this.stream.startStream({
+          dimensions: this.dimensions,
+          frameBackgroundColor: this.getBackgroundColor(),
+          streamAttributes: this.getStreamAttributes(),
+        });
+
+        if (result.startStream?.sceneViewId?.hex != null) {
+          this.sceneViewId = result.startStream.sceneViewId.hex;
+          this.isStreamStarted = true;
+        }
+        if (result.startStream?.streamId?.hex != null) {
+          this.streamId = result.startStream.streamId.hex;
+        }
+
+        await this.waitNextDrawnFrame(15 * 1000);
+      } catch (e) {
+        if (this.lastFrame == null) {
+          this.errorMessage = 'Unable to establish connection to Vertex.';
+          console.error('Failed to establish WS connection', e);
+          throw new WebsocketConnectionError(this.errorMessage, e);
+        }
       }
+    } else {
+      this.errorMessage = 'Unable to start streaming session. Client ID must be provided.';
+      console.error('Unable to start streaming session. Client ID must be provided.');
+      throw new ViewerInitializationError(this.errorMessage);
     }
   }
 
@@ -530,6 +550,7 @@ export class Viewer {
       this.streamDisposable = await this.connectStream(resource);
       await this.stream.reconnect({
         streamId: { hex: streamId },
+        // sessionId: { hex: this.sessionId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),
