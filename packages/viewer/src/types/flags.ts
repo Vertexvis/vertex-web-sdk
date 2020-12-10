@@ -27,7 +27,7 @@ export type Flags = { [K in Flag]: boolean };
 export const defaultFlags: Flags = {
   throttleFrameDelivery: true,
   adaptiveRendering: true,
-  logWsMessages: false,
+  logWsMessages: true,
 };
 
 export function createFlags(

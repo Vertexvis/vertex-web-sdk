@@ -1,48 +1,206 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
-    />
-    <title>Stencil Component Starter</title>
 
-    <script type="module" src="/build/viewer.esm.js"></script>
-    <script nomodule src="/build/viewer.js"></script>
-    <link rel="stylesheet" href="/build/viewer.css" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <title>Stencil Component Starter</title>
 
-    <style>
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
+  <script type="module" src="/build/viewer.esm.js"></script>
+  <script nomodule src="/build/viewer.js"></script>
+  <link rel="stylesheet" href="/build/viewer.css" />
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    #viewer {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <script>
+    // prod
+    // const stepStreamKeys = [
+    //   "8z8SIkjYGrWOUUlizmUVT7x4s-hqMcegAXIK",
+    //   "4_6cdEk7VPEvXLsqiyhDKrPkyYGTCfGy-JOe",
+    //   "Z4hXfLXyk90jPyqdr5bH_TS6vVZ3a_dB0w6e",
+    //   "bMJS7TRNJ7WkA4oSQGcB0DJLTlqo7r0qEFf3",
+    // ];
+
+    // dev
+    const stepStreamKeys = [
+      // "34f2ubNr3MgO2m-jwzWDIY_j3XfHXutSeMhv",
+      "Kc-2NdkjS4LW6Nj7ir17dEmCHTR_lN_KubkR"
+    ];
+
+    const loadStep = async (stepIndex) => {
+      const viewer = document.querySelector('#viewer');
+      viewer.configEnv = 'platdev';
+      const streamKey = stepStreamKeys[stepIndex];
+      console.log(viewer.load);
+      await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
+    };
+
+    const hexRegex = /^(#|0x)?([A-Fa-f0-9]{6})$/;
+    const colorFromHex = (str) => {
+      let color = { r: 0, g: 0, b: 0 };
+      const match = hexRegex.exec(str);
+      if (match != null) {
+        const normalized = parseInt(match[2], 16) & 0xffffff;
+        color = {
+          r: (normalized >> 16) & 0xff,
+          g: (normalized >> 8) & 0xff,
+          b: normalized & 0xff
+        };
       }
+      return {
+        opacity: 100,
+        glossiness: 100,
+        diffuse: {
+          ...color
+        },
+        ambient: {
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 0,
+        },
+        specular: {
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 0,
+        },
+        emissive: {
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 0,
+        },
+      };
+    };
 
-      #viewer {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
+    const color = colorFromHex('#ff0000');
+    let ghostingEnabled = true;
 
-    <script type="module">
-      window.addEventListener('DOMContentLoaded', () => {
-        main();
+    const main = async () => {
+      const viewer = document.querySelector('#viewer');
+      // viewer.configEnv = "platdev";
+      loadStep(0);
+      // setTimeout(() => { loadStep(1); }, 5000);
+      // setTimeout(() => { loadStep(2); }, 10000);
+
+      // viewer.streamAttributes = {
+      //   experimentalGhosting: {
+      //     enabled: { value: ghostingEnabled },
+      //     opacity: { value: 0.3 }
+      //   }
+      // }
+
+      // viewer.addEventListener('tap', async function (event) {
+      //   const viewer = document.querySelector('#viewer');
+      //   const { position } = event.detail;
+      //   const scene = await viewer.scene();
+      //   const raycaster = await scene.raycaster();
+      //   console.log(await raycaster.hitItems(position));
+      // });
+      viewer.addEventListener('tap', async function (event) {
+        console.log('tap');
+        const viewer = document.querySelector('#viewer');
+        const { position } = event.detail;
+        const scene = await viewer.scene();
+        const raycaster = await scene.raycaster();
+        const hitItems = await raycaster.hitItems(position);
+        console.log('tap');
+
+        if (hitItems['hits'].length == 0) {
+          ghostingEnabled = !ghostingEnabled;
+          viewer.streamAttributes = {
+            experimentalGhosting: {
+              enabled: { value: ghostingEnabled },
+              opacity: { value: 0.1 }
+            }
+          };
+          await scene.items(q => {
+            return [
+              // q.where(qWhere => qWhere.all()).show().hide(),
+              q.where(qWhere => qWhere.withItemId('5285ebd3-7028-403f-862a-c384da7ec687').or().withItemId('91d46792-83dd-45e6-a08e-19c00a15151d').or().withItemId('2836ac74-c2f4-4930-a4e4-9b4a2739f0e7')).show(),
+              q.where(qWhere => qWhere.withItemId('91d46792-83dd-45e6-a08e-19c00a15151d').or().withItemId('2836ac74-c2f4-4930-a4e4-9b4a2739f0e7')).materialOverride({ "opacity": 100, "glossiness": 100, "ambient": { "r": 0, "g": 0, "b": 0, "a": 0 }, "diffuse": { "r": 255, "g": 0, "b": 0, "a": 1 }, "specular": { "r": 0, "g": 0, "b": 0, "a": 0 }, "emissive": { "r": 0, "g": 0, "b": 0, "a": 0 } })
+            ];
+          }).execute();
+        } else {
+          const selectedPart = hitItems['hits'][0]['itemId']['hex'];
+          scene
+            .items(op => [
+              //  op.where(q => q.all()).clearMaterialOverrides(),
+              op
+                .where(q =>
+                  q.withItemId(selectedPart)
+                )
+                .materialOverride(color),
+              // .hide()
+            ])
+            .execute();
+        }
       });
 
-      async function main() {
-        const viewer = document.querySelector('#viewer');
-      }
-    </script>
-  </head>
+      viewer.addEventListener('doubletap', async function (event) {
+        console.log('doubletap');
+      })
 
-  <body>
-    <vertex-viewer
-      id="viewer"
-      config-env="platdev"
-      src="urn:vertexvis:stream-key:key"
-    ></vertex-viewer>
-  </body>
+      viewer.addEventListener('longpress', async function (event) {
+        const viewer = document.querySelector('#viewer');
+        const { position } = event.detail;
+        const scene = await viewer.scene();
+        const raycaster = await scene.raycaster();
+        const hitItems = await raycaster.hitItems(position);
+        console.log(hitItems);
+
+        const matrix = {
+          r0: { x: 1, y: 0, z: 0, w: 0 },
+          r1: { x: 0, y: 1, z: 0, w: 0 },
+          r2: { x: 0, y: 0, z: 1, w: 0 },
+          r3: { x: 0.2, y: -0.2, z: 0, w: 1 },
+        }
+
+        if (hitItems['hits'].length == 0) {
+          scene.items(op => [
+            op.where(q => q.all()
+            ).clearMaterialOverrides()
+          ])
+            .execute();
+        } else {
+          const selectedPart = hitItems['hits'][0]['itemId']['hex'];
+          scene
+            .items(op => [
+              //  op.where(q => q.all()).clearMaterialOverrides(),
+              op
+                .where(q =>
+                  q.withItemId(selectedPart)
+                )
+                .transform(matrix),
+            ])
+            .execute();
+        }
+      });
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      main();
+    });
+  </script>
+</head>
+
+<body>
+  <vertex-viewer id="viewer" client-id="clientId">
+  </vertex-viewer>
+</body>
+
 </html>

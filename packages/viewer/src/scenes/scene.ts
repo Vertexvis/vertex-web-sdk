@@ -14,6 +14,7 @@ import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -54,6 +55,15 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  public transform(
+    matrix: vertexvis.protobuf.core.Matrix4x4f
+  ): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.transform(matrix)
+    );
+  }
+
   public build(): QueryOperation {
     return {
       query: this.query,
@@ -84,6 +94,9 @@ export class ItemsOperationExecutor {
       },
       operations: pbOperations,
     };
+    console.log(request);
+    console.log(this.queryOperations);
+    console.log(pbOperations);
     await this.stream.createSceneAlteration(request);
   }
 }
