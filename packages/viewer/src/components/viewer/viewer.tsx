@@ -377,7 +377,6 @@ export class Viewer {
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
       if (!isSameResource) {
-        this.unload();
         this.resource = loadableResource;
         await this.connectStreamingClient(this.resource);
       }
@@ -459,20 +458,38 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
-    if (this.clientId != null) {
+    if (this.clientId == null) {
+      this.errorMessage =
+        'Unable to start streaming session. Client ID must be provided.';
+      console.error(
+        'Unable to start streaming session. Client ID must be provided.'
+      );
+      throw new ViewerInitializationError(this.errorMessage);
+    }
+    if (this.resource == null) {
+      this.errorMessage =
+        'Unable to start streaming session. Resource must be provided.';
+      console.error(
+        'Unable to start streaming session. Resource must be provided.'
+      );
+      throw new ViewerInitializationError(this.errorMessage);
+    }
+
+    if (this.streamId == null) {
       try {
         this.streamDisposable = await this.connectStream(resource);
 
         const result = await this.stream.startStream({
-          // clientId: this.clientId,
-          // streamKey: { value: this.resource },
+          clientId: this.clientId,
+          sessionId: { hex: this.sessionId },
+          streamKey: { value: this.resource.id },
           dimensions: this.dimensions,
           frameBackgroundColor: this.getBackgroundColor(),
           streamAttributes: this.getStreamAttributes(),
         });
 
-        if ((result as any).startSession?.sessionId?.hex != null) {
-          this.sessionId = (result as any).startSession.sessionId.hex;
+        if (result.startStream?.sessionId?.hex != null) {
+          this.sessionId = result.startStream.sessionId.hex;
         }
 
         if (result.startStream?.sceneViewId?.hex != null) {
@@ -482,7 +499,6 @@ export class Viewer {
         if (result.startStream?.streamId?.hex != null) {
           this.streamId = result.startStream.streamId.hex;
         }
-
         await this.waitNextDrawnFrame(15 * 1000);
       } catch (e) {
         if (this.lastFrame == null) {
@@ -492,9 +508,11 @@ export class Viewer {
         }
       }
     } else {
-      this.errorMessage = 'Unable to start streaming session. Client ID must be provided.';
-      console.error('Unable to start streaming session. Client ID must be provided.');
-      throw new ViewerInitializationError(this.errorMessage);
+      await this.stream.loadStream({
+        streamKey: this.resource.id,
+      });
+
+      await this.waitNextDrawnFrame(15 * 1000);
     }
   }
 
@@ -548,7 +566,7 @@ export class Viewer {
       this.streamDisposable = await this.connectStream(resource);
       await this.stream.reconnect({
         streamId: { hex: streamId },
-        // sessionId: { hex: this.sessionId },
+        clientId: this.clientId,
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),

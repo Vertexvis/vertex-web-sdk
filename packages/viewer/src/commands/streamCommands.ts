@@ -20,7 +20,7 @@ export function connect({
       // );
 
       const uri = Uri.appendPath(
-        '/session',
+        '/ws',
         Uri.parse(config.network.renderingHost)
       );
 
