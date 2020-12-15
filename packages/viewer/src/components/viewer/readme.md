@@ -5,22 +5,26 @@
 
 ## Properties
 
-| Property         | Attribute         | Description                                                                                                                                                                      | Type                            | Default      |
-| ---------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------ |
-| `cameraControls` | `camera-controls` | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                         | `boolean`                       | `true`       |
-| `config`         | `config`          | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string \| undefined` | `undefined`  |
-| `configEnv`      | `config-env`      | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev" \| "platprod"`       | `'platprod'` |
-| `src`            | `src`             | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`           | `undefined`  |
+| Property           | Attribute           | Description                                                                                                                                                                      | Type                                       | Default      |
+| ------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------ |
+| `cameraControls`   | `camera-controls`   | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                         | `boolean`                                  | `true`       |
+| `clientId`         | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                           | `string \| undefined`                      | `undefined`  |
+| `config`           | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string \| undefined`            | `undefined`  |
+| `configEnv`        | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev" \| "platprod"`                  | `'platprod'` |
+| `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
+| `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `IStreamAttributes \| string \| undefined` | `undefined`  |
 
 
 ## Events
 
-| Event           | Description                                                                                                                                                                    | Type                           |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
-| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene. | `CustomEvent<Frame>`           |
-| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.       | `CustomEvent<Frame>`           |
-| `tap`           | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.                                                 | `CustomEvent<TapEventDetails>` |
-| `tokenExpired`  | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.       | `CustomEvent<void>`            |
+| Event           | Description                                                                                                                                                                                                     | Type                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `doubletap`     | Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.                                                                     | `CustomEvent<TapEventDetails>` |
+| `frameDrawn`    | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                  | `CustomEvent<Frame>`           |
+| `frameReceived` | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                        | `CustomEvent<Frame>`           |
+| `longpress`     | Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click. | `CustomEvent<TapEventDetails>` |
+| `tap`           | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.                                                                                  | `CustomEvent<TapEventDetails>` |
+| `tokenExpired`  | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.                                        | `CustomEvent<void>`            |
 
 
 ## Methods

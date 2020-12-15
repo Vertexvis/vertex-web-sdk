@@ -359,6 +359,16 @@ export class Viewer {
     }
   }
 
+  @Watch('clientId')
+  public async handleClientIdChanged(
+    clientId: string | undefined
+  ): Promise<void> {
+    if (clientId != null && this.streamId != null && this.resource != null) {
+      await this.unload();
+      await this.connectStreamingClient(this.resource);
+    }
+  }
+
   /**
    * Loads the given scene into the viewer and return a `Promise` that
    * resolves when the scene has been loaded. The specified scene is
@@ -458,14 +468,6 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
-    if (this.clientId == null) {
-      this.errorMessage =
-        'Unable to start streaming session. Client ID must be provided.';
-      console.error(
-        'Unable to start streaming session. Client ID must be provided.'
-      );
-      throw new ViewerInitializationError(this.errorMessage);
-    }
     if (this.resource == null) {
       this.errorMessage =
         'Unable to start streaming session. Resource must be provided.';
@@ -480,7 +482,6 @@ export class Viewer {
         this.streamDisposable = await this.connectStream(resource);
 
         const result = await this.stream.startStream({
-          clientId: this.clientId,
           sessionId: { hex: this.sessionId },
           streamKey: { value: this.resource.id },
           dimensions: this.dimensions,
@@ -519,9 +520,19 @@ export class Viewer {
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
+    if (this.clientId == null) {
+      this.errorMessage =
+        'Unable to start streaming session. Client ID must be provided.';
+      console.error(
+        'Unable to start streaming session. Client ID must be provided.'
+      );
+      throw new ViewerInitializationError(this.errorMessage);
+    }
+
     const connection = await this.commands.execute<Disposable>(
       'stream.connect',
       {
+        clientId: this.clientId,
         resource,
       }
     );
@@ -566,7 +577,6 @@ export class Viewer {
       this.streamDisposable = await this.connectStream(resource);
       await this.stream.reconnect({
         streamId: { hex: streamId },
-        clientId: this.clientId,
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),
