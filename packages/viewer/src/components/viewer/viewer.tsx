@@ -159,6 +159,13 @@ export class Viewer {
    */
   @Event() public tokenExpired!: EventEmitter<void>;
 
+  /**
+   * Used for internals or testing.
+   * 
+   * @private
+   */
+  @Event() public sessionidchange!: EventEmitter<string>;
+
   @State() private dimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
@@ -498,6 +505,7 @@ export class Viewer {
           upsertStorageEntry('stream.sessions', {
             [this.clientId!]: this.streamSessionId,
           });
+          this.sessionidchange.emit(this.streamSessionId);
         }
 
         if (result.startStream?.sceneViewId?.hex != null) {
