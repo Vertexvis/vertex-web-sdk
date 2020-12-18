@@ -218,9 +218,13 @@ export class Viewer {
     this.calculateComponentDimensions();
 
     if (this.streamSessionId == null) {
-      this.streamSessionId = getStorageEntry('stream.sessions', entry =>
-        this.clientId ? entry[this.clientId] : undefined
-      );
+      try {
+        this.streamSessionId = getStorageEntry('stream.sessions', entry =>
+          this.clientId ? entry[this.clientId] : undefined
+        );
+      } catch (e) {
+        // Ignore the case where we can't access local storage for fetching a session
+      }
     }
 
     if (this.src != null) {
@@ -493,7 +497,6 @@ export class Viewer {
         this.streamDisposable = await this.connectStream(resource);
 
         const result = await this.stream.startStream({
-          // sessionId: { hex: this.streamSessionId },
           streamKey: { value: this.resource.id },
           dimensions: this.dimensions,
           frameBackgroundColor: this.getBackgroundColor(),
@@ -502,10 +505,14 @@ export class Viewer {
 
         if (result.startStream?.sessionId?.hex != null) {
           this.streamSessionId = result.startStream.sessionId.hex;
-          upsertStorageEntry('stream.sessions', {
-            [this.clientId!]: this.streamSessionId,
-          });
           this.sessionidchange.emit(this.streamSessionId);
+          try {
+            upsertStorageEntry('stream.sessions', {
+              [this.clientId!]: this.streamSessionId,
+            });
+          } catch (e) {
+            // Ignore the case where we can't access local storage for persisting a session
+          }
         }
 
         if (result.startStream?.sceneViewId?.hex != null) {

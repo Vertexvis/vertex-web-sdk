@@ -1,8 +1,10 @@
 export function upsertStorageEntry<T>(
   key: string,
   values: Record<string, T>,
-  storage: Storage = window.localStorage
+  storageLocation: Record<string, any> = window,
+  storageKey: string = 'localStorage'
 ): void {
+  const storage = storageLocation[storageKey];
   const existing = storage.getItem(key);
 
   if (existing != null) {
@@ -20,8 +22,10 @@ export function upsertStorageEntry<T>(
 export function getStorageEntry<T>(
   key: string,
   f: (value: Record<string, T>) => T | undefined,
-  storage: Storage = window.localStorage
+  storageLocation: Record<string, any> = window,
+  storageKey: string = 'localStorage'
 ): T | undefined {
+  const storage = storageLocation[storageKey];
   const item = storage.getItem(key);
 
   if (item != null) {

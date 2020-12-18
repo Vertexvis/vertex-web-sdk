@@ -130,6 +130,11 @@ declare namespace LocalJSX {
          */
         "onLongpress"?: (event: CustomEvent<TapEventDetails>) => void;
         /**
+          * Used for internals or testing.
+          * @private
+         */
+        "onSessionidchange"?: (event: CustomEvent<string>) => void;
+        /**
           * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
          */
         "onTap"?: (event: CustomEvent<TapEventDetails>) => void;
