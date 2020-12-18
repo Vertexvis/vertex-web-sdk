@@ -7,11 +7,13 @@ import { Settings } from '@vertexvis/stream-api';
 
 export interface ConnectOptions {
   clientId: string;
+  sessionId?: string;
   resource: LoadableResource.LoadableResource;
 }
 
 export function connect({
   clientId,
+  sessionId,
   resource,
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
@@ -20,6 +22,7 @@ export function connect({
         Uri.toString(
           Uri.parseAndAddParams('/ws', {
             clientId,
+            sessionId,
           })
         ),
         Uri.parse(config.network.renderingHost)

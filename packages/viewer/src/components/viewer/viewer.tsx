@@ -161,7 +161,7 @@ export class Viewer {
 
   /**
    * Used for internals or testing.
-   * 
+   *
    * @private
    */
   @Event() public sessionidchange!: EventEmitter<string>;
@@ -493,7 +493,7 @@ export class Viewer {
         this.streamDisposable = await this.connectStream(resource);
 
         const result = await this.stream.startStream({
-          sessionId: { hex: this.streamSessionId },
+          // sessionId: { hex: this.streamSessionId },
           streamKey: { value: this.resource.id },
           dimensions: this.dimensions,
           frameBackgroundColor: this.getBackgroundColor(),
@@ -548,6 +548,7 @@ export class Viewer {
       'stream.connect',
       {
         clientId: this.clientId,
+        sessionId: this.sessionId,
         resource,
       }
     );
