@@ -62,6 +62,7 @@ import {
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
+import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -83,6 +84,13 @@ export class Viewer {
    * The Client ID associated with your Vertex Application.
    */
   @Prop() public clientId?: string;
+
+  /**
+   * Property used for internals or testing.
+   *
+   * @private
+   */
+  @Prop() public sessionId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -174,7 +182,7 @@ export class Viewer {
   private isResizing?: boolean;
   private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
-  private sessionId?: UUID.UUID;
+  private streamSessionId?: UUID.UUID = this.sessionId;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private isStreamStarted = false;
@@ -201,6 +209,12 @@ export class Viewer {
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
+
+    if (this.streamSessionId == null) {
+      this.streamSessionId = getStorageEntry('stream.sessions', entry =>
+        this.clientId ? entry[this.clientId] : undefined
+      );
+    }
 
     if (this.src != null) {
       this.load(this.src);
@@ -359,16 +373,6 @@ export class Viewer {
     }
   }
 
-  @Watch('clientId')
-  public async handleClientIdChanged(
-    clientId: string | undefined
-  ): Promise<void> {
-    if (clientId != null && this.streamId != null && this.resource != null) {
-      await this.unload();
-      await this.connectStreamingClient(this.resource);
-    }
-  }
-
   /**
    * Loads the given scene into the viewer and return a `Promise` that
    * resolves when the scene has been loaded. The specified scene is
@@ -482,7 +486,7 @@ export class Viewer {
         this.streamDisposable = await this.connectStream(resource);
 
         const result = await this.stream.startStream({
-          sessionId: { hex: this.sessionId },
+          sessionId: { hex: this.streamSessionId },
           streamKey: { value: this.resource.id },
           dimensions: this.dimensions,
           frameBackgroundColor: this.getBackgroundColor(),
@@ -490,7 +494,10 @@ export class Viewer {
         });
 
         if (result.startStream?.sessionId?.hex != null) {
-          this.sessionId = result.startStream.sessionId.hex;
+          this.streamSessionId = result.startStream.sessionId.hex;
+          upsertStorageEntry('stream.sessions', {
+            [this.clientId!]: this.streamSessionId,
+          });
         }
 
         if (result.startStream?.sceneViewId?.hex != null) {

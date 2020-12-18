@@ -56,6 +56,11 @@ export namespace Components {
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
         "scene": () => Promise<Scene>;
         /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "sessionId"?: string;
+        /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
@@ -132,6 +137,11 @@ declare namespace LocalJSX {
           * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
          */
         "onTokenExpired"?: (event: CustomEvent<void>) => void;
+        /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "sessionId"?: string;
         /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
          */
