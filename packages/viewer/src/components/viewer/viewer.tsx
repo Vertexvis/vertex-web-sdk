@@ -203,16 +203,16 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
-      if (this.usePointerEvents) {
-        this.registerInteractionHandler(new MouseInteractionHandler(true));
-      } else {
-        this.registerInteractionHandler(new MouseInteractionHandler(false));
+      if (!this.usePointerEvents) {
         this.registerInteractionHandler(new TouchInteractionHandler());
       }
+      this.registerInteractionHandler(
+        new MouseInteractionHandler(this.usePointerEvents)
+      );
     }
 
     this.registerInteractionHandler(
-      new TapInteractionHandler(() => this.getConfig())
+      new TapInteractionHandler(() => this.getConfig(), this.usePointerEvents)
     );
 
     this.injectViewerApi();

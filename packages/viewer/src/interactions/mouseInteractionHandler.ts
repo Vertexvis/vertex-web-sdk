@@ -3,6 +3,12 @@ import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import {
+  Event,
+  getDownEvent,
+  getMoveEvent,
+  getUpEvent,
+} from './interactionEvent';
+import {
   RotateInteraction,
   ZoomInteraction,
   PanInteraction,
@@ -14,8 +20,6 @@ type InteractionType = 'rotate' | 'zoom' | 'pan';
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
-
-export type Event = MouseEvent | PointerEvent;
 
 export class MouseInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
@@ -42,14 +46,11 @@ export class MouseInteractionHandler implements InteractionHandler {
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);
     this.handleWindowUp = this.handleWindowUp.bind(this);
-    this.getDownEvent = this.getDownEvent.bind(this);
-    this.getMoveEvent = this.getMoveEvent.bind(this);
-    this.getUpEvent = this.getUpEvent.bind(this);
   }
 
   public dispose(): void {
     this.element?.removeEventListener(
-      this.getDownEvent(),
+      getDownEvent(this.usePointerEvents),
       this.handleDownEvent
     );
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
@@ -60,7 +61,10 @@ export class MouseInteractionHandler implements InteractionHandler {
     this.element = element;
     this.interactionApi = api;
 
-    element.addEventListener(this.getDownEvent(), this.handleDownEvent);
+    element.addEventListener(
+      getDownEvent(this.usePointerEvents),
+      this.handleDownEvent
+    );
     element.addEventListener('wheel', this.handleMouseWheel);
   }
 
@@ -92,8 +96,14 @@ export class MouseInteractionHandler implements InteractionHandler {
     event.preventDefault();
 
     this.mouseDownPosition = Point.create(event.screenX, event.screenY);
-    window.addEventListener(this.getMoveEvent(), this.handleWindowMove);
-    window.addEventListener(this.getUpEvent(), this.handleWindowUp);
+    window.addEventListener(
+      getMoveEvent(this.usePointerEvents),
+      this.handleWindowMove
+    );
+    window.addEventListener(
+      getUpEvent(this.usePointerEvents),
+      this.handleWindowUp
+    );
   }
 
   private handleWindowMove(event: Event): void {
@@ -117,26 +127,20 @@ export class MouseInteractionHandler implements InteractionHandler {
     }
   }
 
-  private getDownEvent(): 'pointerdown' | 'mousedown' {
-    return this.usePointerEvents ? 'pointerdown' : 'mousedown';
-  }
-
-  private getMoveEvent(): 'pointermove' | 'mousemove' {
-    return this.usePointerEvents ? 'pointermove' : 'mousemove';
-  }
-
-  private getUpEvent(): 'pointerup' | 'mouseup' {
-    return this.usePointerEvents ? 'pointerup' : 'mouseup';
-  }
-
   private async handleWindowUp(event: Event): Promise<void> {
     if (this.isDragging) {
       this.endDrag(event);
       this.isDragging = false;
     }
 
-    window.removeEventListener(this.getMoveEvent(), this.handleWindowMove);
-    window.removeEventListener(this.getUpEvent(), this.handleWindowUp);
+    window.removeEventListener(
+      getMoveEvent(this.usePointerEvents),
+      this.handleWindowMove
+    );
+    window.removeEventListener(
+      getUpEvent(this.usePointerEvents),
+      this.handleWindowUp
+    );
   }
 
   private beginDrag(event: Event): void {
