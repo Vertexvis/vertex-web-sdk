@@ -176,9 +176,11 @@ export class Viewer {
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
 
   private clock?: SynchronizedClock;
+  private usePointerEvents = false;
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.usePointerEvents = window.PointerEvent != null;
   }
 
   public componentDidLoad(): void {
@@ -201,8 +203,12 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
-      this.registerInteractionHandler(new MouseInteractionHandler());
-      this.registerInteractionHandler(new TouchInteractionHandler());
+      if (this.usePointerEvents) {
+        this.registerInteractionHandler(new MouseInteractionHandler(true));
+        this.registerInteractionHandler(new TouchInteractionHandler());
+      } else {
+        this.registerInteractionHandler(new MouseInteractionHandler(false));
+      }
     }
 
     this.registerInteractionHandler(
@@ -228,13 +234,13 @@ export class Viewer {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    const canvasClass = `canvas-container ${
+      this.usePointerEvents ? 'canvas-container-touch' : ''
+    }`;
     return (
       <Host>
         <div class="viewer-container">
-          <div
-            ref={ref => (this.containerElement = ref)}
-            class="canvas-container"
-          >
+          <div ref={ref => (this.containerElement = ref)} class={canvasClass}>
             <canvas
               ref={ref => (this.canvasElement = ref)}
               class="canvas"

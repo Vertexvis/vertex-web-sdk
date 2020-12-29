@@ -27,6 +27,9 @@
   position: relative;
   background: var(--image-background, var(--viewer-background, #ffffff));
 }
+.canvas-container-touch {
+  touch-action: none;
+}
 
 .viewer-container {
   width: 100%;

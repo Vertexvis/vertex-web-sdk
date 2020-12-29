@@ -15,6 +15,8 @@ const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
 
+export type Event = MouseEvent | PointerEvent;
+
 export class MouseInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
   private interactionApi?: InteractionApi;
@@ -31,18 +33,25 @@ export class MouseInteractionHandler implements InteractionHandler {
   private primaryInteractionTypeChange = new EventDispatcher<void>();
 
   public constructor(
+    private usePointerEvents: boolean,
     private rotateInteraction = new RotateInteraction(),
     private zoomInteraction = new ZoomInteraction(),
     private panInteraction = new PanInteraction()
   ) {
-    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
-    this.handleWindowMouseMove = this.handleWindowMouseMove.bind(this);
-    this.handleWindowMouseUp = this.handleWindowMouseUp.bind(this);
+    this.handleWindowMove = this.handleWindowMove.bind(this);
+    this.handleWindowUp = this.handleWindowUp.bind(this);
+    this.getDownEvent = this.getDownEvent.bind(this);
+    this.getMoveEvent = this.getMoveEvent.bind(this);
+    this.getUpEvent = this.getUpEvent.bind(this);
   }
 
   public dispose(): void {
-    this.element?.removeEventListener('mousedown', this.handleMouseDown);
+    this.element?.removeEventListener(
+      this.getDownEvent(),
+      this.handleDownEvent
+    );
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
     this.element = undefined;
   }
@@ -51,7 +60,7 @@ export class MouseInteractionHandler implements InteractionHandler {
     this.element = element;
     this.interactionApi = api;
 
-    element.addEventListener('mousedown', this.handleMouseDown);
+    element.addEventListener(this.getDownEvent(), this.handleDownEvent);
     element.addEventListener('wheel', this.handleMouseWheel);
   }
 
@@ -79,16 +88,15 @@ export class MouseInteractionHandler implements InteractionHandler {
     return this.primaryInteractionType;
   }
 
-  private handleMouseDown(event: MouseEvent): void {
+  private handleDownEvent(event: Event): void {
     event.preventDefault();
 
     this.mouseDownPosition = Point.create(event.screenX, event.screenY);
-
-    window.addEventListener('mousemove', this.handleWindowMouseMove);
-    window.addEventListener('mouseup', this.handleWindowMouseUp);
+    window.addEventListener(this.getMoveEvent(), this.handleWindowMove);
+    window.addEventListener(this.getUpEvent(), this.handleWindowUp);
   }
 
-  private handleWindowMouseMove(event: MouseEvent): void {
+  private handleWindowMove(event: Event): void {
     const mousePosition = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
 
@@ -109,17 +117,29 @@ export class MouseInteractionHandler implements InteractionHandler {
     }
   }
 
-  private async handleWindowMouseUp(event: MouseEvent): Promise<void> {
+  private getDownEvent(): 'pointerdown' | 'mousedown' {
+    return this.usePointerEvents ? 'pointerdown' : 'mousedown';
+  }
+
+  private getMoveEvent(): 'pointermove' | 'mousemove' {
+    return this.usePointerEvents ? 'pointermove' : 'mousemove';
+  }
+
+  private getUpEvent(): 'pointerup' | 'mouseup' {
+    return this.usePointerEvents ? 'pointerup' : 'mouseup';
+  }
+
+  private async handleWindowUp(event: Event): Promise<void> {
     if (this.isDragging) {
       this.endDrag(event);
       this.isDragging = false;
     }
 
-    window.removeEventListener('mousemove', this.handleWindowMouseMove);
-    window.removeEventListener('mouseup', this.handleWindowMouseUp);
+    window.removeEventListener(this.getMoveEvent(), this.handleWindowMove);
+    window.removeEventListener(this.getUpEvent(), this.handleWindowUp);
   }
 
-  private beginDrag(event: MouseEvent): void {
+  private beginDrag(event: Event): void {
     if (event.buttons === 1) {
       this.draggingInteraction = this.primaryInteraction;
     } else if (event.buttons === 2) {
@@ -131,13 +151,13 @@ export class MouseInteractionHandler implements InteractionHandler {
     }
   }
 
-  private drag(event: MouseEvent): void {
+  private drag(event: Event): void {
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.drag(event, this.interactionApi);
     }
   }
 
-  private endDrag(event: MouseEvent): void {
+  private endDrag(event: Event): void {
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.endDrag(event, this.interactionApi);
       this.draggingInteraction = undefined;
@@ -185,7 +205,7 @@ export class MouseInteractionHandler implements InteractionHandler {
     return deltaY;
   }
 
-  private getCanvasPosition(event: MouseEvent): Point.Point | undefined {
+  private getCanvasPosition(event: Event): Point.Point | undefined {
     const canvasBounds = this.element?.getBoundingClientRect();
     const canvasOffset =
       canvasBounds != null
