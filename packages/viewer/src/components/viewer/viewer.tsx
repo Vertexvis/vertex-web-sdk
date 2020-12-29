@@ -205,9 +205,9 @@ export class Viewer {
     if (this.cameraControls) {
       if (this.usePointerEvents) {
         this.registerInteractionHandler(new MouseInteractionHandler(true));
-        this.registerInteractionHandler(new TouchInteractionHandler());
       } else {
         this.registerInteractionHandler(new MouseInteractionHandler(false));
+        this.registerInteractionHandler(new TouchInteractionHandler());
       }
     }
 
