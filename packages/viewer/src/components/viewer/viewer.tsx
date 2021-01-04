@@ -555,7 +555,7 @@ export class Viewer {
       'stream.connect',
       {
         clientId: this.clientId,
-        sessionId: this.sessionId,
+        sessionId: this.streamSessionId,
         resource,
       }
     );

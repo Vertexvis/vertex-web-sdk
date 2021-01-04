@@ -13,9 +13,7 @@ export type StreamAttributes = vertexvis.protobuf.stream.IStreamAttributes;
 
 export type StartStreamPayload = DeepRequired<
   vertexvis.protobuf.stream.IStartStreamPayload,
-  | ['frameCorrelationId']
-  | ['frameBackgroundColor']
-  | ['streamAttributes']
+  ['frameCorrelationId'] | ['frameBackgroundColor'] | ['streamAttributes']
 >;
 
 export type LoadStreamPayload = DeepRequired<
