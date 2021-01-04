@@ -536,9 +536,13 @@ export class Viewer {
         }
       }
     } else {
-      await this.stream.loadStream({
+      const result = await this.stream.loadStream({
         streamKey: this.resource.id,
       });
+
+      if (result.loadStream?.sceneViewId?.hex != null) {
+        this.sceneViewId = result.loadStream?.sceneViewId?.hex;
+      }
 
       await this.waitNextDrawnFrame(15 * 1000);
     }
