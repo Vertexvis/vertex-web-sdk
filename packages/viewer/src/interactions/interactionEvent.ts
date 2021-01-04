@@ -42,22 +42,4 @@ export interface ZoomInteractionEvent extends InteractionEvent {
   delta: number;
 }
 
-export type Event = MouseEvent | PointerEvent;
-
-export const getDownEvent = (
-  usePointerEvents: boolean
-): 'pointerdown' | 'mousedown' => {
-  return usePointerEvents ? 'pointerdown' : 'mousedown';
-};
-
-export const getMoveEvent = (
-  usePointerEvents: boolean
-): 'pointermove' | 'mousemove' => {
-  return usePointerEvents ? 'pointermove' : 'mousemove';
-};
-
-export const getUpEvent = (
-  usePointerEvents: boolean
-): 'pointerup' | 'mouseup' => {
-  return usePointerEvents ? 'pointerup' : 'mouseup';
-};
+export type BaseEvent = MouseEvent | PointerEvent;

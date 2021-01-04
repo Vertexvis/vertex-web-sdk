@@ -27,8 +27,10 @@ import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
+import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
+import { PointerTapInteractionHandler } from '../../interactions/pointerTapInteractionHandler';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -203,17 +205,19 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
-      if (!this.usePointerEvents) {
+      if (this.usePointerEvents) {
+        this.registerInteractionHandler(new PointerInteractionHandler());
+        this.registerInteractionHandler(
+          new PointerTapInteractionHandler(() => this.getConfig())
+        );
+      } else {
+        this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
+        this.registerInteractionHandler(
+          new TapInteractionHandler(() => this.getConfig())
+        );
       }
-      this.registerInteractionHandler(
-        new MouseInteractionHandler(this.usePointerEvents)
-      );
     }
-
-    this.registerInteractionHandler(
-      new TapInteractionHandler(() => this.getConfig(), this.usePointerEvents)
-    );
 
     this.injectViewerApi();
   }
@@ -322,7 +326,6 @@ export class Viewer {
   ): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeInteractionHandler(interactionHandler);
-
     return {
       dispose: () => {
         const index = this.interactionHandlers.indexOf(interactionHandler);

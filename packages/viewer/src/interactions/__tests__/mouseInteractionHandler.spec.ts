@@ -63,7 +63,6 @@ describe(MouseInteractionHandler, () => {
   } as unknown);
 
   const handler = new MouseInteractionHandler(
-    false,
     rotateInteraction,
     zoomInteraction,
     panInteraction

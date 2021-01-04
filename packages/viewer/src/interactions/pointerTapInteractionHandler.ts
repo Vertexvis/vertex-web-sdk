@@ -1,9 +1,9 @@
 import { BaseTapInteractionHandler } from './baseTapInteractionHandler';
 import { ConfigProvider } from '../config/config';
 
-export class TapInteractionHandler extends BaseTapInteractionHandler {
+export class PointerTapInteractionHandler extends BaseTapInteractionHandler {
   public constructor(getConfig: ConfigProvider) {
-    super('mousedown', 'mouseup', 'mousemove', getConfig);
+    super('pointerdown', 'pointerup', 'pointermove', getConfig);
   }
 
   protected registerEvents(element: HTMLElement): void {
