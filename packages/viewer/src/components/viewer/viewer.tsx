@@ -13,6 +13,7 @@ import {
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
+import classnames from 'classnames';
 import {
   Disposable,
   UUID,
@@ -238,13 +239,12 @@ export class Viewer {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const canvasClass = `canvas-container ${
-      this.usePointerEvents ? 'canvas-container-touch' : ''
-    }`;
     return (
       <Host>
         <div class="viewer-container">
-          <div ref={ref => (this.containerElement = ref)} class={canvasClass}>
+          <div ref={ref => (this.containerElement = ref)} class={classnames('canvas-container', {
+            'canvas-container-touch': this.usePointerEvents
+          })}>
             <canvas
               ref={ref => (this.canvasElement = ref)}
               class="canvas"
