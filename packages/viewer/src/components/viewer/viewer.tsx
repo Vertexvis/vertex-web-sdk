@@ -525,8 +525,11 @@ export class Viewer {
         }
         await this.waitNextDrawnFrame(15 * 1000);
       } catch (e) {
-        console.log(e);
-        if (this.lastFrame == null && !(e instanceof CustomError)) {
+        if (e instanceof CustomError) {
+          throw e;
+        }
+
+        if (this.lastFrame == null) {
           this.errorMessage = 'Unable to establish connection to Vertex.';
           console.error('Failed to establish WS connection', e);
           throw new WebsocketConnectionError(this.errorMessage, e);
@@ -609,14 +612,16 @@ export class Viewer {
       this.isStreamStarted = true;
       this.isReconnecting = false;
     } catch (e) {
-      if (!(e instanceof CustomError)) {
-        const message = 'Unable to establish connection to Vertex.';
-        if (!isReopen) {
-          this.errorMessage = this.errorMessage || message;
-          console.error('Failed to establish WS connection', e);
-        }
-        throw new WebsocketConnectionError(message, e);
+      if (e instanceof CustomError) {
+        throw e;
       }
+
+      const message = 'Unable to establish connection to Vertex.';
+      if (!isReopen) {
+        this.errorMessage = this.errorMessage || message;
+        console.error('Failed to establish WS connection', e);
+      }
+      throw new WebsocketConnectionError(message, e);
     }
   }
 
