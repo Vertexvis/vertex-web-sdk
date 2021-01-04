@@ -16,11 +16,6 @@ export type StartStreamPayload = DeepRequired<
   ['frameCorrelationId'] | ['frameBackgroundColor'] | ['streamAttributes']
 >;
 
-export type LoadStreamPayload = DeepRequired<
-  vertexvis.protobuf.stream.ILoadStreamPayload,
-  []
->;
-
 export type ReconnectPayload = DeepRequired<
   vertexvis.protobuf.stream.IReconnectPayload,
   ['frameCorrelationId'] | ['frameBackgroundColor']

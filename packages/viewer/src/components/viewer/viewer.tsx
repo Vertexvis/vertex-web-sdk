@@ -403,6 +403,7 @@ export class Viewer {
         this.resource.type === loadableResource.type &&
         this.resource.id === loadableResource.id;
       if (!isSameResource) {
+        this.unload();
         this.resource = loadableResource;
         await this.connectStreamingClient(this.resource);
       }
@@ -493,58 +494,46 @@ export class Viewer {
       throw new ViewerInitializationError(this.errorMessage);
     }
 
-    if (this.streamId == null) {
-      try {
-        this.streamDisposable = await this.connectStream(resource);
+    try {
+      this.streamDisposable = await this.connectStream(resource);
 
-        const result = await this.stream.startStream({
-          streamKey: { value: this.resource.id },
-          dimensions: this.dimensions,
-          frameBackgroundColor: this.getBackgroundColor(),
-          streamAttributes: this.getStreamAttributes(),
-        });
-
-        if (result.startStream?.sessionId?.hex != null) {
-          this.streamSessionId = result.startStream.sessionId.hex;
-          this.sessionidchange.emit(this.streamSessionId);
-          try {
-            upsertStorageEntry('stream.sessions', {
-              [this.clientId!]: this.streamSessionId,
-            });
-          } catch (e) {
-            // Ignore the case where we can't access local storage for persisting a session
-          }
-        }
-
-        if (result.startStream?.sceneViewId?.hex != null) {
-          this.sceneViewId = result.startStream.sceneViewId.hex;
-          this.isStreamStarted = true;
-        }
-        if (result.startStream?.streamId?.hex != null) {
-          this.streamId = result.startStream.streamId.hex;
-        }
-        await this.waitNextDrawnFrame(15 * 1000);
-      } catch (e) {
-        if (e instanceof CustomError) {
-          throw e;
-        }
-
-        if (this.lastFrame == null) {
-          this.errorMessage = 'Unable to establish connection to Vertex.';
-          console.error('Failed to establish WS connection', e);
-          throw new WebsocketConnectionError(this.errorMessage, e);
-        }
-      }
-    } else {
-      const result = await this.stream.loadStream({
-        streamKey: this.resource.id,
+      const result = await this.stream.startStream({
+        streamKey: { value: this.resource.id },
+        dimensions: this.dimensions,
+        frameBackgroundColor: this.getBackgroundColor(),
+        streamAttributes: this.getStreamAttributes(),
       });
 
-      if (result.loadStream?.sceneViewId?.hex != null) {
-        this.sceneViewId = result.loadStream?.sceneViewId?.hex;
+      if (result.startStream?.sessionId?.hex != null) {
+        this.streamSessionId = result.startStream.sessionId.hex;
+        this.sessionidchange.emit(this.streamSessionId);
+        try {
+          upsertStorageEntry('stream.sessions', {
+            [this.clientId!]: this.streamSessionId,
+          });
+        } catch (e) {
+          // Ignore the case where we can't access local storage for persisting a session
+        }
       }
 
+      if (result.startStream?.sceneViewId?.hex != null) {
+        this.sceneViewId = result.startStream.sceneViewId.hex;
+        this.isStreamStarted = true;
+      }
+      if (result.startStream?.streamId?.hex != null) {
+        this.streamId = result.startStream.streamId.hex;
+      }
       await this.waitNextDrawnFrame(15 * 1000);
+    } catch (e) {
+      if (e instanceof CustomError) {
+        throw e;
+      }
+
+      if (this.lastFrame == null) {
+        this.errorMessage = 'Unable to establish connection to Vertex.';
+        console.error('Failed to establish WS connection', e);
+        throw new WebsocketConnectionError(this.errorMessage, e);
+      }
     }
   }
 
