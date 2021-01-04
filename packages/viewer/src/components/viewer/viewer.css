@@ -27,7 +27,7 @@
   position: relative;
   background: var(--image-background, var(--viewer-background, #ffffff));
 }
-.canvas-container-touch {
+.enable-pointer-events {
   touch-action: none;
 }
 
