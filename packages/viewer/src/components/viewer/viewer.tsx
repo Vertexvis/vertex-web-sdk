@@ -31,7 +31,6 @@ import { MouseInteractionHandler } from '../../interactions/mouseInteractionHand
 import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
-import { PointerTapInteractionHandler } from '../../interactions/pointerTapInteractionHandler';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -209,13 +208,20 @@ export class Viewer {
       if (this.usePointerEvents) {
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(
-          new PointerTapInteractionHandler(() => this.getConfig())
+          new TapInteractionHandler(
+            'pointerdown',
+            'pointerup',
+            'pointermove',
+            () => this.getConfig()
+          )
         );
       } else {
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(
-          new TapInteractionHandler(() => this.getConfig())
+          new TapInteractionHandler('mousedown', 'mouseup', 'mousemove', () =>
+            this.getConfig()
+          )
         );
       }
     }

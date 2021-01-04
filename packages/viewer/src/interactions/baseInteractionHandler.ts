@@ -20,7 +20,7 @@ const DEFAULT_LINE_HEIGHT = 1.2;
 
 export abstract class BaseInteractionHandler implements InteractionHandler {
   protected element?: HTMLElement;
-  private interactionApi?: InteractionApi;
+  protected interactionApi?: InteractionApi;
 
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private primaryInteractionType: InteractionType = 'rotate';
@@ -32,6 +32,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private computedBodyStyle?: CSSStyleDeclaration;
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
+
+  private currentPosition1?: Point.Point;
+  private currentPosition2?: Point.Point;
+  private touchPoints: Record<string, Point.Point> = {};
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -50,11 +54,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.interactionApi = api;
-    this.registerEvents(element);
+    element.addEventListener(this.downEvent, this.handleDownEvent);
+    element.addEventListener('wheel', this.handleMouseWheel);
   }
 
   public dispose(): void {
-    this.deregisterEvents();
+    this.element?.removeEventListener(this.downEvent, this.handleDownEvent);
+    this.element?.removeEventListener('wheel', this.handleMouseWheel);
+    this.element = undefined;
   }
 
   public onPrimaryInteractionTypeChange(listener: Listener<void>): Disposable {
@@ -83,30 +90,52 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected handleDownEvent(event: BaseEvent): void {
     event.preventDefault();
-
+    const pointer = event as PointerEvent;
     this.downPosition = Point.create(event.screenX, event.screenY);
+    if (pointer.pointerId != null) {
+      this.touchPoints = {
+        ...this.touchPoints,
+        [pointer.pointerId]: this.downPosition,
+      };
+    }
+
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
   }
 
   protected handleWindowMove(event: BaseEvent): void {
-    const mousePosition = Point.create(event.screenX, event.screenY);
+    const position = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
 
+    const keys = Object.keys(this.touchPoints);
+    const pointer = event as PointerEvent;
     if (
-      this.downPosition != null &&
-      Point.distance(mousePosition, this.downPosition) >= 2 &&
-      !this.isDragging
+      pointer.pointerId != null &&
+      this.touchPoints[pointer.pointerId] != null
     ) {
-      this.beginDrag(event);
-      didBeginDrag = true;
-      this.isDragging = true;
+      this.touchPoints[pointer.pointerId] = position;
     }
+    if (keys.length === 2) {
+      this.handleTwoPointTouchMove(
+        this.touchPoints[keys[0]],
+        this.touchPoints[keys[1]]
+      );
+    } else {
+      if (
+        this.downPosition != null &&
+        Point.distance(position, this.downPosition) >= 2 &&
+        !this.isDragging
+      ) {
+        this.beginDrag(event);
+        didBeginDrag = true;
+        this.isDragging = true;
+      }
 
-    // We only invoke drag interactions for mouse events after a beginDrag has
-    // been invoked.
-    if (!didBeginDrag && this.isDragging) {
-      this.drag(event);
+      // We only invoke drag interactions for mouse events after a beginDrag has
+      // been invoked.
+      if (!didBeginDrag && this.isDragging) {
+        this.drag(event);
+      }
     }
   }
 
@@ -114,6 +143,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.isDragging) {
       this.endDrag(event);
       this.isDragging = false;
+    }
+
+    const pointer = event as PointerEvent;
+    if (pointer.pointerId != null) {
+      this.interactionApi?.endInteraction();
+      this.touchPoints = {};
+      this.currentPosition1 = undefined;
+      this.currentPosition2 = undefined;
     }
 
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
@@ -198,6 +235,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       : undefined;
   }
 
-  protected abstract registerEvents(element: HTMLElement): void;
-  protected abstract deregisterEvents(): void;
+  private handleTwoPointTouchMove(
+    point1: Point.Point,
+    point2: Point.Point
+  ): void {
+    if (this.currentPosition1 != null && this.currentPosition2 != null) {
+      const delta = Point.scale(
+        Point.add(
+          Point.subtract(point1, this.currentPosition1),
+          Point.subtract(point2, this.currentPosition2)
+        ),
+        0.25,
+        0.25
+      );
+      const distance =
+        Point.distance(point1, point2) -
+        Point.distance(this.currentPosition1, this.currentPosition2);
+      const zoom = distance * 0.5;
+      this.interactionApi?.beginInteraction();
+      this.interactionApi?.zoomCamera(zoom);
+      this.interactionApi?.panCamera(delta);
+    }
+
+    this.currentPosition1 = point1;
+    this.currentPosition2 = point2;
+  }
 }

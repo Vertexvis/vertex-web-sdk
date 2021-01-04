@@ -20,15 +20,4 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       panInteraction
     );
   }
-
-  protected registerEvents(element: HTMLElement): void {
-    element.addEventListener(this.downEvent, this.handleDownEvent);
-    element.addEventListener('wheel', this.handleMouseWheel);
-  }
-
-  protected deregisterEvents(): void {
-    this.element?.removeEventListener(this.downEvent, this.handleDownEvent);
-    this.element?.removeEventListener('wheel', this.handleMouseWheel);
-    this.element = undefined;
-  }
 }
