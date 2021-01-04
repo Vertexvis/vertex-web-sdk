@@ -242,9 +242,12 @@ export class Viewer {
     return (
       <Host>
         <div class="viewer-container">
-          <div ref={ref => (this.containerElement = ref)} class={classnames('canvas-container', {
-            'canvas-container-touch': this.usePointerEvents
-          })}>
+          <div
+            ref={ref => (this.containerElement = ref)}
+            class={classnames('canvas-container', {
+              'canvas-container-touch': this.usePointerEvents,
+            })}
+          >
             <canvas
               ref={ref => (this.canvasElement = ref)}
               class="canvas"
