@@ -179,11 +179,9 @@ export class Viewer {
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
 
   private clock?: SynchronizedClock;
-  private usePointerEvents = false;
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
-    this.usePointerEvents = window.PointerEvent != null;
   }
 
   public componentDidLoad(): void {
@@ -207,7 +205,7 @@ export class Viewer {
 
     if (this.cameraControls) {
       // default to pointer events if allowed by browser.
-      if (this.usePointerEvents) {
+      if (window.PointerEvent != null) {
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(
@@ -255,7 +253,7 @@ export class Viewer {
           <div
             ref={ref => (this.containerElement = ref)}
             class={classnames('canvas-container', {
-              'enable-pointer-events ': this.usePointerEvents,
+              'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
             <canvas

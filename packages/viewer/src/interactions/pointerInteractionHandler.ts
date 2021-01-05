@@ -8,7 +8,7 @@ import {
 import { InteractionApi } from './interactionApi';
 
 export class PointerInteractionHandler extends BaseInteractionHandler {
-  private touchPoints: Record<string, Point.Point> = {};
+  private touchPoints: Set<number>;
 
   public constructor() {
     super(
@@ -19,7 +19,7 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
       new ZoomInteraction(),
       new PanInteraction()
     );
-
+    this.touchPoints = new Set();
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
   }
@@ -33,23 +33,27 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
   private handlePointerDown(event: PointerEvent): void {
     event.preventDefault();
     this.downPosition = Point.create(event.screenX, event.screenY);
-    this.touchPoints = {
-      ...this.touchPoints,
-      [event.pointerId]: this.downPosition,
-    };
+    this.touchPoints.add(event.pointerId);
 
-    const keys = Object.keys(this.touchPoints);
-    if (keys.length === 2) {
+    if (this.touchPoints.size === 1) {
+      window.addEventListener('pointerup', this.handlePointerUp);
+    }
+
+    if (this.touchPoints.size === 2) {
       this.disableIndividualInteractions = true;
     }
-    window.addEventListener('pointerup', this.handlePointerUp);
   }
 
   private handlePointerUp(event: PointerEvent): void {
     this.interactionApi?.endInteraction();
-    this.touchPoints = {};
-    this.disableIndividualInteractions = false;
+    this.touchPoints.delete(event.pointerId);
 
-    window.removeEventListener('pointerup', this.handlePointerUp);
+    if (this.touchPoints.size < 2) {
+      this.disableIndividualInteractions = false;
+    }
+
+    if (this.touchPoints.size === 0) {
+      window.removeEventListener('pointerup', this.handlePointerUp);
+    }
   }
 }

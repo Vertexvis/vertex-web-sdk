@@ -30,9 +30,11 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
       ...this.touchPoints,
       [event.pointerId]: point,
     };
-
-    window.addEventListener('pointermove', this.handlePointerMove);
-    window.addEventListener('pointerup', this.handlePointerUp);
+    const keys = Object.keys(this.touchPoints);
+    if (keys.length === 1) {
+      window.addEventListener('pointermove', this.handlePointerMove);
+      window.addEventListener('pointerup', this.handlePointerUp);
+    }
   }
 
   private handlePointerMove(event: PointerEvent): void {
@@ -55,11 +57,14 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
 
   private handlePointerUp(event: PointerEvent): void {
     this.interactionApi?.endInteraction();
-    this.touchPoints = {};
+    delete this.touchPoints[event.pointerId];
     this.currentPosition1 = undefined;
     this.currentPosition2 = undefined;
 
-    window.removeEventListener('pointermove', this.handlePointerMove);
-    window.removeEventListener('pointerup', this.handlePointerUp);
+    const keys = Object.keys(this.touchPoints);
+    if (keys.length === 0) {
+      window.removeEventListener('pointermove', this.handlePointerMove);
+      window.removeEventListener('pointerup', this.handlePointerUp);
+    }
   }
 }

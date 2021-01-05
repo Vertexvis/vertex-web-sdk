@@ -12,7 +12,7 @@ type TapEmitter = (
 ) => Promise<void> | void;
 
 export class TapInteractionHandler implements InteractionHandler {
-  protected element?: HTMLElement;
+  private element?: HTMLElement;
   private interactionApi?: InteractionApi;
 
   private pointerDownPosition?: Point.Point;
@@ -93,7 +93,7 @@ export class TapInteractionHandler implements InteractionHandler {
     this.handlePointerEnd(this.pointerDownPosition);
   }
 
-  protected handleDown(event: BaseEvent): void {
+  private handleDown(event: BaseEvent): void {
     this.setPointerPositions(Point.create(event.clientX, event.clientY));
 
     const eventKeys = {
@@ -204,7 +204,7 @@ export class TapInteractionHandler implements InteractionHandler {
     this.clearLongPressTimer();
   }
 
-  protected clearDoubleTapTimer(): void {
+  private clearDoubleTapTimer(): void {
     if (this.doubleTapTimer != null) {
       clearTimeout(this.doubleTapTimer);
     }
@@ -221,7 +221,7 @@ export class TapInteractionHandler implements InteractionHandler {
     );
   }
 
-  protected clearLongPressTimer(): void {
+  private clearLongPressTimer(): void {
     if (this.longPressTimer != null) {
       clearTimeout(this.longPressTimer);
     }
