@@ -28,6 +28,7 @@ import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
+import { MultiPointerInteractionHandler } from '../../interactions/multiPointerInteractionHandler';
 import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
@@ -205,8 +206,10 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
+      // default to pointer events if allowed by browser.
       if (this.usePointerEvents) {
         this.registerInteractionHandler(new PointerInteractionHandler());
+        this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(
           new TapInteractionHandler(
             'pointerdown',
@@ -216,6 +219,7 @@ export class Viewer {
           )
         );
       } else {
+        // fallback to touch events and mouse events as a default
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(

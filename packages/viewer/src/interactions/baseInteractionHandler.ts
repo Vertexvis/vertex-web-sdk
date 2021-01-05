@@ -19,23 +19,19 @@ const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
 
 export abstract class BaseInteractionHandler implements InteractionHandler {
-  protected element?: HTMLElement;
   protected interactionApi?: InteractionApi;
-
+  protected element?: HTMLElement;
+  protected downPosition?: Point.Point;
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private primaryInteractionType: InteractionType = 'rotate';
   private draggingInteraction: MouseInteraction | undefined;
-
-  private downPosition?: Point.Point;
   private isDragging = false;
+
+  protected disableIndividualInteractions = false;
 
   private computedBodyStyle?: CSSStyleDeclaration;
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
-
-  private currentPosition1?: Point.Point;
-  private currentPosition2?: Point.Point;
-  private touchPoints: Record<string, Point.Point> = {};
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -90,52 +86,33 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected handleDownEvent(event: BaseEvent): void {
     event.preventDefault();
-    const pointer = event as PointerEvent;
     this.downPosition = Point.create(event.screenX, event.screenY);
-    if (pointer.pointerId != null) {
-      this.touchPoints = {
-        ...this.touchPoints,
-        [pointer.pointerId]: this.downPosition,
-      };
-    }
 
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
   }
 
   protected handleWindowMove(event: BaseEvent): void {
+    if (this.disableIndividualInteractions) {
+      return;
+    }
+
     const position = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
-
-    const keys = Object.keys(this.touchPoints);
-    const pointer = event as PointerEvent;
     if (
-      pointer.pointerId != null &&
-      this.touchPoints[pointer.pointerId] != null
+      this.downPosition != null &&
+      Point.distance(position, this.downPosition) >= 2 &&
+      !this.isDragging
     ) {
-      this.touchPoints[pointer.pointerId] = position;
+      this.beginDrag(event);
+      didBeginDrag = true;
+      this.isDragging = true;
     }
-    if (keys.length === 2) {
-      this.handleTwoPointTouchMove(
-        this.touchPoints[keys[0]],
-        this.touchPoints[keys[1]]
-      );
-    } else {
-      if (
-        this.downPosition != null &&
-        Point.distance(position, this.downPosition) >= 2 &&
-        !this.isDragging
-      ) {
-        this.beginDrag(event);
-        didBeginDrag = true;
-        this.isDragging = true;
-      }
 
-      // We only invoke drag interactions for mouse events after a beginDrag has
-      // been invoked.
-      if (!didBeginDrag && this.isDragging) {
-        this.drag(event);
-      }
+    // We only invoke drag interactions for mouse events after a beginDrag has
+    // been invoked.
+    if (!didBeginDrag && this.isDragging) {
+      this.drag(event);
     }
   }
 
@@ -143,14 +120,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.isDragging) {
       this.endDrag(event);
       this.isDragging = false;
-    }
-
-    const pointer = event as PointerEvent;
-    if (pointer.pointerId != null) {
-      this.interactionApi?.endInteraction();
-      this.touchPoints = {};
-      this.currentPosition1 = undefined;
-      this.currentPosition2 = undefined;
     }
 
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
@@ -235,29 +204,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       : undefined;
   }
 
-  private handleTwoPointTouchMove(
-    point1: Point.Point,
-    point2: Point.Point
-  ): void {
-    if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.scale(
-        Point.add(
-          Point.subtract(point1, this.currentPosition1),
-          Point.subtract(point2, this.currentPosition2)
-        ),
-        0.25,
-        0.25
-      );
-      const distance =
-        Point.distance(point1, point2) -
-        Point.distance(this.currentPosition1, this.currentPosition2);
-      const zoom = distance * 0.5;
-      this.interactionApi?.beginInteraction();
-      this.interactionApi?.zoomCamera(zoom);
-      this.interactionApi?.panCamera(delta);
-    }
+  // private handleTwoPointTouchMove(
+  //   point1: Point.Point,
+  //   point2: Point.Point
+  // ): void {
+  //   if (this.currentPosition1 != null && this.currentPosition2 != null) {
+  //     const delta = Point.scale(
+  //       Point.add(
+  //         Point.subtract(point1, this.currentPosition1),
+  //         Point.subtract(point2, this.currentPosition2)
+  //       ),
+  //       0.25,
+  //       0.25
+  //     );
+  //     const distance =
+  //       Point.distance(point1, point2) -
+  //       Point.distance(this.currentPosition1, this.currentPosition2);
+  //     const zoom = distance * 0.5;
+  //     this.interactionApi?.beginInteraction();
+  //     this.interactionApi?.zoomCamera(zoom);
+  //     this.interactionApi?.panCamera(delta);
+  //   }
 
-    this.currentPosition1 = point1;
-    this.currentPosition2 = point2;
-  }
+  //   this.currentPosition1 = point1;
+  //   this.currentPosition2 = point2;
+  // }
 }

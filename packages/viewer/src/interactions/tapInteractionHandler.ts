@@ -149,7 +149,7 @@ export class TapInteractionHandler implements InteractionHandler {
         this.emit(this.interactionApi?.doubleTap)(
           position,
           keyDetails,
-          this.firstPointerDownPosition
+          this.secondPointerDownPosition
         );
         this.clearDoubleTapTimer();
       }
