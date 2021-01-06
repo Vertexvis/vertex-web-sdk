@@ -51,7 +51,12 @@ describe(TapInteractionHandler, () => {
     touches: [{ clientX: 11, clientY: 10, identifier: 1 }],
   } as any);
 
-  const handler = new TapInteractionHandler(() => parseConfig('platdev'));
+  const handler = new TapInteractionHandler(
+    'mousedown',
+    'mouseup',
+    'mousemove',
+    () => parseConfig('platdev')
+  );
 
   beforeEach(() => {
     jest.resetAllMocks();

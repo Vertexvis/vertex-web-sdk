@@ -3,6 +3,7 @@ import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 import { TapEventKeys } from './tapEventDetails';
 import { ConfigProvider } from '../config/config';
+import { BaseEvent } from './interactionEvent';
 
 type TapEmitter = (
   position: Point.Point,
@@ -23,10 +24,15 @@ export class TapInteractionHandler implements InteractionHandler {
   private doubleTapTimer?: any;
   private longPressTimer?: any;
 
-  public constructor(private getConfig: ConfigProvider) {
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseUp = this.handleMouseUp.bind(this);
-    this.handleMouseMove = this.handleMouseMove.bind(this);
+  public constructor(
+    protected downEvent: 'mousedown' | 'pointerdown',
+    protected upEvent: 'mouseup' | 'pointerup',
+    protected moveEvent: 'mousemove' | 'pointermove',
+    private getConfig: ConfigProvider
+  ) {
+    this.handleDown = this.handleDown.bind(this);
+    this.handleUp = this.handleUp.bind(this);
+    this.handleMove = this.handleMove.bind(this);
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
@@ -42,7 +48,7 @@ export class TapInteractionHandler implements InteractionHandler {
   }
 
   public dispose(): void {
-    this.element?.removeEventListener('mousedown', this.handleMouseDown);
+    this.element?.removeEventListener(this.downEvent, this.handleDown);
     this.element?.removeEventListener('touchstart', this.handleTouchStart);
     this.element = undefined;
 
@@ -53,8 +59,7 @@ export class TapInteractionHandler implements InteractionHandler {
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.interactionApi = api;
-
-    element.addEventListener('mousedown', this.handleMouseDown);
+    element.addEventListener(this.downEvent, this.handleDown);
     element.addEventListener('touchstart', this.handleTouchStart);
   }
 
@@ -69,25 +74,6 @@ export class TapInteractionHandler implements InteractionHandler {
       window.addEventListener('touchend', this.handleTouchEnd);
       window.addEventListener('touchmove', this.handleTouchMove);
     }
-  }
-
-  private handleMouseDown(event: MouseEvent): void {
-    this.setPointerPositions(Point.create(event.clientX, event.clientY));
-
-    const eventKeys = {
-      altKey: event.altKey,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-      shiftKey: event.shiftKey,
-    };
-    this.restartLongPressTimer(eventKeys);
-
-    window.addEventListener('mouseup', this.handleMouseUp);
-    window.addEventListener('mousemove', this.handleMouseMove);
-  }
-
-  private handleMouseMove(event: MouseEvent): void {
-    this.handlePointerMove(Point.create(event.clientX, event.clientY));
   }
 
   private handleTouchMove(event: TouchEvent): void {
@@ -107,10 +93,29 @@ export class TapInteractionHandler implements InteractionHandler {
     this.handlePointerEnd(this.pointerDownPosition);
   }
 
-  private handleMouseUp(event: MouseEvent): void {
+  private handleDown(event: BaseEvent): void {
+    this.setPointerPositions(Point.create(event.clientX, event.clientY));
+
+    const eventKeys = {
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+    };
+    this.restartLongPressTimer(eventKeys);
+
+    window.addEventListener(this.upEvent, this.handleUp);
+    window.addEventListener(this.moveEvent, this.handleMove);
+  }
+
+  private handleMove(event: BaseEvent): void {
+    this.handlePointerMove(Point.create(event.clientX, event.clientY));
+  }
+
+  private handleUp(event: BaseEvent): void {
     if (this.pointerDownPosition != null) {
-      window.removeEventListener('mouseup', this.handleMouseUp);
-      window.removeEventListener('mousemove', this.handleMouseMove);
+      window.removeEventListener(this.upEvent, this.handleUp);
+      window.removeEventListener(this.moveEvent, this.handleMove);
     }
 
     this.handlePointerEnd(Point.create(event.clientX, event.clientY), {
@@ -144,7 +149,7 @@ export class TapInteractionHandler implements InteractionHandler {
         this.emit(this.interactionApi?.doubleTap)(
           position,
           keyDetails,
-          this.firstPointerDownPosition
+          this.secondPointerDownPosition
         );
         this.clearDoubleTapTimer();
       }

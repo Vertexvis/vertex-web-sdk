@@ -13,6 +13,7 @@ import {
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions } from '@vertexvis/geometry';
+import classnames from 'classnames';
 import {
   Disposable,
   UUID,
@@ -27,6 +28,8 @@ import { InteractionHandler } from '../../interactions/interactionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
+import { MultiPointerInteractionHandler } from '../../interactions/multiPointerInteractionHandler';
+import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
 import { CommandFactory } from '../../commands/command';
@@ -201,13 +204,29 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
-      this.registerInteractionHandler(new MouseInteractionHandler());
-      this.registerInteractionHandler(new TouchInteractionHandler());
+      // default to pointer events if allowed by browser.
+      if (window.PointerEvent != null) {
+        this.registerInteractionHandler(new PointerInteractionHandler());
+        this.registerInteractionHandler(new MultiPointerInteractionHandler());
+        this.registerInteractionHandler(
+          new TapInteractionHandler(
+            'pointerdown',
+            'pointerup',
+            'pointermove',
+            () => this.getConfig()
+          )
+        );
+      } else {
+        // fallback to touch events and mouse events as a default
+        this.registerInteractionHandler(new MouseInteractionHandler());
+        this.registerInteractionHandler(new TouchInteractionHandler());
+        this.registerInteractionHandler(
+          new TapInteractionHandler('mousedown', 'mouseup', 'mousemove', () =>
+            this.getConfig()
+          )
+        );
+      }
     }
-
-    this.registerInteractionHandler(
-      new TapInteractionHandler(() => this.getConfig())
-    );
 
     this.injectViewerApi();
   }
@@ -233,7 +252,9 @@ export class Viewer {
         <div class="viewer-container">
           <div
             ref={ref => (this.containerElement = ref)}
-            class="canvas-container"
+            class={classnames('canvas-container', {
+              'enable-pointer-events ': window.PointerEvent != null,
+            })}
           >
             <canvas
               ref={ref => (this.canvasElement = ref)}
@@ -316,7 +337,6 @@ export class Viewer {
   ): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeInteractionHandler(interactionHandler);
-
     return {
       dispose: () => {
         const index = this.interactionHandlers.indexOf(interactionHandler);
