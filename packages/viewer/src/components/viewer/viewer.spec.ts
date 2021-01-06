@@ -110,7 +110,7 @@ describe('vertex-viewer', () => {
       expect(handler.dispose).toHaveBeenCalled();
 
       const handlers = await viewer.getInteractionHandlers();
-      expect(handlers).toHaveLength(1);
+      expect(handlers).toHaveLength(0);
     });
   });
 
