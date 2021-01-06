@@ -300,7 +300,9 @@ describe('vertex-viewer', () => {
     });
 
     it('passes a session id if one is present in storage', async () => {
-      upsertStorageEntry('stream.sessions', { clientId: 'sessionId1' });
+      upsertStorageEntry('vertexvis:stream-sessions', {
+        clientId: 'sessionId1',
+      });
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );

@@ -220,8 +220,9 @@ export class Viewer {
 
     if (this.streamSessionId == null) {
       try {
-        this.streamSessionId = getStorageEntry('stream.sessions', entry =>
-          this.clientId ? entry[this.clientId] : undefined
+        this.streamSessionId = getStorageEntry(
+          'vertexvis:stream-sessions',
+          entry => (this.clientId ? entry[this.clientId] : undefined)
         );
       } catch (e) {
         // Ignore the case where we can't access local storage for fetching a session
@@ -508,7 +509,8 @@ export class Viewer {
         this.streamSessionId = result.startStream.sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
-          upsertStorageEntry('stream.sessions', {
+          upsertStorageEntry('vertexvis:stream-sessions', {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             [this.clientId!]: this.streamSessionId,
           });
         } catch (e) {
