@@ -4,9 +4,10 @@ import { CommandRegistry } from './commandRegistry';
 import { LoadableResource } from '../types';
 import { InvalidCredentialsError } from '../errors';
 import { Settings } from '@vertexvis/stream-api';
+import { Config } from '../config/config';
 
 export interface ConnectOptions {
-  clientId: string;
+  clientId?: string;
   sessionId?: string;
   resource: LoadableResource.LoadableResource;
 }
@@ -18,15 +19,7 @@ export function connect({
 }: ConnectOptions): Command<Promise<Disposable>> {
   return ({ stream, config }) => {
     if (resource.type === 'stream-key') {
-      const uri = Uri.appendPath(
-        Uri.toString(
-          Uri.parseAndAddParams('/ws', {
-            clientId,
-            sessionId,
-          })
-        ),
-        Uri.parse(config.network.renderingHost)
-      );
+      const uri = getWebsocketUri(config, resource, clientId, sessionId);
 
       const descriptor = {
         url: Uri.toString(uri),
@@ -58,4 +51,26 @@ export function connect({
 
 export function registerCommands(commands: CommandRegistry): void {
   commands.register('stream.connect', opts => connect(opts as ConnectOptions));
+}
+
+function getWebsocketUri(
+  config: Config,
+  resource: LoadableResource.LoadableResource,
+  clientId?: string,
+  sessionId?: string
+): Uri.Uri {
+  return clientId != null
+    ? Uri.appendPath(
+        Uri.toString(
+          Uri.parseAndAddParams('/ws', {
+            clientId,
+            sessionId,
+          })
+        ),
+        Uri.parse(config.network.renderingHost)
+      )
+    : Uri.appendPath(
+        `/stream-keys/${resource.id}/session`,
+        Uri.parse(config.network.renderingHost)
+      );
 }

@@ -525,13 +525,12 @@ export class Viewer {
         streamAttributes: this.getStreamAttributes(),
       });
 
-      if (result.startStream?.sessionId?.hex != null) {
+      if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
         this.streamSessionId = result.startStream.sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
           upsertStorageEntry('vertexvis:stream-sessions', {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            [this.clientId!]: this.streamSessionId,
+            [this.clientId]: this.streamSessionId,
           });
         } catch (e) {
           // Ignore the case where we can't access local storage for persisting a session
@@ -563,12 +562,9 @@ export class Viewer {
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
     if (this.clientId == null) {
-      this.errorMessage =
-        'Unable to start streaming session. Client ID must be provided.';
-      console.error(
-        'Unable to start streaming session. Client ID must be provided.'
+      console.warn(
+        'Client ID not provided, using legacy path. A Client ID will be required in an upcoming release.'
       );
-      throw new ViewerInitializationError(this.errorMessage);
     }
 
     const connection = await this.commands.execute<Disposable>(
