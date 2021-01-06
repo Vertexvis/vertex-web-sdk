@@ -45,7 +45,6 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
   }
 
   private handlePointerUp(event: PointerEvent): void {
-    this.interactionApi?.endInteraction();
     this.touchPoints.delete(event.pointerId);
 
     if (this.touchPoints.size < 2) {

@@ -56,12 +56,14 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
   }
 
   private handlePointerUp(event: PointerEvent): void {
-    this.interactionApi?.endInteraction();
     delete this.touchPoints[event.pointerId];
-    this.currentPosition1 = undefined;
-    this.currentPosition2 = undefined;
 
     const keys = Object.keys(this.touchPoints);
+    if (keys.length === 1) {
+      this.interactionApi?.endInteraction();
+      this.currentPosition1 = undefined;
+      this.currentPosition2 = undefined;
+    }
     if (keys.length === 0) {
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.removeEventListener('pointerup', this.handlePointerUp);
