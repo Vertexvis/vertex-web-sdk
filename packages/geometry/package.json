@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/geometry",
-  "version": "0.9.15",
+  "version": "0.9.16",
   "description": "Library for 2D and 3D geometric types.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -38,7 +38,7 @@
     "@types/jest": "^24.0.23",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
     "@vertexvis/jest-config-vertexvis": "0.4.4",
-    "@vertexwebsdk/build": "0.9.15",
+    "@vertexwebsdk/build": "0.9.16",
     "eslint": "^6.1.0",
     "jest": "^24.9.0",
     "rollup": "^1.19.4",
