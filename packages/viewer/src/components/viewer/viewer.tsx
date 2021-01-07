@@ -65,6 +65,8 @@ import {
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
+import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
+import { CustomError } from '../../errors/customError';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -81,6 +83,18 @@ export class Viewer {
    *  * `urn:vertexvis:scene:<sceneid>`
    */
   @Prop() public src?: string;
+
+  /**
+   * The Client ID associated with your Vertex Application.
+   */
+  @Prop() public clientId?: string;
+
+  /**
+   * Property used for internals or testing.
+   *
+   * @private
+   */
+  @Prop() public sessionId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -149,6 +163,13 @@ export class Viewer {
    */
   @Event() public tokenExpired!: EventEmitter<void>;
 
+  /**
+   * Used for internals or testing.
+   *
+   * @private
+   */
+  @Event() public sessionidchange!: EventEmitter<string>;
+
   @State() private dimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
@@ -172,6 +193,7 @@ export class Viewer {
   private isResizing?: boolean;
   private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
+  private streamSessionId?: UUID.UUID = this.sessionId;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private isStreamStarted = false;
@@ -198,6 +220,17 @@ export class Viewer {
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
+
+    if (this.streamSessionId == null) {
+      try {
+        this.streamSessionId = getStorageEntry(
+          'vertexvis:stream-sessions',
+          entry => (this.clientId ? entry[this.clientId] : undefined)
+        );
+      } catch (e) {
+        // Ignore the case where we can't access local storage for fetching a session
+      }
+    }
 
     if (this.src != null) {
       this.load(this.src);
@@ -473,14 +506,36 @@ export class Viewer {
   private async connectStreamingClient(
     resource: LoadableResource.LoadableResource
   ): Promise<void> {
+    if (this.resource == null) {
+      this.errorMessage =
+        'Unable to start streaming session. Resource must be provided.';
+      console.error(
+        'Unable to start streaming session. Resource must be provided.'
+      );
+      throw new ViewerInitializationError(this.errorMessage);
+    }
+
     try {
       this.streamDisposable = await this.connectStream(resource);
 
       const result = await this.stream.startStream({
+        streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),
       });
+
+      if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
+        this.streamSessionId = result.startStream.sessionId.hex;
+        this.sessionidchange.emit(this.streamSessionId);
+        try {
+          upsertStorageEntry('vertexvis:stream-sessions', {
+            [this.clientId]: this.streamSessionId,
+          });
+        } catch (e) {
+          // Ignore the case where we can't access local storage for persisting a session
+        }
+      }
 
       if (result.startStream?.sceneViewId?.hex != null) {
         this.sceneViewId = result.startStream.sceneViewId.hex;
@@ -489,9 +544,12 @@ export class Viewer {
       if (result.startStream?.streamId?.hex != null) {
         this.streamId = result.startStream.streamId.hex;
       }
-
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
+      if (e instanceof CustomError) {
+        throw e;
+      }
+
       if (this.lastFrame == null) {
         this.errorMessage = 'Unable to establish connection to Vertex.';
         console.error('Failed to establish WS connection', e);
@@ -503,9 +561,17 @@ export class Viewer {
   private async connectStream(
     resource: LoadableResource.LoadableResource
   ): Promise<Disposable> {
+    if (this.clientId == null) {
+      console.warn(
+        'Client ID not provided, using legacy path. A Client ID will be required in an upcoming release.'
+      );
+    }
+
     const connection = await this.commands.execute<Disposable>(
       'stream.connect',
       {
+        clientId: this.clientId,
+        sessionId: this.sessionId || this.streamSessionId,
         resource,
       }
     );
@@ -557,9 +623,13 @@ export class Viewer {
       this.isStreamStarted = true;
       this.isReconnecting = false;
     } catch (e) {
+      if (e instanceof CustomError) {
+        throw e;
+      }
+
       const message = 'Unable to establish connection to Vertex.';
       if (!isReopen) {
-        this.errorMessage = message;
+        this.errorMessage = this.errorMessage || message;
         console.error('Failed to establish WS connection', e);
       }
       throw new WebsocketConnectionError(message, e);

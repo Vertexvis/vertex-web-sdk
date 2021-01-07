@@ -1,4 +1,5 @@
 jest.mock('./utils');
+jest.mock('../../sessions/storage');
 jest.mock('@vertexvis/stream-api');
 
 import '../../testing/domMocks';
@@ -13,6 +14,7 @@ import {
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../types/__fixtures__';
+import { upsertStorageEntry } from '../../sessions/storage';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -118,11 +120,17 @@ describe('vertex-viewer', () => {
       const api = viewer.getStreamApi();
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
-          url: expect.stringContaining('/stream-keys/123/session'),
+          url: expect.stringContaining('/ws'),
         }),
         expect.anything()
       );
-      expect(api.startStream).toHaveBeenCalled();
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamKey: {
+            value: '123',
+          },
+        })
+      );
     });
 
     it('starts a stream with a frame background color of the viewer', async () => {
@@ -145,10 +153,17 @@ describe('vertex-viewer', () => {
     });
 
     it('throws exception if scene cannot be loaded', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id=clientId></vertex-viewer`
+      );
       (viewer.getStreamApi().connect as jest.Mock).mockRejectedValue(
         new Error('Failed')
       );
+      expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
+    });
+
+    it('throws an exception if a client id is not provided', async () => {
+      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
       expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
     });
   });
@@ -196,7 +211,9 @@ describe('vertex-viewer', () => {
     };
 
     it('maintains configured attributes after being updated', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
       const api = viewer.getStreamApi();
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
@@ -219,7 +236,9 @@ describe('vertex-viewer', () => {
     });
 
     it('sends configured stream attributes on stream start', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
       const api = viewer.getStreamApi();
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
@@ -232,7 +251,9 @@ describe('vertex-viewer', () => {
     });
 
     it('sends configured stream attributes on reconnect', async () => {
-      const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
       const api = viewer.getStreamApi();
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
@@ -243,6 +264,56 @@ describe('vertex-viewer', () => {
         expect.objectContaining({
           streamAttributes: attributes,
         })
+      );
+    });
+  });
+
+  describe('session ids', () => {
+    it('passes the specified session id if provided', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId" session-id="sessionId"></vertex-viewer>`
+      );
+      const api = viewer.getStreamApi();
+      await loadNewModelForViewer(viewer, '123');
+
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringMatching(/sessionId=sessionId/),
+        }),
+        expect.anything()
+      );
+    });
+
+    it('does not pass a session id if none is present', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
+      const api = viewer.getStreamApi();
+      await loadNewModelForViewer(viewer, '123');
+
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.not.stringMatching(/sessionId=sessionId/),
+        }),
+        expect.anything()
+      );
+    });
+
+    it('passes a session id if one is present in storage', async () => {
+      upsertStorageEntry('vertexvis:stream-sessions', {
+        clientId: 'sessionId1',
+      });
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
+      const api = viewer.getStreamApi();
+      await loadNewModelForViewer(viewer, '123');
+
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringMatching(/sessionId=sessionId1/),
+        }),
+        expect.anything()
       );
     });
   });
@@ -257,7 +328,9 @@ async function createViewerWithLoadedStream(
   key: string,
   dispose?: () => void
 ): Promise<Viewer> {
-  const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
+  const viewer = await createViewerSpec(
+    `<vertex-viewer client-id="clientId"></vertex-viewer`
+  );
 
   return loadNewModelForViewer(viewer, key, dispose);
 }
