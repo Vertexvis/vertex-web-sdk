@@ -62,13 +62,19 @@ interface CdnConfig {
   entrypoint?: string;
 
   /**
-   * Indicates that this module is intended for CDN usage, and what global name
-   * the module should be available under. Setting this name will generate a
-   * UMD and ESM bundle in the /dist/cdn directory.
+   * Indicates the UMD global name where this package's exports will be made
+   * available.
    */
-  globalName?: string;
+  globalName: string;
 }
 
+/**
+ * Builds a Rollup configuration intended for use over CDN. This config
+ * will result in a UMD bundle being generated and placed in the `/dist/cdn`
+ * directory.
+ * 
+ * @param cdnConfig the configuration for generating this CDN bundle.
+ */
 export function rollupCdnConfig({
   entrypoint,
   globalName,

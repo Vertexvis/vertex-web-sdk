@@ -1,4 +1,4 @@
-import { rollupConfig } from '../rollup';
+import { rollupConfig, rollupCdnConfig } from '../rollup';
 
 describe(rollupConfig, () => {
   it('should generate single bundle if not multiplatform', () => {
@@ -14,5 +14,20 @@ describe(rollupConfig, () => {
   it('should generate browser and node bundles if isMultiPlatform', () => {
     const config = rollupConfig({ isMultiPlatform: true });
     expect(config).toHaveLength(2);
+  });
+});
+
+describe(rollupCdnConfig, () => {
+  it('should generate a umd bundle', () => {
+    const config = rollupCdnConfig({
+      globalName: 'Test',
+    });
+    expect(config).toMatchObject(
+      expect.objectContaining({
+        output: expect.arrayContaining([
+          expect.objectContaining({ format: 'umd' }),
+        ]),
+      })
+    );
   });
 });
