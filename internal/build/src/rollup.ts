@@ -11,6 +11,51 @@ import {
 
 interface Config {
   /**
+   * Indicates if the generated config will output both Node and browser
+   * bundles. This is useful for library projects that need to support both
+   * environments.
+   */
+  isMultiPlatform?: boolean;
+}
+
+export function rollupConfig({ isMultiPlatform = false }: Config = {}):
+  | RollupConfig
+  | RollupConfig[] {
+  if (!isMultiPlatform) {
+    return config(
+      input('src/index.ts'),
+      external('tslib'),
+      typescript(),
+      output(),
+      minify()
+    );
+  } else {
+    return [
+      config(
+        input('src/index.ts'),
+        commonJs({ commonjs: { namedExports: { uuid: ['v1'] } } }),
+        external('tslib'),
+        typescript(),
+        output(),
+        minify()
+      ),
+      config(
+        input('src/index.ts'),
+        commonJs({
+          commonjs: { namedExports: { uuid: ['v1'] } },
+          nodeResolve: { browser: true },
+        }),
+        external('tslib'),
+        typescript(),
+        output({ bundleName: 'browser' }),
+        minify()
+      ),
+    ];
+  }
+}
+
+interface CdnConfig {
+  /**
    * The entrypoint for the generated bundle. This defaults to `src/index.ts`
    * if not specified.
    */
@@ -22,84 +67,21 @@ interface Config {
    * UMD and ESM bundle in the /dist/cdn directory.
    */
   globalName?: string;
-
-  /**
-   * Indicates if the generated config will output both Node and browser
-   * bundles. This is useful for library projects that need to support both
-   * environments.
-   */
-  isMultiPlatform?: boolean;
 }
 
-export function rollupConfig({
+export function rollupCdnConfig({
   entrypoint,
   globalName,
-  isMultiPlatform = false,
-}: Config = {}): RollupConfig | RollupConfig[] {
-  if (!isMultiPlatform) {
-    return withCdnDistribution(
-      config(
-        input(entrypoint || 'src/index.ts'),
-        typescript(),
-        output(),
-        minify()
-      ),
-      globalName
-    );
-  } else {
-    return [
-      config(
-        input(entrypoint || 'src/index.ts'),
-        commonJs({ commonjs: { namedExports: { uuid: ['v1'] } } }),
-        typescript(),
-        output(),
-        minify()
-      ),
-      ...withCdnDistribution(
-        config(
-          input(entrypoint || 'src/index.ts'),
-          commonJs({
-            commonjs: { namedExports: { uuid: ['v1'] } },
-            nodeResolve: { browser: true },
-          }),
-          typescript(),
-          output({ bundleName: 'browser' }),
-          minify()
-        ),
-        globalName,
-        { bundleName: 'browser' }
-      ),
-    ];
-  }
-}
-
-function withCdnDistribution(
-  baseConfig: RollupConfig,
-  globalName?: string,
-  options?: Record<string, string>
-): RollupConfig[] {
-  if (globalName != null) {
-    const cdnConfig = config(
-      () => ({ ...baseConfig, plugins: [] }),
-      commonJs({ nodeResolve: { browser: true } }),
-      output({
-        formats: ['umd'],
-        name: globalName,
-        bundleName: 'cdn/bundle',
-        ...options,
-      }),
-      minify()
-    );
-
-    return [
-      {
-        ...baseConfig,
-        ...cdnConfig,
-        plugins: [...(baseConfig.plugins || []), ...(cdnConfig.plugins || [])],
-      },
-      baseConfig,
-    ];
-  }
-
-  return [config(() => baseConfig, external('tslib'))];
+}: CdnConfig): RollupConfig {
+  return config(
+    input(entrypoint || 'src/index.ts'),
+    typescript(),
+    commonJs({ nodeResolve: { browser: true } }),
+    output({
+      formats: ['umd'],
+      name: globalName,
+      bundleName: 'cdn/bundle'
+    }),
+    minify()
+  );
 }

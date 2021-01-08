@@ -1,6 +1,6 @@
-import { rollupConfig } from '@vertexwebsdk/build';
+import { rollupCdnConfig } from '@vertexwebsdk/build';
 
-export default rollupConfig({
+export default rollupCdnConfig({
   entrypoint: 'src/utils.ts',
   globalName: 'Vertexvis.Viewer',
 });
