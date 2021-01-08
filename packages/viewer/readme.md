@@ -38,10 +38,52 @@ file that references our published JS bundles from a CDN.
   </head>
 
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123" client-id="123"></vertex-viewer>
   </body>
 </html>
 ```
+
+---
+
+The `@vertexvis/viewer` package also provides a set of utilities for use with its API.
+These utilities can be imported from a CDN either using ESM imports, or a UMD
+global.
+
+```html
+<!-- ESM import -->
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="module">
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/viewer/viewer.esm.js';
+
+      function main() {
+        const color = ColorMaterial.fromHex('#ff0000');
+      }
+    </script>
+  </body>
+</html>
+
+<!-- UMD global -->
+<html>
+  <head>
+    <script
+      nomodule
+      src="https://unpkg.com/@vertexvis/viewer@0.9.16/dist/cdn/bundle.umd.js"
+    ></script>
+  </head>
+  <body>
+    <script>
+      function main() {
+        const color = window.Vertexvis.Viewer.ColorMaterial.fromHex('#ff0000');
+      }
+    </script>
+  </body>
+</html>
+```
+
+---
 
 ### NPM Dependency
 
