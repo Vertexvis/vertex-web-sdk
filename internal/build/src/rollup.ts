@@ -80,7 +80,7 @@ export function rollupCdnConfig({
     output({
       formats: ['umd'],
       name: globalName,
-      bundleName: 'cdn/bundle'
+      bundleName: 'cdn/bundle',
     }),
     minify()
   );
