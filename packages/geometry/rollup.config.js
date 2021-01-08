@@ -1,3 +1,3 @@
 import { rollupConfig } from '@vertexwebsdk/build';
 
-export default rollupConfig();
+export default rollupConfig({ globalName: 'Vertexvis.Geometry' });
