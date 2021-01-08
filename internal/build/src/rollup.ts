@@ -37,15 +37,6 @@ export function rollupConfig({
   isMultiPlatform = false,
 }: Config = {}): RollupConfig | RollupConfig[] {
   if (!isMultiPlatform) {
-    console.log(
-      config(
-        input(entrypoint || 'src/index.ts'),
-        typescript(),
-        external('tslib'),
-        output(),
-        minify()
-      )
-    );
     return withCdnDistribution(
       config(
         input(entrypoint || 'src/index.ts'),
@@ -92,7 +83,7 @@ function withCdnDistribution(
       () => ({ ...baseConfig, plugins: [] }),
       commonJs({ nodeResolve: { browser: true } }),
       output({
-        formats: ['umd', 'esm'],
+        formats: ['umd'],
         name: globalName,
         bundleName: 'cdn/bundle',
         ...options,
