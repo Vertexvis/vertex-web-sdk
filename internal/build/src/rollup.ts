@@ -72,7 +72,7 @@ interface CdnConfig {
  * Builds a Rollup configuration intended for use over CDN. This config
  * will result in a UMD bundle being generated and placed in the `/dist/cdn`
  * directory.
- * 
+ *
  * @param cdnConfig the configuration for generating this CDN bundle.
  */
 export function rollupCdnConfig({
