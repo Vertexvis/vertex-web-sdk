@@ -11,6 +11,12 @@ import {
 
 interface Config {
   /**
+   * The entrypoint for the generated bundle. This defaults to `src/index.ts`
+   * if not specified.
+   */
+  entrypoint?: string;
+
+  /**
    * Indicates that this module is intended for CDN usage, and what global name
    * the module should be available under. Setting this name will generate a
    * UMD and ESM bundle in the /dist/cdn directory.
@@ -26,18 +32,24 @@ interface Config {
 }
 
 export function rollupConfig({
-  isMultiPlatform = false,
+  entrypoint,
   globalName,
+  isMultiPlatform = false,
 }: Config = {}): RollupConfig | RollupConfig[] {
   if (!isMultiPlatform) {
     return withCdnDistribution(
-      config(input('src/index.ts'), typescript(), output(), minify()),
+      config(
+        input(entrypoint || 'src/index.ts'),
+        typescript(),
+        output(),
+        minify()
+      ),
       globalName
     );
   } else {
     return [
       config(
-        input('src/index.ts'),
+        input(entrypoint || 'src/index.ts'),
         commonJs({ commonjs: { namedExports: { uuid: ['v1'] } } }),
         typescript(),
         output(),
@@ -45,7 +57,7 @@ export function rollupConfig({
       ),
       ...withCdnDistribution(
         config(
-          input('src/index.ts'),
+          input(entrypoint || 'src/index.ts'),
           commonJs({
             commonjs: { namedExports: { uuid: ['v1'] } },
             nodeResolve: { browser: true },
@@ -67,13 +79,16 @@ function withCdnDistribution(
   options?: Record<string, string>
 ): RollupConfig[] {
   if (globalName != null) {
-    const cdnConfig = minify()(
+    const cdnConfig = config(
+      () => ({ ...baseConfig, plugins: [] }),
+      commonJs({nodeResolve: { browser: true },}),
       output({
         formats: ['umd', 'esm'],
         name: globalName,
         bundleName: 'cdn/bundle',
         ...options,
-      })(baseConfig)
+      }),
+      minify()
     );
 
     return [
