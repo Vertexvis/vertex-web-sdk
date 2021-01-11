@@ -3,7 +3,7 @@ import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
-import { ColorMaterial } from './colorMaterial';
+import { ColorMaterial, fromHex } from './colorMaterial';
 import {
   SceneItemOperations,
   SceneOperationBuilder,
@@ -32,11 +32,20 @@ export class SceneItemOperationsBuilder
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
   }
 
-  public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(
-      this.query,
-      this.builder.materialOverride(color)
-    );
+  public materialOverride(hex: string): SceneItemOperationsBuilder;
+  public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder;
+  public materialOverride(...args: any[]) {
+    if (typeof args[0] === 'string') {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.materialOverride(fromHex(args[0]))
+      );
+    } else {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.materialOverride(args[0])
+      );
+    }
   }
 
   public hide(): SceneItemOperationsBuilder {
