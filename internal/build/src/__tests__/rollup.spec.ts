@@ -18,14 +18,12 @@ describe(rollupConfig, () => {
 });
 
 describe(rollupCdnConfig, () => {
-  it('should generate a umd bundle', () => {
-    const config = rollupCdnConfig({
-      globalName: 'Test',
-    });
+  it('should generate an esm bundle', () => {
+    const config = rollupCdnConfig({});
     expect(config).toMatchObject(
       expect.objectContaining({
         output: expect.arrayContaining([
-          expect.objectContaining({ format: 'umd' }),
+          expect.objectContaining({ format: 'esm' }),
         ]),
       })
     );

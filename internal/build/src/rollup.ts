@@ -7,6 +7,7 @@ import {
   input,
   external,
   RollupConfig,
+  autoExternal,
 } from '@vertexvis/build-tools';
 
 interface Config {
@@ -60,32 +61,25 @@ interface CdnConfig {
    * if not specified.
    */
   entrypoint?: string;
-
-  /**
-   * Indicates the UMD global name where this package's exports will be made
-   * available.
-   */
-  globalName: string;
 }
 
 /**
  * Builds a Rollup configuration intended for use over CDN. This config
- * will result in a UMD bundle being generated and placed in the `/dist/cdn`
- * directory.
+ * will result in an ESM bundle being generated and placed in the `/dist/cdn`
+ * directory which does not treat peer dependencies as external.
  *
  * @param cdnConfig the configuration for generating this CDN bundle.
  */
-export function rollupCdnConfig({
-  entrypoint,
-  globalName,
-}: CdnConfig): RollupConfig {
+export function rollupCdnConfig({ entrypoint }: CdnConfig = {}): RollupConfig {
   return config(
     input(entrypoint || 'src/index.ts'),
+    autoExternal({
+      peerDependencies: false,
+    }),
     typescript(),
     commonJs({ nodeResolve: { browser: true } }),
     output({
-      formats: ['umd'],
-      name: globalName,
+      formats: ['esm'],
       bundleName: 'cdn/bundle',
     }),
     minify()

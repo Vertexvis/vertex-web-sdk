@@ -32,7 +32,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "stencil build --docs && rollup --config ./rollup.config.js --silent",
+    "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",

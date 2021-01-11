@@ -45,12 +45,11 @@ file that references our published JS bundles from a CDN.
 
 ---
 
-The `@vertexvis/viewer` package also provides a set of utilities for use with its API.
-These utilities can be imported from a CDN either using ESM imports, or a UMD
-global.
+This package also provides a set of utilities for use with its API.
+These utilities can be imported from a CDN as shown below:
 
 ```html
-<!-- ESM import -->
+<!-- CDN -->
 <html>
   <head>
   </head>
@@ -60,23 +59,6 @@ global.
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');
-      }
-    </script>
-  </body>
-</html>
-
-<!-- UMD global -->
-<html>
-  <head>
-    <script
-      nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.9.16/dist/cdn/bundle.umd.js"
-    ></script>
-  </head>
-  <body>
-    <script>
-      function main() {
-        const color = window.Vertexvis.Viewer.ColorMaterial.fromHex('#ff0000');
       }
     </script>
   </body>

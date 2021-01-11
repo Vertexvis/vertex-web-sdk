@@ -1,3 +1,7 @@
+import * as ColorMaterial from './scenes/colorMaterial';
+
+export { ColorMaterial };
+
 export * from './components';
 
-export * from './utils';
+export * from './interactions/interactionHandler';
