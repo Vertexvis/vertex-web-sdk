@@ -32,18 +32,18 @@ export class SceneItemOperationsBuilder
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
   }
 
-  public materialOverride(hex: string): SceneItemOperationsBuilder;
-  public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder;
-  public materialOverride(...args: any[]) {
-    if (typeof args[0] === 'string') {
+  public materialOverride(
+    color: ColorMaterial | string
+  ): SceneItemOperationsBuilder {
+    if (typeof color === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.materialOverride(fromHex(args[0]))
+        this.builder.materialOverride(fromHex(color))
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.materialOverride(args[0])
+        this.builder.materialOverride(color)
       );
     }
   }
