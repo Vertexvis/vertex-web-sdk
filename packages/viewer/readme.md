@@ -67,6 +67,22 @@ These utilities can be imported from a CDN as shown below:
 
 ---
 
+If you want to interact with the web component via JavaScript, you'll need to ensure the browser has registered the custom elements prior to use. 
+
+Import `defineCustomElements`, and this will register all custom elements in your DOM.
+```js
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/esm/loader.mjs';
+
+async function main() {
+  const viewer = document.querySelector('#viewer');
+  viewer.load("urn:vertexvis:stream-key:123")
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  defineCustomElements(window).then(() => main());
+});
+```
+
 ### NPM Dependency
 
 Our components can also be installed as an NPM dependency and imported through a
