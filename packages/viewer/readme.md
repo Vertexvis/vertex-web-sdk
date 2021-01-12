@@ -55,7 +55,7 @@ These utilities can be imported from a CDN as shown below:
   </head>
   <body>
     <script type="module">
-      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/viewer/viewer.esm.js';
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/esm/index.mjs';
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');

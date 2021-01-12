@@ -33,7 +33,7 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/build-tools": "0.8.1",
+    "@vertexvis/build-tools": "0.8.2",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "tslib": "^2.0.1"
   },

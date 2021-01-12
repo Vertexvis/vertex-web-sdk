@@ -582,10 +582,10 @@
     "@typescript-eslint/types" "4.0.1"
     eslint-visitor-keys "^2.0.0"
 
-"@vertexvis/build-tools@0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/build-tools/-/build-tools-0.8.1.tgz#71bea1ef5dbeb160baa9dbcd2a32e02f3499756e"
-  integrity sha512-JvyT5aZxAxcmkOWgi9gVyrnM8mjo29ZWTJHMBU/csOwtnJYPJC9Yc7mYMRqcwM41fMVhJf3uOgWzdeYacXoDOA==
+"@vertexvis/build-tools@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis/build-tools/-/build-tools-0.8.2.tgz#e75e0f5c5b2a4eab3c94ab788139e69a48e96c62"
+  integrity sha512-FSCWvLeYalWf5JWZoo1Cx2QAzxCi3FRoj9dg6PJiQVc75op6CdvwcTY8NIgS6Cvmd/yQJ2y9XItzUfS3CuWWdA==
   dependencies:
     "@vertexvis/rollup-plugin-vertexvis-copyright" "0.2.0"
     rollup "^1.19.4"
