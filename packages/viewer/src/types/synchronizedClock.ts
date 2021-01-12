@@ -22,8 +22,8 @@ type Milliseconds = number;
  */
 export class SynchronizedClock {
   public constructor(
-    private readonly knownRemoteTime: Date,
-    private readonly knownLocalTime = new Date()
+    public readonly knownRemoteTime: Date,
+    public readonly knownLocalTime = new Date()
   ) {}
 
   /**

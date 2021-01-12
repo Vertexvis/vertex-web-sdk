@@ -14,7 +14,16 @@ function calculateSendToReceiveDuration(
 ): google.protobuf.IDuration | undefined {
   if (clock != null) {
     const receivedAt = new Date(Date.now());
-    return toProtoDuration(sentAt, receivedAt);
+    const duration = toProtoDuration(sentAt, receivedAt);
+
+    const durationInMs = protoToDate(duration).getTime();
+    if (durationInMs < 0) {
+      console.warn(
+        `Possible erroneous send to receive timing [sent-at=${sentAt.toISOString()}, received-at=${receivedAt.toISOString()}, remote-time=${clock?.knownRemoteTime?.toISOString()}]`
+      );
+    }
+
+    return duration;
   }
 }
 
