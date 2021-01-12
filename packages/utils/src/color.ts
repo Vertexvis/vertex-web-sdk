@@ -119,7 +119,7 @@ export const isOpaque = (color: Color): boolean => {
  * Converts a `Color` to a hex string. The returned string will be prefixed with
  * `#`.
  */
-export const toHexString = (color: Color): string => {
+export const toHexString = (color: Omit<Color, 'a'>): string => {
   return `#${componentToHex(color.r)}${componentToHex(color.g)}${componentToHex(
     color.b
   )}`;
