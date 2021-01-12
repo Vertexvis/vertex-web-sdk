@@ -1,6 +1,6 @@
 #/bin/sh
 #
-# Script to generate Viewer SDK documentation.
+# Script to generate SDK documentation.
 
 set -e
 

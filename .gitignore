@@ -77,3 +77,6 @@ dist
 
 # Ignore anything in a `generated` directory
 generated/
+
+# Ignore files used for generating READMEs
+.lib

@@ -40,7 +40,7 @@
     "test:watch": "stencil test --spec --watchAll",
     "test:coverage": "stencil test --spec --coverage .spec",
     "generate": "stencil generate",
-    "generate:docs": "./scripts/generate_docs.sh",
+    "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs"
   },
   "dependencies": {
