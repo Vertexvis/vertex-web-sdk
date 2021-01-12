@@ -28,8 +28,10 @@
     </style>
 
     <script type="module">
+      import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+      
       window.addEventListener('DOMContentLoaded', () => {
-        main();
+        defineCustomElements(window).then(() => main());
       });
 
       async function main() {
