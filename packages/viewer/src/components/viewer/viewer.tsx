@@ -597,6 +597,9 @@ export class Viewer {
         const remoteTime = protoToDate(resp.syncTime.replyTime);
         if (remoteTime != null) {
           this.clock = new SynchronizedClock(remoteTime);
+          console.debug(
+            `Synchronized time [local-time=${this.clock.knownLocalTime.toISOString()}, remote-time=${this.clock.knownRemoteTime.toISOString()}]`
+          );
         }
       }
     } catch (e) {
