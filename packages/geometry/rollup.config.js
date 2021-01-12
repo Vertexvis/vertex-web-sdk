@@ -1,3 +1,8 @@
-import { rollupConfig } from '@vertexwebsdk/build';
+import { rollupConfig, rollupCdnConfig } from '@vertexwebsdk/build';
 
-export default rollupConfig();
+const standardConfig = rollupConfig();
+const cdnConfig = rollupCdnConfig();
+
+export default typeof standardConfig === 'array'
+  ? [...standardConfig, cdnConfig]
+  : [standardConfig, cdnConfig];

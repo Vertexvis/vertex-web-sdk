@@ -38,16 +38,40 @@ file that references our published JS bundles from a CDN.
   </head>
 
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123" client-id="123"></vertex-viewer>
   </body>
 </html>
 ```
+
+---
+
+This package also provides a set of utilities for use with its API.
+These utilities can be imported from a CDN as shown below:
+
+```html
+<!-- CDN -->
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="module">
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/esm/index.mjs';
+
+      function main() {
+        const color = ColorMaterial.fromHex('#ff0000');
+      }
+    </script>
+  </body>
+</html>
+```
+
+---
 
 If you want to interact with the web component via JavaScript, you'll need to ensure the browser has registered the custom elements prior to use. 
 
 Import `defineCustomElements`, and this will register all custom elements in your DOM.
 ```js
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.9.16/dist/esm/loader.mjs';
 
 async function main() {
   const viewer = document.querySelector('#viewer');
@@ -57,7 +81,6 @@ async function main() {
 window.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());
 });
-
 ```
 
 ### NPM Dependency
