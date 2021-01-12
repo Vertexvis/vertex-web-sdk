@@ -28,7 +28,8 @@
     </style>
 
     <script type="module">
-      window.addEventListener('DOMContentLoaded', () => {
+      window.addEventListener('DOMContentLoaded', async () => {
+        await window.customElements.whenDefined('vertex-viewer');
         main();
       });
 
