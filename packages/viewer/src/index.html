@@ -28,12 +28,12 @@
     </style>
 
     <script type="module">
-      window.addEventListener('DOMContentLoaded', async () => {
-        await window.customElements.whenDefined('vertex-viewer');
+      window.addEventListener('DOMContentLoaded', () => {
         main();
       });
 
       async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
         const viewer = document.querySelector('#viewer');
       }
     </script>
