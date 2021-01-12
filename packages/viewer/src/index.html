@@ -28,13 +28,13 @@
     </style>
 
     <script type="module">
-      import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
-      
+
       window.addEventListener('DOMContentLoaded', () => {
-        defineCustomElements(window).then(() => main());
+        main();
       });
 
       async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
         const viewer = document.querySelector('#viewer');
       }
     </script>

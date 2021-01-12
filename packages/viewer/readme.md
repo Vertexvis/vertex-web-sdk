@@ -43,6 +43,28 @@ file that references our published JS bundles from a CDN.
 </html>
 ```
 
+If you want to interact with the web component via JavaScript, you'll need to ensure the browser has registered the custom elements prior to use. 
+
+One option is to call this prior to any method calls on the viewer:
+```js
+  await window.customElements.whenDefined('vertex-viewer');
+```
+
+Another option is to import `defineCustomElements`, and this will register all custom elements in your DOM.
+```js
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+
+async function main() {
+  const viewer = document.querySelector('#viewer');
+  viewer.load(...)
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  defineCustomElements(window).then(() => main());
+});
+
+```
+
 ### NPM Dependency
 
 Our components can also be installed as an NPM dependency and imported through a
