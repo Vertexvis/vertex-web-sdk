@@ -21,7 +21,7 @@ viewer.
   </head>
   <body>
     <script type="module">
-      import { Vector3 } from 'https://unpkg.com/@vertexvis/geometry@0.9.17/dist/cdn/bundle.esm.js';
+      import { Vector3 } from 'https://unpkg.com/@vertexvis/geometry@0.9.18/dist/cdn/bundle.esm.js';
 
       async function main() {
         const viewer = document.querySelector('#viewer');
