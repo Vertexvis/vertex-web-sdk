@@ -8,7 +8,7 @@ set -e
 
 next_bump=`jq -r '.nextVersionBump' package.json`
 
-npx lerna publish from-package --canary --preid next --dist-tag next --yes "$next_bump"
+npx lerna publish from-package --canary --preid next --dist-tag next --yes
 
 version="v$(npm view @vertexvis/viewer dist-tags.next)"
 sha="$(git rev-parse HEAD)"
