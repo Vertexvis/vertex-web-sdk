@@ -25,15 +25,15 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.9.17/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.9.17/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.9.17/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer.js"
     ></script>
   </head>
 
@@ -55,7 +55,7 @@ These utilities can be imported from a CDN as shown below:
   </head>
   <body>
     <script type="module">
-      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.17/dist/esm/index.mjs';
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.18/dist/esm/index.mjs';
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');
@@ -71,7 +71,7 @@ If you want to interact with the web component via JavaScript, you'll need to en
 
 Import `defineCustomElements`, and this will register all custom elements in your DOM.
 ```js
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.9.17/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.9.18/dist/esm/loader.mjs';
 
 async function main() {
   const viewer = document.querySelector('#viewer');
@@ -92,7 +92,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^0.9.17"
+    "@vertexvis/viewer": "^0.9.18"
   }
 }
 ```
