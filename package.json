@@ -5,6 +5,7 @@
   "devDependencies": {
     "eslint": "^6.1.0",
     "lerna": "^3.21.0",
+    "semver": "^7.3.4",
     "typescript": "^3.7.4"
   },
   "scripts": {
