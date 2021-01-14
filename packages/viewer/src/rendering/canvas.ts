@@ -55,11 +55,14 @@ function reportTimings(
 export function measureCanvasRenderer(
   meter: TimingMeter,
   renderer: CanvasRenderer,
+  logFrameRate: boolean,
   callback: ReportTimingsCallback,
   intervalMs: number = REPORTING_INTERVAL_MS
 ): CanvasRenderer {
   let timer: number | undefined;
   let renderCount = 0;
+  let framesRendered: number | undefined;
+  let fpsHistory: number[] = [];
 
   function start(): void {
     renderCount++;
@@ -84,14 +87,39 @@ export function measureCanvasRenderer(
     }
   }
 
+  if (logFrameRate != null) {
+    setInterval(() => {
+      if (framesRendered != null) {
+        if (fpsHistory.length === 5) {
+          fpsHistory = [...fpsHistory.slice(1), framesRendered];
+        } else {
+          fpsHistory.push(framesRendered);
+        }
+
+        const avgFps =
+          fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
+        console.debug(`Paint rate: ${framesRendered}fps`);
+        console.debug(`Paint rate (avg): ${avgFps}`);
+        framesRendered = undefined;
+      }
+    }, 1000);
+  }
+
   return data => {
     start();
-    return meter.measure(renderer(data)).finally(() => end());
+    return meter
+      .measure(async () => {
+        const frame = await renderer(data);
+        framesRendered = framesRendered == null ? 1 : framesRendered + 1;
+        return frame;
+      })
+      .finally(() => end());
   };
 }
 
 export function createCanvasRenderer(): CanvasRenderer {
   let lastFrameNumber: number | undefined;
+  let framesRendered: number | undefined;
 
   return async data => {
     const frameNumber = data.frame.sequenceNumber;
@@ -100,6 +128,7 @@ export function createCanvasRenderer(): CanvasRenderer {
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
       drawImage(image, data);
+      framesRendered = framesRendered == null ? 1 : framesRendered + 1;
     }
 
     image.dispose();

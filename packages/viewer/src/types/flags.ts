@@ -16,7 +16,12 @@ type Flag =
   /**
    * Enables or disables logging of WS message payloads.
    */
-  | 'logWsMessages';
+  | 'logWsMessages'
+
+  /**
+   * Toggles the logging of frame rates.
+   */
+  | 'logFrameRate';
 
 /**
  * A set of experimental features that can be enabled through the viewer's
@@ -28,6 +33,7 @@ export const defaultFlags: Flags = {
   throttleFrameDelivery: true,
   adaptiveRendering: true,
   logWsMessages: false,
+  logFrameRate: false,
 };
 
 export function createFlags(
