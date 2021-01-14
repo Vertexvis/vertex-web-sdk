@@ -579,6 +579,7 @@ export class Viewer {
     this.canvasRenderer = measureCanvasRenderer(
       Metrics.paintTime,
       createCanvasRenderer(),
+      this.getConfig().flags.logFrameRate,
       timings => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
