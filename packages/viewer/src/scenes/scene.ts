@@ -3,14 +3,13 @@ import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
-import { ColorMaterial } from './colorMaterial';
+import { ColorMaterial, fromHex } from './colorMaterial';
 import {
   SceneItemOperations,
   SceneOperationBuilder,
   ItemOperation,
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
-import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
@@ -33,11 +32,20 @@ export class SceneItemOperationsBuilder
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
   }
 
-  public materialOverride(color: ColorMaterial): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(
-      this.query,
-      this.builder.materialOverride(color)
-    );
+  public materialOverride(
+    color: ColorMaterial | string
+  ): SceneItemOperationsBuilder {
+    if (typeof color === 'string') {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.materialOverride(fromHex(color))
+      );
+    } else {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.materialOverride(color)
+      );
+    }
   }
 
   public hide(): SceneItemOperationsBuilder {
@@ -116,8 +124,7 @@ export class Scene {
     private stream: StreamApi,
     private renderer: RemoteRenderer,
     private frame: Frame.Frame,
-    private commands: CommandRegistry,
-    private sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID
   ) {}
 
   /**

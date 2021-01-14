@@ -25,22 +25,62 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.9.13/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.9.13/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer/viewer.esm.js"
     ></script>
     <script
       nomodule
-      src="https://unpkg.com/@vertexvis/viewer@0.9.13/dist/viewer.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.18/dist/viewer.js"
     ></script>
   </head>
 
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123" client-id="123"></vertex-viewer>
   </body>
 </html>
+```
+
+---
+
+This package also provides a set of utilities for use with its API.
+These utilities can be imported from a CDN as shown below:
+
+```html
+<!-- CDN -->
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="module">
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.18/dist/esm/index.mjs';
+
+      function main() {
+        const color = ColorMaterial.fromHex('#ff0000');
+      }
+    </script>
+  </body>
+</html>
+```
+
+---
+
+If you want to interact with the web component via JavaScript, you'll need to ensure the browser has registered the custom elements prior to use. 
+
+Import `defineCustomElements`, and this will register all custom elements in your DOM.
+```js
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.9.18/dist/esm/loader.mjs';
+
+async function main() {
+  const viewer = document.querySelector('#viewer');
+  viewer.load("urn:vertexvis:stream-key:123")
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  defineCustomElements(window).then(() => main());
+});
 ```
 
 ### NPM Dependency
@@ -52,7 +92,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^0.9.13"
+    "@vertexvis/viewer": "^0.9.18"
   }
 }
 ```

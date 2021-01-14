@@ -41,3 +41,5 @@ export interface ZoomInteractionEvent extends InteractionEvent {
    */
   delta: number;
 }
+
+export type BaseEvent = MouseEvent | PointerEvent;

@@ -1,5 +1,8 @@
 # React Bindings for Vertex Viewer SDK
 
+![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)
+![npm (scoped with tag)](https://img.shields.io/npm/v/@vertexvis/viewer-react/canary)
+
 Project contains React bindings for Vertex's Viewer SDK. These bindings are
 auto-generated from `@vertexvis/viewer`.
 

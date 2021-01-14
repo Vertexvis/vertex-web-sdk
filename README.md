@@ -3,10 +3,16 @@
 Welcome to the Vertex Web SDK repo. This is a monorepo containing SDKs for the
 web platform.
 
-## Structure
+## Packages
 
-- `./packages`: Contains platform SDK packages that are published to NPM.
-- `./scripts`: Contains Bash scripts for managing the project.
+| Package      | Version | Description |
+| ------------ | ------- | ----------- |
+| [@vertexvis/geometry]      | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)      | 2D/3D geometry utilities. |
+| [@vertexvis/stream-api]    | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)    | The API client for streaming 3D images. |
+| [@vertexvis/utils]         | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)         | General Node and Web utilities used within Vertex. |
+| [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)        | The Web SDK containing web components to view 3D models. |
+| [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)  | Contains React bindings for Vertex's Web SDK. |
+
 
 ## Setup & Installing
 
@@ -51,11 +57,27 @@ to execute any NPM `test` scripts present for each package.
 Additionally, the project exposes a top-level script to check code coverage
 (`yarn test:coverage`).
 
+## Bumping Versions
+
+The project's release scripts will automatically bump version based on the
+`nextBumpVersion` that's specified in the projects `package.json` file. When
+making a breaking change, you should run `yarn version:bump` and specify
+`minor`. This should be done as part of your PR.
+
+**Note:** minor is being used to signal breaking changes until the Web SDK hits
+1.0.
+
 ## Releasing
 
-To create a release, run the `yarn release` NPM script. This script will verify
-that your working directory is clean, is up-to-date with master, ask for the
-release version, generate documentation, and push a release branch to GitHub.
+Run `yarn release` to create a release based on the `nextBumpVersion` that's
+specified in the projects `package.json` file. This field tracks if the next
+version should be a `major`, `minor` or `patch` release.
+
+Run `yarn release:ask` to specify a custom release version.
+
+These script will verify that your working directory is clean, is up-to-date
+with master, ask for the release version, generate documentation, and push a
+release branch to GitHub.
 
 You can then create a PR from the release branch. Once your PR has been approved
 and merged, the CI pipeline will automatically publish packages to NPM, tag the
@@ -71,3 +93,8 @@ a 1.0 milestone, semver rules should still apply, but minor will be treated as
 major and patch will be treated as minor.
 
 [semver]: https://semver.org/
+[@vertexvis/geometry]: ./packages/geometry
+[@vertexvis/stream-api]: ./packages/stream-api
+[@vertexvis/utils]: ./packages/utils
+[@vertexvis/viewer]: ./packages/viewer
+[@vertexvis/viewer-react]: ./packages/viewer-react

@@ -1,32 +1,20 @@
+jest.mock('@vertexvis/stream-api');
+
 import { Scene } from '../scene';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Dimensions } from '@vertexvis/geometry';
 import { frame } from '../../types/__fixtures__';
-import { CommandRegistry } from '../../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { ColorMaterial } from '../..';
 
 describe(Scene, () => {
-  const executeMock = jest.fn();
-  const commandRegistry = ({
-    execute: executeMock,
-  } as unknown) as CommandRegistry;
   const renderer = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
-  const streamApi = {
-    createSceneAlteration: jest.fn(),
-  };
-  const scene = new Scene(
-    streamApi as StreamApi,
-    renderer,
-    frame,
-    commandRegistry,
-    sceneViewId
-  );
+  const streamApi = new StreamApi();
+  const scene = new Scene(streamApi, renderer, frame, sceneViewId);
 
   afterEach(() => {
-    executeMock.mockReset();
-    streamApi.createSceneAlteration.mockReset();
+    jest.resetAllMocks();
   });
 
   describe(Scene.prototype.camera, () => {

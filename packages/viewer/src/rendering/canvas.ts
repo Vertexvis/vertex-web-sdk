@@ -55,11 +55,14 @@ function reportTimings(
 export function measureCanvasRenderer(
   meter: TimingMeter,
   renderer: CanvasRenderer,
+  logFrameRate: boolean,
   callback: ReportTimingsCallback,
   intervalMs: number = REPORTING_INTERVAL_MS
 ): CanvasRenderer {
   let timer: number | undefined;
   let renderCount = 0;
+  let fpsFrameCount: number | undefined;
+  let fpsHistory: number[] = [];
 
   function start(): void {
     renderCount++;
@@ -84,9 +87,33 @@ export function measureCanvasRenderer(
     }
   }
 
+  if (logFrameRate) {
+    setInterval(() => {
+      if (fpsFrameCount != null) {
+        if (fpsHistory.length === 5) {
+          fpsHistory = [...fpsHistory.slice(1), fpsFrameCount];
+        } else {
+          fpsHistory.push(fpsFrameCount);
+        }
+
+        const avgFps =
+          fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
+        console.debug(`Paint rate: ${fpsFrameCount}fps`);
+        console.debug(`Paint rate (avg): ${avgFps}`);
+        fpsFrameCount = undefined;
+      }
+    }, 1000);
+  }
+
   return data => {
     start();
-    return meter.measure(renderer(data)).finally(() => end());
+    return meter
+      .measure(async () => {
+        const frame = await renderer(data);
+        fpsFrameCount = fpsFrameCount == null ? 1 : fpsFrameCount + 1;
+        return frame;
+      })
+      .finally(() => end());
   };
 }
 

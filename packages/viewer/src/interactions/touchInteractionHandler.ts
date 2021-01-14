@@ -1,16 +1,12 @@
 import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
-import { InteractionHandler } from './interactionHandler';
+import { MultiTouchInteractionHandler } from './multiTouchInteractionHandler';
 
-export class TouchInteractionHandler implements InteractionHandler {
-  private element?: HTMLElement;
-  private interactionApi?: InteractionApi;
-
+export class TouchInteractionHandler extends MultiTouchInteractionHandler {
   private isInteracting?: boolean;
-  private currentPosition1?: Point.Point;
-  private currentPosition2?: Point.Point;
 
   public constructor() {
+    super();
     this.handleTouchStart = this.handleTouchStart.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleTouchEnd = this.handleTouchEnd.bind(this);
@@ -18,12 +14,11 @@ export class TouchInteractionHandler implements InteractionHandler {
 
   public dispose(): void {
     this.element?.removeEventListener('touchstart', this.handleTouchStart);
-    this.element = undefined;
+    super.dispose();
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
-    this.element = element;
-    this.interactionApi = api;
+    super.initialize(element, api);
 
     element.addEventListener('touchstart', this.handleTouchStart);
   }
@@ -54,7 +49,16 @@ export class TouchInteractionHandler implements InteractionHandler {
     if (event.touches.length === 1) {
       this.handleOnePointTouchMove(event.touches[0]);
     } else if (event.touches.length === 2) {
-      this.handleTwoPointTouchMove(event.touches[0], event.touches[1]);
+      const point1 = Point.create(
+        event.touches[0].clientX,
+        event.touches[0].clientY
+      );
+      const point2 = Point.create(
+        event.touches[1].clientX,
+        event.touches[1].clientY
+      );
+
+      this.handleTwoPointTouchMove(point1, point2);
     }
   }
 
@@ -84,32 +88,5 @@ export class TouchInteractionHandler implements InteractionHandler {
     }
 
     this.currentPosition1 = position;
-  }
-
-  private handleTwoPointTouchMove(touch1: Touch, touch2: Touch): void {
-    const position1 = Point.create(touch1.screenX, touch1.screenY);
-    const position2 = Point.create(touch2.screenX, touch2.screenY);
-
-    if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.scale(
-        Point.add(
-          Point.subtract(position1, this.currentPosition1),
-          Point.subtract(position2, this.currentPosition2)
-        ),
-        0.25,
-        0.25
-      );
-      const distance =
-        Point.distance(position1, position2) -
-        Point.distance(this.currentPosition1, this.currentPosition2);
-      const zoom = distance * 0.5;
-
-      this.interactionApi?.beginInteraction();
-      this.interactionApi?.zoomCamera(zoom);
-      this.interactionApi?.panCamera(delta);
-    }
-
-    this.currentPosition1 = position1;
-    this.currentPosition2 = position2;
   }
 }
