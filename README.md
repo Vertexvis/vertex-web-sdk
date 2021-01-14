@@ -3,10 +3,16 @@
 Welcome to the Vertex Web SDK repo. This is a monorepo containing SDKs for the
 web platform.
 
-## Structure
+## Packages
 
-- `./packages`: Contains platform SDK packages that are published to NPM.
-- `./scripts`: Contains Bash scripts for managing the project.
+| Package      | Version | Description |
+| ------------ | ------- | ----------- |
+| [@vertexvis/geometry]      | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)      | 2D/3D geometry utilities. |
+| [@vertexvis/stream-api]    | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)    | The API client for streaming 3D images. |
+| [@vertexvis/utils]         | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)         | General Node and Web utilities used within Vertex. |
+| [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)        | The Web SDK containing web components to view 3D models. |
+| [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)  | Contains React bindings for Vertex's Web SDK. |
+
 
 ## Setup & Installing
 
@@ -87,3 +93,8 @@ a 1.0 milestone, semver rules should still apply, but minor will be treated as
 major and patch will be treated as minor.
 
 [semver]: https://semver.org/
+[@vertexvis/geometry]: ./packages/geometry
+[@vertexvis/stream-api]: ./packages/stream-api
+[@vertexvis/utils]: ./packages/utils
+[@vertexvis/viewer]: ./packages/viewer
+[@vertexvis/viewer-react]: ./packages/viewer-react
