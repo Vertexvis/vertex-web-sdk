@@ -544,6 +544,9 @@ export class Viewer {
       if (result.startStream?.streamId?.hex != null) {
         this.streamId = result.startStream.streamId.hex;
       }
+      console.debug(
+        `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
+      );
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
       if (e instanceof CustomError) {
@@ -626,6 +629,9 @@ export class Viewer {
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
+      console.debug(
+        `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
+      );
     } catch (e) {
       if (e instanceof CustomError) {
         throw e;
@@ -808,7 +814,6 @@ export class Viewer {
         this.stream,
         this.remoteRenderer,
         this.lastFrame,
-        this.commands,
         this.sceneViewId
       );
     }

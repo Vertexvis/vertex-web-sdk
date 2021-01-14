@@ -10,7 +10,6 @@ import {
   ItemOperation,
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
-import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
@@ -112,8 +111,7 @@ export class Scene {
     private stream: StreamApi,
     private renderer: RemoteRenderer,
     private frame: Frame.Frame,
-    private commands: CommandRegistry,
-    private sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID
   ) {}
 
   /**
