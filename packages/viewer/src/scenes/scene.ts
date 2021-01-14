@@ -10,7 +10,6 @@ import {
   ItemOperation,
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
-import { CommandRegistry } from '../commands/commandRegistry';
 import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
