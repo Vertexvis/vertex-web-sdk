@@ -87,7 +87,10 @@ jobs:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-        run: "./scripts/publish_canary.sh"
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          ./scripts/publish_canary.sh
 
 
   publish-release:
