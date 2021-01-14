@@ -61,7 +61,7 @@ export function measureCanvasRenderer(
 ): CanvasRenderer {
   let timer: number | undefined;
   let renderCount = 0;
-  let framesRendered: number | undefined;
+  let fpsFrameCount: number | undefined;
   let fpsHistory: number[] = [];
 
   function start(): void {
@@ -89,18 +89,18 @@ export function measureCanvasRenderer(
 
   if (logFrameRate != null) {
     setInterval(() => {
-      if (framesRendered != null) {
+      if (fpsFrameCount != null) {
         if (fpsHistory.length === 5) {
-          fpsHistory = [...fpsHistory.slice(1), framesRendered];
+          fpsHistory = [...fpsHistory.slice(1), fpsFrameCount];
         } else {
-          fpsHistory.push(framesRendered);
+          fpsHistory.push(fpsFrameCount);
         }
 
         const avgFps =
           fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
-        console.debug(`Paint rate: ${framesRendered}fps`);
+        console.debug(`Paint rate: ${fpsFrameCount}fps`);
         console.debug(`Paint rate (avg): ${avgFps}`);
-        framesRendered = undefined;
+        fpsFrameCount = undefined;
       }
     }, 1000);
   }
@@ -110,7 +110,7 @@ export function measureCanvasRenderer(
     return meter
       .measure(async () => {
         const frame = await renderer(data);
-        framesRendered = framesRendered == null ? 1 : framesRendered + 1;
+        fpsFrameCount = fpsFrameCount == null ? 1 : fpsFrameCount + 1;
         return frame;
       })
       .finally(() => end());
