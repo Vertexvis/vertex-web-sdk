@@ -51,11 +51,27 @@ to execute any NPM `test` scripts present for each package.
 Additionally, the project exposes a top-level script to check code coverage
 (`yarn test:coverage`).
 
+## Bumping Versions
+
+The project's release scripts will automatically bump version based on the
+`nextBumpVersion` that's specified in the projects `package.json` file. When
+making a breaking change, you should run `yarn version:bump` and specify
+`minor`. This should be done as part of your PR.
+
+**Note:** minor is being used to signal breaking changes until the Web SDK hits
+1.0.
+
 ## Releasing
 
-To create a release, run the `yarn release` NPM script. This script will verify
-that your working directory is clean, is up-to-date with master, ask for the
-release version, generate documentation, and push a release branch to GitHub.
+Run `yarn release` to create a release based on the `nextBumpVersion` that's
+specified in the projects `package.json` file. This field tracks if the next
+version should be a `major`, `minor` or `patch` release.
+
+Run `yarn release:ask` to specify a custom release version.
+
+These script will verify that your working directory is clean, is up-to-date
+with master, ask for the release version, generate documentation, and push a
+release branch to GitHub.
 
 You can then create a PR from the release branch. Once your PR has been approved
 and merged, the CI pipeline will automatically publish packages to NPM, tag the

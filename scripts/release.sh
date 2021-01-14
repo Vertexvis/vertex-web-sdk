@@ -30,8 +30,19 @@ local_branch=release-temp/$timestamp
 git checkout -tb $local_branch
 
 # Bump version and generate docs with updated versions
-npx lerna version --no-push --no-git-tag-version --exact
+if test -n "$ASK_VERSION"
+then
+  npx lerna version --no-push --no-git-tag-version --exact
+else
+  next_bump=`jq -r '.nextVersionBump' package.json`
+  npx lerna version --no-push --no-git-tag-version --exact "$next_bump"
+fi
+
 yarn generate:docs
+
+# Set the next version bump back to patch
+json=`jq '.nextVersionBump = patch' package.json`
+echo "$json" > package.json
 
 version="v$(get_version)"
 remote_branch="release/$version"

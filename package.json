@@ -1,9 +1,11 @@
 {
   "name": "root",
   "private": true,
+  "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^6.1.0",
     "lerna": "^3.21.0",
+    "semver": "^7.3.4",
     "typescript": "^3.7.4"
   },
   "scripts": {
@@ -13,12 +15,14 @@
     "generate:npmrc": "./scripts/generate_npmrc.sh",
     "build": "lerna run build",
     "release": "./scripts/release.sh",
+    "release:ask": "ASK_VERSION=true ./scripts/release.sh",
     "test": "lerna run test",
     "test:coverage": "lerna run test:coverage",
     "lint": "lerna run lint",
     "format": "lerna run format",
     "clean": "lerna clean",
     "bootstrap": "lerna bootstrap",
-    "validate": "yarn build && yarn test && yarn lint"
+    "validate": "yarn build && yarn test && yarn lint",
+    "version:bump": "./scripts/version_bump.sh"
   }
 }
