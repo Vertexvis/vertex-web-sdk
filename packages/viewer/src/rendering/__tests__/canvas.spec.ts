@@ -82,6 +82,7 @@ describe(measureCanvasRenderer, () => {
     const render = measureCanvasRenderer(
       meter,
       renderer,
+      false,
       callback,
       reportIntervalInMs
     );
@@ -98,6 +99,7 @@ describe(measureCanvasRenderer, () => {
     const render = measureCanvasRenderer(
       meter,
       renderer,
+      false,
       callback,
       reportIntervalInMs
     );
