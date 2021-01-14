@@ -119,7 +119,6 @@ export function measureCanvasRenderer(
 
 export function createCanvasRenderer(): CanvasRenderer {
   let lastFrameNumber: number | undefined;
-  let framesRendered: number | undefined;
 
   return async data => {
     const frameNumber = data.frame.sequenceNumber;
@@ -128,7 +127,6 @@ export function createCanvasRenderer(): CanvasRenderer {
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
       drawImage(image, data);
-      framesRendered = framesRendered == null ? 1 : framesRendered + 1;
     }
 
     image.dispose();
