@@ -87,7 +87,7 @@ export function measureCanvasRenderer(
     }
   }
 
-  if (logFrameRate != null) {
+  if (logFrameRate) {
     setInterval(() => {
       if (fpsFrameCount != null) {
         if (fpsHistory.length === 5) {

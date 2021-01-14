@@ -112,8 +112,7 @@ export class Scene {
     private stream: StreamApi,
     private renderer: RemoteRenderer,
     private frame: Frame.Frame,
-    private commands: CommandRegistry,
-    private sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID
   ) {}
 
   /**

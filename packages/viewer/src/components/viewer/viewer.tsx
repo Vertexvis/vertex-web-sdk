@@ -808,7 +808,6 @@ export class Viewer {
         this.stream,
         this.remoteRenderer,
         this.lastFrame,
-        this.commands,
         this.sceneViewId
       );
     }
