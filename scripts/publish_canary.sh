@@ -21,7 +21,7 @@ then
   next_canary_version=`npx semver "$published_version" --increment prerelease`
   echo "Publishing canary version $next_canary_version"
 
-  lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
+  npx lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
   git commit -am "Canary release $next_canary_version"
   npx lerna publish from-package --canary --preid "$preid" --dist-tag "$dist_tag" --yes
 else
@@ -30,7 +30,7 @@ else
   next_canary_version=`npx semver "$version" --increment pre"$next_bump" --preid "$preid"`
   echo "Publishing canary version $next_canary_version"
 
-  lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
+  npx lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
   git commit -am "Canary release $next_canary_version"
   npx lerna publish from-package --canary --preid "$preid" --dist-tag "$dist_tag" --yes
 fi
