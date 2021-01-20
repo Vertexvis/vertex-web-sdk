@@ -170,6 +170,8 @@ export class Viewer {
    */
   @Event() public sessionidchange!: EventEmitter<string>;
 
+  @Event() public dimensionschange!: EventEmitter<Dimensions.Dimensions>;
+
   @State() private dimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
@@ -318,6 +320,11 @@ export class Viewer {
     thisArg?: T
   ): Promise<Disposable> {
     return this.commands.register(id, factory, thisArg);
+  }
+
+  @Method()
+  public async getCanvasElement(): Promise<HTMLCanvasElement | undefined> {
+    return this.canvasElement;
   }
 
   /**
@@ -749,6 +756,8 @@ export class Viewer {
     if (this.isResizing) {
       this.calculateComponentDimensions();
       this.isResizing = false;
+
+      this.dimensionschange.emit(this.dimensions);
 
       if (this.isStreamStarted) {
         this.stream.updateDimensions({ dimensions: this.dimensions });

@@ -64,7 +64,7 @@ export class SceneItemOperationsBuilder
   }
 
   public transform(
-    matrix: vertexvis.protobuf.core.Matrix4x4f
+    matrix: vertexvis.protobuf.core.IMatrix4x4f
   ): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -102,9 +102,6 @@ export class ItemsOperationExecutor {
       },
       operations: pbOperations,
     };
-    console.log(request);
-    console.log(this.queryOperations);
-    console.log(pbOperations);
     await this.stream.createSceneAlteration(request);
   }
 }

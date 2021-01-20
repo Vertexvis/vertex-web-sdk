@@ -10,6 +10,7 @@ import { Environment } from "./config/environment";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
+import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
@@ -35,6 +36,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
+        "getCanvasElement": () => Promise<HTMLCanvasElement | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**
@@ -113,6 +115,7 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
         /**
           * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
          */
