@@ -14,6 +14,7 @@ import { UUID } from '@vertexvis/utils';
 import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { InvalidArgumentError } from '../errors';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -64,12 +65,50 @@ export class SceneItemOperationsBuilder
   }
 
   public transform(
-    matrix: vertexvis.protobuf.core.IMatrix4x4f
+    matrix: vertexvis.protobuf.core.IMatrix4x4f | number[]
   ): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(
-      this.query,
-      this.builder.transform(matrix)
-    );
+    if (Array.isArray(matrix)) {
+      if (matrix.length !== 16) {
+        throw new InvalidArgumentError(
+          'Matrix provided must contain exactly 16 values (4x4).'
+        );
+      }
+
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.transform({
+          r0: {
+            x: matrix[0],
+            y: matrix[1],
+            z: matrix[2],
+            w: matrix[3],
+          },
+          r1: {
+            x: matrix[4],
+            y: matrix[5],
+            z: matrix[6],
+            w: matrix[7],
+          },
+          r2: {
+            x: matrix[8],
+            y: matrix[9],
+            z: matrix[10],
+            w: matrix[11],
+          },
+          r3: {
+            x: matrix[12],
+            y: matrix[13],
+            z: matrix[14],
+            w: matrix[15],
+          },
+        })
+      );
+    } else {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.transform(matrix)
+      );
+    }
   }
 
   public build(): QueryOperation {
