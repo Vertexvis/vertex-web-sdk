@@ -36,7 +36,6 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
-        "getCanvasElement": () => Promise<HTMLCanvasElement | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         /**

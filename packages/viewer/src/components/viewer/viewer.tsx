@@ -322,11 +322,6 @@ export class Viewer {
     return this.commands.register(id, factory, thisArg);
   }
 
-  @Method()
-  public async getCanvasElement(): Promise<HTMLCanvasElement | undefined> {
-    return this.canvasElement;
-  }
-
   /**
    * @private For internal use only.
    */

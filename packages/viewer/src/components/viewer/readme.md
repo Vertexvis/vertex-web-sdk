@@ -32,16 +32,6 @@
 
 ## Methods
 
-### `getCanvasElement() => Promise<HTMLCanvasElement | undefined>`
-
-
-
-#### Returns
-
-Type: `Promise<HTMLCanvasElement | undefined>`
-
-
-
 ### `getFrame() => Promise<Frame.Frame | undefined>`
 
 
