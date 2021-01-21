@@ -37,6 +37,7 @@ export namespace Components {
         "configEnv": Environment;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
+        "getJwt": () => Promise<string | undefined>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
@@ -125,6 +126,10 @@ declare namespace LocalJSX {
           * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
         "onFrameReceived"?: (event: CustomEvent<Frame.Frame>) => void;
+        /**
+          * Emits an event when the jwt for a session gets updated
+         */
+        "onJwtRefresh"?: (event: CustomEvent<string>) => void;
         /**
           * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
          */

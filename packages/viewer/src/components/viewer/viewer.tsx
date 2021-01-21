@@ -164,6 +164,11 @@ export class Viewer {
   @Event() public tokenExpired!: EventEmitter<void>;
 
   /**
+   * Emits an event when the jwt for a session gets updated
+   */
+  @Event() public jwtRefresh!: EventEmitter<string>;
+
+  /**
    * Used for internals or testing.
    *
    * @private
@@ -196,6 +201,7 @@ export class Viewer {
   private streamSessionId?: UUID.UUID = this.sessionId;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
+  private jwt?: string;
   private isStreamStarted = false;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
@@ -386,6 +392,11 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
+  @Method()
+  public async getJwt(): Promise<string | undefined> {
+    return this.jwt;
+  }
+
   @Watch('src')
   public handleSrcChanged(scene: string | undefined): void {
     if (scene != null) {
@@ -525,6 +536,9 @@ export class Viewer {
         streamAttributes: this.getStreamAttributes(),
       });
 
+      this.jwt = result.startStream?.jwt || undefined;
+      this.jwtRefresh.emit(this.jwt);
+
       if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
         this.streamSessionId = result.startStream.sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
@@ -621,7 +635,7 @@ export class Viewer {
       this.clock = undefined;
 
       this.streamDisposable = await this.connectStream(resource);
-      await this.stream.reconnect({
+      const result = await this.stream.reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -629,6 +643,10 @@ export class Viewer {
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
+
+      this.jwt = result.reconnect?.jwt || undefined;
+      this.jwtRefresh.emit(this.jwt);
+
       console.debug(
         `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
