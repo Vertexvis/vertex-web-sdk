@@ -40,6 +40,7 @@ import {
   InteractionHandlerError,
   ComponentInitializationError,
   IllegalStateError,
+  MissingJWTError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
@@ -71,7 +72,7 @@ import { CustomError } from '../../errors/customError';
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
 interface ConnectedStatus {
-  jwt?: string;
+  jwt: string;
   status: 'connected';
 }
 
@@ -557,6 +558,11 @@ export class Viewer {
       });
 
       this.jwt = result.startStream?.jwt || undefined;
+
+      if (this.jwt == null) {
+        throw new MissingJWTError('JWT Not present');
+      }
+
       this.connectionChange.emit({
         jwt: this.jwt,
         status: 'connected',
@@ -662,7 +668,6 @@ export class Viewer {
       this.clock = undefined;
 
       this.connectionChange.emit({
-        // jwt: this.jwt,
         status: 'connecting',
       });
 
@@ -677,6 +682,11 @@ export class Viewer {
       this.isReconnecting = false;
 
       this.jwt = result.reconnect?.jwt || undefined;
+
+      if (this.jwt == null) {
+        throw new MissingJWTError('JWT Not present');
+      }
+
       this.connectionChange.emit({
         jwt: this.jwt,
         status: 'connected',
