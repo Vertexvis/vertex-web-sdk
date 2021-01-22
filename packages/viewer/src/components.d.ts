@@ -10,6 +10,7 @@ import { Environment } from "./config/environment";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
+import { ConnectionStatus } from "./components/viewer/viewer";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
@@ -115,6 +116,10 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         /**
+          * Emits an event when the connection status changes for the viewer
+         */
+        "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
+        /**
           * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
          */
         "onDoubletap"?: (event: CustomEvent<TapEventDetails>) => void;
@@ -126,10 +131,6 @@ declare namespace LocalJSX {
           * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
          */
         "onFrameReceived"?: (event: CustomEvent<Frame.Frame>) => void;
-        /**
-          * Emits an event when the jwt for a session gets updated
-         */
-        "onJwtRefresh"?: (event: CustomEvent<string>) => void;
         /**
           * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
          */

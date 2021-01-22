@@ -70,6 +70,11 @@ import { CustomError } from '../../errors/customError';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
+export interface ConnectionStatus {
+  jwt?: string;
+  status: 'connected' | 'connecting' | 'disconnected';
+}
+
 @Component({
   tag: 'vertex-viewer',
   styleUrl: 'viewer.css',
@@ -164,9 +169,9 @@ export class Viewer {
   @Event() public tokenExpired!: EventEmitter<void>;
 
   /**
-   * Emits an event when the jwt for a session gets updated
+   * Emits an event when the connection status changes for the viewer
    */
-  @Event() public jwtRefresh!: EventEmitter<string>;
+  @Event() public connectionChange!: EventEmitter<ConnectionStatus>;
 
   /**
    * Used for internals or testing.
@@ -537,7 +542,10 @@ export class Viewer {
       });
 
       this.jwt = result.startStream?.jwt || undefined;
-      this.jwtRefresh.emit(this.jwt);
+      this.connectionChange.emit({
+        jwt: this.jwt,
+        status: 'connected',
+      });
 
       if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
         this.streamSessionId = result.startStream.sessionId.hex;
@@ -563,6 +571,9 @@ export class Viewer {
       );
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
+      this.connectionChange.emit({
+        status: 'disconnected',
+      });
       if (e instanceof CustomError) {
         throw e;
       }
@@ -570,6 +581,7 @@ export class Viewer {
       if (this.lastFrame == null) {
         this.errorMessage = 'Unable to establish connection to Vertex.';
         console.error('Failed to establish WS connection', e);
+
         throw new WebsocketConnectionError(this.errorMessage, e);
       }
     }
@@ -634,6 +646,11 @@ export class Viewer {
       this.streamDisposable?.dispose();
       this.clock = undefined;
 
+      this.connectionChange.emit({
+        jwt: this.jwt,
+        status: 'connecting',
+      });
+
       this.streamDisposable = await this.connectStream(resource);
       const result = await this.stream.reconnect({
         streamId: { hex: streamId },
@@ -645,12 +662,18 @@ export class Viewer {
       this.isReconnecting = false;
 
       this.jwt = result.reconnect?.jwt || undefined;
-      this.jwtRefresh.emit(this.jwt);
+      this.connectionChange.emit({
+        jwt: this.jwt,
+        status: 'connected',
+      });
 
       console.debug(
         `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
     } catch (e) {
+      this.connectionChange.emit({
+        status: 'disconnected',
+      });
       if (e instanceof CustomError) {
         throw e;
       }
