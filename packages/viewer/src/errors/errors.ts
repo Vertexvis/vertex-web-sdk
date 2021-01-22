@@ -23,3 +23,5 @@ export class ImageLoadError extends CustomError {}
 export class IllegalStateError extends CustomError {}
 
 export class NoImplementationFoundError extends CustomError {}
+
+export class InvalidArgumentError extends CustomError {}
