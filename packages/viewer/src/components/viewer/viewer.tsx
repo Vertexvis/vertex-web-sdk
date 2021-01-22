@@ -70,10 +70,23 @@ import { CustomError } from '../../errors/customError';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
-export interface ConnectionStatus {
+interface ConnectedStatus {
   jwt?: string;
-  status: 'connected' | 'connecting' | 'disconnected';
+  status: 'connected';
 }
+
+interface ConnectingStatus {
+  status: 'connecting';
+}
+
+interface DisconnectedStatus {
+  status: 'disconnected';
+}
+
+export type ConnectionStatus =
+  | ConnectingStatus
+  | ConnectedStatus
+  | DisconnectedStatus;
 
 @Component({
   tag: 'vertex-viewer',
@@ -649,7 +662,7 @@ export class Viewer {
       this.clock = undefined;
 
       this.connectionChange.emit({
-        jwt: this.jwt,
+        // jwt: this.jwt,
         status: 'connecting',
       });
 
