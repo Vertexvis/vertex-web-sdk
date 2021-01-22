@@ -40,6 +40,7 @@ import {
   InteractionHandlerError,
   ComponentInitializationError,
   IllegalStateError,
+  MissingJWTError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
@@ -69,6 +70,24 @@ import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
+
+interface ConnectedStatus {
+  jwt: string;
+  status: 'connected';
+}
+
+interface ConnectingStatus {
+  status: 'connecting';
+}
+
+interface DisconnectedStatus {
+  status: 'disconnected';
+}
+
+export type ConnectionStatus =
+  | ConnectingStatus
+  | ConnectedStatus
+  | DisconnectedStatus;
 
 @Component({
   tag: 'vertex-viewer',
@@ -164,6 +183,11 @@ export class Viewer {
   @Event() public tokenExpired!: EventEmitter<void>;
 
   /**
+   * Emits an event when the connection status changes for the viewer
+   */
+  @Event() public connectionChange!: EventEmitter<ConnectionStatus>;
+
+  /**
    * Used for internals or testing.
    *
    * @private
@@ -198,6 +222,7 @@ export class Viewer {
   private streamSessionId?: UUID.UUID = this.sessionId;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
+  private jwt?: string;
   private isStreamStarted = false;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
@@ -388,6 +413,11 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
+  @Method()
+  public async getJwt(): Promise<string | undefined> {
+    return this.jwt;
+  }
+
   @Watch('src')
   public handleSrcChanged(scene: string | undefined): void {
     if (scene != null) {
@@ -527,6 +557,17 @@ export class Viewer {
         streamAttributes: this.getStreamAttributes(),
       });
 
+      this.jwt = result.startStream?.jwt || undefined;
+
+      if (this.jwt == null) {
+        throw new MissingJWTError('JWT Not present');
+      }
+
+      this.connectionChange.emit({
+        jwt: this.jwt,
+        status: 'connected',
+      });
+
       if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
         this.streamSessionId = result.startStream.sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
@@ -551,6 +592,9 @@ export class Viewer {
       );
       await this.waitNextDrawnFrame(15 * 1000);
     } catch (e) {
+      this.connectionChange.emit({
+        status: 'disconnected',
+      });
       if (e instanceof CustomError) {
         throw e;
       }
@@ -558,6 +602,7 @@ export class Viewer {
       if (this.lastFrame == null) {
         this.errorMessage = 'Unable to establish connection to Vertex.';
         console.error('Failed to establish WS connection', e);
+
         throw new WebsocketConnectionError(this.errorMessage, e);
       }
     }
@@ -622,8 +667,12 @@ export class Viewer {
       this.streamDisposable?.dispose();
       this.clock = undefined;
 
+      this.connectionChange.emit({
+        status: 'connecting',
+      });
+
       this.streamDisposable = await this.connectStream(resource);
-      await this.stream.reconnect({
+      const result = await this.stream.reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -631,10 +680,25 @@ export class Viewer {
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
+
+      this.jwt = result.reconnect?.jwt || undefined;
+
+      if (this.jwt == null) {
+        throw new MissingJWTError('JWT Not present');
+      }
+
+      this.connectionChange.emit({
+        jwt: this.jwt,
+        status: 'connected',
+      });
+
       console.debug(
         `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
     } catch (e) {
+      this.connectionChange.emit({
+        status: 'disconnected',
+      });
       if (e instanceof CustomError) {
         throw e;
       }

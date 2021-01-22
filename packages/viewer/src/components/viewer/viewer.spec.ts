@@ -152,6 +152,12 @@ describe('vertex-viewer', () => {
       );
     });
 
+    it('starts a stream with a the jwt present on the viewer', async () => {
+      const viewer = await createViewerWithLoadedStream('123');
+      const jwt = await viewer.getJwt();
+      expect(jwt).toBeDefined();
+    });
+
     it('throws exception if scene cannot be loaded', async () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id=clientId></vertex-viewer`
@@ -344,6 +350,7 @@ async function loadNewModelForViewer(
     startStream: {
       sceneViewId: { hex: 'scene-view-id' },
       streamId: { hex: 'stream-id' },
+      jwt: 'jwt-value',
     },
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };

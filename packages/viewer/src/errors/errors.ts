@@ -18,6 +18,8 @@ export class WebsocketConnectionError extends CustomError {}
 
 export class InteractionHandlerError extends CustomError {}
 
+export class MissingJWTError extends CustomError {}
+
 export class ImageLoadError extends CustomError {}
 
 export class IllegalStateError extends CustomError {}

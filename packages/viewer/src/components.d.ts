@@ -10,6 +10,7 @@ import { Environment } from "./config/environment";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
+import { ConnectionStatus } from "./components/viewer/viewer";
 import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
@@ -38,6 +39,7 @@ export namespace Components {
         "configEnv": Environment;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
+        "getJwt": () => Promise<string | undefined>;
         /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
@@ -114,6 +116,10 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        /**
+          * Emits an event when the connection status changes for the viewer
+         */
+        "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
         "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
         /**
           * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
