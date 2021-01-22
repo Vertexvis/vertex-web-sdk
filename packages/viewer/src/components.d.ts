@@ -11,6 +11,7 @@ import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
+import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
@@ -119,6 +120,7 @@ declare namespace LocalJSX {
           * Emits an event when the connection status changes for the viewer
          */
         "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
+        "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
         /**
           * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
          */

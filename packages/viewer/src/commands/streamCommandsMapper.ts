@@ -78,6 +78,12 @@ function buildOperationTypes(
         return {
           changeMaterial: {},
         };
+      case 'change-transform':
+        return {
+          changeTransform: {
+            transform: { ...op.transform },
+          },
+        };
       case 'hide':
         return {
           changeVisibility: {
