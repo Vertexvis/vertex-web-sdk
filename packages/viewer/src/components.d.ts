@@ -138,6 +138,10 @@ declare namespace LocalJSX {
          */
         "onLongpress"?: (event: CustomEvent<TapEventDetails>) => void;
         /**
+          * Emits an event when the scene is ready to be interacted with.
+         */
+        "onSceneReady"?: (event: CustomEvent<void>) => void;
+        /**
           * Used for internals or testing.
           * @private
          */

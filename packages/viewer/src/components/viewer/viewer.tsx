@@ -40,7 +40,6 @@ import {
   InteractionHandlerError,
   ComponentInitializationError,
   IllegalStateError,
-  MissingJWTError,
 } from '../../errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
@@ -186,6 +185,11 @@ export class Viewer {
    * Emits an event when the connection status changes for the viewer
    */
   @Event() public connectionChange!: EventEmitter<ConnectionStatus>;
+
+  /**
+   * Emits an event when the scene is ready to be interacted with.
+   */
+  @Event() public sceneReady!: EventEmitter<void>;
 
   /**
    * Used for internals or testing.
@@ -558,15 +562,7 @@ export class Viewer {
       });
 
       this.jwt = result.startStream?.jwt || undefined;
-
-      if (this.jwt == null) {
-        throw new MissingJWTError('JWT Not present');
-      }
-
-      this.connectionChange.emit({
-        jwt: this.jwt,
-        status: 'connected',
-      });
+      this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
 
       if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
         this.streamSessionId = result.startStream.sessionId.hex;
@@ -591,10 +587,9 @@ export class Viewer {
         `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
       await this.waitNextDrawnFrame(15 * 1000);
+      this.sceneReady.emit();
     } catch (e) {
-      this.connectionChange.emit({
-        status: 'disconnected',
-      });
+      this.emitConnectionChange({ status: 'disconnected' });
       if (e instanceof CustomError) {
         throw e;
       }
@@ -667,9 +662,7 @@ export class Viewer {
       this.streamDisposable?.dispose();
       this.clock = undefined;
 
-      this.connectionChange.emit({
-        status: 'connecting',
-      });
+      this.emitConnectionChange({ status: 'connecting' });
 
       this.streamDisposable = await this.connectStream(resource);
       const result = await this.stream.reconnect({
@@ -683,22 +676,13 @@ export class Viewer {
 
       this.jwt = result.reconnect?.jwt || undefined;
 
-      if (this.jwt == null) {
-        throw new MissingJWTError('JWT Not present');
-      }
-
-      this.connectionChange.emit({
-        jwt: this.jwt,
-        status: 'connected',
-      });
+      this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
 
       console.debug(
         `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
     } catch (e) {
-      this.connectionChange.emit({
-        status: 'disconnected',
-      });
+      this.emitConnectionChange({ status: 'disconnected' });
       if (e instanceof CustomError) {
         throw e;
       }
@@ -726,6 +710,16 @@ export class Viewer {
         WS_RECONNECT_DELAYS[Math.min(attempt, WS_RECONNECT_DELAYS.length - 1)]
       );
     }
+  }
+
+  private emitConnectionChange(status: ConnectionStatus): void {
+    if (status.status === 'connected') {
+      // NOTE: Uncomment once FSS is deployed.
+      // if (status.jwt.length === 0) {
+      //   throw new MissingJWTError('JWT is empty');
+      // }
+    }
+    this.connectionChange.emit(status);
   }
 
   private handleElementResize(entries: ResizeObserverEntry[]): void {
