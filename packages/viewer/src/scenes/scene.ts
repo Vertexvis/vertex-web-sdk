@@ -57,6 +57,24 @@ export class SceneItemOperationsBuilder
     return new SceneItemOperationsBuilder(this.query, this.builder.show());
   }
 
+  public select(color: ColorMaterial | string): SceneItemOperationsBuilder {
+    if (typeof color === 'string') {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.select(fromHex(color))
+      );
+    } else {
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.select(color)
+      );
+    }
+  }
+
+  public deselect(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(this.query, this.builder.deselect());
+  }
+
   public clearMaterialOverrides(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,

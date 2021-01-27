@@ -9,6 +9,15 @@ interface HideItemOperation {
   type: 'hide';
 }
 
+interface SelectItemOperation {
+  type: 'select';
+  color: ColorMaterial;
+}
+
+interface DeselectItemOperation {
+  type: 'deselect';
+}
+
 interface ClearItemOperation {
   type: 'clear-override';
 }
@@ -26,6 +35,8 @@ export interface TransformOperation {
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
+  | SelectItemOperation
+  | DeselectItemOperation
   | ChangeMaterialOperation
   | ClearItemOperation
   | TransformOperation;
@@ -34,6 +45,8 @@ export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
   show(): T;
   hide(): T;
+  select(color: ColorMaterial): T;
+  deselect(): T;
   clearMaterialOverrides(): T;
 }
 
@@ -71,6 +84,18 @@ export class SceneOperationBuilder
   public hide(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'hide' }])
+    );
+  }
+
+  public select(color: ColorMaterial): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'select', color }])
+    );
+  }
+
+  public deselect(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'deselect' }])
     );
   }
 
