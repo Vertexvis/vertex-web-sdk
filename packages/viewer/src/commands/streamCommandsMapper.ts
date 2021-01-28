@@ -96,6 +96,23 @@ function buildOperationTypes(
             visible: true,
           },
         };
+      case 'select':
+        return {
+          changeSelection: {
+            material: {
+              d: op.color.opacity,
+              ns: op.color.glossiness,
+              ka: op.color.ambient,
+              kd: op.color.diffuse,
+              ks: op.color.specular,
+              ke: op.color.emissive,
+            },
+          },
+        };
+      case 'deselect':
+        return {
+          changeSelection: {},
+        };
       default:
         return {};
     }
