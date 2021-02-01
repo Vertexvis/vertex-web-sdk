@@ -35,7 +35,7 @@ export type UpdateDimensionsPayload = DeepRequired<
 
 export type HitItemsPayload = DeepRequired<
   vertexvis.protobuf.stream.IHitItemsPayload,
-  []
+  ['includeBoundingBox']
 >;
 
 export type DrawFramePayload = DeepRequired<

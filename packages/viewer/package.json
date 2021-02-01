@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@types/classnames": "2.2.3",
-    "@vertexvis/frame-streaming-protos": "^0.3.13",
+    "@vertexvis/frame-streaming-protos": "^0.3.15",
     "@vertexvis/geometry": "0.9.18",
     "@vertexvis/stream-api": "0.9.18",
     "@vertexvis/utils": "0.9.18",
