@@ -21,5 +21,15 @@ describe(Raycaster, () => {
         true
       );
     });
+
+    it('maps included fields', () => {
+      raycaster.hitItems(Point.create(10, 10), ['bounding-box']);
+      expect(api.hitItems).toHaveBeenCalledWith(
+        expect.objectContaining({
+          includeBoundingBox: true,
+        }),
+        true
+      );
+    });
   });
 });
