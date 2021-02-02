@@ -1,6 +1,6 @@
 export interface Animation {
-  milliseconds?: number;
-  easing?:
+  milliseconds: number;
+  easing:
     | 'linear'
     | 'ease-out-cubic'
     | 'ease-out-quad'
@@ -11,7 +11,7 @@ export interface Animation {
 
 export function create(data: Partial<Animation> = {}): Animation {
   return {
-    milliseconds: data.milliseconds || undefined,
-    easing: data.easing || undefined,
+    milliseconds: data.milliseconds || 2000,
+    easing: data.easing || 'linear',
   };
 }

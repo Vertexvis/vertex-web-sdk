@@ -1,6 +1,6 @@
 import { Async, UUID } from '@vertexvis/utils';
 import { FrameCamera, Frame, Animation } from '../types';
-import { StreamApi, protoToDate } from '@vertexvis/stream-api';
+import { StreamApi, protoToDate, toProtoDuration } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
@@ -22,7 +22,7 @@ export interface FrameResponse {
 
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
 
-export const easingMap = {
+const easingMap = {
   linear: vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
   'ease-out-cubic':
     vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_CUBIC,
@@ -67,18 +67,12 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   return req => {
     const corrId = req.correlationId || UUID.create();
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
-    const animation =
-      req.animation && req.animation.milliseconds
-        ? {
-            duration: {
-              nanos: (req.animation.milliseconds % 1000) * 1000000,
-              seconds: req.animation.milliseconds / 1000,
-            },
-            easing: req.animation?.easing
-              ? easingMap[req.animation.easing]
-              : undefined,
-          }
-        : undefined;
+    const animation = req.animation
+      ? {
+          duration: toProtoDuration(req.animation.milliseconds),
+          easing: easingMap[req.animation.easing],
+        }
+      : undefined;
 
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);

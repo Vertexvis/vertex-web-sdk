@@ -97,8 +97,10 @@ describe(Camera, () => {
 
     it('should render using camera with animations', async () => {
       camera.render({
-        milliseconds: 500,
-        easing: 'ease-out-sine',
+        animation: {
+          milliseconds: 500,
+          easing: 'ease-out-sine',
+        },
       });
 
       expect(renderer).toHaveBeenCalledWith(

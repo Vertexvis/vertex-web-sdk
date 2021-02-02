@@ -4,6 +4,9 @@ import { RemoteRenderer } from '../rendering';
 
 const PI_OVER_360 = 0.008726646259972;
 
+interface CameraRenderOptions {
+  animation: Animation.Animation;
+}
 /**
  * The `Camera` class contains properties that reflect a world space position, a
  * view direction (lookAt), and normalized vector representing the up direction.
@@ -67,9 +70,12 @@ export class Camera implements FrameCamera.FrameCamera {
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
    */
-  public async render(animation?: Animation.Animation): Promise<void> {
+  public async render(renderOptions?: CameraRenderOptions): Promise<void> {
     try {
-      await this.renderer({ camera: this.data, animation });
+      await this.renderer({
+        camera: this.data,
+        animation: renderOptions?.animation,
+      });
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }
