@@ -15,7 +15,6 @@ const PI_OVER_360 = 0.008726646259972;
  * a new instance of the class with the updated properties.
  */
 export class Camera implements FrameCamera.FrameCamera {
-
   public constructor(
     private renderer: RemoteRenderer,
     private aspect: number,
@@ -70,7 +69,7 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public async render(animation?: Animation.Animation): Promise<void> {
     try {
-      await this.renderer({ camera: this.data, animation});
+      await this.renderer({ camera: this.data, animation });
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }

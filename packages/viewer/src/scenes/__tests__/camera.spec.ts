@@ -88,4 +88,30 @@ describe(Camera, () => {
       );
     });
   });
+
+  describe('render with animations', () => {
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.forward(),
+    });
+
+    it('should render using camera with animations', async () => {
+      camera.render({
+        milliseconds: 500,
+        easing: 'ease-out-sine',
+      });
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            position: Vector3.forward(),
+          }),
+          animation: {
+            easing: 'ease-out-sine',
+            milliseconds: 500,
+          },
+        })
+      );
+    });
+  });
 });

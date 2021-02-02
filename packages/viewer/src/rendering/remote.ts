@@ -23,13 +23,13 @@ export interface FrameResponse {
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
 
 export const easingMap = {
-  'linear': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-cubic' : vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  linear: vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-cubic': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
   'ease-out-quad': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
   'ease-out-quart': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
   'ease-out-sine': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
   'ease-out-expo': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-}
+};
 
 function requestFrame(api: StreamApi): RemoteRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
@@ -62,23 +62,27 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   return req => {
     const corrId = req.correlationId || UUID.create();
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
-    const animation = req.animation && req.animation.milliseconds ? {
-      duration: {
-        nanos: (req.animation.milliseconds % 1000) * 1000000,
-        seconds: req.animation.milliseconds / 1000
-      },
-      easing: req.animation?.easing ? easingMap[req.animation.easing] : undefined,
-    }: undefined;
+    const animation =
+      req.animation && req.animation.milliseconds
+        ? {
+            duration: {
+              nanos: (req.animation.milliseconds % 1000) * 1000000,
+              seconds: req.animation.milliseconds / 1000,
+            },
+            easing: req.animation?.easing
+              ? easingMap[req.animation.easing]
+              : undefined,
+          }
+        : undefined;
 
-    console.log('animation', animation);
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);
       api.replaceCamera(
-        { 
-          camera: req.camera, 
+        {
+          camera: req.camera,
           frameCorrelationId: { value: corrId },
           animation,
-         },
+        },
         false
       );
     });
