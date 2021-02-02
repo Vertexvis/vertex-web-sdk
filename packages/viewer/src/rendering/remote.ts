@@ -24,11 +24,16 @@ export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
 
 export const easingMap = {
   linear: vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-cubic': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-quad': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-quart': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-sine': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-expo': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-cubic':
+    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_CUBIC,
+  'ease-out-quad':
+    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_QUAD,
+  'ease-out-quart':
+    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_QUART,
+  'ease-out-sine':
+    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_SINE,
+  'ease-out-expo':
+    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_EXPO,
 };
 
 function requestFrame(api: StreamApi): RemoteRenderer {
