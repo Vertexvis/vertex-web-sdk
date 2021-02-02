@@ -1,8 +1,9 @@
 import { Async, UUID } from '@vertexvis/utils';
-import { FrameCamera, Frame } from '../types';
+import { FrameCamera, Frame, Animation } from '../types';
 import { StreamApi, protoToDate } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 const DEFAULT_TIMEOUT_IN_MS = 10 * 1000; // 10 seconds
 
@@ -10,6 +11,7 @@ export interface FrameRequest {
   correlationId?: string;
   camera: FrameCamera.FrameCamera;
   timeoutInMs?: number;
+  animation?: Animation.Animation;
 }
 
 export interface FrameResponse {
@@ -19,6 +21,15 @@ export interface FrameResponse {
 }
 
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
+
+export const easingMap = {
+  'linear': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-cubic' : vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-quad': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-quart': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-sine': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+  'ease-out-expo': vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
+}
 
 function requestFrame(api: StreamApi): RemoteRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
@@ -51,10 +62,23 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   return req => {
     const corrId = req.correlationId || UUID.create();
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
+    const animation = req.animation && req.animation.milliseconds ? {
+      duration: {
+        nanos: (req.animation.milliseconds % 1000) * 1000000,
+        seconds: req.animation.milliseconds / 1000
+      },
+      easing: req.animation?.easing ? easingMap[req.animation.easing] : undefined,
+    }: undefined;
+
+    console.log('animation', animation);
     const update = new Promise<FrameResponse>(resolve => {
       requests.set(corrId, resolve);
       api.replaceCamera(
-        { camera: req.camera, frameCorrelationId: { value: corrId } },
+        { 
+          camera: req.camera, 
+          frameCorrelationId: { value: corrId },
+          animation,
+         },
         false
       );
     });

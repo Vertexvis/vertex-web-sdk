@@ -1,4 +1,4 @@
-import { FrameCamera } from '../types';
+import { Animation, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { RemoteRenderer } from '../rendering';
 
@@ -15,6 +15,7 @@ const PI_OVER_360 = 0.008726646259972;
  * a new instance of the class with the updated properties.
  */
 export class Camera implements FrameCamera.FrameCamera {
+
   public constructor(
     private renderer: RemoteRenderer,
     private aspect: number,
@@ -67,9 +68,9 @@ export class Camera implements FrameCamera.FrameCamera {
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
    */
-  public async render(): Promise<void> {
+  public async render(animation?: Animation.Animation): Promise<void> {
     try {
-      await this.renderer({ camera: this.data });
+      await this.renderer({ camera: this.data, animation});
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }
