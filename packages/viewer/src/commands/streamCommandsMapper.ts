@@ -1,6 +1,9 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { ItemOperation } from '../scenes/operations';
 import { QueryExpression } from '../scenes/queries';
+import { FlyTo, Animation } from '../types';
+import { UUID } from '@vertexvis/utils';
+import { toProtoDuration } from '@vertexvis/stream-api';
 
 export function buildSceneOperation(
   query: QueryExpression,
@@ -51,6 +54,62 @@ function buildSceneItemQuery(
       return {
         suppliedId: item.value,
       };
+    default:
+      return {};
+  }
+}
+
+export function buildFlyToOperation(
+  frameCorrelationId: UUID.UUID,
+  options: FlyTo.FlyToOptions,
+  animation?: Animation.Animation
+): vertexvis.protobuf.stream.IFlyToPayload {
+  const payload = {
+    frameCorrelationId: {
+      value: frameCorrelationId,
+    },
+    animation: animation
+      ? {
+          duration: toProtoDuration(animation.milliseconds),
+        }
+      : undefined,
+  };
+
+  switch (options.flyTo.type) {
+    case 'supplied': {
+      return {
+        ...payload,
+        itemSuppliedId: options.flyTo.data,
+      };
+    }
+    case 'internal': {
+      return {
+        ...payload,
+        itemId: new vertexvis.protobuf.core.Uuid({
+          hex: options.flyTo.data,
+        }),
+      };
+    }
+    case 'camera': {
+      return {
+        ...payload,
+        camera: options.flyTo.data,
+      };
+    }
+
+    case 'bounding-box': {
+      return {
+        ...payload,
+        boundingBox: {
+          xmin: options.flyTo.data.min.x,
+          xmax: options.flyTo.data.max.x,
+          ymin: options.flyTo.data.min.y,
+          ymax: options.flyTo.data.max.y,
+          zmin: options.flyTo.data.min.z,
+          zmax: options.flyTo.data.max.z,
+        },
+      };
+    }
     default:
       return {};
   }

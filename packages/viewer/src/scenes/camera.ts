@@ -1,4 +1,4 @@
-import { Animation, FrameCamera } from '../types';
+import { Animation, FlyTo, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { RemoteRenderer } from '../rendering';
 
@@ -7,6 +7,7 @@ const PI_OVER_360 = 0.008726646259972;
 interface CameraRenderOptions {
   animation: Animation.Animation;
 }
+
 /**
  * The `Camera` class contains properties that reflect a world space position, a
  * view direction (lookAt), and normalized vector representing the up direction.
@@ -18,6 +19,8 @@ interface CameraRenderOptions {
  * a new instance of the class with the updated properties.
  */
 export class Camera implements FrameCamera.FrameCamera {
+  private flyToOptions?: FlyTo.FlyToOptions;
+
   public constructor(
     private renderer: RemoteRenderer,
     private aspect: number,
@@ -53,6 +56,26 @@ export class Camera implements FrameCamera.FrameCamera {
     return this.update({ lookAt, position });
   }
 
+  public flyToSceneItem(sceneItemId: string): Camera {
+    this.flyToOptions = {
+      flyTo: {
+        type: 'internal',
+        data: sceneItemId,
+      },
+    };
+    return this;
+  }
+
+  public flyToSuppliedId(partId: string): Camera {
+    this.flyToOptions = {
+      flyTo: {
+        type: 'supplied',
+        data: partId,
+      },
+    };
+    return this;
+  }
+
   /**
    * Shifts the position of the camera by the given delta.
    *
@@ -71,10 +94,19 @@ export class Camera implements FrameCamera.FrameCamera {
    * promise will resolve when a frame is received that contains this camera.
    */
   public async render(renderOptions?: CameraRenderOptions): Promise<void> {
+    if (this.flyToOptions == null && renderOptions != null) {
+      this.flyToOptions = {
+        flyTo: {
+          type: 'camera',
+          data: this.data,
+        },
+      };
+    }
+
     try {
       await this.renderer({
         camera: this.data,
-        animation: renderOptions?.animation,
+        flyToOptions: this.flyToOptions,
       });
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);

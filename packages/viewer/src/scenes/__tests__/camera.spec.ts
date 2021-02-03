@@ -96,20 +96,13 @@ describe(Camera, () => {
     });
 
     it('should render using camera with animations', async () => {
-      camera.render({
-        animation: {
-          milliseconds: 500,
-        },
-      });
+      camera.render();
 
       expect(renderer).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-          animation: {
-            milliseconds: 500,
-          },
         })
       );
     });

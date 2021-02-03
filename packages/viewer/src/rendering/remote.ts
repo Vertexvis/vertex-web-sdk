@@ -1,8 +1,9 @@
 import { Async, UUID } from '@vertexvis/utils';
-import { FrameCamera, Frame, Animation } from '../types';
-import { StreamApi, protoToDate, toProtoDuration } from '@vertexvis/stream-api';
+import { Animation, FlyTo, FrameCamera, Frame } from '../types';
+import { StreamApi, protoToDate } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
+import { buildFlyToOperation } from '../commands/streamCommandsMapper';
 
 const DEFAULT_TIMEOUT_IN_MS = 10 * 1000; // 10 seconds
 
@@ -10,6 +11,7 @@ export interface FrameRequest {
   correlationId?: string;
   camera: FrameCamera.FrameCamera;
   timeoutInMs?: number;
+  flyToOptions?: FlyTo.FlyToOptions;
   animation?: Animation.Animation;
 }
 
@@ -52,27 +54,36 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   return req => {
     const corrId = req.correlationId || UUID.create();
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
-    const animation = req.animation
-      ? {
-          duration: toProtoDuration(req.animation.milliseconds),
-        }
-      : undefined;
-
-    const update = new Promise<FrameResponse>(resolve => {
-      requests.set(corrId, resolve);
-      api.replaceCamera(
-        {
-          camera: req.camera,
-          frameCorrelationId: { value: corrId },
-          animation,
-        },
-        false
+    if (req.flyToOptions) {
+      const payload = buildFlyToOperation(
+        corrId,
+        req.flyToOptions,
+        req.animation
       );
-    });
+      const update = new Promise<FrameResponse>(resolve => {
+        requests.set(corrId, resolve);
+        api.flyTo(payload, false);
+      });
 
-    return Async.timeout(timeout, update).finally(() =>
-      requests.delete(corrId)
-    );
+      return Async.timeout(timeout, update).finally(() =>
+        requests.delete(corrId)
+      );
+    } else {
+      const update = new Promise<FrameResponse>(resolve => {
+        requests.set(corrId, resolve);
+        api.replaceCamera(
+          {
+            camera: req.camera,
+            frameCorrelationId: { value: corrId },
+          },
+          false
+        );
+      });
+
+      return Async.timeout(timeout, update).finally(() =>
+        requests.delete(corrId)
+      );
+    }
   };
 }
 
