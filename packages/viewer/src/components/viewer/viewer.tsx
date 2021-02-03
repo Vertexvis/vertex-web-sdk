@@ -64,6 +64,9 @@ import {
   CanvasRenderer,
   createCanvasRenderer,
   measureCanvasRenderer,
+  createThreeJsRenderer,
+  createWebGlScene,
+  composeRenderers,
 } from '../../rendering';
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
@@ -217,6 +220,7 @@ export class Viewer {
   @Element() private hostElement!: HTMLElement;
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
+  private webglCanvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
   private stream!: ViewerStreamApi;
@@ -320,6 +324,26 @@ export class Viewer {
     this.injectViewerApi();
   }
 
+  private createThreeJsRenderer(): CanvasRenderer {
+    if (this.webglCanvasElement == null) {
+      throw new Error('WebGL canvas is not defined.');
+    }
+
+    const scene = createWebGlScene(
+      this.webglCanvasElement,
+      this.dimensions?.width || 0,
+      this.dimensions?.height || 0
+    );
+
+    return createThreeJsRenderer(data => {
+      scene.render(
+        data.frame.sceneAttributes.camera,
+        data.dimensions.width,
+        data.dimensions.height
+      );
+    });
+  }
+
   public connectedCallback(): void {
     this.mutationObserver = new MutationObserver(() => this.injectViewerApi());
     this.mutationObserver.observe(document.body, {
@@ -351,7 +375,14 @@ export class Viewer {
               width={this.dimensions != null ? this.dimensions.width : 0}
               height={this.dimensions != null ? this.dimensions.height : 0}
               onContextMenu={event => event.preventDefault()}
-            ></canvas>
+            />
+            <canvas
+              ref={ref => (this.webglCanvasElement = ref)}
+              class="overlay-canvas"
+              width={this.dimensions != null ? this.dimensions.width : 0}
+              height={this.dimensions != null ? this.dimensions.height : 0}
+              onContextMenu={event => event.preventDefault()}
+            />
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
             ) : null}
@@ -701,6 +732,10 @@ export class Viewer {
       );
     }
 
+    if (this.canvasElement == null) {
+      throw new Error('Canvas element is undefined');
+    }
+
     const connection = await this.commands.execute<Disposable>(
       'stream.connect',
       {
@@ -712,7 +747,10 @@ export class Viewer {
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       Metrics.paintTime,
-      createCanvasRenderer(),
+      composeRenderers(
+        createCanvasRenderer(this.canvasElement),
+        this.createThreeJsRenderer()
+      ),
       this.getConfig().flags.logFrameRate,
       timings => this.reportPerformance(timings)
     );

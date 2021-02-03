@@ -8,7 +8,6 @@ import { HtmlImage, loadImageBytes } from './imageLoaders';
 const REPORTING_INTERVAL_MS = 1000;
 
 export interface DrawFrame {
-  canvas: CanvasRenderingContext2D;
   dimensions: Dimensions.Dimensions;
   frame: Frame.Frame;
 }
@@ -17,7 +16,11 @@ export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
-function drawImage(image: HtmlImage, data: DrawFrame): void {
+function drawImage(
+  context: CanvasRenderingContext2D,
+  image: HtmlImage,
+  data: DrawFrame
+): void {
   const { imageAttributes } = data.frame;
   const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
     imageAttributes.frameDimensions
@@ -31,8 +34,8 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
   const startXPos = imageAttributes.imageRect.x * scaleX;
   const startYPos = imageAttributes.imageRect.y * scaleY;
 
-  data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
-  data.canvas.drawImage(
+  context.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
+  context.drawImage(
     image.image,
     startXPos,
     startYPos,
@@ -117,7 +120,14 @@ export function measureCanvasRenderer(
   };
 }
 
-export function createCanvasRenderer(): CanvasRenderer {
+export function createCanvasRenderer(
+  canvas: HTMLCanvasElement
+): CanvasRenderer {
+  const context = canvas.getContext('2d');
+  if (context == null) {
+    throw new Error('Could not create 2D canvas context.');
+  }
+
   let lastFrameNumber: number | undefined;
 
   return async data => {
@@ -130,7 +140,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
-      drawImage(image, data);
+      drawImage(context, image, data);
 
       // if (depth != null) {
       //   drawImage(depth, data);
@@ -138,6 +148,26 @@ export function createCanvasRenderer(): CanvasRenderer {
     }
 
     image.dispose();
+    return data.frame;
+  };
+}
+
+export function createThreeJsRenderer(
+  render: (data: DrawFrame) => void
+): CanvasRenderer {
+  return async data => {
+    render(data);
+    return data.frame;
+  };
+}
+
+export function composeRenderers(
+  ...renderers: CanvasRenderer[]
+): CanvasRenderer {
+  return async data => {
+    for (const renderer of renderers) {
+      await renderer(data);
+    }
     return data.frame;
   };
 }

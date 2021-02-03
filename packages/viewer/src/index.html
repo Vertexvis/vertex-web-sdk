@@ -27,6 +27,98 @@
       }
     </style>
 
+    <script id="post-vert" type="x-shader/x-vertex">
+      varying vec2 vUv;
+
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    </script>
+
+    <!-- Actual implementation -->
+    <!-- <script id="post-frag" type="x-shader/x-fragment">
+         #include <packing>
+
+         varying vec2 vUv;
+         uniform sampler2D diffuseTexture;
+         uniform sampler2D depthTexture;
+         uniform sampler2D serverDepthTexture;
+      uniform float cameraNear;
+      uniform float cameraFar;
+
+         float readDepth(sampler2D depthSampler, vec2 coord) {
+      	float fragCoordZ = texture2D(depthSampler, coord).x;
+      	float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+      	return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+      }
+
+         void main() {
+           float depth = readDepth(depthTexture, vUv);
+           float serverDepth = texture(serverDepthTexture, vUv).r;
+           vec4 color = texture2D(diffuseTexture, vUv);
+           float alpha = depth < serverDepth ? color.a : 0.0;
+
+           gl_FragColor = color;
+           gl_FragColor.a = alpha;
+         }
+    </script> -->
+
+    <!-- Debug objects -->
+    <script id="post-frag" type="x-shader/x-fragment">
+         #include <packing>
+
+         varying vec2 vUv;
+         uniform sampler2D diffuseTexture;
+         uniform sampler2D depthTexture;
+         uniform sampler2D serverDepthTexture;
+      uniform float cameraNear;
+      uniform float cameraFar;
+
+         float readDepth(sampler2D depthSampler, vec2 coord) {
+        float fragCoordZ = texture2D(depthSampler, coord).x;
+        float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+        return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+      }
+
+         void main() {
+           float depth = readDepth(depthTexture, vUv);
+           float serverDepth = texture(serverDepthTexture, vUv).r;
+           vec4 color = texture2D(diffuseTexture, vUv);
+           float alpha = depth < serverDepth ? color.a : 0.0;
+
+           gl_FragColor = color;
+         }
+    </script>
+
+    <!-- Debug depths-->
+    <!-- <script id="post-frag" type="x-shader/x-fragment">
+         #include <packing>
+
+         varying vec2 vUv;
+         uniform sampler2D diffuseTexture;
+         uniform sampler2D depthTexture;
+         uniform sampler2D serverDepthTexture;
+      uniform float cameraNear;
+      uniform float cameraFar;
+
+         float readDepth(sampler2D depthSampler, vec2 coord) {
+        float fragCoordZ = texture2D(depthSampler, coord).x;
+        float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+        return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+      }
+
+         void main() {
+           float depth = readDepth(depthTexture, vUv);
+           float serverDepth = texture(serverDepthTexture, vUv).r;
+           vec4 color = texture2D(diffuseTexture, vUv);
+           float alpha = depth < serverDepth ? color.a : 0.0;
+
+           gl_FragColor.rgb = 1.0 - vec3(depth);
+           gl_FragColor.a = 1.0;
+         }
+    </script> -->
+
     <script type="module">
       window.addEventListener('DOMContentLoaded', () => {
         main();
@@ -43,8 +135,8 @@
     <vertex-viewer
       id="viewer"
       config-env="platdev"
-      client-id="clientId"
-      src="urn:vertexvis:stream-key:key"
+      client-id="F180BC7099538A7DE4E5730CAD91D36F8F3B1B2A8824150BE386BAFBD642073G"
+      src="urn:vertexvis:stream-key:sdU0-q31mc9L94PM3ek7r6lV713ih22VNdtT"
     ></vertex-viewer>
   </body>
 </html>

@@ -56,6 +56,75 @@ export const fromProto = (
     throw new Error('Invalid payload');
   }
 
+  return {
+    correlationIds: frameCorrelationIds || [],
+    imageAttributes: {
+      frameDimensions: Dimensions.create(
+        imageAttributes.frameDimensions.width,
+        imageAttributes.frameDimensions.height
+      ),
+      imageRect: Rectangle.create(
+        imageAttributes.imageRect.x,
+        imageAttributes.imageRect.y,
+        imageAttributes.imageRect.width,
+        imageAttributes.imageRect.height
+      ),
+      scaleFactor: imageAttributes.scaleFactor,
+    },
+    sceneAttributes: {
+      camera: FrameCamera.create({
+        position: Vector3.create({
+          x: sceneAttributes.camera.position?.x || undefined,
+          y: sceneAttributes.camera.position?.y || undefined,
+          z: sceneAttributes.camera.position?.z || undefined,
+        }),
+        lookAt: Vector3.create({
+          x: sceneAttributes.camera.lookAt?.x || undefined,
+          y: sceneAttributes.camera.lookAt?.y || undefined,
+          z: sceneAttributes.camera.lookAt?.z || undefined,
+        }),
+        up: Vector3.create({
+          x: sceneAttributes.camera.up?.x || undefined,
+          y: sceneAttributes.camera.up?.y || undefined,
+          z: sceneAttributes.camera.up?.z || undefined,
+        }),
+      }),
+    },
+    sequenceNumber: sequenceNumber,
+    image: image,
+    depth: new Uint8Array(),
+  };
+};
+
+export const fromProtoWithDepthBuffer = (
+  payload: vertexvis.protobuf.stream.IDrawFramePayload
+): Frame => {
+  const {
+    frameCorrelationIds,
+    imageAttributes,
+    sceneAttributes,
+    sequenceNumber,
+    image,
+  } = payload;
+  if (
+    imageAttributes == null ||
+    imageAttributes.frameDimensions == null ||
+    imageAttributes.imageRect == null ||
+    sceneAttributes == null ||
+    sceneAttributes.camera == null ||
+    imageAttributes.frameDimensions.width == null ||
+    imageAttributes.frameDimensions.height == null ||
+    imageAttributes.imageRect.x == null ||
+    imageAttributes.imageRect.y == null ||
+    imageAttributes.imageRect.width == null ||
+    imageAttributes.imageRect.height == null ||
+    imageAttributes.scaleFactor == null ||
+    sequenceNumber == null ||
+    image == null
+  ) {
+    throw new Error('Invalid payload');
+  }
+
   const view = new DataView(image.buffer);
   view.setInt8(0, image[0]);
   view.setInt8(1, image[1]);
