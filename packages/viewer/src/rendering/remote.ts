@@ -3,7 +3,6 @@ import { FrameCamera, Frame, Animation } from '../types';
 import { StreamApi, protoToDate, toProtoDuration } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 const DEFAULT_TIMEOUT_IN_MS = 10 * 1000; // 10 seconds
 
@@ -21,20 +20,6 @@ export interface FrameResponse {
 }
 
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
-
-const easingMap = {
-  linear: vertexvis.protobuf.stream.EasingType.EASING_TYPE_LINEAR,
-  'ease-out-cubic':
-    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_CUBIC,
-  'ease-out-quad':
-    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_QUAD,
-  'ease-out-quart':
-    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_QUART,
-  'ease-out-sine':
-    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_SINE,
-  'ease-out-expo':
-    vertexvis.protobuf.stream.EasingType.EASING_TYPE_EASE_OUT_EXPO,
-};
 
 function requestFrame(api: StreamApi): RemoteRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
@@ -70,7 +55,6 @@ function requestFrame(api: StreamApi): RemoteRenderer {
     const animation = req.animation
       ? {
           duration: toProtoDuration(req.animation.milliseconds),
-          easing: easingMap[req.animation.easing],
         }
       : undefined;
 

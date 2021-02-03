@@ -99,7 +99,6 @@ describe(Camera, () => {
       camera.render({
         animation: {
           milliseconds: 500,
-          easing: 'ease-out-sine',
         },
       });
 
@@ -109,7 +108,6 @@ describe(Camera, () => {
             position: Vector3.forward(),
           }),
           animation: {
-            easing: 'ease-out-sine',
             milliseconds: 500,
           },
         })
