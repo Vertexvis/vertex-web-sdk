@@ -129,11 +129,13 @@ describe(Camera, () => {
         position: Vector3.forward(),
       });
       const id = UUID.create();
-      newCamera.flyToSceneItem(id).render({
-        animation: {
-          milliseconds: 500,
-        },
-      });
+      newCamera
+        .flyTo(q => q.withItemId(id))
+        .render({
+          animation: {
+            milliseconds: 500,
+          },
+        });
 
       expect(renderer).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -154,11 +156,13 @@ describe(Camera, () => {
     });
 
     it('should support fly to suppliedId with animations', async () => {
-      camera.flyToSuppliedId('suppliedId').render({
-        animation: {
-          milliseconds: 500,
-        },
-      });
+      camera
+        .flyTo(q => q.withSuppliedId('suppliedId'))
+        .render({
+          animation: {
+            milliseconds: 500,
+          },
+        });
 
       expect(renderer).toHaveBeenCalledWith(
         expect.objectContaining({

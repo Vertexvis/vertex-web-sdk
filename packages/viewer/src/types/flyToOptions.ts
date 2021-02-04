@@ -18,7 +18,7 @@ interface FlyToBoundingBox {
 
 interface FlyToCamera {
   type: 'camera';
-  data: FrameCamera;
+  data: Partial<FrameCamera>;
 }
 export type FlyToType =
   | FlyToSuppliedId

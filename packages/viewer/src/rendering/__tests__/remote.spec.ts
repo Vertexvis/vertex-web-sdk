@@ -39,6 +39,31 @@ describe(createStreamApiRenderer, () => {
     expect(resp.frame.sequenceNumber).toBe(1);
   });
 
+  it('should render given an animation and fly to op', async () => {
+    const req = render({
+      correlationId,
+      camera,
+      flyToOptions: {
+        flyTo: {
+          type: 'supplied',
+          data: 'givenId',
+        },
+      },
+      animation: {
+        milliseconds: 500,
+      },
+    });
+    mockWs.receiveMessage(
+      encode(
+        Fixtures.Requests.drawFrame({
+          payload: { frameCorrelationIds: [correlationId] },
+        })
+      )
+    );
+    const resp = await req;
+    expect(resp.frame.sequenceNumber).toBe(1);
+  });
+
   it('throws exception if render times out', async () => {
     const req = render({ correlationId, camera, timeoutInMs: 10 });
     await expect(req).rejects.toThrow();

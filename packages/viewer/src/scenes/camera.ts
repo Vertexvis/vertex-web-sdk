@@ -8,6 +8,60 @@ interface CameraRenderOptions {
   animation: Animation.Animation;
 }
 
+export class TerminalFlyToExecutor {
+  public constructor(private flyToOptions?: FlyTo.FlyToOptions) {}
+
+  public build(): FlyTo.FlyToOptions | undefined {
+    return this.flyToOptions;
+  }
+}
+
+export class FlyToExecutor {
+  private flyToOptions?: FlyTo.FlyToOptions;
+
+  public withItemId(id: string): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'internal',
+        data: id,
+      },
+    });
+  }
+
+  public withSuppliedId(id: string): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'supplied',
+        data: id,
+      },
+    });
+  }
+
+  public withCamera(camera: FrameCamera.FrameCamera): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'camera',
+        data: camera,
+      },
+    });
+  }
+
+  public withBoundingBox(
+    boundingBox: BoundingBox.BoundingBox
+  ): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'bounding-box',
+        data: boundingBox,
+      },
+    });
+  }
+
+  public build(): FlyTo.FlyToOptions | undefined {
+    return this.flyToOptions;
+  }
+}
+
 /**
  * The `Camera` class contains properties that reflect a world space position, a
  * view direction (lookAt), and normalized vector representing the up direction.
@@ -56,23 +110,12 @@ export class Camera implements FrameCamera.FrameCamera {
     return this.update({ lookAt, position });
   }
 
-  public flyToSceneItem(sceneItemId: string): Camera {
-    this.flyToOptions = {
-      flyTo: {
-        type: 'internal',
-        data: sceneItemId,
-      },
-    };
-    return this;
-  }
-
-  public flyToSuppliedId(partId: string): Camera {
-    this.flyToOptions = {
-      flyTo: {
-        type: 'supplied',
-        data: partId,
-      },
-    };
+  /**
+   *
+   * @param query
+   */
+  public flyTo(query: (q: FlyToExecutor) => TerminalFlyToExecutor): Camera {
+    this.flyToOptions = query(new FlyToExecutor()).build();
     return this;
   }
 
