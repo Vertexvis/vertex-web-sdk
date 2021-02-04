@@ -111,7 +111,8 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
-   *
+   * fly to accepts a function that contains the type of fly to operation that will be done by the camera operation.
+   * To animate the fly to, pass in animation options into render.
    * @param query
    */
   public flyTo(query: (q: FlyToExecutor) => TerminalFlyToExecutor): Camera {
