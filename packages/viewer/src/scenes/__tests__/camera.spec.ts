@@ -1,5 +1,6 @@
 import { Camera } from '../camera';
 import { FrameCamera } from '../../types';
+import { UUID } from '@vertexvis/utils';
 import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
 
 describe(Camera, () => {
@@ -84,6 +85,99 @@ describe(Camera, () => {
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
+        })
+      );
+    });
+  });
+
+  describe('render with animations', () => {
+    const camera = new Camera(renderer, 1, {
+      ...data,
+      position: Vector3.forward(),
+    });
+
+    it('should render using camera with animations', async () => {
+      camera.render({
+        animation: {
+          milliseconds: 500,
+        },
+      });
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            position: Vector3.forward(),
+          }),
+          animation: {
+            milliseconds: 500,
+          },
+          flyToOptions: {
+            flyTo: {
+              data: expect.objectContaining({
+                position: Vector3.forward(),
+              }),
+              type: 'camera',
+            },
+          },
+        })
+      );
+    });
+
+    it('should support fly to with sceneItemId', async () => {
+      const newCamera = new Camera(renderer, 1, {
+        ...data,
+        position: Vector3.forward(),
+      });
+      const id = UUID.create();
+      newCamera
+        .flyTo(q => q.withItemId(id))
+        .render({
+          animation: {
+            milliseconds: 500,
+          },
+        });
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: {
+            milliseconds: 500,
+          },
+          camera: expect.objectContaining({
+            position: Vector3.forward(),
+          }),
+          flyToOptions: {
+            flyTo: {
+              type: 'internal',
+              data: id,
+            },
+          },
+        })
+      );
+    });
+
+    it('should support fly to suppliedId with animations', async () => {
+      camera
+        .flyTo(q => q.withSuppliedId('suppliedId'))
+        .render({
+          animation: {
+            milliseconds: 500,
+          },
+        });
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            position: Vector3.forward(),
+          }),
+          animation: {
+            milliseconds: 500,
+          },
+          flyToOptions: {
+            flyTo: {
+              data: 'suppliedId',
+              type: 'supplied',
+            },
+          },
         })
       );
     });

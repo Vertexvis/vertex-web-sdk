@@ -1,8 +1,66 @@
-import { FrameCamera } from '../types';
+import { Animation, FlyTo, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { RemoteRenderer } from '../rendering';
 
 const PI_OVER_360 = 0.008726646259972;
+
+interface CameraRenderOptions {
+  animation: Animation.Animation;
+}
+
+export class TerminalFlyToExecutor {
+  public constructor(private flyToOptions?: FlyTo.FlyToOptions) {}
+
+  public build(): FlyTo.FlyToOptions | undefined {
+    return this.flyToOptions;
+  }
+}
+
+export class FlyToExecutor {
+  private flyToOptions?: FlyTo.FlyToOptions;
+
+  public withItemId(id: string): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'internal',
+        data: id,
+      },
+    });
+  }
+
+  public withSuppliedId(id: string): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'supplied',
+        data: id,
+      },
+    });
+  }
+
+  public withCamera(camera: FrameCamera.FrameCamera): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'camera',
+        data: camera,
+      },
+    });
+  }
+
+  public withBoundingBox(
+    boundingBox: BoundingBox.BoundingBox
+  ): TerminalFlyToExecutor {
+    return new TerminalFlyToExecutor({
+      flyTo: {
+        type: 'bounding-box',
+        data: boundingBox,
+      },
+    });
+  }
+
+  public build(): FlyTo.FlyToOptions | undefined {
+    return this.flyToOptions;
+  }
+}
 
 /**
  * The `Camera` class contains properties that reflect a world space position, a
@@ -15,6 +73,8 @@ const PI_OVER_360 = 0.008726646259972;
  * a new instance of the class with the updated properties.
  */
 export class Camera implements FrameCamera.FrameCamera {
+  private flyToOptions?: FlyTo.FlyToOptions;
+
   public constructor(
     private renderer: RemoteRenderer,
     private aspect: number,
@@ -51,6 +111,16 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
+   * fly to accepts a function that contains the type of fly to operation that will be done by the camera operation.
+   * To animate the fly to, pass in animation options into render.
+   * @param query
+   */
+  public flyTo(query: (q: FlyToExecutor) => TerminalFlyToExecutor): Camera {
+    this.flyToOptions = query(new FlyToExecutor()).build();
+    return this;
+  }
+
+  /**
    * Shifts the position of the camera by the given delta.
    *
    * @param delta The number of units to shift the camera on the X, Y, and Z
@@ -67,9 +137,22 @@ export class Camera implements FrameCamera.FrameCamera {
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
    */
-  public async render(): Promise<void> {
+  public async render(renderOptions?: CameraRenderOptions): Promise<void> {
+    if (this.flyToOptions == null && renderOptions != null) {
+      this.flyToOptions = {
+        flyTo: {
+          type: 'camera',
+          data: this.data,
+        },
+      };
+    }
+
     try {
-      await this.renderer({ camera: this.data });
+      await this.renderer({
+        camera: this.data,
+        flyToOptions: this.flyToOptions,
+        animation: renderOptions?.animation,
+      });
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }
