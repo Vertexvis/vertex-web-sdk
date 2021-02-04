@@ -107,6 +107,7 @@ export class Camera implements FrameCamera.FrameCamera {
       await this.renderer({
         camera: this.data,
         flyToOptions: this.flyToOptions,
+        animation: renderOptions?.animation,
       });
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
