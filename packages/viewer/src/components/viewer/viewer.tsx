@@ -12,7 +12,7 @@ import {
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
   Disposable,
@@ -25,6 +25,7 @@ import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { InteractionHandler } from '../../interactions/interactionHandler';
+import { KeyStateInteractionHandler } from '../../interactions/keyStateInteractionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
@@ -32,6 +33,7 @@ import { MultiPointerInteractionHandler } from '../../interactions/multiPointerI
 import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
+import { FlyToPartKeyInteraction } from '../../interactions/flyToPartKeyInteraction';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -268,27 +270,39 @@ export class Viewer {
     }
 
     if (this.cameraControls) {
+      const keyStateInteractionHandler = new KeyStateInteractionHandler();
+
+      this.registerInteractionHandler(keyStateInteractionHandler);
       // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'pointerdown',
+          'pointerup',
+          'pointermove',
+          () => this.getConfig(),
+          () => keyStateInteractionHandler.getState()
+        );
+
+        tapInteractionHandler.onTap([new FlyToPartKeyInteraction(this.stream)]);
+
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
-        this.registerInteractionHandler(
-          new TapInteractionHandler(
-            'pointerdown',
-            'pointerup',
-            'pointermove',
-            () => this.getConfig()
-          )
-        );
+        this.registerInteractionHandler(tapInteractionHandler);
       } else {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'mousedown',
+          'mouseup',
+          'mousemove',
+          () => this.getConfig(),
+          () => keyStateInteractionHandler.getState()
+        );
+
+        tapInteractionHandler.onTap([new FlyToPartKeyInteraction(this.stream)]);
+
         // fallback to touch events and mouse events as a default
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
-        this.registerInteractionHandler(
-          new TapInteractionHandler('mousedown', 'mouseup', 'mousemove', () =>
-            this.getConfig()
-          )
-        );
+        this.registerInteractionHandler(tapInteractionHandler);
       }
     }
 
