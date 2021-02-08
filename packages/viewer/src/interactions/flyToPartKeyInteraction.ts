@@ -32,6 +32,10 @@ export class FlyToPartKeyInteraction
           duration: toProtoDuration(this.configProvider().animation.durationMs),
         },
       });
+    } else {
+      console.debug(
+        `No hit results found for fly to part [position={x: ${e.position.x}, y: ${e.position.y}}]`
+      );
     }
   }
 }

@@ -283,6 +283,10 @@ export class Viewer {
     if (this.keyboardControls) {
       this.keyStateInteractionHandler = new KeyStateInteractionHandler();
       this.registerInteractionHandler(this.keyStateInteractionHandler);
+
+      this.registerTapKeyInteraction(
+        new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+      );
     }
 
     if (this.cameraControls) {
@@ -298,9 +302,6 @@ export class Viewer {
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
-        this.registerTapKeyInteraction(
-          new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
-        );
       } else {
         const tapInteractionHandler = new TapInteractionHandler(
           'mousedown',
@@ -313,9 +314,6 @@ export class Viewer {
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
-        this.registerTapKeyInteraction(
-          new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
-        );
       }
     }
 

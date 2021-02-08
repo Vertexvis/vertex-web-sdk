@@ -1,4 +1,4 @@
-const DEFAULT_ANIMATION_DURATION = 2000;
+const DEFAULT_ANIMATION_DURATION = 500;
 
 export interface Animation {
   milliseconds: number;
