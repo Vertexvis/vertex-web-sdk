@@ -9,6 +9,7 @@ import {
   Method,
   Event,
   EventEmitter,
+  Listen,
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
@@ -20,6 +21,7 @@ import {
   Color,
   Async,
   EventDispatcher,
+  Listener,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
@@ -69,6 +71,7 @@ import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
+import { KeyInteraction } from '../../interactions/keyInteraction';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -229,6 +232,7 @@ export class Viewer {
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
   private keyStateInteractionHandler?: KeyStateInteractionHandler;
+  private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
 
   private isResizing?: boolean;
   private isReconnecting?: boolean;
@@ -289,34 +293,30 @@ export class Viewer {
           'pointerdown',
           'pointerup',
           'pointermove',
-          () => this.getConfig(),
-          () => this.keyStateInteractionHandler?.getState() || {}
+          () => this.getConfig()
         );
-
-        tapInteractionHandler.onTap([
-          new FlyToPartKeyInteraction(this.stream, () => this.getConfig()),
-        ]);
 
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
+        this.registerTapKeyInteraction(
+          new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+        );
       } else {
         const tapInteractionHandler = new TapInteractionHandler(
           'mousedown',
           'mouseup',
           'mousemove',
-          () => this.getConfig(),
-          () => this.keyStateInteractionHandler?.getState() || {}
+          () => this.getConfig()
         );
-
-        tapInteractionHandler.onTap([
-          new FlyToPartKeyInteraction(this.stream, () => this.getConfig()),
-        ]);
 
         // fallback to touch events and mouse events as a default
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
+        this.registerTapKeyInteraction(
+          new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+        );
       }
     }
 
@@ -441,6 +441,13 @@ export class Viewer {
   }
 
   @Method()
+  public async registerTapKeyInteraction(
+    handler: KeyInteraction<TapEventDetails>
+  ): Promise<any> {
+    this.tapKeyInteractions = [...this.tapKeyInteractions, handler];
+  }
+
+  @Method()
   public async getInteractionHandlers(): Promise<InteractionHandler[]> {
     return this.interactionHandlers;
   }
@@ -524,6 +531,18 @@ export class Viewer {
   @Method()
   public async getFrame(): Promise<Frame.Frame | undefined> {
     return this.lastFrame;
+  }
+
+  @Listen('tap')
+  private async handleTapEvent(
+    event: CustomEvent<TapEventDetails>
+  ): Promise<void> {
+    const keyState = this.keyStateInteractionHandler?.getState();
+    if (keyState != null) {
+      this.tapKeyInteractions
+        .filter(i => i.predicate(keyState))
+        .forEach(i => i.fn(event.detail));
+    }
   }
 
   /**

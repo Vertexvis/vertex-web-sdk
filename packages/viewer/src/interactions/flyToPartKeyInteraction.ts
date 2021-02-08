@@ -1,9 +1,10 @@
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { KeyInteraction, KeyState } from './keyInteraction';
-import { Point } from '@vertexvis/geometry';
 import { ConfigProvider } from '../config/config';
+import { TapEventDetails } from './tapEventDetails';
 
-export class FlyToPartKeyInteraction implements KeyInteraction<Point.Point> {
+export class FlyToPartKeyInteraction
+  implements KeyInteraction<TapEventDetails> {
   public constructor(
     private stream: StreamApi,
     private configProvider: ConfigProvider
@@ -13,15 +14,13 @@ export class FlyToPartKeyInteraction implements KeyInteraction<Point.Point> {
     return keyState['Meta'] || keyState['Control'];
   }
 
-  public async fn(point: Point.Point): Promise<void> {
+  public async fn(e: TapEventDetails): Promise<void> {
     const hitResult = await this.stream.hitItems(
       {
-        point,
+        point: e.position,
       },
       true
     );
-
-    console.log(hitResult.hitItems?.hits);
 
     if (
       hitResult.hitItems?.hits != null &&

@@ -15,6 +15,7 @@ import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
+import { KeyInteraction } from "./interactions/keyInteraction";
 import { Scene } from "./scenes/scene";
 export namespace Components {
     interface SvgIcon {
@@ -61,6 +62,7 @@ export namespace Components {
           * @returns - A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
+        "registerTapKeyInteraction": (handler: KeyInteraction<TapEventDetails>) => Promise<any>;
         "scene": () => Promise<Scene>;
         /**
           * Property used for internals or testing.

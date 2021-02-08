@@ -4,7 +4,6 @@ import { InteractionHandler } from './interactionHandler';
 import { TapEventKeys } from './tapEventDetails';
 import { ConfigProvider } from '../config/config';
 import { BaseEvent } from './interactionEvent';
-import { KeyState, KeyInteraction } from './keyInteraction';
 
 type TapEmitter = (
   position: Point.Point,
@@ -25,14 +24,11 @@ export class TapInteractionHandler implements InteractionHandler {
   private doubleTapTimer?: any;
   private longPressTimer?: any;
 
-  private tapKeyInteractions: KeyInteraction<Point.Point>[] = [];
-
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
     private getConfig: ConfigProvider,
-    private keyStateProvider: () => KeyState
   ) {
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);
@@ -65,10 +61,6 @@ export class TapInteractionHandler implements InteractionHandler {
     this.interactionApi = api;
     element.addEventListener(this.downEvent, this.handleDown);
     element.addEventListener('touchstart', this.handleTouchStart);
-  }
-
-  public onTap(keyInteractions: KeyInteraction<Point.Point>[]): void {
-    this.tapKeyInteractions = keyInteractions;
   }
 
   private handleTouchStart(event: TouchEvent): void {
@@ -163,17 +155,7 @@ export class TapInteractionHandler implements InteractionHandler {
       }
 
       if (this.longPressTimer != null) {
-        this.emit(
-          (canvasPosition: Point.Point, details?: Partial<TapEventKeys>) => {
-            this.tapKeyInteractions
-              .filter(interaction =>
-                interaction.predicate(this.keyStateProvider())
-              )
-              .forEach(interaction => interaction.fn(canvasPosition));
-
-            this.interactionApi?.tap(canvasPosition, details);
-          }
-        )(position, keyDetails);
+        this.emit(this.interactionApi?.tap)(position, keyDetails);
       }
     }
 
