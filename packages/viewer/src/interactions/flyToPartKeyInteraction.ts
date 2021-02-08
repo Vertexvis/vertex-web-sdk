@@ -1,9 +1,13 @@
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { KeyInteraction, KeyState } from './keyInteraction';
 import { Point } from '@vertexvis/geometry';
+import { ConfigProvider } from '../config/config';
 
 export class FlyToPartKeyInteraction implements KeyInteraction<Point.Point> {
-  public constructor(private stream: StreamApi) {}
+  public constructor(
+    private stream: StreamApi,
+    private configProvider: ConfigProvider
+  ) {}
 
   public predicate(keyState: KeyState): boolean {
     return keyState['Meta'] || keyState['Control'];
@@ -26,7 +30,7 @@ export class FlyToPartKeyInteraction implements KeyInteraction<Point.Point> {
       await this.stream.flyTo({
         itemId: hitResult.hitItems.hits[0].itemId,
         animation: {
-          duration: toProtoDuration(500),
+          duration: toProtoDuration(this.configProvider().animation.durationMs),
         },
       });
     }

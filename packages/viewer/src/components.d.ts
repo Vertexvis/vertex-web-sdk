@@ -41,6 +41,10 @@ export namespace Components {
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;
         /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls": boolean;
+        /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
          */
@@ -116,6 +120,10 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls"?: boolean;
         /**
           * Emits an event when the connection status changes for the viewer
          */

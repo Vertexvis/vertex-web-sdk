@@ -139,6 +139,13 @@ export class Viewer {
   @Prop() public cameraControls = true;
 
   /**
+   * Enables or disables the default keyboard shortcut interactions provided by
+   * the viewer. Enabled by default, requires `cameraControls` being enabled.
+   *
+   */
+  @Prop() public keyboardControls = true;
+
+  /**
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
@@ -221,6 +228,7 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
+  private keyStateInteractionHandler?: KeyStateInteractionHandler;
 
   private isResizing?: boolean;
   private isReconnecting?: boolean;
@@ -269,10 +277,12 @@ export class Viewer {
       this.load(this.src);
     }
 
-    if (this.cameraControls) {
-      const keyStateInteractionHandler = new KeyStateInteractionHandler();
+    if (this.keyboardControls) {
+      this.keyStateInteractionHandler = new KeyStateInteractionHandler();
+      this.registerInteractionHandler(this.keyStateInteractionHandler);
+    }
 
-      this.registerInteractionHandler(keyStateInteractionHandler);
+    if (this.cameraControls) {
       // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
         const tapInteractionHandler = new TapInteractionHandler(
@@ -280,10 +290,12 @@ export class Viewer {
           'pointerup',
           'pointermove',
           () => this.getConfig(),
-          () => keyStateInteractionHandler.getState()
+          () => this.keyStateInteractionHandler?.getState() || {}
         );
 
-        tapInteractionHandler.onTap([new FlyToPartKeyInteraction(this.stream)]);
+        tapInteractionHandler.onTap([
+          new FlyToPartKeyInteraction(this.stream, () => this.getConfig()),
+        ]);
 
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -294,10 +306,12 @@ export class Viewer {
           'mouseup',
           'mousemove',
           () => this.getConfig(),
-          () => keyStateInteractionHandler.getState()
+          () => this.keyStateInteractionHandler?.getState() || {}
         );
 
-        tapInteractionHandler.onTap([new FlyToPartKeyInteraction(this.stream)]);
+        tapInteractionHandler.onTap([
+          new FlyToPartKeyInteraction(this.stream, () => this.getConfig()),
+        ]);
 
         // fallback to touch events and mouse events as a default
         this.registerInteractionHandler(new MouseInteractionHandler());
