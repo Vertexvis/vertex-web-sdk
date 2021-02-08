@@ -28,7 +28,7 @@ export class TapInteractionHandler implements InteractionHandler {
     protected downEvent: 'mousedown' | 'pointerdown',
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
-    private getConfig: ConfigProvider,
+    private getConfig: ConfigProvider
   ) {
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);

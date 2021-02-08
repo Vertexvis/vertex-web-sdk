@@ -13,7 +13,7 @@ import {
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
   Disposable,
@@ -21,7 +21,6 @@ import {
   Color,
   Async,
   EventDispatcher,
-  Listener,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
@@ -443,25 +442,25 @@ export class Viewer {
   /**
    * Registers a key interaction to be invoked when a specific set of
    * keys are pressed during a `tap` event.
-   * 
+   *
    * `KeyInteraction`s are used to build custom keyboard shortcuts for the
    * viewer using the current state of they keyboard to determine whether
    * the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
    * to disable the default keyboard shortcuts provided by the viewer.
-   * 
+   *
    * @example
-   * 
+   *
    * class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {
    *   constructor(private viewer: HTMLVertexViewerElement) {}
-   * 
+   *
    *   public predicate(keyState: KeyState): boolean {
    *     return keyState['Alt'];
    *   }
-   * 
+   *
    *   public async fn(event: TapEventDetails) {
    *     const scene = await this.viewer.scene();
    *     const result = await scene.raycaster().hitItems(event.position);
-   *     
+   *
    *     if (result.hits.length > 0) {
    *       await scene
    *         .camera()
@@ -470,7 +469,7 @@ export class Viewer {
    *     }
    *   }
    * }
-   * 
+   *
    * @param keyInteraction - The `KeyInteraction` to register.
    */
   @Method()

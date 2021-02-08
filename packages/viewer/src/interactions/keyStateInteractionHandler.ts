@@ -6,7 +6,7 @@ export class KeyStateInteractionHandler implements InteractionHandler {
 
   private keyStateChange = new EventDispatcher<Record<string, boolean>>();
 
-  constructor() {
+  public constructor() {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
   }
