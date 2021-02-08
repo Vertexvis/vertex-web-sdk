@@ -1,4 +1,9 @@
-import { Dimensions, Vector3, Rectangle } from '@vertexvis/geometry';
+import {
+  Dimensions,
+  Vector3,
+  Rectangle,
+  BoundingBox,
+} from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import * as FrameCamera from './frameCamera';
 
@@ -18,6 +23,7 @@ export interface ImageAttributes {
 
 export interface SceneAttributes {
   camera: FrameCamera.FrameCamera;
+  visibleBoundingBox: BoundingBox.BoundingBox;
 }
 
 export const fromProto = (
@@ -82,6 +88,18 @@ export const fromProto = (
           z: sceneAttributes.camera.up?.z || undefined,
         }),
       }),
+      visibleBoundingBox: BoundingBox.create(
+        Vector3.create({
+          x: sceneAttributes.visibleBoundingBox?.xmin || undefined,
+          y: sceneAttributes.visibleBoundingBox?.ymin || undefined,
+          z: sceneAttributes.visibleBoundingBox?.zmin || undefined,
+        }),
+        Vector3.create({
+          x: sceneAttributes.visibleBoundingBox?.xmax || undefined,
+          y: sceneAttributes.visibleBoundingBox?.ymax || undefined,
+          z: sceneAttributes.visibleBoundingBox?.zmax || undefined,
+        })
+      ),
     },
     sequenceNumber: sequenceNumber,
     image: image,
