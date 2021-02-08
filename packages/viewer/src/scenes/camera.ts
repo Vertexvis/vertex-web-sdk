@@ -78,7 +78,8 @@ export class Camera implements FrameCamera.FrameCamera {
   public constructor(
     private renderer: RemoteRenderer,
     private aspect: number,
-    private data: FrameCamera.FrameCamera
+    private data: FrameCamera.FrameCamera,
+    private boundingBox: BoundingBox.BoundingBox
   ) {}
 
   /**
@@ -131,6 +132,10 @@ export class Camera implements FrameCamera.FrameCamera {
       position: Vector3.add(this.position, delta),
       lookAt: Vector3.add(this.lookAt, delta),
     });
+  }
+
+  public viewAll(): Camera {
+    return this.fitToBoundingBox(this.boundingBox);
   }
 
   /**
@@ -190,10 +195,15 @@ export class Camera implements FrameCamera.FrameCamera {
    * @param camera The values to update the camera to.
    */
   public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
-    return new Camera(this.renderer, this.aspectRatio, {
-      ...this.data,
-      ...camera,
-    });
+    return new Camera(
+      this.renderer,
+      this.aspectRatio,
+      {
+        ...this.data,
+        ...camera,
+      },
+      this.boundingBox
+    );
   }
 
   /**

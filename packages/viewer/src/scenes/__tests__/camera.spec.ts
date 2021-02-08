@@ -6,6 +6,7 @@ import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
 describe(Camera, () => {
   const renderer = jest.fn();
   const data = FrameCamera.create({ position: Vector3.create(1, 2, 3) });
+  const boundingBox = BoundingBox.create(Vector3.create(), Vector3.create());
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -14,7 +15,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.fitToBoundingBox, () => {
     describe('when aspect ratio < 1', () => {
-      const camera = new Camera(renderer, 0.5, data);
+      const camera = new Camera(renderer, 0.5, data, boundingBox);
 
       it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
         const updatedCamera = camera.fitToBoundingBox(
@@ -28,10 +29,15 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.rotateAroundAxis, () => {
-    const camera = new Camera(renderer, 1, {
-      ...data,
-      position: Vector3.back(),
-    });
+    const camera = new Camera(
+      renderer,
+      1,
+      {
+        ...data,
+        position: Vector3.back(),
+      },
+      boundingBox
+    );
 
     it('returns camera with position rotated around axis', () => {
       const degrees = Angle.toRadians(90);
@@ -45,10 +51,15 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.moveBy, () => {
-    const camera = new Camera(renderer, 1, {
-      ...data,
-      position: Vector3.origin(),
-    });
+    const camera = new Camera(
+      renderer,
+      1,
+      {
+        ...data,
+        position: Vector3.origin(),
+      },
+      boundingBox
+    );
 
     it('shifts the position and lookat by the given delta', () => {
       const delta = Vector3.right();
@@ -61,10 +72,15 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.viewVector, () => {
-    const camera = new Camera(renderer, 1, {
-      ...data,
-      position: Vector3.forward(),
-    });
+    const camera = new Camera(
+      renderer,
+      1,
+      {
+        ...data,
+        position: Vector3.forward(),
+      },
+      boundingBox
+    );
 
     it('returns the vector between the position and lookat', () => {
       const viewVector = camera.viewVector();
@@ -73,10 +89,15 @@ describe(Camera, () => {
   });
 
   describe(Camera.prototype.render, () => {
-    const camera = new Camera(renderer, 1, {
-      ...data,
-      position: Vector3.forward(),
-    });
+    const camera = new Camera(
+      renderer,
+      1,
+      {
+        ...data,
+        position: Vector3.forward(),
+      },
+      boundingBox
+    );
 
     it('should render using camera', async () => {
       camera.render();
@@ -91,10 +112,15 @@ describe(Camera, () => {
   });
 
   describe('render with animations', () => {
-    const camera = new Camera(renderer, 1, {
-      ...data,
-      position: Vector3.forward(),
-    });
+    const camera = new Camera(
+      renderer,
+      1,
+      {
+        ...data,
+        position: Vector3.forward(),
+      },
+      boundingBox
+    );
 
     it('should render using camera with animations', async () => {
       camera.render({
@@ -124,10 +150,15 @@ describe(Camera, () => {
     });
 
     it('should support fly to with sceneItemId', async () => {
-      const newCamera = new Camera(renderer, 1, {
-        ...data,
-        position: Vector3.forward(),
-      });
+      const newCamera = new Camera(
+        renderer,
+        1,
+        {
+          ...data,
+          position: Vector3.forward(),
+        },
+        boundingBox
+      );
       const id = UUID.create();
       newCamera
         .flyTo(q => q.withItemId(id))
@@ -176,6 +207,74 @@ describe(Camera, () => {
             flyTo: {
               data: 'suppliedId',
               type: 'supplied',
+            },
+          },
+        })
+      );
+    });
+
+    it('should go to the visible bounding box on a viewAll', async () => {
+      const newBoundingBox = BoundingBox.create(
+        Vector3.create(1, 1, 1),
+        Vector3.create(2, 2, 2)
+      );
+      const newCamera = new Camera(
+        renderer,
+        1,
+        {
+          ...data,
+          position: Vector3.back(),
+        },
+        newBoundingBox
+      );
+
+      newCamera.viewAll().render();
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            lookAt: Vector3.create(1.5, 1.5, 1.5),
+            position: Vector3.create(1.5, 1.5, 3.7998473026935273),
+            up: Vector3.create(0, 1, 0),
+          }),
+        })
+      );
+    });
+
+    it('viewAll should support animations', async () => {
+      const newBoundingBox = BoundingBox.create(
+        Vector3.create(1, 1, 1),
+        Vector3.create(2, 2, 2)
+      );
+      const newCamera = new Camera(
+        renderer,
+        1,
+        {
+          ...data,
+          position: Vector3.back(),
+        },
+        newBoundingBox
+      );
+
+      newCamera.viewAll().render({
+        animation: {
+          milliseconds: 500,
+        },
+      });
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: {
+            milliseconds: 500,
+          },
+          flyToOptions: {
+            flyTo: {
+              data: expect.objectContaining({
+                lookAt: Vector3.create(1.5, 1.5, 1.5),
+                position: Vector3.create(1.5, 1.5, 3.7998473026935273),
+                up: Vector3.create(0, 1, 0),
+              }),
+              type: 'camera',
             },
           },
         })

@@ -212,7 +212,8 @@ export class Scene {
     return new Camera(
       this.renderer,
       Dimensions.aspectRatio(this.viewport()),
-      this.frame.sceneAttributes.camera
+      this.frame.sceneAttributes.camera,
+      this.frame.sceneAttributes.visibleBoundingBox
     );
   }
 
