@@ -5,3 +5,5 @@ export { ColorMaterial };
 export * from './components';
 
 export * from './interactions/interactionHandler';
+
+export * from './interactions/keyInteraction';

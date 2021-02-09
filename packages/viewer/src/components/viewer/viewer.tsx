@@ -9,6 +9,7 @@ import {
   Method,
   Event,
   EventEmitter,
+  Listen,
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
@@ -25,6 +26,7 @@ import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { InteractionHandler } from '../../interactions/interactionHandler';
+import { KeyStateInteractionHandler } from '../../interactions/keyStateInteractionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
@@ -32,6 +34,7 @@ import { MultiPointerInteractionHandler } from '../../interactions/multiPointerI
 import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
+import { FlyToPartKeyInteraction } from '../../interactions/flyToPartKeyInteraction';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -67,6 +70,7 @@ import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
+import { KeyInteraction } from '../../interactions/keyInteraction';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -135,6 +139,13 @@ export class Viewer {
    * the viewer. Enabled by default.
    */
   @Prop() public cameraControls = true;
+
+  /**
+   * Enables or disables the default keyboard shortcut interactions provided by
+   * the viewer. Enabled by default, requires `cameraControls` being enabled.
+   *
+   */
+  @Prop() public keyboardControls = true;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -219,6 +230,8 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
+  private keyStateInteractionHandler?: KeyStateInteractionHandler;
+  private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
 
   private isResizing?: boolean;
   private isReconnecting?: boolean;
@@ -267,28 +280,40 @@ export class Viewer {
       this.load(this.src);
     }
 
+    if (this.keyboardControls) {
+      this.keyStateInteractionHandler = new KeyStateInteractionHandler();
+      this.registerInteractionHandler(this.keyStateInteractionHandler);
+
+      this.registerTapKeyInteraction(
+        new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+      );
+    }
+
     if (this.cameraControls) {
       // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'pointerdown',
+          'pointerup',
+          'pointermove',
+          () => this.getConfig()
+        );
+
         this.registerInteractionHandler(new PointerInteractionHandler());
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
-        this.registerInteractionHandler(
-          new TapInteractionHandler(
-            'pointerdown',
-            'pointerup',
-            'pointermove',
-            () => this.getConfig()
-          )
-        );
+        this.registerInteractionHandler(tapInteractionHandler);
       } else {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'mousedown',
+          'mouseup',
+          'mousemove',
+          () => this.getConfig()
+        );
+
         // fallback to touch events and mouse events as a default
         this.registerInteractionHandler(new MouseInteractionHandler());
         this.registerInteractionHandler(new TouchInteractionHandler());
-        this.registerInteractionHandler(
-          new TapInteractionHandler('mousedown', 'mouseup', 'mousemove', () =>
-            this.getConfig()
-          )
-        );
+        this.registerInteractionHandler(tapInteractionHandler);
       }
     }
 
@@ -412,6 +437,46 @@ export class Viewer {
     };
   }
 
+  /**
+   * Registers a key interaction to be invoked when a specific set of
+   * keys are pressed during a `tap` event.
+   *
+   * `KeyInteraction`s are used to build custom keyboard shortcuts for the
+   * viewer using the current state of they keyboard to determine whether
+   * the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
+   * to disable the default keyboard shortcuts provided by the viewer.
+   *
+   * @example
+   *
+   * class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {
+   *   constructor(private viewer: HTMLVertexViewerElement) {}
+   *
+   *   public predicate(keyState: KeyState): boolean {
+   *     return keyState['Alt'];
+   *   }
+   *
+   *   public async fn(event: TapEventDetails) {
+   *     const scene = await this.viewer.scene();
+   *     const result = await scene.raycaster().hitItems(event.position);
+   *
+   *     if (result.hits.length > 0) {
+   *       await scene
+   *         .camera()
+   *         .fitTo(q => q.withItemId(result.hits[0].itemId))
+   *         .render();
+   *     }
+   *   }
+   * }
+   *
+   * @param keyInteraction - The `KeyInteraction` to register.
+   */
+  @Method()
+  public async registerTapKeyInteraction(
+    keyInteraction: KeyInteraction<TapEventDetails>
+  ): Promise<void> {
+    this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
+  }
+
   @Method()
   public async getInteractionHandlers(): Promise<InteractionHandler[]> {
     return this.interactionHandlers;
@@ -496,6 +561,18 @@ export class Viewer {
   @Method()
   public async getFrame(): Promise<Frame.Frame | undefined> {
     return this.lastFrame;
+  }
+
+  @Listen('tap')
+  private async handleTapEvent(
+    event: CustomEvent<TapEventDetails>
+  ): Promise<void> {
+    const keyState = this.keyStateInteractionHandler?.getState();
+    if (keyState != null) {
+      this.tapKeyInteractions
+        .filter(i => i.predicate(keyState))
+        .forEach(i => i.fn(event.detail));
+    }
   }
 
   /**

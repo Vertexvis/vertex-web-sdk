@@ -15,6 +15,7 @@ import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
+import { KeyInteraction } from "./interactions/keyInteraction";
 import { Scene } from "./scenes/scene";
 export namespace Components {
     interface SvgIcon {
@@ -41,6 +42,10 @@ export namespace Components {
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;
         /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls": boolean;
+        /**
           * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
          */
@@ -57,6 +62,12 @@ export namespace Components {
           * @returns - A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
+        /**
+          * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
+          * @example class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {   constructor(private viewer: HTMLVertexViewerElement) {}    public predicate(keyState: KeyState): boolean {     return keyState['Alt'];   }    public async fn(event: TapEventDetails) {     const scene = await this.viewer.scene();     const result = await scene.raycaster().hitItems(event.position);      if (result.hits.length > 0) {       await scene         .camera()         .fitTo(q => q.withItemId(result.hits[0].itemId))         .render();     }   } }
+          * @param keyInteraction - The `KeyInteraction` to register.
+         */
+        "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
         "scene": () => Promise<Scene>;
         /**
           * Property used for internals or testing.
@@ -116,6 +127,10 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls"?: boolean;
         /**
           * Emits an event when the connection status changes for the viewer
          */

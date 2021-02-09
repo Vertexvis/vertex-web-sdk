@@ -102,7 +102,7 @@ describe('vertex-viewer', () => {
 
     it('disposing registered interaction handler removes handler', async () => {
       const viewer = await createViewerSpec(
-        `<vertex-viewer camera-controls="false"></vertex-viewer>`
+        `<vertex-viewer camera-controls="false" keyboard-controls="false"></vertex-viewer>`
       );
 
       const disposable = await viewer.registerInteractionHandler(handler);
