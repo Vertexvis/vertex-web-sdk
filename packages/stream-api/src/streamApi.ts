@@ -13,6 +13,7 @@ import {
   RecordPerformancePayload,
   UpdateDimensionsPayload,
   UpdateStreamPayload,
+  LoadSceneViewStatePayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
@@ -313,6 +314,13 @@ export class StreamApi {
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ recordPerformance: payload }, withResponse);
+  }
+
+  public loadSceneViewState(
+    payload: LoadSceneViewStatePayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ loadSceneViewState: payload }, withResponse);
   }
 
   /**
