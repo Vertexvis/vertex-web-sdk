@@ -60,7 +60,7 @@ export type RecordPerformancePayload = DeepRequired<
 
 export type LoadSceneViewStatePayload = DeepRequired<
   vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
-  ['frameCorrelationId']
+  []
 >;
 
 export type DrawFrameResult = DeepRequired<
