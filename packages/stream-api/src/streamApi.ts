@@ -13,6 +13,7 @@ import {
   RecordPerformancePayload,
   UpdateDimensionsPayload,
   UpdateStreamPayload,
+  LoadSceneViewStatePayload,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
@@ -313,6 +314,24 @@ export class StreamApi {
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ recordPerformance: payload }, withResponse);
+  }
+
+  /**
+   * Sends a request to update the current scene view with the state present
+   * in the specified scene view state.
+   *
+   * Use `withResponse` to indicate if the server should reply with a response.
+   * If `false`, the returned promise will complete immediately. Otherwise,
+   * it'll complete when a response is received.
+   *
+   * @param payload
+   * @param withResponse
+   */
+  public loadSceneViewState(
+    payload: LoadSceneViewStatePayload,
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ loadSceneViewState: payload }, withResponse);
   }
 
   /**

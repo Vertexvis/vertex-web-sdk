@@ -230,4 +230,18 @@ export class Scene {
   public viewport(): Dimensions.Dimensions {
     return this.frame.imageAttributes.frameDimensions;
   }
+
+  /**
+   * Applies the provided scene view state to the scene.
+   */
+  public async applySceneViewState(
+    sceneViewStateId: UUID.UUID
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    return await this.stream.loadSceneViewState(
+      {
+        sceneViewStateId: { hex: sceneViewStateId },
+      },
+      true
+    );
+  }
 }

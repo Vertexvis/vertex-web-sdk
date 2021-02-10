@@ -58,6 +58,11 @@ export type RecordPerformancePayload = DeepRequired<
   []
 >;
 
+export type LoadSceneViewStatePayload = DeepRequired<
+  vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+  []
+>;
+
 export type DrawFrameResult = DeepRequired<
   Pick<vertexvis.protobuf.stream.IStreamResponse, 'drawFrame'>,
   | ['drawFrame', 'timing', 'receiveToPaintDuration']
