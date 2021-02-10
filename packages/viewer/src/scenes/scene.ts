@@ -15,7 +15,6 @@ import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
-import { State } from './state';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -168,10 +167,6 @@ export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
   | SceneItemOperationsBuilder[];
 
-export interface SceneLoadOptions {
-  sceneViewStateId?: UUID.UUID;
-}
-
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
  * it, you can retrieve attributes of the scene, such as the camera. It also
@@ -237,9 +232,16 @@ export class Scene {
   }
 
   /**
-   *
+   * Applies the provided scene view state to the scene.
    */
-  public state(): State {
-    return new State(this.stream);
+  public async applySceneViewState(
+    sceneViewStateId: UUID.UUID
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    return await this.stream.loadSceneViewState(
+      {
+        sceneViewStateId: { hex: sceneViewStateId },
+      },
+      true
+    );
   }
 }
