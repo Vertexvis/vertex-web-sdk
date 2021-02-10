@@ -168,9 +168,9 @@ export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
   | SceneItemOperationsBuilder[];
 
-  export interface SceneLoadOptions {
-    sceneViewStateId?: UUID.UUID;
-  }
+export interface SceneLoadOptions {
+  sceneViewStateId?: UUID.UUID;
+}
 
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
@@ -237,7 +237,7 @@ export class Scene {
   }
 
   /**
-   * 
+   *
    */
   public state(): State {
     return new State(this.stream);
