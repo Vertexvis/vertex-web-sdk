@@ -15,7 +15,14 @@ describe(LoadableResource.fromUrn, () => {
 
   it('parses URN for a stream key', () => {
     const urn = 'urn:vertexvis:stream-key:123';
-    const scene = LoadableResource.fromUrn(urn);
-    expect(scene).toEqual({ type: 'stream-key', id: '123' });
+    const { resource } = LoadableResource.fromUrn(urn);
+    expect(resource).toEqual({ type: 'stream-key', id: '123' });
+  });
+
+  it('parses query param for a URN', () => {
+    const urn = 'urn:vertexvis:stream-key:123?scene-view-state=234';
+    const { resource, query } = LoadableResource.fromUrn(urn);
+    expect(resource).toEqual({ type: 'stream-key', id: '123' });
+    expect(query).toEqual({ type: 'scene-view-state', id: '234' });
   });
 });

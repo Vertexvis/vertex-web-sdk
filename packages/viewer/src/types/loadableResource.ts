@@ -19,8 +19,7 @@ export function fromUrn(urn: string): Resource {
     throw new Error('Invalid URN. Expected URN scheme.');
   }
 
-  const [nid, resourceType, resource] = uri.path.split(':');
-  const [resourceId, query] = resource.split('?');
+  const [nid, resourceType, resourceId] = uri.path.split(':');
 
   if (nid !== 'vertexvis') {
     throw new Error('Invalid URN. Expected URN to be vertexvis namespace');
@@ -30,7 +29,7 @@ export function fromUrn(urn: string): Resource {
     case 'stream-key':
       return {
         resource: { type: 'stream-key', id: resourceId },
-        query: fromQuery(query),
+        query: fromQuery(uri.query),
       };
     default:
       throw new Error('Invalid URN. Unknown resource type');
