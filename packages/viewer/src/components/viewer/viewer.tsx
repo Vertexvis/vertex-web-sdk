@@ -519,7 +519,7 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      const { resource, query } = LoadableResource.fromUrn(urn);
+      const { resource, queries } = LoadableResource.fromUrn(urn);
       const isSameResource =
         this.resource != null &&
         this.resource.type === resource.type &&
@@ -527,7 +527,10 @@ export class Viewer {
       if (!isSameResource) {
         this.unload();
         this.resource = resource;
-        await this.connectStreamingClient(this.resource, query);
+        await this.connectStreamingClient(
+          this.resource,
+          queries != null && queries.length > 0 ? queries[0] : undefined
+        );
       }
     } else {
       throw new ViewerInitializationError(
