@@ -236,7 +236,7 @@ export class Viewer {
   private isResizing?: boolean;
   private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
-  private streamSessionId?: UUID.UUID = this.sessionId;
+  private streamSessionId?: UUID.UUID;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private jwt?: string;
@@ -248,6 +248,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.streamSessionId = this.sessionId;
   }
 
   public componentDidLoad(): void {
