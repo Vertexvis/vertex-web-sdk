@@ -7,7 +7,12 @@ interface StreamKeyResource {
 
 export type LoadableResource = StreamKeyResource;
 
-export function fromUrn(urn: string): LoadableResource {
+export interface Resource {
+  resource: LoadableResource;
+  queries?: QueryResource[];
+}
+
+export function fromUrn(urn: string): Resource {
   const uri = Uri.parse(urn);
 
   if (uri.scheme !== 'urn' || uri.path == null) {
@@ -22,8 +27,33 @@ export function fromUrn(urn: string): LoadableResource {
 
   switch (resourceType) {
     case 'stream-key':
-      return { type: 'stream-key', id: resourceId };
+      return {
+        resource: { type: 'stream-key', id: resourceId },
+        queries: fromQuery(uri.query),
+      };
     default:
       throw new Error('Invalid URN. Unknown resource type');
+  }
+}
+
+export interface SceneViewStateResource {
+  type: 'scene-view-state';
+  id: string;
+}
+
+export type QueryResource = SceneViewStateResource;
+
+function fromQuery(query?: string): QueryResource[] | undefined {
+  if (query != null) {
+    return query.split('&').map(queryFragment => {
+      const [resourceType, resourceId] = queryFragment.split('=');
+
+      switch (resourceType) {
+        case 'scene-view-state':
+          return { type: 'scene-view-state', id: resourceId };
+        default:
+          throw new Error('Invalid URN. Unknown query resource type');
+      }
+    });
   }
 }

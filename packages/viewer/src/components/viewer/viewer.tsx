@@ -519,15 +519,18 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
-      const loadableResource = LoadableResource.fromUrn(urn);
+      const { resource, queries } = LoadableResource.fromUrn(urn);
       const isSameResource =
         this.resource != null &&
-        this.resource.type === loadableResource.type &&
-        this.resource.id === loadableResource.id;
+        this.resource.type === resource.type &&
+        this.resource.id === resource.id;
       if (!isSameResource) {
         this.unload();
-        this.resource = loadableResource;
-        await this.connectStreamingClient(this.resource);
+        this.resource = resource;
+        await this.connectStreamingClient(
+          this.resource,
+          queries != null && queries.length > 0 ? queries[0] : undefined
+        );
       }
     } else {
       throw new ViewerInitializationError(
@@ -617,7 +620,8 @@ export class Viewer {
   }
 
   private async connectStreamingClient(
-    resource: LoadableResource.LoadableResource
+    resource: LoadableResource.LoadableResource,
+    queryResource?: LoadableResource.QueryResource
   ): Promise<void> {
     if (this.resource == null) {
       this.errorMessage =
@@ -636,6 +640,9 @@ export class Viewer {
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),
+        ...(queryResource?.type === 'scene-view-state' && {
+          sceneViewStateId: { hex: queryResource.id },
+        }),
       });
 
       this.jwt = result.startStream?.jwt || undefined;
