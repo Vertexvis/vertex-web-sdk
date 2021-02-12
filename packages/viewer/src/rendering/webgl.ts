@@ -1,8 +1,18 @@
 import * as THREE from 'three';
 import { FrameCamera } from '../types';
+import { loadImageBytes } from './imageLoaders';
 
 interface WebGlScene {
-  render(camera: FrameCamera.FrameCamera, width: number, height: number): void;
+  render(
+    camera: FrameCamera.FrameCamera,
+    near: number,
+    far: number,
+    depthTexture: Uint8Array | undefined,
+    offsetX: number,
+    offsetY: number,
+    width: number,
+    height: number
+  ): void;
 }
 
 function drawSimulatedDepthBuffer(
@@ -29,13 +39,46 @@ function drawSimulatedDepthBuffer(
   }
 }
 
-function createServerDepthTexture(w: number, h: number): THREE.CanvasTexture {
+function createSimulatedServerDepthTexture(
+  w: number,
+  h: number
+): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+
   const serverDepthTexture = new THREE.CanvasTexture(canvas);
   serverDepthTexture.format = THREE.RGBFormat;
   serverDepthTexture.minFilter = THREE.NearestFilter;
   serverDepthTexture.magFilter = THREE.NearestFilter;
   drawSimulatedDepthBuffer(canvas, w, h);
+  return serverDepthTexture;
+}
+
+function createServerDepthTexture(
+  w: number,
+  h: number,
+  offsetX: number,
+  offsetY: number,
+  bitmap: ImageBitmap | HTMLImageElement
+): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+
+  const serverDepthTexture = new THREE.CanvasTexture(canvas);
+  serverDepthTexture.format = THREE.RGBFormat;
+  serverDepthTexture.minFilter = THREE.NearestFilter;
+  serverDepthTexture.magFilter = THREE.NearestFilter;
+
+  const context = canvas.getContext('2d');
+
+  if (context != null) {
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, w, h);
+    context.drawImage(bitmap, offsetX, offsetY);
+  }
+
   return serverDepthTexture;
 }
 
@@ -62,6 +105,11 @@ export function createWebGlScene(
     lookAt: { x: 0, y: 0, z: 0 },
     up: { x: 0, y: 1, z: 0 },
   };
+  let lastNear = 0;
+  let lastFar = 1;
+  let lastDepthImage: Uint8Array | undefined;
+  let lastOffsetX = 0;
+  let lastOffsetY = 0;
 
   const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 10000);
   camera.position.z = 1;
@@ -95,7 +143,7 @@ export function createWebGlScene(
       diffuseTexture: { value: target.texture },
       depthTexture: { value: target.depthTexture },
       serverDepthTexture: {
-        value: new THREE.CanvasTexture(document.createElement('canvas')),
+        value: createSimulatedServerDepthTexture(w, h),
       },
       cameraNear: { value: camera.near },
       cameraFar: { value: camera.far },
@@ -113,17 +161,21 @@ export function createWebGlScene(
   });
   renderer.setSize(width, height);
 
-  function render(
+  async function render(
     updatedCamera: FrameCamera.FrameCamera,
+    near: number,
+    far: number,
+    depthImage: Uint8Array | undefined,
+    offsetX: number,
+    offsetY: number,
     w: number,
     h: number
-  ): void {
+  ): Promise<void> {
     if (width !== w || height !== h) {
       width = w;
       height = h;
 
       camera.aspect = width / height;
-      camera.updateProjectionMatrix();
 
       target.width = width;
       target.height = height;
@@ -131,13 +183,29 @@ export function createWebGlScene(
       target.depthTexture.format = THREE.DepthFormat;
       target.depthTexture.type = THREE.UnsignedShortType;
       renderer.setSize(width, height);
+    }
 
+    if (depthImage != null) {
+      const image = await loadImageBytes(depthImage);
+      const texture = createServerDepthTexture(
+        w,
+        h,
+        offsetX,
+        offsetY,
+        image.image
+      );
       postMaterial.uniforms.serverDepthTexture = {
-        value: createServerDepthTexture(w, h),
+        value: texture,
       };
     }
 
+    lastOffsetX = offsetX;
+    lastOffsetY = offsetY;
+    lastNear = near;
+    lastFar = far;
+    lastDepthImage = depthImage;
     frameCamera = updatedCamera;
+
     const { position, lookAt, up } = frameCamera;
     camera.position.x = position.x;
     camera.position.y = position.y;
@@ -148,6 +216,10 @@ export function createWebGlScene(
     camera.up.x = up.x;
     camera.up.y = up.y;
     camera.up.z = up.z;
+
+    camera.near = near;
+    camera.far = far;
+    camera.updateProjectionMatrix();
 
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
@@ -162,12 +234,28 @@ export function createWebGlScene(
       cube.rotation.y = time / 1000;
     });
 
-    render(frameCamera, width, height);
+    render(
+      frameCamera,
+      lastNear,
+      lastFar,
+      lastDepthImage,
+      lastOffsetX,
+      lastOffsetY,
+      width,
+      height
+    );
   });
 
-  render(frameCamera, width, height);
+  render(
+    frameCamera,
+    lastNear,
+    lastFar,
+    lastDepthImage,
+    lastOffsetX,
+    lastOffsetY,
+    width,
+    height
+  );
 
-  return {
-    render,
-  };
+  return { render };
 }

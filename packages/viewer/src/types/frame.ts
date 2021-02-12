@@ -12,6 +12,8 @@ export interface Frame {
   imageAttributes: ImageAttributes;
   sceneAttributes: SceneAttributes;
   sequenceNumber: number;
+  near: number;
+  far: number;
   image: Uint8Array | Int8Array;
   depth: Uint8Array | undefined;
 }
@@ -91,6 +93,8 @@ export const fromProto = (
       }),
     },
     sequenceNumber: sequenceNumber,
+    near: 0,
+    far: 0,
     image: image,
     depth: new Uint8Array(),
   };
@@ -125,16 +129,16 @@ export const fromProtoWithDepthBuffer = (
     throw new Error('Invalid payload');
   }
 
-  const view = new DataView(image.buffer);
-  view.setInt8(0, image[0]);
-  view.setInt8(1, image[1]);
-  view.setInt8(2, image[2]);
-  view.setInt8(3, image[3]);
+  const view = new DataView(new Int8Array(image).buffer);
 
-  const imageLen = view.getInt32(0);
-  const jpeg = image.slice(4, imageLen + 4);
-  const depth = image.slice(4 + imageLen);
+  const near = view.getFloat32(0);
+  const far = view.getFloat32(4);
+  const imageLen = view.getInt32(8);
+  const jpeg = image.slice(4 + 4 + 4, imageLen + 4 + 4 + 4);
+  const depth = image.slice(4 + 4 + 4 + imageLen);
 
+  console.log('near', near);
+  console.log('far', far);
   console.log('payload len', image.byteLength);
   console.log('image len', imageLen);
   console.log('jpeg len', jpeg.length);
@@ -195,7 +199,9 @@ export const fromProtoWithDepthBuffer = (
       ),
     },
     sequenceNumber: sequenceNumber,
+    near,
+    far,
     image: jpeg,
-    depth: depth,
+    depth: depth.length > 0 ? depth : undefined,
   };
 };

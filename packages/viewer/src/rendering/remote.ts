@@ -37,7 +37,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
           seconds: msg.sentAtTime.seconds || 0,
           nanos: msg.sentAtTime.nanos || 0,
         }),
-        frame: Frame.fromProto(frame),
+        frame: Frame.fromProtoWithDepthBuffer(frame),
       };
 
       if (frame.frameCorrelationIds) {

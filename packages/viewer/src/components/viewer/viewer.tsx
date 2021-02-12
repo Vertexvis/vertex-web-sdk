@@ -338,6 +338,11 @@ export class Viewer {
     return createThreeJsRenderer(data => {
       scene.render(
         data.frame.sceneAttributes.camera,
+        data.frame.near,
+        data.frame.far,
+        data.frame.depth,
+        data.frame.imageAttributes.imageRect.x,
+        data.frame.imageAttributes.imageRect.y,
         data.dimensions.width,
         data.dimensions.height
       );
@@ -893,7 +898,7 @@ export class Viewer {
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
     if (this.canvasElement != null && this.dimensions != null) {
-      const frame = Frame.fromProto(payload);
+      const frame = Frame.fromProtoWithDepthBuffer(payload);
       const canvas = this.canvasElement.getContext('2d');
       const dimensions = this.dimensions;
       if (canvas != null) {

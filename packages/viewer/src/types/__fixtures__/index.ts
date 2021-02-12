@@ -19,6 +19,8 @@ export const frame: Frame.Frame = {
     visibleBoundingBox: BoundingBox.create(Vector3.create(), Vector3.create()),
   },
   sequenceNumber: 1,
+  near: 0,
+  far: 1,
   image: new Uint8Array(),
   depth: new Uint8Array(),
 };
