@@ -21,7 +21,13 @@ type Flag =
   /**
    * Toggles the logging of frame rates.
    */
-  | 'logFrameRate';
+  | 'logFrameRate'
+
+  /**
+   * Enables or disables the scaling up of images to the host viewport from
+   * the maximum viewport size of this viewer.
+   */
+  | 'scaleFramesToHost';
 
 /**
  * A set of experimental features that can be enabled through the viewer's
@@ -34,6 +40,7 @@ export const defaultFlags: Flags = {
   adaptiveRendering: true,
   logWsMessages: false,
   logFrameRate: false,
+  scaleFramesToHost: false,
 };
 
 export function createFlags(

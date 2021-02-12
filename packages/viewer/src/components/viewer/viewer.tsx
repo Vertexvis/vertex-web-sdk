@@ -212,6 +212,7 @@ export class Viewer {
   @Event() public dimensionschange!: EventEmitter<Dimensions.Dimensions>;
 
   @State() private dimensions?: Dimensions.Dimensions;
+  @State() private hostDimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
   @Element() private hostElement!: HTMLElement;
@@ -336,6 +337,10 @@ export class Viewer {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    const canvasDimensions = this.getConfig().flags.scaleFramesToHost
+      ? this.hostDimensions
+      : this.dimensions;
+
     return (
       <Host>
         <div class="viewer-container">
@@ -348,8 +353,8 @@ export class Viewer {
             <canvas
               ref={ref => (this.canvasElement = ref)}
               class="canvas"
-              width={this.dimensions != null ? this.dimensions.width : 0}
-              height={this.dimensions != null ? this.dimensions.height : 0}
+              width={canvasDimensions != null ? canvasDimensions.width : 0}
+              height={canvasDimensions != null ? canvasDimensions.height : 0}
               onContextMenu={event => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
@@ -849,10 +854,13 @@ export class Viewer {
   private async handleFrame(
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
-    if (this.canvasElement != null && this.dimensions != null) {
+    const dimensions = this.getConfig().flags.scaleFramesToHost
+      ? this.hostDimensions
+      : this.dimensions;
+
+    if (this.canvasElement != null && dimensions != null) {
       const frame = Frame.fromProto(payload);
       const canvas = this.canvasElement.getContext('2d');
-      const dimensions = this.dimensions;
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
 
@@ -876,12 +884,16 @@ export class Viewer {
   }
 
   private calculateComponentDimensions(): void {
-    const maxViewport = Dimensions.square(1280);
+    const maxViewportPixels = 2000000;
     const bounds = this.getBounds();
     if (bounds?.width != null && bounds?.height != null) {
       const measuredViewport = Dimensions.create(bounds.width, bounds.height);
-      const trimmedViewport = Dimensions.trim(maxViewport, measuredViewport);
+      const trimmedViewport = Dimensions.scaleFit(
+        maxViewportPixels,
+        measuredViewport
+      );
 
+      this.hostDimensions = measuredViewport;
       this.dimensions =
         trimmedViewport != null
           ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
