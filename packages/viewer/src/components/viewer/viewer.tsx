@@ -341,8 +341,7 @@ export class Viewer {
         data.frame.near,
         data.frame.far,
         data.frame.depth,
-        data.frame.imageAttributes.imageRect.x,
-        data.frame.imageAttributes.imageRect.y,
+        data.frame.imageAttributes.imageRect,
         data.dimensions.width,
         data.dimensions.height
       );

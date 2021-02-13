@@ -1,3 +1,4 @@
+import { Rectangle } from '@vertexvis/geometry';
 import * as THREE from 'three';
 import { FrameCamera } from '../types';
 import { loadImageBytes } from './imageLoaders';
@@ -8,8 +9,7 @@ interface WebGlScene {
     near: number,
     far: number,
     depthTexture: Uint8Array | undefined,
-    offsetX: number,
-    offsetY: number,
+    imageRect: Rectangle.Rectangle,
     width: number,
     height: number
   ): void;
@@ -58,8 +58,7 @@ function createSimulatedServerDepthTexture(
 function createServerDepthTexture(
   w: number,
   h: number,
-  offsetX: number,
-  offsetY: number,
+  imageRect: Rectangle.Rectangle,
   bitmap: ImageBitmap | HTMLImageElement
 ): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
@@ -72,11 +71,16 @@ function createServerDepthTexture(
   serverDepthTexture.magFilter = THREE.NearestFilter;
 
   const context = canvas.getContext('2d');
-
   if (context != null) {
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, w, h);
-    context.drawImage(bitmap, offsetX, offsetY);
+    context.drawImage(
+      bitmap,
+      imageRect.x,
+      imageRect.y,
+      imageRect.width,
+      imageRect.height
+    );
   }
 
   return serverDepthTexture;
@@ -106,12 +110,11 @@ export function createWebGlScene(
     up: { x: 0, y: 1, z: 0 },
   };
   let lastNear = 0;
-  let lastFar = 1;
+  let lastFar = 2000;
   let lastDepthImage: Uint8Array | undefined;
-  let lastOffsetX = 0;
-  let lastOffsetY = 0;
+  let lastImageRect = { x: 0, y: 0, width: 1, height: 1 };
 
-  const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 10000);
+  const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 2000);
   camera.position.z = 1;
 
   const scene = new THREE.Scene();
@@ -137,8 +140,8 @@ export function createWebGlScene(
 
   const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const postMaterial = new THREE.ShaderMaterial({
-    vertexShader: document.querySelector('#post-vert')?.textContent?.trim(),
-    fragmentShader: document.querySelector('#post-frag')?.textContent?.trim(),
+    vertexShader: vertexShader,
+    fragmentShader: actualShader,
     uniforms: {
       diffuseTexture: { value: target.texture },
       depthTexture: { value: target.depthTexture },
@@ -147,6 +150,8 @@ export function createWebGlScene(
       },
       cameraNear: { value: camera.near },
       cameraFar: { value: camera.far },
+      serverNear: { value: 0 },
+      serverFar: { value: 1 },
     },
   });
   const postPlane = new THREE.PlaneGeometry(2, 2);
@@ -166,8 +171,7 @@ export function createWebGlScene(
     near: number,
     far: number,
     depthImage: Uint8Array | undefined,
-    offsetX: number,
-    offsetY: number,
+    imageRect: Rectangle.Rectangle,
     w: number,
     h: number
   ): Promise<void> {
@@ -187,20 +191,18 @@ export function createWebGlScene(
 
     if (depthImage != null) {
       const image = await loadImageBytes(depthImage);
-      const texture = createServerDepthTexture(
-        w,
-        h,
-        offsetX,
-        offsetY,
-        image.image
-      );
+      const texture = createServerDepthTexture(w, h, imageRect, image.image);
       postMaterial.uniforms.serverDepthTexture = {
         value: texture,
       };
     }
 
-    lastOffsetX = offsetX;
-    lastOffsetY = offsetY;
+    postMaterial.uniforms.cameraNear = { value: camera.near };
+    postMaterial.uniforms.cameraFar = { value: camera.far };
+    postMaterial.uniforms.serverNear = { value: near };
+    postMaterial.uniforms.serverFar = { value: far };
+
+    lastImageRect = imageRect;
     lastNear = near;
     lastFar = far;
     lastDepthImage = depthImage;
@@ -217,8 +219,8 @@ export function createWebGlScene(
     camera.up.y = up.y;
     camera.up.z = up.z;
 
-    camera.near = near;
-    camera.far = far;
+    // camera.near = near;
+    // camera.far = far;
     camera.updateProjectionMatrix();
 
     renderer.setRenderTarget(target);
@@ -239,8 +241,7 @@ export function createWebGlScene(
       lastNear,
       lastFar,
       lastDepthImage,
-      lastOffsetX,
-      lastOffsetY,
+      lastImageRect,
       width,
       height
     );
@@ -251,11 +252,151 @@ export function createWebGlScene(
     lastNear,
     lastFar,
     lastDepthImage,
-    lastOffsetX,
-    lastOffsetY,
+    lastImageRect,
     width,
     height
   );
 
   return { render };
 }
+
+const vertexShader = `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const actualShader = `
+#include <packing>
+
+varying vec2 vUv;
+uniform sampler2D diffuseTexture;
+uniform sampler2D depthTexture;
+uniform sampler2D serverDepthTexture;
+uniform float cameraNear;
+uniform float cameraFar;
+uniform float serverNear;
+uniform float serverFar;
+
+float readDepth(sampler2D depthSampler, vec2 coord) {
+  float fragCoordZ = texture2D(depthSampler, coord).x;
+  float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+  return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+}
+
+float readServerDepth(sampler2D serverDepth, vec2 coord) {
+  float depth = texture(serverDepth, coord).r;
+  if (depth != 1.0) {
+    float localNearDepth = (serverNear - cameraNear) / (cameraFar - cameraNear);
+    float localFarDepth = (serverFar - cameraNear) / (cameraFar - cameraNear);
+    float localCoordDepth = localNearDepth + ((localFarDepth - localNearDepth) * depth);
+    return localCoordDepth;
+  } else {
+    return depth;
+  }
+}
+
+void main() {
+  float depth = readDepth(depthTexture, vUv);
+  float serverDepth = readServerDepth(serverDepthTexture, vUv);
+  vec4 color = texture2D(diffuseTexture, vUv);
+  float alpha = depth < serverDepth ? color.a : 0.0;
+
+  gl_FragColor = color;
+  gl_FragColor.a = alpha;
+}`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const debugServerDepthShader = `
+#include <packing>
+
+varying vec2 vUv;
+uniform sampler2D diffuseTexture;
+uniform sampler2D depthTexture;
+uniform sampler2D serverDepthTexture;
+uniform float cameraNear;
+uniform float cameraFar;
+uniform float serverNear;
+uniform float serverFar;
+
+float readDepth(sampler2D depthSampler, vec2 coord) {
+  float fragCoordZ = texture2D(depthSampler, coord).x;
+  float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+  return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+}
+
+float readServerDepth(sampler2D serverDepth, vec2 coord) {
+  float depth = texture(serverDepth, coord).r;
+  float localNearDepth = (serverNear - cameraNear) / (cameraFar - cameraNear);
+  float localFarDepth = (serverFar - cameraNear) / (cameraFar - cameraNear);
+  float localCoordDepth = localNearDepth + ((localFarDepth - localNearDepth) * depth);
+  return localCoordDepth;
+}
+
+void main() {
+  float depth = readDepth(depthTexture, vUv);
+  float serverDepth = readServerDepth(serverDepthTexture, vUv);
+  vec4 color = texture2D(diffuseTexture, vUv);
+  float alpha = depth < serverDepth ? color.a : 0.0;
+
+  gl_FragColor.rgb = vec3(serverDepth);
+  gl_FragColor.a = 1.0;
+}`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const debugObjectsShader = `
+#include <packing>
+
+varying vec2 vUv;
+uniform sampler2D diffuseTexture;
+uniform sampler2D depthTexture;
+uniform sampler2D serverDepthTexture;
+uniform float cameraNear;
+uniform float cameraFar;
+
+float readDepth(sampler2D depthSampler, vec2 coord) {
+  float fragCoordZ = texture2D(depthSampler, coord).x;
+  float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+  return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+}
+
+void main() {
+  float depth = readDepth(depthTexture, vUv);
+  float serverDepth = texture(serverDepthTexture, vUv).r;
+  vec4 color = texture2D(diffuseTexture, vUv);
+  float alpha = depth < serverDepth ? color.a : 0.0;
+
+  gl_FragColor = color;
+}
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const debugDepthsShader = `
+#include <packing>
+
+varying vec2 vUv;
+uniform sampler2D diffuseTexture;
+uniform sampler2D depthTexture;
+uniform sampler2D serverDepthTexture;
+uniform float cameraNear;
+uniform float cameraFar;
+
+float readDepth(sampler2D depthSampler, vec2 coord) {
+  float fragCoordZ = texture2D(depthSampler, coord).x;
+  float viewZ = perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
+  return viewZToOrthographicDepth(viewZ, cameraNear, cameraFar);
+}
+
+void main() {
+  float depth = readDepth(depthTexture, vUv);
+  float serverDepth = texture(serverDepthTexture, vUv).r;
+  vec4 color = texture2D(diffuseTexture, vUv);
+  float alpha = depth < serverDepth ? color.a : 0.0;
+
+  gl_FragColor.rgb = vec3(depth);
+  gl_FragColor.a = 1.0;
+}
+`;

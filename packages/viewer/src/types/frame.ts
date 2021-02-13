@@ -137,20 +137,20 @@ export const fromProtoWithDepthBuffer = (
   const jpeg = image.slice(4 + 4 + 4, imageLen + 4 + 4 + 4);
   const depth = image.slice(4 + 4 + 4 + imageLen);
 
-  console.log('near', near);
-  console.log('far', far);
-  console.log('payload len', image.byteLength);
-  console.log('image len', imageLen);
-  console.log('jpeg len', jpeg.length);
-  console.log('depth len', depth.length);
+  // console.log('near', near);
+  // console.log('far', far);
+  // console.log('payload len', image.byteLength);
+  // console.log('image len', imageLen);
+  // console.log('jpeg len', jpeg.length);
+  // console.log('depth len', depth.length);
 
-  const jpegBlob = new Blob([jpeg], { type: 'image/png' });
-  const jpegUrl = URL.createObjectURL(jpegBlob);
-  console.log('jpeg url', jpegUrl);
+  // const jpegBlob = new Blob([jpeg], { type: 'image/png' });
+  // const jpegUrl = URL.createObjectURL(jpegBlob);
+  // console.log('jpeg url', jpegUrl);
 
-  const blob = new Blob([depth], { type: 'image/png' });
-  const url = URL.createObjectURL(blob);
-  console.log('depth url', url);
+  // const blob = new Blob([depth], { type: 'image/png' });
+  // const url = URL.createObjectURL(blob);
+  // console.log('depth url', url);
 
   return {
     correlationIds: frameCorrelationIds || [],
