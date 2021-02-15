@@ -42,7 +42,7 @@
     "generate": "stencil generate",
     "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs",
-    "typedoc": "yarn typedoc src/index.ts --tsconfig tsconfig.docs.json"
+    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
   },
   "dependencies": {
     "@types/classnames": "2.2.3",
@@ -69,7 +69,7 @@
     "eslint-plugin-react": "^7.17.0",
     "jest": "^24.9.0",
     "rollup": "^1.19.4",
-    "typedoc": "^0.20.23",
+    "typedoc": "^0.20.25",
     "typescript": "^4.0.2"
   }
 }

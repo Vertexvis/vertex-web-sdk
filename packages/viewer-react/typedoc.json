@@ -1,0 +1,14 @@
+{
+  "entryPoints": [
+    "./src/generated/components.ts"
+  ],
+  "excludePrivate": true,
+  "excludeExternals": false,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "gitRevision": "master",
+  "readme": "readme.md",
+  "hideGenerator": true,
+  "out": "../../docs/packages/viewer-react"
+}

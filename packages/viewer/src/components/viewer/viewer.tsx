@@ -87,6 +87,7 @@ interface DisconnectedStatus {
   status: 'disconnected';
 }
 
+/** @internal */
 export type ConnectionStatus =
   | ConnectingStatus
   | ConnectedStatus
@@ -394,7 +395,7 @@ export class Viewer {
    * the default camera controls provided by the viewer.
    *
    * @example
-   *
+   * ```
    * class CustomInteractionHandler extends InteractionHandler {
    *   private element: HTMLElement;
    *   private api: InteractionApi;
@@ -416,6 +417,7 @@ export class Viewer {
    *
    * const viewer = document.querySelector("vertex-viewer");
    * viewer.registerInteractionHandler(new CustomInteractionHandler);
+   * ```
    *
    * @param interactionHandler The interaction handler to register.
    * @returns {Promise<void>} - A promise containing the disposable to use to
@@ -448,7 +450,7 @@ export class Viewer {
    * to disable the default keyboard shortcuts provided by the viewer.
    *
    * @example
-   *
+   * ```
    * class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {
    *   constructor(private viewer: HTMLVertexViewerElement) {}
    *
@@ -468,6 +470,7 @@ export class Viewer {
    *     }
    *   }
    * }
+   * ```
    *
    * @param keyInteraction - The `KeyInteraction` to register.
    */
