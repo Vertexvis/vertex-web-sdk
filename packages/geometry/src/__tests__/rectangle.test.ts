@@ -44,6 +44,21 @@ describe(Rectangle.cropFit, () => {
   });
 });
 
+describe(Rectangle.scaleFit, () => {
+  const rect1 = Rectangle.create(100, 100, 100, 100);
+  const rect2 = Rectangle.create(100, 100, 100, 125);
+
+  it('scales the rectangle to have an area less than or equal to the provided area', () => {
+    expect(Rectangle.scaleFit(2500, rect1)).toEqual(
+      Rectangle.create(125, 125, 50, 50)
+    );
+
+    expect(Rectangle.scaleFit(2500, rect2)).toEqual(
+      Rectangle.create(128, 135, 44, 55)
+    );
+  });
+});
+
 describe(Rectangle.offset, () => {
   const rect = Rectangle.create(10, 20, 30, 30);
 
