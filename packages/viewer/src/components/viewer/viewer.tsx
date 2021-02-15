@@ -884,12 +884,12 @@ export class Viewer {
   }
 
   private calculateComponentDimensions(): void {
-    const maxViewportPixels = 2000000;
+    const maxPixelCount = 2073600;
     const bounds = this.getBounds();
     if (bounds?.width != null && bounds?.height != null) {
       const measuredViewport = Dimensions.create(bounds.width, bounds.height);
       const trimmedViewport = Dimensions.scaleFit(
-        maxViewportPixels,
+        maxPixelCount,
         measuredViewport
       );
 
