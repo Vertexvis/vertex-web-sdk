@@ -11,7 +11,7 @@ export class FlyToPartKeyInteraction
   ) {}
 
   public predicate(keyState: KeyState): boolean {
-    return keyState['Alt'];
+    return keyState['Alt'] === true;
   }
 
   public async fn(e: TapEventDetails): Promise<void> {
