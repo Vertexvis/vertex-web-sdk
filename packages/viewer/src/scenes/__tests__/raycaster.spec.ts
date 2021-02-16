@@ -6,9 +6,10 @@ import { Point } from '@vertexvis/geometry';
 
 describe(Raycaster, () => {
   const api = new StreamApi();
+  const imageScaleProvider = (): Point.Point => Point.create(1, 1);
 
   describe(Raycaster.prototype.hitItems, () => {
-    const raycaster = new Raycaster(api);
+    const raycaster = new Raycaster(api, imageScaleProvider);
     (api.hitItems as jest.Mock).mockResolvedValue({
       hitItems: 'sandy',
     });
