@@ -1,5 +1,7 @@
 export * from './canvas';
 
+export * from './parser';
+
 export * from './remote';
 
 export * from './renderer';

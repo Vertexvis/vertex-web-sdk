@@ -67,6 +67,9 @@ import {
   createThreeJsRenderer,
   createWebGlScene,
   composeRenderers,
+  parseFrame,
+  FrameRenderer,
+  DrawFrame,
 } from '../../rendering';
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
@@ -225,7 +228,7 @@ export class Viewer {
   private commands!: CommandRegistry;
   private stream!: ViewerStreamApi;
   private remoteRenderer!: RemoteRenderer;
-  private canvasRenderer!: CanvasRenderer;
+  private canvasRenderer!: FrameRenderer<Frame.Frame, DrawFrame>;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
@@ -340,7 +343,7 @@ export class Viewer {
         data.frame.sceneAttributes.camera,
         data.frame.near,
         data.frame.far,
-        data.frame.depth,
+        data.depth,
         data.frame.imageAttributes.imageRect,
         data.dimensions.width,
         data.dimensions.height
@@ -751,9 +754,11 @@ export class Viewer {
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       Metrics.paintTime,
-      composeRenderers(
-        createCanvasRenderer(this.canvasElement),
-        this.createThreeJsRenderer()
+      parseFrame(
+        composeRenderers(
+          createCanvasRenderer(this.canvasElement),
+          this.createThreeJsRenderer()
+        )
       ),
       this.getConfig().flags.logFrameRate,
       timings => this.reportPerformance(timings)
@@ -899,14 +904,11 @@ export class Viewer {
     if (this.canvasElement != null && this.dimensions != null) {
       const frame = Frame.fromProtoWithDepthBuffer(payload);
       const canvas = this.canvasElement.getContext('2d');
-      const dimensions = this.dimensions;
       if (canvas != null) {
-        const data = { canvas, dimensions, frame };
-
         this.frameReceived.emit(frame);
-        const drawnFrame = await this.canvasRenderer(data);
-        this.lastFrame = drawnFrame;
-        this.dispatchFrameDrawn(drawnFrame);
+        const drawnFrame = await this.canvasRenderer(frame);
+        this.lastFrame = drawnFrame.frame;
+        this.dispatchFrameDrawn(drawnFrame.frame);
       }
     }
   }

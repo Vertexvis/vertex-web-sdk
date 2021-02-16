@@ -10,9 +10,11 @@ const REPORTING_INTERVAL_MS = 1000;
 export interface DrawFrame {
   dimensions: Dimensions.Dimensions;
   frame: Frame.Frame;
+  image: HTMLImageElement | ImageBitmap;
+  depth: HTMLImageElement | ImageBitmap | undefined;
 }
 
-export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
+export type CanvasRenderer = FrameRenderer<DrawFrame, DrawFrame>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
@@ -55,13 +57,13 @@ function reportTimings(
   }
 }
 
-export function measureCanvasRenderer(
+export function measureCanvasRenderer<T>(
   meter: TimingMeter,
-  renderer: CanvasRenderer,
+  renderer: FrameRenderer<T, DrawFrame>,
   logFrameRate: boolean,
   callback: ReportTimingsCallback,
   intervalMs: number = REPORTING_INTERVAL_MS
-): CanvasRenderer {
+): FrameRenderer<T, DrawFrame> {
   let timer: number | undefined;
   let renderCount = 0;
   let fpsFrameCount: number | undefined;
@@ -148,7 +150,7 @@ export function createCanvasRenderer(
     }
 
     image.dispose();
-    return data.frame;
+    return data;
   };
 }
 
@@ -157,7 +159,7 @@ export function createThreeJsRenderer(
 ): CanvasRenderer {
   return async data => {
     render(data);
-    return data.frame;
+    return data;
   };
 }
 
@@ -165,9 +167,7 @@ export function composeRenderers(
   ...renderers: CanvasRenderer[]
 ): CanvasRenderer {
   return async data => {
-    for (const renderer of renderers) {
-      await renderer(data);
-    }
-    return data.frame;
+    await Promise.all(renderers.map(r => r(data)));
+    return data;
   };
 }

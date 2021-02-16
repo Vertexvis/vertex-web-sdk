@@ -1,5 +1,5 @@
 import { Async, UUID } from '@vertexvis/utils';
-import { Animation, FlyTo, FrameCamera, Frame } from '../types';
+import { Animation, FlyTo, FrameCamera } from '../types';
 import { StreamApi, protoToDate } from '@vertexvis/stream-api';
 import { ifDrawFrame } from './utils';
 import { FrameRenderer } from './renderer';
@@ -18,7 +18,6 @@ export interface FrameRequest {
 export interface FrameResponse {
   id: string | undefined;
   sentAt: Date;
-  frame: Frame.Frame;
 }
 
 export type RemoteRenderer = FrameRenderer<FrameRequest, FrameResponse>;
@@ -37,7 +36,6 @@ function requestFrame(api: StreamApi): RemoteRenderer {
           seconds: msg.sentAtTime.seconds || 0,
           nanos: msg.sentAtTime.nanos || 0,
         }),
-        frame: Frame.fromProtoWithDepthBuffer(frame),
       };
 
       if (frame.frameCorrelationIds) {

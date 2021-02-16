@@ -1,14 +1,13 @@
 import { Rectangle } from '@vertexvis/geometry';
 import * as THREE from 'three';
 import { FrameCamera } from '../types';
-import { loadImageBytes } from './imageLoaders';
 
 interface WebGlScene {
   render(
     camera: FrameCamera.FrameCamera,
     near: number,
     far: number,
-    depthTexture: Uint8Array | undefined,
+    depthTexture: HTMLImageElement | ImageBitmap | undefined,
     imageRect: Rectangle.Rectangle,
     width: number,
     height: number
@@ -111,7 +110,7 @@ export function createWebGlScene(
   };
   let lastNear = 0;
   let lastFar = 2000;
-  let lastDepthImage: Uint8Array | undefined;
+  let lastDepthImage: HTMLImageElement | ImageBitmap | undefined;
   let lastImageRect = { x: 0, y: 0, width: 1, height: 1 };
 
   const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 2000);
@@ -170,7 +169,7 @@ export function createWebGlScene(
     updatedCamera: FrameCamera.FrameCamera,
     near: number,
     far: number,
-    depthImage: Uint8Array | undefined,
+    depthImage: HTMLImageElement | ImageBitmap | undefined,
     imageRect: Rectangle.Rectangle,
     w: number,
     h: number
@@ -190,8 +189,7 @@ export function createWebGlScene(
     }
 
     if (depthImage != null) {
-      const image = await loadImageBytes(depthImage);
-      const texture = createServerDepthTexture(w, h, imageRect, image.image);
+      const texture = createServerDepthTexture(w, h, imageRect, depthImage);
       postMaterial.uniforms.serverDepthTexture = {
         value: texture,
       };
@@ -219,8 +217,6 @@ export function createWebGlScene(
     camera.up.y = up.y;
     camera.up.z = up.z;
 
-    // camera.near = near;
-    // camera.far = far;
     camera.updateProjectionMatrix();
 
     renderer.setRenderTarget(target);
