@@ -5,6 +5,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
 
 type SceneProvider = () => Scene;
+type ImageScaleProvider = () => Point.Point | undefined;
 
 type CameraTransform = (
   camera: Camera,
@@ -21,6 +22,7 @@ export class InteractionApi {
   public constructor(
     private stream: StreamApi,
     private getScene: SceneProvider,
+    private getImageScale: ImageScaleProvider,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>
@@ -202,8 +204,9 @@ export class InteractionApi {
       metaKey = false,
       shiftKey = false,
     } = keyDetails;
+    const scale = this.getImageScale();
     emit({
-      position,
+      position: Point.scale(position, scale?.x || 1, scale?.y || 1),
       altKey,
       ctrlKey,
       metaKey,

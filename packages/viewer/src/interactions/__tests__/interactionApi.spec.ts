@@ -15,6 +15,7 @@ describe(InteractionApi, () => {
   const sceneViewId = 'scene-view-id';
   const scene = new Scene(streamApi, renderer, frame, sceneViewId);
   const sceneProvider = (): Scene => scene;
+  const imageScaleProvider = (x, y) => (): Point.Point => Point.create(x, y);
 
   let api: InteractionApi;
 
@@ -25,6 +26,7 @@ describe(InteractionApi, () => {
     api = new InteractionApi(
       streamApi,
       sceneProvider,
+      imageScaleProvider(1, 1),
       { emit: emitTap },
       { emit: emitDoubleTap },
       { emit: emitLongPress }
@@ -101,9 +103,14 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(streamApi, sceneProvider, {
-        emit: emitTap,
-      });
+      api = new InteractionApi(
+        streamApi,
+        sceneProvider,
+        imageScaleProvider(1, 1),
+        {
+          emit: emitTap,
+        }
+      );
     });
 
     it('emits a tap event', async () => {
@@ -130,6 +137,31 @@ describe(InteractionApi, () => {
       await api.tap(point, details);
       expect(emitTap).toHaveBeenCalledWith({
         position: point,
+        ...details,
+      });
+    });
+
+    it('emits a tap event scaled to the base frame dimensions', async () => {
+      api = new InteractionApi(
+        streamApi,
+        sceneProvider,
+        imageScaleProvider(0.5, 0.75),
+        {
+          emit: emitTap,
+        }
+      );
+
+      const point = Point.create(100, 100);
+      const details = {
+        altKey: true,
+        ctrlKey: true,
+        metaKey: true,
+        shiftKey: true,
+      };
+
+      await api.tap(point, details);
+      expect(emitTap).toHaveBeenCalledWith({
+        position: Point.create(50, 75),
         ...details,
       });
     });

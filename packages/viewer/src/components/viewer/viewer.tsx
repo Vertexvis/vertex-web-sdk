@@ -13,7 +13,7 @@ import {
 } from '@stencil/core';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Config, parseConfig } from '../../config/config';
-import { Dimensions } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
   Disposable,
@@ -951,6 +951,15 @@ export class Viewer {
     return new InteractionApi(
       this.stream,
       () => this.createScene(),
+      () => {
+        const canvasDimensions = this.getCanvasDimensions();
+        if (this.dimensions != null && canvasDimensions != null) {
+          return Point.create(
+            this.dimensions.width / canvasDimensions.width,
+            this.dimensions.height / canvasDimensions.height
+          );
+        }
+      },
       this.tap,
       this.doubletap,
       this.longpress
