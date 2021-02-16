@@ -337,10 +337,7 @@ export class Viewer {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const canvasDimensions = this.getConfig().flags.scaleFramesToHost
-      ? this.hostDimensions
-      : this.dimensions;
-
+    const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
         <div class="viewer-container">
@@ -854,9 +851,7 @@ export class Viewer {
   private async handleFrame(
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
-    const dimensions = this.getConfig().flags.scaleFramesToHost
-      ? this.hostDimensions
-      : this.dimensions;
+    const dimensions = this.getCanvasDimensions();
 
     if (this.canvasElement != null && dimensions != null) {
       const frame = Frame.fromProto(payload);
@@ -992,5 +987,11 @@ export class Viewer {
     if (this.hostElement != null) {
       return getElementBoundingClientRect(this.hostElement);
     }
+  }
+
+  private getCanvasDimensions(): Dimensions.Dimensions | undefined {
+    return this.getConfig().flags.scaleFramesToHost
+      ? this.hostDimensions
+      : this.dimensions;
   }
 }
