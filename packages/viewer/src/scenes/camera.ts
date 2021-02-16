@@ -62,6 +62,13 @@ export class FlyToExecutor {
   }
 }
 
+export interface FlyToParams {
+  itemId?: string;
+  camera?: FrameCamera.FrameCamera;
+  boundingBox?: BoundingBox.BoundingBox;
+  itemSuppliedId?: string;
+}
+
 /**
  * The `Camera` class contains properties that reflect a world space position, a
  * view direction (lookAt), and normalized vector representing the up direction.
@@ -112,13 +119,22 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
-   * fly to accepts a function that contains the type of fly to operation that will be done by the camera operation.
-   * To animate the fly to, pass in animation options into render.
-   * @param query
+   * Specifies that the next render of the camera will be repositioned to one of
+   * the options specified in `options`.
+   *
+   * @param paramsOrQuery An object or query describing how the camera should
+   * be positioned.
    */
-  public flyTo(query: (q: FlyToExecutor) => TerminalFlyToExecutor): Camera {
-    this.flyToOptions = query(new FlyToExecutor()).build();
-    return this;
+  public flyTo(
+    paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor)
+  ): Camera {
+    if (typeof paramsOrQuery !== 'function') {
+      this.flyToOptions = { flyTo: this.buildFlyToType(paramsOrQuery) };
+      return this;
+    } else {
+      this.flyToOptions = paramsOrQuery(new FlyToExecutor()).build();
+      return this;
+    }
   }
 
   /**
@@ -204,6 +220,20 @@ export class Camera implements FrameCamera.FrameCamera {
       },
       this.boundingBox
     );
+  }
+
+  private buildFlyToType(options: FlyToParams): FlyTo.FlyToType {
+    if (options.boundingBox != null) {
+      return { type: 'bounding-box', data: options.boundingBox };
+    } else if (options.camera != null) {
+      return { type: 'camera', data: options.camera };
+    } else if (options.itemId != null) {
+      return { type: 'internal', data: options.itemId };
+    } else if (options.itemSuppliedId != null) {
+      return { type: 'supplied', data: options.itemSuppliedId };
+    } else {
+      throw new Error('Fly to must specify at least one option.');
+    }
   }
 
   /**

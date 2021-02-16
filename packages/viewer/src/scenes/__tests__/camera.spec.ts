@@ -177,10 +177,7 @@ describe(Camera, () => {
             position: Vector3.forward(),
           }),
           flyToOptions: {
-            flyTo: {
-              type: 'internal',
-              data: id,
-            },
+            flyTo: { type: 'internal', data: id },
           },
         })
       );
@@ -204,11 +201,59 @@ describe(Camera, () => {
             milliseconds: 500,
           },
           flyToOptions: {
-            flyTo: {
-              data: 'suppliedId',
-              type: 'supplied',
-            },
+            flyTo: { data: 'suppliedId', type: 'supplied' },
           },
+        })
+      );
+    });
+
+    it('renders with fly to item id param', async () => {
+      camera.flyTo({ itemId: 'item-id' }).render();
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          flyToOptions: {
+            flyTo: { type: 'internal', data: 'item-id' },
+          },
+        })
+      );
+    });
+
+    it('renders with fly to item id param', async () => {
+      camera.flyTo({ itemSuppliedId: 'supplied-id' }).render();
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          flyToOptions: {
+            flyTo: { type: 'supplied', data: 'supplied-id' },
+          },
+        })
+      );
+    });
+
+    it('renders with fly to bounding box param', async () => {
+      const boundingBox = BoundingBox.create(
+        Vector3.create(-1, -1, -1),
+        Vector3.create(1, 1, 1)
+      );
+      camera.flyTo({ boundingBox }).render();
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          flyToOptions: {
+            flyTo: { type: 'bounding-box', data: boundingBox },
+          },
+        })
+      );
+    });
+
+    it('renders with fly to camera param', async () => {
+      const data = FrameCamera.create();
+      camera.flyTo({ camera: data }).render();
+
+      expect(renderer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          flyToOptions: { flyTo: { type: 'camera', data } },
         })
       );
     });
