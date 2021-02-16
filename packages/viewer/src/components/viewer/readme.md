@@ -11,6 +11,7 @@
 | `clientId`         | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                           | `string \| undefined`                      | `undefined`  |
 | `config`           | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string \| undefined`            | `undefined`  |
 | `configEnv`        | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev" \| "platprod"`                  | `'platprod'` |
+| `keyboardControls` | `keyboard-controls` | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                              | `boolean`                                  | `true`       |
 | `sessionId`        | `session-id`        | Property used for internals or testing.                                                                                                                                          | `string \| undefined`                      | `undefined`  |
 | `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
 | `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `IStreamAttributes \| string \| undefined` | `undefined`  |
@@ -100,6 +101,22 @@ the default camera controls provided by the viewer.
 #### Returns
 
 Type: `Promise<Disposable>`
+
+
+
+### `registerTapKeyInteraction(keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>`
+
+Registers a key interaction to be invoked when a specific set of
+keys are pressed during a `tap` event.
+
+`KeyInteraction`s are used to build custom keyboard shortcuts for the
+viewer using the current state of they keyboard to determine whether
+the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
+to disable the default keyboard shortcuts provided by the viewer.
+
+#### Returns
+
+Type: `Promise<void>`
 
 
 
