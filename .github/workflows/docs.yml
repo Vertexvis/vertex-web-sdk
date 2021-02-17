@@ -40,5 +40,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add docs/
-          git commit -m "Generating new docs"
+          [[ -z $(git status -s) ]] || git commit -m "Generating new docs"
           git push origin gh-pages
