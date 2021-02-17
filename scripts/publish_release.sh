@@ -8,19 +8,17 @@ set -e
 
 version="v$(get_version)"
 sha="$(git rev-parse HEAD)"
-body="Automated release for $version"
 
 npx lerna publish from-package --yes
-
-git tag -a "$version" -m "$body"
-git push --tags
 
 curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
 -H "Authorization: token $GITHUB_TOKEN" \
 -d @- <<EOF
 {
   "tag_name": "$version",
+  "target_commitish": "$sha",
   "name": "$version",
+  "body": "Automated release for $version\n",
   "draft": false,
   "prelease": false
 }
