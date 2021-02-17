@@ -1,6 +1,7 @@
 import { Animation, FlyTo, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { RemoteRenderer } from '../rendering';
+import { StreamEvents, StreamEventHandler } from '../stream/events';
 
 const PI_OVER_360 = 0.008726646259972;
 
@@ -84,6 +85,7 @@ export class Camera implements FrameCamera.FrameCamera {
 
   public constructor(
     private renderer: RemoteRenderer,
+    private events: StreamEventHandler,
     private aspect: number,
     private data: FrameCamera.FrameCamera,
     private boundingBox: BoundingBox.BoundingBox
@@ -158,7 +160,9 @@ export class Camera implements FrameCamera.FrameCamera {
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
    */
-  public async render(renderOptions?: CameraRenderOptions): Promise<void> {
+  public async render(
+    renderOptions?: CameraRenderOptions
+  ): Promise<StreamEvents | undefined> {
     if (this.flyToOptions == null && renderOptions != null) {
       this.flyToOptions = {
         flyTo: {
@@ -169,11 +173,15 @@ export class Camera implements FrameCamera.FrameCamera {
     }
 
     try {
-      await this.renderer({
+      const resp = await this.renderer({
         camera: this.data,
         flyToOptions: this.flyToOptions,
         animation: renderOptions?.animation,
       });
+
+      if (resp.animationId) {
+        return { animationCompleted: this.events(resp.animationId) };
+      }
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }
@@ -213,6 +221,7 @@ export class Camera implements FrameCamera.FrameCamera {
   public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
     return new Camera(
       this.renderer,
+      this.events,
       this.aspectRatio,
       {
         ...this.data,

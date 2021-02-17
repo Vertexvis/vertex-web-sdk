@@ -71,6 +71,10 @@ import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
 import { KeyInteraction } from '../../interactions/keyInteraction';
+import {
+  StreamEventHandler,
+  createStreamEventHandler,
+} from '../../stream/events';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -222,6 +226,7 @@ export class Viewer {
   private commands!: CommandRegistry;
   private stream!: ViewerStreamApi;
   private remoteRenderer!: RemoteRenderer;
+  private streamEventHandler!: StreamEventHandler;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
@@ -257,6 +262,7 @@ export class Viewer {
 
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.remoteRenderer = createStreamApiRenderer(this.stream);
+    this.streamEventHandler = createStreamEventHandler(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -971,6 +977,7 @@ export class Viewer {
       return new Scene(
         this.stream,
         this.remoteRenderer,
+        this.streamEventHandler,
         this.lastFrame,
         () => this.getImageScale(),
         this.sceneViewId

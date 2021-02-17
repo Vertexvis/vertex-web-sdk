@@ -17,6 +17,7 @@ export interface FrameRequest {
 
 export interface FrameResponse {
   id: string | undefined;
+  animationId?: string;
   sentAt: Date;
   frame: Frame.Frame;
 }
@@ -60,9 +61,15 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         req.flyToOptions,
         req.animation
       );
-      const update = new Promise<FrameResponse>(resolve => {
-        requests.set(corrId, resolve);
-        api.flyTo(payload, false);
+      const update = new Promise<FrameResponse>(async resolve => {
+        let animationId: string | undefined;
+        requests.set(corrId, async (resp: FrameResponse) => {
+          console.log(animationId);
+          resolve({ ...resp, animationId });
+        });
+        const flyToResult = await api.flyTo(payload, true);
+        // animationId = flyToResult.flyTo?.animationId?.hex || undefined;
+        animationId = "Totally real animation id";
       });
 
       return Async.timeout(timeout, update).finally(() =>

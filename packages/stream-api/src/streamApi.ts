@@ -14,6 +14,7 @@ import {
   UpdateDimensionsPayload,
   UpdateStreamPayload,
   LoadSceneViewStatePayload,
+  EventMessage,
 } from './types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
@@ -26,12 +27,15 @@ export type RequestMessageHandler = (msg: RequestMessage) => void;
 
 export type ResponseMessageHandler = (msg: ResponseMessage) => void;
 
+export type EventMessageHandler = (msg: EventMessage) => void;
+
 /**
  * The API client to interact with Vertex's streaming API.
  */
 export class StreamApi {
   private onResponseDispatcher = new EventDispatcher<ResponseMessage>();
   private onRequestDispatcher = new EventDispatcher<RequestMessage>();
+  private onEventDispatcher = new EventDispatcher<EventMessage>();
   private messageSubscription?: Disposable;
 
   public constructor(
@@ -80,6 +84,16 @@ export class StreamApi {
    */
   public onRequest(handler: RequestMessageHandler): Disposable {
     return this.onRequestDispatcher.on(handler);
+  }
+
+  /**
+   * Adds a callback that is invoked when the client receives an event from the
+   * server. Returns a `Disposable` that can be used to remove the listener.
+   *
+   * @param handler - A handler function.
+   */
+  public onEvent(handler: EventMessageHandler): Disposable {
+    return this.onEventDispatcher.on(handler);
   }
 
   /**
@@ -359,18 +373,27 @@ export class StreamApi {
     const msg = decode(message.data);
     this.log('WS message received', msg);
 
-    if (msg?.sentAtTime != null && msg?.response != null) {
-      this.onResponseDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        response: msg.response,
-      });
-    }
+    if (msg?.sentAtTime != null) {
+      if (msg.response != null) {
+        this.onResponseDispatcher.emit({
+          sentAtTime: msg.sentAtTime,
+          response: msg.response,
+        });
+      }
 
-    if (msg?.sentAtTime != null && msg?.request != null) {
-      this.onRequestDispatcher.emit({
-        sentAtTime: msg.sentAtTime,
-        request: msg.request,
-      });
+      if (msg.request != null) {
+        this.onRequestDispatcher.emit({
+          sentAtTime: msg.sentAtTime,
+          request: msg.request,
+        });
+      }
+
+      if (msg.event != null) {
+        this.onEventDispatcher.emit({
+          sentAtTime: msg.sentAtTime,
+          event: msg.event,
+        });
+      }
     }
   }
 
