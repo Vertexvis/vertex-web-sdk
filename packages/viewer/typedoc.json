@@ -1,6 +1,6 @@
 {
   "entryPoints": [
-    "./src/components/viewer/viewer.tsx"
+    "./src/index.ts"
   ],
   "excludePrivate": true,
   "excludeExternals": true,
