@@ -42,7 +42,7 @@
     "generate": "stencil generate",
     "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs",
-    "typedocs": "typedoc"
+    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
   },
   "dependencies": {
     "@types/classnames": "2.2.3",
