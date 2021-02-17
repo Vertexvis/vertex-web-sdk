@@ -41,7 +41,7 @@ fi
 yarn generate:docs
 
 # Set the next version bump back to patch
-json=`jq '.nextVersionBump = patch' package.json`
+json=`jq '.nextVersionBump = "patch"' package.json`
 echo "$json" > package.json
 
 version="v$(get_version)"

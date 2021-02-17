@@ -16,9 +16,9 @@ describe(FlyToPartKeyInteraction, () => {
   );
 
   it('Returns true for its predicate with Command or Control pressed', () => {
-    expect(flyToPartKeyInteraction.predicate({ Control: true })).toBeTruthy();
-    expect(flyToPartKeyInteraction.predicate({ Meta: true })).toBeTruthy();
-    expect(flyToPartKeyInteraction.predicate({ Alt: true })).toBeFalsy();
+    expect(flyToPartKeyInteraction.predicate({ Control: true })).toBe(false);
+    expect(flyToPartKeyInteraction.predicate({ Meta: true })).toBe(false);
+    expect(flyToPartKeyInteraction.predicate({ Alt: true })).toBe(true);
   });
 
   it('Queries for hit results and fits to the item if present', async () => {
