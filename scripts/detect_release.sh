@@ -6,11 +6,10 @@
 
 set -e
 
-version=v$(get_version)
+version=$(get_version)
+published_version=`npm view @vertexvis/viewer --json versions | jq --arg version "$version" -r '.[] | select(. == $version)'`
 
-git fetch --tags
-
-if test -z `git tag --list $version`
+if test -z "$published_version"
 then
   echo 1
 else
