@@ -5,6 +5,7 @@ import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
 
 describe(Camera, () => {
   const renderer = jest.fn();
+  const eventHandler = jest.fn();
   const data = FrameCamera.create({ position: Vector3.create(1, 2, 3) });
   const boundingBox = BoundingBox.create(Vector3.create(), Vector3.create());
 
@@ -15,7 +16,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.fitToBoundingBox, () => {
     describe('when aspect ratio < 1', () => {
-      const camera = new Camera(renderer, 0.5, data, boundingBox);
+      const camera = new Camera(renderer, eventHandler, 0.5, data, boundingBox);
 
       it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
         const updatedCamera = camera.fitToBoundingBox(
@@ -31,6 +32,7 @@ describe(Camera, () => {
   describe(Camera.prototype.rotateAroundAxis, () => {
     const camera = new Camera(
       renderer,
+      eventHandler,
       1,
       {
         ...data,
@@ -53,6 +55,7 @@ describe(Camera, () => {
   describe(Camera.prototype.moveBy, () => {
     const camera = new Camera(
       renderer,
+      eventHandler,
       1,
       {
         ...data,
@@ -74,6 +77,7 @@ describe(Camera, () => {
   describe(Camera.prototype.viewVector, () => {
     const camera = new Camera(
       renderer,
+      eventHandler,
       1,
       {
         ...data,
@@ -91,6 +95,7 @@ describe(Camera, () => {
   describe(Camera.prototype.render, () => {
     const camera = new Camera(
       renderer,
+      eventHandler,
       1,
       {
         ...data,
@@ -114,6 +119,7 @@ describe(Camera, () => {
   describe('render with animations', () => {
     const camera = new Camera(
       renderer,
+      eventHandler,
       1,
       {
         ...data,
@@ -152,6 +158,7 @@ describe(Camera, () => {
     it('should support fly to with sceneItemId', async () => {
       const newCamera = new Camera(
         renderer,
+        eventHandler,
         1,
         {
           ...data,
@@ -265,6 +272,7 @@ describe(Camera, () => {
       );
       const newCamera = new Camera(
         renderer,
+        eventHandler,
         1,
         {
           ...data,
@@ -293,6 +301,7 @@ describe(Camera, () => {
       );
       const newCamera = new Camera(
         renderer,
+        eventHandler,
         1,
         {
           ...data,

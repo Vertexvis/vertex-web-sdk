@@ -62,14 +62,13 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         req.animation
       );
       const update = new Promise<FrameResponse>(async resolve => {
-        let animationId: string | undefined;
+        let animationId: string | undefined = undefined;
         requests.set(corrId, async (resp: FrameResponse) => {
           console.log(animationId);
           resolve({ ...resp, animationId });
         });
         const flyToResult = await api.flyTo(payload, true);
-        // animationId = flyToResult.flyTo?.animationId?.hex || undefined;
-        animationId = "Totally real animation id";
+        animationId = flyToResult.flyTo?.animationId?.hex || undefined;
       });
 
       return Async.timeout(timeout, update).finally(() =>

@@ -68,6 +68,9 @@ export namespace Components {
           * @param keyInteraction - The `KeyInteraction` to register.
          */
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
+        /**
+          * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
+         */
         "scene": () => Promise<Scene>;
         /**
           * Property used for internals or testing.

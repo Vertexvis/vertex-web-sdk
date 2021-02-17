@@ -78,6 +78,6 @@ export type ResponseResult = DrawFrameResult;
 export type ResponseError = vertexvis.protobuf.stream.IError;
 
 export type AnimationCompletedEvent = DeepRequired<
-  Pick<vertexvis.protobuf.stream.IStreamEvent, 'animationCompleted'>,
+  Pick<vertexvis.protobuf.stream.IAnimationCompletedEvent, 'animationId'>,
   []
 >;

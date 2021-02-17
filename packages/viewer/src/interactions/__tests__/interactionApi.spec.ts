@@ -12,8 +12,15 @@ describe(InteractionApi, () => {
   const emitLongPress = jest.fn();
   const streamApi = new StreamApi();
   const renderer = jest.fn();
+  const eventHandler = jest.fn();
   const sceneViewId = 'scene-view-id';
-  const scene = new Scene(streamApi, renderer, frame, sceneViewId);
+  const scene = new Scene(
+    streamApi,
+    renderer,
+    eventHandler,
+    frame,
+    sceneViewId
+  );
   const sceneProvider = (): Scene => scene;
 
   let api: InteractionApi;

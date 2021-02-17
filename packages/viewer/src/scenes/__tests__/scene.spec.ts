@@ -9,12 +9,14 @@ import { ColorMaterial } from '../..';
 
 describe(Scene, () => {
   const renderer = jest.fn();
+  const eventHandler = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
   const scene = new Scene(
     streamApi,
     renderer,
+    eventHandler,
     frame,
     imageScaleProvider,
     sceneViewId
