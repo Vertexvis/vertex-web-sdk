@@ -991,9 +991,9 @@ export class Viewer {
   }
 
   private getCanvasDimensions(): Dimensions.Dimensions | undefined {
-    return this.getConfig().flags.scaleFramesToHost
-      ? this.hostDimensions
-      : this.dimensions;
+    return this.getConfig().flags.letterboxFrames
+      ? this.dimensions
+      : this.hostDimensions;
   }
 
   private getImageScale(): Point.Point | undefined {
