@@ -29,8 +29,7 @@
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "test": "echo 'No unit tests defined'",
-    "test:coverage": "echo 'No unit tests defined'",
-    "typedocs": "typedoc"
+    "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
     "@vertexvis/viewer": "0.9.20"
@@ -43,8 +42,7 @@
     "eslint": "^6.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "rollup": "^1.19.4",
-    "typedoc": "^0.20.25"
+    "rollup": "^1.19.4"
   },
   "peerDependencies": {
     "react": "^16",

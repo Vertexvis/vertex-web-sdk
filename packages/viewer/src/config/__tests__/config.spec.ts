@@ -2,7 +2,7 @@ import * as Config from '../config';
 
 describe(Config.parseConfig, () => {
   it('should default to environment config', () => {
-    const config = Config.parseConfig('platdev', {});
+    const config = Config.parseConfig('platdev', {} as Config.Config);
     expect(config).toMatchObject({
       network: {
         apiHost: 'https://platform.platdev.vertexvis.io',
@@ -14,7 +14,7 @@ describe(Config.parseConfig, () => {
   it('environment defaults should be overridden', () => {
     const config = Config.parseConfig('platdev', {
       network: { apiHost: 'host' },
-    });
+    } as Config.Config);
     expect(config).toMatchObject({
       network: {
         apiHost: 'host',

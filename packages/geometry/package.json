@@ -34,7 +34,7 @@
     "test": "jest",
     "test:coverage": "yarn test --coverage",
     "generate:docs": "../../scripts/generate_docs.sh",
-    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
+    "typedocs": "typedoc"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",

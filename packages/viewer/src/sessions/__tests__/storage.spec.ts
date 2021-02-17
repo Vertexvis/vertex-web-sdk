@@ -7,12 +7,28 @@ class MockLocalStorage {
     this.storage = storage || {};
   }
 
+  public get length(): number {
+    return Object.keys(this.storage).length;
+  }
+
+  public key(index: number): string {
+    return Object.keys(this.storage)[index];
+  }
+
   public getItem(key: string): string {
     return this.storage[key];
   }
 
   public setItem(key: string, value: string): void {
     this.storage[key] = value;
+  }
+
+  public removeItem(key: string): void {
+    delete this.storage[key];
+  }
+
+  public clear(): void {
+    this.storage = {};
   }
 
   public getStorage(): Record<string, string> {
@@ -24,7 +40,7 @@ const localStorageKey = 'testkey';
 
 describe('storage', () => {
   describe(upsertStorageEntry, () => {
-    let localStorage;
+    let localStorage: Storage;
     beforeEach(() => {
       localStorage = new MockLocalStorage();
     });
@@ -58,7 +74,7 @@ describe('storage', () => {
   });
 
   describe(getStorageEntry, () => {
-    let localStorage;
+    let localStorage: Storage;
     beforeEach(() => {
       localStorage = new MockLocalStorage();
     });

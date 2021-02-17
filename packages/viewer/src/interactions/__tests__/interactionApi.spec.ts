@@ -101,9 +101,19 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(streamApi, sceneProvider, {
-        emit: emitTap,
-      });
+      api = new InteractionApi(
+        streamApi,
+        sceneProvider,
+        {
+          emit: emitTap,
+        },
+        {
+          emit: emitDoubleTap,
+        },
+        {
+          emit: emitLongPress,
+        }
+      );
     });
 
     it('emits a tap event', async () => {

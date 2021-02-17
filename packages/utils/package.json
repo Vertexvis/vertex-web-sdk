@@ -34,7 +34,7 @@
     "start": "jest --watch",
     "test": "jest",
     "test:coverage": "yarn test --coverage",
-    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
+    "typedocs": "typedoc"
   },
   "dependencies": {
     "@types/uuid": "^3.4.3",

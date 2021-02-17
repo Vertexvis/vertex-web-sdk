@@ -33,7 +33,7 @@
     "start": "jest --watch",
     "test": "jest",
     "test:coverage": "yarn test --coverage",
-    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
+    "typedocs": "typedoc"
   },
   "dependencies": {
     "@vertexvis/frame-streaming-protos": "^0.3.21",
