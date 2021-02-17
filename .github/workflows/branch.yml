@@ -6,11 +6,48 @@ on:
       - master
 
 jobs:
-  debug-detect-release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v2
+      - name: Set Node Version
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "Install"
+        run: "yarn install"
+      - name: "Build"
+        run: "yarn build"
+      - name: "Upload build artifacts"
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: |
+            packages/*/dist
+            packages/viewer/loader
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: "Checkout changes"
+        uses: actions/checkout@v2
+      - name: "Download build artifacts"
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+          path: packages
       - name: Set Node Version
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
@@ -29,6 +66,15 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: "Install"
         run: "yarn install"
+      - name: "Publish canary to NPM"
+        env:
+          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          ./scripts/publish_canary.sh
       - name: "Detect publish"
         id: "detect-publish"
         run: |
@@ -37,9 +83,12 @@ jobs:
           echo ::set-output name=publish::$result
       - name: "Publish release to NPM"
         if: steps.detect-publish.outputs.publish == 1
-        run: echo "RELEASE!"
-      - name: "Check skipped"
-        run: echo "NOT SKIPPED!"
+        env:
+          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: ./scripts/publish_release.sh
+
 
   # build:
   #   runs-on: ubuntu-latest
