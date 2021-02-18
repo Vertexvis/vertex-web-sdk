@@ -19,6 +19,9 @@ describe(createStreamApiRenderer, () => {
 
   beforeEach(async () => {
     await api.connect({ url: '' });
+    (api.flyTo as any) = jest.fn(() =>
+      Promise.resolve({ animationId: 'some-id' })
+    );
   });
 
   afterEach(() => {
