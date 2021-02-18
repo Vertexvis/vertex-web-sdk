@@ -1,5 +1,6 @@
-import { Rectangle } from '@vertexvis/geometry';
+import { Rectangle, Vector3 } from '@vertexvis/geometry';
 import * as THREE from 'three';
+import { Scene } from '../scenes';
 import { FrameCamera } from '../types';
 
 interface WebGlScene {
@@ -67,8 +68,26 @@ function random(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
 
+function getIntersects(
+  canvas: HTMLCanvasElement,
+  scene: THREE.Scene,
+  camera: THREE.Camera,
+  x: number,
+  y: number
+): THREE.Intersection[] {
+  x = (x / canvas.clientWidth) * 2 - 1;
+  y = -(y / canvas.clientHeight) * 2 + 1;
+
+  const vec = new THREE.Vector3(x, y, 0.5);
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(vec, camera);
+
+  return raycaster.intersectObject(scene, true);
+}
+
 export function createWebGlScene(
   canvas: HTMLCanvasElement,
+  getScene: () => Scene,
   w: number,
   h: number
 ): WebGlScene {
@@ -84,25 +103,36 @@ export function createWebGlScene(
   let lastDepthImage: HTMLImageElement | ImageBitmap | undefined;
   let lastImageRect = { x: 0, y: 0, width: 1, height: 1 };
 
-  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2500);
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 5000);
   camera.position.z = 1;
 
   const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0xffffff, 0, 3000);
+
+  const gridHelper = new THREE.GridHelper(5000, 50, 0x444444, 0xbbbbbb);
+  gridHelper.position.y = -100;
+  scene.add(gridHelper);
 
   const cubes = Array.from({ length: 75 }).map(_ => {
     const cube = createCube();
-    cube.position.x = random(-400, 400);
-    cube.position.y = random(-400, 400);
-    cube.position.z = random(-400, 400);
+    cube.position.x = random(-500, 500);
+    cube.position.y = random(-500, 500);
+    cube.position.z = random(-500, 500);
     scene.add(cube);
     return cube;
   });
 
-  const cube = createCube();
-  cube.position.x = 0;
-  cube.position.y = 0;
-  cube.position.z = -100;
-  scene.add(cube);
+  const frontCube = createCube();
+  frontCube.position.x = 0;
+  frontCube.position.y = 0;
+  frontCube.position.z = -100;
+  scene.add(frontCube);
+
+  const bottomCube = createCube();
+  bottomCube.position.x = 0;
+  bottomCube.position.y = -50;
+  bottomCube.position.z = -50;
+  scene.add(bottomCube);
 
   const target = new THREE.WebGLRenderTarget(width, height);
   target.texture.format = THREE.RGBAFormat;
@@ -216,6 +246,52 @@ export function createWebGlScene(
       width,
       height
     );
+  });
+
+  let hoveredObj: THREE.Mesh | undefined;
+  window.addEventListener('mousemove', event => {
+    const offsetX = canvas.offsetLeft;
+    const offsetY = canvas.offsetTop;
+
+    const hits = getIntersects(
+      canvas,
+      scene,
+      camera,
+      event.clientX - offsetX,
+      event.clientY - offsetY
+    );
+    const obj = hits[0]?.object;
+
+    if (hoveredObj != null) {
+      hoveredObj.material = new THREE.MeshNormalMaterial();
+      hoveredObj = undefined;
+    }
+
+    if (obj instanceof THREE.Mesh && !Array.isArray(obj.material)) {
+      obj.material = new THREE.MeshBasicMaterial({ color: '#ff0000' });
+      hoveredObj = obj;
+    }
+  });
+
+  window.addEventListener('dblclick', event => {
+    if (hoveredObj != null) {
+      hoveredObj.geometry.computeBoundingBox();
+
+      if (hoveredObj.geometry.boundingBox != null) {
+        const bbox = new THREE.Box3()
+          .copy(hoveredObj.geometry.boundingBox)
+          .applyMatrix4(hoveredObj.matrixWorld);
+
+        const vv = new THREE.Vector3()
+          .sub(bbox.getCenter(new THREE.Vector3()).multiplyScalar(-1))
+          .multiplyScalar(2);
+
+        getScene()
+          .camera()
+          .update({ position: vv, lookAt: Vector3.origin(), up: Vector3.up() })
+          .render({ animation: { milliseconds: 2000 } });
+      }
+    }
   });
 
   render(

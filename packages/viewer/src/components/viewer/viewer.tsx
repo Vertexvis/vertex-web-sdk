@@ -334,6 +334,7 @@ export class Viewer {
 
     const scene = createWebGlScene(
       this.webglCanvasElement,
+      () => this.createScene(),
       this.dimensions?.width || 0,
       this.dimensions?.height || 0
     );

@@ -3,7 +3,6 @@ import { Frame } from '../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Rectangle, Dimensions } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../metrics';
-import { HtmlImage, loadImageBytes } from './imageLoaders';
 
 const REPORTING_INTERVAL_MS = 1000;
 
