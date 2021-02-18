@@ -122,7 +122,9 @@ Type: `Promise<void>`
 
 ### `scene() => Promise<Scene>`
 
-
+Returns an object that is used to perform operations on the `Scene` that's
+currently being viewed. These operations include updating items,
+positioning the camera and performing hit tests.
 
 #### Returns
 

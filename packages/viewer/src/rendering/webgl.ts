@@ -14,31 +14,7 @@ interface WebGlScene {
   ): void;
 }
 
-function drawSimulatedDepthBuffer(
-  canvas: HTMLCanvasElement,
-  width: number,
-  height: number
-): void {
-  const ctx = canvas.getContext('2d');
-
-  if (ctx) {
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, centerX, centerY);
-    ctx.fillRect(centerX, centerY, centerX, centerY);
-
-    ctx.fillStyle = '#7f7f7f';
-    ctx.fillRect(0, centerY, centerX, centerY);
-    ctx.fillRect(centerX, 0, centerX, centerY);
-
-    // ctx.fillStyle = '#ff0000';
-    // ctx.fillRect(0, 0, width, height);
-  }
-}
-
-function createSimulatedServerDepthTexture(
+function createInitialServerDepthTexture(
   w: number,
   h: number
 ): THREE.CanvasTexture {
@@ -46,12 +22,7 @@ function createSimulatedServerDepthTexture(
   canvas.width = w;
   canvas.height = h;
 
-  const serverDepthTexture = new THREE.CanvasTexture(canvas);
-  serverDepthTexture.format = THREE.RGBFormat;
-  serverDepthTexture.minFilter = THREE.NearestFilter;
-  serverDepthTexture.magFilter = THREE.NearestFilter;
-  drawSimulatedDepthBuffer(canvas, w, h);
-  return serverDepthTexture;
+  return new THREE.CanvasTexture(canvas);
 }
 
 function createServerDepthTexture(
@@ -113,12 +84,12 @@ export function createWebGlScene(
   let lastDepthImage: HTMLImageElement | ImageBitmap | undefined;
   let lastImageRect = { x: 0, y: 0, width: 1, height: 1 };
 
-  const camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 2000);
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2500);
   camera.position.z = 1;
 
   const scene = new THREE.Scene();
 
-  const cubes = Array.from({ length: 50 }).map(_ => {
+  const cubes = Array.from({ length: 75 }).map(_ => {
     const cube = createCube();
     cube.position.x = random(-400, 400);
     cube.position.y = random(-400, 400);
@@ -126,6 +97,12 @@ export function createWebGlScene(
     scene.add(cube);
     return cube;
   });
+
+  const cube = createCube();
+  cube.position.x = 0;
+  cube.position.y = 0;
+  cube.position.z = -100;
+  scene.add(cube);
 
   const target = new THREE.WebGLRenderTarget(width, height);
   target.texture.format = THREE.RGBAFormat;
@@ -135,7 +112,7 @@ export function createWebGlScene(
   target.depthBuffer = true;
   target.depthTexture = new THREE.DepthTexture(width, height);
   target.depthTexture.format = THREE.DepthFormat;
-  target.depthTexture.type = THREE.UnsignedShortType;
+  target.depthTexture.type = THREE.UnsignedIntType;
 
   const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const postMaterial = new THREE.ShaderMaterial({
@@ -145,7 +122,7 @@ export function createWebGlScene(
       diffuseTexture: { value: target.texture },
       depthTexture: { value: target.depthTexture },
       serverDepthTexture: {
-        value: createSimulatedServerDepthTexture(w, h),
+        value: createInitialServerDepthTexture(w, h),
       },
       cameraNear: { value: camera.near },
       cameraFar: { value: camera.far },
@@ -217,8 +194,6 @@ export function createWebGlScene(
     camera.up.y = up.y;
     camera.up.z = up.z;
 
-    camera.updateProjectionMatrix();
-
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
 
@@ -284,14 +259,13 @@ float readDepth(sampler2D depthSampler, vec2 coord) {
 }
 
 float readServerDepth(sampler2D serverDepth, vec2 coord) {
-  float depth = texture(serverDepth, coord).r;
-  if (depth != 1.0) {
-    float localNearDepth = (serverNear - cameraNear) / (cameraFar - cameraNear);
-    float localFarDepth = (serverFar - cameraNear) / (cameraFar - cameraNear);
-    float localCoordDepth = localNearDepth + ((localFarDepth - localNearDepth) * depth);
-    return localCoordDepth;
+  float serverNormDepth = texture(serverDepth, coord).r;
+  if (serverNormDepth != 1.0) {
+    float localCoordDepth = serverNear + (serverFar - serverNear) * serverNormDepth;
+    float localNormDepth = localCoordDepth / (cameraFar - cameraNear);
+    return localNormDepth;
   } else {
-    return depth;
+    return serverNormDepth;
   }
 }
 
@@ -325,11 +299,14 @@ float readDepth(sampler2D depthSampler, vec2 coord) {
 }
 
 float readServerDepth(sampler2D serverDepth, vec2 coord) {
-  float depth = texture(serverDepth, coord).r;
-  float localNearDepth = (serverNear - cameraNear) / (cameraFar - cameraNear);
-  float localFarDepth = (serverFar - cameraNear) / (cameraFar - cameraNear);
-  float localCoordDepth = localNearDepth + ((localFarDepth - localNearDepth) * depth);
-  return localCoordDepth;
+  float serverNormDepth = texture(serverDepth, coord).r;
+  if (serverNormDepth != 1.0) {
+    float localCoordDepth = serverNear + (serverFar - serverNear) * serverNormDepth;
+    float localNormDepth = localCoordDepth / (cameraFar - cameraNear);
+    return localNormDepth;
+  } else {
+    return serverNormDepth;
+  }
 }
 
 void main() {

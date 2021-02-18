@@ -91,6 +91,18 @@ export const fromProto = (
           z: sceneAttributes.camera.up?.z || undefined,
         }),
       }),
+      visibleBoundingBox: BoundingBox.create(
+        Vector3.create({
+          x: sceneAttributes.visibleBoundingBox?.xmin || undefined,
+          y: sceneAttributes.visibleBoundingBox?.ymin || undefined,
+          z: sceneAttributes.visibleBoundingBox?.zmin || undefined,
+        }),
+        Vector3.create({
+          x: sceneAttributes.visibleBoundingBox?.xmax || undefined,
+          y: sceneAttributes.visibleBoundingBox?.ymax || undefined,
+          z: sceneAttributes.visibleBoundingBox?.zmax || undefined,
+        })
+      ),
     },
     sequenceNumber: sequenceNumber,
     near: 0,

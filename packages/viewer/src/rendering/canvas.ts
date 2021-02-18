@@ -20,7 +20,7 @@ export type ReportTimingsCallback = (timing: Timing[]) => void;
 
 function drawImage(
   context: CanvasRenderingContext2D,
-  image: HtmlImage,
+  image: HTMLImageElement | ImageBitmap,
   data: DrawFrame
 ): void {
   const { imageAttributes } = data.frame;
@@ -38,11 +38,11 @@ function drawImage(
 
   context.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
   context.drawImage(
-    image.image,
+    image,
     startXPos,
     startYPos,
-    image.image.width * imageAttributes.scaleFactor * scaleX,
-    image.image.height * imageAttributes.scaleFactor * scaleY
+    image.width * imageAttributes.scaleFactor * scaleX,
+    image.height * imageAttributes.scaleFactor * scaleY
   );
 }
 
@@ -130,26 +130,8 @@ export function createCanvasRenderer(
     throw new Error('Could not create 2D canvas context.');
   }
 
-  let lastFrameNumber: number | undefined;
-
   return async data => {
-    const frameNumber = data.frame.sequenceNumber;
-    const image = await loadImageBytes(data.frame.image);
-    // const depth =
-    //   data.frame.depth != null
-    //     ? await loadImageBytes(data.frame.depth)
-    //     : undefined;
-
-    if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
-      lastFrameNumber = frameNumber;
-      drawImage(context, image, data);
-
-      // if (depth != null) {
-      //   drawImage(depth, data);
-      // }
-    }
-
-    image.dispose();
+    drawImage(context, data.image, data);
     return data;
   };
 }
