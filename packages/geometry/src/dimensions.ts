@@ -102,12 +102,35 @@ export const cropFit = (to: Dimensions, dimensions: Dimensions): Dimensions => {
 };
 
 /**
+ * Returns a `Dimensions` where each side of `dimensions` will be reduced proportionally
+ * to have an area less than or equal to the provided `to` value. The returned
+ * dimensions will be centered within the original bounds of `dimensions`.
+ *
+ * @param to - the maximum area this dimensions can have
+ * @param dimensions - the dimensions to scale to fit the specified area
+ */
+export const scaleFit = (to: number, dimensions: Dimensions): Dimensions => {
+  const { width, height } = Rectangle.scaleFit(to, toRectangle(dimensions));
+  return { width, height };
+};
+
+/**
  * Returns a `Dimensions` with each length rounded.
  */
 export const round = (dimensions: Dimensions): Dimensions => {
   return {
     width: Math.round(dimensions.width),
     height: Math.round(dimensions.height),
+  };
+};
+
+/**
+ * Returns a `Dimensions` with each length rounded down.
+ */
+export const floor = (dimensions: Dimensions): Dimensions => {
+  return {
+    width: Math.floor(dimensions.width),
+    height: Math.floor(dimensions.height),
   };
 };
 
@@ -124,6 +147,13 @@ export const center = (dimensions: Dimensions): Point.Point => {
  */
 export const aspectRatio = ({ width, height }: Dimensions): number => {
   return width / height;
+};
+
+/**
+ * Returns the area of the given `dimensions`.
+ */
+export const area = ({ width, height }: Dimensions): number => {
+  return width * height;
 };
 
 /**

@@ -88,6 +88,23 @@ export const cropFit = (to: Rectangle, rect: Rectangle): Rectangle => {
 };
 
 /**
+ * Returns a rectangle where each side of `rect` will be reduced proportionally
+ * to have an area less than or equal to the provided `to` value. The returned
+ * rectangle will be centered within the original bounds of `rect`.
+ *
+ * @param to - the maximum area this rectangle can have
+ * @param rect - the rectangle to scale to fit the specified area
+ */
+export const scaleFit = (to: number, rect: Rectangle): Rectangle => {
+  const scale = Math.min(Math.sqrt(to / area(rect)), 1);
+  const dimensions = Dimensions.floor(
+    Dimensions.proportionalScale(scale, rect)
+  );
+  const position = Point.subtract(center(rect), Dimensions.center(dimensions));
+  return fromPointAndDimensions(position, dimensions);
+};
+
+/**
  * Returns true if two rectangles are equal in position and size.
  */
 export const isEqual = (a: Rectangle, b: Rectangle): boolean => {
@@ -100,6 +117,13 @@ export const isEqual = (a: Rectangle, b: Rectangle): boolean => {
  */
 export const offset = (delta: Point.Point, rect: Rectangle): Rectangle => {
   return fromPointAndDimensions(Point.add(topLeft(rect), delta), rect);
+};
+
+/**
+ * Returns the area of the rectangle.
+ */
+export const area = (rect: Rectangle): number => {
+  return rect.width * rect.height;
 };
 
 /**
