@@ -179,9 +179,11 @@ export class Camera implements FrameCamera.FrameCamera {
         animation: renderOptions?.animation,
       });
 
-      if (resp.animationId) {
-        return { animationCompleted: this.events(resp.animationId) };
-      }
+      return {
+        animationCompleted: resp.animationId
+          ? this.events(resp.animationId)
+          : undefined,
+      };
     } catch (e) {
       console.warn('Error when requesting new frame: ', e);
     }
