@@ -2,7 +2,7 @@
 
 set -e
 
-packages=`jq -r '.packages[]' ./lerna.json`
+packages=`jq -r '.workspaces[]' ./package.json`
 package_directories=($packages)
 
 for package_path in "${package_directories[@]}"; do

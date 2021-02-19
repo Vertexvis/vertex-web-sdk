@@ -24,5 +24,9 @@
     "bootstrap": "lerna bootstrap",
     "validate": "yarn build && yarn test && yarn lint",
     "version:bump": "./scripts/version_bump.sh"
-  }
+  },
+  "workspaces": [
+    "internal/*",
+    "packages/*"
+  ]
 }
