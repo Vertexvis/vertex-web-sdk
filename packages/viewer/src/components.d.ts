@@ -90,6 +90,12 @@ export namespace Components {
          */
         "unload": () => Promise<void>;
     }
+    interface VertexViewerButton {
+    }
+    interface VertexViewerToolbar {
+    }
+    interface VertexViewerToolbarGroup {
+    }
 }
 declare global {
     interface HTMLSvgIconElement extends Components.SvgIcon, HTMLStencilElement {
@@ -104,9 +110,30 @@ declare global {
         prototype: HTMLVertexViewerElement;
         new (): HTMLVertexViewerElement;
     };
+    interface HTMLVertexViewerButtonElement extends Components.VertexViewerButton, HTMLStencilElement {
+    }
+    var HTMLVertexViewerButtonElement: {
+        prototype: HTMLVertexViewerButtonElement;
+        new (): HTMLVertexViewerButtonElement;
+    };
+    interface HTMLVertexViewerToolbarElement extends Components.VertexViewerToolbar, HTMLStencilElement {
+    }
+    var HTMLVertexViewerToolbarElement: {
+        prototype: HTMLVertexViewerToolbarElement;
+        new (): HTMLVertexViewerToolbarElement;
+    };
+    interface HTMLVertexViewerToolbarGroupElement extends Components.VertexViewerToolbarGroup, HTMLStencilElement {
+    }
+    var HTMLVertexViewerToolbarGroupElement: {
+        prototype: HTMLVertexViewerToolbarGroupElement;
+        new (): HTMLVertexViewerToolbarGroupElement;
+    };
     interface HTMLElementTagNameMap {
         "svg-icon": HTMLSvgIconElement;
         "vertex-viewer": HTMLVertexViewerElement;
+        "vertex-viewer-button": HTMLVertexViewerButtonElement;
+        "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
+        "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
     }
 }
 declare namespace LocalJSX {
@@ -186,9 +213,18 @@ declare namespace LocalJSX {
          */
         "streamAttributes"?: StreamAttributes | string;
     }
+    interface VertexViewerButton {
+    }
+    interface VertexViewerToolbar {
+    }
+    interface VertexViewerToolbarGroup {
+    }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;
         "vertex-viewer": VertexViewer;
+        "vertex-viewer-button": VertexViewerButton;
+        "vertex-viewer-toolbar": VertexViewerToolbar;
+        "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
     }
 }
 export { LocalJSX as JSX };
@@ -197,6 +233,9 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "svg-icon": LocalJSX.SvgIcon & JSXBase.HTMLAttributes<HTMLSvgIconElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
+            "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
+            "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
+            "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
         }
     }
 }

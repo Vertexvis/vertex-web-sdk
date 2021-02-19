@@ -1,0 +1,18 @@
+:host {
+  /**
+   * @prop --gap: The spacing between elements in the group. Defaults to
+   * `0.25rem`.
+   */
+  --viewer-toolbar-group-gap: 0.25rem;
+
+  display: flex;
+  align-items: center;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin: auto;
+}
+
+::slotted(:not(:first-child)) {
+  margin-left: var(--viewer-toolbar-group-gap);
+}
