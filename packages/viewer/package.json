@@ -12,8 +12,8 @@
   "bugs": {
     "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
   "es2015": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
@@ -57,7 +57,7 @@
     "zen-3d-addons": "^0.0.3"
   },
   "devDependencies": {
-    "@stencil/core": "^1.17.3",
+    "@stencil/core": "^2.4.0",
     "@stencil/react-output-target": "^0.0.9",
     "@types/jest": "^26.0.20",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
