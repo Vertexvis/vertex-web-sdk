@@ -10,4 +10,9 @@ module.exports = {
       statements: 65,
     },
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: './tsconfig.json',
+    },
+  },
 };

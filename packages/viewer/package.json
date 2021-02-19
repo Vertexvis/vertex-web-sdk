@@ -59,15 +59,16 @@
   "devDependencies": {
     "@stencil/core": "^1.17.3",
     "@stencil/react-output-target": "^0.0.9",
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^26.0.20",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
     "@vertexvis/rollup-plugin-vertexvis-copyright": "0.2.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "@vertexwebsdk/build": "0.9.20",
     "eslint": "^6.1.0",
     "eslint-plugin-react": "^7.17.0",
-    "jest": "^24.9.0",
+    "jest": "^26.6.3",
     "rollup": "^1.19.4",
+    "ts-jest": "^26.5.1",
     "typescript": "^4.0.2"
   }
 }

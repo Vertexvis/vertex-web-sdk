@@ -41,14 +41,14 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^26.0.20",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
     "@vertexvis/jest-config-vertexvis": "0.5.0",
     "@vertexwebsdk/build": "0.9.20",
     "eslint": "^6.1.0",
-    "jest": "^24.9.0",
+    "jest": "^26.6.3",
     "rollup": "^1.19.4",
-    "ts-jest": "^26.3.0",
+    "ts-jest": "^26.5.1",
     "tslib": "^1.10.0",
     "typescript": "^4.0.2"
   },
