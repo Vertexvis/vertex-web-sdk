@@ -92,6 +92,9 @@ export namespace Components {
     }
     interface VertexViewerButton {
     }
+    interface VertexViewerDefaultToolbar {
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerToolbar {
     }
     interface VertexViewerToolbarGroup {
@@ -116,6 +119,12 @@ declare global {
         prototype: HTMLVertexViewerButtonElement;
         new (): HTMLVertexViewerButtonElement;
     };
+    interface HTMLVertexViewerDefaultToolbarElement extends Components.VertexViewerDefaultToolbar, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDefaultToolbarElement: {
+        prototype: HTMLVertexViewerDefaultToolbarElement;
+        new (): HTMLVertexViewerDefaultToolbarElement;
+    };
     interface HTMLVertexViewerToolbarElement extends Components.VertexViewerToolbar, HTMLStencilElement {
     }
     var HTMLVertexViewerToolbarElement: {
@@ -132,6 +141,7 @@ declare global {
         "svg-icon": HTMLSvgIconElement;
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
+        "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
     }
@@ -215,6 +225,9 @@ declare namespace LocalJSX {
     }
     interface VertexViewerButton {
     }
+    interface VertexViewerDefaultToolbar {
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerToolbar {
     }
     interface VertexViewerToolbarGroup {
@@ -223,6 +236,7 @@ declare namespace LocalJSX {
         "svg-icon": SvgIcon;
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
+        "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
     }
@@ -234,6 +248,7 @@ declare module "@stencil/core" {
             "svg-icon": LocalJSX.SvgIcon & JSXBase.HTMLAttributes<HTMLSvgIconElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
+            "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
         }

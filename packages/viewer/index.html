@@ -8,9 +8,15 @@
     />
     <title>Stencil Component Starter</title>
 
-    <script type="module" src="/build/viewer.esm.js"></script>
-    <script nomodule src="/build/viewer.js"></script>
-    <link rel="stylesheet" href="/build/viewer.css" />
+    <link
+      rel="stylesheet"
+      href="http://localhost:3333/dist/viewer/viewer.css"
+    />
+    <script
+      type="module"
+      src="http://localhost:3333/dist/viewer/viewer.esm.js"
+    ></script>
+    <script nomodule src="http://localhost:3333/dist/viewer.js"></script>
 
     <style>
       html,
@@ -41,6 +47,14 @@
       async function main() {
         await window.customElements.whenDefined('vertex-viewer');
         const viewer = document.querySelector('#viewer');
+
+        const btn = document.querySelector('#btn');
+        btn.addEventListener('click', () => {
+          const toolbar = document.createElement(
+            'vertex-viewer-default-toolbar'
+          );
+          viewer.appendChild(toolbar);
+        });
       }
     </script>
   </head>
@@ -52,18 +66,8 @@
       client-id="F180BC7099538A7DE4E5730CAD91D36F8F3B1B2A8824150BE386BAFBD642073G"
       src="urn:vertexvis:stream-key:wYumKKlqu39Z4YBo87Q8EONuOuAqzNafwuN1"
     >
-      <vertex-viewer-toolbar>
-        <vertex-viewer-toolbar-group>
-          <vertex-viewer-button>
-            <div class="box"></div>
-            <div>Hi</div>
-          </vertex-viewer-button>
-          <vertex-viewer-button>Hi</vertex-viewer-button>
-        </vertex-viewer-toolbar-group>
-        <vertex-viewer-toolbar-group>
-          <vertex-viewer-button>Hi</vertex-viewer-button>
-        </vertex-viewer-toolbar-group>
-      </vertex-viewer-toolbar>
+      <vertex-viewer-default-toolbar></vertex-viewer-default-toolbar>
     </vertex-viewer>
+    <button id="btn">Btn</button>
   </body>
 </html>

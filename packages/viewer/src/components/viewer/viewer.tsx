@@ -319,16 +319,11 @@ export class Viewer {
       }
     }
 
+    this.registerSlotChangeListeners();
     this.injectViewerApi();
   }
 
   public connectedCallback(): void {
-    this.mutationObserver = new MutationObserver(() => this.injectViewerApi());
-    this.mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
@@ -826,12 +821,24 @@ export class Viewer {
     }
   }
 
+  private registerSlotChangeListeners(): void {
+    this.mutationObserver = new MutationObserver(_ => this.injectViewerApi());
+    this.mutationObserver.observe(this.hostElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
   private injectViewerApi(): void {
-    document
-      .querySelectorAll(`[data-viewer="${this.hostElement.id}"]`)
-      .forEach(result => {
+    const nodes = this.hostElement.shadowRoot
+      ?.querySelector('slot')
+      ?.assignedNodes({ flatten: true });
+
+    nodes
+      ?.filter(node => node.nodeName.startsWith('VERTEX-'))
+      ?.forEach(node => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (result as any).viewer = this.hostElement;
+        (node as any).viewer = this.hostElement;
       });
   }
 
