@@ -26,5 +26,9 @@
     "validate": "yarn build && yarn test && yarn lint",
     "version:bump": "./scripts/version_bump.sh",
     "typedocs": "lerna run typedocs"
-  }
+  },
+  "workspaces": [
+    "internal/*",
+    "packages/*"
+  ]
 }

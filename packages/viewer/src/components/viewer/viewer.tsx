@@ -268,6 +268,7 @@ export class Viewer {
 
     this.calculateComponentDimensions();
 
+    this.streamSessionId = this.sessionId;
     if (this.streamSessionId == null) {
       try {
         this.streamSessionId = getStorageEntry(
