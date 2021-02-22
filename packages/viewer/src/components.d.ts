@@ -46,7 +46,7 @@ export namespace Components {
          */
         "keyboardControls": boolean;
         /**
-          * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
+          * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
           * @param urn The URN of the resource to load.
          */
         "load": (urn: string) => Promise<void>;
@@ -68,6 +68,9 @@ export namespace Components {
           * @param keyInteraction - The `KeyInteraction` to register.
          */
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
+        /**
+          * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
+         */
         "scene": () => Promise<Scene>;
         /**
           * Property used for internals or testing.
@@ -75,7 +78,7 @@ export namespace Components {
          */
         "sessionId"?: string;
         /**
-          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
+          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
         /**
@@ -175,7 +178,7 @@ declare namespace LocalJSX {
          */
         "sessionId"?: string;
         /**
-          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>`
+          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
         /**

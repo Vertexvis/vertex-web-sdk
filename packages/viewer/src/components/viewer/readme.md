@@ -5,16 +5,16 @@
 
 ## Properties
 
-| Property           | Attribute           | Description                                                                                                                                                                      | Type                                       | Default      |
-| ------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------ |
-| `cameraControls`   | `camera-controls`   | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                         | `boolean`                                  | `true`       |
-| `clientId`         | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                           | `string \| undefined`                      | `undefined`  |
-| `config`           | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `Config \| string \| undefined`            | `undefined`  |
-| `configEnv`        | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                     | `"platdev" \| "platprod"`                  | `'platprod'` |
-| `keyboardControls` | `keyboard-controls` | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                              | `boolean`                                  | `true`       |
-| `sessionId`        | `session-id`        | Property used for internals or testing.                                                                                                                                          | `string \| undefined`                      | `undefined`  |
-| `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:    * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
-| `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                             | `IStreamAttributes \| string \| undefined` | `undefined`  |
+| Property           | Attribute           | Description                                                                                                                                                                     | Type                                       | Default      |
+| ------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------ |
+| `cameraControls`   | `camera-controls`   | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                        | `boolean`                                  | `true`       |
+| `clientId`         | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                          | `string \| undefined`                      | `undefined`  |
+| `config`           | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `Config \| string \| undefined`            | `undefined`  |
+| `configEnv`        | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                    | `"platdev" \| "platprod"`                  | `'platprod'` |
+| `keyboardControls` | `keyboard-controls` | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                             | `boolean`                                  | `true`       |
+| `sessionId`        | `session-id`        | Property used for internals or testing.                                                                                                                                         | `string \| undefined`                      | `undefined`  |
+| `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
+| `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `IStreamAttributes \| string \| undefined` | `undefined`  |
 
 
 ## Events
@@ -71,7 +71,7 @@ Loads the given scene into the viewer and return a `Promise` that
 resolves when the scene has been loaded. The specified scene is
 provided as a URN in the following format:
 
-  * `urn:vertexvis:scene:<sceneid>`
+ * `urn:vertexvis:scene:<sceneid>`
 
 #### Returns
 
@@ -122,7 +122,9 @@ Type: `Promise<void>`
 
 ### `scene() => Promise<Scene>`
 
-
+Returns an object that is used to perform operations on the `Scene` that's
+currently being viewed. These operations include updating items,
+positioning the camera and performing hit tests.
 
 #### Returns
 
