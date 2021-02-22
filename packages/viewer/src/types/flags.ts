@@ -21,7 +21,14 @@ type Flag =
   /**
    * Toggles the logging of frame rates.
    */
-  | 'logFrameRate';
+  | 'logFrameRate'
+
+  /**
+   * Enables or disables the letterboxing of frames when the host dimensions
+   * are larger than the supported maximum image size (1080p). By default
+   * this option is disabled, and images will be scaled up to match the host.
+   */
+  | 'letterboxFrames';
 
 /**
  * A set of experimental features that can be enabled through the viewer's
@@ -34,6 +41,7 @@ export const defaultFlags: Flags = {
   adaptiveRendering: true,
   logWsMessages: false,
   logFrameRate: false,
+  letterboxFrames: false,
 };
 
 export function createFlags(

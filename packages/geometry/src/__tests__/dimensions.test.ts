@@ -62,6 +62,15 @@ describe(Dimensions.cropFit, () => {
   });
 });
 
+describe(Dimensions.scaleFit, () => {
+  it('returns a dimension that is scaled to fit within a number of pixels', () => {
+    const dim1 = Dimensions.create(100, 100);
+    const dim2 = Dimensions.create(100, 125);
+    expect(Dimensions.scaleFit(2500, dim1)).toEqual(Dimensions.create(50, 50));
+    expect(Dimensions.scaleFit(2500, dim2)).toEqual(Dimensions.create(44, 55));
+  });
+});
+
 describe(Dimensions.round, () => {
   it('returns a dimension with each length rounded', () => {
     expect(Dimensions.round(Dimensions.create(10.7, 10.1))).toEqual(

@@ -1,7 +1,7 @@
 import { StreamApi } from '@vertexvis/stream-api';
 import { Frame } from '../types';
 import { Camera } from './camera';
-import { Dimensions } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import {
@@ -167,6 +167,8 @@ export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
   | SceneItemOperationsBuilder[];
 
+export type ImageScaleProvider = () => Point.Point | undefined;
+
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
  * it, you can retrieve attributes of the scene, such as the camera. It also
@@ -178,6 +180,7 @@ export class Scene {
     private stream: StreamApi,
     private renderer: RemoteRenderer,
     private frame: Frame.Frame,
+    private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID
   ) {}
 
@@ -221,7 +224,7 @@ export class Scene {
    * Raycaster to request items that intersect a point.
    */
   public raycaster(): Raycaster {
-    return new Raycaster(this.stream);
+    return new Raycaster(this.stream, this.imageScaleProvider);
   }
 
   /**

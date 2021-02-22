@@ -2,7 +2,7 @@ jest.mock('@vertexvis/stream-api');
 
 import { Scene } from '../scene';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Dimensions } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { frame } from '../../types/__fixtures__';
 import { UUID } from '@vertexvis/utils';
 import { ColorMaterial } from '../..';
@@ -11,7 +11,14 @@ describe(Scene, () => {
   const renderer = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
-  const scene = new Scene(streamApi, renderer, frame, sceneViewId);
+  const imageScaleProvider = (): Point.Point => Point.create(1, 1);
+  const scene = new Scene(
+    streamApi,
+    renderer,
+    frame,
+    imageScaleProvider,
+    sceneViewId
+  );
 
   afterEach(() => {
     jest.resetAllMocks();
