@@ -6,7 +6,12 @@ export type StreamEvents = Partial<
   Record<keyof vertexvis.protobuf.stream.IStreamEvent, Promise<void>>
 >;
 
-export type StreamEventHandler = (id: string) => Promise<void>;
+export type StreamEventHandler = (
+  id: string,
+  timeout?: number
+) => Promise<void>;
+
+const DEFAULT_TIMEOUT_MS = 10 * 1000;
 
 export function streamEventHandler(api: StreamApi): StreamEventHandler {
   const requests = new Map<string, () => void>();
@@ -17,14 +22,14 @@ export function streamEventHandler(api: StreamApi): StreamEventHandler {
     }
   });
 
-  return (id: string) => {
+  return (id: string, timeout = DEFAULT_TIMEOUT_MS) => {
     const promise = new Promise<void>(resolve => {
       requests.set(id, () => {
         resolve();
       });
     });
 
-    return Async.timeout(10 * 1000, promise).finally(() => requests.delete(id));
+    return Async.timeout(timeout, promise).finally(() => requests.delete(id));
   };
 }
 

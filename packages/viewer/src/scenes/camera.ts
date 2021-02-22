@@ -181,7 +181,7 @@ export class Camera implements FrameCamera.FrameCamera {
 
       return {
         animationCompleted: resp.animationId
-          ? this.events(resp.animationId)
+          ? this.events(resp.animationId, renderOptions?.animation.milliseconds)
           : undefined,
       };
     } catch (e) {
