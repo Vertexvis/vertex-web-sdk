@@ -242,7 +242,7 @@ export class Viewer {
   private isResizing?: boolean;
   private isReconnecting?: boolean;
   private sceneViewId?: UUID.UUID;
-  private streamSessionId?: UUID.UUID = this.sessionId;
+  private streamSessionId?: UUID.UUID;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
   private jwt?: string;
@@ -272,6 +272,7 @@ export class Viewer {
 
     this.calculateComponentDimensions();
 
+    this.streamSessionId = this.sessionId;
     if (this.streamSessionId == null) {
       try {
         this.streamSessionId = getStorageEntry(
