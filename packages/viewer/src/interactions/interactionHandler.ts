@@ -11,7 +11,7 @@ import { InteractionApi } from './interactionApi';
  * state.
  *
  * @example
- *
+ * ```
  * class CustomInteractionHandler extends InteractionHandler {
  *   private element: HTMLElement;
  *   private api: InteractionApi;
@@ -33,6 +33,7 @@ import { InteractionApi } from './interactionApi';
  *
  * const viewer = document.querySelector("vertex-viewer");
  * viewer.registerInteractionHandler(new CustomInteractionHandler);
+ * ```
  */
 export interface InteractionHandler extends Disposable {
   /**

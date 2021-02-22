@@ -59,7 +59,7 @@ export namespace Components {
           * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
           * @example ``` class CustomInteractionHandler extends InteractionHandler {   private element: HTMLElement;   private api: InteractionApi;    public dispose(): void {     this.element.removeEventListener('click', this.handleElementClick);   }    public initialize(element: HTMLElement, api: InteractionApi): void {     this.api = api;     this.element = element;     this.element.addEventListener('click', this.handleElementClick);   }    private handleElementClick = (event: MouseEvent) => {     api.tap({ x: event.clientX, y: event.clientY });   } }  const viewer = document.querySelector("vertex-viewer"); viewer.registerInteractionHandler(new CustomInteractionHandler); ```
           * @param interactionHandler The interaction handler to register.
-          * @returns - A promise containing the disposable to use to deregister the handler.
+          * @returns A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
         /**
@@ -68,6 +68,9 @@ export namespace Components {
           * @param keyInteraction - The `KeyInteraction` to register.
          */
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
+        /**
+          * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
+         */
         "scene": () => Promise<Scene>;
         /**
           * Property used for internals or testing.

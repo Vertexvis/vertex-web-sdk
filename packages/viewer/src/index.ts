@@ -1,3 +1,6 @@
+/**
+ * @module Viewer
+ */
 import * as ColorMaterial from './scenes/colorMaterial';
 
 export { ColorMaterial };

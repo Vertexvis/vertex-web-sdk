@@ -1,3 +1,6 @@
+/**
+ * @module Scenes
+ */
 export * from './camera';
 
 export * from './raycaster';

@@ -420,7 +420,7 @@ export class Viewer {
    * ```
    *
    * @param interactionHandler The interaction handler to register.
-   * @returns {Promise<void>} - A promise containing the disposable to use to
+   * @returns {Promise<void>} A promise containing the disposable to use to
    *  deregister the handler.
    */
   @Method()

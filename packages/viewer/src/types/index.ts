@@ -1,3 +1,6 @@
+/**
+ * @module Types
+ */
 import * as Flags from './flags';
 import * as Events from './events';
 import * as FrameCamera from './frameCamera';

@@ -1,9 +1,12 @@
 {
   "entryPoints": [
-    "./src/index.ts"
+    "./src/index.ts",
+    "./src/commands/index.ts",
+    "./src/interactions/index.ts",
+    "./src/scenes/index.ts",
+    "./src/types/index.ts"
   ],
   "excludePrivate": true,
-  "excludeExternals": true,
   "excludeProtected": true,
   "excludeInternal": true,
   "includeVersion": true,
