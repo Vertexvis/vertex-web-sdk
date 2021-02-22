@@ -1,6 +1,7 @@
 /**
  * @module Interactions
  */
+/* istanbul ignore file */
 export * from './interactionHandler';
 
 export * from './flyToPartKeyInteraction';
