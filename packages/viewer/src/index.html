@@ -1,172 +1,46 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
-    />
-    <title>Stencil Component Starter</title>
 
-    <script type="module" src="/build/viewer.esm.js"></script>
-    <script nomodule src="/build/viewer.js"></script>
-    <link rel="stylesheet" href="/build/viewer.css" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <title>Stencil Component Starter</title>
+
+  <script type="module" src="/build/viewer.esm.js"></script>
+  <script nomodule src="/build/viewer.js"></script>
+  <link rel="stylesheet" href="/build/viewer.css" />
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    #viewer {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <script type="module">
+
+    window.addEventListener('DOMContentLoaded', () => {
+      main();
+    });
+
+    async function main() {
+      await window.customElements.whenDefined('vertex-viewer');
+      const viewer = document.querySelector('#viewer');
+    }
+  </script>
+</head>
+
+<body>
+  <vertex-viewer id="viewer" config-env="platdev" client-id="clientId" src="urn:vertexvis:stream-key:key">
+  </vertex-viewer>
+</body>
 
-    <style>
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-
-      #viewer {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-
-    <script type="module">
-      import {ColorMaterial} from './build/index.esm.js';
-      // import { defineCustomElements } from '../loader';
-      // defineCustomElements(window).then(() => main());
-    
-      window.addEventListener('DOMContentLoaded', async () => {
-        await window.customElements.whenDefined('vertex-viewer');
-        await main();
-      });
-
-      async function main() {
-        await window.customElements.whenDefined('vertex-viewer');
-        const viewer = document.querySelector('#viewer');
-        viewer.configEnv = 'platdev';
-
-        viewer.load(`urn:vertexvis:stream-key:bOaXtxTCClO8MAQ4uyx6WVJsloofBm1y20_B`);
-
-        viewer.addEventListener('longpress', async function(event) {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          const raycaster = await scene.raycaster();
-          const hitItems = await raycaster.hitItems(position);
-          console.log(hitItems);
-          await scene.items(op => [
-            op.where(q => q.all()).hide(),
-            op.where(q => q.withItemId(hitItems.hits[0].itemId.hex)).show()
-          ]).execute();
-          // await scene.camera().viewAll().render();
-
-        });
-
-        viewer.addEventListener('doubletap', async () => {
-
-          const updateCamera = {
-              lookAt: {x: -950.7554931640625, y: -7.001983642578125, z: 380.2992858886719},
-              position: {x: -2059.092529296875, y: -2054.5224609375, z: 79.51849365234375},
-              up: {x: 0.02399381622672081, y: -0.15799997746944427, z: 0.9871475100517273}
-            
-          }
-          const scene = await viewer.scene();
-
-          await scene.camera().viewAll().render({
-            milliseconds: 1500,
-            easing: 'ease-out-quad' 
-          });
-
-          // await scene.camera().update(updateCamera).render();
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        viewer.addEventListener('tap', async function(event) {
-          const { position } = event.detail;
-          const jwt = await viewer.getJwt();
-          console.log('got JWT: ', jwt);
-          const scene = await viewer.scene();
-          console.log(scene.camera())
-          // const raycaster = await scene.raycaster();
-          // const hitItems = await raycaster.hitItems(position);
-
-          // console.log(hitItems.hits[0].partRevisionId);
-          // console.log(hitItems);
-
-          // scene.items(op => op.where(q => q.withItemId(hitItems.hits[0].itemId.hex)).materialOverride(ColorMaterial.fromHex("#222222"))).execute();
-        });
-      
-        // viewer.addEventListener('tap', async function(event) {
-        //   const { position } = event.detail;
-        //   const scene = await viewer.scene();
-        //   const raycaster = await scene.raycaster();
-        //   const hitItems = await raycaster.hitItems(position);
-
-        //   console.log(hitItems.hits[0].partRevisionId);
-        //   console.log(hitItems);
-
-        //   scene.items(op => op.where(q => q.withItemId(hitItems.hits[0].itemId.hex)).materialOverride(ColorMaterial.fromHex("#222222"))).execute();
-        // });
-      }
-    </script>
-  </head>
-
-  <body>
-
-    <vertex-viewer
-      id="viewer"
-    ></vertex-viewer>
-    <!-- <vertex-viewer
-      id="viewer"
-    
-      src="urn:vertexvis:stream-key:4_6cdEk7VPEvXLsqiyhDKrPkyYGTCfGy-JOe"
-    ></vertex-viewer> -->
-  </body>
 </html>
-
