@@ -4,7 +4,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { ImageScaleProvider } from './scene';
 
 /**
- * Optional raycaster options available on a hit request
+ * Optional raycaster options available on a hit request.
  */
 interface RaycasterOptions {
   includeMetadata: boolean;
@@ -30,11 +30,10 @@ export class Raycaster {
     options?: RaycasterOptions
   ): Promise<vertexvis.protobuf.stream.IHitItemsResult | undefined> {
     const scale = this.imageScaleProvider();
-    const includeMetadata: boolean | undefined = options?.includeMetadata;
     const res = await this.stream.hitItems(
       {
         point: Point.scale(point, scale?.x || 1, scale?.y || 1),
-        includeMetadata,
+        includeMetadata: options?.includeMetadata,
       },
       true
     );
