@@ -34,5 +34,16 @@ describe(Raycaster, () => {
         true
       );
     });
+
+    it('should support requesting for metadata', () => {
+      raycaster.hitItems(Point.create(10, 10), { includeMetadata: true });
+      expect(api.hitItems).toHaveBeenCalledWith(
+        expect.objectContaining({
+          point: Point.create(10, 10),
+          includeMetadata: true,
+        }),
+        true
+      );
+    });
   });
 });
