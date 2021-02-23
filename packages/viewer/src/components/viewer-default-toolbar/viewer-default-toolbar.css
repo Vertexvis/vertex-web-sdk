@@ -44,12 +44,20 @@
   padding: var(--viewer-toolbar-group-padding);
 }
 
-.group:not(:first-child) {
+.group[data-direction='horizontal']:not(:first-child) {
   margin-left: var(--viewer-toolbar-group-gap);
 }
 
-.group-item:not(:first-child) {
+.group[data-direction='horizontal'] .group-item:not(:first-child) {
   margin-left: var(--viewer-toolbar-group-item-gap);
+}
+
+.group[data-direction='vertical']:not(:first-child) {
+  margin-top: var(--viewer-toolbar-group-gap);
+}
+
+.group[data-direction='vertical'] .group-item:not(:first-child) {
+  margin-top: var(--viewer-toolbar-group-item-gap);
 }
 
 .btn {

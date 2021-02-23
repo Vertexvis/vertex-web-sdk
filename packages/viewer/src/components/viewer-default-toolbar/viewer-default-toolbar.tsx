@@ -1,4 +1,5 @@
 import { Component, h, Prop } from '@stencil/core';
+import { ViewerToolbarGroupDirection } from '../viewer-toolbar-group/viewer-toolbar-group';
 import { ViewerToolbarPlacement } from '../viewer-toolbar/viewer-toolbar';
 
 @Component({
@@ -16,12 +17,16 @@ export class ViewerDefaultToolbar {
   public viewer?: HTMLVertexViewerElement;
 
   /**
-   * Specifies where the toolbar is positioned. Can be `'top-left' |
-   * 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' |
-   * 'bottom-right'`. Defaults to `bottom-center`.
+   * Specifies where the toolbar is positioned.
    */
   @Prop()
   public placement: ViewerToolbarPlacement = 'bottom-center';
+
+  /**
+   * Specifies the direction that UI elements are placed.
+   */
+  @Prop()
+  public direction: ViewerToolbarGroupDirection = 'horizontal';
 
   /**
    * Indicates whether animations will be used when performing camera
@@ -38,8 +43,15 @@ export class ViewerDefaultToolbar {
 
   public render(): h.JSX.IntrinsicElements {
     return (
-      <vertex-viewer-toolbar placement={this.placement}>
-        <vertex-viewer-toolbar-group class="group">
+      <vertex-viewer-toolbar
+        placement={this.placement}
+        direction={this.direction}
+      >
+        <vertex-viewer-toolbar-group
+          class="group"
+          direction={this.direction}
+          data-direction={this.direction}
+        >
           <vertex-viewer-button
             class="group-item btn"
             onClick={() => this.viewAll()}

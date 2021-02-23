@@ -2,32 +2,47 @@
   position: absolute;
   left: 0;
   right: 0;
+  top: 0;
+  bottom: 0;
   padding: 1rem;
   pointer-events: none;
+  display: flex;
 }
 
 :host(.position-top) {
-  top: 0;
+  align-items: flex-start;
+}
+
+:host(.position-middle) {
+  align-items: center;
 }
 
 :host(.position-bottom) {
-  bottom: 0;
+  align-items: flex-end;
+}
+
+:host(.position-left) {
+  justify-content: flex-start;
+}
+
+:host(.position-center) {
+  justify-content: center;
+}
+
+:host(.position-right) {
+  justify-content: flex-end;
 }
 
 .inner {
   display: flex;
 }
 
-.inner.position-left {
-  justify-content: flex-start;
+.inner.vertical {
+  flex-direction: column;
 }
 
-.inner.position-center {
-  justify-content: center;
-}
-
-.inner.position-right {
-  justify-content: flex-end;
+.inner.horizonal {
+  flex-direction: row;
 }
 
 ::slotted(*) {

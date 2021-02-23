@@ -9,8 +9,6 @@ By default, this component only provides the necessary CSS to layout elements
 within a group and does not provide any styling. You can customize borders,
 backgrounds, and padding through CSS.
 
-## Usage
-
 ```html
 <style>
   .group {
@@ -27,7 +25,23 @@ backgrounds, and padding through CSS.
 </vertex-viewer-toolbar>
 ```
 
+## Direction
+
+By default, elements flow horizontally. You can change the flow direction using
+the `direction` property.
+
+```html
+<vertex-viewer-toolbar-group direction="vertical"></vertex-viewer-toolbar-group>
+```
+
 <!-- Auto Generated Below -->
+
+
+## Properties
+
+| Property    | Attribute   | Description | Type                         | Default        |
+| ----------- | ----------- | ----------- | ---------------------------- | -------------- |
+| `direction` | `direction` |             | `"horizontal" \| "vertical"` | `'horizontal'` |
 
 
 ## Dependencies

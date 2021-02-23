@@ -18,8 +18,10 @@ import { InteractionHandler } from "./interactions/interactionHandler";
 import { KeyInteraction } from "./interactions/keyInteraction";
 import { Scene } from "./scenes/scene";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
-import { ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 export namespace Components {
     interface SvgIcon {
     }
@@ -105,7 +107,11 @@ export namespace Components {
          */
         "animationsDisabled": boolean;
         /**
-          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+          * Specifies the direction that UI elements are placed.
+         */
+        "direction": ViewerToolbarGroupDirection;
+        /**
+          * Specifies where the toolbar is positioned.
          */
         "placement": ViewerToolbarPlacement;
         /**
@@ -124,12 +130,14 @@ export namespace Components {
         "size"?: ViewerIconSize;
     }
     interface VertexViewerToolbar {
+        "direction": ViewerToolbarDirection;
         /**
-          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+          * Specifies where the toolbar is positioned.
          */
         "placement": ViewerToolbarPlacement;
     }
     interface VertexViewerToolbarGroup {
+        "direction": ViewerToolbarGroupDirection;
     }
 }
 declare global {
@@ -274,7 +282,11 @@ declare namespace LocalJSX {
          */
         "animationsDisabled"?: boolean;
         /**
-          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+          * Specifies the direction that UI elements are placed.
+         */
+        "direction"?: ViewerToolbarGroupDirection;
+        /**
+          * Specifies where the toolbar is positioned.
          */
         "placement"?: ViewerToolbarPlacement;
         /**
@@ -293,12 +305,14 @@ declare namespace LocalJSX {
         "size"?: ViewerIconSize;
     }
     interface VertexViewerToolbar {
+        "direction"?: ViewerToolbarDirection;
         /**
-          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+          * Specifies where the toolbar is positioned.
          */
         "placement"?: ViewerToolbarPlacement;
     }
     interface VertexViewerToolbarGroup {
+        "direction"?: ViewerToolbarGroupDirection;
     }
     interface IntrinsicElements {
         "svg-icon": SvgIcon;
