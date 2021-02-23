@@ -56,6 +56,7 @@ import { Scene } from '../../scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
+  getAssignedSlotNodes,
 } from './utils';
 import {
   createStreamApiRenderer,
@@ -216,6 +217,7 @@ export class Viewer {
   @State() private errorMessage?: string;
 
   @Element() private hostElement!: HTMLElement;
+
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
 
@@ -830,16 +832,16 @@ export class Viewer {
   }
 
   private injectViewerApi(): void {
-    const nodes = this.hostElement.shadowRoot
-      ?.querySelector('slot')
-      ?.assignedNodes({ flatten: true });
+    const slot = this.hostElement.shadowRoot?.querySelector('slot');
 
-    nodes
-      ?.filter(node => node.nodeName.startsWith('VERTEX-'))
-      ?.forEach(node => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (node as any).viewer = this.hostElement;
-      });
+    if (slot != null) {
+      getAssignedSlotNodes(slot)
+        .filter(node => node.nodeName.startsWith('VERTEX-'))
+        .forEach(node => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (node as any).viewer = this.hostElement;
+        });
+    }
   }
 
   private async handleStreamRequest(

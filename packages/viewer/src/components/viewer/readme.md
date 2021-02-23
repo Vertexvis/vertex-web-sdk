@@ -15,6 +15,7 @@
 | `sessionId`        | `session-id`        | Property used for internals or testing.                                                                                                                                         | `string \| undefined`                      | `undefined`  |
 | `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
 | `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `IStreamAttributes \| string \| undefined` | `undefined`  |
+| `unitTestMode`     | `unit-test-mode`    | Puts the viewer into a testing mode intended for unit testing.                                                                                                                  | `boolean`                                  | `false`      |
 
 
 ## Events
