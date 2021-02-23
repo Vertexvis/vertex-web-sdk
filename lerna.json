@@ -1,10 +1,7 @@
 {
   "version": "0.9.21",
   "npmClient": "yarn",
-  "packages": [
-    "internal/*",
-    "packages/*"
-  ],
+  "useWorkspaces": true,
   "command": {
     "version": {
       "allowBranch": [

@@ -7,18 +7,18 @@
 set -e
 
 shadow_dir="./.shadowroot"
-lerna_file="./lerna.json"
+package_file="./package.json"
 extensions_file="./.vscode/extensions.json"
 settings_file="./.vscode/settings.json"
 workspace_file="./vertex-web-sdks.code-workspace"
 
 update_workspace_projects() {
   tmp_workspace_file="$workspace_file.tmp"
-  packages=`jq -r '.packages[]' $lerna_file`
+  packages=`jq -r '.workspaces[]' $package_file`
   package_directories=($packages)
 
   folders='[ '
-  for package_path in "${package_directories[@]}"; do 
+  for package_path in "${package_directories[@]}"; do
     package_json="$package_path/package.json"
     package_name=`jq '.name' -r $package_json`
     folders="$folders { \"name\": \"$package_name\", \"path\": \"$package_path\" },"
