@@ -4,7 +4,7 @@ import classname from 'classnames';
 /**
  * Values that define where the toolbar is positioned.
  */
-export type ViewerToolbarPosition =
+export type ViewerToolbarPlacement =
   | 'top-left'
   | 'top-center'
   | 'top-right'
@@ -24,10 +24,10 @@ export class ViewerToolbar {
    * 'bottom-right'`. Defaults to `bottom-center`.
    */
   @Prop()
-  public position: ViewerToolbarPosition = 'bottom-center';
+  public placement: ViewerToolbarPlacement = 'bottom-center';
 
   public render(): h.JSX.IntrinsicElements {
-    const [vertical, horizontal] = this.position.split('-');
+    const [vertical, horizontal] = this.placement.split('-');
 
     return (
       <Host

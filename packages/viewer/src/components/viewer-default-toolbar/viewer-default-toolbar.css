@@ -1,12 +1,5 @@
 :host {
   /**
-   * @prop --viewer-toolbar-justify: The alignment of toolbar. Can be
-   * `flex-start | flex-end | center | space-between | space-around |
-   * space-evenly`. Defaults to `center`.
-   */
-  --viewer-toolbar-justify: center;
-
-  /**
    * @prop --viewer-toolbar-group-gap: The spacing between each toolbar group.
    * Defaults to `0.5rem`.
    */
@@ -44,31 +37,27 @@
   --viewer-toolbar-group-item-gap: 0.25rem;
 }
 
-:host .toolbar {
-  --viewer-toolbar-justify: inherit;
-}
-
-:host .group {
+.group {
   background: var(--viewer-toolbar-group-background);
   border-radius: var(--viewer-toolbar-group-border-radius);
   box-shadow: var(--viewer-toolbar-group-box-shadow);
   padding: var(--viewer-toolbar-group-padding);
 }
 
-:host .group:not(:first-child) {
+.group:not(:first-child) {
   margin-left: var(--viewer-toolbar-group-gap);
 }
 
-:host .button {
+.group-item:not(:first-child) {
+  margin-left: var(--viewer-toolbar-group-item-gap);
+}
+
+.btn {
   color: var(--neutral-800);
   padding: 0.125rem;
   border-radius: 0.125rem;
 }
 
-:host .group-item:not(:first-child) {
-  margin-left: var(--viewer-toolbar-group-item-gap);
-}
-
-:host .button:hover {
+.btn:hover {
   background: var(--neutral-300);
 }

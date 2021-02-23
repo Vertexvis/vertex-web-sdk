@@ -17,9 +17,9 @@ import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 import { KeyInteraction } from "./interactions/keyInteraction";
 import { Scene } from "./scenes/scene";
-import { ViewerToolbarPosition } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
-import { ViewerToolbarPosition as ViewerToolbarPosition1 } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 export namespace Components {
     interface SvgIcon {
     }
@@ -107,7 +107,7 @@ export namespace Components {
         /**
           * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
          */
-        "position": ViewerToolbarPosition;
+        "placement": ViewerToolbarPlacement;
         /**
           * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
          */
@@ -127,7 +127,7 @@ export namespace Components {
         /**
           * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
          */
-        "position": ViewerToolbarPosition;
+        "placement": ViewerToolbarPlacement;
     }
     interface VertexViewerToolbarGroup {
     }
@@ -276,7 +276,7 @@ declare namespace LocalJSX {
         /**
           * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
          */
-        "position"?: ViewerToolbarPosition;
+        "placement"?: ViewerToolbarPlacement;
         /**
           * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
          */
@@ -296,7 +296,7 @@ declare namespace LocalJSX {
         /**
           * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
          */
-        "position"?: ViewerToolbarPosition;
+        "placement"?: ViewerToolbarPlacement;
     }
     interface VertexViewerToolbarGroup {
     }

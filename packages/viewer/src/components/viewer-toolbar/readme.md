@@ -1,5 +1,8 @@
 # vertex-viewer-toolbar
 
+A `<vertex-viewer-toolbar>` is an element that contains UI controls that
+interact with the viewer. They're intended to be placed inside a
+`<vertex-viewer>` element and positioned on an edge in the viewer.
 
 
 <!-- Auto Generated Below -->
@@ -7,9 +10,9 @@
 
 ## Properties
 
-| Property   | Attribute  | Description                                                                                                                                                                       | Type                                                                                              | Default           |
-| ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------- |
-| `position` | `position` | Specifies where the toolbar is positioned. Can be `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'`. Defaults to `bottom-center`. | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
+| Property    | Attribute   | Description                                                                                                                                                                       | Type                                                                                              | Default           |
+| ----------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------- |
+| `placement` | `placement` | Specifies where the toolbar is positioned. Can be `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'`. Defaults to `bottom-center`. | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
 
 
 ## Dependencies

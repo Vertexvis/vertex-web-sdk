@@ -1,6 +1,45 @@
 # vertex-viewer-icon
 
+A `<vertex-viewer-icon>` is an element that renders an SVG icon from the Vertex
+SDK icon set.
 
+## Size
+
+The icon size can be specified using the `size` attribute.
+
+```html
+<vertex-viewer-icon size="sm"></vertex-viewer-icon>
+<vertex-viewer-icon size="md"></vertex-viewer-icon>
+<vertex-viewer-icon size="lg"></vertex-viewer-icon>
+```
+
+You can also specify a custom size by applying a `font-size` CSS property on the
+component.
+
+```html
+<style>
+  .icon {
+    font-size: 64px;
+  }
+</style>
+
+<vertex-viewer-icon class="icon"></vertex-viewer-icon>
+```
+
+## Color
+
+Specify the color of the icon by applying a `color` CSS property on the
+component.
+
+```html
+<style>
+  .icon {
+    color: red;
+  }
+</style>
+
+<vertex-viewer-icon class="icon"></vertex-viewer-icon>
+```
 
 <!-- Auto Generated Below -->
 

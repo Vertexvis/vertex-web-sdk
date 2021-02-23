@@ -1,5 +1,5 @@
 import { Component, h, Prop } from '@stencil/core';
-import { ViewerToolbarPosition } from '../viewer-toolbar/viewer-toolbar';
+import { ViewerToolbarPlacement } from '../viewer-toolbar/viewer-toolbar';
 
 @Component({
   tag: 'vertex-viewer-default-toolbar',
@@ -21,7 +21,7 @@ export class ViewerDefaultToolbar {
    * 'bottom-right'`. Defaults to `bottom-center`.
    */
   @Prop()
-  public position: ViewerToolbarPosition = 'bottom-center';
+  public placement: ViewerToolbarPlacement = 'bottom-center';
 
   /**
    * Indicates whether animations will be used when performing camera
@@ -38,13 +38,13 @@ export class ViewerDefaultToolbar {
 
   public render(): h.JSX.IntrinsicElements {
     return (
-      <vertex-viewer-toolbar position={this.position}>
+      <vertex-viewer-toolbar placement={this.placement}>
         <vertex-viewer-toolbar-group class="group">
           <vertex-viewer-button
-            class="group-item button"
+            class="group-item btn"
             onClick={() => this.viewAll()}
           >
-            <vertex-viewer-icon name="fit-all" size="md" />
+            <vertex-viewer-icon class="icon" name="fit-all" size="md" />
           </vertex-viewer-button>
         </vertex-viewer-toolbar-group>
       </vertex-viewer-toolbar>
