@@ -17,6 +17,9 @@ import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 import { KeyInteraction } from "./interactions/keyInteraction";
 import { Scene } from "./scenes/scene";
+import { ViewerToolbarPosition } from "./components/viewer-toolbar/viewer-toolbar";
+import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
+import { ViewerToolbarPosition as ViewerToolbarPosition1 } from "./components/viewer-toolbar/viewer-toolbar";
 export namespace Components {
     interface SvgIcon {
     }
@@ -93,9 +96,38 @@ export namespace Components {
     interface VertexViewerButton {
     }
     interface VertexViewerDefaultToolbar {
+        /**
+          * The duration of animations, in milliseconds. Defaults to `1000`.
+         */
+        "animationMs": number;
+        /**
+          * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
+         */
+        "animationsDisabled": boolean;
+        /**
+          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+         */
+        "position": ViewerToolbarPosition;
+        /**
+          * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
+         */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerIcon {
+        /**
+          * The name of the icon to render.
+         */
+        "name"?: ViewerIconName;
+        /**
+          * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+         */
+        "size"?: ViewerIconSize;
+    }
     interface VertexViewerToolbar {
+        /**
+          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+         */
+        "position": ViewerToolbarPosition;
     }
     interface VertexViewerToolbarGroup {
     }
@@ -125,6 +157,12 @@ declare global {
         prototype: HTMLVertexViewerDefaultToolbarElement;
         new (): HTMLVertexViewerDefaultToolbarElement;
     };
+    interface HTMLVertexViewerIconElement extends Components.VertexViewerIcon, HTMLStencilElement {
+    }
+    var HTMLVertexViewerIconElement: {
+        prototype: HTMLVertexViewerIconElement;
+        new (): HTMLVertexViewerIconElement;
+    };
     interface HTMLVertexViewerToolbarElement extends Components.VertexViewerToolbar, HTMLStencilElement {
     }
     var HTMLVertexViewerToolbarElement: {
@@ -142,6 +180,7 @@ declare global {
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
+        "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
     }
@@ -226,9 +265,38 @@ declare namespace LocalJSX {
     interface VertexViewerButton {
     }
     interface VertexViewerDefaultToolbar {
+        /**
+          * The duration of animations, in milliseconds. Defaults to `1000`.
+         */
+        "animationMs"?: number;
+        /**
+          * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
+         */
+        "animationsDisabled"?: boolean;
+        /**
+          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+         */
+        "position"?: ViewerToolbarPosition;
+        /**
+          * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
+         */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerIcon {
+        /**
+          * The name of the icon to render.
+         */
+        "name"?: ViewerIconName;
+        /**
+          * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+         */
+        "size"?: ViewerIconSize;
+    }
     interface VertexViewerToolbar {
+        /**
+          * Specifies where the toolbar is positioned. Can be `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Defaults to `bottom-center`.
+         */
+        "position"?: ViewerToolbarPosition;
     }
     interface VertexViewerToolbarGroup {
     }
@@ -237,6 +305,7 @@ declare namespace LocalJSX {
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
     }
@@ -249,6 +318,7 @@ declare module "@stencil/core" {
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
+            "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
         }

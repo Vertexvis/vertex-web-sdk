@@ -5,11 +5,11 @@
 <!-- Auto Generated Below -->
 
 
-## CSS Custom Properties
+## Properties
 
-| Name    | Description                                                        |
-| ------- | ------------------------------------------------------------------ |
-| `--gap` | The spacing between elements in the toolbar. Defaults to `0.5rem`. |
+| Property   | Attribute  | Description                                                                                                                                                                       | Type                                                                                              | Default           |
+| ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------- |
+| `position` | `position` | Specifies where the toolbar is positioned. Can be `'top-left' \| 'top-center' \| 'top-right' \| 'bottom-left' \| 'bottom-center' \| 'bottom-right'`. Defaults to `bottom-center`. | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
 
 
 ## Dependencies

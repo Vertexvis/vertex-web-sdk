@@ -1,18 +1,74 @@
 :host {
   /**
-   * @prop --gap: The spacing between elements in the group. Defaults to
-   * `0.25rem`.
+   * @prop --viewer-toolbar-justify: The alignment of toolbar. Can be
+   * `flex-start | flex-end | center | space-between | space-around |
+   * space-evenly`. Defaults to `center`.
    */
-  --viewer-toolbar-group-gap: 0.25rem;
+  --viewer-toolbar-justify: center;
 
-  display: flex;
-  align-items: center;
-  background-color: lightgray;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  margin: auto;
+  /**
+   * @prop --viewer-toolbar-group-gap: The spacing between each toolbar group.
+   * Defaults to `0.5rem`.
+   */
+  --viewer-toolbar-group-gap: 0.5rem;
+
+  /**
+   * @prop --viewer-toolbar-group-background: The background to apply to each
+   * group in the toolbar. Defaults to `rgba(245, 245, 245, 0.95)`
+   */
+  --viewer-toolbar-group-background: rgba(245, 245, 245, 0.95);
+
+  /**
+   * @prop --viewer-toolbar-group-border-radius: The corner radius to apply to
+   * each group in the toolbar. Defaults to `0.25rem`.
+   */
+  --viewer-toolbar-group-border-radius: 0.25rem;
+
+  /**
+   * @prop --viewer-toolbar-group-box-shadow: The shadow to apply to each group
+   * in the toolbar. Defaults to `-1px 0 2px rgba(0, 0, 0, 0.12), 1px 0 2px rgba(0, 0, 0, 0.13)`.
+   */
+  --viewer-toolbar-group-box-shadow: -1px 0 2px rgba(0, 0, 0, 0.12),
+    1px 0 2px rgba(0, 0, 0, 0.13);
+
+  /**
+   * @prop --viewer-toolbar-group-padding: The padding to apply to each group in
+   * the toolbar. Defaults to `0.25rem`.
+   */
+  --viewer-toolbar-group-padding: 0.25rem;
+
+  /**
+   * @prop --viewer-toolbar-group-item-gap: The spacing between each item within
+   * a toolbar group. Defaults to `0.25rem`.
+   */
+  --viewer-toolbar-group-item-gap: 0.25rem;
 }
 
-::slotted(:not(:first-child)) {
+:host .toolbar {
+  --viewer-toolbar-justify: inherit;
+}
+
+:host .group {
+  background: var(--viewer-toolbar-group-background);
+  border-radius: var(--viewer-toolbar-group-border-radius);
+  box-shadow: var(--viewer-toolbar-group-box-shadow);
+  padding: var(--viewer-toolbar-group-padding);
+}
+
+:host .group:not(:first-child) {
   margin-left: var(--viewer-toolbar-group-gap);
+}
+
+:host .button {
+  color: var(--neutral-800);
+  padding: 0.125rem;
+  border-radius: 0.125rem;
+}
+
+:host .group-item:not(:first-child) {
+  margin-left: var(--viewer-toolbar-group-item-gap);
+}
+
+:host .button:hover {
+  background: var(--neutral-300);
 }

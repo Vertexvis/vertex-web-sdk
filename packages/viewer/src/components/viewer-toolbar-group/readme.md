@@ -5,13 +5,6 @@
 <!-- Auto Generated Below -->
 
 
-## CSS Custom Properties
-
-| Name    | Description                                                       |
-| ------- | ----------------------------------------------------------------- |
-| `--gap` | The spacing between elements in the group. Defaults to `0.25rem`. |
-
-
 ## Dependencies
 
 ### Used by

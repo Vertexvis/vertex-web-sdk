@@ -1,4 +1,4 @@
-import { Component, h, Host } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'vertex-viewer-toolbar-group',
@@ -8,9 +8,9 @@ import { Component, h, Host } from '@stencil/core';
 export class ViewerToolbarGroup {
   public render(): h.JSX.IntrinsicElements {
     return (
-      <Host>
+      <div class="inner">
         <slot></slot>
-      </Host>
+      </div>
     );
   }
 }

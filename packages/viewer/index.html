@@ -47,14 +47,6 @@
       async function main() {
         await window.customElements.whenDefined('vertex-viewer');
         const viewer = document.querySelector('#viewer');
-
-        const btn = document.querySelector('#btn');
-        btn.addEventListener('click', () => {
-          const toolbar = document.createElement(
-            'vertex-viewer-default-toolbar'
-          );
-          viewer.appendChild(toolbar);
-        });
       }
     </script>
   </head>
@@ -63,11 +55,10 @@
     <vertex-viewer
       id="viewer"
       config-env="platdev"
-      client-id="F180BC7099538A7DE4E5730CAD91D36F8F3B1B2A8824150BE386BAFBD642073G"
-      src="urn:vertexvis:stream-key:wYumKKlqu39Z4YBo87Q8EONuOuAqzNafwuN1"
+      client-id="client-id"
+      src="urn:vertexvis:stream-key:key"
     >
       <vertex-viewer-default-toolbar></vertex-viewer-default-toolbar>
     </vertex-viewer>
-    <button id="btn">Btn</button>
   </body>
 </html>

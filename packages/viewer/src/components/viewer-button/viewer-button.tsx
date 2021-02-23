@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, h, Host } from '@stencil/core';
 
 @Component({
   tag: 'vertex-viewer-button',
@@ -8,9 +8,11 @@ import { Component, h } from '@stencil/core';
 export class ViewerButton {
   public render(): h.JSX.IntrinsicElements {
     return (
-      <button class="viewer-button">
-        <slot></slot>
-      </button>
+      <Host>
+        <button class="viewer-button">
+          <slot></slot>
+        </button>
+      </Host>
     );
   }
 }
