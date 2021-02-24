@@ -76,7 +76,7 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
 
     if (this.currentPosition1 != null) {
       const delta = Point.subtract(position, this.currentPosition1);
-      const threshold = this.interactionApi?.scalePixelThreshold(2) || 2;
+      const threshold = this.interactionApi?.scalePixelThreshold(2, true) || 2;
       if (
         Point.distance(position, this.currentPosition1) >= threshold ||
         this.isInteracting

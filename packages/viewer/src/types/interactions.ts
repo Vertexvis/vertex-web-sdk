@@ -8,7 +8,7 @@ export interface InteractionConfig {
 
   /**
    * A scalar to be applied to the pixel thresholds for a coarse pointer
-   * input device (e.g. touch, stylus, etc). This will affect pixel thresholds
+   * input device (e.g. touch). This will affect pixel thresholds
    * for interactions at a rate of (N px * devicePixelRatio * coarsePointerThresholdScale).
    */
   coarsePointerThresholdScale: number;
@@ -16,5 +16,5 @@ export interface InteractionConfig {
 
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThresholdScale: 1,
-  coarsePointerThresholdScale: 1.5,
+  coarsePointerThresholdScale: 2,
 };

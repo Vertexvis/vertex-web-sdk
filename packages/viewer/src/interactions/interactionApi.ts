@@ -198,7 +198,7 @@ export class InteractionApi {
   /**
    * Scales the provided `pixelThreshold` by the device's pixel ratio
    * and the configured `coarsePointerThresholdScale` value if the
-   * primary pointer input is coarse (touch, stylus, etc).
+   * primary pointer input is coarse (touch).
    *
    * Scales the provided `pixelThreshold` by the configured
    * `finePointerThresholdScale` value if the primary pointer input is
@@ -207,8 +207,11 @@ export class InteractionApi {
    * @param pixelThreshold - The pixel threshold to scale.
    * @returns The scaled pixel threshold.
    */
-  public scalePixelThreshold(pixelThreshold: number): number {
-    if (this.isCoarseInputDevice()) {
+  public scalePixelThreshold(
+    pixelThreshold: number,
+    isTouch?: boolean
+  ): number {
+    if (this.isCoarseInputDevice(isTouch)) {
       return (
         pixelThreshold *
         window.devicePixelRatio *
@@ -239,7 +242,7 @@ export class InteractionApi {
     });
   }
 
-  private isCoarseInputDevice(): boolean {
-    return window.matchMedia('(pointer: coarse)').matches;
+  private isCoarseInputDevice(isTouch?: boolean): boolean {
+    return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 }
