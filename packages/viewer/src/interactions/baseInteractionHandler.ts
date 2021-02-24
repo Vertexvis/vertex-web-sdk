@@ -72,7 +72,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   public setPrimaryInteractionType(type: InteractionType): void {
     this.primaryInteractionType = type;
-    console.log('SETTING: ', type);
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
