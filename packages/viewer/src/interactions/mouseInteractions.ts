@@ -1,5 +1,6 @@
-import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
+import { Point, Vector3, Angle } from '@vertexvis/geometry';
+
 
 export class MouseInteraction {
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
@@ -22,6 +23,8 @@ export class MouseInteraction {
 export class RotateInteraction extends MouseInteraction {
   private currentPosition: Point.Point | undefined;
 
+  private lastAngle: number | undefined;
+
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -29,13 +32,35 @@ export class RotateInteraction extends MouseInteraction {
     }
   }
 
+
   public drag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition != null) {
-      const position = Point.create(event.screenX, event.screenY);
-      const delta = Point.subtract(position, this.currentPosition);
+      
+      if (event.shiftKey && event.altKey) {
+        const position  = Point.create(event.screenX, event.screenY);
+        api.transformCamera((camera, viewport) => {
+          const center = Point.create(
+            viewport.width / 2,
+            viewport.height / 2
+          );
+          const currentAngle = Angle.fromPoints(center, position);
+          const angleDelta = this.lastAngle != null ? currentAngle - this.lastAngle : 0;
 
-      api.rotateCamera(delta);
-      this.currentPosition = position;
+          this.lastAngle = currentAngle;
+          const axis = Vector3.normalize(
+            Vector3.subtract(camera.lookAt, camera.position)
+          );
+          const angleInRadians = Angle.toRadians(-angleDelta);
+          return camera.rotateAroundAxis(angleInRadians, axis);
+        });
+
+      } else {
+        const position = Point.create(event.screenX, event.screenY);
+        const delta = Point.subtract(position, this.currentPosition);
+  
+        api.rotateCamera(delta);
+        this.currentPosition = position;
+      }
     }
   }
 
