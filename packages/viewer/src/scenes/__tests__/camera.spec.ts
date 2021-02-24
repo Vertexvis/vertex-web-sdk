@@ -1,13 +1,21 @@
+const realApi = jest.requireActual('@vertexvis/stream-api');
+jest.mock('@vertexvis/stream-api');
+
 import { Camera } from '../camera';
 import { FrameCamera } from '../../types';
 import { UUID } from '@vertexvis/utils';
 import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
+import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 
 describe(Camera, () => {
-  const renderer = jest.fn();
-  const eventHandler = jest.fn();
+  const stream = new StreamApi();
   const data = FrameCamera.create({ position: Vector3.create(1, 2, 3) });
   const boundingBox = BoundingBox.create(Vector3.create(), Vector3.create());
+
+  beforeAll(() => {
+    stream.flyTo = jest.fn(async () => ({ flyTo: {} }));
+    (toProtoDuration as any).mockImplementation(realApi.toProtoDuration);
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -16,7 +24,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.fitToBoundingBox, () => {
     describe('when aspect ratio < 1', () => {
-      const camera = new Camera(renderer, eventHandler, 0.5, data, boundingBox);
+      const camera = new Camera(stream, 0.5, data, boundingBox);
 
       it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
         const updatedCamera = camera.fitToBoundingBox(
@@ -31,8 +39,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.rotateAroundAxis, () => {
     const camera = new Camera(
-      renderer,
-      eventHandler,
+      stream,
       1,
       {
         ...data,
@@ -54,8 +61,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.moveBy, () => {
     const camera = new Camera(
-      renderer,
-      eventHandler,
+      stream,
       1,
       {
         ...data,
@@ -76,8 +82,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.viewVector, () => {
     const camera = new Camera(
-      renderer,
-      eventHandler,
+      stream,
       1,
       {
         ...data,
@@ -94,8 +99,7 @@ describe(Camera, () => {
 
   describe(Camera.prototype.render, () => {
     const camera = new Camera(
-      renderer,
-      eventHandler,
+      stream,
       1,
       {
         ...data,
@@ -106,7 +110,7 @@ describe(Camera, () => {
 
     it('should render using camera', async () => {
       camera.render();
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
@@ -118,8 +122,7 @@ describe(Camera, () => {
 
   describe('render with animations', () => {
     const camera = new Camera(
-      renderer,
-      eventHandler,
+      stream,
       1,
       {
         ...data,
@@ -129,36 +132,33 @@ describe(Camera, () => {
     );
 
     it('should render using camera with animations', async () => {
-      camera.render({
+      await camera.render({
         animation: {
           milliseconds: 500,
         },
       });
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: {
+            duration: { nanos: 500000000, seconds: 0 },
+          },
+        }),
+        true
+      );
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-          animation: {
-            milliseconds: 500,
-          },
-          flyToOptions: {
-            flyTo: {
-              data: expect.objectContaining({
-                position: Vector3.forward(),
-              }),
-              type: 'camera',
-            },
-          },
         })
       );
     });
 
     it('should support fly to with sceneItemId', async () => {
       const newCamera = new Camera(
-        renderer,
-        eventHandler,
+        stream,
+
         1,
         {
           ...data,
@@ -167,7 +167,7 @@ describe(Camera, () => {
         boundingBox
       );
       const id = UUID.create();
-      newCamera
+      await newCamera
         .flyTo(q => q.withItemId(id))
         .render({
           animation: {
@@ -175,23 +175,25 @@ describe(Camera, () => {
           },
         });
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: {
-            milliseconds: 500,
+            duration: { nanos: 500000000, seconds: 0 },
           },
+        }),
+        true
+      );
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
+        expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-          flyToOptions: {
-            flyTo: { type: 'internal', data: id },
-          },
         })
       );
     });
 
     it('should support fly to suppliedId with animations', async () => {
-      camera
+      await camera
         .flyTo(q => q.withSuppliedId('suppliedId'))
         .render({
           animation: {
@@ -199,37 +201,40 @@ describe(Camera, () => {
           },
         });
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: {
+            duration: { nanos: 500000000, seconds: 0 },
+          },
+        }),
+        true
+      );
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             position: Vector3.forward(),
           }),
-          animation: {
-            milliseconds: 500,
-          },
-          flyToOptions: {
-            flyTo: { data: 'suppliedId', type: 'supplied' },
-          },
         })
       );
     });
 
-    it('renders with fly to item id param', async () => {
-      camera.flyTo({ itemId: 'item-id' }).render();
+    it.only('renders with fly to item id param', async () => {
+      await camera.flyTo({ itemId: 'item-id' }).render();
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          flyToOptions: {
-            flyTo: { type: 'internal', data: 'item-id' },
+          itemId: {
+            hex: 'item-id',
           },
-        })
+        }),
+        true
       );
     });
 
     it('renders with fly to item id param', async () => {
-      camera.flyTo({ itemSuppliedId: 'supplied-id' }).render();
+      await camera.flyTo({ itemSuppliedId: 'supplied-id' }).render();
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           flyToOptions: {
             flyTo: { type: 'supplied', data: 'supplied-id' },
@@ -243,9 +248,9 @@ describe(Camera, () => {
         Vector3.create(-1, -1, -1),
         Vector3.create(1, 1, 1)
       );
-      camera.flyTo({ boundingBox }).render();
+      await camera.flyTo({ boundingBox }).render();
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           flyToOptions: {
             flyTo: { type: 'bounding-box', data: boundingBox },
@@ -256,9 +261,9 @@ describe(Camera, () => {
 
     it('renders with fly to camera param', async () => {
       const data = FrameCamera.create();
-      camera.flyTo({ camera: data }).render();
+      await camera.flyTo({ camera: data }).render();
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           flyToOptions: { flyTo: { type: 'camera', data } },
         })
@@ -271,8 +276,8 @@ describe(Camera, () => {
         Vector3.create(2, 2, 2)
       );
       const newCamera = new Camera(
-        renderer,
-        eventHandler,
+        stream,
+
         1,
         {
           ...data,
@@ -281,9 +286,9 @@ describe(Camera, () => {
         newBoundingBox
       );
 
-      newCamera.viewAll().render();
+      await newCamera.viewAll().render();
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
             lookAt: Vector3.create(1.5, 1.5, 1.5),
@@ -300,8 +305,8 @@ describe(Camera, () => {
         Vector3.create(2, 2, 2)
       );
       const newCamera = new Camera(
-        renderer,
-        eventHandler,
+        stream,
+
         1,
         {
           ...data,
@@ -310,13 +315,13 @@ describe(Camera, () => {
         newBoundingBox
       );
 
-      newCamera.viewAll().render({
+      await newCamera.viewAll().render({
         animation: {
           milliseconds: 500,
         },
       });
 
-      expect(renderer).toHaveBeenCalledWith(
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: {
             milliseconds: 500,

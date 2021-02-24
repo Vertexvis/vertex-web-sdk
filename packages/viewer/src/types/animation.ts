@@ -5,6 +5,7 @@ export interface Animation {
 }
 
 export function create(data: Partial<Animation> = {}): Animation {
+  console.log(data);
   return {
     milliseconds: data.milliseconds || DEFAULT_ANIMATION_DURATION,
   };

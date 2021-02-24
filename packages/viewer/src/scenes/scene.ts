@@ -11,11 +11,9 @@ import {
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { UUID } from '@vertexvis/utils';
-import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
-import { StreamEventHandler } from '../stream/events';
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -179,8 +177,6 @@ export type ImageScaleProvider = () => Point.Point | undefined;
 export class Scene {
   public constructor(
     private stream: StreamApi,
-    private renderer: RemoteRenderer,
-    private events: StreamEventHandler,
     private frame: Frame.Frame,
     private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID
@@ -215,8 +211,7 @@ export class Scene {
    */
   public camera(): Camera {
     return new Camera(
-      this.renderer,
-      this.events,
+      this.stream,
       Dimensions.aspectRatio(this.viewport()),
       this.frame.sceneAttributes.camera,
       this.frame.sceneAttributes.visibleBoundingBox
