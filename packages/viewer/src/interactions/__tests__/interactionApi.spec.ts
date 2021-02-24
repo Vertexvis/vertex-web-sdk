@@ -99,6 +99,20 @@ describe(InteractionApi, () => {
     });
   });
 
+  describe(InteractionApi.prototype.twistCamera, () => {
+    it('replaces the camera if interacting', () => {
+      api.beginInteraction();
+      api.twistCamera(Point.create(10, 0));
+      api.endInteraction();
+      expect(renderer).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if not interacting', () => {
+      api.zoomCamera(1);
+      expect(renderer).not.toHaveBeenCalled();
+    });
+  });
+
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
       api = new InteractionApi(streamApi, sceneProvider, {

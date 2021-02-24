@@ -82,9 +82,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       case 'pan':
         this.primaryInteraction = this.panInteraction;
         break;
-      case 'twist':
-        this.primaryInteraction = this.twistInteraction;
-        break;
+      // case 'twist':
+      //   this.primaryInteraction = this.twistInteraction;
+      //   break;
     }
     this.primaryInteractionTypeChange.emit();
   }

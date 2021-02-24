@@ -1,4 +1,4 @@
-import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -17,6 +17,7 @@ type CameraTransform = (
  */
 export class InteractionApi {
   private currentCamera?: Camera;
+  private lastAngle: Angle.Angle | undefined;
 
   public constructor(
     private stream: StreamApi,
@@ -89,6 +90,29 @@ export class InteractionApi {
 
       await this.currentCamera?.render();
     }
+  }
+
+  /**
+   * Performs a twist operation of the scene's camera, and requests a new image
+   * for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public async twistCamera(point: Point.Point): Promise<void> {
+    return this.transformCamera((camera, viewport) => {
+      const center = Point.create(viewport.width / 2, viewport.height / 2);
+      const currentAngle = Angle.fromPoints(center, point);
+      const angleDelta =
+        this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+
+      this.lastAngle = currentAngle;
+      const axis = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+      const angleInRadians = Angle.toRadians(-angleDelta);
+      return camera.rotateAroundAxis(angleInRadians, axis);
+    });
   }
 
   /**

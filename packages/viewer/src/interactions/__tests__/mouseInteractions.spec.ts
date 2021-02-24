@@ -138,7 +138,8 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api = new InteractionApiMock();
+  const api = new (InteractionApi as jest.Mock<InteractionApi>)();
+  api.transformCamera;
 
   const event1 = new MouseEvent('mousemove', { screenX: 10, screenY: 5 });
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
@@ -245,7 +246,7 @@ describe(TwistInteraction, () => {
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
-      expect(api.transformCamera).toHaveBeenCalledTimes(2);
+      expect(api.twistCamera).toHaveBeenCalledTimes(2);
     });
 
     it('does nothing if begin drag has not been called', () => {
