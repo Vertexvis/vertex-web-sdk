@@ -18,6 +18,6 @@ export class EventDispatcher<T> {
   }
 
   public emit(event: T): void {
-    this.listeners.forEach(listener => listener(event));
+    this.listeners.forEach((listener) => listener(event));
   }
 }

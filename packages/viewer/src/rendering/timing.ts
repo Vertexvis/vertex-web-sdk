@@ -38,8 +38,8 @@ export function acknowledgeFrameRequests(
   api: StreamApi,
   clockProvider: () => SynchronizedClock | undefined
 ): RequestMessageHandler {
-  return ifRequestId(reqId =>
-    ifDrawFrame(_ => req => {
+  return ifRequestId((reqId) =>
+    ifDrawFrame((_) => (req) => {
       const protoDate = protoToDate(req.sentAtTime);
       if (protoDate != null) {
         const sendToReceiveDuration = calculateSendToReceiveDuration(

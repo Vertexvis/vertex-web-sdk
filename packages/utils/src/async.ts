@@ -18,7 +18,7 @@ export async function delay(...args: unknown[]): Promise<unknown> {
 
   if (typeof ms === 'number') {
     const promise = args[1];
-    const delay = new Promise(resolve => setTimeout(resolve, ms));
+    const delay = new Promise((resolve) => setTimeout(resolve, ms));
     if (promise != null) {
       await delay;
       return promise;
