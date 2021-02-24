@@ -4,7 +4,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 export function ifRequestId(
   f: (id: string) => RequestMessageHandler
 ): RequestMessageHandler {
-  return req => {
+  return (req) => {
     const reqId = req.request.requestId?.value;
     if (reqId != null) {
       f(reqId)(req);
@@ -17,7 +17,7 @@ export function ifDrawFrame(
     frame: vertexvis.protobuf.stream.IDrawFramePayload
   ) => RequestMessageHandler
 ): RequestMessageHandler {
-  return req => {
+  return (req) => {
     const { drawFrame } = req.request;
 
     if (drawFrame != null) {

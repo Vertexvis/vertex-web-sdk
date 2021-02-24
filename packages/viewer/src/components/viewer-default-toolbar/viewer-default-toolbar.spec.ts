@@ -103,7 +103,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
 
     page.root?.shadowRoot
       ?.querySelectorAll('vertex-viewer-toolbar-group')
-      .forEach(group => {
+      .forEach((group) => {
         expect(group.dataset.direction).toBe('vertical');
         expect(group).toEqualAttribute('direction', 'vertical');
       });

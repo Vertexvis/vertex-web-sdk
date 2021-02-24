@@ -72,7 +72,7 @@ describe(MouseInteractionHandler, () => {
     jest.resetAllMocks();
     jest.clearAllMocks();
 
-    api.scalePixelThreshold = jest.fn(n => n);
+    api.scalePixelThreshold = jest.fn((n) => n);
     handler.setPrimaryInteractionType('rotate');
     handler.initialize(div, api);
   });
@@ -173,6 +173,6 @@ describe(MouseInteractionHandler, () => {
   }
 
   function delay(milliseconds: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 });
