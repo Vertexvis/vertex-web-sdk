@@ -9,7 +9,7 @@ import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 const PI_OVER_360 = 0.008726646259972;
 
 interface CameraRenderOptions {
-  animation: Animation.Animation;
+  animation?: Animation.Animation;
 }
 
 export class TerminalFlyToExecutor {
