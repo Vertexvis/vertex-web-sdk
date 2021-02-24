@@ -28,7 +28,7 @@ export class StreamApiEventDispatcher<T> {
   }
 
   public off(listener: Listener<T>): void {
-    this.listeners = this.listeners.filter(l => l !== listener);
+    this.listeners = this.listeners.filter((l) => l !== listener);
     if (this.listeners.length === 0) {
       this.removeListeners();
     }
@@ -38,7 +38,7 @@ export class StreamApiEventDispatcher<T> {
     let handler: (data: T) => void;
     return Async.timeout(
       this.timeout,
-      new Promise<T>(resolve => {
+      new Promise<T>((resolve) => {
         handler = (data: T) => {
           listener?.(data);
           resolve(data);
@@ -54,7 +54,7 @@ export class StreamApiEventDispatcher<T> {
 
   private handleMessage(msg: vertexvis.protobuf.stream.IStreamMessage): void {
     if (this.predicate(msg)) {
-      this.listeners.forEach(l => l(this.transform(msg)));
+      this.listeners.forEach((l) => l(this.transform(msg)));
     }
   }
 

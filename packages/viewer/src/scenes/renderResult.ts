@@ -20,17 +20,17 @@ export class RenderResult implements Result {
   ) {
     this.onAnimationCompleted = new StreamApiEventDispatcher(
       stream,
-      msg => msg.event?.animationCompleted?.animationId?.hex === animationId,
-      msg => msg.event?.animationCompleted?.animationId?.hex || undefined,
+      (msg) => msg.event?.animationCompleted?.animationId?.hex === animationId,
+      (msg) => msg.event?.animationCompleted?.animationId?.hex || undefined,
       timeout
     );
     this.onFrameReceived = new StreamApiEventDispatcher(
       stream,
-      msg =>
+      (msg) =>
         !!msg.request?.drawFrame?.frameCorrelationIds?.some(
-          id => id === correlationId
+          (id) => id === correlationId
         ),
-      msg =>
+      (msg) =>
         msg.request?.drawFrame != null
           ? Frame.fromProto(msg.request?.drawFrame)
           : undefined,

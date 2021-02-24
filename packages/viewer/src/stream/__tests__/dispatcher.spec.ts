@@ -14,11 +14,11 @@ describe(StreamApiEventDispatcher, () => {
   const stream = new StreamApi(mockWs);
   const dispatcher = new StreamApiEventDispatcher(
     stream,
-    msg =>
+    (msg) =>
       msg.request.drawFrame.frameCorrelationIds.some(
-        id => id === correlationId
+        (id) => id === correlationId
       ),
-    msg =>
+    (msg) =>
       msg.request.drawFrame != null
         ? Frame.fromProto(msg.request.drawFrame)
         : undefined,
