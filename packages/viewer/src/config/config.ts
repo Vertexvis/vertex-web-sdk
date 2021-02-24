@@ -1,6 +1,6 @@
 import { Objects, DeepPartial } from '@vertexvis/utils';
 import { Environment } from './environment';
-import { Animation, Flags, Events } from '../types';
+import { Animation, Flags, Events, Interactions } from '../types';
 import { FrameDeliverySettings } from '@vertexvis/stream-api';
 import {
   AdaptiveRenderingSettings,
@@ -17,6 +17,7 @@ export interface Config {
   flags: Flags.Flags;
   events: Events.EventConfig;
   animation: Animation.AnimationConfig;
+  interactions: Interactions.InteractionConfig;
   EXPERIMENTAL_frameDelivery: Omit<
     FrameDeliverySettings,
     'rateLimitingEnabled'
@@ -37,6 +38,7 @@ const platdevConfig: Config = {
   flags: Flags.defaultFlags,
   events: Events.defaultEventConfig,
   animation: Animation.defaultAnimationConfig,
+  interactions: Interactions.defaultInteractionConfig,
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
@@ -50,6 +52,7 @@ const platprodConfig: Config = {
   flags: Flags.defaultFlags,
   events: Events.defaultEventConfig,
   animation: Animation.defaultAnimationConfig,
+  interactions: Interactions.defaultInteractionConfig,
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},

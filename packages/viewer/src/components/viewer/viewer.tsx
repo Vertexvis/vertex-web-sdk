@@ -965,6 +965,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
+      () => this.getConfig().interactions,
       () => this.createScene(),
       this.tap,
       this.doubletap,

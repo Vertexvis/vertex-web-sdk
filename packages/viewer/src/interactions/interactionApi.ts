@@ -3,8 +3,11 @@ import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
+import { Interactions } from '../types';
 
 type SceneProvider = () => Scene;
+
+type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (
   camera: Camera,
@@ -20,6 +23,7 @@ export class InteractionApi {
 
   public constructor(
     private stream: StreamApi,
+    private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
@@ -191,6 +195,30 @@ export class InteractionApi {
     return this.currentCamera != null;
   }
 
+  /**
+   * Scales the provided `pixelThreshold` by the device's pixel ratio
+   * and the configured `coarsePointerThresholdScale` value if the
+   * primary pointer input is coarse (touch, stylus, etc).
+   *
+   * Scales the provided `pixelThreshold` by the configured 
+   * `finePointerThresholdScale` value if the primary pointer input is 
+   * fine (mouse).
+   *
+   * @param pixelThreshold - The pixel threshold to scale.
+   * @returns The scaled pixel threshold.
+   */
+  public scalePixelThreshold(pixelThreshold: number): number {
+    if (this.isCoarseInputDevice()) {
+      return (
+        pixelThreshold *
+        window.devicePixelRatio *
+        this.getConfig().coarsePointerThresholdScale
+      );
+    } else {
+      return pixelThreshold * this.getConfig().finePointerThresholdScale;
+    }
+  }
+
   private emitTapEvent(
     emit: (details: TapEventDetails) => void,
     position: Point.Point,
@@ -209,5 +237,9 @@ export class InteractionApi {
       metaKey,
       shiftKey,
     });
+  }
+
+  private isCoarseInputDevice(): boolean {
+    return window.matchMedia('(pointer: coarse)').matches;
   }
 }

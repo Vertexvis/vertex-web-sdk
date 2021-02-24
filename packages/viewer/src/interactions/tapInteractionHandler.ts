@@ -129,9 +129,10 @@ export class TapInteractionHandler implements InteractionHandler {
   private handlePointerMove(position: Point.Point): void {
     // Ignore pointer end events for this associated touch start
     // since the distance from the start is large enough
+    const threshold = this.interactionApi?.scalePixelThreshold(2) || 2;
     if (
       this.pointerDownPosition != null &&
-      Point.distance(position, this.pointerDownPosition) >= 2
+      Point.distance(position, this.pointerDownPosition) >= threshold
     ) {
       this.clearPositions();
     }
@@ -171,9 +172,10 @@ export class TapInteractionHandler implements InteractionHandler {
       pointerDownPosition?: Point.Point
     ): void => {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
+      const threshold = this.interactionApi?.scalePixelThreshold(1) || 1;
       if (
         downPosition != null &&
-        Point.distance(downPosition, pointerUpPosition) <= 1
+        Point.distance(downPosition, pointerUpPosition) <= threshold
       ) {
         const position = this.getCanvasPosition(pointerUpPosition);
         if (position != null && emitter != null) {

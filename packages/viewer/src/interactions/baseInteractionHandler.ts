@@ -17,6 +17,8 @@ type InteractionType = 'rotate' | 'zoom' | 'pan';
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
+const DEFAULT_COARSE_INPUT_PIXEL_SCALE = 2;
+const DEFAULT_FINE_INPUT_PIXEL_SCALE = 1;
 
 export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
@@ -99,9 +101,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     const position = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
+    const pixelThreshold =
+      this.interactionApi != null
+        ? this.interactionApi.scalePixelThreshold(2)
+        : 2;
     if (
       this.downPosition != null &&
-      Point.distance(position, this.downPosition) >= 2 &&
+      Point.distance(position, this.downPosition) >= pixelThreshold &&
       !this.isDragging
     ) {
       this.beginDrag(event);
