@@ -153,8 +153,8 @@ describe(Camera, () => {
 
     it('should support fly to with sceneItemId', async () => {
       const id = UUID.create();
-      await camera
-        .flyTo(q => q.withItemId(id))
+      newCamera
+        .flyTo((q) => q.withItemId(id))
         .render({
           animation: {
             milliseconds: 500,
@@ -175,8 +175,8 @@ describe(Camera, () => {
     });
 
     it('should support fly to suppliedId with animations', async () => {
-      await camera
-        .flyTo(q => q.withSuppliedId('suppliedId'))
+      camera
+        .flyTo((q) => q.withSuppliedId('suppliedId'))
         .render({
           animation: {
             milliseconds: 500,

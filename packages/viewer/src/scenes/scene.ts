@@ -149,7 +149,7 @@ export class ItemsOperationExecutor {
   ) {}
 
   public async execute(): Promise<void> {
-    const pbOperations = this.queryOperations.map(op =>
+    const pbOperations = this.queryOperations.map((op) =>
       buildSceneOperation(op.query, op.operations)
     );
     const request = {

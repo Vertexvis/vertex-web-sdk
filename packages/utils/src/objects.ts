@@ -87,7 +87,7 @@ export function toPairs<T>(obj: T[]): Array<[string, T]>;
 export function toPairs(obj: object | null | undefined): Array<[string, any]>;
 export function toPairs(obj: any): Array<[string, any]> {
   if (obj != null) {
-    return Object.keys(obj).map(key => [key, obj[key]]);
+    return Object.keys(obj).map((key) => [key, obj[key]]);
   } else {
     return [];
   }
