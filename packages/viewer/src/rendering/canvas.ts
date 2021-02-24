@@ -105,7 +105,7 @@ export function measureCanvasRenderer(
     }, 1000);
   }
 
-  return (data) => {
+  return data => {
     start();
     return meter
       .measure(async () => {
@@ -120,7 +120,7 @@ export function measureCanvasRenderer(
 export function createCanvasRenderer(): CanvasRenderer {
   let lastFrameNumber: number | undefined;
 
-  return async (data) => {
+  return async data => {
     const frameNumber = data.frame.sequenceNumber;
     const image = await loadImageBytes(data.frame.image);
 
