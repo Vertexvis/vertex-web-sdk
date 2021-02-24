@@ -190,7 +190,7 @@ export class Camera implements FrameCamera.FrameCamera {
             correlationId: corrId,
             animationId: flyToResponse.flyTo?.animationId?.hex || undefined,
           },
-          renderOptions?.animation.milliseconds != null
+          renderOptions?.animation?.milliseconds != null
             ? renderOptions.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS
             : undefined
         );
