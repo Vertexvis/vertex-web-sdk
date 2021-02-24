@@ -19,7 +19,7 @@ export function resetAwaiter(scene: Scene): void {
     return Promise.resolve(scene);
   });
 
-  awaitScene = new Promise(resolve => {
+  awaitScene = new Promise((resolve) => {
     resolveScene = resolve;
   });
 }

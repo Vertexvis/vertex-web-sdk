@@ -38,7 +38,7 @@ export class WebSocketClientMock implements WebSocketClient {
    * @param data The websocket message data.
    */
   public receiveMessage(data: WebSocketSendData): void {
-    this.handlers.forEach(handler =>
+    this.handlers.forEach((handler) =>
       handler(new MessageEvent('message', { data }))
     );
   }
