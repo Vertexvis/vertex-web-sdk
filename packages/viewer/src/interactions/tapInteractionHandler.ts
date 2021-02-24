@@ -265,7 +265,7 @@ export class TapInteractionHandler implements InteractionHandler {
   }
 
   private isTouch(event: BaseEvent): boolean {
-    return event instanceof PointerEvent
+    return window.PointerEvent != null && event instanceof PointerEvent
       ? event.pointerType === 'touch'
       : false;
   }
