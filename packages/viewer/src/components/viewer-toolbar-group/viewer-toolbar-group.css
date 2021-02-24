@@ -1,0 +1,13 @@
+.inner {
+  display: flex;
+  align-items: center;
+  margin: auto;
+}
+
+.inner.vertical {
+  flex-direction: column;
+}
+
+.inner.horizontal {
+  flex-direction: row;
+}
