@@ -11,7 +11,9 @@ describe(TwistInteractionHandler, () => {
   it('Returns true for its predicate with Command or Control pressed', () => {
     expect(twistInteractionHandler.predicate({ Alt: true })).toBe(false);
     expect(twistInteractionHandler.predicate({ Shift: true })).toBe(false);
-    expect(twistInteractionHandler.predicate({ Alt: true , Shift: true})).toBe(true);
+    expect(twistInteractionHandler.predicate({ Alt: true, Shift: true })).toBe(
+      true
+    );
   });
 
   it('should set the base interaction to be twist', async () => {
@@ -23,6 +25,8 @@ describe(TwistInteractionHandler, () => {
   it('should reset the base interaction to be rotate', async () => {
     await twistInteractionHandler.reset();
 
-    expect(baseInteractionHandler.getPrimaryInteractionType()).toEqual('rotate');
+    expect(baseInteractionHandler.getPrimaryInteractionType()).toEqual(
+      'rotate'
+    );
   });
 });
