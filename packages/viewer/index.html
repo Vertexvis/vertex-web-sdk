@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Stencil Component Starter</title>
+
+    <link
+      rel="stylesheet"
+      href="http://localhost:3333/dist/viewer/viewer.css"
+    />
+    <script
+      type="module"
+      src="http://localhost:3333/dist/viewer/viewer.esm.js"
+    ></script>
+    <script nomodule src="http://localhost:3333/dist/viewer.js"></script>
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      .box {
+        background-color: red;
+        width: 24px;
+        height: 24px;
+      }
+    </style>
+
+    <script type="module">
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
+
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+        const viewer = document.querySelector('#viewer');
+      }
+    </script>
+  </head>
+
+  <body>
+    <vertex-viewer
+      id="viewer"
+      config-env="platdev"
+      client-id="client-id"
+      src="urn:vertexvis:stream-key:key"
+    >
+      <vertex-viewer-default-toolbar
+        placement="bottom-left"
+        direction="vertical"
+      ></vertex-viewer-default-toolbar>
+    </vertex-viewer>
+  </body>
+</html>
