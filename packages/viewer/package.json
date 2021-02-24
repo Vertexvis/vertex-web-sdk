@@ -33,6 +33,7 @@
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
     "build": "stencil build --docs",
+    "postbuild": "cp ./dist/esm/index.js ./dist/esm/index.mjs && cp ./dist/esm/loader.js ./dist/esm/loader.mjs",
     "start": "stencil build --dev --watch --serve",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
