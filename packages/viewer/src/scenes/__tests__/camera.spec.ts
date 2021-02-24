@@ -153,7 +153,7 @@ describe(Camera, () => {
 
     it('should support fly to with sceneItemId', async () => {
       const id = UUID.create();
-      newCamera
+      camera
         .flyTo((q) => q.withItemId(id))
         .render({
           animation: {
