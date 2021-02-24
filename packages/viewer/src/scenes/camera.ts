@@ -164,7 +164,7 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public async render(
     renderOptions?: CameraRenderOptions
-  ): Promise<RenderResult | undefined> {
+  ): Promise<RenderResult> {
     if (this.flyToOptions == null && renderOptions != null) {
       this.flyToOptions = {
         flyTo: {
@@ -205,7 +205,8 @@ export class Camera implements FrameCamera.FrameCamera {
         });
       }
     } catch (e) {
-      console.warn('Error when requesting new frame: ', e);
+      console.warn('Error when performing render: ', e);
+      throw e;
     }
   }
 

@@ -8,7 +8,8 @@ export interface RenderResultIds {
   correlationId?: string;
 }
 
-export class RenderResult extends Result {
+export class RenderResult implements Result {
+  public data = undefined;
   public onAnimationCompleted: StreamApiEventDispatcher<string | undefined>;
   public onFrameReceived: StreamApiEventDispatcher<Frame.Frame | undefined>;
 
@@ -17,8 +18,6 @@ export class RenderResult extends Result {
     { animationId, correlationId }: RenderResultIds,
     timeout?: number
   ) {
-    super(undefined, stream);
-
     this.onAnimationCompleted = new StreamApiEventDispatcher(
       stream,
       msg => msg.event?.animationCompleted?.animationId?.hex === animationId,
