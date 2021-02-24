@@ -84,7 +84,7 @@ export class BulkQuery implements TerminalQuery {
   public build(): QueryExpression {
     return {
       type: 'or',
-      expressions: this.ids.map(id => {
+      expressions: this.ids.map((id) => {
         return {
           type: this.type,
           value: id,

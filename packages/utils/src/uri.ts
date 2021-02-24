@@ -90,7 +90,7 @@ export const addQueryEntry = (query: QueryEntry, uri: Uri): Uri => {
     return {
       ...uri,
       query: newQuery
-        .map(entry => entry.map(encodeURIComponent).join('='))
+        .map((entry) => entry.map(encodeURIComponent).join('='))
         .join('&'),
     };
   } else {
@@ -131,8 +131,8 @@ export const queryAsArray = (uri: Uri): QueryEntry[] => {
 const stringAsQueryArray = (queryString: string): QueryEntry[] => {
   return queryString
     .split('&')
-    .map(param =>
-      param.split('=').map(value => decodeURIComponent(value))
+    .map((param) =>
+      param.split('=').map((value) => decodeURIComponent(value))
     ) as QueryEntry[];
 };
 
@@ -176,7 +176,7 @@ export const toString = (uri: Uri): string => {
 };
 
 const sanitizePath = (path: string[]): string[] => {
-  return path.filter(segment => segment.length > 0);
+  return path.filter((segment) => segment.length > 0);
 };
 
 const mapAsEntries = (map: Record<string, any>): QueryEntry[] => {

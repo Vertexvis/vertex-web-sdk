@@ -200,7 +200,7 @@ describe(ZoomInteraction, () => {
     const timeoutDelay = 50;
 
     function delay(): Promise<void> {
-      return new Promise(resolve => setTimeout(resolve, timeoutDelay + 10));
+      return new Promise((resolve) => setTimeout(resolve, timeoutDelay + 10));
     }
 
     it('only begins interaction once within interaction timeout', async () => {
