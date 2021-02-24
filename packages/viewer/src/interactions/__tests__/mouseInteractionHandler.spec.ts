@@ -7,17 +7,19 @@ import {
   PanInteraction,
   ZoomInteraction,
   RotateInteraction,
+  TwistInteraction,
 } from '../mouseInteractions';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
-
+const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
   const zoomInteraction = new ZoomInteractionMock();
   const panInteraction = new PanInteractionMock();
+  const twistInteraction = new TwistInteractionMock();
   const api = new InteractionApiMock();
 
   const div = document.createElement('div');
@@ -65,7 +67,8 @@ describe(MouseInteractionHandler, () => {
   const handler = new MouseInteractionHandler(
     rotateInteraction,
     zoomInteraction,
-    panInteraction
+    panInteraction,
+    twistInteraction
   );
 
   beforeEach(() => {
@@ -94,6 +97,13 @@ describe(MouseInteractionHandler, () => {
     expect(panInteraction.beginDrag).toHaveBeenCalledTimes(1);
     expect(panInteraction.drag).toHaveBeenCalledTimes(1);
     expect(panInteraction.endDrag).toHaveBeenCalledTimes(1);
+  });
+
+  it('defaults to a twist op with shift+alt and a drag op', () => {
+    simulateShiftAltMove();
+    expect(twistInteraction.beginDrag).toHaveBeenCalledTimes(1);
+    expect(twistInteraction.drag).toHaveBeenCalledTimes(1);
+    expect(twistInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
   it('removes window listeners on mouse up', () => {
@@ -161,6 +171,29 @@ describe(MouseInteractionHandler, () => {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMovePrimaryButton1);
     window.dispatchEvent(mouseMovePrimaryButton2);
+    window.dispatchEvent(mouseUp);
+  }
+
+  function simulateShiftAltMove(): void {
+    const shiftAltPrimaryMove1 = new MouseEvent('mousemove', {
+      screenX: 110,
+      screenY: 60,
+      buttons: 1,
+      bubbles: true,
+      shiftKey: true,
+      altKey: true,
+    });
+    const shiftAltPrimaryMove2 = new MouseEvent('mousemove', {
+      screenX: 115,
+      screenY: 65,
+      buttons: 1,
+      bubbles: true,
+      shiftKey: true,
+      altKey: true,
+    });
+    div.dispatchEvent(mouseDown);
+    window.dispatchEvent(shiftAltPrimaryMove1);
+    window.dispatchEvent(shiftAltPrimaryMove2);
     window.dispatchEvent(mouseUp);
   }
 

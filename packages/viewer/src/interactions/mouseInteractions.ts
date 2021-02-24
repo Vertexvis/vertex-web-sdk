@@ -1,7 +1,6 @@
 import { InteractionApi } from './interactionApi';
 import { Point, Vector3, Angle } from '@vertexvis/geometry';
 
-
 export class MouseInteraction {
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     // noop
@@ -32,35 +31,13 @@ export class RotateInteraction extends MouseInteraction {
     }
   }
 
-
   public drag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition != null) {
-      
-      if (event.shiftKey && event.altKey) {
-        const position  = Point.create(event.screenX, event.screenY);
-        api.transformCamera((camera, viewport) => {
-          const center = Point.create(
-            viewport.width / 2,
-            viewport.height / 2
-          );
-          const currentAngle = Angle.fromPoints(center, position);
-          const angleDelta = this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+      const position = Point.create(event.screenX, event.screenY);
+      const delta = Point.subtract(position, this.currentPosition);
 
-          this.lastAngle = currentAngle;
-          const axis = Vector3.normalize(
-            Vector3.subtract(camera.lookAt, camera.position)
-          );
-          const angleInRadians = Angle.toRadians(-angleDelta);
-          return camera.rotateAroundAxis(angleInRadians, axis);
-        });
-
-      } else {
-        const position = Point.create(event.screenX, event.screenY);
-        const delta = Point.subtract(position, this.currentPosition);
-  
-        api.rotateCamera(delta);
-        this.currentPosition = position;
-      }
+      api.rotateCamera(delta);
+      this.currentPosition = position;
     }
   }
 
@@ -163,6 +140,41 @@ export class PanInteraction extends MouseInteraction {
       api.panCamera(delta);
       this.currentPosition = position;
     }
+  }
+
+  public endDrag(event: MouseEvent, api: InteractionApi): void {
+    if (this.currentPosition != null) {
+      api.endInteraction();
+      this.currentPosition = undefined;
+    }
+  }
+}
+
+export class TwistInteraction extends MouseInteraction {
+  private currentPosition: Point.Point | undefined;
+
+  private lastAngle: number | undefined;
+
+  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+    this.currentPosition = Point.create(event.screenX, event.screenY);
+    api.beginInteraction();
+  }
+
+  public drag(event: MouseEvent, api: InteractionApi): void {
+    const position = Point.create(event.screenX, event.screenY);
+    api.transformCamera((camera, viewport) => {
+      const center = Point.create(viewport.width / 2, viewport.height / 2);
+      const currentAngle = Angle.fromPoints(center, position);
+      const angleDelta =
+        this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+
+      this.lastAngle = currentAngle;
+      const axis = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+      const angleInRadians = Angle.toRadians(-angleDelta);
+      return camera.rotateAroundAxis(angleInRadians, axis);
+    });
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {

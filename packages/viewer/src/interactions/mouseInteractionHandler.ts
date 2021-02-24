@@ -3,13 +3,15 @@ import {
   RotateInteraction,
   ZoomInteraction,
   PanInteraction,
+  TwistInteraction,
 } from './mouseInteractions';
 
 export class MouseInteractionHandler extends BaseInteractionHandler {
   public constructor(
     rotateInteraction = new RotateInteraction(),
     zoomInteraction = new ZoomInteraction(),
-    panInteraction = new PanInteraction()
+    panInteraction = new PanInteraction(),
+    twistInteraction = new TwistInteraction()
   ) {
     super(
       'mousedown',
@@ -17,7 +19,8 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       'mousemove',
       rotateInteraction,
       zoomInteraction,
-      panInteraction
+      panInteraction,
+      twistInteraction
     );
   }
 }

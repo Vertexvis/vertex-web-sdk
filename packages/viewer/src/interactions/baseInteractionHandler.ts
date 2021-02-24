@@ -7,12 +7,13 @@ import {
   ZoomInteraction,
   PanInteraction,
   MouseInteraction,
+  TwistInteraction,
 } from './mouseInteractions';
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 
-type InteractionType = 'rotate' | 'zoom' | 'pan';
+type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -39,7 +40,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected moveEvent: 'mousemove' | 'pointermove',
     private rotateInteraction: RotateInteraction,
     private zoomInteraction: ZoomInteraction,
-    private panInteraction: PanInteraction
+    private panInteraction: PanInteraction,
+    private twistInteraction: TwistInteraction
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
@@ -79,6 +81,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         break;
       case 'pan':
         this.primaryInteraction = this.panInteraction;
+        break;
+      case 'twist':
+        this.primaryInteraction = this.twistInteraction;
         break;
     }
     this.primaryInteractionTypeChange.emit();
@@ -127,10 +132,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected beginDrag(event: BaseEvent): void {
-    if (event.buttons === 1) {
-      this.draggingInteraction = this.primaryInteraction;
-    } else if (event.buttons === 2) {
-      this.draggingInteraction = this.panInteraction;
+    if (event.shiftKey && event.altKey) {
+      this.draggingInteraction = this.twistInteraction;
+    } else {
+      if (event.buttons === 1) {
+        this.draggingInteraction = this.primaryInteraction;
+      } else if (event.buttons === 2) {
+        this.draggingInteraction = this.panInteraction;
+      }
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
