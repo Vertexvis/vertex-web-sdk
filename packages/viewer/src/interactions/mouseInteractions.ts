@@ -2,6 +2,16 @@ import { InteractionApi } from './interactionApi';
 import { Point } from '@vertexvis/geometry';
 
 export class MouseInteraction {
+  protected currentPosition: Point.Point | undefined;
+
+  public setPosition(position?: Point.Point): void {
+    this.currentPosition = position;
+  }
+
+  public getPosition(): Point.Point | undefined {
+    return this.currentPosition;
+  }
+
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     // noop
   }
@@ -20,8 +30,6 @@ export class MouseInteraction {
 }
 
 export class RotateInteraction extends MouseInteraction {
-  private currentPosition: Point.Point | undefined;
-
   private lastAngle: number | undefined;
 
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
@@ -52,8 +60,6 @@ export class RotateInteraction extends MouseInteraction {
 export class ZoomInteraction extends MouseInteraction {
   private didTransformBegin = false;
   private interactionTimer: number | undefined;
-
-  private currentPosition: Point.Point | undefined;
 
   public constructor(private interactionTimeout = 1000) {
     super();
@@ -123,8 +129,6 @@ export class ZoomInteraction extends MouseInteraction {
 }
 
 export class PanInteraction extends MouseInteraction {
-  private currentPosition: Point.Point | undefined;
-
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -151,8 +155,6 @@ export class PanInteraction extends MouseInteraction {
 }
 
 export class TwistInteraction extends MouseInteraction {
-  private currentPosition: Point.Point | undefined;
-
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     this.currentPosition = Point.create(event.screenX, event.screenY);
     api.beginInteraction();

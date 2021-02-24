@@ -16,6 +16,7 @@ import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
 import { KeyInteraction, KeyInteractionWithReset } from "./interactions/keyInteraction";
+import { BaseInteractionHandler } from "./interactions/baseInteractionHandler";
 import { Scene } from "./scenes/scene";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -43,6 +44,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
+        "getBaseInteractionHandler": () => Promise<BaseInteractionHandler | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;

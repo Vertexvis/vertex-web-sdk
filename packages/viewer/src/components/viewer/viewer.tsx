@@ -541,6 +541,13 @@ export class Viewer {
   }
 
   @Method()
+  public async getBaseInteractionHandler(): Promise<
+    BaseInteractionHandler | undefined
+  > {
+    return this.baseInteractionHandler;
+  }
+
+  @Method()
   public async getJwt(): Promise<string | undefined> {
     return this.jwt;
   }
