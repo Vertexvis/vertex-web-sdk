@@ -72,6 +72,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   public setPrimaryInteractionType(type: InteractionType): void {
     this.primaryInteractionType = type;
+    console.log('SETTING: ', type);
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
@@ -82,9 +83,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       case 'pan':
         this.primaryInteraction = this.panInteraction;
         break;
-      // case 'twist':
-      //   this.primaryInteraction = this.twistInteraction;
-      //   break;
+      case 'twist':
+        this.primaryInteraction = this.twistInteraction;
+        break;
     }
     this.primaryInteractionTypeChange.emit();
   }
@@ -132,14 +133,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected beginDrag(event: BaseEvent): void {
-    if (event.shiftKey && event.altKey) {
-      this.draggingInteraction = this.twistInteraction;
-    } else {
-      if (event.buttons === 1) {
-        this.draggingInteraction = this.primaryInteraction;
-      } else if (event.buttons === 2) {
-        this.draggingInteraction = this.panInteraction;
-      }
+    if (event.buttons === 1) {
+      this.draggingInteraction = this.primaryInteraction;
+    } else if (event.buttons === 2) {
+      this.draggingInteraction = this.panInteraction;
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
