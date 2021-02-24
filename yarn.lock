@@ -1754,7 +1754,7 @@
     eslint-plugin-prettier "^3.1.0"
     prettier "^1.19.1"
 
-"@vertexvis/frame-streaming-protos@^0.4.0":
+"@vertexvis/frame-streaming-protos@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.4.1.tgz#8432468e4cdc45035f31e5545adeaa1ce8bb8603"
   integrity sha512-GTDoM6P6U+Uo6llq4GDcEQDoPYSkbZqiGE5vXMRf+oG32g55Fqk+M5fmAzKPNT3zyJj2aFNyXuisNWRuJcF8rg==
