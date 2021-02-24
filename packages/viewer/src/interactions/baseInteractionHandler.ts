@@ -17,8 +17,6 @@ type InteractionType = 'rotate' | 'zoom' | 'pan';
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
-const DEFAULT_COARSE_INPUT_PIXEL_SCALE = 2;
-const DEFAULT_FINE_INPUT_PIXEL_SCALE = 1;
 
 export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;

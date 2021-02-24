@@ -200,8 +200,8 @@ export class InteractionApi {
    * and the configured `coarsePointerThresholdScale` value if the
    * primary pointer input is coarse (touch, stylus, etc).
    *
-   * Scales the provided `pixelThreshold` by the configured 
-   * `finePointerThresholdScale` value if the primary pointer input is 
+   * Scales the provided `pixelThreshold` by the configured
+   * `finePointerThresholdScale` value if the primary pointer input is
    * fine (mouse).
    *
    * @param pixelThreshold - The pixel threshold to scale.

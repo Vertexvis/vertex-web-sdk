@@ -5,6 +5,7 @@ import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
 import { frame } from '../../types/__fixtures__';
 import { StreamApi } from '@vertexvis/stream-api';
+import { Interactions } from '../../types';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
@@ -15,6 +16,8 @@ describe(InteractionApi, () => {
   const sceneViewId = 'scene-view-id';
   const scene = new Scene(streamApi, renderer, frame, sceneViewId);
   const sceneProvider = (): Scene => scene;
+  const interactionConfigProvider = (): Interactions.InteractionConfig =>
+    Interactions.defaultInteractionConfig;
 
   let api: InteractionApi;
 
@@ -24,6 +27,7 @@ describe(InteractionApi, () => {
 
     api = new InteractionApi(
       streamApi,
+      interactionConfigProvider,
       sceneProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
@@ -101,9 +105,14 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(streamApi, sceneProvider, {
-        emit: emitTap,
-      });
+      api = new InteractionApi(
+        streamApi,
+        interactionConfigProvider,
+        sceneProvider,
+        { emit: emitTap },
+        { emit: emitDoubleTap },
+        { emit: emitLongPress }
+      );
     });
 
     it('emits a tap event', async () => {
