@@ -16,5 +16,5 @@ export interface InteractionConfig {
 
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThresholdScale: 1,
-  coarsePointerThresholdScale: 2,
+  coarsePointerThresholdScale: 1.5,
 };
