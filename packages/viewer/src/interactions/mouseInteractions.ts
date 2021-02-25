@@ -3,8 +3,9 @@ import { Point } from '@vertexvis/geometry';
 import { InteractionType } from './baseInteractionHandler';
 
 export abstract class MouseInteraction {
+  protected currentPosition: Point.Point | undefined;
+
   protected abstract type: InteractionType;
-  protected abstract currentPosition: Point.Point | undefined;
 
   public setPosition(position?: Point.Point): void {
     this.currentPosition = position;
