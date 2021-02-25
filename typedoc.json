@@ -1,0 +1,19 @@
+{
+  "entryPoints": [
+    "./src/packages/utils/src/index.ts",
+    "./src/packages/viewer/src/index.ts",
+    "./src/packages/viewer/src/commands/index.ts",
+    "./src/packages/viewer/src/interactions/index.ts",
+    "./src/packages/viewer/src/scenes/index.ts",
+    "./src/packages/viewer/src/types/index.ts"
+  ],
+  "theme": "minimal",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "gitRevision": "master",
+  "readme": "readme.md",
+  "hideGenerator": true,
+  "out": "../../docs/packages/viewer"
+}
