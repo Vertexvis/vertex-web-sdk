@@ -42,7 +42,7 @@ describe(acknowledgeFrameRequests, () => {
       )
     );
 
-    const frame = mockWs.nextSent(d => decode(d as Uint8Array));
+    const frame = mockWs.nextSent((d) => decode(d as Uint8Array));
 
     expect(frame).toMatchObject({
       response: expect.objectContaining({
