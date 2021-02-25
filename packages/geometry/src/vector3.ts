@@ -49,7 +49,7 @@ export function create(...args: any[]): Vector3 {
  * component. A component is invalid if it contains a non-finite or NaN value.
  */
 export const isValid = ({ x, y, z }: Vector3): boolean => {
-  return [x, y, z].every((v) => isFinite(v) && !isNaN(v));
+  return [x, y, z].every(v => isFinite(v) && !isNaN(v));
 };
 
 /**

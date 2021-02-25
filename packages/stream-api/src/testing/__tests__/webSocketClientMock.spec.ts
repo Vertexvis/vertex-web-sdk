@@ -25,7 +25,7 @@ describe(WebSocketClientMock, () => {
 
     it('should decode message with decoder', () => {
       mock.send('123');
-      expect(mock.nextSent((str) => parseInt(str.toString()))).toBe(123);
+      expect(mock.nextSent(str => parseInt(str.toString()))).toBe(123);
     });
   });
 

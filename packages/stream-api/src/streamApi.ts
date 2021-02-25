@@ -57,7 +57,7 @@ export class StreamApi {
       url: appendSettingsToUrl(descriptor.url, settings),
     };
     await this.websocket.connect(desc);
-    this.messageSubscription = this.websocket.onMessage((message) => {
+    this.messageSubscription = this.websocket.onMessage(message => {
       this.handleMessage(message);
     });
 
@@ -394,7 +394,7 @@ export class StreamApi {
       const request = { ...req, requestId: { value: requestId } };
 
       return new Promise((resolve, reject) => {
-        const subscription = this.onResponse((msg) => {
+        const subscription = this.onResponse(msg => {
           if (requestId === msg.response.requestId?.value) {
             if (msg.response.error == null) {
               resolve(msg.response);

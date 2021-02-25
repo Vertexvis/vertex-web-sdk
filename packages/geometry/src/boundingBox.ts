@@ -25,7 +25,7 @@ export const create = (
 export const fromVectors = (
   vectors: Vector3.Vector3[]
 ): BoundingBox | undefined => {
-  return union(...vectors.map((v) => create(v, v)));
+  return union(...vectors.map(v => create(v, v)));
 };
 
 /**
