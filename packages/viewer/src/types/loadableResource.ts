@@ -45,7 +45,7 @@ export type QueryResource = SceneViewStateResource;
 
 function fromQuery(query?: string): QueryResource[] | undefined {
   if (query != null) {
-    return query.split('&').map((queryFragment) => {
+    return query.split('&').map(queryFragment => {
       const [resourceType, resourceId] = queryFragment.split('=');
 
       switch (resourceType) {

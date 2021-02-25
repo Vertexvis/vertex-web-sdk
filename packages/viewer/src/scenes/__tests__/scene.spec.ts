@@ -44,9 +44,7 @@ describe(Scene, () => {
     it('should execute commands and query by itemId', () => {
       const itemId = UUID.create();
 
-      scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
-        .execute();
+      scene.items(op => op.where(q => q.withItemId(itemId)).hide()).execute();
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
@@ -76,13 +74,18 @@ describe(Scene, () => {
       const itemId = UUID.create();
       const suppliedId = UUID.create();
       scene
-        .items((op) => [
-          op.where((q) => q.all()).hide(),
+        .items(op => [
+          op.where(q => q.all()).hide(),
           op
-            .where((q) => q.withItemId(itemId).or().withSuppliedId(suppliedId))
+            .where(q =>
+              q
+                .withItemId(itemId)
+                .or()
+                .withSuppliedId(suppliedId)
+            )
             .show(),
           op
-            .where((q) => q.all())
+            .where(q => q.all())
             .materialOverride(ColorMaterial.fromHex('#ff1122')),
         ])
         .execute();

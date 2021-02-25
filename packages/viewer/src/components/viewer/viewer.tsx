@@ -280,7 +280,7 @@ export class Viewer {
       try {
         this.streamSessionId = getStorageEntry(
           'vertexvis:stream-sessions',
-          (entry) => (this.clientId ? entry[this.clientId] : undefined)
+          entry => (this.clientId ? entry[this.clientId] : undefined)
         );
       } catch (e) {
         // Ignore the case where we can't access local storage for fetching a session
@@ -354,17 +354,17 @@ export class Viewer {
       <Host>
         <div class="viewer-container">
           <div
-            ref={(ref) => (this.containerElement = ref)}
+            ref={ref => (this.containerElement = ref)}
             class={classnames('canvas-container', {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
             <canvas
-              ref={(ref) => (this.canvasElement = ref)}
+              ref={ref => (this.canvasElement = ref)}
               class="canvas"
               width={canvasDimensions != null ? canvasDimensions.width : 0}
               height={canvasDimensions != null ? canvasDimensions.height : 0}
-              onContextMenu={(event) => event.preventDefault()}
+              onContextMenu={event => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -643,8 +643,8 @@ export class Viewer {
     const keyState = this.keyStateInteractionHandler?.getState();
     if (keyState != null) {
       this.tapKeyInteractions
-        .filter((i) => i.predicate(keyState))
-        .forEach((i) => i.fn(event.detail));
+        .filter(i => i.predicate(keyState))
+        .forEach(i => i.fn(event.detail));
     }
   }
 
@@ -779,7 +779,7 @@ export class Viewer {
       Metrics.paintTime,
       createCanvasRenderer(),
       this.getConfig().flags.logFrameRate,
-      (timings) => this.reportPerformance(timings)
+      timings => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
       this.resizeObserver?.observe(this.containerElement);
@@ -889,7 +889,7 @@ export class Viewer {
   }
 
   private registerSlotChangeListeners(): void {
-    this.mutationObserver = new MutationObserver((_) => this.injectViewerApi());
+    this.mutationObserver = new MutationObserver(_ => this.injectViewerApi());
     this.mutationObserver.observe(this.hostElement, {
       childList: true,
       subtree: true,
@@ -901,8 +901,8 @@ export class Viewer {
 
     if (slot != null) {
       getAssignedSlotNodes(slot)
-        .filter((node) => node.nodeName.startsWith('VERTEX-'))
-        .forEach((node) => {
+        .filter(node => node.nodeName.startsWith('VERTEX-'))
+        .forEach(node => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (node as any).viewer = this.hostElement;
         });
@@ -948,8 +948,8 @@ export class Viewer {
   }
 
   private waitNextDrawnFrame(timeout?: number): Promise<Frame.Frame> {
-    const frame = new Promise<Frame.Frame>((resolve) => {
-      const disposable = this.internalFrameDrawnDispatcher.on((frame) => {
+    const frame = new Promise<Frame.Frame>(resolve => {
+      const disposable = this.internalFrameDrawnDispatcher.on(frame => {
         resolve(frame);
         disposable.dispose();
       });
@@ -992,7 +992,7 @@ export class Viewer {
   private reportPerformance(timings: Timing[]): void {
     if (this.isStreamStarted) {
       const payload = {
-        timings: timings.map((t) => ({
+        timings: timings.map(t => ({
           receiveToPaintDuration: toProtoDuration(t.duration),
         })),
       };
@@ -1001,7 +1001,7 @@ export class Viewer {
   }
 
   private setupStreamListeners(): void {
-    this.stream.onRequest((msg) => this.handleStreamRequest(msg.request));
+    this.stream.onRequest(msg => this.handleStreamRequest(msg.request));
     this.stream.onRequest(
       acknowledgeFrameRequests(this.stream, () => this.clock)
     );

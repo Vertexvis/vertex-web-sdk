@@ -16,7 +16,7 @@ export function buildSceneOperation(
     case 'or':
       return {
         [query.type]: {
-          queries: query.expressions.map((exp) => ({
+          queries: query.expressions.map(exp => ({
             sceneItemQuery: buildSceneItemQuery(exp),
           })),
         },
@@ -118,7 +118,7 @@ export function buildFlyToOperation(
 function buildOperationTypes(
   operations: ItemOperation[]
 ): vertexvis.protobuf.stream.IOperationType[] {
-  return operations.map((op) => {
+  return operations.map(op => {
     switch (op.type) {
       case 'change-material':
         return {
