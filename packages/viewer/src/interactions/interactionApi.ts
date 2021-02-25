@@ -88,7 +88,7 @@ export class InteractionApi {
           ? t(this.currentCamera, scene.viewport())
           : undefined;
 
-      await this.currentCamera?.render();
+      this.currentCamera?.render();
     }
   }
 
@@ -204,8 +204,16 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
+      this.resetLastAngle();
       await this.stream.endInteraction();
     }
+  }
+
+  /**
+   * resets the last recorded angle for a twist op
+   */
+  public resetLastAngle(): void {
+    this.lastAngle = undefined;
   }
 
   /**

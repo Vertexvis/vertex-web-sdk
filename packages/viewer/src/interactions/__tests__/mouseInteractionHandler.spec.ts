@@ -167,29 +167,6 @@ describe(MouseInteractionHandler, () => {
     window.dispatchEvent(mouseUp);
   }
 
-  // function simulateShiftAltMove(): void {
-  //   const shiftAltPrimaryMove1 = new MouseEvent('mousemove', {
-  //     screenX: 110,
-  //     screenY: 60,
-  //     buttons: 1,
-  //     bubbles: true,
-  //     shiftKey: true,
-  //     altKey: true,
-  //   });
-  //   const shiftAltPrimaryMove2 = new MouseEvent('mousemove', {
-  //     screenX: 115,
-  //     screenY: 65,
-  //     buttons: 1,
-  //     bubbles: true,
-  //     shiftKey: true,
-  //     altKey: true,
-  //   });
-  //   div.dispatchEvent(mouseDown);
-  //   window.dispatchEvent(shiftAltPrimaryMove1);
-  //   window.dispatchEvent(shiftAltPrimaryMove2);
-  //   window.dispatchEvent(mouseUp);
-  // }
-
   function simulateSecondaryInteractions(): void {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton1);

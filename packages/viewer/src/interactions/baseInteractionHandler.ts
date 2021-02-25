@@ -90,6 +90,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.draggingInteraction) {
       const point = this.draggingInteraction.getPosition();
       this.draggingInteraction = this.primaryInteraction;
+      this.interactionApi?.resetLastAngle();
       this.draggingInteraction.setPosition(point);
     }
     this.primaryInteractionTypeChange.emit();

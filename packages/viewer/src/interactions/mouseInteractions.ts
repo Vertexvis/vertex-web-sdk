@@ -21,7 +21,10 @@ export class MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    // noop
+    if (this.currentPosition != null) {
+      api.endInteraction();
+      this.currentPosition = undefined;
+    }
   }
 
   public zoom(delta: number, api: InteractionApi): void {
@@ -50,10 +53,7 @@ export class RotateInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 }
 
@@ -83,10 +83,7 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 
   public zoom(delta: number, api: InteractionApi): void {
@@ -147,10 +144,7 @@ export class PanInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 }
 
@@ -162,13 +156,12 @@ export class TwistInteraction extends MouseInteraction {
 
   public drag(event: MouseEvent, api: InteractionApi): void {
     const position = Point.create(event.screenX, event.screenY);
+    this.currentPosition = position;
+
     api.twistCamera(position);
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 }
