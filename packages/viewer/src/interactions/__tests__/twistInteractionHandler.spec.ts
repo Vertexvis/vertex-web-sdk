@@ -19,13 +19,13 @@ describe(TwistInteractionHandler, () => {
   it('should set the base interaction to be twist', async () => {
     await twistInteractionHandler.fn();
 
-    expect(baseInteractionHandler.getPrimaryInteractionType()).toEqual('twist');
+    expect(baseInteractionHandler.getCurrentInteractionType()).toEqual('twist');
   });
 
   it('should reset the base interaction to be rotate', async () => {
     await twistInteractionHandler.reset();
 
-    expect(baseInteractionHandler.getPrimaryInteractionType()).toEqual(
+    expect(baseInteractionHandler.getCurrentInteractionType()).toEqual(
       'rotate'
     );
   });

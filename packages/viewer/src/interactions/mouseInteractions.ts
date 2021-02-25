@@ -1,8 +1,10 @@
 import { InteractionApi } from './interactionApi';
 import { Point } from '@vertexvis/geometry';
+import { InteractionType } from './baseInteractionHandler';
 
-export class MouseInteraction {
-  protected currentPosition: Point.Point | undefined;
+export abstract class MouseInteraction {
+  protected abstract type: InteractionType;
+  protected abstract currentPosition: Point.Point | undefined;
 
   public setPosition(position?: Point.Point): void {
     this.currentPosition = position;
@@ -10,6 +12,10 @@ export class MouseInteraction {
 
   public getPosition(): Point.Point | undefined {
     return this.currentPosition;
+  }
+
+  public getType(): InteractionType {
+    return this.type;
   }
 
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
@@ -33,7 +39,7 @@ export class MouseInteraction {
 }
 
 export class RotateInteraction extends MouseInteraction {
-  private lastAngle: number | undefined;
+  public type: InteractionType = 'rotate';
 
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
@@ -58,6 +64,8 @@ export class RotateInteraction extends MouseInteraction {
 }
 
 export class ZoomInteraction extends MouseInteraction {
+  public type: InteractionType = 'zoom';
+
   private didTransformBegin = false;
   private interactionTimer: number | undefined;
 
@@ -126,6 +134,8 @@ export class ZoomInteraction extends MouseInteraction {
 }
 
 export class PanInteraction extends MouseInteraction {
+  public type: InteractionType = 'pan';
+
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -149,6 +159,8 @@ export class PanInteraction extends MouseInteraction {
 }
 
 export class TwistInteraction extends MouseInteraction {
+  public type: InteractionType = 'twist';
+
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     this.currentPosition = Point.create(event.screenX, event.screenY);
     api.beginInteraction();

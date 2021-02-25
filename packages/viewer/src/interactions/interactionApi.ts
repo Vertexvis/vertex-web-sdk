@@ -88,7 +88,7 @@ export class InteractionApi {
           ? t(this.currentCamera, scene.viewport())
           : undefined;
 
-      this.currentCamera?.render();
+      await this.currentCamera?.render();
     }
   }
 

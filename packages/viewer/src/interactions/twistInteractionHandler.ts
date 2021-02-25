@@ -9,10 +9,10 @@ export class TwistInteractionHandler implements KeyInteractionWithReset {
   }
 
   public async fn(): Promise<void> {
-    this.baseInteractionHandler.setPrimaryInteractionType('twist');
+    this.baseInteractionHandler.setCurrentInteractionType('twist');
   }
 
   public async reset(): Promise<void> {
-    this.baseInteractionHandler.setPrimaryInteractionType('rotate');
+    this.baseInteractionHandler.setCurrentInteractionType(undefined);
   }
 }
