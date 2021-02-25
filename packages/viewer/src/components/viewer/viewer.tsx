@@ -239,6 +239,7 @@ export class Viewer {
   private streamSessionId?: UUID.UUID;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
+  private firstFrameCorrelationId?: string;
   private jwt?: string;
   private isStreamStarted = false;
 
@@ -562,6 +563,16 @@ export class Viewer {
     return this.createScene();
   }
 
+  /**
+   * The first frame drawn will be one that has a correlation ID of the one given
+   */
+  @Method()
+  public async setFirstFrameCorrelationId(
+    suppliedCorrelationId: string
+  ): Promise<void> {
+    this.firstFrameCorrelationId = suppliedCorrelationId;
+  }
+
   @Method()
   public async getFrame(): Promise<Frame.Frame | undefined> {
     return this.lastFrame;
@@ -708,7 +719,7 @@ export class Viewer {
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       Metrics.paintTime,
-      createCanvasRenderer(),
+      createCanvasRenderer(this.firstFrameCorrelationId),
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
@@ -869,7 +880,6 @@ export class Viewer {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
-
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.lastFrame = drawnFrame;

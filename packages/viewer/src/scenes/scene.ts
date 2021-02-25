@@ -15,6 +15,10 @@ import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
 
+interface SceneExecutionOptions {
+  suppliedCorrelationId?: string;
+}
+
 /**
  * A class that is responsible for building operations for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in order
@@ -148,16 +152,26 @@ export class ItemsOperationExecutor {
     private queryOperations: QueryOperation[]
   ) {}
 
-  public async execute(): Promise<void> {
+  public async execute(
+    executionOptions?: SceneExecutionOptions
+  ): Promise<void> {
     const pbOperations = this.queryOperations.map((op) =>
       buildSceneOperation(op.query, op.operations)
     );
-    const request = {
+    const request: vertexvis.protobuf.stream.ICreateSceneAlterationPayload = {
       sceneViewId: {
         hex: this.sceneViewId,
       },
       operations: pbOperations,
+      suppliedCorrelationId:
+        executionOptions?.suppliedCorrelationId != null
+          ? {
+              value: executionOptions?.suppliedCorrelationId,
+            }
+          : undefined,
     };
+
+    console.log('reguest:', request);
     await this.stream.createSceneAlteration(request);
   }
 }

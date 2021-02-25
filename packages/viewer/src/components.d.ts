@@ -83,6 +83,10 @@ export namespace Components {
          */
         "sessionId"?: string;
         /**
+          * The first frame drawn will be one that has a correlation ID of the one given
+         */
+        "setFirstFrameCorrelationId": (suppliedCorrelationId: string) => Promise<void>;
+        /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
