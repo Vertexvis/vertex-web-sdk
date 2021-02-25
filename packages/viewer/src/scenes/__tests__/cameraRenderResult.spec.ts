@@ -4,15 +4,15 @@ import {
   encode,
   Fixtures,
 } from '@vertexvis/stream-api';
-import { RenderResult } from '../renderResult';
+import { CameraRenderResult } from '../cameraRenderResult';
 import '../../testing/domMocks';
 
-describe(RenderResult, () => {
+describe(CameraRenderResult, () => {
   const correlationId = 'corr-id';
   const animationId = 'animation-id';
   const mockWs = new WebSocketClientMock();
   const stream = new StreamApi(mockWs);
-  const result = new RenderResult(
+  const result = new CameraRenderResult(
     stream,
     {
       correlationId,

@@ -3,7 +3,7 @@ import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
-import { RenderResult } from './cameraRenderResult';
+import { CameraRenderResult } from './cameraRenderResult';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 
 const PI_OVER_360 = 0.008726646259972;
@@ -164,7 +164,7 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public async render(
     renderOptions?: CameraRenderOptions
-  ): Promise<RenderResult> {
+  ): Promise<CameraRenderResult> {
     if (this.flyToOptions == null && renderOptions != null) {
       this.flyToOptions = {
         flyTo: {
@@ -184,7 +184,7 @@ export class Camera implements FrameCamera.FrameCamera {
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 
-        return new RenderResult(
+        return new CameraRenderResult(
           this.stream,
           {
             correlationId: corrId,
@@ -200,7 +200,7 @@ export class Camera implements FrameCamera.FrameCamera {
           frameCorrelationId: { value: corrId },
         });
 
-        return new RenderResult(this.stream, {
+        return new CameraRenderResult(this.stream, {
           correlationId: corrId,
         });
       }

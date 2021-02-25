@@ -8,10 +8,10 @@ export interface RenderResultIds {
   correlationId?: string;
 }
 
-export class RenderResult implements Result {
+export class CameraRenderResult implements Result {
   public data = undefined;
-  public onAnimationCompleted: StreamApiEventDispatcher<string | undefined>;
-  public onFrameReceived: StreamApiEventDispatcher<Frame.Frame | undefined>;
+  public onAnimationCompleted: StreamApiEventDispatcher<string>;
+  public onFrameReceived: StreamApiEventDispatcher<Frame.Frame>;
 
   public constructor(
     stream: StreamApi,
