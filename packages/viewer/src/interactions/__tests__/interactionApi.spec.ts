@@ -108,12 +108,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.twistCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.zoomCamera(1);
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
