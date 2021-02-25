@@ -1,3 +1,6 @@
+/**
+ * @module Stream API
+ */
 export * from './connection';
 
 export * from './encoder';

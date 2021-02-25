@@ -1,3 +1,6 @@
+/**
+ * @module Utils
+ */
 import * as Async from './async';
 import * as BinaryReader from './binaryReader';
 import * as Color from './color';
