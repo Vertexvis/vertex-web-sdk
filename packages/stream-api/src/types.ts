@@ -9,6 +9,10 @@ export type ResponseMessage = RequiredAndNonNullable<
   Pick<vertexvis.protobuf.stream.IStreamMessage, 'response' | 'sentAtTime'>
 >;
 
+export type EventMessage = RequiredAndNonNullable<
+  Pick<vertexvis.protobuf.stream.IStreamMessage, 'event' | 'sentAtTime'>
+>;
+
 export type StreamAttributes = vertexvis.protobuf.stream.IStreamAttributes;
 
 export type StartStreamPayload = DeepRequired<
@@ -72,3 +76,8 @@ export type DrawFrameResult = DeepRequired<
 export type ResponseResult = DrawFrameResult;
 
 export type ResponseError = vertexvis.protobuf.stream.IError;
+
+export type AnimationCompletedEvent = DeepRequired<
+  Pick<vertexvis.protobuf.stream.IAnimationCompletedEvent, 'animationId'>,
+  []
+>;
