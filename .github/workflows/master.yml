@@ -158,10 +158,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: "Install"
         run: "yarn install"
-      - name: "Build"
-        run: "yarn build"
       - name: "Generate docs"
-        run: "yarn typedocs"
+        run: "yarn generate:docs"
       - name: "Publish docs"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
