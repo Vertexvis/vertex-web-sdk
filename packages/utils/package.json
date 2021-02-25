@@ -33,8 +33,7 @@
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
     "test": "jest",
-    "test:coverage": "yarn test --coverage",
-    "typedocs": "typedoc"
+    "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
     "@types/uuid": "^3.4.3",

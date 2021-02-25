@@ -1,19 +1,18 @@
 {
+  "name": "Vertex Viewer SDK",
   "entryPoints": [
-    "./src/packages/utils/src/index.ts",
-    "./src/packages/viewer/src/index.ts",
-    "./src/packages/viewer/src/commands/index.ts",
-    "./src/packages/viewer/src/interactions/index.ts",
-    "./src/packages/viewer/src/scenes/index.ts",
-    "./src/packages/viewer/src/types/index.ts"
+    "./packages/geometry/src/index.ts",
+    "./packages/stream-api/src/index.ts",
+    "./packages/utils/src/index.ts",
+    "./packages/viewer/src/index.ts"
   ],
   "theme": "minimal",
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,
-  "includeVersion": true,
+  "includeVersion": false,
   "gitRevision": "master",
-  "readme": "readme.md",
   "hideGenerator": true,
-  "out": "../../docs/packages/viewer"
+  "readme": "none",
+  "out": "docs"
 }

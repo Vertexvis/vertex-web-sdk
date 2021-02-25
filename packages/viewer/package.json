@@ -42,9 +42,7 @@
     "test:coverage": "stencil test --spec --coverage .spec",
     "generate": "stencil generate",
     "generate:docs": "../../scripts/generate_docs.sh",
-    "release:stage": "yarn generate:docs",
-    "pretypedocs": "yarn build && rm -fr ../../docs/packages/viewer",
-    "typedocs": "typedoc --tsconfig tsconfig.docs.json"
+    "release:stage": "yarn generate:docs"
   },
   "dependencies": {
     "@juggle/resize-observer": "^3.3.0",

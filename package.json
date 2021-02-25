@@ -12,7 +12,7 @@
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc && yarn bootstrap",
     "generate:vscode-workspace": "./scripts/generate_vscode_workspace.sh",
-    "generate:docs": "lerna run generate:docs",
+    "generate:docs": "lerna run generate:docs && npx typedoc --tsconfig tsconfig.docs.json",
     "generate:npmrc": "./scripts/generate_npmrc.sh",
     "build": "lerna run build",
     "release": "./scripts/release.sh",
@@ -24,8 +24,7 @@
     "clean": "lerna clean",
     "bootstrap": "lerna bootstrap",
     "validate": "yarn build && yarn test && yarn lint",
-    "version:bump": "./scripts/version_bump.sh",
-    "typedocs": "lerna run typedocs"
+    "version:bump": "./scripts/version_bump.sh"
   },
   "workspaces": [
     "internal/*",

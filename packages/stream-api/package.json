@@ -32,8 +32,7 @@
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
     "test": "jest",
-    "test:coverage": "yarn test --coverage",
-    "typedocs": "typedoc"
+    "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
     "@vertexvis/frame-streaming-protos": "^0.4.1",

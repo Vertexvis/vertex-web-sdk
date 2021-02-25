@@ -33,8 +33,7 @@
     "start": "jest --watch",
     "test": "jest",
     "test:coverage": "yarn test --coverage",
-    "generate:docs": "../../scripts/generate_docs.sh",
-    "typedocs": "typedoc"
+    "generate:docs": "../../scripts/generate_docs.sh"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
