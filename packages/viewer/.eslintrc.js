@@ -1,5 +1,3 @@
-require('@vertexvis/eslint-config-vertexvis-typescript/patch');
-
 module.exports = {
   parserOptions: {
     ecmaFeatures: {

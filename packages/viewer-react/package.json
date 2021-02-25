@@ -37,9 +37,9 @@
   "devDependencies": {
     "@types/react": "^16.9.46",
     "@types/react-dom": "^16.9.8",
-    "@vertexvis/eslint-config-vertexvis-typescript": "^0.3.0",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.0",
     "@vertexwebsdk/build": "0.9.23",
-    "eslint": "^6.1.0",
+    "eslint": "^7.20.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "rollup": "^1.19.4"

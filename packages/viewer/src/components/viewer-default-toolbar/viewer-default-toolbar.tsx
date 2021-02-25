@@ -69,9 +69,6 @@ export class ViewerDefaultToolbar {
     const animation = this.animationsDisabled
       ? undefined
       : { milliseconds: this.animationMs };
-    scene
-      ?.camera()
-      .viewAll()
-      .render({ animation });
+    scene?.camera().viewAll().render({ animation });
   }
 }
