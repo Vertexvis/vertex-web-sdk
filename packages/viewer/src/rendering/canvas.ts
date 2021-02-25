@@ -118,10 +118,9 @@ export function measureCanvasRenderer(
 }
 
 export function createCanvasRenderer(
-  suppliedCorrelationId?: string
+  suppliedCorrelationIdProvider: () => string | undefined
 ): CanvasRenderer {
   let lastFrameNumber: number | undefined;
-  let waitForFrameWithCorId = suppliedCorrelationId != null;
 
   return async (data) => {
     const frameNumber = data.frame.sequenceNumber;
@@ -129,21 +128,18 @@ export function createCanvasRenderer(
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
-
-      if (waitForFrameWithCorId && suppliedCorrelationId != null) {
-        if (
-          waitForFrameWithCorId &&
-          data.frame.correlationIds.includes(suppliedCorrelationId)
-        ) {
-          waitForFrameWithCorId = false;
-          console.log(
-            'drawing frame with correlation id: ',
-            data.frame.correlationIds[0]
-          );
-          console.log(data.frame.imageAttributes.scaleFactor);
-          drawImage(image, data);
-        }
-      } else {
+      const currentCorrelationId = suppliedCorrelationIdProvider();
+      if (
+        currentCorrelationId &&
+        data.frame.correlationIds.includes(currentCorrelationId)
+      ) {
+        console.log(
+          'drawing frame with correlation id: ',
+          data.frame.correlationIds[0]
+        );
+        console.log(data.frame.imageAttributes.scaleFactor);
+        drawImage(image, data);
+      } else if (currentCorrelationId == null) {
         drawImage(image, data);
       }
     }
