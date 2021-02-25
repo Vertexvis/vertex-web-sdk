@@ -27,7 +27,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
   const requests = new Map<string, (resp: FrameResponse) => void>();
 
   api.onRequest(
-    ifDrawFrame(frame => msg => {
+    ifDrawFrame((frame) => (msg) => {
       const resp = {
         id:
           msg.request.requestId?.value != null
@@ -41,7 +41,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
       };
 
       if (frame.frameCorrelationIds) {
-        frame.frameCorrelationIds.forEach(id => {
+        frame.frameCorrelationIds.forEach((id) => {
           const callback = requests.get(id);
           if (callback != null) {
             callback(resp);
@@ -51,7 +51,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
     })
   );
 
-  return req => {
+  return (req) => {
     const corrId = req.correlationId || UUID.create();
     const timeout = req.timeoutInMs || DEFAULT_TIMEOUT_IN_MS;
     if (req.flyToOptions) {
@@ -60,7 +60,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         req.flyToOptions,
         req.animation
       );
-      const update = new Promise<FrameResponse>(resolve => {
+      const update = new Promise<FrameResponse>((resolve) => {
         requests.set(corrId, resolve);
         api.flyTo(payload, false);
       });
@@ -69,7 +69,7 @@ function requestFrame(api: StreamApi): RemoteRenderer {
         requests.delete(corrId)
       );
     } else {
-      const update = new Promise<FrameResponse>(resolve => {
+      const update = new Promise<FrameResponse>((resolve) => {
         requests.set(corrId, resolve);
         api.replaceCamera(
           {
