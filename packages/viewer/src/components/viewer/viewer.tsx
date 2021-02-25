@@ -60,9 +60,7 @@ import {
   getAssignedSlotNodes,
 } from './utils';
 import {
-  createStreamApiRenderer,
   acknowledgeFrameRequests,
-  RemoteRenderer,
   CanvasRenderer,
   createCanvasRenderer,
   measureCanvasRenderer,
@@ -228,7 +226,6 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: ViewerStreamApi;
-  private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
@@ -265,7 +262,6 @@ export class Viewer {
     ws.onClose(() => this.handleWebSocketClose());
 
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
-    this.remoteRenderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -1045,7 +1041,6 @@ export class Viewer {
     } else {
       return new Scene(
         this.stream,
-        this.remoteRenderer,
         this.lastFrame,
         () => this.getImageScale(),
         this.sceneViewId

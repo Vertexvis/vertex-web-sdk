@@ -1,3 +1,4 @@
 import * as Requests from './requests';
+import * as Events from './events';
 
-export { Requests };
+export { Requests, Events };

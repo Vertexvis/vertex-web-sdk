@@ -11,9 +11,13 @@ describe(InteractionApi, () => {
   const emitDoubleTap = jest.fn();
   const emitLongPress = jest.fn();
   const streamApi = new StreamApi();
-  const renderer = jest.fn();
   const sceneViewId = 'scene-view-id';
-  const scene = new Scene(streamApi, renderer, frame, sceneViewId);
+  const scene = new Scene(
+    streamApi,
+    frame,
+    () => Point.create(1, 1),
+    sceneViewId
+  );
   const sceneProvider = (): Scene => scene;
 
   let api: InteractionApi;
@@ -62,12 +66,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.panCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.panCamera(Point.create(10, 0));
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
@@ -76,12 +80,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.rotateCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.rotateCamera(Point.create(10, 0));
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
@@ -90,12 +94,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.zoomCamera(1);
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.zoomCamera(1);
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
