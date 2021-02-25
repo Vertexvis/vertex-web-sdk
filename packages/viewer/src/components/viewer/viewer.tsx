@@ -11,7 +11,7 @@ import {
   EventEmitter,
   Listen,
 } from '@stencil/core';
-import ResizeObserver from 'resize-observer-polyfill';
+import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { Config, parseConfig } from '../../config/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
