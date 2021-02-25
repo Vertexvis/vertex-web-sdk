@@ -14,7 +14,9 @@ export class StreamApiEventDispatcher<T> {
     private predicate: (
       msg: vertexvis.protobuf.stream.IStreamMessage
     ) => boolean,
-    private transform: (msg: vertexvis.protobuf.stream.IStreamMessage) => T,
+    private transform: (
+      msg: vertexvis.protobuf.stream.IStreamMessage
+    ) => T | undefined,
     private timeout: number = DEFAULT_TIMEOUT_IN_MS
   ) {
     this.handleMessage = this.handleMessage.bind(this);
@@ -34,13 +36,12 @@ export class StreamApiEventDispatcher<T> {
     }
   }
 
-  public once(listener?: Listener<T>): Promise<T> {
+  public once(): Promise<T> {
     let handler: (data: T) => void;
     return Async.timeout(
       this.timeout,
       new Promise<T>((resolve) => {
         handler = (data: T) => {
-          listener?.(data);
           resolve(data);
           this.off(handler);
         };
@@ -54,7 +55,11 @@ export class StreamApiEventDispatcher<T> {
 
   private handleMessage(msg: vertexvis.protobuf.stream.IStreamMessage): void {
     if (this.predicate(msg)) {
-      this.listeners.forEach((l) => l(this.transform(msg)));
+      const transformed = this.transform(msg);
+
+      if (transformed != null) {
+        this.listeners.forEach((l) => l(transformed));
+      }
     }
   }
 

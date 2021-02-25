@@ -3,7 +3,7 @@ import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
-import { RenderResult } from './renderResult';
+import { RenderResult } from './cameraRenderResult';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 
 const PI_OVER_360 = 0.008726646259972;

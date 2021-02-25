@@ -14,6 +14,7 @@ describe(Camera, () => {
 
   beforeAll(() => {
     stream.flyTo = jest.fn(async () => ({ flyTo: {} }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (toProtoDuration as any).mockImplementation(realApi.toProtoDuration);
   });
 
