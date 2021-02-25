@@ -3,14 +3,15 @@ jest.mock('../../sessions/storage');
 jest.mock('@vertexvis/stream-api');
 
 import '../../testing/domMocks';
+import {
+  getAssignedSlotNodes,
+  getElementBackgroundColor,
+  getElementBoundingClientRect,
+} from './utils';
 import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
 import { newSpecPage } from '@stencil/core/testing';
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
-import {
-  getElementBackgroundColor,
-  getElementBoundingClientRect,
-} from './utils';
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../types/__fixtures__';
@@ -25,6 +26,8 @@ describe('vertex-viewer', () => {
     width: 200,
     height: 150,
   });
+
+  (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -335,7 +338,7 @@ async function createViewerWithLoadedStream(
   dispose?: () => void
 ): Promise<Viewer> {
   const viewer = await createViewerSpec(
-    `<vertex-viewer client-id="clientId"></vertex-viewer`
+    `<vertex-viewer client-id="clientId" unit-test-mode="true"></vertex-viewer>`
   );
 
   return loadNewModelForViewer(viewer, key, dispose);

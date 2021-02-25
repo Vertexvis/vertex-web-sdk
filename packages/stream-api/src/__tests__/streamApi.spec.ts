@@ -60,14 +60,14 @@ describe(StreamApi, () => {
         }).finish()
       );
       await request;
-      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+      expect(ws.nextSent((d) => decode(d as Uint8Array))).toMatchObject({
         sentAtTime: expect.anything(),
       });
     });
 
     it('includes sent at time for requests without responses', () => {
       streamApi.syncTime({ requestTime: currentDateAsProtoTimestamp() }, false);
-      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+      expect(ws.nextSent((d) => decode(d as Uint8Array))).toMatchObject({
         sentAtTime: expect.anything(),
       });
     });
@@ -112,7 +112,7 @@ describe(StreamApi, () => {
 
     it('sends result on the websocket', () => {
       streamApi.replyResult('123', { drawFrame: { sendToReceiveDuration } });
-      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+      expect(ws.nextSent((d) => decode(d as Uint8Array))).toMatchObject({
         sentAtTime: expect.anything(),
       });
     });
@@ -121,7 +121,7 @@ describe(StreamApi, () => {
   describe(StreamApi.prototype.replyError, () => {
     it('sends error on the websocket', () => {
       streamApi.replyError('123', {});
-      expect(ws.nextSent(d => decode(d as Uint8Array))).toMatchObject({
+      expect(ws.nextSent((d) => decode(d as Uint8Array))).toMatchObject({
         sentAtTime: expect.anything(),
       });
     });

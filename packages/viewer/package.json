@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer",
-  "version": "0.9.21",
+  "version": "0.9.23",
   "description": "The Vertex SDK for viewing models.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -33,6 +33,7 @@
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
     "build": "stencil build --docs",
+    "postbuild": "cp ./dist/esm/index.js ./dist/esm/index.mjs && cp ./dist/esm/loader.js ./dist/esm/loader.mjs",
     "start": "stencil build --dev --watch --serve",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
@@ -46,15 +47,15 @@
     "typedocs": "typedoc --tsconfig tsconfig.docs.json"
   },
   "dependencies": {
-    "@types/classnames": "2.2.3",
-    "@vertexvis/frame-streaming-protos": "^0.3.21",
-    "@vertexvis/geometry": "0.9.20",
-    "@vertexvis/stream-api": "0.9.20",
-    "@vertexvis/utils": "0.9.20",
+    "@types/classnames": "2.2.11",
+    "@vertexvis/frame-streaming-protos": "^0.4.1",
+    "@vertexvis/geometry": "0.9.23",
+    "@vertexvis/stream-api": "0.9.23",
+    "@vertexvis/utils": "0.9.23",
     "classnames": "2.2.6",
     "protobufjs": "^6.9.0",
     "resize-observer-polyfill": "^1.5.1",
-    "tslib": "^2.0.1",
+    "tslib": "^2.1.0",
     "zen-3d": "^0.0.1",
     "zen-3d-addons": "^0.0.3"
   },
@@ -62,16 +63,16 @@
     "@stencil/core": "^2.4.0",
     "@stencil/react-output-target": "^0.0.9",
     "@types/jest": "^26.0.20",
-    "@vertexvis/eslint-config-vertexvis-typescript": "0.3.0",
-    "@vertexvis/rollup-plugin-vertexvis-copyright": "0.2.0",
+    "@vertexvis/eslint-config-vertexvis-typescript": "0.4.0",
+    "@vertexvis/rollup-plugin-vertexvis-copyright": "0.3.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
-    "@vertexwebsdk/build": "0.9.20",
-    "eslint": "^6.1.0",
+    "@vertexwebsdk/build": "0.9.23",
+    "eslint": "^7.20.0",
     "eslint-plugin-react": "^7.17.0",
     "jest": "^26.6.3",
     "rollup": "^1.19.4",
-    "ts-jest": "^26.5.1",
+    "ts-jest": "^26.5.2",
     "typedoc": "^0.20.25",
-    "typescript": "^4.0.2"
+    "typescript": "^4.2.2"
   }
 }

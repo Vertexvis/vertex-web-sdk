@@ -152,7 +152,7 @@ function toFrameDeliverySettingsParams(
   defaults: FrameDeliverySettings | undefined
 ): ParamsBuilder<Settings> {
   return defineSettings(
-    s => s.EXPERIMENTAL_frameDelivery,
+    (s) => s.EXPERIMENTAL_frameDelivery,
     defaults,
     defineParams(
       defineBoolean('frame-delivery.rate-limit-enabled', 'rateLimitingEnabled'),
@@ -174,7 +174,7 @@ function toAdaptiveRenderingSettingsParams(
   defaults: AdaptiveRenderingSettings | undefined
 ): ParamsBuilder<Settings> {
   return defineSettings(
-    s => s.EXPERIMENTAL_adaptiveRendering,
+    (s) => s.EXPERIMENTAL_adaptiveRendering,
     defaults,
     defineParams(
       defineBoolean('adaptive-rendering.enabled', 'enabled'),
@@ -192,7 +192,7 @@ function toQualityOfServiceSettingsParams(
   defaults: QualityOfServiceSettings | undefined
 ): ParamsBuilder<Settings> {
   return defineSettings(
-    s => s.EXPERIMENTAL_qualityOfService,
+    (s) => s.EXPERIMENTAL_qualityOfService,
     defaults,
     defineParams(defineNumber('qos.history-max-size', 'historyMaxSize'))
   );
@@ -203,7 +203,7 @@ function defineSettings<S, T>(
   defaults: T | undefined,
   builder: ParamsBuilder<T>
 ): ParamsBuilder<S> {
-  return settings => {
+  return (settings) => {
     const merged = Objects.defaults(getter(settings) || {}, defaults);
     return builder(merged);
   };

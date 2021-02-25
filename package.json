@@ -3,11 +3,11 @@
   "private": true,
   "nextVersionBump": "patch",
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "lerna": "^3.21.0",
+    "eslint": "^7.20.0",
+    "lerna": "^3.22.1",
     "semver": "^7.3.4",
     "typedoc": "^0.20.25",
-    "typescript": "^3.7.4"
+    "typescript": "^4.2.2"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc && yarn bootstrap",

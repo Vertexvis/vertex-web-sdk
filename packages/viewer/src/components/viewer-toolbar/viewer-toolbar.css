@@ -1,0 +1,50 @@
+:host {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1rem;
+  pointer-events: none;
+  display: flex;
+}
+
+:host(.position-top) {
+  align-items: flex-start;
+}
+
+:host(.position-middle) {
+  align-items: center;
+}
+
+:host(.position-bottom) {
+  align-items: flex-end;
+}
+
+:host(.position-left) {
+  justify-content: flex-start;
+}
+
+:host(.position-center) {
+  justify-content: center;
+}
+
+:host(.position-right) {
+  justify-content: flex-end;
+}
+
+.inner {
+  display: flex;
+}
+
+.inner.vertical {
+  flex-direction: column;
+}
+
+.inner.horizonal {
+  flex-direction: row;
+}
+
+::slotted(*) {
+  pointer-events: initial;
+}

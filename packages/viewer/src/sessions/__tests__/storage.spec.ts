@@ -88,7 +88,7 @@ describe('storage', () => {
       expect(
         getStorageEntry(
           localStorageKey,
-          entry => ({ ...entry, newValue: 'value' }),
+          (entry) => ({ ...entry, newValue: 'value' }),
           () => localStorage
         )
       ).toMatchObject({
@@ -101,7 +101,7 @@ describe('storage', () => {
       expect(
         getStorageEntry(
           localStorageKey,
-          entry => entry,
+          (entry) => entry,
           () => localStorage
         )
       ).toBeUndefined();
