@@ -4,6 +4,7 @@ import {
   ZoomInteraction,
   PanInteraction,
   RotateInteraction,
+  TwistInteraction,
 } from './mouseInteractions';
 import { InteractionApi } from './interactionApi';
 
@@ -17,7 +18,8 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
       'pointermove',
       new RotateInteraction(),
       new ZoomInteraction(),
-      new PanInteraction()
+      new PanInteraction(),
+      new TwistInteraction()
     );
     this.touchPoints = new Set();
     this.handlePointerDown = this.handlePointerDown.bind(this);

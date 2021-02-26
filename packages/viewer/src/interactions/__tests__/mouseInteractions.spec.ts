@@ -4,6 +4,7 @@ import {
   RotateInteraction,
   PanInteraction,
   ZoomInteraction,
+  TwistInteraction,
 } from '../mouseInteractions';
 import { InteractionApi } from '../interactionApi';
 import { Point } from '@vertexvis/geometry';
@@ -137,7 +138,8 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api = new InteractionApiMock();
+  const api = new (InteractionApi as jest.Mock<InteractionApi>)();
+  api.transformCamera;
 
   const event1 = new MouseEvent('mousemove', { screenX: 10, screenY: 5 });
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
@@ -217,6 +219,58 @@ describe(ZoomInteraction, () => {
       interaction.zoom(1, api);
       await delay();
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe(TwistInteraction, () => {
+  const api = new InteractionApiMock();
+
+  const event1 = new MouseEvent('mousemove', { screenX: 10, screenY: 5 });
+  const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
+  const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
+
+  describe(TwistInteraction.prototype.beginDrag, () => {
+    it('should start an interaction', () => {
+      const interaction = new TwistInteraction();
+      interaction.beginDrag(event1, api);
+
+      expect(api.beginInteraction).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe(TwistInteraction.prototype.drag, () => {
+    it('should transform the camera for each drag event', () => {
+      const interaction = new TwistInteraction();
+      interaction.beginDrag(event1, api);
+      interaction.drag(event2, api);
+      interaction.drag(event3, api);
+
+      expect(api.twistCamera).toHaveBeenCalledTimes(2);
+    });
+
+    it('does nothing if begin drag has not been called', () => {
+      const interaction = new ZoomInteraction();
+      interaction.drag(event1, api);
+
+      expect(api.zoomCamera).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(TwistInteraction.prototype.endDrag, () => {
+    it('ends interaction if begin drag has been called', () => {
+      const interaction = new TwistInteraction();
+      interaction.beginDrag(event1, api);
+      interaction.endDrag(event1, api);
+
+      expect(api.endInteraction).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if begin drag has not been called', () => {
+      const interaction = new TwistInteraction();
+      interaction.endDrag(event1, api);
+
+      expect(api.endInteraction).not.toHaveBeenCalled();
     });
   });
 });
