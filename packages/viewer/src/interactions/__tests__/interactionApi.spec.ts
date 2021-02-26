@@ -15,7 +15,6 @@ describe(InteractionApi, () => {
   const sceneViewId = 'scene-view-id';
   const scene = new Scene(
     streamApi,
-    renderer,
     frame,
     () => Point.create(1, 1),
     sceneViewId
