@@ -15,7 +15,8 @@ import { Dimensions } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
-import { KeyInteraction } from "./interactions/keyInteraction";
+import { KeyInteraction, KeyInteractionWithReset } from "./interactions/keyInteraction";
+import { BaseInteractionHandler } from "./interactions/baseInteractionHandler";
 import { Scene } from "./scenes/scene";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -43,6 +44,7 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
+        "getBaseInteractionHandler": () => Promise<BaseInteractionHandler | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;
@@ -67,6 +69,12 @@ export namespace Components {
           * @returns - A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
+        /**
+          * Registers a key interaction to be invoked on a key down event  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
+          * @example class CustomKeyboardInteraction extends KeyInteractionWithReset {   constructor(private baseInteractionHandler: BaseInteractionHandler) {}    public predicate(keyState: KeyState): boolean {     return keyState['Alt'] === true && keyState['Shift'] === true;   }    public async fn(): Promise<void> {     this.baseInteractionHandler.setPrimaryInteractionType("twist")   }    public async reset: Promise<void> {     this.baseInteractionHandler.setPrimaryInteractionType('rotate');   }
+          * @param keyInteraction - The `KeyInteraction` to register.
+         */
+        "registerKeyInteraction": (keyInteraction: KeyInteractionWithReset) => Promise<void>;
         /**
           * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
           * @example class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {   constructor(private viewer: HTMLVertexViewerElement) {}    public predicate(keyState: KeyState): boolean {     return keyState['Alt'];   }    public async fn(event: TapEventDetails) {     const scene = await this.viewer.scene();     const result = await scene.raycaster().hitItems(event.position);      if (result.hits.length > 0) {       await scene         .camera()         .fitTo(q => q.withItemId(result.hits[0].itemId))         .render();     }   } }

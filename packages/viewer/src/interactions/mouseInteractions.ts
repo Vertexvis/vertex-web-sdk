@@ -1,7 +1,24 @@
-import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
+import { Point } from '@vertexvis/geometry';
+import { InteractionType } from './baseInteractionHandler';
 
-export class MouseInteraction {
+export abstract class MouseInteraction {
+  protected currentPosition: Point.Point | undefined;
+
+  protected abstract type: InteractionType;
+
+  public setPosition(position?: Point.Point): void {
+    this.currentPosition = position;
+  }
+
+  public getPosition(): Point.Point | undefined {
+    return this.currentPosition;
+  }
+
+  public getType(): InteractionType {
+    return this.type;
+  }
+
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     // noop
   }
@@ -11,7 +28,10 @@ export class MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    // noop
+    if (this.currentPosition != null) {
+      api.endInteraction();
+      this.currentPosition = undefined;
+    }
   }
 
   public zoom(delta: number, api: InteractionApi): void {
@@ -20,7 +40,7 @@ export class MouseInteraction {
 }
 
 export class RotateInteraction extends MouseInteraction {
-  private currentPosition: Point.Point | undefined;
+  public type: InteractionType = 'rotate';
 
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
@@ -40,18 +60,15 @@ export class RotateInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 }
 
 export class ZoomInteraction extends MouseInteraction {
+  public type: InteractionType = 'zoom';
+
   private didTransformBegin = false;
   private interactionTimer: number | undefined;
-
-  private currentPosition: Point.Point | undefined;
 
   public constructor(private interactionTimeout = 1000) {
     super();
@@ -75,10 +92,7 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
   }
 
   public zoom(delta: number, api: InteractionApi): void {
@@ -121,7 +135,7 @@ export class ZoomInteraction extends MouseInteraction {
 }
 
 export class PanInteraction extends MouseInteraction {
-  private currentPosition: Point.Point | undefined;
+  public type: InteractionType = 'pan';
 
   public beginDrag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition == null) {
@@ -141,9 +155,26 @@ export class PanInteraction extends MouseInteraction {
   }
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      api.endInteraction();
-      this.currentPosition = undefined;
-    }
+    super.endDrag(event, api);
+  }
+}
+
+export class TwistInteraction extends MouseInteraction {
+  public type: InteractionType = 'twist';
+
+  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+    this.currentPosition = Point.create(event.screenX, event.screenY);
+    api.beginInteraction();
+  }
+
+  public drag(event: MouseEvent, api: InteractionApi): void {
+    const position = Point.create(event.screenX, event.screenY);
+    this.currentPosition = position;
+
+    api.twistCamera(position);
+  }
+
+  public endDrag(event: MouseEvent, api: InteractionApi): void {
+    super.endDrag(event, api);
   }
 }

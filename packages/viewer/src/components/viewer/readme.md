@@ -35,6 +35,16 @@
 
 ## Methods
 
+### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
+
+
+
+#### Returns
+
+Type: `Promise<BaseInteractionHandler | undefined>`
+
+
+
 ### `getFrame() => Promise<Frame.Frame | undefined>`
 
 
@@ -101,6 +111,21 @@ the default camera controls provided by the viewer.
 #### Returns
 
 Type: `Promise<Disposable>`
+
+
+
+### `registerKeyInteraction(keyInteraction: KeyInteractionWithReset) => Promise<void>`
+
+Registers a key interaction to be invoked on a key down event
+
+`KeyInteraction`s are used to build custom keyboard shortcuts for the
+viewer using the current state of they keyboard to determine whether
+the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
+to disable the default keyboard shortcuts provided by the viewer.
+
+#### Returns
+
+Type: `Promise<void>`
 
 
 
