@@ -1,10 +1,13 @@
-import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
+import { Interactions } from '../types';
 
 type SceneProvider = () => Scene;
+
+type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (
   camera: Camera,
@@ -17,9 +20,11 @@ type CameraTransform = (
  */
 export class InteractionApi {
   private currentCamera?: Camera;
+  private lastAngle: Angle.Angle | undefined;
 
   public constructor(
     private stream: StreamApi,
+    private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
@@ -89,6 +94,29 @@ export class InteractionApi {
 
       await this.currentCamera?.render();
     }
+  }
+
+  /**
+   * Performs a twist operation of the scene's camera, and requests a new image
+   * for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public async twistCamera(point: Point.Point): Promise<void> {
+    return this.transformCamera((camera, viewport) => {
+      const center = Point.create(viewport.width / 2, viewport.height / 2);
+      const currentAngle = Angle.fromPoints(center, point);
+      const angleDelta =
+        this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+
+      this.lastAngle = currentAngle;
+      const axis = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+      const angleInRadians = Angle.toRadians(-angleDelta);
+      return camera.rotateAroundAxis(angleInRadians, axis);
+    });
   }
 
   /**
@@ -180,8 +208,16 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
+      this.resetLastAngle();
       await this.stream.endInteraction();
     }
+  }
+
+  /**
+   * resets the last recorded angle for a twist op
+   */
+  public resetLastAngle(): void {
+    this.lastAngle = undefined;
   }
 
   /**
@@ -189,6 +225,24 @@ export class InteractionApi {
    */
   public isInteracting(): boolean {
     return this.currentCamera != null;
+  }
+
+  /**
+   * Returns the pixel threshold that should be used to detect
+   * movement based on the type of pointer input being coarse or fine.
+   * This threshold is based on the configured `coarsePointerThreshold`
+   * or the `finePointerThreshold` respectively.
+   *
+   * @param isTouch - Whether the event is a touch or not, if false or
+   * undefined, a media query will be used to determine pointer type
+   * @returns The pixel threshold.
+   */
+  public pixelThreshold(isTouch?: boolean): number {
+    const pixelThreshold = this.isCoarseInputDevice(isTouch)
+      ? this.getConfig().coarsePointerThreshold
+      : this.getConfig().finePointerThreshold;
+
+    return pixelThreshold * window.devicePixelRatio;
   }
 
   private emitTapEvent(
@@ -209,5 +263,9 @@ export class InteractionApi {
       metaKey,
       shiftKey,
     });
+  }
+
+  private isCoarseInputDevice(isTouch?: boolean): boolean {
+    return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 }

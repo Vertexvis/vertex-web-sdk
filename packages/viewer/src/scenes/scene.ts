@@ -11,10 +11,13 @@ import {
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { UUID } from '@vertexvis/utils';
-import { RemoteRenderer } from '../rendering';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
+
+interface SceneExecutionOptions {
+  suppliedCorrelationId?: string;
+}
 
 /**
  * A class that is responsible for building operations for a specific scene.
@@ -149,7 +152,9 @@ export class ItemsOperationExecutor {
     private queryOperations: QueryOperation[]
   ) {}
 
-  public async execute(): Promise<void> {
+  public async execute(
+    executionOptions?: SceneExecutionOptions
+  ): Promise<void> {
     const pbOperations = this.queryOperations.map((op) =>
       buildSceneOperation(op.query, op.operations)
     );
@@ -158,7 +163,14 @@ export class ItemsOperationExecutor {
         hex: this.sceneViewId,
       },
       operations: pbOperations,
+      suppliedCorrelationId:
+        executionOptions?.suppliedCorrelationId != null
+          ? {
+              value: executionOptions?.suppliedCorrelationId,
+            }
+          : undefined,
     };
+
     await this.stream.createSceneAlteration(request);
   }
 }
@@ -178,7 +190,6 @@ export type ImageScaleProvider = () => Point.Point | undefined;
 export class Scene {
   public constructor(
     private stream: StreamApi,
-    private renderer: RemoteRenderer,
     private frame: Frame.Frame,
     private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID
@@ -213,7 +224,7 @@ export class Scene {
    */
   public camera(): Camera {
     return new Camera(
-      this.renderer,
+      this.stream,
       Dimensions.aspectRatio(this.viewport()),
       this.frame.sceneAttributes.camera,
       this.frame.sceneAttributes.visibleBoundingBox

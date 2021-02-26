@@ -47,7 +47,7 @@
   "dependencies": {
     "@juggle/resize-observer": "^3.3.0",
     "@types/classnames": "2.2.11",
-    "@vertexvis/frame-streaming-protos": "^0.4.1",
+    "@vertexvis/frame-streaming-protos": "^0.4.2",
     "@vertexvis/geometry": "0.9.23",
     "@vertexvis/stream-api": "0.9.23",
     "@vertexvis/utils": "0.9.23",

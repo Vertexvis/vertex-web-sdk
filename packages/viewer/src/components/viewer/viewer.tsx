@@ -35,6 +35,7 @@ import { PointerInteractionHandler } from '../../interactions/pointerInteraction
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../interactions/flyToPartKeyInteraction';
+import { TwistInteractionHandler } from '../../interactions/twistInteractionHandler';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -59,9 +60,7 @@ import {
   getAssignedSlotNodes,
 } from './utils';
 import {
-  createStreamApiRenderer,
   acknowledgeFrameRequests,
-  RemoteRenderer,
   CanvasRenderer,
   createCanvasRenderer,
   measureCanvasRenderer,
@@ -71,7 +70,11 @@ import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
-import { KeyInteraction } from '../../interactions/keyInteraction';
+import {
+  KeyInteraction,
+  KeyInteractionWithReset,
+} from '../../interactions/keyInteraction';
+import { BaseInteractionHandler } from '../../interactions/baseInteractionHandler';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -224,7 +227,6 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private stream!: ViewerStreamApi;
-  private remoteRenderer!: RemoteRenderer;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
@@ -236,6 +238,8 @@ export class Viewer {
   private interactionApi!: InteractionApi;
   private keyStateInteractionHandler?: KeyStateInteractionHandler;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
+  private keyInteractions: KeyInteractionWithReset[] = [];
+  private baseInteractionHandler?: BaseInteractionHandler;
 
   private isResizing?: boolean;
   private isReconnecting?: boolean;
@@ -260,7 +264,6 @@ export class Viewer {
     ws.onClose(() => this.handleWebSocketClose());
 
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
-    this.remoteRenderer = createStreamApiRenderer(this.stream);
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
@@ -286,15 +289,6 @@ export class Viewer {
       this.load(this.src);
     }
 
-    if (this.keyboardControls) {
-      this.keyStateInteractionHandler = new KeyStateInteractionHandler();
-      this.registerInteractionHandler(this.keyStateInteractionHandler);
-
-      this.registerTapKeyInteraction(
-        new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
-      );
-    }
-
     if (this.cameraControls) {
       // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
@@ -304,8 +298,8 @@ export class Viewer {
           'pointermove',
           () => this.getConfig()
         );
-
-        this.registerInteractionHandler(new PointerInteractionHandler());
+        this.baseInteractionHandler = new PointerInteractionHandler();
+        this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
       } else {
@@ -317,9 +311,25 @@ export class Viewer {
         );
 
         // fallback to touch events and mouse events as a default
-        this.registerInteractionHandler(new MouseInteractionHandler());
+        this.baseInteractionHandler = new MouseInteractionHandler();
+        this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
+      }
+    }
+
+    if (this.keyboardControls) {
+      this.keyStateInteractionHandler = new KeyStateInteractionHandler();
+      this.registerInteractionHandler(this.keyStateInteractionHandler);
+
+      this.registerTapKeyInteraction(
+        new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+      );
+
+      if (this.baseInteractionHandler) {
+        this.registerKeyInteraction(
+          new TwistInteractionHandler(this.baseInteractionHandler)
+        );
       }
     }
 
@@ -481,9 +491,60 @@ export class Viewer {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
   }
 
+  /**
+   * Registers a key interaction to be invoked on a key down event
+   *
+   * `KeyInteraction`s are used to build custom keyboard shortcuts for the
+   * viewer using the current state of they keyboard to determine whether
+   * the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
+   * to disable the default keyboard shortcuts provided by the viewer.
+   *
+   * @example
+   *
+   * class CustomKeyboardInteraction extends KeyInteractionWithReset {
+   *   constructor(private baseInteractionHandler: BaseInteractionHandler) {}
+   *
+   *   public predicate(keyState: KeyState): boolean {
+   *     return keyState['Alt'] === true && keyState['Shift'] === true;
+   *   }
+   *
+   *   public async fn(): Promise<void> {
+   *     this.baseInteractionHandler.setPrimaryInteractionType("twist")
+   *   }
+   *
+   *   public async reset: Promise<void> {
+   *     this.baseInteractionHandler.setPrimaryInteractionType('rotate');
+   *   }
+   *
+   * @param keyInteraction - The `KeyInteraction` to register.
+   */
+  @Method()
+  public async registerKeyInteraction(
+    keyInteraction: KeyInteractionWithReset
+  ): Promise<void> {
+    this.keyInteractions = [...this.keyInteractions, keyInteraction];
+
+    this.keyStateInteractionHandler?.onKeyStateChange((state) => {
+      this.keyInteractions
+        .filter((i) => i.predicate(state))
+        .forEach((i) => i.fn(undefined));
+
+      this.keyInteractions
+        .filter((i) => !i.predicate(state))
+        .forEach((i) => i.reset());
+    });
+  }
+
   @Method()
   public async getInteractionHandlers(): Promise<InteractionHandler[]> {
     return this.interactionHandlers;
+  }
+
+  @Method()
+  public async getBaseInteractionHandler(): Promise<
+    BaseInteractionHandler | undefined
+  > {
+    return this.baseInteractionHandler;
   }
 
   @Method()
@@ -877,7 +938,6 @@ export class Viewer {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
-
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.lastFrame = drawnFrame;
@@ -969,6 +1029,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
+      () => this.getConfig().interactions,
       () => this.createScene(),
       this.tap,
       this.doubletap,
@@ -984,7 +1045,6 @@ export class Viewer {
     } else {
       return new Scene(
         this.stream,
-        this.remoteRenderer,
         this.lastFrame,
         () => this.getImageScale(),
         this.sceneViewId

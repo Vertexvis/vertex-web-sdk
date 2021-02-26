@@ -5,16 +5,23 @@ import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
 import { frame } from '../../types/__fixtures__';
 import { StreamApi } from '@vertexvis/stream-api';
+import { Interactions } from '../../types';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
   const emitDoubleTap = jest.fn();
   const emitLongPress = jest.fn();
   const streamApi = new StreamApi();
-  const renderer = jest.fn();
   const sceneViewId = 'scene-view-id';
-  const scene = new Scene(streamApi, renderer, frame, sceneViewId);
+  const scene = new Scene(
+    streamApi,
+    frame,
+    () => Point.create(1, 1),
+    sceneViewId
+  );
   const sceneProvider = (): Scene => scene;
+  const interactionConfigProvider = (): Interactions.InteractionConfig =>
+    Interactions.defaultInteractionConfig;
 
   let api: InteractionApi;
 
@@ -24,6 +31,7 @@ describe(InteractionApi, () => {
 
     api = new InteractionApi(
       streamApi,
+      interactionConfigProvider,
       sceneProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
@@ -62,12 +70,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.panCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.panCamera(Point.create(10, 0));
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
@@ -76,12 +84,12 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.rotateCamera(Point.create(10, 0));
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.rotateCamera(Point.create(10, 0));
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
@@ -90,12 +98,26 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.zoomCamera(1);
       api.endInteraction();
-      expect(renderer).toHaveBeenCalledTimes(1);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
       api.zoomCamera(1);
-      expect(renderer).not.toHaveBeenCalled();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(InteractionApi.prototype.twistCamera, () => {
+    it('replaces the camera if interacting', () => {
+      api.beginInteraction();
+      api.twistCamera(Point.create(10, 0));
+      api.endInteraction();
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if not interacting', () => {
+      api.zoomCamera(1);
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
@@ -103,6 +125,7 @@ describe(InteractionApi, () => {
     beforeEach(() => {
       api = new InteractionApi(
         streamApi,
+        interactionConfigProvider,
         sceneProvider,
         {
           emit: emitTap,

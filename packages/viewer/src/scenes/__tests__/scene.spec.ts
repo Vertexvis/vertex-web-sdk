@@ -8,17 +8,10 @@ import { UUID } from '@vertexvis/utils';
 import { ColorMaterial } from '../..';
 
 describe(Scene, () => {
-  const renderer = jest.fn();
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
-  const scene = new Scene(
-    streamApi,
-    renderer,
-    frame,
-    imageScaleProvider,
-    sceneViewId
-  );
+  const scene = new Scene(streamApi, frame, imageScaleProvider, sceneViewId);
 
   afterEach(() => {
     jest.resetAllMocks();
@@ -69,6 +62,41 @@ describe(Scene, () => {
             ],
           },
         ],
+      });
+    });
+
+    it('should support passing a supplied correlationId', () => {
+      const itemId = UUID.create();
+      const suppliedId = `SuppliedId-${UUID.create()}`;
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .execute({ suppliedCorrelationId: suppliedId });
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            item: {
+              sceneItemQuery: {
+                id: {
+                  hex: itemId.toString(),
+                },
+              },
+            },
+            operationTypes: [
+              {
+                changeVisibility: {
+                  visible: false,
+                },
+              },
+            ],
+          },
+        ],
+        suppliedCorrelationId: {
+          value: suppliedId,
+        },
       });
     });
 

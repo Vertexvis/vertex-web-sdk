@@ -7,12 +7,13 @@ import {
   ZoomInteraction,
   PanInteraction,
   MouseInteraction,
+  TwistInteraction,
 } from './mouseInteractions';
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 
-type InteractionType = 'rotate' | 'zoom' | 'pan';
+export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -23,7 +24,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
-  private primaryInteractionType: InteractionType = 'rotate';
+  private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
 
@@ -39,7 +40,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected moveEvent: 'mousemove' | 'pointermove',
     private rotateInteraction: RotateInteraction,
     private zoomInteraction: ZoomInteraction,
-    private panInteraction: PanInteraction
+    private panInteraction: PanInteraction,
+    private twistInteraction: TwistInteraction
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
@@ -64,12 +66,42 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     return this.primaryInteractionTypeChange.on(listener);
   }
 
+  public setCurrentInteractionType(type?: InteractionType): void {
+    switch (type) {
+      case 'rotate':
+        this.currentInteraction = this.rotateInteraction;
+        break;
+      case 'zoom':
+        this.currentInteraction = this.zoomInteraction;
+        break;
+      case 'pan':
+        this.currentInteraction = this.panInteraction;
+        break;
+      case 'twist':
+        this.currentInteraction = this.twistInteraction;
+        break;
+      default:
+        this.currentInteraction = undefined;
+    }
+
+    if (this.draggingInteraction) {
+      const point = this.draggingInteraction.getPosition();
+      this.draggingInteraction =
+        this.currentInteraction || this.primaryInteraction;
+      this.interactionApi?.resetLastAngle();
+      this.draggingInteraction.setPosition(point);
+    }
+  }
+
   public getPrimaryInteractionType(): InteractionType {
-    return this.primaryInteractionType;
+    return this.primaryInteraction.getType();
+  }
+
+  public getCurrentInteractionType(): InteractionType {
+    return (this.currentInteraction || this.primaryInteraction).getType();
   }
 
   public setPrimaryInteractionType(type: InteractionType): void {
-    this.primaryInteractionType = type;
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
@@ -99,9 +131,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     const position = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
+    const pixelThreshold =
+      this.interactionApi != null
+        ? this.interactionApi.pixelThreshold(this.isTouch(event))
+        : 2;
     if (
       this.downPosition != null &&
-      Point.distance(position, this.downPosition) >= 2 &&
+      Point.distance(position, this.downPosition) >= pixelThreshold &&
       !this.isDragging
     ) {
       this.beginDrag(event);
@@ -128,7 +164,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected beginDrag(event: BaseEvent): void {
     if (event.buttons === 1) {
-      this.draggingInteraction = this.primaryInteraction;
+      this.draggingInteraction =
+        this.currentInteraction || this.primaryInteraction;
     } else if (event.buttons === 2) {
       this.draggingInteraction = this.panInteraction;
     }
@@ -202,5 +239,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     return canvasOffset != null
       ? Point.subtract(Point.create(event.clientX, event.clientY), canvasOffset)
       : undefined;
+  }
+
+  protected isTouch(event: BaseEvent): boolean {
+    return window.PointerEvent != null && event instanceof PointerEvent
+      ? event.pointerType === 'touch'
+      : false;
   }
 }

@@ -7,17 +7,19 @@ import {
   PanInteraction,
   ZoomInteraction,
   RotateInteraction,
+  TwistInteraction,
 } from '../mouseInteractions';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
-
+const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
   const zoomInteraction = new ZoomInteractionMock();
   const panInteraction = new PanInteractionMock();
+  const twistInteraction = new TwistInteractionMock();
   const api = new InteractionApiMock();
 
   const div = document.createElement('div');
@@ -65,13 +67,15 @@ describe(MouseInteractionHandler, () => {
   const handler = new MouseInteractionHandler(
     rotateInteraction,
     zoomInteraction,
-    panInteraction
+    panInteraction,
+    twistInteraction
   );
 
   beforeEach(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
 
+    api.pixelThreshold = jest.fn(() => 2);
     handler.setPrimaryInteractionType('rotate');
     handler.initialize(div, api);
   });

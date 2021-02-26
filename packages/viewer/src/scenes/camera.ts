@@ -1,6 +1,10 @@
 import { Animation, FlyTo, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
-import { RemoteRenderer } from '../rendering';
+import { StreamApi } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
+import { buildFlyToOperation } from '../commands/streamCommandsMapper';
+import { CameraRenderResult } from './cameraRenderResult';
+import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 
 const PI_OVER_360 = 0.008726646259972;
 
@@ -83,7 +87,7 @@ export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
 
   public constructor(
-    private renderer: RemoteRenderer,
+    private stream: StreamApi,
     private aspect: number,
     private data: FrameCamera.FrameCamera,
     private boundingBox: BoundingBox.BoundingBox
@@ -158,7 +162,9 @@ export class Camera implements FrameCamera.FrameCamera {
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
    */
-  public async render(renderOptions?: CameraRenderOptions): Promise<void> {
+  public async render(
+    renderOptions?: CameraRenderOptions
+  ): Promise<CameraRenderResult> {
     if (this.flyToOptions == null && renderOptions != null) {
       this.flyToOptions = {
         flyTo: {
@@ -169,13 +175,38 @@ export class Camera implements FrameCamera.FrameCamera {
     }
 
     try {
-      await this.renderer({
-        camera: this.data,
-        flyToOptions: this.flyToOptions,
-        animation: renderOptions?.animation,
-      });
+      const corrId = UUID.create();
+      if (this.flyToOptions != null) {
+        const payload = buildFlyToOperation(
+          corrId,
+          this.flyToOptions,
+          renderOptions?.animation
+        );
+        const flyToResponse = await this.stream.flyTo(payload, true);
+
+        return new CameraRenderResult(
+          this.stream,
+          {
+            correlationId: corrId,
+            animationId: flyToResponse.flyTo?.animationId?.hex || undefined,
+          },
+          renderOptions?.animation?.milliseconds != null
+            ? renderOptions.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS
+            : undefined
+        );
+      } else {
+        this.stream.replaceCamera({
+          camera: this.data,
+          frameCorrelationId: { value: corrId },
+        });
+
+        return new CameraRenderResult(this.stream, {
+          correlationId: corrId,
+        });
+      }
     } catch (e) {
-      console.warn('Error when requesting new frame: ', e);
+      console.warn('Error when performing render: ', e);
+      throw e;
     }
   }
 
@@ -212,7 +243,7 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
     return new Camera(
-      this.renderer,
+      this.stream,
       this.aspectRatio,
       {
         ...this.data,
