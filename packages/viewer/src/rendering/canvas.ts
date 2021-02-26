@@ -18,6 +18,7 @@ export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
 function drawImage(image: HtmlImage, data: DrawFrame): void {
+  console.log('drawing frame with correlation id: ', data.frame.correlationIds);
   const { imageAttributes } = data.frame;
   const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
     imageAttributes.frameDimensions
@@ -117,9 +118,7 @@ export function measureCanvasRenderer(
   };
 }
 
-export function createCanvasRenderer(
-  suppliedCorrelationIdProvider: () => string | undefined
-): CanvasRenderer {
+export function createCanvasRenderer(): CanvasRenderer {
   let lastFrameNumber: number | undefined;
 
   return async (data) => {
@@ -128,20 +127,7 @@ export function createCanvasRenderer(
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
-      const currentCorrelationId = suppliedCorrelationIdProvider();
-      if (
-        currentCorrelationId &&
-        data.frame.correlationIds.includes(currentCorrelationId)
-      ) {
-        console.log(
-          'drawing frame with correlation id: ',
-          data.frame.correlationIds[0]
-        );
-        console.log(data.frame.imageAttributes.scaleFactor);
-        drawImage(image, data);
-      } else if (currentCorrelationId == null) {
-        drawImage(image, data);
-      }
+      drawImage(image, data);
     }
 
     image.dispose();

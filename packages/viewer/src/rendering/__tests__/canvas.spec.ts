@@ -9,7 +9,7 @@ import {
 import { Dimensions } from '@vertexvis/geometry';
 import * as Fixtures from '../../types/__fixtures__';
 import { loadImageBytes } from '../imageLoaders';
-import { Async, UUID } from '@vertexvis/utils';
+import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../metrics';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -39,7 +39,7 @@ describe(createCanvasRenderer, () => {
   });
 
   it('draws the next frame', async () => {
-    const renderer = createCanvasRenderer(() => undefined);
+    const renderer = createCanvasRenderer();
     const drawImage = jest.spyOn(canvas, 'drawImage');
     const result = await renderer(drawFrame1);
     expect(result).toBeDefined();
@@ -47,7 +47,7 @@ describe(createCanvasRenderer, () => {
   });
 
   it('skips drawing previous frames', async () => {
-    const renderer = createCanvasRenderer(() => undefined);
+    const renderer = createCanvasRenderer();
     const drawImage = jest.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame2);
@@ -56,34 +56,8 @@ describe(createCanvasRenderer, () => {
     expect(drawImage).toHaveBeenCalledTimes(1);
   });
 
-  it('skips drawing frames that do not have the given correlationId', async () => {
-    const givenCorrelationId = `some-given-id-${UUID.create()}`;
-    const renderer = createCanvasRenderer(() => givenCorrelationId);
-    const drawImage = jest.spyOn(canvas, 'drawImage');
-
-    const drawFrameWithOutCorrelationId: DrawFrame = {
-      canvas,
-      dimensions: Dimensions.create(100, 50),
-      frame: { ...Fixtures.frame, sequenceNumber: 1, correlationIds: [] },
-    };
-    const drawFrameWithCorrelationId: DrawFrame = {
-      canvas,
-      dimensions: Dimensions.create(100, 50),
-      frame: {
-        ...Fixtures.frame,
-        sequenceNumber: 2,
-        correlationIds: [givenCorrelationId],
-      },
-    };
-
-    await renderer(drawFrameWithOutCorrelationId);
-    await renderer(drawFrameWithCorrelationId);
-
-    expect(drawImage).toHaveBeenCalledTimes(1);
-  });
-
   it('disposes loaded image', async () => {
-    const renderer = createCanvasRenderer(() => undefined);
+    const renderer = createCanvasRenderer();
     await renderer(drawFrame1);
     expect(image.dispose).toHaveBeenCalled();
   });

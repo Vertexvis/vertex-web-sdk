@@ -158,7 +158,7 @@ export class ItemsOperationExecutor {
     const pbOperations = this.queryOperations.map((op) =>
       buildSceneOperation(op.query, op.operations)
     );
-    const request: vertexvis.protobuf.stream.ICreateSceneAlterationPayload = {
+    const request = {
       sceneViewId: {
         hex: this.sceneViewId,
       },
@@ -171,7 +171,6 @@ export class ItemsOperationExecutor {
           : undefined,
     };
 
-    console.log('reguest:', request);
     await this.stream.createSceneAlteration(request);
   }
 }

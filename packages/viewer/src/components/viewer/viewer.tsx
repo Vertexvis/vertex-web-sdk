@@ -239,7 +239,6 @@ export class Viewer {
   private streamSessionId?: UUID.UUID;
   private streamId?: UUID.UUID;
   private streamDisposable?: Disposable;
-  private waitForFrameCorrelationId?: string;
   private jwt?: string;
   private isStreamStarted = false;
 
@@ -563,22 +562,6 @@ export class Viewer {
     return this.createScene();
   }
 
-  /**
-   * Waits for a certain duration for a frame with a given correlation ID to be present on a frame.
-   * Default timeout for waiting is 2 seconds, but can be configured.
-   */
-  @Method()
-  public async setWaitForFrameWithCorrelationId(
-    suppliedCorrelationId: string,
-    waitTimeoutMs = 2000
-  ): Promise<void> {
-    this.waitForFrameCorrelationId = suppliedCorrelationId;
-    setTimeout(
-      () => (this.waitForFrameCorrelationId = undefined),
-      waitTimeoutMs
-    );
-  }
-
   @Method()
   public async getFrame(): Promise<Frame.Frame | undefined> {
     return this.lastFrame;
@@ -725,7 +708,7 @@ export class Viewer {
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
       Metrics.paintTime,
-      createCanvasRenderer(() => this.waitForFrameCorrelationId),
+      createCanvasRenderer(),
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
@@ -887,12 +870,6 @@ export class Viewer {
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
         this.frameReceived.emit(frame);
-        if (
-          this.waitForFrameCorrelationId != null &&
-          data.frame.correlationIds.includes(this.waitForFrameCorrelationId)
-        ) {
-          this.waitForFrameCorrelationId = undefined;
-        }
         const drawnFrame = await this.canvasRenderer(data);
         this.lastFrame = drawnFrame;
         this.dispatchFrameDrawn(drawnFrame);

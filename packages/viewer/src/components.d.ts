@@ -83,10 +83,6 @@ export namespace Components {
          */
         "sessionId"?: string;
         /**
-          * Waits for a certain duration for a frame with a given correlation ID to be present on a frame. Default timeout for waiting is 2 seconds, but can be configured.
-         */
-        "setWaitForFrameWithCorrelationId": (suppliedCorrelationId: string, waitTimeoutMs?: number) => Promise<void>;
-        /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
