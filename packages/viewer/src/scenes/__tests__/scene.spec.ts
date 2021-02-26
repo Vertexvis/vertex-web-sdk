@@ -65,6 +65,41 @@ describe(Scene, () => {
       });
     });
 
+    it('should support passing a supplied correlationId', () => {
+      const itemId = UUID.create();
+      const suppliedId = `SuppliedId-${UUID.create()}`;
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .execute({ suppliedCorrelationId: suppliedId });
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            item: {
+              sceneItemQuery: {
+                id: {
+                  hex: itemId.toString(),
+                },
+              },
+            },
+            operationTypes: [
+              {
+                changeVisibility: {
+                  visible: false,
+                },
+              },
+            ],
+          },
+        ],
+        suppliedCorrelationId: {
+          value: suppliedId,
+        },
+      });
+    });
+
     it('should support passing multiple operations in one request', () => {
       const itemId = UUID.create();
       const suppliedId = UUID.create();
