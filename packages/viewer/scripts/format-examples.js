@@ -15,15 +15,6 @@ process.stdin.once('readable', async function () {
     return typeDefNewFormatted.replace(exampleMatch[0], `\n${formattedMatch}`);
   },
   typeDefTxt);
-
-  // const exampleReplacements = [];
-  // for (const exampleMatch of docExampleMatches) {
-  //   const formattedMatch = `\`\`\`\n${formatExample(exampleMatch[1])}\`\`\``;
-  //   exampleReplacements.push([exampleMatch[0], formattedMatch]);
-  // }
-  // const typeDefNew = exampleReplacements.reduce(function (typeDef, match) {
-  //   return typeDef.replace(match[0], `\n${match[1]}`);
-  // }, typeDefTxt);
   process.stdout.write(typeDefNewFormatted);
 });
 
