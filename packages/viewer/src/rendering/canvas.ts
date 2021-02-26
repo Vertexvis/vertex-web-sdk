@@ -18,7 +18,6 @@ export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
 function drawImage(image: HtmlImage, data: DrawFrame): void {
-  console.log('drawing frame with correlation id: ', data.frame.correlationIds);
   const { imageAttributes } = data.frame;
   const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
     imageAttributes.frameDimensions
