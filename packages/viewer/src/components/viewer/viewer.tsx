@@ -934,7 +934,6 @@ export class Viewer {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
-
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.lastFrame = drawnFrame;
