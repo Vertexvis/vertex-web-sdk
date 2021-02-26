@@ -230,7 +230,7 @@ export class InteractionApi {
   /**
    * Returns the pixel threshold that should be used to detect
    * movement based on the type of pointer input being coarse or fine.
-   * This threshold is based on the configured `coarsePointerThreshold` 
+   * This threshold is based on the configured `coarsePointerThreshold`
    * or the `finePointerThreshold` respectively.
    *
    * @param isTouch - Whether the event is a touch or not, if false or
