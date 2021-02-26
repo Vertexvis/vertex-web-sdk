@@ -131,9 +131,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     const position = Point.create(event.screenX, event.screenY);
     let didBeginDrag = false;
+    const pixelThreshold =
+      this.interactionApi != null
+        ? this.interactionApi.pixelThreshold(this.isTouch(event))
+        : 2;
     if (
       this.downPosition != null &&
-      Point.distance(position, this.downPosition) >= 2 &&
+      Point.distance(position, this.downPosition) >= pixelThreshold &&
       !this.isDragging
     ) {
       this.beginDrag(event);
@@ -235,5 +239,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     return canvasOffset != null
       ? Point.subtract(Point.create(event.clientX, event.clientY), canvasOffset)
       : undefined;
+  }
+
+  protected isTouch(event: BaseEvent): boolean {
+    return window.PointerEvent != null && event instanceof PointerEvent
+      ? event.pointerType === 'touch'
+      : false;
   }
 }

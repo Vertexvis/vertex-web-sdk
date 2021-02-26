@@ -5,6 +5,7 @@ import * as Frame from './frame';
 import * as LoadableResource from './loadableResource';
 import * as Animation from './animation';
 import * as FlyTo from './flyToOptions';
+import * as Interactions from './interactions';
 
 export * from './synchronizedClock';
 
@@ -18,4 +19,5 @@ export {
   LoadableResource,
   Animation,
   FlyTo,
+  Interactions,
 };

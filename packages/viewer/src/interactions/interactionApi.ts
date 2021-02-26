@@ -3,8 +3,11 @@ import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
+import { Interactions } from '../types';
 
 type SceneProvider = () => Scene;
+
+type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (
   camera: Camera,
@@ -21,6 +24,7 @@ export class InteractionApi {
 
   public constructor(
     private stream: StreamApi,
+    private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
@@ -223,6 +227,24 @@ export class InteractionApi {
     return this.currentCamera != null;
   }
 
+  /**
+   * Returns the pixel threshold that should be used to detect
+   * movement based on the type of pointer input being coarse or fine.
+   * This threshold is based on the configured `coarsePointerThreshold`
+   * or the `finePointerThreshold` respectively.
+   *
+   * @param isTouch - Whether the event is a touch or not, if false or
+   * undefined, a media query will be used to determine pointer type
+   * @returns The pixel threshold.
+   */
+  public pixelThreshold(isTouch?: boolean): number {
+    const pixelThreshold = this.isCoarseInputDevice(isTouch)
+      ? this.getConfig().coarsePointerThreshold
+      : this.getConfig().finePointerThreshold;
+
+    return pixelThreshold * window.devicePixelRatio;
+  }
+
   private emitTapEvent(
     emit: (details: TapEventDetails) => void,
     position: Point.Point,
@@ -241,5 +263,9 @@ export class InteractionApi {
       metaKey,
       shiftKey,
     });
+  }
+
+  private isCoarseInputDevice(isTouch?: boolean): boolean {
+    return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 }

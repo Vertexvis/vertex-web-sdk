@@ -75,6 +75,7 @@ describe(MouseInteractionHandler, () => {
     jest.resetAllMocks();
     jest.clearAllMocks();
 
+    api.pixelThreshold = jest.fn(() => 2);
     handler.setPrimaryInteractionType('rotate');
     handler.initialize(div, api);
   });

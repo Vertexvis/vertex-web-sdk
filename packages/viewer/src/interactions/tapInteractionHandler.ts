@@ -79,7 +79,8 @@ export class TapInteractionHandler implements InteractionHandler {
   private handleTouchMove(event: TouchEvent): void {
     if (event.touches.length > 0) {
       this.handlePointerMove(
-        Point.create(event.touches[0].clientX, event.touches[0].clientY)
+        Point.create(event.touches[0].clientX, event.touches[0].clientY),
+        true
       );
     }
   }
@@ -109,7 +110,10 @@ export class TapInteractionHandler implements InteractionHandler {
   }
 
   private handleMove(event: BaseEvent): void {
-    this.handlePointerMove(Point.create(event.clientX, event.clientY));
+    this.handlePointerMove(
+      Point.create(event.clientX, event.clientY),
+      this.isTouch(event)
+    );
   }
 
   private handleUp(event: BaseEvent): void {
@@ -118,20 +122,25 @@ export class TapInteractionHandler implements InteractionHandler {
       window.removeEventListener(this.moveEvent, this.handleMove);
     }
 
-    this.handlePointerEnd(Point.create(event.clientX, event.clientY), {
-      altKey: event.altKey,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-      shiftKey: event.shiftKey,
-    });
+    this.handlePointerEnd(
+      Point.create(event.clientX, event.clientY),
+      {
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      },
+      this.isTouch(event)
+    );
   }
 
-  private handlePointerMove(position: Point.Point): void {
+  private handlePointerMove(position: Point.Point, isTouch?: boolean): void {
     // Ignore pointer end events for this associated touch start
     // since the distance from the start is large enough
+    const threshold = this.interactionApi?.pixelThreshold(isTouch) || 2;
     if (
       this.pointerDownPosition != null &&
-      Point.distance(position, this.pointerDownPosition) >= 2
+      Point.distance(position, this.pointerDownPosition) >= threshold
     ) {
       this.clearPositions();
     }
@@ -139,7 +148,8 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private handlePointerEnd(
     position?: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
+    keyDetails: Partial<TapEventKeys> = {},
+    isTouch = false
   ): void {
     if (position != null && this.pointerDownPosition != null) {
       if (
@@ -168,12 +178,14 @@ export class TapInteractionHandler implements InteractionHandler {
     return (
       pointerUpPosition: Point.Point,
       keyDetails: Partial<TapEventKeys> = {},
-      pointerDownPosition?: Point.Point
+      pointerDownPosition?: Point.Point,
+      isTouch = false
     ): void => {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
+      const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
       if (
         downPosition != null &&
-        Point.distance(downPosition, pointerUpPosition) <= 1
+        Point.distance(downPosition, pointerUpPosition) <= threshold
       ) {
         const position = this.getCanvasPosition(pointerUpPosition);
         if (position != null && emitter != null) {
@@ -249,5 +261,11 @@ export class TapInteractionHandler implements InteractionHandler {
     } else {
       this.secondPointerDownPosition = point;
     }
+  }
+
+  private isTouch(event: BaseEvent): boolean {
+    return window.PointerEvent != null && event instanceof PointerEvent
+      ? event.pointerType === 'touch'
+      : false;
   }
 }
