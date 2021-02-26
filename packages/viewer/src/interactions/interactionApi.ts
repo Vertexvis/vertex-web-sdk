@@ -235,7 +235,7 @@ export class InteractionApi {
    *
    * @param isTouch - Whether the event is a touch or not, if false or
    * undefined, a media query will be used to determine pointer type
-\  * @returns The pixel threshold.
+   * @returns The pixel threshold.
    */
   public pixelThreshold(isTouch?: boolean): number {
     const pixelThreshold = this.isCoarseInputDevice(isTouch)
