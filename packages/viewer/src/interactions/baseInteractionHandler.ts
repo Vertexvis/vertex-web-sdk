@@ -101,7 +101,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     let didBeginDrag = false;
     const pixelThreshold =
       this.interactionApi != null
-        ? this.interactionApi.scalePixelThreshold(2, this.isTouch(event))
+        ? this.interactionApi.pixelThreshold(this.isTouch(event))
         : 2;
     if (
       this.downPosition != null &&

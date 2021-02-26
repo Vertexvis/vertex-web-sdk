@@ -1,20 +1,20 @@
 export interface InteractionConfig {
   /**
-   * A scalar to be applied to the pixel thresholds for a fine pointer
-   * input device (e.g. a mouse). This will affect pixel thresholds for
-   * interactions at a rate of (N px * finePointerThresholdScale).
+   * The amount of movement required with a fine (mouse, trackpad, etc) pointer
+   * input before an interaction is considered a movement that will update the
+   * camera. This threshold is always scaled up based on the device's pixel ratio.
    */
-  finePointerThresholdScale: number;
+  finePointerThreshold: number;
 
   /**
-   * A scalar to be applied to the pixel thresholds for a coarse pointer
-   * input device (e.g. touch). This will affect pixel thresholds
-   * for interactions at a rate of (N px * devicePixelRatio * coarsePointerThresholdScale).
+   * The amount of movement required with a coarse (touch, stylus, etc) pointer
+   * input before an interaction is considered a movement that will update the
+   * camera. This threshold is always scaled up based on the device's pixel ratio.
    */
-  coarsePointerThresholdScale: number;
+  coarsePointerThreshold: number;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
-  finePointerThresholdScale: 1,
-  coarsePointerThresholdScale: 1.5,
+  finePointerThreshold: 1,
+  coarsePointerThreshold: 3,
 };
