@@ -106,7 +106,21 @@ export namespace Components {
     ) => Promise<Disposable>;
     /**
      * Registers a key interaction to be invoked on a key down event  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
-     * @example class CustomKeyboardInteraction extends KeyInteractionWithReset {   constructor(private baseInteractionHandler: BaseInteractionHandler) {}    public predicate(keyState: KeyState): boolean {     return keyState['Alt'] === true && keyState['Shift'] === true;   }    public async fn(): Promise<void> {     this.baseInteractionHandler.setPrimaryInteractionType("twist")   }    public async reset: Promise<void> {     this.baseInteractionHandler.setPrimaryInteractionType('rotate');   }
+     * @example
+     * ```
+     * class CustomKeyboardInteraction extends KeyInteractionWithReset {
+     *   constructor(private baseInteractionHandler: BaseInteractionHandler) {}
+     *   public predicate(keyState: KeyState): boolean {
+     *     return keyState['Alt'] === true && keyState['Shift'] === true;
+     *   }
+     *   public async fn(): Promise<void> {
+     *     this.baseInteractionHandler.setPrimaryInteractionType('twist');
+     *   }
+     *   public async reset(): Promise<void> {
+     *     this.baseInteractionHandler.setPrimaryInteractionType('rotate');
+     *   }
+     * }
+     * ```
      * @param keyInteraction - The `KeyInteraction` to register.
      */
     registerKeyInteraction: (

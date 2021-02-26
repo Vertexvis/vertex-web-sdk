@@ -500,7 +500,7 @@ export class Viewer {
    * to disable the default keyboard shortcuts provided by the viewer.
    *
    * @example
-   *
+   * ```
    * class CustomKeyboardInteraction extends KeyInteractionWithReset {
    *   constructor(private baseInteractionHandler: BaseInteractionHandler) {}
    *
@@ -509,12 +509,14 @@ export class Viewer {
    *   }
    *
    *   public async fn(): Promise<void> {
-   *     this.baseInteractionHandler.setPrimaryInteractionType("twist")
+   *     this.baseInteractionHandler.setPrimaryInteractionType('twist');
    *   }
    *
-   *   public async reset: Promise<void> {
+   *   public async reset(): Promise<void> {
    *     this.baseInteractionHandler.setPrimaryInteractionType('rotate');
    *   }
+   * }
+   * ```
    *
    * @param keyInteraction - The `KeyInteraction` to register.
    */

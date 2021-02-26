@@ -8,14 +8,16 @@
  * adjusted offset and the read value, and can further be passed to additional
  * helpers.
  *
- * @example // Reading from an `ArrayBuffer`
- *
+ * @example
+ * ```
+ * // Reading from an `ArrayBuffer`
  * const reader = BinaryReader.fromArrayBuffer(buffer);
  * const messageLength = BinaryReader.readInt32(reader);
  * console.log(messageLength.value); // 11
  *
  * const message = BinaryReader.readUtf8String(messageLength.value, messageLength);
  * console.log(message.value); // Hello world
+ * ```
  */
 export interface BinaryReader {
   offset: number;

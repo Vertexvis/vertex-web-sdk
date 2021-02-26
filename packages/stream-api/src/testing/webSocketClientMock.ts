@@ -80,13 +80,14 @@ export class WebSocketClientMock implements WebSocketClient {
    * Returns the next message that was sent on this websocket.
    *
    * @example
-   *
+   * ```
    * const ws = new WebSocketClientMock();
    * ws.send("1");
    * ws.send("2");
    *
    * ws.nextSent(); // "1"
    * ws.nextSent(); // "2"
+   * ```
    */
   public nextSent(): WebSocketSendData;
   public nextSent<T>(
@@ -108,7 +109,7 @@ export class WebSocketClientMock implements WebSocketClient {
    * Skips the next N sent messages.
    *
    * @example
-   *
+   * ```
    * const ws = new WebSocketClientMock();
    * ws.send("1");
    * ws.send("2");
@@ -116,6 +117,7 @@ export class WebSocketClientMock implements WebSocketClient {
    *
    * ws.skipSent(2);
    * ws.nextSent(); // "3"
+   * ```
    *
    * @param n The number of sent messages to skip over.
    */

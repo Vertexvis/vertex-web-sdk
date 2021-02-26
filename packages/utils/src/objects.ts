@@ -8,9 +8,10 @@ import isSimpleObject from 'is-plain-object';
  * config.
  *
  * @example
- *
+ * ```
  * defaults({ 'a': [1] }, { 'b': 2 }, { 'a': [2] });
  * // => { a: [1], b: 2 }
+ * ```
  */
 export function defaults<A>(a: A): A;
 export function defaults<A, B>(a: A, b: B): A & B;
@@ -47,7 +48,7 @@ export function defaults(
  * by the `Object` constructor. Returns `false` otherwise.
  *
  * @example
- *
+ * ```
  * isPlainObject(Object.create({})); //=> true
  * isPlainObject(Object.create(Object.prototype)); //=> true
  * isPlainObject({foo: 'bar'}); //=> true
@@ -59,6 +60,7 @@ export function defaults(
  * isPlainObject(new Foo); //=> false
  * isPlainObject(null); //=> false
  * isPlainObject(Object.create(null)); //=> false
+ * ```
  */
 export const isPlainObject = (obj: unknown): boolean => {
   return isSimpleObject(obj);
@@ -72,7 +74,7 @@ export const isPlainObject = (obj: unknown): boolean => {
  * Returns an array of key-value pairs for each enumerable key in `obj`.
  *
  * @example
- *
+ * ```
  * toPairs({a: 1, b: 2}); //=> [['a', 1], ['b', 2]]
  * toPairs(['a', 'b']); //=> [['0', 'a'], ['1', 'b']]
  *
@@ -81,6 +83,7 @@ export const isPlainObject = (obj: unknown): boolean => {
  *   this.b = 2;
  * }
  * toPairs(new Foo()); //=> [['a', 1], ['b', 2]]
+ * ```
  */
 export function toPairs<T>(obj: Record<string, T>): Array<[string, T]>;
 export function toPairs<T>(obj: T[]): Array<[string, T]>;
