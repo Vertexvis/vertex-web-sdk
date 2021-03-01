@@ -34,4 +34,9 @@ export const config: Config = {
     },
     roots: ['<rootDir>/src/'],
   },
+  extras: {
+    cssVarsShim: true,
+    dynamicImportShim: true,
+    shadowDomShim: true,
+  },
 };
