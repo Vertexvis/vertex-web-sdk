@@ -1,6 +1,15 @@
+jest.mock('@juggle/resize-observer', () => ({
+  ResizeObserver: jest.fn(() => {
+    console.log('in the mock');
+    return {
+      observe: jest.fn(),
+      disconnect: jest.fn(),
+    };
+  }),
+}));
+jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
 jest.mock('../../sessions/storage');
-jest.mock('@vertexvis/stream-api');
 
 import '../../testing/domMocks';
 import {

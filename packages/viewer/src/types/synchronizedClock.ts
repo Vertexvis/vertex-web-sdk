@@ -8,7 +8,7 @@ type Milliseconds = number;
  * machine from a date or duration.
  *
  * @example
- *
+ * ```
  * const knownRemoteTime = await getRemoteTime();
  * const clock = new SynchronizedClock(knownRemoteTime);
  *
@@ -19,6 +19,7 @@ type Milliseconds = number;
  * const localTime = clock.localTime(remoteDate);
  *
  * const currentRemoteTime = clock.remoteNow();
+ * ```
  */
 export class SynchronizedClock {
   public constructor(

@@ -7,10 +7,11 @@
  * A type that recursively makes each property of `T` optional.
  *
  * @example
- *
+ * ```
  * type Foo = { a: number };
  * type Bar = { foo: Foo };
  * type Baz = DeepPartial<Bar>; // { foo?: { a?: number } }
+ * ```
  */
 export type DeepPartial<T> = T extends Record<string, unknown>
   ? { [K in keyof T]?: DeepPartial<T[K]> }
@@ -21,11 +22,13 @@ export type DeepPartial<T> = T extends Record<string, unknown>
  * Optionally excluding a nested path specified by a list of keys.
  *
  * @example
+ * ```
  * type Foo = { a?: { c?: number }, b?: string };
  * type Bar = { foo: Foo };
  * type Baz = DeepRequired<Bar, []>; // { foo: { a: { c: number }, b: string } }
  * type Baz = DeepRequired<Bar, ['a', 'c']>; // { foo: { a: { c?: number }, b: string } }
  * type Baz = DeepRequired<Bar, ['a'] | ['b']>; // { foo: { a: { c?: number }, b?: string } }
+ * ```
  */
 // https://stackoverflow.com/a/57837897
 export type DeepRequired<T, P extends string[]> = T extends unknown[]
@@ -60,9 +63,10 @@ type ShiftUnion<
  * not undefined, also makes them not nullable.
  *
  * @example
- *
- *type Foo = { a?: number | null };
- *type Bar = RequiredAndNonNullable<Bar>; // { a: number }
+ * ```
+ * type Foo = { a?: number | null };
+ * type Bar = RequiredAndNonNullable<Bar>; // { a: number }
+ * ```
  */
 export type RequiredAndNonNullable<T> = Required<
   {

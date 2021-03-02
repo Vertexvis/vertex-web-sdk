@@ -6,12 +6,13 @@
     "eslint": "^7.20.0",
     "lerna": "^3.22.1",
     "semver": "^7.3.4",
+    "typedoc": "^0.20.25",
     "typescript": "^4.2.2"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc && yarn bootstrap",
     "generate:vscode-workspace": "./scripts/generate_vscode_workspace.sh",
-    "generate:docs": "lerna run generate:docs",
+    "generate:docs": "lerna run generate:docs && typedoc --tsconfig tsconfig.docs.json",
     "generate:npmrc": "./scripts/generate_npmrc.sh",
     "build": "lerna run build",
     "release": "./scripts/release.sh",

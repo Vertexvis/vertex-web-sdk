@@ -1,3 +1,6 @@
+/**
+ * @module Geometry
+ */
 import * as Angle from './angle';
 import * as BoundingBox from './boundingBox';
 import * as Dimensions from './dimensions';

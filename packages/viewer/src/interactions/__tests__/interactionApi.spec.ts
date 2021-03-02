@@ -127,9 +127,15 @@ describe(InteractionApi, () => {
         streamApi,
         interactionConfigProvider,
         sceneProvider,
-        { emit: emitTap },
-        { emit: emitDoubleTap },
-        { emit: emitLongPress }
+        {
+          emit: emitTap,
+        },
+        {
+          emit: emitDoubleTap,
+        },
+        {
+          emit: emitLongPress,
+        }
       );
     });
 
