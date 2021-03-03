@@ -120,6 +120,23 @@ export class InteractionApi {
   }
 
   /**
+   * Performs a twist operation of the scene's camera, and requests a new image
+   * for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public async twistCamera2(delta: number): Promise<void> {
+    return this.transformCamera((camera) => {
+      const axis = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+      const angleInRadians = Angle.toRadians(delta);
+      return camera.rotateAroundAxis(angleInRadians, axis);
+    });
+  }
+
+  /**
    * Performs a pan operation of the scene's camera, and requests a new image
    * for the updated scene.
    *

@@ -1,6 +1,6 @@
 import { InteractionHandler } from './interactionHandler';
 import { InteractionApi } from './interactionApi';
-import { Point } from '@vertexvis/geometry';
+import { Point, Matrix2, Angle } from '@vertexvis/geometry';
 
 export abstract class MultiTouchInteractionHandler
   implements InteractionHandler {
@@ -8,6 +8,8 @@ export abstract class MultiTouchInteractionHandler
   protected interactionApi?: InteractionApi;
   protected currentPosition1?: Point.Point;
   protected currentPosition2?: Point.Point;
+  protected startingPosition1?: Point.Point;
+  protected startingPosition2?: Point.Point;
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
@@ -39,6 +41,32 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.beginInteraction();
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCamera(delta);
+
+      if (this.startingPosition1 != null && this.startingPosition2 != null) {
+        const startingToPrevious = Matrix2.create(
+          Point.subtract(this.startingPosition1, this.startingPosition2),
+          Point.subtract(this.currentPosition1, this.currentPosition2)
+        );
+        const startingToCurrent = Matrix2.create(
+          Point.subtract(this.startingPosition1, this.startingPosition2),
+          Point.subtract(point1, point2)
+        );
+        const previousAngle = Angle.toDegrees(
+          Math.atan2(
+            Matrix2.determinant(startingToPrevious),
+            Matrix2.dot(startingToPrevious)
+          )
+        );
+        const currentAngle = Angle.toDegrees(
+          Math.atan2(
+            Matrix2.determinant(startingToCurrent),
+            Matrix2.dot(startingToCurrent)
+          )
+        );
+
+        // Previous - Current to invert the value of the angle
+        this.interactionApi?.twistCamera2(previousAngle - currentAngle);
+      }
     }
 
     this.currentPosition1 = point1;
