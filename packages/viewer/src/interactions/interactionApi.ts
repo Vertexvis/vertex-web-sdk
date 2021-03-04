@@ -101,21 +101,33 @@ export class InteractionApi {
    * for the updated scene.
    *
    * @param delta A position delta `{x, y}` in the 2D coordinate space of the
-   *  viewer.
+   *  viewer or the angle to twist the camera by around the view vector.
    */
-  public async twistCamera(point: Point.Point): Promise<void> {
+  public async twistCamera(delta: number): Promise<void>;
+  public async twistCamera(delta: Point.Point): Promise<void>;
+  public async twistCamera(...args: any[]): Promise<void> {
     return this.transformCamera((camera, viewport) => {
-      const center = Point.create(viewport.width / 2, viewport.height / 2);
-      const currentAngle = Angle.fromPoints(center, point);
-      const angleDelta =
-        this.lastAngle != null ? currentAngle - this.lastAngle : 0;
-
-      this.lastAngle = currentAngle;
       const axis = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
       );
-      const angleInRadians = Angle.toRadians(-angleDelta);
-      return camera.rotateAroundAxis(angleInRadians, axis);
+
+      if (args.length === 1 && typeof args[0] === 'number') {
+        const angleInRadians = Angle.toRadians(-args[0]);
+        return camera.rotateAroundAxis(angleInRadians, axis);
+      } else if (args.length === 1) {
+        const center = Point.create(viewport.width / 2, viewport.height / 2);
+        const currentAngle = Angle.fromPoints(center, args[0]);
+        const angleDelta =
+          this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+
+        this.lastAngle = currentAngle;
+        const axis = Vector3.normalize(
+          Vector3.subtract(camera.lookAt, camera.position)
+        );
+        const angleInRadians = Angle.toRadians(-angleDelta);
+        return camera.rotateAroundAxis(angleInRadians, axis);
+      }
+      return camera;
     });
   }
 

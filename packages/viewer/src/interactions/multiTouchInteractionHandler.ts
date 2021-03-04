@@ -1,6 +1,6 @@
 import { InteractionHandler } from './interactionHandler';
 import { InteractionApi } from './interactionApi';
-import { Point } from '@vertexvis/geometry';
+import { Point, Matrix2, Angle } from '@vertexvis/geometry';
 
 export abstract class MultiTouchInteractionHandler
   implements InteractionHandler {
@@ -36,9 +36,20 @@ export abstract class MultiTouchInteractionHandler
         Point.distance(point1, point2) -
         Point.distance(this.currentPosition1, this.currentPosition2);
       const zoom = distance * 0.5;
+      const previousToCurrent = Matrix2.create(
+        Point.subtract(this.currentPosition1, this.currentPosition2),
+        Point.subtract(point1, point2)
+      );
+      const angle = Angle.toDegrees(
+        Math.atan2(
+          Matrix2.determinant(previousToCurrent),
+          Matrix2.dot(previousToCurrent)
+        )
+      );
       this.interactionApi?.beginInteraction();
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCamera(delta);
+      this.interactionApi?.twistCamera(angle);
     }
 
     this.currentPosition1 = point1;
