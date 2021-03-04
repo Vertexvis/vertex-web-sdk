@@ -49,7 +49,6 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.beginInteraction();
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCamera(delta);
-
       this.interactionApi?.twistCamera(angle);
     }
 
