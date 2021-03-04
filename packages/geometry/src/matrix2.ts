@@ -17,22 +17,31 @@ export function create(a: Point.Point, b: Point.Point): Matrix;
 
 export function create(a: number, b: number, c: number, d: number): Matrix;
 
+export function create(): Matrix;
+
 export function create(...args: any[]): Matrix {
   if (args.length === 2) {
     return {
-      a: args[0].x || 0,
-      b: args[0].y || 0,
-      c: args[1].x || 0,
-      d: args[1].y || 0,
+      a: args[0].x,
+      b: args[0].y,
+      c: args[1].x,
+      d: args[1].y,
     };
-  } else {
+  } else if (args.length === 4) {
     return {
-      a: args[0] || 0,
-      b: args[1] || 0,
-      c: args[2] || 0,
-      d: args[3] || 0,
+      a: args[0],
+      b: args[1],
+      c: args[2],
+      d: args[3],
     };
   }
+
+  return {
+    a: 0,
+    b: 0,
+    c: 0,
+    d: 0,
+  };
 }
 
 /**

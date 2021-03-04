@@ -12,13 +12,20 @@ describe(Matrix2.create, () => {
   });
 
   it('creates a matrix from values', () => {
-    expect(() => {
-      expect(Matrix2.create(1, 2, 3, 4)).toEqual({
-        a: 1,
-        b: 2,
-        c: 3,
-        d: 4,
-      });
+    expect(Matrix2.create(1, 2, 3, 4)).toEqual({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: 4,
+    });
+  });
+
+  it('returns an emtpy matrix if nothing is passed', () => {
+    expect(Matrix2.create()).toEqual({
+      a: 0,
+      b: 0,
+      c: 0,
+      d: 0,
     });
   });
 });
