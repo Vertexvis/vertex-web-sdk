@@ -2,7 +2,7 @@ import * as Point from './point';
 
 /**
  * A 2x2 matrix. The contents are mapped as follows:
- * 
+ *
  * ```
  * a  b
  * c  d
