@@ -9,7 +9,7 @@ import { toRadians } from './angle';
  *
  * ```
  * a  b  tx
- * b  d  ty
+ * c  d  ty
  * u  v  w
  * ```
  */
