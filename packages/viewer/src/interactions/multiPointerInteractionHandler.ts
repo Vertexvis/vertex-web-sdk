@@ -4,7 +4,6 @@ import { MultiTouchInteractionHandler } from './multiTouchInteractionHandler';
 
 export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler {
   private touchPoints: Record<string, Point.Point> = {};
-  private startTouchPoints: Record<string, Point.Point> = {};
 
   public constructor() {
     super();
@@ -31,10 +30,6 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
       ...this.touchPoints,
       [event.pointerId]: point,
     };
-    this.startTouchPoints = {
-      ...this.startTouchPoints,
-      [event.pointerId]: point,
-    };
     const keys = Object.keys(this.touchPoints);
     if (keys.length === 1) {
       window.addEventListener('pointermove', this.handlePointerMove);
@@ -54,10 +49,6 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
 
     const keys = Object.keys(this.touchPoints);
     if (keys.length === 2) {
-      this.startingPosition1 =
-        this.startingPosition1 || this.touchPoints[keys[0]];
-      this.startingPosition2 =
-        this.startingPosition2 || this.touchPoints[keys[1]];
       const point1 = this.touchPoints[keys[0]];
       const point2 = this.touchPoints[keys[1]];
       this.handleTwoPointTouchMove(point1, point2);
