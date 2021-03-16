@@ -48,10 +48,11 @@
     "protobufjs": "^6.9.0",
     "rollup": "^1.19.4",
     "ts-jest": "^26.5.2",
+    "tslib": "^2.1.0",
     "typescript": "^4.2.2"
   },
   "peerDependencies": {
-    "protobufjs": "^6.9.0",
-    "tslib": "^1.10.0"
+    "protobufjs": ">=6.9.0 <7.0.0",
+    "tslib": ">=2.1.0"
   }
 }
