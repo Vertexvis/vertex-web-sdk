@@ -4,7 +4,7 @@
   "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^7.20.0",
-    "lerna": "^3.22.1",
+    "lerna": "^4.0.0",
     "semver": "^7.3.4",
     "typedoc": "^0.20.25",
     "typescript": "^4.2.2"
