@@ -45,7 +45,7 @@
     "rollup": "^1.19.4"
   },
   "peerDependencies": {
-    "react": "^16",
-    "react-dom": "^16"
+    "react": ">=16.0.0 <18.0.0",
+    "react-dom": ">=16.0.0 <18.0.0"
   }
 }
