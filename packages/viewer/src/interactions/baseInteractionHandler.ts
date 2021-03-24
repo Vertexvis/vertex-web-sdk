@@ -130,7 +130,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     const position = Point.create(event.screenX, event.screenY);
-    let didBeginDrag = false;
     const pixelThreshold =
       this.interactionApi != null
         ? this.interactionApi.pixelThreshold(this.isTouch(event))
@@ -141,13 +140,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       !this.isDragging
     ) {
       this.beginDrag(event);
-      didBeginDrag = true;
       this.isDragging = true;
     }
 
-    // We only invoke drag interactions for mouse events after a beginDrag has
-    // been invoked.
-    if (!didBeginDrag && this.isDragging) {
+    if (this.isDragging) {
       this.drag(event);
     }
   }
