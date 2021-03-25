@@ -189,6 +189,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleMouseWheel(event: WheelEvent): void {
+    event.preventDefault();
+
     SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
