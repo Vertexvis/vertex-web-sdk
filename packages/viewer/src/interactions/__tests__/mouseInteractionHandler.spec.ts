@@ -9,6 +9,7 @@ import {
   RotateInteraction,
   TwistInteraction,
 } from '../mouseInteractions';
+import { parseConfig } from '../../config/config';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
@@ -64,7 +65,17 @@ describe(MouseInteractionHandler, () => {
     deltaMode: 0,
   } as unknown) as EventInit);
 
+  const config = parseConfig('platdev');
   const handler = new MouseInteractionHandler(
+    () => ({
+      ...config,
+      interactions: {
+        ...config.interactions,
+        interactionDelay: 10,
+        finePointerThreshold: 1,
+        coarsePointerThreshold: 1,
+      },
+    }),
     rotateInteraction,
     zoomInteraction,
     panInteraction,
@@ -84,24 +95,24 @@ describe(MouseInteractionHandler, () => {
     handler.dispose();
   });
 
-  it('begins a drag of primary interaction if the primary mouse has moved more than 2 pixels', () => {
-    simulatePrimaryInteractions();
+  it.only('begins a drag of primary interaction if the primary mouse has moved more than 2 pixels', async () => {
+    await simulatePrimaryInteractions(50);
 
     expect(rotateInteraction.beginDrag).toHaveBeenCalledTimes(1);
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
     expect(rotateInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
-  it('begins a drag of pan interaction if the secondary mouse has moved more than 2 pixels', () => {
-    simulateSecondaryInteractions();
+  it('begins a drag of pan interaction if the secondary mouse has moved more than 2 pixels', async () => {
+    await simulateSecondaryInteractions(50);
 
     expect(panInteraction.beginDrag).toHaveBeenCalledTimes(1);
     expect(panInteraction.drag).toHaveBeenCalledTimes(1);
     expect(panInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
-  it('removes window listeners on mouse up', () => {
-    simulatePrimaryInteractions();
+  it('removes window listeners on mouse up', async () => {
+    await simulatePrimaryInteractions(50);
     window.dispatchEvent(mouseMovePrimaryButton2);
 
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
@@ -116,9 +127,9 @@ describe(MouseInteractionHandler, () => {
   });
 
   describe(MouseInteractionHandler.prototype.dispose, () => {
-    it('removes mouse down event listeners', () => {
+    it('removes mouse down event listeners', async () => {
       handler.dispose();
-      simulatePrimaryInteractions();
+      await simulatePrimaryInteractions(50);
 
       expect(rotateInteraction.beginDrag).not.toHaveBeenCalled();
     });
@@ -134,21 +145,21 @@ describe(MouseInteractionHandler, () => {
   });
 
   describe(MouseInteractionHandler.prototype.setPrimaryInteractionType, () => {
-    it('sets rotate interaction', () => {
+    it('sets rotate interaction', async () => {
       handler.setPrimaryInteractionType('rotate');
-      simulatePrimaryInteractions();
+      await simulatePrimaryInteractions(50);
       expect(rotateInteraction.beginDrag).toHaveBeenCalled();
     });
 
-    it('sets zoom interaction', () => {
+    it('sets zoom interaction', async () => {
       handler.setPrimaryInteractionType('zoom');
-      simulatePrimaryInteractions();
+      await simulatePrimaryInteractions(50);
       expect(zoomInteraction.beginDrag).toHaveBeenCalled();
     });
 
-    it('sets pan interaction', () => {
+    it('sets pan interaction', async () => {
       handler.setPrimaryInteractionType('pan');
-      simulatePrimaryInteractions();
+      await simulatePrimaryInteractions(50);
       expect(panInteraction.beginDrag).toHaveBeenCalled();
     });
 
@@ -161,17 +172,23 @@ describe(MouseInteractionHandler, () => {
     });
   });
 
-  function simulatePrimaryInteractions(): void {
+  async function simulatePrimaryInteractions(
+    interactionDelay?: number
+  ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMovePrimaryButton1);
     window.dispatchEvent(mouseMovePrimaryButton2);
+    await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
 
-  function simulateSecondaryInteractions(): void {
+  async function simulateSecondaryInteractions(
+    interactionDelay?: number
+  ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton1);
     window.dispatchEvent(mouseMoveSecondaryButton2);
+    await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
 
