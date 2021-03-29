@@ -186,15 +186,18 @@ export class TapInteractionHandler implements InteractionHandler {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
       const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
       console.log(this.interactionTimer);
-      if (
-        this.interactionTimer != null ||
-        (downPosition != null &&
-          Point.distance(downPosition, pointerUpPosition) <= threshold)
+
+      let emittedPosition: Point.Point | undefined;
+      if (this.interactionTimer != null && downPosition != null) {
+        emittedPosition = this.getCanvasPosition(downPosition);
+      } else if (
+        downPosition != null &&
+        Point.distance(downPosition, pointerUpPosition) <= threshold
       ) {
-        const position = this.getCanvasPosition(pointerUpPosition);
-        if (position != null && emitter != null) {
-          emitter(position, keyDetails);
-        }
+        emittedPosition = this.getCanvasPosition(pointerUpPosition);
+      }
+      if (emittedPosition != null && emitter != null) {
+        emitter(emittedPosition, keyDetails, eventInfo);
       }
     };
   }

@@ -15,7 +15,7 @@ export interface InteractionConfig {
 
   /**
    * The amount of time before a movement is considered an interaction and will
-   * update the camera. 
+   * update the camera.
    */
   interactionDelay: number;
 }

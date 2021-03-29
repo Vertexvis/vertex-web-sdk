@@ -28,7 +28,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
-  private lastMouseEvent?: BaseEvent;
+  private lastMoveEvent?: BaseEvent;
   private interactionTimer: number | undefined;
 
   protected disableIndividualInteractions = false;
@@ -127,8 +127,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.interactionTimer = undefined;
 
-      if (this.lastMouseEvent != null) {
-        this.handleWindowMove(this.lastMouseEvent);
+      // Perform the current movement in the case that the interaction timer elapses
+      if (this.lastMoveEvent != null) {
+        this.handleWindowMove(this.lastMoveEvent);
       }
     }, this.getConfig().interactions.interactionDelay);
 
@@ -161,7 +162,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       }
     }
 
-    this.lastMouseEvent = event;
+    this.lastMoveEvent = event;
   }
 
   protected async handleWindowUp(event: BaseEvent): Promise<void> {
@@ -173,11 +174,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.interactionTimer != null) {
       window.clearTimeout(this.interactionTimer);
       this.interactionTimer = undefined;
-      this.lastMouseEvent = undefined;
     }
 
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
     window.removeEventListener(this.upEvent, this.handleWindowUp);
+    this.lastMoveEvent = undefined;
   }
 
   protected beginDrag(event: BaseEvent): void {
