@@ -298,7 +298,7 @@ export class Viewer {
           'pointermove',
           () => this.getConfig()
         );
-        this.baseInteractionHandler = new PointerInteractionHandler();
+        this.baseInteractionHandler = new PointerInteractionHandler(() => this.getConfig());
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
@@ -311,7 +311,7 @@ export class Viewer {
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler();
+        this.baseInteractionHandler = new MouseInteractionHandler(() => this.getConfig());
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);

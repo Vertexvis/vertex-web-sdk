@@ -23,6 +23,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private doubleTapTimer?: any;
   private longPressTimer?: any;
+  private interactionTimer?: number;
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -140,7 +141,8 @@ export class TapInteractionHandler implements InteractionHandler {
     const threshold = this.interactionApi?.pixelThreshold(isTouch) || 2;
     if (
       this.pointerDownPosition != null &&
-      Point.distance(position, this.pointerDownPosition) >= threshold
+      Point.distance(position, this.pointerDownPosition) >= threshold &&
+      this.interactionTimer == null
     ) {
       this.clearPositions();
     }
@@ -183,9 +185,11 @@ export class TapInteractionHandler implements InteractionHandler {
     ): void => {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
       const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
+      console.log(this.interactionTimer);
       if (
-        downPosition != null &&
-        Point.distance(downPosition, pointerUpPosition) <= threshold
+        this.interactionTimer != null ||
+        (downPosition != null &&
+          Point.distance(downPosition, pointerUpPosition) <= threshold)
       ) {
         const position = this.getCanvasPosition(pointerUpPosition);
         if (position != null && emitter != null) {
@@ -253,9 +257,24 @@ export class TapInteractionHandler implements InteractionHandler {
     }, this.getConfig().events.longPressThreshold);
   }
 
+  private restartInteractionTimer(): void {
+    this.clearInteractionTimer();
+    this.interactionTimer = window.setTimeout(() => {
+      this.interactionTimer = undefined;
+    }, this.getConfig().interactions.interactionDelay);
+  }
+
+  private clearInteractionTimer(): void {
+    if (this.interactionTimer != null) {
+      window.clearTimeout(this.interactionTimer);
+      this.interactionTimer = undefined;
+    }
+  }
+
   private setPointerPositions(point: Point.Point): void {
     this.pointerDownPosition = point;
     if (this.firstPointerDownPosition == null) {
+      this.restartInteractionTimer();
       this.restartDoubleTapTimer();
       this.firstPointerDownPosition = point;
     } else {
