@@ -153,7 +153,9 @@ export class TapInteractionHandler implements InteractionHandler {
     keyDetails: Partial<TapEventKeys> = {},
     isTouch = false
   ): void {
-    if (position != null && this.pointerDownPosition != null) {
+    if (position != null) {
+      this.emit(this.interactionApi?.tap)(position, keyDetails);
+
       if (
         this.doubleTapTimer != null &&
         this.secondPointerDownPosition != null
@@ -187,8 +189,10 @@ export class TapInteractionHandler implements InteractionHandler {
       const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
 
       let emittedPosition: Point.Point | undefined;
-      if (this.interactionTimer != null && downPosition != null) {
-        emittedPosition = this.getCanvasPosition(downPosition);
+      if (this.interactionTimer != null) {
+        emittedPosition = this.getCanvasPosition(
+          downPosition || pointerUpPosition
+        );
       } else if (
         downPosition != null &&
         Point.distance(downPosition, pointerUpPosition) <= threshold
@@ -220,6 +224,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
     this.clearDoubleTapTimer();
     this.clearLongPressTimer();
+    this.clearInteractionTimer();
   }
 
   private clearDoubleTapTimer(): void {
@@ -275,8 +280,8 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private setPointerPositions(point: Point.Point): void {
     this.pointerDownPosition = point;
+    this.restartInteractionTimer();
     if (this.firstPointerDownPosition == null) {
-      this.restartInteractionTimer();
       this.restartDoubleTapTimer();
       this.firstPointerDownPosition = point;
     } else {
