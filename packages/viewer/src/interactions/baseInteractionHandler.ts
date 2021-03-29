@@ -29,7 +29,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
   private lastMoveEvent?: BaseEvent;
-  private interactionTimer?: any;
+  private interactionTimer?: number;
 
   protected disableIndividualInteractions = false;
 
@@ -123,7 +123,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected handleDownEvent(event: BaseEvent): void {
     event.preventDefault();
 
-    this.interactionTimer = setTimeout(() => {
+    this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.interactionTimer = undefined;
 
@@ -172,7 +172,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.interactionTimer != null) {
-      clearTimeout(this.interactionTimer);
+      window.clearTimeout(this.interactionTimer);
       this.interactionTimer = undefined;
     }
 

@@ -72,8 +72,6 @@ describe(MouseInteractionHandler, () => {
       interactions: {
         ...config.interactions,
         interactionDelay: 10,
-        finePointerThreshold: 1,
-        coarsePointerThreshold: 1,
       },
     }),
     rotateInteraction,
@@ -95,7 +93,7 @@ describe(MouseInteractionHandler, () => {
     handler.dispose();
   });
 
-  it.only('begins a drag of primary interaction if the primary mouse has moved more than 2 pixels', async () => {
+  it('begins a drag of primary interaction if the primary mouse has moved more than 2 pixels', async () => {
     await simulatePrimaryInteractions(50);
 
     expect(rotateInteraction.beginDrag).toHaveBeenCalledTimes(1);

@@ -21,8 +21,8 @@ export class TapInteractionHandler implements InteractionHandler {
   private firstPointerDownPosition?: Point.Point;
   private secondPointerDownPosition?: Point.Point;
 
-  private doubleTapTimer?: any;
-  private longPressTimer?: any;
+  private doubleTapTimer?: number;
+  private longPressTimer?: number;
   private interactionTimer?: number;
 
   public constructor(
@@ -185,7 +185,6 @@ export class TapInteractionHandler implements InteractionHandler {
     ): void => {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
       const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
-      console.log(this.interactionTimer);
 
       let emittedPosition: Point.Point | undefined;
       if (this.interactionTimer != null && downPosition != null) {
@@ -225,7 +224,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private clearDoubleTapTimer(): void {
     if (this.doubleTapTimer != null) {
-      clearTimeout(this.doubleTapTimer);
+      window.clearTimeout(this.doubleTapTimer);
     }
     this.doubleTapTimer = undefined;
     this.firstPointerDownPosition = undefined;
@@ -234,7 +233,7 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private restartDoubleTapTimer(): void {
     this.clearDoubleTapTimer();
-    this.doubleTapTimer = setTimeout(
+    this.doubleTapTimer = window.setTimeout(
       () => this.clearDoubleTapTimer(),
       this.getConfig().events.doubleTapThreshold
     );
@@ -242,14 +241,14 @@ export class TapInteractionHandler implements InteractionHandler {
 
   private clearLongPressTimer(): void {
     if (this.longPressTimer != null) {
-      clearTimeout(this.longPressTimer);
+      window.clearTimeout(this.longPressTimer);
     }
     this.longPressTimer = undefined;
   }
 
   private restartLongPressTimer(eventKeys: Partial<TapEventKeys> = {}): void {
     this.clearLongPressTimer();
-    this.longPressTimer = setTimeout(() => {
+    this.longPressTimer = window.setTimeout(() => {
       if (this.pointerDownPosition) {
         this.emit(this.interactionApi?.longPress)(
           this.pointerDownPosition,
