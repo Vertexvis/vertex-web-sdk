@@ -208,6 +208,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleMouseWheel(event: WheelEvent): void {
+    event.preventDefault();
+
     SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
@@ -227,20 +229,23 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     const defaultLineHeight =
       this.computedBodyStyle.fontSize != null &&
-      this.computedBodyStyle.fontSize !== ''
+      this.computedBodyStyle.fontSize !== '' &&
+      !isNaN(parseFloat(this.computedBodyStyle.fontSize))
         ? parseFloat(this.computedBodyStyle.fontSize) * DEFAULT_LINE_HEIGHT
         : DEFAULT_FONT_SIZE * DEFAULT_LINE_HEIGHT;
 
     if (deltaMode === 1) {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
       return this.computedBodyStyle.lineHeight != null &&
-        this.computedBodyStyle.lineHeight !== ''
+        this.computedBodyStyle.lineHeight !== '' &&
+        !isNaN(parseFloat(this.computedBodyStyle.lineHeight))
         ? deltaY * parseFloat(this.computedBodyStyle.lineHeight)
         : deltaY * defaultLineHeight;
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages
       return this.computedBodyStyle.height != null &&
-        this.computedBodyStyle.height !== ''
+        this.computedBodyStyle.height !== '' &&
+        !isNaN(parseFloat(this.computedBodyStyle.height))
         ? deltaY * parseFloat(this.computedBodyStyle.height)
         : deltaY * window.innerHeight;
     }
