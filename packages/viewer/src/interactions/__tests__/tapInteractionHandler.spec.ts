@@ -169,7 +169,7 @@ describe(TapInteractionHandler, () => {
     window.dispatchEvent(touchMove1);
     window.dispatchEvent(touchEnd);
 
-    expect(api.doubleTap).toHaveBeenCalledWith(Point.create(10, 10), {}, {});
+    expect(api.doubleTap).toHaveBeenCalledWith(Point.create(10, 10), {});
   });
 
   it('should emit a double tap if a touch move has occurred < 2 pixels away from the touch start', () => {

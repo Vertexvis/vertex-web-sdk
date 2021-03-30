@@ -200,7 +200,7 @@ export class TapInteractionHandler implements InteractionHandler {
         emittedPosition = this.getCanvasPosition(pointerUpPosition);
       }
       if (emittedPosition != null && emitter != null) {
-        emitter(emittedPosition, keyDetails, eventInfo);
+        emitter(emittedPosition, keyDetails);
       }
     };
   }
