@@ -29,27 +29,15 @@ describe(MouseInteractionHandler, () => {
     buttons: 1,
     bubbles: true,
   });
-  const mouseMovePrimaryButton1 = new MouseEvent('mousemove', {
+  const mouseMovePrimaryButton = new MouseEvent('mousemove', {
     screenX: 110,
     screenY: 60,
     buttons: 1,
     bubbles: true,
   });
-  const mouseMovePrimaryButton2 = new MouseEvent('mousemove', {
-    screenX: 115,
-    screenY: 65,
-    buttons: 1,
-    bubbles: true,
-  });
-  const mouseMoveSecondaryButton1 = new MouseEvent('mousemove', {
+  const mouseMoveSecondaryButton = new MouseEvent('mousemove', {
     screenX: 110,
     screenY: 60,
-    buttons: 2,
-    bubbles: true,
-  });
-  const mouseMoveSecondaryButton2 = new MouseEvent('mousemove', {
-    screenX: 115,
-    screenY: 65,
     buttons: 2,
     bubbles: true,
   });
@@ -84,7 +72,7 @@ describe(MouseInteractionHandler, () => {
     handler.dispose();
   });
 
-  it('begins a drag of primary interaction if the primary mouse has moved more than 2 pixels', () => {
+  it('begins a drag of primary interaction if the primary mouse has moved 2 pixels', () => {
     simulatePrimaryInteractions();
 
     expect(rotateInteraction.beginDrag).toHaveBeenCalledTimes(1);
@@ -92,7 +80,7 @@ describe(MouseInteractionHandler, () => {
     expect(rotateInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
-  it('begins a drag of pan interaction if the secondary mouse has moved more than 2 pixels', () => {
+  it('begins a drag of pan interaction if the secondary mouse has moved 2 pixels', () => {
     simulateSecondaryInteractions();
 
     expect(panInteraction.beginDrag).toHaveBeenCalledTimes(1);
@@ -102,7 +90,7 @@ describe(MouseInteractionHandler, () => {
 
   it('removes window listeners on mouse up', () => {
     simulatePrimaryInteractions();
-    window.dispatchEvent(mouseMovePrimaryButton2);
+    window.dispatchEvent(mouseMovePrimaryButton);
 
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
   });
@@ -163,15 +151,13 @@ describe(MouseInteractionHandler, () => {
 
   function simulatePrimaryInteractions(): void {
     div.dispatchEvent(mouseDown);
-    window.dispatchEvent(mouseMovePrimaryButton1);
-    window.dispatchEvent(mouseMovePrimaryButton2);
+    window.dispatchEvent(mouseMovePrimaryButton);
     window.dispatchEvent(mouseUp);
   }
 
   function simulateSecondaryInteractions(): void {
     div.dispatchEvent(mouseDown);
-    window.dispatchEvent(mouseMoveSecondaryButton1);
-    window.dispatchEvent(mouseMoveSecondaryButton2);
+    window.dispatchEvent(mouseMoveSecondaryButton);
     window.dispatchEvent(mouseUp);
   }
 
