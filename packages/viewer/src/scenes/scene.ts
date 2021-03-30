@@ -3,6 +3,7 @@ import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
+import { CrossSectioner } from './crossSectioner';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import {
   SceneItemOperations,
@@ -228,6 +229,16 @@ export class Scene {
       Dimensions.aspectRatio(this.viewport()),
       this.frame.sceneAttributes.camera,
       this.frame.sceneAttributes.visibleBoundingBox
+    );
+  }
+
+  /**
+   * CrossSectioner to update cross sectioning planes and get current configuration.
+   */
+  public crossSectioning(): CrossSectioner {
+    return new CrossSectioner(
+      this.stream,
+      this.frame.sceneAttributes.crossSectioning
     );
   }
 

@@ -9,6 +9,7 @@ import * as LoadableResource from './loadableResource';
 import * as Animation from './animation';
 import * as FlyTo from './flyToOptions';
 import * as Interactions from './interactions';
+import * as CrossSectioning from './crossSectioning';
 
 export * from './synchronizedClock';
 
@@ -23,4 +24,5 @@ export {
   Animation,
   FlyTo,
   Interactions,
+  CrossSectioning,
 };

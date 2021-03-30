@@ -202,4 +202,12 @@ describe(Scene, () => {
       expect(scene.viewport()).toEqual(Dimensions.create(100, 50));
     });
   });
+
+  describe(Scene.prototype.crossSectioning, () => {
+    it('should return crossSectioner', () => {
+      const cs = scene.crossSectioning();
+
+      expect(cs.current()).toEqual(frame.sceneAttributes.crossSectioning);
+    });
+  });
 });

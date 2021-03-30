@@ -37,6 +37,11 @@ export type UpdateDimensionsPayload = DeepRequired<
   ['frameCorrelationId']
 >;
 
+export type UpdateCrossSectioningPayload = DeepRequired<
+  vertexvis.protobuf.stream.IUpdateCrossSectioningPayload,
+  ['frameCorrelationId']
+>;
+
 export type HitItemsPayload = DeepRequired<
   vertexvis.protobuf.stream.IHitItemsPayload,
   []
