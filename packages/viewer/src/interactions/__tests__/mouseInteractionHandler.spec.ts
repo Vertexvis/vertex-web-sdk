@@ -30,27 +30,15 @@ describe(MouseInteractionHandler, () => {
     buttons: 1,
     bubbles: true,
   });
-  const mouseMovePrimaryButton1 = new MouseEvent('mousemove', {
+  const mouseMovePrimaryButton = new MouseEvent('mousemove', {
     screenX: 110,
     screenY: 60,
     buttons: 1,
     bubbles: true,
   });
-  const mouseMovePrimaryButton2 = new MouseEvent('mousemove', {
-    screenX: 115,
-    screenY: 65,
-    buttons: 1,
-    bubbles: true,
-  });
-  const mouseMoveSecondaryButton1 = new MouseEvent('mousemove', {
+  const mouseMoveSecondaryButton = new MouseEvent('mousemove', {
     screenX: 110,
     screenY: 60,
-    buttons: 2,
-    bubbles: true,
-  });
-  const mouseMoveSecondaryButton2 = new MouseEvent('mousemove', {
-    screenX: 115,
-    screenY: 65,
     buttons: 2,
     bubbles: true,
   });
@@ -111,7 +99,7 @@ describe(MouseInteractionHandler, () => {
 
   it('removes window listeners on mouse up', async () => {
     await simulatePrimaryInteractions(50);
-    window.dispatchEvent(mouseMovePrimaryButton2);
+    window.dispatchEvent(mouseMovePrimaryButton);
 
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
   });
@@ -174,8 +162,7 @@ describe(MouseInteractionHandler, () => {
     interactionDelay?: number
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
-    window.dispatchEvent(mouseMovePrimaryButton1);
-    window.dispatchEvent(mouseMovePrimaryButton2);
+    window.dispatchEvent(mouseMovePrimaryButton);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
@@ -184,8 +171,7 @@ describe(MouseInteractionHandler, () => {
     interactionDelay?: number
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
-    window.dispatchEvent(mouseMoveSecondaryButton1);
-    window.dispatchEvent(mouseMoveSecondaryButton2);
+    window.dispatchEvent(mouseMoveSecondaryButton);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
