@@ -7,11 +7,12 @@ import {
   TwistInteraction,
 } from './mouseInteractions';
 import { InteractionApi } from './interactionApi';
+import { ConfigProvider } from '../config/config';
 
 export class PointerInteractionHandler extends BaseInteractionHandler {
   private touchPoints: Set<number>;
 
-  public constructor() {
+  public constructor(getConfig: ConfigProvider) {
     super(
       'pointerdown',
       'pointerup',
@@ -19,7 +20,8 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
       new RotateInteraction(),
       new ZoomInteraction(),
       new PanInteraction(),
-      new TwistInteraction()
+      new TwistInteraction(),
+      getConfig
     );
     this.touchPoints = new Set();
     this.handlePointerDown = this.handlePointerDown.bind(this);
