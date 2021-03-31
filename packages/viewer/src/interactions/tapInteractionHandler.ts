@@ -152,6 +152,10 @@ export class TapInteractionHandler implements InteractionHandler {
     isTouch = false
   ): void {
     if (position != null && this.pointerDownPosition != null) {
+      if (this.longPressTimer != null) {
+        this.emit(this.interactionApi?.tap)(position, keyDetails);
+      }
+
       if (
         this.doubleTapTimer != null &&
         this.secondPointerDownPosition != null
@@ -162,10 +166,6 @@ export class TapInteractionHandler implements InteractionHandler {
           this.secondPointerDownPosition
         );
         this.clearDoubleTapTimer();
-      }
-
-      if (this.longPressTimer != null) {
-        this.emit(this.interactionApi?.tap)(position, keyDetails);
       }
     }
 
