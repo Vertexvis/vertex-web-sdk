@@ -1,3 +1,4 @@
+import { ConfigProvider } from '../config/config';
 import { BaseInteractionHandler } from './baseInteractionHandler';
 import {
   RotateInteraction,
@@ -8,6 +9,7 @@ import {
 
 export class MouseInteractionHandler extends BaseInteractionHandler {
   public constructor(
+    getConfig: ConfigProvider,
     rotateInteraction = new RotateInteraction(),
     zoomInteraction = new ZoomInteraction(),
     panInteraction = new PanInteraction(),
@@ -20,7 +22,8 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       rotateInteraction,
       zoomInteraction,
       panInteraction,
-      twistInteraction
+      twistInteraction,
+      getConfig
     );
   }
 }

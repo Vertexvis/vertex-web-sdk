@@ -12,6 +12,7 @@ import {
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
+import { ConfigProvider } from '../config/config';
 
 export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist';
 
@@ -27,6 +28,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
+  private lastMoveEvent?: BaseEvent;
+  private interactionTimer?: number;
 
   protected disableIndividualInteractions = false;
 
@@ -41,7 +44,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private rotateInteraction: RotateInteraction,
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
-    private twistInteraction: TwistInteraction
+    private twistInteraction: TwistInteraction,
+    private getConfig: ConfigProvider
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
@@ -118,38 +122,47 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected handleDownEvent(event: BaseEvent): void {
     event.preventDefault();
-    this.downPosition = Point.create(event.screenX, event.screenY);
+
+    this.interactionTimer = window.setTimeout(() => {
+      this.downPosition = Point.create(event.screenX, event.screenY);
+      this.interactionTimer = undefined;
+
+      // Perform the current movement in the case that the interaction timer elapses
+      if (this.lastMoveEvent != null) {
+        this.handleWindowMove(this.lastMoveEvent);
+      }
+    }, this.getConfig().interactions.interactionDelay);
 
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
   }
 
   protected handleWindowMove(event: BaseEvent): void {
-    if (this.disableIndividualInteractions) {
-      return;
+    if (this.interactionTimer == null) {
+      if (this.disableIndividualInteractions) {
+        return;
+      }
+
+      const position = Point.create(event.screenX, event.screenY);
+      const pixelThreshold =
+        this.interactionApi != null
+          ? this.interactionApi.pixelThreshold(this.isTouch(event))
+          : 2;
+      if (
+        this.downPosition != null &&
+        Point.distance(position, this.downPosition) >= pixelThreshold &&
+        !this.isDragging
+      ) {
+        this.beginDrag(event);
+        this.isDragging = true;
+      }
+
+      if (this.isDragging) {
+        this.drag(event);
+      }
     }
 
-    const position = Point.create(event.screenX, event.screenY);
-    let didBeginDrag = false;
-    const pixelThreshold =
-      this.interactionApi != null
-        ? this.interactionApi.pixelThreshold(this.isTouch(event))
-        : 2;
-    if (
-      this.downPosition != null &&
-      Point.distance(position, this.downPosition) >= pixelThreshold &&
-      !this.isDragging
-    ) {
-      this.beginDrag(event);
-      didBeginDrag = true;
-      this.isDragging = true;
-    }
-
-    // We only invoke drag interactions for mouse events after a beginDrag has
-    // been invoked.
-    if (!didBeginDrag && this.isDragging) {
-      this.drag(event);
-    }
+    this.lastMoveEvent = event;
   }
 
   protected async handleWindowUp(event: BaseEvent): Promise<void> {
@@ -158,8 +171,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.isDragging = false;
     }
 
+    if (this.interactionTimer != null) {
+      window.clearTimeout(this.interactionTimer);
+      this.interactionTimer = undefined;
+    }
+
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
     window.removeEventListener(this.upEvent, this.handleWindowUp);
+    this.lastMoveEvent = undefined;
   }
 
   protected beginDrag(event: BaseEvent): void {

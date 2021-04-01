@@ -1,8 +1,11 @@
 import { TwistInteractionHandler } from '../twistInteractionHandler';
 import { PointerInteractionHandler } from '../pointerInteractionHandler';
+import { parseConfig } from '../../config/config';
 
 describe(TwistInteractionHandler, () => {
-  const baseInteractionHandler = new PointerInteractionHandler();
+  const baseInteractionHandler = new PointerInteractionHandler(() =>
+    parseConfig('platdev')
+  );
 
   const twistInteractionHandler = new TwistInteractionHandler(
     baseInteractionHandler
