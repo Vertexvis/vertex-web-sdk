@@ -1,5 +1,6 @@
 import * as Frame from '../frame';
 import * as FrameCamera from '../frameCamera';
+import * as CrossSectioning from '../crossSectioning';
 import {
   Dimensions,
   Rectangle,
@@ -17,6 +18,9 @@ export const frame: Frame.Frame = {
   sceneAttributes: {
     camera: FrameCamera.create(),
     visibleBoundingBox: BoundingBox.create(Vector3.create(), Vector3.create()),
+    crossSectioning: CrossSectioning.create({
+      sectionPlanes: [{ normal: Vector3.create(), offset: 0 }],
+    }),
   },
   sequenceNumber: 1,
   image: new Uint8Array(),

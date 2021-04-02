@@ -6,6 +6,7 @@ import {
 } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import * as FrameCamera from './frameCamera';
+import * as CrossSectioning from './crossSectioning';
 
 export interface Frame {
   correlationIds: string[];
@@ -24,6 +25,7 @@ export interface ImageAttributes {
 export interface SceneAttributes {
   camera: FrameCamera.FrameCamera;
   visibleBoundingBox: BoundingBox.BoundingBox;
+  crossSectioning: CrossSectioning.CrossSectioning;
 }
 
 export const fromProto = (
@@ -100,6 +102,18 @@ export const fromProto = (
           z: sceneAttributes.visibleBoundingBox?.zmax || undefined,
         })
       ),
+      crossSectioning: CrossSectioning.create({
+        sectionPlanes: sceneAttributes.crossSectioning?.sectionPlanes?.map(
+          (sp) => ({
+            normal: Vector3.create({
+              x: sp.normal?.x || undefined,
+              y: sp.normal?.y || undefined,
+              z: sp.normal?.z || undefined,
+            }),
+            offset: sp.offset || 0,
+          })
+        ),
+      }),
     },
     sequenceNumber: sequenceNumber,
     image: image,
