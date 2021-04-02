@@ -23,5 +23,5 @@ export interface InteractionConfig {
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThreshold: 1,
   coarsePointerThreshold: 3,
-  interactionDelay: 150,
+  interactionDelay: 75,
 };
