@@ -24,7 +24,10 @@ export class TextNodeBinding extends NodeBinding<Node> {
   }
 
   public bind<T>(data: T): void {
-    this.node.textContent = replaceBindingString(data, this.expr);
+    const newContent = replaceBindingString(data, this.expr);
+    if (newContent !== this.node.textContent) {
+      this.node.textContent = newContent;
+    }
   }
 }
 
@@ -34,7 +37,10 @@ export class AttributeBinding extends NodeBinding<Element> {
   }
 
   public bind<T>(data: T): void {
-    this.node.setAttribute(this.attr, replaceBindingString(data, this.expr));
+    const value = replaceBindingString(data, this.expr);
+    if (this.node.getAttribute(this.attr) !== value) {
+      this.node.setAttribute(this.attr, value);
+    }
   }
 }
 
@@ -47,7 +53,9 @@ export class EventHandlerBinding extends NodeBinding<Element> {
     const path = extractBindingPath(this.expr);
     if (path != null) {
       const value = getBindableValue(data, path, true);
-      (this.node as any)[this.eventName] = value;
+      if (value !== (this.node as any)[this.eventName]) {
+        (this.node as any)[this.eventName] = value;
+      }
     }
   }
 }
@@ -72,7 +80,8 @@ export function generateBindings(element: Element): Binding[] {
       bindings.push(...generateBindings(el));
     } else if (
       child.nodeType === child.TEXT_NODE &&
-      child.textContent != null
+      child.textContent != null &&
+      bindingRegEx.test(child.textContent)
     ) {
       bindings.push(new TextNodeBinding(child, child.textContent));
     }

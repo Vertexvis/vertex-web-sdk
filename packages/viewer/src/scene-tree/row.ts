@@ -1,4 +1,5 @@
 export interface LoadedRow {
+  id: string;
   loading: false;
   selected: boolean;
   name: string;
@@ -8,6 +9,7 @@ export interface LoadedRow {
 }
 
 export interface PendingRow {
+  id: string;
   loading: true;
 }
 

@@ -8,3 +8,8 @@
 .item-container {
   position: relative;
 }
+
+.wrapper {
+  position: absolute;
+  width: 100%;
+}

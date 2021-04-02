@@ -65,10 +65,10 @@
         };
 
         const scrollToIndex = document.getElementById('scroll-to-index');
-        // const scrollToBtn = document.getElementById('scroll-to-index-btn');
-        // scrollToBtn.addEventListener('click', () => {
-        //   sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
-        // });
+        const scrollToBtn = document.getElementById('scroll-to-index-btn');
+        scrollToBtn.addEventListener('click', () => {
+          sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
+        });
       }
     </script>
   </head>
@@ -76,6 +76,11 @@
   <body>
     <div class="app">
       <div class="container">
+        <div>
+          <span>Scroll To:</span>
+          <input id="scroll-to-index" type="number" />
+          <button id="scroll-to-index-btn">Go</button>
+        </div>
         <vertex-scene-tree id="scene-tree">
           <template>
             <vertex-scene-tree-item name="{{row.name}}">
