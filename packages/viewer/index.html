@@ -82,16 +82,11 @@
           <button id="scroll-to-index-btn">Go</button>
         </div>
         <vertex-scene-tree id="scene-tree">
-          <template>
-            <vertex-scene-tree-item name="{{row.name}}">
-              <style>
-                vertex-scene-tree-item {
-                  height: 30px;
-                  padding: 0 8px;
-                }
-              </style>
-              <button onclick="{{row.data.func}}">Hi</button>
-            </vertex-scene-tree-item>
+          <template slot="left">
+            <div class="icon">{{row.name}}</div>
+          </template>
+          <template slot="right">
+            <button onclick="{{row.data.func}}">Hi</button>
           </template>
         </vertex-scene-tree>
       </div>

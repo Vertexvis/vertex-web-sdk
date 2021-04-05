@@ -53,38 +53,39 @@ export class EventHandlerBinding extends NodeBinding<Element> {
     const path = extractBindingPath(this.expr);
     if (path != null) {
       const value = getBindableValue(data, path, true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (value !== (this.node as any)[this.eventName]) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (this.node as any)[this.eventName] = value;
       }
     }
   }
 }
 
-export function generateBindings(element: Element): Binding[] {
+export function generateBindings(node: Node): Binding[] {
   const bindings: Binding[] = [];
 
-  for (let i = 0; i < element.childNodes.length; i++) {
-    const child = element.childNodes[i];
+  if (node.nodeType === node.ELEMENT_NODE) {
+    const el = node as HTMLElement;
+    const bindableAttributes = getBindableAttributes(el);
 
-    if (child.nodeType === child.ELEMENT_NODE) {
-      const el = child as HTMLElement;
-      const bindableAttributes = getBindableAttributes(el);
+    bindableAttributes.forEach((attr) => {
+      if (attr.name.startsWith('on')) {
+        bindings.push(new EventHandlerBinding(el, attr.value, attr.name));
+      } else {
+        bindings.push(new AttributeBinding(el, attr.value, attr.name));
+      }
+    });
+  } else if (
+    node.nodeType === node.TEXT_NODE &&
+    node.textContent != null &&
+    bindingRegEx.test(node.textContent)
+  ) {
+    bindings.push(new TextNodeBinding(node, node.textContent));
+  }
 
-      bindableAttributes.forEach((attr) => {
-        if (attr.name.startsWith('on')) {
-          bindings.push(new EventHandlerBinding(el, attr.value, attr.name));
-        } else {
-          bindings.push(new AttributeBinding(el, attr.value, attr.name));
-        }
-      });
-      bindings.push(...generateBindings(el));
-    } else if (
-      child.nodeType === child.TEXT_NODE &&
-      child.textContent != null &&
-      bindingRegEx.test(child.textContent)
-    ) {
-      bindings.push(new TextNodeBinding(child, child.textContent));
-    }
+  for (let i = 0; i < node.childNodes.length; i++) {
+    bindings.push(...generateBindings(node.childNodes[i]));
   }
 
   return bindings;
@@ -101,6 +102,7 @@ function extractBindingPath(expr: string): string | undefined {
   return result != null ? result[1] : undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function replaceBindingString(data: Record<string, any>, expr: string): string {
   const path = extractBindingPath(expr);
   if (path != null) {
@@ -112,9 +114,11 @@ function replaceBindingString(data: Record<string, any>, expr: string): string {
 }
 
 function getBindableValue(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>,
   path: string,
   ignoreHead = false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const [head, ...tail] = path.split('.');
   if (ignoreHead) {

@@ -1,15 +1,34 @@
 :host {
+  /**
+   * @prop --scene-tree-row-height: The height of each row in the scene tree.
+   */
+  --scene-tree-row-height: 30px;
+
+  /**
+   * @prop --scene-tree-row-padding: The padding of each row in the scene tree.
+   */
+  --scene-tree-row-padding: 0 8px;
+
   width: 300px;
   height: 100%;
   background-color: red;
   overflow-y: scroll;
 }
 
-.item-container {
+.rows {
   position: relative;
 }
 
-.wrapper {
+.row {
   position: absolute;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--scene-tree-row-height);
+  padding: var(--scene-tree-row-padding);
+  box-sizing: border-box;
+}
+
+.row-text {
   width: 100%;
 }

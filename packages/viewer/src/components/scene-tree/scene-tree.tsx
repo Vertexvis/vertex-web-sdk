@@ -6,18 +6,13 @@ import {
   Method,
   Prop,
   readTask,
-  writeTask,
+  State,
 } from '@stencil/core';
-import { InstancedTemplate, append } from './lib/templates';
 import { Row } from '../../scene-tree';
+import { CollectionBinding, generateBindings } from './lib/binding';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type RowDataProvider = (row: Row) => object;
-
-interface ComponentMetrics {
-  scrollTop: number;
-  viewportHeight: number;
-}
 
 @Component({
   tag: 'vertex-scene-tree',
@@ -31,13 +26,23 @@ export class SceneTree {
   @Prop()
   public offscreenItemCount = 2;
 
+  @Prop()
+  public overScanCount = 10;
+
   @Element()
   private el!: HTMLElement;
 
-  private container: HTMLElement | undefined;
-  private template: HTMLTemplateElement | undefined;
-  private instances: InstancedTemplate<HTMLElement>[] = [];
-  private previousStart = 0;
+  @State()
+  private startIndex = 0;
+
+  @State()
+  private viewportHeight: number | undefined;
+
+  @State()
+  private viewportItems: Row[] = [];
+
+  @State()
+  private isComputingItemHeight = true;
 
   private items = Array.from({ length: 10000 }).map((_, i) => ({
     id: i.toString(),
@@ -49,40 +54,87 @@ export class SceneTree {
   }));
 
   private computedItemHeight: number | undefined;
-  private resizeObserver: ResizeObserver;
 
-  public constructor() {
-    this.resizeObserver = new ResizeObserver(() => this.invalidateRows());
-  }
+  private scrollTop = 0;
+
+  private leftTemplate: HTMLTemplateElement | undefined;
+  private rightTemplate: HTMLTemplateElement | undefined;
+  private bindings = new Map<Element, CollectionBinding>();
 
   @Prop()
   public rowData: RowDataProvider = () => ({});
 
   public async componentDidLoad(): Promise<void> {
     this.el.addEventListener('scroll', () => this.handleScroll());
-    this.resizeObserver.observe(this.el);
 
-    const template = this.el.querySelector('template');
-    if (template != null) {
-      this.template = template;
-      this.computedItemHeight = await this.computeItemHeight(template);
+    this.leftTemplate =
+      (this.el.querySelector('template[slot="left"]') as HTMLTemplateElement) ||
+      undefined;
 
-      this.scheduleDomUpdate();
-    }
+    this.rightTemplate =
+      (this.el.querySelector(
+        'template[slot="right"]'
+      ) as HTMLTemplateElement) || undefined;
+
+    readTask(() => {
+      this.viewportHeight = this.el.clientHeight;
+      this.updateState();
+    });
+  }
+
+  public componentDidRender(): void {
+    this.cleanupBindings();
+    this.computeRowHeight();
   }
 
   public render(): h.JSX.IntrinsicElements {
+    const itemHeight = this.getComputedOrPlaceholderRowHeight();
+    const totalHeight = this.items.length * itemHeight;
+    const startY = this.startIndex * itemHeight;
     return (
       <Host>
-        <div class="item-container" ref={(el) => (this.container = el)} />
+        <div class="rows" style={{ height: `${totalHeight}px` }}>
+          {this.isComputingItemHeight ? (
+            <div class="row" />
+          ) : (
+            this.viewportItems.map((row, i) => {
+              return (
+                !row.loading && (
+                  <div
+                    class="row"
+                    style={{ top: `${startY + itemHeight * i}px` }}
+                  >
+                    <span
+                      ref={(el) => {
+                        if (el != null && this.leftTemplate != null) {
+                          this.populateSlot(this.leftTemplate, row, el);
+                        }
+                      }}
+                    />
+                    <span class="row-text">{row.name}</span>
+                    <span
+                      ref={(el) => {
+                        if (el != null && this.rightTemplate != null) {
+                          this.populateSlot(this.rightTemplate, row, el);
+                        }
+                      }}
+                    />
+                  </div>
+                )
+              );
+            })
+          )}
+        </div>
       </Host>
     );
   }
 
   @Method()
   public async invalidateRows(): Promise<void> {
-    this.scheduleDomUpdate();
-    // this.scheduleDomUpdateRaf();
+    readTask(() => {
+      this.scrollTop = this.el.scrollTop || 0;
+      this.updateState();
+    });
   }
 
   @Method()
@@ -96,131 +148,43 @@ export class SceneTree {
     }
   }
 
-  private async scheduleDomUpdate(): Promise<void> {
-    const metrics = await this.readDom();
-    const rows = this.updateDom(metrics);
-    rows.forEach(([row, instance]) => {
-      instance.bindings.bind(row);
-    });
-  }
-
-  private scheduleDomUpdateRaf(): void {
-    requestAnimationFrame(() => {
-      const metrics = this.readDomSync();
-      const rows = this.updateDom(metrics);
-      rows.forEach(([row, instance]) => {
-        instance.bindings.bind(row);
-      });
-    });
-  }
-
-  private readDom(): Promise<ComponentMetrics> {
-    return new Promise((resolve) => {
-      readTask(() => {
-        resolve({
-          scrollTop: this.el.scrollTop,
-          viewportHeight: this.el.clientHeight,
-        });
-      });
-    });
-  }
-
-  private readDomSync(): ComponentMetrics {
-    return {
-      scrollTop: this.el.scrollTop,
-      viewportHeight: this.el.clientHeight,
-    };
-  }
-
-  private updateDom({
-    scrollTop,
-    viewportHeight,
-  }: ComponentMetrics): [Row, InstancedTemplate<HTMLElement>][] {
-    if (
-      this.template != null &&
-      this.container != null &&
-      this.computedItemHeight != null
-    ) {
-      const itemHeight = this.computedItemHeight;
-      const totalHeight = itemHeight * this.items.length;
-
-      const halfOffscreenItemCount = this.offscreenItemCount / 2;
-      const itemCount = Math.ceil(
-        viewportHeight / itemHeight + this.offscreenItemCount
-      );
+  private updateState(): void {
+    if (this.viewportHeight != null) {
+      const itemHeight = this.getComputedOrPlaceholderRowHeight();
+      const itemCount = Math.ceil(this.viewportHeight / itemHeight);
       const start = Math.max(
         0,
-        Math.floor(scrollTop / itemHeight - halfOffscreenItemCount)
+        Math.floor(this.scrollTop / itemHeight) - this.overScanCount
       );
       const end = Math.min(
         this.items.length,
-        start + itemCount + halfOffscreenItemCount
+        start + itemCount + this.overScanCount * 2
       );
 
-      const items = this.items
+      this.startIndex = start;
+      this.viewportItems = this.items
         .slice(start, end)
         .map((row) => this.populateRowData(row));
-      const offsetY = start * itemHeight;
-
-      this.container.style.height = `${totalHeight}px`;
-
-      const children = this.container.children;
-      const newChildren = items.length - children.length;
-
-      for (let i = 0; i < newChildren; i++) {
-        const item = items[i];
-        const node = this.createNode(this.template, item) as HTMLElement;
-        const instance = append(this.container, node, item);
-        this.instances.push(instance);
-      }
-
-      this.reorder(start);
-
-      const result: [Row, InstancedTemplate<HTMLElement>][] = [];
-      this.instances.forEach((instance, i) => {
-        instance.element.style.position = 'absolute';
-        instance.element.style.top = `${offsetY + (itemHeight || 0) * i}px`;
-        result.push([items[i], instance]);
-      });
-      return result;
-    } else {
-      return [];
     }
   }
 
-  private reorder(newStart: number): void {
-    const diff = newStart - this.previousStart;
-    const allInvalid = Math.abs(diff) > this.instances.length;
-    this.previousStart = newStart;
-
-    // There's no point to reorder, everything is invalid.
-    if (allInvalid) {
-      return;
+  private populateSlot(
+    template: HTMLTemplateElement,
+    row: Row,
+    el: HTMLElement
+  ): void {
+    if (el.firstElementChild == null) {
+      const node = template.content.cloneNode(true);
+      el.appendChild(node);
     }
 
-    // Scrolling down. Shift the items at the top, and move them to the bottom.
-    if (diff > 0) {
-      const toMove = this.instances.splice(0, diff);
-      this.instances.splice(this.instances.length, 0, ...toMove);
-
-      for (let i = 0; i < diff; i++) {
-        const child = this.container?.firstChild;
-        if (child != null) {
-          this.container?.append(child);
-        }
+    if (el.firstElementChild != null) {
+      let binding = this.bindings.get(el);
+      if (binding == null) {
+        binding = new CollectionBinding(generateBindings(el.firstElementChild));
+        this.bindings.set(el, binding);
       }
-    }
-    // Scrolling up. Pop the items off the end, and move them to the beginning.
-    else if (diff < 0) {
-      const toMove = this.instances.splice(diff, -diff);
-      this.instances.splice(0, 0, ...toMove);
-
-      for (let i = 0; i < -diff; i++) {
-        const child = this.container?.lastChild;
-        if (child != null) {
-          this.container?.prepend(child);
-        }
-      }
+      binding.bind(row);
     }
   }
 
@@ -228,49 +192,36 @@ export class SceneTree {
     this.invalidateRows();
   }
 
-  private async computeItemHeight(
-    template: HTMLTemplateElement
-  ): Promise<number | undefined> {
-    const item = {
-      id: '',
-      name: 'foo',
-      loading: false,
-      selected: false,
-      expanded: false,
-      data: {},
-    };
-    const node = this.createNode(template, item);
-    this.el.shadowRoot?.appendChild(node);
-    const element = this.el.shadowRoot?.lastElementChild;
-
-    if (element != null) {
-      const el = element as HTMLElement;
-      if (typeof (el as any).componentOnReady === 'function') {
-        await (el as any).componentOnReady();
-      }
-
-      const height = el.offsetHeight;
-      el.remove();
-      return height;
-    } else {
-      throw new Error(
-        'Cannot compute row height. Placeholder row cannot be created.'
-      );
-    }
-  }
-
-  private createNode(template: HTMLTemplateElement, item: Row): Node {
-    const content = template.content;
-    const node = content.cloneNode(true) as HTMLElement;
-    return node;
-  }
-
   private populateRowData(row: Row): Row {
-    if (row.loading) {
-      return row;
-    } else {
+    if (this.rowData != null && !row.loading) {
       const data = this.rowData(row);
       return { ...row, data };
+    } else {
+      return row;
     }
+  }
+
+  private cleanupBindings(): void {
+    for (const key of this.bindings.keys()) {
+      if (key.parentElement == null) {
+        this.bindings.delete(key);
+      }
+    }
+  }
+
+  private computeRowHeight(): void {
+    if (this.isComputingItemHeight) {
+      // Set the state on the next event tick to prevent a warning from
+      // StencilJS.
+      setTimeout(() => {
+        const rowEl = this.el.shadowRoot?.querySelector('.row');
+        this.computedItemHeight = rowEl?.clientHeight;
+        this.isComputingItemHeight = false;
+      }, 0);
+    }
+  }
+
+  private getComputedOrPlaceholderRowHeight(): number {
+    return this.computedItemHeight || 24;
   }
 }
