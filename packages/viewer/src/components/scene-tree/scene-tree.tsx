@@ -9,12 +9,9 @@ import {
   readTask,
   State,
 } from '@stencil/core';
-import { Row } from '../../scene-tree';
+import { Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
-import {
-  SceneTreeController,
-  SceneTreeState,
-} from '../../scene-tree/controller';
+import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';

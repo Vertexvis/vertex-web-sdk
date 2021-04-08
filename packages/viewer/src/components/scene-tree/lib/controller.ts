@@ -162,12 +162,12 @@ export class SceneTreeController {
   }
 
   public async fetchRange(
-    start: number,
-    end: number,
+    startOffset: number,
+    endOffset: number,
     jwt: string
   ): Promise<void> {
-    const startPage = Math.floor(start / this.rowLimit);
-    const endPage = Math.floor(end / this.rowLimit);
+    const startPage = Math.floor(startOffset / this.rowLimit);
+    const endPage = Math.floor(endOffset / this.rowLimit);
     const [boundedStart, boundedEnd] = this.constrainPageRange(
       startPage,
       endPage
@@ -193,11 +193,14 @@ export class SceneTreeController {
   }
 
   public invalidatePagesOutsideRange(
-    start: number,
-    end: number,
+    startPage: number,
+    endPage: number,
     threshold = 0
   ): void {
-    const [boundedStart, boundedEnd] = this.constrainPageRange(start, end);
+    const [boundedStart, boundedEnd] = this.constrainPageRange(
+      startPage,
+      endPage
+    );
     const boundedThreshold = Math.max(boundedEnd - boundedStart, threshold);
     if (this.fetchedPageCount > boundedThreshold) {
       const pages = Array.from(this.pages.keys()).map((index) => {
