@@ -25,15 +25,17 @@
         display: flex;
         width: 100%;
         height: 100%;
-        justify-content: center;
-        align-items: center;
       }
 
-      .container {
+      .tree {
         display: flex;
         flex-direction: column;
-        width: 300px;
-        max-height: 75vh;
+        min-width: 300px;
+      }
+
+      .workarea {
+        width: 100%;
+        height: 100%;
       }
 
       #viewer {
@@ -56,6 +58,11 @@
       async function main() {
         await window.customElements.whenDefined('vertex-viewer');
         const viewer = document.querySelector('#viewer');
+        viewer.config = {
+          flags: {
+            logWsMessages: false,
+          },
+        };
 
         const sceneTree = document.querySelector('#scene-tree');
         sceneTree.rowData = (row) => {
@@ -69,26 +76,39 @@
         scrollToBtn.addEventListener('click', () => {
           sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
         });
+
+        const expandAllBtn = document.getElementById('expand-all-btn');
+        expandAllBtn.addEventListener('click', () => sceneTree.expandAll());
       }
     </script>
   </head>
 
   <body>
     <div class="app">
-      <div class="container">
+      <div class="tree">
         <div>
           <span>Scroll To:</span>
           <input id="scroll-to-index" type="number" />
           <button id="scroll-to-index-btn">Go</button>
+          <button id="expand-all-btn">+</button>
         </div>
-        <vertex-scene-tree id="scene-tree">
-          <template slot="left">
-            <div class="icon">{{row.name}}</div>
-          </template>
+        <vertex-scene-tree
+          id="scene-tree"
+          viewer-selector="#viewer"
+          config-env="platdev"
+        >
           <template slot="right">
             <button onclick="{{row.data.func}}">Hi</button>
           </template>
         </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer
+          id="viewer"
+          client-id="7A8EAF1430FFA64FF51CF0F64E38C0B5B4837EA660F07B110A8B6C1A9D186807"
+          config-env="platdev"
+          src="urn:vertexvis:stream-key:key"
+        ></vertex-viewer>
       </div>
     </div>
   </body>

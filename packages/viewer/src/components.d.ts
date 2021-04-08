@@ -277,6 +277,7 @@ declare global {
   }
 }
 declare namespace LocalJSX {
+<<<<<<< HEAD
   interface SvgIcon {}
   interface VertexViewer {
     /**
@@ -404,6 +405,149 @@ declare namespace LocalJSX {
     'vertex-viewer-toolbar': VertexViewerToolbar;
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
   }
+=======
+    interface SvgIcon {
+    }
+    interface VertexSceneTree {
+        "approximateItemHeight"?: number;
+        "config"?: Config;
+        /**
+          * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+         */
+        "configEnv"?: Environment;
+        "overScanCount"?: number;
+        "rowData"?: RowDataProvider;
+        "viewerSelector"?: string;
+    }
+    interface VertexViewer {
+        /**
+          * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
+         */
+        "cameraControls"?: boolean;
+        /**
+          * The Client ID associated with your Vertex Application.
+         */
+        "clientId"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "config"?: Config | string;
+        /**
+          * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+          * @see Viewer.config
+         */
+        "configEnv"?: Environment;
+        /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls"?: boolean;
+        /**
+          * Emits an event when the connection status changes for the viewer
+         */
+        "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
+        "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
+        /**
+          * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
+         */
+        "onDoubletap"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
+         */
+        "onFrameDrawn"?: (event: CustomEvent<Frame.Frame>) => void;
+        /**
+          * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
+         */
+        "onFrameReceived"?: (event: CustomEvent<Frame.Frame>) => void;
+        /**
+          * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
+         */
+        "onLongpress"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when the scene is ready to be interacted with.
+         */
+        "onSceneReady"?: (event: CustomEvent<void>) => void;
+        /**
+          * Used for internals or testing.
+          * @private
+         */
+        "onSessionidchange"?: (event: CustomEvent<string>) => void;
+        /**
+          * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
+         */
+        "onTap"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
+         */
+        "onTokenExpired"?: (event: CustomEvent<void>) => void;
+        /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "sessionId"?: string;
+        /**
+          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
+         */
+        "src"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "streamAttributes"?: StreamAttributes | string;
+    }
+    interface VertexViewerButton {
+    }
+    interface VertexViewerDefaultToolbar {
+        /**
+          * The duration of animations, in milliseconds. Defaults to `1000`.
+         */
+        "animationMs"?: number;
+        /**
+          * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
+         */
+        "animationsDisabled"?: boolean;
+        /**
+          * Specifies the direction that UI elements are placed.
+         */
+        "direction"?: ViewerToolbarGroupDirection;
+        /**
+          * Specifies where the toolbar is positioned.
+         */
+        "placement"?: ViewerToolbarPlacement;
+        /**
+          * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerIcon {
+        /**
+          * The name of the icon to render.
+         */
+        "name"?: ViewerIconName;
+        /**
+          * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+         */
+        "size"?: ViewerIconSize;
+    }
+    interface VertexViewerToolbar {
+        "direction"?: ViewerToolbarDirection;
+        /**
+          * Specifies where the toolbar is positioned.
+         */
+        "placement"?: ViewerToolbarPlacement;
+    }
+    interface VertexViewerToolbarGroup {
+        "direction"?: ViewerToolbarGroupDirection;
+    }
+    interface IntrinsicElements {
+        "svg-icon": SvgIcon;
+        "vertex-scene-tree": VertexSceneTree;
+        "vertex-viewer": VertexViewer;
+        "vertex-viewer-button": VertexViewerButton;
+        "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-icon": VertexViewerIcon;
+        "vertex-viewer-toolbar": VertexViewerToolbar;
+        "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
+    }
+>>>>>>> Wire up scene tree to backend
 }
 export { LocalJSX as JSX };
 declare module '@stencil/core' {
