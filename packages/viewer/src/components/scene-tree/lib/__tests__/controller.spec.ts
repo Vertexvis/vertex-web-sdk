@@ -50,7 +50,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.subscribe, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 100);
+    const controller = new SceneTreeController(client, sceneViewId, 10);
 
     it('subscribes to remote changes', () => {
       const stream = new ResponseStreamMock();
@@ -124,6 +124,38 @@ describe(SceneTreeController, () => {
       resp.setChange(changeType);
       stream.invokeOnData(resp);
     });
+
+    it('invalidates pages after list change', async (done) => {
+      const getTree = createGetTreeResponse(10, 100);
+      let onStateChangeCount = 0;
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      await controller.fetchPage(0, jwt);
+      await controller.fetchRange(0, 100, jwt);
+
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      controller.onStateChange.on((state) => {
+        onStateChangeCount++;
+        if (onStateChangeCount === 2) {
+          expect(controller.fetchedPageCount).toBe(2);
+          done();
+        }
+      });
+      controller.subscribe(() => jwt);
+
+      const listChange = new ListChange();
+      listChange.setStart(11);
+      const changeType = new TreeChangeType();
+      changeType.setListChange(listChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+    });
   });
 
   describe(SceneTreeController.prototype.collapseNode, () => {
@@ -151,6 +183,16 @@ describe(SceneTreeController, () => {
     it('throws if grpc call errors', () => {
       (client.collapseNode as jest.Mock).mockImplementationOnce(
         mockGrpcUnaryError(new Error('oops'))
+      );
+
+      return expect(
+        controller.collapseNode(random.guid(), jwt)
+      ).rejects.toThrowError();
+    });
+
+    it('throws if grpc error and result are null', () => {
+      (client.collapseNode as jest.Mock).mockImplementationOnce(
+        (_, __, handler) => handler(null, null)
       );
 
       return expect(
@@ -498,7 +540,7 @@ function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
 
 function createGetTreeResponse(
   itemCount: number,
-  totalCount: number
+  totalCount: number | null
 ): GetTreeResponse {
   const nodes = Array.from({ length: itemCount }).map((_, i) => {
     const id = new Uuid();
@@ -515,7 +557,9 @@ function createGetTreeResponse(
   });
 
   const cursor = new OffsetCursor();
-  cursor.setTotal(totalCount);
+  if (totalCount != null) {
+    cursor.setTotal(totalCount);
+  }
 
   const res = new GetTreeResponse();
   res.setItemsList(nodes);

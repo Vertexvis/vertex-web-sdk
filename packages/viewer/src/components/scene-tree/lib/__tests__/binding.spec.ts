@@ -45,6 +45,39 @@ describe(TextNodeBinding, () => {
     binding.bind(data2);
     expect(node.textContent).toEqual('123 bar 456');
   });
+
+  it('does nothing if expression is invalid', () => {
+    const node = document.createElement('div');
+    node.textContent = '123 {{data.name 456';
+
+    if (node.firstChild == null) {
+      throw 'node is empty';
+    }
+
+    const binding = new TextNodeBinding(node.firstChild, node.textContent);
+
+    const data = { name: 'foo' };
+
+    binding.bind(data);
+    expect(node.textContent).toEqual('123 {{data.name 456');
+  });
+
+  it('does nothing if data is the same', () => {
+    const node = document.createElement('div');
+    node.textContent = '123 {{data.name}} 456';
+
+    if (node.firstChild == null) {
+      throw 'node is empty';
+    }
+
+    const binding = new TextNodeBinding(node.firstChild, node.textContent);
+
+    const data = { name: 'foo' };
+
+    binding.bind(data);
+    binding.bind(data);
+    expect(node.textContent).toEqual('123 foo 456');
+  });
 });
 
 describe(AttributeBinding, () => {
@@ -67,6 +100,26 @@ describe(AttributeBinding, () => {
     binding.bind(data2);
     expect(node.getAttribute('title')).toEqual('123 bar 456');
   });
+
+  it('does nothing is data is the same', () => {
+    const node = document.createElement('div');
+    node.setAttribute('title', '123 {{data.name}} 456');
+
+    const setAttribute = jest.spyOn(node, 'setAttribute');
+    const binding = new AttributeBinding(
+      node,
+      '123 {{data.name}} 456',
+      'title'
+    );
+
+    const data = { name: 'foo' };
+
+    binding.bind(data);
+
+    setAttribute.mockClear();
+    binding.bind(data);
+    expect(setAttribute).not.toHaveBeenCalled();
+  });
 });
 
 describe(EventHandlerBinding, () => {
@@ -77,6 +130,33 @@ describe(EventHandlerBinding, () => {
 
     const data = { func: jest.fn() };
     const binding = new EventHandlerBinding(node, '{{data.func}}', 'onclick');
+    binding.bind(data);
+
+    expect(node.onclick).toBe(data.func);
+  });
+
+  it('does nothing if binding expression invalid', () => {
+    const node = document.createElement('div');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (node as any).onclick = '{{data.func';
+
+    const data = { func: jest.fn() };
+    const binding = new EventHandlerBinding(node, '{{data.func', 'onclick');
+
+    binding.bind(data);
+
+    expect(node.onclick).toBe('{{data.func');
+  });
+
+  it('does nothing if data is the same', () => {
+    const node = document.createElement('div');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (node as any).onclick = '{{data.func}}';
+
+    const data = { func: jest.fn() };
+    const binding = new EventHandlerBinding(node, '{{data.func}}', 'onclick');
+
+    binding.bind(data);
     binding.bind(data);
 
     expect(node.onclick).toBe(data.func);
@@ -93,14 +173,23 @@ describe(generateBindings, () => {
     parent.appendChild(text);
 
     const attr = document.createElement('div');
-    attr.setAttribute('title', '{{data.attr}}');
+    attr.setAttribute('title', '{{data.child.attr}}');
     parent.appendChild(attr);
 
     const event = document.createElement('div');
     event.innerHTML = '<div onclick="{{data.event}}"></div>';
     attr.appendChild(event);
 
-    const data = { attr: 'attr', text: 'text', event: () => undefined };
+    const comment = document.createElement('div');
+    comment.innerHTML = `<!-- <div/> -->`;
+    parent.appendChild(comment);
+
+    const data = {
+      attr: 'attr',
+      text: 'text',
+      event: () => undefined,
+      child: { attr: 'attr-child' },
+    };
     const bindings = generateBindings(parent);
     const collection = new CollectionBinding(bindings);
     collection.bind(data);
@@ -109,7 +198,7 @@ describe(generateBindings, () => {
 
     expect(parent.getAttribute('title')).toBe('attr');
     expect(text.textContent).toBe('text');
-    expect(attr.getAttribute('title')).toBe('attr');
+    expect(attr.getAttribute('title')).toBe('attr-child');
     expect(event.querySelector('div')?.onclick).toBe(data.event);
   });
 });
