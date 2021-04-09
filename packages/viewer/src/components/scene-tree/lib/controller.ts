@@ -2,7 +2,6 @@ import {
   ResponseStream,
   SceneTreeAPIClient,
   ServiceError,
-  Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import {
   CollapseAllRequest,
@@ -31,11 +30,6 @@ interface Page {
   res: Promise<GetTreeResponse>;
 }
 
-interface SubscribeHandlers {
-  onData?: (msg: SubscribeResponse) => void;
-  onEnd?: (status?: Status) => void;
-}
-
 export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -53,11 +47,7 @@ export class SceneTreeController {
     private rowLimit: number
   ) {}
 
-  public subscribe(
-    jwt: () => string,
-    handlers: SubscribeHandlers = {}
-  ): Disposable {
-    const { onData, onEnd } = handlers;
+  public subscribe(jwt: () => string): Disposable {
     let stream: ResponseStream<SubscribeResponse> | undefined;
 
     const sub = (): void => {
@@ -79,13 +69,10 @@ export class SceneTreeController {
           this.invalidateAfterOffset(change.listChange.start);
           this.fetchPageAtOffset(change.listChange.start, jwt());
         }
-
-        onData?.(msg);
       });
 
-      stream.on('end', (status) => {
+      stream.on('end', () => {
         sub();
-        onEnd?.(status);
       });
     };
 
@@ -345,6 +332,7 @@ export class SceneTreeController {
   }
 
   private createJwtMetadata(jwt: string): grpc.Metadata {
+    console.log('jwt', jwt);
     return new grpc.Metadata({
       'jwt-context': JSON.stringify({ jwt }),
     });

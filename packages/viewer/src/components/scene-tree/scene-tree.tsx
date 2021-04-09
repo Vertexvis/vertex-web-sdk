@@ -42,6 +42,12 @@ export class SceneTree {
   @Prop()
   public viewerSelector?: string;
 
+  @Prop({ reflect: true, mutable: true })
+  public viewer: HTMLVertexViewerElement | undefined;
+
+  @Prop({ reflect: true, mutable: true })
+  public controller: SceneTreeController | undefined;
+
   @Prop()
   public config?: Config;
 
@@ -52,6 +58,9 @@ export class SceneTree {
    * Use the `config` property for manually setting hosts.
    */
   @Prop() public configEnv: Environment = 'platprod';
+
+  @Prop({ reflect: true, mutable: true })
+  public jwt: string | undefined;
 
   @Element()
   private el!: HTMLElement;
@@ -83,38 +92,35 @@ export class SceneTree {
   private rightTemplate: HTMLTemplateElement | undefined;
   private bindings = new Map<Element, CollectionBinding>();
 
-  private controller: SceneTreeController | undefined;
   private idleCallbackId: number | undefined;
 
   // TODO(dan): Consider pulling these out into a context object that can be
   // shared between components.
   private sceneViewId: string | undefined;
-  private jwt: string | undefined;
 
   @Prop()
   public rowData: RowDataProvider = () => ({});
 
   public componentWillLoad(): void {
-    if (this.viewerSelector) {
-      const viewer = document.querySelector(this.viewerSelector) as
+    if (this.viewerSelector != null) {
+      this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
         | undefined;
 
-      if (viewer != null) {
-        viewer.addEventListener('sceneReady', async () => {
-          const scene = await viewer.scene();
-          const jwt = await viewer.getJwt();
+      this.viewer?.addEventListener('sceneReady', async (event) => {
+        const viewer = event.currentTarget as HTMLVertexViewerElement;
+        const scene = await viewer.scene();
+        const jwt = await viewer.getJwt();
 
-          if (jwt != null) {
-            this.handleViewerSceneReady(scene.sceneViewId, jwt);
-          }
-        });
-        viewer.addEventListener('connectionChange', (event) =>
-          this.handleViewerConnectionStatusChanged(
-            event as CustomEvent<ConnectionStatus>
-          )
-        );
-      }
+        if (jwt != null) {
+          this.handleViewerSceneReady(scene.sceneViewId, jwt);
+        }
+      });
+      this.viewer?.addEventListener('connectionChange', (event) =>
+        this.handleViewerConnectionStatusChanged(
+          event as CustomEvent<ConnectionStatus>
+        )
+      );
     }
   }
 
@@ -226,6 +232,17 @@ export class SceneTree {
   public async expandAll(): Promise<void> {
     if (this.jwt != null) {
       await this.controller?.expandAll(this.jwt);
+    } else {
+      throw new Error('Cannot expand all nodes. Token is undefined.');
+    }
+  }
+
+  @Method()
+  public async collapseAll(): Promise<void> {
+    if (this.jwt != null) {
+      await this.controller?.collapseAll(this.jwt);
+    } else {
+      throw new Error('Cannot collapse all nodes. Token is undefined.');
     }
   }
 
@@ -238,11 +255,17 @@ export class SceneTree {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
       this.controller = new SceneTreeController(client, sceneViewId, 100);
+      this.initializeController();
+    }
+  }
+
+  private initializeController(): void {
+    if (this.controller != null && this.jwt != null) {
       this.controller.onStateChange.on((state) => {
         this.handleControllerStateChange(state);
         this.scheduleClearUnusedData();
       });
-      this.controller.fetchPage(0, jwt);
+      this.controller.fetchPage(0, this.jwt);
       this.controller.subscribe(() => {
         if (this.jwt != null) {
           return this.jwt;

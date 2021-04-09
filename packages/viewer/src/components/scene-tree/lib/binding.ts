@@ -65,7 +65,7 @@ export class EventHandlerBinding extends NodeBinding<Element> {
 export function generateBindings(node: Node): Binding[] {
   const bindings: Binding[] = [];
 
-  if (node.nodeType === node.ELEMENT_NODE) {
+  if (node.nodeType === Node.ELEMENT_NODE) {
     const el = node as HTMLElement;
     const bindableAttributes = getBindableAttributes(el);
 
@@ -77,7 +77,7 @@ export function generateBindings(node: Node): Binding[] {
       }
     });
   } else if (
-    node.nodeType === node.TEXT_NODE &&
+    node.nodeType === Node.TEXT_NODE &&
     node.textContent != null &&
     bindingRegEx.test(node.textContent)
   ) {

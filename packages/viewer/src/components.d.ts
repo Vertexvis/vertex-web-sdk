@@ -277,8 +277,22 @@ declare global {
   }
 }
 declare namespace LocalJSX {
-<<<<<<< HEAD
   interface SvgIcon {}
+  interface SvgIcon {}
+  interface VertexSceneTree {
+    approximateItemHeight?: number;
+    config?: Config;
+    /**
+     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+     */
+    configEnv?: Environment;
+    controller?: SceneTreeController | undefined;
+    jwt?: string | undefined;
+    overScanCount?: number;
+    rowData?: RowDataProvider;
+    viewer?: HTMLVertexViewerElement | undefined;
+    viewerSelector?: string;
+  }
   interface VertexViewer {
     /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
@@ -398,6 +412,7 @@ declare namespace LocalJSX {
   }
   interface IntrinsicElements {
     'svg-icon': SvgIcon;
+    'vertex-scene-tree': VertexSceneTree;
     'vertex-viewer': VertexViewer;
     'vertex-viewer-button': VertexViewerButton;
     'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
@@ -405,7 +420,6 @@ declare namespace LocalJSX {
     'vertex-viewer-toolbar': VertexViewerToolbar;
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
   }
-=======
     interface SvgIcon {
     }
     interface VertexSceneTree {
@@ -547,13 +561,14 @@ declare namespace LocalJSX {
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
     }
->>>>>>> Wire up scene tree to backend
 }
 export { LocalJSX as JSX };
 declare module '@stencil/core' {
   export namespace JSX {
     interface IntrinsicElements {
       'svg-icon': LocalJSX.SvgIcon & JSXBase.HTMLAttributes<HTMLSvgIconElement>;
+      'vertex-scene-tree': LocalJSX.VertexSceneTree &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
       'vertex-viewer': LocalJSX.VertexViewer &
         JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
       'vertex-viewer-button': LocalJSX.VertexViewerButton &

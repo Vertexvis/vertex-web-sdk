@@ -147,6 +147,16 @@ describe(SceneTreeController, () => {
         expect.anything()
       );
     });
+
+    it('throws if grpc call errors', () => {
+      (client.collapseNode as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryError(new Error('oops'))
+      );
+
+      return expect(
+        controller.collapseNode(random.guid(), jwt)
+      ).rejects.toThrowError();
+    });
   });
 
   describe(SceneTreeController.prototype.expandNode, () => {
@@ -436,12 +446,52 @@ describe(SceneTreeController, () => {
       expect(pages).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
   });
+
+  describe(SceneTreeController.prototype.getPageForOffset, () => {
+    it('constrains offset', async () => {
+      (client.getTree as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const controller = new SceneTreeController(client, sceneViewId, 10);
+      await controller.fetchPage(0, jwt);
+      await controller.fetchRange(0, 100, jwt);
+
+      const page = controller.getPageForOffset(101);
+      expect(page).toBe(9);
+    });
+  });
+
+  describe(SceneTreeController.prototype.getPageIndexesForRange, () => {
+    it('constrains ranges', async () => {
+      (client.getTree as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const controller = new SceneTreeController(client, sceneViewId, 10);
+      await controller.fetchPage(0, jwt);
+      await controller.fetchRange(0, 100, jwt);
+
+      const range = controller.getPageIndexesForRange(-1, 101);
+      expect(range).toEqual([0, 9]);
+    });
+  });
 });
 
-function mockGrpcUnaryResult(result: unknown): (...args) => unknown {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mockGrpcUnaryResult(result: unknown): (...args: any[]) => unknown {
   return (_, __, handler) => {
     setTimeout(() => {
       handler(null, result);
+    }, 10);
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
+  return (_, __, handler) => {
+    setTimeout(() => {
+      handler(error);
     }, 10);
   };
 }

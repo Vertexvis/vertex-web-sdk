@@ -24,6 +24,7 @@ export const config: Config = {
   ],
   testing: {
     collectCoverageFrom: ['**/src/**/*.{ts,tsx}'],
+    coveragePathIgnorePatterns: ['src/testing'],
     coverageThreshold: {
       global: {
         branches: 60,
