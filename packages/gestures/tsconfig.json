@@ -1,9 +1,8 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
-  "extends": "@vertexvis/typescript-config-vertexvis/tsconfig",
+  "extends": "@vertexwebsdk/build/tsconfig",
   "compilerOptions": {
-    "importHelpers": true,
-    "downlevelIteration": true
+    "lib": ["DOM", "ES6"]
   },
   "exclude": ["dist", "node_modules"]
 }

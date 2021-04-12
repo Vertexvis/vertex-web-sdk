@@ -1,0 +1,23 @@
+{
+  "name": "@vertexvis/gestures",
+  "version": "0.0.0",
+  "description": "A library for handling user gestures.",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "rollup --config ./rollup.config.js --silent",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore ."
+  },
+  "dependencies": {
+    "@vertexvis/geometry": "0.9.25",
+    "@vertexvis/utils": "0.9.25"
+  },
+  "devDependencies": {
+    "@vertexwebsdk/build": "0.9.25",
+    "eslint": "^7.20.0"
+  }
+}
