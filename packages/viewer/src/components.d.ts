@@ -67,6 +67,10 @@ export namespace Components {
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;
         /**
+          * Returns `true` indicating that the scene is ready to be interacted with.
+         */
+        "isSceneReady": () => Promise<boolean>;
+        /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */
         "keyboardControls": boolean;

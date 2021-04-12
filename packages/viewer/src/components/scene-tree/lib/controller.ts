@@ -58,7 +58,7 @@ export class SceneTreeController {
 
   public constructor(
     private client: SceneTreeAPIClient,
-    private sceneViewId: string,
+    public sceneViewId: string,
     private rowLimit: number
   ) {}
 

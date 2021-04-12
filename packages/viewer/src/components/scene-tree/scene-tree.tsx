@@ -96,9 +96,6 @@ export class SceneTree {
 
   private idleCallbackId: number | undefined;
 
-  // TODO(dan): Consider pulling these out into a context object that can be
-  // shared between components.
-  private sceneViewId: string | undefined;
   private connected = false;
 
   private onStateChangeDisposable: Disposable | undefined;
@@ -238,10 +235,10 @@ export class SceneTree {
   }
 
   @Watch('viewer')
-  public handleViewerChanged(
+  public async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
-  ): void {
+  ): Promise<void> {
     if (newViewer !== oldViewer) {
       if (oldViewer != null) {
         this.cleanupController();
@@ -261,29 +258,41 @@ export class SceneTree {
           'connectionChange',
           this.handleViewerConnectionStatusChange
         );
+
+        const isSceneReady = await newViewer.isSceneReady();
+        if (isSceneReady) {
+          this.jwt = await newViewer.getJwt();
+          this.createController();
+        }
       }
     }
   }
 
-  private handleViewerSceneReady = async (event: Event): Promise<void> => {
-    const viewer = event.currentTarget as HTMLVertexViewerElement;
-    const { sceneViewId } = await viewer.scene();
-
-    console.debug('Scene tree received viewer scene ready', sceneViewId);
-
-    if (this.sceneViewId !== sceneViewId) {
-      this.sceneViewId = sceneViewId;
-
-      const { sceneTreeHost } = this.getConfig().network;
-      const client = new SceneTreeAPIClient(sceneTreeHost);
-      this.controller = new SceneTreeController(client, sceneViewId, 100);
-      this.initializeController();
-    }
+  private handleViewerSceneReady = (): void => {
+    console.debug('Scene tree received viewer scene ready');
+    this.createController();
   };
 
   private cleanupController(): void {
     this.onStateChangeDisposable?.dispose();
     this.subscribeDisposable?.dispose();
+  }
+
+  private async createController(): Promise<void> {
+    if (this.viewer != null) {
+      const { sceneViewId } = await this.viewer.scene();
+
+      if (this.controller?.sceneViewId !== sceneViewId) {
+        this.cleanupController();
+
+        const { sceneTreeHost } = this.getConfig().network;
+        const client = new SceneTreeAPIClient(sceneTreeHost);
+        this.controller = new SceneTreeController(client, sceneViewId, 100);
+        this.initializeController();
+      }
+    } else {
+      throw new Error('Viewer is not set');
+    }
   }
 
   private initializeController(): void {

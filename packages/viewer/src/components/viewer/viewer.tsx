@@ -642,6 +642,14 @@ export class Viewer {
     return this.lastFrame;
   }
 
+  /**
+   * Returns `true` indicating that the scene is ready to be interacted with.
+   */
+  @Method()
+  public async isSceneReady(): Promise<boolean> {
+    return this.lastFrame != null && this.sceneViewId != null;
+  }
+
   @Listen('tap')
   private async handleTapEvent(
     event: CustomEvent<TapEventDetails>
