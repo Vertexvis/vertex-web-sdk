@@ -87,6 +87,7 @@ export function measureCanvasRenderer(
     }
   }
 
+  /* istanbul ignore next */
   if (logFrameRate) {
     setInterval(() => {
       if (fpsFrameCount != null) {

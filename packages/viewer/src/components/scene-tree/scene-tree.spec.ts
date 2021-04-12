@@ -5,7 +5,7 @@ import { Viewer } from '../viewer/viewer';
 import { SceneTree } from './scene-tree';
 
 describe('<vertex-scene-tree />', () => {
-  it('is created', async () => {
+  it('queries for the viewer', async () => {
     const page = await newSpecPage({
       components: [SceneTree, Viewer],
       html: `
@@ -18,6 +18,6 @@ describe('<vertex-scene-tree />', () => {
       'vertex-scene-tree'
     ) as HTMLVertexSceneTreeElement;
 
-    expect(sceneTree).toBeDefined();
+    expect(sceneTree.viewer).toBeDefined();
   });
 });
