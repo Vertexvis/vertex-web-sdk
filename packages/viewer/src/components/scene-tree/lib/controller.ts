@@ -30,6 +30,11 @@ interface Page {
   res: Promise<GetTreeResponse>;
 }
 
+/**
+ * The `SceneTreeController` is responsible for coordinating interactions of the
+ * view, fetching and mutating tree data on the server, maintaining state and
+ * notifying the view about state changes.
+ */
 export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -39,7 +44,17 @@ export class SceneTreeController {
     rows: [],
   };
 
+  /**
+   * A dispatcher that emits an event whenever the internal state has changed.
+   */
   public onStateChange = new EventDispatcher<SceneTreeState>();
+
+  /**
+   * The number of pages that have been fetched.
+   */
+  public get fetchedPageCount(): number {
+    return this.pages.size;
+  }
 
   public constructor(
     private client: SceneTreeAPIClient,
@@ -47,6 +62,14 @@ export class SceneTreeController {
     private rowLimit: number
   ) {}
 
+  /**
+   * Performs a network request that will listen to server-side changes of the
+   * scene tree's data. If the server terminates the connection, this will
+   * automatically attempt to resubscribe to changes.
+   *
+   * @param jwt A JWT token used to auth with the server.
+   * @returns A `Disposable` that can be used to terminate the subscription.
+   */
   public subscribe(jwt: () => string): Disposable {
     let stream: ResponseStream<SubscribeResponse> | undefined;
 
@@ -81,6 +104,12 @@ export class SceneTreeController {
     return { dispose: () => stream?.cancel() };
   }
 
+  /**
+   * Collapses a node with the given node ID.
+   *
+   * @param id A node ID to collapse.
+   * @param jwt A JWT token to authenticate with the server.
+   */
   public async collapseNode(id: string, jwt: string): Promise<void> {
     const viewId = new Uuid();
     viewId.setHex(this.sceneViewId);
@@ -96,6 +125,12 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Expands a node with the given node ID.
+   *
+   * @param id A node ID to expand.
+   * @param jwt A JWT token to authenticate with the server.
+   */
   public async expandNode(id: string, jwt: string): Promise<void> {
     const viewId = new Uuid();
     viewId.setHex(this.sceneViewId);
@@ -111,6 +146,11 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Collapses all nodes in the tree.
+   *
+   * @param jwt A JWT token used to authenticate with the server.
+   */
   public async collapseAll(jwt: string): Promise<void> {
     const req = new CollapseAllRequest();
     await this.requestUnary(jwt, (metadata, handler) =>
@@ -118,6 +158,11 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Expands all nodes in the tree.
+   *
+   * @param jwt A JWT token used to authenticate with the server.
+   */
   public async expandAll(jwt: string): Promise<void> {
     const req = new ExpandAllRequest();
     await this.requestUnary(jwt, (metadata, handler) =>
@@ -125,6 +170,17 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Fetches a page at the given index. Once the data has been fetched, the
+   * controller will emit an `onStateChange` event that contains rows with the
+   * fetched page. If a page is invalidated before the request completes, the
+   * response is ignored.
+   *
+   * If the index is out of range, returns without fetching any data.
+   *
+   * @param index A 0 based index to fetch.
+   * @param jwt A JWT token to authenticate with the server.
+   */
   public async fetchPage(index: number, jwt: string): Promise<void> {
     if (index < 0 || index > this.maxPages - 1) {
       return;
@@ -143,11 +199,24 @@ export class SceneTreeController {
     await this.pages.get(index)?.res;
   }
 
+  /**
+   * Fetches a page that contains the given row offset.
+   *
+   * @param offset The row offset of the page to fetch.
+   * @param jwt A JWT token to authenticate with the server.
+   */
   public fetchPageAtOffset(offset: number, jwt: string): Promise<void> {
     const page = Math.floor(offset / this.rowLimit);
     return this.fetchPage(page, jwt);
   }
 
+  /**
+   * Fetches pages that contain the given row ranges.
+   *
+   * @param startOffset A start offset, inclusive.
+   * @param endOffset The end offset, inclusive.
+   * @param jwt A JWT token used to authenticate with the server.
+   */
   public async fetchRange(
     startOffset: number,
     endOffset: number,
@@ -167,10 +236,23 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Checks if the page at the given index is loaded.
+   *
+   * @param index A page index.
+   * @returns `true` if the page is loaded. `false` otherwise.
+   */
   public isPageLoaded(index: number): boolean {
     return this.pages.has(index);
   }
 
+  /**
+   * Returns a list of page indices within a range that have not been loaded.
+   *
+   * @param start The start page index, inclusive.
+   * @param end The end page index, inclusive.
+   * @returns A list of pages indices that have not been loaded.
+   */
   public getNonLoadedPageIndexes(start: number, end: number): number[] {
     const [boundedStart, boundedEnd] = this.constrainPageRange(start, end);
     const pageCount = boundedEnd - boundedStart + 1;
@@ -179,6 +261,17 @@ export class SceneTreeController {
       .filter((page) => !this.isPageLoaded(page));
   }
 
+  /**
+   * Clears page data that is outside a given range. Uses a distance algorithm
+   * to removes pages that are furthest from either end of the range. This
+   * method is useful for clearing out data that is not needed anymore to keep
+   * memory pressure in the client low.
+   *
+   * @param startPage The index of the starting page in the range.
+   * @param endPage The index of the ending page in the range.
+   * @param threshold A minimum number of pages to keep. No cleanup is performed
+   *  if the number of fetched pages doesn't meet this threshold.
+   */
   public invalidatePagesOutsideRange(
     startPage: number,
     endPage: number,
@@ -332,7 +425,6 @@ export class SceneTreeController {
   }
 
   private createJwtMetadata(jwt: string): grpc.Metadata {
-    console.log('jwt', jwt);
     return new grpc.Metadata({
       'jwt-context': JSON.stringify({ jwt }),
     });
@@ -352,9 +444,5 @@ export class SceneTreeController {
 
   private get maxPages(): number {
     return Math.max(1, Math.ceil(this.state.totalRows / this.rowLimit));
-  }
-
-  public get fetchedPageCount(): number {
-    return this.pages.size;
   }
 }

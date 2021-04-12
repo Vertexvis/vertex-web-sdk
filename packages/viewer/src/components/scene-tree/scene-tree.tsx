@@ -8,6 +8,7 @@ import {
   Prop,
   readTask,
   State,
+  Watch,
 } from '@stencil/core';
 import { Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
@@ -16,6 +17,7 @@ import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { Disposable } from '@vertexvis/utils';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type RowDataProvider = (row: Row) => object;
@@ -97,6 +99,10 @@ export class SceneTree {
   // TODO(dan): Consider pulling these out into a context object that can be
   // shared between components.
   private sceneViewId: string | undefined;
+  private connected = false;
+
+  private onStateChangeDisposable: Disposable | undefined;
+  private subscribeDisposable: Disposable | undefined;
 
   @Prop()
   public rowData: RowDataProvider = () => ({});
@@ -106,21 +112,6 @@ export class SceneTree {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
         | undefined;
-
-      this.viewer?.addEventListener('sceneReady', async (event) => {
-        const viewer = event.currentTarget as HTMLVertexViewerElement;
-        const scene = await viewer.scene();
-        const jwt = await viewer.getJwt();
-
-        if (jwt != null) {
-          this.handleViewerSceneReady(scene.sceneViewId, jwt);
-        }
-      });
-      this.viewer?.addEventListener('connectionChange', (event) =>
-        this.handleViewerConnectionStatusChanged(
-          event as CustomEvent<ConnectionStatus>
-        )
-      );
     }
   }
 
@@ -246,33 +237,72 @@ export class SceneTree {
     }
   }
 
-  private handleViewerSceneReady(sceneViewId: string, jwt: string): void {
-    this.jwt = jwt;
+  @Watch('viewer')
+  public handleViewerChanged(
+    newViewer: HTMLVertexViewerElement | undefined,
+    oldViewer: HTMLVertexViewerElement | undefined
+  ): void {
+    if (newViewer !== oldViewer) {
+      if (oldViewer != null) {
+        this.cleanupController();
+        oldViewer.removeEventListener(
+          'sceneReady',
+          this.handleViewerSceneReady
+        );
+        oldViewer.removeEventListener(
+          'connectionChange',
+          this.handleViewerConnectionStatusChange
+        );
+      }
+
+      if (newViewer != null) {
+        newViewer.addEventListener('sceneReady', this.handleViewerSceneReady);
+        newViewer.addEventListener(
+          'connectionChange',
+          this.handleViewerConnectionStatusChange
+        );
+      }
+    }
+  }
+
+  private handleViewerSceneReady = async (event: Event): Promise<void> => {
+    const viewer = event.currentTarget as HTMLVertexViewerElement;
+    const { sceneViewId } = await viewer.scene();
 
     console.debug('Scene tree received viewer scene ready', sceneViewId);
 
     if (this.sceneViewId !== sceneViewId) {
+      this.sceneViewId = sceneViewId;
+
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
       this.controller = new SceneTreeController(client, sceneViewId, 100);
       this.initializeController();
     }
+  };
+
+  private cleanupController(): void {
+    this.onStateChangeDisposable?.dispose();
+    this.subscribeDisposable?.dispose();
   }
 
   private initializeController(): void {
-    if (this.controller != null && this.jwt != null) {
-      this.controller.onStateChange.on((state) => {
-        this.handleControllerStateChange(state);
-        this.scheduleClearUnusedData();
-      });
-      this.controller.fetchPage(0, this.jwt);
-      this.controller.subscribe(() => {
+    if (this.controller != null && this.jwt != null && !this.connected) {
+      this.onStateChangeDisposable = this.controller.onStateChange.on(
+        (state) => {
+          this.handleControllerStateChange(state);
+          this.scheduleClearUnusedData();
+        }
+      );
+      this.subscribeDisposable = this.controller.subscribe(() => {
         if (this.jwt != null) {
           return this.jwt;
         } else {
           throw new Error('Cannot update subscription. JWT is null.');
         }
       });
+      this.controller.fetchPage(0, this.jwt);
+      this.connected = true;
     }
   }
 
@@ -302,15 +332,14 @@ export class SceneTree {
     }
   }
 
-  private handleViewerConnectionStatusChanged(
-    event: CustomEvent<ConnectionStatus>
-  ): void {
-    const { detail } = event;
+  private handleViewerConnectionStatusChange = (event: Event): void => {
+    const { detail } = event as CustomEvent<ConnectionStatus>;
     if (detail.status === 'connected') {
       console.debug('Scene tree received new token');
       this.jwt = detail.jwt;
+      this.initializeController();
     }
-  }
+  };
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
@@ -390,11 +419,8 @@ export class SceneTree {
         this.startIndex,
         this.startIndex + this.viewportItems.length
       );
-      const unloadedPages = this.controller.getNonLoadedPageIndexes(
-        start - 3,
-        end + 3
-      );
-      for (const page of unloadedPages) {
+      const unloadedPages = this.controller.getNonLoadedPageIndexes(start, end);
+      for (const page of unloadedPages.slice(0, 1)) {
         this.controller.fetchPage(page, this.jwt);
       }
     }
