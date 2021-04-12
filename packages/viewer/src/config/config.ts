@@ -10,6 +10,7 @@ import {
 interface NetworkConfig {
   apiHost: string;
   renderingHost: string;
+  sceneTreeHost: string;
 }
 
 export interface Config {
@@ -34,6 +35,7 @@ const config: Config = {
   network: {
     apiHost: 'https://platform.platprod.vertexvis.io',
     renderingHost: 'wss://stream.platprod.vertexvis.io',
+    sceneTreeHost: 'https://scene-trees.platprod.vertexvis.io',
   },
   flags: Flags.defaultFlags,
   events: Events.defaultEventConfig,
@@ -49,6 +51,7 @@ const platdevConfig: Config = {
   network: {
     apiHost: 'https://platform.platdev.vertexvis.io',
     renderingHost: 'wss://stream.platdev.vertexvis.io',
+    sceneTreeHost: 'https://scene-trees.platdev.vertexvis.io',
   },
 };
 
@@ -57,6 +60,7 @@ const platstagingConfig: Config = {
   network: {
     apiHost: 'https://platform.platstaging.vertexvis.io',
     renderingHost: 'wss://stream.platstaging.vertexvis.io',
+    sceneTreeHost: 'https://scene-trees.platstaging.vertexvis.io',
   },
 };
 

@@ -12,6 +12,16 @@ describe('<vertex-viewer-icon>', () => {
     expect(svg?.innerHTML).toContain('path');
   });
 
+  it('renders empty element if no icon is found', async () => {
+    const page = await newSpecPage({
+      components: [ViewerIcon],
+      html: `<vertex-viewer-icon name="foo"></vertex-viewer-button>`,
+    });
+
+    const svg = page.root?.shadowRoot?.querySelector('svg');
+    expect(svg?.innerHTML).not.toContain('path');
+  });
+
   it('sets the correct size class name', async () => {
     const page = await newSpecPage({
       components: [ViewerIcon],
