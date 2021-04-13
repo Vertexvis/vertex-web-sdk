@@ -1,12 +1,3 @@
-jest.mock('@juggle/resize-observer', () => ({
-  ResizeObserver: jest.fn(() => {
-    console.log('in the mock');
-    return {
-      observe: jest.fn(),
-      disconnect: jest.fn(),
-    };
-  }),
-}));
 jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
 jest.mock('../../sessions/storage');
@@ -129,7 +120,7 @@ describe('vertex-viewer', () => {
   describe(Viewer.prototype.load, () => {
     it('loads the scene view for a stream key', async () => {
       const viewer = await createViewerWithLoadedStream('123');
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/ws'),
@@ -151,7 +142,7 @@ describe('vertex-viewer', () => {
       );
 
       const viewer = await createViewerWithLoadedStream('123');
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -174,7 +165,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id=clientId></vertex-viewer`
       );
-      (viewer.getStreamApi().connect as jest.Mock).mockRejectedValue(
+      (viewer.stream.connect as jest.Mock).mockRejectedValue(
         new Error('Failed')
       );
       expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
@@ -189,7 +180,7 @@ describe('vertex-viewer', () => {
   describe(Viewer.prototype.unload, () => {
     it('disconnects the WS', async () => {
       const viewer = await createViewerWithLoadedStream('123');
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
 
       viewer.unload();
       expect(api.dispose).toHaveBeenCalled();
@@ -209,12 +200,12 @@ describe('vertex-viewer', () => {
       let viewer: Viewer = await createViewerWithLoadedStream('123', () =>
         viewer.handleWebSocketClose()
       );
-      let api = viewer.getStreamApi();
+      let api = viewer.stream;
       viewer = await loadNewModelForViewer(
         viewer,
         `urn:vertexvis:stream-key:234`
       );
-      api = viewer.getStreamApi();
+      api = viewer.stream;
 
       expect(api.reconnect).not.toHaveBeenCalled();
     });
@@ -232,7 +223,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
       const updatedAttributes = {
@@ -257,7 +248,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
 
@@ -272,7 +263,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       viewer.streamAttributes = attributes;
       await loadNewModelForViewer(viewer, '123');
 
@@ -291,7 +282,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId" session-id="sessionId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       await loadNewModelForViewer(viewer, '123');
 
       expect(api.connect).toHaveBeenCalledWith(
@@ -306,7 +297,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       await loadNewModelForViewer(viewer, '123');
 
       expect(api.connect).toHaveBeenCalledWith(
@@ -324,7 +315,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
-      const api = viewer.getStreamApi();
+      const api = viewer.stream;
       await loadNewModelForViewer(viewer, '123');
 
       expect(api.connect).toHaveBeenCalledWith(
@@ -347,7 +338,7 @@ async function createViewerWithLoadedStream(
   dispose?: () => void
 ): Promise<Viewer> {
   const viewer = await createViewerSpec(
-    `<vertex-viewer client-id="clientId" unit-test-mode="true"></vertex-viewer>`
+    `<vertex-viewer client-id="clientId"></vertex-viewer>`
   );
 
   return loadNewModelForViewer(viewer, key, dispose);
@@ -366,7 +357,7 @@ async function loadNewModelForViewer(
     },
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-  const api = viewer.getStreamApi();
+  const api = viewer.stream;
   (api.connect as jest.Mock).mockResolvedValue({
     dispose: () => {
       if (dispose != null) {

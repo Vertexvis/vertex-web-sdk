@@ -158,6 +158,8 @@ export class Viewer {
    */
   @Prop() public streamAttributes?: StreamAttributes | string;
 
+  @Prop({ mutable: true, reflect: true }) public stream!: ViewerStreamApi;
+
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
@@ -226,7 +228,6 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
-  private stream!: ViewerStreamApi;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
@@ -395,7 +396,9 @@ export class Viewer {
   /**
    * @private For internal use only.
    */
-  public dispatchFrameDrawn(frame: Frame.Frame): void {
+  @Method()
+  public async dispatchFrameDrawn(frame: Frame.Frame): Promise<void> {
+    this.lastFrame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
   }
@@ -682,13 +685,6 @@ export class Viewer {
   /**
    * @private Used for testing.
    */
-  public getStreamApi(): ViewerStreamApi {
-    return this.stream;
-  }
-
-  /**
-   * @private Used for testing.
-   */
   public async handleWebSocketClose(): Promise<void> {
     if (this.isStreamStarted) {
       this.isStreamStarted = false;
@@ -954,7 +950,6 @@ export class Viewer {
         const data = { canvas, dimensions, frame };
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
-        this.lastFrame = drawnFrame;
         this.dispatchFrameDrawn(drawnFrame);
       }
     }

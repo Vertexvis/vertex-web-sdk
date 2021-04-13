@@ -23,21 +23,29 @@ import {
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
-import {
-  ResponseStream,
-  SceneTreeAPIClient,
-  Status,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { EventDispatcher } from '@vertexvis/utils';
+import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { sign } from 'jsonwebtoken';
 import Chance from 'chance';
 import { SceneTreeController } from '../controller';
 import { fromNodeProto } from '../row';
+import { ResponseStreamMock } from '../testing';
 
 const random = new Chance();
 
 describe(SceneTreeController, () => {
-  const sceneViewId = 'scene-view-id';
-  const jwt = 'jwt';
+  const sceneViewId = random.guid();
+  const jwt = sign(
+    {
+      aud: 'vertex-api',
+      iss: 'frame-streaming-service-platdev',
+      iat: 1618269253,
+      sub: '23bccce9-1cb1-4b4f-88b3-5808e6dfed78',
+      scene: 'd12e5340-b329-4654-9f7e-68e556637b38',
+      view: sceneViewId,
+      exp: 1618269553,
+    },
+    'secret'
+  );
 
   const client = new SceneTreeAPIClient('https://example.com');
 
@@ -50,7 +58,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.subscribe, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 10);
+    const controller = new SceneTreeController(client, 10);
 
     it('subscribes to remote changes', () => {
       const stream = new ResponseStreamMock();
@@ -159,7 +167,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.collapseNode, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 100);
+    const controller = new SceneTreeController(client, 100);
 
     it('makes call to collapse node', () => {
       const viewId = new Uuid();
@@ -202,7 +210,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.expandNode, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 100);
+    const controller = new SceneTreeController(client, 100);
 
     it('makes call to expand node', () => {
       const viewId = new Uuid();
@@ -225,7 +233,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.expandAll, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 100);
+    const controller = new SceneTreeController(client, 100);
 
     it('makes call to expand all nodes', () => {
       const req = new ExpandAllRequest();
@@ -239,7 +247,7 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.collapseAll, () => {
-    const controller = new SceneTreeController(client, sceneViewId, 100);
+    const controller = new SceneTreeController(client, 100);
 
     it('makes call to collapse all nodes', () => {
       const req = new CollapseAllRequest();
@@ -254,7 +262,7 @@ describe(SceneTreeController, () => {
 
   describe(SceneTreeController.prototype.fetchPage, () => {
     it('does nothing if index is outside bounds', async () => {
-      const controller = new SceneTreeController(client, sceneViewId, 100);
+      const controller = new SceneTreeController(client, 100);
       await controller.fetchPage(-1, jwt);
       await controller.fetchPage(1, jwt);
       expect(client.getTree).not.toHaveBeenCalled();
@@ -265,7 +273,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(1, 1))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 100);
+      const controller = new SceneTreeController(client, 100);
       await controller.fetchPage(0, jwt);
       await controller.fetchPage(0, jwt);
 
@@ -277,7 +285,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(1, 1))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 100);
+      const controller = new SceneTreeController(client, 100);
       await controller.fetchPage(0, jwt);
 
       const viewId = new Uuid();
@@ -309,7 +317,7 @@ describe(SceneTreeController, () => {
       );
 
       const onStateChange = jest.fn();
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       controller.onStateChange.on(onStateChange);
 
       await controller.fetchPage(0, jwt);
@@ -341,7 +349,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
 
       await controller.fetchPageAtOffset(-1, jwt);
@@ -355,7 +363,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
 
       await controller.fetchPageAtOffset(10, jwt);
@@ -384,7 +392,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
 
       await controller.fetchRange(-1, 101, jwt);
@@ -425,7 +433,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       (client.getTree as jest.Mock).mockClear();
 
@@ -442,7 +450,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       await controller.fetchPage(1, jwt);
 
@@ -457,7 +465,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       await controller.fetchRange(0, 100, jwt);
 
@@ -475,7 +483,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       await controller.fetchRange(0, 100, jwt);
 
@@ -495,7 +503,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       await controller.fetchRange(0, 100, jwt);
 
@@ -510,7 +518,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, sceneViewId, 10);
+      const controller = new SceneTreeController(client, 10);
       await controller.fetchPage(0, jwt);
       await controller.fetchRange(0, 100, jwt);
 
@@ -566,37 +574,4 @@ function createGetTreeResponse(
   res.setCursor(cursor);
 
   return res;
-}
-
-class ResponseStreamMock<T> implements ResponseStream<T> {
-  private onData = new EventDispatcher<T>();
-  private onStatus = new EventDispatcher<Status>();
-  private onEnd = new EventDispatcher<Status | undefined>();
-
-  public cancel(): void {
-    // no op
-  }
-
-  public on(type: string, handler: any): ResponseStream<T> {
-    if (type === 'data') {
-      this.onData.on(handler);
-    } else if (type === 'end') {
-      this.onEnd.on(handler);
-    } else {
-      this.onStatus.on(handler);
-    }
-    return this;
-  }
-
-  public invokeOnData(msg: T): void {
-    this.onData.emit(msg);
-  }
-
-  public invokeOnEnd(status?: Status): void {
-    this.onEnd.emit(status);
-  }
-
-  public invokeOnStatus(status: Status): void {
-    this.onStatus.emit(status);
-  }
 }

@@ -6,10 +6,12 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SceneTreeController } from "./components/scene-tree/lib/controller";
+import { SceneTreeAPIClient } from "@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
 import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { StreamAttributes } from "@vertexvis/stream-api";
+import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
@@ -28,6 +30,7 @@ import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./c
 export namespace Components {
     interface VertexSceneTree {
         "approximateItemHeight": number;
+        "client": SceneTreeAPIClient;
         "collapseAll": () => Promise<void>;
         "config"?: Config;
         /**
@@ -62,6 +65,10 @@ export namespace Components {
           * @see Viewer.config
          */
         "configEnv": Environment;
+        /**
+          * @private For internal use only.
+         */
+        "dispatchFrameDrawn": (frame: Frame.Frame) => Promise<void>;
         "getBaseInteractionHandler": () => Promise<BaseInteractionHandler | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
@@ -116,6 +123,7 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        "stream": ViewerStreamApi;
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
@@ -226,6 +234,7 @@ declare global {
 declare namespace LocalJSX {
     interface VertexSceneTree {
         "approximateItemHeight"?: number;
+        "client": SceneTreeAPIClient;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
@@ -307,6 +316,7 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
+        "stream": ViewerStreamApi;
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */

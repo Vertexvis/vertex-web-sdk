@@ -16,8 +16,9 @@ import {
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { grpc } from '@improbable-eng/grpc-web';
-import { fromNodeProto, Row } from './row';
 import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import decodeJwt, { JwtPayload } from 'jwt-decode';
+import { fromNodeProto, Row } from './row';
 
 export interface SceneTreeState {
   totalRows: number;
@@ -28,6 +29,12 @@ interface Page {
   id: number;
   index: number;
   res: Promise<GetTreeResponse>;
+}
+
+// TODO(dan): add other fields.
+interface SceneTreeJwtPayload extends JwtPayload {
+  view: string;
+  scene: string;
 }
 
 /**
@@ -58,7 +65,6 @@ export class SceneTreeController {
 
   public constructor(
     private client: SceneTreeAPIClient,
-    public sceneViewId: string,
     private rowLimit: number
   ) {}
 
@@ -75,7 +81,7 @@ export class SceneTreeController {
 
     const sub = (): void => {
       const viewId = new Uuid();
-      viewId.setHex(this.sceneViewId);
+      viewId.setHex(this.getSceneViewId(jwt()));
 
       const req = new SubscribeRequest();
       req.setViewId(viewId);
@@ -112,7 +118,7 @@ export class SceneTreeController {
    */
   public async collapseNode(id: string, jwt: string): Promise<void> {
     const viewId = new Uuid();
-    viewId.setHex(this.sceneViewId);
+    viewId.setHex(this.getSceneViewId(jwt));
     const nodeId = new Uuid();
     nodeId.setHex(id);
 
@@ -133,7 +139,7 @@ export class SceneTreeController {
    */
   public async expandNode(id: string, jwt: string): Promise<void> {
     const viewId = new Uuid();
-    viewId.setHex(this.sceneViewId);
+    viewId.setHex(this.getSceneViewId(jwt));
     const nodeId = new Uuid();
     nodeId.setHex(id);
 
@@ -381,7 +387,7 @@ export class SceneTreeController {
   ): Promise<GetTreeResponse> {
     return this.requestUnary(jwt, (metadata, handler) => {
       const viewId = new Uuid();
-      viewId.setHex(this.sceneViewId);
+      viewId.setHex(this.getSceneViewId(jwt));
 
       const pager = new OffsetPager();
       pager.setOffset(offset);
@@ -440,6 +446,14 @@ export class SceneTreeController {
 
   private constrainPageIndex(index: number): number {
     return Math.max(0, Math.min(index, this.maxPages - 1));
+  }
+
+  /**
+   * TODO(dan): Remove after https://vertexvis.atlassian.net/browse/API-1747 is
+   * implemented. Make sure to `yarn remove jwt_decode` as well.
+   */
+  private getSceneViewId(jwt: string): string {
+    return decodeJwt<SceneTreeJwtPayload>(jwt).view;
   }
 
   private get maxPages(): number {
