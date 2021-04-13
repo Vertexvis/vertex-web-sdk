@@ -39,6 +39,9 @@ export namespace Components {
         "configEnv": Environment;
         "controller": SceneTreeController | undefined;
         "expandAll": () => Promise<void>;
+        /**
+          * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
+         */
         "invalidateRows": () => Promise<void>;
         "jwt": string | undefined;
         "overScanCount": number;

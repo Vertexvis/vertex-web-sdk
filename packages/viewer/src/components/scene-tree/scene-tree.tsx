@@ -2,6 +2,7 @@ import 'requestidlecallback-polyfill';
 import {
   Component,
   Element,
+  forceUpdate,
   h,
   Host,
   Method,
@@ -204,11 +205,17 @@ export class SceneTree {
     );
   }
 
+  /**
+   * Schedules a render of the rows in the scene tree. Useful if any custom
+   * data in your scene tree has changed, and you want to update the row's
+   * contents.
+   *
+   * **Note:** This is an asynchronous operation. The update may happen on the
+   * next frame.
+   */
   @Method()
   public async invalidateRows(): Promise<void> {
-    readTask(() => {
-      this.scrollTop = this.el.scrollTop || 0;
-    });
+    forceUpdate(this.el);
   }
 
   @Method()
