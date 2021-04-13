@@ -5,16 +5,17 @@
 
 ## Properties
 
-| Property           | Attribute           | Description                                                                                                                                                                     | Type                                       | Default      |
-| ------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------ |
-| `cameraControls`   | `camera-controls`   | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                        | `boolean`                                  | `true`       |
-| `clientId`         | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                          | `string \| undefined`                      | `undefined`  |
-| `config`           | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `Config \| string \| undefined`            | `undefined`  |
-| `configEnv`        | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                    | `"platdev" \| "platprod" \| "platstaging"` | `'platprod'` |
-| `keyboardControls` | `keyboard-controls` | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                             | `boolean`                                  | `true`       |
-| `sessionId`        | `session-id`        | Property used for internals or testing.                                                                                                                                         | `string \| undefined`                      | `undefined`  |
-| `src`              | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
-| `streamAttributes` | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `IStreamAttributes \| string \| undefined` | `undefined`  |
+| Property              | Attribute           | Description                                                                                                                                                                     | Type                                       | Default      |
+| --------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------ |
+| `cameraControls`      | `camera-controls`   | Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.                                                                        | `boolean`                                  | `true`       |
+| `clientId`            | `client-id`         | The Client ID associated with your Vertex Application.                                                                                                                          | `string \| undefined`                      | `undefined`  |
+| `config`              | `config`            | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `Config \| string \| undefined`            | `undefined`  |
+| `configEnv`           | `config-env`        | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                    | `"platdev" \| "platprod" \| "platstaging"` | `'platprod'` |
+| `keyboardControls`    | `keyboard-controls` | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                             | `boolean`                                  | `true`       |
+| `sessionId`           | `session-id`        | Property used for internals or testing.                                                                                                                                         | `string \| undefined`                      | `undefined`  |
+| `src`                 | `src`               | A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>` | `string \| undefined`                      | `undefined`  |
+| `stream` _(required)_ | --                  |                                                                                                                                                                                 | `ViewerStreamApi`                          | `undefined`  |
+| `streamAttributes`    | `stream-attributes` | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `IStreamAttributes \| string \| undefined` | `undefined`  |
 
 
 ## Events
@@ -34,6 +35,16 @@
 
 
 ## Methods
+
+### `dispatchFrameDrawn(frame: Frame.Frame) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 ### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
 
@@ -72,6 +83,16 @@ Type: `Promise<InteractionHandler[]>`
 #### Returns
 
 Type: `Promise<string | undefined>`
+
+
+
+### `isSceneReady() => Promise<boolean>`
+
+Returns `true` indicating that the scene is ready to be interacted with.
+
+#### Returns
+
+Type: `Promise<boolean>`
 
 
 

@@ -301,20 +301,6 @@ export class SceneTree {
     }
   }
 
-  @Watch('controller')
-  public handleControllerChanged(
-    newController: SceneTreeController | undefined,
-    oldController: SceneTreeController | undefined
-  ): void {
-    if (oldController != null) {
-      this.cleanupController();
-    }
-
-    if (newController != null) {
-      this.connectController(newController);
-    }
-  }
-
   @Watch('jwt')
   public handleJwtChanged(): void {
     if (this.controller != null) {
