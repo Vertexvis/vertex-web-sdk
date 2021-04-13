@@ -214,13 +214,23 @@ export class SceneTree {
                     <span class="row-text" title={row.name}>
                       {row.name}
                     </span>
-                    <span
-                      ref={(el) => {
-                        if (el != null && this.rightTemplate != null) {
-                          this.populateSlot(this.rightTemplate, row, el);
-                        }
-                      }}
-                    />
+
+                    {this.rightTemplate != null ? (
+                      <span
+                        ref={(el) => {
+                          if (el != null && this.rightTemplate != null) {
+                            this.populateSlot(this.rightTemplate, row, el);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <button
+                        class="visibility-btn"
+                        onClick={() => this.toggleItemVisibilityAtIndex(i)}
+                      >
+                        {row.visible ? <VisibleIcon /> : <HiddenIcon />}
+                      </button>
+                    )}
                   </div>
                 );
               }
@@ -270,6 +280,34 @@ export class SceneTree {
       await this.controller?.collapseAll(this.jwt);
     } else {
       throw new Error('Cannot collapse all nodes. Token is undefined.');
+    }
+  }
+
+  @Method()
+  public async toggleItemVisibilityAtIndex(index: number): Promise<void> {
+    const scene = await this.viewer?.scene();
+    const node = this.rows[index];
+
+    if (node == null) {
+      throw new Error(
+        `Cannot show item. Row at index ${index} has not been loaded`
+      );
+    }
+
+    if (scene == null) {
+      throw new Error(
+        `Cannot show item. Cannot get reference to viewer or scene.`
+      );
+    }
+
+    if (node.visible) {
+      return scene
+        .items((op) => op.where((q) => q.withItemId(node.id)).hide())
+        .execute();
+    } else {
+      return scene
+        .items((op) => op.where((q) => q.withItemId(node.id)).show())
+        .execute();
     }
   }
 
@@ -492,4 +530,36 @@ export class SceneTree {
   private getConfig(): Config {
     return parseConfig(this.configEnv, this.config);
   }
+}
+
+function HiddenIcon(): h.JSX.IntrinsicElements {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+    >
+      <path
+        d="M8,5a3,3,0,1,0,3,3A3,3,0,0,0,8,5Zm4.65-1.17A8.53,8.53,0,0,0,8,2.5,8.53,8.53,0,0,0,3.35,3.83,6.57,6.57,0,0,0,.51,7.89v.22a6.57,6.57,0,0,0,2.84,4.06A8.53,8.53,0,0,0,8,13.5a8.53,8.53,0,0,0,4.65-1.33,6.57,6.57,0,0,0,2.84-4.06V7.89A6.57,6.57,0,0,0,12.65,3.83Zm-.55,7.5A7.52,7.52,0,0,1,8,12.5a7.52,7.52,0,0,1-4.1-1.17A5.49,5.49,0,0,1,1.53,8,5.49,5.49,0,0,1,3.9,4.67,7.52,7.52,0,0,1,8,3.5a7.52,7.52,0,0,1,4.1,1.17A5.49,5.49,0,0,1,14.47,8,5.49,5.49,0,0,1,12.1,11.33Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function VisibleIcon(): h.JSX.IntrinsicElements {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+    >
+      <path
+        d="M8,5a3,3,0,1,0,3,3A3,3,0,0,0,8,5Zm4.65-1.17A8.53,8.53,0,0,0,8,2.5,8.53,8.53,0,0,0,3.35,3.83,6.57,6.57,0,0,0,.51,7.89v.22a6.57,6.57,0,0,0,2.84,4.06A8.53,8.53,0,0,0,8,13.5a8.53,8.53,0,0,0,4.65-1.33,6.57,6.57,0,0,0,2.84-4.06V7.89A6.57,6.57,0,0,0,12.65,3.83Zm-.55,7.5A7.52,7.52,0,0,1,8,12.5a7.52,7.52,0,0,1-4.1-1.17A5.49,5.49,0,0,1,1.53,8,5.49,5.49,0,0,1,3.9,4.67,7.52,7.52,0,0,1,8,3.5a7.52,7.52,0,0,1,4.1,1.17A5.49,5.49,0,0,1,14.47,8,5.49,5.49,0,0,1,12.1,11.33Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }
