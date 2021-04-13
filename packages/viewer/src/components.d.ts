@@ -5,11 +5,9 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { SceneTreeController } from "./components/scene-tree/lib/controller";
-import { SceneTreeAPIClient } from "@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service";
+import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
-import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { TapEventDetails } from "./interactions/tapEventDetails";
@@ -30,14 +28,12 @@ import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./c
 export namespace Components {
     interface VertexSceneTree {
         "approximateItemHeight": number;
-        "client": SceneTreeAPIClient;
         "collapseAll": () => Promise<void>;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv": Environment;
-        "controller": SceneTreeController | undefined;
         "expandAll": () => Promise<void>;
         /**
           * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
@@ -45,7 +41,7 @@ export namespace Components {
         "invalidateRows": () => Promise<void>;
         "jwt": string | undefined;
         "overScanCount": number;
-        "rowData": RowDataProvider;
+        "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
         "viewer": HTMLVertexViewerElement | undefined;
         "viewerSelector"?: string;
@@ -237,13 +233,11 @@ declare global {
 declare namespace LocalJSX {
     interface VertexSceneTree {
         "approximateItemHeight"?: number;
-        "client": SceneTreeAPIClient;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv"?: Environment;
-        "controller"?: SceneTreeController | undefined;
         "jwt"?: string | undefined;
         "overScanCount"?: number;
         "rowData"?: RowDataProvider;

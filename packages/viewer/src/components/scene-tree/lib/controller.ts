@@ -268,6 +268,16 @@ export class SceneTreeController {
   }
 
   /**
+   * Returns the page at the given index, or `undefined` if one doesn't exist.
+   *
+   * @param index The index to return.
+   * @returns A `Page` if found, otherwise `undefined`.
+   */
+  public getPage(index: number): Page | undefined {
+    return this.pages.get(index);
+  }
+
+  /**
    * Clears page data that is outside a given range. Uses a distance algorithm
    * to removes pages that are furthest from either end of the range. This
    * method is useful for clearing out data that is not needed anymore to keep

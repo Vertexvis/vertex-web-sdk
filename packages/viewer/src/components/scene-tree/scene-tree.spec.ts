@@ -3,18 +3,29 @@ jest.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
 );
 jest.mock('../../scenes');
+jest.mock('./lib/dom');
+jest.mock('../viewer/utils');
 
 import '../../testing/domMocks';
 
 import Chance from 'chance';
-import { newSpecPage } from '@stencil/core/testing';
+import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import { sign } from 'jsonwebtoken';
 import { Viewer } from '../viewer/viewer';
 import { SceneTree } from './scene-tree';
 import * as Fixtures from '../../types/__fixtures__';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { ResponseStreamMock } from './lib/testing';
+import {
+  createGetTreeResponse,
+  mockGrpcUnaryResult,
+  ResponseStreamMock,
+} from './lib/testing';
+import { getSceneTreeViewportHeight } from './lib/dom';
+import {
+  getAssignedSlotNodes,
+  getElementBoundingClientRect,
+} from '../viewer/utils';
 
 const random = new Chance();
 
@@ -33,67 +44,138 @@ describe('<vertex-scene-tree />', () => {
     'secret'
   );
 
+  // Viewer mocks
+  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+    left: 0,
+    top: 0,
+    bottom: 150,
+    right: 200,
+    width: 200,
+    height: 150,
+  });
+  (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
+
+  // Scene tree mocks
   const client = new SceneTreeAPIClient('http://example.com');
   (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
+  (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('queries for the viewer', async () => {
-    const page = await newSpecPage({
-      components: [SceneTree, Viewer],
+    mockGetTree(client);
+    const { sceneTree, viewer, page } = await loadSceneTree({
+      client,
+      jwt,
       html: `
         <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
         <vertex-viewer id="viewer"></vertex-viewer>
       `,
     });
 
-    const sceneTree = page.body.querySelector(
-      'vertex-scene-tree'
-    ) as HTMLVertexSceneTreeElement;
-
-    const viewer = page.body.querySelector(
-      'vertex-viewer'
-    ) as HTMLVertexViewerElement;
-
-    sceneTree.client = client;
-    await loadModelForViewer(viewer, jwt, 'stream-key');
-
-    await page.waitForChanges();
+    const rows = page.body
+      .querySelector('vertex-scene-tree')
+      ?.shadowRoot?.querySelectorAll('.row');
 
     expect(sceneTree.viewer).toBe(viewer);
     expect(sceneTree.controller).toBeDefined();
     expect(sceneTree.jwt).toBe(jwt);
+    expect(rows?.length).toBeGreaterThan(0);
   });
 
   it('initializes scene tree when setting viewer', async () => {
-    const page = await newSpecPage({
-      components: [SceneTree, Viewer],
+    mockGetTree(client);
+
+    const { sceneTree, page } = await loadSceneTree({
+      client,
+      jwt,
       html: `
         <vertex-scene-tree></vertex-scene-tree>
         <vertex-viewer></vertex-viewer>
       `,
+      setup({ sceneTree, viewer }) {
+        sceneTree.viewer = viewer;
+      },
     });
 
-    const sceneTree = page.body.querySelector(
-      'vertex-scene-tree'
-    ) as HTMLVertexSceneTreeElement;
-    const viewer = page.body.querySelector(
-      'vertex-viewer'
-    ) as HTMLVertexViewerElement;
-
-    sceneTree.client = client;
-    sceneTree.viewer = viewer;
-
-    await loadModelForViewer(viewer, jwt, 'stream-key');
-
     await page.waitForChanges();
+    await sceneTree.controller?.getPage(0)?.res;
+    await page.waitForChanges();
+
+    const rows = page.body
+      .querySelector('vertex-scene-tree')
+      ?.shadowRoot?.querySelectorAll('.row');
 
     expect(sceneTree.controller).toBeDefined();
     expect(sceneTree.jwt).toBeDefined();
+    expect(rows?.length).toBeGreaterThan(0);
+  });
+
+  it('invalidates rows when invalidateRows() is called', async () => {
+    mockGetTree(client);
+    const { sceneTree, page } = await loadSceneTree({
+      client,
+      jwt,
+      html: `
+        <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+        <vertex-viewer id="viewer"></vertex-viewer>
+      `,
+    });
+
+    const rowData = jest.fn();
+    sceneTree.rowData = rowData;
+    rowData.mockReset();
+    sceneTree.invalidateRows();
+    await page.waitForChanges();
+
+    const rows = page.body
+      .querySelector('vertex-scene-tree')
+      ?.shadowRoot?.querySelectorAll('.row');
+
+    if (rows == null) {
+      throw new Error('Rows are empty');
+    }
+
+    expect(rowData).toHaveBeenCalledTimes(rows.length);
   });
 });
+
+interface LoadSceneTreeResult {
+  sceneTree: SceneTree;
+  viewer: HTMLVertexViewerElement;
+  page: SpecPage;
+}
+
+async function loadSceneTree(data: {
+  client: SceneTreeAPIClient;
+  jwt: string;
+  html: string;
+  setup?: (data: LoadSceneTreeResult) => void;
+}): Promise<LoadSceneTreeResult> {
+  const page = await newSpecPage({
+    components: [SceneTree, Viewer],
+    html: data.html,
+  });
+
+  const sceneTree = page.rootInstance as SceneTree;
+  const viewer = page.body.querySelector(
+    'vertex-viewer'
+  ) as HTMLVertexViewerElement;
+
+  sceneTree.client = data.client;
+
+  const result = { sceneTree, viewer, page };
+  data.setup?.(result);
+
+  await loadModelForViewer(viewer, data.jwt, 'stream-key');
+  await page.waitForChanges();
+  await sceneTree.controller?.getPage(0)?.res;
+  await page.waitForChanges();
+
+  return result;
+}
 
 async function loadModelForViewer(
   viewer: HTMLVertexViewerElement,
@@ -121,4 +203,11 @@ async function loadModelForViewer(
   setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
   await loading;
   return viewer;
+}
+
+function mockGetTree(client: SceneTreeAPIClient): void {
+  const res = createGetTreeResponse(100, 100);
+  (client.getTree as jest.Mock).mockImplementationOnce(
+    mockGrpcUnaryResult(res)
+  );
 }

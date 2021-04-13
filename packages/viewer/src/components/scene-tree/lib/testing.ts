@@ -3,6 +3,13 @@ import type {
   ResponseStream,
   Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import Chance from 'chance';
+import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
+
+const random = new Chance();
 
 export class ResponseStreamMock<T> implements ResponseStream<T> {
   private onData = new EventDispatcher<T>();
@@ -35,4 +42,54 @@ export class ResponseStreamMock<T> implements ResponseStream<T> {
   public invokeOnStatus(status: Status): void {
     this.onStatus.emit(status);
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mockGrpcUnaryResult(
+  result: unknown
+): (...args: any[]) => unknown {
+  return (_, __, handler) => {
+    setTimeout(() => {
+      handler(null, result);
+    }, 10);
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
+  return (_, __, handler) => {
+    setTimeout(() => {
+      handler(error);
+    }, 10);
+  };
+}
+
+export function createGetTreeResponse(
+  itemCount: number,
+  totalCount: number | null
+): GetTreeResponse {
+  const nodes = Array.from({ length: itemCount }).map((_, i) => {
+    const id = new Uuid();
+    id.setHex(random.guid());
+    const node = new Node();
+    node.setId(id);
+    node.setDepth(0);
+    node.setExpanded(false);
+    node.setIsLeaf(false);
+    node.setName(random.string());
+    node.setSelected(false);
+    node.setVisible(false);
+    return node;
+  });
+
+  const cursor = new OffsetCursor();
+  if (totalCount != null) {
+    cursor.setTotal(totalCount);
+  }
+
+  const res = new GetTreeResponse();
+  res.setItemsList(nodes);
+  res.setCursor(cursor);
+
+  return res;
 }

@@ -19,6 +19,7 @@ import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
+import { getSceneTreeViewportHeight } from './lib/dom';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type RowDataProvider = (row: Row) => object;
@@ -48,11 +49,8 @@ export class SceneTree {
   @Prop({ reflect: true, mutable: true })
   public viewer: HTMLVertexViewerElement | undefined;
 
-  @Prop({ reflect: true, mutable: true })
-  public controller: SceneTreeController | undefined;
-
-  @Prop({ reflect: true, mutable: true })
-  public client!: SceneTreeAPIClient;
+  @Prop()
+  public rowData?: RowDataProvider;
 
   @Prop()
   public config?: Config;
@@ -105,8 +103,34 @@ export class SceneTree {
   private onStateChangeDisposable: Disposable | undefined;
   private subscribeDisposable: Disposable | undefined;
 
-  @Prop()
-  public rowData: RowDataProvider = () => ({});
+  /**
+   * @private Used for internal testing.
+   */
+  public client!: SceneTreeAPIClient;
+
+  /* eslint-disable lines-between-class-members */
+  private _controller: SceneTreeController | undefined;
+  /**
+   * @private Used for internal testing
+   */
+  public get controller(): SceneTreeController | undefined {
+    return this._controller;
+  }
+  /**
+   * @private Used for internal testing
+   */
+  public set controller(value: SceneTreeController | undefined) {
+    if (this.controller == null) {
+      this.cleanupController();
+    }
+
+    this._controller = value;
+
+    if (this.controller != null) {
+      this.connectController(this.controller);
+    }
+  }
+  /* eslint-enable lines-between-class-members */
 
   public componentWillLoad(): void {
     if (this.viewerSelector != null) {
@@ -132,7 +156,7 @@ export class SceneTree {
       ) as HTMLTemplateElement) || undefined;
 
     readTask(() => {
-      this.viewportHeight = this.el.clientHeight;
+      this.viewportHeight = getSceneTreeViewportHeight(this.el);
       this.updateRenderState();
     });
   }
@@ -270,7 +294,6 @@ export class SceneTree {
       );
 
       const isSceneReady = await newViewer.isSceneReady();
-      console.log('is scene ready', isSceneReady);
       if (isSceneReady) {
         this.jwt = await newViewer.getJwt();
         this.createController();
@@ -394,9 +417,10 @@ export class SceneTree {
       );
 
       this.startIndex = start;
-      this.viewportItems = this.getViewportRows(start, end).map((row) =>
+      const items = this.getViewportRows(start, end).map((row) =>
         this.populateRowData(row)
       );
+      this.viewportItems = items;
     }
   }
 
@@ -425,12 +449,14 @@ export class SceneTree {
   }
 
   private handleScroll(): void {
-    this.invalidateRows();
+    readTask(() => {
+      this.scrollTop = this.el.scrollTop || 0;
+    });
   }
 
   private populateRowData(row: Row): Row {
     if (this.rowData != null && row != null) {
-      const data = this.rowData(row);
+      const data = this.rowData?.(row) || {};
       return { ...row, data };
     } else {
       return row;
