@@ -158,6 +158,8 @@ export class Viewer {
    */
   @Prop() public streamAttributes?: StreamAttributes | string;
 
+  @Prop({ mutable: true, reflect: true }) public stream!: ViewerStreamApi;
+
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
@@ -226,7 +228,6 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private commands!: CommandRegistry;
-  private stream!: ViewerStreamApi;
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
@@ -395,7 +396,9 @@ export class Viewer {
   /**
    * @private For internal use only.
    */
-  public dispatchFrameDrawn(frame: Frame.Frame): void {
+  @Method()
+  public async dispatchFrameDrawn(frame: Frame.Frame): Promise<void> {
+    this.lastFrame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
   }
@@ -642,6 +645,14 @@ export class Viewer {
     return this.lastFrame;
   }
 
+  /**
+   * Returns `true` indicating that the scene is ready to be interacted with.
+   */
+  @Method()
+  public async isSceneReady(): Promise<boolean> {
+    return this.lastFrame != null && this.sceneViewId != null;
+  }
+
   @Listen('tap')
   private async handleTapEvent(
     event: CustomEvent<TapEventDetails>
@@ -669,13 +680,6 @@ export class Viewer {
       typeof this.streamAttributes === 'string'
       ? JSON.parse(this.streamAttributes)
       : { ...this.streamAttributes };
-  }
-
-  /**
-   * @private Used for testing.
-   */
-  public getStreamApi(): ViewerStreamApi {
-    return this.stream;
   }
 
   /**
@@ -946,7 +950,6 @@ export class Viewer {
         const data = { canvas, dimensions, frame };
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
-        this.lastFrame = drawnFrame;
         this.dispatchFrameDrawn(drawnFrame);
       }
     }

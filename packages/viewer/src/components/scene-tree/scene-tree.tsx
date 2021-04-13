@@ -50,6 +50,9 @@ export class SceneTree {
   @Prop({ reflect: true, mutable: true })
   public controller: SceneTreeController | undefined;
 
+  @Prop({ reflect: true, mutable: true })
+  public client!: SceneTreeAPIClient;
+
   @Prop()
   public config?: Config;
 
@@ -96,9 +99,6 @@ export class SceneTree {
 
   private idleCallbackId: number | undefined;
 
-  // TODO(dan): Consider pulling these out into a context object that can be
-  // shared between components.
-  private sceneViewId: string | undefined;
   private connected = false;
 
   private onStateChangeDisposable: Disposable | undefined;
@@ -113,6 +113,9 @@ export class SceneTree {
         | HTMLVertexViewerElement
         | undefined;
     }
+
+    const { sceneTreeHost } = this.getConfig().network;
+    this.client = new SceneTreeAPIClient(sceneTreeHost);
   }
 
   public async componentDidLoad(): Promise<void> {
@@ -238,70 +241,85 @@ export class SceneTree {
   }
 
   @Watch('viewer')
-  public handleViewerChanged(
+  public async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
-  ): void {
-    if (newViewer !== oldViewer) {
-      if (oldViewer != null) {
-        this.cleanupController();
-        oldViewer.removeEventListener(
-          'sceneReady',
-          this.handleViewerSceneReady
-        );
-        oldViewer.removeEventListener(
-          'connectionChange',
-          this.handleViewerConnectionStatusChange
-        );
-      }
+  ): Promise<void> {
+    if (oldViewer != null) {
+      this.controller = undefined;
 
-      if (newViewer != null) {
-        newViewer.addEventListener('sceneReady', this.handleViewerSceneReady);
-        newViewer.addEventListener(
-          'connectionChange',
-          this.handleViewerConnectionStatusChange
-        );
+      oldViewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
+      oldViewer.removeEventListener(
+        'connectionChange',
+        this.handleViewerConnectionStatusChange
+      );
+    }
+
+    if (newViewer != null) {
+      newViewer.addEventListener('sceneReady', this.handleViewerSceneReady);
+      newViewer.addEventListener(
+        'connectionChange',
+        this.handleViewerConnectionStatusChange
+      );
+
+      const isSceneReady = await newViewer.isSceneReady();
+      console.log('is scene ready', isSceneReady);
+      if (isSceneReady) {
+        this.jwt = await newViewer.getJwt();
+        this.createController();
       }
     }
   }
 
-  private handleViewerSceneReady = async (event: Event): Promise<void> => {
-    const viewer = event.currentTarget as HTMLVertexViewerElement;
-    const { sceneViewId } = await viewer.scene();
-
-    console.debug('Scene tree received viewer scene ready', sceneViewId);
-
-    if (this.sceneViewId !== sceneViewId) {
-      this.sceneViewId = sceneViewId;
-
-      const { sceneTreeHost } = this.getConfig().network;
-      const client = new SceneTreeAPIClient(sceneTreeHost);
-      this.controller = new SceneTreeController(client, sceneViewId, 100);
-      this.initializeController();
+  @Watch('controller')
+  public handleControllerChanged(
+    newController: SceneTreeController | undefined,
+    oldController: SceneTreeController | undefined
+  ): void {
+    if (oldController != null) {
+      this.cleanupController();
     }
+
+    if (newController != null) {
+      this.connectController(newController);
+    }
+  }
+
+  @Watch('jwt')
+  public handleJwtChanged(): void {
+    if (this.controller != null) {
+      this.connectController(this.controller);
+    }
+  }
+
+  private handleViewerSceneReady = (): void => {
+    console.debug('Scene tree received viewer scene ready');
+    this.createController();
   };
+
+  private async createController(): Promise<void> {
+    this.controller = new SceneTreeController(this.client, 100);
+  }
 
   private cleanupController(): void {
     this.onStateChangeDisposable?.dispose();
     this.subscribeDisposable?.dispose();
   }
 
-  private initializeController(): void {
-    if (this.controller != null && this.jwt != null && !this.connected) {
-      this.onStateChangeDisposable = this.controller.onStateChange.on(
-        (state) => {
-          this.handleControllerStateChange(state);
-          this.scheduleClearUnusedData();
-        }
-      );
-      this.subscribeDisposable = this.controller.subscribe(() => {
+  private connectController(controller: SceneTreeController): void {
+    if (this.jwt != null && !this.connected) {
+      this.onStateChangeDisposable = controller.onStateChange.on((state) => {
+        this.handleControllerStateChange(state);
+        this.scheduleClearUnusedData();
+      });
+      this.subscribeDisposable = controller.subscribe(() => {
         if (this.jwt != null) {
           return this.jwt;
         } else {
           throw new Error('Cannot update subscription. JWT is null.');
         }
       });
-      this.controller.fetchPage(0, this.jwt);
+      controller.fetchPage(0, this.jwt);
       this.connected = true;
     }
   }
@@ -337,7 +355,6 @@ export class SceneTree {
     if (detail.status === 'connected') {
       console.debug('Scene tree received new token');
       this.jwt = detail.jwt;
-      this.initializeController();
     }
   };
 
