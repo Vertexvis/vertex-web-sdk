@@ -35,6 +35,16 @@
 
 ## Methods
 
+### `dispatchFrameDrawn(frame: Frame.Frame) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
 
 
@@ -72,6 +82,26 @@ Type: `Promise<InteractionHandler[]>`
 #### Returns
 
 Type: `Promise<string | undefined>`
+
+
+
+### `getStream() => Promise<ViewerStreamApi>`
+
+
+
+#### Returns
+
+Type: `Promise<ViewerStreamApi>`
+
+
+
+### `isSceneReady() => Promise<boolean>`
+
+Returns `true` indicating that the scene is ready to be interacted with.
+
+#### Returns
+
+Type: `Promise<boolean>`
 
 
 

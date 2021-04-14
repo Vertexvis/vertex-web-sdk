@@ -2,6 +2,7 @@ import 'requestidlecallback-polyfill';
 import {
   Component,
   Element,
+  forceUpdate,
   h,
   Host,
   Method,
@@ -18,6 +19,7 @@ import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
+import { getSceneTreeViewportHeight } from './lib/dom';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type RowDataProvider = (row: Row) => object;
@@ -45,13 +47,10 @@ export class SceneTree {
   public viewerSelector?: string;
 
   @Prop({ reflect: true, mutable: true })
-  public viewer: HTMLVertexViewerElement | undefined;
+  public viewer: HTMLVertexViewerElement | undefined | null;
 
-  @Prop({ reflect: true, mutable: true })
-  public controller: SceneTreeController | undefined;
-
-  @Prop({ reflect: true, mutable: true })
-  public client!: SceneTreeAPIClient;
+  @Prop()
+  public rowData?: RowDataProvider;
 
   @Prop()
   public config?: Config;
@@ -104,8 +103,36 @@ export class SceneTree {
   private onStateChangeDisposable: Disposable | undefined;
   private subscribeDisposable: Disposable | undefined;
 
-  @Prop()
-  public rowData: RowDataProvider = () => ({});
+  /**
+   * @private Used for internal testing.
+   */
+  public client!: SceneTreeAPIClient;
+
+  /* eslint-disable lines-between-class-members */
+  private _controller: SceneTreeController | undefined;
+  /**
+   * @private Used for internal testing
+   */
+  public get controller(): SceneTreeController | undefined {
+    return this._controller;
+  }
+  /**
+   * @private Used for internal testing
+   */
+  public set controller(value: SceneTreeController | undefined) {
+    if (this.controller !== value) {
+      if (this.controller != null) {
+        this.cleanupController();
+      }
+
+      this._controller = value;
+
+      if (this.controller != null) {
+        this.connectController(this.controller);
+      }
+    }
+  }
+  /* eslint-enable lines-between-class-members */
 
   public componentWillLoad(): void {
     if (this.viewerSelector != null) {
@@ -131,7 +158,7 @@ export class SceneTree {
       ) as HTMLTemplateElement) || undefined;
 
     readTask(() => {
-      this.viewportHeight = this.el.clientHeight;
+      this.viewportHeight = getSceneTreeViewportHeight(this.el);
       this.updateRenderState();
     });
   }
@@ -204,11 +231,17 @@ export class SceneTree {
     );
   }
 
+  /**
+   * Schedules a render of the rows in the scene tree. Useful if any custom
+   * data in your scene tree has changed, and you want to update the row's
+   * contents.
+   *
+   * **Note:** This is an asynchronous operation. The update may happen on the
+   * next frame.
+   */
   @Method()
   public async invalidateRows(): Promise<void> {
-    readTask(() => {
-      this.scrollTop = this.el.scrollTop || 0;
-    });
+    forceUpdate(this.el);
   }
 
   @Method()
@@ -263,25 +296,10 @@ export class SceneTree {
       );
 
       const isSceneReady = await newViewer.isSceneReady();
-      console.log('is scene ready', isSceneReady);
       if (isSceneReady) {
         this.jwt = await newViewer.getJwt();
         this.createController();
       }
-    }
-  }
-
-  @Watch('controller')
-  public handleControllerChanged(
-    newController: SceneTreeController | undefined,
-    oldController: SceneTreeController | undefined
-  ): void {
-    if (oldController != null) {
-      this.cleanupController();
-    }
-
-    if (newController != null) {
-      this.connectController(newController);
     }
   }
 
@@ -304,6 +322,7 @@ export class SceneTree {
   private cleanupController(): void {
     this.onStateChangeDisposable?.dispose();
     this.subscribeDisposable?.dispose();
+    this.connected = false;
   }
 
   private connectController(controller: SceneTreeController): void {
@@ -387,9 +406,10 @@ export class SceneTree {
       );
 
       this.startIndex = start;
-      this.viewportItems = this.getViewportRows(start, end).map((row) =>
+      const items = this.getViewportRows(start, end).map((row) =>
         this.populateRowData(row)
       );
+      this.viewportItems = items;
     }
   }
 
@@ -418,12 +438,14 @@ export class SceneTree {
   }
 
   private handleScroll(): void {
-    this.invalidateRows();
+    readTask(() => {
+      this.scrollTop = this.el.scrollTop || 0;
+    });
   }
 
   private populateRowData(row: Row): Row {
     if (this.rowData != null && row != null) {
-      const data = this.rowData(row);
+      const data = this.rowData?.(row) || {};
       return { ...row, data };
     } else {
       return row;
