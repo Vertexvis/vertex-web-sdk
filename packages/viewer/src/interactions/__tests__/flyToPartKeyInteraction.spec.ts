@@ -16,9 +16,15 @@ describe(FlyToPartKeyInteraction, () => {
   );
 
   it('Returns true for its predicate with Command or Control pressed', () => {
-    expect(flyToPartKeyInteraction.predicate({ Control: true })).toBe(false);
-    expect(flyToPartKeyInteraction.predicate({ Meta: true })).toBe(false);
-    expect(flyToPartKeyInteraction.predicate({ Alt: true })).toBe(true);
+    expect(
+      flyToPartKeyInteraction.predicate({ ctrlKey: true } as TapEventDetails)
+    ).toBe(false);
+    expect(
+      flyToPartKeyInteraction.predicate({ metaKey: true } as TapEventDetails)
+    ).toBe(false);
+    expect(
+      flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails)
+    ).toBe(true);
   });
 
   it('Queries for hit results and fits to the item if present', async () => {

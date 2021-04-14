@@ -30,6 +30,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private isDragging = false;
   private lastMoveEvent?: BaseEvent;
   private interactionTimer?: number;
+  private keyboardControls = false;
 
   protected disableIndividualInteractions = false;
 
@@ -120,6 +121,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.primaryInteractionTypeChange.emit();
   }
 
+  public setDefaultKeyboardControls(keyboardControls: boolean): void {
+    this.keyboardControls = keyboardControls;
+  }
+
   protected handleDownEvent(event: BaseEvent): void {
     event.preventDefault();
 
@@ -195,6 +200,15 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected drag(event: BaseEvent): void {
+    if (this.keyboardControls && event.altKey && event.shiftKey) {
+      this.currentInteraction = this.twistInteraction;
+    } else {
+      this.currentInteraction = undefined;
+    }
+    this.draggingInteraction =
+      this.currentInteraction ||
+      this.draggingInteraction ||
+      this.primaryInteraction;
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.drag(event, this.interactionApi);
     }

@@ -48,6 +48,12 @@ describe(MouseInteractionHandler, () => {
     buttons: 1,
     bubbles: true,
   });
+
+  const twistEvent = new MouseEvent('mousemove', {
+    ...mouseMoveSecondaryButton,
+    altKey: true,
+    shiftKey: true,
+  });
   const wheelEvent = new Event('wheel', ({
     deltaY: 100,
     deltaMode: 0,
@@ -87,6 +93,20 @@ describe(MouseInteractionHandler, () => {
     expect(rotateInteraction.beginDrag).toHaveBeenCalledTimes(1);
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
     expect(rotateInteraction.endDrag).toHaveBeenCalledTimes(1);
+  });
+
+  it('begins a drag and does a twist op if alt/shift are pressed', async () => {
+    handler.setDefaultKeyboardControls(true);
+    await simulateTwistEvent(50);
+
+    expect(twistInteraction.drag).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not twist if the default keyboard controls are off', async () => {
+    handler.setDefaultKeyboardControls(false);
+    await simulateTwistEvent(50);
+
+    expect(twistInteraction.drag).not.toHaveBeenCalled();
   });
 
   it('begins a drag of pan interaction if the secondary mouse has moved more than 2 pixels', async () => {
@@ -172,6 +192,13 @@ describe(MouseInteractionHandler, () => {
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton);
+    await delay(interactionDelay || 0);
+    window.dispatchEvent(mouseUp);
+  }
+
+  async function simulateTwistEvent(interactionDelay?: number): Promise<void> {
+    div.dispatchEvent(mouseDown);
+    window.dispatchEvent(twistEvent);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }

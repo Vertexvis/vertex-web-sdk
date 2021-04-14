@@ -1,5 +1,5 @@
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
-import { KeyInteraction, KeyState } from './keyInteraction';
+import { KeyInteraction } from './keyInteraction';
 import { ConfigProvider } from '../config/config';
 import { TapEventDetails } from './tapEventDetails';
 
@@ -10,8 +10,8 @@ export class FlyToPartKeyInteraction
     private configProvider: ConfigProvider
   ) {}
 
-  public predicate(keyState: KeyState): boolean {
-    return keyState['Alt'] === true;
+  public predicate(e: TapEventDetails): boolean {
+    return !!e.altKey;
   }
 
   public async fn(e: TapEventDetails): Promise<void> {
