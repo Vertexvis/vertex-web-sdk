@@ -3,14 +3,10 @@ jest.mock(
 );
 
 import { grpc } from '@improbable-eng/grpc-web';
-import {
-  OffsetCursor,
-  OffsetPager,
-} from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
+import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import {
   ListChange,
-  Node,
   TreeChangeType,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
@@ -19,7 +15,6 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   GetTreeRequest,
-  GetTreeResponse,
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
@@ -28,7 +23,12 @@ import { sign } from 'jsonwebtoken';
 import Chance from 'chance';
 import { SceneTreeController } from '../controller';
 import { fromNodeProto } from '../row';
-import { ResponseStreamMock } from '../testing';
+import {
+  createGetTreeResponse,
+  mockGrpcUnaryError,
+  mockGrpcUnaryResult,
+  ResponseStreamMock,
+} from '../testing';
 
 const random = new Chance();
 
@@ -527,51 +527,3 @@ describe(SceneTreeController, () => {
     });
   });
 });
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mockGrpcUnaryResult(result: unknown): (...args: any[]) => unknown {
-  return (_, __, handler) => {
-    setTimeout(() => {
-      handler(null, result);
-    }, 10);
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
-  return (_, __, handler) => {
-    setTimeout(() => {
-      handler(error);
-    }, 10);
-  };
-}
-
-function createGetTreeResponse(
-  itemCount: number,
-  totalCount: number | null
-): GetTreeResponse {
-  const nodes = Array.from({ length: itemCount }).map((_, i) => {
-    const id = new Uuid();
-    id.setHex(random.guid());
-    const node = new Node();
-    node.setId(id);
-    node.setDepth(0);
-    node.setExpanded(false);
-    node.setIsLeaf(false);
-    node.setName(random.string());
-    node.setSelected(false);
-    node.setVisible(false);
-    return node;
-  });
-
-  const cursor = new OffsetCursor();
-  if (totalCount != null) {
-    cursor.setTotal(totalCount);
-  }
-
-  const res = new GetTreeResponse();
-  res.setItemsList(nodes);
-  res.setCursor(cursor);
-
-  return res;
-}

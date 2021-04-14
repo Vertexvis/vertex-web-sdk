@@ -153,8 +153,6 @@ export class Viewer {
    */
   @Prop() public streamAttributes?: StreamAttributes | string;
 
-  @Prop({ mutable: true, reflect: true }) public stream!: ViewerStreamApi;
-
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
@@ -221,6 +219,8 @@ export class Viewer {
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
+
+  private stream!: ViewerStreamApi;
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
@@ -593,6 +593,14 @@ export class Viewer {
   @Method()
   public async isSceneReady(): Promise<boolean> {
     return this.lastFrame != null && this.sceneViewId != null;
+  }
+
+  /**
+   * @private Used for internal testing.
+   */
+  @Method()
+  public async getStream(): Promise<ViewerStreamApi> {
+    return this.stream;
   }
 
   @Listen('tap')

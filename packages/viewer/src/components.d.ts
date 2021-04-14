@@ -5,13 +5,10 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { SceneTreeController } from "./components/scene-tree/lib/controller";
-import { SceneTreeAPIClient } from "@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service";
+import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
-import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { StreamAttributes } from "@vertexvis/stream-api";
-import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
@@ -22,6 +19,7 @@ import { InteractionHandler } from "./interactions/interactionHandler";
 import { KeyInteraction } from "./interactions/keyInteraction";
 import { BaseInteractionHandler } from "./interactions/baseInteractionHandler";
 import { Scene } from "./scenes/scene";
+import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
@@ -30,21 +28,22 @@ import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./c
 export namespace Components {
     interface VertexSceneTree {
         "approximateItemHeight": number;
-        "client": SceneTreeAPIClient;
         "collapseAll": () => Promise<void>;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv": Environment;
-        "controller": SceneTreeController | undefined;
         "expandAll": () => Promise<void>;
+        /**
+          * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
+         */
         "invalidateRows": () => Promise<void>;
         "jwt": string | undefined;
         "overScanCount": number;
-        "rowData": RowDataProvider;
+        "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
-        "viewer": HTMLVertexViewerElement | undefined;
+        "viewer": HTMLVertexViewerElement | undefined | null;
         "viewerSelector"?: string;
     }
     interface VertexViewer {
@@ -73,6 +72,10 @@ export namespace Components {
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
         "getJwt": () => Promise<string | undefined>;
+        /**
+          * @private Used for internal testing.
+         */
+        "getStream": () => Promise<ViewerStreamApi>;
         /**
           * Returns `true` indicating that the scene is ready to be interacted with.
          */
@@ -117,7 +120,6 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
-        "stream": ViewerStreamApi;
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
@@ -228,17 +230,15 @@ declare global {
 declare namespace LocalJSX {
     interface VertexSceneTree {
         "approximateItemHeight"?: number;
-        "client": SceneTreeAPIClient;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv"?: Environment;
-        "controller"?: SceneTreeController | undefined;
         "jwt"?: string | undefined;
         "overScanCount"?: number;
         "rowData"?: RowDataProvider;
-        "viewer"?: HTMLVertexViewerElement | undefined;
+        "viewer"?: HTMLVertexViewerElement | undefined | null;
         "viewerSelector"?: string;
     }
     interface VertexViewer {
@@ -310,7 +310,6 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
         "src"?: string;
-        "stream": ViewerStreamApi;
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
