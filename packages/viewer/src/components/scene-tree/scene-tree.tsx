@@ -47,7 +47,7 @@ export class SceneTree {
   public viewerSelector?: string;
 
   @Prop({ reflect: true, mutable: true })
-  public viewer: HTMLVertexViewerElement | undefined;
+  public viewer: HTMLVertexViewerElement | undefined | null;
 
   @Prop()
   public rowData?: RowDataProvider;
@@ -120,14 +120,16 @@ export class SceneTree {
    * @private Used for internal testing
    */
   public set controller(value: SceneTreeController | undefined) {
-    if (this.controller == null) {
-      this.cleanupController();
-    }
+    if (this.controller !== value) {
+      if (this.controller != null) {
+        this.cleanupController();
+      }
 
-    this._controller = value;
+      this._controller = value;
 
-    if (this.controller != null) {
-      this.connectController(this.controller);
+      if (this.controller != null) {
+        this.connectController(this.controller);
+      }
     }
   }
   /* eslint-enable lines-between-class-members */
@@ -320,6 +322,7 @@ export class SceneTree {
   private cleanupController(): void {
     this.onStateChangeDisposable?.dispose();
     this.subscribeDisposable?.dispose();
+    this.connected = false;
   }
 
   private connectController(controller: SceneTreeController): void {

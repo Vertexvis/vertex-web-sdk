@@ -26,6 +26,7 @@ import {
   getAssignedSlotNodes,
   getElementBoundingClientRect,
 } from '../viewer/utils';
+import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 
 const random = new Chance();
 
@@ -140,6 +141,38 @@ describe('<vertex-scene-tree />', () => {
 
     expect(rowData).toHaveBeenCalledTimes(rows.length);
   });
+
+  it('refetches tree if viewer changes', async () => {
+    mockGetTree(client);
+
+    const { sceneTree, page, viewer } = await loadSceneTree({
+      client,
+      jwt,
+      html: `
+        <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+        <vertex-viewer id="viewer"></vertex-viewer>
+      `,
+    });
+
+    sceneTree.viewer = undefined;
+    await page.waitForChanges();
+
+    const res = mockGetTree(client);
+    sceneTree.viewer = viewer;
+    await page.waitForChanges();
+    await sceneTree.controller?.getPage(0)?.res;
+    await page.waitForChanges();
+
+    const rows = page.body
+      .querySelector('vertex-scene-tree')
+      ?.shadowRoot?.querySelectorAll('.row');
+
+    if (rows == null) {
+      throw new Error('Rows are empty');
+    }
+
+    expect(rows[0].textContent).toContain(res.getItemsList()[0].getName());
+  });
 });
 
 interface LoadSceneTreeResult {
@@ -190,12 +223,12 @@ async function loadModelForViewer(
     },
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-  const api = viewer.stream;
-  (viewer.stream.connect as jest.Mock).mockResolvedValue({
+  const api = await viewer.getStream();
+  (api.connect as jest.Mock).mockResolvedValue({
     dispose: () => api.dispose(),
   });
-  (viewer.stream.startStream as jest.Mock).mockResolvedValue(startStream);
-  (viewer.stream.syncTime as jest.Mock).mockResolvedValue(syncTime);
+  (api.startStream as jest.Mock).mockResolvedValue(startStream);
+  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
   const loading = viewer.load(`urn:vertexvis:stream-key:${key}`);
 
@@ -205,9 +238,12 @@ async function loadModelForViewer(
   return viewer;
 }
 
-function mockGetTree(client: SceneTreeAPIClient): void {
-  const res = createGetTreeResponse(100, 100);
-  (client.getTree as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryResult(res)
-  );
+function mockGetTree(
+  client: SceneTreeAPIClient,
+  itemCount = 100,
+  totalCount = 100
+): GetTreeResponse {
+  const res = createGetTreeResponse(itemCount, totalCount);
+  (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
+  return res;
 }
