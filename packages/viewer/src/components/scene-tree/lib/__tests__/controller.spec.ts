@@ -67,12 +67,7 @@ describe(SceneTreeController, () => {
       const controller = new SceneTreeController(client, 10, () => jwt);
       controller.subscribe();
 
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
-
       const req = new SubscribeRequest();
-      req.setViewId(viewId);
-
       expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
     });
 
@@ -320,14 +315,10 @@ describe(SceneTreeController, () => {
     const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to collapse node', () => {
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
-
       const nodeId = new Uuid();
       nodeId.setHex(random.guid());
 
       const req = new CollapseNodeRequest();
-      req.setViewId(viewId);
       req.setNodeId(nodeId);
 
       controller.collapseNode(nodeId.getHex());
@@ -363,14 +354,10 @@ describe(SceneTreeController, () => {
     const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to expand node', () => {
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
-
       const nodeId = new Uuid();
       nodeId.setHex(random.guid());
 
       const req = new ExpandNodeRequest();
-      req.setViewId(viewId);
       req.setNodeId(nodeId);
 
       controller.expandNode(nodeId.getHex());
@@ -438,14 +425,11 @@ describe(SceneTreeController, () => {
       const controller = new SceneTreeController(client, 100, () => jwt);
       await controller.fetchPage(0);
 
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
       const pager = new OffsetPager();
       pager.setOffset(0);
       pager.setLimit(100);
 
       const req = new GetTreeRequest();
-      req.setViewId(viewId);
       req.setPager(pager);
 
       expect(client.getTree).toHaveBeenCalledWith(
@@ -518,14 +502,11 @@ describe(SceneTreeController, () => {
 
       await controller.fetchPageAtOffset(10);
 
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
       const pager = new OffsetPager();
       pager.setOffset(10);
       pager.setLimit(10);
 
       const req = new GetTreeRequest();
-      req.setViewId(viewId);
       req.setPager(pager);
 
       expect(client.getTree).toHaveBeenCalledWith(
@@ -547,9 +528,6 @@ describe(SceneTreeController, () => {
 
       await controller.fetchRange(-1, 101);
 
-      const viewId = new Uuid();
-      viewId.setHex(sceneViewId);
-
       const pager1 = new OffsetPager();
       pager1.setOffset(0);
       pager1.setLimit(10);
@@ -559,12 +537,10 @@ describe(SceneTreeController, () => {
       pager2.setLimit(10);
 
       const req1 = new GetTreeRequest();
-      req1.setViewId(viewId);
       req1.setPager(pager1);
 
       const req2 = new GetTreeRequest();
-      req2.setViewId(viewId);
-      req2.setPager(pager1);
+      req2.setPager(pager2);
 
       expect(client.getTree).toHaveBeenCalledWith(
         req1,
