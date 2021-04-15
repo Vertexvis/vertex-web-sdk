@@ -49,7 +49,6 @@ import {
   currentDateAsProtoTimestamp,
   protoToDate,
   toProtoDuration,
-  StreamAttributes,
 } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
@@ -60,12 +59,17 @@ import {
 import {
   acknowledgeFrameRequests,
   CanvasRenderer,
+  createCanvasDepthProvider,
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../rendering';
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
+import {
+  StreamAttributes,
+  toProtoStreamAttributes,
+} from '../../stream/streamAttributes';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
 import { KeyInteraction } from '../../interactions/keyInteraction';
@@ -231,11 +235,13 @@ export class Viewer {
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
+  private depthBufferCanvasElement?: HTMLCanvasElement;
 
   private stream!: ViewerStreamApi;
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
+  private depthBufferCanvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
@@ -304,8 +310,13 @@ export class Viewer {
           'pointermove',
           () => this.getConfig()
         );
-        this.baseInteractionHandler = new PointerInteractionHandler(() =>
-          this.getConfig()
+        this.baseInteractionHandler = new PointerInteractionHandler(
+          () => this.getConfig(),
+          createCanvasDepthProvider(
+            () => this.createScene().camera(),
+            () => this.getImageScale(),
+            this.depthBufferCanvasElement?.getContext('2d')
+          )
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -319,8 +330,13 @@ export class Viewer {
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(() =>
-          this.getConfig()
+        this.baseInteractionHandler = new MouseInteractionHandler(
+          () => this.getConfig(),
+          createCanvasDepthProvider(
+            () => this.createScene().camera(),
+            () => this.getImageScale(),
+            this.depthBufferCanvasElement?.getContext('2d')
+          )
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
@@ -362,6 +378,15 @@ export class Viewer {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
+            {this.getStreamAttributes().depthBuffers?.enabled && (
+              <canvas
+                ref={(ref) => (this.depthBufferCanvasElement = ref)}
+                class="depth-buffer-canvas"
+                width={canvasDimensions != null ? canvasDimensions.width : 0}
+                height={canvasDimensions != null ? canvasDimensions.height : 0}
+                onContextMenu={(event) => event.preventDefault()}
+              ></canvas>
+            )}
             <canvas
               ref={(ref) => (this.canvasElement = ref)}
               class="canvas"
@@ -530,7 +555,7 @@ export class Viewer {
   ): void {
     if (streamAttributes != null && this.isStreamStarted) {
       this.stream.updateStream({
-        streamAttributes,
+        streamAttributes: toProtoStreamAttributes(streamAttributes),
       });
     }
   }
@@ -678,7 +703,7 @@ export class Viewer {
         streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
         ...(queryResource?.type === 'scene-view-state' && {
           sceneViewStateId: { hex: queryResource.id },
         }),
@@ -750,6 +775,7 @@ export class Viewer {
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
+    this.depthBufferCanvasRenderer = createCanvasRenderer();
     if (this.containerElement != null) {
       this.resizeObserver?.observe(this.containerElement);
     }
@@ -792,7 +818,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
@@ -910,6 +936,19 @@ export class Viewer {
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
+      }
+
+      if (payload.depthBuffer?.value != null) {
+        const depthBuffer = Frame.fromProto(payload, true);
+        const depthCanvas = this.depthBufferCanvasElement?.getContext('2d');
+        if (depthCanvas != null) {
+          const data = {
+            canvas: depthCanvas,
+            dimensions,
+            frame: depthBuffer,
+          };
+          await this.depthBufferCanvasRenderer(data);
+        }
       }
     }
   }

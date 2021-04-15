@@ -8,13 +8,15 @@ import {
   PanInteraction,
   MouseInteraction,
   TwistInteraction,
+  RotateDepthInteraction,
 } from './mouseInteractions';
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import { ConfigProvider } from '../config/config';
+import { CanvasDepthProvider } from '../rendering';
 
-export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist';
+export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist' | 'rotate-depth';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -24,13 +26,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
-  private primaryInteraction: MouseInteraction = this.rotateInteraction;
+  private primaryInteraction: MouseInteraction = this.rotateDepthInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
   private lastMoveEvent?: BaseEvent;
   private interactionTimer?: number;
   private keyboardControls = false;
+  private depth?: number;
 
   protected disableIndividualInteractions = false;
 
@@ -43,10 +46,12 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
     private rotateInteraction: RotateInteraction,
+    private rotateDepthInteraction: RotateDepthInteraction,
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
-    private getConfig: ConfigProvider
+    private getConfig: ConfigProvider,
+    private depthProvider: CanvasDepthProvider
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
@@ -74,7 +79,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public setCurrentInteractionType(type?: InteractionType): void {
     switch (type) {
       case 'rotate':
-        this.currentInteraction = this.rotateInteraction;
+        this.currentInteraction = this.rotateDepthInteraction;
         break;
       case 'zoom':
         this.currentInteraction = this.zoomInteraction;
@@ -131,6 +136,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.interactionTimer = undefined;
+
+      const canvasPosition = this.getCanvasPosition(event);
+      if (canvasPosition != null) {
+        this.depth = this.depthProvider(canvasPosition);
+      }
 
       // Perform the current movement in the case that the interaction timer elapses
       if (this.lastMoveEvent != null) {
@@ -195,7 +205,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
-      this.draggingInteraction.beginDrag(event, this.interactionApi);
+      this.draggingInteraction.beginDrag(event, this.interactionApi, this.depth);
     }
   }
 

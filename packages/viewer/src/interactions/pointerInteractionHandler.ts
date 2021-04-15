@@ -5,23 +5,30 @@ import {
   PanInteraction,
   RotateInteraction,
   TwistInteraction,
+  RotateDepthInteraction,
 } from './mouseInteractions';
 import { InteractionApi } from './interactionApi';
 import { ConfigProvider } from '../config/config';
+import { CanvasDepthProvider } from '../rendering';
 
 export class PointerInteractionHandler extends BaseInteractionHandler {
   private touchPoints: Set<number>;
 
-  public constructor(getConfig: ConfigProvider) {
+  public constructor(
+    getConfig: ConfigProvider,
+    depthProvider: CanvasDepthProvider
+  ) {
     super(
       'pointerdown',
       'pointerup',
       'pointermove',
       new RotateInteraction(),
+      new RotateDepthInteraction(),
       new ZoomInteraction(),
       new PanInteraction(),
       new TwistInteraction(),
-      getConfig
+      getConfig,
+      depthProvider
     );
     this.touchPoints = new Set();
     this.handlePointerDown = this.handlePointerDown.bind(this);

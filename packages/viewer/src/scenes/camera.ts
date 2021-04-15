@@ -1,5 +1,5 @@
 import { Animation, FlyTo, FrameCamera } from '../types';
-import { Vector3, BoundingBox } from '@vertexvis/geometry';
+import { Vector3, BoundingBox, Matrix4, Angle } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
@@ -100,20 +100,7 @@ export class Camera implements FrameCamera.FrameCamera {
    * @param boundingBox The bounding box to position to.
    */
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    const radius =
-      1.1 *
-      Vector3.magnitude(
-        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
-      );
-
-    // height (of scene?) over diameter
-    let hOverD = Math.tan(this.fovY * PI_OVER_360);
-
-    if (this.aspectRatio < 1.0) {
-      hOverD *= this.aspectRatio;
-    }
-
-    const distance = Math.abs(radius / hOverD);
+    const distance = this.getDistanceToBoundingBoxFarEdge();
     const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
 
     const lookAt = BoundingBox.center(boundingBox);
@@ -267,12 +254,111 @@ export class Camera implements FrameCamera.FrameCamera {
     }
   }
 
+  private getDistanceToBoundingBoxFarEdge(): number {
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(
+          this.boundingBox.max,
+          BoundingBox.center(this.boundingBox)
+        )
+      );
+
+    // height (of scene?) over diameter
+    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+
+    if (this.aspectRatio < 1.0) {
+      hOverD *= this.aspectRatio;
+    }
+
+    return Math.abs(radius / hOverD);
+  }
+
   /**
    * Returns the view vector for the camera, which is the direction between the
    * `position` and `lookAt` vectors.
    */
   public viewVector(): Vector3.Vector3 {
     return Vector3.subtract(this.lookAt, this.position);
+  }
+
+  public get projectionMatrix(): Matrix4.Matrix4 {
+    const near = this.near;
+    const far = this.far;
+    const fovY = this.fovY;
+
+    console.log(near, far, this.aspect, fovY);
+    const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
+    const xmax = ymax * this.aspect;
+
+    const left = -xmax;
+    const right = xmax;
+    const bottom = -ymax;
+    const top = ymax;
+
+    return Matrix4.create([
+      (2.0 * near) / (right - left),
+      0,
+      (right + left) / (right - left),
+      0,
+      0,
+      (2.0 * near) / (top - bottom),
+      (top + bottom) / (top - bottom),
+      0,
+      0,
+      0,
+      -(far + near) / (far - near),
+      -(2.0 * near * far) / (far - near),
+      0,
+      0,
+      -1.0,
+      0,
+    ]);
+  }
+
+  public get viewMatrix(): Matrix4.Matrix4 {
+    const flippedViewVector = Vector3.scale(-1, this.viewVector());
+    const sideVector = Vector3.normalize(
+      Vector3.cross(this.up, flippedViewVector)
+    );
+    const upVector = Vector3.normalize(
+      Vector3.cross(flippedViewVector, sideVector)
+    );
+    const forwardVector = Vector3.normalize(flippedViewVector);
+    const offset = Vector3.scale(
+      -1,
+      Vector3.add(this.lookAt, flippedViewVector)
+    );
+
+    return Matrix4.create([
+      sideVector.x,
+      sideVector.y,
+      sideVector.z,
+      sideVector.x * offset.x +
+        sideVector.y * offset.y +
+        sideVector.z * offset.z,
+      upVector.x,
+      upVector.y,
+      upVector.z,
+      upVector.x * offset.x + upVector.y * offset.y + upVector.z * offset.z,
+      forwardVector.x,
+      forwardVector.y,
+      forwardVector.z,
+      forwardVector.x * offset.x +
+        forwardVector.y * offset.y +
+        forwardVector.z * offset.z,
+      0,
+      0,
+      0,
+      1,
+    ]);
+  }
+
+  public get viewProjectionMatrix(): Matrix4.Matrix4 {
+    console.log('view', this.viewMatrix);
+    console.log('proj', this.projectionMatrix);
+
+    return Matrix4.multiply(this.projectionMatrix, this.viewMatrix);
   }
 
   /**
@@ -308,5 +394,18 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get aspectRatio(): number {
     return this.aspect;
+  }
+
+  /**
+   * The camera's near clipping plane.
+   */
+  public get near(): number {
+    return 0.01 * this.getDistanceToBoundingBoxFarEdge();
+  }
+  /**
+   * The camera's far clipping plane.
+   */
+  public get far(): number {
+    return 1.1 * this.getDistanceToBoundingBoxFarEdge();
   }
 }

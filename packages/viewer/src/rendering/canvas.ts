@@ -1,9 +1,11 @@
 import { FrameRenderer } from './renderer';
 import { Frame } from '../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Rectangle, Dimensions } from '@vertexvis/geometry';
+import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../metrics';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
+import { DepthProvider } from './depth';
+import { Camera, ImageScaleProvider } from '../scenes';
 
 const REPORTING_INTERVAL_MS = 1000;
 
@@ -14,6 +16,8 @@ export interface DrawFrame {
 }
 
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
+
+export type CanvasDepthProvider = DepthProvider<Point.Point>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
@@ -132,5 +136,28 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     image.dispose();
     return data.frame;
+  };
+}
+
+export function createCanvasDepthProvider(
+  cameraProvider: () => Camera | undefined,
+  imageScaleProvider: ImageScaleProvider,
+  canvas?: CanvasRenderingContext2D | null
+): CanvasDepthProvider {
+  return (point) => {
+    const { near, far } = cameraProvider() || {};
+    if (canvas != null && near != null && far != null) {
+      const scale = imageScaleProvider();
+      const scaled = Point.scale(point, scale?.x || 1, scale?.y || 1);
+      const data = canvas
+        .getImageData(scaled.x, scaled.y, 1, 1)
+        .data.slice(0, 3);
+
+      const colorAvg =
+        data.reduce((avg, component) => avg + component, 0) / data.length;
+
+      return (colorAvg / 255) * (far - near);
+    }
+    return -1;
   };
 }

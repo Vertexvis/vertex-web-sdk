@@ -14,6 +14,7 @@ export interface Frame {
   sceneAttributes: SceneAttributes;
   sequenceNumber: number;
   image: Uint8Array;
+  depthBuffer?: Uint8Array;
 }
 
 export interface ImageAttributes {
@@ -29,7 +30,8 @@ export interface SceneAttributes {
 }
 
 export const fromProto = (
-  payload: vertexvis.protobuf.stream.IDrawFramePayload
+  payload: vertexvis.protobuf.stream.IDrawFramePayload,
+  isDepthBuffer: boolean = false
 ): Frame => {
   const {
     frameCorrelationIds,
@@ -37,7 +39,10 @@ export const fromProto = (
     sceneAttributes,
     sequenceNumber,
     image,
+    depthBuffer,
   } = payload;
+  const imageBytes = isDepthBuffer ? depthBuffer?.value : image;
+
   if (
     imageAttributes == null ||
     imageAttributes.frameDimensions == null ||
@@ -52,7 +57,7 @@ export const fromProto = (
     imageAttributes.imageRect.height == null ||
     imageAttributes.scaleFactor == null ||
     sequenceNumber == null ||
-    image == null
+    imageBytes == null
   ) {
     throw new Error('Invalid payload');
   }
@@ -116,6 +121,6 @@ export const fromProto = (
       }),
     },
     sequenceNumber: sequenceNumber,
-    image: image,
+    image: imageBytes,
   };
 };

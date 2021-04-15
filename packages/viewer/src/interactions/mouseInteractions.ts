@@ -19,7 +19,11 @@ export abstract class MouseInteraction {
     return this.type;
   }
 
-  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+  public beginDrag(
+    event: MouseEvent,
+    api: InteractionApi,
+    depth?: number
+  ): void {
     // noop
   }
 
@@ -55,6 +59,40 @@ export class RotateInteraction extends MouseInteraction {
       const delta = Point.subtract(position, this.currentPosition);
 
       api.rotateCamera(delta);
+      this.currentPosition = position;
+    }
+  }
+
+  public endDrag(event: MouseEvent, api: InteractionApi): void {
+    super.endDrag(event, api);
+  }
+}
+
+export class RotateDepthInteraction extends MouseInteraction {
+  public type: InteractionType = 'rotate-depth';
+
+  private startingPosition?: Point.Point;
+  private depth?: number;
+
+  public beginDrag(
+    event: MouseEvent,
+    api: InteractionApi,
+    depth?: number
+  ): void {
+    if (this.currentPosition == null) {
+      this.currentPosition = Point.create(event.screenX, event.screenY);
+      this.startingPosition = Point.create(event.screenX, event.screenY);
+      this.depth = depth;
+      api.beginInteraction();
+    }
+  }
+
+  public drag(event: MouseEvent, api: InteractionApi): void {
+    if (this.currentPosition != null && this.startingPosition != null) {
+      const position = Point.create(event.screenX, event.screenY);
+      const delta = Point.subtract(position, this.currentPosition);
+
+      api.rotateCameraDepth(delta, this.startingPosition, this.depth);
       this.currentPosition = position;
     }
   }

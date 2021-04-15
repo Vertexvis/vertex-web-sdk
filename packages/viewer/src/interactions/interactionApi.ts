@@ -1,4 +1,10 @@
-import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Dimensions,
+  Matrix4,
+  Point,
+  Vector3,
+} from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -191,6 +197,28 @@ export class InteractionApi {
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
       return camera.rotateAroundAxis(angle, rotationAxis);
+    });
+  }
+
+  public async rotateCameraDepth(
+    delta: Point.Point,
+    starting: Point.Point,
+    depth?: number
+  ): Promise<void> {
+    return this.transformCamera((camera, viewport) => {
+      const viewProjectionMatrix = camera.viewProjectionMatrix;
+      console.log(viewProjectionMatrix);
+      console.log(Matrix4.inverse(viewProjectionMatrix));
+      const screenPoint = Vector3.create(starting.x, starting.y, depth || -1);
+
+      const rotationPoint = Matrix4.multiplyVector3(
+        Matrix4.inverse(viewProjectionMatrix),
+        screenPoint
+      );
+
+      console.log(rotationPoint);
+
+      return camera;
     });
   }
 
