@@ -26,7 +26,6 @@ import { CommandRegistry } from '../../commands/commandRegistry';
 import { Frame, LoadableResource, SynchronizedClock } from '../../types';
 import { registerCommands } from '../../commands/streamCommands';
 import { InteractionHandler } from '../../interactions/interactionHandler';
-import { KeyStateInteractionHandler } from '../../interactions/keyStateInteractionHandler';
 import { InteractionApi } from '../../interactions/interactionApi';
 import { TapEventDetails } from '../../interactions/tapEventDetails';
 import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
@@ -35,7 +34,6 @@ import { PointerInteractionHandler } from '../../interactions/pointerInteraction
 import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../interactions/flyToPartKeyInteraction';
-import { TwistInteractionHandler } from '../../interactions/twistInteractionHandler';
 import { CommandFactory } from '../../commands/command';
 import { Environment } from '../../config/environment';
 import {
@@ -70,10 +68,7 @@ import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
-import {
-  KeyInteraction,
-  KeyInteractionWithReset,
-} from '../../interactions/keyInteraction';
+import { KeyInteraction } from '../../interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../interactions/baseInteractionHandler';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
@@ -237,9 +232,7 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
-  private keyStateInteractionHandler?: KeyStateInteractionHandler;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
-  private keyInteractions: KeyInteractionWithReset[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
   private isResizing?: boolean;
@@ -324,18 +317,13 @@ export class Viewer {
     }
 
     if (this.keyboardControls) {
-      this.keyStateInteractionHandler = new KeyStateInteractionHandler();
-      this.registerInteractionHandler(this.keyStateInteractionHandler);
+      this.baseInteractionHandler?.setDefaultKeyboardControls(
+        this.keyboardControls
+      );
 
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
       );
-
-      if (this.baseInteractionHandler) {
-        this.registerKeyInteraction(
-          new TwistInteractionHandler(this.baseInteractionHandler)
-        );
-      }
     }
 
     this.registerSlotChangeListeners();
@@ -498,52 +486,6 @@ export class Viewer {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
   }
 
-  /**
-   * Registers a key interaction to be invoked on a key down event
-   *
-   * `KeyInteraction`s are used to build custom keyboard shortcuts for the
-   * viewer using the current state of they keyboard to determine whether
-   * the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
-   * to disable the default keyboard shortcuts provided by the viewer.
-   *
-   * @example
-   * ```
-   * class CustomKeyboardInteraction extends KeyInteractionWithReset {
-   *   constructor(private baseInteractionHandler: BaseInteractionHandler) {}
-   *
-   *   public predicate(keyState: KeyState): boolean {
-   *     return keyState['Alt'] === true && keyState['Shift'] === true;
-   *   }
-   *
-   *   public async fn(): Promise<void> {
-   *     this.baseInteractionHandler.setPrimaryInteractionType('twist');
-   *   }
-   *
-   *   public async reset(): Promise<void> {
-   *     this.baseInteractionHandler.setPrimaryInteractionType('rotate');
-   *   }
-   * }
-   * ```
-   *
-   * @param keyInteraction - The `KeyInteraction` to register.
-   */
-  @Method()
-  public async registerKeyInteraction(
-    keyInteraction: KeyInteractionWithReset
-  ): Promise<void> {
-    this.keyInteractions = [...this.keyInteractions, keyInteraction];
-
-    this.keyStateInteractionHandler?.onKeyStateChange((state) => {
-      this.keyInteractions
-        .filter((i) => i.predicate(state))
-        .forEach((i) => i.fn(undefined));
-
-      this.keyInteractions
-        .filter((i) => !i.predicate(state))
-        .forEach((i) => i.reset());
-    });
-  }
-
   @Method()
   public async getInteractionHandlers(): Promise<InteractionHandler[]> {
     return this.interactionHandlers;
@@ -665,12 +607,9 @@ export class Viewer {
   private async handleTapEvent(
     event: CustomEvent<TapEventDetails>
   ): Promise<void> {
-    const keyState = this.keyStateInteractionHandler?.getState();
-    if (keyState != null) {
-      this.tapKeyInteractions
-        .filter((i) => i.predicate(keyState))
-        .forEach((i) => i.fn(event.detail));
-    }
+    this.tapKeyInteractions
+      .filter((i) => i.predicate(event.detail))
+      .forEach((i) => i.fn(event.detail));
   }
 
   /**
