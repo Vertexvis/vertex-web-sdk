@@ -8,6 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
+import { Row } from "./components/scene-tree/lib/row";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
@@ -27,14 +28,35 @@ import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacemen
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 export namespace Components {
     interface VertexSceneTree {
-        "approximateItemHeight": number;
+        "approximateRowHeight": number;
         "collapseAll": () => Promise<void>;
+        "collapseItem": (rowOrIndex: number | Row) => Promise<void>;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv": Environment;
         "expandAll": () => Promise<void>;
+        "expandItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * Returns the row data from the given vertical client position.
+          * @param clientY The vertical client position.
+          * @returns A row or `undefined` if the row hasn't been loaded.
+         */
+        "getRowAtClientY": (clientY: number) => Promise<Row>;
+        /**
+          * Returns a row at the given index. If the row data has not been loaded, returns `undefined`.
+          * @param index The index of the row.
+          * @returns A row, or `undefined` if the row hasn't been loaded.
+         */
+        "getRowAtIndex": (index: number) => Promise<Row>;
+        /**
+          * Returns the row data from the given mouse or pointer event. If this event did not originate from this component will return undefined.
+          * @param event A mouse or pointer event that originated from this component.
+          * @returns A row, or `undefined` if the row hasn't been loaded.
+         */
+        "getRowFromEvent": (event: MouseEvent | PointerEvent) => Promise<Row>;
+        "hideItem": (rowOrIndex: number | Row) => Promise<void>;
         /**
           * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
          */
@@ -43,6 +65,9 @@ export namespace Components {
         "overScanCount": number;
         "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
+        "showItem": (rowOrIndex: number | Row) => Promise<void>;
+        "toggleExpandItem": (rowOrIndex: number | Row) => Promise<void>;
+        "toggleItemVisibility": (rowOrIndex: number | Row) => Promise<void>;
         "viewer": HTMLVertexViewerElement | undefined | null;
         "viewerSelector"?: string;
     }
@@ -229,7 +254,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface VertexSceneTree {
-        "approximateItemHeight"?: number;
+        "approximateRowHeight"?: number;
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.

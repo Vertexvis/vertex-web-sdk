@@ -11,15 +11,21 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Row } from './lib/row';
+import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { Disposable } from '@vertexvis/utils';
+import classnames from 'classnames';
+import { LoadedRow, Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Disposable } from '@vertexvis/utils';
-import { getSceneTreeViewportHeight } from './lib/dom';
+import {
+  getSceneTreeContainsElement,
+  getSceneTreeOffsetTop,
+  getSceneTreeViewportHeight,
+} from './lib/dom';
+import { hideItem, showItem } from './lib/viewer-ops';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type RowDataProvider = (row: Row) => object;
@@ -31,6 +37,23 @@ export type RowDataProvider = (row: Row) => object;
  */
 const MIN_CLEAR_UNUSED_DATA_MS = 10;
 
+interface StateMap {
+  leftTemplate?: HTMLTemplateElement;
+  rightTemplate?: HTMLTemplateElement;
+  bindings: Map<Element, CollectionBinding>;
+  idleCallbackId?: number;
+  connected: boolean;
+  onStateChangeDisposable?: Disposable;
+  subscribeDisposable?: Disposable;
+  client?: SceneTreeAPIClient;
+  controller?: SceneTreeController;
+}
+
+type OperationHandler = (data: {
+  viewer: HTMLVertexViewerElement;
+  row: LoadedRow;
+}) => void;
+
 @Component({
   tag: 'vertex-scene-tree',
   styleUrl: 'scene-tree.css',
@@ -38,7 +61,7 @@ const MIN_CLEAR_UNUSED_DATA_MS = 10;
 })
 export class SceneTree {
   @Prop()
-  public approximateItemHeight = 20;
+  public approximateRowHeight = 24;
 
   @Prop()
   public overScanCount = 10;
@@ -73,13 +96,16 @@ export class SceneTree {
   private startIndex = 0;
 
   @State()
+  private endIndex = 0;
+
+  @State()
   private viewportHeight: number | undefined;
 
   @State()
-  private viewportItems: Row[] = [];
+  private viewportRows: Row[] = [];
 
   @State()
-  private isComputingItemHeight = true;
+  private isComputingRowHeight = true;
 
   @State()
   private rows: Row[] = [];
@@ -90,31 +116,41 @@ export class SceneTree {
   @State()
   private scrollTop = 0;
 
-  private computedItemHeight: number | undefined;
+  @State()
+  private computedRowHeight: number | undefined;
 
-  private leftTemplate: HTMLTemplateElement | undefined;
-  private rightTemplate: HTMLTemplateElement | undefined;
-  private bindings = new Map<Element, CollectionBinding>();
+  /**
+   * This stores state that shouldn't trigger a refresh if the data changes.
+   * Marking this with @State to allow to preserve state across live-reloads.
+   */
+  @State()
+  private stateMap: StateMap = {
+    bindings: new Map(),
+    connected: false,
+  };
 
-  private idleCallbackId: number | undefined;
-
-  private connected = false;
-
-  private onStateChangeDisposable: Disposable | undefined;
-  private subscribeDisposable: Disposable | undefined;
-
+  /* eslint-disable lines-between-class-members */
   /**
    * @private Used for internal testing.
    */
-  public client!: SceneTreeAPIClient;
+  public get client(): SceneTreeAPIClient {
+    if (this.stateMap.client != null) {
+      return this.stateMap.client;
+    } else {
+      throw new Error('Client is null.');
+    }
+  }
+  public set client(value: SceneTreeAPIClient) {
+    this.stateMap.client = value;
+  }
+  /* eslint-enable lines-between-class-members */
 
   /* eslint-disable lines-between-class-members */
-  private _controller: SceneTreeController | undefined;
   /**
    * @private Used for internal testing
    */
   public get controller(): SceneTreeController | undefined {
-    return this._controller;
+    return this.stateMap.controller;
   }
   /**
    * @private Used for internal testing
@@ -125,7 +161,7 @@ export class SceneTree {
         this.cleanupController();
       }
 
-      this._controller = value;
+      this.stateMap.controller = value;
 
       if (this.controller != null) {
         this.connectController(this.controller);
@@ -142,17 +178,17 @@ export class SceneTree {
     }
 
     const { sceneTreeHost } = this.getConfig().network;
-    this.client = new SceneTreeAPIClient(sceneTreeHost);
+    this.stateMap.client = new SceneTreeAPIClient(sceneTreeHost);
   }
 
   public async componentDidLoad(): Promise<void> {
     this.el.addEventListener('scroll', () => this.handleScroll());
 
-    this.leftTemplate =
+    this.stateMap.leftTemplate =
       (this.el.querySelector('template[slot="left"]') as HTMLTemplateElement) ||
       undefined;
 
-    this.rightTemplate =
+    this.stateMap.rightTemplate =
       (this.el.querySelector(
         'template[slot="right"]'
       ) as HTMLTemplateElement) || undefined;
@@ -165,7 +201,7 @@ export class SceneTree {
 
   public componentWillRender(): void {
     this.updateRenderState();
-    this.loadMoreRowsIfNeeded();
+    this.controller?.updateActiveRowRange(this.startIndex, this.endIndex);
   }
 
   public componentDidRender(): void {
@@ -174,28 +210,32 @@ export class SceneTree {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const itemHeight = this.getComputedOrPlaceholderRowHeight();
-    const totalHeight = this.totalRows * itemHeight;
-    const startY = this.startIndex * itemHeight;
+    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+    const totalHeight = this.totalRows * rowHeight;
+    const startY = this.startIndex * rowHeight;
     return (
       <Host>
         <div class="rows" style={{ height: `${totalHeight}px` }}>
-          {this.isComputingItemHeight ? (
+          {this.isComputingRowHeight ? (
             <div class="row" />
           ) : (
-            this.viewportItems.map((row, i) => {
+            this.viewportRows.map((row, i) => {
               if (row == null) {
                 return <div class="row"></div>;
               } else {
                 return (
                   <div
                     class="row"
-                    style={{ top: `${startY + itemHeight * i}px` }}
+                    style={{ top: `${startY + rowHeight * i}px` }}
                   >
                     <span
                       ref={(el) => {
-                        if (el != null && this.leftTemplate != null) {
-                          this.populateSlot(this.leftTemplate, row, el);
+                        if (el != null && this.stateMap.leftTemplate != null) {
+                          this.populateSlot(
+                            this.stateMap.leftTemplate,
+                            row,
+                            el
+                          );
                         }
                       }}
                     />
@@ -206,7 +246,7 @@ export class SceneTree {
                     />
                     <span
                       class="expand-toggle"
-                      onClick={() => this.toggleExpansion(row)}
+                      onClick={() => this.toggleExpandItem(row)}
                     >
                       {!row.isLeaf && row.expanded && '▾'}
                       {!row.isLeaf && !row.expanded && '▸'}
@@ -215,20 +255,35 @@ export class SceneTree {
                       {row.name}
                     </span>
 
-                    {this.rightTemplate != null ? (
+                    {this.stateMap.rightTemplate != null ? (
                       <span
                         ref={(el) => {
-                          if (el != null && this.rightTemplate != null) {
-                            this.populateSlot(this.rightTemplate, row, el);
+                          if (
+                            el != null &&
+                            this.stateMap.rightTemplate != null
+                          ) {
+                            this.populateSlot(
+                              this.stateMap.rightTemplate,
+                              row,
+                              el
+                            );
                           }
                         }}
                       />
                     ) : (
                       <button
-                        class="visibility-btn"
-                        onClick={() => this.toggleItemVisibilityAtIndex(i)}
+                        class={classnames('visibility-btn', {
+                          'is-hidden': !row.visible,
+                        })}
+                        onClick={() => {
+                          this.toggleItemVisibility(this.startIndex + i);
+                        }}
                       >
-                        {row.visible ? <VisibleIcon /> : <HiddenIcon />}
+                        {row.visible ? (
+                          <vertex-viewer-icon name="visible" size="sm" />
+                        ) : (
+                          <vertex-viewer-icon name="hidden" size="sm" />
+                        )}
                       </button>
                     )}
                   </div>
@@ -259,56 +314,125 @@ export class SceneTree {
     // TODO(dan): Add alignment to top, center, or bottom.
     const i = Math.max(0, Math.min(index, this.totalRows));
 
-    if (this.computedItemHeight != null) {
-      const top = i * this.computedItemHeight;
+    if (this.computedRowHeight != null) {
+      const top = i * this.computedRowHeight;
       this.el.scrollTo({ top, behavior: 'smooth' });
     }
   }
 
   @Method()
   public async expandAll(): Promise<void> {
-    if (this.jwt != null) {
-      await this.controller?.expandAll(this.jwt);
-    } else {
-      throw new Error('Cannot expand all nodes. Token is undefined.');
-    }
+    await this.controller?.expandAll();
   }
 
   @Method()
   public async collapseAll(): Promise<void> {
-    if (this.jwt != null) {
-      await this.controller?.collapseAll(this.jwt);
-    } else {
-      throw new Error('Cannot collapse all nodes. Token is undefined.');
-    }
+    await this.controller?.collapseAll();
   }
 
   @Method()
-  public async toggleItemVisibilityAtIndex(index: number): Promise<void> {
-    const scene = await this.viewer?.scene();
-    const node = this.rows[index];
+  public async expandItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (!row.expanded) {
+        await this.controller?.expandNode(row.id);
+      }
+    });
+  }
 
-    if (node == null) {
-      throw new Error(
-        `Cannot show item. Row at index ${index} has not been loaded`
-      );
-    }
+  @Method()
+  public async collapseItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (row.expanded) {
+        await this.controller?.collapseNode(row.id);
+      }
+    });
+  }
 
-    if (scene == null) {
-      throw new Error(
-        `Cannot show item. Cannot get reference to viewer or scene.`
-      );
-    }
+  @Method()
+  public async toggleExpandItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (row.expanded) {
+        await this.collapseItem(row);
+      } else {
+        await this.expandItem(row);
+      }
+    });
+  }
 
-    if (node.visible) {
-      return scene
-        .items((op) => op.where((q) => q.withItemId(node.id)).hide())
-        .execute();
+  @Method()
+  public async toggleItemVisibility(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (row.visible) {
+        await hideItem(viewer, row.id);
+      } else {
+        await showItem(viewer, row.id);
+      }
+    });
+  }
+
+  @Method()
+  public async hideItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (row.visible) {
+        await hideItem(viewer, row.id);
+      }
+    });
+  }
+
+  @Method()
+  public async showItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (!row.visible) {
+        await showItem(viewer, row.id);
+      }
+    });
+  }
+
+  /**
+   * Returns a row at the given index. If the row data has not been loaded,
+   * returns `undefined`.
+   *
+   * @param index The index of the row.
+   * @returns A row, or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public async getRowAtIndex(index: number): Promise<Row> {
+    return this.rows[index];
+  }
+
+  /**
+   * Returns the row data from the given mouse or pointer event. If this event
+   * did not originate from this component will return undefined.
+   *
+   * @param event A mouse or pointer event that originated from this component.
+   * @returns A row, or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public async getRowFromEvent(event: MouseEvent | PointerEvent): Promise<Row> {
+    const { clientY, currentTarget } = event;
+    if (
+      currentTarget != null &&
+      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
+    ) {
+      return this.getRowAtClientY(clientY);
     } else {
-      return scene
-        .items((op) => op.where((q) => q.withItemId(node.id)).show())
-        .execute();
+      return undefined;
     }
+  }
+
+  /**
+   * Returns the row data from the given vertical client position.
+   *
+   * @param clientY The vertical client position.
+   * @returns A row or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public getRowAtClientY(clientY: number): Promise<Row> {
+    const index = Math.floor(
+      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
+        this.getComputedOrPlaceholderRowHeight()
+    );
+    return this.getRowAtIndex(index);
   }
 
   @Watch('viewer')
@@ -354,47 +478,49 @@ export class SceneTree {
   };
 
   private async createController(): Promise<void> {
-    this.controller = new SceneTreeController(this.client, 100);
+    this.controller = new SceneTreeController(this.client, 100, () => {
+      if (this.jwt != null) {
+        return this.jwt;
+      } else {
+        throw new Error('Cannot update subscription. JWT is null.');
+      }
+    });
   }
 
   private cleanupController(): void {
-    this.onStateChangeDisposable?.dispose();
-    this.subscribeDisposable?.dispose();
-    this.connected = false;
+    this.stateMap.onStateChangeDisposable?.dispose();
+    this.stateMap.subscribeDisposable?.dispose();
+    this.stateMap.connected = false;
   }
 
   private connectController(controller: SceneTreeController): void {
-    if (this.jwt != null && !this.connected) {
-      this.onStateChangeDisposable = controller.onStateChange.on((state) => {
-        this.handleControllerStateChange(state);
-        this.scheduleClearUnusedData();
-      });
-      this.subscribeDisposable = controller.subscribe(() => {
-        if (this.jwt != null) {
-          return this.jwt;
-        } else {
-          throw new Error('Cannot update subscription. JWT is null.');
+    if (this.jwt != null && !this.stateMap.connected) {
+      this.stateMap.onStateChangeDisposable = controller.onStateChange.on(
+        (state) => {
+          this.handleControllerStateChange(state);
+          this.scheduleClearUnusedData();
         }
-      });
-      controller.fetchPage(0, this.jwt);
-      this.connected = true;
+      );
+      this.stateMap.subscribeDisposable = controller.subscribe();
+      controller.fetchPage(0);
+      this.stateMap.connected = true;
     }
   }
 
   private scheduleClearUnusedData(): void {
-    if (this.idleCallbackId != null) {
-      window.cancelIdleCallback(this.idleCallbackId);
+    if (this.stateMap.idleCallbackId != null) {
+      window.cancelIdleCallback(this.stateMap.idleCallbackId);
     }
 
     if (this.controller != null) {
-      this.idleCallbackId = window.requestIdleCallback((foo) => {
+      this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
         const remaining = foo.timeRemaining?.();
 
         if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
           const [start, end] =
             this.controller?.getPageIndexesForRange(
               this.startIndex,
-              this.startIndex + this.viewportItems.length
+              this.startIndex + this.viewportRows.length
             ) || [];
 
           if (start != null && end != null) {
@@ -420,34 +546,45 @@ export class SceneTree {
     this.totalRows = state.totalRows;
   }
 
-  private toggleExpansion(row: Row): void {
-    if (row != null && this.jwt) {
-      if (row.expanded) {
-        this.controller?.collapseNode(row.id, this.jwt);
-      } else {
-        this.controller?.expandNode(row.id, this.jwt);
-      }
+  private async performRowOperation(
+    rowOrIndex: number | Row,
+    op: OperationHandler
+  ): Promise<void> {
+    const row =
+      typeof rowOrIndex === 'number' ? this.rows[rowOrIndex] : rowOrIndex;
+
+    if (row == null) {
+      throw new Error(`Cannot perform scene tree operation. Row not found.`);
     }
+
+    if (this.viewer == null) {
+      throw new Error(
+        `Cannot perform scene tree operation. Cannot get reference to viewer.`
+      );
+    }
+
+    await op({ viewer: this.viewer, row });
   }
 
   private updateRenderState(): void {
     if (this.viewportHeight != null) {
-      const itemHeight = this.getComputedOrPlaceholderRowHeight();
-      const viewportCount = Math.ceil(this.viewportHeight / itemHeight);
-      const start = Math.max(
+      const rowHeight = this.getComputedOrPlaceholderRowHeight();
+      const viewportCount = Math.ceil(this.viewportHeight / rowHeight);
+
+      this.startIndex = Math.max(
         0,
-        Math.floor(this.scrollTop / itemHeight) - this.overScanCount
+        Math.floor(this.scrollTop / rowHeight) - this.overScanCount
       );
-      const end = Math.min(
+      this.endIndex = Math.min(
         this.totalRows,
-        start + viewportCount + this.overScanCount * 2
+        this.startIndex + viewportCount + this.overScanCount * 2
       );
 
-      this.startIndex = start;
-      const items = this.getViewportRows(start, end).map((row) =>
-        this.populateRowData(row)
-      );
-      this.viewportItems = items;
+      const rows = this.getViewportRows(
+        this.startIndex,
+        this.endIndex
+      ).map((row) => this.populateRowData(row));
+      this.viewportRows = rows;
     }
   }
 
@@ -466,10 +603,10 @@ export class SceneTree {
     }
 
     if (el.firstElementChild != null) {
-      let binding = this.bindings.get(el);
+      let binding = this.stateMap.bindings.get(el);
       if (binding == null) {
         binding = new CollectionBinding(generateBindings(el.firstElementChild));
-        this.bindings.set(el, binding);
+        this.stateMap.bindings.set(el, binding);
       }
       binding.bind(row);
     }
@@ -490,76 +627,31 @@ export class SceneTree {
     }
   }
 
-  private async loadMoreRowsIfNeeded(): Promise<void> {
-    if (this.jwt != null && this.controller != null) {
-      const [start, end] = this.controller.getPageIndexesForRange(
-        this.startIndex,
-        this.startIndex + this.viewportItems.length
-      );
-      const unloadedPages = this.controller.getNonLoadedPageIndexes(start, end);
-      for (const page of unloadedPages.slice(0, 1)) {
-        this.controller.fetchPage(page, this.jwt);
-      }
-    }
-  }
-
   private cleanupBindings(): void {
-    for (const key of this.bindings.keys()) {
+    for (const key of this.stateMap.bindings.keys()) {
       if (key.parentElement == null) {
-        this.bindings.delete(key);
+        this.stateMap.bindings.delete(key);
       }
     }
   }
 
   private computeRowHeight(): void {
-    if (this.isComputingItemHeight) {
+    if (this.isComputingRowHeight) {
       // Set the state on the next event tick to prevent a warning from
       // StencilJS.
       setTimeout(() => {
         const rowEl = this.el.shadowRoot?.querySelector('.row');
-        this.computedItemHeight = rowEl?.clientHeight;
-        this.isComputingItemHeight = false;
+        this.computedRowHeight = rowEl?.clientHeight;
+        this.isComputingRowHeight = false;
       }, 0);
     }
   }
 
   private getComputedOrPlaceholderRowHeight(): number {
-    return this.computedItemHeight || 24;
+    return this.computedRowHeight || 24;
   }
 
   private getConfig(): Config {
     return parseConfig(this.configEnv, this.config);
   }
-}
-
-function HiddenIcon(): h.JSX.IntrinsicElements {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-    >
-      <path
-        d="M8,5a3,3,0,1,0,3,3A3,3,0,0,0,8,5Zm4.65-1.17A8.53,8.53,0,0,0,8,2.5,8.53,8.53,0,0,0,3.35,3.83,6.57,6.57,0,0,0,.51,7.89v.22a6.57,6.57,0,0,0,2.84,4.06A8.53,8.53,0,0,0,8,13.5a8.53,8.53,0,0,0,4.65-1.33,6.57,6.57,0,0,0,2.84-4.06V7.89A6.57,6.57,0,0,0,12.65,3.83Zm-.55,7.5A7.52,7.52,0,0,1,8,12.5a7.52,7.52,0,0,1-4.1-1.17A5.49,5.49,0,0,1,1.53,8,5.49,5.49,0,0,1,3.9,4.67,7.52,7.52,0,0,1,8,3.5a7.52,7.52,0,0,1,4.1,1.17A5.49,5.49,0,0,1,14.47,8,5.49,5.49,0,0,1,12.1,11.33Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function VisibleIcon(): h.JSX.IntrinsicElements {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-    >
-      <path
-        d="M8,5a3,3,0,1,0,3,3A3,3,0,0,0,8,5Zm4.65-1.17A8.53,8.53,0,0,0,8,2.5,8.53,8.53,0,0,0,3.35,3.83,6.57,6.57,0,0,0,.51,7.89v.22a6.57,6.57,0,0,0,2.84,4.06A8.53,8.53,0,0,0,8,13.5a8.53,8.53,0,0,0,4.65-1.33,6.57,6.57,0,0,0,2.84-4.06V7.89A6.57,6.57,0,0,0,12.65,3.83Zm-.55,7.5A7.52,7.52,0,0,1,8,12.5a7.52,7.52,0,0,1-4.1-1.17A5.49,5.49,0,0,1,1.53,8,5.49,5.49,0,0,1,3.9,4.67,7.52,7.52,0,0,1,8,3.5a7.52,7.52,0,0,1,4.1,1.17A5.49,5.49,0,0,1,14.47,8,5.49,5.49,0,0,1,12.1,11.33Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
 }

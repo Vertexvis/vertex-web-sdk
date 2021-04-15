@@ -11,7 +11,7 @@
 
   width: 300px;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* Reset */
@@ -55,6 +55,10 @@ button {
   align-items: center;
   visibility: hidden;
   padding: 4px;
+}
+
+.visibility-btn.is-hidden {
+  visibility: visible;
 }
 
 .row:hover .visibility-btn {

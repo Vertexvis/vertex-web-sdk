@@ -38,6 +38,10 @@
         height: 100%;
       }
 
+      #scroll-to-index {
+        width: 100px;
+      }
+
       #viewer {
         width: 100%;
         height: 100%;
@@ -67,18 +71,32 @@
         const sceneTree = document.querySelector('#scene-tree');
         sceneTree.rowData = (row) => {
           return {
-            func: () => console.log('tap', row.name),
+            color: Math.random() * (255 * 255 * 255),
+            func: () => console.log('row', row.name),
           };
         };
 
         const scrollToIndex = document.getElementById('scroll-to-index');
         const scrollToBtn = document.getElementById('scroll-to-index-btn');
         scrollToBtn.addEventListener('click', () => {
-          sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
+          // sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
+          sceneTree.invalidateRows();
+        });
+
+        const collapseAllBtn = document.getElementById('collapse-all-btn');
+        collapseAllBtn.addEventListener('click', () => {
+          sceneTree.collapseAll();
         });
 
         const expandAllBtn = document.getElementById('expand-all-btn');
-        expandAllBtn.addEventListener('click', () => sceneTree.expandAll());
+        expandAllBtn.addEventListener('click', () => {
+          sceneTree.expandAll();
+        });
+
+        // setTimeout(() => {
+        //   sceneTree.viewer = viewer;
+        //   console.log('setting viewer on scene tree');
+        // }, 5000);
       }
     </script>
   </head>
@@ -90,16 +108,14 @@
           <span>Scroll To:</span>
           <input id="scroll-to-index" type="number" />
           <button id="scroll-to-index-btn">Go</button>
+          <button id="collapse-all-btn">-</button>
           <button id="expand-all-btn">+</button>
         </div>
         <vertex-scene-tree
           id="scene-tree"
-          viewer-selector="#viewer"
           config-env="platdev"
+          viewer-selector="#viewer"
         >
-          <template slot="right">
-            <button onclick="{{row.data.func}}">Hi</button>
-          </template>
         </vertex-scene-tree>
       </div>
       <div class="workarea">
@@ -107,7 +123,7 @@
           id="viewer"
           client-id="7A8EAF1430FFA64FF51CF0F64E38C0B5B4837EA660F07B110A8B6C1A9D186807"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:8AN_L_K3YHR9CpF5IU1TkdDdbkwjpJrXPGVK"
         ></vertex-viewer>
       </div>
     </div>

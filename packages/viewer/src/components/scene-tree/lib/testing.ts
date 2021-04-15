@@ -66,7 +66,8 @@ export function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
 
 export function createGetTreeResponse(
   itemCount: number,
-  totalCount: number | null
+  totalCount: number | null,
+  transform?: (node: Node) => void
 ): GetTreeResponse {
   const nodes = Array.from({ length: itemCount }).map((_, i) => {
     const id = new Uuid();
@@ -79,6 +80,7 @@ export function createGetTreeResponse(
     node.setName(random.string());
     node.setSelected(false);
     node.setVisible(false);
+    transform?.(node);
     return node;
   });
 

@@ -7,6 +7,8 @@ import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb'
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import {
   ListChange,
+  Range,
+  StateChange,
   TreeChangeType,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
@@ -22,7 +24,7 @@ import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/proto
 import { sign } from 'jsonwebtoken';
 import Chance from 'chance';
 import { SceneTreeController } from '../controller';
-import { fromNodeProto } from '../row';
+import { fromNodeProto, Row } from '../row';
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
@@ -58,13 +60,12 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.subscribe, () => {
-    const controller = new SceneTreeController(client, 10);
-
     it('subscribes to remote changes', () => {
       const stream = new ResponseStreamMock();
       (client.subscribe as jest.Mock).mockReturnValue(stream);
 
-      controller.subscribe(() => jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      controller.subscribe();
 
       const viewId = new Uuid();
       viewId.setHex(sceneViewId);
@@ -81,7 +82,8 @@ describe(SceneTreeController, () => {
 
       const cancel = jest.spyOn(stream, 'cancel');
 
-      const disposable = controller.subscribe(() => jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      const disposable = controller.subscribe();
       disposable.dispose();
 
       expect(cancel).toHaveBeenCalled();
@@ -91,7 +93,8 @@ describe(SceneTreeController, () => {
       const stream = new ResponseStreamMock();
       (client.subscribe as jest.Mock).mockReturnValue(stream);
 
-      controller.subscribe(() => jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      controller.subscribe();
       stream.invokeOnEnd();
 
       expect(client.subscribe).toHaveBeenCalledTimes(2);
@@ -110,7 +113,8 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(getTree2)
       );
 
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
 
       const stream = new ResponseStreamMock<SubscribeResponse>();
       (client.subscribe as jest.Mock).mockReturnValue(stream);
@@ -122,7 +126,7 @@ describe(SceneTreeController, () => {
           done();
         }
       });
-      controller.subscribe(() => jwt);
+      controller.subscribe();
 
       const listChange = new ListChange();
       listChange.setStart(0);
@@ -141,8 +145,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(getTree)
       );
 
-      await controller.fetchPage(0, jwt);
-      await controller.fetchRange(0, 100, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchRange(0, 100);
 
       const stream = new ResponseStreamMock<SubscribeResponse>();
       (client.subscribe as jest.Mock).mockReturnValue(stream);
@@ -154,7 +159,7 @@ describe(SceneTreeController, () => {
           done();
         }
       });
-      controller.subscribe(() => jwt);
+      controller.subscribe();
 
       const listChange = new ListChange();
       listChange.setStart(11);
@@ -164,10 +169,96 @@ describe(SceneTreeController, () => {
       resp.setChange(changeType);
       stream.invokeOnData(resp);
     });
+
+    it('patches data that has been hidden', async () => {
+      const getTree = createGetTreeResponse(100, 100, (node) =>
+        node.setVisible(true)
+      );
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
+
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      controller.subscribe();
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          resolve(state.rows);
+        });
+      });
+
+      const range = new Range();
+      range.setStart(0);
+      range.setEnd(1);
+      const stateChange = new StateChange();
+      stateChange.setHiddenList([range]);
+      const changeType = new TreeChangeType();
+      changeType.setRanges(stateChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 3)).toMatchObject([
+        { ...rows[0], visible: false },
+        { ...rows[1], visible: false },
+        { ...rows[2], visible: true },
+      ]);
+    });
+
+    it('patches data that has been shown', async () => {
+      const getTree = createGetTreeResponse(100, 100, (node) =>
+        node.setVisible(false)
+      );
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
+
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      controller.subscribe();
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          resolve(state.rows);
+        });
+      });
+
+      const range = new Range();
+      range.setStart(0);
+      range.setEnd(1);
+      const stateChange = new StateChange();
+      stateChange.setShownList([range]);
+      const changeType = new TreeChangeType();
+      changeType.setRanges(stateChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 3)).toMatchObject([
+        { ...rows[0], visible: true },
+        { ...rows[1], visible: true },
+        { ...rows[2], visible: false },
+      ]);
+    });
   });
 
   describe(SceneTreeController.prototype.collapseNode, () => {
-    const controller = new SceneTreeController(client, 100);
+    const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to collapse node', () => {
       const viewId = new Uuid();
@@ -180,7 +271,7 @@ describe(SceneTreeController, () => {
       req.setViewId(viewId);
       req.setNodeId(nodeId);
 
-      controller.collapseNode(nodeId.getHex(), jwt);
+      controller.collapseNode(nodeId.getHex());
       expect(client.collapseNode).toHaveBeenCalledWith(
         req,
         metadata,
@@ -194,7 +285,7 @@ describe(SceneTreeController, () => {
       );
 
       return expect(
-        controller.collapseNode(random.guid(), jwt)
+        controller.collapseNode(random.guid())
       ).rejects.toThrowError();
     });
 
@@ -204,13 +295,13 @@ describe(SceneTreeController, () => {
       );
 
       return expect(
-        controller.collapseNode(random.guid(), jwt)
+        controller.collapseNode(random.guid())
       ).rejects.toThrowError();
     });
   });
 
   describe(SceneTreeController.prototype.expandNode, () => {
-    const controller = new SceneTreeController(client, 100);
+    const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to expand node', () => {
       const viewId = new Uuid();
@@ -223,7 +314,7 @@ describe(SceneTreeController, () => {
       req.setViewId(viewId);
       req.setNodeId(nodeId);
 
-      controller.expandNode(nodeId.getHex(), jwt);
+      controller.expandNode(nodeId.getHex());
       expect(client.expandNode).toHaveBeenCalledWith(
         req,
         metadata,
@@ -233,11 +324,11 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.expandAll, () => {
-    const controller = new SceneTreeController(client, 100);
+    const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to expand all nodes', () => {
       const req = new ExpandAllRequest();
-      controller.expandAll(jwt);
+      controller.expandAll();
       expect(client.expandAll).toHaveBeenCalledWith(
         req,
         metadata,
@@ -247,11 +338,11 @@ describe(SceneTreeController, () => {
   });
 
   describe(SceneTreeController.prototype.collapseAll, () => {
-    const controller = new SceneTreeController(client, 100);
+    const controller = new SceneTreeController(client, 100, () => jwt);
 
     it('makes call to collapse all nodes', () => {
       const req = new CollapseAllRequest();
-      controller.collapseAll(jwt);
+      controller.collapseAll();
       expect(client.collapseAll).toHaveBeenCalledWith(
         req,
         metadata,
@@ -262,9 +353,9 @@ describe(SceneTreeController, () => {
 
   describe(SceneTreeController.prototype.fetchPage, () => {
     it('does nothing if index is outside bounds', async () => {
-      const controller = new SceneTreeController(client, 100);
-      await controller.fetchPage(-1, jwt);
-      await controller.fetchPage(1, jwt);
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(-1);
+      await controller.fetchPage(1);
       expect(client.getTree).not.toHaveBeenCalled();
     });
 
@@ -273,9 +364,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(1, 1))
       );
 
-      const controller = new SceneTreeController(client, 100);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchPage(0);
 
       expect(client.getTree).toHaveBeenCalledTimes(1);
     });
@@ -285,8 +376,8 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(1, 1))
       );
 
-      const controller = new SceneTreeController(client, 100);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
 
       const viewId = new Uuid();
       viewId.setHex(sceneViewId);
@@ -317,10 +408,10 @@ describe(SceneTreeController, () => {
       );
 
       const onStateChange = jest.fn();
-      const controller = new SceneTreeController(client, 10);
+      const controller = new SceneTreeController(client, 10, () => jwt);
       controller.onStateChange.on(onStateChange);
 
-      await controller.fetchPage(0, jwt);
+      await controller.fetchPage(0);
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -329,7 +420,7 @@ describe(SceneTreeController, () => {
         })
       );
 
-      await controller.fetchPage(1, jwt);
+      await controller.fetchPage(1);
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           rows: [
@@ -349,11 +440,11 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
 
-      await controller.fetchPageAtOffset(-1, jwt);
-      await controller.fetchPageAtOffset(100, jwt);
+      await controller.fetchPageAtOffset(-1);
+      await controller.fetchPageAtOffset(100);
 
       expect(client.getTree).toHaveBeenCalledTimes(1);
     });
@@ -363,10 +454,10 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
 
-      await controller.fetchPageAtOffset(10, jwt);
+      await controller.fetchPageAtOffset(10);
 
       const viewId = new Uuid();
       viewId.setHex(sceneViewId);
@@ -392,10 +483,10 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
 
-      await controller.fetchRange(-1, 101, jwt);
+      await controller.fetchRange(-1, 101);
 
       const viewId = new Uuid();
       viewId.setHex(sceneViewId);
@@ -433,11 +524,11 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
       (client.getTree as jest.Mock).mockClear();
 
-      await controller.fetchRange(0, 100, jwt);
+      await controller.fetchRange(0, 100);
 
       // skips first page because its already been fetched
       expect(client.getTree).toHaveBeenCalledTimes(9);
@@ -450,9 +541,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchPage(1, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchPage(1);
 
       const pages = controller.getNonLoadedPageIndexes(0, 100);
       expect(pages).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
@@ -465,9 +556,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchRange(0, 100, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchRange(0, 100);
 
       controller.invalidatePagesOutsideRange(4, 5, 4);
 
@@ -483,9 +574,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchRange(0, 100, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchRange(0, 100);
 
       controller.invalidatePagesOutsideRange(4, 5, 10);
 
@@ -503,9 +594,9 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchRange(0, 100, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchRange(0, 100);
 
       const page = controller.getPageForOffset(101);
       expect(page).toBe(9);
@@ -518,12 +609,33 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
-      const controller = new SceneTreeController(client, 10);
-      await controller.fetchPage(0, jwt);
-      await controller.fetchRange(0, 100, jwt);
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+      await controller.fetchRange(0, 100);
 
       const range = controller.getPageIndexesForRange(-1, 101);
       expect(range).toEqual([0, 9]);
     });
   });
+
+  describe(SceneTreeController.prototype.updateActiveRowRange, () => [
+    it('fetches pages in active rows that have not been fetched', async () => {
+      (client.getTree as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      await controller.fetchPage(0);
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => resolve(state.rows));
+      });
+
+      controller.updateActiveRowRange(0, 9);
+      controller.updateActiveRowRange(10, 19);
+
+      const rows = await pendingRows;
+      expect(rows.slice(0, 20).every((row) => row != null)).toBe(true);
+    }),
+  ]);
 });
