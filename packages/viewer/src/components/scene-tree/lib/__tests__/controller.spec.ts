@@ -100,31 +100,34 @@ describe(SceneTreeController, () => {
       expect(client.subscribe).toHaveBeenCalledTimes(2);
     });
 
-    it('fetches page when list changes', async (done) => {
+    it('fetches page when list changes', async () => {
       const getTree1 = createGetTreeResponse(10, 20);
-      const getTree2 = createGetTreeResponse(20, 20);
-      let onStateChangeCount = 0;
+      const getTree2 = createGetTreeResponse(10, 20);
 
-      (client.getTree as jest.Mock).mockImplementationOnce(
+      (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(getTree1)
       );
 
-      (client.getTree as jest.Mock).mockImplementationOnce(
+      (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(getTree2)
       );
 
       const controller = new SceneTreeController(client, 10, () => jwt);
       await controller.fetchPage(0);
+      await controller.fetchPage(1);
+      controller.updateActiveRowRange(0, 9);
 
       const stream = new ResponseStreamMock<SubscribeResponse>();
       (client.subscribe as jest.Mock).mockReturnValue(stream);
 
-      controller.onStateChange.on((state) => {
-        onStateChangeCount++;
-        if (onStateChangeCount === 2) {
-          expect(state.rows).toHaveLength(20);
-          done();
-        }
+      const pendingRows = new Promise((resolve) => {
+        let onStateChangeCount = 0;
+        controller.onStateChange.on((state) => {
+          onStateChangeCount++;
+          if (onStateChangeCount === 2) {
+            resolve(state.rows);
+          }
+        });
       });
       controller.subscribe();
 
@@ -135,39 +138,9 @@ describe(SceneTreeController, () => {
       const resp = new SubscribeResponse();
       resp.setChange(changeType);
       stream.invokeOnData(resp);
-    });
 
-    it('invalidates pages after list change', async (done) => {
-      const getTree = createGetTreeResponse(10, 100);
-      let onStateChangeCount = 0;
-
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
-
-      const controller = new SceneTreeController(client, 10, () => jwt);
-      await controller.fetchPage(0);
-      await controller.fetchRange(0, 100);
-
-      const stream = new ResponseStreamMock<SubscribeResponse>();
-      (client.subscribe as jest.Mock).mockReturnValue(stream);
-
-      controller.onStateChange.on((state) => {
-        onStateChangeCount++;
-        if (onStateChangeCount === 2) {
-          expect(controller.fetchedPageCount).toBe(2);
-          done();
-        }
-      });
-      controller.subscribe();
-
-      const listChange = new ListChange();
-      listChange.setStart(11);
-      const changeType = new TreeChangeType();
-      changeType.setListChange(listChange);
-      const resp = new SubscribeResponse();
-      resp.setChange(changeType);
-      stream.invokeOnData(resp);
+      const rows = await pendingRows;
+      expect(rows).toHaveLength(20);
     });
 
     it('patches data that has been hidden', async () => {
@@ -253,6 +226,92 @@ describe(SceneTreeController, () => {
         { ...rows[0], visible: true },
         { ...rows[1], visible: true },
         { ...rows[2], visible: false },
+      ]);
+    });
+
+    it('patches data that has been selected', async () => {
+      const getTree = createGetTreeResponse(100, 100, (node) =>
+        node.setSelected(false)
+      );
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
+
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      controller.subscribe();
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          resolve(state.rows);
+        });
+      });
+
+      const range = new Range();
+      range.setStart(0);
+      range.setEnd(1);
+      const stateChange = new StateChange();
+      stateChange.setSelectedList([range]);
+      const changeType = new TreeChangeType();
+      changeType.setRanges(stateChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 3)).toMatchObject([
+        { ...rows[0], selected: true },
+        { ...rows[1], selected: true },
+        { ...rows[2], selected: false },
+      ]);
+    });
+
+    it('patches data that has been deselected', async () => {
+      const getTree = createGetTreeResponse(100, 100, (node) =>
+        node.setSelected(true)
+      );
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await controller.fetchPage(0);
+
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      controller.subscribe();
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          resolve(state.rows);
+        });
+      });
+
+      const range = new Range();
+      range.setStart(0);
+      range.setEnd(1);
+      const stateChange = new StateChange();
+      stateChange.setDeselectedList([range]);
+      const changeType = new TreeChangeType();
+      changeType.setRanges(stateChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 3)).toMatchObject([
+        { ...rows[0], selected: false },
+        { ...rows[1], selected: false },
+        { ...rows[2], selected: true },
       ]);
     });
   });

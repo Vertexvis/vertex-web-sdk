@@ -42,6 +42,17 @@ Type: `Promise<void>`
 
 
 
+### `deselectItem(rowOrIndex: number | Row) => Promise<void>`
+
+Performs an API call that will deselect the item associated to the given
+row or row index.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `expandAll() => Promise<void>`
 
 Performs an API call to expand all nodes in the tree.
@@ -131,6 +142,17 @@ Type: `Promise<void>`
 
 
 
+### `selectItem(rowOrIndex: number | Row, append?: boolean) => Promise<void>`
+
+Performs an API call that will select the item associated to the given row
+or row index.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `showItem(rowOrIndex: number | Row) => Promise<void>`
 
 Performs an API call that will show the item associated to the given row
@@ -167,10 +189,12 @@ Type: `Promise<void>`
 
 ## CSS Custom Properties
 
-| Name                       | Description                                |
-| -------------------------- | ------------------------------------------ |
-| `--scene-tree-row-height`  | The height of each row in the scene tree.  |
-| `--scene-tree-row-padding` | The padding of each row in the scene tree. |
+| Name                          | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `--scene-tree-hover-color`    | The background color of a row when hovered.  |
+| `--scene-tree-row-height`     | The height of each row in the scene tree.    |
+| `--scene-tree-row-padding`    | The padding of each row in the scene tree.   |
+| `--scene-tree-selected-color` | The background color of a row when selected. |
 
 
 ## Dependencies

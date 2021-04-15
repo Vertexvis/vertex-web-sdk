@@ -103,22 +103,42 @@ export class SceneTreeController {
           this.fetchUnloadedPagesInActiveRows();
         }
 
-        if (change?.ranges?.hiddenList != null) {
-          console.debug(
-            'Received hidden list change',
-            change.ranges.hiddenList
-          );
+        const {
+          hiddenList = [],
+          shownList = [],
+          deselectedList = [],
+          selectedList = [],
+        } = change?.ranges || {};
 
-          change.ranges.hiddenList.forEach(({ start, end }) =>
+        if (hiddenList != null && hiddenList.length > 0) {
+          console.debug('Received hidden list change', hiddenList);
+
+          hiddenList.forEach(({ start, end }) =>
             this.patchRowsInRange(start, end, () => ({ visible: false }))
           );
         }
 
-        if (change?.ranges?.shownList != null) {
-          console.debug('Received shown list change', change.ranges.shownList);
+        if (shownList != null && shownList.length > 0) {
+          console.debug('Received shown list change', shownList);
 
-          change.ranges.shownList.forEach(({ start, end }) =>
+          shownList.forEach(({ start, end }) =>
             this.patchRowsInRange(start, end, () => ({ visible: true }))
+          );
+        }
+
+        if (deselectedList != null && deselectedList.length > 0) {
+          console.debug('Received deselected list change', deselectedList);
+
+          deselectedList.forEach(({ start, end }) =>
+            this.patchRowsInRange(start, end, () => ({ selected: false }))
+          );
+        }
+
+        if (selectedList != null && selectedList.length > 0) {
+          console.debug('Received selected list change', selectedList);
+
+          selectedList.forEach(({ start, end }) =>
+            this.patchRowsInRange(start, end, () => ({ selected: true }))
           );
         }
       });
@@ -348,9 +368,9 @@ export class SceneTreeController {
       this.activeRowRange[1]
     );
 
-    this.getNonLoadedPageIndexes(startPage - 1, endPage + 1).forEach((page) =>
-      this.fetchPage(page)
-    );
+    this.getNonLoadedPageIndexes(startPage - 1, endPage + 1).forEach((page) => {
+      this.fetchPage(page);
+    });
   }
 
   private patchRowsInRange(
@@ -405,19 +425,12 @@ export class SceneTreeController {
 
   private invalidateAfterOffset(offset: number): void {
     const pageIndex = Math.floor(offset / this.rowLimit);
-    const nextPageIndex = pageIndex + 1;
-    const nextPageOffset = nextPageIndex * this.rowLimit;
-
-    const start = this.state.rows.slice(0, nextPageOffset);
-    const end = new Array(this.state.totalRows - start.length);
-    const rows = [...start, ...end];
 
     for (const index of this.pages.keys()) {
       if (index >= pageIndex) {
         this.invalidatePage(index);
       }
     }
-    this.updateState({ ...this.state, rows });
   }
 
   private updateState(newState: SceneTreeState): void {

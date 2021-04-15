@@ -46,6 +46,11 @@ export namespace Components {
          */
         "configEnv": Environment;
         /**
+          * Performs an API call that will deselect the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to deselect.
+         */
+        "deselectItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
           * Performs an API call to expand all nodes in the tree.
          */
         "expandAll": () => Promise<void>;
@@ -95,6 +100,18 @@ export namespace Components {
          */
         "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
+        /**
+          * Performs an API call that will select the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to select.
+          * @param append `true` if the selection should append to the current selection, or `false` if this should replace the current selection. Defaults to replace.
+         */
+        "selectItem": (rowOrIndex: number | Row, append?: boolean) => Promise<void>;
+        /**
+          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
+          * @see SceneTree.selectItem *
+          * @see SceneTree.deselectItem
+         */
+        "selectionDisabled": boolean;
         /**
           * Performs an API call that will show the item associated to the given row or row index.
           * @param rowOrIndex The row or row index to show.
@@ -323,6 +340,12 @@ declare namespace LocalJSX {
           * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
          */
         "rowData"?: RowDataProvider;
+        /**
+          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
+          * @see SceneTree.selectItem *
+          * @see SceneTree.deselectItem
+         */
+        "selectionDisabled"?: boolean;
         /**
           * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
          */

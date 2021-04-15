@@ -37,7 +37,7 @@ import {
   GetTreeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { hideItem, showItem } from './lib/viewer-ops';
+import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
 
 const random = new Chance();
 
@@ -515,7 +515,7 @@ describe('<vertex-scene-tree />', () => {
       expect(hideItem).toHaveBeenCalled();
     });
 
-    it('hides item if index  visible', async () => {
+    it('hides item if index visible', async () => {
       mockGetTree({ client, transform: (node) => node.setVisible(true) });
 
       const { sceneTree } = await loadSceneTree({
@@ -546,6 +546,99 @@ describe('<vertex-scene-tree />', () => {
 
       await sceneTree.hideItem(0);
       expect(hideItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.selectItem, () => {
+    it('selects item if row deselected', async () => {
+      mockGetTree({ client, transform: (node) => node.setSelected(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.selectItem(row);
+      expect(selectItem).toHaveBeenCalled();
+    });
+
+    // This is intentional behavior, in order to select a child of a parent
+    // that's current selected.
+    it('selects item if row is selected', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.selectItem(0);
+      expect(selectItem).toHaveBeenCalled();
+    });
+
+    it('appends selection if flag is set', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.selectItem(0, true);
+      expect(selectItem).toHaveBeenCalledWith(
+        expect.anything(),
+        row?.id,
+        expect.objectContaining({ append: true })
+      );
+    });
+  });
+
+  describe(SceneTree.prototype.deselectItem, () => {
+    it('deselects item if row selected', async () => {
+      mockGetTree({ client, transform: (node) => node.setSelected(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.deselectItem(row);
+      expect(deselectItem).toHaveBeenCalled();
+    });
+
+    it('does nothing if row is deselected', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.deselectItem(0);
+      expect(deselectItem).not.toHaveBeenCalled();
     });
   });
 });
