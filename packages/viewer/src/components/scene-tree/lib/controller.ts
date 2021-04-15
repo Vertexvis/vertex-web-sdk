@@ -330,6 +330,13 @@ export class SceneTreeController {
     }
   }
 
+  /**
+   * Sets the active rows. Active rows dictate which pages will be refetched
+   * when the tree changes.
+   *
+   * @param start The starting row index.
+   * @param end The ending row index.
+   */
   public updateActiveRowRange(start: number, end: number): void {
     this.activeRowRange = this.constrainRowOffsets(start, end);
     this.fetchUnloadedPagesInActiveRows();

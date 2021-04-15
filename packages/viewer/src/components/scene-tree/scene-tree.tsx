@@ -60,21 +60,56 @@ type OperationHandler = (data: {
   shadow: true,
 })
 export class SceneTree {
-  @Prop()
-  public approximateRowHeight = 24;
-
+  /**
+   * The number of offscreen rows above and below the viewport to render. Having
+   * a higher number reduces the chance of the browser not displaying a row
+   * while scrolling.
+   */
   @Prop()
   public overScanCount = 10;
 
+  /**
+   * A CSS selector that points to a `<vertex-viewer>` element. Either this
+   * property or `viewer` must be set.
+   */
   @Prop()
   public viewerSelector?: string;
 
+  /**
+   * An instance of a `<vertex-viewer>` element. Either this property or
+   * `viewerSelector` must be set.
+   */
   @Prop({ reflect: true, mutable: true })
-  public viewer: HTMLVertexViewerElement | undefined | null;
+  public viewer?: HTMLVertexViewerElement | null;
 
+  /**
+   * A callback that is invoked immediately before a row is about to rendered.
+   * This callback can return additional data that can be bound to in a
+   * template.
+   *
+   * @example
+   *
+   * ```html
+   * <script>
+   *   const tree = document.querySelector('vertex-scene-tree');
+   *   tree.rowData = (row) => {
+   *     return { func: () => console.log('row', row.name) };
+   *   }
+   * </script>
+   *
+   * <vertex-scene-tree>
+   *   <template slot="right">
+   *     <button onclick="row.data.func">Hi</button>
+   *   </template>
+   * </vertex-scene-tree>
+   * ```
+   */
   @Prop()
   public rowData?: RowDataProvider;
 
+  /**
+   * An object to configure the scene tree.
+   */
   @Prop()
   public config?: Config;
 
@@ -86,6 +121,10 @@ export class SceneTree {
    */
   @Prop() public configEnv: Environment = 'platprod';
 
+  /**
+   * A JWT token to make authenticated API calls. This is normally automatically
+   * assigned from the viewer, and shouldn't be assigned manually.
+   */
   @Prop({ reflect: true, mutable: true })
   public jwt: string | undefined;
 
@@ -170,7 +209,188 @@ export class SceneTree {
   }
   /* eslint-enable lines-between-class-members */
 
-  public componentWillLoad(): void {
+  /**
+   * Schedules a render of the rows in the scene tree. Useful if any custom
+   * data in your scene tree has changed, and you want to update the row's
+   * contents.
+   *
+   * **Note:** This is an asynchronous operation. The update may happen on the
+   * next frame.
+   */
+  @Method()
+  public async invalidateRows(): Promise<void> {
+    forceUpdate(this.el);
+  }
+
+  @Method()
+  public async scrollToIndex(index: number): Promise<void> {
+    // TODO(dan): Add alignment to top, center, or bottom.
+    const i = Math.max(0, Math.min(index, this.totalRows));
+
+    if (this.computedRowHeight != null) {
+      const top = i * this.computedRowHeight;
+      this.el.scrollTo({ top, behavior: 'smooth' });
+    }
+  }
+
+  /**
+   * Performs an API call to expand all nodes in the tree.
+   */
+  @Method()
+  public async expandAll(): Promise<void> {
+    await this.controller?.expandAll();
+  }
+
+  /**
+   * Performs an API call to collapse all nodes in the tree.
+   */
+  @Method()
+  public async collapseAll(): Promise<void> {
+    await this.controller?.collapseAll();
+  }
+
+  /**
+   * Performs an API call that will expand the node associated to the specified
+   * row or row index.
+   *
+   * @param rowOrIndex A row or row index to expand.
+   */
+  @Method()
+  public async expandItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (!row.expanded) {
+        await this.controller?.expandNode(row.id);
+      }
+    });
+  }
+
+  /**
+   * Performs an API call that will collapse the node associated to the
+   * specified row or row index.
+   *
+   * @param rowOrIndex A row or row index to collapse.
+   */
+  @Method()
+  public async collapseItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (row.expanded) {
+        await this.controller?.collapseNode(row.id);
+      }
+    });
+  }
+
+  /**
+   * Performs an API call that will either expand or collapse the node
+   * associated to the given row or row index.
+   *
+   * @param rowOrIndex The row or row index to collapse or expand.
+   */
+  @Method()
+  public async toggleExpandItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ row }) => {
+      if (row.expanded) {
+        await this.collapseItem(row);
+      } else {
+        await this.expandItem(row);
+      }
+    });
+  }
+
+  /**
+   * Performs an API call that will either hide or show the item associated to
+   * the given row or row index.
+   *
+   * @param rowOrIndex The row or row index to toggle visibility.
+   */
+  @Method()
+  public async toggleItemVisibility(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (row.visible) {
+        await hideItem(viewer, row.id);
+      } else {
+        await showItem(viewer, row.id);
+      }
+    });
+  }
+
+  /**
+   * Performs an API call that will hide the item associated to the given row
+   * or row index.
+   *
+   * @param rowOrIndex The row or row index to hide.
+   */
+  @Method()
+  public async hideItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (row.visible) {
+        await hideItem(viewer, row.id);
+      }
+    });
+  }
+
+  /**
+   * Performs an API call that will show the item associated to the given row
+   * or row index.
+   *
+   * @param rowOrIndex The row or row index to show.
+   */
+  @Method()
+  public async showItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (!row.visible) {
+        await showItem(viewer, row.id);
+      }
+    });
+  }
+
+  /**
+   * Returns a row at the given index. If the row data has not been loaded,
+   * returns `undefined`.
+   *
+   * @param index The index of the row.
+   * @returns A row, or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public async getRowAtIndex(index: number): Promise<Row> {
+    return this.rows[index];
+  }
+
+  /**
+   * Returns the row data from the given mouse or pointer event. The event
+   * must originate from this component otherwise `undefined` is returned.
+   *
+   * @param event A mouse or pointer event that originated from this component.
+   * @returns A row, or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public async getRowFromEvent(event: MouseEvent | PointerEvent): Promise<Row> {
+    const { clientY, currentTarget } = event;
+    if (
+      currentTarget != null &&
+      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
+    ) {
+      return this.getRowAtClientY(clientY);
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns the row data from the given vertical client position.
+   *
+   * @param clientY The vertical client position.
+   * @returns A row or `undefined` if the row hasn't been loaded.
+   */
+  @Method()
+  public getRowAtClientY(clientY: number): Promise<Row> {
+    const index = Math.floor(
+      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
+        this.getComputedOrPlaceholderRowHeight()
+    );
+    return this.getRowAtIndex(index);
+  }
+
+  protected componentWillLoad(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
@@ -181,7 +401,7 @@ export class SceneTree {
     this.stateMap.client = new SceneTreeAPIClient(sceneTreeHost);
   }
 
-  public async componentDidLoad(): Promise<void> {
+  protected async componentDidLoad(): Promise<void> {
     this.el.addEventListener('scroll', () => this.handleScroll());
 
     this.stateMap.leftTemplate =
@@ -199,17 +419,17 @@ export class SceneTree {
     });
   }
 
-  public componentWillRender(): void {
+  protected componentWillRender(): void {
     this.updateRenderState();
     this.controller?.updateActiveRowRange(this.startIndex, this.endIndex);
   }
 
-  public componentDidRender(): void {
+  protected componentDidRender(): void {
     this.cleanupBindings();
     this.computeRowHeight();
   }
 
-  public render(): h.JSX.IntrinsicElements {
+  protected render(): h.JSX.IntrinsicElements {
     const rowHeight = this.getComputedOrPlaceholderRowHeight();
     const totalHeight = this.totalRows * rowHeight;
     const startY = this.startIndex * rowHeight;
@@ -296,147 +516,8 @@ export class SceneTree {
     );
   }
 
-  /**
-   * Schedules a render of the rows in the scene tree. Useful if any custom
-   * data in your scene tree has changed, and you want to update the row's
-   * contents.
-   *
-   * **Note:** This is an asynchronous operation. The update may happen on the
-   * next frame.
-   */
-  @Method()
-  public async invalidateRows(): Promise<void> {
-    forceUpdate(this.el);
-  }
-
-  @Method()
-  public async scrollToIndex(index: number): Promise<void> {
-    // TODO(dan): Add alignment to top, center, or bottom.
-    const i = Math.max(0, Math.min(index, this.totalRows));
-
-    if (this.computedRowHeight != null) {
-      const top = i * this.computedRowHeight;
-      this.el.scrollTo({ top, behavior: 'smooth' });
-    }
-  }
-
-  @Method()
-  public async expandAll(): Promise<void> {
-    await this.controller?.expandAll();
-  }
-
-  @Method()
-  public async collapseAll(): Promise<void> {
-    await this.controller?.collapseAll();
-  }
-
-  @Method()
-  public async expandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (!row.expanded) {
-        await this.controller?.expandNode(row.id);
-      }
-    });
-  }
-
-  @Method()
-  public async collapseItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.controller?.collapseNode(row.id);
-      }
-    });
-  }
-
-  @Method()
-  public async toggleExpandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.collapseItem(row);
-      } else {
-        await this.expandItem(row);
-      }
-    });
-  }
-
-  @Method()
-  public async toggleItemVisibility(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
-      } else {
-        await showItem(viewer, row.id);
-      }
-    });
-  }
-
-  @Method()
-  public async hideItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
-      }
-    });
-  }
-
-  @Method()
-  public async showItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (!row.visible) {
-        await showItem(viewer, row.id);
-      }
-    });
-  }
-
-  /**
-   * Returns a row at the given index. If the row data has not been loaded,
-   * returns `undefined`.
-   *
-   * @param index The index of the row.
-   * @returns A row, or `undefined` if the row hasn't been loaded.
-   */
-  @Method()
-  public async getRowAtIndex(index: number): Promise<Row> {
-    return this.rows[index];
-  }
-
-  /**
-   * Returns the row data from the given mouse or pointer event. If this event
-   * did not originate from this component will return undefined.
-   *
-   * @param event A mouse or pointer event that originated from this component.
-   * @returns A row, or `undefined` if the row hasn't been loaded.
-   */
-  @Method()
-  public async getRowFromEvent(event: MouseEvent | PointerEvent): Promise<Row> {
-    const { clientY, currentTarget } = event;
-    if (
-      currentTarget != null &&
-      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
-    ) {
-      return this.getRowAtClientY(clientY);
-    } else {
-      return undefined;
-    }
-  }
-
-  /**
-   * Returns the row data from the given vertical client position.
-   *
-   * @param clientY The vertical client position.
-   * @returns A row or `undefined` if the row hasn't been loaded.
-   */
-  @Method()
-  public getRowAtClientY(clientY: number): Promise<Row> {
-    const index = Math.floor(
-      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
-        this.getComputedOrPlaceholderRowHeight()
-    );
-    return this.getRowAtIndex(index);
-  }
-
   @Watch('viewer')
-  public async handleViewerChanged(
+  protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
@@ -466,7 +547,7 @@ export class SceneTree {
   }
 
   @Watch('jwt')
-  public handleJwtChanged(): void {
+  protected handleJwtChanged(): void {
     if (this.controller != null) {
       this.connectController(this.controller);
     }

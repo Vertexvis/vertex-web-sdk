@@ -79,8 +79,7 @@
         const scrollToIndex = document.getElementById('scroll-to-index');
         const scrollToBtn = document.getElementById('scroll-to-index-btn');
         scrollToBtn.addEventListener('click', () => {
-          // sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
-          sceneTree.invalidateRows();
+          sceneTree.scrollToIndex(scrollToIndex.valueAsNumber);
         });
 
         const collapseAllBtn = document.getElementById('collapse-all-btn');
@@ -92,11 +91,6 @@
         expandAllBtn.addEventListener('click', () => {
           sceneTree.expandAll();
         });
-
-        // setTimeout(() => {
-        //   sceneTree.viewer = viewer;
-        //   console.log('setting viewer on scene tree');
-        // }, 5000);
       }
     </script>
   </head>
@@ -123,7 +117,7 @@
           id="viewer"
           client-id="7A8EAF1430FFA64FF51CF0F64E38C0B5B4837EA660F07B110A8B6C1A9D186807"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:8AN_L_K3YHR9CpF5IU1TkdDdbkwjpJrXPGVK"
+          src="urn:vertexvis:stream-key:key"
         ></vertex-viewer>
       </div>
     </div>
