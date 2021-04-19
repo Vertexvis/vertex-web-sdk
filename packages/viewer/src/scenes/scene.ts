@@ -72,18 +72,20 @@ export class SceneItemOperationsBuilder
     );
   }
 
-  public select(color?: ColorMaterial | string): SceneItemOperationsBuilder {
-    if (typeof color === 'string') {
+  public select(
+    colorOrMaterial?: ColorMaterial | string
+  ): SceneItemOperationsBuilder {
+    if (typeof colorOrMaterial === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
         this.defaultSelectionMaterial,
-        this.builder.select(fromHex(color))
+        this.builder.select(fromHex(colorOrMaterial))
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
         this.defaultSelectionMaterial,
-        this.builder.select(color || this.defaultSelectionMaterial)
+        this.builder.select(colorOrMaterial || this.defaultSelectionMaterial)
       );
     }
   }

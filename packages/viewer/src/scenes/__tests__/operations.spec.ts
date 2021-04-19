@@ -37,7 +37,7 @@ describe(SceneOperationBuilder, () => {
     const definitions = builder.materialOverride(materialOverride).build();
 
     expect(definitions).toEqual([
-      { type: 'change-material', color: materialOverride },
+      { type: 'change-material', material: materialOverride },
     ]);
   });
 
@@ -46,7 +46,7 @@ describe(SceneOperationBuilder, () => {
     const builder = new SceneOperationBuilder();
     const definitions = builder.select(material).build();
 
-    expect(definitions).toEqual([{ type: 'select', color: material }]);
+    expect(definitions).toEqual([{ type: 'select', material }]);
   });
 
   it('create a deselect operation', () => {

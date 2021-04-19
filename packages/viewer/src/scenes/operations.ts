@@ -11,7 +11,7 @@ interface HideItemOperation {
 
 interface SelectItemOperation {
   type: 'select';
-  color: ColorMaterial;
+  material: ColorMaterial;
 }
 
 interface DeselectItemOperation {
@@ -24,7 +24,7 @@ interface ClearItemOperation {
 
 export interface ChangeMaterialOperation {
   type: 'change-material';
-  color: ColorMaterial;
+  material: ColorMaterial;
 }
 
 export interface TransformOperation {
@@ -65,9 +65,9 @@ export class SceneOperationBuilder
     return this.operations.concat();
   }
 
-  public materialOverride(color: ColorMaterial): SceneOperationBuilder {
+  public materialOverride(material: ColorMaterial): SceneOperationBuilder {
     return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'change-material', color }])
+      this.operations.concat([{ type: 'change-material', material }])
     );
   }
 
@@ -83,9 +83,9 @@ export class SceneOperationBuilder
     );
   }
 
-  public select(color: ColorMaterial): SceneOperationBuilder {
+  public select(material: ColorMaterial): SceneOperationBuilder {
     return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'select', color }])
+      this.operations.concat([{ type: 'select', material }])
     );
   }
 
