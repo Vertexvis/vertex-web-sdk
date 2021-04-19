@@ -95,7 +95,7 @@ export const inverse = (matrix: Matrix4): Matrix4 => {
     matrix[11],
     matrix[12],
     matrix[13],
-    matrix[14]
+    matrix[15]
   );
   const m24 = Matrix3.create(
     matrix[0],
@@ -140,7 +140,7 @@ export const inverse = (matrix: Matrix4): Matrix4 => {
     matrix[7],
     matrix[12],
     matrix[13],
-    matrix[14]
+    matrix[15]
   );
   const m34 = Matrix3.create(
     matrix[0],
@@ -219,14 +219,14 @@ export const inverse = (matrix: Matrix4): Matrix4 => {
     Matrix3.determinant(m44),
   ]);
 
-  return adjoint.map((v) => v * (1 / determinant(matrix)));
+  return adjoint.map((v) => v * (1.0 / determinant(matrix)));
 };
 
 export const determinant = (matrix: Matrix4): number => {
   const a = matrix[0];
-  const b = matrix[1];
-  const c = matrix[2];
-  const d = matrix[3];
+  const b = matrix[4];
+  const c = matrix[8];
+  const d = matrix[12];
 
   const subMatrix1 = Matrix3.create(
     matrix[5],
@@ -241,39 +241,39 @@ export const determinant = (matrix: Matrix4): number => {
   );
 
   const subMatrix2 = Matrix3.create(
-    matrix[4],
-    matrix[6],
-    matrix[7],
-    matrix[8],
+    matrix[1],
+    matrix[2],
+    matrix[3],
+    matrix[9],
     matrix[10],
     matrix[11],
-    matrix[12],
+    matrix[13],
     matrix[14],
     matrix[15]
   );
 
   const subMatrix3 = Matrix3.create(
-    matrix[4],
+    matrix[1],
+    matrix[2],
+    matrix[3],
     matrix[5],
+    matrix[6],
     matrix[7],
-    matrix[8],
-    matrix[9],
-    matrix[11],
     matrix[12],
     matrix[13],
     matrix[15]
   );
 
   const subMatrix4 = Matrix3.create(
-    matrix[4],
+    matrix[1],
+    matrix[2],
+    matrix[3],
     matrix[5],
+    matrix[6],
     matrix[7],
-    matrix[8],
     matrix[9],
     matrix[10],
-    matrix[12],
-    matrix[13],
-    matrix[14]
+    matrix[11]
   );
 
   return (
