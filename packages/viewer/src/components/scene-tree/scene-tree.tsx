@@ -25,7 +25,13 @@ import {
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
 } from './lib/dom';
-import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
+import {
+  deselectItem,
+  hideItem,
+  selectItem,
+  SelectItemOptions,
+  showItem,
+} from './lib/viewer-ops';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -365,10 +371,10 @@ export class SceneTree {
   @Method()
   public async selectItem(
     rowOrIndex: number | Row,
-    append = false
+    options: SelectItemOptions = {}
   ): Promise<void> {
     await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      await selectItem(viewer, row.id, { append });
+      await selectItem(viewer, row.id, options);
     });
   }
 
@@ -407,7 +413,7 @@ export class SceneTree {
    * @returns A row, or `undefined` if the row hasn't been loaded.
    */
   @Method()
-  public async getRowFromEvent(event: MouseEvent | PointerEvent): Promise<Row> {
+  public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
     const { clientY, currentTarget } = event;
     if (
       currentTarget != null &&
@@ -515,6 +521,8 @@ export class SceneTree {
                         event.stopPropagation();
                         this.toggleExpandItem(row);
                       }}
+                      onMouseUp={(event) => event.stopPropagation()}
+                      onClick={(event) => event.stopPropagation()}
                     >
                       {!row.isLeaf && row.expanded && '▾'}
                       {!row.isLeaf && !row.expanded && '▸'}
@@ -547,6 +555,8 @@ export class SceneTree {
                           event.stopPropagation();
                           this.toggleItemVisibility(this.startIndex + i);
                         }}
+                        onMouseUp={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
                       >
                         {row.visible ? (
                           <vertex-viewer-icon name="visible" size="sm" />
@@ -604,11 +614,10 @@ export class SceneTree {
 
   private handleRowMouseDown(event: MouseEvent, row: LoadedRow): void {
     if (!this.selectionDisabled && event.button === 0) {
-      // TODO(dan): Check what append selection is on Windows.
       if (event.metaKey && row.selected) {
         this.deselectItem(row);
       } else {
-        this.selectItem(row, event.ctrlKey || event.metaKey);
+        this.selectItem(row, { append: event.ctrlKey || event.metaKey });
       }
     }
   }

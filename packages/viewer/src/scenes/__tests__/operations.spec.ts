@@ -1,10 +1,10 @@
 import { SceneOperationBuilder } from '../operations';
-import { ColorMaterial } from '../colorMaterial';
+import { ColorMaterial, fromHex } from '../colorMaterial';
 import { Color } from '@vertexvis/utils';
 
 describe(SceneOperationBuilder, () => {
   it('creates a hide operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new SceneOperationBuilder([]);
     const definitions = builder.hide().build();
 
     expect(definitions).toEqual([{ type: 'hide' }]);
@@ -39,5 +39,20 @@ describe(SceneOperationBuilder, () => {
     expect(definitions).toEqual([
       { type: 'change-material', color: materialOverride },
     ]);
+  });
+
+  it('create a select operation', () => {
+    const material = fromHex('#ff0000');
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.select(material).build();
+
+    expect(definitions).toEqual([{ type: 'select', color: material }]);
+  });
+
+  it('create a deselect operation', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.deselect().build();
+
+    expect(definitions).toEqual([{ type: 'deselect' }]);
   });
 });

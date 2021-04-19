@@ -206,7 +206,7 @@ describe('<vertex-scene-tree />', () => {
     });
   });
 
-  describe(SceneTree.prototype.getRowFromEvent, () => {
+  describe(SceneTree.prototype.getRowForEvent, () => {
     it('returns row for event', async () => {
       const res = mockGetTree({ client });
 
@@ -228,7 +228,7 @@ describe('<vertex-scene-tree />', () => {
       page.root?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
 
       const event = await pendingEvent;
-      const row = await sceneTree.getRowFromEvent(event);
+      const row = await sceneTree.getRowForEvent(event);
       expect(row?.name).toBe(res.toObject().itemsList[1].name);
     });
 
@@ -246,7 +246,7 @@ describe('<vertex-scene-tree />', () => {
 
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
-      const row = await sceneTree.getRowFromEvent(
+      const row = await sceneTree.getRowForEvent(
         new MouseEvent('click', { clientY: 30 })
       );
       expect(row).not.toBeDefined();
@@ -598,7 +598,7 @@ describe('<vertex-scene-tree />', () => {
       });
 
       const row = await sceneTree.getRowAtIndex(0);
-      await sceneTree.selectItem(0, true);
+      await sceneTree.selectItem(0, { append: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         row?.id,

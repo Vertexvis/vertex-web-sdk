@@ -1,3 +1,4 @@
+import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperationsBuilder } from './scene';
 
 interface AllQueryExpression {
@@ -157,11 +158,16 @@ export class AndQuery implements TerminalQuery, ItemQuery<AndQuery> {
 }
 
 export class SceneItemQueryExecutor {
+  public constructor(private defaultSelectionMaterial: ColorMaterial) {}
+
   public where(
     query: (q: RootQuery) => TerminalQuery
   ): SceneItemOperationsBuilder {
     const expression: QueryExpression = query(new RootQuery()).build();
 
-    return new SceneItemOperationsBuilder(expression);
+    return new SceneItemOperationsBuilder(
+      expression,
+      this.defaultSelectionMaterial
+    );
   }
 }

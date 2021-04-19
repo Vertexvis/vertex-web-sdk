@@ -6,12 +6,20 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { frame } from '../../types/__fixtures__';
 import { UUID } from '@vertexvis/utils';
 import { ColorMaterial } from '../..';
+import { fromHex } from '../colorMaterial';
 
 describe(Scene, () => {
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
-  const scene = new Scene(streamApi, frame, imageScaleProvider, sceneViewId);
+  const colorMaterial = fromHex('#ff0000');
+  const scene = new Scene(
+    streamApi,
+    frame,
+    imageScaleProvider,
+    sceneViewId,
+    colorMaterial
+  );
 
   afterEach(() => {
     jest.resetAllMocks();
@@ -188,6 +196,101 @@ describe(Scene, () => {
                     },
                     ns: 10,
                   },
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('uses default selection material if color is not specified', () => {
+      const itemId = UUID.create();
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select())
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            item: {
+              sceneItemQuery: {
+                id: { hex: itemId.toString() },
+              },
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: colorMaterial.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('selection uses specified material', () => {
+      const itemId = UUID.create();
+      const material = fromHex('#0000ff');
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select(material))
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            item: {
+              sceneItemQuery: {
+                id: { hex: itemId.toString() },
+              },
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: material.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('selection uses hex color', () => {
+      const itemId = UUID.create();
+      const material = fromHex('#0000ff');
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select('#0000ff'))
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            item: {
+              sceneItemQuery: {
+                id: { hex: itemId.toString() },
+              },
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: material.diffuse,
+                  }),
                 },
               },
             ],

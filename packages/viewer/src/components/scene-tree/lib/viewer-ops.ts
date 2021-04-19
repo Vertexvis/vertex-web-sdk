@@ -28,8 +28,7 @@ export async function hideItem(
 export async function selectItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  // TODO(dan): Make color optional.
-  { color = '#FF0000', append = false }: SelectItemOptions
+  { color, append = false }: SelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
