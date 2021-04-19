@@ -14,6 +14,12 @@ module.exports = {
         paths: [
           { name: 'lodash', message: 'Use lodash-es instead.' },
           { name: 'lodash-es', message: 'Use lodash-es submodules instead.' },
+          {
+            name: '@stencil/core',
+            importNames: ['readTask', 'writeTask'],
+            message:
+              'This function does not work in tests. Use imports from ./src/utils/stencil instead.',
+          },
         ],
         patterns: ['lodash', 'lodash/*'],
       },

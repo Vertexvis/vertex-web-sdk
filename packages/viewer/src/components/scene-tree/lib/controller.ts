@@ -10,6 +10,8 @@ import {
   ExpandNodeRequest,
   GetTreeRequest,
   GetTreeResponse,
+  LocateItemRequest,
+  LocateItemResponse,
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
@@ -195,6 +197,38 @@ export class SceneTreeController {
   }
 
   /**
+   * Invokes a network request that will return the index of the node with the
+   * given ID. If the node is collapsed, all parents will be expanded.
+   *
+   * @param id An ID of an item.
+   * @returns A promise that resolves with the index of the node.
+   */
+  public async locateNode(id: string): Promise<number> {
+    const nodeId = new Uuid();
+    nodeId.setHex(id);
+
+    const req = new LocateItemRequest();
+    req.setNodeId(nodeId);
+
+    const res = await this.requestUnary<LocateItemResponse>(
+      this.jwt(),
+      (metadata, handler) => this.client.locateItem(req, metadata, handler)
+    );
+    const { requiresReload, locatedIndex } = res.toObject();
+
+    if (requiresReload) {
+      this.invalidateAfterOffset(0);
+      await this.fetchUnloadedPagesInActiveRows();
+    }
+
+    if (locatedIndex == null) {
+      throw new Error('Cannot locate node. Location index is undefined.');
+    }
+
+    return locatedIndex.value;
+  }
+
+  /**
    * Fetches a page at the given index. Once the data has been fetched, the
    * controller will emit an `onStateChange` event that contains rows with the
    * fetched page. If a page is invalidated before the request completes, the
@@ -335,21 +369,26 @@ export class SceneTreeController {
    *
    * @param start The starting row index.
    * @param end The ending row index.
+   * @returns A promise that resolves when the first page of data has been
+   *  loaded.
    */
-  public updateActiveRowRange(start: number, end: number): void {
+  public async updateActiveRowRange(start: number, end: number): Promise<void> {
     this.activeRowRange = this.constrainRowOffsets(start, end);
-    this.fetchUnloadedPagesInActiveRows();
+    await this.fetchUnloadedPagesInActiveRows();
   }
 
-  private fetchUnloadedPagesInActiveRows(): void {
+  private async fetchUnloadedPagesInActiveRows(): Promise<void> {
     const [startPage, endPage] = this.getPageIndexesForRange(
       this.activeRowRange[0],
       this.activeRowRange[1]
     );
 
-    this.getNonLoadedPageIndexes(startPage - 1, endPage + 1).forEach((page) => {
-      this.fetchPage(page);
-    });
+    const pages = this.getNonLoadedPageIndexes(startPage - 1, endPage + 1);
+    pages.forEach((page) => this.fetchPage(page));
+
+    if (pages.length > 0) {
+      await this.getPage(pages[0])?.res;
+    }
   }
 
   private patchRowsInRange(

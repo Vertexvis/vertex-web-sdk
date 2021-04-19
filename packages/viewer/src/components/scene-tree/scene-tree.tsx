@@ -7,7 +7,6 @@ import {
   Host,
   Method,
   Prop,
-  readTask,
   State,
   Watch,
 } from '@stencil/core';
@@ -24,6 +23,7 @@ import {
   getSceneTreeContainsElement,
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
+  scrollToTop,
 } from './lib/dom';
 import {
   deselectItem,
@@ -32,6 +32,7 @@ import {
   SelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
+import { readDOM, writeDOM } from '../../utils/stencil';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -58,6 +59,22 @@ type OperationHandler = (data: {
   viewer: HTMLVertexViewerElement;
   row: LoadedRow;
 }) => void;
+
+/**
+ * A set of options to configure the scroll to index behavior.
+ */
+export interface ScrollToOptions {
+  /**
+   * Indicates if this operation will be animated. Defaults to `false`.
+   */
+  animate?: boolean;
+
+  /**
+   * Indicates where in the viewport the scrolled to item should be placed.
+   * Defaults to `middle`.
+   */
+  position?: 'start' | 'middle' | 'end';
+}
 
 @Component({
   tag: 'vertex-scene-tree',
@@ -238,15 +255,49 @@ export class SceneTree {
     forceUpdate(this.el);
   }
 
+  /**
+   * Scrolls the tree to the given row index.
+   *
+   * @param index An index of the row to scroll to.
+   * @param options A set of options to configure the scrolling behavior.
+   */
   @Method()
-  public async scrollToIndex(index: number): Promise<void> {
-    // TODO(dan): Add alignment to top, center, or bottom. See https://vertexvis.atlassian.net/browse/API-1780
+  public async scrollToIndex(
+    index: number,
+    options: ScrollToOptions = {}
+  ): Promise<void> {
+    const { animate, position = 'middle' } = options;
     const i = Math.max(0, Math.min(index, this.totalRows));
 
-    if (this.computedRowHeight != null) {
-      const top = i * this.computedRowHeight;
-      this.el.scrollTo({ top, behavior: 'smooth' });
+    const top = this.getScrollToPosition(i, position);
+    scrollToTop(this.el, top, { behavior: animate ? 'smooth' : undefined });
+  }
+
+  /**
+   * Scrolls the tree to an item with the given ID. If the node for the item is
+   * not expanded, the tree will expand each of its parent nodes.
+   *
+   * @param itemId An ID of an item to scroll to.
+   * @param options A set of options to configure the scrolling behavior.
+   * @returns A promise that resolves when the operation is finished.
+   */
+  @Method()
+  public async scrollToItem(
+    itemId: string,
+    options: ScrollToOptions = {}
+  ): Promise<void> {
+    if (this.controller == null) {
+      throw new Error('Cannot lookup item. Controller is undefined.');
     }
+    const index = await this.controller.locateNode(itemId);
+
+    return new Promise((resolve) => {
+      // Scroll to the row after StencilJS has updated the DOM.
+      writeDOM(async () => {
+        await this.scrollToIndex(index, options);
+        resolve();
+      });
+    });
   }
 
   /**
@@ -463,7 +514,7 @@ export class SceneTree {
         'template[slot="right"]'
       ) as HTMLTemplateElement) || undefined;
 
-    readTask(() => {
+    readDOM(() => {
       this.viewportHeight = getSceneTreeViewportHeight(this.el);
       this.updateRenderState();
     });
@@ -763,7 +814,7 @@ export class SceneTree {
   }
 
   private handleScroll(): void {
-    readTask(() => {
+    readDOM(() => {
       this.scrollTop = this.el.scrollTop || 0;
     });
   }
@@ -799,6 +850,25 @@ export class SceneTree {
 
   private getComputedOrPlaceholderRowHeight(): number {
     return this.computedRowHeight || 24;
+  }
+
+  private getScrollToPosition(
+    index: number,
+    position: ScrollToOptions['position']
+  ): number {
+    const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
+    const viewportHeight = this.viewportHeight || 0;
+    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+
+    if (position === 'start') {
+      return constrainedIndex * rowHeight;
+    } else if (position === 'middle') {
+      const rowCenterY = constrainedIndex * rowHeight + rowHeight / 2;
+      return rowCenterY - viewportHeight / 2;
+    } else {
+      const rowBottomY = constrainedIndex * rowHeight + rowHeight;
+      return rowBottomY - viewportHeight;
+    }
   }
 
   private getConfig(): Config {
