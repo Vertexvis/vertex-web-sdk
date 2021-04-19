@@ -12,6 +12,26 @@ describe('<vertex-viewer-icon>', () => {
     expect(svg?.innerHTML).toContain('path');
   });
 
+  it('render a visible icon', async () => {
+    const page = await newSpecPage({
+      components: [ViewerIcon],
+      html: `<vertex-viewer-icon name="visible"></vertex-viewer-button>`,
+    });
+
+    const svg = page.root?.shadowRoot?.querySelector('svg');
+    expect(svg?.innerHTML).toContain('path');
+  });
+
+  it('render a visible icon', async () => {
+    const page = await newSpecPage({
+      components: [ViewerIcon],
+      html: `<vertex-viewer-icon name="hidden"></vertex-viewer-button>`,
+    });
+
+    const svg = page.root?.shadowRoot?.querySelector('svg');
+    expect(svg?.innerHTML).toContain('path');
+  });
+
   it('renders empty element if no icon is found', async () => {
     const page = await newSpecPage({
       components: [ViewerIcon],

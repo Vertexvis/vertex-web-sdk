@@ -8,7 +8,7 @@ export const config: Config = {
     browser: true,
   },
   plugins: [copyright()],
-  globalStyle: 'src/global/index.css',
+  globalStyle: 'src/css/global.css',
   outputTargets: [
     reactOutputTarget({
       componentCorePackage: '@vertexvis/viewer',

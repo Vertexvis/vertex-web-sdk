@@ -8,6 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
+import { Row } from "./components/scene-tree/lib/row";
 import { StreamAttributes } from "@vertexvis/stream-api";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
@@ -27,23 +28,95 @@ import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacemen
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 export namespace Components {
     interface VertexSceneTree {
-        "approximateItemHeight": number;
+        /**
+          * Performs an API call to collapse all nodes in the tree.
+         */
         "collapseAll": () => Promise<void>;
+        /**
+          * Performs an API call that will collapse the node associated to the specified row or row index.
+          * @param rowOrIndex A row or row index to collapse.
+         */
+        "collapseItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * An object to configure the scene tree.
+         */
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv": Environment;
+        /**
+          * Performs an API call to expand all nodes in the tree.
+         */
         "expandAll": () => Promise<void>;
+        /**
+          * Performs an API call that will expand the node associated to the specified row or row index.
+          * @param rowOrIndex A row or row index to expand.
+         */
+        "expandItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * Returns the row data from the given vertical client position.
+          * @param clientY The vertical client position.
+          * @returns A row or `undefined` if the row hasn't been loaded.
+         */
+        "getRowAtClientY": (clientY: number) => Promise<Row>;
+        /**
+          * Returns a row at the given index. If the row data has not been loaded, returns `undefined`.
+          * @param index The index of the row.
+          * @returns A row, or `undefined` if the row hasn't been loaded.
+         */
+        "getRowAtIndex": (index: number) => Promise<Row>;
+        /**
+          * Returns the row data from the given mouse or pointer event. The event must originate from this component otherwise `undefined` is returned.
+          * @param event A mouse or pointer event that originated from this component.
+          * @returns A row, or `undefined` if the row hasn't been loaded.
+         */
+        "getRowFromEvent": (event: MouseEvent | PointerEvent) => Promise<Row>;
+        /**
+          * Performs an API call that will hide the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to hide.
+         */
+        "hideItem": (rowOrIndex: number | Row) => Promise<void>;
         /**
           * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
          */
         "invalidateRows": () => Promise<void>;
+        /**
+          * A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.
+         */
         "jwt": string | undefined;
+        /**
+          * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
+         */
         "overScanCount": number;
+        /**
+          * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+          * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+         */
         "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
-        "viewer": HTMLVertexViewerElement | undefined | null;
+        /**
+          * Performs an API call that will show the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to show.
+         */
+        "showItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * Performs an API call that will either expand or collapse the node associated to the given row or row index.
+          * @param rowOrIndex The row or row index to collapse or expand.
+         */
+        "toggleExpandItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * Performs an API call that will either hide or show the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to toggle visibility.
+         */
+        "toggleItemVisibility": (rowOrIndex: number | Row) => Promise<void>;
+        /**
+          * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
+         */
+        "viewer"?: HTMLVertexViewerElement | null;
+        /**
+          * A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.
+         */
         "viewerSelector"?: string;
     }
     interface VertexViewer {
@@ -229,16 +302,34 @@ declare global {
 }
 declare namespace LocalJSX {
     interface VertexSceneTree {
-        "approximateItemHeight"?: number;
+        /**
+          * An object to configure the scene tree.
+         */
         "config"?: Config;
         /**
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv"?: Environment;
+        /**
+          * A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.
+         */
         "jwt"?: string | undefined;
+        /**
+          * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
+         */
         "overScanCount"?: number;
+        /**
+          * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+          * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+         */
         "rowData"?: RowDataProvider;
-        "viewer"?: HTMLVertexViewerElement | undefined | null;
+        /**
+          * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
+         */
+        "viewer"?: HTMLVertexViewerElement | null;
+        /**
+          * A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.
+         */
         "viewerSelector"?: string;
     }
     interface VertexViewer {

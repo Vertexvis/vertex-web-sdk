@@ -4,6 +4,7 @@ jest.mock(
 );
 jest.mock('../../scenes');
 jest.mock('./lib/dom');
+jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
 
 import '../../testing/domMocks';
@@ -21,12 +22,22 @@ import {
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from './lib/testing';
-import { getSceneTreeViewportHeight } from './lib/dom';
+import {
+  getSceneTreeContainsElement,
+  getSceneTreeOffsetTop,
+  getSceneTreeViewportHeight,
+} from './lib/dom';
 import {
   getAssignedSlotNodes,
   getElementBoundingClientRect,
 } from '../viewer/utils';
-import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import {
+  CollapseNodeResponse,
+  ExpandNodeResponse,
+  GetTreeResponse,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { hideItem, showItem } from './lib/viewer-ops';
 
 const random = new Chance();
 
@@ -60,118 +71,482 @@ describe('<vertex-scene-tree />', () => {
   const client = new SceneTreeAPIClient('http://example.com');
   (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
   (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
+  (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('queries for the viewer', async () => {
-    mockGetTree(client);
-    const { sceneTree, viewer, page } = await loadSceneTree({
-      client,
-      jwt,
-      html: `
-        <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
-        <vertex-viewer id="viewer"></vertex-viewer>
-      `,
+  describe('initialization', () => {
+    it('queries for the viewer', async () => {
+      mockGetTree({ client });
+      const { sceneTree, viewer, page } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const rows = page.body
+        .querySelector('vertex-scene-tree')
+        ?.shadowRoot?.querySelectorAll('.row');
+
+      expect(sceneTree.viewer).toBe(viewer);
+      expect(sceneTree.controller).toBeDefined();
+      expect(sceneTree.jwt).toBe(jwt);
+      expect(rows?.length).toBeGreaterThan(0);
     });
 
-    const rows = page.body
-      .querySelector('vertex-scene-tree')
-      ?.shadowRoot?.querySelectorAll('.row');
+    it('initializes scene tree when setting viewer', async () => {
+      mockGetTree({ client });
 
-    expect(sceneTree.viewer).toBe(viewer);
-    expect(sceneTree.controller).toBeDefined();
-    expect(sceneTree.jwt).toBe(jwt);
-    expect(rows?.length).toBeGreaterThan(0);
+      const { sceneTree, page } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree></vertex-scene-tree>
+          <vertex-viewer></vertex-viewer>
+        `,
+        setup({ sceneTree, viewer }) {
+          sceneTree.viewer = viewer;
+        },
+      });
+
+      await page.waitForChanges();
+      await sceneTree.controller?.getPage(0)?.res;
+      await page.waitForChanges();
+
+      const rows = page.body
+        .querySelector('vertex-scene-tree')
+        ?.shadowRoot?.querySelectorAll('.row');
+
+      expect(sceneTree.controller).toBeDefined();
+      expect(sceneTree.jwt).toBeDefined();
+      expect(rows?.length).toBeGreaterThan(0);
+    });
+
+    it('invalidates rows when invalidateRows() is called', async () => {
+      mockGetTree({ client });
+      const { sceneTree, page } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const rowData = jest.fn();
+      sceneTree.rowData = rowData;
+      rowData.mockReset();
+      sceneTree.invalidateRows();
+      await page.waitForChanges();
+
+      const rows = page.body
+        .querySelector('vertex-scene-tree')
+        ?.shadowRoot?.querySelectorAll('.row');
+
+      if (rows == null) {
+        throw new Error('Rows are empty');
+      }
+
+      expect(rowData).toHaveBeenCalledTimes(rows.length);
+    });
+
+    it('refetches tree if viewer changes', async () => {
+      mockGetTree({ client });
+
+      const { sceneTree, page, viewer } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      sceneTree.viewer = undefined;
+      await page.waitForChanges();
+
+      const res = mockGetTree({ client });
+      sceneTree.viewer = viewer;
+      await page.waitForChanges();
+      await sceneTree.controller?.getPage(0)?.res;
+      await page.waitForChanges();
+
+      const rows = page.body
+        .querySelector('vertex-scene-tree')
+        ?.shadowRoot?.querySelectorAll('.row');
+
+      if (rows == null) {
+        throw new Error('Rows are empty');
+      }
+
+      expect(rows[0].textContent).toContain(res.getItemsList()[0].getName());
+    });
   });
 
-  it('initializes scene tree when setting viewer', async () => {
-    mockGetTree(client);
+  describe(SceneTree.prototype.getRowAtIndex, () => {
+    it('returns row at index', async () => {
+      const res = mockGetTree({ client });
 
-    const { sceneTree, page } = await loadSceneTree({
-      client,
-      jwt,
-      html: `
-        <vertex-scene-tree></vertex-scene-tree>
-        <vertex-viewer></vertex-viewer>
-      `,
-      setup({ sceneTree, viewer }) {
-        sceneTree.viewer = viewer;
-      },
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(1);
+      expect(row?.name).toBe(res.toObject().itemsList[1].name);
     });
-
-    await page.waitForChanges();
-    await sceneTree.controller?.getPage(0)?.res;
-    await page.waitForChanges();
-
-    const rows = page.body
-      .querySelector('vertex-scene-tree')
-      ?.shadowRoot?.querySelectorAll('.row');
-
-    expect(sceneTree.controller).toBeDefined();
-    expect(sceneTree.jwt).toBeDefined();
-    expect(rows?.length).toBeGreaterThan(0);
   });
 
-  it('invalidates rows when invalidateRows() is called', async () => {
-    mockGetTree(client);
-    const { sceneTree, page } = await loadSceneTree({
-      client,
-      jwt,
-      html: `
-        <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
-        <vertex-viewer id="viewer"></vertex-viewer>
-      `,
+  describe(SceneTree.prototype.getRowFromEvent, () => {
+    it('returns row for event', async () => {
+      const res = mockGetTree({ client });
+
+      const { sceneTree, page } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+
+      const pendingEvent = new Promise<MouseEvent>((resolve) => {
+        page.root?.addEventListener('click', (event) => resolve(event));
+      });
+
+      page.root?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
+
+      const event = await pendingEvent;
+      const row = await sceneTree.getRowFromEvent(event);
+      expect(row?.name).toBe(res.toObject().itemsList[1].name);
     });
 
-    const rowData = jest.fn();
-    sceneTree.rowData = rowData;
-    rowData.mockReset();
-    sceneTree.invalidateRows();
-    await page.waitForChanges();
+    it('returns undefined if no current target', async () => {
+      mockGetTree({ client });
 
-    const rows = page.body
-      .querySelector('vertex-scene-tree')
-      ?.shadowRoot?.querySelectorAll('.row');
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
 
-    if (rows == null) {
-      throw new Error('Rows are empty');
-    }
+      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
-    expect(rowData).toHaveBeenCalledTimes(rows.length);
+      const row = await sceneTree.getRowFromEvent(
+        new MouseEvent('click', { clientY: 30 })
+      );
+      expect(row).not.toBeDefined();
+    });
   });
 
-  it('refetches tree if viewer changes', async () => {
-    mockGetTree(client);
+  describe(SceneTree.prototype.getRowAtClientY, () => {
+    it('returns row at vertical position', async () => {
+      const res = mockGetTree({ client });
 
-    const { sceneTree, page, viewer } = await loadSceneTree({
-      client,
-      jwt,
-      html: `
-        <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
-        <vertex-viewer id="viewer"></vertex-viewer>
-      `,
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtClientY(30);
+      expect(row?.name).toBe(res.toObject().itemsList[1].name);
+    });
+  });
+
+  describe(SceneTree.prototype.expandItem, () => {
+    beforeEach(() => {
+      (client.expandNode as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new ExpandNodeResponse())
+      );
     });
 
-    sceneTree.viewer = undefined;
-    await page.waitForChanges();
+    it('expands item if index collapsed', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(false) });
 
-    const res = mockGetTree(client);
-    sceneTree.viewer = viewer;
-    await page.waitForChanges();
-    await sceneTree.controller?.getPage(0)?.res;
-    await page.waitForChanges();
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
 
-    const rows = page.body
-      .querySelector('vertex-scene-tree')
-      ?.shadowRoot?.querySelectorAll('.row');
+      await sceneTree.expandItem(0);
+      expect(client.expandNode).toHaveBeenCalled();
+    });
 
-    if (rows == null) {
-      throw new Error('Rows are empty');
-    }
+    it('does nothing if item expanded', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(true) });
 
-    expect(rows[0].textContent).toContain(res.getItemsList()[0].getName());
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.expandItem(0);
+      expect(client.expandNode).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.collapseItem, () => {
+    beforeEach(() => {
+      (client.collapseNode as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new CollapseNodeResponse())
+      );
+    });
+
+    it('collapses item if index expanded', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.collapseItem(0);
+      expect(client.collapseNode).toHaveBeenCalled();
+    });
+
+    it('does nothing if item collapsed', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.collapseItem(0);
+      expect(client.collapseNode).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.toggleExpandItem, () => {
+    beforeEach(() => {
+      (client.collapseNode as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new CollapseNodeResponse())
+      );
+      (client.expandNode as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new ExpandNodeResponse())
+      );
+    });
+
+    it('collapses item if index expanded', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.toggleExpandItem(0);
+      expect(client.collapseNode).toHaveBeenCalled();
+    });
+
+    it('expands item if index collapsed', async () => {
+      mockGetTree({ client, transform: (node) => node.setExpanded(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.toggleExpandItem(0);
+      expect(client.expandNode).toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.toggleItemVisibility, () => {
+    it('shows item if index hidden', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.toggleItemVisibility(0);
+      expect(showItem).toHaveBeenCalled();
+    });
+
+    it('hides item if index visible', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.toggleItemVisibility(0);
+      expect(hideItem).toHaveBeenCalled();
+    });
+
+    it('shows item if row hidden', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.toggleItemVisibility(row);
+      expect(showItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+    });
+  });
+
+  describe(SceneTree.prototype.showItem, () => {
+    it('shows item if row hidden', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.showItem(row);
+      expect(showItem).toHaveBeenCalled();
+    });
+
+    it('shows item if index hidden', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.showItem(0);
+      expect(showItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+    });
+
+    it('does nothing if row is visible', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.showItem(0);
+      expect(showItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.hideItem, () => {
+    it('hides item if row visible', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.hideItem(row);
+      expect(hideItem).toHaveBeenCalled();
+    });
+
+    it('hides item if index  visible', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(true) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      const row = await sceneTree.getRowAtIndex(0);
+      await sceneTree.hideItem(0);
+      expect(hideItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+    });
+
+    it('does nothing if row is hidden', async () => {
+      mockGetTree({ client, transform: (node) => node.setVisible(false) });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.hideItem(0);
+      expect(hideItem).not.toHaveBeenCalled();
+    });
   });
 });
 
@@ -238,12 +613,20 @@ async function loadModelForViewer(
   return viewer;
 }
 
-function mockGetTree(
-  client: SceneTreeAPIClient,
+interface MockGetTreeOptions {
+  client: SceneTreeAPIClient;
+  itemCount?: number;
+  totalCount?: number;
+  transform?: (node: Node) => void;
+}
+
+function mockGetTree({
+  client,
   itemCount = 100,
-  totalCount = 100
-): GetTreeResponse {
-  const res = createGetTreeResponse(itemCount, totalCount);
+  totalCount = 100,
+  transform,
+}: MockGetTreeOptions): GetTreeResponse {
+  const res = createGetTreeResponse(itemCount, totalCount, transform);
   (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
   return res;
 }
