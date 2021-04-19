@@ -27,8 +27,7 @@ import {
 } from './lib/dom';
 import { hideItem, showItem } from './lib/viewer-ops';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type RowDataProvider = (row: Row) => object;
+export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
 /**
  * The minimum amount of time provided by requestIdleCallback to clear purged
@@ -224,7 +223,7 @@ export class SceneTree {
 
   @Method()
   public async scrollToIndex(index: number): Promise<void> {
-    // TODO(dan): Add alignment to top, center, or bottom.
+    // TODO(dan): Add alignment to top, center, or bottom. See https://vertexvis.atlassian.net/browse/API-1780
     const i = Math.max(0, Math.min(index, this.totalRows));
 
     if (this.computedRowHeight != null) {
