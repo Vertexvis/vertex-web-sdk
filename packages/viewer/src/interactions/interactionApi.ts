@@ -233,7 +233,7 @@ export class InteractionApi {
           z: delta.x * crossX.z + delta.y * crossY.z,
         });
 
-        const normalizedScreenPoint = Vector3.create(
+        const normalizedDeviceCoordinate = Vector3.create(
           (starting.x * 2.0) / viewport.width - 1,
           1 - (starting.y * 2.0) / viewport.height,
           depth
@@ -241,7 +241,7 @@ export class InteractionApi {
 
         const point = Matrix4.multiplyVector3(
           this.startingCameraInverseProjection,
-          normalizedScreenPoint
+          normalizedDeviceCoordinate
         );
 
         const scaledProjPoint = Vector3.scale(1.0 / point.w, point);
