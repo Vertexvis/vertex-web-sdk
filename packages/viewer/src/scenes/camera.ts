@@ -102,7 +102,20 @@ export class Camera implements FrameCamera.FrameCamera {
    * @param boundingBox The bounding box to position to.
    */
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    const distance = this.getDistanceToBoundingBoxFarEdge();
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
+      );
+
+    // height (of scene?) over diameter
+    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+
+    if (this.aspectRatio < 1.0) {
+      hOverD *= this.aspectRatio;
+    }
+
+    const distance = Math.abs(radius / hOverD);
     const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
 
     const lookAt = BoundingBox.center(boundingBox);
@@ -276,31 +289,6 @@ export class Camera implements FrameCamera.FrameCamera {
     } else {
       throw new Error('Fly to must specify at least one option.');
     }
-  }
-
-  private getBoundingBoxRadius(): number {
-    return (
-      1.1 *
-      Vector3.magnitude(
-        Vector3.subtract(
-          this.boundingBox.max,
-          BoundingBox.center(this.boundingBox)
-        )
-      )
-    );
-  }
-
-  private getDistanceToBoundingBoxFarEdge(): number {
-    const radius = this.getBoundingBoxRadius();
-
-    // height (of scene?) over diameter
-    let hOverD = Math.tan(Angle.toRadians(this.fovY) / 2.0);
-
-    if (this.aspectRatio < 1.0) {
-      hOverD *= this.aspectRatio;
-    }
-
-    return Math.abs(radius / hOverD);
   }
 
   private computeClippingPlanes(): void {
