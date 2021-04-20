@@ -1,86 +1,43 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-  <title>Stencil Component Starter</title>
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
 
-  <link rel="stylesheet" href="/dist/viewer/viewer.css" />
-  <script type="module" src="/dist/viewer/viewer.esm.js"></script>
-  <script nomodule src="/dist/esm/viewer.js"></script>
-
-  <style>
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-
-    #viewer {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-
-  <script type="module">
-    window.addEventListener('DOMContentLoaded', () => {
-      main();
-    });
-
-    class TestKeyInteraction {
-      constructor(viewer) {
-        this.viewer = viewer;
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
       }
 
-      predicate(keyState) {
-        return keyState['w'];
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
       }
 
-      async fn(event) {
-        const scene = await this.viewer.scene();
-        const hitResults = await scene.raycaster().hitItems(event.position);
-
-        if (hitResults.hits.length > 0) {
-          await scene.items(op => op.where(q => q.withItemId(hitResults.hits[0].itemId.hex)).materialOverride('#ffffff')).execute()
-        }
-      }
-    }
-
-    class TestKeyInteractionHide {
-      constructor(viewer) {
-        this.viewer = viewer;
+      .tree {
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
       }
 
-      predicate(keyState) {
-        return keyState['h'];
+      .workarea {
+        width: 100%;
+        height: 100%;
       }
 
-      async fn(event) {
-        console.log(this.viewer);
-
-        const scene = await this.viewer.scene();
-        const hitResults = await scene.raycaster().hitItems(event.position, { includeMetadata: true });
-
-        console.log(hitResults);
-        if (hitResults.hits.length > 0) {
-          await scene.items(op => op.where(q => q.withItemId(hitResults.hits[0].itemId.hex)).hide()).execute()
-        }
-      }
-    }
-
-    class TestKeyInteractionClear {
-      constructor(viewer) {
-        this.viewer = viewer;
-      }
-
-      predicate(keyState) {
-        return keyState['c'];
-      }
-
-<<<<<<< HEAD
       #scroll-to-index {
         width: 100px;
       }
@@ -88,63 +45,13 @@
       #viewer {
         width: 100%;
         height: 100%;
-=======
-      async fn(event) {
-        const scene = await this.viewer.scene();
-        console.log(event);
-        await scene.items(op => op.where(q => q.all()).clearMaterialOverrides()).execute()
->>>>>>> Setup view projection matrix and attributes
       }
-    }
 
-    async function main() {
-      await window.customElements.whenDefined('vertex-viewer');
-      const viewer = document.querySelector('#viewer');
-
-      // viewer.addEventListener('frameDrawn', e => {
-      //   // console.log(e.detail.correlationIds);
-      //   if (e.detail.correlationIds.includes('jeff-test-correlation-id')) {
-      //     document.getElementById("viewer").style.visibility = "visible";
-      //   }
-      // })
-
-      // viewer.addEventListener('sceneReady', async () => {
-      //   const scene = await viewer.scene();
-
-      //   await scene.items(op => {
-      //     return [op.where(q => q.withItemId('6967473a-7edc-4fed-a930-867ca3e3a6bb')).hide(), op.where(q => q.withItemId('08b9df7c-9d10-4300-8655-89d60d75048a')).materialOverride('#ffff00')]
-      //   }).execute({
-      //     suppliedCorrelationId: 'jeff-test-correlation-id'
-      //   });
-      // })
-
-      viewer.registerTapKeyInteraction(
-        new TestKeyInteraction(viewer),
-      )
-      viewer.registerTapKeyInteraction(
-        new TestKeyInteractionClear(viewer),
-      )
-      viewer.registerTapKeyInteraction(
-        new TestKeyInteractionHide(viewer)
-      )
-
-      window.addEventListener('keydown', async (event) => {
-        const scene = await viewer.scene();
-        if (event.key === '1') {
-          await scene.applySceneViewState(`5bd1ffa7-69bd-4edd-b99d-ad96700f05fa`)
-        } else if (event.key === '2') {
-          await scene.applySceneViewState(`e29f425c-b55d-47ba-80c5-817ed55ccce1`)
-        } else if (event.key === '3') {
-          await scene.applySceneViewState(`78284656-1337-4338-a31e-c29bd25ebae0`)
-        }
-      })
-
-      viewer.config = {
-        interactions: {
-          interactionDelay: 100,
-        }
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+        margin-top: 1rem;
       }
-<<<<<<< HEAD
     </style>
 
     <script type="module">
@@ -216,97 +123,3 @@
     </div>
   </body>
 </html>
-=======
-
-      viewer.streamAttributes = {
-        depthBuffers: {
-          frameType: 'all',
-          enabled: { value: true }
-        }
-      }
-
-      window.addEventListener('tap', async (event) => {
-        const scene = await viewer.scene();
-        const hitResults = await scene.raycaster().hitItems(event.detail.position);
-
-
-        if (hitResults.hits.length > 0) {
-          console.log(hitResults.hits[0].hitPoint)
-          await scene.items(op => op.where(q => q.withItemId(hitResults.hits[0].itemId.hex)).materialOverride('#ffffff')).execute()
-        }
-      })
-
-      // viewer.addEventListener('longpress', async (event) => {
-      //   const scene = await viewer.scene();
-      //   const hitResults = await scene.raycaster().hitItems(event.detail.position);
-
-      //   console.log(hitResults);
-      //   if (hitResults.hits.length > 0) {
-      //     const events = await scene.camera().flyTo({
-      //       itemId: hitResults.hits[0].itemId.hex
-      //     }).render({
-      //       animation: {
-      //         milliseconds: 750
-      //       }
-      //     });
-
-      //     // operations is an object w/ promises for different async ops
-
-      //     const listener = (frame) => {
-      //       console.log(frame);
-      //     };
-      //     events.onFrameReceived.on(listener);
-
-      //     await events.onAnimationCompleted.once();
-      //     console.log('animation completed');
-
-      //     // setTimeout(async () => {
-      //     events.onFrameReceived.off(listener);
-      //     // console.log(frame);
-
-      //     // events.onFrameReceived.on(f => console.log(f));
-      //     // }, 4000);
-
-
-
-
-
-      //     // animation done
-      //   }
-      // })
-
-      // ARM - 8e671a43-9338-49d4-8f11-5c4cc24a3c1f
-      // BODY - bbe33edd-69d8-45e5-bc85-f264916c3da4
-      // SIDE - afb31118-2307-46dc-a397-9a3fdebf4b38
-
-      // setTimeout(() => {
-      //   viewer.load("urn:vertexvis:stream-key:ZBr46I3D8sZ9mLmxXgg-epKRfdSc7PMt-O1-");
-
-      //   // setTimeout(() => {
-      //   //   viewer.load("urn:vertexvis:stream-key:xq1x8bI_wP5OoNKEmCy-OVJzU7emUTEZauZX");
-      //   // }, 5000)
-      // }, 5000)
-
-      //
-
-      // viewer.addEventListener('sceneReady', async () => {
-      //   setInterval(async () => {
-      //     const scene = await viewer.scene();
-      //     await scene.camera().rotateAroundAxis(0.01745327778, scene.camera().up).render()
-      //   }, 33)
-      // })
-
-      await viewer.load("urn:vertexvis:stream-key:ZBr46I3D8sZ9mLmxXgg-epKRfdSc7PMt-O1-");
-    }
-  </script>
-</head>
-
-<body>
-  <vertex-viewer id="viewer" config-env="platdev"
-    client-id="F180BC7099538A7DE4E5730CAD91D36F8F3B1B2A8824150BE386BAFBD642073G">
-    <vertex-viewer-default-toolbar placement="bottom-left" direction="vertical"></vertex-viewer-default-toolbar>
-  </vertex-viewer>
-</body>
-
-</html>
->>>>>>> Setup view projection matrix and attributes
