@@ -9,7 +9,9 @@ import { RowDataProvider } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
 import { Row } from "./components/scene-tree/lib/row";
+import { SelectItemOptions } from "./components/scene-tree/lib/viewer-ops";
 import { StreamAttributes } from "@vertexvis/stream-api";
+import { ColorMaterial } from "./scenes/colorMaterial";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
@@ -46,6 +48,11 @@ export namespace Components {
          */
         "configEnv": Environment;
         /**
+          * Performs an API call that will deselect the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to deselect.
+         */
+        "deselectItem": (rowOrIndex: number | Row) => Promise<void>;
+        /**
           * Performs an API call to expand all nodes in the tree.
          */
         "expandAll": () => Promise<void>;
@@ -71,7 +78,7 @@ export namespace Components {
           * @param event A mouse or pointer event that originated from this component.
           * @returns A row, or `undefined` if the row hasn't been loaded.
          */
-        "getRowFromEvent": (event: MouseEvent | PointerEvent) => Promise<Row>;
+        "getRowForEvent": (event: MouseEvent | PointerEvent) => Promise<Row>;
         /**
           * Performs an API call that will hide the item associated to the given row or row index.
           * @param rowOrIndex The row or row index to hide.
@@ -95,6 +102,18 @@ export namespace Components {
          */
         "rowData"?: RowDataProvider;
         "scrollToIndex": (index: number) => Promise<void>;
+        /**
+          * Performs an API call that will select the item associated to the given row or row index.
+          * @param rowOrIndex The row or row index to select.
+          * @param append `true` if the selection should append to the current selection, or `false` if this should replace the current selection. Defaults to replace.
+         */
+        "selectItem": (rowOrIndex: number | Row, options: SelectItemOptions) => Promise<void>;
+        /**
+          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
+          * @see SceneTree.selectItem *
+          * @see SceneTree.deselectItem
+         */
+        "selectionDisabled": boolean;
         /**
           * Performs an API call that will show the item associated to the given row or row index.
           * @param rowOrIndex The row or row index to show.
@@ -184,6 +203,11 @@ export namespace Components {
           * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
          */
         "scene": () => Promise<Scene>;
+        /**
+          * The default hex color or material to use when selecting items.
+         */
+        "selectionMaterial": | string
+    | ColorMaterial;
         /**
           * Property used for internals or testing.
           * @private
@@ -324,6 +348,12 @@ declare namespace LocalJSX {
          */
         "rowData"?: RowDataProvider;
         /**
+          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
+          * @see SceneTree.selectItem *
+          * @see SceneTree.deselectItem
+         */
+        "selectionDisabled"?: boolean;
+        /**
           * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
          */
         "viewer"?: HTMLVertexViewerElement | null;
@@ -392,6 +422,11 @@ declare namespace LocalJSX {
           * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
          */
         "onTokenExpired"?: (event: CustomEvent<void>) => void;
+        /**
+          * The default hex color or material to use when selecting items.
+         */
+        "selectionMaterial"?: | string
+    | ColorMaterial;
         /**
           * Property used for internals or testing.
           * @private

@@ -31,6 +31,7 @@ export class SceneItemOperationsBuilder
 
   public constructor(
     private query: QueryExpression,
+    private defaultSelectionMaterial: ColorMaterial,
     givenBuilder?: SceneOperationBuilder
   ) {
     this.builder =
@@ -43,45 +44,64 @@ export class SceneItemOperationsBuilder
     if (typeof color === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
+        this.defaultSelectionMaterial,
         this.builder.materialOverride(fromHex(color))
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
+        this.defaultSelectionMaterial,
         this.builder.materialOverride(color)
       );
     }
   }
 
   public hide(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.hide());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.defaultSelectionMaterial,
+      this.builder.hide()
+    );
   }
 
   public show(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.show());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.defaultSelectionMaterial,
+      this.builder.show()
+    );
   }
 
-  public select(color: ColorMaterial | string): SceneItemOperationsBuilder {
-    if (typeof color === 'string') {
+  public select(
+    colorOrMaterial?: ColorMaterial | string
+  ): SceneItemOperationsBuilder {
+    if (typeof colorOrMaterial === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.select(fromHex(color))
+        this.defaultSelectionMaterial,
+        this.builder.select(fromHex(colorOrMaterial))
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.select(color)
+        this.defaultSelectionMaterial,
+        this.builder.select(colorOrMaterial || this.defaultSelectionMaterial)
       );
     }
   }
 
   public deselect(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.deselect());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.defaultSelectionMaterial,
+      this.builder.deselect()
+    );
   }
 
   public clearMaterialOverrides(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
+      this.defaultSelectionMaterial,
       this.builder.clearMaterialOverrides()
     );
   }
@@ -98,6 +118,7 @@ export class SceneItemOperationsBuilder
 
       return new SceneItemOperationsBuilder(
         this.query,
+        this.defaultSelectionMaterial,
         this.builder.transform({
           r0: {
             x: matrix[0],
@@ -128,6 +149,7 @@ export class SceneItemOperationsBuilder
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
+        this.defaultSelectionMaterial,
         this.builder.transform(matrix)
       );
     }
@@ -193,7 +215,8 @@ export class Scene {
     private stream: StreamApi,
     private frame: Frame.Frame,
     private imageScaleProvider: ImageScaleProvider,
-    public readonly sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID,
+    private defaultSelectionMaterial: ColorMaterial
   ) {}
 
   /**
@@ -204,7 +227,9 @@ export class Scene {
   public items(
     operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
   ): ItemsOperationExecutor {
-    const sceneOperations = operations(new SceneItemQueryExecutor());
+    const sceneOperations = operations(
+      new SceneItemQueryExecutor(this.defaultSelectionMaterial)
+    );
 
     const ops = Array.isArray(sceneOperations)
       ? sceneOperations

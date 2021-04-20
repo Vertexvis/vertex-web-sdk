@@ -17,7 +17,6 @@ import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable, EventDispatcher } from '@vertexvis/utils';
-import decodeJwt, { JwtPayload } from 'jwt-decode';
 import { fromNodeProto, LoadedRow, Row } from './row';
 
 export interface SceneTreeState {
@@ -29,12 +28,6 @@ interface Page {
   id: number;
   index: number;
   res: Promise<GetTreeResponse>;
-}
-
-// TODO(dan): add other fields.
-interface SceneTreeJwtPayload extends JwtPayload {
-  view: string;
-  scene: string;
 }
 
 type JwtProvider = () => string;
@@ -84,14 +77,8 @@ export class SceneTreeController {
     let stream: ResponseStream<SubscribeResponse> | undefined;
 
     const sub = (): void => {
-      const viewId = new Uuid();
-      viewId.setHex(this.getSceneViewId(this.jwt()));
-
-      const req = new SubscribeRequest();
-      req.setViewId(viewId);
-
       stream = this.requestServerStream(this.jwt(), (metadata) =>
-        this.client.subscribe(req, metadata)
+        this.client.subscribe(new SubscribeRequest(), metadata)
       );
 
       stream.on('data', (msg) => {
@@ -103,22 +90,42 @@ export class SceneTreeController {
           this.fetchUnloadedPagesInActiveRows();
         }
 
-        if (change?.ranges?.hiddenList != null) {
-          console.debug(
-            'Received hidden list change',
-            change.ranges.hiddenList
-          );
+        const {
+          hiddenList = [],
+          shownList = [],
+          deselectedList = [],
+          selectedList = [],
+        } = change?.ranges || {};
 
-          change.ranges.hiddenList.forEach(({ start, end }) =>
+        if (hiddenList != null && hiddenList.length > 0) {
+          console.debug('Received hidden list change', hiddenList);
+
+          hiddenList.forEach(({ start, end }) =>
             this.patchRowsInRange(start, end, () => ({ visible: false }))
           );
         }
 
-        if (change?.ranges?.shownList != null) {
-          console.debug('Received shown list change', change.ranges.shownList);
+        if (shownList != null && shownList.length > 0) {
+          console.debug('Received shown list change', shownList);
 
-          change.ranges.shownList.forEach(({ start, end }) =>
+          shownList.forEach(({ start, end }) =>
             this.patchRowsInRange(start, end, () => ({ visible: true }))
+          );
+        }
+
+        if (deselectedList != null && deselectedList.length > 0) {
+          console.debug('Received deselected list change', deselectedList);
+
+          deselectedList.forEach(({ start, end }) =>
+            this.patchRowsInRange(start, end, () => ({ selected: false }))
+          );
+        }
+
+        if (selectedList != null && selectedList.length > 0) {
+          console.debug('Received selected list change', selectedList);
+
+          selectedList.forEach(({ start, end }) =>
+            this.patchRowsInRange(start, end, () => ({ selected: true }))
           );
         }
       });
@@ -139,13 +146,10 @@ export class SceneTreeController {
    * @param id A node ID to collapse.
    */
   public async collapseNode(id: string): Promise<void> {
-    const viewId = new Uuid();
-    viewId.setHex(this.getSceneViewId(this.jwt()));
     const nodeId = new Uuid();
     nodeId.setHex(id);
 
     const req = new CollapseNodeRequest();
-    req.setViewId(viewId);
     req.setNodeId(nodeId);
 
     await this.requestUnary(this.jwt(), (metadata, handler) =>
@@ -159,13 +163,10 @@ export class SceneTreeController {
    * @param id A node ID to expand.
    */
   public async expandNode(id: string): Promise<void> {
-    const viewId = new Uuid();
-    viewId.setHex(this.getSceneViewId(this.jwt()));
     const nodeId = new Uuid();
     nodeId.setHex(id);
 
     const req = new ExpandNodeRequest();
-    req.setViewId(viewId);
     req.setNodeId(nodeId);
 
     await this.requestUnary(this.jwt(), (metadata, handler) =>
@@ -177,9 +178,8 @@ export class SceneTreeController {
    * Collapses all nodes in the tree.
    */
   public async collapseAll(): Promise<void> {
-    const req = new CollapseAllRequest();
     await this.requestUnary(this.jwt(), (metadata, handler) =>
-      this.client.collapseAll(req, metadata, handler)
+      this.client.collapseAll(new CollapseAllRequest(), metadata, handler)
     );
   }
 
@@ -189,9 +189,8 @@ export class SceneTreeController {
    * @param jwt A JWT token used to authenticate with the server.
    */
   public async expandAll(): Promise<void> {
-    const req = new ExpandAllRequest();
     await this.requestUnary(this.jwt(), (metadata, handler) =>
-      this.client.expandAll(req, metadata, handler)
+      this.client.expandAll(new ExpandAllRequest(), metadata, handler)
     );
   }
 
@@ -348,9 +347,9 @@ export class SceneTreeController {
       this.activeRowRange[1]
     );
 
-    this.getNonLoadedPageIndexes(startPage - 1, endPage + 1).forEach((page) =>
-      this.fetchPage(page)
-    );
+    this.getNonLoadedPageIndexes(startPage - 1, endPage + 1).forEach((page) => {
+      this.fetchPage(page);
+    });
   }
 
   private patchRowsInRange(
@@ -405,19 +404,12 @@ export class SceneTreeController {
 
   private invalidateAfterOffset(offset: number): void {
     const pageIndex = Math.floor(offset / this.rowLimit);
-    const nextPageIndex = pageIndex + 1;
-    const nextPageOffset = nextPageIndex * this.rowLimit;
-
-    const start = this.state.rows.slice(0, nextPageOffset);
-    const end = new Array(this.state.totalRows - start.length);
-    const rows = [...start, ...end];
 
     for (const index of this.pages.keys()) {
       if (index >= pageIndex) {
         this.invalidatePage(index);
       }
     }
-    this.updateState({ ...this.state, rows });
   }
 
   private updateState(newState: SceneTreeState): void {
@@ -442,15 +434,11 @@ export class SceneTreeController {
     jwt: string
   ): Promise<GetTreeResponse> {
     return this.requestUnary(jwt, (metadata, handler) => {
-      const viewId = new Uuid();
-      viewId.setHex(this.getSceneViewId(jwt));
-
       const pager = new OffsetPager();
       pager.setOffset(offset);
       pager.setLimit(limit);
 
       const req = new GetTreeRequest();
-      req.setViewId(viewId);
       req.setPager(pager);
 
       this.client.getTree(req, metadata, handler);
@@ -502,14 +490,6 @@ export class SceneTreeController {
 
   private constrainRowOffsets(start: number, end: number): [number, number] {
     return [Math.max(0, start), Math.min(this.state.totalRows - 1, end)];
-  }
-
-  /**
-   * TODO(dan): Remove after https://vertexvis.atlassian.net/browse/API-1747 is
-   * implemented. Make sure to `yarn remove jwt_decode` as well.
-   */
-  private getSceneViewId(jwt: string): string {
-    return decodeJwt<SceneTreeJwtPayload>(jwt).view;
   }
 
   private get maxPages(): number {

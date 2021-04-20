@@ -124,12 +124,12 @@ function buildOperationTypes(
         return {
           changeMaterial: {
             material: {
-              d: op.color.opacity,
-              ns: op.color.glossiness,
-              ka: op.color.ambient,
-              kd: op.color.diffuse,
-              ks: op.color.specular,
-              ke: op.color.emissive,
+              d: op.material.opacity,
+              ns: op.material.glossiness,
+              ka: op.material.ambient,
+              kd: op.material.diffuse,
+              ks: op.material.specular,
+              ke: op.material.emissive,
             },
           },
         };
@@ -159,12 +159,12 @@ function buildOperationTypes(
         return {
           changeSelection: {
             material: {
-              d: op.color.opacity,
-              ns: op.color.glossiness,
-              ka: op.color.ambient,
-              kd: op.color.diffuse,
-              ks: op.color.specular,
-              ke: op.color.emissive,
+              d: op.material.opacity,
+              ns: op.material.glossiness,
+              ka: op.material.ambient,
+              kd: op.material.diffuse,
+              ks: op.material.specular,
+              ke: op.material.emissive,
             },
           },
         };

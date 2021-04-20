@@ -70,6 +70,11 @@ import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
 import { KeyInteraction } from '../../interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../interactions/baseInteractionHandler';
+import {
+  ColorMaterial,
+  defaultSelectionMaterial,
+  fromHex,
+} from '../../scenes/colorMaterial';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -152,6 +157,13 @@ export class Viewer {
    * the viewer.
    */
   @Prop() public streamAttributes?: StreamAttributes | string;
+
+  /**
+   * The default hex color or material to use when selecting items.
+   */
+  @Prop() public selectionMaterial:
+    | string
+    | ColorMaterial = defaultSelectionMaterial;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -999,11 +1011,16 @@ export class Viewer {
         'Cannot create scene. Frame has not been rendered or stream not initialized.'
       );
     } else {
+      const selectionMaterial =
+        typeof this.selectionMaterial === 'string'
+          ? fromHex(this.selectionMaterial)
+          : this.selectionMaterial;
       return new Scene(
         this.stream,
         this.lastFrame,
         () => this.getImageScale(),
-        this.sceneViewId
+        this.sceneViewId,
+        selectionMaterial
       );
     }
   }

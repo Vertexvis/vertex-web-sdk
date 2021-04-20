@@ -25,7 +25,13 @@ import {
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
 } from './lib/dom';
-import { hideItem, showItem } from './lib/viewer-ops';
+import {
+  deselectItem,
+  hideItem,
+  selectItem,
+  SelectItemOptions,
+  showItem,
+} from './lib/viewer-ops';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -118,7 +124,8 @@ export class SceneTree {
    *
    * Use the `config` property for manually setting hosts.
    */
-  @Prop() public configEnv: Environment = 'platprod';
+  @Prop()
+  public configEnv: Environment = 'platprod';
 
   /**
    * A JWT token to make authenticated API calls. This is normally automatically
@@ -126,6 +133,16 @@ export class SceneTree {
    */
   @Prop({ reflect: true, mutable: true })
   public jwt: string | undefined;
+
+  /**
+   * Disables the default selection behavior of the tree. Can be used to
+   * implement custom selection behavior via the trees selection methods.
+   *
+   * @see SceneTree.selectItem
+   * @see SceneTree.deselectItem
+   */
+  @Prop()
+  public selectionDisabled = false;
 
   @Element()
   private el!: HTMLElement;
@@ -343,6 +360,40 @@ export class SceneTree {
   }
 
   /**
+   * Performs an API call that will select the item associated to the given row
+   * or row index.
+   *
+   * @param rowOrIndex The row or row index to select.
+   * @param append `true` if the selection should append to the current
+   *  selection, or `false` if this should replace the current selection.
+   *  Defaults to replace.
+   */
+  @Method()
+  public async selectItem(
+    rowOrIndex: number | Row,
+    options: SelectItemOptions = {}
+  ): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      await selectItem(viewer, row.id, options);
+    });
+  }
+
+  /**
+   * Performs an API call that will deselect the item associated to the given
+   * row or row index.
+   *
+   * @param rowOrIndex The row or row index to deselect.
+   */
+  @Method()
+  public async deselectItem(rowOrIndex: number | Row): Promise<void> {
+    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
+      if (row.selected) {
+        await deselectItem(viewer, row.id);
+      }
+    });
+  }
+
+  /**
    * Returns a row at the given index. If the row data has not been loaded,
    * returns `undefined`.
    *
@@ -362,7 +413,7 @@ export class SceneTree {
    * @returns A row, or `undefined` if the row hasn't been loaded.
    */
   @Method()
-  public async getRowFromEvent(event: MouseEvent | PointerEvent): Promise<Row> {
+  public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
     const { clientY, currentTarget } = event;
     if (
       currentTarget != null &&
@@ -444,8 +495,9 @@ export class SceneTree {
               } else {
                 return (
                   <div
-                    class="row"
+                    class={classnames('row', { 'is-selected': row.selected })}
                     style={{ top: `${startY + rowHeight * i}px` }}
+                    onMouseDown={(event) => this.handleRowMouseDown(event, row)}
                   >
                     <span
                       ref={(el) => {
@@ -465,7 +517,12 @@ export class SceneTree {
                     />
                     <span
                       class="expand-toggle"
-                      onClick={() => this.toggleExpandItem(row)}
+                      onMouseDown={(event) => {
+                        event.stopPropagation();
+                        this.toggleExpandItem(row);
+                      }}
+                      onMouseUp={(event) => event.stopPropagation()}
+                      onClick={(event) => event.stopPropagation()}
                     >
                       {!row.isLeaf && row.expanded && '▾'}
                       {!row.isLeaf && !row.expanded && '▸'}
@@ -494,9 +551,12 @@ export class SceneTree {
                         class={classnames('visibility-btn', {
                           'is-hidden': !row.visible,
                         })}
-                        onClick={() => {
+                        onMouseDown={(event) => {
+                          event.stopPropagation();
                           this.toggleItemVisibility(this.startIndex + i);
                         }}
+                        onMouseUp={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
                       >
                         {row.visible ? (
                           <vertex-viewer-icon name="visible" size="sm" />
@@ -549,6 +609,16 @@ export class SceneTree {
   protected handleJwtChanged(): void {
     if (this.controller != null) {
       this.connectController(this.controller);
+    }
+  }
+
+  private handleRowMouseDown(event: MouseEvent, row: LoadedRow): void {
+    if (!this.selectionDisabled && event.button === 0) {
+      if (event.metaKey && row.selected) {
+        this.deselectItem(row);
+      } else {
+        this.selectItem(row, { append: event.ctrlKey || event.metaKey });
+      }
     }
   }
 
