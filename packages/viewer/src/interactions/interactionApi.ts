@@ -27,6 +27,8 @@ type CameraTransform = (
 export class InteractionApi {
   private currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
+  private startingCameraInverseProjection?: Matrix4.Matrix4;
+  private startingCameraInverseView?: Matrix4.Matrix4;
 
   public constructor(
     private stream: StreamApi,
@@ -200,24 +202,66 @@ export class InteractionApi {
     });
   }
 
-  public async rotateCameraDepth(
+  public async rotateCameraAtPoint(
     delta: Point.Point,
     starting: Point.Point,
     depth?: number
   ): Promise<void> {
     return this.transformCamera((camera, viewport) => {
-      const viewProjectionMatrix = camera.viewProjectionMatrix;
-      console.log(viewProjectionMatrix);
-      console.log(Matrix4.inverse(viewProjectionMatrix));
-      const screenPoint = Vector3.create(starting.x, starting.y, depth || -1);
+      this.startingCameraInverseProjection =
+        this.startingCameraInverseProjection ||
+        camera.inverseProjectionMatrix();
+      this.startingCameraInverseView =
+        this.startingCameraInverseView || camera.inverseViewMatrix();
 
-      const rotationPoint = Matrix4.multiplyVector3(
-        Matrix4.inverse(viewProjectionMatrix),
-        screenPoint
-      );
+      if (
+        this.startingCameraInverseProjection != null &&
+        this.startingCameraInverseView != null &&
+        depth != null
+      ) {
+        const upVector = Vector3.normalize(camera.up);
+        const lookAt = Vector3.normalize(
+          Vector3.subtract(camera.lookAt, camera.position)
+        );
 
-      console.log(rotationPoint);
+        const crossX = Vector3.cross(upVector, lookAt);
+        const crossY = Vector3.cross(lookAt, crossX);
 
+        const mouseToWorld = Vector3.normalize({
+          x: delta.x * crossX.x + delta.y * crossY.x,
+          y: delta.x * crossX.y + delta.y * crossY.y,
+          z: delta.x * crossX.z + delta.y * crossY.z,
+        });
+
+        const normalizedScreenPoint = Vector3.create(
+          (starting.x * 2.0) / viewport.width - 1,
+          1 - (starting.y * 2.0) / viewport.height,
+          depth
+        );
+
+        const point = Matrix4.multiplyVector3(
+          this.startingCameraInverseProjection,
+          normalizedScreenPoint
+        );
+
+        const scaledProjPoint = Vector3.scale(1.0 / point.w, point);
+
+        const viewPoint = Matrix4.multiplyVector3(
+          this.startingCameraInverseView,
+          scaledProjPoint
+        );
+
+        const rotationAxis = Vector3.cross(
+          mouseToWorld,
+          Vector3.normalize(Vector3.subtract(viewPoint, camera.position))
+        );
+
+        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
+        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+        const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+        return camera.rotateAroundAxisAtPoint(angle, viewPoint, rotationAxis);
+      }
       return camera;
     });
   }
@@ -248,6 +292,8 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
+      this.startingCameraInverseProjection = undefined;
+      this.startingCameraInverseView = undefined;
       this.resetLastAngle();
       await this.stream.endInteraction();
     }

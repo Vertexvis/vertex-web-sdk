@@ -21,6 +21,7 @@ export abstract class MouseInteraction {
 
   public beginDrag(
     event: MouseEvent,
+    canvasPosition: Point.Point,
     api: InteractionApi,
     depth?: number
   ): void {
@@ -46,7 +47,11 @@ export abstract class MouseInteraction {
 export class RotateInteraction extends MouseInteraction {
   public type: InteractionType = 'rotate';
 
-  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+  public beginDrag(
+    event: MouseEvent,
+    canvasPosition: Point.Point,
+    api: InteractionApi
+  ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
       api.beginInteraction();
@@ -68,20 +73,21 @@ export class RotateInteraction extends MouseInteraction {
   }
 }
 
-export class RotateDepthInteraction extends MouseInteraction {
-  public type: InteractionType = 'rotate-depth';
+export class RotatePointInteraction extends MouseInteraction {
+  public type: InteractionType = 'rotate-point';
 
   private startingPosition?: Point.Point;
   private depth?: number;
 
   public beginDrag(
     event: MouseEvent,
+    canvasPosition: Point.Point,
     api: InteractionApi,
     depth?: number
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
-      this.startingPosition = Point.create(event.screenX, event.screenY);
+      this.startingPosition = canvasPosition;
       this.depth = depth;
       api.beginInteraction();
     }
@@ -92,7 +98,7 @@ export class RotateDepthInteraction extends MouseInteraction {
       const position = Point.create(event.screenX, event.screenY);
       const delta = Point.subtract(position, this.currentPosition);
 
-      api.rotateCameraDepth(delta, this.startingPosition, this.depth);
+      api.rotateCameraAtPoint(delta, this.startingPosition, this.depth);
       this.currentPosition = position;
     }
   }
@@ -112,7 +118,11 @@ export class ZoomInteraction extends MouseInteraction {
     super();
   }
 
-  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+  public beginDrag(
+    event: MouseEvent,
+    canvasPosition: Point.Point,
+    api: InteractionApi
+  ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
       api.beginInteraction();
@@ -175,7 +185,11 @@ export class ZoomInteraction extends MouseInteraction {
 export class PanInteraction extends MouseInteraction {
   public type: InteractionType = 'pan';
 
-  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+  public beginDrag(
+    event: MouseEvent,
+    canvasPosition: Point.Point,
+    api: InteractionApi
+  ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
       api.beginInteraction();
@@ -200,7 +214,11 @@ export class PanInteraction extends MouseInteraction {
 export class TwistInteraction extends MouseInteraction {
   public type: InteractionType = 'twist';
 
-  public beginDrag(event: MouseEvent, api: InteractionApi): void {
+  public beginDrag(
+    event: MouseEvent,
+    canvasPosition: Point.Point,
+    api: InteractionApi
+  ): void {
     this.currentPosition = Point.create(event.screenX, event.screenY);
     api.beginInteraction();
   }

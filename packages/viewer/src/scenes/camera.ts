@@ -85,6 +85,8 @@ export interface FlyToParams {
  */
 export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
+  private cameraNear: number = 0;
+  private cameraFar: number = 0;
 
   public constructor(
     private stream: StreamApi,
@@ -223,6 +225,28 @@ export class Camera implements FrameCamera.FrameCamera {
     });
   }
 
+  public rotateAroundAxisAtPoint(
+    angleInRadians: number,
+    point: Vector3.Vector3,
+    axis: Vector3.Vector3
+  ): Camera {
+    return this.update({
+      position: Vector3.rotateAboutAxis(
+        angleInRadians,
+        this.position,
+        axis,
+        point
+      ),
+      lookAt: Vector3.rotateAboutAxis(angleInRadians, this.lookAt, axis, point),
+      up: Vector3.rotateAboutAxis(
+        angleInRadians,
+        this.up,
+        axis,
+        Vector3.origin()
+      ),
+    });
+  }
+
   /**
    * Updates the `position`, `lookAt` and/or `up` vectors of the camera.
    *
@@ -254,24 +278,54 @@ export class Camera implements FrameCamera.FrameCamera {
     }
   }
 
-  private getDistanceToBoundingBoxFarEdge(): number {
-    const radius =
+  private getBoundingBoxRadius(): number {
+    return (
       1.1 *
       Vector3.magnitude(
         Vector3.subtract(
           this.boundingBox.max,
           BoundingBox.center(this.boundingBox)
         )
-      );
+      )
+    );
+  }
+
+  private getDistanceToBoundingBoxFarEdge(): number {
+    const radius = this.getBoundingBoxRadius();
 
     // height (of scene?) over diameter
-    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+    let hOverD = Math.tan(Angle.toRadians(this.fovY) / 2.0);
 
     if (this.aspectRatio < 1.0) {
       hOverD *= this.aspectRatio;
     }
 
     return Math.abs(radius / hOverD);
+  }
+
+  private computeClippingPlanes(): void {
+    const boundingBoxCenter = BoundingBox.center(this.boundingBox);
+    const cameraToCenter = Vector3.subtract(this.position, boundingBoxCenter);
+    const centerToBoundingPlane = Vector3.subtract(
+      this.boundingBox.max,
+      boundingBoxCenter
+    );
+    const distanceToCenterAlongViewVec =
+      Math.abs(Vector3.dot(this.viewVector(), cameraToCenter)) /
+      Vector3.magnitude(this.viewVector());
+    const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
+    this.cameraFar = distanceToCenterAlongViewVec + radius;
+    this.cameraNear = this.cameraFar * 0.01;
+
+    if (this.cameraNear > distanceToCenterAlongViewVec - radius) {
+      if (this.cameraNear > 1000) {
+        const difference = this.cameraNear - 1000;
+        this.cameraNear = 1000;
+        this.cameraFar -= difference;
+      }
+    } else {
+      this.cameraNear = distanceToCenterAlongViewVec - radius;
+    }
   }
 
   /**
@@ -282,12 +336,11 @@ export class Camera implements FrameCamera.FrameCamera {
     return Vector3.subtract(this.lookAt, this.position);
   }
 
-  public get projectionMatrix(): Matrix4.Matrix4 {
+  public projectionMatrix(): Matrix4.Matrix4 {
     const near = this.near;
     const far = this.far;
     const fovY = this.fovY;
 
-    console.log(near, far, this.aspect, fovY);
     const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
     const xmax = ymax * this.aspect;
 
@@ -299,11 +352,11 @@ export class Camera implements FrameCamera.FrameCamera {
     return Matrix4.create([
       (2.0 * near) / (right - left),
       0,
-      (right + left) / (right - left),
+      0,
       0,
       0,
       (2.0 * near) / (top - bottom),
-      (top + bottom) / (top - bottom),
+      0,
       0,
       0,
       0,
@@ -316,7 +369,41 @@ export class Camera implements FrameCamera.FrameCamera {
     ]);
   }
 
-  public get viewMatrix(): Matrix4.Matrix4 {
+  public inverseProjectionMatrix(): Matrix4.Matrix4 {
+    const near = this.near;
+    const far = this.far;
+    const fovY = this.fovY;
+
+    const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
+    const xmax = ymax * this.aspect;
+
+    const left = -xmax;
+    const right = xmax;
+    const bottom = -ymax;
+    const top = ymax;
+
+    return Matrix4.create([
+      (right - left) / (2 * near),
+      0,
+      0,
+      0,
+      0,
+      (top - bottom) / (2 * near),
+      0,
+      0,
+      0,
+      0,
+      0,
+      -1,
+
+      0,
+      0,
+      -(far - near) / (2 * far * near),
+      (far + near) / (2 * far * near),
+    ]);
+  }
+
+  public viewMatrix(): Matrix4.Matrix4 {
     const flippedViewVector = Vector3.scale(-1, this.viewVector());
     const sideVector = Vector3.normalize(
       Vector3.cross(this.up, flippedViewVector)
@@ -326,7 +413,7 @@ export class Camera implements FrameCamera.FrameCamera {
     );
     const forwardVector = Vector3.normalize(flippedViewVector);
     const offset = Vector3.scale(
-      -1,
+      -1.0,
       Vector3.add(this.lookAt, flippedViewVector)
     );
 
@@ -347,18 +434,81 @@ export class Camera implements FrameCamera.FrameCamera {
       forwardVector.x * offset.x +
         forwardVector.y * offset.y +
         forwardVector.z * offset.z,
-      0,
-      0,
-      0,
-      1,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
     ]);
   }
 
-  public get viewProjectionMatrix(): Matrix4.Matrix4 {
-    console.log('view', this.viewMatrix);
-    console.log('proj', this.projectionMatrix);
+  public inverseViewMatrix(): Matrix4.Matrix4 {
+    const flippedViewVector = Vector3.scale(-1, this.viewVector());
+    const sideVector = Vector3.normalize(
+      Vector3.cross(this.up, flippedViewVector)
+    );
+    const upVector = Vector3.normalize(
+      Vector3.cross(flippedViewVector, sideVector)
+    );
+    const forwardVector = Vector3.normalize(flippedViewVector);
+    const offset = Vector3.scale(
+      -1,
+      Vector3.add(this.lookAt, flippedViewVector)
+    );
 
-    return Matrix4.multiply(this.projectionMatrix, this.viewMatrix);
+    const rotationTranspose = Matrix4.create([
+      sideVector.x,
+      upVector.x,
+      forwardVector.x,
+      0,
+      sideVector.y,
+      upVector.y,
+      forwardVector.y,
+      0,
+      sideVector.z,
+      upVector.z,
+      forwardVector.z,
+      0,
+      0,
+      0,
+      0,
+      1.0,
+    ]);
+
+    const translation = Matrix4.multiplyVector3(
+      rotationTranspose,
+      Vector3.create(
+        sideVector.x * offset.x +
+          sideVector.y * offset.y +
+          sideVector.z * offset.z,
+        upVector.x * offset.x + upVector.y * offset.y + upVector.z * offset.z,
+        forwardVector.x * offset.x +
+          forwardVector.y * offset.y +
+          forwardVector.z * offset.z
+      )
+    );
+
+    return Matrix4.create([
+      sideVector.x,
+      upVector.x,
+      forwardVector.x,
+      -translation.x,
+      sideVector.y,
+      upVector.y,
+      forwardVector.y,
+      -translation.y,
+      sideVector.z,
+      upVector.z,
+      forwardVector.z,
+      -translation.z,
+      0,
+      0,
+      0,
+      1.0,
+    ]);
+  }
+
+  public viewProjectionMatrix(): Matrix4.Matrix4 {
+    return Matrix4.multiply(this.projectionMatrix(), this.viewMatrix());
   }
 
   /**
@@ -400,12 +550,16 @@ export class Camera implements FrameCamera.FrameCamera {
    * The camera's near clipping plane.
    */
   public get near(): number {
-    return 0.01 * this.getDistanceToBoundingBoxFarEdge();
+    this.computeClippingPlanes();
+
+    return this.cameraNear;
   }
   /**
    * The camera's far clipping plane.
    */
   public get far(): number {
-    return 1.1 * this.getDistanceToBoundingBoxFarEdge();
+    this.computeClippingPlanes();
+
+    return this.cameraFar;
   }
 }

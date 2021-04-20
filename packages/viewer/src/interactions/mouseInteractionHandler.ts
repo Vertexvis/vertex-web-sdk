@@ -6,7 +6,7 @@ import {
   ZoomInteraction,
   PanInteraction,
   TwistInteraction,
-  RotateDepthInteraction,
+  RotatePointInteraction,
 } from './mouseInteractions';
 
 export class MouseInteractionHandler extends BaseInteractionHandler {
@@ -14,7 +14,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
     getConfig: ConfigProvider,
     depthProvider: CanvasDepthProvider,
     rotateInteraction = new RotateInteraction(),
-    rotateDepthInteraction = new RotateDepthInteraction(),
+    rotatePointInteraction = new RotatePointInteraction(),
     zoomInteraction = new ZoomInteraction(),
     panInteraction = new PanInteraction(),
     twistInteraction = new TwistInteraction()
@@ -24,7 +24,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       'mouseup',
       'mousemove',
       rotateInteraction,
-      rotateDepthInteraction,
+      rotatePointInteraction,
       zoomInteraction,
       panInteraction,
       twistInteraction,

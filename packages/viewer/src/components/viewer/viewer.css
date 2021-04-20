@@ -49,6 +49,5 @@
 .depth-buffer-canvas {
   position: absolute;
   pointer-events: none;
-  /* TODO re-enable this to prevent depth buffer from appearing */
-  /* visibility: hidden; */
+  visibility: hidden;
 }

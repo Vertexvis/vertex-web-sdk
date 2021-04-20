@@ -8,7 +8,7 @@ import {
   PanInteraction,
   MouseInteraction,
   TwistInteraction,
-  RotateDepthInteraction,
+  RotatePointInteraction,
 } from './mouseInteractions';
 
 import { Point } from '@vertexvis/geometry';
@@ -16,7 +16,12 @@ import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import { ConfigProvider } from '../config/config';
 import { CanvasDepthProvider } from '../rendering';
 
-export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist' | 'rotate-depth';
+export type InteractionType =
+  | 'rotate'
+  | 'zoom'
+  | 'pan'
+  | 'twist'
+  | 'rotate-point';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -26,7 +31,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
-  private primaryInteraction: MouseInteraction = this.rotateDepthInteraction;
+  private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private isDragging = false;
@@ -46,7 +51,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
     private rotateInteraction: RotateInteraction,
-    private rotateDepthInteraction: RotateDepthInteraction,
+    private rotatePointInteraction: RotatePointInteraction,
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
@@ -79,7 +84,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public setCurrentInteractionType(type?: InteractionType): void {
     switch (type) {
       case 'rotate':
-        this.currentInteraction = this.rotateDepthInteraction;
+        this.currentInteraction = this.rotateInteraction;
         break;
       case 'zoom':
         this.currentInteraction = this.zoomInteraction;
@@ -89,6 +94,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         break;
       case 'twist':
         this.currentInteraction = this.twistInteraction;
+        break;
+      case 'rotate-point':
+        this.currentInteraction = this.rotatePointInteraction;
         break;
       default:
         this.currentInteraction = undefined;
@@ -114,7 +122,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public setPrimaryInteractionType(type: InteractionType): void {
     switch (type) {
       case 'rotate':
-        this.primaryInteraction = this.rotateInteraction;
+        this.primaryInteraction = this.rotatePointInteraction;
         break;
       case 'zoom':
         this.primaryInteraction = this.zoomInteraction;
@@ -205,7 +213,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
-      this.draggingInteraction.beginDrag(event, this.interactionApi, this.depth);
+      this.draggingInteraction.beginDrag(
+        event,
+        this.getCanvasPosition(event) ||
+          Point.create(event.clientX, event.clientY),
+        this.interactionApi,
+        this.depth
+      );
     }
   }
 

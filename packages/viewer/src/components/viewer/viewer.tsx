@@ -313,7 +313,6 @@ export class Viewer {
         this.baseInteractionHandler = new PointerInteractionHandler(
           () => this.getConfig(),
           createCanvasDepthProvider(
-            () => this.createScene().camera(),
             () => this.getImageScale(),
             this.depthBufferCanvasElement?.getContext('2d')
           )
@@ -333,7 +332,6 @@ export class Viewer {
         this.baseInteractionHandler = new MouseInteractionHandler(
           () => this.getConfig(),
           createCanvasDepthProvider(
-            () => this.createScene().camera(),
             () => this.getImageScale(),
             this.depthBufferCanvasElement?.getContext('2d')
           )
