@@ -289,7 +289,7 @@ export class SceneTree {
     if (this.controller == null) {
       throw new Error('Cannot lookup item. Controller is undefined.');
     }
-    const index = await this.controller.locateNode(itemId);
+    const index = await this.controller.expandParentNodes(itemId);
 
     return new Promise((resolve) => {
       // Scroll to the row after StencilJS has updated the DOM.

@@ -197,13 +197,14 @@ export class SceneTreeController {
   }
 
   /**
-   * Invokes a network request that will return the index of the node with the
-   * given ID. If the node is collapsed, all parents will be expanded.
+   * Invokes a network request that will expand all the parent nodes for the
+   * node mapped to the given ID.
    *
    * @param id An ID of an item.
-   * @returns A promise that resolves with the index of the node.
+   * @returns A promise that resolves with the index of the node after
+   *  expansion.
    */
-  public async locateNode(id: string): Promise<number> {
+  public async expandParentNodes(id: string): Promise<number> {
     const nodeId = new Uuid();
     nodeId.setHex(id);
 

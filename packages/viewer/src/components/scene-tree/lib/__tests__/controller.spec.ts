@@ -655,7 +655,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.locateNode, () => {
+  describe(SceneTreeController.prototype.expandParentNodes, () => {
     it('reloads tree if call responds with require reload', async () => {
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
@@ -675,7 +675,7 @@ describe(SceneTreeController, () => {
       controller.updateActiveRowRange(0, 9);
 
       (client.getTree as jest.Mock).mockClear();
-      await controller.locateNode('node-id');
+      await controller.expandParentNodes('node-id');
 
       const page1 = new OffsetPager();
       page1.setOffset(0);
