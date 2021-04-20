@@ -61,6 +61,7 @@ interface StateMap {
   subscribeDisposable?: Disposable;
   client?: SceneTreeAPIClient;
   controller?: SceneTreeController;
+  componentLoaded: boolean;
 }
 
 type OperationHandler = (data: {
@@ -210,6 +211,7 @@ export class SceneTree {
   private stateMap: StateMap = {
     bindings: new Map(),
     connected: false,
+    componentLoaded: false,
   };
 
   @State()
@@ -507,15 +509,32 @@ export class SceneTree {
     return this.getRowAtIndex(index);
   }
 
+  protected connectedCallback(): void {
+    console.log('connected callback', this.configEnv);
+    // if (this.viewer != null) {
+    //   this.connectViewer(this.viewer);
+    // }
+  }
+
+  protected disconnectedCallback(): void {
+    if (this.viewer != null) {
+      this.disconnectViewer(this.viewer);
+    }
+  }
+
   protected componentWillLoad(): void {
+    const { sceneTreeHost } = this.getConfig().network;
+    this.client = new SceneTreeAPIClient(sceneTreeHost);
+
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
         | undefined;
     }
 
-    const { sceneTreeHost } = this.getConfig().network;
-    this.stateMap.client = new SceneTreeAPIClient(sceneTreeHost);
+    if (this.viewer != null) {
+      this.connectViewer(this.viewer);
+    }
   }
 
   protected async componentDidLoad(): Promise<void> {
@@ -534,6 +553,8 @@ export class SceneTree {
       this.viewportHeight = getSceneTreeViewportHeight(this.el);
       this.updateRenderState();
     });
+
+    this.stateMap.componentLoaded = true;
   }
 
   protected componentWillRender(): void {
@@ -665,28 +686,21 @@ export class SceneTree {
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
+    // StencilJS will invoke this callback even before the component has been
+    // loaded. According to their docs, this shouldn't happen. Return if the
+    // component hasn't been loaded.
+    // See https://stenciljs.com/docs/reactive-data#watch-decorator
+    if (!this.stateMap.componentLoaded) {
+      return;
+    }
+
     if (oldViewer != null) {
       this.controller = undefined;
-
-      oldViewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
-      oldViewer.removeEventListener(
-        'connectionChange',
-        this.handleViewerConnectionStatusChange
-      );
+      this.disconnectViewer(oldViewer);
     }
 
     if (newViewer != null) {
-      newViewer.addEventListener('sceneReady', this.handleViewerSceneReady);
-      newViewer.addEventListener(
-        'connectionChange',
-        this.handleViewerConnectionStatusChange
-      );
-
-      const isSceneReady = await newViewer.isSceneReady();
-      if (isSceneReady) {
-        this.jwt = await newViewer.getJwt();
-        this.createController();
-      }
+      this.connectViewer(newViewer);
     }
   }
 
@@ -764,6 +778,28 @@ export class SceneTree {
     }
 
     this.error.emit(this.connectionError);
+  }
+
+  private async connectViewer(viewer: HTMLVertexViewerElement): Promise<void> {
+    viewer.addEventListener('sceneReady', this.handleViewerSceneReady);
+    viewer.addEventListener(
+      'connectionChange',
+      this.handleViewerConnectionStatusChange
+    );
+
+    const isSceneReady = await viewer.isSceneReady();
+    if (isSceneReady) {
+      this.jwt = await viewer.getJwt();
+      this.createController();
+    }
+  }
+
+  private disconnectViewer(viewer: HTMLVertexViewerElement): void {
+    viewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
+    viewer.removeEventListener(
+      'connectionChange',
+      this.handleViewerConnectionStatusChange
+    );
   }
 
   private scheduleClearUnusedData(): void {
