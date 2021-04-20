@@ -6,6 +6,7 @@ jest.mock('../../scenes');
 jest.mock('./lib/dom');
 jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
+jest.mock('../../utils/stencil');
 
 import '../../testing/domMocks';
 
@@ -26,6 +27,7 @@ import {
   getSceneTreeContainsElement,
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
+  scrollToTop,
 } from './lib/dom';
 import {
   getAssignedSlotNodes,
@@ -35,9 +37,11 @@ import {
   CollapseNodeResponse,
   ExpandNodeResponse,
   GetTreeResponse,
+  LocateItemResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
+import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 const random = new Chance();
 
@@ -67,14 +71,16 @@ describe('<vertex-scene-tree />', () => {
   });
   (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
 
-  // Scene tree mocks
-  const client = new SceneTreeAPIClient('http://example.com');
-  (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
-  (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
-  (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
+  let client!: SceneTreeAPIClient;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Scene tree mocks
+    client = new SceneTreeAPIClient('http://example.com');
+    (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
+    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
+    (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
   });
 
   describe('initialization', () => {
@@ -639,6 +645,103 @@ describe('<vertex-scene-tree />', () => {
 
       await sceneTree.deselectItem(0);
       expect(deselectItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.scrollToIndex, () => {
+    beforeEach(() => {
+      (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(240);
+    });
+
+    it('positions item at viewport start', async () => {
+      mockGetTree({ client });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.scrollToIndex(1, { position: 'start' });
+
+      expect(scrollToTop).toHaveBeenCalledWith(
+        expect.anything(),
+        24,
+        expect.anything()
+      );
+    });
+
+    it('positions item in viewport middle', async () => {
+      mockGetTree({ client });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.scrollToIndex(50, { position: 'middle' });
+
+      expect(scrollToTop).toHaveBeenCalledWith(
+        expect.anything(),
+        1092,
+        expect.anything()
+      );
+    });
+
+    it('positions item at viewport end', async () => {
+      mockGetTree({ client });
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+
+      await sceneTree.scrollToIndex(99, { position: 'end' });
+
+      expect(scrollToTop).toHaveBeenCalledWith(
+        expect.anything(),
+        2160,
+        expect.anything()
+      );
+    });
+  });
+
+  describe(SceneTree.prototype.scrollToItem, () => {
+    it("scrolls to the item's index", async () => {
+      mockGetTree({ client });
+
+      const index = new UInt64Value();
+      index.setValue(10);
+      const res = new LocateItemResponse();
+      res.setLocatedIndex(index);
+
+      (client.locateItem as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { sceneTree } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+          <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+          <vertex-viewer id="viewer"></vertex-viewer>
+        `,
+      });
+      const scrollToIndex = jest.spyOn(sceneTree, 'scrollToIndex');
+
+      await sceneTree.scrollToItem('item-id');
+      expect(scrollToIndex).toHaveBeenCalledWith(10, expect.anything());
     });
   });
 });

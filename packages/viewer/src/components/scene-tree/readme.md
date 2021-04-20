@@ -7,16 +7,16 @@
 
 ## Properties
 
-| Property                | Attribute                 | Description                                                                                                                                                  | Type                                           | Default      |
-| ----------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- | ------------ |
-| `approximateItemHeight` | `approximate-item-height` |                                                                                                                                                              | `number`                                       | `20`         |
-| `config`                | --                        |                                                                                                                                                              | `Config \| undefined`                          | `undefined`  |
-| `configEnv`             | `config-env`              | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts. | `"platdev" \| "platprod" \| "platstaging"`     | `'platprod'` |
-| `jwt`                   | `jwt`                     |                                                                                                                                                              | `string \| undefined`                          | `undefined`  |
-| `overScanCount`         | `over-scan-count`         |                                                                                                                                                              | `number`                                       | `10`         |
-| `rowData`               | --                        |                                                                                                                                                              | `((row: Row) => object) \| undefined`          | `undefined`  |
-| `viewer`                | --                        |                                                                                                                                                              | `HTMLVertexViewerElement \| null \| undefined` | `undefined`  |
-| `viewerSelector`        | `viewer-selector`         |                                                                                                                                                              | `string \| undefined`                          | `undefined`  |
+| Property            | Attribute            | Description                                                                                                                                                         | Type                                                   | Default      |
+| ------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `config`            | --                   | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
+| `configEnv`         | `config-env`         | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
+| `jwt`               | `jwt`                | A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.                           | `string \| undefined`                                  | `undefined`  |
+| `overScanCount`     | `over-scan-count`    | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `10`         |
+| `rowData`           | --                   | A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
+| `selectionDisabled` | `selection-disabled` | Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.                            | `boolean`                                              | `false`      |
+| `viewer`            | --                   | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                   | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
+| `viewerSelector`    | `viewer-selector`    | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                            | `string \| undefined`                                  | `undefined`  |
 
 
 ## Methods
@@ -95,7 +95,7 @@ Type: `Promise<Row>`
 
 
 
-### `getRowFromEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
+### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
 Returns the row data from the given mouse or pointer event. The event
 must originate from this component otherwise `undefined` is returned.
@@ -132,9 +132,9 @@ Type: `Promise<void>`
 
 
 
-### `scrollToIndex(index: number) => Promise<void>`
+### `scrollToIndex(index: number, options?: ScrollToOptions) => Promise<void>`
 
-
+Scrolls the tree to the given row index.
 
 #### Returns
 
@@ -142,7 +142,18 @@ Type: `Promise<void>`
 
 
 
-### `selectItem(rowOrIndex: number | Row, append?: boolean) => Promise<void>`
+### `scrollToItem(itemId: string, options?: ScrollToOptions) => Promise<void>`
+
+Scrolls the tree to an item with the given ID. If the node for the item is
+not expanded, the tree will expand each of its parent nodes.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+### `selectItem(rowOrIndex: number | Row, options?: SelectItemOptions) => Promise<void>`
 
 Performs an API call that will select the item associated to the given row
 or row index.

@@ -17,6 +17,7 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   GetTreeRequest,
+  LocateItemResponse,
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
@@ -31,6 +32,7 @@ import {
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from '../testing';
+import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 const random = new Chance();
 
@@ -650,6 +652,53 @@ describe(SceneTreeController, () => {
 
       const range = controller.getPageIndexesForRange(-1, 101);
       expect(range).toEqual([0, 9]);
+    });
+  });
+
+  describe(SceneTreeController.prototype.expandParentNodes, () => {
+    it('reloads tree if call responds with require reload', async () => {
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const index = new UInt64Value();
+      index.setValue(0);
+      const locateRes = new LocateItemResponse();
+      locateRes.setLocatedIndex(index);
+      locateRes.setRequiresReload(true);
+
+      (client.locateItem as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(locateRes)
+      );
+
+      const controller = new SceneTreeController(client, 10, () => jwt);
+      controller.updateActiveRowRange(0, 9);
+
+      (client.getTree as jest.Mock).mockClear();
+      await controller.expandParentNodes('node-id');
+
+      const page1 = new OffsetPager();
+      page1.setOffset(0);
+      page1.setLimit(10);
+      const expectedReq1 = new GetTreeRequest();
+      expectedReq1.setPager(page1);
+
+      const page2 = new OffsetPager();
+      page2.setOffset(10);
+      page2.setLimit(10);
+      const expectedReq2 = new GetTreeRequest();
+      expectedReq2.setPager(page2);
+
+      expect(client.getTree).toHaveBeenCalledWith(
+        expectedReq1,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(client.getTree).toHaveBeenCalledWith(
+        expectedReq2,
+        expect.anything(),
+        expect.anything()
+      );
     });
   });
 
