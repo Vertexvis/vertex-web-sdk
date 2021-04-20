@@ -2,6 +2,8 @@ import 'requestidlecallback-polyfill';
 import {
   Component,
   Element,
+  Event,
+  EventEmitter,
   forceUpdate,
   h,
   Host,
@@ -10,7 +12,11 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import {
+  SceneTreeAPIClient,
+  ServiceError,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable } from '@vertexvis/utils';
 import classnames from 'classnames';
 import { LoadedRow, Row } from './lib/row';
@@ -32,7 +38,9 @@ import {
   SelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
+import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
+import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -161,6 +169,9 @@ export class SceneTree {
   @Prop()
   public selectionDisabled = false;
 
+  @Event()
+  public error!: EventEmitter<SceneTreeErrorDetails>;
+
   @Element()
   private el!: HTMLElement;
 
@@ -200,6 +211,9 @@ export class SceneTree {
     bindings: new Map(),
     connected: false,
   };
+
+  @State()
+  private connectionError: SceneTreeErrorDetails | undefined;
 
   /* eslint-disable lines-between-class-members */
   /**
@@ -466,9 +480,11 @@ export class SceneTree {
   @Method()
   public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
     const { clientY, currentTarget } = event;
+    const rowsEl = this.el.shadowRoot?.querySelector('.rows');
     if (
       currentTarget != null &&
-      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
+      rowsEl != null &&
+      getSceneTreeContainsElement(rowsEl, currentTarget as HTMLElement)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -536,6 +552,24 @@ export class SceneTree {
     const startY = this.startIndex * rowHeight;
     return (
       <Host>
+        {this.connectionError != null && (
+          <div class="error">
+            <span>
+              {this.connectionError.message}
+              {this.connectionError.link && (
+                <span>
+                  {' '}
+                  See our{' '}
+                  <a href={this.connectionError.link} target="_blank">
+                    documentation
+                  </a>{' '}
+                  for more information.
+                </span>
+              )}
+            </span>
+          </div>
+        )}
+
         <div class="rows" style={{ height: `${totalHeight}px` }}>
           {this.isComputingRowHeight ? (
             <div class="row" />
@@ -694,7 +728,9 @@ export class SceneTree {
     this.stateMap.connected = false;
   }
 
-  private connectController(controller: SceneTreeController): void {
+  private async connectController(
+    controller: SceneTreeController
+  ): Promise<void> {
     if (this.jwt != null && !this.stateMap.connected) {
       this.stateMap.onStateChangeDisposable = controller.onStateChange.on(
         (state) => {
@@ -702,10 +738,32 @@ export class SceneTree {
           this.scheduleClearUnusedData();
         }
       );
-      this.stateMap.subscribeDisposable = controller.subscribe();
-      controller.fetchPage(0);
-      this.stateMap.connected = true;
+
+      try {
+        await controller.fetchPage(0);
+        this.stateMap.subscribeDisposable = controller.subscribe();
+        this.stateMap.connected = true;
+      } catch (e) {
+        if (isGrpcServiceError(e)) {
+          this.handleConnectionError(e);
+        }
+      }
     }
+  }
+
+  private handleConnectionError(e: ServiceError): void {
+    if (e.code === grpc.Code.FailedPrecondition) {
+      this.connectionError = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.SCENE_TREE_DISABLED,
+        'https://developer.vertexvis.com'
+      );
+    } else {
+      this.connectionError = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.UNKNOWN
+      );
+    }
+
+    this.error.emit(this.connectionError);
   }
 
   private scheduleClearUnusedData(): void {
