@@ -85,8 +85,8 @@ export interface FlyToParams {
  */
 export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
-  private cameraNear: number = 0;
-  private cameraFar: number = 0;
+  private cameraNear = 0;
+  private cameraFar = 0;
 
   public constructor(
     private stream: StreamApi,
@@ -542,6 +542,7 @@ export class Camera implements FrameCamera.FrameCamera {
 
     return this.cameraNear;
   }
+
   /**
    * The camera's far clipping plane.
    */

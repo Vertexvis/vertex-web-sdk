@@ -14,7 +14,6 @@ import {
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import { ConfigProvider } from '../config/config';
-import { CanvasDepthProvider } from '../rendering';
 
 export type InteractionType =
   | 'rotate'
@@ -38,7 +37,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private lastMoveEvent?: BaseEvent;
   private interactionTimer?: number;
   private keyboardControls = false;
-  private depth?: number;
 
   protected disableIndividualInteractions = false;
 
@@ -55,8 +53,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
-    private getConfig: ConfigProvider,
-    private depthProvider: CanvasDepthProvider
+    private getConfig: ConfigProvider
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
@@ -145,11 +142,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.interactionTimer = undefined;
 
-      const canvasPosition = this.getCanvasPosition(event);
-      if (canvasPosition != null) {
-        this.depth = this.depthProvider(canvasPosition);
-      }
-
       // Perform the current movement in the case that the interaction timer elapses
       if (this.lastMoveEvent != null) {
         this.handleWindowMove(this.lastMoveEvent);
@@ -217,8 +209,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         event,
         this.getCanvasPosition(event) ||
           Point.create(event.clientX, event.clientY),
-        this.interactionApi,
-        this.depth
+        this.interactionApi
       );
     }
   }

@@ -10,6 +10,7 @@ import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
 import { Interactions } from '../types';
+import { DepthProvider } from '../rendering/depth';
 
 type SceneProvider = () => Scene;
 
@@ -27,13 +28,13 @@ type CameraTransform = (
 export class InteractionApi {
   private currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
-  private startingCameraInverseProjection?: Matrix4.Matrix4;
-  private startingCameraInverseView?: Matrix4.Matrix4;
+  private worldRotationPoint?: Vector3.Vector3;
 
   public constructor(
     private stream: StreamApi,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
+    private getDepth: DepthProvider<Point.Point>,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>
@@ -204,21 +205,14 @@ export class InteractionApi {
 
   public async rotateCameraAtPoint(
     delta: Point.Point,
-    starting: Point.Point,
-    depth?: number
+    point: Point.Point
   ): Promise<void> {
     return this.transformCamera((camera, viewport) => {
-      this.startingCameraInverseProjection =
-        this.startingCameraInverseProjection ||
-        camera.inverseProjectionMatrix();
-      this.startingCameraInverseView =
-        this.startingCameraInverseView || camera.inverseViewMatrix();
+      this.worldRotationPoint =
+        this.worldRotationPoint ||
+        this.computeWorldPosition(camera, viewport, point);
 
-      if (
-        this.startingCameraInverseProjection != null &&
-        this.startingCameraInverseView != null &&
-        depth != null
-      ) {
+      if (this.worldRotationPoint != null) {
         const upVector = Vector3.normalize(camera.up);
         const lookAt = Vector3.normalize(
           Vector3.subtract(camera.lookAt, camera.position)
@@ -233,34 +227,17 @@ export class InteractionApi {
           z: delta.x * crossX.z + delta.y * crossY.z,
         });
 
-        const normalizedDeviceCoordinate = Vector3.create(
-          (starting.x * 2.0) / viewport.width - 1,
-          1 - (starting.y * 2.0) / viewport.height,
-          depth
-        );
-
-        const point = Matrix4.multiplyVector3(
-          this.startingCameraInverseProjection,
-          normalizedDeviceCoordinate
-        );
-
-        const scaledProjPoint = Vector3.scale(1.0 / point.w, point);
-
-        const viewPoint = Matrix4.multiplyVector3(
-          this.startingCameraInverseView,
-          scaledProjPoint
-        );
-
-        const rotationAxis = Vector3.cross(
-          mouseToWorld,
-          Vector3.normalize(Vector3.subtract(viewPoint, camera.position))
-        );
+        const rotationAxis = Vector3.cross(mouseToWorld, lookAt);
 
         const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
         const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
         const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
-        return camera.rotateAroundAxisAtPoint(angle, viewPoint, rotationAxis);
+        return camera.rotateAroundAxisAtPoint(
+          angle,
+          this.worldRotationPoint,
+          rotationAxis
+        );
       }
       return camera;
     });
@@ -292,8 +269,7 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
-      this.startingCameraInverseProjection = undefined;
-      this.startingCameraInverseView = undefined;
+      this.worldRotationPoint = undefined;
       this.resetLastAngle();
       await this.stream.endInteraction();
     }
@@ -353,5 +329,29 @@ export class InteractionApi {
 
   private isCoarseInputDevice(isTouch?: boolean): boolean {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
+  }
+
+  private computeWorldPosition(
+    camera: Camera,
+    viewport: Dimensions.Dimensions,
+    point: Point.Point
+  ): Vector3.Vector3 {
+    const normalizedDeviceCoordinate = Vector3.create(
+      (point.x * 2.0) / viewport.width - 1,
+      1 - (point.y * 2.0) / viewport.height,
+      this.getDepth(point)
+    );
+
+    const inverseProjPoint = Matrix4.multiplyVector3(
+      camera.inverseProjectionMatrix(),
+      normalizedDeviceCoordinate
+    );
+
+    const scaledProjPoint = Vector3.scale(
+      1.0 / inverseProjPoint.w,
+      inverseProjPoint
+    );
+
+    return Matrix4.multiplyVector3(camera.inverseViewMatrix(), scaledProjPoint);
   }
 }

@@ -5,7 +5,7 @@ import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../metrics';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { DepthProvider } from './depth';
-import { Camera, ImageScaleProvider } from '../scenes';
+import { ImageScaleProvider } from '../scenes';
 
 const REPORTING_INTERVAL_MS = 1000;
 

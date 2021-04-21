@@ -1,5 +1,4 @@
 import { ConfigProvider } from '../config/config';
-import { CanvasDepthProvider } from '../rendering';
 import { BaseInteractionHandler } from './baseInteractionHandler';
 import {
   RotateInteraction,
@@ -12,7 +11,6 @@ import {
 export class MouseInteractionHandler extends BaseInteractionHandler {
   public constructor(
     getConfig: ConfigProvider,
-    depthProvider: CanvasDepthProvider,
     rotateInteraction = new RotateInteraction(),
     rotatePointInteraction = new RotatePointInteraction(),
     zoomInteraction = new ZoomInteraction(),
@@ -28,8 +26,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       zoomInteraction,
       panInteraction,
       twistInteraction,
-      getConfig,
-      depthProvider
+      getConfig
     );
   }
 }

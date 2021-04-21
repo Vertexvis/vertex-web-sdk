@@ -31,7 +31,7 @@ export interface SceneAttributes {
 
 export const fromProto = (
   payload: vertexvis.protobuf.stream.IDrawFramePayload,
-  isDepthBuffer: boolean = false
+  isDepthBuffer = false
 ): Frame => {
   const {
     frameCorrelationIds,

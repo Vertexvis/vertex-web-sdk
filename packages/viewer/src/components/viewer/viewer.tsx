@@ -58,6 +58,7 @@ import {
 } from './utils';
 import {
   acknowledgeFrameRequests,
+  CanvasDepthProvider,
   CanvasRenderer,
   createCanvasDepthProvider,
   createCanvasRenderer,
@@ -250,6 +251,7 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
+  private depthProvider!: CanvasDepthProvider;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
@@ -278,6 +280,10 @@ export class Viewer {
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.setupStreamListeners();
 
+    this.depthProvider = createCanvasDepthProvider(
+      () => this.getImageScale(),
+      this.depthBufferCanvasElement?.getContext('2d')
+    );
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(this.stream, () => this.getConfig());
@@ -310,12 +316,8 @@ export class Viewer {
           'pointermove',
           () => this.getConfig()
         );
-        this.baseInteractionHandler = new PointerInteractionHandler(
-          () => this.getConfig(),
-          createCanvasDepthProvider(
-            () => this.getImageScale(),
-            this.depthBufferCanvasElement?.getContext('2d')
-          )
+        this.baseInteractionHandler = new PointerInteractionHandler(() =>
+          this.getConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -329,12 +331,8 @@ export class Viewer {
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(
-          () => this.getConfig(),
-          createCanvasDepthProvider(
-            () => this.getImageScale(),
-            this.depthBufferCanvasElement?.getContext('2d')
-          )
+        this.baseInteractionHandler = new MouseInteractionHandler(() =>
+          this.getConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
@@ -1036,6 +1034,7 @@ export class Viewer {
       this.stream,
       () => this.getConfig().interactions,
       () => this.createScene(),
+      this.depthProvider,
       this.tap,
       this.doubletap,
       this.longpress
