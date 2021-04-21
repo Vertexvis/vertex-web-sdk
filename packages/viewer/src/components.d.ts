@@ -11,6 +11,7 @@ import {
 } from './components/scene-tree/scene-tree';
 import { Config } from './config/config';
 import { Environment } from './config/environment';
+import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { SelectItemOptions } from './components/scene-tree/lib/viewer-ops';
 import { StreamAttributes } from '@vertexvis/stream-api';
@@ -414,6 +415,7 @@ declare namespace LocalJSX {
      * A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.
      */
     jwt?: string | undefined;
+    onError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */

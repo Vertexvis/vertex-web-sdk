@@ -409,29 +409,43 @@ export class SceneTreeController {
   }
 
   private async handlePageResult(page: Page): Promise<void> {
-    const res = await page.res;
+    try {
+      const res = await page.res;
 
-    const currentPage = this.pages.get(page.index);
-    // Only handle the result if the page has not been invalidated.
-    if (currentPage?.id === page.id) {
-      const cursor = res.getCursor();
-      const itemsList = res.getItemsList();
+      const currentPage = this.getPage(page.index);
+      // Only handle the result if the page has not been invalidated.
+      if (currentPage?.id === page.id) {
+        const cursor = res.getCursor();
+        const itemsList = res.getItemsList();
 
-      const totalRows = cursor?.getTotal() ?? 0;
-      const offset = page.index * this.rowLimit;
-      const fetchedRows = fromNodeProto(itemsList);
+        const totalRows = cursor?.getTotal() ?? 0;
+        const offset = page.index * this.rowLimit;
+        const fetchedRows = fromNodeProto(itemsList);
 
-      const start = this.state.rows.slice(0, offset);
-      const end = this.state.rows.slice(
-        start.length + fetchedRows.length,
-        totalRows
+        const start = this.state.rows.slice(0, offset);
+        const end = this.state.rows.slice(
+          start.length + fetchedRows.length,
+          totalRows
+        );
+        const fill = new Array(
+          Math.max(
+            0,
+            totalRows - start.length - fetchedRows.length - end.length
+          )
+        );
+        const rows = [...start, ...fetchedRows, ...end, ...fill];
+
+        this.updateState({ ...this.state, totalRows, rows });
+      }
+    } catch (e) {
+      console.error(
+        `Request error fetching page at index ${page.index} (${e.toString()})`
       );
-      const fill = new Array(
-        Math.max(0, totalRows - start.length - fetchedRows.length - end.length)
-      );
-      const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-      this.updateState({ ...this.state, totalRows, rows });
+      const currentPage = this.getPage(page.index);
+      if (currentPage?.id === page.id) {
+        this.invalidatePage(page.index);
+      }
     }
   }
 
@@ -494,6 +508,7 @@ export class SceneTreeController {
   ): Promise<R> {
     return new Promise((resolve, reject) => {
       const metadata = this.createJwtMetadata(jwt);
+
       req(metadata, (err, res) => {
         if (err != null) {
           reject(err);

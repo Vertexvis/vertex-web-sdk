@@ -21,7 +21,10 @@ import {
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import {
+  SceneTreeAPIClient,
+  ServiceError,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { sign } from 'jsonwebtoken';
 import Chance from 'chance';
 import { SceneTreeController } from '../controller';
@@ -476,6 +479,25 @@ describe(SceneTreeController, () => {
           totalRows: 100,
         })
       );
+    });
+
+    it('marks page as not loaded if request fails', async () => {
+      const error: ServiceError = {
+        code: grpc.Code.FailedPrecondition,
+        metadata: new grpc.Metadata({}),
+        message: 'Failed',
+      };
+
+      (client.getTree as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryError(error)
+      );
+
+      const controller = new SceneTreeController(client, 100, () => jwt);
+      await expect(controller.fetchPage(0)).rejects.toMatchObject({
+        code: grpc.Code.FailedPrecondition,
+      });
+
+      expect(controller.isPageLoaded(0)).toBe(false);
     });
   });
 

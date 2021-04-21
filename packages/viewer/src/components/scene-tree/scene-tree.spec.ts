@@ -17,9 +17,13 @@ import { sign } from 'jsonwebtoken';
 import { Viewer } from '../viewer/viewer';
 import { SceneTree } from './scene-tree';
 import * as Fixtures from '../../types/__fixtures__';
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import {
+  SceneTreeAPIClient,
+  ServiceError,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import {
   createGetTreeResponse,
+  mockGrpcUnaryError,
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from './lib/testing';
@@ -40,8 +44,10 @@ import {
   LocateItemResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
+import { grpc } from '@improbable-eng/grpc-web';
+import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
+import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
 
 const random = new Chance();
 
@@ -71,16 +77,17 @@ describe('<vertex-scene-tree />', () => {
   });
   (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
 
+  // Scene tree mocks
+  (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
+  (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
+
   let client!: SceneTreeAPIClient;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Scene tree mocks
     client = new SceneTreeAPIClient('http://example.com');
     (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
-    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
-    (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
   });
 
   describe('initialization', () => {
@@ -192,6 +199,44 @@ describe('<vertex-scene-tree />', () => {
 
       expect(rows[0].textContent).toContain(res.getItemsList()[0].getName());
     });
+
+    it('emits error details if tree is not enabled', async (done) => {
+      mockGetTreeError(client, grpc.Code.FailedPrecondition);
+
+      await loadSceneTree({
+        client,
+        jwt,
+        html: `
+            <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+            <vertex-viewer id="viewer"></vertex-viewer>
+          `,
+        setup: ({ page }) => {
+          page.root?.addEventListener('error', (event: unknown) => {
+            const evt = event as CustomEvent<SceneTreeErrorDetails>;
+            expect(evt.detail.code).toBe(
+              SceneTreeErrorCode.SCENE_TREE_DISABLED
+            );
+            done();
+          });
+        },
+      });
+    });
+
+    it('renders message if load failed', async () => {
+      mockGetTreeError(client, grpc.Code.FailedPrecondition);
+
+      const { page } = await loadSceneTree({
+        client,
+        jwt,
+        html: `
+            <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+            <vertex-viewer id="viewer"></vertex-viewer>
+          `,
+      });
+
+      const errorEl = page.root?.shadowRoot?.querySelector('.error');
+      expect(errorEl).toBeDefined();
+    });
   });
 
   describe(SceneTree.prototype.getRowAtIndex, () => {
@@ -228,10 +273,14 @@ describe('<vertex-scene-tree />', () => {
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
       const pendingEvent = new Promise<MouseEvent>((resolve) => {
-        page.root?.addEventListener('click', (event) => resolve(event));
+        const rowEl = page.root?.shadowRoot?.querySelectorAll('.row')[1];
+        rowEl?.addEventListener('click', (event) =>
+          resolve(event as MouseEvent)
+        );
       });
 
-      page.root?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
+      const rowEl = page.root?.shadowRoot?.querySelectorAll('.row')[1];
+      rowEl?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
 
       const event = await pendingEvent;
       const row = await sceneTree.getRowForEvent(event);
@@ -775,7 +824,12 @@ async function loadSceneTree(data: {
 
   await loadModelForViewer(viewer, data.jwt, 'stream-key');
   await page.waitForChanges();
-  await sceneTree.controller?.getPage(0)?.res;
+
+  try {
+    await sceneTree.controller?.getPage(0)?.res;
+  } catch (e) {
+    // ignore
+  }
   await page.waitForChanges();
 
   return result;
@@ -825,4 +879,15 @@ function mockGetTree({
   const res = createGetTreeResponse(itemCount, totalCount, transform);
   (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
   return res;
+}
+
+function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
+  const error: ServiceError = {
+    code,
+    message: 'Scene tree test error',
+    metadata: new grpc.Metadata({}),
+  };
+  (client.getTree as jest.Mock).mockImplementationOnce(
+    mockGrpcUnaryError(error)
+  );
 }

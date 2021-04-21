@@ -19,6 +19,13 @@
 | `viewerSelector`    | `viewer-selector`    | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                            | `string \| undefined`                                  | `undefined`  |
 
 
+## Events
+
+| Event   | Description | Type                                 |
+| ------- | ----------- | ------------------------------------ |
+| `error` |             | `CustomEvent<SceneTreeErrorDetails>` |
+
+
 ## Methods
 
 ### `collapseAll() => Promise<void>`

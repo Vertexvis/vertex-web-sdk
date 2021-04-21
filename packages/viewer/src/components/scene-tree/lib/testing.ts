@@ -1,6 +1,7 @@
 import { EventDispatcher } from '@vertexvis/utils';
 import type {
   ResponseStream,
+  ServiceError,
   Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
@@ -56,7 +57,9 @@ export function mockGrpcUnaryResult(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mockGrpcUnaryError(error: Error): (...args: any[]) => unknown {
+export function mockGrpcUnaryError(
+  error: Error | ServiceError
+): (...args: any[]) => unknown {
   return (_, __, handler) => {
     setTimeout(() => {
       handler(error);
