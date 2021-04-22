@@ -24,6 +24,7 @@ import { CollectionBinding, generateBindings } from './lib/binding';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
+import { getElementBoundingClientRect } from '../viewer/utils';
 import { Environment } from '../../config/environment';
 import {
   getSceneTreeContainsElement,
@@ -501,7 +502,7 @@ export class SceneTree {
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
     const index = Math.floor(
-      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
+      (clientY - getElementBoundingClientRect(this.el).top + this.scrollTop) /
         this.getComputedOrPlaceholderRowHeight()
     );
     return this.getRowAtIndex(index);
