@@ -28,7 +28,6 @@ import { getElementBoundingClientRect } from '../viewer/utils';
 import { Environment } from '../../config/environment';
 import {
   getSceneTreeContainsElement,
-  getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
   scrollToTop,
 } from './lib/dom';
