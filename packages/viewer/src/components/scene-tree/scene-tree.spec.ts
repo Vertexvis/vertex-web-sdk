@@ -108,7 +108,6 @@ describe('<vertex-scene-tree />', () => {
 
       expect(sceneTree.viewer).toBe(viewer);
       expect(sceneTree.controller).toBeDefined();
-      expect(sceneTree.jwt).toBe(jwt);
       expect(rows?.length).toBeGreaterThan(0);
     });
 
@@ -136,7 +135,6 @@ describe('<vertex-scene-tree />', () => {
         ?.shadowRoot?.querySelectorAll('.row');
 
       expect(sceneTree.controller).toBeDefined();
-      expect(sceneTree.jwt).toBeDefined();
       expect(rows?.length).toBeGreaterThan(0);
     });
 
