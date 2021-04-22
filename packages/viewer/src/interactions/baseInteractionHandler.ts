@@ -55,6 +55,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private twistInteraction: TwistInteraction,
     private getConfig: ConfigProvider
   ) {
+    this.primaryInteraction = this.getConfig().flags.defaultToSpinCenter
+      ? this.rotatePointInteraction
+      : this.rotateInteraction;
+
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);
@@ -197,6 +201,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected beginDrag(event: BaseEvent): void {
+    if (this.keyboardControls && event.metaKey && event.shiftKey) {
+      this.currentInteraction = this.rotatePointInteraction;
+    }
+
     if (event.buttons === 1) {
       this.draggingInteraction =
         this.currentInteraction || this.primaryInteraction;
@@ -217,8 +225,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected drag(event: BaseEvent): void {
     if (this.keyboardControls && event.altKey && event.shiftKey) {
       this.currentInteraction = this.twistInteraction;
-    } else if (this.keyboardControls && event.metaKey && event.shiftKey) {
-      this.currentInteraction = this.rotatePointInteraction;
     } else {
       this.currentInteraction = undefined;
     }

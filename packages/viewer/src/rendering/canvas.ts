@@ -151,6 +151,7 @@ export function createCanvasDepthProvider(
         .getImageData(scaled.x, scaled.y, 1, 1)
         .data.slice(0, 1);
 
+      console.log(data[0] / 255.0);
       return data[0] / 255.0;
     }
     return -1;

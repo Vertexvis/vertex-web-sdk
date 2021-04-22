@@ -1,7 +1,9 @@
 import { google, vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamAttributes as PBStreamAttributes } from '@vertexvis/stream-api';
 
-export type DepthBufferFrameType = 'all' | 'final' | 'transition';
+// TODO: support other frame types
+// Currently only final frames are allowed to prevent performance issues
+export type DepthBufferFrameType = 'final';
 
 interface ViewerStreamAttributes {
   depthBuffers?: {
@@ -19,15 +21,9 @@ export type StreamAttributes = Pick<
 export const toProtoStreamAttributes = (
   attributes: StreamAttributes
 ): PBStreamAttributes => {
-  let pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_INVALID;
+  let pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_ALL;
 
   switch (attributes.depthBuffers?.frameType) {
-    case 'all':
-      pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_ALL;
-      break;
-    case 'transition':
-      pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_TRANSITION;
-      break;
     case 'final':
       pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL;
       break;
