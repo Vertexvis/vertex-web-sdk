@@ -41,6 +41,7 @@ import {
 import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
 import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
+import { getElementBoundingClientRect } from '../viewer/utils';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -503,7 +504,7 @@ export class SceneTree {
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
     const index = Math.floor(
-      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
+      (clientY - getElementBoundingClientRect(this.el).top + this.scrollTop) /
         this.getComputedOrPlaceholderRowHeight()
     );
     return this.getRowAtIndex(index);
