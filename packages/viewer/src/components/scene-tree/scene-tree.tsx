@@ -476,12 +476,10 @@ export class SceneTree {
   @Method()
   public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
     const { clientY, currentTarget } = event;
-    const rowsEl = this.el.shadowRoot?.querySelector('.rows');
     if (
       currentTarget != null &&
-      rowsEl != null &&
-      // TODO(dan): this is causing a bug in scene studio
-      getSceneTreeContainsElement(rowsEl, currentTarget as HTMLElement)
+      this.connectionError == null &&
+      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -751,6 +749,7 @@ export class SceneTree {
         await controller.fetchPage(0);
         this.stateMap.subscribeDisposable = controller.subscribe();
         this.stateMap.connected = true;
+        this.connectionError = undefined;
       } catch (e) {
         if (isGrpcServiceError(e)) {
           this.handleConnectionError(e);
