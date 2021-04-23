@@ -208,23 +208,12 @@ export class InteractionApi {
     point: Point.Point
   ): Promise<void> {
     return this.transformCamera((camera, viewport, scale) => {
-      const scaledPoint = Point.scale(point, scale?.x || 1, scale?.y || 1);
-      this.worldRotationPoint =
-        this.worldRotationPoint ||
-        computeWorldPosition(
-          inverseProjectionMatrix(
-            camera.near,
-            camera.far,
-            camera.fovY,
-            camera.aspectRatio
-          ),
-          inverseViewMatrix(camera),
-          viewport,
-          scaledPoint,
-          this.getDepth(point),
-          camera.near,
-          camera.far
-        );
+      this.worldRotationPoint = this.getWorldRotationPoint(
+        camera,
+        viewport,
+        Point.scale(point, scale?.x || 1, scale?.y || 1),
+        this.getDepth(point)
+      );
 
       if (this.worldRotationPoint != null) {
         const upVector = Vector3.normalize(camera.up);
@@ -343,5 +332,34 @@ export class InteractionApi {
 
   private isCoarseInputDevice(isTouch?: boolean): boolean {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
+  }
+
+  private getWorldRotationPoint(
+    camera: Camera,
+    viewport: Dimensions.Dimensions,
+    scaledPoint: Point.Point,
+    depth: number
+  ): Vector3.Vector3 {
+    if (this.worldRotationPoint != null) {
+      return this.worldRotationPoint;
+    } else if (depth === 0 || depth === 1 || depth === -1) {
+      // In the case that the depth is at near, at far, or undefined, use lookAt
+      return camera.lookAt;
+    } else {
+      return computeWorldPosition(
+        inverseProjectionMatrix(
+          camera.near,
+          camera.far,
+          camera.fovY,
+          camera.aspectRatio
+        ),
+        inverseViewMatrix(camera),
+        viewport,
+        scaledPoint,
+        depth,
+        camera.near,
+        camera.far
+      );
+    }
   }
 }
