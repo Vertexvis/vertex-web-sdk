@@ -3,13 +3,15 @@
 ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)
 ![npm (scoped with tag)](https://img.shields.io/npm/v/@vertexvis/viewer-react/canary)
 
-Project contains React bindings for Vertex's Viewer SDK. These bindings are
+This project contains React bindings for Vertex's Viewer SDK. These bindings are
 auto-generated from `@vertexvis/viewer`.
 
-## Usage
+## Installation
 
 Run `yarn add @vertexvis/viewer-react` or `npm install @vertexvis/viewer-react`
 to add the project as an NPM dependency.
+
+## Usage
 
 The project includes a component loader, `defineCustomElements`, that needs to
 be invoked in order for the elements to be loaded and rendered.
@@ -58,9 +60,32 @@ export function App() {
 }
 ```
 
+## Styles
+
+The project includes a set of [global styles] that you should bundle as part of
+your application. These styles define [CSS variables] that specify the default
+component colors. You can override these variables to match your application's
+branding.
+
+If you're using a bundler like Webpack, import these styles from one of your JS
+files.
+
+```jsx
+import '@vertexvis/viewer/dist/viewer/viewer.css';
+
+export function MyApp() {
+  return <div></div>;
+}
+```
+
+Consult your bundler's documentation on approaches and best practices for
+bundling CSS.
+
 ## Documentation
 
 See [@vertexvis/viewer][component docs] for a full list of components and their
 documentation.
 
 [component docs]: https://github.com/Vertexvis/vertex-web-sdk/tree/master/packages/viewer/src/components
+[css variables]: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
+[global styles]: https://github.com/Vertexvis/vertex-web-sdk/blob/master/packages/viewer/src/css/global.css

@@ -27,7 +27,6 @@ import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
 import {
   getSceneTreeContainsElement,
-  getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
   scrollToTop,
 } from './lib/dom';
@@ -41,6 +40,7 @@ import {
 import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
 import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
+import { getElementBoundingClientRect } from '../viewer/utils';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -61,6 +61,8 @@ interface StateMap {
   subscribeDisposable?: Disposable;
   client?: SceneTreeAPIClient;
   controller?: SceneTreeController;
+  componentLoaded: boolean;
+  jwt?: string;
 }
 
 type OperationHandler = (data: {
@@ -153,13 +155,6 @@ export class SceneTree {
   public configEnv: Environment = 'platprod';
 
   /**
-   * A JWT token to make authenticated API calls. This is normally automatically
-   * assigned from the viewer, and shouldn't be assigned manually.
-   */
-  @Prop({ reflect: true, mutable: true })
-  public jwt: string | undefined;
-
-  /**
    * Disables the default selection behavior of the tree. Can be used to
    * implement custom selection behavior via the trees selection methods.
    *
@@ -210,6 +205,7 @@ export class SceneTree {
   private stateMap: StateMap = {
     bindings: new Map(),
     connected: false,
+    componentLoaded: false,
   };
 
   @State()
@@ -244,7 +240,7 @@ export class SceneTree {
   public set controller(value: SceneTreeController | undefined) {
     if (this.controller !== value) {
       if (this.controller != null) {
-        this.cleanupController();
+        this.disconnectController();
       }
 
       this.stateMap.controller = value;
@@ -480,11 +476,10 @@ export class SceneTree {
   @Method()
   public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
     const { clientY, currentTarget } = event;
-    const rowsEl = this.el.shadowRoot?.querySelector('.rows');
     if (
       currentTarget != null &&
-      rowsEl != null &&
-      getSceneTreeContainsElement(rowsEl, currentTarget as HTMLElement)
+      this.connectionError == null &&
+      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -500,22 +495,43 @@ export class SceneTree {
    */
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
+    const { top } = getElementBoundingClientRect(this.el);
     const index = Math.floor(
-      (clientY - getSceneTreeOffsetTop(this.el) + this.scrollTop) /
+      (clientY - top + this.scrollTop) /
         this.getComputedOrPlaceholderRowHeight()
     );
     return this.getRowAtIndex(index);
   }
 
+  protected connectedCallback(): void {
+    console.debug('Scene tree added to DOM');
+  }
+
+  protected disconnectedCallback(): void {
+    console.debug('Scene tree removed from DOM');
+
+    if (this.viewer != null) {
+      this.disconnectViewer(this.viewer);
+    }
+
+    if (this.controller != null) {
+      this.controller = undefined;
+    }
+  }
+
   protected componentWillLoad(): void {
+    const { sceneTreeHost } = this.getConfig().network;
+    this.client = new SceneTreeAPIClient(sceneTreeHost);
+
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
         | undefined;
     }
 
-    const { sceneTreeHost } = this.getConfig().network;
-    this.stateMap.client = new SceneTreeAPIClient(sceneTreeHost);
+    if (this.viewer != null) {
+      this.connectViewer(this.viewer);
+    }
   }
 
   protected async componentDidLoad(): Promise<void> {
@@ -534,6 +550,8 @@ export class SceneTree {
       this.viewportHeight = getSceneTreeViewportHeight(this.el);
       this.updateRenderState();
     });
+
+    this.stateMap.componentLoaded = true;
   }
 
   protected componentWillRender(): void {
@@ -665,35 +683,21 @@ export class SceneTree {
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
+    // StencilJS will invoke this callback even before the component has been
+    // loaded. According to their docs, this shouldn't happen. Return if the
+    // component hasn't been loaded.
+    // See https://stenciljs.com/docs/reactive-data#watch-decorator
+    if (!this.stateMap.componentLoaded) {
+      return;
+    }
+
     if (oldViewer != null) {
       this.controller = undefined;
-
-      oldViewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
-      oldViewer.removeEventListener(
-        'connectionChange',
-        this.handleViewerConnectionStatusChange
-      );
+      this.disconnectViewer(oldViewer);
     }
 
     if (newViewer != null) {
-      newViewer.addEventListener('sceneReady', this.handleViewerSceneReady);
-      newViewer.addEventListener(
-        'connectionChange',
-        this.handleViewerConnectionStatusChange
-      );
-
-      const isSceneReady = await newViewer.isSceneReady();
-      if (isSceneReady) {
-        this.jwt = await newViewer.getJwt();
-        this.createController();
-      }
-    }
-  }
-
-  @Watch('jwt')
-  protected handleJwtChanged(): void {
-    if (this.controller != null) {
-      this.connectController(this.controller);
+      this.connectViewer(newViewer);
     }
   }
 
@@ -713,16 +717,18 @@ export class SceneTree {
   };
 
   private async createController(): Promise<void> {
-    this.controller = new SceneTreeController(this.client, 100, () => {
-      if (this.jwt != null) {
-        return this.jwt;
-      } else {
-        throw new Error('Cannot update subscription. JWT is null.');
-      }
-    });
+    if (this.controller == null) {
+      this.controller = new SceneTreeController(this.client, 100, () => {
+        if (this.stateMap.jwt != null) {
+          return this.stateMap.jwt;
+        } else {
+          throw new Error('Cannot update subscription. JWT is null.');
+        }
+      });
+    }
   }
 
-  private cleanupController(): void {
+  private disconnectController(): void {
     this.stateMap.onStateChangeDisposable?.dispose();
     this.stateMap.subscribeDisposable?.dispose();
     this.stateMap.connected = false;
@@ -731,7 +737,7 @@ export class SceneTree {
   private async connectController(
     controller: SceneTreeController
   ): Promise<void> {
-    if (this.jwt != null && !this.stateMap.connected) {
+    if (this.stateMap.jwt != null && !this.stateMap.connected) {
       this.stateMap.onStateChangeDisposable = controller.onStateChange.on(
         (state) => {
           this.handleControllerStateChange(state);
@@ -743,6 +749,7 @@ export class SceneTree {
         await controller.fetchPage(0);
         this.stateMap.subscribeDisposable = controller.subscribe();
         this.stateMap.connected = true;
+        this.connectionError = undefined;
       } catch (e) {
         if (isGrpcServiceError(e)) {
           this.handleConnectionError(e);
@@ -764,6 +771,31 @@ export class SceneTree {
     }
 
     this.error.emit(this.connectionError);
+  }
+
+  private async connectViewer(viewer: HTMLVertexViewerElement): Promise<void> {
+    viewer.addEventListener('sceneReady', this.handleViewerSceneReady);
+    viewer.addEventListener(
+      'connectionChange',
+      this.handleViewerConnectionStatusChange
+    );
+
+    const isSceneReady = await viewer.isSceneReady();
+    if (isSceneReady) {
+      const jwt = await viewer.getJwt();
+      if (jwt != null) {
+        this.updateJwt(jwt);
+      }
+      this.createController();
+    }
+  }
+
+  private disconnectViewer(viewer: HTMLVertexViewerElement): void {
+    viewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
+    viewer.removeEventListener(
+      'connectionChange',
+      this.handleViewerConnectionStatusChange
+    );
   }
 
   private scheduleClearUnusedData(): void {
@@ -796,9 +828,19 @@ export class SceneTree {
     const { detail } = event as CustomEvent<ConnectionStatus>;
     if (detail.status === 'connected') {
       console.debug('Scene tree received new token');
-      this.jwt = detail.jwt;
+      this.updateJwt(detail.jwt);
     }
   };
+
+  private updateJwt(jwt: string): void {
+    if (this.stateMap.jwt !== jwt) {
+      this.stateMap.jwt = jwt;
+
+      if (this.controller != null) {
+        this.connectController(this.controller);
+      }
+    }
+  }
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;

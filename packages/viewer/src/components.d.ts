@@ -99,10 +99,6 @@ export namespace Components {
      */
     invalidateRows: () => Promise<void>;
     /**
-     * A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.
-     */
-    jwt: string | undefined;
-    /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
     overScanCount: number;
@@ -411,10 +407,6 @@ declare namespace LocalJSX {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
     configEnv?: Environment;
-    /**
-     * A JWT token to make authenticated API calls. This is normally automatically assigned from the viewer, and shouldn't be assigned manually.
-     */
-    jwt?: string | undefined;
     onError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
