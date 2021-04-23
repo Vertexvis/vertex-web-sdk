@@ -1,12 +1,4 @@
-import {
-  BoundingBox,
-  Dimensions,
-  Matrix4,
-  Point,
-  Vector3,
-} from '@vertexvis/geometry';
-import { StreamApi } from '@vertexvis/stream-api';
-import { Camera } from '../../scenes';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import {
   computeNormalizedDeviceCoordinates,
   computeWorldPosition,
@@ -14,7 +6,6 @@ import {
 import {
   inverseProjectionMatrix,
   inverseViewMatrix,
-  viewMatrix,
 } from '../../rendering/matrices';
 
 describe(computeNormalizedDeviceCoordinates, () => {
@@ -70,66 +61,19 @@ describe(computeNormalizedDeviceCoordinates, () => {
 });
 
 describe(computeWorldPosition, () => {
-  const near = 1;
-  const far = 50;
+  const near = 5;
+  const far = 15;
   const viewport = Dimensions.create(100, 100);
   const inverseProjection = inverseProjectionMatrix(near, far, 45, 1);
-  const inverseView = Matrix4.inverse(
-    viewMatrix({
-      position: { x: 0, y: 0, z: 1 },
-      lookAt: { x: 0, y: 0, z: 0 },
-      up: { x: 0, y: 1, z: 0 },
-    })
-  );
-  const point = Point.create(50, 50);
-  const depth1 = 0;
-  const depth2 = 1;
-  // (depthBufferDepth * (far - near) + near) / far
-  // [0, 1] [camera.position, far]
-
-  const d1 = 0.5 * 2 - 1;
-  const depth3 = (2.0 * near * far) / (far + near - d1 * (far - near));
-
-  const depth4 = Matrix4.multiplyVector3(inverseProjection, {
-    x: 0,
-    y: 0,
-    z: 0.5,
+  const inverseView = inverseViewMatrix({
+    position: { x: 0, y: 0, z: 5 },
+    lookAt: { x: 0, y: 0, z: 0 },
+    up: { x: 0, y: 1, z: 0 },
   });
-  const depth5 = Vector3.scale(1 / depth4.w, depth4);
+  const point = Point.create(50, 50);
 
-  console.log(depth5);
-
-  it('should return correct world position', () => {
-    console.log(inverseProjection);
-    console.log(inverseView);
-
-    // expect(
-    //   computeWorldPosition(
-    //     inverseProjection,
-    //     inverseView,
-    //     viewport,
-    //     point,
-    //     depth1
-    //   )
-    // ).toMatchObject({
-    //   x: 0,
-    //   y: 0,
-    //   z: 0,
-    // });
-
-    // expect(
-    //   computeWorldPosition(
-    //     inverseProjection,
-    //     inverseView,
-    //     viewport,
-    //     point,
-    //     depth2
-    //   )
-    // ).toMatchObject({
-    //   x: 0,
-    //   y: 0,
-    //   z: -1,
-    // });
+  it('should return correct world position for near-plane depth', () => {
+    const depth = 0;
 
     expect(
       computeWorldPosition(
@@ -137,8 +81,42 @@ describe(computeWorldPosition, () => {
         inverseView,
         viewport,
         point,
-        d1
+        depth,
+        near,
+        far
       ).z
-    ).toBeCloseTo(-1);
+    ).toBe(0);
+  });
+
+  it('should return correct world position for far-plane depth', () => {
+    const depth = 1;
+
+    expect(
+      computeWorldPosition(
+        inverseProjection,
+        inverseView,
+        viewport,
+        point,
+        depth,
+        near,
+        far
+      ).z
+    ).toBe(-10);
+  });
+
+  it('should return correct world position for depths in-between near and far', () => {
+    const depth = 0.5;
+
+    expect(
+      computeWorldPosition(
+        inverseProjection,
+        inverseView,
+        viewport,
+        point,
+        depth,
+        near,
+        far
+      ).z
+    ).toBe(-5);
   });
 });

@@ -7,7 +7,7 @@ export type DepthBufferFrameType = 'final';
 
 interface ViewerStreamAttributes {
   depthBuffers?: {
-    enabled: google.protobuf.BoolValue;
+    enabled: google.protobuf.IBoolValue;
     frameType: DepthBufferFrameType;
   };
 }
@@ -21,7 +21,7 @@ export type StreamAttributes = Pick<
 export const toProtoStreamAttributes = (
   attributes: StreamAttributes
 ): PBStreamAttributes => {
-  let pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_ALL;
+  let pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_INVALID;
 
   switch (attributes.depthBuffers?.frameType) {
     case 'final':

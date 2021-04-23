@@ -15,8 +15,6 @@ import { computeWorldPosition } from '../rendering/coordinates';
 import {
   inverseProjectionMatrix,
   inverseViewMatrix,
-  projectionMatrix,
-  viewMatrix,
 } from '../rendering/matrices';
 
 type SceneProvider = () => Scene;
@@ -25,7 +23,8 @@ type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (
   camera: Camera,
-  viewport: Dimensions.Dimensions
+  viewport: Dimensions.Dimensions,
+  scale: Point.Point
 ) => Camera;
 
 /**
@@ -105,7 +104,7 @@ export class InteractionApi {
       const scene = this.getScene();
       this.currentCamera =
         this.currentCamera != null
-          ? t(this.currentCamera, scene.viewport())
+          ? t(this.currentCamera, scene.viewport(), scene.scale())
           : undefined;
 
       await this.currentCamera?.render();
@@ -214,71 +213,8 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
-      const ndcDepth = this.getDepth(point) * 2 - 1;
-      console.log(this.getDepth(point));
-      // (2.0 * near * far) / (far + near - ndc * (far - near));
-      // (2.0 * near * far) / (far + near - d1 * (far - near)) / far;
-      // const linear =
-      //   (2.0 * camera.near * camera.far) /
-      //   (camera.far + camera.near - ndcDepth * (camera.far - camera.near));
-      const linear =
-        (2 * camera.near) /
-        (ndcDepth * (camera.far - camera.near) - camera.far);
-      // console.log('linear', linear);
-      // const nonlinear =
-      //   (camera.far + camera.near - (2.0 * camera.near * camera.far) / linear) /
-      //   (camera.far - camera.near);
-      const depth = linear;
-
-      const zEye =
-        (2.0 * camera.near * camera.far) /
-        (camera.far + camera.near - this.getDepth(point) * (camera.far - camera.near));
-
-      console.log(-zEye);
-
-      const d1 = Matrix4.multiplyVector3(
-        inverseProjectionMatrix(
-          // camera.near,
-          0.1,
-          camera.far,
-          camera.fovY,
-          camera.aspectRatio
-        ),
-        {
-          x: 0,
-          y: 0,
-          z: this.getDepth(point) * (camera.far - camera.near) + camera.near,
-        }
-      );
-
-      // console.log(
-      //   Matrix4.multiplyVector3(
-      //     inverseViewMatrix(camera),
-      //     Vector3.scale(1 / d1.w, d1)
-      //   )
-      // );
-
-      const p1 = {
-        x: -0.4227161705493927,
-        y: 0.42538318037986755,
-        z: -0.5000001788139343,
-      };
-      const p2 = Matrix4.multiplyVector3(viewMatrix(camera), p1);
-      const p3 = Matrix4.multiplyVector4(
-        projectionMatrix(
-          camera.near,
-          camera.far,
-          camera.fovY,
-          camera.aspectRatio
-        ),
-        p2
-      );
-      console.log(Vector3.scale(1 / p3.w, p3));
-
-      console.log('depth', depth);
-      // console.log('d1', d1);
-
+    return this.transformCamera((camera, viewport, scale) => {
+      const scaledPoint = Point.scale(point, scale?.x || 1, scale?.y || 1);
       this.worldRotationPoint =
         this.worldRotationPoint ||
         computeWorldPosition(
@@ -290,9 +226,10 @@ export class InteractionApi {
           ),
           inverseViewMatrix(camera),
           viewport,
-          point,
-          // this.getDepth(point)
-          ndcDepth
+          scaledPoint,
+          this.getDepth(point),
+          camera.near,
+          camera.far
         );
 
       if (this.worldRotationPoint != null) {

@@ -108,7 +108,7 @@ export class Camera implements FrameCamera.FrameCamera {
         Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
       );
 
-    // height (of scene?) over diameter
+    // ratio of the height of the frustum to the distance along the view vector
     let hOverD = Math.tan(this.fovY * PI_OVER_360);
 
     if (this.aspectRatio < 1.0) {

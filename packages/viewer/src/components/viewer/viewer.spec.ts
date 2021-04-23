@@ -239,7 +239,7 @@ describe('vertex-viewer', () => {
 
       expect(api.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: updatedAttributes,
+          streamAttributes: expect.objectContaining(updatedAttributes),
         })
       );
     });
@@ -254,7 +254,7 @@ describe('vertex-viewer', () => {
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: attributes,
+          streamAttributes: expect.objectContaining(attributes),
         })
       );
     });
@@ -271,7 +271,7 @@ describe('vertex-viewer', () => {
 
       expect(api.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: attributes,
+          streamAttributes: expect.objectContaining(attributes),
         })
       );
     });

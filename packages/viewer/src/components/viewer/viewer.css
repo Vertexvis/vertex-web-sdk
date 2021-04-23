@@ -49,5 +49,5 @@
 .depth-buffer-canvas {
   position: absolute;
   pointer-events: none;
-  /* visibility: hidden; */
+  visibility: hidden;
 }

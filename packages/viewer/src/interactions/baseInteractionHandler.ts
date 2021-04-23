@@ -123,7 +123,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public setPrimaryInteractionType(type: InteractionType): void {
     switch (type) {
       case 'rotate':
-        this.primaryInteraction = this.rotatePointInteraction;
+        this.primaryInteraction = this.rotateInteraction;
         break;
       case 'zoom':
         this.primaryInteraction = this.zoomInteraction;

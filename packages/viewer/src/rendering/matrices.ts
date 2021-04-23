@@ -41,7 +41,7 @@ export function inverseProjectionMatrix(
   fovY: number,
   aspect: number
 ): Matrix4.Matrix4 {
-  const ymax = near * Math.tan(Angle.toRadians(fovY)/ 2.0);
+  const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
   const xmax = ymax * aspect;
 
   const left = -xmax;

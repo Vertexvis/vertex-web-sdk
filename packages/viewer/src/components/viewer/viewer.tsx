@@ -281,7 +281,6 @@ export class Viewer {
     this.setupStreamListeners();
 
     this.depthProvider = createCanvasDepthProvider(
-      () => this.getImageScale(),
       this.depthBufferCanvasElement?.getContext('2d')
     );
     this.interactionApi = this.createInteractionApi();

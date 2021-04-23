@@ -140,18 +140,12 @@ export function createCanvasRenderer(): CanvasRenderer {
 }
 
 export function createCanvasDepthProvider(
-  imageScaleProvider: ImageScaleProvider,
   canvas?: CanvasRenderingContext2D | null
 ): CanvasDepthProvider {
   return (point) => {
     if (canvas != null) {
-      const scale = imageScaleProvider();
-      const scaled = Point.scale(point, scale?.x || 1, scale?.y || 1);
-      const data = canvas
-        .getImageData(scaled.x, scaled.y, 1, 1)
-        .data.slice(0, 1);
+      const data = canvas.getImageData(point.x, point.y, 1, 1).data.slice(0, 1);
 
-      console.log(data[0] / 255.0);
       return data[0] / 255.0;
     }
     return -1;

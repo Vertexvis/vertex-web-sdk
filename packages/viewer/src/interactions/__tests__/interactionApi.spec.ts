@@ -6,6 +6,7 @@ import { InteractionApi } from '../interactionApi';
 import { frame } from '../../types/__fixtures__';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Interactions } from '../../types';
+import { ColorMaterial } from '../..';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
@@ -17,9 +18,11 @@ describe(InteractionApi, () => {
     streamApi,
     frame,
     () => Point.create(1, 1),
-    sceneViewId
+    sceneViewId,
+    ColorMaterial.fromHex('#ffffff')
   );
   const sceneProvider = (): Scene => scene;
+  const depthProvider = (): number => 1;
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
 
@@ -33,6 +36,7 @@ describe(InteractionApi, () => {
       streamApi,
       interactionConfigProvider,
       sceneProvider,
+      depthProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
       { emit: emitLongPress }
@@ -93,6 +97,20 @@ describe(InteractionApi, () => {
     });
   });
 
+  describe(InteractionApi.prototype.rotateCameraAtPoint, () => {
+    it('replaces the camera if interacting', () => {
+      api.beginInteraction();
+      api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
+      api.endInteraction();
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if not interacting', () => {
+      api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
+    });
+  });
+
   describe(InteractionApi.prototype.zoomCamera, () => {
     it('replaces the camera if interacting', () => {
       api.beginInteraction();
@@ -127,6 +145,7 @@ describe(InteractionApi, () => {
         streamApi,
         interactionConfigProvider,
         sceneProvider,
+        depthProvider,
         {
           emit: emitTap,
         },

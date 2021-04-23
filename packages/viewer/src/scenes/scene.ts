@@ -282,6 +282,13 @@ export class Scene {
   }
 
   /**
+   * The current x and y scale of the rendered image.
+   */
+  public scale(): Point.Point {
+    return this.imageScaleProvider() || Point.create(1, 1);
+  }
+
+  /**
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
