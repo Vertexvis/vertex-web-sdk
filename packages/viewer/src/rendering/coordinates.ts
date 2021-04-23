@@ -1,10 +1,4 @@
-import {
-  Angle,
-  Dimensions,
-  Matrix4,
-  Point,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 export function computeWorldPosition(
   inverseProjection: Matrix4.Matrix4,

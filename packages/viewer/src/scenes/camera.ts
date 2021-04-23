@@ -1,5 +1,5 @@
 import { Animation, FlyTo, FrameCamera } from '../types';
-import { Vector3, BoundingBox, Matrix4, Angle } from '@vertexvis/geometry';
+import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';

@@ -75,7 +75,11 @@ describe(Camera, () => {
       const degrees = Angle.toRadians(90);
       const axis = Vector3.up();
 
-      const result = camera.rotateAroundAxisAtPoint(degrees, Vector3.origin(), axis);
+      const result = camera.rotateAroundAxisAtPoint(
+        degrees,
+        Vector3.origin(),
+        axis
+      );
       expect(result.position.x).toBeCloseTo(1, 5);
       expect(result.position.y).toBeCloseTo(0, 5);
       expect(result.position.z).toBeCloseTo(0, 5);

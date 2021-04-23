@@ -1,10 +1,4 @@
-import {
-  Angle,
-  Dimensions,
-  Matrix4,
-  Point,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
