@@ -348,8 +348,8 @@ export class InteractionApi {
     } else {
       return computeWorldPosition(
         inverseProjectionMatrix(
-          camera.near,
-          camera.far,
+          camera.nearFitAll,
+          camera.farFitAll,
           camera.fovY,
           camera.aspectRatio
         ),
@@ -358,7 +358,13 @@ export class InteractionApi {
         scaledPoint,
         depth,
         camera.near,
-        camera.far
+        camera.far,
+        camera.distanceToBoundingBoxCenter(camera) /
+          camera.distanceToBoundingBoxCenter({
+            position: camera.positionFitAll,
+            lookAt: camera.lookAtFitAll,
+            up: camera.upFitAll,
+          })
       );
     }
   }

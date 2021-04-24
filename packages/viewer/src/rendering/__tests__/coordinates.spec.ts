@@ -19,7 +19,7 @@ describe(computeNormalizedDeviceCoordinates, () => {
 
   it('returns correct NDC values', () => {
     expect(
-      computeNormalizedDeviceCoordinates(viewport, point1, depth1)
+      computeNormalizedDeviceCoordinates(viewport, point1, 1, depth1)
     ).toMatchObject({
       x: 0,
       y: 0,
@@ -27,7 +27,7 @@ describe(computeNormalizedDeviceCoordinates, () => {
     });
 
     expect(
-      computeNormalizedDeviceCoordinates(viewport, point2, depth1)
+      computeNormalizedDeviceCoordinates(viewport, point2, 1, depth1)
     ).toMatchObject({
       x: -1,
       y: 1,
@@ -35,7 +35,7 @@ describe(computeNormalizedDeviceCoordinates, () => {
     });
 
     expect(
-      computeNormalizedDeviceCoordinates(viewport, point3, depth1)
+      computeNormalizedDeviceCoordinates(viewport, point3, 1, depth1)
     ).toMatchObject({
       x: 1,
       y: -1,
@@ -43,7 +43,7 @@ describe(computeNormalizedDeviceCoordinates, () => {
     });
 
     expect(
-      computeNormalizedDeviceCoordinates(viewport, point1, depth2)
+      computeNormalizedDeviceCoordinates(viewport, point1, 1, depth2)
     ).toMatchObject({
       x: 0,
       y: 0,
@@ -51,7 +51,7 @@ describe(computeNormalizedDeviceCoordinates, () => {
     });
 
     expect(
-      computeNormalizedDeviceCoordinates(viewport, point1, depth3)
+      computeNormalizedDeviceCoordinates(viewport, point1, 1, depth3)
     ).toMatchObject({
       x: 0,
       y: 0,
@@ -83,7 +83,8 @@ describe(computeWorldPosition, () => {
         point,
         depth,
         near,
-        far
+        far,
+        1
       ).z
     ).toBe(0);
   });
@@ -99,7 +100,8 @@ describe(computeWorldPosition, () => {
         point,
         depth,
         near,
-        far
+        far,
+        1
       ).z
     ).toBe(-10);
   });
@@ -115,7 +117,8 @@ describe(computeWorldPosition, () => {
         point,
         depth,
         near,
-        far
+        far,
+        1
       ).z
     ).toBe(-5);
   });

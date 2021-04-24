@@ -12,6 +12,11 @@ interface CameraRenderOptions {
   animation?: Animation.Animation;
 }
 
+interface ClippingPlanes {
+  near: number;
+  far: number;
+}
+
 export class TerminalFlyToExecutor {
   public constructor(private flyToOptions?: FlyTo.FlyToOptions) {}
 
@@ -85,8 +90,6 @@ export interface FlyToParams {
  */
 export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
-  private cameraNear = 0;
-  private cameraFar = 0;
 
   public constructor(
     private stream: StreamApi,
@@ -102,26 +105,33 @@ export class Camera implements FrameCamera.FrameCamera {
    * @param boundingBox The bounding box to position to.
    */
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    const radius =
-      1.1 *
-      Vector3.magnitude(
-        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
-      );
+    return this.update(this.positionAtBoundingBox(boundingBox));
+  }
 
-    // ratio of the height of the frustum to the distance along the view vector
-    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+  /**
+   * Returns the distance from the provided camera's position to the center
+   * of the provided bounding box (or the scene's visible bounding box if not provided).
+   *
+   * @param camera - The camera to use.
+   * @param boundingBox - The bounding box to determine distance from.
+   */
+  public distanceToBoundingBoxCenter(
+    camera: FrameCamera.FrameCamera,
+    boundingBox?: BoundingBox.BoundingBox
+  ): number {
+    const box = boundingBox || this.boundingBox;
+    const boundingBoxCenter = BoundingBox.center(box);
+    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
 
-    if (this.aspectRatio < 1.0) {
-      hOverD *= this.aspectRatio;
-    }
+    const distanceToCenterAlongViewVec =
+      Math.abs(
+        Vector3.dot(
+          Vector3.subtract(camera.lookAt, camera.position),
+          cameraToCenter
+        )
+      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
 
-    const distance = Math.abs(radius / hOverD);
-    const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
-
-    const lookAt = BoundingBox.center(boundingBox);
-    const position = Vector3.subtract(lookAt, vvec);
-
-    return this.update({ lookAt, position });
+    return distanceToCenterAlongViewVec;
   }
 
   /**
@@ -291,29 +301,63 @@ export class Camera implements FrameCamera.FrameCamera {
     }
   }
 
-  private computeClippingPlanes(): void {
+  private computeClippingPlanes(
+    camera: FrameCamera.FrameCamera
+  ): ClippingPlanes {
     const boundingBoxCenter = BoundingBox.center(this.boundingBox);
-    const cameraToCenter = Vector3.subtract(this.position, boundingBoxCenter);
+    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
     const centerToBoundingPlane = Vector3.subtract(
       this.boundingBox.max,
       boundingBoxCenter
     );
     const distanceToCenterAlongViewVec =
-      Math.abs(Vector3.dot(this.viewVector(), cameraToCenter)) /
-      Vector3.magnitude(this.viewVector());
+      Math.abs(
+        Vector3.dot(
+          Vector3.subtract(camera.lookAt, camera.position),
+          cameraToCenter
+        )
+      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
     const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
-    this.cameraFar = distanceToCenterAlongViewVec + radius;
-    this.cameraNear = this.cameraFar * 0.01;
+    let far = distanceToCenterAlongViewVec + radius;
+    let near = far * 0.01;
 
-    if (this.cameraNear > distanceToCenterAlongViewVec - radius) {
-      if (this.cameraNear > 1000) {
-        const difference = this.cameraNear - 1000;
-        this.cameraNear = 1000;
-        this.cameraFar -= difference;
+    if (near > distanceToCenterAlongViewVec - radius) {
+      if (near > 1000) {
+        const difference = near - 1000;
+        near = 1000;
+        far -= difference;
+      } else {
       }
     } else {
-      this.cameraNear = distanceToCenterAlongViewVec - radius;
+      near = distanceToCenterAlongViewVec - radius;
     }
+
+    return { far, near };
+  }
+
+  private positionAtBoundingBox(
+    boundingBox: BoundingBox.BoundingBox
+  ): FrameCamera.FrameCamera {
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
+      );
+
+    // ratio of the height of the frustum to the distance along the view vector
+    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+
+    if (this.aspectRatio < 1.0) {
+      hOverD *= this.aspectRatio;
+    }
+
+    const distance = Math.abs(radius / hOverD);
+    const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
+
+    const lookAt = BoundingBox.center(boundingBox);
+    const position = Vector3.subtract(lookAt, vvec);
+
+    return { lookAt, position, up: this.up };
   }
 
   /**
@@ -332,6 +376,14 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
+   * The position vector for the camera when fit to the visible bounding box,
+   * in world space coordinates.
+   */
+  public get positionFitAll(): Vector3.Vector3 {
+    return { ...this.fitToBoundingBox(this.boundingBox).position };
+  }
+
+  /**
    * A normalized vector representing the up direction.
    */
   public get up(): Vector3.Vector3 {
@@ -339,10 +391,26 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
+   * The up (see `camera.up`) vector for the camera when fit to the visible bounding box,
+   * in world space coordinates.
+   */
+  public get upFitAll(): Vector3.Vector3 {
+    return { ...this.fitToBoundingBox(this.boundingBox).up };
+  }
+
+  /**
    * A vector, in world space coordinates, of where the camera is pointed at.
    */
   public get lookAt(): Vector3.Vector3 {
     return { ...this.data.lookAt };
+  }
+
+  /**
+   * The lookAt (see `camera.lookAt`) vector for the camera when fit to the visible bounding box,
+   * in world space coordinates.
+   */
+  public get lookAtFitAll(): Vector3.Vector3 {
+    return { ...this.fitToBoundingBox(this.boundingBox).lookAt };
   }
 
   /**
@@ -363,17 +431,39 @@ export class Camera implements FrameCamera.FrameCamera {
    * The camera's near clipping plane.
    */
   public get near(): number {
-    this.computeClippingPlanes();
+    const { near } = this.computeClippingPlanes(this.data);
 
-    return this.cameraNear;
+    return near;
+  }
+
+  /**
+   * The camera's near clipping plane when fit to the visible
+   * bounding box.
+   */
+  public get nearFitAll(): number {
+    const { near } = this.computeClippingPlanes(
+      this.positionAtBoundingBox(this.boundingBox)
+    );
+    return near;
   }
 
   /**
    * The camera's far clipping plane.
    */
   public get far(): number {
-    this.computeClippingPlanes();
+    const { far } = this.computeClippingPlanes(this.data);
 
-    return this.cameraFar;
+    return far;
+  }
+
+  /**
+   * The camera's far clipping plane when fit to the visible
+   * bounding box.
+   */
+  public get farFitAll(): number {
+    const { far } = this.computeClippingPlanes(
+      this.positionAtBoundingBox(this.boundingBox)
+    );
+    return far;
   }
 }

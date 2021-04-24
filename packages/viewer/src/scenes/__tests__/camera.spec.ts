@@ -38,6 +38,17 @@ describe(Camera, () => {
     });
   });
 
+  describe(Camera.prototype.distanceToBoundingBoxCenter, () => {
+    const forward = FrameCamera.create({ position: { x: 0, y: 0, z: 5 } });
+    const camera = new Camera(stream, 0.5, forward, boundingBox);
+
+    it('computes the distance to the center of the provided bounding box', () => {
+      const distance = camera.distanceToBoundingBoxCenter(camera, boundingBox);
+
+      expect(distance).toBeCloseTo(5);
+    });
+  });
+
   describe(Camera.prototype.rotateAroundAxis, () => {
     const camera = new Camera(
       stream,
