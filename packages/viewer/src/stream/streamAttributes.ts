@@ -5,21 +5,21 @@ import { StreamAttributes as PBStreamAttributes } from '@vertexvis/stream-api';
 // Currently only final frames are allowed to prevent performance issues
 export type DepthBufferFrameType = 'final';
 
-interface ViewerStreamAttributes {
+type ViewerStreamAttributeBoolValue = boolean | google.protobuf.IBoolValue;
+
+export interface ViewerStreamAttributes {
   depthBuffers?: {
-    enabled: google.protobuf.IBoolValue;
-    frameType: DepthBufferFrameType;
+    enabled?: ViewerStreamAttributeBoolValue;
+    frameType?: DepthBufferFrameType;
+  };
+  experimentalGhosting?: {
+    enabled?: ViewerStreamAttributeBoolValue;
+    opacity?: number | google.protobuf.IFloatValue;
   };
 }
 
-export type StreamAttributes = Pick<
-  PBStreamAttributes,
-  'experimentalGhosting'
-> &
-  ViewerStreamAttributes;
-
 export const toProtoStreamAttributes = (
-  attributes: StreamAttributes
+  attributes: ViewerStreamAttributes
 ): PBStreamAttributes => {
   let pbFrameType = vertexvis.protobuf.stream.FrameType.FRAME_TYPE_INVALID;
 
@@ -34,8 +34,23 @@ export const toProtoStreamAttributes = (
   return {
     ...attributes,
     depthBuffers: {
-      ...attributes.depthBuffers,
+      enabled: boolToProto(attributes.depthBuffers?.enabled),
       frameType: pbFrameType,
     },
+    experimentalGhosting: {
+      enabled: boolToProto(attributes.experimentalGhosting?.enabled),
+      opacity:
+        typeof attributes.experimentalGhosting?.opacity === 'number'
+          ? { value: attributes.experimentalGhosting?.opacity }
+          : attributes.experimentalGhosting?.opacity,
+    },
   };
+};
+
+const boolToProto = (
+  bool?: ViewerStreamAttributeBoolValue
+): google.protobuf.IBoolValue | undefined => {
+  if (bool != null) {
+    return typeof bool === 'boolean' ? { value: bool } : bool;
+  }
 };

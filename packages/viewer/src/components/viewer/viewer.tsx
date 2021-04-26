@@ -68,7 +68,7 @@ import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
 import {
-  StreamAttributes,
+  ViewerStreamAttributes,
   toProtoStreamAttributes,
 } from '../../stream/streamAttributes';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
@@ -161,7 +161,7 @@ export class Viewer {
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
-  @Prop() public streamAttributes?: StreamAttributes | string;
+  @Prop() public streamAttributes?: ViewerStreamAttributes | string;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -546,7 +546,7 @@ export class Viewer {
 
   @Watch('streamAttributes')
   public handleStreamAttributesChanged(
-    streamAttributes: StreamAttributes | undefined
+    streamAttributes: ViewerStreamAttributes | undefined
   ): void {
     if (streamAttributes != null && this.isStreamStarted) {
       this.stream.updateStream({
@@ -654,7 +654,7 @@ export class Viewer {
   /**
    * @private Used for internals or testing.
    */
-  public getStreamAttributes(): StreamAttributes {
+  public getStreamAttributes(): ViewerStreamAttributes {
     return this.streamAttributes != null &&
       typeof this.streamAttributes === 'string'
       ? JSON.parse(this.streamAttributes)

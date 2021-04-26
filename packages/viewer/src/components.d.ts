@@ -11,7 +11,7 @@ import { Environment } from "./config/environment";
 import { SceneTreeErrorDetails } from "./components/scene-tree/lib/errors";
 import { Row } from "./components/scene-tree/lib/row";
 import { SelectItemOptions } from "./components/scene-tree/lib/viewer-ops";
-import { StreamAttributes } from "./stream/streamAttributes";
+import { ViewerStreamAttributes } from "./stream/streamAttributes";
 import { ColorMaterial } from "./scenes/colorMaterial";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
@@ -229,7 +229,7 @@ export namespace Components {
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
-        "streamAttributes"?: StreamAttributes | string;
+        "streamAttributes"?: ViewerStreamAttributes | string;
         /**
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
@@ -445,7 +445,7 @@ declare namespace LocalJSX {
         /**
           * An object or JSON encoded string that defines configuration settings for the viewer.
          */
-        "streamAttributes"?: StreamAttributes | string;
+        "streamAttributes"?: ViewerStreamAttributes | string;
     }
     interface VertexViewerButton {
     }
