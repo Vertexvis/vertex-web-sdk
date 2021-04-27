@@ -161,6 +161,12 @@ describe(MouseInteractionHandler, () => {
       expect(rotateInteraction.beginDrag).toHaveBeenCalled();
     });
 
+    it('sets rotate point interaction', async () => {
+      handler.setPrimaryInteractionType('rotate-point');
+      await simulatePrimaryInteractions(50);
+      expect(rotatePointInteraction.beginDrag).toHaveBeenCalled();
+    });
+
     it('sets zoom interaction', async () => {
       handler.setPrimaryInteractionType('zoom');
       await simulatePrimaryInteractions(50);
