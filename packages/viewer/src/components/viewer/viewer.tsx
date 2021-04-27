@@ -158,6 +158,13 @@ export class Viewer {
   @Prop() public keyboardControls = true;
 
   /**
+   * Enables or disables the default rotation interaction being changed to
+   * rotate around the mouse down location. This requires the enabling of
+   * depth buffers through the viewer's `streamAttributes`.
+   */
+  @Prop() public defaultSpinCenter = false;
+
+  /**
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
@@ -347,6 +354,10 @@ export class Viewer {
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
       );
+    }
+
+    if (this.defaultSpinCenter) {
+      this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
     }
 
     this.registerSlotChangeListeners();
@@ -933,14 +944,16 @@ export class Viewer {
         this.dispatchFrameDrawn(drawnFrame);
       }
 
-      if (payload.depthBuffer?.value != null) {
-        const depthBuffer = Frame.fromProto(payload, true);
+      if (frame.depthBuffer != null) {
         const depthCanvas = this.depthBufferCanvasElement?.getContext('2d');
         if (depthCanvas != null) {
           const data = {
             canvas: depthCanvas,
             dimensions,
-            frame: depthBuffer,
+            frame: {
+              ...frame,
+              image: frame.depthBuffer,
+            },
           };
           await this.depthBufferCanvasRenderer(data);
         }

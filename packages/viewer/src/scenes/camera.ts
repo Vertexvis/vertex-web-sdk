@@ -232,22 +232,17 @@ export class Camera implements FrameCamera.FrameCamera {
     angleInRadians: number,
     axis: Vector3.Vector3
   ): Camera {
-    return this.update({
-      position: Vector3.rotateAboutAxis(
-        angleInRadians,
-        this.position,
-        axis,
-        this.lookAt
-      ),
-      up: Vector3.rotateAboutAxis(
-        angleInRadians,
-        this.up,
-        axis,
-        Vector3.origin()
-      ),
-    });
+    return this.rotateAroundAxisAtPoint(angleInRadians, this.lookAt, axis);
   }
 
+  /**
+   * Repositions the camera by rotating its current position around an axis
+   * defined at a specific world point.
+   *
+   * @param angleInRadians The angle, in radians, to rotate.
+   * @param point The point in world space to place the axis at.
+   * @param axis A normalized vector to rotate around.
+   */
   public rotateAroundAxisAtPoint(
     angleInRadians: number,
     point: Vector3.Vector3,

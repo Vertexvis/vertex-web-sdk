@@ -166,6 +166,10 @@ export namespace Components {
          */
         "configEnv": Environment;
         /**
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+         */
+        "defaultSpinCenter": boolean;
+        /**
           * @private For internal use only.
          */
         "dispatchFrameDrawn": (frame: Frame.Frame) => Promise<void>;
@@ -386,6 +390,10 @@ declare namespace LocalJSX {
           * @see Viewer.config
          */
         "configEnv"?: Environment;
+        /**
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+         */
+        "defaultSpinCenter"?: boolean;
         /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */

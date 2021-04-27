@@ -28,14 +28,7 @@ type Flag =
    * are larger than the supported maximum image size (1080p). By default
    * this option is disabled, and images will be scaled up to match the host.
    */
-  | 'letterboxFrames'
-
-  /**
-   * Enables or disables the default rotation interaction being changed to
-   * rotate around the mouse down location. This requires the enabling of
-   * depth buffers through the viewer's `streamAttributes`.
-   */
-  | 'defaultToSpinCenter';
+  | 'letterboxFrames';
 
 /**
  * A set of experimental features that can be enabled through the viewer's
@@ -49,7 +42,6 @@ export const defaultFlags: Flags = {
   logWsMessages: false,
   logFrameRate: false,
   letterboxFrames: false,
-  defaultToSpinCenter: false,
 };
 
 export function createFlags(

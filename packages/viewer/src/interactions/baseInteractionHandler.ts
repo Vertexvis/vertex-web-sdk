@@ -55,10 +55,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private twistInteraction: TwistInteraction,
     private getConfig: ConfigProvider
   ) {
-    this.primaryInteraction = this.getConfig().flags.defaultToSpinCenter
-      ? this.rotatePointInteraction
-      : this.rotateInteraction;
-
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);
@@ -124,6 +120,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
+        break;
+      case 'rotate-point':
+        this.primaryInteraction = this.rotatePointInteraction;
         break;
       case 'zoom':
         this.primaryInteraction = this.zoomInteraction;
