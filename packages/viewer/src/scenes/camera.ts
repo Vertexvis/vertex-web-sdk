@@ -105,31 +105,48 @@ export class Camera implements FrameCamera.FrameCamera {
    * @param boundingBox The bounding box to position to.
    */
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    return this.update(this.positionAtBoundingBox(boundingBox));
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
+      );
+
+    // ratio of the height of the frustum to the distance along the view vector
+    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+
+    if (this.aspectRatio < 1.0) {
+      hOverD *= this.aspectRatio;
+    }
+
+    const distance = Math.abs(radius / hOverD);
+    const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
+
+    const lookAt = BoundingBox.center(boundingBox);
+    const position = Vector3.subtract(lookAt, vvec);
+
+    return this.update({ lookAt, position });
   }
 
   /**
-   * Returns the distance from the provided camera's position to the center
+   * Returns the distance from the camera's position to the center
    * of the provided bounding box (or the scene's visible bounding box if not provided).
    *
-   * @param camera - The camera to use.
    * @param boundingBox - The bounding box to determine distance from.
    */
   public distanceToBoundingBoxCenter(
-    camera: FrameCamera.FrameCamera,
     boundingBox?: BoundingBox.BoundingBox
   ): number {
     const box = boundingBox || this.boundingBox;
     const boundingBoxCenter = BoundingBox.center(box);
-    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
+    const cameraToCenter = Vector3.subtract(this.position, boundingBoxCenter);
 
     const distanceToCenterAlongViewVec =
       Math.abs(
         Vector3.dot(
-          Vector3.subtract(camera.lookAt, camera.position),
+          Vector3.subtract(this.lookAt, this.position),
           cameraToCenter
         )
-      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
+      ) / Vector3.magnitude(Vector3.subtract(this.lookAt, this.position));
 
     return distanceToCenterAlongViewVec;
   }
@@ -330,31 +347,6 @@ export class Camera implements FrameCamera.FrameCamera {
     return { far, near };
   }
 
-  private positionAtBoundingBox(
-    boundingBox: BoundingBox.BoundingBox
-  ): FrameCamera.FrameCamera {
-    const radius =
-      1.1 *
-      Vector3.magnitude(
-        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
-      );
-
-    // ratio of the height of the frustum to the distance along the view vector
-    let hOverD = Math.tan(this.fovY * PI_OVER_360);
-
-    if (this.aspectRatio < 1.0) {
-      hOverD *= this.aspectRatio;
-    }
-
-    const distance = Math.abs(radius / hOverD);
-    const vvec = Vector3.scale(distance, Vector3.normalize(this.viewVector()));
-
-    const lookAt = BoundingBox.center(boundingBox);
-    const position = Vector3.subtract(lookAt, vvec);
-
-    return { lookAt, position, up: this.up };
-  }
-
   /**
    * Returns the view vector for the camera, which is the direction between the
    * `position` and `lookAt` vectors.
@@ -371,14 +363,6 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
-   * The position vector for the camera when fit to the visible bounding box,
-   * in world space coordinates.
-   */
-  public get positionFitAll(): Vector3.Vector3 {
-    return { ...this.fitToBoundingBox(this.boundingBox).position };
-  }
-
-  /**
    * A normalized vector representing the up direction.
    */
   public get up(): Vector3.Vector3 {
@@ -386,26 +370,10 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
-   * The up (see `camera.up`) vector for the camera when fit to the visible bounding box,
-   * in world space coordinates.
-   */
-  public get upFitAll(): Vector3.Vector3 {
-    return { ...this.fitToBoundingBox(this.boundingBox).up };
-  }
-
-  /**
    * A vector, in world space coordinates, of where the camera is pointed at.
    */
   public get lookAt(): Vector3.Vector3 {
     return { ...this.data.lookAt };
-  }
-
-  /**
-   * The lookAt (see `camera.lookAt`) vector for the camera when fit to the visible bounding box,
-   * in world space coordinates.
-   */
-  public get lookAtFitAll(): Vector3.Vector3 {
-    return { ...this.fitToBoundingBox(this.boundingBox).lookAt };
   }
 
   /**
@@ -432,33 +400,11 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
-   * The camera's near clipping plane when fit to the visible
-   * bounding box.
-   */
-  public get nearFitAll(): number {
-    const { near } = this.computeClippingPlanes(
-      this.positionAtBoundingBox(this.boundingBox)
-    );
-    return near;
-  }
-
-  /**
    * The camera's far clipping plane.
    */
   public get far(): number {
     const { far } = this.computeClippingPlanes(this.data);
 
-    return far;
-  }
-
-  /**
-   * The camera's far clipping plane when fit to the visible
-   * bounding box.
-   */
-  public get farFitAll(): number {
-    const { far } = this.computeClippingPlanes(
-      this.positionAtBoundingBox(this.boundingBox)
-    );
     return far;
   }
 }

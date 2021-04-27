@@ -43,7 +43,7 @@ describe(Camera, () => {
     const camera = new Camera(stream, 0.5, forward, boundingBox);
 
     it('computes the distance to the center of the provided bounding box', () => {
-      const distance = camera.distanceToBoundingBoxCenter(camera, boundingBox);
+      const distance = camera.distanceToBoundingBoxCenter(boundingBox);
 
       expect(distance).toBeCloseTo(5);
     });

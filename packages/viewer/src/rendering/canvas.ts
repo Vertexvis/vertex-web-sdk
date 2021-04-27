@@ -14,34 +14,74 @@ export interface DrawFrame {
   frame: Frame.Frame;
 }
 
+export interface DrawPixel extends DrawFrame {
+  point: Point.Point;
+}
+
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
 
-export type CanvasDepthProvider = DepthProvider<Point.Point>;
+export type CanvasDepthProvider = DepthProvider<DrawPixel>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
+interface FramePosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 function drawImage(image: HtmlImage, data: DrawFrame): void {
-  const { imageAttributes } = data.frame;
+  const position = getFramePosition(image, data.frame, data.dimensions);
+
+  data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
+  data.canvas.drawImage(
+    image.image,
+    position.x,
+    position.y,
+    position.width,
+    position.height
+  );
+}
+
+function drawPixel(image: HtmlImage, data: DrawPixel): void {
+  const position = getFramePosition(image, data.frame, data.dimensions);
+
+  data.canvas.clearRect(0, 0, 1, 1);
+  data.canvas.drawImage(
+    image.image,
+    data.point.x - position.x,
+    data.point.y - position.y,
+    1,
+    1,
+    0,
+    0,
+    1,
+    1
+  );
+}
+
+function getFramePosition(
+  image: HtmlImage,
+  frame: Frame.Frame,
+  dimensions: Dimensions.Dimensions
+): FramePosition {
+  const { imageAttributes } = frame;
   const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
     imageAttributes.frameDimensions
   );
-  const fitTo = Rectangle.fromDimensions(data.dimensions);
+  const fitTo = Rectangle.fromDimensions(dimensions);
   const fit = Rectangle.containFit(fitTo, imageRect);
 
   const scaleX = fit.width / imageRect.width;
   const scaleY = fit.height / imageRect.height;
 
-  const startXPos = imageAttributes.imageRect.x * scaleX;
-  const startYPos = imageAttributes.imageRect.y * scaleY;
-
-  data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
-  data.canvas.drawImage(
-    image.image,
-    startXPos,
-    startYPos,
-    image.image.width * imageAttributes.scaleFactor * scaleX,
-    image.image.height * imageAttributes.scaleFactor * scaleY
-  );
+  return {
+    x: imageAttributes.imageRect.x * scaleX,
+    y: imageAttributes.imageRect.y * scaleY,
+    width: image.image.width * imageAttributes.scaleFactor * scaleX,
+    height: image.image.height * imageAttributes.scaleFactor * scaleY,
+  };
 }
 
 function reportTimings(
@@ -138,15 +178,20 @@ export function createCanvasRenderer(): CanvasRenderer {
   };
 }
 
-export function createCanvasDepthProvider(
-  canvas?: CanvasRenderingContext2D | null
-): CanvasDepthProvider {
-  return (point) => {
-    if (canvas != null) {
-      const data = canvas.getImageData(point.x, point.y, 1, 1).data.slice(0, 1);
+export function createCanvasDepthProvider(): CanvasDepthProvider {
+  return async (data) => {
+    if (data.frame.depthBuffer != null) {
+      const image = await loadImageBytes(data.frame.depthBuffer);
 
-      return data[0] / 255.0;
+      drawPixel(image, data);
+      image.dispose();
+
+      const pixel = data.canvas.getImageData(0, 0, 1, 1).data.slice(0, 1);
+      console.log(pixel);
+
+      return pixel[0] / 255.0;
     }
+
     return -1;
   };
 }

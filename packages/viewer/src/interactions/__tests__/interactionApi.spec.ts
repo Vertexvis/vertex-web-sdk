@@ -22,7 +22,7 @@ describe(InteractionApi, () => {
     ColorMaterial.fromHex('#ffffff')
   );
   const sceneProvider = (): Scene => scene;
-  const depthProvider = (): number => 1;
+  const depthProvider = async (): Promise<number> => 1;
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
 
@@ -98,9 +98,9 @@ describe(InteractionApi, () => {
   });
 
   describe(InteractionApi.prototype.rotateCameraAtPoint, () => {
-    it('replaces the camera if interacting', () => {
+    it('replaces the camera if interacting', async () => {
       api.beginInteraction();
-      api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
+      await api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
       api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });

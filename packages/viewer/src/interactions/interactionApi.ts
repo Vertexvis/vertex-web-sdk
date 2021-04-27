@@ -207,12 +207,14 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
+    const depth = await this.getDepth(point);
+
     return this.transformCamera((camera, viewport, scale) => {
       this.worldRotationPoint = this.getWorldRotationPoint(
         camera,
         viewport,
         Point.scale(point, scale?.x || 1, scale?.y || 1),
-        this.getDepth(point)
+        depth
       );
 
       if (this.worldRotationPoint != null) {
@@ -346,10 +348,12 @@ export class InteractionApi {
       // In the case that the depth is at near, at far, or undefined, use lookAt
       return camera.lookAt;
     } else {
+      const fitAllCamera = camera.viewAll();
+
       return computeWorldPosition(
         inverseProjectionMatrix(
-          camera.nearFitAll,
-          camera.farFitAll,
+          fitAllCamera.near,
+          fitAllCamera.far,
           camera.fovY,
           camera.aspectRatio
         ),
@@ -359,12 +363,8 @@ export class InteractionApi {
         depth,
         camera.near,
         camera.far,
-        camera.distanceToBoundingBoxCenter(camera) /
-          camera.distanceToBoundingBoxCenter({
-            position: camera.positionFitAll,
-            lookAt: camera.lookAtFitAll,
-            up: camera.upFitAll,
-          })
+        camera.distanceToBoundingBoxCenter() /
+          fitAllCamera.distanceToBoundingBoxCenter()
       );
     }
   }

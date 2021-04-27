@@ -287,9 +287,7 @@ export class Viewer {
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.setupStreamListeners();
 
-    this.depthProvider = createCanvasDepthProvider(
-      this.depthBufferCanvasElement?.getContext('2d')
-    );
+    this.depthProvider = createCanvasDepthProvider();
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(this.stream, () => this.getConfig());
@@ -388,9 +386,8 @@ export class Viewer {
               <canvas
                 ref={(ref) => (this.depthBufferCanvasElement = ref)}
                 class="depth-buffer-canvas"
-                width={canvasDimensions != null ? canvasDimensions.width : 0}
-                height={canvasDimensions != null ? canvasDimensions.height : 0}
-                onContextMenu={(event) => event.preventDefault()}
+                width={1}
+                height={1}
               ></canvas>
             )}
             <canvas
@@ -943,21 +940,6 @@ export class Viewer {
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
-
-      if (frame.depthBuffer != null) {
-        const depthCanvas = this.depthBufferCanvasElement?.getContext('2d');
-        if (depthCanvas != null) {
-          const data = {
-            canvas: depthCanvas,
-            dimensions,
-            frame: {
-              ...frame,
-              image: frame.depthBuffer,
-            },
-          };
-          await this.depthBufferCanvasRenderer(data);
-        }
-      }
     }
   }
 
@@ -1046,7 +1028,7 @@ export class Viewer {
       this.stream,
       () => this.getConfig().interactions,
       () => this.createScene(),
-      this.depthProvider,
+      (point) => this.getDepth(point),
       this.tap,
       this.doubletap,
       this.longpress
@@ -1071,6 +1053,24 @@ export class Viewer {
         selectionMaterial
       );
     }
+  }
+
+  private async getDepth(point: Point.Point): Promise<number> {
+    const context = this.depthBufferCanvasElement?.getContext('2d');
+    if (context != null && this.lastFrame != null && this.dimensions != null) {
+      return await this.depthProvider({
+        point,
+        canvas: context,
+        dimensions: this.dimensions,
+        frame: this.lastFrame,
+      });
+    } else {
+      console.warn(
+        'Depth info not available. Please enable depth buffers in the stream attributes.'
+      );
+    }
+
+    return -1;
   }
 
   /**
