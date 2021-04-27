@@ -166,10 +166,6 @@ export namespace Components {
          */
         "configEnv": Environment;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
-         */
-        "defaultSpinCenter": boolean;
-        /**
           * @private For internal use only.
          */
         "dispatchFrameDrawn": (frame: Frame.Frame) => Promise<void>;
@@ -212,6 +208,10 @@ export namespace Components {
           * @param keyInteraction - The `KeyInteraction` to register.
          */
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
+        /**
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+         */
+        "rotateAroundTapPoint": boolean;
         /**
           * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
          */
@@ -391,10 +391,6 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
-         */
-        "defaultSpinCenter"?: boolean;
-        /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */
         "keyboardControls"?: boolean;
@@ -436,6 +432,10 @@ declare namespace LocalJSX {
           * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
          */
         "onTokenExpired"?: (event: CustomEvent<void>) => void;
+        /**
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+         */
+        "rotateAroundTapPoint"?: boolean;
         /**
           * The default hex color or material to use when selecting items.
          */

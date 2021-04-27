@@ -162,7 +162,7 @@ export class Viewer {
    * rotate around the mouse down location. This requires the enabling of
    * depth buffers through the viewer's `streamAttributes`.
    */
-  @Prop() public defaultSpinCenter = false;
+  @Prop() public rotateAroundTapPoint = false;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -354,7 +354,7 @@ export class Viewer {
       );
     }
 
-    if (this.defaultSpinCenter) {
+    if (this.rotateAroundTapPoint) {
       this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
     }
 
