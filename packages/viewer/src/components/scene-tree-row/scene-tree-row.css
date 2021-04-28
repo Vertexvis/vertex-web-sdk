@@ -3,7 +3,28 @@
 :host {
   width: 100%;
 
-  --indentation-size: 4px;
+  /**
+   * @prop --scene-tree-row-background: A CSS background of a row.
+   */
+  --scene-tree-row-background: unset;
+
+  /**
+   * @prop --scene-tree-row-background-hover: A CSS background of a row when
+   * hovered.
+   */
+  --scene-tree-row-background-hover: var(--blue-200);
+
+  /**
+    * @prop --scene-tree-row-background-selected: A CSS background color of a
+    * row when selected.
+    */
+  --scene-tree-row-background-selected: var(--blue-300);
+
+  /**
+    * @prop --scene-tree-row-indentation-size: A CSS length that specifies the
+    * size of indenting a node's child from its parent.
+    */
+  --scene-tree-row-indentation-size: 4px;
 }
 
 .root {
@@ -12,8 +33,17 @@
   padding: 4px 8px;
   width: 100%;
   box-sizing: border-box;
+  background: var(--scene-tree-row-background);
 
   --depth: 0;
+}
+
+.root:hover {
+  background: var(--scene-tree-row-background-hover);
+}
+
+.root.is-selected {
+  background: var(--scene-tree-row-background-selected);
 }
 
 .label {
@@ -49,13 +79,12 @@
 }
 
 .indentation {
-  flex-shrink: 0;
-  width: calc(var(--indentation-size) * var(--depth));
+  min-width: calc(var(--scene-tree-row-indentation-size) * var(--depth));
 }
 
 .icon {
-  min-width: 16px;
-  min-height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .icon-expanded {

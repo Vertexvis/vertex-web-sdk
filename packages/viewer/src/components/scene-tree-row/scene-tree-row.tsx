@@ -15,6 +15,9 @@ export class SceneTreeRow {
   @Prop()
   public tree?: HTMLVertexSceneTreeElement;
 
+  @Prop()
+  public interactionsDisabled = false;
+
   @Event()
   public expandToggled!: EventEmitter<LoadedRow>;
 
@@ -25,6 +28,8 @@ export class SceneTreeRow {
   public selected!: EventEmitter<LoadedRow>;
 
   private rootEl?: HTMLElement;
+  private expandBtn?: HTMLButtonElement;
+  private visibilityBtn?: HTMLButtonElement;
 
   public render(): h.JSX.IntrinsicElements {
     if (this.row == null) {
@@ -32,11 +37,19 @@ export class SceneTreeRow {
     } else {
       return (
         <div
-          class={classnames('root', { 'is-hidden': !this.row.visible })}
+          class={classnames('root', {
+            'is-hidden': !this.row.visible,
+            'is-selected': this.row.selected,
+          })}
           ref={(ref) => (this.rootEl = ref)}
+          onMouseDown={(event) => this.handleRowMouseDown(event)}
         >
           <div class="indentation" />
-          <button class="expand-btn" onMouseDown={() => this.toggleExpansion()}>
+          <button
+            class="expand-btn"
+            ref={(ref) => (this.expandBtn = ref)}
+            onMouseDown={() => this.toggleExpansion()}
+          >
             {!this.row.isLeaf && (
               <div
                 class={classnames('icon', {
@@ -50,6 +63,7 @@ export class SceneTreeRow {
           <div class="right-gutter">
             <button
               class="visibility-btn"
+              ref={(ref) => (this.visibilityBtn = ref)}
               onMouseDown={() => this.toggleVisibility()}
             >
               <div
@@ -96,16 +110,44 @@ export class SceneTreeRow {
 
   private toggleExpansion(): void {
     this.ifRowDefined((row) => {
-      this.tree?.toggleExpandItem(row);
-      this.expandToggled.emit(row);
+      if (!this.interactionsDisabled) {
+        this.tree?.toggleExpandItem(row);
+        this.expandToggled.emit(row);
+      }
     });
   }
 
   private toggleVisibility(): void {
     this.ifRowDefined((row) => {
-      this.tree?.toggleItemVisibility(row);
-      this.visibilityToggled.emit(row);
+      if (!this.interactionsDisabled) {
+        this.tree?.toggleItemVisibility(row);
+        this.visibilityToggled.emit(row);
+      }
     });
+  }
+
+  private handleRowMouseDown(event: MouseEvent): void {
+    if (this.isSelectionEvent(event) && !this.interactionsDisabled) {
+      if (event.metaKey && this.row?.selected) {
+        this.tree?.deselectItem(this.row);
+      } else {
+        this.tree?.selectItem(this.row, {
+          append: event.ctrlKey || event.metaKey,
+        });
+      }
+    }
+  }
+
+  private isSelectionEvent(event: MouseEvent): boolean {
+    if (event.target != null) {
+      return (
+        this.rootEl?.contains(event.target as Node) === true &&
+        this.expandBtn?.contains(event.target as Node) === false &&
+        this.visibilityBtn?.contains(event.target as Node) === false
+      );
+    } else {
+      return false;
+    }
   }
 
   private ifRowDefined(f: (row: LoadedRow) => void): void {
