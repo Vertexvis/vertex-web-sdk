@@ -31,7 +31,7 @@
     * @prop --scene-tree-row-padding: CSS lengths that specifies the amount of
     * padding between the row's border and content.
     */
-  --scene-tree-row-padding: 4px 0px;
+  --scene-tree-row-padding: 2px 0px;
 }
 
 .root {
@@ -83,11 +83,11 @@
 }
 
 .root:hover .visibility-btn {
-  visibility: visible;
+  visibility: inherit;
 }
 
 .root.hidden .visibility-btn {
-  visibility: visible;
+  visibility: inherit;
 }
 
 .indentation {

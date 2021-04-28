@@ -17,7 +17,7 @@ import {
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
-import { Disposable, Sets } from '@vertexvis/utils';
+import { Disposable } from '@vertexvis/utils';
 import { LoadedRow, Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
@@ -556,15 +556,11 @@ export class SceneTree {
         'template[slot="right"]'
       ) as HTMLTemplateElement) || undefined;
 
-    readDOM(() => {
-      this.viewportHeight = getSceneTreeViewportHeight(this.el);
+    this.ensureTemplateDefined();
 
-      this.ensureTemplateDefined();
-      this.createPool();
-
-      // this.updateRenderState();
-      this.updateElements();
-    });
+    this.viewportHeight = getSceneTreeViewportHeight(this.el);
+    await this.computeRowHeight();
+    this.createPool();
 
     this.stateMap.componentLoaded = true;
   }
@@ -578,9 +574,8 @@ export class SceneTree {
     );
   }
 
-  protected componentDidRender(): void {
+  protected async componentDidRender(): Promise<void> {
     this.cleanupBindings();
-    this.computeRowHeight();
   }
 
   protected render(): h.JSX.IntrinsicElements {
@@ -877,15 +872,41 @@ export class SceneTree {
     }
   }
 
-  private computeRowHeight(): void {
+  private async computeRowHeight(): Promise<void> {
     if (this.isComputingRowHeight) {
-      // Set the state on the next event tick to prevent a warning from
-      // StencilJS.
-      setTimeout(() => {
-        const rowEl = this.el.shadowRoot?.querySelector('.row');
-        this.computedRowHeight = rowEl?.clientHeight;
-        this.isComputingRowHeight = false;
-      }, 0);
+      const dummyData: LoadedRow = {
+        id: '',
+        name: 'Dummy row',
+        expanded: false,
+        selected: false,
+        visible: false,
+        isLeaf: false,
+        depth: 0,
+        data: {},
+      };
+      const { bindings, element } = this.createInstancedTemplate();
+      bindings.bind(dummyData);
+      element.style.visibility = 'hidden';
+
+      this.el.shadowRoot?.appendChild(element);
+
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      if (typeof (element as any).componentOnReady === 'function') {
+        await (element as any).componentOnReady();
+      }
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+
+      let height = element.clientHeight;
+      let attempts = 0;
+
+      while (height === 0 && attempts < 10) {
+        height = await new Promise((resolve) => {
+          setTimeout(() => resolve(element.getBoundingClientRect().height), 5);
+        });
+        attempts = attempts + 1;
+      }
+      this.computedRowHeight = height;
+      element.remove();
     }
   }
 
@@ -960,12 +981,6 @@ export class SceneTree {
     this.updatePool();
     this.bindData();
     this.positionElements();
-    // });
-
-    // requestAnimationFrame(() => {
-    //   this.updatePool();
-    //   this.bindData();
-    //   this.positionElements();
     // });
   }
 

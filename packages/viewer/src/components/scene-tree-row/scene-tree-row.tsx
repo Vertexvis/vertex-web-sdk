@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Prop, State } from '@stencil/core';
 import classnames from 'classnames';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 
@@ -97,7 +97,7 @@ export class SceneTreeRow {
         oldRow?.depth !== newRow?.depth
       );
     } else {
-      return false;
+      return oldValue !== newValue;
     }
   }
 
