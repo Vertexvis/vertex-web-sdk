@@ -159,8 +159,7 @@ export class Viewer {
 
   /**
    * Enables or disables the default rotation interaction being changed to
-   * rotate around the mouse down location. This requires the enabling of
-   * depth buffers through the viewer's `streamAttributes`.
+   * rotate around the mouse down location.
    */
   @Prop() public rotateAroundTapPoint = false;
 
@@ -243,13 +242,11 @@ export class Viewer {
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
-  private depthBufferCanvasElement?: HTMLCanvasElement;
 
   private stream!: ViewerStreamApi;
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
-  private depthBufferCanvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
   private lastFrame?: Frame.Frame;
@@ -270,6 +267,7 @@ export class Viewer {
   private streamDisposable?: Disposable;
   private jwt?: string;
   private isStreamStarted = false;
+  private internalStreamAttributes?: ViewerStreamAttributes;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
 
@@ -356,6 +354,14 @@ export class Viewer {
 
     if (this.rotateAroundTapPoint) {
       this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
+
+      this.internalStreamAttributes = {
+        ...this.internalStreamAttributes,
+        depthBuffers: {
+          enabled: true,
+          frameType: 'final',
+        },
+      };
     }
 
     this.registerSlotChangeListeners();
@@ -382,14 +388,6 @@ export class Viewer {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
-            {this.getStreamAttributes().depthBuffers?.enabled && (
-              <canvas
-                ref={(ref) => (this.depthBufferCanvasElement = ref)}
-                class="depth-buffer-canvas"
-                width={1}
-                height={1}
-              ></canvas>
-            )}
             <canvas
               ref={(ref) => (this.canvasElement = ref)}
               class="canvas"
@@ -558,7 +556,28 @@ export class Viewer {
   ): void {
     if (streamAttributes != null && this.isStreamStarted) {
       this.stream.updateStream({
-        streamAttributes: toProtoStreamAttributes(streamAttributes),
+        streamAttributes: toProtoStreamAttributes({
+          ...this.internalStreamAttributes,
+          ...streamAttributes,
+        }),
+      });
+    }
+  }
+
+  @Watch('rotateAroundTapPoint')
+  public handleRotateAboutTapPointChanged(
+    rotateAboutTapPoint: boolean | undefined
+  ): void {
+    if (rotateAboutTapPoint != null) {
+      this.internalStreamAttributes = {
+        ...this.internalStreamAttributes,
+        depthBuffers: {
+          enabled: rotateAboutTapPoint,
+          frameType: 'final',
+        },
+      };
+      this.stream.updateStream({
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
       });
     }
   }
@@ -665,8 +684,11 @@ export class Viewer {
   public getStreamAttributes(): ViewerStreamAttributes {
     return this.streamAttributes != null &&
       typeof this.streamAttributes === 'string'
-      ? JSON.parse(this.streamAttributes)
-      : { ...this.streamAttributes };
+      ? {
+          ...this.internalStreamAttributes,
+          ...JSON.parse(this.streamAttributes),
+        }
+      : { ...this.internalStreamAttributes, ...this.streamAttributes };
   }
 
   /**
@@ -778,7 +800,6 @@ export class Viewer {
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
-    this.depthBufferCanvasRenderer = createCanvasRenderer();
     if (this.containerElement != null) {
       this.resizeObserver?.observe(this.containerElement);
     }
@@ -1056,18 +1077,12 @@ export class Viewer {
   }
 
   private async getDepth(point: Point.Point): Promise<number> {
-    const context = this.depthBufferCanvasElement?.getContext('2d');
-    if (context != null && this.lastFrame != null && this.dimensions != null) {
+    if (this.lastFrame != null && this.dimensions != null) {
       return await this.depthProvider({
         point,
-        canvas: context,
         dimensions: this.dimensions,
         frame: this.lastFrame,
       });
-    } else {
-      console.warn(
-        'Depth info not available. Please enable depth buffers in the stream attributes.'
-      );
     }
 
     return -1;

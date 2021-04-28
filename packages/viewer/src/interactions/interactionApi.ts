@@ -207,7 +207,7 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    const depth = await this.getDepth(point);
+    const depth = await this.getDepthForPoint(point);
 
     return this.transformCamera((camera, viewport, scale) => {
       this.worldRotationPoint = this.getWorldRotationPoint(
@@ -334,6 +334,15 @@ export class InteractionApi {
 
   private isCoarseInputDevice(isTouch?: boolean): boolean {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
+  }
+
+  private async getDepthForPoint(point: Point.Point): Promise<number> {
+    const scene = this.getScene();
+    const scale = scene.scale();
+
+    return await this.getDepth(
+      Point.scale(point, scale?.x || 1, scale?.y || 1)
+    );
   }
 
   private getWorldRotationPoint(

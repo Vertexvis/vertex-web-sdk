@@ -14,7 +14,9 @@ export interface DrawFrame {
   frame: Frame.Frame;
 }
 
-export interface DrawPixel extends DrawFrame {
+export interface DrawPixel {
+  dimensions: Dimensions.Dimensions;
+  frame: Frame.Frame;
   point: Point.Point;
 }
 
@@ -31,6 +33,13 @@ interface FramePosition {
   height: number;
 }
 
+interface Pixel {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const position = getFramePosition(image, data.frame, data.dimensions);
 
@@ -44,21 +53,43 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
   );
 }
 
-function drawPixel(image: HtmlImage, data: DrawPixel): void {
+function getPixel(image: HtmlImage, data: DrawPixel): Pixel {
   const position = getFramePosition(image, data.frame, data.dimensions);
 
-  data.canvas.clearRect(0, 0, 1, 1);
-  data.canvas.drawImage(
-    image.image,
-    data.point.x - position.x,
-    data.point.y - position.y,
-    1,
-    1,
-    0,
-    0,
-    1,
-    1
-  );
+  const canvas = window.document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+
+  if (ctx != null) {
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.drawImage(
+      image.image,
+      data.point.x - position.x,
+      data.point.y - position.y,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    );
+
+    const pixel = ctx.getImageData(0, 0, 1, 1).data;
+    return {
+      r: pixel[0] || 0,
+      g: pixel[1] || 0,
+      b: pixel[2] || 0,
+      a: pixel[3] || 0,
+    };
+  }
+
+  return {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 0,
+  };
 }
 
 function getFramePosition(
@@ -183,13 +214,10 @@ export function createCanvasDepthProvider(): CanvasDepthProvider {
     if (data.frame.depthBuffer != null) {
       const image = await loadImageBytes(data.frame.depthBuffer);
 
-      drawPixel(image, data);
+      const pixel = getPixel(image, data);
       image.dispose();
 
-      const pixel = data.canvas.getImageData(0, 0, 1, 1).data.slice(0, 1);
-      console.log(pixel);
-
-      return pixel[0] / 255.0;
+      return pixel.r / 255.0;
     }
 
     return -1;

@@ -24,4 +24,5 @@ export const frame: Frame.Frame = {
   },
   sequenceNumber: 1,
   image: new Uint8Array(),
+  depthBuffer: new Uint8Array(),
 };

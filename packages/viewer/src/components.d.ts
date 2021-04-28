@@ -209,7 +209,7 @@ export namespace Components {
          */
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
          */
         "rotateAroundTapPoint": boolean;
         /**
@@ -433,7 +433,7 @@ declare namespace LocalJSX {
          */
         "onTokenExpired"?: (event: CustomEvent<void>) => void;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location. This requires the enabling of depth buffers through the viewer's `streamAttributes`.
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
          */
         "rotateAroundTapPoint"?: boolean;
         /**
