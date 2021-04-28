@@ -57,13 +57,16 @@ const MIN_CLEAR_UNUSED_DATA_MS = 25;
 
 interface StateMap {
   idleCallbackId?: number;
-  connected: boolean;
+  resizeObserver?: ResizeObserver;
+  componentLoaded: boolean;
+
+  client?: SceneTreeAPIClient;
+  jwt?: string;
+
+  controller?: SceneTreeController;
   onStateChangeDisposable?: Disposable;
   subscribeDisposable?: Disposable;
-  client?: SceneTreeAPIClient;
-  controller?: SceneTreeController;
-  componentLoaded: boolean;
-  jwt?: string;
+  connected: boolean;
 
   elementPool?: ElementPool;
   template?: HTMLTemplateElement;
@@ -546,9 +549,15 @@ export class SceneTree {
       passive: true,
     });
 
+    const resizeObserver = new ResizeObserver(() =>
+      this.updateViewportHeight()
+    );
+    resizeObserver.observe(this.el);
+    this.stateMap.resizeObserver = resizeObserver;
+
     this.ensureTemplateDefined();
 
-    this.viewportHeight = getSceneTreeViewportHeight(this.el);
+    this.updateViewportHeight();
     await this.computeRowHeight();
     this.createPool();
 
@@ -717,7 +726,7 @@ export class SceneTree {
           const [start, end] =
             this.controller?.getPageIndexesForRange(
               this.stateMap.startIndex,
-              this.stateMap.startIndex + this.stateMap.viewportRows.length
+              this.stateMap.endIndex
             ) || [];
 
           if (start != null && end != null) {
@@ -939,11 +948,11 @@ export class SceneTree {
   }
 
   private updateElements(): void {
-    // writeDOM(() => {
-    this.updatePool();
-    this.bindData();
-    this.positionElements();
-    // });
+    writeDOM(() => {
+      this.updatePool();
+      this.bindData();
+      this.positionElements();
+    });
   }
 
   private updatePool(): void {
@@ -955,8 +964,12 @@ export class SceneTree {
     this.stateMap.elementPool?.iterateElements((el, binding, i) => {
       const row = this.stateMap.viewportRows[i];
       if (row != null) {
+        el.style.visibility = 'inherit';
         binding.bind(row);
+      } else {
+        el.style.visibility = 'hidden';
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (el as any).tree = this;
     });
   }
@@ -968,5 +981,9 @@ export class SceneTree {
       el.style.top = `${rowHeight * (this.stateMap.startIndex + i)}px`;
       el.style.height = `${rowHeight}px`;
     });
+  }
+
+  private updateViewportHeight(): void {
+    this.viewportHeight = getSceneTreeViewportHeight(this.el);
   }
 }

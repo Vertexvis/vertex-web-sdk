@@ -40,7 +40,6 @@ export class AttributeBinding extends NodeBinding<Element> {
     const value = replaceBinding(data, this.expr);
     const existingValue = (this.node as any)[this.attr];
     if (existingValue !== value) {
-      // console.log('update binding', value);
       (this.node as any)[this.attr] = value;
     }
   }
