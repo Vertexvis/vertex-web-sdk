@@ -44,6 +44,9 @@ export class SceneTreeRow {
           ref={(ref) => (this.rootEl = ref)}
           onMouseDown={(event) => this.handleRowMouseDown(event)}
         >
+          <div class="no-shrink">
+            <slot name="left-gutter" />
+          </div>
           <div class="indentation" />
           <button
             class="expand-btn"
@@ -59,20 +62,23 @@ export class SceneTreeRow {
               />
             )}
           </button>
-          <div class="label">{this.row.name}</div>
-          <div class="right-gutter">
-            <button
-              class="visibility-btn"
-              ref={(ref) => (this.visibilityBtn = ref)}
-              onMouseDown={() => this.toggleVisibility()}
-            >
-              <div
-                class={classnames('icon', {
-                  'icon-visible': this.row.visible,
-                  'icon-hidden': !this.row.visible,
-                })}
-              />
-            </button>
+          <div class="label">
+            <slot name="label">{this.row.name}</slot>
+          </div>
+          <button
+            class="visibility-btn"
+            ref={(ref) => (this.visibilityBtn = ref)}
+            onMouseDown={() => this.toggleVisibility()}
+          >
+            <div
+              class={classnames('icon', {
+                'icon-visible': this.row.visible,
+                'icon-hidden': !this.row.visible,
+              })}
+            />
+          </button>
+          <div class="no-shrink">
+            <slot name="right-gutter" />
           </div>
         </div>
       );

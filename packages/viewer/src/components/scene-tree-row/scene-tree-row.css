@@ -53,6 +53,10 @@
   background: var(--scene-tree-row-background-selected);
 }
 
+.no-shrink {
+  flex-shrink: 0;
+}
+
 .label {
   width: 100%;
   overflow: hidden;
@@ -77,6 +81,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   visibility: hidden;
   width: 24px;
   height: 24px;
