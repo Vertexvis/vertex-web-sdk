@@ -4,6 +4,12 @@ import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
 import { Interactions } from '../types';
+import { DepthProvider } from '../rendering/depth';
+import { computeWorldPosition } from '../rendering/coordinates';
+import {
+  inverseProjectionMatrix,
+  inverseViewMatrix,
+} from '../rendering/matrices';
 
 type SceneProvider = () => Scene;
 
@@ -11,7 +17,8 @@ type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (
   camera: Camera,
-  viewport: Dimensions.Dimensions
+  viewport: Dimensions.Dimensions,
+  scale: Point.Point
 ) => Camera;
 
 /**
@@ -21,11 +28,13 @@ type CameraTransform = (
 export class InteractionApi {
   private currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
+  private worldRotationPoint?: Vector3.Vector3;
 
   public constructor(
     private stream: StreamApi,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
+    private getDepth: DepthProvider<Point.Point>,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>
@@ -89,7 +98,7 @@ export class InteractionApi {
       const scene = this.getScene();
       this.currentCamera =
         this.currentCamera != null
-          ? t(this.currentCamera, scene.viewport())
+          ? t(this.currentCamera, scene.viewport(), scene.scale())
           : undefined;
 
       await this.currentCamera?.render();
@@ -194,6 +203,51 @@ export class InteractionApi {
     });
   }
 
+  public async rotateCameraAtPoint(
+    delta: Point.Point,
+    point: Point.Point
+  ): Promise<void> {
+    const depth = await this.getDepthForPoint(point);
+
+    return this.transformCamera((camera, viewport, scale) => {
+      this.worldRotationPoint = this.getWorldRotationPoint(
+        camera,
+        viewport,
+        Point.scale(point, scale?.x || 1, scale?.y || 1),
+        depth
+      );
+
+      if (this.worldRotationPoint != null) {
+        const upVector = Vector3.normalize(camera.up);
+        const lookAt = Vector3.normalize(
+          Vector3.subtract(camera.lookAt, camera.position)
+        );
+
+        const crossX = Vector3.cross(upVector, lookAt);
+        const crossY = Vector3.cross(lookAt, crossX);
+
+        const mouseToWorld = Vector3.normalize({
+          x: delta.x * crossX.x + delta.y * crossY.x,
+          y: delta.x * crossX.y + delta.y * crossY.y,
+          z: delta.x * crossX.z + delta.y * crossY.z,
+        });
+
+        const rotationAxis = Vector3.cross(mouseToWorld, lookAt);
+
+        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
+        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+        const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+        return camera.rotateAroundAxisAtPoint(
+          angle,
+          this.worldRotationPoint,
+          rotationAxis
+        );
+      }
+      return camera;
+    });
+  }
+
   /**
    * Performs a zoom operation of the scene's camera, and requests a new image
    * for the updated scene.
@@ -220,6 +274,7 @@ export class InteractionApi {
   public async endInteraction(): Promise<void> {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
+      this.worldRotationPoint = undefined;
       this.resetLastAngle();
       await this.stream.endInteraction();
     }
@@ -279,5 +334,47 @@ export class InteractionApi {
 
   private isCoarseInputDevice(isTouch?: boolean): boolean {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
+  }
+
+  private async getDepthForPoint(point: Point.Point): Promise<number> {
+    const scene = this.getScene();
+    const scale = scene.scale();
+
+    return await this.getDepth(
+      Point.scale(point, scale?.x || 1, scale?.y || 1)
+    );
+  }
+
+  private getWorldRotationPoint(
+    camera: Camera,
+    viewport: Dimensions.Dimensions,
+    scaledPoint: Point.Point,
+    depth: number
+  ): Vector3.Vector3 {
+    if (this.worldRotationPoint != null) {
+      return this.worldRotationPoint;
+    } else if (depth === 0 || depth === 1 || depth === -1) {
+      // In the case that the depth is at near, at far, or undefined, use lookAt
+      return camera.lookAt;
+    } else {
+      const fitAllCamera = camera.viewAll();
+
+      return computeWorldPosition(
+        inverseProjectionMatrix(
+          fitAllCamera.near,
+          fitAllCamera.far,
+          camera.fovY,
+          camera.aspectRatio
+        ),
+        inverseViewMatrix(camera),
+        viewport,
+        scaledPoint,
+        depth,
+        camera.near,
+        camera.far,
+        camera.distanceToBoundingBoxCenter() /
+          fitAllCamera.distanceToBoundingBoxCenter()
+      );
+    }
   }
 }

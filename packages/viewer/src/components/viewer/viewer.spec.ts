@@ -16,6 +16,7 @@ import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../types/__fixtures__';
 import { upsertStorageEntry } from '../../sessions/storage';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -239,7 +240,7 @@ describe('vertex-viewer', () => {
 
       expect(api.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: updatedAttributes,
+          streamAttributes: expect.objectContaining(updatedAttributes),
         })
       );
     });
@@ -254,7 +255,7 @@ describe('vertex-viewer', () => {
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: attributes,
+          streamAttributes: expect.objectContaining(attributes),
         })
       );
     });
@@ -271,7 +272,7 @@ describe('vertex-viewer', () => {
 
       expect(api.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: attributes,
+          streamAttributes: expect.objectContaining(attributes),
         })
       );
     });
@@ -323,6 +324,48 @@ describe('vertex-viewer', () => {
           url: expect.stringMatching(/sessionId=sessionId1/),
         }),
         expect.anything()
+      );
+    });
+  });
+
+  describe('rotate about tap point', () => {
+    it('enables depth buffers', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId" rotate-around-tap-point="true"></vertex-viewer>`
+      );
+      const api = viewer.stream;
+      await loadNewModelForViewer(viewer, '123');
+
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            depthBuffers: {
+              enabled: { value: true },
+              frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
+            },
+          }),
+        })
+      );
+    });
+
+    it('disables depth buffers when disabled', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId" rotate-around-tap-point="true"></vertex-viewer>`
+      );
+      const api = viewer.stream;
+      await loadNewModelForViewer(viewer, '123');
+
+      viewer.rotateAroundTapPoint = false;
+
+      expect(api.updateStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            depthBuffers: {
+              enabled: { value: false },
+              frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
+            },
+          }),
+        })
       );
     });
   });

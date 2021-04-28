@@ -14,6 +14,7 @@ export interface Frame {
   sceneAttributes: SceneAttributes;
   sequenceNumber: number;
   image: Uint8Array;
+  depthBuffer?: Uint8Array;
 }
 
 export interface ImageAttributes {
@@ -37,6 +38,7 @@ export const fromProto = (
     sceneAttributes,
     sequenceNumber,
     image,
+    depthBuffer,
   } = payload;
   if (
     imageAttributes == null ||
@@ -116,6 +118,7 @@ export const fromProto = (
       }),
     },
     sequenceNumber: sequenceNumber,
-    image: image,
+    image,
+    depthBuffer: depthBuffer?.value || undefined,
   };
 };

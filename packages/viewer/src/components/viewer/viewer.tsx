@@ -49,7 +49,6 @@ import {
   currentDateAsProtoTimestamp,
   protoToDate,
   toProtoDuration,
-  StreamAttributes,
 } from '@vertexvis/stream-api';
 import { Scene } from '../../scenes/scene';
 import {
@@ -59,13 +58,19 @@ import {
 } from './utils';
 import {
   acknowledgeFrameRequests,
+  CanvasDepthProvider,
   CanvasRenderer,
+  createCanvasDepthProvider,
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../rendering';
 import * as Metrics from '../../metrics';
 import { Timing } from '../../metrics';
 import { ViewerStreamApi } from '../../stream/viewerStreamApi';
+import {
+  ViewerStreamAttributes,
+  toProtoStreamAttributes,
+} from '../../stream/streamAttributes';
 import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
 import { CustomError } from '../../errors/customError';
 import { KeyInteraction } from '../../interactions/keyInteraction';
@@ -153,10 +158,16 @@ export class Viewer {
   @Prop() public keyboardControls = true;
 
   /**
+   * Enables or disables the default rotation interaction being changed to
+   * rotate around the mouse down location.
+   */
+  @Prop() public rotateAroundTapPoint = false;
+
+  /**
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
-  @Prop() public streamAttributes?: StreamAttributes | string;
+  @Prop() public streamAttributes?: ViewerStreamAttributes | string;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -244,6 +255,7 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
+  private depthProvider!: CanvasDepthProvider;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
@@ -255,6 +267,7 @@ export class Viewer {
   private streamDisposable?: Disposable;
   private jwt?: string;
   private isStreamStarted = false;
+  private internalStreamAttributes?: ViewerStreamAttributes;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
 
@@ -272,6 +285,7 @@ export class Viewer {
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.setupStreamListeners();
 
+    this.depthProvider = createCanvasDepthProvider();
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(this.stream, () => this.getConfig());
@@ -336,6 +350,18 @@ export class Viewer {
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
       );
+    }
+
+    if (this.rotateAroundTapPoint) {
+      this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
+
+      this.internalStreamAttributes = {
+        ...this.internalStreamAttributes,
+        depthBuffers: {
+          enabled: true,
+          frameType: 'final',
+        },
+      };
     }
 
     this.registerSlotChangeListeners();
@@ -526,11 +552,32 @@ export class Viewer {
 
   @Watch('streamAttributes')
   public handleStreamAttributesChanged(
-    streamAttributes: StreamAttributes | undefined
+    streamAttributes: ViewerStreamAttributes | undefined
   ): void {
     if (streamAttributes != null && this.isStreamStarted) {
       this.stream.updateStream({
-        streamAttributes,
+        streamAttributes: toProtoStreamAttributes({
+          ...this.internalStreamAttributes,
+          ...streamAttributes,
+        }),
+      });
+    }
+  }
+
+  @Watch('rotateAroundTapPoint')
+  public handleRotateAboutTapPointChanged(
+    rotateAboutTapPoint: boolean | undefined
+  ): void {
+    if (rotateAboutTapPoint != null) {
+      this.internalStreamAttributes = {
+        ...this.internalStreamAttributes,
+        depthBuffers: {
+          enabled: rotateAboutTapPoint,
+          frameType: 'final',
+        },
+      };
+      this.stream.updateStream({
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
       });
     }
   }
@@ -634,11 +681,14 @@ export class Viewer {
   /**
    * @private Used for internals or testing.
    */
-  public getStreamAttributes(): StreamAttributes {
+  public getStreamAttributes(): ViewerStreamAttributes {
     return this.streamAttributes != null &&
       typeof this.streamAttributes === 'string'
-      ? JSON.parse(this.streamAttributes)
-      : { ...this.streamAttributes };
+      ? {
+          ...this.internalStreamAttributes,
+          ...JSON.parse(this.streamAttributes),
+        }
+      : { ...this.internalStreamAttributes, ...this.streamAttributes };
   }
 
   /**
@@ -678,7 +728,7 @@ export class Viewer {
         streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
         ...(queryResource?.type === 'scene-view-state' && {
           sceneViewStateId: { hex: queryResource.id },
         }),
@@ -792,7 +842,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
+        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
@@ -999,6 +1049,7 @@ export class Viewer {
       this.stream,
       () => this.getConfig().interactions,
       () => this.createScene(),
+      (point) => this.getDepth(point),
       this.tap,
       this.doubletap,
       this.longpress
@@ -1023,6 +1074,18 @@ export class Viewer {
         selectionMaterial
       );
     }
+  }
+
+  private async getDepth(point: Point.Point): Promise<number> {
+    if (this.lastFrame != null && this.dimensions != null) {
+      return await this.depthProvider({
+        point,
+        dimensions: this.dimensions,
+        frame: this.lastFrame,
+      });
+    }
+
+    return -1;
   }
 
   /**

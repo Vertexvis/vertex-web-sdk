@@ -23,11 +23,13 @@ describe(RotateInteraction, () => {
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
   const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
 
+  const canvasPoint = Point.create(0, 0);
+
   describe(RotateInteraction.prototype.beginDrag, () => {
     it('begins interaction once for multiple begin drag calls', () => {
       const interaction = new RotateInteraction();
-      interaction.beginDrag(event1, api);
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
     });
   });
@@ -35,7 +37,7 @@ describe(RotateInteraction, () => {
   describe(RotateInteraction.prototype.drag, () => {
     it('first drag rotates camera using delta between begin drag and drag', () => {
       const interaction = new RotateInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
 
       expect(api.rotateCamera).toHaveBeenCalledWith(Point.create(5, 5));
@@ -43,7 +45,7 @@ describe(RotateInteraction, () => {
 
     it('continuous drags rotate camera using delta between calls', () => {
       const interaction = new RotateInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
@@ -61,7 +63,7 @@ describe(RotateInteraction, () => {
   describe(RotateInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new RotateInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
@@ -83,11 +85,13 @@ describe(PanInteraction, () => {
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
   const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
 
+  const canvasPoint = Point.create(0, 0);
+
   describe(PanInteraction.prototype.beginDrag, () => {
     it('begins interaction once for multiple begin drag calls', () => {
       const interaction = new PanInteraction();
-      interaction.beginDrag(event1, api);
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
     });
@@ -96,7 +100,7 @@ describe(PanInteraction, () => {
   describe(PanInteraction.prototype.drag, () => {
     it('first drag rotates camera using delta between begin drag and drag', () => {
       const interaction = new PanInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
 
       expect(api.panCamera).toHaveBeenCalledWith(Point.create(5, 5));
@@ -104,7 +108,7 @@ describe(PanInteraction, () => {
 
     it('continuous drags rotate camera using delta between calls', () => {
       const interaction = new PanInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
@@ -122,7 +126,7 @@ describe(PanInteraction, () => {
   describe(PanInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new PanInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
@@ -145,11 +149,13 @@ describe(ZoomInteraction, () => {
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
   const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
 
+  const canvasPoint = Point.create(0, 0);
+
   describe(ZoomInteraction.prototype.beginDrag, () => {
     it('begins interaction once for multiple begin drag calls', () => {
       const interaction = new ZoomInteraction();
-      interaction.beginDrag(event1, api);
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
     });
@@ -158,7 +164,7 @@ describe(ZoomInteraction, () => {
   describe(ZoomInteraction.prototype.drag, () => {
     it('first drag rotates camera using delta between begin drag and drag', () => {
       const interaction = new ZoomInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
 
       expect(api.zoomCamera).toHaveBeenCalledWith(5);
@@ -166,7 +172,7 @@ describe(ZoomInteraction, () => {
 
     it('continuous drags rotate camera using delta between calls', () => {
       const interaction = new ZoomInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
@@ -184,7 +190,7 @@ describe(ZoomInteraction, () => {
   describe(ZoomInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new ZoomInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
@@ -230,10 +236,12 @@ describe(TwistInteraction, () => {
   const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
   const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
 
+  const canvasPoint = Point.create(0, 0);
+
   describe(TwistInteraction.prototype.beginDrag, () => {
     it('should start an interaction', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
     });
@@ -242,7 +250,7 @@ describe(TwistInteraction, () => {
   describe(TwistInteraction.prototype.drag, () => {
     it('should transform the camera for each drag event', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
@@ -260,7 +268,7 @@ describe(TwistInteraction, () => {
   describe(TwistInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, api);
+      interaction.beginDrag(event1, canvasPoint, api);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).toHaveBeenCalledTimes(1);

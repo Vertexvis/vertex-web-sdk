@@ -12,6 +12,11 @@ interface CameraRenderOptions {
   animation?: Animation.Animation;
 }
 
+interface ClippingPlanes {
+  near: number;
+  far: number;
+}
+
 export class TerminalFlyToExecutor {
   public constructor(private flyToOptions?: FlyTo.FlyToOptions) {}
 
@@ -106,7 +111,7 @@ export class Camera implements FrameCamera.FrameCamera {
         Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
       );
 
-    // height (of scene?) over diameter
+    // ratio of the height of the frustum to the distance along the view vector
     let hOverD = Math.tan(this.fovY * PI_OVER_360);
 
     if (this.aspectRatio < 1.0) {
@@ -120,6 +125,30 @@ export class Camera implements FrameCamera.FrameCamera {
     const position = Vector3.subtract(lookAt, vvec);
 
     return this.update({ lookAt, position });
+  }
+
+  /**
+   * Returns the distance from the camera's position to the center
+   * of the provided bounding box (or the scene's visible bounding box if not provided).
+   *
+   * @param boundingBox - The bounding box to determine distance from.
+   */
+  public distanceToBoundingBoxCenter(
+    boundingBox?: BoundingBox.BoundingBox
+  ): number {
+    const box = boundingBox || this.boundingBox;
+    const boundingBoxCenter = BoundingBox.center(box);
+    const cameraToCenter = Vector3.subtract(this.position, boundingBoxCenter);
+
+    const distanceToCenterAlongViewVec =
+      Math.abs(
+        Vector3.dot(
+          Vector3.subtract(this.lookAt, this.position),
+          cameraToCenter
+        )
+      ) / Vector3.magnitude(Vector3.subtract(this.lookAt, this.position));
+
+    return distanceToCenterAlongViewVec;
   }
 
   /**
@@ -220,13 +249,30 @@ export class Camera implements FrameCamera.FrameCamera {
     angleInRadians: number,
     axis: Vector3.Vector3
   ): Camera {
+    return this.rotateAroundAxisAtPoint(angleInRadians, this.lookAt, axis);
+  }
+
+  /**
+   * Repositions the camera by rotating its current position around an axis
+   * defined at a specific world point.
+   *
+   * @param angleInRadians The angle, in radians, to rotate.
+   * @param point The point in world space to place the axis at.
+   * @param axis A normalized vector to rotate around.
+   */
+  public rotateAroundAxisAtPoint(
+    angleInRadians: number,
+    point: Vector3.Vector3,
+    axis: Vector3.Vector3
+  ): Camera {
     return this.update({
       position: Vector3.rotateAboutAxis(
         angleInRadians,
         this.position,
         axis,
-        this.lookAt
+        point
       ),
+      lookAt: Vector3.rotateAboutAxis(angleInRadians, this.lookAt, axis, point),
       up: Vector3.rotateAboutAxis(
         angleInRadians,
         this.up,
@@ -265,6 +311,40 @@ export class Camera implements FrameCamera.FrameCamera {
     } else {
       throw new Error('Fly to must specify at least one option.');
     }
+  }
+
+  private computeClippingPlanes(
+    camera: FrameCamera.FrameCamera
+  ): ClippingPlanes {
+    const boundingBoxCenter = BoundingBox.center(this.boundingBox);
+    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
+    const centerToBoundingPlane = Vector3.subtract(
+      this.boundingBox.max,
+      boundingBoxCenter
+    );
+    const distanceToCenterAlongViewVec =
+      Math.abs(
+        Vector3.dot(
+          Vector3.subtract(camera.lookAt, camera.position),
+          cameraToCenter
+        )
+      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
+    const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
+    let far = distanceToCenterAlongViewVec + radius;
+    let near = far * 0.01;
+
+    if (near > distanceToCenterAlongViewVec - radius) {
+      if (near > 1000) {
+        const difference = near - 1000;
+        near = 1000;
+        far -= difference;
+      } else {
+      }
+    } else {
+      near = distanceToCenterAlongViewVec - radius;
+    }
+
+    return { far, near };
   }
 
   /**
@@ -308,5 +388,23 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get aspectRatio(): number {
     return this.aspect;
+  }
+
+  /**
+   * The camera's near clipping plane.
+   */
+  public get near(): number {
+    const { near } = this.computeClippingPlanes(this.data);
+
+    return near;
+  }
+
+  /**
+   * The camera's far clipping plane.
+   */
+  public get far(): number {
+    const { far } = this.computeClippingPlanes(this.data);
+
+    return far;
   }
 }

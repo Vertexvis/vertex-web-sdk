@@ -5,6 +5,7 @@ import {
   PanInteraction,
   RotateInteraction,
   TwistInteraction,
+  RotatePointInteraction,
 } from './mouseInteractions';
 import { InteractionApi } from './interactionApi';
 import { ConfigProvider } from '../config/config';
@@ -18,6 +19,7 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
       'pointerup',
       'pointermove',
       new RotateInteraction(),
+      new RotatePointInteraction(),
       new ZoomInteraction(),
       new PanInteraction(),
       new TwistInteraction(),

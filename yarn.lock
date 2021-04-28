@@ -1775,15 +1775,10 @@
     eslint-plugin-prettier "^3.3.1"
     prettier "^2.2.1"
 
-"@vertexvis/frame-streaming-protos@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.1.tgz#71aee8bd41984c856b797d7f9df1efad8b051b36"
-  integrity sha512-ssOeM8jwR+jFRuIkxhuCNA7IweHkgbAOtK5wvpd8sGJqcZU8WhC25IRVi8zl2YU60WYAuyGoGQ5SqECgjGlrfw==
-
-"@vertexvis/frame-streaming-protos@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.2.tgz#589b5243751b4dffb7f0cc2b2c05497da9e47b86"
-  integrity sha512-6Ud8U984+WKPgzczjX4GvvL4w2+3/hWax5u3eMGcVVg1EHQ1zNXbG1CHL0V3Vw8E33rQ5Za9tXbjxoSR5UybRQ==
+"@vertexvis/frame-streaming-protos@^0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.4.tgz#8b3adb1d12058a3f11c4d9ddf8eb0ca3bb964a42"
+  integrity sha512-HBdIjXa0w3btvi3y1uXbRN54zn0OdUkzgmFrQrZfJ5G7C8nULzVCL8jZ0VIykb93Zwo1Mas6+8kj0VNdjw1Nnw==
 
 "@vertexvis/jest-config-vertexvis@0.5.2", "@vertexvis/jest-config-vertexvis@^0.5.0":
   version "0.5.2"

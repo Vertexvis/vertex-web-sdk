@@ -38,6 +38,17 @@ describe(Camera, () => {
     });
   });
 
+  describe(Camera.prototype.distanceToBoundingBoxCenter, () => {
+    const forward = FrameCamera.create({ position: { x: 0, y: 0, z: 5 } });
+    const camera = new Camera(stream, 0.5, forward, boundingBox);
+
+    it('computes the distance to the center of the provided bounding box', () => {
+      const distance = camera.distanceToBoundingBoxCenter(boundingBox);
+
+      expect(distance).toBeCloseTo(5);
+    });
+  });
+
   describe(Camera.prototype.rotateAroundAxis, () => {
     const camera = new Camera(
       stream,
@@ -54,6 +65,32 @@ describe(Camera, () => {
       const axis = Vector3.up();
 
       const result = camera.rotateAroundAxis(degrees, axis);
+      expect(result.position.x).toBeCloseTo(1, 5);
+      expect(result.position.y).toBeCloseTo(0, 5);
+      expect(result.position.z).toBeCloseTo(0, 5);
+    });
+  });
+
+  describe(Camera.prototype.rotateAroundAxisAtPoint, () => {
+    const camera = new Camera(
+      stream,
+      1,
+      {
+        ...data,
+        position: Vector3.back(),
+      },
+      boundingBox
+    );
+
+    it('returns camera with position rotated around axis', () => {
+      const degrees = Angle.toRadians(90);
+      const axis = Vector3.up();
+
+      const result = camera.rotateAroundAxisAtPoint(
+        degrees,
+        Vector3.origin(),
+        axis
+      );
       expect(result.position.x).toBeCloseTo(1, 5);
       expect(result.position.y).toBeCloseTo(0, 5);
       expect(result.position.z).toBeCloseTo(0, 5);
@@ -306,6 +343,34 @@ describe(Camera, () => {
         }),
         true
       );
+    });
+
+    it('should compute near and far clipping planes correctly', () => {
+      const newBoundingBox = BoundingBox.create(
+        Vector3.create(-1, -1, -1),
+        Vector3.create(1, 1, 1)
+      );
+      const boundingBoxCenter = BoundingBox.center(newBoundingBox);
+      const centerToBoundingPlane = Vector3.subtract(
+        newBoundingBox.max,
+        boundingBoxCenter
+      );
+      const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
+
+      const newCamera = new Camera(
+        stream,
+
+        1,
+        {
+          ...data,
+          position: Vector3.create(0, 0, 1),
+          lookAt: Vector3.origin(),
+        },
+        newBoundingBox
+      );
+
+      expect(newCamera.far).toBe(1 + radius);
+      expect(newCamera.near).toBe((1 + radius) * 0.01);
     });
   });
 });

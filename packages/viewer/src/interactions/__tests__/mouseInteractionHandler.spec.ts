@@ -8,6 +8,7 @@ import {
   ZoomInteraction,
   RotateInteraction,
   TwistInteraction,
+  RotatePointInteraction,
 } from '../mouseInteractions';
 import { parseConfig } from '../../config/config';
 
@@ -15,9 +16,11 @@ const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
+const RotatePointInteractionMock = RotateInteraction as jest.Mock<RotatePointInteraction>;
 const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
+  const rotatePointInteraction = new RotatePointInteractionMock();
   const zoomInteraction = new ZoomInteractionMock();
   const panInteraction = new PanInteractionMock();
   const twistInteraction = new TwistInteractionMock();
@@ -69,6 +72,7 @@ describe(MouseInteractionHandler, () => {
       },
     }),
     rotateInteraction,
+    rotatePointInteraction,
     zoomInteraction,
     panInteraction,
     twistInteraction
@@ -155,6 +159,12 @@ describe(MouseInteractionHandler, () => {
       handler.setPrimaryInteractionType('rotate');
       await simulatePrimaryInteractions(50);
       expect(rotateInteraction.beginDrag).toHaveBeenCalled();
+    });
+
+    it('sets rotate point interaction', async () => {
+      handler.setPrimaryInteractionType('rotate-point');
+      await simulatePrimaryInteractions(50);
+      expect(rotatePointInteraction.beginDrag).toHaveBeenCalled();
     });
 
     it('sets zoom interaction', async () => {

@@ -8,13 +8,19 @@ import {
   PanInteraction,
   MouseInteraction,
   TwistInteraction,
+  RotatePointInteraction,
 } from './mouseInteractions';
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import { ConfigProvider } from '../config/config';
 
-export type InteractionType = 'rotate' | 'zoom' | 'pan' | 'twist';
+export type InteractionType =
+  | 'rotate'
+  | 'zoom'
+  | 'pan'
+  | 'twist'
+  | 'rotate-point';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -43,6 +49,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
     private rotateInteraction: RotateInteraction,
+    private rotatePointInteraction: RotatePointInteraction,
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
@@ -85,6 +92,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       case 'twist':
         this.currentInteraction = this.twistInteraction;
         break;
+      case 'rotate-point':
+        this.currentInteraction = this.rotatePointInteraction;
+        break;
       default:
         this.currentInteraction = undefined;
     }
@@ -110,6 +120,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
+        break;
+      case 'rotate-point':
+        this.primaryInteraction = this.rotatePointInteraction;
         break;
       case 'zoom':
         this.primaryInteraction = this.zoomInteraction;
@@ -187,6 +200,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected beginDrag(event: BaseEvent): void {
+    if (this.keyboardControls && event.metaKey && event.shiftKey) {
+      this.currentInteraction = this.rotatePointInteraction;
+    }
+
     if (event.buttons === 1) {
       this.draggingInteraction =
         this.currentInteraction || this.primaryInteraction;
@@ -195,7 +212,12 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
-      this.draggingInteraction.beginDrag(event, this.interactionApi);
+      this.draggingInteraction.beginDrag(
+        event,
+        this.getCanvasPosition(event) ||
+          Point.create(event.clientX, event.clientY),
+        this.interactionApi
+      );
     }
   }
 
