@@ -18,8 +18,7 @@ import {
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable } from '@vertexvis/utils';
-import { isLoadedRow, Row } from './lib/row';
-import { CollectionBinding, generateBindings } from './lib/binding';
+import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
@@ -57,9 +56,6 @@ export type RowDataProvider = (row: Row) => Record<string, unknown>;
 const MIN_CLEAR_UNUSED_DATA_MS = 25;
 
 interface StateMap {
-  leftTemplate?: HTMLTemplateElement;
-  rightTemplate?: HTMLTemplateElement;
-  bindings: Map<Element, CollectionBinding>;
   idleCallbackId?: number;
   connected: boolean;
   onStateChangeDisposable?: Disposable;
@@ -210,7 +206,6 @@ export class SceneTree {
    */
   @State()
   private stateMap: StateMap = {
-    bindings: new Map(),
     connected: false,
     componentLoaded: false,
 
@@ -551,15 +546,6 @@ export class SceneTree {
       passive: true,
     });
 
-    this.stateMap.leftTemplate =
-      (this.el.querySelector('template[slot="left"]') as HTMLTemplateElement) ||
-      undefined;
-
-    this.stateMap.rightTemplate =
-      (this.el.querySelector(
-        'template[slot="right"]'
-      ) as HTMLTemplateElement) || undefined;
-
     this.ensureTemplateDefined();
 
     this.viewportHeight = getSceneTreeViewportHeight(this.el);
@@ -576,10 +562,6 @@ export class SceneTree {
       this.stateMap.startIndex,
       this.stateMap.endIndex
     );
-  }
-
-  protected async componentDidRender(): Promise<void> {
-    this.cleanupBindings();
   }
 
   protected render(): h.JSX.IntrinsicElements {
@@ -831,26 +813,6 @@ export class SceneTree {
     return rows.map((row) => (row != null ? this.populateRowData(row) : row));
   }
 
-  private populateSlot(
-    template: HTMLTemplateElement,
-    row: Row,
-    el: HTMLElement
-  ): void {
-    if (el.firstElementChild == null) {
-      const node = template.content.cloneNode(true);
-      el.appendChild(node);
-    }
-
-    if (el.firstElementChild != null) {
-      let binding = this.stateMap.bindings.get(el);
-      if (binding == null) {
-        binding = new CollectionBinding(generateBindings(el.firstElementChild));
-        this.stateMap.bindings.set(el, binding);
-      }
-      binding.bind(row);
-    }
-  }
-
   private handleScroll(): void {
     readDOM(() => {
       this.scrollTop = this.el.scrollTop || 0;
@@ -866,24 +828,20 @@ export class SceneTree {
     }
   }
 
-  private cleanupBindings(): void {
-    for (const key of this.stateMap.bindings.keys()) {
-      if (key.parentElement == null) {
-        this.stateMap.bindings.delete(key);
-      }
-    }
-  }
-
   private async computeRowHeight(): Promise<void> {
     if (this.isComputingRowHeight) {
-      const dummyData: Node.AsObject = {
-        id: { hex: '' },
-        name: 'Dummy row',
-        expanded: false,
-        selected: false,
-        visible: false,
-        isLeaf: false,
-        depth: 0,
+      const dummyData: LoadedRow = {
+        index: 0,
+        node: {
+          id: { hex: '' },
+          name: 'Dummy row',
+          expanded: false,
+          selected: false,
+          visible: false,
+          isLeaf: false,
+          depth: 0,
+        },
+        data: {},
       };
       const { bindings, element } = this.createInstancedTemplate();
       bindings.bind(dummyData);
@@ -939,12 +897,15 @@ export class SceneTree {
   }
 
   private ensureTemplateDefined(): void {
-    const template = this.el.querySelector('template');
-    if (template != null) {
-      this.stateMap.template = template;
-    } else {
-      console.warn('<vertex-scene-tree> requires a template');
+    let template = this.el.querySelector('template');
+    if (template == null) {
+      template = document.createElement('template');
+      template.innerHTML = `
+      <vertex-scene-tree-row node="{{row.node}}"></vertex-scene-tree-row>
+      `;
+      this.el.appendChild(template);
     }
+    this.stateMap.template = template;
   }
 
   private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
