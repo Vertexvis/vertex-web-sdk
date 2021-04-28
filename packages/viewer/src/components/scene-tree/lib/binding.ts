@@ -37,9 +37,11 @@ export class AttributeBinding extends NodeBinding<Element> {
   }
 
   public bind<T>(data: T): void {
-    const value = replaceBindingString(data, this.expr);
-    if (this.node.getAttribute(this.attr) !== value) {
-      this.node.setAttribute(this.attr, value);
+    const value = replaceBinding(data, this.expr);
+    const existingValue = (this.node as any)[this.attr];
+    if (existingValue !== value) {
+      // console.log('update binding', value);
+      (this.node as any)[this.attr] = value;
     }
   }
 }
@@ -113,15 +115,28 @@ function replaceBindingString(data: Record<string, any>, expr: string): string {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function replaceBinding(data: Record<string, any>, expr: string): any {
+  const path = extractBindingPath(expr);
+  if (path != null) {
+    const value = getBindableValue(data, path, true);
+    return value;
+  } else {
+    return expr;
+  }
+}
+
 function getBindableValue(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>,
   path: string,
-  ignoreHead = false
+  isHead = false
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const [head, ...tail] = path.split('.');
-  if (ignoreHead) {
+  if (isHead && tail.length === 0) {
+    return data;
+  } else if (isHead && tail.length > 0) {
     return getBindableValue(data, tail.join('.'), false);
   } else {
     const value = data[head];

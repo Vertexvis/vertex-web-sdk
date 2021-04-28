@@ -214,19 +214,6 @@ Type: `Promise<void>`
 | `--scene-tree-selected-color` | The background color of a row when selected. |
 
 
-## Dependencies
-
-### Depends on
-
-- [vertex-viewer-icon](../viewer-icon)
-
-### Graph
-```mermaid
-graph TD;
-  vertex-scene-tree --> vertex-viewer-icon
-  style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
-```
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

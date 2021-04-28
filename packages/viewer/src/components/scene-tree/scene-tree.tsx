@@ -17,8 +17,7 @@ import {
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
-import { Disposable } from '@vertexvis/utils';
-import classnames from 'classnames';
+import { Disposable, Sets } from '@vertexvis/utils';
 import { LoadedRow, Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
@@ -41,6 +40,11 @@ import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
 import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
 import { getElementBoundingClientRect } from '../viewer/utils';
+import { ElementPool } from './lib/element-pool';
+import {
+  generateInstanceFromTemplate,
+  InstancedTemplate,
+} from './lib/templates';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -63,6 +67,14 @@ interface StateMap {
   controller?: SceneTreeController;
   componentLoaded: boolean;
   jwt?: string;
+
+  elementPool?: ElementPool;
+  template?: HTMLTemplateElement;
+
+  startIndex: number;
+  endIndex: number;
+  viewportRows: Row[];
+  viewportRowMap: Map<string, Row>;
 }
 
 type OperationHandler = (data: {
@@ -98,7 +110,7 @@ export class SceneTree {
    * while scrolling.
    */
   @Prop()
-  public overScanCount = 10;
+  public overScanCount = 25;
 
   /**
    * A CSS selector that points to a `<vertex-viewer>` element. Either this
@@ -171,16 +183,7 @@ export class SceneTree {
   private el!: HTMLElement;
 
   @State()
-  private startIndex = 0;
-
-  @State()
-  private endIndex = 0;
-
-  @State()
   private viewportHeight: number | undefined;
-
-  @State()
-  private viewportRows: Row[] = [];
 
   @State()
   private isComputingRowHeight = true;
@@ -206,6 +209,11 @@ export class SceneTree {
     bindings: new Map(),
     connected: false,
     componentLoaded: false,
+
+    startIndex: 0,
+    endIndex: 0,
+    viewportRows: [],
+    viewportRowMap: new Map(),
   };
 
   @State()
@@ -535,7 +543,9 @@ export class SceneTree {
   }
 
   protected async componentDidLoad(): Promise<void> {
-    this.el.addEventListener('scroll', () => this.handleScroll());
+    this.el.addEventListener('scroll', () => this.handleScroll(), {
+      passive: true,
+    });
 
     this.stateMap.leftTemplate =
       (this.el.querySelector('template[slot="left"]') as HTMLTemplateElement) ||
@@ -548,7 +558,12 @@ export class SceneTree {
 
     readDOM(() => {
       this.viewportHeight = getSceneTreeViewportHeight(this.el);
-      this.updateRenderState();
+
+      this.ensureTemplateDefined();
+      this.createPool();
+
+      // this.updateRenderState();
+      this.updateElements();
     });
 
     this.stateMap.componentLoaded = true;
@@ -556,7 +571,11 @@ export class SceneTree {
 
   protected componentWillRender(): void {
     this.updateRenderState();
-    this.controller?.updateActiveRowRange(this.startIndex, this.endIndex);
+    this.updateElements();
+    this.controller?.updateActiveRowRange(
+      this.stateMap.startIndex,
+      this.stateMap.endIndex
+    );
   }
 
   protected componentDidRender(): void {
@@ -567,7 +586,6 @@ export class SceneTree {
   protected render(): h.JSX.IntrinsicElements {
     const rowHeight = this.getComputedOrPlaceholderRowHeight();
     const totalHeight = this.totalRows * rowHeight;
-    const startY = this.startIndex * rowHeight;
     return (
       <Host>
         {this.connectionError != null && (
@@ -588,92 +606,7 @@ export class SceneTree {
           </div>
         )}
 
-        <div class="rows" style={{ height: `${totalHeight}px` }}>
-          {this.isComputingRowHeight ? (
-            <div class="row" />
-          ) : (
-            this.viewportRows.map((row, i) => {
-              if (row == null) {
-                return <div class="row"></div>;
-              } else {
-                return (
-                  <div
-                    class={classnames('row', { 'is-selected': row.selected })}
-                    style={{ top: `${startY + rowHeight * i}px` }}
-                    onMouseDown={(event) => this.handleRowMouseDown(event, row)}
-                  >
-                    <span
-                      ref={(el) => {
-                        if (el != null && this.stateMap.leftTemplate != null) {
-                          this.populateSlot(
-                            this.stateMap.leftTemplate,
-                            row,
-                            el
-                          );
-                        }
-                      }}
-                    />
-                    <span
-                      style={{
-                        'margin-left': `${row.depth * 8}px`,
-                      }}
-                    />
-                    <span
-                      class="expand-toggle"
-                      onMouseDown={(event) => {
-                        event.stopPropagation();
-                        this.toggleExpandItem(row);
-                      }}
-                      onMouseUp={(event) => event.stopPropagation()}
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      {!row.isLeaf && row.expanded && '▾'}
-                      {!row.isLeaf && !row.expanded && '▸'}
-                    </span>
-                    <span class="row-text" title={row.name}>
-                      {row.name}
-                    </span>
-
-                    {this.stateMap.rightTemplate != null ? (
-                      <span
-                        ref={(el) => {
-                          if (
-                            el != null &&
-                            this.stateMap.rightTemplate != null
-                          ) {
-                            this.populateSlot(
-                              this.stateMap.rightTemplate,
-                              row,
-                              el
-                            );
-                          }
-                        }}
-                      />
-                    ) : (
-                      <button
-                        class={classnames('visibility-btn', {
-                          'is-hidden': !row.visible,
-                        })}
-                        onMouseDown={(event) => {
-                          event.stopPropagation();
-                          this.toggleItemVisibility(this.startIndex + i);
-                        }}
-                        onMouseUp={(event) => event.stopPropagation()}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        {row.visible ? (
-                          <vertex-viewer-icon name="visible" size="sm" />
-                        ) : (
-                          <vertex-viewer-icon name="hidden" size="sm" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                );
-              }
-            })
-          )}
-        </div>
+        <div class="rows" style={{ height: `${totalHeight}px` }} />
       </Host>
     );
   }
@@ -810,8 +743,8 @@ export class SceneTree {
         if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
           const [start, end] =
             this.controller?.getPageIndexesForRange(
-              this.startIndex,
-              this.startIndex + this.viewportRows.length
+              this.stateMap.startIndex,
+              this.stateMap.startIndex + this.stateMap.viewportRows.length
             ) || [];
 
           if (start != null && end != null) {
@@ -872,25 +805,33 @@ export class SceneTree {
       const rowHeight = this.getComputedOrPlaceholderRowHeight();
       const viewportCount = Math.ceil(this.viewportHeight / rowHeight);
 
-      this.startIndex = Math.max(
-        0,
-        Math.floor(this.scrollTop / rowHeight) - this.overScanCount
-      );
-      this.endIndex = Math.min(
-        this.totalRows,
-        this.startIndex + viewportCount + this.overScanCount * 2
+      const viewportStartIndex = Math.floor(this.scrollTop / rowHeight);
+      const viewportEndIndex = viewportStartIndex + viewportCount;
+
+      const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
+      const endIndex = Math.min(
+        this.totalRows - 1,
+        viewportEndIndex + this.overScanCount
       );
 
-      const rows = this.getViewportRows(
-        this.startIndex,
-        this.endIndex
-      ).map((row) => this.populateRowData(row));
-      this.viewportRows = rows;
+      const rows = this.getViewportRows(startIndex, endIndex);
+
+      const diff = startIndex - this.stateMap.startIndex;
+      if (diff > 0) {
+        this.stateMap.elementPool?.swapHeadToTail(diff);
+      } else {
+        this.stateMap.elementPool?.swapTailToHead(-diff);
+      }
+
+      this.stateMap.startIndex = startIndex;
+      this.stateMap.endIndex = endIndex;
+      this.stateMap.viewportRows = rows;
     }
   }
 
-  private getViewportRows(start: number, end: number): Row[] {
-    return this.rows.slice(start, end);
+  private getViewportRows(startIndex: number, endIndex: number): Row[] {
+    const rows = this.rows.slice(startIndex, endIndex + 1);
+    return rows.map((row) => (row != null ? this.populateRowData(row) : row));
   }
 
   private populateSlot(
@@ -973,5 +914,82 @@ export class SceneTree {
 
   private getConfig(): Config {
     return parseConfig(this.configEnv, this.config);
+  }
+
+  private ensureTemplateDefined(): void {
+    const template = this.el.querySelector('template');
+    if (template != null) {
+      this.stateMap.template = template;
+    } else {
+      console.warn('<vertex-scene-tree> requires a template');
+    }
+  }
+
+  private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
+    if (this.stateMap.template != null) {
+      return generateInstanceFromTemplate(this.stateMap.template);
+    } else {
+      throw new Error('No template defined for scene tree.');
+    }
+  }
+
+  private createPool(): void {
+    const container = this.el.shadowRoot?.querySelector('.rows');
+
+    if (this.viewportHeight == null) {
+      throw new Error('Viewport height is not defined');
+    }
+
+    if (container == null) {
+      throw new Error(
+        'Cannot create scene tree pool. Row container cannot be found'
+      );
+    }
+
+    // When doing a live reload, this function might get called multiple times.
+    // Only create the pool if on hasn't been created yet.
+    if (this.stateMap.elementPool == null) {
+      this.stateMap.elementPool = new ElementPool(container, () =>
+        this.createInstancedTemplate()
+      );
+    }
+  }
+
+  private updateElements(): void {
+    // writeDOM(() => {
+    this.updatePool();
+    this.bindData();
+    this.positionElements();
+    // });
+
+    // requestAnimationFrame(() => {
+    //   this.updatePool();
+    //   this.bindData();
+    //   this.positionElements();
+    // });
+  }
+
+  private updatePool(): void {
+    const count = this.stateMap.endIndex - this.stateMap.startIndex + 1;
+    this.stateMap.elementPool?.updateElements(count);
+  }
+
+  private bindData(): void {
+    this.stateMap.elementPool?.iterateElements((el, binding, i) => {
+      const row = this.stateMap.viewportRows[i];
+      if (row != null) {
+        binding.bind(row);
+      }
+      (el as any).tree = this;
+    });
+  }
+
+  private positionElements(): void {
+    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+    this.stateMap.elementPool?.iterateElements((el, _, i) => {
+      el.style.position = 'absolute';
+      el.style.top = `${rowHeight * (this.stateMap.startIndex + i)}px`;
+      el.style.height = `${rowHeight}px`;
+    });
   }
 }
