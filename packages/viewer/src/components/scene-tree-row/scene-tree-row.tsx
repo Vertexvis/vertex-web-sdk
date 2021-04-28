@@ -1,6 +1,5 @@
 import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
 import classnames from 'classnames';
-import { writeDOM } from '../../utils/stencil';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 
 @Component({
@@ -38,8 +37,9 @@ export class SceneTreeRow {
       return (
         <div
           class={classnames('root', {
-            'is-hidden': !this.row.visible,
-            'is-selected': this.row.selected,
+            hidden: !this.row.visible,
+            selected: this.row.selected,
+            leaf: this.row.isLeaf,
           })}
           ref={(ref) => (this.rootEl = ref)}
           onMouseDown={(event) => this.handleRowMouseDown(event)}
@@ -102,10 +102,8 @@ export class SceneTreeRow {
   }
 
   protected componentDidRender(): void {
-    writeDOM(() => {
-      const { depth = 0 } = this.row || {};
-      this.rootEl?.style.setProperty('--depth', `${depth}`);
-    });
+    const { depth = 0 } = this.row || {};
+    this.rootEl?.style.setProperty('--depth', `${depth}`);
   }
 
   private toggleExpansion(): void {
