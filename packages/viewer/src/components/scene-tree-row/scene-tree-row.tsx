@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, h, Prop, State } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
 import classnames from 'classnames';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 
@@ -131,7 +131,11 @@ export class SceneTreeRow {
   }
 
   private handleRowMouseDown(event: MouseEvent): void {
-    if (this.isSelectionEvent(event) && !this.interactionsDisabled) {
+    if (
+      event.button === 0 &&
+      this.isSelectionEvent(event) &&
+      !this.interactionsDisabled
+    ) {
       if (event.metaKey && this.row?.selected) {
         this.tree?.deselectItem(this.row);
       } else {

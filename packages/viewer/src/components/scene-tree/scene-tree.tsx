@@ -601,7 +601,9 @@ export class SceneTree {
           </div>
         )}
 
-        <div class="rows" style={{ height: `${totalHeight}px` }} />
+        <div class="rows" style={{ height: `${totalHeight}px` }}>
+          <slot></slot>
+        </div>
       </Host>
     );
   }
@@ -970,7 +972,7 @@ export class SceneTree {
     // When doing a live reload, this function might get called multiple times.
     // Only create the pool if on hasn't been created yet.
     if (this.stateMap.elementPool == null) {
-      this.stateMap.elementPool = new ElementPool(container, () =>
+      this.stateMap.elementPool = new ElementPool(this.el, () =>
         this.createInstancedTemplate()
       );
     }
