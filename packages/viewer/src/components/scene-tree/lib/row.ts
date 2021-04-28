@@ -1,38 +1,33 @@
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 
 export interface LoadedRow {
-  id: string;
-  isLeaf: boolean;
-  name: string;
-  selected: boolean;
-  expanded: boolean;
-  visible: boolean;
-  depth: number;
-  suppliedId?: string;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  data: object;
+  index: number;
+  node: Node.AsObject;
+  data: Record<string, unknown>;
 }
 
 export type Row = LoadedRow | undefined;
 
 /* eslint-disable padding-line-between-statements */
-export function fromNodeProto(node: Node): Row;
-export function fromNodeProto(nodes: Node[]): Row[];
-export function fromNodeProto(nodes: Node | Node[]): Row | Row[] {
+export function fromNodeProto(index: number, node: Node): Row;
+export function fromNodeProto(index: number, nodes: Node[]): Row[];
+export function fromNodeProto(
+  index: number,
+  nodes: Node | Node[]
+): Row | Row[] {
   if (Array.isArray(nodes)) {
-    return nodes.map((node) => fromNodeProto(node));
+    return nodes.map((node, i) => fromNodeProto(index + i, node));
   } else {
     return {
-      id: nodes.getId()?.getHex() || '',
-      expanded: nodes.getExpanded(),
-      isLeaf: nodes.getIsLeaf(),
-      name: nodes.getName(),
-      selected: nodes.getSelected(),
-      visible: nodes.getVisible(),
-      depth: nodes.getDepth(),
-      suppliedId: nodes.getSuppliedId()?.getValue(),
+      index,
+      node: nodes.toObject(),
       data: {},
     };
   }
 }
 /* eslint-enable padding-line-between-statements */
+
+export function isLoadedRow(obj: unknown): obj is LoadedRow {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return obj != null && (obj as any).hasOwnProperty('node');
+}

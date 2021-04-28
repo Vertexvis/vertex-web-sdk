@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { RowDataProvider, ScrollToOptions } from "./components/scene-tree/scene-tree";
+import { RowArg, RowDataProvider, ScrollToOptions } from "./components/scene-tree/scene-tree";
 import { Config } from "./config/config";
 import { Environment } from "./config/environment";
 import { SceneTreeErrorDetails } from "./components/scene-tree/lib/errors";
@@ -37,9 +37,9 @@ export namespace Components {
         "collapseAll": () => Promise<void>;
         /**
           * Performs an API call that will collapse the node associated to the specified row or row index.
-          * @param rowOrIndex A row or row index to collapse.
+          * @param row A row, row index, or node to collapse.
          */
-        "collapseItem": (rowOrIndex: number | Row) => Promise<void>;
+        "collapseItem": (row: RowArg) => Promise<void>;
         /**
           * An object to configure the scene tree.
          */
@@ -50,18 +50,18 @@ export namespace Components {
         "configEnv": Environment;
         /**
           * Performs an API call that will deselect the item associated to the given row or row index.
-          * @param rowOrIndex The row or row index to deselect.
+          * @param row The row, row index, or node to deselect.
          */
-        "deselectItem": (rowOrIndex: number | Row) => Promise<void>;
+        "deselectItem": (row: RowArg) => Promise<void>;
         /**
           * Performs an API call to expand all nodes in the tree.
          */
         "expandAll": () => Promise<void>;
         /**
           * Performs an API call that will expand the node associated to the specified row or row index.
-          * @param rowOrIndex A row or row index to expand.
+          * @param row A row, row index, or node to expand.
          */
-        "expandItem": (rowOrIndex: number | Row) => Promise<void>;
+        "expandItem": (row: RowArg) => Promise<void>;
         /**
           * Returns the row data from the given vertical client position.
           * @param clientY The vertical client position.
@@ -82,9 +82,9 @@ export namespace Components {
         "getRowForEvent": (event: MouseEvent | PointerEvent) => Promise<Row>;
         /**
           * Performs an API call that will hide the item associated to the given row or row index.
-          * @param rowOrIndex The row or row index to hide.
+          * @param row The row, row index, or node to hide.
          */
-        "hideItem": (rowOrIndex: number | Row) => Promise<void>;
+        "hideItem": (row: RowArg) => Promise<void>;
         /**
           * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
          */
@@ -113,10 +113,10 @@ export namespace Components {
         "scrollToItem": (itemId: string, options?: ScrollToOptions) => Promise<void>;
         /**
           * Performs an API call that will select the item associated to the given row or row index.
-          * @param rowOrIndex The row or row index to select.
+          * @param row The row, row index or node to select.
           * @param append `true` if the selection should append to the current selection, or `false` if this should replace the current selection. Defaults to replace.
          */
-        "selectItem": (rowOrIndex: number | Row, options?: SelectItemOptions) => Promise<void>;
+        "selectItem": (row: RowArg, options?: SelectItemOptions) => Promise<void>;
         /**
           * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
           * @see SceneTree.selectItem *
@@ -125,19 +125,19 @@ export namespace Components {
         "selectionDisabled": boolean;
         /**
           * Performs an API call that will show the item associated to the given row or row index.
-          * @param rowOrIndex The row or row index to show.
+          * @param row The row, row index, or node to show.
          */
-        "showItem": (rowOrIndex: number | Row) => Promise<void>;
+        "showItem": (row: RowArg) => Promise<void>;
         /**
           * Performs an API call that will either expand or collapse the node associated to the given row or row index.
-          * @param rowOrIndex The row or row index to collapse or expand.
+          * @param row The row, row index, or node to collapse or expand.
          */
-        "toggleExpandItem": (rowOrIndex: number | Row) => Promise<void>;
+        "toggleExpandItem": (row: RowArg) => Promise<void>;
         /**
           * Performs an API call that will either hide or show the item associated to the given row or row index.
-          * @param rowOrIndex The row or row index to toggle visibility.
+          * @param row The row, row index, or node to toggle visibility.
          */
-        "toggleItemVisibility": (rowOrIndex: number | Row) => Promise<void>;
+        "toggleItemVisibility": (row: RowArg) => Promise<void>;
         /**
           * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
          */

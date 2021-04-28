@@ -1,6 +1,6 @@
 import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classnames from 'classnames';
-import { LoadedRow, Row } from '../scene-tree/lib/row';
 
 @Component({
   tag: 'vertex-scene-tree-row',
@@ -9,7 +9,7 @@ import { LoadedRow, Row } from '../scene-tree/lib/row';
 })
 export class SceneTreeRow {
   @Prop()
-  public row?: LoadedRow;
+  public node?: Node.AsObject;
 
   @Prop()
   public tree?: HTMLVertexSceneTreeElement;
@@ -18,28 +18,28 @@ export class SceneTreeRow {
   public interactionsDisabled = false;
 
   @Event()
-  public expandToggled!: EventEmitter<LoadedRow>;
+  public expandToggled!: EventEmitter<void>;
 
   @Event()
-  public visibilityToggled!: EventEmitter<LoadedRow>;
+  public visibilityToggled!: EventEmitter<void>;
 
   @Event()
-  public selected!: EventEmitter<LoadedRow>;
+  public selected!: EventEmitter<void>;
 
   private rootEl?: HTMLElement;
   private expandBtn?: HTMLButtonElement;
   private visibilityBtn?: HTMLButtonElement;
 
   public render(): h.JSX.IntrinsicElements {
-    if (this.row == null) {
+    if (this.node == null) {
       return <div />;
     } else {
       return (
         <div
           class={classnames('root', {
-            hidden: !this.row.visible,
-            selected: this.row.selected,
-            leaf: this.row.isLeaf,
+            hidden: !this.node.visible,
+            selected: this.node.selected,
+            leaf: this.node.isLeaf,
           })}
           ref={(ref) => (this.rootEl = ref)}
           onMouseDown={(event) => this.handleRowMouseDown(event)}
@@ -49,31 +49,31 @@ export class SceneTreeRow {
           </div>
           <div class="indentation" />
           <button
-            class="expand-btn"
+            class="expand-btn no-shrink"
             ref={(ref) => (this.expandBtn = ref)}
             onMouseDown={() => this.toggleExpansion()}
           >
-            {!this.row.isLeaf && (
+            {!this.node.isLeaf && (
               <div
                 class={classnames('icon', {
-                  'icon-expanded': this.row.expanded,
-                  'icon-collapsed': !this.row.expanded,
+                  'icon-expanded': this.node.expanded,
+                  'icon-collapsed': !this.node.expanded,
                 })}
               />
             )}
           </button>
           <div class="label">
-            <slot name="label">{this.row.name}</slot>
+            <slot name="label">{this.node.name}</slot>
           </div>
           <button
-            class="visibility-btn"
+            class="visibility-btn no-shrink"
             ref={(ref) => (this.visibilityBtn = ref)}
             onMouseDown={() => this.toggleVisibility()}
           >
             <div
               class={classnames('icon', {
-                'icon-visible': this.row.visible,
-                'icon-hidden': !this.row.visible,
+                'icon-visible': this.node.visible,
+                'icon-hidden': !this.node.visible,
               })}
             />
           </button>
@@ -85,47 +85,25 @@ export class SceneTreeRow {
     }
   }
 
-  protected componentShouldUpdate(
-    oldValue: unknown,
-    newValue: unknown,
-    prop: string
-  ): boolean {
-    if (prop === 'row') {
-      const oldRow = oldValue as Row;
-      const newRow = newValue as Row;
-
-      return (
-        oldRow?.name !== newRow?.name ||
-        oldRow?.selected !== newRow?.selected ||
-        oldRow?.visible !== newRow?.visible ||
-        oldRow?.isLeaf !== newRow?.isLeaf ||
-        oldRow?.expanded !== newRow?.expanded ||
-        oldRow?.depth !== newRow?.depth
-      );
-    } else {
-      return oldValue !== newValue;
-    }
-  }
-
   protected componentDidRender(): void {
-    const { depth = 0 } = this.row || {};
+    const { depth = 0 } = this.node || {};
     this.rootEl?.style.setProperty('--depth', `${depth}`);
   }
 
   private toggleExpansion(): void {
-    this.ifRowDefined((row) => {
+    this.ifNodeDefined((node) => {
       if (!this.interactionsDisabled) {
-        this.tree?.toggleExpandItem(row);
-        this.expandToggled.emit(row);
+        this.tree?.toggleExpandItem(node);
+        this.expandToggled.emit();
       }
     });
   }
 
   private toggleVisibility(): void {
-    this.ifRowDefined((row) => {
+    this.ifNodeDefined((node) => {
       if (!this.interactionsDisabled) {
-        this.tree?.toggleItemVisibility(row);
-        this.visibilityToggled.emit(row);
+        this.tree?.toggleItemVisibility(node);
+        this.visibilityToggled.emit();
       }
     });
   }
@@ -136,10 +114,10 @@ export class SceneTreeRow {
       this.isSelectionEvent(event) &&
       !this.interactionsDisabled
     ) {
-      if (event.metaKey && this.row?.selected) {
-        this.tree?.deselectItem(this.row);
+      if (event.metaKey && this.node?.selected) {
+        this.tree?.deselectItem(this.node);
       } else {
-        this.tree?.selectItem(this.row, {
+        this.tree?.selectItem(this.node, {
           append: event.ctrlKey || event.metaKey,
         });
       }
@@ -149,18 +127,18 @@ export class SceneTreeRow {
   private isSelectionEvent(event: MouseEvent): boolean {
     if (event.target != null) {
       return (
-        this.rootEl?.contains(event.target as Node) === true &&
-        this.expandBtn?.contains(event.target as Node) === false &&
-        this.visibilityBtn?.contains(event.target as Node) === false
+        this.rootEl?.contains(event.target as Element) === true &&
+        this.expandBtn?.contains(event.target as Element) === false &&
+        this.visibilityBtn?.contains(event.target as Element) === false
       );
     } else {
       return false;
     }
   }
 
-  private ifRowDefined(f: (row: LoadedRow) => void): void {
-    if (this.row != null) {
-      f(this.row);
+  private ifNodeDefined(f: (row: Node.AsObject) => void): void {
+    if (this.node != null) {
+      f(this.node);
     }
   }
 }

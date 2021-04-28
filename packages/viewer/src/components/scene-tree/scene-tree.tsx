@@ -18,7 +18,7 @@ import {
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable } from '@vertexvis/utils';
-import { LoadedRow, Row } from './lib/row';
+import { isLoadedRow, Row } from './lib/row';
 import { CollectionBinding, generateBindings } from './lib/binding';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
@@ -45,6 +45,7 @@ import {
   generateInstanceFromTemplate,
   InstancedTemplate,
 } from './lib/templates';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -53,7 +54,7 @@ export type RowDataProvider = (row: Row) => Record<string, unknown>;
  * data. A value too low may cause contention with browser rendering. A value
  * too high will cause too many items to be accumulated.
  */
-const MIN_CLEAR_UNUSED_DATA_MS = 10;
+const MIN_CLEAR_UNUSED_DATA_MS = 25;
 
 interface StateMap {
   leftTemplate?: HTMLTemplateElement;
@@ -79,8 +80,11 @@ interface StateMap {
 
 type OperationHandler = (data: {
   viewer: HTMLVertexViewerElement;
-  row: LoadedRow;
+  id: string;
+  node: Node.AsObject;
 }) => void;
+
+export type RowArg = number | Row | Node.AsObject;
 
 /**
  * A set of options to configure the scroll to index behavior.
@@ -338,13 +342,13 @@ export class SceneTree {
    * Performs an API call that will expand the node associated to the specified
    * row or row index.
    *
-   * @param rowOrIndex A row or row index to expand.
+   * @param row A row, row index, or node to expand.
    */
   @Method()
-  public async expandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (!row.expanded) {
-        await this.controller?.expandNode(row.id);
+  public async expandItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ id, node }) => {
+      if (!node.expanded) {
+        await this.controller?.expandNode(id);
       }
     });
   }
@@ -353,13 +357,13 @@ export class SceneTree {
    * Performs an API call that will collapse the node associated to the
    * specified row or row index.
    *
-   * @param rowOrIndex A row or row index to collapse.
+   * @param row A row, row index, or node to collapse.
    */
   @Method()
-  public async collapseItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.controller?.collapseNode(row.id);
+  public async collapseItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ id, node }) => {
+      if (node.expanded) {
+        await this.controller?.collapseNode(id);
       }
     });
   }
@@ -368,15 +372,15 @@ export class SceneTree {
    * Performs an API call that will either expand or collapse the node
    * associated to the given row or row index.
    *
-   * @param rowOrIndex The row or row index to collapse or expand.
+   * @param row The row, row index, or node to collapse or expand.
    */
   @Method()
-  public async toggleExpandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.collapseItem(row);
+  public async toggleExpandItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ node }) => {
+      if (node.expanded) {
+        await this.collapseItem(node);
       } else {
-        await this.expandItem(row);
+        await this.expandItem(node);
       }
     });
   }
@@ -385,15 +389,15 @@ export class SceneTree {
    * Performs an API call that will either hide or show the item associated to
    * the given row or row index.
    *
-   * @param rowOrIndex The row or row index to toggle visibility.
+   * @param row The row, row index, or node to toggle visibility.
    */
   @Method()
-  public async toggleItemVisibility(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
+  public async toggleItemVisibility(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.visible) {
+        await hideItem(viewer, id);
       } else {
-        await showItem(viewer, row.id);
+        await showItem(viewer, id);
       }
     });
   }
@@ -402,13 +406,13 @@ export class SceneTree {
    * Performs an API call that will hide the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to hide.
+   * @param row The row, row index, or node to hide.
    */
   @Method()
-  public async hideItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
+  public async hideItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.visible) {
+        await hideItem(viewer, id);
       }
     });
   }
@@ -417,13 +421,13 @@ export class SceneTree {
    * Performs an API call that will show the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to show.
+   * @param row The row, row index, or node to show.
    */
   @Method()
-  public async showItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (!row.visible) {
-        await showItem(viewer, row.id);
+  public async showItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (!node.visible) {
+        await showItem(viewer, id);
       }
     });
   }
@@ -432,18 +436,18 @@ export class SceneTree {
    * Performs an API call that will select the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to select.
+   * @param row The row, row index or node to select.
    * @param append `true` if the selection should append to the current
    *  selection, or `false` if this should replace the current selection.
    *  Defaults to replace.
    */
   @Method()
   public async selectItem(
-    rowOrIndex: number | Row,
+    row: RowArg,
     options: SelectItemOptions = {}
   ): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      await selectItem(viewer, row.id, options);
+    await this.performRowOperation(row, async ({ viewer, id }) => {
+      await selectItem(viewer, id, options);
     });
   }
 
@@ -451,13 +455,13 @@ export class SceneTree {
    * Performs an API call that will deselect the item associated to the given
    * row or row index.
    *
-   * @param rowOrIndex The row or row index to deselect.
+   * @param row The row, row index, or node to deselect.
    */
   @Method()
-  public async deselectItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.selected) {
-        await deselectItem(viewer, row.id);
+  public async deselectItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.selected) {
+        await deselectItem(viewer, id);
       }
     });
   }
@@ -631,16 +635,6 @@ export class SceneTree {
     }
   }
 
-  private handleRowMouseDown(event: MouseEvent, row: LoadedRow): void {
-    if (!this.selectionDisabled && event.button === 0) {
-      if (event.metaKey && row.selected) {
-        this.deselectItem(row);
-      } else {
-        this.selectItem(row, { append: event.ctrlKey || event.metaKey });
-      }
-    }
-  }
-
   private handleViewerSceneReady = (): void => {
     console.debug('Scene tree received viewer scene ready');
     this.createController();
@@ -778,7 +772,7 @@ export class SceneTree {
   }
 
   private async performRowOperation(
-    rowOrIndex: number | Row,
+    rowOrIndex: number | Row | Node.AsObject,
     op: OperationHandler
   ): Promise<void> {
     const row =
@@ -788,13 +782,19 @@ export class SceneTree {
       throw new Error(`Cannot perform scene tree operation. Row not found.`);
     }
 
+    const node = isLoadedRow(row) ? row.node : row;
+
+    if (node.id == null) {
+      throw new Error(`Cannot perform scene tree operation. ID is undefined.`);
+    }
+
     if (this.viewer == null) {
       throw new Error(
         `Cannot perform scene tree operation. Cannot get reference to viewer.`
       );
     }
 
-    await op({ viewer: this.viewer, row });
+    await op({ viewer: this.viewer, id: node.id.hex, node });
   }
 
   private updateRenderState(): void {
@@ -876,15 +876,14 @@ export class SceneTree {
 
   private async computeRowHeight(): Promise<void> {
     if (this.isComputingRowHeight) {
-      const dummyData: LoadedRow = {
-        id: '',
+      const dummyData: Node.AsObject = {
+        id: { hex: '' },
         name: 'Dummy row',
         expanded: false,
         selected: false,
         visible: false,
         isLeaf: false,
         depth: 0,
-        data: {},
       };
       const { bindings, element } = this.createInstancedTemplate();
       bindings.bind(dummyData);
