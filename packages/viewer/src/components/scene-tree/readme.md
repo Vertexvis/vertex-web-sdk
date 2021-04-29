@@ -129,12 +129,16 @@ syntaxes:
 
 ### Attributes vs Properties
 
-Internally, using the `attr:name` syntax uses `element.setAttribute('name',
-value)`, and the `prop:name` syntax will use `element.name = value`.
+The `attr:name` syntax will use `element.setAttribute('name', value)` to assign
+a value to a DOM attribute. The `prop:name` syntax uses `element.name = value`
+for assignment.
 
-Beyond these syntax differences, DOM attributes must be strings. However, DOM
-properties can be objects. Because of this, attribute bindings can support
-string interpolation, but property bindings cannot.
+With attribute binding, the browser can only assign strings to attributes.
+Because of this, you cannot use an attribute binding to assign a JS object to an
+attribute. In these scenarios, using a property binding is preferred. However,
+because attribute bindings are string values, they can support string
+interpolation. So doing `<div attr:title="Hello {{row.data.name}}"></div>` would
+work for an attribute, but not for a property binding.
 
 <!-- Auto Generated Below -->
 

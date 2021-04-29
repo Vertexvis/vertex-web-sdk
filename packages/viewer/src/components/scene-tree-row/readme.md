@@ -64,8 +64,8 @@ about how data binding.
 
 ## CSS Selectors
 
-The row will set certain CSS selectors depending on the state of the node.
-Selectors can be used to customize the styling of your slots depending on which
+The row will set certain CSS selectors depending on the state of the node. These
+selectors are used to customize the styling of your slots depending on which
 selectors are set. The following is a list of selectors that will be set:
 
 * `selected`: Specifies that the row's node has been selected.
@@ -107,7 +107,7 @@ selectors are set. The following is a list of selectors that will be set:
 
 ## Event Handlers
 
-The row dispatches events when a user expands, selects or changes the node's
+The row will dispatch events when a user expands, selects, or changes the node's
 visibility through user interactions. You can bind to these events to perform
 custom behavior through bindings and the `rowData` callback.
 
@@ -134,6 +134,41 @@ custom behavior through bindings and the `rowData` callback.
   </body>
 </html>
 ```
+
+You can also bind events from your template to callbacks that are returned by
+`rowData` using the `event:[eventName]` syntax.
+
+**Example:** Binding to an event.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree class="tree">
+      <template>
+        <vertex-scene-tree-row prop:node={{row.node}}>
+          <button slot="right-gutter" event:mousedown="{{row.data.handler}}">
+            Hi
+          </button>
+        </vertex-scene-tree-row>
+      </template>
+    </vertex-scene-tree>
+
+    <script type="module">
+      const tree = document.querySelector('vertex-scene-tree');
+
+      tree.rowData = (row) => {
+        return { handler: (event) =>
+          event.preventDefault(); // prevents the row from being selected.
+          console.log('click', row);
+        };
+      }
+    </script>
+  </body>
+</html>
+```
+
+**Note:** You should call `event.preventDefault()` for `mousedown` events if you
+do not want your DOM element to trigger a selection of the row.
 
 <!-- Auto Generated Below -->
 

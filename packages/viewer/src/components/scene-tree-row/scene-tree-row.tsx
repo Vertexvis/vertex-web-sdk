@@ -1,11 +1,14 @@
-import { Component, Event, EventEmitter, h, Host, Prop } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+} from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classnames from 'classnames';
-import {
-  getSceneTreeRowExpandContainsElement,
-  getSceneTreeRowRootContainsElement,
-  getSceneTreeRowVisibilityContainsElement,
-} from './lib/dom';
 
 /**
  * A `<vertex-scene-tree-row>` component that is responsible for rendering a row
@@ -70,9 +73,10 @@ export class SceneTreeRow {
   @Event()
   public selectionToggled!: EventEmitter<void>;
 
+  @Element()
+  private hostEl!: HTMLElement;
+
   private rootEl?: HTMLElement;
-  private expandBtn?: HTMLButtonElement;
-  private visibilityBtn?: HTMLButtonElement;
 
   public render(): h.JSX.IntrinsicElements {
     if (this.node == null) {
@@ -86,19 +90,17 @@ export class SceneTreeRow {
             leaf: this.node.isLeaf,
           })}
         >
-          <div
-            class="root"
-            ref={(ref) => (this.rootEl = ref)}
-            onMouseDown={(event) => this.handleRowMouseDown(event)}
-          >
+          <div class="root" ref={(ref) => (this.rootEl = ref)}>
             <div class="no-shrink">
               <slot name="left-gutter" />
             </div>
             <div class="indentation" />
             <button
               class="expand-btn no-shrink"
-              ref={(ref) => (this.expandBtn = ref)}
-              onMouseDown={() => this.toggleExpansion()}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                this.toggleExpansion();
+              }}
             >
               {!this.node.isLeaf && (
                 <div
@@ -114,8 +116,10 @@ export class SceneTreeRow {
             </div>
             <button
               class="visibility-btn no-shrink"
-              ref={(ref) => (this.visibilityBtn = ref)}
-              onMouseDown={() => this.toggleVisibility()}
+              onMouseDown={(event) => {
+                event?.preventDefault();
+                this.toggleVisibility();
+              }}
             >
               <div
                 class={classnames('icon', {
@@ -131,6 +135,15 @@ export class SceneTreeRow {
         </Host>
       );
     }
+  }
+
+  /**
+   * @internal
+   */
+  protected componentDidLoad(): void {
+    this.hostEl.addEventListener('mousedown', (event) =>
+      this.handleRowMouseDown(event)
+    );
   }
 
   /**
@@ -161,8 +174,8 @@ export class SceneTreeRow {
 
   private handleRowMouseDown(event: MouseEvent): void {
     if (
+      !event.defaultPrevented &&
       event.button === 0 &&
-      this.isSelectionEvent(event) &&
       !this.interactionsDisabled
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
@@ -173,19 +186,6 @@ export class SceneTreeRow {
         });
       }
       this.selectionToggled.emit();
-    }
-  }
-
-  private isSelectionEvent(event: MouseEvent): boolean {
-    const target = event.target as HTMLElement | undefined;
-    if (target != null) {
-      return (
-        getSceneTreeRowRootContainsElement(this.rootEl, target) &&
-        !getSceneTreeRowExpandContainsElement(this.expandBtn, target) &&
-        !getSceneTreeRowVisibilityContainsElement(this.visibilityBtn, target)
-      );
-    } else {
-      return false;
     }
   }
 

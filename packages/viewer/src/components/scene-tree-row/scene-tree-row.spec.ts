@@ -1,26 +1,11 @@
-jest.mock('./lib/dom');
-
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import Chance from 'chance';
-import {
-  getSceneTreeRowExpandContainsElement,
-  getSceneTreeRowRootContainsElement,
-  getSceneTreeRowVisibilityContainsElement,
-} from './lib/dom';
 import { SceneTreeRow } from './scene-tree-row';
 
 const random = new Chance();
 
 describe('<vertex-scene-tree-row>', () => {
-  beforeEach(() => {
-    (getSceneTreeRowRootContainsElement as jest.Mock).mockReturnValue(true);
-    (getSceneTreeRowExpandContainsElement as jest.Mock).mockReturnValue(false);
-    (getSceneTreeRowVisibilityContainsElement as jest.Mock).mockReturnValue(
-      false
-    );
-  });
-
   it('renders empty element if node is undefined', async () => {
     const { row } = await newComponentSpec({
       html: `<vertex-scene-tree-row></vertex-scene-tree-row>`,
@@ -211,8 +196,7 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selectionToggled', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
+    row.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
 
     expect(tree.selectItem).toHaveBeenCalled();
     expect(selected).toHaveBeenCalled();
@@ -234,8 +218,7 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selectionToggled', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(
+    row.dispatchEvent(
       new MouseEvent('mousedown', { button: 0, metaKey: true })
     );
 
@@ -262,8 +245,7 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selectionToggled', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(
+    row.dispatchEvent(
       new MouseEvent('mousedown', { button: 0, ctrlKey: true })
     );
 
@@ -290,8 +272,7 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selectionToggled', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(
+    row.dispatchEvent(
       new MouseEvent('mousedown', { button: 0, metaKey: true })
     );
 
@@ -315,8 +296,7 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selectionToggled', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(
+    row.dispatchEvent(
       new MouseEvent('mousedown', { button: 0, ctrlKey: true })
     );
 
@@ -324,9 +304,7 @@ describe('<vertex-scene-tree-row>', () => {
     expect(selected).toHaveBeenCalled();
   });
 
-  it('does not select if event from interaction button', async () => {
-    (getSceneTreeRowExpandContainsElement as jest.Mock).mockReturnValue(true);
-
+  it('does not select if event default behavior prevented', async () => {
     const node = createNode({ selected: false });
     const { row } = await newComponentSpec({
       html: `
@@ -341,10 +319,9 @@ describe('<vertex-scene-tree-row>', () => {
     const selected = jest.fn();
     row.addEventListener('selected', selected);
 
-    const expandBtn = row.shadowRoot?.querySelector('.root');
-    expandBtn?.dispatchEvent(
-      new MouseEvent('mousedown', { button: 0, metaKey: true })
-    );
+    const event = new MouseEvent('mousedown', { button: 0, metaKey: true });
+    event.preventDefault();
+    row.dispatchEvent(event);
 
     expect(selected).not.toHaveBeenCalled();
   });
