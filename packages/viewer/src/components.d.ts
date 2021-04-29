@@ -347,7 +347,7 @@ declare namespace LocalJSX {
           * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
          */
         "configEnv"?: Environment;
-        "onError"?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
+        "onConnectionError"?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
         /**
           * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
          */

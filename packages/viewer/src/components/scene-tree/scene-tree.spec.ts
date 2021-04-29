@@ -202,7 +202,7 @@ describe('<vertex-scene-tree />', () => {
             <vertex-viewer id="viewer"></vertex-viewer>
           `,
         setup: ({ page }) => {
-          page.root?.addEventListener('error', (event: unknown) => {
+          page.root?.addEventListener('connectionError', (event: unknown) => {
             const evt = event as CustomEvent<SceneTreeErrorDetails>;
             expect(evt.detail.code).toBe(
               SceneTreeErrorCode.SCENE_TREE_DISABLED

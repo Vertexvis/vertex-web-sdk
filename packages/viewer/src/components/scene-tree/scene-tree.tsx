@@ -180,7 +180,7 @@ export class SceneTree {
   public selectionDisabled = false;
 
   @Event()
-  public error!: EventEmitter<SceneTreeErrorDetails>;
+  public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
   @Element()
   private el!: HTMLElement;
@@ -219,7 +219,7 @@ export class SceneTree {
   };
 
   @State()
-  private connectionError: SceneTreeErrorDetails | undefined;
+  private connectionErrorDetails: SceneTreeErrorDetails | undefined;
 
   /* eslint-disable lines-between-class-members */
   /**
@@ -488,7 +488,7 @@ export class SceneTree {
     const { clientY, currentTarget } = event;
     if (
       currentTarget != null &&
-      this.connectionError == null &&
+      this.connectionErrorDetails == null &&
       getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
     ) {
       return this.getRowAtClientY(clientY);
@@ -581,15 +581,15 @@ export class SceneTree {
     const totalHeight = this.totalRows * rowHeight;
     return (
       <Host>
-        {this.connectionError != null && (
+        {this.connectionErrorDetails != null && (
           <div class="error">
             <span>
-              {this.connectionError.message}
-              {this.connectionError.link && (
+              {this.connectionErrorDetails.message}
+              {this.connectionErrorDetails.link && (
                 <span>
                   {' '}
                   See our{' '}
-                  <a href={this.connectionError.link} target="_blank">
+                  <a href={this.connectionErrorDetails.link} target="_blank">
                     documentation
                   </a>{' '}
                   for more information.
@@ -667,7 +667,7 @@ export class SceneTree {
         await controller.fetchPage(0);
         this.stateMap.subscribeDisposable = controller.subscribe();
         this.stateMap.connected = true;
-        this.connectionError = undefined;
+        this.connectionErrorDetails = undefined;
       } catch (e) {
         if (isGrpcServiceError(e)) {
           this.handleConnectionError(e);
@@ -678,17 +678,17 @@ export class SceneTree {
 
   private handleConnectionError(e: ServiceError): void {
     if (e.code === grpc.Code.FailedPrecondition) {
-      this.connectionError = new SceneTreeErrorDetails(
+      this.connectionErrorDetails = new SceneTreeErrorDetails(
         SceneTreeErrorCode.SCENE_TREE_DISABLED,
         'https://developer.vertexvis.com'
       );
     } else {
-      this.connectionError = new SceneTreeErrorDetails(
+      this.connectionErrorDetails = new SceneTreeErrorDetails(
         SceneTreeErrorCode.UNKNOWN
       );
     }
 
-    this.error.emit(this.connectionError);
+    this.connectionError.emit(this.connectionErrorDetails);
   }
 
   private async connectViewer(viewer: HTMLVertexViewerElement): Promise<void> {
