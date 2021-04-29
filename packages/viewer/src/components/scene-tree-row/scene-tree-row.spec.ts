@@ -209,7 +209,7 @@ describe('<vertex-scene-tree-row>', () => {
     (row as any).tree = tree;
 
     const selected = jest.fn();
-    row.addEventListener('selected', selected);
+    row.addEventListener('selectionToggled', selected);
 
     const expandBtn = row.shadowRoot?.querySelector('.root');
     expandBtn?.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
@@ -232,7 +232,7 @@ describe('<vertex-scene-tree-row>', () => {
     (row as any).tree = tree;
 
     const selected = jest.fn();
-    row.addEventListener('selected', selected);
+    row.addEventListener('selectionToggled', selected);
 
     const expandBtn = row.shadowRoot?.querySelector('.root');
     expandBtn?.dispatchEvent(
@@ -260,7 +260,7 @@ describe('<vertex-scene-tree-row>', () => {
     (row as any).tree = tree;
 
     const selected = jest.fn();
-    row.addEventListener('selected', selected);
+    row.addEventListener('selectionToggled', selected);
 
     const expandBtn = row.shadowRoot?.querySelector('.root');
     expandBtn?.dispatchEvent(
@@ -288,7 +288,7 @@ describe('<vertex-scene-tree-row>', () => {
     (row as any).tree = tree;
 
     const selected = jest.fn();
-    row.addEventListener('selected', selected);
+    row.addEventListener('selectionToggled', selected);
 
     const expandBtn = row.shadowRoot?.querySelector('.root');
     expandBtn?.dispatchEvent(
@@ -313,7 +313,7 @@ describe('<vertex-scene-tree-row>', () => {
     (row as any).tree = tree;
 
     const selected = jest.fn();
-    row.addEventListener('selected', selected);
+    row.addEventListener('selectionToggled', selected);
 
     const expandBtn = row.shadowRoot?.querySelector('.root');
     expandBtn?.dispatchEvent(
