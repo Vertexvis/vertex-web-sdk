@@ -123,62 +123,66 @@ describe(AttributeBinding, () => {
 });
 
 describe(EventHandlerBinding, () => {
-  it('replaces event handler', () => {
+  it('adds event handler', () => {
     const node = document.createElement('div');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (node as any).onclick = '{{data.func}}';
 
     const data = { func: jest.fn() };
-    const binding = new EventHandlerBinding(node, '{{data.func}}', 'onclick');
+    const binding = new EventHandlerBinding(node, '{{data.func}}', 'click');
     binding.bind(data);
 
-    expect(node.onclick).toBe(data.func);
+    node.dispatchEvent(new MouseEvent('click'));
+    expect(data.func).toHaveBeenCalled();
   });
 
   it('does nothing if binding expression invalid', () => {
     const node = document.createElement('div');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (node as any).onclick = '{{data.func';
 
     const data = { func: jest.fn() };
-    const binding = new EventHandlerBinding(node, '{{data.func', 'onclick');
-
+    const binding = new EventHandlerBinding(node, '{{data.func', 'click');
     binding.bind(data);
 
-    expect(node.onclick).toBe('{{data.func');
+    node.dispatchEvent(new MouseEvent('click'));
+    expect(data.func).not.toHaveBeenCalled();
   });
 
-  it('does nothing if data is the same', () => {
+  it('replaces existing listener', () => {
     const node = document.createElement('div');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (node as any).onclick = '{{data.func}}';
 
-    const data = { func: jest.fn() };
-    const binding = new EventHandlerBinding(node, '{{data.func}}', 'onclick');
+    const data1 = { func: jest.fn() };
+    const data2 = { func: jest.fn() };
+    const binding = new EventHandlerBinding(node, '{{data.func}}', 'click');
 
-    binding.bind(data);
-    binding.bind(data);
+    binding.bind(data1);
+    binding.bind(data2);
 
-    expect(node.onclick).toBe(data.func);
+    node.dispatchEvent(new MouseEvent('click'));
+    expect(data1.func).not.toHaveBeenCalled();
+    expect(data2.func).toHaveBeenCalled();
   });
 });
 
 describe(generateBindings, () => {
   it('returns parsed bindings', () => {
     const parent = document.createElement('div');
-    parent.setAttribute('title', '{{data.attr}}');
+    parent.setAttribute('attr:title', '{{data.attr}}');
 
     const text = document.createElement('div');
     text.textContent = '{{data.text}}';
     parent.appendChild(text);
 
     const attr = document.createElement('div');
-    attr.setAttribute('title', '{{data.child.attr}}');
+    attr.setAttribute('attr:title', '{{data.child.attr}}');
     parent.appendChild(attr);
 
     const event = document.createElement('div');
-    event.innerHTML = '<div onclick="{{data.event}}"></div>';
+    event.innerHTML = '<div event:click="{{data.event}}"></div>';
     attr.appendChild(event);
+
+    const prop = document.createElement('div');
+    prop.innerHTML = '<input prop:value="{{data.value}}"></input>';
+    parent.appendChild(prop);
+
+    const input = prop.firstElementChild as HTMLInputElement;
 
     const comment = document.createElement('div');
     comment.innerHTML = `<!-- <div/> -->`;
@@ -187,18 +191,21 @@ describe(generateBindings, () => {
     const data = {
       attr: 'attr',
       text: 'text',
-      event: () => undefined,
+      event: jest.fn(),
       child: { attr: 'attr-child' },
+      value: 'foo',
     };
     const bindings = generateBindings(parent);
     const collection = new CollectionBinding(bindings);
     collection.bind(data);
 
-    expect(bindings).toHaveLength(4);
+    event.firstElementChild?.dispatchEvent(new MouseEvent('click'));
 
+    expect(bindings).toHaveLength(5);
     expect(parent.getAttribute('title')).toBe('attr');
     expect(text.textContent).toBe('text');
     expect(attr.getAttribute('title')).toBe('attr-child');
-    expect(event.querySelector('div')?.onclick).toBe(data.event);
+    expect(data.event).toHaveBeenCalled();
+    expect(input.value).toBe('foo');
   });
 });

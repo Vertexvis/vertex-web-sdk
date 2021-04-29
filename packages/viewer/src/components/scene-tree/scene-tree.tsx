@@ -913,7 +913,7 @@ export class SceneTree {
     if (template == null) {
       template = document.createElement('template');
       template.innerHTML = `
-      <vertex-scene-tree-row node="{{row.node}}"></vertex-scene-tree-row>
+      <vertex-scene-tree-row prop:node="{{row.node}}"></vertex-scene-tree-row>
       `;
       this.el.appendChild(template);
     }
