@@ -15,6 +15,10 @@ can run in any browser supporting the Custom Elements v1 specification. For
 browsers that do not support the Custom Elements v1 spec, a polyfill will
 automatically be used.
 
+## Documentation
+
+Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/).
+
 ## Getting Started
 
 ### Script Tag

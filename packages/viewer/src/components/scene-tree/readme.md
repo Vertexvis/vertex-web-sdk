@@ -1,6 +1,140 @@
 # vertex-scene-tree
 
+The `<vertex-scene-tree>` is a component that renders the items that belong to a
+scene.
 
+Because scenes can be large, this component uses a list virtualization strategy
+to minimize the number of DOM elements created. The component uses [HTML
+templates](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots)
+to stamp DOM elements when needed and manages an internal pool of previously
+created DOM elements to maximize performance.
+
+## Initializing a Scene Tree
+
+The tree requires that it's connected to an instance of the viewer to perform
+certain operations. You can either set the viewer directly through the `viewer`
+property, or specify `viewerSelector` with a CSS selector to search for a viewer
+instance.
+
+**Example:** Specifying a viewer.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+  </body>
+</html>
+```
+
+## Custom Rows
+
+The tree provides a default row component that is responsible for displaying the
+content for a row. If you want to customize the appearance or behavior or a row,
+you can use the `<vertex-scene-tree-row>` or provide your own HTML.
+
+Custom rows require the use of [binding][#binding] to bind row data to the
+template. You can use the `rowData` callback in conjunction with binding to
+pass custom data and handlers to your row.
+
+**Example:** Customizing a `<vertex-scene-tree-row>`.
+
+Refer to the [`<vertex-scene-tree-row>`](../scene-tree-row/readme.md) for more
+information about this component.
+
+```html
+<html>
+  <head>
+    <style>
+      .my-btn {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <template>
+        <vertex-scene-tree-row prop:node="{{row.node}}">
+          <button class="my-btn" slot="right-gutter" event:click="{{row.data.handleClick}}">
+            {{row.data.buttonLabel}}
+          </button>
+        </vertex-scene-tree-row>
+      </template>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+
+    <script type="module">
+      const tree = document.querySelector('vertex-scene-tree');
+      tree.rowData = (row) => {
+        return {
+          handleClick: () => console.log('clicked row button', row);
+          buttonLabel: `Click ${row.index}`
+        }
+      }
+    </script>
+  </body>
+</html>
+```
+
+**Example:** Using your own HTML.
+
+```html
+<html>
+  <head>
+    <style>
+      .label {
+        color: blue;
+      }
+
+      .my-btn {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <template>
+        <div>
+          <span>{{row.node.name}}</span>
+          <button class="my-btn" slot="right-gutter">Click Me</button>
+        </div>
+      </template>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+  </body>
+</html>
+```
+
+## Binding
+
+The tree provides a simple binding syntax to pass data from your `rowData`
+callback to your row template. A binding's specified with one of the following
+syntaxes:
+
+```html
+<!-- Bind text content -->
+<div>{{row.data.foo}}</div>
+
+<!-- Bind to a DOM property -->
+<input prop:value="{{row.data.foo}}"></div>
+
+<!-- Bind to a DOM attribute -->
+<div attr:title="{{row.data.foo}}"></div>
+
+<!-- Bind to a DOM event -->
+<button event:click="{{row.data.handler}}"></button>
+```
+
+### Attributes vs Properties
+
+Internally, using the `attr:name` syntax uses `element.setAttribute('name',
+value)`, and the `prop:name` syntax will use `element.name = value`.
+
+Beyond these syntax differences, DOM attributes must be strings. However, DOM
+properties can be objects. Because of this, attribute bindings can support
+string interpolation, but property bindings cannot.
 
 <!-- Auto Generated Below -->
 
@@ -11,7 +145,7 @@
 | ------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
 | `config`            | --                   | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
 | `configEnv`         | `config-env`         | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
-| `overScanCount`     | `over-scan-count`    | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `10`         |
+| `overScanCount`     | `over-scan-count`    | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `25`         |
 | `rowData`           | --                   | A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
 | `selectionDisabled` | `selection-disabled` | Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.                            | `boolean`                                              | `false`      |
 | `viewer`            | --                   | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                   | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
@@ -20,9 +154,9 @@
 
 ## Events
 
-| Event   | Description | Type                                 |
-| ------- | ----------- | ------------------------------------ |
-| `error` |             | `CustomEvent<SceneTreeErrorDetails>` |
+| Event             | Description | Type                                 |
+| ----------------- | ----------- | ------------------------------------ |
+| `connectionError` |             | `CustomEvent<SceneTreeErrorDetails>` |
 
 
 ## Methods
@@ -37,7 +171,7 @@ Type: `Promise<void>`
 
 
 
-### `collapseItem(rowOrIndex: number | Row) => Promise<void>`
+### `collapseItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will collapse the node associated to the
 specified row or row index.
@@ -48,7 +182,7 @@ Type: `Promise<void>`
 
 
 
-### `deselectItem(rowOrIndex: number | Row) => Promise<void>`
+### `deselectItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will deselect the item associated to the given
 row or row index.
@@ -69,7 +203,7 @@ Type: `Promise<void>`
 
 
 
-### `expandItem(rowOrIndex: number | Row) => Promise<void>`
+### `expandItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will expand the node associated to the specified
 row or row index.
@@ -112,7 +246,7 @@ Type: `Promise<Row>`
 
 
 
-### `hideItem(rowOrIndex: number | Row) => Promise<void>`
+### `hideItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will hide the item associated to the given row
 or row index.
@@ -159,7 +293,7 @@ Type: `Promise<void>`
 
 
 
-### `selectItem(rowOrIndex: number | Row, options?: SelectItemOptions) => Promise<void>`
+### `selectItem(row: RowArg, options?: SelectItemOptions) => Promise<void>`
 
 Performs an API call that will select the item associated to the given row
 or row index.
@@ -170,7 +304,7 @@ Type: `Promise<void>`
 
 
 
-### `showItem(rowOrIndex: number | Row) => Promise<void>`
+### `showItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will show the item associated to the given row
 or row index.
@@ -181,7 +315,7 @@ Type: `Promise<void>`
 
 
 
-### `toggleExpandItem(rowOrIndex: number | Row) => Promise<void>`
+### `toggleExpandItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will either expand or collapse the node
 associated to the given row or row index.
@@ -192,7 +326,7 @@ Type: `Promise<void>`
 
 
 
-### `toggleItemVisibility(rowOrIndex: number | Row) => Promise<void>`
+### `toggleItemVisibility(row: RowArg) => Promise<void>`
 
 Performs an API call that will either hide or show the item associated to
 the given row or row index.
@@ -202,16 +336,6 @@ the given row or row index.
 Type: `Promise<void>`
 
 
-
-
-## CSS Custom Properties
-
-| Name                          | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `--scene-tree-hover-color`    | The background color of a row when hovered.  |
-| `--scene-tree-row-height`     | The height of each row in the scene tree.    |
-| `--scene-tree-row-padding`    | The padding of each row in the scene tree.   |
-| `--scene-tree-selected-color` | The background color of a row when selected. |
 
 
 ----------------------------------------------

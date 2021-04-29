@@ -13,6 +13,9 @@ web platform.
 | [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)        | The Web SDK containing web components to view 3D models. |
 | [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)  | Contains React bindings for Vertex's Web SDK. |
 
+## Documentation
+
+Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/).
 
 ## Setup & Installing
 

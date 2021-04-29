@@ -45,11 +45,11 @@
   --depth: 0;
 }
 
-.root:hover {
+:host(:hover) .root {
   background: var(--scene-tree-row-background-hover);
 }
 
-.root.selected {
+:host(.selected) .root {
   background: var(--scene-tree-row-background-selected);
 }
 
@@ -87,11 +87,11 @@
   height: 24px;
 }
 
-.root:hover .visibility-btn {
+:host(:hover) .visibility-btn {
   visibility: inherit;
 }
 
-.root.hidden .visibility-btn {
+:host(.hidden) .visibility-btn {
   visibility: inherit;
 }
 
