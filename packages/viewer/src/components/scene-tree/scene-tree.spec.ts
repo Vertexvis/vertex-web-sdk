@@ -48,6 +48,7 @@ import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import { grpc } from '@improbable-eng/grpc-web';
 import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
+import { SceneTreeRow } from '../scene-tree-row/scene-tree-row';
 
 const random = new Chance();
 
@@ -102,9 +103,7 @@ describe('<vertex-scene-tree />', () => {
         `,
       });
 
-      const rows = page.body
-        .querySelector('vertex-scene-tree')
-        ?.shadowRoot?.querySelectorAll('.row');
+      const rows = page.root?.querySelectorAll('vertex-scene-tree-row');
 
       expect(sceneTree.viewer).toBe(viewer);
       expect(sceneTree.controller).toBeDefined();
@@ -130,9 +129,7 @@ describe('<vertex-scene-tree />', () => {
       await sceneTree.controller?.getPage(0)?.res;
       await page.waitForChanges();
 
-      const rows = page.body
-        .querySelector('vertex-scene-tree')
-        ?.shadowRoot?.querySelectorAll('.row');
+      const rows = page.root?.querySelectorAll('vertex-scene-tree-row');
 
       expect(sceneTree.controller).toBeDefined();
       expect(rows?.length).toBeGreaterThan(0);
@@ -155,9 +152,7 @@ describe('<vertex-scene-tree />', () => {
       sceneTree.invalidateRows();
       await page.waitForChanges();
 
-      const rows = page.body
-        .querySelector('vertex-scene-tree')
-        ?.shadowRoot?.querySelectorAll('.row');
+      const rows = page.root?.querySelectorAll('vertex-scene-tree-row');
 
       if (rows == null) {
         throw new Error('Rows are empty');
@@ -187,15 +182,13 @@ describe('<vertex-scene-tree />', () => {
       await sceneTree.controller?.getPage(0)?.res;
       await page.waitForChanges();
 
-      const rows = page.body
-        .querySelector('vertex-scene-tree')
-        ?.shadowRoot?.querySelectorAll('.row');
+      const rows = page.root?.querySelectorAll('vertex-scene-tree-row');
 
       if (rows == null) {
         throw new Error('Rows are empty');
       }
 
-      expect(rows[0].textContent).toContain(res.getItemsList()[0].getName());
+      expect(rows[0].node).toEqual(res.getItemsList()[0].toObject());
     });
 
     it('emits error details if tree is not enabled', async (done) => {
@@ -251,7 +244,7 @@ describe('<vertex-scene-tree />', () => {
       });
 
       const row = await sceneTree.getRowAtIndex(1);
-      expect(row?.name).toBe(res.toObject().itemsList[1].name);
+      expect(row?.node.name).toBe(res.toObject().itemsList[1].name);
     });
   });
 
@@ -271,18 +264,18 @@ describe('<vertex-scene-tree />', () => {
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
       const pendingEvent = new Promise<MouseEvent>((resolve) => {
-        const rowEl = page.root?.shadowRoot?.querySelectorAll('.row')[1];
+        const rowEl = page.root?.querySelectorAll('vertex-scene-tree-row')[1];
         rowEl?.addEventListener('click', (event) =>
           resolve(event as MouseEvent)
         );
       });
 
-      const rowEl = page.root?.shadowRoot?.querySelectorAll('.row')[1];
+      const rowEl = page.root?.querySelectorAll('vertex-scene-tree-row')[1];
       rowEl?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
 
       const event = await pendingEvent;
       const row = await sceneTree.getRowForEvent(event);
-      expect(row?.name).toBe(res.toObject().itemsList[1].name);
+      expect(row?.node.name).toBe(res.toObject().itemsList[1].name);
     });
 
     it('returns undefined if no current target', async () => {
@@ -320,7 +313,7 @@ describe('<vertex-scene-tree />', () => {
       });
 
       const row = await sceneTree.getRowAtClientY(30);
-      expect(row?.name).toBe(res.toObject().itemsList[1].name);
+      expect(row?.node.name).toBe(res.toObject().itemsList[1].name);
     });
   });
 
@@ -494,7 +487,10 @@ describe('<vertex-scene-tree />', () => {
 
       const row = await sceneTree.getRowAtIndex(0);
       await sceneTree.toggleItemVisibility(row);
-      expect(showItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+      expect(showItem).toHaveBeenCalledWith(
+        expect.anything(),
+        row?.node.id?.hex
+      );
     });
   });
 
@@ -530,7 +526,10 @@ describe('<vertex-scene-tree />', () => {
 
       const row = await sceneTree.getRowAtIndex(0);
       await sceneTree.showItem(0);
-      expect(showItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+      expect(showItem).toHaveBeenCalledWith(
+        expect.anything(),
+        row?.node.id?.hex
+      );
     });
 
     it('does nothing if row is visible', async () => {
@@ -582,7 +581,10 @@ describe('<vertex-scene-tree />', () => {
 
       const row = await sceneTree.getRowAtIndex(0);
       await sceneTree.hideItem(0);
-      expect(hideItem).toHaveBeenCalledWith(expect.anything(), row?.id);
+      expect(hideItem).toHaveBeenCalledWith(
+        expect.anything(),
+        row?.node.id?.hex
+      );
     });
 
     it('does nothing if row is hidden', async () => {
@@ -654,7 +656,7 @@ describe('<vertex-scene-tree />', () => {
       await sceneTree.selectItem(0, { append: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
-        row?.id,
+        row?.node.id?.hex,
         expect.objectContaining({ append: true })
       );
     });
@@ -806,7 +808,7 @@ async function loadSceneTree(data: {
   setup?: (data: LoadSceneTreeResult) => void;
 }): Promise<LoadSceneTreeResult> {
   const page = await newSpecPage({
-    components: [SceneTree, Viewer],
+    components: [SceneTree, SceneTreeRow, Viewer],
     html: data.html,
   });
 

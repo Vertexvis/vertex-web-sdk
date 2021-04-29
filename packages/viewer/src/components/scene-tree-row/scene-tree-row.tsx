@@ -1,6 +1,11 @@
 import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classnames from 'classnames';
+import {
+  getSceneTreeRowExpandContainsElement,
+  getSceneTreeRowRootContainsElement,
+  getSceneTreeRowVisibilityContainsElement,
+} from './lib/dom';
 
 @Component({
   tag: 'vertex-scene-tree-row',
@@ -94,8 +99,8 @@ export class SceneTreeRow {
     this.ifNodeDefined((node) => {
       if (!this.interactionsDisabled) {
         this.tree?.toggleExpandItem(node);
-        this.expandToggled.emit();
       }
+      this.expandToggled.emit();
     });
   }
 
@@ -103,8 +108,8 @@ export class SceneTreeRow {
     this.ifNodeDefined((node) => {
       if (!this.interactionsDisabled) {
         this.tree?.toggleItemVisibility(node);
-        this.visibilityToggled.emit();
       }
+      this.visibilityToggled.emit();
     });
   }
 
@@ -114,22 +119,24 @@ export class SceneTreeRow {
       this.isSelectionEvent(event) &&
       !this.interactionsDisabled
     ) {
-      if (event.metaKey && this.node?.selected) {
+      if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
       } else {
         this.tree?.selectItem(this.node, {
           append: event.ctrlKey || event.metaKey,
         });
       }
+      this.selected.emit();
     }
   }
 
   private isSelectionEvent(event: MouseEvent): boolean {
-    if (event.target != null) {
+    const target = event.target as HTMLElement | undefined;
+    if (target != null) {
       return (
-        this.rootEl?.contains(event.target as Element) === true &&
-        this.expandBtn?.contains(event.target as Element) === false &&
-        this.visibilityBtn?.contains(event.target as Element) === false
+        getSceneTreeRowRootContainsElement(this.rootEl, target) &&
+        !getSceneTreeRowExpandContainsElement(this.expandBtn, target) &&
+        !getSceneTreeRowVisibilityContainsElement(this.visibilityBtn, target)
       );
     } else {
       return false;

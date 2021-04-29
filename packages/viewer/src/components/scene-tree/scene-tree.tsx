@@ -566,11 +566,14 @@ export class SceneTree {
 
   protected componentWillRender(): void {
     this.updateRenderState();
-    this.updateElements();
     this.controller?.updateActiveRowRange(
       this.stateMap.startIndex,
       this.stateMap.endIndex
     );
+  }
+
+  protected componentDidRender(): void {
+    this.updateElements();
   }
 
   protected render(): h.JSX.IntrinsicElements {
@@ -947,12 +950,10 @@ export class SceneTree {
     }
   }
 
-  private updateElements(): void {
-    writeDOM(() => {
-      this.updatePool();
-      this.bindData();
-      this.positionElements();
-    });
+  private async updateElements(): Promise<void> {
+    this.updatePool();
+    this.bindData();
+    this.positionElements();
   }
 
   private updatePool(): void {
