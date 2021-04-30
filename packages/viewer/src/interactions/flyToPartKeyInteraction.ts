@@ -2,12 +2,15 @@ import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { KeyInteraction } from './keyInteraction';
 import { ConfigProvider } from '../config/config';
 import { TapEventDetails } from './tapEventDetails';
+import { ImageScaleProvider } from '../scenes';
+import { Point } from '@vertexvis/geometry';
 
 export class FlyToPartKeyInteraction
   implements KeyInteraction<TapEventDetails> {
   public constructor(
     private stream: StreamApi,
-    private configProvider: ConfigProvider
+    private configProvider: ConfigProvider,
+    private imageScaleProvider: ImageScaleProvider
   ) {}
 
   public predicate(e: TapEventDetails): boolean {
@@ -15,9 +18,10 @@ export class FlyToPartKeyInteraction
   }
 
   public async fn(e: TapEventDetails): Promise<void> {
+    const scale = this.imageScaleProvider();
     const hitResult = await this.stream.hitItems(
       {
-        point: e.position,
+        point: Point.scale(e.position, scale?.x || 1, scale?.y || 1),
       },
       true
     );

@@ -348,7 +348,11 @@ export class Viewer {
       );
 
       this.registerTapKeyInteraction(
-        new FlyToPartKeyInteraction(this.stream, () => this.getConfig())
+        new FlyToPartKeyInteraction(
+          this.stream,
+          () => this.getConfig(),
+          () => this.getImageScale()
+        )
       );
     }
 
