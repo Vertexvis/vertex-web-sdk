@@ -4,7 +4,12 @@ import classname from 'classnames';
 /**
  * The names of the icons that the `<vertex-viewer-icon>` element can display.
  */
-export type ViewerIconName = 'fit-all' | 'visible' | 'hidden';
+export type ViewerIconName =
+  | 'fit-all'
+  | 'visible'
+  | 'hidden'
+  | 'chevron-right'
+  | 'chevron-down';
 
 /**
  * The predefined sizes for icons.
@@ -49,6 +54,17 @@ export class ViewerIcon {
     } else if (this.name === 'hidden') {
       return this.renderSvgIcon(
         <path d="M13.35 2.65a.48.48 0 00-.7 0l-.78.77a8.71 8.71 0 00-8.52.41A6.57 6.57 0 00.51 7.89v.22a6.58 6.58 0 002.71 4l-.57.58a.49.49 0 00.7.7l10-10a.48.48 0 000-.74zM9.73 5.56a3 3 0 00-4.17 4.17l-1.62 1.62A5.49 5.49 0 011.53 8 5.49 5.49 0 013.9 4.67 7.52 7.52 0 018 3.5a7.67 7.67 0 013.12.67zm3.61-1.2l-.72.72A5.45 5.45 0 0114.47 8a5.49 5.49 0 01-2.37 3.33A7.52 7.52 0 018 12.5a8.15 8.15 0 01-2.41-.38l-.78.78a8.9 8.9 0 003.19.6 8.53 8.53 0 004.65-1.33 6.57 6.57 0 002.84-4.06v-.22a6.56 6.56 0 00-2.15-3.53z" />
+      );
+    } else if (this.name === 'chevron-right') {
+      return this.renderSvgIcon(
+        <path d="M10.83,7.62l-4-3.5A.5.5,0,0,0,6,4.5v7a.5.5,0,0,0,.83.38l4-3.5a.51.51,0,0,0,0-.76Z" />
+      );
+    } else if (this.name === 'chevron-down') {
+      return this.renderSvgIcon(
+        <path
+          d="M11.88,9.17l-3.5-4a.51.51,0,0,0-.76,0l-3.5,4A.5.5,0,0,0,4.5,10h7a.5.5,0,0,0,.38-.83Z"
+          transform="rotate(180 8 8)"
+        />
       );
     } else {
       return <svg />;

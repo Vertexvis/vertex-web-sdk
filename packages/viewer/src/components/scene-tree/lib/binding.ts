@@ -1,3 +1,5 @@
+import { Disposable } from '@vertexvis/utils';
+
 const bindingRegEx = /{{(.+)}}/;
 
 export interface Binding {
@@ -37,14 +39,33 @@ export class AttributeBinding extends NodeBinding<Element> {
   }
 
   public bind<T>(data: T): void {
-    const value = replaceBindingString(data, this.expr);
-    if (this.node.getAttribute(this.attr) !== value) {
-      this.node.setAttribute(this.attr, value);
+    const newValue = replaceBindingString(data, this.expr);
+    const oldValue = this.node.getAttribute(this.attr);
+    if (oldValue !== newValue) {
+      this.node.setAttribute(this.attr, newValue);
     }
   }
 }
 
+export class PropertyBinding extends NodeBinding<Element> {
+  public constructor(node: Element, expr: string, private prop: string) {
+    super(node, expr);
+  }
+
+  public bind<T>(data: T): void {
+    const newValue = replaceBinding(data, this.expr);
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const oldValue = (this.node as any)[this.prop];
+    if (oldValue !== newValue) {
+      (this.node as any)[this.prop] = newValue;
+    }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+  }
+}
+
 export class EventHandlerBinding extends NodeBinding<Element> {
+  private disposable?: Disposable;
+
   public constructor(node: Element, expr: string, private eventName: string) {
     super(node, expr);
   }
@@ -52,12 +73,16 @@ export class EventHandlerBinding extends NodeBinding<Element> {
   public bind<T>(data: T): void {
     const path = extractBindingPath(this.expr);
     if (path != null) {
-      const value = getBindableValue(data, path, true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (value !== (this.node as any)[this.eventName]) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.node as any)[this.eventName] = value;
-      }
+      this.disposable?.dispose();
+
+      const listener = getBindableValue(data, path, true);
+      this.node.addEventListener(this.eventName, listener);
+
+      this.disposable = {
+        dispose: () => {
+          this.node.removeEventListener(this.eventName, listener);
+        },
+      };
     }
   }
 }
@@ -70,10 +95,22 @@ export function generateBindings(node: Node): Binding[] {
     const bindableAttributes = getBindableAttributes(el);
 
     bindableAttributes.forEach((attr) => {
-      if (attr.name.startsWith('on')) {
-        bindings.push(new EventHandlerBinding(el, attr.value, attr.name));
-      } else {
-        bindings.push(new AttributeBinding(el, attr.value, attr.name));
+      if (attr.name.startsWith('event:')) {
+        bindings.push(
+          new EventHandlerBinding(
+            el,
+            attr.value,
+            attr.name.replace('event:', '')
+          )
+        );
+      } else if (attr.name.startsWith('attr:')) {
+        bindings.push(
+          new AttributeBinding(el, attr.value, attr.name.replace('attr:', ''))
+        );
+      } else if (attr.name.startsWith('prop:')) {
+        bindings.push(
+          new PropertyBinding(el, attr.value, attr.name.replace('prop:', ''))
+        );
       }
     });
   } else if (
@@ -113,15 +150,28 @@ function replaceBindingString(data: Record<string, any>, expr: string): string {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function replaceBinding(data: Record<string, any>, expr: string): any {
+  const path = extractBindingPath(expr);
+  if (path != null) {
+    const value = getBindableValue(data, path, true);
+    return value;
+  } else {
+    return expr;
+  }
+}
+
 function getBindableValue(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>,
   path: string,
-  ignoreHead = false
+  isHead = false
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const [head, ...tail] = path.split('.');
-  if (ignoreHead) {
+  if (isHead && tail.length === 0) {
+    return data;
+  } else if (isHead && tail.length > 0) {
     return getBindableValue(data, tail.join('.'), false);
   } else {
     const value = data[head];

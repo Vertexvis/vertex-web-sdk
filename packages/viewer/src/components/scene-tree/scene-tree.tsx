@@ -18,9 +18,7 @@ import {
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable } from '@vertexvis/utils';
-import classnames from 'classnames';
-import { LoadedRow, Row } from './lib/row';
-import { CollectionBinding, generateBindings } from './lib/binding';
+import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
 import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
@@ -41,6 +39,12 @@ import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
 import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
 import { getElementBoundingClientRect } from '../viewer/utils';
+import { ElementPool } from './lib/element-pool';
+import {
+  generateInstanceFromTemplate,
+  InstancedTemplate,
+} from './lib/templates';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -49,26 +53,37 @@ export type RowDataProvider = (row: Row) => Record<string, unknown>;
  * data. A value too low may cause contention with browser rendering. A value
  * too high will cause too many items to be accumulated.
  */
-const MIN_CLEAR_UNUSED_DATA_MS = 10;
+const MIN_CLEAR_UNUSED_DATA_MS = 25;
 
 interface StateMap {
-  leftTemplate?: HTMLTemplateElement;
-  rightTemplate?: HTMLTemplateElement;
-  bindings: Map<Element, CollectionBinding>;
   idleCallbackId?: number;
-  connected: boolean;
+  resizeObserver?: ResizeObserver;
+  componentLoaded: boolean;
+
+  client?: SceneTreeAPIClient;
+  jwt?: string;
+
+  controller?: SceneTreeController;
   onStateChangeDisposable?: Disposable;
   subscribeDisposable?: Disposable;
-  client?: SceneTreeAPIClient;
-  controller?: SceneTreeController;
-  componentLoaded: boolean;
-  jwt?: string;
+  connected: boolean;
+
+  elementPool?: ElementPool;
+  template?: HTMLTemplateElement;
+
+  startIndex: number;
+  endIndex: number;
+  viewportRows: Row[];
+  viewportRowMap: Map<string, Row>;
 }
 
 type OperationHandler = (data: {
   viewer: HTMLVertexViewerElement;
-  row: LoadedRow;
+  id: string;
+  node: Node.AsObject;
 }) => void;
+
+export type RowArg = number | Row | Node.AsObject;
 
 /**
  * A set of options to configure the scroll to index behavior.
@@ -98,7 +113,7 @@ export class SceneTree {
    * while scrolling.
    */
   @Prop()
-  public overScanCount = 10;
+  public overScanCount = 25;
 
   /**
    * A CSS selector that points to a `<vertex-viewer>` element. Either this
@@ -165,22 +180,13 @@ export class SceneTree {
   public selectionDisabled = false;
 
   @Event()
-  public error!: EventEmitter<SceneTreeErrorDetails>;
+  public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
   @Element()
   private el!: HTMLElement;
 
   @State()
-  private startIndex = 0;
-
-  @State()
-  private endIndex = 0;
-
-  @State()
   private viewportHeight: number | undefined;
-
-  @State()
-  private viewportRows: Row[] = [];
 
   @State()
   private isComputingRowHeight = true;
@@ -203,13 +209,17 @@ export class SceneTree {
    */
   @State()
   private stateMap: StateMap = {
-    bindings: new Map(),
     connected: false,
     componentLoaded: false,
+
+    startIndex: 0,
+    endIndex: 0,
+    viewportRows: [],
+    viewportRowMap: new Map(),
   };
 
   @State()
-  private connectionError: SceneTreeErrorDetails | undefined;
+  private connectionErrorDetails: SceneTreeErrorDetails | undefined;
 
   /* eslint-disable lines-between-class-members */
   /**
@@ -330,13 +340,13 @@ export class SceneTree {
    * Performs an API call that will expand the node associated to the specified
    * row or row index.
    *
-   * @param rowOrIndex A row or row index to expand.
+   * @param row A row, row index, or node to expand.
    */
   @Method()
-  public async expandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (!row.expanded) {
-        await this.controller?.expandNode(row.id);
+  public async expandItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ id, node }) => {
+      if (!node.expanded) {
+        await this.controller?.expandNode(id);
       }
     });
   }
@@ -345,13 +355,13 @@ export class SceneTree {
    * Performs an API call that will collapse the node associated to the
    * specified row or row index.
    *
-   * @param rowOrIndex A row or row index to collapse.
+   * @param row A row, row index, or node to collapse.
    */
   @Method()
-  public async collapseItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.controller?.collapseNode(row.id);
+  public async collapseItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ id, node }) => {
+      if (node.expanded) {
+        await this.controller?.collapseNode(id);
       }
     });
   }
@@ -360,15 +370,15 @@ export class SceneTree {
    * Performs an API call that will either expand or collapse the node
    * associated to the given row or row index.
    *
-   * @param rowOrIndex The row or row index to collapse or expand.
+   * @param row The row, row index, or node to collapse or expand.
    */
   @Method()
-  public async toggleExpandItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ row }) => {
-      if (row.expanded) {
-        await this.collapseItem(row);
+  public async toggleExpandItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ node }) => {
+      if (node.expanded) {
+        await this.collapseItem(node);
       } else {
-        await this.expandItem(row);
+        await this.expandItem(node);
       }
     });
   }
@@ -377,15 +387,15 @@ export class SceneTree {
    * Performs an API call that will either hide or show the item associated to
    * the given row or row index.
    *
-   * @param rowOrIndex The row or row index to toggle visibility.
+   * @param row The row, row index, or node to toggle visibility.
    */
   @Method()
-  public async toggleItemVisibility(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
+  public async toggleItemVisibility(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.visible) {
+        await hideItem(viewer, id);
       } else {
-        await showItem(viewer, row.id);
+        await showItem(viewer, id);
       }
     });
   }
@@ -394,13 +404,13 @@ export class SceneTree {
    * Performs an API call that will hide the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to hide.
+   * @param row The row, row index, or node to hide.
    */
   @Method()
-  public async hideItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.visible) {
-        await hideItem(viewer, row.id);
+  public async hideItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.visible) {
+        await hideItem(viewer, id);
       }
     });
   }
@@ -409,13 +419,13 @@ export class SceneTree {
    * Performs an API call that will show the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to show.
+   * @param row The row, row index, or node to show.
    */
   @Method()
-  public async showItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (!row.visible) {
-        await showItem(viewer, row.id);
+  public async showItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (!node.visible) {
+        await showItem(viewer, id);
       }
     });
   }
@@ -424,18 +434,18 @@ export class SceneTree {
    * Performs an API call that will select the item associated to the given row
    * or row index.
    *
-   * @param rowOrIndex The row or row index to select.
+   * @param row The row, row index or node to select.
    * @param append `true` if the selection should append to the current
    *  selection, or `false` if this should replace the current selection.
    *  Defaults to replace.
    */
   @Method()
   public async selectItem(
-    rowOrIndex: number | Row,
+    row: RowArg,
     options: SelectItemOptions = {}
   ): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      await selectItem(viewer, row.id, options);
+    await this.performRowOperation(row, async ({ viewer, id }) => {
+      await selectItem(viewer, id, options);
     });
   }
 
@@ -443,13 +453,13 @@ export class SceneTree {
    * Performs an API call that will deselect the item associated to the given
    * row or row index.
    *
-   * @param rowOrIndex The row or row index to deselect.
+   * @param row The row, row index, or node to deselect.
    */
   @Method()
-  public async deselectItem(rowOrIndex: number | Row): Promise<void> {
-    await this.performRowOperation(rowOrIndex, async ({ viewer, row }) => {
-      if (row.selected) {
-        await deselectItem(viewer, row.id);
+  public async deselectItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id, node }) => {
+      if (node.selected) {
+        await deselectItem(viewer, id);
       }
     });
   }
@@ -478,7 +488,7 @@ export class SceneTree {
     const { clientY, currentTarget } = event;
     if (
       currentTarget != null &&
-      this.connectionError == null &&
+      this.connectionErrorDetails == null &&
       getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
     ) {
       return this.getRowAtClientY(clientY);
@@ -535,50 +545,51 @@ export class SceneTree {
   }
 
   protected async componentDidLoad(): Promise<void> {
-    this.el.addEventListener('scroll', () => this.handleScroll());
-
-    this.stateMap.leftTemplate =
-      (this.el.querySelector('template[slot="left"]') as HTMLTemplateElement) ||
-      undefined;
-
-    this.stateMap.rightTemplate =
-      (this.el.querySelector(
-        'template[slot="right"]'
-      ) as HTMLTemplateElement) || undefined;
-
-    readDOM(() => {
-      this.viewportHeight = getSceneTreeViewportHeight(this.el);
-      this.updateRenderState();
+    this.el.addEventListener('scroll', () => this.handleScroll(), {
+      passive: true,
     });
+
+    const resizeObserver = new ResizeObserver(() =>
+      this.updateViewportHeight()
+    );
+    resizeObserver.observe(this.el);
+    this.stateMap.resizeObserver = resizeObserver;
+
+    this.ensureTemplateDefined();
+
+    this.updateViewportHeight();
+    await this.computeRowHeight();
+    this.createPool();
 
     this.stateMap.componentLoaded = true;
   }
 
   protected componentWillRender(): void {
     this.updateRenderState();
-    this.controller?.updateActiveRowRange(this.startIndex, this.endIndex);
+    this.controller?.updateActiveRowRange(
+      this.stateMap.startIndex,
+      this.stateMap.endIndex
+    );
   }
 
   protected componentDidRender(): void {
-    this.cleanupBindings();
-    this.computeRowHeight();
+    this.updateElements();
   }
 
   protected render(): h.JSX.IntrinsicElements {
     const rowHeight = this.getComputedOrPlaceholderRowHeight();
     const totalHeight = this.totalRows * rowHeight;
-    const startY = this.startIndex * rowHeight;
     return (
       <Host>
-        {this.connectionError != null && (
+        {this.connectionErrorDetails != null && (
           <div class="error">
             <span>
-              {this.connectionError.message}
-              {this.connectionError.link && (
+              {this.connectionErrorDetails.message}
+              {this.connectionErrorDetails.link && (
                 <span>
                   {' '}
                   See our{' '}
-                  <a href={this.connectionError.link} target="_blank">
+                  <a href={this.connectionErrorDetails.link} target="_blank">
                     documentation
                   </a>{' '}
                   for more information.
@@ -589,90 +600,7 @@ export class SceneTree {
         )}
 
         <div class="rows" style={{ height: `${totalHeight}px` }}>
-          {this.isComputingRowHeight ? (
-            <div class="row" />
-          ) : (
-            this.viewportRows.map((row, i) => {
-              if (row == null) {
-                return <div class="row"></div>;
-              } else {
-                return (
-                  <div
-                    class={classnames('row', { 'is-selected': row.selected })}
-                    style={{ top: `${startY + rowHeight * i}px` }}
-                    onMouseDown={(event) => this.handleRowMouseDown(event, row)}
-                  >
-                    <span
-                      ref={(el) => {
-                        if (el != null && this.stateMap.leftTemplate != null) {
-                          this.populateSlot(
-                            this.stateMap.leftTemplate,
-                            row,
-                            el
-                          );
-                        }
-                      }}
-                    />
-                    <span
-                      style={{
-                        'margin-left': `${row.depth * 8}px`,
-                      }}
-                    />
-                    <span
-                      class="expand-toggle"
-                      onMouseDown={(event) => {
-                        event.stopPropagation();
-                        this.toggleExpandItem(row);
-                      }}
-                      onMouseUp={(event) => event.stopPropagation()}
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      {!row.isLeaf && row.expanded && '▾'}
-                      {!row.isLeaf && !row.expanded && '▸'}
-                    </span>
-                    <span class="row-text" title={row.name}>
-                      {row.name}
-                    </span>
-
-                    {this.stateMap.rightTemplate != null ? (
-                      <span
-                        ref={(el) => {
-                          if (
-                            el != null &&
-                            this.stateMap.rightTemplate != null
-                          ) {
-                            this.populateSlot(
-                              this.stateMap.rightTemplate,
-                              row,
-                              el
-                            );
-                          }
-                        }}
-                      />
-                    ) : (
-                      <button
-                        class={classnames('visibility-btn', {
-                          'is-hidden': !row.visible,
-                        })}
-                        onMouseDown={(event) => {
-                          event.stopPropagation();
-                          this.toggleItemVisibility(this.startIndex + i);
-                        }}
-                        onMouseUp={(event) => event.stopPropagation()}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        {row.visible ? (
-                          <vertex-viewer-icon name="visible" size="sm" />
-                        ) : (
-                          <vertex-viewer-icon name="hidden" size="sm" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                );
-              }
-            })
-          )}
+          <slot></slot>
         </div>
       </Host>
     );
@@ -698,16 +626,6 @@ export class SceneTree {
 
     if (newViewer != null) {
       this.connectViewer(newViewer);
-    }
-  }
-
-  private handleRowMouseDown(event: MouseEvent, row: LoadedRow): void {
-    if (!this.selectionDisabled && event.button === 0) {
-      if (event.metaKey && row.selected) {
-        this.deselectItem(row);
-      } else {
-        this.selectItem(row, { append: event.ctrlKey || event.metaKey });
-      }
     }
   }
 
@@ -749,7 +667,7 @@ export class SceneTree {
         await controller.fetchPage(0);
         this.stateMap.subscribeDisposable = controller.subscribe();
         this.stateMap.connected = true;
-        this.connectionError = undefined;
+        this.connectionErrorDetails = undefined;
       } catch (e) {
         if (isGrpcServiceError(e)) {
           this.handleConnectionError(e);
@@ -760,17 +678,17 @@ export class SceneTree {
 
   private handleConnectionError(e: ServiceError): void {
     if (e.code === grpc.Code.FailedPrecondition) {
-      this.connectionError = new SceneTreeErrorDetails(
+      this.connectionErrorDetails = new SceneTreeErrorDetails(
         SceneTreeErrorCode.SCENE_TREE_DISABLED,
         'https://developer.vertexvis.com'
       );
     } else {
-      this.connectionError = new SceneTreeErrorDetails(
+      this.connectionErrorDetails = new SceneTreeErrorDetails(
         SceneTreeErrorCode.UNKNOWN
       );
     }
 
-    this.error.emit(this.connectionError);
+    this.connectionError.emit(this.connectionErrorDetails);
   }
 
   private async connectViewer(viewer: HTMLVertexViewerElement): Promise<void> {
@@ -810,8 +728,8 @@ export class SceneTree {
         if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
           const [start, end] =
             this.controller?.getPageIndexesForRange(
-              this.startIndex,
-              this.startIndex + this.viewportRows.length
+              this.stateMap.startIndex,
+              this.stateMap.endIndex
             ) || [];
 
           if (start != null && end != null) {
@@ -848,7 +766,7 @@ export class SceneTree {
   }
 
   private async performRowOperation(
-    rowOrIndex: number | Row,
+    rowOrIndex: number | Row | Node.AsObject,
     op: OperationHandler
   ): Promise<void> {
     const row =
@@ -858,13 +776,19 @@ export class SceneTree {
       throw new Error(`Cannot perform scene tree operation. Row not found.`);
     }
 
+    const node = isLoadedRow(row) ? row.node : row;
+
+    if (node.id == null) {
+      throw new Error(`Cannot perform scene tree operation. ID is undefined.`);
+    }
+
     if (this.viewer == null) {
       throw new Error(
         `Cannot perform scene tree operation. Cannot get reference to viewer.`
       );
     }
 
-    await op({ viewer: this.viewer, row });
+    await op({ viewer: this.viewer, id: node.id.hex, node });
   }
 
   private updateRenderState(): void {
@@ -872,45 +796,33 @@ export class SceneTree {
       const rowHeight = this.getComputedOrPlaceholderRowHeight();
       const viewportCount = Math.ceil(this.viewportHeight / rowHeight);
 
-      this.startIndex = Math.max(
-        0,
-        Math.floor(this.scrollTop / rowHeight) - this.overScanCount
+      const viewportStartIndex = Math.floor(this.scrollTop / rowHeight);
+      const viewportEndIndex = viewportStartIndex + viewportCount;
+
+      const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
+      const endIndex = Math.min(
+        this.totalRows - 1,
+        viewportEndIndex + this.overScanCount
       );
-      this.endIndex = Math.min(
-        this.totalRows,
-        this.startIndex + viewportCount + this.overScanCount * 2
-      );
 
-      const rows = this.getViewportRows(
-        this.startIndex,
-        this.endIndex
-      ).map((row) => this.populateRowData(row));
-      this.viewportRows = rows;
-    }
-  }
+      const rows = this.getViewportRows(startIndex, endIndex);
 
-  private getViewportRows(start: number, end: number): Row[] {
-    return this.rows.slice(start, end);
-  }
-
-  private populateSlot(
-    template: HTMLTemplateElement,
-    row: Row,
-    el: HTMLElement
-  ): void {
-    if (el.firstElementChild == null) {
-      const node = template.content.cloneNode(true);
-      el.appendChild(node);
-    }
-
-    if (el.firstElementChild != null) {
-      let binding = this.stateMap.bindings.get(el);
-      if (binding == null) {
-        binding = new CollectionBinding(generateBindings(el.firstElementChild));
-        this.stateMap.bindings.set(el, binding);
+      const diff = startIndex - this.stateMap.startIndex;
+      if (diff > 0) {
+        this.stateMap.elementPool?.swapHeadToTail(diff);
+      } else {
+        this.stateMap.elementPool?.swapTailToHead(-diff);
       }
-      binding.bind(row);
+
+      this.stateMap.startIndex = startIndex;
+      this.stateMap.endIndex = endIndex;
+      this.stateMap.viewportRows = rows;
     }
+  }
+
+  private getViewportRows(startIndex: number, endIndex: number): Row[] {
+    const rows = this.rows.slice(startIndex, endIndex + 1);
+    return rows.map((row) => (row != null ? this.populateRowData(row) : row));
   }
 
   private handleScroll(): void {
@@ -928,23 +840,44 @@ export class SceneTree {
     }
   }
 
-  private cleanupBindings(): void {
-    for (const key of this.stateMap.bindings.keys()) {
-      if (key.parentElement == null) {
-        this.stateMap.bindings.delete(key);
-      }
-    }
-  }
-
-  private computeRowHeight(): void {
+  private async computeRowHeight(): Promise<void> {
     if (this.isComputingRowHeight) {
-      // Set the state on the next event tick to prevent a warning from
-      // StencilJS.
-      setTimeout(() => {
-        const rowEl = this.el.shadowRoot?.querySelector('.row');
-        this.computedRowHeight = rowEl?.clientHeight;
-        this.isComputingRowHeight = false;
-      }, 0);
+      const dummyData: LoadedRow = {
+        index: 0,
+        node: {
+          id: { hex: '' },
+          name: 'Dummy row',
+          expanded: false,
+          selected: false,
+          visible: false,
+          isLeaf: false,
+          depth: 0,
+        },
+        data: {},
+      };
+      const { bindings, element } = this.createInstancedTemplate();
+      bindings.bind(dummyData);
+      element.style.visibility = 'hidden';
+
+      this.el.shadowRoot?.appendChild(element);
+
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      if (typeof (element as any).componentOnReady === 'function') {
+        await (element as any).componentOnReady();
+      }
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+
+      let height = element.clientHeight;
+      let attempts = 0;
+
+      while (height === 0 && attempts < 10) {
+        height = await new Promise((resolve) => {
+          setTimeout(() => resolve(element.getBoundingClientRect().height), 5);
+        });
+        attempts = attempts + 1;
+      }
+      this.computedRowHeight = height;
+      element.remove();
     }
   }
 
@@ -973,5 +906,85 @@ export class SceneTree {
 
   private getConfig(): Config {
     return parseConfig(this.configEnv, this.config);
+  }
+
+  private ensureTemplateDefined(): void {
+    let template = this.el.querySelector('template');
+    if (template == null) {
+      template = document.createElement('template');
+      template.innerHTML = `
+      <vertex-scene-tree-row prop:node="{{row.node}}"></vertex-scene-tree-row>
+      `;
+      this.el.appendChild(template);
+    }
+    this.stateMap.template = template;
+  }
+
+  private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
+    if (this.stateMap.template != null) {
+      return generateInstanceFromTemplate(this.stateMap.template);
+    } else {
+      throw new Error('No template defined for scene tree.');
+    }
+  }
+
+  private createPool(): void {
+    const container = this.el.shadowRoot?.querySelector('.rows');
+
+    if (this.viewportHeight == null) {
+      throw new Error('Viewport height is not defined');
+    }
+
+    if (container == null) {
+      throw new Error(
+        'Cannot create scene tree pool. Row container cannot be found'
+      );
+    }
+
+    // When doing a live reload, this function might get called multiple times.
+    // Only create the pool if on hasn't been created yet.
+    if (this.stateMap.elementPool == null) {
+      this.stateMap.elementPool = new ElementPool(this.el, () =>
+        this.createInstancedTemplate()
+      );
+    }
+  }
+
+  private async updateElements(): Promise<void> {
+    this.updatePool();
+    this.bindData();
+    this.positionElements();
+  }
+
+  private updatePool(): void {
+    const count = this.stateMap.endIndex - this.stateMap.startIndex + 1;
+    this.stateMap.elementPool?.updateElements(count);
+  }
+
+  private bindData(): void {
+    this.stateMap.elementPool?.iterateElements((el, binding, i) => {
+      const row = this.stateMap.viewportRows[i];
+      if (row != null) {
+        el.style.visibility = 'inherit';
+        binding.bind(row);
+      } else {
+        el.style.visibility = 'hidden';
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (el as any).tree = this;
+    });
+  }
+
+  private positionElements(): void {
+    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+    this.stateMap.elementPool?.iterateElements((el, _, i) => {
+      el.style.position = 'absolute';
+      el.style.top = `${rowHeight * (this.stateMap.startIndex + i)}px`;
+      el.style.height = `${rowHeight}px`;
+    });
+  }
+
+  private updateViewportHeight(): void {
+    this.viewportHeight = getSceneTreeViewportHeight(this.el);
   }
 }
