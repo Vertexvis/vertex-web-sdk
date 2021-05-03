@@ -238,11 +238,24 @@ export class InteractionApi {
         const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
         const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
-        return camera.rotateAroundAxisAtPoint(
+        const updated = camera.rotateAroundAxisAtPoint(
           angle,
           this.worldRotationPoint,
           rotationAxis
         );
+
+        return updated.update({
+          // Scale the lookAt point to the same length as the distance to the center
+          // of the bounding box to maintain zoom and pan behavior.
+          lookAt: Vector3.add(
+            Vector3.scale(
+              camera.distanceToBoundingBoxCenter() /
+                Vector3.magnitude(updated.viewVector()),
+              updated.viewVector()
+            ),
+            updated.position
+          ),
+        });
       }
       return camera;
     });
@@ -353,11 +366,12 @@ export class InteractionApi {
   ): Vector3.Vector3 {
     if (this.worldRotationPoint != null) {
       return this.worldRotationPoint;
-    } else if (depth === 0 || depth === 1 || depth === -1) {
-      // In the case that the depth is at near, at far, or undefined, use lookAt
-      return camera.lookAt;
     } else {
       const fitAllCamera = camera.viewAll();
+      // In the case that the depth is at the near or far plane, or we
+      // don't have depth info, use 0.5 to represent a value in the middle.
+      const adjustedDepth =
+        depth === 0 || depth === 1 || depth === -1 ? 0.5 : depth;
 
       return computeWorldPosition(
         inverseProjectionMatrix(
@@ -369,7 +383,7 @@ export class InteractionApi {
         inverseViewMatrix(camera),
         viewport,
         scaledPoint,
-        depth,
+        adjustedDepth,
         camera.near,
         camera.far,
         camera.distanceToBoundingBoxCenter() /
