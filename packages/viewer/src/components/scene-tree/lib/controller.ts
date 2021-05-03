@@ -19,7 +19,8 @@ import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Disposable, EventDispatcher } from '@vertexvis/utils';
-import { fromNodeProto, LoadedRow, Row } from './row';
+import { fromNodeProto, Row } from './row';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 
 export interface SceneTreeState {
   totalRows: number;
@@ -103,7 +104,7 @@ export class SceneTreeController {
           console.debug('Received hidden list change', hiddenList);
 
           hiddenList.forEach(({ start, end }) =>
-            this.patchRowsInRange(start, end, () => ({ visible: false }))
+            this.patchNodesInRange(start, end, () => ({ visible: false }))
           );
         }
 
@@ -111,7 +112,7 @@ export class SceneTreeController {
           console.debug('Received shown list change', shownList);
 
           shownList.forEach(({ start, end }) =>
-            this.patchRowsInRange(start, end, () => ({ visible: true }))
+            this.patchNodesInRange(start, end, () => ({ visible: true }))
           );
         }
 
@@ -119,7 +120,7 @@ export class SceneTreeController {
           console.debug('Received deselected list change', deselectedList);
 
           deselectedList.forEach(({ start, end }) =>
-            this.patchRowsInRange(start, end, () => ({ selected: false }))
+            this.patchNodesInRange(start, end, () => ({ selected: false }))
           );
         }
 
@@ -127,7 +128,7 @@ export class SceneTreeController {
           console.debug('Received selected list change', selectedList);
 
           selectedList.forEach(({ start, end }) =>
-            this.patchRowsInRange(start, end, () => ({ selected: true }))
+            this.patchNodesInRange(start, end, () => ({ selected: true }))
           );
         }
       });
@@ -392,14 +393,18 @@ export class SceneTreeController {
     }
   }
 
-  private patchRowsInRange(
+  private patchNodesInRange(
     start: number,
     end: number,
-    transform: (row: LoadedRow) => Partial<Row>
+    transform: (node: Node.AsObject) => Partial<Node.AsObject>
   ): void {
     const updatedRows = this.state.rows
       .slice(start, end + 1)
-      .map((row) => (row != null ? { ...row, ...transform(row) } : row));
+      .map((row) =>
+        row != null
+          ? { ...row, node: { ...row.node, ...transform(row.node) } }
+          : row
+      );
 
     const startRows = this.state.rows.slice(0, start);
     const endRows = this.state.rows.slice(end + 1);
@@ -420,7 +425,7 @@ export class SceneTreeController {
 
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
-        const fetchedRows = fromNodeProto(itemsList);
+        const fetchedRows = fromNodeProto(offset, itemsList);
 
         const start = this.state.rows.slice(0, offset);
         const end = this.state.rows.slice(

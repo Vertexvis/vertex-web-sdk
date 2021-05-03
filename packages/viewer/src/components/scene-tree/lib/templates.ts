@@ -20,3 +20,12 @@ export function append<E extends Element, D>(
     throw new Error('Failed to append element');
   }
 }
+
+export function generateInstanceFromTemplate(
+  template: HTMLTemplateElement
+): InstancedTemplate<HTMLElement> {
+  const fragment = template.content.cloneNode(true) as HTMLElement;
+  const element = fragment.firstElementChild as HTMLElement;
+  const bindings = new CollectionBinding(generateBindings(fragment));
+  return { element, bindings };
+}

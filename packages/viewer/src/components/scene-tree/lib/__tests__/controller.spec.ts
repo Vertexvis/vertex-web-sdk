@@ -180,9 +180,9 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], visible: false },
-        { ...rows[1], visible: false },
-        { ...rows[2], visible: true },
+        { ...rows[0], node: { ...rows[0]?.node, visible: false } },
+        { ...rows[1], node: { ...rows[1]?.node, visible: false } },
+        { ...rows[2], node: { ...rows[2]?.node, visible: true } },
       ]);
     });
 
@@ -223,9 +223,9 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], visible: true },
-        { ...rows[1], visible: true },
-        { ...rows[2], visible: false },
+        { ...rows[0], node: { ...rows[0]?.node, visible: true } },
+        { ...rows[1], node: { ...rows[1]?.node, visible: true } },
+        { ...rows[2], node: { ...rows[2]?.node, visible: false } },
       ]);
     });
 
@@ -266,9 +266,9 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], selected: true },
-        { ...rows[1], selected: true },
-        { ...rows[2], selected: false },
+        { ...rows[0], node: { ...rows[0]?.node, selected: true } },
+        { ...rows[1], node: { ...rows[1]?.node, selected: true } },
+        { ...rows[2], node: { ...rows[2]?.node, selected: false } },
       ]);
     });
 
@@ -309,9 +309,9 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], selected: false },
-        { ...rows[1], selected: false },
-        { ...rows[2], selected: true },
+        { ...rows[0], node: { ...rows[0]?.node, selected: false } },
+        { ...rows[1], node: { ...rows[1]?.node, selected: false } },
+        { ...rows[2], node: { ...rows[2]?.node, selected: true } },
       ]);
     });
   });
@@ -463,7 +463,10 @@ describe(SceneTreeController, () => {
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          rows: [...fromNodeProto(getTree1.getItemsList()), ...new Array(90)],
+          rows: [
+            ...fromNodeProto(0, getTree1.getItemsList()),
+            ...new Array(90),
+          ],
           totalRows: 100,
         })
       );
@@ -472,8 +475,8 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           rows: [
-            ...fromNodeProto(getTree1.getItemsList()),
-            ...fromNodeProto(getTree2.getItemsList()),
+            ...fromNodeProto(0, getTree1.getItemsList()),
+            ...fromNodeProto(10, getTree2.getItemsList()),
             ...new Array(80),
           ],
           totalRows: 100,
