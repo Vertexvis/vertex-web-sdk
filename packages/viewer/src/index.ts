@@ -18,3 +18,7 @@ export { Environment } from './config/environment';
 export { Scene } from './scenes';
 
 export { Frame, LoadableResource, SynchronizedClock } from './types';
+
+import { TapEventDetails } from './interactions/tapEventDetails';
+
+export { TapEventDetails };
