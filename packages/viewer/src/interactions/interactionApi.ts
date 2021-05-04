@@ -370,8 +370,7 @@ export class InteractionApi {
       const fitAllCamera = camera.viewAll();
       // In the case that the depth is at the near or far plane, or we
       // don't have depth info, use 0.5 to represent a value in the middle.
-      const adjustedDepth =
-        depth === 0 || depth === 1 || depth === -1 ? 0.5 : depth;
+      const adjustedDepth = depth >= 1 || depth <= 0 ? 0.5 : depth;
 
       return computeWorldPosition(
         inverseProjectionMatrix(
