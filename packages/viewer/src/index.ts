@@ -21,4 +21,4 @@ export { Frame, LoadableResource, SynchronizedClock } from './types';
 
 import { TapEventDetails } from './interactions/tapEventDetails';
 
-export { TapEventDetails }
+export { TapEventDetails };
