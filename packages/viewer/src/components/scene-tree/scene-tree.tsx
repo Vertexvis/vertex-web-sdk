@@ -172,8 +172,8 @@ export class SceneTree {
   @Prop()
   public selectionDisabled = false;
 
-  @Prop({ mutable: true, reflect: true })
-  public controller!: SceneTreeController;
+  @Prop({ mutable: true })
+  public controller?: SceneTreeController;
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
@@ -214,22 +214,6 @@ export class SceneTree {
 
   @State()
   private connectionErrorDetails: SceneTreeErrorDetails | undefined;
-
-  /* eslint-disable lines-between-class-members */
-  /**
-   * @private Used for internal testing.
-   */
-  public get client(): SceneTreeAPIClient {
-    if (this.stateMap.client != null) {
-      return this.stateMap.client;
-    } else {
-      throw new Error('Client is null.');
-    }
-  }
-  public set client(value: SceneTreeAPIClient) {
-    this.stateMap.client = value;
-  }
-  /* eslint-enable lines-between-class-members */
 
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
@@ -275,12 +259,14 @@ export class SceneTree {
     itemId: string,
     options: ScrollToOptions = {}
   ): Promise<void> {
-    const index = await this.controller.expandParentNodes(itemId);
+    const index = await this.controller?.expandParentNodes(itemId);
 
     return new Promise((resolve) => {
       // Scroll to the row after StencilJS has updated the DOM.
       writeDOM(async () => {
-        await this.scrollToIndex(index, options);
+        if (index != null) {
+          await this.scrollToIndex(index, options);
+        }
         resolve();
       });
     });
@@ -291,7 +277,7 @@ export class SceneTree {
    */
   @Method()
   public async expandAll(): Promise<void> {
-    await this.controller.expandAll();
+    await this.controller?.expandAll();
   }
 
   /**
@@ -299,7 +285,7 @@ export class SceneTree {
    */
   @Method()
   public async collapseAll(): Promise<void> {
-    await this.controller.collapseAll();
+    await this.controller?.collapseAll();
   }
 
   /**
@@ -312,7 +298,7 @@ export class SceneTree {
   public async expandItem(row: RowArg): Promise<void> {
     await this.performRowOperation(row, async ({ id, node }) => {
       if (!node.expanded) {
-        await this.controller.expandNode(id);
+        await this.controller?.expandNode(id);
       }
     });
   }
@@ -327,7 +313,7 @@ export class SceneTree {
   public async collapseItem(row: RowArg): Promise<void> {
     await this.performRowOperation(row, async ({ id, node }) => {
       if (node.expanded) {
-        await this.controller.collapseNode(id);
+        await this.controller?.collapseNode(id);
       }
     });
   }
@@ -490,10 +476,11 @@ export class SceneTree {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
       this.controller = new SceneTreeController(client, 100);
-      this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
-        (state) => this.handleControllerStateChange(state)
-      );
     }
+
+    this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
+      (state) => this.handleControllerStateChange(state)
+    );
 
     if (this.viewer != null) {
       this.stateMap.viewerDisposable = this.controller.connectToViewer(
@@ -525,7 +512,7 @@ export class SceneTree {
   protected componentWillRender(): void {
     this.updateRenderState();
 
-    if (this.controller.isConnected) {
+    if (this.controller?.isConnected) {
       this.controller.updateActiveRowRange(
         this.stateMap.startIndex,
         this.stateMap.endIndex
@@ -585,7 +572,7 @@ export class SceneTree {
     }
 
     if (newViewer != null) {
-      this.stateMap.viewerDisposable = this.controller.connectToViewer(
+      this.stateMap.viewerDisposable = this.controller?.connectToViewer(
         newViewer
       );
     }
@@ -618,13 +605,13 @@ export class SceneTree {
 
       if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
         const [start, end] =
-          this.controller.getPageIndexesForRange(
+          this.controller?.getPageIndexesForRange(
             this.stateMap.startIndex,
             this.stateMap.endIndex
           ) || [];
 
         if (start != null && end != null) {
-          this.controller.invalidatePagesOutsideRange(start, end, 50);
+          this.controller?.invalidatePagesOutsideRange(start, end, 50);
         }
       } else {
         this.scheduleClearUnusedData();
@@ -638,6 +625,7 @@ export class SceneTree {
 
     if (state.connection.type === 'failure') {
       this.connectionErrorDetails = state.connection.details;
+      this.connectionError.emit(state.connection.details);
     } else {
       this.connectionErrorDetails = undefined;
     }

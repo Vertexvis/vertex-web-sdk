@@ -22,8 +22,8 @@ import { Disposable, EventDispatcher } from '@vertexvis/utils';
 import { fromNodeProto, Row } from './row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { isGrpcServiceError } from './grpc';
+import { decodeSceneTreeJwt } from './jwt';
 
 export interface SceneTreeState {
   totalRows: number;
@@ -35,10 +35,6 @@ interface Page {
   id: number;
   index: number;
   res: Promise<GetTreeResponse>;
-}
-
-interface JwtToken extends JwtPayload {
-  view: string;
 }
 
 export interface DisconnectedState {
@@ -124,21 +120,22 @@ export class SceneTreeController {
 
   private disconnectIfSceneViewChanged(jwt: string): void {
     const { connection } = this.state;
-    const { view: sceneViewId } = jwtDecode<JwtToken>(jwt);
+    const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
 
-    if (connection.sceneViewId !== sceneViewId) {
-      if (connection.type !== 'disconnected') {
-        console.debug(
-          'Scene tree controller scene view has changed. Disconnecting and clearing state.'
-        );
-        this.disconnect(true);
-      }
+    if (
+      connection.sceneViewId !== sceneViewId &&
+      connection.type !== 'disconnected'
+    ) {
+      console.debug(
+        'Scene tree controller scene view has changed. Disconnecting and clearing state.'
+      );
+      this.disconnect(true);
     }
   }
 
   private async connectIfDisconnected(jwt: string): Promise<void> {
     const { connection } = this.state;
-    const { view: sceneViewId } = jwtDecode<JwtToken>(jwt);
+    const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
 
     if (connection.type === 'disconnected') {
       const connecting: ConnectingState = {
@@ -183,7 +180,12 @@ export class SceneTreeController {
         console.debug(
           'Scene tree controller found viewer JWT. Attempting connection.'
         );
-        this.connect(jwt);
+
+        try {
+          await this.connect(jwt);
+        } catch (e) {
+          console.error('Scene tree controller erred connecting.', e);
+        }
       }
     };
 

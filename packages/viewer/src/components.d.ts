@@ -60,7 +60,7 @@ export namespace Components {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
     configEnv: Environment;
-    controller: SceneTreeController;
+    controller?: SceneTreeController;
     /**
      * Performs an API call that will deselect the item associated to the given row or row index.
      * @param row The row, row index, or node to deselect.
@@ -434,7 +434,7 @@ declare namespace LocalJSX {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
     configEnv?: Environment;
-    controller: SceneTreeController;
+    controller?: SceneTreeController;
     onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
