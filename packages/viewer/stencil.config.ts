@@ -13,6 +13,11 @@ export const config: Config = {
     reactOutputTarget({
       componentCorePackage: '@vertexvis/viewer',
       proxiesFile: '../viewer-react/src/generated/components.ts',
+      excludeComponents: [
+        // Omitted because the React scene tree component doesn't support
+        // rendering a row as a React element.
+        'vertex-scene-tree-row',
+      ],
     }),
     {
       type: 'dist',
