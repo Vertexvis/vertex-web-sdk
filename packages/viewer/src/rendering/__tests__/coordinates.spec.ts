@@ -22,8 +22,6 @@ describe(computeWorldPosition, () => {
   it('should return correct world position for near-plane depth', () => {
     const depth = 0;
 
-    console.log(camera.near, camera.far);
-
     expect(computeWorldPosition(camera, viewport, point, depth).z).toBe(4);
   });
 
