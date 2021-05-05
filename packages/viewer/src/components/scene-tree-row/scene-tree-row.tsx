@@ -83,13 +83,7 @@ export class SceneTreeRow {
       return <div />;
     } else {
       return (
-        <Host
-          class={classnames({
-            hidden: !this.node.visible,
-            selected: this.node.selected,
-            leaf: this.node.isLeaf,
-          })}
-        >
+        <Host>
           <div class="root" ref={(ref) => (this.rootEl = ref)}>
             <div class="no-shrink">
               <slot name="left-gutter" />
@@ -146,6 +140,15 @@ export class SceneTreeRow {
     );
   }
 
+  protected componentWillRender(): void {
+    this.ifNodeDefined(({ visible, selected, expanded, isLeaf }) => {
+      this.toggleAttribute('is-hidden', !visible);
+      this.toggleAttribute('is-selected', selected);
+      this.toggleAttribute('is-expanded', expanded);
+      this.toggleAttribute('is-leaf', isLeaf);
+    });
+  }
+
   /**
    * @internal
    */
@@ -192,6 +195,14 @@ export class SceneTreeRow {
   private ifNodeDefined(f: (row: Node.AsObject) => void): void {
     if (this.node != null) {
       f(this.node);
+    }
+  }
+
+  private toggleAttribute(attr: string, value: boolean): void {
+    if (value) {
+      this.hostEl.setAttribute(attr, '');
+    } else {
+      this.hostEl.removeAttribute(attr);
     }
   }
 }

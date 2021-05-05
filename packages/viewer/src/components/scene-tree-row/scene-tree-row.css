@@ -49,7 +49,7 @@
   background: var(--scene-tree-row-background-hover);
 }
 
-:host(.selected) .root {
+:host([is-selected]) .root {
   background: var(--scene-tree-row-background-selected);
 }
 
@@ -73,7 +73,7 @@
   min-height: 24px;
 }
 
-.root.leaf .expand-btn {
+:host([is-leaf]) .expand-btn {
   visibility: hidden;
 }
 
@@ -91,7 +91,7 @@
   visibility: inherit;
 }
 
-:host(.hidden) .visibility-btn {
+:host([is-hidden]) .visibility-btn {
   visibility: inherit;
 }
 

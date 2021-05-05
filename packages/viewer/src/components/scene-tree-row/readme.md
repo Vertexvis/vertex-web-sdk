@@ -62,15 +62,16 @@ about how data binding.
 </html>
 ```
 
-## CSS Selectors
+## State Attributes
 
-The row will set certain CSS selectors depending on the state of the node. These
-selectors are used to customize the styling of your slots depending on which
-selectors are set. The following is a list of selectors that will be set:
+The row will set certain HTML attributes depending on the state of the node.
+These attributes can be used by CSS selectors to customize the styling of your
+slots. The following is a list of attributes that are set:
 
-* `selected`: Specifies that the row's node has been selected.
-* `expanded`: Specifies that the row's node has been expanded.
-* `hidden`: Specifies that the row's node has been hidden.
+* `is-selected`: Specifies that the row's node has been selected.
+* `is-expanded`: Specifies that the row's node has been expanded.
+* `is-hidden`: Specifies that the row's node has been hidden.
+* `is-leaf`: Specifies if the row is a leaf node or not.
 
 **Example:** Using selectors to customize appearance.
 
@@ -78,7 +79,7 @@ selectors are set. The following is a list of selectors that will be set:
 <html>
   <head>
     <style>
-      .row.selected .label {
+      .row[is-selected] .label {
         text-decoration: underline;
       }
     </style>
@@ -86,7 +87,7 @@ selectors are set. The following is a list of selectors that will be set:
   <body>
     <vertex-scene-tree>
       <template>
-        <vertex-scene-tree-row class="row" prop:node={{row.node}}>
+        <vertex-scene-tree-row class="row" prop:node="{{row.node}}">
           <div slot="label" class="label">{{row.node.name}}</div>
         </vertex-scene-tree-row>
       </template>
@@ -118,8 +119,7 @@ custom behavior through bindings and the `rowData` callback.
   <body>
     <vertex-scene-tree>
       <template>
-        <vertex-scene-tree-row class="row" event:expandToggled={{row.data.handleExpand}}>
-        </vertex-scene-tree-row>
+        <vertex-scene-tree-row class="row" event:expandToggled="{{row.data.handleExpand}}"></vertex-scene-tree-row>
       </template>
     </vertex-scene-tree>
 
@@ -145,7 +145,7 @@ You can also bind events from your template to callbacks that are returned by
   <body>
     <vertex-scene-tree class="tree">
       <template>
-        <vertex-scene-tree-row prop:node={{row.node}}>
+        <vertex-scene-tree-row prop:node="{{row.node}}">
           <button slot="right-gutter" event:mousedown="{{row.data.handler}}">
             Hi
           </button>
