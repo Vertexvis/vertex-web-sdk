@@ -291,10 +291,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected getCanvasPosition(event: BaseEvent): Point.Point | undefined {
-    return this.getCanvasPoint(Point.create(event.clientX, event.clientY));
-  }
-
-  protected getCanvasPoint(point: Point.Point): Point.Point | undefined {
     const canvasBounds = this.element?.getBoundingClientRect();
     const canvasOffset =
       canvasBounds != null
@@ -302,7 +298,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         : undefined;
 
     return canvasOffset != null
-      ? Point.subtract(point, canvasOffset)
+      ? Point.subtract(Point.create(event.clientX, event.clientY), canvasOffset)
       : undefined;
   }
 
