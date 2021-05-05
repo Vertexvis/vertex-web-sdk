@@ -50,7 +50,7 @@
     "@types/classnames": "2.2.11",
     "@vertexvis/frame-streaming-protos": "^0.5.4",
     "@vertexvis/geometry": "0.9.26",
-    "@vertexvis/scene-tree-protos": "^0.0.4",
+    "@vertexvis/scene-tree-protos": "^0.1.0",
     "@vertexvis/stream-api": "0.9.26",
     "@vertexvis/utils": "0.9.26",
     "classnames": "2.2.6",

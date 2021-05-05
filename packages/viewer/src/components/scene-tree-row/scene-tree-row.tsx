@@ -183,6 +183,8 @@ export class SceneTreeRow {
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
+      } else if (this.node?.selected) {
+        this.tree?.selectItem(this.node, { nextAncestor: true });
       } else {
         this.tree?.selectItem(this.node, {
           append: event.ctrlKey || event.metaKey,

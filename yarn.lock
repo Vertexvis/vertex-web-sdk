@@ -1801,10 +1801,10 @@
   dependencies:
     rollup "^1.19.4"
 
-"@vertexvis/scene-tree-protos@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.0.4.tgz#d32a56294acc44354f4d98dbdb5c8bc965e4481b"
-  integrity sha512-0s7GhqEzbm7ZRPDeGKmA5wG+Zoq2m+f9dOTt5pKUcd1jIV+IkXkyi5ApjQdUspkzdAy1oGr9N4MbH7/qek0BVQ==
+"@vertexvis/scene-tree-protos@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.0.tgz#c67e981768265f05534ca95f2d7f6a115b971273"
+  integrity sha512-fgNa2CyQ9wz5p+uw6MGvTKVb8xI/1RQrtLCX6EIs7ybhh+6Gemgy9p661LTCRps1PSVQygePxtue9/d9SAjJxg==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"

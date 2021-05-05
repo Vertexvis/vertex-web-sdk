@@ -8,6 +8,8 @@ import {
   CollapseNodeRequest,
   ExpandAllRequest,
   ExpandNodeRequest,
+  GetNodeAncestorsRequest,
+  GetNodeAncestorsResponse,
   GetTreeRequest,
   GetTreeResponse,
   LocateItemRequest,
@@ -78,20 +80,17 @@ export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
-  private onStateChangeDispatcher = new EventDispatcher<SceneTreeState>();
+
+  /**
+   * A dispatcher that emits an event whenever the internal state has changed.
+   */
+  public onStateChange = new EventDispatcher<SceneTreeState>();
 
   private state: SceneTreeState = {
     totalRows: 0,
     rows: [],
     connection: { type: 'disconnected' },
   };
-
-  /**
-   * A dispatcher that emits an event whenever the internal state has changed.
-   */
-  public get onStateChange(): EventDispatcher<SceneTreeState> {
-    return this.onStateChangeDispatcher;
-  }
 
   /**
    * The number of pages that have been fetched.
@@ -316,6 +315,23 @@ export class SceneTreeController {
       }
 
       return locatedIndex.value;
+    });
+  }
+
+  public async fetchNodeAncestors(nodeId: string): Promise<Node.AsObject[]> {
+    return this.ifConnectionHasJwt(async ({ jwt }) => {
+      const nodeUuid = new Uuid();
+      nodeUuid.setHex(nodeId);
+      const req = new GetNodeAncestorsRequest();
+      req.setNodeId(nodeUuid);
+
+      const res = await this.requestUnary<GetNodeAncestorsResponse>(
+        jwt,
+        (metadata, handler) =>
+          this.client.getNodeAncestors(req, metadata, handler)
+      );
+
+      return res.toObject().itemsList;
     });
   }
 

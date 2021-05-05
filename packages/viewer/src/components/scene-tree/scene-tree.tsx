@@ -27,7 +27,7 @@ import {
   deselectItem,
   hideItem,
   selectItem,
-  SelectItemOptions,
+  ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
 import { readDOM, writeDOM } from '../../utils/stencil';
@@ -92,6 +92,16 @@ export interface ScrollToOptions {
    * Defaults to `middle`.
    */
   position?: 'start' | 'middle' | 'end';
+}
+
+/**
+ * A set of options to configure selection behavior.
+ */
+export interface SelectItemOptions extends ViewerSelectItemOptions {
+  /**
+   * Specifies that the next deselected ancestor should be selected.
+   */
+  nextAncestor?: boolean;
 }
 
 @Component({
@@ -387,17 +397,24 @@ export class SceneTree {
    * or row index.
    *
    * @param row The row, row index or node to select.
-   * @param append `true` if the selection should append to the current
-   *  selection, or `false` if this should replace the current selection.
-   *  Defaults to replace.
+   * @param options A set of options to configure selection behavior.
    */
   @Method()
   public async selectItem(
     row: RowArg,
-    options: SelectItemOptions = {}
+    { nextAncestor, ...options }: SelectItemOptions = {}
   ): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id }) => {
-      await selectItem(viewer, id, options);
+      if (nextAncestor) {
+        const ancestors = (await this.controller?.fetchNodeAncestors(id)) || [];
+        const node = ancestors.find(({ selected }) => !selected);
+
+        if (node != null) {
+          await this.selectItem(node, options);
+        }
+      } else {
+        await selectItem(viewer, id, options);
+      }
     });
   }
 
