@@ -12,6 +12,7 @@ import {
 } from './components/scene-tree/scene-tree';
 import { Config } from './config/config';
 import { Environment } from './config/environment';
+import { SceneTreeController } from './components/scene-tree/lib/controller';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { SelectItemOptions } from './components/scene-tree/lib/viewer-ops';
 import { Row } from './components/scene-tree/lib/row';
@@ -59,6 +60,7 @@ export namespace Components {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
     configEnv: Environment;
+    controller?: SceneTreeController;
     /**
      * Performs an API call that will deselect the item associated to the given row or row index.
      * @param row The row, row index, or node to deselect.
@@ -432,6 +434,7 @@ declare namespace LocalJSX {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
     configEnv?: Environment;
+    controller?: SceneTreeController;
     onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.

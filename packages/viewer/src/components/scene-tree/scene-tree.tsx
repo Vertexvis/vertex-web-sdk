@@ -12,15 +12,10 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import {
-  SceneTreeAPIClient,
-  ServiceError,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { grpc } from '@improbable-eng/grpc-web';
+import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
-import { ConnectionStatus } from '../viewer/viewer';
 import { Config, parseConfig } from '../../config/config';
 import { Environment } from '../../config/environment';
 import {
@@ -35,9 +30,8 @@ import {
   SelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { isGrpcServiceError } from './lib/grpc';
 import { readDOM, writeDOM } from '../../utils/stencil';
-import { SceneTreeErrorDetails, SceneTreeErrorCode } from './lib/errors';
+import { SceneTreeErrorDetails } from './lib/errors';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { ElementPool } from './lib/element-pool';
 import {
@@ -63,10 +57,9 @@ interface StateMap {
   client?: SceneTreeAPIClient;
   jwt?: string;
 
-  controller?: SceneTreeController;
   onStateChangeDisposable?: Disposable;
   subscribeDisposable?: Disposable;
-  connected: boolean;
+  viewerDisposable?: Disposable;
 
   elementPool?: ElementPool;
   template?: HTMLTemplateElement;
@@ -179,6 +172,9 @@ export class SceneTree {
   @Prop()
   public selectionDisabled = false;
 
+  @Prop({ mutable: true })
+  public controller?: SceneTreeController;
+
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
@@ -209,9 +205,7 @@ export class SceneTree {
    */
   @State()
   private stateMap: StateMap = {
-    connected: false,
     componentLoaded: false,
-
     startIndex: 0,
     endIndex: 0,
     viewportRows: [],
@@ -220,47 +214,6 @@ export class SceneTree {
 
   @State()
   private connectionErrorDetails: SceneTreeErrorDetails | undefined;
-
-  /* eslint-disable lines-between-class-members */
-  /**
-   * @private Used for internal testing.
-   */
-  public get client(): SceneTreeAPIClient {
-    if (this.stateMap.client != null) {
-      return this.stateMap.client;
-    } else {
-      throw new Error('Client is null.');
-    }
-  }
-  public set client(value: SceneTreeAPIClient) {
-    this.stateMap.client = value;
-  }
-  /* eslint-enable lines-between-class-members */
-
-  /* eslint-disable lines-between-class-members */
-  /**
-   * @private Used for internal testing
-   */
-  public get controller(): SceneTreeController | undefined {
-    return this.stateMap.controller;
-  }
-  /**
-   * @private Used for internal testing
-   */
-  public set controller(value: SceneTreeController | undefined) {
-    if (this.controller !== value) {
-      if (this.controller != null) {
-        this.disconnectController();
-      }
-
-      this.stateMap.controller = value;
-
-      if (this.controller != null) {
-        this.connectController(this.controller);
-      }
-    }
-  }
-  /* eslint-enable lines-between-class-members */
 
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
@@ -306,15 +259,14 @@ export class SceneTree {
     itemId: string,
     options: ScrollToOptions = {}
   ): Promise<void> {
-    if (this.controller == null) {
-      throw new Error('Cannot lookup item. Controller is undefined.');
-    }
-    const index = await this.controller.expandParentNodes(itemId);
+    const index = await this.controller?.expandParentNodes(itemId);
 
     return new Promise((resolve) => {
       // Scroll to the row after StencilJS has updated the DOM.
       writeDOM(async () => {
-        await this.scrollToIndex(index, options);
+        if (index != null) {
+          await this.scrollToIndex(index, options);
+        }
         resolve();
       });
     });
@@ -513,34 +465,27 @@ export class SceneTree {
     return this.getRowAtIndex(index);
   }
 
-  protected connectedCallback(): void {
-    console.debug('Scene tree added to DOM');
-  }
-
-  protected disconnectedCallback(): void {
-    console.debug('Scene tree removed from DOM');
-
-    if (this.viewer != null) {
-      this.disconnectViewer(this.viewer);
-    }
-
-    if (this.controller != null) {
-      this.controller = undefined;
-    }
-  }
-
   protected componentWillLoad(): void {
-    const { sceneTreeHost } = this.getConfig().network;
-    this.client = new SceneTreeAPIClient(sceneTreeHost);
-
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
         | undefined;
     }
 
+    if (this.controller == null) {
+      const { sceneTreeHost } = this.getConfig().network;
+      const client = new SceneTreeAPIClient(sceneTreeHost);
+      this.controller = new SceneTreeController(client, 100);
+    }
+
+    this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
+      (state) => this.handleControllerStateChange(state)
+    );
+
     if (this.viewer != null) {
-      this.connectViewer(this.viewer);
+      this.stateMap.viewerDisposable = this.controller.connectToViewer(
+        this.viewer
+      );
     }
   }
 
@@ -566,10 +511,13 @@ export class SceneTree {
 
   protected componentWillRender(): void {
     this.updateRenderState();
-    this.controller?.updateActiveRowRange(
-      this.stateMap.startIndex,
-      this.stateMap.endIndex
-    );
+
+    if (this.controller?.isConnected) {
+      this.controller.updateActiveRowRange(
+        this.stateMap.startIndex,
+        this.stateMap.endIndex
+      );
+    }
   }
 
   protected componentDidRender(): void {
@@ -607,10 +555,10 @@ export class SceneTree {
   }
 
   @Watch('viewer')
-  protected async handleViewerChanged(
+  protected handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
     oldViewer: HTMLVertexViewerElement | undefined
-  ): Promise<void> {
+  ): void {
     // StencilJS will invoke this callback even before the component has been
     // loaded. According to their docs, this shouldn't happen. Return if the
     // component hasn't been loaded.
@@ -620,99 +568,30 @@ export class SceneTree {
     }
 
     if (oldViewer != null) {
-      this.controller = undefined;
-      this.disconnectViewer(oldViewer);
+      this.stateMap.viewerDisposable?.dispose();
     }
 
     if (newViewer != null) {
-      this.connectViewer(newViewer);
+      this.stateMap.viewerDisposable = this.controller?.connectToViewer(
+        newViewer
+      );
     }
   }
 
-  private handleViewerSceneReady = (): void => {
-    console.debug('Scene tree received viewer scene ready');
-    this.createController();
-  };
-
-  private async createController(): Promise<void> {
-    if (this.controller == null) {
-      this.controller = new SceneTreeController(this.client, 100, () => {
-        if (this.stateMap.jwt != null) {
-          return this.stateMap.jwt;
-        } else {
-          throw new Error('Cannot update subscription. JWT is null.');
-        }
-      });
+  @Watch('controller')
+  protected handleControllerChanged(newController: SceneTreeController): void {
+    // StencilJS will invoke this callback even before the component has been
+    // loaded. According to their docs, this shouldn't happen. Return if the
+    // component hasn't been loaded.
+    // See https://stenciljs.com/docs/reactive-data#watch-decorator
+    if (!this.stateMap.componentLoaded) {
+      return;
     }
-  }
 
-  private disconnectController(): void {
     this.stateMap.onStateChangeDisposable?.dispose();
-    this.stateMap.subscribeDisposable?.dispose();
-    this.stateMap.connected = false;
-  }
 
-  private async connectController(
-    controller: SceneTreeController
-  ): Promise<void> {
-    if (this.stateMap.jwt != null && !this.stateMap.connected) {
-      this.stateMap.onStateChangeDisposable = controller.onStateChange.on(
-        (state) => {
-          this.handleControllerStateChange(state);
-          this.scheduleClearUnusedData();
-        }
-      );
-
-      try {
-        await controller.fetchPage(0);
-        this.stateMap.subscribeDisposable = controller.subscribe();
-        this.stateMap.connected = true;
-        this.connectionErrorDetails = undefined;
-      } catch (e) {
-        if (isGrpcServiceError(e)) {
-          this.handleConnectionError(e);
-        }
-      }
-    }
-  }
-
-  private handleConnectionError(e: ServiceError): void {
-    if (e.code === grpc.Code.FailedPrecondition) {
-      this.connectionErrorDetails = new SceneTreeErrorDetails(
-        SceneTreeErrorCode.SCENE_TREE_DISABLED,
-        'https://developer.vertexvis.com'
-      );
-    } else {
-      this.connectionErrorDetails = new SceneTreeErrorDetails(
-        SceneTreeErrorCode.UNKNOWN
-      );
-    }
-
-    this.connectionError.emit(this.connectionErrorDetails);
-  }
-
-  private async connectViewer(viewer: HTMLVertexViewerElement): Promise<void> {
-    viewer.addEventListener('sceneReady', this.handleViewerSceneReady);
-    viewer.addEventListener(
-      'connectionChange',
-      this.handleViewerConnectionStatusChange
-    );
-
-    const isSceneReady = await viewer.isSceneReady();
-    if (isSceneReady) {
-      const jwt = await viewer.getJwt();
-      if (jwt != null) {
-        this.updateJwt(jwt);
-      }
-      this.createController();
-    }
-  }
-
-  private disconnectViewer(viewer: HTMLVertexViewerElement): void {
-    viewer.removeEventListener('sceneReady', this.handleViewerSceneReady);
-    viewer.removeEventListener(
-      'connectionChange',
-      this.handleViewerConnectionStatusChange
+    this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
+      (state) => this.handleControllerStateChange(state)
     );
   }
 
@@ -721,48 +600,35 @@ export class SceneTree {
       window.cancelIdleCallback(this.stateMap.idleCallbackId);
     }
 
-    if (this.controller != null) {
-      this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
-        const remaining = foo.timeRemaining?.();
+    this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
+      const remaining = foo.timeRemaining?.();
 
-        if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
-          const [start, end] =
-            this.controller?.getPageIndexesForRange(
-              this.stateMap.startIndex,
-              this.stateMap.endIndex
-            ) || [];
+      if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
+        const [start, end] =
+          this.controller?.getPageIndexesForRange(
+            this.stateMap.startIndex,
+            this.stateMap.endIndex
+          ) || [];
 
-          if (start != null && end != null) {
-            this.controller?.invalidatePagesOutsideRange(start, end, 50);
-          }
-        } else {
-          this.scheduleClearUnusedData();
+        if (start != null && end != null) {
+          this.controller?.invalidatePagesOutsideRange(start, end, 50);
         }
-      });
-    }
-  }
-
-  private handleViewerConnectionStatusChange = (event: Event): void => {
-    const { detail } = event as CustomEvent<ConnectionStatus>;
-    if (detail.status === 'connected') {
-      console.debug('Scene tree received new token');
-      this.updateJwt(detail.jwt);
-    }
-  };
-
-  private updateJwt(jwt: string): void {
-    if (this.stateMap.jwt !== jwt) {
-      this.stateMap.jwt = jwt;
-
-      if (this.controller != null) {
-        this.connectController(this.controller);
+      } else {
+        this.scheduleClearUnusedData();
       }
-    }
+    });
   }
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
+
+    if (state.connection.type === 'failure') {
+      this.connectionErrorDetails = state.connection.details;
+      this.connectionError.emit(state.connection.details);
+    } else {
+      this.connectionErrorDetails = undefined;
+    }
   }
 
   private async performRowOperation(
