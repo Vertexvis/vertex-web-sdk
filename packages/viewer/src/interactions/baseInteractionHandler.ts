@@ -30,6 +30,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
+  private downPositionCanvas?: Point.Point;
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
@@ -143,6 +144,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
+      this.downPositionCanvas = this.getCanvasPosition(event);
       this.interactionTimer = undefined;
 
       // Perform the current movement in the case that the interaction timer elapses
@@ -212,10 +214,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
+      console.log(this.downPositionCanvas, this.getCanvasPosition(event));
+
       this.draggingInteraction.beginDrag(
         event,
-        this.getCanvasPosition(event) ||
-          Point.create(event.clientX, event.clientY),
+        this.downPositionCanvas || Point.create(event.clientX, event.clientY),
         this.interactionApi
       );
     }
@@ -290,6 +293,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected getCanvasPosition(event: BaseEvent): Point.Point | undefined {
+    return this.getCanvasPoint(Point.create(event.clientX, event.clientY));
+  }
+
+  protected getCanvasPoint(point: Point.Point): Point.Point | undefined {
     const canvasBounds = this.element?.getBoundingClientRect();
     const canvasOffset =
       canvasBounds != null
@@ -297,7 +304,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         : undefined;
 
     return canvasOffset != null
-      ? Point.subtract(Point.create(event.clientX, event.clientY), canvasOffset)
+      ? Point.subtract(point, canvasOffset)
       : undefined;
   }
 

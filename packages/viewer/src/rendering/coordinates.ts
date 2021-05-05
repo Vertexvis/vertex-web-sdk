@@ -14,78 +14,53 @@ export function computeWorldPosition(
   depth: number,
   near: number,
   far: number,
-  distanceToCenterRatio: number
+  viewVector: Vector3.Vector3,
+  normalizedViewVector: Vector3.Vector3,
+  position: Vector3.Vector3,
+  crossX: Vector3.Vector3,
+  crossY: Vector3.Vector3,
+  aspect: number,
+  fovy: number
 ): Vector3.Vector3 {
-  const normalizedDeviceCoordinate = computeNormalizedDeviceCoordinates(
-    viewport,
-    point,
-    distanceToCenterRatio
+  const rayDir = Vector3.create(
+    (point.x / viewport.width - 0.5) * aspect,
+    -(point.y / viewport.height) + 0.5,
+    -0.5 / Math.tan(Angle.toRadians(fovy / 2.0))
   );
 
-  const inverseProjPoint = Matrix4.multiplyVector3(
-    inverseProjection,
-    normalizedDeviceCoordinate
+  const normalized = Vector3.normalize(
+    Vector3.add(
+      Vector3.scale(rayDir.x, Vector3.scale(-1, crossX)),
+      Vector3.scale(rayDir.y, crossY),
+      Vector3.scale(rayDir.z, Vector3.scale(-1, normalizedViewVector))
+    )
+  );
+  const pointAtViewVector = Vector3.subtract(
+    Vector3.add(
+      position,
+      Vector3.scale(linearDepth(depth, near, far), normalized)
+    ),
+    position
   );
 
-  const scaledProjPoint = Vector3.scale(
-    1.0 / inverseProjPoint.w,
-    inverseProjPoint
-  );
+  const a =
+    Vector3.dot(viewVector, pointAtViewVector) /
+    (Vector3.magnitude(viewVector) * Vector3.magnitude(pointAtViewVector));
 
-  // Convert the depth to be relative to the clicked point rather than the
-  // view vector.
   const angle =
-    Math.abs(normalizedDeviceCoordinate.x * 22.5) +
-    Math.abs(normalizedDeviceCoordinate.y * 22.5);
-
+    Math.abs((point.x / viewport.width) * fovy - fovy / 2) / aspect +
+    Math.abs((point.y / viewport.height) * fovy - fovy / 2);
+  console.log(a);
   const relativeDepth = depth / Math.cos(Angle.toRadians(angle));
+  // const relativeDepth = depth / a;
+  console.log(relativeDepth);
 
-  // The z-component is replaced here to represent the actual depth of the point
-  // in world space.
-  return Matrix4.multiplyVector3(inverseView, {
-    ...scaledProjPoint,
-    // LinearDepth is flipped due to the coordinate system changing when multiplying
-    // by the inverse projection matrix.
-    z: -linearDepth(relativeDepth, near, far),
-  });
-}
-
-/**
- * Returns the normalized device coordinate for a point.
- *
- * Normalized device coordinates are represented as a range
- * from [-1, 1] for the x, y, and z components of a vector.
- * X: [-1, 1] = [left, right]
- * Y: [-1, 1] = [bottom, top]
- * Z: [-1, 1] = [near, far]
- * If a depth is not provided, zero is used.
- *
- * These values are further scaled to reflect the position
- * within the viewport of a model that has its camera fit to the
- * visible bounding box. This corrects for inconsistencies when
- * the camera is located in the model's visible bounding box.
- *
- * @param viewport - The viewport of the scene.
- * @param point - The screen position of a click.
- * @param distanceToCenterRatio - The ratio between the cameras current
- * distance to the center of the bounding box compared to the distance to
- * the center when fit to the bounding box. This corrects the normalized
- * values to be relative to the original viewport.
- * @param depth - The depth from [0, 1] between the near and far planes.
- */
-export function computeNormalizedDeviceCoordinates(
-  viewport: Dimensions.Dimensions,
-  point: Point.Point,
-  distanceToCenterRatio: number,
-  depth?: number
-): Vector3.Vector3 {
-  return Vector3.create(
-    ((point.x * 2.0) / viewport.width - 1) * distanceToCenterRatio,
-    (1 - (point.y * 2.0) / viewport.height) * distanceToCenterRatio,
-    depth != null ? depth * 2 - 1 : 0
+  return Vector3.add(
+    position,
+    Vector3.scale(linearDepth(depth, near, far) / a, normalized)
   );
 }
 
-function linearDepth(depth: number, near: number, far: number): number {
+export function linearDepth(depth: number, near: number, far: number): number {
   return depth * (far - near) + near;
 }
