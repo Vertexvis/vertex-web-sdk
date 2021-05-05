@@ -214,8 +214,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
-      console.log(this.downPositionCanvas, this.getCanvasPosition(event));
-
       this.draggingInteraction.beginDrag(
         event,
         this.downPositionCanvas || Point.create(event.clientX, event.clientY),

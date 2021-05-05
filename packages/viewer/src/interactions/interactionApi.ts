@@ -1,10 +1,4 @@
-import {
-  Angle,
-  Dimensions,
-  Matrix4,
-  Point,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -12,12 +6,6 @@ import { Scene, Camera } from '../scenes';
 import { Interactions } from '../types';
 import { DepthProvider } from '../rendering/depth';
 import { computeWorldPosition } from '../rendering/coordinates';
-import {
-  inverseProjectionMatrix,
-  inverseViewMatrix,
-  projectionMatrix,
-  viewMatrix,
-} from '../rendering/matrices';
 
 type SceneProvider = () => Scene;
 
@@ -225,44 +213,6 @@ export class InteractionApi {
         depth
       );
 
-      const p1 = Matrix4.multiplyVector3(
-        viewMatrix(camera),
-        this.worldRotationPoint
-      );
-      const p2 = Matrix4.multiplyVector4(
-        projectionMatrix(
-          camera.near,
-          camera.far,
-          camera.fovY,
-          camera.aspectRatio
-        ),
-        p1
-      );
-      const p3 = Vector3.scale(1 / p2.w, p2);
-      const screen = Point.scale(
-        Point.create(
-          ((p3.x + 1) / 2) * viewport.width,
-          ((-p3.y + 1) / 2) * viewport.height
-        ),
-        1 / scale?.x || 1,
-        1 / scale?.y || 1
-      );
-
-      const div =
-        document.querySelector('#dot') || document.createElement('div');
-      div.setAttribute(
-        'style',
-        `width: 5px; height: 5px; background-color: red; position: fixed; top: ${Math.round(
-          screen.y
-        )}px; left: ${Math.round(screen.x)}px; border: 1px solid black`
-      );
-      if (document.querySelector('#dot') == null) {
-        div.id = 'dot';
-        document.body.appendChild(div);
-      }
-
-      // console.log(this.worldRotationPoint);
-
       if (this.worldRotationPoint != null) {
         const upVector = Vector3.normalize(camera.up);
         const lookAt = Vector3.normalize(
@@ -413,83 +363,11 @@ export class InteractionApi {
     if (this.worldRotationPoint != null) {
       return this.worldRotationPoint;
     } else {
-      const fitAllCamera = camera.viewAll();
       // In the case that the depth is at the near or far plane, or we
       // don't have depth info, use 0.5 to represent a value in the middle.
       const adjustedDepth = depth >= 1 || depth <= 0 ? 0.5 : depth;
 
-      console.log(
-        'near/far values',
-        fitAllCamera.far,
-        fitAllCamera.near,
-        camera.far,
-        camera.near
-      );
-
-      // const wp = computeWorldPosition(
-      //   inverseProjectionMatrix(
-      //     fitAllCamera.near,
-      //     fitAllCamera.far,
-      //     // camera.near,
-      //     // camera.far,
-      //     camera.fovY,
-      //     camera.aspectRatio
-      //   ),
-      //   inverseViewMatrix(fitAllCamera),
-      //   viewport,
-      //   scaledPoint,
-      //   adjustedDepth,
-      //   camera.near,
-      //   camera.far,
-      //   // camera.aspectRatio,
-      //   (camera.distanceToBoundingBoxCenter() /
-      //     fitAllCamera.distanceToBoundingBoxCenter())
-      //   // (fitAllCamera.far) / (camera.far)
-      //   // Vector3.scale(1 / p2.w, p2)
-      //   // Vector3.subtract(camera.position, camera.lookAt)
-      // );
-
-      const upVector = Vector3.normalize(camera.up);
-      const lookAt = Vector3.normalize(
-        Vector3.subtract(camera.lookAt, camera.position)
-      );
-
-      const crossX = Vector3.normalize(Vector3.cross(upVector, lookAt));
-      const crossY = Vector3.normalize(Vector3.cross(lookAt, crossX));
-
-      const wp = computeWorldPosition(
-        inverseProjectionMatrix(
-          fitAllCamera.near,
-          fitAllCamera.far,
-          // camera.near,
-          // camera.far,
-          camera.fovY,
-          camera.aspectRatio
-        ),
-        inverseViewMatrix(fitAllCamera),
-        viewport,
-        scaledPoint,
-        adjustedDepth,
-        camera.near,
-        camera.far,
-        Vector3.subtract(camera.lookAt, camera.position),
-        lookAt,
-        camera.position,
-        crossX,
-        crossY,
-        camera.aspectRatio,
-        camera.fovY
-        // // camera.aspectRatio,
-        // (camera.distanceToBoundingBoxCenter() /
-        //   fitAllCamera.distanceToBoundingBoxCenter())
-        // (fitAllCamera.far) / (camera.far)
-        // Vector3.scale(1 / p2.w, p2)
-        // Vector3.subtract(camera.position, camera.lookAt)
-      );
-
-      console.log(wp);
-
-      return wp;
+      return computeWorldPosition(camera, viewport, scaledPoint, adjustedDepth);
     }
   }
 }
