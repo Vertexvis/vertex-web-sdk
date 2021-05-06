@@ -30,6 +30,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
+  private downPositionCanvas?: Point.Point;
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
@@ -143,6 +144,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
+      this.downPositionCanvas = this.getCanvasPosition(event);
       this.interactionTimer = undefined;
 
       // Perform the current movement in the case that the interaction timer elapses
@@ -214,8 +216,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.beginDrag(
         event,
-        this.getCanvasPosition(event) ||
-          Point.create(event.clientX, event.clientY),
+        this.downPositionCanvas || Point.create(event.clientX, event.clientY),
         this.interactionApi
       );
     }

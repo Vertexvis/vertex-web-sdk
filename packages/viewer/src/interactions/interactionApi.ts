@@ -6,10 +6,6 @@ import { Scene, Camera } from '../scenes';
 import { Interactions } from '../types';
 import { DepthProvider } from '../rendering/depth';
 import { computeWorldPosition } from '../rendering/coordinates';
-import {
-  inverseProjectionMatrix,
-  inverseViewMatrix,
-} from '../rendering/matrices';
 
 type SceneProvider = () => Scene;
 
@@ -367,27 +363,11 @@ export class InteractionApi {
     if (this.worldRotationPoint != null) {
       return this.worldRotationPoint;
     } else {
-      const fitAllCamera = camera.viewAll();
       // In the case that the depth is at the near or far plane, or we
       // don't have depth info, use 0.5 to represent a value in the middle.
       const adjustedDepth = depth >= 1 || depth <= 0 ? 0.5 : depth;
 
-      return computeWorldPosition(
-        inverseProjectionMatrix(
-          fitAllCamera.near,
-          fitAllCamera.far,
-          camera.fovY,
-          camera.aspectRatio
-        ),
-        inverseViewMatrix(camera),
-        viewport,
-        scaledPoint,
-        adjustedDepth,
-        camera.near,
-        camera.far,
-        camera.distanceToBoundingBoxCenter() /
-          fitAllCamera.distanceToBoundingBoxCenter()
-      );
+      return computeWorldPosition(camera, viewport, scaledPoint, adjustedDepth);
     }
   }
 }
