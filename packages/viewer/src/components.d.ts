@@ -114,11 +114,11 @@ export namespace Components {
          */
         "scrollToItem": (itemId: string, options?: ScrollToOptions) => Promise<void>;
         /**
-          * Performs an API call that will select the item associated to the given row or row index.
+          * Performs an API call that will select the item associated to the given row or row index.  This method supports a `recurseParent` option that allows for recursively selecting the next unselected parent node. This behavior is considered stateful. Each call to `selectItem` will track the ancestry of the passed in `rowArg`. If calling `selectItem` with a row not belonging to the ancestry of a previous selection, then this method will perform a standard selection.
           * @param row The row, row index or node to select.
           * @param options A set of options to configure selection behavior.
          */
-        "selectItem": (row: RowArg, { nextAncestor, ...options }?: SelectItemOptions) => Promise<void>;
+        "selectItem": (row: RowArg, { recurseParent, ...options }?: SelectItemOptions) => Promise<void>;
         /**
           * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
           * @see SceneTree.selectItem *
@@ -158,6 +158,10 @@ export namespace Components {
           * The node data that is associated to the row. Contains information related to if the node is expanded, visible, etc.
          */
         "node"?: Node.AsObject;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+         */
+        "recurseParentSelectionDisabled": boolean;
         /**
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */
@@ -417,6 +421,10 @@ declare namespace LocalJSX {
           * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
          */
         "onVisibilityToggled"?: (event: CustomEvent<void>) => void;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+         */
+        "recurseParentSelectionDisabled"?: boolean;
         /**
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */

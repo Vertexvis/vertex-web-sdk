@@ -68,6 +68,8 @@ interface StateMap {
   endIndex: number;
   viewportRows: Row[];
   viewportRowMap: Map<string, Row>;
+
+  selectionPath?: string[];
 }
 
 type OperationHandler = (data: {
@@ -99,9 +101,9 @@ export interface ScrollToOptions {
  */
 export interface SelectItemOptions extends ViewerSelectItemOptions {
   /**
-   * Specifies that the next deselected ancestor should be selected.
+   * Specifies that the next deselected ancestor node should be selected.
    */
-  nextAncestor?: boolean;
+  recurseParent?: boolean;
 }
 
 @Component({
@@ -396,25 +398,38 @@ export class SceneTree {
    * Performs an API call that will select the item associated to the given row
    * or row index.
    *
+   * This method supports a `recurseParent` option that allows for recursively
+   * selecting the next unselected parent node. This behavior is considered
+   * stateful. Each call to `selectItem` will track the ancestry of the passed
+   * in `rowArg`. If calling `selectItem` with a row not belonging to the
+   * ancestry of a previous selection, then this method will perform a standard
+   * selection.
+   *
    * @param row The row, row index or node to select.
    * @param options A set of options to configure selection behavior.
    */
   @Method()
   public async selectItem(
     row: RowArg,
-    { nextAncestor, ...options }: SelectItemOptions = {}
+    { recurseParent, ...options }: SelectItemOptions = {}
   ): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id }) => {
-      if (nextAncestor) {
-        const ancestors = (await this.controller?.fetchNodeAncestors(id)) || [];
-        const node = ancestors.find(({ selected }) => !selected);
+      const ancestors = (await this.controller?.fetchNodeAncestors(id)) || [];
+      const isInPath = this.stateMap.selectionPath?.includes(id);
 
-        if (node != null) {
-          await this.selectItem(node, options);
+      if (recurseParent && isInPath) {
+        const nextNode = ancestors.find(({ selected }) => !selected);
+        if (nextNode != null) {
+          await this.selectItem(nextNode, options);
         }
       } else {
         await selectItem(viewer, id, options);
       }
+
+      this.stateMap.selectionPath = [
+        ...ancestors.map(({ id }) => id?.hex || ''),
+        id,
+      ];
     });
   }
 

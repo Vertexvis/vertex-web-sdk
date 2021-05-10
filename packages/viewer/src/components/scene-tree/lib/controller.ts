@@ -654,7 +654,7 @@ export class SceneTreeController {
 
   private updateState(newState: SceneTreeState): void {
     this.state = newState;
-    this.onStateChangeDispatcher.emit(this.state);
+    this.onStateChange.emit(this.state);
   }
 
   public getPageForOffset(offset: number): number {
