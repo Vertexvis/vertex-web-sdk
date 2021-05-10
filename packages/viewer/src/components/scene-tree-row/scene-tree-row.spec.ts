@@ -256,6 +256,46 @@ describe('<vertex-scene-tree-row>', () => {
     expect(selected).toHaveBeenCalled();
   });
 
+  it('recursively selects parents if selected', async () => {
+    const node = createNode({ selected: true });
+    const { row } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-row></vertex-scene-tree-row>
+      `,
+      node,
+    });
+
+    const tree = { selectItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (row as any).tree = tree;
+
+    row.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
+
+    expect(tree.selectItem).toHaveBeenCalledWith(
+      node,
+      expect.objectContaining({ recurseParent: true })
+    );
+  });
+
+  it('does nothing if selected and recursive selection disabled', async () => {
+    const node = createNode({ selected: true });
+    const { row } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-row recurse-parent-selection-disabled></vertex-scene-tree-row>
+      `,
+      node,
+    });
+
+    const tree = { selectItem: jest.fn(), deselectItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (row as any).tree = tree;
+
+    row.dispatchEvent(new MouseEvent('mousedown', { button: 0 }));
+
+    expect(tree.selectItem).not.toHaveBeenCalled();
+    expect(tree.deselectItem).not.toHaveBeenCalled();
+  });
+
   it('deselects if selected and meta key', async () => {
     const node = createNode({ selected: true });
     const { row } = await newComponentSpec({

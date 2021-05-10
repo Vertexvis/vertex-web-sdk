@@ -23,6 +23,7 @@ import * as Fixtures from '../../types/__fixtures__';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
+  GetNodeAncestorsResponse,
   GetTreeResponse,
   LocateItemResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
@@ -666,6 +667,11 @@ describe('<vertex-scene-tree-new>', () => {
 
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
+      const res = new GetNodeAncestorsResponse();
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
       const {
         tree,
         viewer,
@@ -684,6 +690,11 @@ describe('<vertex-scene-tree-new>', () => {
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client, transform: (node) => node.setSelected(true) });
+
+      const res = new GetNodeAncestorsResponse();
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
 
       const {
         tree,
@@ -704,6 +715,11 @@ describe('<vertex-scene-tree-new>', () => {
 
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
+      const res = new GetNodeAncestorsResponse();
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
       const {
         tree,
         viewer,
@@ -718,6 +734,48 @@ describe('<vertex-scene-tree-new>', () => {
         expect.anything(),
         row?.node.id?.hex,
         expect.objectContaining({ append: true })
+      );
+    });
+
+    it('selects first unselected parent if node belongs to selection path', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      const getTreeRes = mockGetTree({
+        client,
+        transform: (node) => node.setSelected(false),
+      });
+
+      const node1 = getTreeRes.getItemsList()[0].clone();
+      const node2 = getTreeRes.getItemsList()[1].clone();
+      node2.setSelected(true);
+      const node3 = getTreeRes.getItemsList()[2].clone();
+      node3.setSelected(true);
+      const ancestry = [node1, node2, node3];
+
+      const res = new GetNodeAncestorsResponse();
+      res.setItemsList(ancestry);
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const {
+        tree,
+        viewer,
+        waitForSceneTreeConnected,
+      } = await newSceneTreeSpec({ controller });
+      await loadViewer(jwt, viewer);
+      await waitForSceneTreeConnected();
+
+      const row = await tree.getRowAtIndex(2);
+      await tree.selectItem(row, { recurseParent: true });
+
+      (selectItem as jest.Mock).mockClear();
+      await tree.selectItem(row, { recurseParent: true });
+      expect(selectItem).toHaveBeenCalledWith(
+        expect.anything(),
+        node1.getId()?.getHex(),
+        expect.anything()
       );
     });
   });

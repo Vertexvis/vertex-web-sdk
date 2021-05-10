@@ -53,6 +53,15 @@ export class SceneTreeRow {
   public interactionsDisabled = false;
 
   /**
+   * A flag that disables selection of the node's parent if the user selects
+   * the row multiple times. When enabled, selection of the same row multiple
+   * times will recursively select the next unselected parent until the root
+   * node is selected.
+   */
+  @Prop()
+  public recurseParentSelectionDisabled = false;
+
+  /**
    * An event that is emitted when a user requests to expand the node. This is
    * emitted even if interactions are disabled.
    */
@@ -183,7 +192,11 @@ export class SceneTreeRow {
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
-      } else {
+      } else if (this.node?.selected && !this.recurseParentSelectionDisabled) {
+        this.tree?.selectItem(this.node, {
+          recurseParent: true,
+        });
+      } else if (!this.node?.selected) {
         this.tree?.selectItem(this.node, {
           append: event.ctrlKey || event.metaKey,
         });

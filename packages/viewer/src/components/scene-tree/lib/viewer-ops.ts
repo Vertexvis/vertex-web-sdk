@@ -1,6 +1,6 @@
 import { ColorMaterial } from '../../..';
 
-export interface SelectItemOptions {
+export interface ViewerSelectItemOptions {
   material?: string | ColorMaterial.ColorMaterial;
   append?: boolean;
 }
@@ -28,7 +28,7 @@ export async function hideItem(
 export async function selectItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { material, append = false }: SelectItemOptions
+  { material, append = false }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
