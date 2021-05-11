@@ -140,6 +140,21 @@ because attribute bindings are string values, they can support string
 interpolation. So doing `<div attr:title="Hello {{row.data.name}}"></div>` would
 work for an attribute, but not for a property binding.
 
+### Camel Cased Properties and Events
+
+The DOM lowercases property names and events that you assign in your templates
+HTML. Bind to a camel cased property or event by separating words with a dash.
+The binding syntax will convert dash case to camel case for properties and
+events.
+
+```html
+<!-- Bind to a DOM property -->
+<input prop:my-camel-cased-prop="{{row.data.foo}}"></div>
+
+<!-- Bind to a DOM event -->
+<button event:my-camel-cased-event="{{row.data.handler}}"></button>
+```
+
 <!-- Auto Generated Below -->
 
 

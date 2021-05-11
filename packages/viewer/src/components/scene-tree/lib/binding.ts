@@ -1,4 +1,5 @@
 import { Disposable } from '@vertexvis/utils';
+import { camelCase } from 'camel-case';
 
 const bindingRegEx = /{{(.+)}}/;
 
@@ -96,21 +97,15 @@ export function generateBindings(node: Node): Binding[] {
 
     bindableAttributes.forEach((attr) => {
       if (attr.name.startsWith('event:')) {
-        bindings.push(
-          new EventHandlerBinding(
-            el,
-            attr.value,
-            attr.name.replace('event:', '')
-          )
-        );
+        const eventName = camelCase(attr.name.replace('event:', ''));
+        bindings.push(new EventHandlerBinding(el, attr.value, eventName));
       } else if (attr.name.startsWith('attr:')) {
         bindings.push(
           new AttributeBinding(el, attr.value, attr.name.replace('attr:', ''))
         );
       } else if (attr.name.startsWith('prop:')) {
-        bindings.push(
-          new PropertyBinding(el, attr.value, attr.name.replace('prop:', ''))
-        );
+        const propName = camelCase(attr.name.replace('prop:', ''));
+        bindings.push(new PropertyBinding(el, attr.value, propName));
       }
     });
   } else if (

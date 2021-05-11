@@ -175,14 +175,24 @@ describe(generateBindings, () => {
     parent.appendChild(attr);
 
     const event = document.createElement('div');
-    event.innerHTML = '<div event:click="{{data.event}}"></div>';
+    event.innerHTML = '<div event:click="{{data.click}}"></div>';
     attr.appendChild(event);
+
+    const eventCamelCase = document.createElement('div');
+    eventCamelCase.innerHTML = '<div event:click-me="{{data.clickMe}}"></div>';
+    attr.appendChild(eventCamelCase);
 
     const prop = document.createElement('div');
     prop.innerHTML = '<input prop:value="{{data.value}}"></input>';
     parent.appendChild(prop);
 
-    const input = prop.firstElementChild as HTMLInputElement;
+    const propCamelCase = document.createElement('div');
+    propCamelCase.innerHTML =
+      '<input prop:form-action="{{data.value}}"></input>';
+    parent.appendChild(propCamelCase);
+
+    const input1 = prop.firstElementChild as HTMLInputElement;
+    const input2 = propCamelCase.firstElementChild as HTMLInputElement;
 
     const comment = document.createElement('div');
     comment.innerHTML = `<!-- <div/> -->`;
@@ -191,7 +201,8 @@ describe(generateBindings, () => {
     const data = {
       attr: 'attr',
       text: 'text',
-      event: jest.fn(),
+      click: jest.fn(),
+      clickMe: jest.fn(),
       child: { attr: 'attr-child' },
       value: 'foo',
     };
@@ -200,12 +211,15 @@ describe(generateBindings, () => {
     collection.bind(data);
 
     event.firstElementChild?.dispatchEvent(new MouseEvent('click'));
+    eventCamelCase.firstElementChild?.dispatchEvent(new CustomEvent('clickMe'));
 
-    expect(bindings).toHaveLength(5);
+    expect(bindings).toHaveLength(7);
     expect(parent.getAttribute('title')).toBe('attr');
     expect(text.textContent).toBe('text');
     expect(attr.getAttribute('title')).toBe('attr-child');
-    expect(data.event).toHaveBeenCalled();
-    expect(input.value).toBe('foo');
+    expect(data.click).toHaveBeenCalled();
+    expect(data.clickMe).toHaveBeenCalled();
+    expect(input1.value).toBe('foo');
+    expect(input2.formAction).toBe('foo');
   });
 });
