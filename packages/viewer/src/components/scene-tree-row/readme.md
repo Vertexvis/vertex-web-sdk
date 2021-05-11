@@ -119,7 +119,7 @@ custom behavior through bindings and the `rowData` callback.
   <body>
     <vertex-scene-tree>
       <template>
-        <vertex-scene-tree-row class="row" event:expandToggled="{{row.data.handleExpand}}"></vertex-scene-tree-row>
+        <vertex-scene-tree-row class="row" event:expand-toggled="{{row.data.handleExpand}}"></vertex-scene-tree-row>
       </template>
     </vertex-scene-tree>
 
@@ -146,7 +146,7 @@ You can also bind events from your template to callbacks that are returned by
     <vertex-scene-tree class="tree">
       <template>
         <vertex-scene-tree-row prop:node="{{row.node}}">
-          <button slot="right-gutter" event:mousedown="{{row.data.handler}}">
+          <button slot="right-gutter" event:mousedown="{{row.data.mouseDown}}">
             Hi
           </button>
         </vertex-scene-tree-row>

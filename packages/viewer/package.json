@@ -53,6 +53,7 @@
     "@vertexvis/scene-tree-protos": "^0.1.0",
     "@vertexvis/stream-api": "0.9.26",
     "@vertexvis/utils": "0.9.26",
+    "camel-case": "^4.1.2",
     "classnames": "2.2.6",
     "google-protobuf": "^3.15.7",
     "jwt-decode": "^3.1.2",
