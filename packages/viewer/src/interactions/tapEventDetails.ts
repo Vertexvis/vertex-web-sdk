@@ -6,6 +6,7 @@ export interface TapEventDetails {
   ctrlKey: boolean;
   metaKey: boolean;
   shiftKey: boolean;
+  buttons: number;
 }
 
 export type TapEventKeys = Pick<
