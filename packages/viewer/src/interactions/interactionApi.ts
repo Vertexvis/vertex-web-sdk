@@ -51,23 +51,36 @@ export class InteractionApi {
    */
   public async tap(
     position: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
+    keyDetails: Partial<TapEventKeys> = {},
+    buttons = 0
   ): Promise<void> {
-    this.emitTapEvent(this.tapEmitter.emit, position, keyDetails);
+    this.emitTapEvent(this.tapEmitter.emit, position, keyDetails, buttons);
   }
 
   public async doubleTap(
     position: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
+    keyDetails: Partial<TapEventKeys> = {},
+    buttons = 0
   ): Promise<void> {
-    this.emitTapEvent(this.doubleTapEmitter.emit, position, keyDetails);
+    this.emitTapEvent(
+      this.doubleTapEmitter.emit,
+      position,
+      keyDetails,
+      buttons
+    );
   }
 
   public async longPress(
     position: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
+    keyDetails: Partial<TapEventKeys> = {},
+    buttons = 0
   ): Promise<void> {
-    this.emitTapEvent(this.longPressEmitter.emit, position, keyDetails);
+    this.emitTapEvent(
+      this.longPressEmitter.emit,
+      position,
+      keyDetails,
+      buttons
+    );
   }
 
   /**
@@ -324,7 +337,8 @@ export class InteractionApi {
   private emitTapEvent(
     emit: (details: TapEventDetails) => void,
     position: Point.Point,
-    keyDetails: Partial<TapEventKeys> = {}
+    keyDetails: Partial<TapEventKeys> = {},
+    buttons = 0
   ): void {
     const {
       altKey = false,
@@ -338,6 +352,7 @@ export class InteractionApi {
       ctrlKey,
       metaKey,
       shiftKey,
+      buttons,
     });
   }
 
