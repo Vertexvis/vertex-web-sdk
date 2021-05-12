@@ -167,6 +167,7 @@ describe(InteractionApi, () => {
         ctrlKey: false,
         metaKey: false,
         shiftKey: false,
+        buttons: 0,
       });
     });
 
@@ -183,6 +184,24 @@ describe(InteractionApi, () => {
       expect(emitTap).toHaveBeenCalledWith({
         position: point,
         ...details,
+        buttons: 0,
+      });
+    });
+
+    it('emits a tap event with correct button details', async () => {
+      const point = Point.create();
+      const details = {
+        altKey: true,
+        ctrlKey: true,
+        metaKey: true,
+        shiftKey: true,
+      };
+
+      await api.tap(point, details, 2);
+      expect(emitTap).toHaveBeenCalledWith({
+        position: point,
+        ...details,
+        buttons: 2,
       });
     });
   });
