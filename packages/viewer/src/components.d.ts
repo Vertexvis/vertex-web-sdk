@@ -304,6 +304,7 @@ export namespace Components {
         "direction": ViewerToolbarGroupDirection;
     }
     interface VertexViewerViewCube {
+        "animationDuration": number;
         "viewer"?: HTMLVertexViewerElement;
         "xNegativeLabel": string;
         "xPositiveLabel": string;
@@ -574,6 +575,7 @@ declare namespace LocalJSX {
         "direction"?: ViewerToolbarGroupDirection;
     }
     interface VertexViewerViewCube {
+        "animationDuration"?: number;
         "viewer"?: HTMLVertexViewerElement;
         "xNegativeLabel"?: string;
         "xPositiveLabel"?: string;

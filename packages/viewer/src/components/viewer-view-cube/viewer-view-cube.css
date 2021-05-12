@@ -9,6 +9,7 @@
   height: 100%;
   perspective: inherit;
   visibility: hidden;
+  user-select: none;
 }
 
 .scene.ready {
@@ -22,17 +23,21 @@
   transform-style: preserve-3d;
 }
 
-.cube-face {
-  display: flex;
+.cube-side {
   justify-content: center;
   align-items: center;
+
+  background-color: red;
+  border: 2px solid black;
+}
+
+.cube-face {
+  display: flex;
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
 
-  background-color: red;
-  border: 2px solid black;
   box-sizing: border-box;
 }
 
@@ -59,4 +64,54 @@
 .cube-face-bottom {
   transform: rotateX(-90deg) rotateZ(180deg) rotateY(-90deg)
     translateX(calc(100% / 2)) rotateY(90deg);
+}
+
+.cube-corner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.cube-corner.hovered .cube-edge-face {
+  opacity: 100%;
+}
+
+.cube-corner-face {
+  width: 20px;
+  height: 20px;
+}
+
+.cube-edge-face {
+  position: absolute;
+  background-color: blue;
+  pointer-events: initial;
+  opacity: 0;
+}
+
+.cube-edge-face-horiz {
+  width: calc(100% - 20px * 2);
+  height: 20px;
+}
+
+.cube-edge-face-vert {
+  width: 20px;
+  height: calc(100% - 20px * 2);
+}
+
+.vert-center {
+  align-items: center;
+}
+
+.vert-end {
+  align-items: flex-end;
+}
+
+.horiz-center {
+  justify-content: center;
+}
+
+.horiz-end {
+  justify-content: flex-end;
 }
