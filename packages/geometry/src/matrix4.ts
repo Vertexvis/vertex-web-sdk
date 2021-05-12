@@ -9,6 +9,10 @@ import * as Vector4 from './vector4';
  */
 export type Matrix4 = number[];
 
+export function identity(): Matrix4 {
+  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+}
+
 export const create = (matrix: number[]): Matrix4 => {
   if (matrix.length !== 16) {
     throw new Error('Must have 16 items');
@@ -329,3 +333,14 @@ export const multiply = (a: Matrix4, b: Matrix4): Matrix4 => {
     a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15],
   ]);
 };
+
+export function transpose(matrix: Matrix4): Matrix4 {
+  /* eslint-disable prettier/prettier */
+  return create([
+    matrix[0], matrix[4], matrix[8], matrix[12],
+    matrix[1], matrix[5], matrix[9], matrix[13],
+    matrix[2], matrix[6], matrix[10], matrix[14],
+    matrix[3], matrix[7], matrix[11], matrix[15],
+  ])
+  /* eslint-enable prettier/prettier */
+}

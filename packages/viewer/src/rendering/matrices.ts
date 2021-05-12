@@ -104,6 +104,44 @@ export function viewMatrix(
   ]);
 }
 
+export function makeLookAtViewMatrix(
+  camera: FrameCamera.FrameCamera
+): Matrix4.Matrix4 {
+  const { position, lookAt, up } = camera;
+
+  const z = Vector3.normalize(Vector3.subtract(position, lookAt));
+  const x = Vector3.normalize(Vector3.cross(up, z));
+  const y = Vector3.cross(z, x);
+
+  /* eslint-disable prettier/prettier */
+  return Matrix4.create([
+    x.x, x.y, x.z, -Vector3.dot(x, position),
+    y.x, y.y, y.z, -Vector3.dot(y, position),
+    z.x, z.y, z.z, -Vector3.dot(z, position),
+    0  , 0  , 0  , 1,
+  ])
+  /* eslint-enable prettier/prettier */
+}
+
+export function makeViewMatrix({
+  position,
+  lookAt,
+  up,
+}: FrameCamera.FrameCamera): Matrix4.Matrix4 {
+  const z = Vector3.normalize(Vector3.subtract(position, lookAt));
+  const x = Vector3.normalize(Vector3.cross(up, z));
+  const y = Vector3.cross(z, x);
+
+  /* eslint-disable prettier/prettier */
+  return Matrix4.create([
+    x.x, y.x, z.x, position.x,
+    x.y, y.y, z.y, position.y,
+    x.z, y.z, z.z, position.z,
+    0  , 0  , 0  , 1
+  ])
+  /* eslint-enable prettier/prettier */
+}
+
 export function inverseViewMatrix(
   frameCamera: FrameCamera.FrameCamera
 ): Matrix4.Matrix4 {
@@ -167,4 +205,30 @@ export function inverseViewMatrix(
     0,
     1.0,
   ]);
+}
+
+export function lookAtMatrix(camera: FrameCamera.FrameCamera): Matrix4.Matrix4 {
+  const { position, lookAt, up } = camera;
+
+  const forwardV = Vector3.normalize(Vector3.subtract(lookAt, position));
+  const sideV = Vector3.normalize(Vector3.cross(forwardV, up));
+  const upV = Vector3.cross(sideV, forwardV);
+
+  /* eslint-disable prettier/prettier */
+  const matrix = [
+    sideV.x, upV.x, -forwardV.x, 0,
+    sideV.y, upV.y, -forwardV.y, 0,
+    sideV.z, upV.z, -forwardV.z, 0,
+    0, 0, 0, 1,
+  ]
+
+  const transpose = [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    -position.x, -position.y, -position.z, 1
+  ]
+  /* eslint-enable prettier/prettier */
+
+  return Matrix4.create(Matrix4.multiply(matrix, transpose));
 }

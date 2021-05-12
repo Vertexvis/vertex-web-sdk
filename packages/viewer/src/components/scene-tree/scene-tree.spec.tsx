@@ -36,7 +36,7 @@ import {
 } from './lib/testing';
 import { Viewer } from '../viewer/viewer';
 import {
-  getAssignedSlotNodes,
+  getAssignedSlotElements,
   getElementBoundingClientRect,
 } from '../viewer/utils';
 import {
@@ -67,7 +67,7 @@ describe('<vertex-scene-tree-new>', () => {
     width: 200,
     height: 150,
   });
-  (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
+  (getAssignedSlotElements as jest.Mock).mockReturnValue([]);
 
   // Scene tree mocks
   (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
