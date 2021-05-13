@@ -30,17 +30,17 @@ viewer's scene changes. The cube can be embedded within a
 
 ## Properties
 
-| Property              | Attribute              | Description                                                                                                                       | Type                                   | Default     |
-| --------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `animationDuration`   | `animation-duration`   | The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations. | `number`                               | `500`       |
-| `interactionDisabled` | `interaction-disabled` | Disables standard view interactions.                                                                                              | `boolean`                              | `false`     |
-| `viewer`              | --                     | An instance of the viewer to bind to.                                                                                             | `HTMLVertexViewerElement \| undefined` | `undefined` |
-| `xNegativeLabel`      | `x-negative-label`     | The label for the side of the cube on the negative x-axis.                                                                        | `string`                               | `'Left'`    |
-| `xPositiveLabel`      | `x-positive-label`     | The label for the side of the cube on the positive x-axis.                                                                        | `string`                               | `'Right'`   |
-| `yNegativeLabel`      | `y-negative-label`     | The label for the side of the cube on the negative y-axis.                                                                        | `string`                               | `'Bottom'`  |
-| `yPositiveLabel`      | `y-positive-label`     | The label for the side of the cube on the positive y-axis.                                                                        | `string`                               | `'Top'`     |
-| `zNegativeLabel`      | `z-negative-label`     | The label for the side of the cube on the negative z-axis.                                                                        | `string`                               | `'Front'`   |
-| `zPositiveLabel`      | `z-positive-label`     | The label for the side of the cube on the positive z-axis.                                                                        | `string`                               | `'Back'`    |
+| Property                | Attribute                 | Description                                                                                                                       | Type                                   | Default     |
+| ----------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `animationDuration`     | `animation-duration`      | The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations. | `number`                               | `500`       |
+| `standardViewsDisabled` | `standard-views-disabled` | Disables standard view interactions.                                                                                              | `boolean`                              | `false`     |
+| `viewer`                | --                        | An instance of the viewer to bind to.                                                                                             | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| `xNegativeLabel`        | `x-negative-label`        | The label for the side of the cube on the negative x-axis.                                                                        | `string`                               | `'Left'`    |
+| `xPositiveLabel`        | `x-positive-label`        | The label for the side of the cube on the positive x-axis.                                                                        | `string`                               | `'Right'`   |
+| `yNegativeLabel`        | `y-negative-label`        | The label for the side of the cube on the negative y-axis.                                                                        | `string`                               | `'Bottom'`  |
+| `yPositiveLabel`        | `y-positive-label`        | The label for the side of the cube on the positive y-axis.                                                                        | `string`                               | `'Top'`     |
+| `zNegativeLabel`        | `z-negative-label`        | The label for the side of the cube on the negative z-axis.                                                                        | `string`                               | `'Front'`   |
+| `zPositiveLabel`        | `z-positive-label`        | The label for the side of the cube on the positive z-axis.                                                                        | `string`                               | `'Back'`    |
 
 
 ## CSS Custom Properties
