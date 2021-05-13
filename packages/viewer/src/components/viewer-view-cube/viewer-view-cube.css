@@ -17,7 +17,7 @@
    * @prop --viewer-view-cube-edge-length: A CSS length value that defines the
    * size of an edge when hovered.
    */
-  --viewer-view-cube-edge-length: 16px;
+  --viewer-view-cube-edge-length: 12px;
 
   /**
    * @prop --viewer-view-cube-edge-background: A CSS background value that
@@ -90,9 +90,11 @@
 
 .cube-side::before {
   content: '';
-  width: 100%;
-  height: 100%;
   position: absolute;
+  left: calc(var(--viewer-view-cube-edge-length) - 4px);
+  right: calc(var(--viewer-view-cube-edge-length) - 4px);
+  top: calc(var(--viewer-view-cube-edge-length) - 4px);
+  bottom: calc(var(--viewer-view-cube-edge-length) - 4px);
 }
 
 .cube-side:hover::before {
