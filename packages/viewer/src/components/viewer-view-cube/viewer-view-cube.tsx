@@ -60,27 +60,58 @@ type StandardView =
   shadow: true,
 })
 export class ViewerViewCube {
+  /**
+   * The label for the side of the cube on the positive x-axis.
+   */
   @Prop()
   public xPositiveLabel = 'Right';
 
+  /**
+   * The label for the side of the cube on the negative x-axis.
+   */
   @Prop()
   public xNegativeLabel = 'Left';
 
+  /**
+   * The label for the side of the cube on the positive y-axis.
+   */
   @Prop()
   public yPositiveLabel = 'Top';
 
+  /**
+   * The label for the side of the cube on the negative y-axis.
+   */
   @Prop()
   public yNegativeLabel = 'Bottom';
 
+  /**
+   * The label for the side of the cube on the positive z-axis.
+   */
   @Prop()
   public zPositiveLabel = 'Back';
 
+  /**
+   * The label for the side of the cube on the negative z-axis.
+   */
   @Prop()
   public zNegativeLabel = 'Front';
 
+  /**
+   * The duration of the animation, in milliseconds, when a user performs a
+   * standard view interaction. Set to 0 to disable animations.
+   */
   @Prop()
   public animationDuration = 500;
 
+  /**
+   * Disables standard view interactions.
+   */
+  @Prop()
+  public interactionDisabled = false;
+
+  /**
+   * An instance of the viewer to bind to.
+   */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
@@ -487,20 +518,23 @@ export class ViewerViewCube {
   };
 
   private handleStandardView(view: StandardView): () => Promise<void> {
-    return async () => {
-      console.log('view', view);
-      if (this.viewer != null) {
-        const scene = await this.viewer.scene();
-        const animation =
-          this.animationDuration > 0
-            ? { animation: { milliseconds: this.animationDuration } }
-            : {};
-        scene
-          .camera()
-          .update(this.standardViews[view])
-          .viewAll()
-          .render(animation);
-      }
-    };
+    if (this.interactionDisabled) {
+      return async () => undefined;
+    } else {
+      return async () => {
+        if (this.viewer != null) {
+          const scene = await this.viewer.scene();
+          const animation =
+            this.animationDuration > 0
+              ? { animation: { milliseconds: this.animationDuration } }
+              : {};
+          scene
+            .camera()
+            .update(this.standardViews[view])
+            .viewAll()
+            .render(animation);
+        }
+      };
+    }
   }
 }

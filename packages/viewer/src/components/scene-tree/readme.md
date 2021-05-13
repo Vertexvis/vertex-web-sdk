@@ -313,10 +313,17 @@ Type: `Promise<void>`
 
 
 
-### `selectItem(row: RowArg, options?: SelectItemOptions) => Promise<void>`
+### `selectItem(row: RowArg, { recurseParent, ...options }?: SelectItemOptions) => Promise<void>`
 
 Performs an API call that will select the item associated to the given row
 or row index.
+
+This method supports a `recurseParent` option that allows for recursively
+selecting the next unselected parent node. This behavior is considered
+stateful. Each call to `selectItem` will track the ancestry of the passed
+in `rowArg`. If calling `selectItem` with a row not belonging to the
+ancestry of a previous selection, then this method will perform a standard
+selection.
 
 #### Returns
 
