@@ -5,18 +5,19 @@ import classNames from 'classnames';
 interface Props {
   id: string;
   hovered: boolean;
+  disabled: boolean;
   onHoverChange: (hovered: boolean) => void;
   onMouseDown: (event: MouseEvent) => void;
 }
 
 const ViewerViewCubeEdge: FunctionalComponent<Props> = (
-  { id, hovered, onHoverChange, onMouseDown },
+  { id, hovered, disabled, onHoverChange, onMouseDown },
   children
 ) => {
   return (
     <div
       id={id}
-      class={classNames('cube cube-corner', { hovered })}
+      class={classNames('cube cube-corner', { hovered, disabled })}
       onMouseDown={onMouseDown}
       onMouseEnter={() => onHoverChange(true)}
       onMouseLeave={() => onHoverChange(false)}

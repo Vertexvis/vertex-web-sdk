@@ -100,6 +100,10 @@
   opacity: var(--viewer-view-cube-side-background-hover-opacity);
 }
 
+.cube-side.disabled {
+  pointer-events: none;
+}
+
 .cube-face {
   display: flex;
   position: absolute;
@@ -145,6 +149,10 @@
 
 .cube-corner.hovered .cube-edge-face {
   opacity: var(--viewer-view-cube-edge-opacity);
+}
+
+.cube-corner.disabled {
+  display: none;
 }
 
 .cube-corner-face {
