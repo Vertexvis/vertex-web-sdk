@@ -3,17 +3,19 @@ import { FunctionalComponent, h } from '@stencil/core';
 import classNames from 'classnames';
 
 interface Props {
+  id: string;
   hovered: boolean;
   onHoverChange: (hovered: boolean) => void;
   onMouseDown: (event: MouseEvent) => void;
 }
 
 const ViewerViewCubeEdge: FunctionalComponent<Props> = (
-  { hovered, onHoverChange, onMouseDown },
+  { id, hovered, onHoverChange, onMouseDown },
   children
 ) => {
   return (
     <div
+      id={id}
       class={classNames('cube cube-corner', { hovered })}
       onMouseDown={onMouseDown}
       onMouseEnter={() => onHoverChange(true)}

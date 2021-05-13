@@ -13,14 +13,14 @@ export function identity(): Matrix4 {
   return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
 
-export const create = (matrix: number[]): Matrix4 => {
+export function create(matrix: number[]): Matrix4 {
   if (matrix.length !== 16) {
     throw new Error('Must have 16 items');
   }
   return matrix;
-};
+}
 
-export const inverse = (matrix: Matrix4): Matrix4 => {
+export function inverse(matrix: Matrix4): Matrix4 {
   const m11 = Matrix3.create(
     matrix[5],
     matrix[6],
@@ -221,9 +221,9 @@ export const inverse = (matrix: Matrix4): Matrix4 => {
   ]);
 
   return adjoint.map((v) => v * (1.0 / determinant(matrix)));
-};
+}
 
-export const determinant = (matrix: Matrix4): number => {
+export function determinant(matrix: Matrix4): number {
   const a = matrix[0];
   const b = matrix[4];
   const c = matrix[8];
@@ -283,24 +283,24 @@ export const determinant = (matrix: Matrix4): number => {
     c * Matrix3.determinant(subMatrix3) -
     d * Matrix3.determinant(subMatrix4)
   );
-};
+}
 
-export const multiplyVector3 = (
+export function multiplyVector3(
   matrix: Matrix4,
   vector: Vector3.Vector3
-): Vector4.Vector4 => {
+): Vector4.Vector4 {
   const { x: vx, y: vy, z: vz } = vector;
   const x = matrix[0] * vx + matrix[1] * vy + matrix[2] * vz + matrix[3];
   const y = matrix[4] * vx + matrix[5] * vy + matrix[6] * vz + matrix[7];
   const z = matrix[8] * vx + matrix[9] * vy + matrix[10] * vz + matrix[11];
   const w = matrix[12] * vx + matrix[13] * vy + matrix[14] * vz + matrix[15];
   return Vector4.create(x, y, z, w);
-};
+}
 
-export const multiplyVector4 = (
+export function multiplyVector4(
   matrix: Matrix4,
   vector: Vector4.Vector4
-): Vector4.Vector4 => {
+): Vector4.Vector4 {
   const { x: vx, y: vy, z: vz, w: vw } = vector;
   const x = matrix[0] * vx + matrix[1] * vy + matrix[2] * vz + matrix[3] * vw;
   const y = matrix[4] * vx + matrix[5] * vy + matrix[6] * vz + matrix[7] * vw;
@@ -308,7 +308,7 @@ export const multiplyVector4 = (
   const w =
     matrix[12] * vx + matrix[13] * vy + matrix[14] * vz + matrix[15] * vw;
   return Vector4.create(x, y, z, w);
-};
+}
 
 export const multiply = (a: Matrix4, b: Matrix4): Matrix4 => {
   return create([
