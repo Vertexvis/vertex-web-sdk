@@ -9,7 +9,7 @@
   color: var(--neutral-700);
   text-transform: uppercase;
 
-  filter: drop-shadow(0px 16px 20px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 
   transition: opacity 200ms ease-in-out;
 
@@ -29,7 +29,7 @@
    * @prop --viewer-view-cube-edge-opacity: A CSS number that defines the
    * opacity of an edge when hovered.
    */
-  --viewer-view-cube-edge-opacity: 25%;
+  --viewer-view-cube-edge-opacity: 0.25;
 
   /**
    * @prop --viewer-view-cube-side-background: A CSS background value that
@@ -48,7 +48,7 @@
    * @prop --viewer-view-cube-side-background-hover-opacity: A CSS number that
    * defines the opacity of the background for a hovered side of the cube.
    */
-  --viewer-view-cube-side-background-hover-opacity: 25%;
+  --viewer-view-cube-side-background-hover-opacity: 0.25;
 
   /**
    * @prop --viewer-view-cube-side-border: A CSS border value that defines the
@@ -58,7 +58,7 @@
 }
 
 :host(:hover) {
-  opacity: 95%;
+  opacity: 0.95;
 }
 
 .scene {
