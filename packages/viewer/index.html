@@ -8,6 +8,12 @@
     />
     <title>Viewer SDK Playground</title>
 
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="/dist/viewer/viewer.css" />
     <script type="module" src="/dist/viewer/viewer.esm.js"></script>
     <script nomodule src="/dist/viewer.js"></script>
@@ -15,6 +21,7 @@
     <style>
       html,
       body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
         width: 100%;
         height: 100%;
         padding: 0;
@@ -80,7 +87,17 @@
           client-id="client-id"
           config-env="platdev"
           src="urn:vertexvis:stream-key:key"
-        ></vertex-viewer>
+        >
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
       </div>
     </div>
   </body>

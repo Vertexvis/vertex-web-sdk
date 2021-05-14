@@ -1,0 +1,196 @@
+:host {
+  width: 80px;
+  height: 80px;
+  perspective: 240px;
+  opacity: 85%;
+  margin: 20px;
+
+  font-size: 0.875rem;
+  color: var(--neutral-700);
+  text-transform: uppercase;
+
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+
+  transition: opacity 200ms ease-in-out;
+
+  /**
+   * @prop --viewer-view-cube-edge-length: A CSS length value that defines the
+   * size of an edge when hovered.
+   */
+  --viewer-view-cube-edge-length: 12px;
+
+  /**
+   * @prop --viewer-view-cube-edge-background: A CSS background value that
+   * defines a background color of an edge when hovered.
+   */
+  --viewer-view-cube-edge-background: var(--blue-500);
+
+  /**
+   * @prop --viewer-view-cube-edge-opacity: A CSS number that defines the
+   * opacity of an edge when hovered.
+   */
+  --viewer-view-cube-edge-opacity: 0.25;
+
+  /**
+   * @prop --viewer-view-cube-side-background: A CSS background value that
+   * defines the background of a side of the cube.
+   */
+  --viewer-view-cube-side-background: var(--white);
+
+  /**
+   * @prop --viewer-view-cube-side-background-hover: A CSS background value that
+   * defines the background of the hovered side of the cube. Note, the hover
+   * background is rendered on-top of the side's background.
+   */
+  --viewer-view-cube-side-background-hover: var(--blue-500);
+
+  /**
+   * @prop --viewer-view-cube-side-background-hover-opacity: A CSS number that
+   * defines the opacity of the background for a hovered side of the cube.
+   */
+  --viewer-view-cube-side-background-hover-opacity: 0.25;
+
+  /**
+   * @prop --viewer-view-cube-side-border: A CSS border value that defines the
+   * border of each side of the cube.
+   */
+  --viewer-view-cube-side-border: 1px solid var(--neutral-500);
+}
+
+:host(:hover) {
+  opacity: 0.95;
+}
+
+.scene {
+  width: 100%;
+  height: 100%;
+  perspective: inherit;
+  visibility: hidden;
+  user-select: none;
+}
+
+.scene.ready {
+  visibility: inherit;
+}
+
+.cube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.cube-side {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background: var(--viewer-view-cube-side-background);
+  border: var(--viewer-view-cube-side-border);
+}
+
+.cube-side::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--viewer-view-cube-edge-length) - 4px);
+  right: calc(var(--viewer-view-cube-edge-length) - 4px);
+  top: calc(var(--viewer-view-cube-edge-length) - 4px);
+  bottom: calc(var(--viewer-view-cube-edge-length) - 4px);
+}
+
+.cube-side:hover::before {
+  background: var(--viewer-view-cube-side-background-hover);
+  opacity: var(--viewer-view-cube-side-background-hover-opacity);
+}
+
+.cube-side.disabled {
+  pointer-events: none;
+}
+
+.cube-face {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+
+  box-sizing: border-box;
+}
+
+.cube-face-back {
+  transform: rotateY(0deg) rotateY(-90deg) translateX(calc(100% / 2))
+    rotateY(90deg);
+}
+.cube-face-left {
+  transform: rotateY(90deg) rotateY(-90deg) translateX(calc(100% / 2))
+    rotateY(90deg);
+}
+.cube-face-front {
+  transform: rotateY(180deg) rotateY(-90deg) translateX(calc(100% / 2))
+    rotateY(90deg);
+}
+.cube-face-right {
+  transform: rotateY(-90deg) rotateY(-90deg) translateX(calc(100% / 2))
+    rotateY(90deg);
+}
+.cube-face-top {
+  transform: rotateX(90deg) rotateZ(180deg) rotateY(-90deg)
+    translateX(calc(100% / 2)) rotateY(90deg);
+}
+.cube-face-bottom {
+  transform: rotateX(-90deg) rotateZ(180deg) rotateY(-90deg)
+    translateX(calc(100% / 2)) rotateY(90deg);
+}
+
+.cube-corner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.cube-corner.hovered .cube-edge-face {
+  opacity: var(--viewer-view-cube-edge-opacity);
+}
+
+.cube-corner.disabled {
+  display: none;
+}
+
+.cube-corner-face {
+  width: var(--viewer-view-cube-edge-length);
+  height: var(--viewer-view-cube-edge-length);
+}
+
+.cube-edge-face {
+  position: absolute;
+  background: var(--viewer-view-cube-edge-background);
+  pointer-events: initial;
+  opacity: 0;
+}
+
+.cube-edge-face-horiz {
+  width: calc(100% - var(--viewer-view-cube-edge-length) * 2);
+  height: var(--viewer-view-cube-edge-length);
+}
+
+.cube-edge-face-vert {
+  width: var(--viewer-view-cube-edge-length);
+  height: calc(100% - var(--viewer-view-cube-edge-length) * 2);
+}
+
+.vert-center {
+  align-items: center;
+}
+
+.vert-end {
+  align-items: flex-end;
+}
+
+.horiz-center {
+  justify-content: center;
+}
+
+.horiz-end {
+  justify-content: flex-end;
+}

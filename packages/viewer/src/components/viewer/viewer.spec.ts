@@ -4,7 +4,7 @@ jest.mock('../../sessions/storage');
 
 import '../../testing/domMocks';
 import {
-  getAssignedSlotNodes,
+  getAssignedSlotElements,
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
@@ -28,7 +28,7 @@ describe('vertex-viewer', () => {
     height: 150,
   });
 
-  (getAssignedSlotNodes as jest.Mock).mockReturnValue([]);
+  (getAssignedSlotElements as jest.Mock).mockReturnValue([]);
 
   beforeEach(() => {
     jest.clearAllMocks();

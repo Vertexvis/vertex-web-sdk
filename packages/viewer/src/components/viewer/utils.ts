@@ -11,17 +11,17 @@ export function getElementBoundingClientRect(element: HTMLElement): ClientRect {
   return element.getBoundingClientRect();
 }
 
-export function foo(): string {
-  return 'hi';
-}
-
-export function getAssignedSlotNodes(slot: HTMLSlotElement): Node[] {
-  if (typeof slot.assignedNodes === 'function') {
-    return slot.assignedNodes({ flatten: true });
+export function getAssignedSlotElements(slot: HTMLSlotElement): Element[] {
+  if (typeof slot.assignedElements === 'function') {
+    return slot.assignedElements({ flatten: true });
   } else {
     console.warn(
-      'HTMLSlotElement.assignedNodes() not found. Your browser may not support <slot> elements.'
+      'HTMLSlotElement.assignedElements() not found. Your browser may not support <slot> elements.'
     );
     return [];
   }
+}
+
+export function queryAllChildren(element: Element): Element[] {
+  return Array.from(element.querySelectorAll('*'));
 }

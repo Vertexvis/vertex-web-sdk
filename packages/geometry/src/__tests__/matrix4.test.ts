@@ -161,4 +161,25 @@ describe(Matrix4.multiply, () => {
       40,
     ]);
   });
+
+  describe('transpose', () => {
+    it('swaps matrix values', () => {
+      /* eslint-disable prettier/prettier */
+      const matrix = Matrix4.create([
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
+      ])
+
+      const transposed = Matrix4.transpose(matrix);
+      expect(transposed).toEqual([
+        1, 5, 9, 13,
+        2, 6, 10, 14,
+        3, 7, 11, 15,
+        4, 8, 12, 16
+      ])
+      /* eslint-enable prettier/prettier */
+    });
+  });
 });

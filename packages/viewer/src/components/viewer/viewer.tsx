@@ -54,7 +54,8 @@ import { Scene } from '../../scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
-  getAssignedSlotNodes,
+  getAssignedSlotElements,
+  queryAllChildren,
 } from './utils';
 import {
   acknowledgeFrameRequests,
@@ -923,8 +924,16 @@ export class Viewer {
     const slot = this.hostElement.shadowRoot?.querySelector('slot');
 
     if (slot != null) {
-      getAssignedSlotNodes(slot)
+      getAssignedSlotElements(slot)
         .filter((node) => node.nodeName.startsWith('VERTEX-'))
+        .reduce(
+          (elements, element) => [
+            ...elements,
+            element,
+            ...queryAllChildren(element),
+          ],
+          [] as Element[]
+        )
         .forEach((node) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (node as any).viewer = this.hostElement;

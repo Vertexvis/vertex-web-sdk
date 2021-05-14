@@ -303,6 +303,44 @@ export namespace Components {
     interface VertexViewerToolbarGroup {
         "direction": ViewerToolbarGroupDirection;
     }
+    interface VertexViewerViewCube {
+        /**
+          * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
+         */
+        "animationDuration": number;
+        /**
+          * Disables standard view interactions.
+         */
+        "standardViewsDisabled": boolean;
+        /**
+          * An instance of the viewer to bind to.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+        /**
+          * The label for the side of the cube on the negative x-axis.
+         */
+        "xNegativeLabel": string;
+        /**
+          * The label for the side of the cube on the positive x-axis.
+         */
+        "xPositiveLabel": string;
+        /**
+          * The label for the side of the cube on the negative y-axis.
+         */
+        "yNegativeLabel": string;
+        /**
+          * The label for the side of the cube on the positive y-axis.
+         */
+        "yPositiveLabel": string;
+        /**
+          * The label for the side of the cube on the negative z-axis.
+         */
+        "zNegativeLabel": string;
+        /**
+          * The label for the side of the cube on the positive z-axis.
+         */
+        "zPositiveLabel": string;
+    }
 }
 declare global {
     interface HTMLVertexSceneTreeElement extends Components.VertexSceneTree, HTMLStencilElement {
@@ -353,6 +391,12 @@ declare global {
         prototype: HTMLVertexViewerToolbarGroupElement;
         new (): HTMLVertexViewerToolbarGroupElement;
     };
+    interface HTMLVertexViewerViewCubeElement extends Components.VertexViewerViewCube, HTMLStencilElement {
+    }
+    var HTMLVertexViewerViewCubeElement: {
+        prototype: HTMLVertexViewerViewCubeElement;
+        new (): HTMLVertexViewerViewCubeElement;
+    };
     interface HTMLElementTagNameMap {
         "vertex-scene-tree": HTMLVertexSceneTreeElement;
         "vertex-scene-tree-row": HTMLVertexSceneTreeRowElement;
@@ -362,6 +406,7 @@ declare global {
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
+        "vertex-viewer-view-cube": HTMLVertexViewerViewCubeElement;
     }
 }
 declare namespace LocalJSX {
@@ -557,6 +602,44 @@ declare namespace LocalJSX {
     interface VertexViewerToolbarGroup {
         "direction"?: ViewerToolbarGroupDirection;
     }
+    interface VertexViewerViewCube {
+        /**
+          * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
+         */
+        "animationDuration"?: number;
+        /**
+          * Disables standard view interactions.
+         */
+        "standardViewsDisabled"?: boolean;
+        /**
+          * An instance of the viewer to bind to.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+        /**
+          * The label for the side of the cube on the negative x-axis.
+         */
+        "xNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive x-axis.
+         */
+        "xPositiveLabel"?: string;
+        /**
+          * The label for the side of the cube on the negative y-axis.
+         */
+        "yNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive y-axis.
+         */
+        "yPositiveLabel"?: string;
+        /**
+          * The label for the side of the cube on the negative z-axis.
+         */
+        "zNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive z-axis.
+         */
+        "zPositiveLabel"?: string;
+    }
     interface IntrinsicElements {
         "vertex-scene-tree": VertexSceneTree;
         "vertex-scene-tree-row": VertexSceneTreeRow;
@@ -566,6 +649,7 @@ declare namespace LocalJSX {
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
+        "vertex-viewer-view-cube": VertexViewerViewCube;
     }
 }
 export { LocalJSX as JSX };
@@ -580,6 +664,7 @@ declare module "@stencil/core" {
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
+            "vertex-viewer-view-cube": LocalJSX.VertexViewerViewCube & JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
         }
     }
 }
