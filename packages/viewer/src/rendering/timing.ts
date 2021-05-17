@@ -8,23 +8,35 @@ import {
 import { google } from '@vertexvis/frame-streaming-protos';
 import { ifRequestId, ifDrawFrame } from './utils';
 
+const MUTE_WARNING_SECONDS = 1 * 60; // 1 minute
+
 function calculateSendToReceiveDuration(
-  clock: SynchronizedClock | undefined,
-  sentAt: Date
-): google.protobuf.IDuration | undefined {
-  if (clock != null) {
-    const receivedAt = new Date(Date.now());
-    const duration = toProtoDuration(sentAt, receivedAt);
+  clockProvider: () => SynchronizedClock | undefined
+): (sentAt: Date) => google.protobuf.IDuration | undefined {
+  let muteWarning = false;
 
-    const durationInMs = protoToDate(duration).getTime();
-    if (durationInMs < 0) {
-      console.warn(
-        `Possible erroneous send to receive timing [sent-at=${sentAt.toISOString()}, received-at=${receivedAt.toISOString()}, remote-time=${clock?.knownRemoteTime?.toISOString()}]`
-      );
+  return (sentAt) => {
+    const clock = clockProvider();
+    if (clock != null) {
+      const receivedAt = clock.remoteTime(new Date(Date.now()));
+      const duration = toProtoDuration(sentAt, receivedAt);
+
+      const durationInMs = protoToDate(duration).getTime();
+      if (durationInMs >= 0) {
+        return duration;
+      } else {
+        if (!muteWarning) {
+          console.warn(
+            `Possible erroneous send to receive timing. Muting for ${MUTE_WARNING_SECONDS}s. [sent-at=${sentAt.toISOString()}, received-at=${receivedAt.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
+          );
+
+          muteWarning = true;
+          setTimeout(() => (muteWarning = false), MUTE_WARNING_SECONDS * 1000);
+        }
+        return undefined;
+      }
     }
-
-    return duration;
-  }
+  };
 }
 
 /**
@@ -38,18 +50,14 @@ export function acknowledgeFrameRequests(
   api: StreamApi,
   clockProvider: () => SynchronizedClock | undefined
 ): RequestMessageHandler {
+  const sendToReceiveDuration = calculateSendToReceiveDuration(clockProvider);
   return ifRequestId((reqId) =>
     ifDrawFrame((_) => (req) => {
-      const protoDate = protoToDate(req.sentAtTime);
-      if (protoDate != null) {
-        const sendToReceiveDuration = calculateSendToReceiveDuration(
-          clockProvider(),
-          protoDate
-        );
-
+      const sentAt = protoToDate(req.sentAtTime);
+      if (sentAt != null) {
         api.replyResult(reqId, {
           drawFrame: {
-            sendToReceiveDuration,
+            sendToReceiveDuration: sendToReceiveDuration(sentAt),
           },
         });
       }

@@ -30,6 +30,16 @@ describe(toProtoDuration, () => {
     const duration = toProtoDuration(millis);
     expect(duration).toMatchObject({ seconds: 1, nanos: 0 });
   });
+
+  it('returns correct duration if negative', () => {
+    const duration = toProtoDuration(-1);
+    expect(duration).toMatchObject({ seconds: -0, nanos: -1000000 });
+  });
+
+  it('returns correct duration if negative', () => {
+    const duration = toProtoDuration(-1000);
+    expect(duration).toMatchObject({ seconds: -1, nanos: -0 });
+  });
 });
 
 describe(protoToDate, () => {
