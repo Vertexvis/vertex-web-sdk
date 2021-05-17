@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <title>Camera Manipulations</title>
+  <head>
+    <!-- Live reload script -->
+    <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <script type="module" src="main.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@vertexvis/viewer@0.9.x/dist/viewer/viewer.css"
+    />
+    <script
+      type="module"
+      src="https://unpkg.com/@vertexvis/viewer@0.9.x/dist/viewer/viewer.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/@vertexvis/viewer@0.9.x/dist/viewer.js"
+    ></script>
+  </head>
+  <body>
+    <div>
+      <div>
+        <h3>Fitting Camera</h3>
+        <button id="fit-to-bounding-box-btn">Fit to Bounding Box</button>
+        <button id="view-all-btn">View All</button>
+      </div>
+      <div>
+        <h3>Standard Views</h3>
+        <button id="view-front-btn">Front</button>
+        <button id="view-back-btn">Back</button>
+        <button id="view-top-btn">Top</button>
+        <button id="view-bottom-btn">Bottom</button>
+        <button id="view-left-btn">Left</button>
+        <button id="view-right-btn">Right</button>
+        <button id="view-front-top-left-btn">Front-Top-Left</button>
+        <button id="view-front-bottom-left-btn">Front-Bottom-Left</button>
+      </div>
+    </div>
+    <div>
+      <vertex-viewer id="viewer" class="viewer"></vertex-viewer>
+    </div>
+  </body>
+</html>

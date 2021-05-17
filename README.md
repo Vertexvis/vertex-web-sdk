@@ -101,3 +101,15 @@ major and patch will be treated as minor.
 [@vertexvis/utils]: ./packages/utils
 [@vertexvis/viewer]: ./packages/viewer
 [@vertexvis/viewer-react]: ./packages/viewer-react
+
+## Examples
+
+These examples make use of more modern EcmaScript features. You'll need a browser that supports ES modules. Most modern browsers (Chrome, Edge, Firefox, Safari) support these features.
+
+- Obtain a `clientId` and `streamKey` following [this guide](https://developer.vertexvis.com/docs/guides/authentication)
+- Run `yarn examples:start` to spin up a local development environment.
+- Open browser to <http://localhost:8080?clientid=YOUR_CLIENT_ID&streamkey=YOUR_STREAM_KEY> to browser the examples. The `streamKey`. The development environment supports live refresh. Any changes you make the examples will automatically refresh your browser.
+
+### Contributing Examples
+
+We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.

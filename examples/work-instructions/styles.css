@@ -1,0 +1,30 @@
+.viewer-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 500px;
+  height: 500px;
+}
+
+.viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.button {
+  background-color: transparent;
+  outline: none;
+  height: 40px;
+  width: 100%;
+}
+
+.label {
+  width: 100%;
+  text-align: center;
+}
