@@ -83,7 +83,7 @@ export function protoToDate(
 /* eslint-enable padding-line-between-statements */
 
 function parseEpochMillis(millis: number): DefinedTimestampOrDuration {
-  const seconds = Math.floor(millis / 1000);
+  const seconds = Math.floor(Math.abs(millis) / 1000);
   const nanos = (millis % 1000) * 1000000;
-  return { seconds, nanos };
+  return { seconds: seconds * (millis < 0 ? -1 : 1), nanos };
 }
