@@ -133,7 +133,7 @@ applyPolyfills().then(() => defineCustomElements(window)).then(() => main());
 
 ## Examples
 
-Check out our [examples] directory for more in-depth examples of how to use Vertex's Viewer SDK.
+Check out our [examples](../../examples) directory and [Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to get an idea of what you can do with Vertex's Viewer component.
 
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
