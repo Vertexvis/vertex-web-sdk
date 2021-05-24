@@ -2,5 +2,11 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "./packages/viewer/tsconfig.json",
   "include": ["./packages/*/src", "./packages/*/types/*.d.ts"],
-  "exclude": ["dist", "node_modules", "**/*.spec.ts", "packages/viewer-react"]
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "packages/viewer-react"
+  ]
 }
