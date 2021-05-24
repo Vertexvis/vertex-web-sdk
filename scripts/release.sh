@@ -38,6 +38,7 @@ else
   npx lerna version --no-push --no-git-tag-version --exact "$next_bump"
 fi
 
+yarn install
 yarn generate:docs
 
 # Set the next version bump back to patch
