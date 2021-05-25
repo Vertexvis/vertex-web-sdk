@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@vertexwebsdk/build/tsconfig",
+  "compilerOptions": {},
+  "exclude": ["dist", "node_modules"]
+}
