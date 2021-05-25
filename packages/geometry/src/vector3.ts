@@ -1,3 +1,5 @@
+import * as Matrix4 from './matrix4';
+
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a
  * point or direction.
@@ -7,6 +9,12 @@ export interface Vector3 {
   y: number;
   z: number;
 }
+
+/**
+ * A `Vector3` representation as an array.
+ */
+export type Vector3AsArray = [x: number, y: number, z: number];
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable padding-line-between-statements */
 /**
@@ -23,15 +31,15 @@ export function create(): Vector3;
 export function create(...args: any[]): Vector3 {
   if (args.length === 1) {
     return {
-      x: args[0].x || 0,
-      y: args[0].y || 0,
-      z: args[0].z || 0,
+      x: args[0].x ?? 0,
+      y: args[0].y ?? 0,
+      z: args[0].z ?? 0,
     };
   } else if (args.length === 3) {
     return {
-      x: args[0],
-      y: args[1],
-      z: args[2],
+      x: args[0] ?? 0,
+      y: args[1] ?? 0,
+      z: args[2] ?? 0,
     };
   }
 
@@ -48,19 +56,60 @@ export function create(...args: any[]): Vector3 {
  * Checks if each component of the given vector is populated with a numeric
  * component. A component is invalid if it contains a non-finite or NaN value.
  */
-export const isValid = ({ x, y, z }: Vector3): boolean => {
+export function isValid({ x, y, z }: Vector3): boolean {
   return [x, y, z].every((v) => isFinite(v) && !isNaN(v));
-};
+}
 
 /**
- * Converts an array of [x, y, z] values to a `Vector3`.
+ * Returns a vector representing the scale elements of `matrix`.
+ */
+export function fromMatrixScale(matrix: Matrix4.Matrix4): Vector3 {
+  const m = Matrix4.toObject(matrix);
+  return {
+    x: Math.hypot(m.m11, m.m21, m.m31),
+    y: Math.hypot(m.m12, m.m22, m.m32),
+    z: Math.hypot(m.m13, m.m23, m.m33),
+  };
+}
+
+/**
+ * Returns a vector representing the position elements of `matrix`.
+ */
+export function fromMatrixPosition(matrix: Matrix4.Matrix4): Vector3 {
+  const m = Matrix4.toObject(matrix);
+  return { x: m.m14, y: m.m24, z: m.m34 };
+}
+
+/**
+ * Parses a JSON string representation of a Vector3 and returns an object.
+ *
+ * @param json A JSON string, either in the form `[x,y,z]` or `{"x": 0, "y": 0, "z": 0}`
+ * @returns A parsed Vector3.
+ */
+export function fromJson(json: string): Vector3 {
+  const obj = JSON.parse(json);
+  if (Array.isArray(obj)) {
+    const [x, y, z] = obj;
+    return create(x, y, z);
+  } else {
+    const { x, y, z } = obj;
+    return create(x, y, z);
+  }
+}
+
+/**
+ * Creates a `Vector3` from an array. Pass `offset` to read values from the
+ * starting index.
  *
  * @see #toArray()
  * @see #create()
  */
-export const fromArray = ([x, y, z]: number[]): Vector3 => {
+export function fromArray(nums: number[], offset = 0): Vector3 {
+  const x = nums[offset];
+  const y = nums[offset + 1];
+  const z = nums[offset + 2];
   return create(x, y, z);
-};
+}
 
 /**
  * Converts a Vector3 to an array where the values of the vector will be
@@ -69,61 +118,83 @@ export const fromArray = ([x, y, z]: number[]): Vector3 => {
  * @see #fromArray()
  * @see #create()
  */
-export const toArray = ({ x, y, z }: Vector3): number[] => {
+export function toArray({ x, y, z }: Vector3): Vector3AsArray {
   return [x, y, z];
-};
+}
 
 /**
  * Returns a directional vector on the positive x axis, Vector3(1, 0, 0).
  */
-export const right = (): Vector3 => create(1, 0, 0);
+export function right(): Vector3 {
+  return create(1, 0, 0);
+}
 
 /**
  * Returns a directional vector on the positive y axis, Vector3(0, 1, 0).
  */
-export const up = (): Vector3 => create(0, 1, 0);
+export function up(): Vector3 {
+  return create(0, 1, 0);
+}
 
 /**
  * Returns a directional vector on the positive z axis, Vector3(0, 0, -1).
  */
-export const forward = (): Vector3 => create(0, 0, -1);
+export function forward(): Vector3 {
+  return create(0, 0, -1);
+}
 
 /**
  * Returns a directional vector on the negative x axis, Vector3(-1, 0, 0).
  */
-export const left = (): Vector3 => create(-1, 0, 0);
+export function left(): Vector3 {
+  return create(-1, 0, 0);
+}
 
 /**
  * Returns a directional vector on the negative y axis, Vector3(0, -1, 0).
  */
-export const down = (): Vector3 => create(0, -1, 0);
+export function down(): Vector3 {
+  return create(0, -1, 0);
+}
 
 /**
  * Returns a directional vector on the negative z axis, Vector3(0, 0, 1).
  */
-export const back = (): Vector3 => create(0, 0, 1);
+export function back(): Vector3 {
+  return create(0, 0, 1);
+}
 
 /**
  * Returns a vector at the origin, Vector3(0, 0, 0).
  */
-export const origin = (): Vector3 => create(0, 0, 0);
+export function origin(): Vector3 {
+  return create(0, 0, 0);
+}
 
 /**
  * Returns a vector with that will have a magnitude of 1.
  */
-export const normalize = (vector: Vector3): Vector3 => {
+export function normalize(vector: Vector3): Vector3 {
   const length = magnitude(vector);
   return { x: vector.x / length, y: vector.y / length, z: vector.z / length };
-};
+}
 
 /**
- * Returns the length of the given vector.
+ * Returns the straight-line length from (0, 0, 0) to the given vector.
  */
-export const magnitude = (vector: Vector3): number => {
-  return Math.sqrt(
-    vector.x * vector.x + vector.y * vector.y + vector.z * vector.z
-  );
-};
+export function magnitude(vector: Vector3): number {
+  return Math.sqrt(magnitudeSquared(vector));
+}
+
+/**
+ * Returns the straight-line length from (0, 0, 0) to the given vector).
+ *
+ * When comparing lengths of vectors, you should use this function as it's
+ * slightly more efficient to calculate.
+ */
+export function magnitudeSquared(vector: Vector3): number {
+  return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
+}
 
 /**
  * Returns a vector that is the cross product of two vectors.
@@ -134,43 +205,45 @@ export const magnitude = (vector: Vector3): number => {
  * the sine of the angle between the inputs. You can determine the direction of
  * the result vector using the "left hand rule".
  */
-export const cross = (a: Vector3, b: Vector3): Vector3 => {
+export function cross(a: Vector3, b: Vector3): Vector3 {
   return {
     x: a.y * b.z - a.z * b.y,
     y: a.z * b.x - a.x * b.z,
     z: a.x * b.y - a.y * b.x,
   };
-};
+}
 
 /**
  * Returns a vector that is the sum of two vectors.
  */
-export const add = (a: Vector3, ...vectors: Vector3[]): Vector3 => {
-  return vectors.reduce((acc, current) => {
-    return { x: acc.x + current.x, y: acc.y + current.y, z: acc.z + current.z };
+export function add(a: Vector3, ...vectors: Vector3[]): Vector3 {
+  return vectors.reduce((res, next) => {
+    return { x: res.x + next.x, y: res.y + next.y, z: res.z + next.z };
   }, a);
-};
+}
 
 /**
  * Returns a vector that is the difference between two vectors.
  */
-export const subtract = (a: Vector3, b: Vector3): Vector3 => {
-  return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
-};
+export function subtract(a: Vector3, ...vectors: Vector3[]): Vector3 {
+  return vectors.reduce((res, next) => {
+    return { x: res.x - next.x, y: res.y - next.y, z: res.z - next.z };
+  }, a);
+}
 
 /**
  * Returns a vector that where each component of `b` is multiplied with `a`.
  */
-export const multiply = (a: Vector3, b: Vector3): Vector3 => {
+export function multiply(a: Vector3, b: Vector3): Vector3 {
   return { x: a.x * b.x, y: a.y * b.y, z: a.z * b.z };
-};
+}
 
 /**
  * Returns a vector where each value of a vector is multiplied by the `scalar`.
  */
-export const scale = (scalar: number, vector: Vector3): Vector3 => {
+export function scale(scalar: number, vector: Vector3): Vector3 {
   return { x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar };
-};
+}
 
 /**
  * Returns a value representing the dot product of two vectors.
@@ -179,9 +252,9 @@ export const scale = (scalar: number, vector: Vector3): Vector3 => {
  * multiplied together and then multiplied by the cosine of the angle between
  * them.
  */
-export const dot = (a: Vector3, b: Vector3): number => {
+export function dot(a: Vector3, b: Vector3): number {
   return a.x * b.x + a.y * b.y + a.z * b.z;
-};
+}
 
 /**
  * Returns the angle, in radians, between two vectors.
@@ -190,11 +263,11 @@ export const dot = (a: Vector3, b: Vector3): number => {
  * the smaller of the two possible angles between the two vectors is used. The
  * result is never greater than 180 degrees.
  */
-export const angleTo = (a: Vector3, b: Vector3): number => {
+export function angleTo(a: Vector3, b: Vector3): number {
   const theta = dot(a, b) / (magnitude(a) * magnitude(b));
   // Clamp to avoid numerical problems.
   return Math.acos(theta);
-};
+}
 
 /**
  * Performs a projection of `projected` onto `onto`.
@@ -202,9 +275,9 @@ export const angleTo = (a: Vector3, b: Vector3): number => {
  * The result of the projection is the `onto` vector scaled corresponding to
  * the dot product of the `onto` and `projected` vectors.
  */
-export const projection = (onto: Vector3, projected: Vector3): Vector3 => {
+export function projection(onto: Vector3, projected: Vector3): Vector3 {
   return scale(dot(onto, projected) / magnitude(onto), onto);
-};
+}
 
 /**
  * Returns a vector that is rotated about an origin point.
@@ -214,12 +287,12 @@ export const projection = (onto: Vector3, projected: Vector3): Vector3 => {
  * @param axisDirection The direction used to compute the axis.
  * @param axisPosition The point of the axis.
  */
-export const rotateAboutAxis = (
+export function rotateAboutAxis(
   angle: number,
   point: Vector3,
   axisDirection: Vector3,
   axisPosition: Vector3
-): Vector3 => {
+): Vector3 {
   if (angle !== 0) {
     const { x, y, z } = point;
     const { x: a, y: b, z: c } = axisPosition;
@@ -247,29 +320,61 @@ export const rotateAboutAxis = (
   } else {
     return point;
   }
-};
+}
+
+/**
+ * Returns a vector that is multiplied with a matrix.
+ */
+export function transformMatrix(vector: Vector3, m: Matrix4.Matrix4): Vector3 {
+  const { x, y, z } = vector;
+  const w = 1 / (m[3] * x + m[7] * y + m[11] * z + m[15]);
+  return {
+    x: (m[0] * x + m[4] * y + m[8] * z + m[12]) * w,
+    y: (m[1] * x + m[5] * y + m[9] * z + m[13]) * w,
+    z: (m[2] * x + m[6] * y + m[10] * z + m[14]) * w,
+  };
+}
 
 /**
  * Euclidean distance between two vectors
  */
-export const distance = (a: Vector3, b: Vector3): number =>
-  Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2);
+export function distance(a: Vector3, b: Vector3): number {
+  return Math.sqrt(distanceSquared(a, b));
+}
+
+/**
+ * Returns the squared distance between two vectors. If you're just comparing
+ * distances, this is slightly more efficient than `distanceTo`.
+ */
+export function distanceSquared(a: Vector3, b: Vector3): number {
+  const { x: dx, y: dy, z: dz } = subtract(a, b);
+  return dx * dx + dy * dy + dz * dz;
+}
 
 /**
  * Returns `true` if two vectors have the same values.
  */
-export const isEqual = (a: Vector3, b: Vector3): boolean => {
+export function isEqual(a: Vector3, b: Vector3): boolean {
   return a.x === b.x && a.y === b.y && a.z === b.z;
-};
+}
 
 /**
  * Returns a vector that contains the largest components of `a` and `b`.
  */
-export const max = (a: Vector3, b: Vector3): Vector3 =>
-  create(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
+export function max(a: Vector3, b: Vector3): Vector3 {
+  return create(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
+}
 
 /**
  * Returns a vector that contains the smallest components of `a` and `b`.
  */
-export const min = (a: Vector3, b: Vector3): Vector3 =>
-  create(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
+export function min(a: Vector3, b: Vector3): Vector3 {
+  return create(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
+}
+
+/**
+ * Returns a vector that each of its component negated.
+ */
+export function negate(vector: Vector3): Vector3 {
+  return { x: -vector.x, y: -vector.y, z: -vector.z };
+}

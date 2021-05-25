@@ -1,5 +1,6 @@
 import * as Vector3 from '../vector3';
 import * as Angle from '../angle';
+import * as Matrix4 from '../matrix4';
 
 describe(Vector3.create, () => {
   it('creates a vector with x, y, z', () => {
@@ -16,6 +17,18 @@ describe(Vector3.create, () => {
 
   it('creates a origin vector if no arg', () => {
     expect(Vector3.create()).toMatchObject({ x: 0, y: 0, z: 0 });
+  });
+});
+
+describe(Vector3.fromJson, () => {
+  it('parses json obj', () => {
+    const v = Vector3.fromJson(JSON.stringify({ x: 1, y: 2, z: 3 }));
+    expect(v).toEqual(Vector3.create(1, 2, 3));
+  });
+
+  it('parses json array', () => {
+    const v = Vector3.fromJson('[1, 2, 3]');
+    expect(v).toEqual(Vector3.create(1, 2, 3));
   });
 });
 
@@ -168,5 +181,23 @@ describe(Vector3.cross, () => {
     expect(result.x).toBeCloseTo(0, 5);
     expect(result.y).toBeCloseTo(1, 5);
     expect(result.z).toBeCloseTo(0, 5);
+  });
+});
+
+describe(Vector3.transformMatrix, () => {
+  it('returns correct value given a Matrix4 and Vector3', () => {
+    const values = Matrix4.makeIdentity();
+    const transformed = Vector3.transformMatrix(
+      Vector3.create(2, 2, 2),
+      values
+    );
+    expect(transformed).toEqual(Vector3.create(2, 2, 2));
+  });
+});
+
+describe(Vector3.negate, () => {
+  it('returns vector with each component negated', () => {
+    const negated = Vector3.negate({ x: 1, y: 1, z: 1 });
+    expect(negated).toEqual({ x: -1, y: -1, z: -1 });
   });
 });
