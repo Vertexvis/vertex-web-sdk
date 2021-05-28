@@ -267,7 +267,7 @@ export class ViewerViewCube {
       m21, m22, m23, m24,
       m31, m32, m33, m34,
       m41, m42, m43, m44,
-    ] = Matrix4.transpose(this.viewMatrix || Matrix4.identity());
+    ] = Matrix4.transpose(this.viewMatrix || Matrix4.makeIdentity());
 
     const matrix3d = [
       m11, m12, m13, m14,
@@ -560,7 +560,7 @@ export class ViewerViewCube {
     if (camera != null) {
       this.viewMatrix = makeLookAtViewMatrix(camera);
     } else {
-      this.viewMatrix = Matrix4.identity();
+      this.viewMatrix = Matrix4.makeIdentity();
     }
   };
 

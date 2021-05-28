@@ -55,6 +55,12 @@
         width: 100%;
         height: 100%;
       }
+
+      .pin {
+        /* width: 10px;
+        height: 10px; */
+        background-color: red;
+      }
     </style>
 
     <script type="module">
@@ -67,6 +73,39 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+
+        const domRenderer = document.getElementById('dom-renderer');
+
+        const pin1Element = document.getElementById('pin1');
+        pin1Element.position = { x: 0, y: 0, z: 100 };
+
+        const pin2Element = document.getElementById('pin2');
+        pin2Element.position = { x: 0, y: 0, z: -100 };
+
+        const pin3Element = document.getElementById('pin3');
+        pin3Element.position = { x: 100, y: 0, z: 0 };
+
+        const pin4Element = document.getElementById('pin4');
+        pin4Element.position = { x: -100, y: 0, z: 0 };
+
+        const pin5Element = document.getElementById('pin5');
+        pin5Element.position = { x: 0, y: 100, z: 0 };
+
+        const pin6Element = document.getElementById('pin6');
+        pin6Element.position = { x: 0, y: -100, z: 0 };
+
+        const pin7Element = document.getElementById('pin7');
+        pin7Element.position = { x: 0, y: 0, z: 0 };
+
+        function animatePin() {
+          requestAnimationFrame((time) => {
+            const ms = 3000;
+            const scale = 1 + (time % ms) / ms;
+            pin7Element.scale = { x: scale, y: scale, z: scale };
+            animatePin();
+          });
+        }
+        animatePin();
       }
     </script>
   </head>
@@ -84,13 +123,36 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:pHtDxMOBvPsO-QBlUaj_Z0Gy_Zx-Qe8BJRWa"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-dom-renderer id="dom-renderer" draw-mode="2d">
+            <vertex-viewer-dom-element id="pin1" billboard>
+              <div class="pin">1</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin2" billboard>
+              <div class="pin">2</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin3" billboard>
+              <div class="pin">3</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin4" billboard>
+              <div class="pin">4</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin5" billboard>
+              <div class="pin">5</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin6" billboard>
+              <div class="pin">6</div>
+            </vertex-viewer-dom-element>
+            <vertex-viewer-dom-element id="pin7" billboard>
+              <div class="pin">7</div>
+            </vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube

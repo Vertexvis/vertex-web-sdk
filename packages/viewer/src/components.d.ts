@@ -17,7 +17,7 @@ import { ColorMaterial } from "./scenes/colorMaterial";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions } from "@vertexvis/geometry";
+import { Dimensions, Quaternion, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
@@ -27,6 +27,7 @@ import { Scene } from "./scenes/scene";
 import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
+import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -283,6 +284,17 @@ export namespace Components {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDomElement {
+        "billboard": boolean;
+        "position": Vector3.Vector3;
+        "quaternion": Quaternion.Quaternion;
+        "scale": Vector3.Vector3;
+        "up": Vector3.Vector3;
+    }
+    interface VertexViewerDomRenderer {
+        "drawMode": ViewerDomRendererDrawMode;
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerIcon {
         /**
           * The name of the icon to render.
@@ -373,6 +385,18 @@ declare global {
         prototype: HTMLVertexViewerDefaultToolbarElement;
         new (): HTMLVertexViewerDefaultToolbarElement;
     };
+    interface HTMLVertexViewerDomElementElement extends Components.VertexViewerDomElement, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDomElementElement: {
+        prototype: HTMLVertexViewerDomElementElement;
+        new (): HTMLVertexViewerDomElementElement;
+    };
+    interface HTMLVertexViewerDomRendererElement extends Components.VertexViewerDomRenderer, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDomRendererElement: {
+        prototype: HTMLVertexViewerDomRendererElement;
+        new (): HTMLVertexViewerDomRendererElement;
+    };
     interface HTMLVertexViewerIconElement extends Components.VertexViewerIcon, HTMLStencilElement {
     }
     var HTMLVertexViewerIconElement: {
@@ -403,6 +427,8 @@ declare global {
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
+        "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
+        "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
@@ -582,6 +608,18 @@ declare namespace LocalJSX {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDomElement {
+        "billboard"?: boolean;
+        "onPropertyChange"?: (event: CustomEvent<void>) => void;
+        "position"?: Vector3.Vector3;
+        "quaternion"?: Quaternion.Quaternion;
+        "scale"?: Vector3.Vector3;
+        "up"?: Vector3.Vector3;
+    }
+    interface VertexViewerDomRenderer {
+        "drawMode"?: ViewerDomRendererDrawMode;
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerIcon {
         /**
           * The name of the icon to render.
@@ -646,6 +684,8 @@ declare namespace LocalJSX {
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-dom-element": VertexViewerDomElement;
+        "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
@@ -661,6 +701,8 @@ declare module "@stencil/core" {
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
+            "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
+            "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;

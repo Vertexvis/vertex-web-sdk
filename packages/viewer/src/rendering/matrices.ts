@@ -38,12 +38,12 @@ export function makeFrustumMatrix(
   const d = (-2 * far * near) / (far - near);
 
   /* eslint-disable prettier/prettier */
-  return Matrix4.create([
+  return [
     (2 * near) / (right - left), 0, a, 0,
     0, (2 * near) / (top - bottom), b, 0,
     0, 0, c, d,
     0, 0, -1, 0
-  ])
+  ];
   /* eslint-enable prettier/prettier */
 }
 
@@ -109,12 +109,12 @@ export function makeLookAtViewMatrix(
   const y = Vector3.cross(z, x);
 
   /* eslint-disable prettier/prettier */
-  return Matrix4.create([
+  return [
     x.x, x.y, x.z, -Vector3.dot(x, position),
     y.x, y.y, y.z, -Vector3.dot(y, position),
     z.x, z.y, z.z, -Vector3.dot(z, position),
     0  , 0  , 0  , 1,
-  ])
+  ];
   /* eslint-enable prettier/prettier */
 }
 
@@ -139,11 +139,11 @@ export function makeLookAtMatrix(
   const y = Vector3.cross(z, x);
 
   /* eslint-disable prettier/prettier */
-  return Matrix4.create([
+  return [
     x.x, y.x, z.x, position.x,
     x.y, y.y, z.y, position.y,
     x.z, y.z, z.z, position.z,
     0  , 0  , 0  , 1
-  ])
+  ];
   /* eslint-enable prettier/prettier */
 }
