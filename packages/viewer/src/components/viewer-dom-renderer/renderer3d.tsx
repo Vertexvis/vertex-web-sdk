@@ -12,7 +12,7 @@ export const Renderer3d: FunctionalComponent<Props> = (
   { projectionMatrix, viewMatrix, dimensions },
   children
 ) => {
-  const pMatrix = Matrix4.toRowMajor(projectionMatrix);
+  const pMatrix = Matrix4.toObject(projectionMatrix);
   const fovY = pMatrix.m22 * (dimensions.height / 2);
   const cameraTransform = [
     `translateZ(${fovY}px)`,
@@ -51,7 +51,9 @@ function updateElement(
     element.scale
   );
 
-  if (element.billboard) {
+  if (element.billboardOff) {
+    element.style.transform = getElementCssMatrix(matrixWorld);
+  } else {
     let m = viewMatrix;
     m = Matrix4.transpose(m);
     m = Matrix4.position(m, matrixWorld);
@@ -63,8 +65,6 @@ function updateElement(
     m[15] = 1;
 
     element.style.transform = getElementCssMatrix(m);
-  } else {
-    element.style.transform = getElementCssMatrix(matrixWorld);
   }
 }
 

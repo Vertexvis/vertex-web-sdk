@@ -57,9 +57,14 @@
       }
 
       .pin {
-        /* width: 10px;
-        height: 10px; */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
         background-color: red;
+        transform: scale(0.5);
       }
     </style>
 
@@ -124,13 +129,13 @@
         <vertex-viewer
           id="viewer"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:pHtDxMOBvPsO-QBlUaj_Z0Gy_Zx-Qe8BJRWa"
+          src="urn:vertexvis:stream-key:aWBDEieL5pKVT3YoGMeZF8r8iP1OnSGiO96S"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
 
-          <vertex-viewer-dom-renderer id="dom-renderer" draw-mode="2d">
+          <vertex-viewer-dom-renderer id="dom-renderer" draw-mode="3d">
             <vertex-viewer-dom-element id="pin1" billboard>
               <div class="pin">1</div>
             </vertex-viewer-dom-element>
