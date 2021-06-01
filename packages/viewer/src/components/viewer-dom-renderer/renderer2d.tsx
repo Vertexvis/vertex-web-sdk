@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Dimensions, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { parseDomElement } from './renderer-element';
 
 export const Renderer2d: FunctionalComponent = (_, children) => {
   return <div class="root-2d">{children}</div>;
@@ -16,7 +17,9 @@ export function update2d(
     .filter((el) => el.nodeName === 'VERTEX-VIEWER-DOM-ELEMENT')
     .map((element) => {
       const el = element as HTMLVertexViewerDomElementElement;
-      const matrixWorld = Matrix4.makeTRS(el.position, el.quaternion, el.scale);
+
+      const { position, quaternion, scale } = parseDomElement(el);
+      const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
       const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
       const distanceToCamera = Vector3.distanceToSquared(
         cameraPosition,

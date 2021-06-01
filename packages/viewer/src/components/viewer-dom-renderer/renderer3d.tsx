@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Dimensions, Matrix4 } from '@vertexvis/geometry';
+import { parseDomElement } from './renderer-element';
 
 interface Props {
   viewMatrix: Matrix4.Matrix4;
@@ -45,11 +46,8 @@ function updateElement(
   element: HTMLVertexViewerDomElementElement,
   viewMatrix: Matrix4.Matrix4
 ): void {
-  const matrixWorld = Matrix4.makeTRS(
-    element.position,
-    element.quaternion,
-    element.scale
-  );
+  const { position, quaternion, scale } = parseDomElement(element);
+  const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
 
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(matrixWorld);
@@ -57,7 +55,7 @@ function updateElement(
     let m = viewMatrix;
     m = Matrix4.transpose(m);
     m = Matrix4.position(m, matrixWorld);
-    m = Matrix4.scale(m, element.scale);
+    m = Matrix4.scale(m, scale);
 
     m[3] = 0;
     m[7] = 0;

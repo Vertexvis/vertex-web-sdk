@@ -136,10 +136,10 @@ property.
 
 ## Properties
 
-| Property   | Attribute   | Description                                                                                                                                                                                                                                                         | Type                                   | Default     |
-| ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `drawMode` | `draw-mode` | Specifies the drawing mode for the renderer.  When in `3d` mode, elements positioned using CSS 3D transforms and are able to scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with the camera. | `"2d" \| "3d"`                         | `'3d'`      |
-| `viewer`   | --          | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                   | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property   | Attribute   | Description                                                                                                                                                                                                                                                          | Type                                   | Default     |
+| ---------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `drawMode` | `draw-mode` | Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes. | `"2d" \| "3d"`                         | `'3d'`      |
+| `viewer`   | --          | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                    | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ----------------------------------------------

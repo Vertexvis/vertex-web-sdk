@@ -64,7 +64,7 @@
         height: 24px;
         border-radius: 50%;
         background-color: red;
-        transform: scale(0.5);
+        /* transform: scale(0.5); */
       }
     </style>
 
@@ -129,35 +129,37 @@
         <vertex-viewer
           id="viewer"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:aWBDEieL5pKVT3YoGMeZF8r8iP1OnSGiO96S"
+          src="urn:vertexvis:stream-key:6HFE6bDV-EG0dIqWrAn8hNRAYzJwkSU2Njez"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
 
-          <vertex-viewer-dom-renderer id="dom-renderer" draw-mode="3d">
-            <vertex-viewer-dom-element id="pin1" billboard>
+          <vertex-viewer-dom-renderer id="dom-renderer" draw-mode="2d">
+            <vertex-viewer-dom-element id="pin1">
               <div class="pin">1</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin2" billboard>
+            <vertex-viewer-dom-element id="pin2">
               <div class="pin">2</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin3" billboard>
+            <vertex-viewer-dom-element id="pin3">
               <div class="pin">3</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin4" billboard>
+            <vertex-viewer-dom-element id="pin4">
               <div class="pin">4</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin5" billboard>
+            <vertex-viewer-dom-element id="pin5">
               <div class="pin">5</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin6" billboard>
+            <vertex-viewer-dom-element id="pin6">
               <div class="pin">6</div>
             </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element id="pin7" billboard>
+            <vertex-viewer-dom-element id="pin7">
               <div class="pin">7</div>
             </vertex-viewer-dom-element>
           </vertex-viewer-dom-renderer>
+
+          <vertex-viewer-distance-measurer></vertex-viewer-distance-measurer>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube

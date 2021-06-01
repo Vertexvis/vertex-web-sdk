@@ -7,7 +7,7 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Quaternion, Vector3 } from '@vertexvis/geometry';
+import { Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
 
 /**
  * The `ViewerDomElement` is responsible for managing a
@@ -22,28 +22,35 @@ import { Quaternion, Vector3 } from '@vertexvis/geometry';
 })
 export class ViewerDomElement {
   /**
-   * The 3D position where this element is located.
+   * The 3D position where this element is located. Can either be an instance of
+   * a `Vector3` or a JSON string representation in the format of `[x, y, z]` or
+   * `{"x": 0, "y": 0, "z": 0}`.
    */
   @Prop()
-  public position: Vector3.Vector3 = Vector3.origin();
+  public position: Vector3.Vector3 | string = Vector3.origin();
 
   /**
-   * The rotation of this this element, represented as a Quaternion.
+   * The rotation of this this element, represented as a `Quaternion`, `Euler`
+   * or a JSON string representation in one of the following formats:
+   *
+   * * `[x, y, z, w]`
+   * * `{"x": 0, "y": 0, "z": 0, "w": 0}`
+   * * `[x, y, z, order]`
+   * * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
    */
   @Prop()
-  public quaternion: Quaternion.Quaternion = Quaternion.create();
+  public rotation:
+    | Quaternion.Quaternion
+    | Euler.Euler
+    | string = Quaternion.create();
 
   /**
-   * The scale of this element.
+   * The scale of this element. Can either be an instance of a `Vector3` or a
+   * JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y":
+   * 0, "z": 0}`.
    */
   @Prop()
-  public scale: Vector3.Vector3 = Vector3.create(1, 1, 1);
-
-  /**
-   * The direction which this object considers up.
-   */
-  @Prop()
-  public up: Vector3.Vector3 = Vector3.up();
+  public scale: Vector3.Vector3 | string = Vector3.create(1, 1, 1);
 
   /**
    * Disables the billboarding behavior of the element. When billboarding is
@@ -80,8 +87,8 @@ export class ViewerDomElement {
   /**
    * @ignore
    */
-  @Watch('quaternion')
-  protected handleQuaternionChange(): void {
+  @Watch('rotation')
+  protected handleRotationChange(): void {
     this.dispatchPropertyChange();
   }
 
@@ -90,14 +97,6 @@ export class ViewerDomElement {
    */
   @Watch('scale')
   protected handleScaleChange(): void {
-    this.dispatchPropertyChange();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('up')
-  protected handleUpChange(): void {
     this.dispatchPropertyChange();
   }
 
