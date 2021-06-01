@@ -21,7 +21,7 @@ export function update2d(
       const { position, quaternion, scale } = parseDomElement(el);
       const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
       const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
-      const distanceToCamera = Vector3.distanceToSquared(
+      const distanceToCamera = Vector3.distanceSquared(
         cameraPosition,
         positionWorld
       );

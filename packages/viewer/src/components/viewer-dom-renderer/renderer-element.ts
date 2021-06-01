@@ -37,15 +37,15 @@ function parseRotation(
       const obj = JSON.parse(str);
       if (Array.isArray(obj)) {
         const [x, y, z, wOrOrder] = obj;
-        if (typeof wOrOrder === 'string') {
+        if (typeof wOrOrder === 'number') {
+          return Quaternion.create({ x, y, z, w: wOrOrder });
+        } else {
           return Quaternion.fromEuler({
             x,
             y,
             z,
             order: wOrOrder as Euler.EulerOrder,
           });
-        } else {
-          return Quaternion.create({ x, y, z, w: wOrOrder });
         }
       } else {
         const { x, y, z, w, order } = obj;
