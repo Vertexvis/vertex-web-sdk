@@ -7,11 +7,12 @@ web platform.
 
 | Package      | Version | Description |
 | ------------ | ------- | ----------- |
-| [@vertexvis/geometry]      | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)      | 2D/3D geometry utilities. |
-| [@vertexvis/stream-api]    | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)    | The API client for streaming 3D images. |
-| [@vertexvis/utils]         | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)         | General Node and Web utilities used within Vertex. |
-| [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)        | The Web SDK containing web components to view 3D models. |
-| [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)  | Contains React bindings for Vertex's Web SDK. |
+| [@vertexvis/geometry]      | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)     | 2D/3D geometry utilities. |
+| [@vertexvis/stream-api]    | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)   | The API client for streaming 3D images. |
+| [@vertexvis/utils]         | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)        | General Node and Web utilities used within Vertex. |
+| [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)       | The Web SDK containing web components to view 3D models. |
+| [@vertexvis/viewer-core]   | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-core)  | The core libraries for the Web SDK |
+| [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react) | Contains React bindings for Vertex's Web SDK. |
 
 ## Documentation
 

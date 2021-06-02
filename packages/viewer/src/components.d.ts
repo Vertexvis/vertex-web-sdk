@@ -17,7 +17,7 @@ import { ColorMaterial } from "./scenes/colorMaterial";
 import { TapEventDetails } from "./interactions/tapEventDetails";
 import { Frame } from "./types";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions } from "@vertexvis/geometry";
+import { Dimensions, Euler, Quaternion, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./commands/command";
 import { InteractionHandler } from "./interactions/interactionHandler";
@@ -27,6 +27,7 @@ import { Scene } from "./scenes/scene";
 import { ViewerStreamApi } from "./stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
+import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -283,6 +284,36 @@ export namespace Components {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDomElement {
+        /**
+          * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
+         */
+        "billboardOff": boolean;
+        /**
+          * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "position": Vector3.Vector3 | string;
+        /**
+          * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+         */
+        "rotation": | Quaternion.Quaternion
+    | Euler.Euler
+    | string;
+        /**
+          * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scale": Vector3.Vector3 | string;
+    }
+    interface VertexViewerDomRenderer {
+        /**
+          * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
+         */
+        "drawMode": ViewerDomRendererDrawMode;
+        /**
+          * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerIcon {
         /**
           * The name of the icon to render.
@@ -373,6 +404,18 @@ declare global {
         prototype: HTMLVertexViewerDefaultToolbarElement;
         new (): HTMLVertexViewerDefaultToolbarElement;
     };
+    interface HTMLVertexViewerDomElementElement extends Components.VertexViewerDomElement, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDomElementElement: {
+        prototype: HTMLVertexViewerDomElementElement;
+        new (): HTMLVertexViewerDomElementElement;
+    };
+    interface HTMLVertexViewerDomRendererElement extends Components.VertexViewerDomRenderer, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDomRendererElement: {
+        prototype: HTMLVertexViewerDomRendererElement;
+        new (): HTMLVertexViewerDomRendererElement;
+    };
     interface HTMLVertexViewerIconElement extends Components.VertexViewerIcon, HTMLStencilElement {
     }
     var HTMLVertexViewerIconElement: {
@@ -403,6 +446,8 @@ declare global {
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
+        "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
+        "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
@@ -582,6 +627,40 @@ declare namespace LocalJSX {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDomElement {
+        /**
+          * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
+         */
+        "billboardOff"?: boolean;
+        /**
+          * An event that's emitted when a property of this component changes.
+         */
+        "onPropertyChange"?: (event: CustomEvent<void>) => void;
+        /**
+          * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "position"?: Vector3.Vector3 | string;
+        /**
+          * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+         */
+        "rotation"?: | Quaternion.Quaternion
+    | Euler.Euler
+    | string;
+        /**
+          * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scale"?: Vector3.Vector3 | string;
+    }
+    interface VertexViewerDomRenderer {
+        /**
+          * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
+         */
+        "drawMode"?: ViewerDomRendererDrawMode;
+        /**
+          * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerIcon {
         /**
           * The name of the icon to render.
@@ -646,6 +725,8 @@ declare namespace LocalJSX {
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-dom-element": VertexViewerDomElement;
+        "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
@@ -661,6 +742,8 @@ declare module "@stencil/core" {
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
+            "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
+            "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;

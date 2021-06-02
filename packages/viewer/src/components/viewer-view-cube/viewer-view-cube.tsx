@@ -1,6 +1,5 @@
 import { Component, h, Prop, State, Watch } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
-import { makeLookAtViewMatrix } from '../../rendering/matrices';
 import classNames from 'classnames';
 import { FrameCamera } from '../../types';
 import {
@@ -260,23 +259,10 @@ export class ViewerViewCube {
   }
 
   protected render(): h.JSX.IntrinsicElements {
-    /* eslint-disable prettier/prettier */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [
-      m11, m12, m13, m14,
-      m21, m22, m23, m24,
-      m31, m32, m33, m34,
-      m41, m42, m43, m44,
-    ] = Matrix4.transpose(this.viewMatrix || Matrix4.identity());
-
-    const matrix3d = [
-      m11, m12, m13, m14,
-      m21, m22, m23, m24,
-      m31, m32, m33, m34,
-      0, 0, 0, m44,
-    ];
-    /* eslint-enable prettier/prettier */
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+    const m = Matrix4.position(
+      this.viewMatrix || Matrix4.makeIdentity(),
+      Matrix4.makeIdentity()
+    );
 
     const style = {
       transform: [
@@ -291,7 +277,7 @@ export class ViewerViewCube {
         'scale3d(-1, 1, -1)',
 
         // Applies the view matrix using a column major matrix.
-        `matrix3d(${matrix3d.join(', ')})`,
+        `matrix3d(${m.join(', ')})`,
       ].join(' '),
     };
 
@@ -558,9 +544,10 @@ export class ViewerViewCube {
     const camera = scene?.camera();
 
     if (camera != null) {
-      this.viewMatrix = makeLookAtViewMatrix(camera);
+      const { position, lookAt, up } = camera;
+      this.viewMatrix = Matrix4.makeLookAtView(position, lookAt, up);
     } else {
-      this.viewMatrix = Matrix4.identity();
+      this.viewMatrix = Matrix4.makeIdentity();
     }
   };
 
