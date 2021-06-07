@@ -5,7 +5,7 @@ jest.mock(
 jest.mock('./lib/dom');
 jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
-jest.mock('../../utils/stencil');
+jest.mock('../../lib/stencil');
 
 import '../../testing/domMocks';
 
@@ -19,7 +19,7 @@ import { h } from '@stencil/core';
 import { SceneTree } from './scene-tree';
 import { SceneTreeController } from './lib/controller';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../types/__fixtures__';
+import * as Fixtures from '../../testing/fixtures';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
@@ -54,7 +54,7 @@ import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 const random = new Chance();
 
-describe('<vertex-scene-tree-new>', () => {
+describe('<vertex-scene-tree>', () => {
   const sceneViewId = random.guid();
   const jwt = signJwt(sceneViewId);
 

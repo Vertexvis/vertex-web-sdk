@@ -1,6 +1,6 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
-jest.mock('../../sessions/storage');
+jest.mock('../../lib/sessions/storage');
 
 import '../../testing/domMocks';
 import {
@@ -9,13 +9,13 @@ import {
   getElementBoundingClientRect,
 } from './utils';
 import { Viewer } from './viewer';
-import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
+import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { newSpecPage } from '@stencil/core/testing';
-import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
+import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../types/__fixtures__';
-import { upsertStorageEntry } from '../../sessions/storage';
+import * as Fixtures from '../../testing/fixtures';
+import { upsertStorageEntry } from '../../lib/sessions/storage';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 describe('vertex-viewer', () => {

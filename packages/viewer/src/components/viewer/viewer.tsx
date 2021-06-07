@@ -12,7 +12,7 @@ import {
   Listen,
 } from '@stencil/core';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
-import { Config, parseConfig } from '../../config/config';
+import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
@@ -22,27 +22,27 @@ import {
   Async,
   EventDispatcher,
 } from '@vertexvis/utils';
-import { CommandRegistry } from '../../commands/commandRegistry';
-import { Frame, LoadableResource, SynchronizedClock } from '../../types';
-import { registerCommands } from '../../commands/streamCommands';
-import { InteractionHandler } from '../../interactions/interactionHandler';
-import { InteractionApi } from '../../interactions/interactionApi';
-import { TapEventDetails } from '../../interactions/tapEventDetails';
-import { MouseInteractionHandler } from '../../interactions/mouseInteractionHandler';
-import { MultiPointerInteractionHandler } from '../../interactions/multiPointerInteractionHandler';
-import { PointerInteractionHandler } from '../../interactions/pointerInteractionHandler';
-import { TouchInteractionHandler } from '../../interactions/touchInteractionHandler';
-import { TapInteractionHandler } from '../../interactions/tapInteractionHandler';
-import { FlyToPartKeyInteraction } from '../../interactions/flyToPartKeyInteraction';
-import { CommandFactory } from '../../commands/command';
-import { Environment } from '../../config/environment';
+import { CommandRegistry } from '../../lib/commands/commandRegistry';
+import { Frame, LoadableResource, SynchronizedClock } from '../../lib/types';
+import { registerCommands } from '../../lib/commands/streamCommands';
+import { InteractionHandler } from '../../lib/interactions/interactionHandler';
+import { InteractionApi } from '../../lib/interactions/interactionApi';
+import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
+import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
+import { MultiPointerInteractionHandler } from '../../lib/interactions/multiPointerInteractionHandler';
+import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
+import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
+import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
+import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
+import { CommandFactory } from '../../lib/commands/command';
+import { Environment } from '../../lib/environment';
 import {
   WebsocketConnectionError,
   ViewerInitializationError,
   InteractionHandlerError,
   ComponentInitializationError,
   IllegalStateError,
-} from '../../errors';
+} from '../../lib/errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   WebSocketClientImpl,
@@ -50,7 +50,7 @@ import {
   protoToDate,
   toProtoDuration,
 } from '@vertexvis/stream-api';
-import { Scene } from '../../scenes/scene';
+import { Scene } from '../../lib/scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
@@ -64,23 +64,25 @@ import {
   createCanvasDepthProvider,
   createCanvasRenderer,
   measureCanvasRenderer,
-} from '../../rendering';
-import * as Metrics from '../../metrics';
-import { Timing } from '../../metrics';
-import { ViewerStreamApi } from '../../stream/viewerStreamApi';
+} from '../../lib/rendering';
+import { paintTime, Timing } from '../../lib/meters';
+import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
 import {
   ViewerStreamAttributes,
   toProtoStreamAttributes,
-} from '../../stream/streamAttributes';
-import { upsertStorageEntry, getStorageEntry } from '../../sessions/storage';
-import { CustomError } from '../../errors/customError';
-import { KeyInteraction } from '../../interactions/keyInteraction';
-import { BaseInteractionHandler } from '../../interactions/baseInteractionHandler';
+} from '../../lib/stream/streamAttributes';
+import {
+  upsertStorageEntry,
+  getStorageEntry,
+} from '../../lib/sessions/storage';
+import { CustomError } from '../../lib/errors';
+import { KeyInteraction } from '../../lib/interactions/keyInteraction';
+import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
   ColorMaterial,
   defaultSelectionMaterial,
   fromHex,
-} from '../../scenes/colorMaterial';
+} from '../../lib/scenes/colorMaterial';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -800,7 +802,7 @@ export class Viewer {
     );
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
-      Metrics.paintTime,
+      paintTime,
       createCanvasRenderer(),
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)

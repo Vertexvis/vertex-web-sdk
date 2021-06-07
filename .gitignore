@@ -80,3 +80,6 @@ generated/
 
 # Ignore files used for generating READMEs
 .lib
+
+# Ignore TSDoc directory
+docs/

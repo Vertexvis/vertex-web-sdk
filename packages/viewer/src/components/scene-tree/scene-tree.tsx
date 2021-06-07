@@ -16,8 +16,8 @@ import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/proto
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
-import { Config, parseConfig } from '../../config/config';
-import { Environment } from '../../config/environment';
+import { Config, parseConfig } from '../../lib/config';
+import { Environment } from '../../lib/environment';
 import {
   getSceneTreeContainsElement,
   getSceneTreeViewportHeight,
@@ -30,7 +30,7 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { readDOM, writeDOM } from '../../utils/stencil';
+import { readDOM, writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { ElementPool } from './lib/element-pool';
