@@ -137,6 +137,8 @@ export class ZoomInteraction extends MouseInteraction {
 
   public endDrag(event: MouseEvent, api: InteractionApi): void {
     super.endDrag(event, api);
+    this.stopInteractionTimer();
+    this.didTransformBegin = false;
   }
 
   public zoom(delta: number, api: InteractionApi): void {
