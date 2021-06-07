@@ -1,4 +1,4 @@
-import { isPromise } from '../types';
+import { isPromise } from './types';
 
 export interface Timing {
   startTime: number;
@@ -85,3 +85,5 @@ export class TimingMeter {
     this.measures.delete(mark);
   }
 }
+
+export const paintTime = new TimingMeter('paint_time');

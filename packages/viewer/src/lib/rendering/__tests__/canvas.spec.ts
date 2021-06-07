@@ -12,7 +12,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import * as Fixtures from '../../types/__fixtures__';
 import { loadImageBytes } from '../imageLoaders';
 import { Async } from '@vertexvis/utils';
-import { TimingMeter } from '../../metrics';
+import { TimingMeter } from '../../meters';
 
 interface MockCanvasContext {
   clearRect: jest.Mock;

@@ -2,7 +2,7 @@ import { FrameRenderer } from './renderer';
 import { Frame } from '../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
-import { Timing, TimingMeter } from '../metrics';
+import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { DepthProvider } from './depth';
 

@@ -65,8 +65,7 @@ import {
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
-import * as Metrics from '../../lib/metrics';
-import { Timing } from '../../lib/metrics';
+import { paintTime, Timing } from '../../lib/meters';
 import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
 import {
   ViewerStreamAttributes,
@@ -803,7 +802,7 @@ export class Viewer {
     );
     this.synchronizeTime();
     this.canvasRenderer = measureCanvasRenderer(
-      Metrics.paintTime,
+      paintTime,
       createCanvasRenderer(),
       this.getConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)

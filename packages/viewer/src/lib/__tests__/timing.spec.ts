@@ -1,4 +1,4 @@
-import { TimingMeter } from '../timing';
+import { TimingMeter } from '../meters';
 
 describe(TimingMeter, () => {
   const mark = jest.spyOn(window.performance, 'mark');
