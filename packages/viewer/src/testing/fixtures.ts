@@ -1,6 +1,6 @@
-import * as Frame from '../frame';
-import * as FrameCamera from '../frameCamera';
-import * as CrossSectioning from '../crossSectioning';
+import * as Frame from '../lib/types/frame';
+import * as FrameCamera from '../lib/types/frameCamera';
+import * as CrossSectioning from '../lib/types/crossSectioning';
 import {
   Dimensions,
   Rectangle,

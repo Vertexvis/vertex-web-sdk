@@ -14,7 +14,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../lib/types/__fixtures__';
+import * as Fixtures from '../../testing/fixtures';
 import { upsertStorageEntry } from '../../lib/sessions/storage';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 

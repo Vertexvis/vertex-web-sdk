@@ -9,7 +9,7 @@ import {
   DrawPixel,
 } from '../canvas';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import * as Fixtures from '../../types/__fixtures__';
+import * as Fixtures from '../../../testing/fixtures';
 import { loadImageBytes } from '../imageLoaders';
 import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../meters';

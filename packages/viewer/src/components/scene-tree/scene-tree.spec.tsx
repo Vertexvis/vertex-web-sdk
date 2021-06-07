@@ -19,7 +19,7 @@ import { h } from '@stencil/core';
 import { SceneTree } from './scene-tree';
 import { SceneTreeController } from './lib/controller';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../lib/types/__fixtures__';
+import * as Fixtures from '../../testing/fixtures';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,

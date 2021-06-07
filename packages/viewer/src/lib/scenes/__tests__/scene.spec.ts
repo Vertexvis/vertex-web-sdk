@@ -3,7 +3,7 @@ jest.mock('@vertexvis/stream-api');
 import { Scene } from '../scene';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { frame } from '../../types/__fixtures__';
+import { frame } from '../../../testing/fixtures';
 import { UUID } from '@vertexvis/utils';
 import * as ColorMaterial from '../colorMaterial';
 
