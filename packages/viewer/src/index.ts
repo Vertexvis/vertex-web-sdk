@@ -11,9 +11,9 @@ export * from './lib/interactions/interactionHandler';
 
 export * from './lib/interactions/keyInteraction';
 
-export { Config } from './lib/config/config';
+export { Config } from './lib/config';
 
-export { Environment } from './lib/config/environment';
+export { Environment } from './lib/environment';
 
 export { Scene } from './lib/scenes';
 

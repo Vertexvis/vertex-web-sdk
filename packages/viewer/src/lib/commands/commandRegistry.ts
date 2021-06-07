@@ -1,6 +1,6 @@
 import { Disposable } from '@vertexvis/utils';
 import { CommandFactory } from './command';
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 import { StreamApi } from '@vertexvis/stream-api';
 
 interface CommandDefinition<R> {

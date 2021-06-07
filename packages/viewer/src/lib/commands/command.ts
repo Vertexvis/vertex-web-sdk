@@ -1,4 +1,4 @@
-import { Config } from '../config/config';
+import { Config } from '../config';
 import { StreamApi } from '@vertexvis/stream-api';
 
 export interface CommandContext {

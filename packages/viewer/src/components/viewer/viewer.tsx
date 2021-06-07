@@ -12,7 +12,7 @@ import {
   Listen,
 } from '@stencil/core';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
-import { Config, parseConfig } from '../../lib/config/config';
+import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
@@ -35,7 +35,7 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
 import { CommandFactory } from '../../lib/commands/command';
-import { Environment } from '../../lib/config/environment';
+import { Environment } from '../../lib/environment';
 import {
   WebsocketConnectionError,
   ViewerInitializationError,

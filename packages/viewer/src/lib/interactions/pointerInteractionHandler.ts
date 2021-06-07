@@ -8,7 +8,7 @@ import {
   RotatePointInteraction,
 } from './mouseInteractions';
 import { InteractionApi } from './interactionApi';
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 
 export class PointerInteractionHandler extends BaseInteractionHandler {
   private touchPoints: Set<number>;

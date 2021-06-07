@@ -54,7 +54,7 @@ import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 const random = new Chance();
 
-describe('<vertex-scene-tree-new>', () => {
+describe('<vertex-scene-tree>', () => {
   const sceneViewId = random.guid();
   const jwt = signJwt(sceneViewId);
 

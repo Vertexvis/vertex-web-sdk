@@ -16,8 +16,8 @@ import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/proto
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import { SceneTreeController, SceneTreeState } from './lib/controller';
-import { Config, parseConfig } from '../../lib/config/config';
-import { Environment } from '../../lib/config/environment';
+import { Config, parseConfig } from '../../lib/config';
+import { Environment } from '../../lib/environment';
 import {
   getSceneTreeContainsElement,
   getSceneTreeViewportHeight,

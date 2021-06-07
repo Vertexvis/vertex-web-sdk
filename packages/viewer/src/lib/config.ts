@@ -1,6 +1,6 @@
 import { Objects, DeepPartial } from '@vertexvis/utils';
 import { Environment } from './environment';
-import { Animation, Flags, Events, Interactions } from '../types';
+import { Animation, Flags, Events, Interactions } from './types';
 import { FrameDeliverySettings } from '@vertexvis/stream-api';
 import {
   AdaptiveRenderingSettings,

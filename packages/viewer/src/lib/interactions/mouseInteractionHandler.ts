@@ -1,4 +1,4 @@
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 import { BaseInteractionHandler } from './baseInteractionHandler';
 import {
   RotateInteraction,

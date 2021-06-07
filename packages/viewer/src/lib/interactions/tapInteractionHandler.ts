@@ -2,7 +2,7 @@ import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 import { TapEventKeys } from './tapEventDetails';
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 import { BaseEvent } from './interactionEvent';
 
 type TapEmitter = (

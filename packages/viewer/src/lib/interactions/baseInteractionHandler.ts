@@ -13,7 +13,7 @@ import {
 
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 
 export type InteractionType =
   | 'rotate'

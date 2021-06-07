@@ -4,7 +4,7 @@ import { CommandRegistry } from './commandRegistry';
 import { LoadableResource } from '../types';
 import { InvalidCredentialsError } from '../errors';
 import { Settings } from '@vertexvis/stream-api';
-import { Config } from '../config/config';
+import { Config } from '../config';
 
 export interface ConnectOptions {
   clientId?: string;

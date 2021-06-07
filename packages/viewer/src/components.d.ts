@@ -11,8 +11,8 @@ import {
   ScrollToOptions,
   SelectItemOptions,
 } from './components/scene-tree/scene-tree';
-import { Config } from './lib/config/config';
-import { Environment } from './lib/config/environment';
+import { Config } from './lib/config';
+import { Environment } from './lib/environment';
 import { SceneTreeController } from './components/scene-tree/lib/controller';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';

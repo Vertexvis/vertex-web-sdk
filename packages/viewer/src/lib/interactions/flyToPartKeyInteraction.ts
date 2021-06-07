@@ -1,6 +1,6 @@
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { KeyInteraction } from './keyInteraction';
-import { ConfigProvider } from '../config/config';
+import { ConfigProvider } from '../config';
 import { TapEventDetails } from './tapEventDetails';
 import { ImageScaleProvider } from '../scenes';
 import { Point } from '@vertexvis/geometry';

@@ -10,7 +10,7 @@ import {
   TwistInteraction,
   RotatePointInteraction,
 } from '../mouseInteractions';
-import { parseConfig } from '../../config/config';
+import { parseConfig } from '../../config';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
