@@ -76,7 +76,7 @@ import {
   upsertStorageEntry,
   getStorageEntry,
 } from '../../lib/sessions/storage';
-import { CustomError } from '../../lib/errors/customError';
+import { CustomError } from '../../lib/errors';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
