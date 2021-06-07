@@ -214,6 +214,10 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (this.draggingInteraction != null && this.interactionApi != null) {
+      // Ensure any scroll wheel interactions have been ended prior to beginning
+      // another interaction to prevent the interaction from being ended early.
+      this.zoomInteraction.endDrag(event, this.interactionApi);
+
       this.draggingInteraction.beginDrag(
         event,
         this.downPositionCanvas || Point.create(event.clientX, event.clientY),

@@ -136,6 +136,18 @@ describe(MouseInteractionHandler, () => {
     expect(zoomInteraction.zoom).toHaveBeenCalled();
   });
 
+  it('ends zoom interaction on drag', async () => {
+    div.dispatchEvent(wheelEvent);
+
+    await delay(50);
+
+    expect(zoomInteraction.zoom).toHaveBeenCalled();
+
+    await simulatePrimaryInteractions(50);
+
+    expect(zoomInteraction.endDrag).toHaveBeenCalled();
+  });
+
   describe(MouseInteractionHandler.prototype.dispose, () => {
     it('removes mouse down event listeners', async () => {
       handler.dispose();
