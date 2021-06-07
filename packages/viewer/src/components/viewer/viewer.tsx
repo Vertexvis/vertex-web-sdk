@@ -707,7 +707,6 @@ export class Viewer {
    */
   public async handleWebSocketClose(): Promise<void> {
     if (this.isStreamStarted) {
-      console.log('handle ws closed');
       this.isStreamStarted = false;
 
       if (
