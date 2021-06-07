@@ -30,7 +30,7 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { readDOM, writeDOM } from '../../lib/utils/stencil';
+import { readDOM, writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { ElementPool } from './lib/element-pool';

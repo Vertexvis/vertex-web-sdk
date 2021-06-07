@@ -5,7 +5,7 @@ jest.mock(
 jest.mock('./lib/dom');
 jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
-jest.mock('../../lib/utils/stencil');
+jest.mock('../../lib/stencil');
 
 import '../../testing/domMocks';
 
