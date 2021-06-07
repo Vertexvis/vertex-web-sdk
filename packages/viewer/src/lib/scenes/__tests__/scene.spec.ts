@@ -5,14 +5,13 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { frame } from '../../types/__fixtures__';
 import { UUID } from '@vertexvis/utils';
-import { ColorMaterial } from '../..';
-import { fromHex } from '../colorMaterial';
+import * as ColorMaterial from '../colorMaterial';
 
 describe(Scene, () => {
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
-  const colorMaterial = fromHex('#ff0000');
+  const colorMaterial = ColorMaterial.fromHex('#ff0000');
   const scene = new Scene(
     streamApi,
     frame,
@@ -237,7 +236,7 @@ describe(Scene, () => {
 
     it('selection uses specified material', () => {
       const itemId = UUID.create();
-      const material = fromHex('#0000ff');
+      const material = ColorMaterial.fromHex('#0000ff');
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select(material))
         .execute();
@@ -269,7 +268,7 @@ describe(Scene, () => {
 
     it('selection uses hex color', () => {
       const itemId = UUID.create();
-      const material = fromHex('#0000ff');
+      const material = ColorMaterial.fromHex('#0000ff');
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select('#0000ff'))
         .execute();

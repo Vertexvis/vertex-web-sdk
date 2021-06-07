@@ -5,7 +5,7 @@ jest.mock(
 jest.mock('./lib/dom');
 jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
-jest.mock('../../utils/stencil');
+jest.mock('../../lib/utils/stencil');
 
 import '../../testing/domMocks';
 
@@ -19,7 +19,7 @@ import { h } from '@stencil/core';
 import { SceneTree } from './scene-tree';
 import { SceneTreeController } from './lib/controller';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../types/__fixtures__';
+import * as Fixtures from '../../lib/types/__fixtures__';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,

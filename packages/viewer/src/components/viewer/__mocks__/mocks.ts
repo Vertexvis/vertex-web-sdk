@@ -1,9 +1,9 @@
 jest.mock('../viewer');
 
 import { Viewer } from '../viewer';
-import { Scene } from '../../../scenes';
+import { Scene } from '../../../lib/scenes';
 
-export * from '../../../scenes/__mocks__/mocks';
+export * from '../../../lib/scenes/__mocks__/mocks';
 
 export let awaitScene: Promise<void> | undefined = undefined;
 

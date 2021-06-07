@@ -6,7 +6,7 @@ import { InteractionApi } from '../interactionApi';
 import { frame } from '../../types/__fixtures__';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Interactions } from '../../types';
-import { ColorMaterial } from '../..';
+import * as ColorMaterial from '../../scenes/colorMaterial';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();

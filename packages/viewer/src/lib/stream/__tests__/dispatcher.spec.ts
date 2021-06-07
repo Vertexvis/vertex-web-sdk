@@ -6,7 +6,7 @@ import {
 } from '@vertexvis/stream-api';
 import { StreamApiEventDispatcher } from '../dispatcher';
 import { Frame } from '../../types';
-import '../../testing/domMocks';
+import '../../../testing/domMocks';
 
 describe(StreamApiEventDispatcher, () => {
   const correlationId = 'corr-id';

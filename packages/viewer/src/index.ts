@@ -1,24 +1,24 @@
 /**
  * @module Viewer
  */
-import * as ColorMaterial from './scenes/colorMaterial';
+import * as ColorMaterial from './lib/scenes/colorMaterial';
 
 export { ColorMaterial };
 
 export * from './components';
 
-export * from './interactions/interactionHandler';
+export * from './lib/interactions/interactionHandler';
 
-export * from './interactions/keyInteraction';
+export * from './lib/interactions/keyInteraction';
 
-export { Config } from './config/config';
+export { Config } from './lib/config/config';
 
-export { Environment } from './config/environment';
+export { Environment } from './lib/config/environment';
 
-export { Scene } from './scenes';
+export { Scene } from './lib/scenes';
 
-export { Frame, LoadableResource, SynchronizedClock } from './types';
+export { Frame, LoadableResource, SynchronizedClock } from './lib/types';
 
-import { TapEventDetails } from './interactions/tapEventDetails';
+import { TapEventDetails } from './lib/interactions/tapEventDetails';
 
 export { TapEventDetails };

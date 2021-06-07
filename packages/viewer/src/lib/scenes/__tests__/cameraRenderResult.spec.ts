@@ -5,7 +5,7 @@ import {
   Fixtures,
 } from '@vertexvis/stream-api';
 import { CameraRenderResult } from '../cameraRenderResult';
-import '../../testing/domMocks';
+import '../../../testing/domMocks';
 
 describe(CameraRenderResult, () => {
   const correlationId = 'corr-id';

@@ -1,7 +1,7 @@
 import { Component, h, Prop, State, Watch } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
-import { FrameCamera } from '../../types';
+import { FrameCamera } from '../../lib/types';
 import {
   ViewerViewCubeBackLeftEdge,
   ViewerViewCubeBackRightEdge,
