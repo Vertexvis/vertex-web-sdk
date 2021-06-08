@@ -583,9 +583,12 @@ export class Viewer {
           frameType: 'final',
         },
       };
-      this.stream.updateStream({
-        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
-      });
+
+      if (this.isStreamStarted) {
+        this.stream.updateStream({
+          streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
+        });
+      }
     }
   }
 
@@ -628,6 +631,7 @@ export class Viewer {
   @Method()
   public async unload(): Promise<void> {
     if (this.streamDisposable != null) {
+      this.isStreamStarted = false;
       this.streamId = undefined;
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
