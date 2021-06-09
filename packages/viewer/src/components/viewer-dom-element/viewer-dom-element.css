@@ -1,4 +1,8 @@
 :host {
   position: absolute;
+  pointer-events: none;
+}
+
+:host > * {
   pointer-events: auto;
 }

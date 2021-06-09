@@ -55,6 +55,7 @@
     "@vertexvis/utils": "0.9.27",
     "camel-case": "^4.1.2",
     "classnames": "2.2.6",
+    "fast-png": "^5.0.4",
     "google-protobuf": "^3.15.7",
     "jwt-decode": "^3.1.2",
     "protobufjs": "^6.9.0",

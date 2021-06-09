@@ -11,9 +11,13 @@ import * as FlyTo from './flyToOptions';
 import * as Interactions from './interactions';
 import * as CrossSectioning from './crossSectioning';
 
+export * from './depthBuffer';
+
 export * from './synchronizedClock';
 
 export * from './typeGuards';
+
+export * from './viewport';
 
 export {
   Events,

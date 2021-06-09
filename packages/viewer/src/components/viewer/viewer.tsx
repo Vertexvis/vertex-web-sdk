@@ -23,7 +23,12 @@ import {
   EventDispatcher,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import { Frame, LoadableResource, SynchronizedClock } from '../../lib/types';
+import {
+  DepthBuffer,
+  Frame,
+  LoadableResource,
+  SynchronizedClock,
+} from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -83,6 +88,7 @@ import {
   defaultSelectionMaterial,
   fromHex,
 } from '../../lib/scenes/colorMaterial';
+import { decodePng } from '../../workers/png-decoder';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -171,6 +177,8 @@ export class Viewer {
    * the viewer.
    */
   @Prop() public streamAttributes?: ViewerStreamAttributes | string;
+
+  @Prop({ mutable: true }) public depthBuffer: DepthBuffer | undefined;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -978,6 +986,14 @@ export class Viewer {
         const data = { canvas, dimensions, frame };
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
+        if (frame.depthBuffer != null) {
+          const png = await decodePng(frame.depthBuffer);
+          this.depthBuffer = DepthBuffer.fromPng(
+            png,
+            frame.imageAttributes.imageRect,
+            frame.imageAttributes.scaleFactor
+          );
+        }
         this.dispatchFrameDrawn(drawnFrame);
       }
     }

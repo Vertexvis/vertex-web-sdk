@@ -1,5 +1,5 @@
 import { Animation, FlyTo, FrameCamera } from '../types';
-import { Vector3, BoundingBox } from '@vertexvis/geometry';
+import { Vector3, BoundingBox, Matrix4 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
@@ -91,12 +91,34 @@ export interface FlyToParams {
 export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
 
+  public readonly worldMatrix: Matrix4.Matrix4;
+  public readonly viewMatrix: Matrix4.Matrix4;
+  public readonly projectionMatrix: Matrix4.Matrix4;
+  public readonly projectionViewMatrix: Matrix4.Matrix4;
+
   public constructor(
     private stream: StreamApi,
     private aspect: number,
     private data: FrameCamera.FrameCamera,
     private boundingBox: BoundingBox.BoundingBox
-  ) {}
+  ) {
+    this.viewMatrix = Matrix4.makeLookAtView(
+      this.position,
+      this.lookAt,
+      this.up
+    );
+    this.worldMatrix = Matrix4.invert(this.viewMatrix);
+    this.projectionMatrix = Matrix4.makePerspective(
+      this.near,
+      this.far,
+      this.fovY,
+      this.aspectRatio
+    );
+    this.projectionViewMatrix = Matrix4.multiply(
+      this.projectionMatrix,
+      this.viewMatrix
+    );
+  }
 
   /**
    * Updates the position of the camera such that the given bounding box will
@@ -406,5 +428,13 @@ export class Camera implements FrameCamera.FrameCamera {
     const { far } = this.computeClippingPlanes(this.data);
 
     return far;
+  }
+
+  /**
+   * A normalized vector that represents the world direction the camera is
+   * facing.
+   */
+  public get direction(): Vector3.Vector3 {
+    return Vector3.normalize(this.viewVector());
   }
 }

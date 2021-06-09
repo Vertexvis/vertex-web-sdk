@@ -53,6 +53,12 @@ export class ViewerDomElement {
   public scale: Vector3.Vector3 | string = Vector3.create(1, 1, 1);
 
   /**
+   * Indicates if the element is hidden by geometry.
+   */
+  @Prop({ reflect: true })
+  public occluded = false;
+
+  /**
    * Disables the billboarding behavior of the element. When billboarding is
    * enabled, the element will always be oriented towards the screen.
    */
