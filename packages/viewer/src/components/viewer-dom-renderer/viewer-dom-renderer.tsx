@@ -11,8 +11,8 @@ import {
 import { Dimensions } from '@vertexvis/geometry';
 import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
-import { Viewport } from '../../lib/types';
-import { Camera } from '../../lib/scenes/camera';
+import { DepthBuffer, Viewport } from '../../lib/types';
+import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
 
 export type ViewerDomRendererDrawMode = '2d' | '3d';
 
@@ -45,7 +45,10 @@ export class ViewerDomRenderer {
   public viewer?: HTMLVertexViewerElement;
 
   @State()
-  private camera?: Camera;
+  private camera?: ReceivedPerspectiveCamera;
+
+  @State()
+  private depthBuffer?: DepthBuffer;
 
   @State()
   private viewport: Viewport = new Viewport(Dimensions.create(0, 0));
@@ -130,16 +133,17 @@ export class ViewerDomRenderer {
 
     if (camera != null) {
       if (this.drawMode === '3d') {
-        update3d(this.hostEl, viewport, camera, this.viewer?.depthBuffer);
+        update3d(this.hostEl, viewport, camera, this.depthBuffer);
       } else {
-        update2d(this.hostEl, viewport, camera, this.viewer?.depthBuffer);
+        update2d(this.hostEl, viewport, camera, this.depthBuffer);
       }
     }
   }
 
   private handleViewerFrameDrawn = async (): Promise<void> => {
-    const scene = await this.viewer?.scene();
-    this.camera = scene?.camera();
+    const frame = this.viewer?.frame;
+    this.depthBuffer = await frame?.depthBuffer();
+    this.camera = frame?.scene?.camera;
   };
 
   private handleResize(): void {

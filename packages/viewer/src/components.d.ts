@@ -14,6 +14,7 @@ import { Row } from "./components/scene-tree/lib/row";
 import { Node } from "@vertexvis/scene-tree-protos/scenetree/protos/domain_pb";
 import { ViewerStreamAttributes } from "./lib/stream/streamAttributes";
 import { DepthBuffer, Frame } from "./lib/types";
+import { ReceivedFrame } from "./lib/types/frame";
 import { ColorMaterial } from "./lib/scenes/colorMaterial";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
@@ -191,6 +192,7 @@ export namespace Components {
           * @private For internal use only.
          */
         "dispatchFrameDrawn": (frame: Frame.Frame) => Promise<void>;
+        "frame": ReceivedFrame | undefined;
         "getBaseInteractionHandler": () => Promise<BaseInteractionHandler | undefined>;
         "getFrame": () => Promise<Frame.Frame | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
@@ -544,6 +546,7 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         "depthBuffer"?: DepthBuffer | undefined;
+        "frame"?: ReceivedFrame | undefined;
         /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */

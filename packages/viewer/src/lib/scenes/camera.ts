@@ -1,5 +1,5 @@
-import { Animation, FlyTo, FrameCamera } from '../types';
-import { Vector3, BoundingBox, Matrix4 } from '@vertexvis/geometry';
+import { Animation, ClippingPlanes, FlyTo, FrameCamera } from '../types';
+import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
@@ -10,11 +10,6 @@ const PI_OVER_360 = 0.008726646259972;
 
 interface CameraRenderOptions {
   animation?: Animation.Animation;
-}
-
-interface ClippingPlanes {
-  near: number;
-  far: number;
 }
 
 export class TerminalFlyToExecutor {
@@ -91,34 +86,12 @@ export interface FlyToParams {
 export class Camera implements FrameCamera.FrameCamera {
   private flyToOptions?: FlyTo.FlyToOptions;
 
-  public readonly worldMatrix: Matrix4.Matrix4;
-  public readonly viewMatrix: Matrix4.Matrix4;
-  public readonly projectionMatrix: Matrix4.Matrix4;
-  public readonly projectionViewMatrix: Matrix4.Matrix4;
-
   public constructor(
     private stream: StreamApi,
     private aspect: number,
     private data: FrameCamera.FrameCamera,
     private boundingBox: BoundingBox.BoundingBox
-  ) {
-    this.viewMatrix = Matrix4.makeLookAtView(
-      this.position,
-      this.lookAt,
-      this.up
-    );
-    this.worldMatrix = Matrix4.invert(this.viewMatrix);
-    this.projectionMatrix = Matrix4.makePerspective(
-      this.near,
-      this.far,
-      this.fovY,
-      this.aspectRatio
-    );
-    this.projectionViewMatrix = Matrix4.multiply(
-      this.projectionMatrix,
-      this.viewMatrix
-    );
-  }
+  ) {}
 
   /**
    * Updates the position of the camera such that the given bounding box will
@@ -337,36 +310,11 @@ export class Camera implements FrameCamera.FrameCamera {
 
   private computeClippingPlanes(
     camera: FrameCamera.FrameCamera
-  ): ClippingPlanes {
-    const boundingBoxCenter = BoundingBox.center(this.boundingBox);
-    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
-    const centerToBoundingPlane = Vector3.subtract(
-      this.boundingBox.max,
-      boundingBoxCenter
+  ): ClippingPlanes.ClippingPlanes {
+    return ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+      this.boundingBox,
+      camera
     );
-    const distanceToCenterAlongViewVec =
-      Math.abs(
-        Vector3.dot(
-          Vector3.subtract(camera.lookAt, camera.position),
-          cameraToCenter
-        )
-      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
-    const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
-    let far = distanceToCenterAlongViewVec + radius;
-    let near = far * 0.01;
-
-    if (near > distanceToCenterAlongViewVec - radius) {
-      if (near > 1000) {
-        const difference = near - 1000;
-        near = 1000;
-        far -= difference;
-      } else {
-      }
-    } else {
-      near = distanceToCenterAlongViewVec - radius;
-    }
-
-    return { far, near };
   }
 
   /**
@@ -417,7 +365,6 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get near(): number {
     const { near } = this.computeClippingPlanes(this.data);
-
     return near;
   }
 
@@ -426,15 +373,6 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get far(): number {
     const { far } = this.computeClippingPlanes(this.data);
-
     return far;
-  }
-
-  /**
-   * A normalized vector that represents the world direction the camera is
-   * facing.
-   */
-  public get direction(): Vector3.Vector3 {
-    return Vector3.normalize(this.viewVector());
   }
 }

@@ -1,6 +1,7 @@
 /**
  * @module Types
  */
+import * as ClippingPlanes from './clippingPlanes';
 import * as Flags from './flags';
 import * as Events from './events';
 import * as FrameCamera from './frameCamera';
@@ -20,6 +21,7 @@ export * from './typeGuards';
 export * from './viewport';
 
 export {
+  ClippingPlanes,
   Events,
   Flags,
   Frame,

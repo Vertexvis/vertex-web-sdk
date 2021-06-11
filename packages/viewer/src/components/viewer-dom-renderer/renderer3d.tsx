@@ -1,12 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
-import { Camera } from '../../lib/scenes';
 import { DepthBuffer, Viewport } from '../../lib/types';
+import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 interface Props {
-  camera: Camera;
+  camera: ReceivedPerspectiveCamera;
   viewport: Viewport;
 }
 
@@ -34,7 +34,7 @@ export const Renderer3d: FunctionalComponent<Props> = (
 export function update3d(
   hostEl: HTMLElement,
   viewport: Viewport,
-  camera: Camera,
+  camera: ReceivedPerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < hostEl.children.length; i++) {
@@ -53,7 +53,7 @@ export function update3d(
 function updateElement(
   element: HTMLVertexViewerDomElementElement,
   viewport: Viewport,
-  camera: Camera,
+  camera: ReceivedPerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const { position, quaternion, scale } = parseDomElement(element);
@@ -61,7 +61,7 @@ function updateElement(
   const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
   const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
 
-  const occluded = depthBuffer?.isOccluded(viewport, positionWorld, camera);
+  const occluded = depthBuffer?.isOccluded(viewport, positionWorld);
   element.toggleAttribute('occluded', occluded);
 
   if (element.billboardOff) {

@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
-import { Camera } from '../../lib/scenes';
 import { DepthBuffer, Viewport } from '../../lib/types';
+import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 export const Renderer2d: FunctionalComponent = (_, children) => {
@@ -12,7 +12,7 @@ export const Renderer2d: FunctionalComponent = (_, children) => {
 export function update2d(
   hostEl: HTMLElement,
   viewport: Viewport,
-  camera: Camera,
+  camera: ReceivedPerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const elements = Array.from(hostEl.children)
@@ -27,7 +27,7 @@ export function update2d(
         camera.position,
         positionWorld
       );
-      const occluded = depthBuffer?.isOccluded(viewport, positionWorld, camera);
+      const occluded = depthBuffer?.isOccluded(viewport, positionWorld);
 
       return {
         element: el,
@@ -50,7 +50,7 @@ function updateTransform(
   element: HTMLVertexViewerDomElementElement,
   viewport: Viewport,
   worldPt: Vector3.Vector3,
-  camera: Camera
+  camera: ReceivedPerspectiveCamera
 ): void {
   const ndcPt = Vector3.transformMatrix(worldPt, camera.projectionViewMatrix);
   const screenPt = viewport.transformPoint(ndcPt);

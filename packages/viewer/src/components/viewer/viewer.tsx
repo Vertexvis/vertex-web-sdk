@@ -21,6 +21,7 @@ import {
   Color,
   Async,
   EventDispatcher,
+  Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
 import {
@@ -88,7 +89,8 @@ import {
   defaultSelectionMaterial,
   fromHex,
 } from '../../lib/scenes/colorMaterial';
-import { decodePng } from '../../workers/png-decoder';
+import { ReceivedFrame } from '../../lib/types/frame';
+import { mapFrame } from '../../lib/protos/decoders';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -178,7 +180,7 @@ export class Viewer {
    */
   @Prop() public streamAttributes?: ViewerStreamAttributes | string;
 
-  @Prop({ mutable: true }) public depthBuffer: DepthBuffer | undefined;
+  @Prop({ mutable: true }) public frame: ReceivedFrame | undefined;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -984,16 +986,9 @@ export class Viewer {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
         const data = { canvas, dimensions, frame };
+        this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
         this.frameReceived.emit(frame);
         const drawnFrame = await this.canvasRenderer(data);
-        if (frame.depthBuffer != null) {
-          const png = await decodePng(frame.depthBuffer);
-          this.depthBuffer = DepthBuffer.fromPng(
-            png,
-            frame.imageAttributes.imageRect,
-            frame.imageAttributes.scaleFactor
-          );
-        }
         this.dispatchFrameDrawn(drawnFrame);
       }
     }

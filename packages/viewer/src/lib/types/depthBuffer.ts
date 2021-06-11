@@ -1,7 +1,7 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { IDecodedPNG } from 'fast-png';
-import { Camera } from '../scenes/camera';
+import { ReceivedPerspectiveCamera } from './frame';
 import { Viewport } from './viewport';
 
 /**
@@ -29,6 +29,7 @@ export class DepthBuffer {
    * @param data A 16-bit typed array of depth values.
    */
   public constructor(
+    private readonly camera: ReceivedPerspectiveCamera,
     public readonly depthDimensions: Dimensions.Dimensions,
     public readonly imageRect: Rectangle.Rectangle,
     public readonly imageScaleFactor: number,
@@ -46,11 +47,13 @@ export class DepthBuffer {
    */
   public static fromPng(
     png: Pick<IDecodedPNG, 'width' | 'height' | 'data'>,
+    camera: ReceivedPerspectiveCamera,
     imageRect: Rectangle.Rectangle,
     imageScaleFactor: number
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
       return new DepthBuffer(
+        camera,
         Dimensions.create(png.width, png.height),
         imageRect,
         imageScaleFactor,
@@ -68,11 +71,8 @@ export class DepthBuffer {
    * @param point A 2D point within the viewport.
    * @returns A depth between 0 and 1.
    */
-  public getDepthAtViewportPoint(
-    point: Point.Point,
-    clippingPlanes: Pick<Camera, 'near' | 'far'>
-  ): number {
-    const { near, far } = clippingPlanes;
+  public getDepthAtViewportPoint(point: Point.Point): number {
+    const { near, far } = this.camera;
     const depth = this.getDepth(point);
     return depth * (far - near) + near;
   }
@@ -86,15 +86,8 @@ export class DepthBuffer {
    * @param camera The camera used to generate this depth buffer.
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
-  public isOccluded(
-    viewport: Viewport,
-    worldPt: Vector3.Vector3,
-    camera: Pick<
-      Camera,
-      'position' | 'projectionViewMatrix' | 'direction' | 'near' | 'far'
-    >
-  ): boolean {
-    const { position, direction, projectionViewMatrix } = camera;
+  public isOccluded(viewport: Viewport, worldPt: Vector3.Vector3): boolean {
+    const { position, direction, projectionViewMatrix } = this.camera;
 
     const eyeToPoint = Vector3.subtract(worldPt, position);
     const projected = Vector3.project(eyeToPoint, direction);
@@ -102,7 +95,7 @@ export class DepthBuffer {
 
     const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
     const screenPt = viewport.transformPoint(ndc);
-    const normalizedDepth = this.getDepthAtViewportPoint(screenPt, camera);
+    const normalizedDepth = this.getDepthAtViewportPoint(screenPt);
 
     return distance > normalizedDepth;
   }
