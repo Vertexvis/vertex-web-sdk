@@ -1,26 +1,26 @@
 import { FrameRenderer } from './renderer';
-import { Frame } from '../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { DepthProvider } from './depth';
+import { ReceivedFrame } from '../types/frame';
 
 const REPORTING_INTERVAL_MS = 1000;
 
 export interface DrawFrame {
   canvas: CanvasRenderingContext2D;
   dimensions: Dimensions.Dimensions;
-  frame: Frame.Frame;
+  frame: ReceivedFrame;
 }
 
 export interface DrawPixel {
   dimensions: Dimensions.Dimensions;
-  frame: Frame.Frame;
+  frame: ReceivedFrame;
   point: Point.Point;
 }
 
-export type CanvasRenderer = FrameRenderer<DrawFrame, Frame.Frame>;
+export type CanvasRenderer = FrameRenderer<DrawFrame, ReceivedFrame>;
 
 export type CanvasDepthProvider = DepthProvider<DrawPixel>;
 
@@ -53,53 +53,14 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
   );
 }
 
-function getPixel(image: HtmlImage, data: DrawPixel): Pixel {
-  const position = getFramePosition(image, data.frame, data.dimensions);
-
-  const canvas = window.document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  const ctx = canvas.getContext('2d');
-
-  if (ctx != null) {
-    ctx.clearRect(0, 0, 1, 1);
-    ctx.drawImage(
-      image.image,
-      data.point.x - position.x,
-      data.point.y - position.y,
-      1,
-      1,
-      0,
-      0,
-      1,
-      1
-    );
-
-    const pixel = ctx.getImageData(0, 0, 1, 1).data;
-    return {
-      r: pixel[0] || 0,
-      g: pixel[1] || 0,
-      b: pixel[2] || 0,
-      a: pixel[3] || 0,
-    };
-  }
-
-  return {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 0,
-  };
-}
-
 function getFramePosition(
   image: HtmlImage,
-  frame: Frame.Frame,
+  frame: ReceivedFrame,
   dimensions: Dimensions.Dimensions
 ): FramePosition {
-  const { imageAttributes } = frame;
+  const { image: imageAttr, dimensions: frameDimensions } = frame;
   const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
-    imageAttributes.frameDimensions
+    frameDimensions
   );
   const fitTo = Rectangle.fromDimensions(dimensions);
   const fit = Rectangle.containFit(fitTo, imageRect);
@@ -108,10 +69,10 @@ function getFramePosition(
   const scaleY = fit.height / imageRect.height;
 
   return {
-    x: imageAttributes.imageRect.x * scaleX,
-    y: imageAttributes.imageRect.y * scaleY,
-    width: image.image.width * imageAttributes.scaleFactor * scaleX,
-    height: image.image.height * imageAttributes.scaleFactor * scaleY,
+    x: imageAttr.rect.x * scaleX,
+    y: imageAttr.rect.y * scaleY,
+    width: image.image.width * imageAttr.scale * scaleX,
+    height: image.image.height * imageAttr.scale * scaleY,
   };
 }
 
@@ -197,7 +158,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 
   return async (data) => {
     const frameNumber = data.frame.sequenceNumber;
-    const image = await loadImageBytes(data.frame.image);
+    const image = await loadImageBytes(data.frame.image.data);
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
@@ -211,15 +172,11 @@ export function createCanvasRenderer(): CanvasRenderer {
 
 export function createCanvasDepthProvider(): CanvasDepthProvider {
   return async (data) => {
-    if (data.frame.depthBuffer != null) {
-      const image = await loadImageBytes(data.frame.depthBuffer);
-
-      const pixel = getPixel(image, data);
-      image.dispose();
-
-      return pixel.r / 255.0;
+    const depthBuffer = await data.frame.depthBuffer();
+    if (depthBuffer != null) {
+      const depth = depthBuffer.getNormalizedDepthAtPoint(data.point);
+      return depth;
     }
-
     return -1;
   };
 }

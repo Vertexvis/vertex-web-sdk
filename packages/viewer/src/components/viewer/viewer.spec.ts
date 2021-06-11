@@ -191,7 +191,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream('123');
       viewer.unload();
 
-      const frame = await viewer.getFrame();
+      const frame = await viewer.frame;
       expect(frame).toBeUndefined();
     });
   });

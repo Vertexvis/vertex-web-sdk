@@ -17,7 +17,14 @@ export { Environment } from './lib/environment';
 
 export { Scene } from './lib/scenes';
 
-export { Frame, LoadableResource, SynchronizedClock } from './lib/types';
+export {
+  ReceivedFrame,
+  ReceivedFrameImage,
+  ReceivedFrameScene,
+  ReceivedPerspectiveCamera,
+  LoadableResource,
+  SynchronizedClock,
+} from './lib/types';
 
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 

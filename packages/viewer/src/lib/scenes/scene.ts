@@ -1,5 +1,4 @@
 import { StreamApi } from '@vertexvis/stream-api';
-import { Frame } from '../types';
 import { Camera } from './camera';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
@@ -15,6 +14,7 @@ import { UUID } from '@vertexvis/utils';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
+import { ReceivedFrame } from '../types/frame';
 
 interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
@@ -213,7 +213,7 @@ export type ImageScaleProvider = () => Point.Point | undefined;
 export class Scene {
   public constructor(
     private stream: StreamApi,
-    private frame: Frame.Frame,
+    private frame: ReceivedFrame,
     private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID,
     private defaultSelectionMaterial: ColorMaterial
@@ -249,11 +249,17 @@ export class Scene {
    * An instance of the current camera of the scene.
    */
   public camera(): Camera {
+    const { scene } = this.frame;
+    const data = {
+      position: scene.camera.position,
+      lookAt: scene.camera.lookAt,
+      up: scene.camera.up,
+    };
     return new Camera(
       this.stream,
       Dimensions.aspectRatio(this.viewport()),
-      this.frame.sceneAttributes.camera,
-      this.frame.sceneAttributes.visibleBoundingBox
+      data,
+      this.frame.scene.boundingBox
     );
   }
 
@@ -261,10 +267,7 @@ export class Scene {
    * CrossSectioner to update cross sectioning planes and get current configuration.
    */
   public crossSectioning(): CrossSectioner {
-    return new CrossSectioner(
-      this.stream,
-      this.frame.sceneAttributes.crossSectioning
-    );
+    return new CrossSectioner(this.stream, this.frame.scene.crossSection);
   }
 
   /**
@@ -278,7 +281,7 @@ export class Scene {
    * The current viewport of the scene, in pixels.
    */
   public viewport(): Dimensions.Dimensions {
-    return this.frame.imageAttributes.frameDimensions;
+    return this.frame.dimensions;
   }
 
   /**

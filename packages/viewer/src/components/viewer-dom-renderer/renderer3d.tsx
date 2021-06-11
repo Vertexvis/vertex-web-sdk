@@ -62,7 +62,7 @@ function updateElement(
   const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
 
   const occluded = depthBuffer?.isOccluded(viewport, positionWorld);
-  element.toggleAttribute('occluded', occluded);
+  element.occluded = occluded ?? false;
 
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(matrixWorld);

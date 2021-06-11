@@ -5,8 +5,9 @@ import {
   Fixtures,
 } from '@vertexvis/stream-api';
 import { StreamApiEventDispatcher } from '../dispatcher';
-import { Frame } from '../../types';
 import '../../../testing/domMocks';
+import { Mapper } from '@vertexvis/utils';
+import { mapFrame } from '../../mappers';
 
 describe(StreamApiEventDispatcher, () => {
   const correlationId = 'corr-id';
@@ -15,12 +16,12 @@ describe(StreamApiEventDispatcher, () => {
   const dispatcher = new StreamApiEventDispatcher(
     stream,
     (msg) =>
-      msg.request.drawFrame.frameCorrelationIds.some(
+      msg.request?.drawFrame?.frameCorrelationIds?.some(
         (id) => id === correlationId
-      ),
+      ) ?? false,
     (msg) =>
-      msg.request.drawFrame != null
-        ? Frame.fromProto(msg.request.drawFrame)
+      msg.request?.drawFrame != null
+        ? Mapper.ifInvalidThrow(mapFrame)(msg.request.drawFrame)
         : undefined,
     5
   );

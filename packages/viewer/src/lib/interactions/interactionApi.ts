@@ -286,7 +286,8 @@ export class InteractionApi {
       const epsilon = (3 * distance * delta) / viewport.height;
 
       const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
-      return camera.update({ position });
+      const newCamera = camera.update({ position });
+      return newCamera;
     });
   }
 

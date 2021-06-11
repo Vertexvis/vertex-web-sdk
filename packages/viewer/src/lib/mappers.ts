@@ -6,13 +6,14 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
-import { CrossSectioning, FrameCamera } from '../types';
 import {
+  CrossSectioning,
+  FrameCamera,
   ReceivedFrame,
   ReceivedFrameImage,
   ReceivedFrameScene,
   ReceivedPerspectiveCamera,
-} from '../types/frame';
+} from './types';
 
 export function mapRGBi(): M.Func<vertexvis.protobuf.core.IRGBAi, Color.Color> {
   return M.defineMapper(
@@ -107,30 +108,28 @@ export const mapSectionPlane: M.Func<
   ([normal, offset]) => ({ normal, offset })
 );
 
-function mapImageAttributes(): M.Func<
+const mapImageAttributes: M.Func<
   vertexvis.protobuf.stream.IImageAttributes,
   {
     frameDimensions: Dimensions.Dimensions;
     imageRect: Rectangle.Rectangle;
     scaleFactor: number;
   }
-> {
-  return M.defineMapper(
-    M.read(
-      M.mapProp(
-        'frameDimensions',
-        M.compose(M.required('frameDimensions'), mapDim())
-      ),
-      M.mapProp('imageRect', M.compose(M.required('imageRect'), mapRect())),
-      M.mapProp('scaleFactor', M.required('scaleFactor'))
+> = M.defineMapper(
+  M.read(
+    M.mapProp(
+      'frameDimensions',
+      M.compose(M.required('frameDimensions'), mapDim())
     ),
-    ([frameDimensions, imageRect, scaleFactor]) => ({
-      frameDimensions,
-      imageRect,
-      scaleFactor,
-    })
-  );
-}
+    M.mapProp('imageRect', M.compose(M.required('imageRect'), mapRect())),
+    M.mapProp('scaleFactor', M.required('scaleFactor'))
+  ),
+  ([frameDimensions, imageRect, scaleFactor]) => ({
+    frameDimensions,
+    imageRect,
+    scaleFactor,
+  })
+);
 
 export const mapCrossSectioning: M.Func<
   vertexvis.protobuf.stream.ICrossSectioning,
@@ -161,7 +160,7 @@ const mapFrameImageAttributes: M.Func<
   M.read(
     M.mapProp(
       'imageAttributes',
-      M.compose(M.required('imageAttributes'), mapImageAttributes())
+      M.compose(M.required('imageAttributes'), mapImageAttributes)
     )
   ),
   ([imageAttr]) => imageAttr
@@ -252,14 +251,16 @@ export const mapFrame: M.Func<
   M.read(
     M.mapProp('frameCorrelationIds', (ids) => (ids != null ? ids : [])),
     M.requiredProp('sequenceNumber'),
+    M.compose(mapFrameImageAttributes, M.getProp('frameDimensions')),
     mapFrameScene,
     mapFrameImage,
     M.getProp('depthBuffer')
   ),
-  ([correlationIds, seqNum, scene, image, depthBuffer]) => {
+  ([correlationIds, seqNum, frameDimensions, scene, image, depthBuffer]) => {
     return new ReceivedFrame(
       correlationIds,
       seqNum,
+      frameDimensions,
       image,
       scene,
       depthBuffer?.value || undefined

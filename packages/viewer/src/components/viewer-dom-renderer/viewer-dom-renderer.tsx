@@ -44,11 +44,23 @@ export class ViewerDomRenderer {
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
-  @State()
-  private camera?: ReceivedPerspectiveCamera;
+  /**
+   * The current camera of the frame.
+   *
+   * This property will automatically be set when supplying a viewer to the
+   * component, or when added as a child to `<vertex-viewer>`.
+   */
+  @Prop({ mutable: true })
+  public camera?: ReceivedPerspectiveCamera;
 
-  @State()
-  private depthBuffer?: DepthBuffer;
+  /**
+   * The current depth buffer of the frame.
+   *
+   * This property will automatically be set when supplying a viewer to the
+   * component, or when added as a child to `<vertex-viewer>`.
+   */
+  @Prop({ mutable: true })
+  public depthBuffer?: DepthBuffer;
 
   @State()
   private viewport: Viewport = new Viewport(Dimensions.create(0, 0));
@@ -141,9 +153,7 @@ export class ViewerDomRenderer {
   }
 
   private handleViewerFrameDrawn = async (): Promise<void> => {
-    const frame = this.viewer?.frame;
-    this.depthBuffer = await frame?.depthBuffer();
-    this.camera = frame?.scene?.camera;
+    this.updatePropsFromViewer();
   };
 
   private handleResize(): void {
@@ -156,5 +166,11 @@ export class ViewerDomRenderer {
 
   private handleChildrenChange(): void {
     this.invalidateFrame();
+  }
+
+  private async updatePropsFromViewer(): Promise<void> {
+    const frame = this.viewer?.frame;
+    this.depthBuffer = await frame?.depthBuffer();
+    this.camera = frame?.scene?.camera;
   }
 }

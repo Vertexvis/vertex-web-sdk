@@ -65,16 +65,41 @@ export class DepthBuffer {
   }
 
   /**
-   * Computes the depth from a 2D point within the viewport. The returned value
-   * is normalized between 0 and 1.
+   * Computes the depth from a 2D point within the viewport, where the returned
+   * depth is a value that's between the near and far plane of the camera.
+   *
+   * @param point A 2D point within the viewport.
+   * @returns A depth between the near and far plane..
+   */
+  public getLinearDepthAtPoint(point: Point.Point): number {
+    const { near, far } = this.camera;
+    const depth = this.getNormalizedDepthAtPoint(point);
+    return depth * (far - near) + near;
+  }
+
+  /**
+   * Computes a depth from a 2D point within the viewport, where the returned
+   * depth is a normalized value (`[0, 1]`) between the near and far plane.
    *
    * @param point A 2D point within the viewport.
    * @returns A depth between 0 and 1.
    */
-  public getDepthAtViewportPoint(point: Point.Point): number {
-    const { near, far } = this.camera;
-    const depth = this.getDepth(point);
-    return depth * (far - near) + near;
+  public getNormalizedDepthAtPoint(point: Point.Point): number {
+    const { width, height } = this.depthDimensions;
+
+    const offset = Point.subtract(point, this.imageRect);
+    const scale = 1 / this.imageScaleFactor;
+    const pixel = Point.scale(offset, scale, scale);
+
+    if (pixel.x >= 1 && pixel.y >= 1 && pixel.x <= width && pixel.y <= height) {
+      const index = Math.floor(pixel.x) - 1 + (Math.floor(pixel.y) - 1) * width;
+      const depth = this.data[index];
+      return (
+        (depth || DepthBuffer.MAX_DEPTH_VALUE) / DepthBuffer.MAX_DEPTH_VALUE
+      );
+    } else {
+      return 1;
+    }
   }
 
   /**
@@ -95,26 +120,8 @@ export class DepthBuffer {
 
     const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
     const screenPt = viewport.transformPoint(ndc);
-    const normalizedDepth = this.getDepthAtViewportPoint(screenPt);
+    const depth = this.getLinearDepthAtPoint(screenPt);
 
-    return distance > normalizedDepth;
-  }
-
-  private getDepth(point: Point.Point): number {
-    const { width, height } = this.depthDimensions;
-
-    const offset = Point.subtract(point, this.imageRect);
-    const scale = 1 / this.imageScaleFactor;
-    const pixel = Point.scale(offset, scale, scale);
-
-    if (pixel.x >= 1 && pixel.y >= 1 && pixel.x <= width && pixel.y <= height) {
-      const index = Math.floor(pixel.x) - 1 + (Math.floor(pixel.y) - 1) * width;
-      const depth = this.data[index];
-      return (
-        (depth || DepthBuffer.MAX_DEPTH_VALUE) / DepthBuffer.MAX_DEPTH_VALUE
-      );
-    } else {
-      return 1;
-    }
+    return distance > depth;
   }
 }

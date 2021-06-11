@@ -24,12 +24,7 @@ import {
   Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import {
-  DepthBuffer,
-  Frame,
-  LoadableResource,
-  SynchronizedClock,
-} from '../../lib/types';
+import { LoadableResource, SynchronizedClock } from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -90,7 +85,7 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { ReceivedFrame } from '../../lib/types/frame';
-import { mapFrame } from '../../lib/protos/decoders';
+import { mapFrame } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -180,6 +175,10 @@ export class Viewer {
    */
   @Prop() public streamAttributes?: ViewerStreamAttributes | string;
 
+  /**
+   * The last frame that was received, which can be used to inspect the scene
+   * and camera information.
+   */
   @Prop({ mutable: true }) public frame: ReceivedFrame | undefined;
 
   /**
@@ -213,14 +212,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<Frame.Frame>;
+  @Event() public frameReceived!: EventEmitter<ReceivedFrame>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<Frame.Frame>;
+  @Event() public frameDrawn!: EventEmitter<ReceivedFrame>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -262,7 +261,7 @@ export class Viewer {
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
-  private lastFrame?: Frame.Frame;
+  private lastFrame?: ReceivedFrame;
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
 
@@ -282,7 +281,7 @@ export class Viewer {
   private isStreamStarted = false;
   private internalStreamAttributes?: ViewerStreamAttributes;
 
-  private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
+  private internalFrameDrawnDispatcher = new EventDispatcher<ReceivedFrame>();
 
   private clock?: SynchronizedClock;
 
@@ -440,7 +439,7 @@ export class Viewer {
    * @private For internal use only.
    */
   @Method()
-  public async dispatchFrameDrawn(frame: Frame.Frame): Promise<void> {
+  public async dispatchFrameDrawn(frame: ReceivedFrame): Promise<void> {
     this.lastFrame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
@@ -645,6 +644,7 @@ export class Viewer {
       this.streamId = undefined;
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
+      this.frame = undefined;
       this.sceneViewId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
@@ -660,11 +660,6 @@ export class Viewer {
   @Method()
   public async scene(): Promise<Scene> {
     return this.createScene();
-  }
-
-  @Method()
-  public async getFrame(): Promise<Frame.Frame | undefined> {
-    return this.lastFrame;
   }
 
   /**
@@ -982,20 +977,20 @@ export class Viewer {
     const dimensions = this.getCanvasDimensions();
 
     if (this.canvasElement != null && dimensions != null) {
-      const frame = Frame.fromProto(payload);
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        const data = { canvas, dimensions, frame };
         this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
-        this.frameReceived.emit(frame);
+
+        const data = { canvas, dimensions, frame: this.frame };
+        this.frameReceived.emit(this.frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
     }
   }
 
-  private waitNextDrawnFrame(timeout?: number): Promise<Frame.Frame> {
-    const frame = new Promise<Frame.Frame>((resolve) => {
+  private waitNextDrawnFrame(timeout?: number): Promise<ReceivedFrame> {
+    const frame = new Promise<ReceivedFrame>((resolve) => {
       const disposable = this.internalFrameDrawnDispatcher.on((frame) => {
         resolve(frame);
         disposable.dispose();

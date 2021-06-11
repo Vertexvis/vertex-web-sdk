@@ -11,8 +11,7 @@
 | `clientId`             | `client-id`               | The Client ID associated with your Vertex Application.                                                                                                                          | `string \| undefined`                           | `undefined`                |
 | `config`               | `config`                  | An object or JSON encoded string that defines configuration settings for the viewer.                                                                                            | `Config \| string \| undefined`                 | `undefined`                |
 | `configEnv`            | `config-env`              | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                    | `"platdev" \| "platprod" \| "platstaging"`      | `'platprod'`               |
-| `depthBuffer`          | --                        |                                                                                                                                                                                 | `DepthBuffer \| undefined`                      | `undefined`                |
-| `frame`                | --                        |                                                                                                                                                                                 | `ReceivedFrame \| undefined`                    | `undefined`                |
+| `frame`                | --                        | The last frame that was received, which can be used to inspect the scene and camera information.                                                                                | `ReceivedFrame \| undefined`                    | `undefined`                |
 | `keyboardControls`     | `keyboard-controls`       | Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.                             | `boolean`                                       | `true`                     |
 | `rotateAroundTapPoint` | `rotate-around-tap-point` | Enables or disables the default rotation interaction being changed to rotate around the mouse down location.                                                                    | `boolean`                                       | `false`                    |
 | `selectionMaterial`    | `selection-material`      | The default hex color or material to use when selecting items.                                                                                                                  | `ColorMaterial \| string`                       | `defaultSelectionMaterial` |
@@ -28,8 +27,8 @@
 | `connectionChange` | Emits an event when the connection status changes for the viewer                                                                                                                                                | `CustomEvent<ConnectedStatus \| ConnectingStatus \| DisconnectedStatus>` |
 | `dimensionschange` |                                                                                                                                                                                                                 | `CustomEvent<Dimensions>`                                                |
 | `doubletap`        | Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.                                                                     | `CustomEvent<TapEventDetails>`                                           |
-| `frameDrawn`       | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                  | `CustomEvent<Frame>`                                                     |
-| `frameReceived`    | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                        | `CustomEvent<Frame>`                                                     |
+| `frameDrawn`       | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                  | `CustomEvent<ReceivedFrame>`                                             |
+| `frameReceived`    | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                        | `CustomEvent<ReceivedFrame>`                                             |
 | `longpress`        | Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click. | `CustomEvent<TapEventDetails>`                                           |
 | `sceneReady`       | Emits an event when the scene is ready to be interacted with.                                                                                                                                                   | `CustomEvent<void>`                                                      |
 | `sessionidchange`  | Used for internals or testing.                                                                                                                                                                                  | `CustomEvent<string>`                                                    |
@@ -39,7 +38,7 @@
 
 ## Methods
 
-### `dispatchFrameDrawn(frame: Frame.Frame) => Promise<void>`
+### `dispatchFrameDrawn(frame: ReceivedFrame) => Promise<void>`
 
 
 
@@ -56,16 +55,6 @@ Type: `Promise<void>`
 #### Returns
 
 Type: `Promise<BaseInteractionHandler | undefined>`
-
-
-
-### `getFrame() => Promise<Frame.Frame | undefined>`
-
-
-
-#### Returns
-
-Type: `Promise<Frame | undefined>`
 
 
 
