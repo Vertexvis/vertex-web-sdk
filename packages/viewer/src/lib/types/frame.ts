@@ -11,15 +11,15 @@ import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
 import { decodePng } from '../../workers/png-decoder.worker';
 
-export class ReceivedFrame {
+export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
 
   public constructor(
     public readonly correlationIds: string[],
     public readonly sequenceNumber: number,
     public readonly dimensions: Dimensions.Dimensions,
-    public readonly image: ReceivedFrameImage,
-    public readonly scene: ReceivedFrameScene,
+    public readonly image: FrameImage,
+    public readonly scene: FrameScene,
     public readonly depthBufferBytes: Uint8Array | undefined
   ) {}
 
@@ -42,7 +42,7 @@ export class ReceivedFrame {
   }
 }
 
-export class ReceivedFrameImage {
+export class FrameImage {
   public constructor(
     public readonly rect: Rectangle.Rectangle,
     public readonly scale: number,
@@ -50,23 +50,22 @@ export class ReceivedFrameImage {
   ) {}
 }
 
-export class ReceivedFrameScene {
+export class FrameScene {
   public constructor(
-    public readonly camera: ReceivedPerspectiveCamera,
+    public readonly camera: FramePerspectiveCamera,
     public readonly boundingBox: BoundingBox.BoundingBox,
     public readonly crossSection: CrossSectioning.CrossSectioning
   ) {}
 }
 
-interface ReceivedCameraLike {
+interface FrameCameraMatrices {
   readonly worldMatrix: Matrix4.Matrix4;
   readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionMatrix: Matrix4.Matrix4;
   readonly projectionViewMatrix: Matrix4.Matrix4;
-  readonly direction: Vector3.Vector3;
 }
 
-interface ReceivedPerspectiveCameraLike {
+interface FramePerspectiveCameraLike {
   readonly position: Vector3.Vector3;
   readonly lookAt: Vector3.Vector3;
   readonly up: Vector3.Vector3;
@@ -76,33 +75,41 @@ interface ReceivedPerspectiveCameraLike {
   readonly fovY: number;
 }
 
-export class ReceivedPerspectiveCamera
-  implements ReceivedCameraLike, ReceivedPerspectiveCameraLike {
-  private cameraMatrices?: ReceivedCameraLike;
+export class FramePerspectiveCamera
+  implements FrameCameraMatrices, FramePerspectiveCameraLike {
+  private cameraMatrices?: FrameCameraMatrices;
 
-  public constructor(private readonly data: ReceivedPerspectiveCameraLike) {}
+  public constructor(
+    public readonly position: Vector3.Vector3,
+    public readonly lookAt: Vector3.Vector3,
+    public readonly up: Vector3.Vector3,
+    public readonly near: number,
+    public readonly far: number,
+    public readonly aspectRatio: number,
+    public readonly fovY: number
+  ) {}
 
   public static fromBoundingBox(
     camera: FrameCamera.FrameCamera,
     boundingBox: BoundingBox.BoundingBox,
     aspectRatio: number
-  ): ReceivedPerspectiveCamera {
+  ): FramePerspectiveCamera {
     const { near, far } = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
       boundingBox,
       camera
     );
-    return new ReceivedPerspectiveCamera({
-      position: camera.position,
-      lookAt: camera.lookAt,
-      up: camera.up,
+    return new FramePerspectiveCamera(
+      camera.position,
+      camera.lookAt,
+      camera.up,
       near,
       far,
       aspectRatio,
-      fovY: 45,
-    });
+      45
+    );
   }
 
-  private computeCameraMatrices(): ReceivedCameraLike {
+  private computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
       const viewMatrix = Matrix4.makeLookAtView(
         this.position,
@@ -120,23 +127,19 @@ export class ReceivedPerspectiveCamera
         projectionMatrix,
         viewMatrix
       );
-      const direction = Vector3.normalize(
-        Vector3.subtract(this.lookAt, this.position)
-      );
 
       this.cameraMatrices = {
         viewMatrix,
         worldMatrix,
         projectionMatrix,
         projectionViewMatrix,
-        direction,
       };
     }
     return this.cameraMatrices;
   }
 
   public get direction(): Vector3.Vector3 {
-    return this.computeCameraMatrices().direction;
+    return Vector3.normalize(Vector3.subtract(this.lookAt, this.position));
   }
 
   public get worldMatrix(): Matrix4.Matrix4 {
@@ -153,33 +156,5 @@ export class ReceivedPerspectiveCamera
 
   public get projectionViewMatrix(): Matrix4.Matrix4 {
     return this.computeCameraMatrices().projectionViewMatrix;
-  }
-
-  public get position(): Vector3.Vector3 {
-    return this.data.position;
-  }
-
-  public get lookAt(): Vector3.Vector3 {
-    return this.data.lookAt;
-  }
-
-  public get up(): Vector3.Vector3 {
-    return this.data.up;
-  }
-
-  public get near(): number {
-    return this.data.near;
-  }
-
-  public get far(): number {
-    return this.data.far;
-  }
-
-  public get aspectRatio(): number {
-    return this.data.aspectRatio;
-  }
-
-  public get fovY(): number {
-    return this.data.fovY;
   }
 }

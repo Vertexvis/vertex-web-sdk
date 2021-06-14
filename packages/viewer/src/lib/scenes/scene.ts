@@ -14,7 +14,7 @@ import { UUID } from '@vertexvis/utils';
 import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
-import { ReceivedFrame } from '../types/frame';
+import { Frame } from '../types/frame';
 
 interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
@@ -213,7 +213,7 @@ export type ImageScaleProvider = () => Point.Point | undefined;
 export class Scene {
   public constructor(
     private stream: StreamApi,
-    private frame: ReceivedFrame,
+    private frame: Frame,
     private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID,
     private defaultSelectionMaterial: ColorMaterial

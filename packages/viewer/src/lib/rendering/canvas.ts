@@ -4,23 +4,23 @@ import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { DepthProvider } from './depth';
-import { ReceivedFrame } from '../types/frame';
+import { Frame } from '../types/frame';
 
 const REPORTING_INTERVAL_MS = 1000;
 
 export interface DrawFrame {
   canvas: CanvasRenderingContext2D;
   dimensions: Dimensions.Dimensions;
-  frame: ReceivedFrame;
+  frame: Frame;
 }
 
 export interface DrawPixel {
   dimensions: Dimensions.Dimensions;
-  frame: ReceivedFrame;
+  frame: Frame;
   point: Point.Point;
 }
 
-export type CanvasRenderer = FrameRenderer<DrawFrame, ReceivedFrame>;
+export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
 
 export type CanvasDepthProvider = DepthProvider<DrawPixel>;
 
@@ -48,7 +48,7 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
 
 function getFramePosition(
   image: HtmlImage,
-  frame: ReceivedFrame,
+  frame: Frame,
   dimensions: Dimensions.Dimensions
 ): FramePosition {
   const { image: imageAttr, dimensions: frameDimensions } = frame;

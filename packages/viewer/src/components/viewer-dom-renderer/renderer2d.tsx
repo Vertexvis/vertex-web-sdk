@@ -2,7 +2,7 @@
 import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 export const Renderer2d: FunctionalComponent = (_, children) => {
@@ -12,7 +12,7 @@ export const Renderer2d: FunctionalComponent = (_, children) => {
 export function update2d(
   hostEl: HTMLElement,
   viewport: Viewport,
-  camera: ReceivedPerspectiveCamera,
+  camera: FramePerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const elements = Array.from(hostEl.children)
@@ -51,7 +51,7 @@ function updateTransform(
   element: HTMLVertexViewerDomElementElement,
   viewport: Viewport,
   worldPt: Vector3.Vector3,
-  camera: ReceivedPerspectiveCamera
+  camera: FramePerspectiveCamera
 ): void {
   const ndcPt = Vector3.transformMatrix(worldPt, camera.projectionViewMatrix);
   const screenPt = viewport.transformPoint(ndcPt);

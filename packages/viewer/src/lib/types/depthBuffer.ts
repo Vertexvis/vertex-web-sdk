@@ -1,7 +1,7 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { IDecodedPNG } from 'fast-png';
-import { ReceivedPerspectiveCamera } from './frame';
+import { FramePerspectiveCamera } from './frame';
 import { Viewport } from './viewport';
 
 /**
@@ -29,7 +29,7 @@ export class DepthBuffer {
    * @param data A 16-bit typed array of depth values.
    */
   public constructor(
-    private readonly camera: ReceivedPerspectiveCamera,
+    private readonly camera: FramePerspectiveCamera,
     public readonly depthDimensions: Dimensions.Dimensions,
     public readonly imageRect: Rectangle.Rectangle,
     public readonly imageScaleFactor: number,
@@ -47,7 +47,7 @@ export class DepthBuffer {
    */
   public static fromPng(
     png: Pick<IDecodedPNG, 'width' | 'height' | 'data'>,
-    camera: ReceivedPerspectiveCamera,
+    camera: FramePerspectiveCamera,
     imageRect: Rectangle.Rectangle,
     imageScaleFactor: number
   ): DepthBuffer {

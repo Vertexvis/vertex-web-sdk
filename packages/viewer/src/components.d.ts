@@ -22,7 +22,7 @@ import {
   ViewerStreamAttributes,
 } from './lib/stream/streamAttributes';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
-import { ReceivedFrame, ReceivedPerspectiveCamera } from './lib/types/frame';
+import { Frame, FramePerspectiveCamera } from './lib/types/frame';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import { Dimensions, Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
@@ -211,7 +211,7 @@ export namespace Components {
     /**
      * @private For internal use only.
      */
-    dispatchFrameDrawn: (frame: ReceivedFrame) => Promise<void>;
+    dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
      */
@@ -219,7 +219,7 @@ export namespace Components {
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
      */
-    frame: ReceivedFrame | undefined;
+    frame: Frame | undefined;
     getBaseInteractionHandler: () => Promise<
       BaseInteractionHandler | undefined
     >;
@@ -390,7 +390,7 @@ export namespace Components {
     /**
      * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
-    camera?: ReceivedPerspectiveCamera;
+    camera?: FramePerspectiveCamera;
     /**
      * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
@@ -650,7 +650,7 @@ declare namespace LocalJSX {
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
      */
-    frame?: ReceivedFrame | undefined;
+    frame?: Frame | undefined;
     /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
@@ -667,11 +667,11 @@ declare namespace LocalJSX {
     /**
      * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameDrawn?: (event: CustomEvent<ReceivedFrame>) => void;
+    onFrameDrawn?: (event: CustomEvent<Frame>) => void;
     /**
      * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameReceived?: (event: CustomEvent<ReceivedFrame>) => void;
+    onFrameReceived?: (event: CustomEvent<Frame>) => void;
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
      */
@@ -774,7 +774,7 @@ declare namespace LocalJSX {
     /**
      * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
-    camera?: ReceivedPerspectiveCamera;
+    camera?: FramePerspectiveCamera;
     /**
      * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */

@@ -9,13 +9,13 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
-import { DepthBuffer, ReceivedPerspectiveCamera } from '../../lib/types';
+import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
 import { createDepthImageBytes } from '../../testing/fixtures';
 
 import '../../testing/domMocks';
 
 describe('<vertex-viewer-dom-renderer>', () => {
-  const camera = ReceivedPerspectiveCamera.fromBoundingBox(
+  const camera = FramePerspectiveCamera.fromBoundingBox(
     {
       position: { x: 0, y: 0, z: -100 },
       lookAt: Vector3.origin(),

@@ -9,10 +9,10 @@ import {
 import {
   CrossSectioning,
   FrameCamera,
-  ReceivedFrame,
-  ReceivedFrameImage,
-  ReceivedFrameScene,
-  ReceivedPerspectiveCamera,
+  Frame,
+  FrameImage,
+  FrameScene,
+  FramePerspectiveCamera,
 } from './types';
 
 export function mapRGBi(): M.Func<vertexvis.protobuf.core.IRGBAi, Color.Color> {
@@ -168,11 +168,11 @@ const mapFrameImageAttributes: M.Func<
 
 const mapFrameImage: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  ReceivedFrameImage
+  FrameImage
 > = M.defineMapper(
   M.read(mapFrameImageAttributes, M.mapProp('image', M.required('image'))),
   ([imageAttr, image]) =>
-    new ReceivedFrameImage(imageAttr.imageRect, imageAttr.scaleFactor, image)
+    new FrameImage(imageAttr.imageRect, imageAttr.scaleFactor, image)
 );
 
 const mapSceneAttributes: M.Func<
@@ -220,11 +220,11 @@ const mapFrameSceneAttributes: M.Func<
 
 const mapFrameCamera: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  ReceivedPerspectiveCamera
+  FramePerspectiveCamera
 > = M.defineMapper(
   M.read(mapFrameSceneAttributes, mapFrameImageAttributes),
   ([sceneAttr, imageAttr]) =>
-    ReceivedPerspectiveCamera.fromBoundingBox(
+    FramePerspectiveCamera.fromBoundingBox(
       sceneAttr.camera,
       sceneAttr.boundingBox,
       Dimensions.aspectRatio(imageAttr.frameDimensions)
@@ -233,20 +233,16 @@ const mapFrameCamera: M.Func<
 
 const mapFrameScene: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  ReceivedFrameScene
+  FrameScene
 > = M.defineMapper(
   M.read(mapFrameSceneAttributes, mapFrameCamera),
   ([sceneAttr, camera]) =>
-    new ReceivedFrameScene(
-      camera,
-      sceneAttr.boundingBox,
-      sceneAttr.crossSectioning
-    )
+    new FrameScene(camera, sceneAttr.boundingBox, sceneAttr.crossSectioning)
 );
 
 export const mapFrame: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  ReceivedFrame
+  Frame
 > = M.defineMapper(
   M.read(
     M.mapProp('frameCorrelationIds', (ids) => (ids != null ? ids : [])),
@@ -257,7 +253,7 @@ export const mapFrame: M.Func<
     M.getProp('depthBuffer')
   ),
   ([correlationIds, seqNum, frameDimensions, scene, image, depthBuffer]) => {
-    return new ReceivedFrame(
+    return new Frame(
       correlationIds,
       seqNum,
       frameDimensions,

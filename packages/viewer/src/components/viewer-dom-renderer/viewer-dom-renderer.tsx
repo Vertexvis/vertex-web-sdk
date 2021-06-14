@@ -12,7 +12,7 @@ import { Dimensions } from '@vertexvis/geometry';
 import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 
 export type ViewerDomRendererDrawMode = '2d' | '3d';
 
@@ -51,7 +51,7 @@ export class ViewerDomRenderer {
    * component, or when added as a child to `<vertex-viewer>`.
    */
   @Prop({ mutable: true })
-  public camera?: ReceivedPerspectiveCamera;
+  public camera?: FramePerspectiveCamera;
 
   /**
    * The current depth buffer of the frame.

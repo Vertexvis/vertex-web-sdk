@@ -2,11 +2,11 @@
 import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { ReceivedPerspectiveCamera } from '../../lib/types/frame';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 interface Props {
-  camera: ReceivedPerspectiveCamera;
+  camera: FramePerspectiveCamera;
   viewport: Viewport;
 }
 
@@ -34,7 +34,7 @@ export const Renderer3d: FunctionalComponent<Props> = (
 export function update3d(
   hostEl: HTMLElement,
   viewport: Viewport,
-  camera: ReceivedPerspectiveCamera,
+  camera: FramePerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < hostEl.children.length; i++) {
@@ -53,7 +53,7 @@ export function update3d(
 function updateElement(
   element: HTMLVertexViewerDomElementElement,
   viewport: Viewport,
-  camera: ReceivedPerspectiveCamera,
+  camera: FramePerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const { position, quaternion, scale } = parseDomElement(element);

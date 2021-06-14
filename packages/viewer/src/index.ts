@@ -18,10 +18,10 @@ export { Environment } from './lib/environment';
 export { Scene } from './lib/scenes';
 
 export {
-  ReceivedFrame,
-  ReceivedFrameImage,
-  ReceivedFrameScene,
-  ReceivedPerspectiveCamera,
+  Frame as ReceivedFrame,
+  FrameImage as ReceivedFrameImage,
+  FrameScene as ReceivedFrameScene,
+  FramePerspectiveCamera as ReceivedPerspectiveCamera,
   LoadableResource,
   SynchronizedClock,
 } from './lib/types';

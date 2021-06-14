@@ -6,12 +6,12 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { DepthBuffer } from '../depthBuffer';
-import { ReceivedPerspectiveCamera } from '../frame';
+import { FramePerspectiveCamera } from '../frame';
 import { createDepthImageBytes } from '../../../testing/fixtures';
 import { Viewport } from '../viewport';
 
 describe(DepthBuffer, () => {
-  const camera = ReceivedPerspectiveCamera.fromBoundingBox(
+  const camera = FramePerspectiveCamera.fromBoundingBox(
     {
       position: { x: 0, y: 0, z: -100 },
       lookAt: Vector3.origin(),

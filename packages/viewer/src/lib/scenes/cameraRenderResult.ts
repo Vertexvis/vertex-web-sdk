@@ -1,7 +1,7 @@
 import { StreamApi } from '@vertexvis/stream-api';
 import { Result } from '../stream/result';
 import { StreamApiEventDispatcher } from '../stream/dispatcher';
-import { ReceivedFrame } from '../types/frame';
+import { Frame } from '../types/frame';
 import { mapFrame } from '../mappers';
 import { Mapper } from '@vertexvis/utils';
 
@@ -13,7 +13,7 @@ export interface RenderResultIds {
 export class CameraRenderResult implements Result {
   public data = undefined;
   public onAnimationCompleted: StreamApiEventDispatcher<string>;
-  public onFrameReceived: StreamApiEventDispatcher<ReceivedFrame>;
+  public onFrameReceived: StreamApiEventDispatcher<Frame>;
 
   public constructor(
     stream: StreamApi,

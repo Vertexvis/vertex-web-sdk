@@ -85,7 +85,7 @@ import {
   defaultSelectionMaterial,
   fromHex,
 } from '../../lib/scenes/colorMaterial';
-import { ReceivedFrame } from '../../lib/types/frame';
+import { Frame } from '../../lib/types/frame';
 import { mapFrame } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
@@ -204,7 +204,7 @@ export class Viewer {
    * The last frame that was received, which can be used to inspect the scene
    * and camera information.
    */
-  @Prop({ mutable: true }) public frame: ReceivedFrame | undefined;
+  @Prop({ mutable: true }) public frame: Frame | undefined;
 
   /**
    * An object containing the stream attribute values sent to rendering. This
@@ -240,14 +240,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<ReceivedFrame>;
+  @Event() public frameReceived!: EventEmitter<Frame>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<ReceivedFrame>;
+  @Event() public frameDrawn!: EventEmitter<Frame>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -289,7 +289,7 @@ export class Viewer {
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
-  private lastFrame?: ReceivedFrame;
+  private lastFrame?: Frame;
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
 
@@ -308,7 +308,7 @@ export class Viewer {
   private jwt?: string;
   private isStreamStarted = false;
 
-  private internalFrameDrawnDispatcher = new EventDispatcher<ReceivedFrame>();
+  private internalFrameDrawnDispatcher = new EventDispatcher<Frame>();
 
   private clock?: SynchronizedClock;
 
@@ -459,7 +459,7 @@ export class Viewer {
    * @private For internal use only.
    */
   @Method()
-  public async dispatchFrameDrawn(frame: ReceivedFrame): Promise<void> {
+  public async dispatchFrameDrawn(frame: Frame): Promise<void> {
     this.lastFrame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
@@ -999,8 +999,8 @@ export class Viewer {
     }
   }
 
-  private waitNextDrawnFrame(timeout?: number): Promise<ReceivedFrame> {
-    const frame = new Promise<ReceivedFrame>((resolve) => {
+  private waitNextDrawnFrame(timeout?: number): Promise<Frame> {
+    const frame = new Promise<Frame>((resolve) => {
       const disposable = this.internalFrameDrawnDispatcher.on((frame) => {
         resolve(frame);
         disposable.dispose();
