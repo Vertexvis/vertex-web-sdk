@@ -55,39 +55,9 @@
         width: 100%;
         height: 100%;
       }
-
-      .pin-2d {
-        user-select: none;
-        height: 24px;
-        padding: 4px;
-        border: 1px solid black;
-        background-color: goldenrod;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-      }
-
-      .pin-3d {
-        user-select: none;
-        width: 20px;
-        height: 20px;
-        background-color: red;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-      }
-      .pin-3d[occluded] {
-        opacity: 0;
-      }
     </style>
 
     <script type="module">
-      import { Vector3 } from 'https://unpkg.com/@vertexvis/geometry@latest/dist/cdn/bundle.esm.js';
-
-      let counter = 1;
-
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
@@ -95,44 +65,7 @@
       async function main() {
         await window.customElements.whenDefined('vertex-viewer');
 
-        const renderer3d = document.getElementById('renderer');
-
         const viewer = document.getElementById('viewer');
-        viewer.config = {
-          flags: {
-            logWsMessages: true,
-          },
-        };
-        viewer.rotateAroundTapPoint = true;
-        // viewer.streamAttributes = {
-        //   depthBuffers: { enabled: true, frameType: 'all' },
-        // };
-
-        viewer.addEventListener('tap', async ({ detail }) => {
-          const scene = await viewer.scene();
-          const hitRes = await scene.raycaster().hitItems(detail.position);
-
-          const [hit] = hitRes.hits;
-
-          if (hit != null) {
-            const position = Vector3.add(
-              hit.hitPoint,
-              Vector3.scale(2, hit.hitNormal)
-            );
-
-            const element = document.createElement('vertex-viewer-dom-element');
-            element.position = position;
-            element.scale = { x: 0.3, y: 0.3, z: 0.3 };
-            element.className = 'pin-3d';
-
-            const div = document.createElement('div');
-            div.textContent = `${counter++}`;
-            element.appendChild(div);
-
-            renderer3d.append(element);
-          }
-        });
-
         const tree = document.getElementById('scene-tree');
       }
     </script>
@@ -151,34 +84,10 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
+          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:Y1GojTXJlaHE-Y06TusMa9rDFFJyARqIyBl9"
-          rotate-around-tap-point
+          src="urn:vertexvis:stream-key:key"
         >
-          <vertex-viewer-dom-renderer draw-mode="2d">
-            <vertex-viewer-dom-element class="pin-2d" position="[0, 0, -100]">
-              <div>Back</div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element class="pin-2d" position="[0, 0, 100]">
-              <div>Front</div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element class="pin-2d" position="[-100, 0, 0]">
-              <div>Left</div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element class="pin-2d" position="[100, 0, 0]">
-              <div>Right</div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element class="pin-2d" position="[0, -100, 0]">
-              <div>Bottom</div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-dom-element class="pin-2d" position="[0, 100, 0]">
-              <div>Top</div>
-            </vertex-viewer-dom-element>
-          </vertex-viewer-dom-renderer>
-
-          <vertex-viewer-dom-renderer id="renderer" draw-mode="3d">
-          </vertex-viewer-dom-renderer>
-
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
