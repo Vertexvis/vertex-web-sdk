@@ -131,6 +131,44 @@ property.
 </html>
 ```
 
+## Occlusion
+The renderer supports occluding its elements based on the element's position and
+depth information returned on a frame. **Note:** you must opt-in to requesting
+a depth buffer for all frames in order for occlusion to work.
+
+Occlusion can be enabled or disabled per element by setting its `occlusion-off`
+attribute.
+
+**Example:** Styling an element when occluded.
+
+```html
+<html>
+  <head>
+    <style>
+      vertex-viewer-dom-renderer[occluded] {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Opt-in to depth buffers for all frames. -->
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" depth-buffers="all">
+      <vertex-viewer-dom-renderer>
+        <!-- This element will be included in occlusion testing. -->
+        <vertex-viewer-dom-element position="[0, 0, 100]">
+          <div class="pin">1</div>
+        </vertex-viewer-dom-element>
+
+        <!-- This element will be exempt from occlusion testing. -->
+        <vertex-viewer-dom-element position="[0, 0, -100]" occlusion-off>
+          <div class="pin">2</div>
+        </vertex-viewer-dom-element>
+      </vertex-viewer-dom-renderer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
 <!-- Auto Generated Below -->
 
 
