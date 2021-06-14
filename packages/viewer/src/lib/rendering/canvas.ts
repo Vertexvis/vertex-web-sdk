@@ -33,13 +33,6 @@ interface FramePosition {
   height: number;
 }
 
-interface Pixel {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
-
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const position = getFramePosition(image, data.frame, data.dimensions);
 
