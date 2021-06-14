@@ -61,7 +61,8 @@ function updateElement(
   const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
   const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
 
-  const occluded = depthBuffer?.isOccluded(viewport, positionWorld);
+  const occluded =
+    !element.occlusionOff && depthBuffer?.isOccluded(viewport, positionWorld);
   element.occluded = occluded ?? false;
 
   if (element.billboardOff) {

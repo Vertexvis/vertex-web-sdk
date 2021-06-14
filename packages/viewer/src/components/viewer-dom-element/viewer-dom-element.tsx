@@ -53,7 +53,28 @@ export class ViewerDomElement {
   public scale: Vector3.Vector3 | string = Vector3.create(1, 1, 1);
 
   /**
-   * Indicates if the element is hidden by geometry.
+   * Disables occlusion testing for this element. Defaults to enabled. When
+   * enabled, the elements position will be tested against the current depth
+   * buffer. If the position is occluded, then the `occluded` attribute will be
+   * set.
+   */
+  @Prop()
+  public occlusionOff = false;
+
+  /**
+   * Indicates if the element is hidden by geometry. This property can be used
+   * with a CSS selector to modify the appearance of the element when its
+   * occluded.
+   *
+   * @example
+   *
+   * ```html
+   * <style>
+   *   vertex-viewer-dom-element[occluded] {
+   *     opacity: 0;
+   *   }
+   * </style>
+   * ```
    */
   @Prop({ reflect: true })
   public occluded = false;

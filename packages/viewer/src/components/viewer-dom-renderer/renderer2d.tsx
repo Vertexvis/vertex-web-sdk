@@ -27,7 +27,8 @@ export function update2d(
         camera.position,
         positionWorld
       );
-      const occluded = depthBuffer?.isOccluded(viewport, positionWorld);
+      const occluded =
+        !el.occlusionOff && depthBuffer?.isOccluded(viewport, positionWorld);
 
       return {
         element: el,

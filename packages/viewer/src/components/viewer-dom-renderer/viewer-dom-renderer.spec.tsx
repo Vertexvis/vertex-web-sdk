@@ -96,6 +96,29 @@ describe('<vertex-viewer-dom-renderer>', () => {
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
     });
+
+    it('does not set occluded if element has occlusion disabled', async () => {
+      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      isOccluded.mockReturnValue(true);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            drawMode="2d"
+            camera={camera}
+            depthBuffer={depthBuffer}
+          >
+            <vertex-viewer-dom-element occlusionOff></vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root?.querySelector(
+        'vertex-viewer-dom-element'
+      ) as HTMLElement;
+      expect(el.getAttribute('occluded')).toBeNull();
+    });
   });
 
   describe('3d draw mode', () => {
@@ -179,6 +202,29 @@ describe('<vertex-viewer-dom-renderer>', () => {
         'vertex-viewer-dom-element'
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
+    });
+
+    it('does not set occluded if element occlusion disabled', async () => {
+      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      isOccluded.mockReturnValue(true);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            drawMode="3d"
+            camera={camera}
+            depthBuffer={depthBuffer}
+          >
+            <vertex-viewer-dom-element occlusionOff></vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root?.querySelector(
+        'vertex-viewer-dom-element'
+      ) as HTMLElement;
+      expect(el.getAttribute('occluded')).toBeNull();
     });
   });
 
