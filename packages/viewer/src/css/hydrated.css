@@ -1,0 +1,6 @@
+vertex-viewer-dom-renderer {
+  visibility: hidden;
+}
+vertex-viewer-dom-renderer.hydrated {
+  visibility: unset;
+}
