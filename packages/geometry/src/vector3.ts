@@ -270,13 +270,22 @@ export function angleTo(a: Vector3, b: Vector3): number {
 }
 
 /**
- * Performs a projection of `projected` onto `onto`.
+ * Performs a projection of a `vector` onto `onNormal`.
  *
- * The result of the projection is the `onto` vector scaled corresponding to
- * the dot product of the `onto` and `projected` vectors.
+ * A projection is represented as the nearest point along a normal to a vector,
+ * which constructs a triangle from the origin, to the vector, to the projected
+ * point.
+ *
+ * ```
+ * Vector -->  *   * <-- Projected
+ *              \
+ *               \ | <-- Normal
+ *                \|
+ *                 * <-- Origin
+ * ```
  */
-export function projection(onto: Vector3, projected: Vector3): Vector3 {
-  return scale(dot(onto, projected) / magnitude(onto), onto);
+export function project(vector: Vector3, onNormal: Vector3): Vector3 {
+  return scale(dot(onNormal, vector) / magnitude(onNormal), onNormal);
 }
 
 /**

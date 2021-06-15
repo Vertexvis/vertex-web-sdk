@@ -309,7 +309,7 @@ describe(Scene, () => {
     it('should return crossSectioner', () => {
       const cs = scene.crossSectioning();
 
-      expect(cs.current()).toEqual(frame.sceneAttributes.crossSectioning);
+      expect(cs.current()).toEqual(frame.scene.crossSection);
     });
   });
 });

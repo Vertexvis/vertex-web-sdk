@@ -8,9 +8,11 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Dimensions, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
+import { DepthBuffer, Viewport } from '../../lib/types';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 
 export type ViewerDomRendererDrawMode = '2d' | '3d';
 
@@ -42,17 +44,26 @@ export class ViewerDomRenderer {
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
-  @State()
-  private dimensions = Dimensions.create(0, 0);
+  /**
+   * The current camera of the frame.
+   *
+   * This property will automatically be set when supplying a viewer to the
+   * component, or when added as a child to `<vertex-viewer>`.
+   */
+  @Prop({ mutable: true })
+  public camera?: FramePerspectiveCamera;
+
+  /**
+   * The current depth buffer of the frame.
+   *
+   * This property will automatically be set when supplying a viewer to the
+   * component, or when added as a child to `<vertex-viewer>`.
+   */
+  @Prop({ mutable: true })
+  public depthBuffer?: DepthBuffer;
 
   @State()
-  private projectionMatrix = Matrix4.makeZero();
-
-  @State()
-  private viewMatrix = Matrix4.makeZero();
-
-  @State()
-  private cameraMatrixWorld = Matrix4.makeZero();
+  private viewport: Viewport = new Viewport(Dimensions.create(0, 0));
 
   @State()
   private invalidateFrameCounter = 0;
@@ -66,32 +77,35 @@ export class ViewerDomRenderer {
   protected componentWillLoad(): void {
     const resized = new ResizeObserver(() => this.handleResize());
     resized.observe(this.hostEl);
+
+    const mutation = new MutationObserver(() => this.handleChildrenChange());
+    mutation.observe(this.hostEl, { childList: true });
   }
 
   /**
    * @ignore
    */
   public render(): h.JSX.IntrinsicElements {
-    if (this.drawMode === '2d') {
-      return (
-        <Host>
-          <Renderer2d>
-            <slot></slot>
-          </Renderer2d>
-        </Host>
-      );
+    if (this.camera != null) {
+      if (this.drawMode === '2d') {
+        return (
+          <Host>
+            <Renderer2d>
+              <slot></slot>
+            </Renderer2d>
+          </Host>
+        );
+      } else {
+        return (
+          <Host>
+            <Renderer3d camera={this.camera} viewport={this.viewport}>
+              <slot></slot>
+            </Renderer3d>
+          </Host>
+        );
+      }
     } else {
-      return (
-        <Host>
-          <Renderer3d
-            projectionMatrix={this.projectionMatrix}
-            viewMatrix={this.viewMatrix}
-            dimensions={this.dimensions}
-          >
-            <slot></slot>
-          </Renderer3d>
-        </Host>
-      );
+      return <Host></Host>;
     }
   }
 
@@ -126,46 +140,42 @@ export class ViewerDomRenderer {
     this.invalidateFrameCounter = this.invalidateFrameCounter + 1;
   }
 
-  private updateElements(): void {
-    if (this.drawMode === '3d') {
-      update3d(this.hostEl, this.viewMatrix);
-    } else {
-      const halfDim = {
-        width: this.dimensions.width / 2,
-        height: this.dimensions.height / 2,
-      };
-      const cameraPosition = Vector3.fromMatrixPosition(this.cameraMatrixWorld);
-      const viewProjectionMatrix = Matrix4.multiply(
-        this.projectionMatrix,
-        this.viewMatrix
-      );
+  private async updateElements(): Promise<void> {
+    const { viewport, camera } = this;
 
-      update2d(this.hostEl, halfDim, cameraPosition, viewProjectionMatrix);
+    if (camera != null) {
+      if (this.drawMode === '3d') {
+        update3d(this.hostEl, viewport, camera, this.depthBuffer);
+      } else {
+        update2d(this.hostEl, viewport, camera, this.depthBuffer);
+      }
     }
   }
 
   private handleViewerFrameDrawn = async (): Promise<void> => {
-    const scene = await this.viewer?.scene();
-    const camera = scene?.camera();
-
-    if (camera != null) {
-      const { position, lookAt, up, near, far, fovY, aspectRatio } = camera;
-      this.viewMatrix = Matrix4.makeLookAtView(position, lookAt, up);
-      this.cameraMatrixWorld = Matrix4.invert(this.viewMatrix);
-      this.projectionMatrix = Matrix4.makePerspective(
-        near,
-        far,
-        fovY,
-        aspectRatio
-      );
-    } else {
-      this.viewMatrix = Matrix4.makeZero();
-      this.projectionMatrix = Matrix4.makeZero();
-    }
+    this.updatePropsFromViewer();
   };
 
   private handleResize(): void {
     const bounds = this.hostEl.getBoundingClientRect();
-    this.dimensions = { width: bounds.width, height: bounds.height };
+    this.viewport = new Viewport({
+      width: bounds.width,
+      height: bounds.height,
+    });
+  }
+
+  private handleChildrenChange(): void {
+    this.invalidateFrame();
+  }
+
+  private async updatePropsFromViewer(): Promise<void> {
+    const { frame, streamAttributes } = this.viewer || {};
+
+    this.depthBuffer =
+      streamAttributes?.depthBuffers?.enabled &&
+      streamAttributes.depthBuffers.frameType === 'all'
+        ? await frame?.depthBuffer()
+        : undefined;
+    this.camera = frame?.scene?.camera;
   }
 }

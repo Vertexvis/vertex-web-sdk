@@ -191,7 +191,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream('123');
       viewer.unload();
 
-      const frame = await viewer.getFrame();
+      const frame = await viewer.frame;
       expect(frame).toBeUndefined();
     });
   });
@@ -360,10 +360,9 @@ describe('vertex-viewer', () => {
       expect(api.updateStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
-            depthBuffers: {
+            depthBuffers: expect.objectContaining({
               enabled: { value: false },
-              frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
-            },
+            }),
           }),
         })
       );

@@ -8,6 +8,7 @@ import * as Euler from './euler';
 import * as Matrix from './matrix';
 import * as Matrix2 from './matrix2';
 import * as Matrix4 from './matrix4';
+import * as Plane from './plane';
 import * as Point from './point';
 import * as Quaternion from './quaternion';
 import * as Rectangle from './rectangle';
@@ -21,6 +22,7 @@ export {
   Matrix,
   Matrix2,
   Matrix4,
+  Plane,
   Point,
   Quaternion,
   Rectangle,

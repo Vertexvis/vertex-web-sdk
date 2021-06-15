@@ -17,10 +17,13 @@ import { SceneTreeController } from './components/scene-tree/lib/controller';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { ViewerStreamAttributes } from './lib/stream/streamAttributes';
+import {
+  DepthBufferFrameType,
+  ViewerStreamAttributes,
+} from './lib/stream/streamAttributes';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
+import { Frame, FramePerspectiveCamera } from './lib/types/frame';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
-import { Frame } from './lib/types';
 import { ConnectionStatus } from './components/viewer/viewer';
 import { Dimensions, Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
@@ -33,6 +36,7 @@ import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
+import { DepthBuffer } from './lib/types';
 import {
   ViewerIconName,
   ViewerIconSize,
@@ -201,13 +205,24 @@ export namespace Components {
      */
     configEnv: Environment;
     /**
+     * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     */
+    depthBuffers?: DepthBufferFrameType;
+    /**
      * @private For internal use only.
      */
-    dispatchFrameDrawn: (frame: Frame.Frame) => Promise<void>;
+    dispatchFrameDrawn: (frame: Frame) => Promise<void>;
+    /**
+     * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
+     */
+    experimentalGhostingOpacity: number;
+    /**
+     * The last frame that was received, which can be used to inspect the scene and camera information.
+     */
+    frame: Frame | undefined;
     getBaseInteractionHandler: () => Promise<
       BaseInteractionHandler | undefined
     >;
-    getFrame: () => Promise<Frame.Frame | undefined>;
     getInteractionHandlers: () => Promise<InteractionHandler[]>;
     getJwt: () => Promise<string | undefined>;
     /**
@@ -312,9 +327,10 @@ export namespace Components {
      */
     src?: string;
     /**
-     * An object or JSON encoded string that defines configuration settings for the viewer.
+     * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
+     * @readonly
      */
-    streamAttributes?: ViewerStreamAttributes | string;
+    streamAttributes: ViewerStreamAttributes;
     /**
      * Disconnects the websocket and removes any internal state associated with the scene.
      */
@@ -349,6 +365,15 @@ export namespace Components {
      */
     billboardOff: boolean;
     /**
+     * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
+     * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
+     */
+    occluded: boolean;
+    /**
+     * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
+     */
+    occlusionOff: boolean;
+    /**
      * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
     position: Vector3.Vector3 | string;
@@ -362,6 +387,14 @@ export namespace Components {
     scale: Vector3.Vector3 | string;
   }
   interface VertexViewerDomRenderer {
+    /**
+     * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    camera?: FramePerspectiveCamera;
+    /**
+     * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
     /**
      * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */
@@ -607,6 +640,18 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     /**
+     * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     */
+    depthBuffers?: DepthBufferFrameType;
+    /**
+     * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
+     */
+    experimentalGhostingOpacity?: number;
+    /**
+     * The last frame that was received, which can be used to inspect the scene and camera information.
+     */
+    frame?: Frame | undefined;
+    /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
     keyboardControls?: boolean;
@@ -622,11 +667,11 @@ declare namespace LocalJSX {
     /**
      * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameDrawn?: (event: CustomEvent<Frame.Frame>) => void;
+    onFrameDrawn?: (event: CustomEvent<Frame>) => void;
     /**
      * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameReceived?: (event: CustomEvent<Frame.Frame>) => void;
+    onFrameReceived?: (event: CustomEvent<Frame>) => void;
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
      */
@@ -666,9 +711,10 @@ declare namespace LocalJSX {
      */
     src?: string;
     /**
-     * An object or JSON encoded string that defines configuration settings for the viewer.
+     * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
+     * @readonly
      */
-    streamAttributes?: ViewerStreamAttributes | string;
+    streamAttributes?: ViewerStreamAttributes;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
@@ -699,6 +745,15 @@ declare namespace LocalJSX {
      */
     billboardOff?: boolean;
     /**
+     * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
+     * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
+     */
+    occluded?: boolean;
+    /**
+     * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
+     */
+    occlusionOff?: boolean;
+    /**
      * An event that's emitted when a property of this component changes.
      */
     onPropertyChange?: (event: CustomEvent<void>) => void;
@@ -716,6 +771,14 @@ declare namespace LocalJSX {
     scale?: Vector3.Vector3 | string;
   }
   interface VertexViewerDomRenderer {
+    /**
+     * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    camera?: FramePerspectiveCamera;
+    /**
+     * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
     /**
      * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */

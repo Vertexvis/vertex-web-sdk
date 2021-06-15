@@ -55,7 +55,7 @@ describe(toProtoStreamAttributes, () => {
 
     it('returns invalid for any value that is not supported', () => {
       const depthBuffers: any = {
-        frameType: 'all',
+        frameType: 'unsupported-type',
         enabled: { value: true },
       };
 

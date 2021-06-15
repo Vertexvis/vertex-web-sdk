@@ -1,4 +1,4 @@
-import { Animation, FlyTo, FrameCamera } from '../types';
+import { Animation, ClippingPlanes, FlyTo, FrameCamera } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
@@ -10,11 +10,6 @@ const PI_OVER_360 = 0.008726646259972;
 
 interface CameraRenderOptions {
   animation?: Animation.Animation;
-}
-
-interface ClippingPlanes {
-  near: number;
-  far: number;
 }
 
 export class TerminalFlyToExecutor {
@@ -315,36 +310,11 @@ export class Camera implements FrameCamera.FrameCamera {
 
   private computeClippingPlanes(
     camera: FrameCamera.FrameCamera
-  ): ClippingPlanes {
-    const boundingBoxCenter = BoundingBox.center(this.boundingBox);
-    const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
-    const centerToBoundingPlane = Vector3.subtract(
-      this.boundingBox.max,
-      boundingBoxCenter
+  ): ClippingPlanes.ClippingPlanes {
+    return ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+      this.boundingBox,
+      camera
     );
-    const distanceToCenterAlongViewVec =
-      Math.abs(
-        Vector3.dot(
-          Vector3.subtract(camera.lookAt, camera.position),
-          cameraToCenter
-        )
-      ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
-    const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
-    let far = distanceToCenterAlongViewVec + radius;
-    let near = far * 0.01;
-
-    if (near > distanceToCenterAlongViewVec - radius) {
-      if (near > 1000) {
-        const difference = near - 1000;
-        near = 1000;
-        far -= difference;
-      } else {
-      }
-    } else {
-      near = distanceToCenterAlongViewVec - radius;
-    }
-
-    return { far, near };
   }
 
   /**
@@ -395,7 +365,6 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get near(): number {
     const { near } = this.computeClippingPlanes(this.data);
-
     return near;
   }
 
@@ -404,7 +373,6 @@ export class Camera implements FrameCamera.FrameCamera {
    */
   public get far(): number {
     const { far } = this.computeClippingPlanes(this.data);
-
     return far;
   }
 }

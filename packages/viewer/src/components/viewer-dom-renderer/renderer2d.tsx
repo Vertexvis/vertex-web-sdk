@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
-import { Dimensions, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { DepthBuffer, Viewport } from '../../lib/types';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 export const Renderer2d: FunctionalComponent = (_, children) => {
@@ -9,9 +11,9 @@ export const Renderer2d: FunctionalComponent = (_, children) => {
 
 export function update2d(
   hostEl: HTMLElement,
-  halfDim: Dimensions.Dimensions,
-  cameraPosition: Vector3.Vector3,
-  viewProjectionMatrix: Matrix4.Matrix4
+  viewport: Viewport,
+  camera: FramePerspectiveCamera,
+  depthBuffer: DepthBuffer | undefined
 ): void {
   const elements = Array.from(hostEl.children)
     .filter((el) => el.nodeName === 'VERTEX-VIEWER-DOM-ELEMENT')
@@ -22,38 +24,41 @@ export function update2d(
       const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
       const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
       const distanceToCamera = Vector3.distanceSquared(
-        cameraPosition,
+        camera.position,
         positionWorld
       );
+      const occluded =
+        !el.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
 
       return {
         element: el,
         positionWorld,
         distanceToCamera,
+        occluded,
       };
     })
     .sort((a, b) => a.distanceToCamera - b.distanceToCamera);
 
   for (let i = 0; i < elements.length; i++) {
-    const { element, positionWorld } = elements[i];
-    updateTransform(element, halfDim, positionWorld, viewProjectionMatrix);
+    const { element, positionWorld, occluded } = elements[i];
+    element.occluded = occluded ?? false;
+    updateTransform(element, viewport, positionWorld, camera);
     updateDepth(element, i, elements.length);
   }
 }
 
 function updateTransform(
   element: HTMLVertexViewerDomElementElement,
-  halfDim: Dimensions.Dimensions,
-  positionWorld: Vector3.Vector3,
-  viewProjectionMatrix: Matrix4.Matrix4
+  viewport: Viewport,
+  worldPt: Vector3.Vector3,
+  camera: FramePerspectiveCamera
 ): void {
-  const position = Vector3.transformMatrix(positionWorld, viewProjectionMatrix);
+  const ndcPt = Vector3.transformMatrix(worldPt, camera.projectionViewMatrix);
+  const screenPt = viewport.transformNdc(ndcPt);
 
   element.style.transform = [
     `translate(-50%, -50%)`,
-    `translate(${position.x * halfDim.width + halfDim.width}px, ${
-      -position.y * halfDim.height + halfDim.height
-    }px)`,
+    `translate(${screenPt.x}px, ${screenPt.y}px)`,
   ].join(' ');
 }
 

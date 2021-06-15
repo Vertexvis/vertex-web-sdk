@@ -49,6 +49,17 @@ export function drawFrame(
         lookAt: { x: 0, y: 0, z: 0 },
         up: { x: 0, y: 1, z: 0 },
       },
+      visibleBoundingBox: {
+        xmin: -1,
+        ymin: -1,
+        zmin: -1,
+        xmax: 1,
+        ymax: 1,
+        zmax: 1,
+      },
+      crossSectioning: {
+        sectionPlanes: [],
+      },
     },
     imageAttributes: {
       frameDimensions: { width: 200, height: 150 },

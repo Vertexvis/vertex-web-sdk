@@ -13,16 +13,7 @@ import * as Fixtures from '../../../testing/fixtures';
 import { loadImageBytes } from '../imageLoaders';
 import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../meters';
-
-interface MockCanvasContext {
-  clearRect: jest.Mock;
-  drawImage: jest.Mock;
-  getImageData: jest.Mock<{ data: Array<number | undefined> }>;
-}
-
-interface MockCanvas {
-  getContext: jest.Mock<MockCanvasContext | undefined>;
-}
+import { Viewport } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = new HTMLCanvasElement().getContext('2d')!;
@@ -34,18 +25,20 @@ const image = {
 const drawFrame1: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
-  frame: { ...Fixtures.frame, sequenceNumber: 1 },
+  frame: Fixtures.frame,
+  viewport: new Viewport(Dimensions.create(100, 50)),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
-  frame: { ...Fixtures.frame },
+  frame: Fixtures.frame,
+  viewport: new Viewport(Dimensions.create(100, 50)),
 };
 
 const drawPixel: DrawPixel = {
   dimensions: Dimensions.create(100, 50),
-  frame: { ...Fixtures.frame },
+  frame: Fixtures.frame,
   point: Point.create(0, 0),
 };
 
@@ -82,23 +75,6 @@ describe(createCanvasRenderer, () => {
 });
 
 describe(createCanvasDepthProvider, () => {
-  const createMockContext = (value?: number): MockCanvasContext => ({
-    clearRect: jest.fn(),
-    drawImage: jest.fn(),
-    getImageData: jest.fn(() => ({
-      data: [value, value, value, 255],
-    })),
-  });
-  const createMockCanvas = (context?: MockCanvasContext): MockCanvas => ({
-    getContext: jest.fn(() => context),
-  });
-  const mockCreateElement = (canvas: MockCanvas) => (name: string) => {
-    if (name === 'canvas') {
-      return canvas as any;
-    }
-    return window.document.createElement(name);
-  };
-
   (loadImageBytes as jest.Mock).mockResolvedValue(image);
 
   beforeEach(() => {
@@ -106,34 +82,9 @@ describe(createCanvasDepthProvider, () => {
   });
 
   it('returns depth from the current frame', async () => {
-    const spy = jest.spyOn(window.document, 'createElement');
-    spy.mockImplementation(
-      mockCreateElement(createMockCanvas(createMockContext(50)))
-    );
-
     const renderer = createCanvasDepthProvider();
     const result = await renderer(drawPixel);
-    expect(result).toBeCloseTo(0.196);
-  });
-
-  it('returns zero if the image data is undefined', async () => {
-    const spy = jest.spyOn(window.document, 'createElement');
-    spy.mockImplementation(
-      mockCreateElement(createMockCanvas(createMockContext()))
-    );
-
-    const renderer = createCanvasDepthProvider();
-    const result = await renderer(drawPixel);
-    expect(result).toBeCloseTo(0);
-  });
-
-  it('returns zero if the canvas context is undefined', async () => {
-    const spy = jest.spyOn(window.document, 'createElement');
-    spy.mockImplementation(mockCreateElement(createMockCanvas()));
-
-    const renderer = createCanvasDepthProvider();
-    const result = await renderer(drawPixel);
-    expect(result).toBeCloseTo(0);
+    expect(result).toBeCloseTo(1);
   });
 });
 

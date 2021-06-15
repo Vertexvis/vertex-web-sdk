@@ -21,9 +21,10 @@ import {
   Color,
   Async,
   EventDispatcher,
+  Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import { Frame, LoadableResource, SynchronizedClock } from '../../lib/types';
+import { LoadableResource, SynchronizedClock, Viewport } from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -70,6 +71,7 @@ import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
 import {
   ViewerStreamAttributes,
   toProtoStreamAttributes,
+  DepthBufferFrameType,
 } from '../../lib/stream/streamAttributes';
 import {
   upsertStorageEntry,
@@ -83,6 +85,8 @@ import {
   defaultSelectionMaterial,
   fromHex,
 } from '../../lib/scenes/colorMaterial';
+import { Frame } from '../../lib/types/frame';
+import { mapFrame } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -167,10 +171,27 @@ export class Viewer {
   @Prop() public rotateAroundTapPoint = false;
 
   /**
-   * An object or JSON encoded string that defines configuration settings for
-   * the viewer.
+   * Specifies when a depth buffer is requested from rendering. Possible values
+   * are:
+   *
+   * * `undefined`: A depth buffer is never requested.
+   * * `final`: A depth buffer is only requested on the final frame.
+   * * `all`: A depth buffer is requested for every frame.
+   *
+   * Depth buffers can increase the amount of data that's sent to a client and
+   * can impact rendering performance. Values of `undefined` or `final` should
+   * be used when needing the highest rendering performance.
    */
-  @Prop() public streamAttributes?: ViewerStreamAttributes | string;
+  @Prop() public depthBuffers?: DepthBufferFrameType;
+
+  /**
+   * Specifies the opacity, between 0 and 100, for an experimental ghosting
+   * feature. When the value is non-zero, any scene items that are hidden will
+   * be appear translucent.
+   *
+   * **Note:** This feature is experimental, and may cause slower frame rates.
+   */
+  @Prop() public experimentalGhostingOpacity = 0;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -178,6 +199,22 @@ export class Viewer {
   @Prop() public selectionMaterial:
     | string
     | ColorMaterial = defaultSelectionMaterial;
+
+  /**
+   * The last frame that was received, which can be used to inspect the scene
+   * and camera information.
+   */
+  @Prop({ mutable: true }) public frame: Frame | undefined;
+
+  /**
+   * An object containing the stream attribute values sent to rendering. This
+   * value is updated automatically when properties like `depthBuffers` are
+   * set. You should not set this value directly, as it may be overridden.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true })
+  public streamAttributes: ViewerStreamAttributes = {};
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -203,14 +240,14 @@ export class Viewer {
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameReceived!: EventEmitter<Frame.Frame>;
+  @Event() public frameReceived!: EventEmitter<Frame>;
 
   /**
    * Emits an event when a frame has been drawn to the viewer's canvas. The event
    * will include details about the drawn frame, such as the `Scene` information
    * related to the scene.
    */
-  @Event() public frameDrawn!: EventEmitter<Frame.Frame>;
+  @Event() public frameDrawn!: EventEmitter<Frame>;
 
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
@@ -252,7 +289,7 @@ export class Viewer {
   private canvasRenderer!: CanvasRenderer;
   private resource?: LoadableResource.LoadableResource;
 
-  private lastFrame?: Frame.Frame;
+  private lastFrame?: Frame;
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
 
@@ -270,9 +307,8 @@ export class Viewer {
   private streamDisposable?: Disposable;
   private jwt?: string;
   private isStreamStarted = false;
-  private internalStreamAttributes?: ViewerStreamAttributes;
 
-  private internalFrameDrawnDispatcher = new EventDispatcher<Frame.Frame>();
+  private internalFrameDrawnDispatcher = new EventDispatcher<Frame>();
 
   private clock?: SynchronizedClock;
 
@@ -361,16 +397,9 @@ export class Viewer {
 
     if (this.rotateAroundTapPoint) {
       this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
-
-      this.internalStreamAttributes = {
-        ...this.internalStreamAttributes,
-        depthBuffers: {
-          enabled: true,
-          frameType: 'final',
-        },
-      };
     }
 
+    this.updateStreamAttributesProp();
     this.registerSlotChangeListeners();
     this.injectViewerApi();
   }
@@ -430,7 +459,7 @@ export class Viewer {
    * @private For internal use only.
    */
   @Method()
-  public async dispatchFrameDrawn(frame: Frame.Frame): Promise<void> {
+  public async dispatchFrameDrawn(frame: Frame): Promise<void> {
     this.lastFrame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
@@ -557,39 +586,42 @@ export class Viewer {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('streamAttributes')
-  public handleStreamAttributesChanged(
-    streamAttributes: ViewerStreamAttributes | undefined
+  protected handleStreamAttributesChanged(
+    streamAttributes: ViewerStreamAttributes
   ): void {
-    if (streamAttributes != null && this.isStreamStarted) {
+    if (this.isStreamStarted) {
       this.stream.updateStream({
-        streamAttributes: toProtoStreamAttributes({
-          ...this.internalStreamAttributes,
-          ...streamAttributes,
-        }),
+        streamAttributes: toProtoStreamAttributes(streamAttributes),
       });
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('rotateAroundTapPoint')
-  public handleRotateAboutTapPointChanged(
-    rotateAboutTapPoint: boolean | undefined
-  ): void {
-    if (rotateAboutTapPoint != null) {
-      this.internalStreamAttributes = {
-        ...this.internalStreamAttributes,
-        depthBuffers: {
-          enabled: rotateAboutTapPoint,
-          frameType: 'final',
-        },
-      };
+  protected handleRotateAboutTapPointChanged(): void {
+    this.updateStreamAttributesProp();
+  }
 
-      if (this.isStreamStarted) {
-        this.stream.updateStream({
-          streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
-        });
-      }
-    }
+  /**
+   * @ignore
+   */
+  @Watch('depthBuffers')
+  protected handleDepthBuffersChanged(): void {
+    this.updateStreamAttributesProp();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('experimentalGhostingOpacity')
+  protected handleExperimentalGhostingOpacity(): void {
+    this.updateStreamAttributesProp();
   }
 
   /**
@@ -635,6 +667,7 @@ export class Viewer {
       this.streamId = undefined;
       this.streamDisposable.dispose();
       this.lastFrame = undefined;
+      this.frame = undefined;
       this.sceneViewId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
@@ -650,11 +683,6 @@ export class Viewer {
   @Method()
   public async scene(): Promise<Scene> {
     return this.createScene();
-  }
-
-  @Method()
-  public async getFrame(): Promise<Frame.Frame | undefined> {
-    return this.lastFrame;
   }
 
   /**
@@ -687,19 +715,6 @@ export class Viewer {
    */
   public getConfig(): Config {
     return parseConfig(this.configEnv, this.config);
-  }
-
-  /**
-   * @private Used for internals or testing.
-   */
-  public getStreamAttributes(): ViewerStreamAttributes {
-    return this.streamAttributes != null &&
-      typeof this.streamAttributes === 'string'
-      ? {
-          ...this.internalStreamAttributes,
-          ...JSON.parse(this.streamAttributes),
-        }
-      : { ...this.internalStreamAttributes, ...this.streamAttributes };
   }
 
   /**
@@ -739,7 +754,7 @@ export class Viewer {
         streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
+        streamAttributes: toProtoStreamAttributes(this.streamAttributes),
         ...(queryResource?.type === 'scene-view-state' && {
           sceneViewStateId: { hex: queryResource.id },
         }),
@@ -853,7 +868,7 @@ export class Viewer {
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: toProtoStreamAttributes(this.getStreamAttributes()),
+        streamAttributes: toProtoStreamAttributes(this.streamAttributes),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
@@ -972,19 +987,28 @@ export class Viewer {
     const dimensions = this.getCanvasDimensions();
 
     if (this.canvasElement != null && dimensions != null) {
-      const frame = Frame.fromProto(payload);
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        const data = { canvas, dimensions, frame };
-        this.frameReceived.emit(frame);
+        this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
+
+        const data = {
+          canvas,
+          dimensions,
+          frame: this.frame,
+          viewport: new Viewport(
+            this.getCanvasDimensions() || Dimensions.create(0, 0)
+          ),
+        };
+
+        this.frameReceived.emit(this.frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
     }
   }
 
-  private waitNextDrawnFrame(timeout?: number): Promise<Frame.Frame> {
-    const frame = new Promise<Frame.Frame>((resolve) => {
+  private waitNextDrawnFrame(timeout?: number): Promise<Frame> {
+    const frame = new Promise<Frame>((resolve) => {
       const disposable = this.internalFrameDrawnDispatcher.on((frame) => {
         resolve(frame);
         disposable.dispose();
@@ -1138,5 +1162,24 @@ export class Viewer {
         this.dimensions.height / canvasDimensions.height
       );
     }
+  }
+
+  private updateStreamAttributesProp(): void {
+    const depthBuffers = this.getDepthBufferStreamAttributesValue();
+    this.streamAttributes = {
+      depthBuffers: { enabled: depthBuffers != null, frameType: depthBuffers },
+      experimentalGhosting: {
+        enabled: this.experimentalGhostingOpacity > 0,
+        opacity: this.experimentalGhostingOpacity,
+      },
+    };
+  }
+
+  private getDepthBufferStreamAttributesValue():
+    | DepthBufferFrameType
+    | undefined {
+    const depthBuffer =
+      this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
+    return depthBuffer;
   }
 }

@@ -1,24 +1,25 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
-import { Dimensions, Matrix4 } from '@vertexvis/geometry';
+import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { DepthBuffer, Viewport } from '../../lib/types';
+import { FramePerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 interface Props {
-  viewMatrix: Matrix4.Matrix4;
-  projectionMatrix: Matrix4.Matrix4;
-  dimensions: Dimensions.Dimensions;
+  camera: FramePerspectiveCamera;
+  viewport: Viewport;
 }
 
 export const Renderer3d: FunctionalComponent<Props> = (
-  { projectionMatrix, viewMatrix, dimensions },
+  { camera, viewport },
   children
 ) => {
-  const pMatrix = Matrix4.toObject(projectionMatrix);
-  const fovY = pMatrix.m22 * (dimensions.height / 2);
+  const pMatrix = Matrix4.toObject(camera.projectionMatrix);
+  const fovY = pMatrix.m22 * (viewport.height / 2);
   const cameraTransform = [
     `translateZ(${fovY}px)`,
-    getCameraCssMatrix(viewMatrix),
-    `translate(${dimensions.width / 2}px, ${dimensions.height / 2}px)`,
+    getCameraCssMatrix(camera.viewMatrix),
+    `translate(${viewport.width / 2}px, ${viewport.height / 2}px)`,
   ].join(' ');
 
   return (
@@ -32,27 +33,42 @@ export const Renderer3d: FunctionalComponent<Props> = (
 
 export function update3d(
   hostEl: HTMLElement,
-  viewMatrix: Matrix4.Matrix4
+  viewport: Viewport,
+  camera: FramePerspectiveCamera,
+  depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < hostEl.children.length; i++) {
     const el = hostEl.children[i];
     if (el.nodeName === 'VERTEX-VIEWER-DOM-ELEMENT') {
-      updateElement(el as HTMLVertexViewerDomElementElement, viewMatrix);
+      updateElement(
+        el as HTMLVertexViewerDomElementElement,
+        viewport,
+        camera,
+        depthBuffer
+      );
     }
   }
 }
 
 function updateElement(
   element: HTMLVertexViewerDomElementElement,
-  viewMatrix: Matrix4.Matrix4
+  viewport: Viewport,
+  camera: FramePerspectiveCamera,
+  depthBuffer: DepthBuffer | undefined
 ): void {
   const { position, quaternion, scale } = parseDomElement(element);
+
   const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
+  const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
+
+  const occluded =
+    !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
+  element.occluded = occluded ?? false;
 
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(matrixWorld);
   } else {
-    let m = viewMatrix;
+    let m = camera.viewMatrix;
     m = Matrix4.transpose(m);
     m = Matrix4.position(m, matrixWorld);
     m = Matrix4.scale(m, scale);

@@ -56,7 +56,9 @@ describe(CameraRenderResult, () => {
       )
     );
 
-    expect(await res).toMatchObject(
+    const r = await res;
+
+    expect(r).toMatchObject(
       expect.objectContaining({
         correlationIds: expect.arrayContaining([correlationId]),
       })

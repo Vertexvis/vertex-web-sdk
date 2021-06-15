@@ -131,15 +131,55 @@ property.
 </html>
 ```
 
+## Occlusion
+The renderer supports occluding its elements based on the element's position and
+depth information returned on a frame. **Note:** you must opt-in to requesting
+a depth buffer for all frames in order for occlusion to work.
+
+Occlusion can be enabled or disabled per element by setting its `occlusion-off`
+attribute.
+
+**Example:** Styling an element when occluded.
+
+```html
+<html>
+  <head>
+    <style>
+      vertex-viewer-dom-element[occluded] {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Opt-in to depth buffers for all frames. -->
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" depth-buffers="all">
+      <vertex-viewer-dom-renderer>
+        <!-- This element will be included in occlusion testing. -->
+        <vertex-viewer-dom-element position="[0, 0, 100]">
+          <div class="pin">1</div>
+        </vertex-viewer-dom-element>
+
+        <!-- This element will be exempt from occlusion testing. -->
+        <vertex-viewer-dom-element position="[0, 0, -100]" occlusion-off>
+          <div class="pin">2</div>
+        </vertex-viewer-dom-element>
+      </vertex-viewer-dom-renderer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
 <!-- Auto Generated Below -->
 
 
 ## Properties
 
-| Property   | Attribute   | Description                                                                                                                                                                                                                                                          | Type                                   | Default     |
-| ---------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `drawMode` | `draw-mode` | Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes. | `"2d" \| "3d"`                         | `'3d'`      |
-| `viewer`   | --          | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                    | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property      | Attribute   | Description                                                                                                                                                                                                                                                          | Type                                   | Default     |
+| ------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `camera`      | --          | The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                                   | `FramePerspectiveCamera \| undefined`  | `undefined` |
+| `depthBuffer` | --          | The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                             | `DepthBuffer \| undefined`             | `undefined` |
+| `drawMode`    | `draw-mode` | Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes. | `"2d" \| "3d"`                         | `'3d'`      |
+| `viewer`      | --          | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                    | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ----------------------------------------------

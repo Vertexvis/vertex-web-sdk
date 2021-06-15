@@ -1,7 +1,9 @@
-import { Frame } from '../types';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Result } from '../stream/result';
 import { StreamApiEventDispatcher } from '../stream/dispatcher';
+import { Frame } from '../types/frame';
+import { mapFrame } from '../mappers';
+import { Mapper } from '@vertexvis/utils';
 
 export interface RenderResultIds {
   animationId?: string;
@@ -11,7 +13,7 @@ export interface RenderResultIds {
 export class CameraRenderResult implements Result {
   public data = undefined;
   public onAnimationCompleted: StreamApiEventDispatcher<string>;
-  public onFrameReceived: StreamApiEventDispatcher<Frame.Frame>;
+  public onFrameReceived: StreamApiEventDispatcher<Frame>;
 
   public constructor(
     stream: StreamApi,
@@ -32,7 +34,7 @@ export class CameraRenderResult implements Result {
         ),
       (msg) =>
         msg.request?.drawFrame != null
-          ? Frame.fromProto(msg.request?.drawFrame)
+          ? Mapper.ifInvalidThrow(mapFrame)(msg.request.drawFrame)
           : undefined,
       timeout
     );
