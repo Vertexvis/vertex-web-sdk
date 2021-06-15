@@ -13,6 +13,7 @@ import * as Fixtures from '../../../testing/fixtures';
 import { loadImageBytes } from '../imageLoaders';
 import { Async } from '@vertexvis/utils';
 import { TimingMeter } from '../../meters';
+import { Viewport } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = new HTMLCanvasElement().getContext('2d')!;
@@ -25,12 +26,14 @@ const drawFrame1: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
   frame: Fixtures.frame,
+  viewport: new Viewport(Dimensions.create(100, 50)),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
   frame: Fixtures.frame,
+  viewport: new Viewport(Dimensions.create(100, 50)),
 };
 
 const drawPixel: DrawPixel = {
