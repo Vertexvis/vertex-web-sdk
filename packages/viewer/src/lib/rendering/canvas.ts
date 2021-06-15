@@ -1,10 +1,10 @@
 import { FrameRenderer } from './renderer';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Rectangle, Dimensions, Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { DepthProvider } from './depth';
 import { Frame } from '../types/frame';
+import { Viewport } from '../types';
 
 const REPORTING_INTERVAL_MS = 1000;
 
@@ -12,6 +12,7 @@ export interface DrawFrame {
   canvas: CanvasRenderingContext2D;
   dimensions: Dimensions.Dimensions;
   frame: Frame;
+  viewport: Viewport;
 }
 
 export interface DrawPixel {
@@ -26,47 +27,11 @@ export type CanvasDepthProvider = DepthProvider<DrawPixel>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
-interface FramePosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 function drawImage(image: HtmlImage, data: DrawFrame): void {
-  const position = getFramePosition(image, data.frame, data.dimensions);
+  const rect = data.viewport.calculateDrawRect(data.frame.image, image.image);
 
   data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
-  data.canvas.drawImage(
-    image.image,
-    position.x,
-    position.y,
-    position.width,
-    position.height
-  );
-}
-
-function getFramePosition(
-  image: HtmlImage,
-  frame: Frame,
-  dimensions: Dimensions.Dimensions
-): FramePosition {
-  const { image: imageAttr, dimensions: frameDimensions } = frame;
-  const imageRect = vertexvis.protobuf.stream.Rectangle.fromObject(
-    frameDimensions
-  );
-  const fitTo = Rectangle.fromDimensions(dimensions);
-  const fit = Rectangle.containFit(fitTo, imageRect);
-
-  const scaleX = fit.width / imageRect.width;
-  const scaleY = fit.height / imageRect.height;
-
-  return {
-    x: imageAttr.rect.x * scaleX,
-    y: imageAttr.rect.y * scaleY,
-    width: image.image.width * imageAttr.scale * scaleX,
-    height: image.image.height * imageAttr.scale * scaleY,
-  };
+  data.canvas.drawImage(image.image, rect.x, rect.y, rect.width, rect.height);
 }
 
 function reportTimings(

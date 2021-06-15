@@ -172,7 +172,12 @@ const mapFrameImage: M.Func<
 > = M.defineMapper(
   M.read(mapFrameImageAttributes, M.mapProp('image', M.required('image'))),
   ([imageAttr, image]) =>
-    new FrameImage(imageAttr.imageRect, imageAttr.scaleFactor, image)
+    new FrameImage(
+      imageAttr.frameDimensions,
+      imageAttr.imageRect,
+      imageAttr.scaleFactor,
+      image
+    )
 );
 
 const mapSceneAttributes: M.Func<

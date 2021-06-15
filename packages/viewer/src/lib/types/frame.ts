@@ -30,6 +30,7 @@ export class Frame {
           DepthBuffer.fromPng(
             png,
             this.scene.camera,
+            this.dimensions,
             this.image.rect,
             this.image.scale
           )
@@ -42,8 +43,11 @@ export class Frame {
   }
 }
 
-export class FrameImage {
+export type FrameImageLike = Pick<FrameImage, 'dimensions' | 'rect' | 'scale'>;
+
+export class FrameImage implements FrameImageLike {
   public constructor(
+    public readonly dimensions: Dimensions.Dimensions,
     public readonly rect: Rectangle.Rectangle,
     public readonly scale: number,
     public readonly data: Uint8Array

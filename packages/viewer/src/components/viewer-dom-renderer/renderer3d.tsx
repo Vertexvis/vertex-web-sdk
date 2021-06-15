@@ -62,7 +62,7 @@ function updateElement(
   const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
 
   const occluded =
-    !element.occlusionOff && depthBuffer?.isOccluded(viewport, positionWorld);
+    !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
   element.occluded = occluded ?? false;
 
   if (element.billboardOff) {

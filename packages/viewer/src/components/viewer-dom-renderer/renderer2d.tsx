@@ -28,7 +28,7 @@ export function update2d(
         positionWorld
       );
       const occluded =
-        !el.occlusionOff && depthBuffer?.isOccluded(viewport, positionWorld);
+        !el.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
 
       return {
         element: el,
@@ -54,7 +54,7 @@ function updateTransform(
   camera: FramePerspectiveCamera
 ): void {
   const ndcPt = Vector3.transformMatrix(worldPt, camera.projectionViewMatrix);
-  const screenPt = viewport.transformPoint(ndcPt);
+  const screenPt = viewport.transformNdc(ndcPt);
 
   element.style.transform = [
     `translate(-50%, -50%)`,

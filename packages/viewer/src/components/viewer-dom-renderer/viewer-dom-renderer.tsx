@@ -170,6 +170,7 @@ export class ViewerDomRenderer {
 
   private async updatePropsFromViewer(): Promise<void> {
     const { frame, streamAttributes } = this.viewer || {};
+
     this.depthBuffer =
       streamAttributes?.depthBuffers?.enabled &&
       streamAttributes.depthBuffers.frameType === 'all'

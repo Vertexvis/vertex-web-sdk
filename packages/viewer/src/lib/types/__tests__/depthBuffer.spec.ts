@@ -29,7 +29,8 @@ describe(DepthBuffer, () => {
     Dimensions.create(100, 100),
     Rectangle.create(0, 0, 100, 100),
     1,
-    createDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
+    createDepthImageBytes(100, 100, (2 ** 16 - 1) / 2),
+    Dimensions.create(100, 100)
   );
 
   describe(DepthBuffer.prototype.getLinearDepthAtPoint, () => {
@@ -59,16 +60,16 @@ describe(DepthBuffer, () => {
   describe(DepthBuffer.prototype.isOccluded, () => {
     it('returns true if distance of world point is further than depth value', () => {
       const occluded = depthBuffer.isOccluded(
-        new Viewport(Dimensions.create(100, 100)),
-        { x: 0, y: 0, z: 200 }
+        { x: 0, y: 0, z: 200 },
+        new Viewport(Dimensions.create(100, 100))
       );
       expect(occluded).toBe(true);
     });
 
     it('returns false if distance of world point is closer than depth value', () => {
       const occluded = depthBuffer.isOccluded(
-        new Viewport(Dimensions.create(100, 100)),
-        { x: 0, y: 0, z: -100 }
+        { x: 0, y: 0, z: -100 },
+        new Viewport(Dimensions.create(100, 100))
       );
       expect(occluded).toBe(false);
     });

@@ -24,7 +24,7 @@ import {
   Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import { LoadableResource, SynchronizedClock } from '../../lib/types';
+import { LoadableResource, SynchronizedClock, Viewport } from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -991,7 +991,15 @@ export class Viewer {
       if (canvas != null) {
         this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
 
-        const data = { canvas, dimensions, frame: this.frame };
+        const data = {
+          canvas,
+          dimensions,
+          frame: this.frame,
+          viewport: new Viewport(
+            this.getCanvasDimensions() || Dimensions.create(0, 0)
+          ),
+        };
+
         this.frameReceived.emit(this.frame);
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
