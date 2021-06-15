@@ -145,7 +145,7 @@ attribute.
 <html>
   <head>
     <style>
-      vertex-viewer-dom-renderer[occluded] {
+      vertex-viewer-dom-element[occluded] {
         opacity: 0;
       }
     </style>

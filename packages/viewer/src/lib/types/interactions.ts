@@ -18,16 +18,10 @@ export interface InteractionConfig {
    * update the camera.
    */
   interactionDelay: number;
-
-  /**
-   * Indicates if rotation should rotate around where the user tapped.
-   */
-  rotateAroundTapPoint: boolean;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThreshold: 1,
   coarsePointerThreshold: 3,
   interactionDelay: 75,
-  rotateAroundTapPoint: false,
 };

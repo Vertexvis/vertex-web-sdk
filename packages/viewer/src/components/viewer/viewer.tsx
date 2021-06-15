@@ -620,7 +620,7 @@ export class Viewer {
    * @ignore
    */
   @Watch('experimentalGhostingOpacity')
-  protected handleEXPERIMENTAL_ghostingOpacity(): void {
+  protected handleExperimentalGhostingOpacity(): void {
     this.updateStreamAttributesProp();
   }
 
