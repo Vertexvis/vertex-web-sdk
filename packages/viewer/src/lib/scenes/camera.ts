@@ -1,4 +1,10 @@
-import { Animation, ClippingPlanes, FlyTo, FrameCamera } from '../types';
+import {
+  Animation,
+  ClippingPlanes,
+  FlyTo,
+  FrameCamera,
+  StandardView,
+} from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
@@ -274,6 +280,21 @@ export class Camera implements FrameCamera.FrameCamera {
         axis,
         Vector3.origin()
       ),
+    });
+  }
+
+  /**
+   * Updates the `position` and `up` vectors of the camera to the given standard
+   * view.
+   *
+   * @param standardView The standard view to apply.
+   * @returns A new camera.
+   */
+  public standardView(standardView: StandardView): Camera {
+    return this.update({
+      position: standardView.position,
+      lookAt: Vector3.origin(),
+      up: standardView.up,
     });
   }
 

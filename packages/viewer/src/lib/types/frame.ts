@@ -10,6 +10,7 @@ import * as CrossSectioning from './crossSectioning';
 import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
 import { decodePng } from '../../workers/png-decoder.worker';
+import { Orientation } from './orientation';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
@@ -58,7 +59,8 @@ export class FrameScene {
   public constructor(
     public readonly camera: FramePerspectiveCamera,
     public readonly boundingBox: BoundingBox.BoundingBox,
-    public readonly crossSection: CrossSectioning.CrossSectioning
+    public readonly crossSection: CrossSectioning.CrossSectioning,
+    public readonly worldOrientation: Orientation
   ) {}
 }
 

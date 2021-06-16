@@ -13,7 +13,7 @@ import {
 } from '@stencil/core';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { Config, parseConfig } from '../../lib/config';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
   Disposable,
@@ -24,7 +24,12 @@ import {
   Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import { LoadableResource, SynchronizedClock, Viewport } from '../../lib/types';
+import {
+  LoadableResource,
+  SynchronizedClock,
+  Viewport,
+  Orientation,
+} from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -101,6 +106,10 @@ interface ConnectingStatus {
 
 interface DisconnectedStatus {
   status: 'disconnected';
+}
+
+interface StateMap {
+  streamWorldOrientation?: Orientation;
 }
 
 /** @internal */
@@ -213,8 +222,7 @@ export class Viewer {
    *
    * @readonly
    */
-  @Prop({ mutable: true })
-  public streamAttributes: ViewerStreamAttributes = {};
+  @Prop({ mutable: true }) public streamAttributes: ViewerStreamAttributes = {};
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -277,6 +285,8 @@ export class Viewer {
   @State() private dimensions?: Dimensions.Dimensions;
   @State() private hostDimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
+
+  @State() private stateMap: StateMap = {};
 
   @Element() private hostElement!: HTMLElement;
 
@@ -620,7 +630,7 @@ export class Viewer {
    * @ignore
    */
   @Watch('experimentalGhostingOpacity')
-  protected handleExperimentalGhostingOpacity(): void {
+  protected handleExperimentalGhostingOpacityChanged(): void {
     this.updateStreamAttributesProp();
   }
 
@@ -672,6 +682,7 @@ export class Viewer {
       this.clock = undefined;
       this.errorMessage = undefined;
       this.resource = undefined;
+      this.stateMap.streamWorldOrientation = undefined;
     }
   }
 
@@ -750,7 +761,7 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
-      const result = await this.stream.startStream({
+      const { startStream } = await this.stream.startStream({
         streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -760,11 +771,11 @@ export class Viewer {
         }),
       });
 
-      this.jwt = result.startStream?.jwt || undefined;
+      this.jwt = startStream?.jwt || undefined;
       this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
 
-      if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
-        this.streamSessionId = result.startStream.sessionId.hex;
+      if (this.clientId != null && startStream?.sessionId?.hex != null) {
+        this.streamSessionId = startStream.sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
           upsertStorageEntry('vertexvis:stream-sessions', {
@@ -775,17 +786,26 @@ export class Viewer {
         }
       }
 
-      if (result.startStream?.sceneViewId?.hex != null) {
-        this.sceneViewId = result.startStream.sceneViewId.hex;
+      if (startStream?.sceneViewId?.hex != null) {
+        this.sceneViewId = startStream.sceneViewId.hex;
         this.isStreamStarted = true;
       }
-      if (result.startStream?.streamId?.hex != null) {
-        this.streamId = result.startStream.streamId.hex;
+      if (startStream?.streamId?.hex != null) {
+        this.streamId = startStream.streamId.hex;
       }
+
+      // Need to parse world orientation.
+      this.stateMap.streamWorldOrientation = new Orientation(
+        Vector3.up(),
+        Vector3.back()
+      );
+
       console.debug(
         `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
+
       await this.waitNextDrawnFrame(15 * 1000);
+
       this.sceneReady.emit();
     } catch (e) {
       this.emitConnectionChange({ status: 'disconnected' });
@@ -985,11 +1005,19 @@ export class Viewer {
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
     const dimensions = this.getCanvasDimensions();
+    const worldOrientation = this.stateMap.streamWorldOrientation;
 
-    if (this.canvasElement != null && dimensions != null) {
+    if (
+      this.canvasElement != null &&
+      dimensions != null &&
+      worldOrientation != null
+    ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
+        const mapFrameOrThrow = Mapper.ifInvalidThrow(
+          mapFrame(worldOrientation)
+        );
+        this.frame = mapFrameOrThrow(payload);
 
         const data = {
           canvas,

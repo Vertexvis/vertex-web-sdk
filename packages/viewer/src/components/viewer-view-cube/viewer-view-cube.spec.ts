@@ -8,6 +8,7 @@ import {
   awaitScene,
 } from '../viewer/__mocks__/mocks';
 import { Vector3 } from '@vertexvis/geometry';
+import { StandardView } from '../../lib/types';
 
 describe('<vertex-viewer-view-cube>', () => {
   beforeEach(() => {
@@ -98,12 +99,7 @@ describe('<vertex-viewer-view-cube>', () => {
 
     await awaitScene;
 
-    expect(cameraMock.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        position: Vector3.back(),
-        up: Vector3.up(),
-      })
-    );
+    expect(cameraMock.standardView).toHaveBeenCalledWith(StandardView.FRONT);
     expect(cameraMock.viewAll).toHaveBeenCalled();
     expect(cameraMock.render).toHaveBeenCalledWith(
       expect.objectContaining({

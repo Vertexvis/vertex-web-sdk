@@ -13,6 +13,7 @@ import {
   FrameImage,
   FrameScene,
   FramePerspectiveCamera,
+  Orientation,
 } from './types';
 
 export function mapRGBi(): M.Func<vertexvis.protobuf.core.IRGBAi, Color.Color> {
@@ -236,35 +237,42 @@ const mapFrameCamera: M.Func<
     )
 );
 
-const mapFrameScene: M.Func<
-  vertexvis.protobuf.stream.IDrawFramePayload,
-  FrameScene
-> = M.defineMapper(
-  M.read(mapFrameSceneAttributes, mapFrameCamera),
-  ([sceneAttr, camera]) =>
-    new FrameScene(camera, sceneAttr.boundingBox, sceneAttr.crossSectioning)
-);
+function mapFrameScene(
+  worldOrientation: Orientation
+): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, FrameScene> {
+  return M.defineMapper(
+    M.read(mapFrameSceneAttributes, mapFrameCamera),
+    ([sceneAttr, camera]) =>
+      new FrameScene(
+        camera,
+        sceneAttr.boundingBox,
+        sceneAttr.crossSectioning,
+        worldOrientation
+      )
+  );
+}
 
-export const mapFrame: M.Func<
-  vertexvis.protobuf.stream.IDrawFramePayload,
-  Frame
-> = M.defineMapper(
-  M.read(
-    M.mapProp('frameCorrelationIds', (ids) => (ids != null ? ids : [])),
-    M.requiredProp('sequenceNumber'),
-    M.compose(mapFrameImageAttributes, M.getProp('frameDimensions')),
-    mapFrameScene,
-    mapFrameImage,
-    M.getProp('depthBuffer')
-  ),
-  ([correlationIds, seqNum, frameDimensions, scene, image, depthBuffer]) => {
-    return new Frame(
-      correlationIds,
-      seqNum,
-      frameDimensions,
-      image,
-      scene,
-      depthBuffer?.value || undefined
-    );
-  }
-);
+export function mapFrame(
+  worldOrientation: Orientation
+): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, Frame> {
+  return M.defineMapper(
+    M.read(
+      M.mapProp('frameCorrelationIds', (ids) => (ids != null ? ids : [])),
+      M.requiredProp('sequenceNumber'),
+      M.compose(mapFrameImageAttributes, M.getProp('frameDimensions')),
+      mapFrameScene(worldOrientation),
+      mapFrameImage,
+      M.getProp('depthBuffer')
+    ),
+    ([correlationIds, seqNum, frameDimensions, scene, image, depthBuffer]) => {
+      return new Frame(
+        correlationIds,
+        seqNum,
+        frameDimensions,
+        image,
+        scene,
+        depthBuffer?.value || undefined
+      );
+    }
+  );
+}

@@ -1,7 +1,7 @@
 import { Component, h, Prop, State, Watch } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
-import { FrameCamera } from '../../lib/types';
+import { Orientation, StandardView } from '../../lib/types';
 import {
   ViewerViewCubeBackLeftEdge,
   ViewerViewCubeBackRightEdge,
@@ -25,34 +25,6 @@ import {
   ViewerViewCubeTopRightEdge,
 } from './viewer-view-cube-edges';
 import { ViewerViewCubeSide } from './viewer-view-cube-sides';
-
-type StandardView =
-  | 'front'
-  | 'back'
-  | 'left'
-  | 'right'
-  | 'top'
-  | 'bottom'
-  | 'top-front-left'
-  | 'top-front-right'
-  | 'bottom-front-left'
-  | 'bottom-front-right'
-  | 'top-back-left'
-  | 'top-back-right'
-  | 'bottom-back-left'
-  | 'bottom-back-right'
-  | 'top-front'
-  | 'bottom-front'
-  | 'front-left'
-  | 'front-right'
-  | 'top-back'
-  | 'bottom-back'
-  | 'back-left'
-  | 'back-right'
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right';
 
 @Component({
   tag: 'vertex-viewer-view-cube',
@@ -119,140 +91,10 @@ export class ViewerViewCube {
   private viewMatrix?: Matrix4.Matrix4;
 
   @State()
-  private hoveredStandardView?: StandardView;
+  private worldOrientation: Orientation = Orientation.DEFAULT;
 
-  private standardViews: Record<StandardView, FrameCamera.FrameCamera> = {
-    front: {
-      position: Vector3.back(),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    back: {
-      position: Vector3.forward(),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    left: {
-      position: Vector3.left(),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    right: {
-      position: Vector3.right(),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    top: {
-      position: Vector3.up(),
-      lookAt: Vector3.origin(),
-      up: Vector3.forward(),
-    },
-    bottom: {
-      position: Vector3.down(),
-      lookAt: Vector3.origin(),
-      up: Vector3.back(),
-    },
-    'top-front-left': {
-      position: Vector3.add(Vector3.back(), Vector3.up(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-front-right': {
-      position: Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-front-left': {
-      position: Vector3.add(Vector3.back(), Vector3.down(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-front-right': {
-      position: Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-back-left': {
-      position: Vector3.add(Vector3.forward(), Vector3.up(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-back-right': {
-      position: Vector3.add(Vector3.forward(), Vector3.up(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-back-left': {
-      position: Vector3.add(Vector3.forward(), Vector3.down(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-back-right': {
-      position: Vector3.add(Vector3.forward(), Vector3.down(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-front': {
-      position: Vector3.add(Vector3.back(), Vector3.up()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-front': {
-      position: Vector3.add(Vector3.back(), Vector3.down()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'front-left': {
-      position: Vector3.add(Vector3.back(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'front-right': {
-      position: Vector3.add(Vector3.back(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-back': {
-      position: Vector3.add(Vector3.forward(), Vector3.up()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-back': {
-      position: Vector3.add(Vector3.forward(), Vector3.down()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'back-left': {
-      position: Vector3.add(Vector3.forward(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'back-right': {
-      position: Vector3.add(Vector3.forward(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-left': {
-      position: Vector3.add(Vector3.up(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'top-right': {
-      position: Vector3.add(Vector3.up(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-left': {
-      position: Vector3.add(Vector3.down(), Vector3.left()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-    'bottom-right': {
-      position: Vector3.add(Vector3.down(), Vector3.right()),
-      lookAt: Vector3.origin(),
-      up: Vector3.up(),
-    },
-  };
+  @State()
+  private hoveredStandardView?: StandardView;
 
   protected componentDidLoad(): void {
     this.handleViewerChange(this.viewer, undefined);
@@ -287,242 +129,280 @@ export class ViewerViewCube {
           <ViewerViewCubeSide
             side="front"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('front')}
+            onMouseDown={this.handleStandardView(StandardView.FRONT)}
           >
             {this.zNegativeLabel}
           </ViewerViewCubeSide>
           <ViewerViewCubeSide
             side="back"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('back')}
+            onMouseDown={this.handleStandardView(StandardView.BACK)}
           >
             {this.zPositiveLabel}
           </ViewerViewCubeSide>
           <ViewerViewCubeSide
             side="left"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('left')}
+            onMouseDown={this.handleStandardView(StandardView.LEFT)}
           >
             {this.xNegativeLabel}
           </ViewerViewCubeSide>
           <ViewerViewCubeSide
             side="right"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('right')}
+            onMouseDown={this.handleStandardView(StandardView.RIGHT)}
           >
             {this.xPositiveLabel}
           </ViewerViewCubeSide>
           <ViewerViewCubeSide
             side="top"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top')}
+            onMouseDown={this.handleStandardView(StandardView.TOP)}
           >
             {this.yPositiveLabel}
           </ViewerViewCubeSide>
           <ViewerViewCubeSide
             side="bottom"
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM)}
           >
             {this.yNegativeLabel}
           </ViewerViewCubeSide>
 
           <ViewerViewCubeTopFrontLeftEdge
             id="top-front-left"
-            hovered={this.hoveredStandardView === 'top-front-left'}
+            hovered={this.hoveredStandardView === StandardView.TOP_FRONT_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-front-left')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_FRONT_LEFT)}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'top-front-left'
+                ? StandardView.TOP_FRONT_LEFT
                 : undefined)
             }
           />
           <ViewerViewCubeTopFrontRightEdge
             id="top-front-right"
-            hovered={this.hoveredStandardView === 'top-front-right'}
+            hovered={this.hoveredStandardView === StandardView.TOP_FRONT_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-front-right')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_FRONT_RIGHT)}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'top-front-right'
+                ? StandardView.TOP_FRONT_RIGHT
                 : undefined)
             }
           />
           <ViewerViewCubeBottomFrontLeftEdge
             id="bottom-front-left"
-            hovered={this.hoveredStandardView === 'bottom-front-left'}
+            hovered={
+              this.hoveredStandardView === StandardView.BOTTOM_FRONT_LEFT
+            }
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-front-left')}
+            onMouseDown={this.handleStandardView(
+              StandardView.BOTTOM_FRONT_LEFT
+            )}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'bottom-front-left'
+                ? StandardView.BOTTOM_FRONT_LEFT
                 : undefined)
             }
           />
           <ViewerViewCubeBottomFrontRightEdge
             id="bottom-front-right"
-            hovered={this.hoveredStandardView === 'bottom-front-right'}
+            hovered={
+              this.hoveredStandardView === StandardView.BOTTOM_FRONT_RIGHT
+            }
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-front-right')}
+            onMouseDown={this.handleStandardView(
+              StandardView.BOTTOM_FRONT_RIGHT
+            )}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'bottom-front-right'
+                ? StandardView.BOTTOM_FRONT_RIGHT
                 : undefined)
             }
           />
 
           <ViewerViewCubeTopBackLeftEdge
             id="top-back-left"
-            hovered={this.hoveredStandardView === 'top-back-left'}
+            hovered={this.hoveredStandardView === StandardView.TOP_BACK_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-back-left')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_BACK_LEFT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'top-back-left' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.TOP_BACK_LEFT
+                : undefined)
             }
           />
           <ViewerViewCubeTopBackRightEdge
             id="top-back-right"
-            hovered={this.hoveredStandardView === 'top-back-right'}
+            hovered={this.hoveredStandardView === StandardView.TOP_BACK_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-back-right')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_BACK_RIGHT)}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'top-back-right'
+                ? StandardView.TOP_BACK_RIGHT
                 : undefined)
             }
           />
           <ViewerViewCubeBottomBackLeftEdge
             id="bottom-back-left"
-            hovered={this.hoveredStandardView === 'bottom-back-left'}
+            hovered={this.hoveredStandardView === StandardView.BOTTOM_BACK_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-back-left')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM_BACK_LEFT)}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'bottom-back-left'
+                ? StandardView.BOTTOM_BACK_LEFT
                 : undefined)
             }
           />
           <ViewerViewCubeBottomBackRightEdge
             id="bottom-back-right"
-            hovered={this.hoveredStandardView === 'bottom-back-right'}
+            hovered={
+              this.hoveredStandardView === StandardView.BOTTOM_BACK_RIGHT
+            }
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-back-right')}
+            onMouseDown={this.handleStandardView(
+              StandardView.BOTTOM_BACK_RIGHT
+            )}
             onHoverChange={(hovered) =>
               (this.hoveredStandardView = hovered
-                ? 'bottom-back-right'
+                ? StandardView.BOTTOM_BACK_RIGHT
                 : undefined)
             }
           />
 
           <ViewerViewCubeTopFrontEdge
             id="top-front"
-            hovered={this.hoveredStandardView === 'top-front'}
+            hovered={this.hoveredStandardView === StandardView.TOP_FRONT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-front')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_FRONT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'top-front' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.TOP_FRONT
+                : undefined)
             }
           />
           <ViewerViewCubeBottomFrontEdge
             id="bottom-front"
-            hovered={this.hoveredStandardView === 'bottom-front'}
+            hovered={this.hoveredStandardView === StandardView.BOTTOM_FRONT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-front')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM_FRONT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'bottom-front' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BOTTOM_FRONT
+                : undefined)
             }
           />
           <ViewerViewCubeFrontLeftEdge
             id="front-left"
-            hovered={this.hoveredStandardView === 'front-left'}
+            hovered={this.hoveredStandardView === StandardView.FRONT_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('front-left')}
+            onMouseDown={this.handleStandardView(StandardView.FRONT_LEFT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'front-left' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.FRONT_LEFT
+                : undefined)
             }
           />
           <ViewerViewCubeFrontRightEdge
             id="front-right"
-            hovered={this.hoveredStandardView === 'front-right'}
+            hovered={this.hoveredStandardView === StandardView.FRONT_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('front-right')}
+            onMouseDown={this.handleStandardView(StandardView.FRONT_RIGHT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'front-right' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.FRONT_RIGHT
+                : undefined)
             }
           />
 
           <ViewerViewCubeTopBackEdge
             id="top-back"
-            hovered={this.hoveredStandardView === 'top-back'}
+            hovered={this.hoveredStandardView === StandardView.TOP_BACK}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-back')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_BACK)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'top-back' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.TOP_BACK
+                : undefined)
             }
           />
           <ViewerViewCubeBottomBackEdge
             id="bottom-back"
-            hovered={this.hoveredStandardView === 'bottom-back'}
+            hovered={this.hoveredStandardView === StandardView.BOTTOM_BACK}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-back')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM_BACK)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'bottom-back' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BOTTOM_BACK
+                : undefined)
             }
           />
           <ViewerViewCubeBackLeftEdge
             id="back-left"
-            hovered={this.hoveredStandardView === 'back-left'}
+            hovered={this.hoveredStandardView === StandardView.BACK_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('back-left')}
+            onMouseDown={this.handleStandardView(StandardView.BACK_LEFT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'back-left' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BACK_LEFT
+                : undefined)
             }
           />
           <ViewerViewCubeBackRightEdge
             id="back-right"
-            hovered={this.hoveredStandardView === 'back-right'}
+            hovered={this.hoveredStandardView === StandardView.BACK_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('back-right')}
+            onMouseDown={this.handleStandardView(StandardView.BACK_RIGHT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'back-right' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BACK_RIGHT
+                : undefined)
             }
           />
 
           <ViewerViewCubeTopLeftEdge
             id="top-left"
-            hovered={this.hoveredStandardView === 'top-left'}
+            hovered={this.hoveredStandardView === StandardView.TOP_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-left')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_LEFT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'top-left' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.TOP_LEFT
+                : undefined)
             }
           />
           <ViewerViewCubeTopRightEdge
             id="top-right"
-            hovered={this.hoveredStandardView === 'top-right'}
+            hovered={this.hoveredStandardView === StandardView.TOP_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('top-right')}
+            onMouseDown={this.handleStandardView(StandardView.TOP_RIGHT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'top-right' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.TOP_RIGHT
+                : undefined)
             }
           />
           <ViewerViewCubeBottomLeftEdge
             id="bottom-left"
-            hovered={this.hoveredStandardView === 'bottom-left'}
+            hovered={this.hoveredStandardView === StandardView.BOTTOM_LEFT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-left')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM_LEFT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'bottom-left' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BOTTOM_LEFT
+                : undefined)
             }
           />
           <ViewerViewCubeBottomRightEdge
             id="bottom-right"
-            hovered={this.hoveredStandardView === 'bottom-right'}
+            hovered={this.hoveredStandardView === StandardView.BOTTOM_RIGHT}
             disabled={this.standardViewsDisabled}
-            onMouseDown={this.handleStandardView('bottom-right')}
+            onMouseDown={this.handleStandardView(StandardView.BOTTOM_RIGHT)}
             onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered ? 'bottom-right' : undefined)
+              (this.hoveredStandardView = hovered
+                ? StandardView.BOTTOM_RIGHT
+                : undefined)
             }
           />
         </div>
@@ -543,15 +423,22 @@ export class ViewerViewCube {
     const scene = await this.viewer?.scene();
     const camera = scene?.camera();
 
+    this.worldOrientation =
+      this.viewer?.frame?.scene.worldOrientation ?? Orientation.DEFAULT;
+
     if (camera != null) {
       const { position, lookAt, up } = camera;
-      this.viewMatrix = Matrix4.makeLookAtView(position, lookAt, up);
+
+      this.viewMatrix = Matrix4.multiply(
+        Matrix4.makeLookAtView(position, lookAt, up),
+        this.worldOrientation.matrix
+      );
     } else {
       this.viewMatrix = Matrix4.makeIdentity();
     }
   };
 
-  private handleStandardView(view: StandardView): () => Promise<void> {
+  private handleStandardView(standardView: StandardView): () => Promise<void> {
     if (this.standardViewsDisabled) {
       return async () => undefined;
     } else {
@@ -562,9 +449,13 @@ export class ViewerViewCube {
             this.animationDuration > 0
               ? { animation: { milliseconds: this.animationDuration } }
               : {};
+          const worldStandardView = standardView.transformMatrix(
+            this.worldOrientation.matrix
+          );
+
           scene
             .camera()
-            .update(this.standardViews[view])
+            .standardView(worldStandardView)
             .viewAll()
             .render(animation);
         }
