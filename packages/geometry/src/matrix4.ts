@@ -1,5 +1,5 @@
 import * as Vector3 from './vector3';
-import type { Quaternion } from './quaternion';
+import * as Quaternion from './quaternion';
 import * as Angle from './angle';
 
 /**
@@ -141,7 +141,7 @@ export function makeTranslation(translation: Vector3.Vector3): Matrix4 {
  * @param rotation A quaternion representing the rotation.
  * @returns A rotation matrix.
  */
-export function makeRotation(rotation: Quaternion): Matrix4 {
+export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
   const { x, y, z, w } = rotation;
 
   const x2 = x + x,
@@ -202,13 +202,77 @@ export function makeScale(scale: Vector3.Vector3): Matrix4 {
  */
 export function makeTRS(
   translation: Vector3.Vector3,
-  rotation: Quaternion,
+  rotation: Quaternion.Quaternion,
   scale: Vector3.Vector3
 ): Matrix4 {
   const t = makeTranslation(translation);
   const r = makeRotation(rotation);
   const s = makeScale(scale);
   return multiply(multiply(t, r), s);
+}
+
+/**
+ * Returns a matrix that has the basis components (upper left 3x3 matrix) set to
+ * the following x, y, and z axis.
+ *
+ * ```
+ * x.x  y.x  z.x  0
+ * x.y  y.y  z.y  0
+ * x.z  y.z  z.z  0
+ * 0    0    0    0
+ * ```
+ *
+ * @param x The x axis to set.
+ * @param y The y axis to set.
+ * @param z The z axis to set.
+ * @returns A matrix with its basis components populated.
+ */
+export function makeBasis(
+  x: Vector3.Vector3,
+  y: Vector3.Vector3,
+  z: Vector3.Vector3
+): Matrix4 {
+  /* eslint-disable prettier/prettier */
+  return [
+    x.x, x.y, x.z, 0,
+    y.x, y.y, y.z, 0,
+    z.x, z.y, z.z, 0,
+    0, 0, 0, 1
+  ]
+  /* eslint-enable prettier/prettier */
+}
+
+/**
+ * Creates a rotation matrix that is rotated around a given axis by the given
+ * angle.
+ *
+ * @param axis The axis of rotation.
+ * @param radians The angle of rotation.
+ * @returns A rotation matrix.
+ */
+export function makeRotationAxis(
+  axis: Vector3.Vector3,
+  radians: number
+): Matrix4 {
+  const c = Math.cos(radians);
+  const s = Math.sin(radians);
+  const t = 1 - c;
+
+  const x = axis.x;
+  const y = axis.y;
+  const z = axis.z;
+
+  const tx = t * x;
+  const ty = t * y;
+
+  /* eslint-disable prettier/prettier */
+  return [
+    tx * x + c,       tx * y + s * z,   tx * z - s * y,   0,
+    tx * y - s * z,   ty * y + c,       ty * z + s * x,   0,
+    tx * z + s * y,   ty * z - s * x,   t * z * z + c,    0,
+    0,                0,                0,                1
+  ]
+  /* eslint-enable prettier/prettier */
 }
 
 /**

@@ -1,8 +1,15 @@
+import * as Angle from './angle';
 import * as Matrix4 from './matrix4';
 import { clamp } from './util';
 
+/**
+ * A string representing the axis order of rotation.
+ */
 export type EulerOrder = 'xyz' | 'yzx' | 'zxy' | 'xzy' | 'yxz' | 'zyx';
 
+/**
+ * A type that represents [Euler Angles](http://en.wikipedia.org/wiki/Euler_angles).
+ */
 export interface Euler {
   x: number;
   y: number;
@@ -10,10 +17,49 @@ export interface Euler {
   order: EulerOrder;
 }
 
+/**
+ * Creates a new euler angle where each axis of rotation is defined by an angle,
+ * in radians. If no value is given, then `{x: 0, y: 0, z: 0, order: 'xyz'}` is
+ * returned.
+ *
+ * @param value The values to populate the euler angle with.
+ * @returns A euler angle.
+ */
 export function create(value: Partial<Euler> = {}): Euler {
-  return { x: 0, y: 0, z: 0, order: 'xyz', ...value };
+  return {
+    x: value.x ?? 0,
+    y: value.y ?? 0,
+    z: value.z ?? 0,
+    order: value.order ?? 'xyz',
+  };
 }
 
+/**
+ * Creates a new euler angle where each axis of rotation is defined by an angle,
+ * in degrees. If no value is given, then `{x: 0, y: 0, z: 0, order: 'xyz'}` is
+ * returned.
+ *
+ * @param value The values to populate the euler angle with.
+ * @returns A euler angle.
+ */
+export function fromDegrees(value: Partial<Euler> = {}): Euler {
+  const { x = 0, y = 0, z = 0, order } = value;
+  return create({
+    x: Angle.toRadians(x),
+    y: Angle.toRadians(y),
+    z: Angle.toRadians(z),
+    order,
+  });
+}
+
+/**
+ * Creates a euler angle from the rotation components of a 4x4 matrix. The
+ * rotation components are represented by the upper 3x3 of the matrix.
+ *
+ * @param matrix A pure rotation matrix, unscaled.
+ * @param order The order that the rotations are applied.
+ * @returns
+ */
 export function fromRotationMatrix(
   matrix: Matrix4.Matrix4,
   order: EulerOrder = 'xyz'
@@ -83,6 +129,14 @@ export function fromRotationMatrix(
   return { x, y, z, order };
 }
 
+/**
+ * Returns a euler angle that was decoded from a JSON string. Supports either
+ * extracting values from an array `[x, y, z, order]` or object `{x, y, z,
+ * order}`.
+ *
+ * @param json A JSON object.
+ * @returns A euler angle.
+ */
 export function fromJson(json: string): Euler {
   const obj = JSON.parse(json);
   if (Array.isArray(obj)) {
