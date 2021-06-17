@@ -373,6 +373,15 @@ export class StreamApi {
   }
 
   /**
+   * Sends a request to get a stencil buffer image for the current scene view.
+   */
+  public getStencilBuffer(
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ getStencilBuffer: {} }, true);
+  }
+
+  /**
    * Acknowledges a successful request by sending a reply back to the server
    * with an optional result body.
    *

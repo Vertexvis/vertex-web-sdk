@@ -1785,6 +1785,11 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.6.tgz#7944e3e9faa7b067d57d59ef81be5c7ff1d68046"
   integrity sha512-3G0KgyVnRh4EyIb7L3uSZ9jdYFfxGkQXBsytY400UsH00LJDQ1ah+Yt3LMa09+xcUwBS4ZJ/ugo6opjad096WA==
 
+"@vertexvis/frame-streaming-protos@^0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.9.tgz#d1e3f6dd3ec0b4462105ef0c3dde7b32d5be5f20"
+  integrity sha512-IvvCiteOD8BDw3QP6F0PWykQcCBO0RMexeUzbBQS/hFHlqyKgUfj5nCwmKCIsqo9+QBSnUr+MzVp7EVPLYc/UA==
+
 "@vertexvis/jest-config-vertexvis@0.5.2", "@vertexvis/jest-config-vertexvis@^0.5.0":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@vertexvis/jest-config-vertexvis/-/jest-config-vertexvis-0.5.2.tgz#fb6f8f24fbe47f4d2c784e24041f01b4be04e084"
