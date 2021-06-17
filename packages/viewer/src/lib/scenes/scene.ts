@@ -15,6 +15,7 @@ import { buildSceneOperation } from '../commands/streamCommandsMapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
 import { Frame } from '../types/frame';
+import { FrameDecoder } from '../mappers';
 
 interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
@@ -214,6 +215,7 @@ export class Scene {
   public constructor(
     private stream: StreamApi,
     private frame: Frame,
+    private decodeFrame: FrameDecoder,
     private imageScaleProvider: ImageScaleProvider,
     public readonly sceneViewId: UUID.UUID,
     private defaultSelectionMaterial: ColorMaterial
@@ -259,7 +261,8 @@ export class Scene {
       this.stream,
       Dimensions.aspectRatio(this.viewport()),
       data,
-      this.frame.scene.boundingBox
+      this.frame.scene.boundingBox,
+      this.decodeFrame
     );
   }
 

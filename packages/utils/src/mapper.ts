@@ -100,6 +100,12 @@ export type Validated<T> = Invalid | T;
 export type Func<T, R> = (input: T) => Validated<R>;
 
 /**
+ * A function that transforms an input into another type, or throws if the input
+ * is valid;
+ */
+export type ThrowIfInvalidFunc<T, R> = (input: T) => R;
+
+/**
  * Returns a mapper that asserts the input is not null or not undefined.
  *
  * @param name A name to report when invalid.
@@ -231,7 +237,9 @@ export function isInvalid(obj: unknown): obj is Invalid {
  * @param mapper A mapper that will be invoked with the input.
  * @throws {@link MapperValidationError} If the input is invalid.
  */
-export function ifInvalidThrow<T, R>(mapper: Func<T, R>): (obj: T) => R {
+export function ifInvalidThrow<T, R>(
+  mapper: Func<T, R>
+): ThrowIfInvalidFunc<T, R> {
   return (input) => {
     const value = mapper(input);
     if (isInvalid(value)) {

@@ -1,5 +1,5 @@
 import { Component, h, Prop, State, Watch } from '@stencil/core';
-import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Matrix4 } from '@vertexvis/geometry';
 import classNames from 'classnames';
 import { Orientation, StandardView } from '../../lib/types';
 import {
@@ -82,16 +82,24 @@ export class ViewerViewCube {
   public standardViewsDisabled = false;
 
   /**
+   * An orientation that defines the X and Z vectors to orient the world. If
+   * `viewer` is set, this property will be populated automatically.
+   */
+  @Prop({ mutable: true })
+  public worldOrientation: Orientation = Orientation.DEFAULT;
+
+  /**
+   * The view matrix that specifies the camera's orientation. If `viewer` is
+   * set, this property will be populated automatically.
+   */
+  @Prop({ mutable: true })
+  public viewMatrix?: Matrix4.Matrix4 = Matrix4.makeIdentity();
+
+  /**
    * An instance of the viewer to bind to.
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
-
-  @State()
-  private viewMatrix?: Matrix4.Matrix4;
-
-  @State()
-  private worldOrientation: Orientation = Orientation.DEFAULT;
 
   @State()
   private hoveredStandardView?: StandardView;
@@ -101,10 +109,11 @@ export class ViewerViewCube {
   }
 
   protected render(): h.JSX.IntrinsicElements {
-    const m = Matrix4.position(
+    const rotationMatrix = Matrix4.position(
       this.viewMatrix || Matrix4.makeIdentity(),
       Matrix4.makeIdentity()
     );
+    const m = Matrix4.multiply(rotationMatrix, this.worldOrientation.matrix);
 
     const style = {
       transform: [
@@ -428,11 +437,7 @@ export class ViewerViewCube {
 
     if (camera != null) {
       const { position, lookAt, up } = camera;
-
-      this.viewMatrix = Matrix4.multiply(
-        Matrix4.makeLookAtView(position, lookAt, up),
-        this.worldOrientation.matrix
-      );
+      this.viewMatrix = Matrix4.makeLookAtView(position, lookAt, up);
     } else {
       this.viewMatrix = Matrix4.makeIdentity();
     }

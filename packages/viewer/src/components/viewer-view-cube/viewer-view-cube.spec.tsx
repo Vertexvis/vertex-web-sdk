@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { ViewerViewCube } from './viewer-view-cube';
 import {
@@ -7,8 +9,8 @@ import {
   resetAwaiter,
   awaitScene,
 } from '../viewer/__mocks__/mocks';
-import { Vector3 } from '@vertexvis/geometry';
-import { StandardView } from '../../lib/types';
+import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Orientation } from '../../lib/types';
 
 describe('<vertex-viewer-view-cube>', () => {
   beforeEach(() => {
@@ -56,6 +58,58 @@ describe('<vertex-viewer-view-cube>', () => {
     expect(right?.textContent).toBe('xpos');
   });
 
+  it('orients view cube to the view matrix with no position', async () => {
+    const viewMatrix = Matrix4.makeLookAtView(
+      Vector3.back(),
+      Vector3.origin(),
+      Vector3.up()
+    );
+    const appliedMatrix = Matrix4.position(viewMatrix, Matrix4.makeIdentity());
+
+    const page = await newSpecPage({
+      components: [ViewerViewCube],
+      template: () => (
+        <div>
+          <vertex-viewer-view-cube viewMatrix={viewMatrix} />
+        </div>
+      ),
+    });
+
+    const el = page.root?.shadowRoot?.querySelector('.cube') as HTMLElement;
+    expect(el?.style.transform).toContain(
+      `matrix3d(${appliedMatrix.join(', ')})`
+    );
+  });
+
+  it('applies the world transform to the view matrix', async () => {
+    const viewMatrix = Matrix4.makeLookAtView(
+      Vector3.back(),
+      Vector3.origin(),
+      Vector3.up()
+    );
+    const orientation = new Orientation(Vector3.forward(), Vector3.up());
+
+    const m = Matrix4.position(viewMatrix, Matrix4.makeIdentity());
+    const appliedMatrix = Matrix4.multiply(m, orientation.matrix);
+
+    const page = await newSpecPage({
+      components: [ViewerViewCube],
+      template: () => (
+        <div>
+          <vertex-viewer-view-cube
+            viewMatrix={viewMatrix}
+            worldOrientation={orientation}
+          />
+        </div>
+      ),
+    });
+
+    const el = page.root?.shadowRoot?.querySelector('.cube') as HTMLElement;
+    expect(el?.style.transform).toContain(
+      `matrix3d(${appliedMatrix.join(', ')})`
+    );
+  });
+
   it('sets hovered selector when mouse entered', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
@@ -99,7 +153,12 @@ describe('<vertex-viewer-view-cube>', () => {
 
     await awaitScene;
 
-    expect(cameraMock.standardView).toHaveBeenCalledWith(StandardView.FRONT);
+    expect(cameraMock.standardView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        position: Vector3.back(),
+        up: Vector3.up(),
+      })
+    );
     expect(cameraMock.viewAll).toHaveBeenCalled();
     expect(cameraMock.render).toHaveBeenCalledWith(
       expect.objectContaining({

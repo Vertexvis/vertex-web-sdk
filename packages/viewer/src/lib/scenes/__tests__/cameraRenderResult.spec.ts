@@ -6,6 +6,8 @@ import {
 } from '@vertexvis/stream-api';
 import { CameraRenderResult } from '../cameraRenderResult';
 import '../../../testing/domMocks';
+import { mapFrameOrThrow } from '../../mappers';
+import { Orientation } from '../../types';
 
 describe(CameraRenderResult, () => {
   const correlationId = 'corr-id';
@@ -14,11 +16,12 @@ describe(CameraRenderResult, () => {
   const stream = new StreamApi(mockWs);
   const result = new CameraRenderResult(
     stream,
+    mapFrameOrThrow(Orientation.DEFAULT),
     {
       correlationId,
       animationId,
     },
-    5
+    50
   );
 
   beforeEach(async () => {

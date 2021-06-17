@@ -6,6 +6,8 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { frame } from '../../../testing/fixtures';
 import { UUID } from '@vertexvis/utils';
 import * as ColorMaterial from '../colorMaterial';
+import { mapFrameOrThrow } from '../../mappers';
+import { Orientation } from '../../types';
 
 describe(Scene, () => {
   const sceneViewId: UUID.UUID = UUID.create();
@@ -15,6 +17,7 @@ describe(Scene, () => {
   const scene = new Scene(
     streamApi,
     frame,
+    mapFrameOrThrow(Orientation.DEFAULT),
     imageScaleProvider,
     sceneViewId,
     colorMaterial

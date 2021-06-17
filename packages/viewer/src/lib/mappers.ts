@@ -276,3 +276,12 @@ export function mapFrame(
     }
   );
 }
+
+export type FrameDecoder = M.ThrowIfInvalidFunc<
+  vertexvis.protobuf.stream.IDrawFramePayload,
+  Frame
+>;
+
+export function mapFrameOrThrow(worldOrientation: Orientation): FrameDecoder {
+  return M.ifInvalidThrow(mapFrame(worldOrientation));
+}

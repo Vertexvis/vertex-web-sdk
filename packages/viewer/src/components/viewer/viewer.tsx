@@ -21,7 +21,6 @@ import {
   Color,
   Async,
   EventDispatcher,
-  Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
 import {
@@ -91,7 +90,7 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import { mapFrame } from '../../lib/mappers';
+import { mapFrameOrThrow } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -108,6 +107,10 @@ interface DisconnectedStatus {
   status: 'disconnected';
 }
 
+/**
+ * Internal state values for the component. Used to preserve values across live
+ * reload refreshes.
+ */
 interface StateMap {
   streamWorldOrientation?: Orientation;
 }
@@ -286,6 +289,11 @@ export class Viewer {
   @State() private hostDimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
+  /**
+   * This stores internal state that you want to preserve across live-reloads,
+   * but shouldn't trigger a refresh if the data changes. Marking this with
+   * @State to allow to preserve state across live-reloads.
+   */
   @State() private stateMap: StateMap = {};
 
   @Element() private hostElement!: HTMLElement;
@@ -1014,10 +1022,7 @@ export class Viewer {
     ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        const mapFrameOrThrow = Mapper.ifInvalidThrow(
-          mapFrame(worldOrientation)
-        );
-        this.frame = mapFrameOrThrow(payload);
+        this.frame = mapFrameOrThrow(worldOrientation)(payload);
 
         const data = {
           canvas,
@@ -1128,23 +1133,28 @@ export class Viewer {
   }
 
   private createScene(): Scene {
-    if (this.lastFrame == null || this.sceneViewId == null) {
+    if (
+      this.lastFrame == null ||
+      this.sceneViewId == null ||
+      this.stateMap.streamWorldOrientation == null
+    ) {
       throw new IllegalStateError(
         'Cannot create scene. Frame has not been rendered or stream not initialized.'
       );
-    } else {
-      const selectionMaterial =
-        typeof this.selectionMaterial === 'string'
-          ? fromHex(this.selectionMaterial)
-          : this.selectionMaterial;
-      return new Scene(
-        this.stream,
-        this.lastFrame,
-        () => this.getImageScale(),
-        this.sceneViewId,
-        selectionMaterial
-      );
     }
+
+    const selectionMaterial =
+      typeof this.selectionMaterial === 'string'
+        ? fromHex(this.selectionMaterial)
+        : this.selectionMaterial;
+    return new Scene(
+      this.stream,
+      this.lastFrame,
+      mapFrameOrThrow(this.stateMap.streamWorldOrientation),
+      () => this.getImageScale(),
+      this.sceneViewId,
+      selectionMaterial
+    );
   }
 
   private async getDepth(point: Point.Point): Promise<number> {

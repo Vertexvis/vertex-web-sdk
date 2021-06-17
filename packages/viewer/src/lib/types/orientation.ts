@@ -8,7 +8,7 @@ export class Orientation {
    * A default orientation where up points up is represented as `[0, 1, 0]` and
    * forward is represented as `[0, 0, -1]`.
    */
-  public static DEFAULT = new Orientation(Vector3.up(), Vector3.forward());
+  public static DEFAULT = new Orientation(Vector3.up(), Vector3.back());
 
   public constructor(
     /**

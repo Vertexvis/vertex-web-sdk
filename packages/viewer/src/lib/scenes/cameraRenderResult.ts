@@ -1,6 +1,8 @@
 import { StreamApi } from '@vertexvis/stream-api';
 import { Result } from '../stream/result';
 import { StreamApiEventDispatcher } from '../stream/dispatcher';
+import type { FrameDecoder } from '../mappers';
+import { Frame } from '../types';
 
 export interface RenderResultIds {
   animationId?: string;
@@ -10,10 +12,11 @@ export interface RenderResultIds {
 export class CameraRenderResult implements Result {
   public data = undefined;
   public onAnimationCompleted: StreamApiEventDispatcher<string>;
-  public onFrameReceived: StreamApiEventDispatcher<void>;
+  public onFrameReceived: StreamApiEventDispatcher<Frame>;
 
   public constructor(
     stream: StreamApi,
+    decodeFrame: FrameDecoder,
     { animationId, correlationId }: RenderResultIds,
     timeout?: number
   ) {
@@ -23,13 +26,16 @@ export class CameraRenderResult implements Result {
       (msg) => msg.event?.animationCompleted?.animationId?.hex || undefined,
       timeout
     );
-    this.onFrameReceived = new StreamApiEventDispatcher<void>(
+    this.onFrameReceived = new StreamApiEventDispatcher<Frame>(
       stream,
       (msg) =>
         !!msg.request?.drawFrame?.frameCorrelationIds?.some(
           (id) => id === correlationId
         ),
-      (msg) => undefined,
+      (msg) =>
+        msg.request?.drawFrame != null
+          ? decodeFrame(msg.request.drawFrame)
+          : undefined,
       timeout
     );
   }

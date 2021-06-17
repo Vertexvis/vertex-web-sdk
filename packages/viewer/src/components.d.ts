@@ -17,7 +17,7 @@ import { ColorMaterial } from "./lib/scenes/colorMaterial";
 import { Frame, FramePerspectiveCamera } from "./lib/types/frame";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions, Euler, Quaternion, Vector3 } from "@vertexvis/geometry";
+import { Dimensions, Euler, Matrix4, Quaternion, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./lib/commands/command";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
@@ -28,7 +28,7 @@ import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
-import { DepthBuffer } from "./lib/types";
+import { DepthBuffer, Orientation } from "./lib/types";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -374,9 +374,17 @@ export namespace Components {
          */
         "standardViewsDisabled": boolean;
         /**
+          * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+         */
+        "viewMatrix"?: Matrix4.Matrix4;
+        /**
           * An instance of the viewer to bind to.
          */
         "viewer"?: HTMLVertexViewerElement;
+        /**
+          * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
+         */
+        "worldOrientation": Orientation;
         /**
           * The label for the side of the cube on the negative x-axis.
          */
@@ -751,9 +759,17 @@ declare namespace LocalJSX {
          */
         "standardViewsDisabled"?: boolean;
         /**
+          * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+         */
+        "viewMatrix"?: Matrix4.Matrix4;
+        /**
           * An instance of the viewer to bind to.
          */
         "viewer"?: HTMLVertexViewerElement;
+        /**
+          * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
+         */
+        "worldOrientation"?: Orientation;
         /**
           * The label for the side of the cube on the negative x-axis.
          */
