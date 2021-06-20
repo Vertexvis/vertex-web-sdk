@@ -188,6 +188,21 @@ export function mapProp<T, P extends keyof T, R>(
 }
 
 /**
+ * Returns a mapper that will check if the given property is defined, and if so
+ * invoke the given mapping function.
+ *
+ * @param prop The name of the property to map over.
+ * @param mapper A function that will be invoked with the property's value if
+ *   the property is defined.
+ */
+export function mapRequiredProp<T, P extends keyof T, R>(
+  prop: P,
+  mapper: Func<NonNullable<T[P]>, R>
+): Func<T, R> {
+  return mapProp(prop, compose(required(prop.toString()), mapper));
+}
+
+/**
  * Returns a mapper that will invoke a mapper over each value in the input
  * array. Returns `Invalid` containing errors for all invalid values in the
  * array.
