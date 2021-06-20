@@ -93,7 +93,7 @@ export class ViewerViewCube {
    * set, this property will be populated automatically.
    */
   @Prop({ mutable: true })
-  public viewMatrix?: Matrix4.Matrix4 = Matrix4.makeIdentity();
+  public viewMatrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
   /**
    * An instance of the viewer to bind to.
@@ -110,7 +110,7 @@ export class ViewerViewCube {
 
   protected render(): h.JSX.IntrinsicElements {
     const rotationMatrix = Matrix4.position(
-      this.viewMatrix || Matrix4.makeIdentity(),
+      this.viewMatrix,
       Matrix4.makeIdentity()
     );
     const m = Matrix4.multiply(rotationMatrix, this.worldOrientation.matrix);

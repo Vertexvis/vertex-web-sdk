@@ -13,7 +13,7 @@ import {
 } from '@stencil/core';
 import { ResizeObserver, ResizeObserverEntry } from '@juggle/resize-observer';
 import { Config, parseConfig } from '../../lib/config';
-import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
 import {
   Disposable,
@@ -59,8 +59,6 @@ import { Scene } from '../../lib/scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
-  getAssignedSlotElements,
-  queryAllChildren,
 } from './utils';
 import {
   acknowledgeFrameRequests,
@@ -90,7 +88,7 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import { mapFrameOrThrow } from '../../lib/mappers';
+import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -779,11 +777,14 @@ export class Viewer {
         }),
       });
 
-      this.jwt = startStream?.jwt || undefined;
+      const { streamId, sessionId, sceneViewId, jwt, worldOrientation } =
+        startStream || {};
+
+      this.jwt = jwt || undefined;
       this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
 
-      if (this.clientId != null && startStream?.sessionId?.hex != null) {
-        this.streamSessionId = startStream.sessionId.hex;
+      if (this.clientId != null && sessionId?.hex != null) {
+        this.streamSessionId = sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
           upsertStorageEntry('vertexvis:stream-sessions', {
@@ -794,18 +795,17 @@ export class Viewer {
         }
       }
 
-      if (startStream?.sceneViewId?.hex != null) {
-        this.sceneViewId = startStream.sceneViewId.hex;
+      if (sceneViewId?.hex != null) {
+        this.sceneViewId = sceneViewId.hex;
         this.isStreamStarted = true;
       }
-      if (startStream?.streamId?.hex != null) {
-        this.streamId = startStream.streamId.hex;
+      if (streamId?.hex != null) {
+        this.streamId = streamId.hex;
       }
 
       // Need to parse world orientation.
-      this.stateMap.streamWorldOrientation = new Orientation(
-        Vector3.up(),
-        Vector3.back()
+      this.stateMap.streamWorldOrientation = mapWorldOrientationOrThrow(
+        worldOrientation
       );
 
       console.debug(
@@ -970,24 +970,26 @@ export class Viewer {
   }
 
   private injectViewerApi(): void {
-    const slot = this.hostElement.shadowRoot?.querySelector('slot');
-
-    if (slot != null) {
-      getAssignedSlotElements(slot)
-        .filter((node) => node.nodeName.startsWith('VERTEX-'))
-        .reduce(
-          (elements, element) => [
-            ...elements,
-            element,
-            ...queryAllChildren(element),
-          ],
-          [] as Element[]
-        )
-        .forEach((node) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (node as any).viewer = this.hostElement;
-        });
+    function queryChildren(el: Element): HTMLElement[] {
+      return Array.from(el.querySelectorAll('*'));
     }
+
+    const children = queryChildren(this.hostElement);
+
+    children
+      .filter((node) => node.nodeName.startsWith('VERTEX-'))
+      .reduce(
+        (elements, element) => [
+          ...elements,
+          element,
+          ...queryChildren(element),
+        ],
+        [] as Element[]
+      )
+      .forEach((node) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (node as any).viewer = this.hostElement;
+      });
   }
 
   private async handleStreamRequest(

@@ -1,20 +1,28 @@
+jest.mock('../viewer/utils');
+
+import '../../testing/domMocks';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { ViewerViewCube } from './viewer-view-cube';
-import {
-  sceneMock,
-  cameraMock,
-  viewer,
-  resetAwaiter,
-  awaitScene,
-} from '../viewer/__mocks__/mocks';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { ViewerViewCube } from './viewer-view-cube';
 import { Orientation } from '../../lib/types';
+import { loadModelForViewer } from '../../testing/viewer';
+import { Viewer } from '../viewer/viewer';
+import { getElementBoundingClientRect } from '../viewer/utils';
 
 describe('<vertex-viewer-view-cube>', () => {
+  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+    left: 0,
+    top: 0,
+    bottom: 150,
+    right: 200,
+    width: 200,
+    height: 150,
+  });
+
   beforeEach(() => {
-    resetAwaiter(sceneMock);
     jest.clearAllMocks();
     jest.restoreAllMocks();
   });
@@ -110,6 +118,28 @@ describe('<vertex-viewer-view-cube>', () => {
     );
   });
 
+  it('applies camera and world transform from viewer', async () => {
+    const page = await newSpecPage({
+      components: [Viewer, ViewerViewCube],
+      html: `
+        <vertex-viewer>
+          <vertex-viewer-view-cube></vertex-viewer-view-cube>
+        </vertex-viewer>
+      `,
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const viewCube = page.body.querySelector('vertex-viewer-view-cube');
+    const el = viewCube?.shadowRoot?.querySelector('.cube') as HTMLElement;
+
+    await loadModelForViewer(viewer);
+    await page.waitForChanges();
+
+    expect(el?.style.transform).toContain(`matrix3d`);
+  });
+
   it('sets hovered selector when mouse entered', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
@@ -138,6 +168,22 @@ describe('<vertex-viewer-view-cube>', () => {
     await page.waitForChanges();
 
     expect(el?.className).not.toContain('hovered');
+  });
+});
+
+import {
+  sceneMock,
+  cameraMock,
+  viewer,
+  resetAwaiter,
+  awaitScene,
+} from '../viewer/__mocks__/mocks';
+
+describe('<vertex-viewer-view-cube> interactions', () => {
+  beforeEach(() => {
+    resetAwaiter(sceneMock);
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('performs standard view when side clicked', async () => {
