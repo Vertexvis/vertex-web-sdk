@@ -58,7 +58,6 @@ export function fromDegrees(value: Partial<Euler> = {}): Euler {
  *
  * @param matrix A pure rotation matrix, unscaled.
  * @param order The order that the rotations are applied.
- * @returns
  */
 export function fromRotationMatrix(
   matrix: Matrix4.Matrix4,

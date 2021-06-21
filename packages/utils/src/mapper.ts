@@ -101,7 +101,7 @@ export type Func<T, R> = (input: T) => Validated<R>;
 
 /**
  * A function that transforms an input into another type, or throws if the input
- * is valid;
+ * is invalid.
  */
 export type ThrowIfInvalidFunc<T, R> = (input: T) => R;
 

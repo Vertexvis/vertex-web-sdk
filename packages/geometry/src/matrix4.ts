@@ -258,9 +258,7 @@ export function makeRotationAxis(
   const s = Math.sin(radians);
   const t = 1 - c;
 
-  const x = axis.x;
-  const y = axis.y;
-  const z = axis.z;
+  const { x, y, z } = axis;
 
   const tx = t * x;
   const ty = t * y;
