@@ -212,8 +212,9 @@ export class SceneTree {
   private computedRowHeight: number | undefined;
 
   /**
-   * This stores state that shouldn't trigger a refresh if the data changes.
-   * Marking this with @State to allow to preserve state across live-reloads.
+   * This stores internal state that you want to preserve across live-reloads,
+   * but shouldn't trigger a refresh if the data changes. Marking this with
+   * @State to allow to preserve state across live-reloads.
    */
   @State()
   private stateMap: StateMap = {

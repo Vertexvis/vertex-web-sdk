@@ -4,7 +4,6 @@ jest.mock('../../lib/sessions/storage');
 
 import '../../testing/domMocks';
 import {
-  getAssignedSlotElements,
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
@@ -27,8 +26,6 @@ describe('vertex-viewer', () => {
     width: 200,
     height: 150,
   });
-
-  (getAssignedSlotElements as jest.Mock).mockReturnValue([]);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -396,6 +393,10 @@ async function loadNewModelForViewer(
       sceneViewId: { hex: 'scene-view-id' },
       streamId: { hex: 'stream-id' },
       jwt: 'jwt-value',
+      worldOrientation: {
+        front: { x: 0, y: 0, z: 1 },
+        up: { x: 0, y: 1, z: 0 },
+      },
     },
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };

@@ -21,10 +21,14 @@ import {
   Color,
   Async,
   EventDispatcher,
-  Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import { LoadableResource, SynchronizedClock, Viewport } from '../../lib/types';
+import {
+  LoadableResource,
+  SynchronizedClock,
+  Viewport,
+  Orientation,
+} from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -55,8 +59,6 @@ import { Scene } from '../../lib/scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
-  getAssignedSlotElements,
-  queryAllChildren,
 } from './utils';
 import {
   acknowledgeFrameRequests,
@@ -86,7 +88,7 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import { mapFrame } from '../../lib/mappers';
+import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -101,6 +103,14 @@ interface ConnectingStatus {
 
 interface DisconnectedStatus {
   status: 'disconnected';
+}
+
+/**
+ * Internal state values for the component. Used to preserve values across live
+ * reload refreshes.
+ */
+interface StateMap {
+  streamWorldOrientation?: Orientation;
 }
 
 /** @internal */
@@ -213,8 +223,7 @@ export class Viewer {
    *
    * @readonly
    */
-  @Prop({ mutable: true })
-  public streamAttributes: ViewerStreamAttributes = {};
+  @Prop({ mutable: true }) public streamAttributes: ViewerStreamAttributes = {};
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -277,6 +286,13 @@ export class Viewer {
   @State() private dimensions?: Dimensions.Dimensions;
   @State() private hostDimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
+
+  /**
+   * This stores internal state that you want to preserve across live-reloads,
+   * but shouldn't trigger a refresh if the data changes. Marking this with
+   * @State to allow to preserve state across live-reloads.
+   */
+  @State() private stateMap: StateMap = {};
 
   @Element() private hostElement!: HTMLElement;
 
@@ -620,7 +636,7 @@ export class Viewer {
    * @ignore
    */
   @Watch('experimentalGhostingOpacity')
-  protected handleExperimentalGhostingOpacity(): void {
+  protected handleExperimentalGhostingOpacityChanged(): void {
     this.updateStreamAttributesProp();
   }
 
@@ -672,6 +688,7 @@ export class Viewer {
       this.clock = undefined;
       this.errorMessage = undefined;
       this.resource = undefined;
+      this.stateMap.streamWorldOrientation = undefined;
     }
   }
 
@@ -750,7 +767,7 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
-      const result = await this.stream.startStream({
+      const { startStream } = await this.stream.startStream({
         streamKey: { value: this.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -760,11 +777,14 @@ export class Viewer {
         }),
       });
 
-      this.jwt = result.startStream?.jwt || undefined;
+      const { streamId, sessionId, sceneViewId, jwt, worldOrientation } =
+        startStream || {};
+
+      this.jwt = jwt || undefined;
       this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
 
-      if (this.clientId != null && result.startStream?.sessionId?.hex != null) {
-        this.streamSessionId = result.startStream.sessionId.hex;
+      if (this.clientId != null && sessionId?.hex != null) {
+        this.streamSessionId = sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
           upsertStorageEntry('vertexvis:stream-sessions', {
@@ -775,17 +795,25 @@ export class Viewer {
         }
       }
 
-      if (result.startStream?.sceneViewId?.hex != null) {
-        this.sceneViewId = result.startStream.sceneViewId.hex;
+      if (sceneViewId?.hex != null) {
+        this.sceneViewId = sceneViewId.hex;
         this.isStreamStarted = true;
       }
-      if (result.startStream?.streamId?.hex != null) {
-        this.streamId = result.startStream.streamId.hex;
+      if (streamId?.hex != null) {
+        this.streamId = streamId.hex;
       }
+
+      // Need to parse world orientation.
+      this.stateMap.streamWorldOrientation = mapWorldOrientationOrThrow(
+        worldOrientation
+      );
+
       console.debug(
         `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
       );
+
       await this.waitNextDrawnFrame(15 * 1000);
+
       this.sceneReady.emit();
     } catch (e) {
       this.emitConnectionChange({ status: 'disconnected' });
@@ -942,24 +970,26 @@ export class Viewer {
   }
 
   private injectViewerApi(): void {
-    const slot = this.hostElement.shadowRoot?.querySelector('slot');
-
-    if (slot != null) {
-      getAssignedSlotElements(slot)
-        .filter((node) => node.nodeName.startsWith('VERTEX-'))
-        .reduce(
-          (elements, element) => [
-            ...elements,
-            element,
-            ...queryAllChildren(element),
-          ],
-          [] as Element[]
-        )
-        .forEach((node) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (node as any).viewer = this.hostElement;
-        });
+    function queryChildren(el: Element): HTMLElement[] {
+      return Array.from(el.querySelectorAll('*'));
     }
+
+    const children = queryChildren(this.hostElement);
+
+    children
+      .filter((node) => node.nodeName.startsWith('VERTEX-'))
+      .reduce(
+        (elements, element) => [
+          ...elements,
+          element,
+          ...queryChildren(element),
+        ],
+        [] as Element[]
+      )
+      .forEach((node) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (node as any).viewer = this.hostElement;
+      });
   }
 
   private async handleStreamRequest(
@@ -985,11 +1015,16 @@ export class Viewer {
     payload: vertexvis.protobuf.stream.IDrawFramePayload
   ): Promise<void> {
     const dimensions = this.getCanvasDimensions();
+    const worldOrientation = this.stateMap.streamWorldOrientation;
 
-    if (this.canvasElement != null && dimensions != null) {
+    if (
+      this.canvasElement != null &&
+      dimensions != null &&
+      worldOrientation != null
+    ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        this.frame = Mapper.ifInvalidThrow(mapFrame)(payload);
+        this.frame = mapFrameOrThrow(worldOrientation)(payload);
 
         const data = {
           canvas,
@@ -1100,23 +1135,28 @@ export class Viewer {
   }
 
   private createScene(): Scene {
-    if (this.lastFrame == null || this.sceneViewId == null) {
+    if (
+      this.lastFrame == null ||
+      this.sceneViewId == null ||
+      this.stateMap.streamWorldOrientation == null
+    ) {
       throw new IllegalStateError(
         'Cannot create scene. Frame has not been rendered or stream not initialized.'
       );
-    } else {
-      const selectionMaterial =
-        typeof this.selectionMaterial === 'string'
-          ? fromHex(this.selectionMaterial)
-          : this.selectionMaterial;
-      return new Scene(
-        this.stream,
-        this.lastFrame,
-        () => this.getImageScale(),
-        this.sceneViewId,
-        selectionMaterial
-      );
     }
+
+    const selectionMaterial =
+      typeof this.selectionMaterial === 'string'
+        ? fromHex(this.selectionMaterial)
+        : this.selectionMaterial;
+    return new Scene(
+      this.stream,
+      this.lastFrame,
+      mapFrameOrThrow(this.stateMap.streamWorldOrientation),
+      () => this.getImageScale(),
+      this.sceneViewId,
+      selectionMaterial
+    );
   }
 
   private async getDepth(point: Point.Point): Promise<number> {

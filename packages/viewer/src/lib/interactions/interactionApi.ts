@@ -228,12 +228,12 @@ export class InteractionApi {
 
       if (this.worldRotationPoint != null) {
         const upVector = Vector3.normalize(camera.up);
-        const lookAt = Vector3.normalize(
+        const vv = Vector3.normalize(
           Vector3.subtract(camera.lookAt, camera.position)
         );
 
-        const crossX = Vector3.cross(upVector, lookAt);
-        const crossY = Vector3.cross(lookAt, crossX);
+        const crossX = Vector3.cross(upVector, vv);
+        const crossY = Vector3.cross(vv, crossX);
 
         const mouseToWorld = Vector3.normalize({
           x: delta.x * crossX.x + delta.y * crossY.x,
@@ -241,7 +241,7 @@ export class InteractionApi {
           z: delta.x * crossX.z + delta.y * crossY.z,
         });
 
-        const rotationAxis = Vector3.cross(mouseToWorld, lookAt);
+        const rotationAxis = Vector3.cross(mouseToWorld, vv);
 
         const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
         const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;

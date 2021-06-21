@@ -120,7 +120,7 @@
   transform: rotateY(0deg) rotateY(-90deg) translateX(calc(100% / 2))
     rotateY(90deg);
 }
-.cube-face-left {
+.cube-face-right {
   transform: rotateY(90deg) rotateY(-90deg) translateX(calc(100% / 2))
     rotateY(90deg);
 }
@@ -128,7 +128,7 @@
   transform: rotateY(180deg) rotateY(-90deg) translateX(calc(100% / 2))
     rotateY(90deg);
 }
-.cube-face-right {
+.cube-face-left {
   transform: rotateY(-90deg) rotateY(-90deg) translateX(calc(100% / 2))
     rotateY(90deg);
 }

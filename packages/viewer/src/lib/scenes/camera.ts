@@ -1,10 +1,17 @@
-import { Animation, ClippingPlanes, FlyTo, FrameCamera } from '../types';
+import {
+  Animation,
+  ClippingPlanes,
+  FlyTo,
+  FrameCamera,
+  StandardView,
+} from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import { buildFlyToOperation } from '../commands/streamCommandsMapper';
 import { CameraRenderResult } from './cameraRenderResult';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
+import { FrameDecoder } from '../mappers';
 
 const PI_OVER_360 = 0.008726646259972;
 
@@ -90,7 +97,8 @@ export class Camera implements FrameCamera.FrameCamera {
     private stream: StreamApi,
     private aspect: number,
     private data: FrameCamera.FrameCamera,
-    private boundingBox: BoundingBox.BoundingBox
+    private boundingBox: BoundingBox.BoundingBox,
+    private decodeFrame: FrameDecoder
   ) {}
 
   /**
@@ -210,6 +218,7 @@ export class Camera implements FrameCamera.FrameCamera {
 
         return new CameraRenderResult(
           this.stream,
+          this.decodeFrame,
           {
             correlationId: corrId,
             animationId: flyToResponse.flyTo?.animationId?.hex || undefined,
@@ -224,7 +233,7 @@ export class Camera implements FrameCamera.FrameCamera {
           frameCorrelationId: { value: corrId },
         });
 
-        return new CameraRenderResult(this.stream, {
+        return new CameraRenderResult(this.stream, this.decodeFrame, {
           correlationId: corrId,
         });
       }
@@ -278,6 +287,21 @@ export class Camera implements FrameCamera.FrameCamera {
   }
 
   /**
+   * Updates the `position` and `up` vectors of the camera to the given standard
+   * view.
+   *
+   * @param standardView The standard view to apply.
+   * @returns A new camera.
+   */
+  public standardView(standardView: StandardView): Camera {
+    return this.update({
+      position: standardView.position,
+      lookAt: Vector3.origin(),
+      up: standardView.up,
+    });
+  }
+
+  /**
    * Updates the `position`, `lookAt` and/or `up` vectors of the camera.
    *
    * @param camera The values to update the camera to.
@@ -290,7 +314,8 @@ export class Camera implements FrameCamera.FrameCamera {
         ...this.data,
         ...camera,
       },
-      this.boundingBox
+      this.boundingBox,
+      this.decodeFrame
     );
   }
 

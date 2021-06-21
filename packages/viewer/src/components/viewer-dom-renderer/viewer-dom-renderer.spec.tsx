@@ -29,7 +29,8 @@ describe('<vertex-viewer-dom-renderer>', () => {
     Dimensions.create(100, 100),
     Rectangle.create(0, 0, 100, 100),
     1,
-    createDepthImageBytes(100, 100, 0)
+    createDepthImageBytes(100, 100, 0),
+    Dimensions.create(100, 100)
   );
 
   beforeEach(() => jest.resetAllMocks());

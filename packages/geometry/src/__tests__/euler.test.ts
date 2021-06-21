@@ -4,6 +4,30 @@ import * as Vector3 from '../vector3';
 import * as Angle from '../angle';
 import * as Matrix4 from '../matrix4';
 
+describe(Euler.create, () => {
+  it('creates values with defaults', () => {
+    const euler = Euler.create();
+    expect(euler).toEqual({ x: 0, y: 0, z: 0, order: 'xyz' });
+  });
+
+  it('supports partial create', () => {
+    const euler = Euler.create({ x: 1, y: 2, z: 3, order: undefined });
+    expect(euler).toEqual({ x: 1, y: 2, z: 3, order: 'xyz' });
+  });
+});
+
+describe(Euler.fromDegrees, () => {
+  it('converts degrees to radians', () => {
+    const euler = Euler.fromDegrees({ x: 90, y: -90, z: 180 });
+    expect(euler).toEqual({
+      x: Angle.toRadians(90),
+      y: Angle.toRadians(-90),
+      z: Angle.toRadians(180),
+      order: 'xyz',
+    });
+  });
+});
+
 describe(Euler.fromRotationMatrix, () => {
   const quat = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
   const m = Matrix4.makeRotation(quat);

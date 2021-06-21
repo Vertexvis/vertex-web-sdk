@@ -1780,15 +1780,10 @@
     eslint-plugin-prettier "^3.3.1"
     prettier "^2.2.1"
 
-"@vertexvis/frame-streaming-protos@^0.5.5":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.6.tgz#7944e3e9faa7b067d57d59ef81be5c7ff1d68046"
-  integrity sha512-3G0KgyVnRh4EyIb7L3uSZ9jdYFfxGkQXBsytY400UsH00LJDQ1ah+Yt3LMa09+xcUwBS4ZJ/ugo6opjad096WA==
-
-"@vertexvis/frame-streaming-protos@^0.5.9":
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.9.tgz#d1e3f6dd3ec0b4462105ef0c3dde7b32d5be5f20"
-  integrity sha512-IvvCiteOD8BDw3QP6F0PWykQcCBO0RMexeUzbBQS/hFHlqyKgUfj5nCwmKCIsqo9+QBSnUr+MzVp7EVPLYc/UA==
+"@vertexvis/frame-streaming-protos@^0.5.5", "@vertexvis/frame-streaming-protos@^0.5.9":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.5.10.tgz#73c59da3b0f407007fb9264bf178c276233ebf87"
+  integrity sha512-fwohZQ63GaEYHtl6DZoPVwg7oakVLDMVX38fLTEQi9xV0eoEeRDC4ovtblQ6DP7UBbvK4ivTG6ImDy7YpmCrHg==
 
 "@vertexvis/jest-config-vertexvis@0.5.2", "@vertexvis/jest-config-vertexvis@^0.5.0":
   version "0.5.2"
@@ -3912,9 +3907,9 @@ globby@^11.0.1, globby@^11.0.2:
     slash "^3.0.0"
 
 google-protobuf@^3.15.7:
-  version "3.17.1"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.17.1.tgz#d5224fe7dc931f1a69cbdc5cb6e3d69ae74da651"
-  integrity sha512-CHisE5cwd66w6y/K4K7x2N+SSZ0HgPBQwky7lKsj2vr4nXPuXQ2uUZgMF/ctXnd4xHL747Lh8LUgby2nA8gViA==
+  version "3.17.3"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.17.3.tgz#f87595073545a77946c8f0b67c302c5f7646d700"
+  integrity sha512-OVPzcSWIAJ+d5yiHyeaLrdufQtrvaBrF4JQg+z8ynTkbO3uFcujqXszTumqg1cGsAsjkWnI+M5B1xZ19yR4Wyg==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.2, graceful-fs@^4.2.3, graceful-fs@^4.2.4:
   version "4.2.6"

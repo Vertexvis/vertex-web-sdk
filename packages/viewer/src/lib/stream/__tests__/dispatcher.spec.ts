@@ -6,8 +6,8 @@ import {
 } from '@vertexvis/stream-api';
 import { StreamApiEventDispatcher } from '../dispatcher';
 import '../../../testing/domMocks';
-import { Mapper } from '@vertexvis/utils';
-import { mapFrame } from '../../mappers';
+import { mapFrameOrThrow } from '../../mappers';
+import { Orientation } from '../../types';
 
 describe(StreamApiEventDispatcher, () => {
   const correlationId = 'corr-id';
@@ -21,7 +21,7 @@ describe(StreamApiEventDispatcher, () => {
       ) ?? false,
     (msg) =>
       msg.request?.drawFrame != null
-        ? Mapper.ifInvalidThrow(mapFrame)(msg.request.drawFrame)
+        ? mapFrameOrThrow(Orientation.DEFAULT)(msg.request.drawFrame)
         : undefined,
     5
   );

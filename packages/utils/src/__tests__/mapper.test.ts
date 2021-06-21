@@ -91,6 +91,27 @@ describe(Mapper.mapArray, () => {
   });
 });
 
+describe(Mapper.mapRequiredProp, () => {
+  const mapper = Mapper.mapRequiredProp<{ foo: string | null }, 'foo', number>(
+    'foo',
+    (str) => parseInt(str)
+  );
+
+  it('invokes mapping function if prop is defined', () => {
+    const res = mapper({ foo: '1' });
+    expect(res).toBe(1);
+  });
+
+  it('returns invalid if value is not defined', () => {
+    const res = mapper({ foo: null });
+    expect(res).toEqual(
+      expect.objectContaining({
+        errors: expect.arrayContaining([expect.anything()]),
+      })
+    );
+  });
+});
+
 describe(Mapper.ifInvalidThrow, () => {
   const mapper = Mapper.ifInvalidThrow(Mapper.required<string>(''));
 

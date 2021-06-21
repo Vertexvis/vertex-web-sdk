@@ -69,6 +69,33 @@ describe(Matrix4.makeRotation, () => {
   });
 });
 
+describe(Matrix4.makeRotationAxis, () => {
+  it('creates a rotation matrix from axis and angle', () => {
+    const matrix = Matrix4.makeRotationAxis(Vector3.up(), Angle.toRadians(90));
+    const pt = Vector3.transformMatrix(Vector3.create(1, 0, 0), matrix);
+    expect(pt.x).toBeCloseTo(0);
+    expect(pt.y).toBeCloseTo(0);
+    expect(pt.z).toBeCloseTo(-1);
+  });
+});
+
+describe(Matrix4.makeBasis, () => {
+  it('creates a basis matrix', () => {
+    const x = { x: 1, y: 2, z: 3 };
+    const y = { x: 11, y: 22, z: 33 };
+    const z = { x: 111, y: 222, z: 333 };
+    const matrix = Matrix4.makeBasis(x, y, z);
+    /* eslint-disable prettier/prettier */
+    expect(matrix).toEqual([
+      1,   2,   3,   0,
+      11,  22,  33,  0,
+      111, 222, 333, 0,
+      0,   0,   0,   1
+    ])
+    /* eslint-enable prettier/prettier */
+  });
+});
+
 describe(Matrix4.makeScale, () => {
   it('creates matrix with scale components', () => {
     const m = Matrix4.makeScale(Vector3.create(1, 2, 3));

@@ -15,11 +15,15 @@ export * from './depthBuffer';
 
 export * from './frame';
 
+export * from './standardView';
+
 export * from './synchronizedClock';
 
 export * from './typeGuards';
 
 export * from './viewport';
+
+export * from './orientation';
 
 export {
   ClippingPlanes,

@@ -18,8 +18,6 @@ import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { h } from '@stencil/core';
 import { SceneTree } from './scene-tree';
 import { SceneTreeController } from './lib/controller';
-import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
-import * as Fixtures from '../../testing/fixtures';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
@@ -35,10 +33,7 @@ import {
   ResponseStreamMock,
 } from './lib/testing';
 import { Viewer } from '../viewer/viewer';
-import {
-  getAssignedSlotElements,
-  getElementBoundingClientRect,
-} from '../viewer/utils';
+import { getElementBoundingClientRect } from '../viewer/utils';
 import {
   getSceneTreeContainsElement,
   getSceneTreeOffsetTop,
@@ -51,6 +46,7 @@ import { decodeSceneTreeJwt } from './lib/jwt';
 import { grpc } from '@improbable-eng/grpc-web';
 import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
+import { loadModelForViewer } from '../../testing/viewer';
 
 const random = new Chance();
 
@@ -67,7 +63,6 @@ describe('<vertex-scene-tree>', () => {
     width: 200,
     height: 150,
   });
-  (getAssignedSlotElements as jest.Mock).mockReturnValue([]);
 
   // Scene tree mocks
   (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
@@ -108,7 +103,7 @@ describe('<vertex-scene-tree>', () => {
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
 
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       expect(
@@ -140,12 +135,18 @@ describe('<vertex-scene-tree>', () => {
         ),
       });
 
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, {
+        jwt,
+        streamKey: decodeSceneTreeJwt(jwt).view,
+      });
       await waitForSceneTreeConnected();
 
       rowData.mockClear();
       const newJwt = signJwt(random.guid());
-      await loadViewer(newJwt, viewer);
+      await loadModelForViewer(viewer, {
+        jwt: newJwt,
+        streamKey: decodeSceneTreeJwt(newJwt).view,
+      });
       await waitForSceneTreeConnected();
       await page.waitForChanges();
 
@@ -170,7 +171,7 @@ describe('<vertex-scene-tree>', () => {
           </div>
         ),
       });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
     });
 
     it('renders message if load failed', async () => {
@@ -179,7 +180,7 @@ describe('<vertex-scene-tree>', () => {
 
       const controller = new SceneTreeController(client, 100);
       const { tree, viewer } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
 
       const errorEl = tree.shadowRoot?.querySelector('.error');
       expect(errorEl).toBeDefined();
@@ -211,7 +212,7 @@ describe('<vertex-scene-tree>', () => {
         ),
       });
 
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const res = mockGetTree({ client });
@@ -221,7 +222,7 @@ describe('<vertex-scene-tree>', () => {
       ) as HTMLVertexViewerElement;
       tree.viewer = newViewer;
       await page.waitForChanges();
-      await loadViewer(newJwt, newViewer);
+      await loadModelForViewer(newViewer, { jwt: newJwt });
       await waitForSceneTreeConnected();
 
       const row = tree.querySelectorAll(
@@ -257,7 +258,7 @@ describe('<vertex-scene-tree>', () => {
         ),
       });
 
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       rowData.mockClear();
@@ -280,7 +281,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(1);
@@ -302,7 +303,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const pendingEvent = new Promise<MouseEvent>((resolve) => {
@@ -332,7 +333,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowForEvent(
@@ -355,7 +356,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtClientY(30);
@@ -378,7 +379,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.expandItem(0);
@@ -395,7 +396,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.expandItem(0);
@@ -418,7 +419,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.collapseItem(0);
@@ -435,7 +436,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.collapseItem(0);
@@ -458,7 +459,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.toggleExpandItem(0);
@@ -479,7 +480,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.toggleExpandItem(0);
@@ -499,7 +500,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.toggleItemVisibility(0);
@@ -519,7 +520,7 @@ describe('<vertex-scene-tree>', () => {
       } = await newSceneTreeSpec({
         controller,
       });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.toggleItemVisibility(0);
@@ -537,7 +538,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -558,7 +559,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -577,7 +578,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.showItem(0);
@@ -595,7 +596,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.showItem(0);
@@ -615,7 +616,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -634,7 +635,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.hideItem(0);
@@ -652,7 +653,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.hideItem(0);
@@ -677,7 +678,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -701,7 +702,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -725,7 +726,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -764,7 +765,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(2);
@@ -792,7 +793,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const row = await tree.getRowAtIndex(0);
@@ -811,7 +812,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.deselectItem(0);
@@ -835,7 +836,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.scrollToIndex(1, { position: 'start' });
@@ -857,7 +858,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.scrollToIndex(50, { position: 'middle' });
@@ -879,7 +880,7 @@ describe('<vertex-scene-tree>', () => {
         viewer,
         waitForSceneTreeConnected,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       await tree.scrollToIndex(99, { position: 'end' });
@@ -912,7 +913,7 @@ describe('<vertex-scene-tree>', () => {
         waitForSceneTreeConnected,
         page,
       } = await newSceneTreeSpec({ controller });
-      await loadViewer(jwt, viewer);
+      await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       const tree = page.rootInstance as SceneTree;
@@ -974,34 +975,6 @@ async function newSceneTreeSpec(data: {
       await page.waitForChanges();
     },
   };
-}
-
-async function loadViewer(
-  jwt: string,
-  viewer: HTMLVertexViewerElement
-): Promise<void> {
-  const startStream = {
-    startStream: {
-      sceneViewId: { hex: 'scene-view-id' },
-      streamId: { hex: 'stream-id' },
-      jwt,
-    },
-  };
-  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-  const api = await viewer.getStream();
-  (api.connect as jest.Mock).mockResolvedValue({
-    dispose: () => api.dispose(),
-  });
-  (api.startStream as jest.Mock).mockResolvedValue(startStream);
-  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
-
-  const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
-  const loading = viewer.load(`urn:vertexvis:stream-key:${sceneViewId}`);
-
-  // Emit frame drawn on next event loop
-  setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
-
-  await loading;
 }
 
 interface MockGetTreeOptions {
