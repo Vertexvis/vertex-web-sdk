@@ -61,7 +61,7 @@ describe(DepthBuffer, () => {
     it('returns true if distance of world point is further than depth value', () => {
       const occluded = depthBuffer.isOccluded(
         { x: 0, y: 0, z: 200 },
-        new Viewport(Dimensions.create(100, 100))
+        new Viewport(100, 100)
       );
       expect(occluded).toBe(true);
     });
@@ -69,7 +69,7 @@ describe(DepthBuffer, () => {
     it('returns false if distance of world point is closer than depth value', () => {
       const occluded = depthBuffer.isOccluded(
         { x: 0, y: 0, z: -100 },
-        new Viewport(Dimensions.create(100, 100))
+        new Viewport(100, 100)
       );
       expect(occluded).toBe(false);
     });

@@ -1,0 +1,39 @@
+:host {
+  /**
+   * @prop --viewer-distance-measurement-line-stroke: A CSS color that specifies
+   * the color of the measurement line.
+   */
+  --viewer-distance-measurement-line-stroke: var(--blue-600);
+
+  /**
+   * @prop --viewer-distance-measurement-line-stroke-width: A CSS length that
+   * width of the measurement line.
+   */
+  --viewer-distance-measurement-line-stroke-width: 2px;
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.line {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  stroke: var(--viewer-distance-measurement-line-stroke);
+  stroke-width: var(--viewer-distance-measurement-line-stroke-width);
+}
+
+.anchor-container {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.anchor {
+  background-color: var(--blue-600);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}

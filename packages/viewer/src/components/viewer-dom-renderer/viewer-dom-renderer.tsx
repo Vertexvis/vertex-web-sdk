@@ -8,7 +8,6 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Dimensions } from '@vertexvis/geometry';
 import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
 import { DepthBuffer, Viewport } from '../../lib/types';
@@ -63,7 +62,7 @@ export class ViewerDomRenderer {
   public depthBuffer?: DepthBuffer;
 
   @State()
-  private viewport: Viewport = new Viewport(Dimensions.create(0, 0));
+  private viewport: Viewport = new Viewport(0, 0);
 
   @State()
   private invalidateFrameCounter = 0;
@@ -158,10 +157,7 @@ export class ViewerDomRenderer {
 
   private handleResize(): void {
     const bounds = this.hostEl.getBoundingClientRect();
-    this.viewport = new Viewport({
-      width: bounds.width,
-      height: bounds.height,
-    });
+    this.viewport = new Viewport(bounds.width, bounds.height);
   }
 
   private handleChildrenChange(): void {

@@ -1030,7 +1030,7 @@ export class Viewer {
           canvas,
           dimensions,
           frame: this.frame,
-          viewport: new Viewport(
+          viewport: Viewport.fromDimensions(
             this.getCanvasDimensions() || Dimensions.create(0, 0)
           ),
         };

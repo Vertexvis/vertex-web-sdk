@@ -12,10 +12,45 @@ import type { FrameImageLike } from './frame';
  * translate 2D coordinates between the viewport and the frame.
  */
 export class Viewport implements Dimensions.Dimensions {
+  /**
+   * The center point of the viewport.
+   */
   public readonly center: Point.Point;
 
-  public constructor(public dimensions: Dimensions.Dimensions) {
-    this.center = Dimensions.center(dimensions);
+  public constructor(
+    /**
+     * The width of the viewport.
+     */
+    public readonly width: number,
+
+    /**
+     * The height of the viewport.
+     */
+    public readonly height: number
+  ) {
+    this.center = Dimensions.center(this.dimensions);
+  }
+
+  /**
+   * Returns a new viewport with the given dimensions.
+   * @param dimensions The dimensions of the viewport
+   * @returns A new viewport.
+   */
+  public static fromDimensions(dimensions: Dimensions.Dimensions): Viewport {
+    return new Viewport(dimensions.width, dimensions.height);
+  }
+
+  /**
+   * @deprecated
+   *
+   * Transforms a normalized device coordinate to a 2D point within the
+   * viewport.
+   *
+   * @param ndc A 3D point in NDC.
+   * @returns A 2D point in the coordinate space of the viewport.
+   */
+  public transformNdc(ndc: Vector3.Vector3): Point.Point {
+    return this.transformPointToViewport(ndc);
   }
 
   /**
@@ -25,7 +60,7 @@ export class Viewport implements Dimensions.Dimensions {
    * @param ndc A 3D point in NDC.
    * @returns A 2D point in the coordinate space of the viewport.
    */
-  public transformNdc(ndc: Vector3.Vector3): Point.Point {
+  public transformPointToViewport(ndc: Vector3.Vector3): Point.Point {
     return Point.create(
       ndc.x * this.center.x + this.center.x,
       -ndc.y * this.center.y + this.center.y
@@ -85,17 +120,7 @@ export class Viewport implements Dimensions.Dimensions {
     return Point.create(scaleX, scaleY);
   }
 
-  /**
-   * The width of the viewport.
-   */
-  public get width(): number {
-    return this.dimensions.width;
-  }
-
-  /**
-   * The height of the viewport.
-   */
-  public get height(): number {
-    return this.dimensions.height;
+  public get dimensions(): Dimensions.Dimensions {
+    return Dimensions.create(this.width, this.height);
   }
 }

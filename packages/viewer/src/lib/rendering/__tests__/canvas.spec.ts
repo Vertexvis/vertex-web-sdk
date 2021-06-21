@@ -26,14 +26,14 @@ const drawFrame1: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
   frame: Fixtures.frame,
-  viewport: new Viewport(Dimensions.create(100, 50)),
+  viewport: new Viewport(100, 50),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
   frame: Fixtures.frame,
-  viewport: new Viewport(Dimensions.create(100, 50)),
+  viewport: new Viewport(100, 50),
 };
 
 const drawPixel: DrawPixel = {
