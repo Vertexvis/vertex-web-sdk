@@ -12,12 +12,12 @@ export class StandardView {
   /**
    * A standard view that positions the camera facing the left of the scene.
    */
-  public static LEFT = new StandardView(Vector3.left(), Vector3.up());
+  public static LEFT = new StandardView(Vector3.right(), Vector3.up());
 
   /**
    * A standard view that positions the camera facing the right of the scene.
    */
-  public static RIGHT = new StandardView(Vector3.right(), Vector3.up());
+  public static RIGHT = new StandardView(Vector3.left(), Vector3.up());
 
   /**
    * A standard view that positions the camera facing the back of the scene.
@@ -39,7 +39,7 @@ export class StandardView {
    * scene.
    */
   public static TOP_FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.up(), Vector3.left()),
+    Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
     Vector3.up()
   );
 
@@ -48,7 +48,7 @@ export class StandardView {
    * scene.
    */
   public static TOP_FRONT_RIGHT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
+    Vector3.add(Vector3.back(), Vector3.up(), Vector3.left()),
     Vector3.up()
   );
 
@@ -57,7 +57,7 @@ export class StandardView {
    * the scene.
    */
   public static BOTTOM_FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.down(), Vector3.left()),
+    Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
     Vector3.up()
   );
 
@@ -66,7 +66,7 @@ export class StandardView {
    * the scene.
    */
   public static BOTTOM_FRONT_RIGHT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
+    Vector3.add(Vector3.back(), Vector3.down(), Vector3.left()),
     Vector3.up()
   );
 
@@ -75,7 +75,7 @@ export class StandardView {
    * scene.
    */
   public static TOP_BACK_LEFT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.up(), Vector3.left()),
+    Vector3.add(Vector3.forward(), Vector3.up(), Vector3.right()),
     Vector3.up()
   );
 
@@ -84,7 +84,7 @@ export class StandardView {
    * scene.
    */
   public static TOP_BACK_RIGHT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.up(), Vector3.right()),
+    Vector3.add(Vector3.forward(), Vector3.up(), Vector3.left()),
     Vector3.up()
   );
 
@@ -93,7 +93,7 @@ export class StandardView {
    * the scene.
    */
   public static BOTTOM_BACK_LEFT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.down(), Vector3.left()),
+    Vector3.add(Vector3.forward(), Vector3.down(), Vector3.right()),
     Vector3.up()
   );
 
@@ -102,7 +102,7 @@ export class StandardView {
    * the scene.
    */
   public static BOTTOM_BACK_RIGHT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.down(), Vector3.right()),
+    Vector3.add(Vector3.forward(), Vector3.down(), Vector3.left()),
     Vector3.up()
   );
 
@@ -129,7 +129,7 @@ export class StandardView {
    * scene.
    */
   public static FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.left()),
+    Vector3.add(Vector3.back(), Vector3.right()),
     Vector3.up()
   );
 
@@ -138,7 +138,7 @@ export class StandardView {
    * scene.
    */
   public static FRONT_RIGHT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.right()),
+    Vector3.add(Vector3.back(), Vector3.left()),
     Vector3.up()
   );
 
@@ -164,7 +164,7 @@ export class StandardView {
    * scene.
    */
   public static BACK_LEFT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.left()),
+    Vector3.add(Vector3.forward(), Vector3.right()),
     Vector3.up()
   );
 
@@ -173,7 +173,7 @@ export class StandardView {
    * scene.
    */
   public static BACK_RIGHT = new StandardView(
-    Vector3.add(Vector3.forward(), Vector3.right()),
+    Vector3.add(Vector3.forward(), Vector3.left()),
     Vector3.up()
   );
 
@@ -181,7 +181,7 @@ export class StandardView {
    * A standard view that positions the camera facing the top-left of the scene.
    */
   public static TOP_LEFT = new StandardView(
-    Vector3.add(Vector3.up(), Vector3.left()),
+    Vector3.add(Vector3.up(), Vector3.right()),
     Vector3.up()
   );
 
@@ -190,7 +190,7 @@ export class StandardView {
    * scene.
    */
   public static TOP_RIGHT = new StandardView(
-    Vector3.add(Vector3.up(), Vector3.right()),
+    Vector3.add(Vector3.up(), Vector3.left()),
     Vector3.up()
   );
 
@@ -199,7 +199,7 @@ export class StandardView {
    * scene.
    */
   public static BOTTOM_LEFT = new StandardView(
-    Vector3.add(Vector3.down(), Vector3.left()),
+    Vector3.add(Vector3.down(), Vector3.right()),
     Vector3.up()
   );
 
@@ -208,7 +208,7 @@ export class StandardView {
    * scene.
    */
   public static BOTTOM_RIGHT = new StandardView(
-    Vector3.add(Vector3.down(), Vector3.right()),
+    Vector3.add(Vector3.down(), Vector3.left()),
     Vector3.up()
   );
 

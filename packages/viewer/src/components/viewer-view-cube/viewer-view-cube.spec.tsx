@@ -62,8 +62,8 @@ describe('<vertex-viewer-view-cube>', () => {
     const left = page.root?.shadowRoot?.querySelector('.cube-face-left');
     const right = page.root?.shadowRoot?.querySelector('.cube-face-right');
 
-    expect(left?.textContent).toBe('xneg');
-    expect(right?.textContent).toBe('xpos');
+    expect(left?.textContent).toBe('xpos');
+    expect(right?.textContent).toBe('xneg');
   });
 
   it('orients view cube to the view matrix with no position', async () => {
