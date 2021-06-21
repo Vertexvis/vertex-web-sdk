@@ -1,4 +1,5 @@
 import * as Matrix4 from './matrix4';
+import { clamp } from './util';
 
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a
@@ -386,4 +387,19 @@ export function min(a: Vector3, b: Vector3): Vector3 {
  */
 export function negate(vector: Vector3): Vector3 {
   return { x: -vector.x, y: -vector.y, z: -vector.z };
+}
+
+/**
+ * Performs a linear interpolation between `a` and `b` and returns the result.
+ * The value of `t` is clamped between `[0, 1]`.
+ *
+ * @param a The start value.
+ * @param b The end value.
+ * @param t A value between 0 and 1.
+ * @returns A point between `a` and `b`.
+ */
+export function lerp(a: Vector3, b: Vector3, t: number): Vector3 {
+  t = clamp(t, 0, 1);
+  const v = scale(t, subtract(b, a));
+  return add(a, v);
 }

@@ -5,6 +5,7 @@ import * as Angle from './angle';
 import * as BoundingBox from './boundingBox';
 import * as Dimensions from './dimensions';
 import * as Euler from './euler';
+import * as Line3 from './line3';
 import * as Matrix from './matrix';
 import * as Matrix2 from './matrix2';
 import * as Matrix4 from './matrix4';
@@ -19,6 +20,7 @@ export {
   BoundingBox,
   Dimensions,
   Euler,
+  Line3,
   Matrix,
   Matrix2,
   Matrix4,
