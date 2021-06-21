@@ -47,14 +47,14 @@
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.14.0",
     "@juggle/resize-observer": "^3.3.0",
-    "@types/classnames": "2.2.11",
+    "@types/classnames": "^2.3.1",
     "@vertexvis/frame-streaming-protos": "^0.5.5",
     "@vertexvis/geometry": "0.9.27",
     "@vertexvis/scene-tree-protos": "^0.1.0",
     "@vertexvis/stream-api": "0.9.27",
     "@vertexvis/utils": "0.9.27",
     "camel-case": "^4.1.2",
-    "classnames": "2.2.6",
+    "classnames": "^2.3.1",
     "fast-png": "^5.0.4",
     "google-protobuf": "^3.15.7",
     "jwt-decode": "^3.1.2",
@@ -82,7 +82,7 @@
     "jsonwebtoken": "^8.5.1",
     "rollup": "^1.19.4",
     "ts-jest": "^26.5.2",
-    "typedoc": "^0.20.25",
+    "typedoc": "^0.21.0",
     "typescript": "^4.2.2"
   }
 }
