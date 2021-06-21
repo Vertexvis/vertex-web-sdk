@@ -8655,13 +8655,3 @@ yargs@^16.2.0:
     string-width "^4.2.0"
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
-
-zen-3d-addons@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/zen-3d-addons/-/zen-3d-addons-0.0.3.tgz#6bb4112dd1b7bf86725bb561b2eea3b1f2e56043"
-  integrity sha512-2uCPuIWQWBud7+k09MuSwPa6ptvId7dKRJzMYHh3gYSdmd8MdegcWGtOiThJ9h41w6TtCKg5sWSxn1RNPviqfw==
-
-zen-3d@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/zen-3d/-/zen-3d-0.0.1.tgz#d84fb41c1cd467c72170271ce155116667c91c1a"
-  integrity sha512-rQP538CxIRzFn4Y0QGjojebL8yg9mvKe3CzZBHbEN76Ne2eQHwdrRT5mjIXrmRrpMDJLJJjRPByEh4vMp1jbiA==

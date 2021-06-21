@@ -60,9 +60,7 @@
     "jwt-decode": "^3.1.2",
     "protobufjs": "^6.9.0",
     "requestidlecallback-polyfill": "^1.0.2",
-    "tslib": "^2.1.0",
-    "zen-3d": "^0.0.1",
-    "zen-3d-addons": "^0.0.3"
+    "tslib": "^2.1.0"
   },
   "devDependencies": {
     "@stencil/core": "^2.4.0",
