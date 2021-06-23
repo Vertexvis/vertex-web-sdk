@@ -1,0 +1,74 @@
+:host {
+  /**
+   * @prop --viewer-distance-measurement-line-stroke: A CSS color that specifies
+   * the color of the measurement line.
+   */
+  --viewer-distance-measurement-line-stroke: var(--blue-600);
+
+  /**
+   * @prop --viewer-distance-measurement-line-stroke-width: A CSS length that
+   * width of the measurement line.
+   */
+  --viewer-distance-measurement-line-stroke-width: 2px;
+
+  /**
+   * @prop --viewer-distance-measurement-label-background: A CSS background that
+   * specifies the background color or image for the measurement's label.
+   */
+  --viewer-distance-measurement-label-background: var(--white);
+
+  /**
+   * @prop --viewer-distance-measurement-label-border: A CSS border that
+   * specifies the border color or image for the measurement's label.
+   */
+  --viewer-distance-measurement-label-border: 1px solid var(--blue-600);
+
+  /**
+   * @prop --viewer-distance-measurement-label-border: A CSS length that
+   * specifies the border radius for the measurement's label.
+   */
+  --viewer-distance-measurement-label-border-radius: 0.25rem;
+
+  /**
+   * @prop --viewer-distance-measurement-label-padding: A CSS length that
+   * specifies the padding of the measurement's label.
+   */
+  --viewer-distance-measurement-label-padding: 0.375rem 0.5rem;
+
+  color: var(--blue-600);
+  font-size: 0.75rem;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.line {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  stroke: var(--viewer-distance-measurement-line-stroke);
+  stroke-width: var(--viewer-distance-measurement-line-stroke-width);
+}
+
+.anchor-container {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.anchor {
+  background-color: var(--blue-600);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.distance-label {
+  position: absolute;
+  background: var(--viewer-distance-measurement-label-background);
+  border: var(--viewer-distance-measurement-label-border);
+  border-radius: var(--viewer-distance-measurement-label-border-radius);
+  padding: var(--viewer-distance-measurement-label-padding);
+  pointer-events: initial;
+}

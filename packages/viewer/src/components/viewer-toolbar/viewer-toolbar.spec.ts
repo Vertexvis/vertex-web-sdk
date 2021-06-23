@@ -10,43 +10,43 @@ describe('<vertex-viewer-toolbar>', () => {
 
     page.root?.setAttribute('placement', 'top-left');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-top');
-    expect(page.root).toHaveClass('position-left');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-top');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-left');
 
     page.root?.setAttribute('placement', 'top-center');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-top');
-    expect(page.root).toHaveClass('position-center');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-top');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-center');
 
     page.root?.setAttribute('placement', 'top-right');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-top');
-    expect(page.root).toHaveClass('position-right');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-top');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-right');
 
     page.root?.setAttribute('placement', 'middle-left');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-middle');
-    expect(page.root).toHaveClass('position-left');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-middle');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-left');
 
     page.root?.setAttribute('placement', 'middle-right');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-middle');
-    expect(page.root).toHaveClass('position-right');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-middle');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-right');
 
     page.root?.setAttribute('placement', 'bottom-left');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-bottom');
-    expect(page.root).toHaveClass('position-left');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-bottom');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-left');
 
     page.root?.setAttribute('placement', 'bottom-center');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-bottom');
-    expect(page.root).toHaveClass('position-center');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-bottom');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-center');
 
     page.root?.setAttribute('placement', 'bottom-right');
     await page.waitForChanges();
-    expect(page.root).toHaveClass('position-bottom');
-    expect(page.root).toHaveClass('position-right');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-bottom');
+    expect(page.root?.shadowRoot?.firstChild).toHaveClass('position-right');
   });
 
   it('sets the correct direction', async () => {

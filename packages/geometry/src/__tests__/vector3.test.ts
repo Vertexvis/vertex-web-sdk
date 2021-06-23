@@ -201,3 +201,19 @@ describe(Vector3.negate, () => {
     expect(negated).toEqual({ x: -1, y: -1, z: -1 });
   });
 });
+
+describe(Vector3.lerp, () => {
+  it('returns a point between A and B', () => {
+    const pt = Vector3.lerp(
+      Vector3.create(1, 1, 1),
+      Vector3.create(2, 2, 2),
+      0.5
+    );
+    expect(pt).toEqual(Vector3.create(1.5, 1.5, 1.5));
+  });
+
+  it('clamps the value of T', () => {
+    const pt = Vector3.lerp(Vector3.origin(), Vector3.create(1, 1, 1), 2);
+    expect(pt).toEqual(Vector3.create(1, 1, 1));
+  });
+});

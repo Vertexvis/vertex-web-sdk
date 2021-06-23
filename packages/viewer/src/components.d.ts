@@ -27,8 +27,9 @@ import { Scene } from "./lib/scenes/scene";
 import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
+import { DepthBuffer, Orientation, UnitType } from "./lib/types";
+import { ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter } from "./components/viewer-distance-measurement/viewer-distance-measurement";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
-import { DepthBuffer, Orientation } from "./lib/types";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -297,6 +298,40 @@ export namespace Components {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDistanceMeasurement {
+        /**
+          * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
+         */
+        "computeElementMetrics": () => Promise<ViewerDistanceMeasurementElementMetrics>;
+        /**
+          * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "end": Vector3.Vector3 | string;
+        /**
+          * The number of fraction digits to display.
+         */
+        "fractionalDigits": number;
+        /**
+          * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+         */
+        "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        /**
+          * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+         */
+        "projectionViewMatrix"?: Matrix4.Matrix4;
+        /**
+          * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "start": Vector3.Vector3 | string;
+        /**
+          * The unit of measurement.
+         */
+        "units": UnitType;
+        /**
+          * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerDomElement {
         /**
           * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -353,6 +388,8 @@ export namespace Components {
           * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
          */
         "size"?: ViewerIconSize;
+    }
+    interface VertexViewerLayer {
     }
     interface VertexViewerToolbar {
         "direction": ViewerToolbarDirection;
@@ -442,6 +479,12 @@ declare global {
         prototype: HTMLVertexViewerDefaultToolbarElement;
         new (): HTMLVertexViewerDefaultToolbarElement;
     };
+    interface HTMLVertexViewerDistanceMeasurementElement extends Components.VertexViewerDistanceMeasurement, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDistanceMeasurementElement: {
+        prototype: HTMLVertexViewerDistanceMeasurementElement;
+        new (): HTMLVertexViewerDistanceMeasurementElement;
+    };
     interface HTMLVertexViewerDomElementElement extends Components.VertexViewerDomElement, HTMLStencilElement {
     }
     var HTMLVertexViewerDomElementElement: {
@@ -459,6 +502,12 @@ declare global {
     var HTMLVertexViewerIconElement: {
         prototype: HTMLVertexViewerIconElement;
         new (): HTMLVertexViewerIconElement;
+    };
+    interface HTMLVertexViewerLayerElement extends Components.VertexViewerLayer, HTMLStencilElement {
+    }
+    var HTMLVertexViewerLayerElement: {
+        prototype: HTMLVertexViewerLayerElement;
+        new (): HTMLVertexViewerLayerElement;
     };
     interface HTMLVertexViewerToolbarElement extends Components.VertexViewerToolbar, HTMLStencilElement {
     }
@@ -484,9 +533,11 @@ declare global {
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
+        "vertex-viewer-distance-measurement": HTMLVertexViewerDistanceMeasurementElement;
         "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
         "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
+        "vertex-viewer-layer": HTMLVertexViewerLayerElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
         "vertex-viewer-view-cube": HTMLVertexViewerViewCubeElement;
@@ -678,6 +729,36 @@ declare namespace LocalJSX {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerDistanceMeasurement {
+        /**
+          * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "end"?: Vector3.Vector3 | string;
+        /**
+          * The number of fraction digits to display.
+         */
+        "fractionalDigits"?: number;
+        /**
+          * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+         */
+        "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        /**
+          * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+         */
+        "projectionViewMatrix"?: Matrix4.Matrix4;
+        /**
+          * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "start"?: Vector3.Vector3 | string;
+        /**
+          * The unit of measurement.
+         */
+        "units"?: UnitType;
+        /**
+          * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerDomElement {
         /**
           * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -738,6 +819,8 @@ declare namespace LocalJSX {
           * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
          */
         "size"?: ViewerIconSize;
+    }
+    interface VertexViewerLayer {
     }
     interface VertexViewerToolbar {
         "direction"?: ViewerToolbarDirection;
@@ -801,9 +884,11 @@ declare namespace LocalJSX {
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-distance-measurement": VertexViewerDistanceMeasurement;
         "vertex-viewer-dom-element": VertexViewerDomElement;
         "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
         "vertex-viewer-icon": VertexViewerIcon;
+        "vertex-viewer-layer": VertexViewerLayer;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
         "vertex-viewer-view-cube": VertexViewerViewCube;
@@ -818,9 +903,11 @@ declare module "@stencil/core" {
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
+            "vertex-viewer-distance-measurement": LocalJSX.VertexViewerDistanceMeasurement & JSXBase.HTMLAttributes<HTMLVertexViewerDistanceMeasurementElement>;
             "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
             "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
+            "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
             "vertex-viewer-view-cube": LocalJSX.VertexViewerViewCube & JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;

@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 import classname from 'classnames';
 
 /**
@@ -35,8 +35,8 @@ export class ViewerToolbar {
     const [vertical, horizontal] = this.placement.split('-');
 
     return (
-      <Host
-        class={classname({
+      <vertex-viewer-layer
+        class={classname('layer', {
           'position-top': vertical === 'top',
           'position-middle': vertical === 'middle',
           'position-bottom': vertical === 'bottom',
@@ -53,7 +53,7 @@ export class ViewerToolbar {
         >
           <slot></slot>
         </div>
-      </Host>
+      </vertex-viewer-layer>
     );
   }
 }

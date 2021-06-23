@@ -8,17 +8,17 @@ const def: DrawFramePayload = {
   sequenceNumber: 1,
   sceneAttributes: {
     camera: {
-      position: { x: 0, y: 0, z: 1 },
+      position: { x: 0, y: 0, z: 100 },
       lookAt: { x: 0, y: 0, z: 0 },
       up: { x: 0, y: 1, z: 0 },
     },
     visibleBoundingBox: {
-      xmin: -1,
-      ymin: -1,
-      zmin: -1,
-      xmax: 1,
-      ymax: 1,
-      zmax: 1,
+      xmin: -100,
+      ymin: -100,
+      zmin: -100,
+      xmax: 100,
+      ymax: 100,
+      zmax: 100,
     },
     crossSectioning: {
       sectionPlanes: [{ normal: { x: 0, y: 0, z: 0 }, offset: 0 }],
