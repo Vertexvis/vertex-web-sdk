@@ -13,7 +13,7 @@ import { getMeasurementBoundingClientRect } from './utils';
 import { loadModelForViewer } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
-import { ViewerMeasurements } from '../viewer-measurements/viewer-measurements';
+import { ViewerLayer } from '../viewer-layer/viewer-layer';
 
 describe('vertex-viewer-distance-measurement', () => {
   const projectionViewMatrix = Matrix4.makeIdentity();
@@ -242,7 +242,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('rerenders when viewer renders', async () => {
     const page = await newSpecPage({
-      components: [Viewer, ViewerMeasurements, ViewerDistanceMeasurement],
+      components: [Viewer, ViewerLayer, ViewerDistanceMeasurement],
       template: () => (
         <vertex-viewer>
           <vertex-viewer-measurements>

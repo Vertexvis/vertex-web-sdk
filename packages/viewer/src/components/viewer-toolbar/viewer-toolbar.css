@@ -1,35 +1,29 @@
-:host {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+.layer {
   padding: 1rem;
-  pointer-events: none;
   display: flex;
 }
 
-:host(.position-top) {
+.layer.position-top {
   align-items: flex-start;
 }
 
-:host(.position-middle) {
+.layer.position-middle {
   align-items: center;
 }
 
-:host(.position-bottom) {
+.layer.position-bottom {
   align-items: flex-end;
 }
 
-:host(.position-left) {
+.layer.position-left {
   justify-content: flex-start;
 }
 
-:host(.position-center) {
+.layer.position-center {
   justify-content: center;
 }
 
-:host(.position-right) {
+.layer.position-right {
   justify-content: flex-end;
 }
 
