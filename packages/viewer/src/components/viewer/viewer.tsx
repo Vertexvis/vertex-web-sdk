@@ -477,6 +477,7 @@ export class Viewer {
   @Method()
   public async dispatchFrameDrawn(frame: Frame): Promise<void> {
     this.lastFrame = frame;
+    this.frame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
   }
