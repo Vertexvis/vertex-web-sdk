@@ -40,6 +40,11 @@ export type ViewerDistanceMeasurementLabelFormatter = (
   distance: number
 ) => string;
 
+/**
+ * @slot start-anchor An HTML element for the starting point anchor.
+ *
+ * @slot end-anchor An HTML element for the ending point anchor.
+ */
 @Component({
   tag: 'vertex-viewer-distance-measurement',
   styleUrl: 'viewer-distance-measurement.css',

@@ -1,6 +1,120 @@
 # vertex-viewer-distance-measurement
 
+The `<vertex-viewer-distance-measurement>` is a component for displaying
+point-to-point measurements between two 3D points. The component will place
+anchors at each point with a line between the two anchors and display the
+approximate distance between the two points.
 
+Measurements should be placed in a `<vertex-viewer-layer>` in order to be
+displayed correctly.
+
+**Example:** Creating a measurement between two points.
+
+```html
+<html>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+      <vertex-viewer-layer>
+        <vertex-viewer-distance-measurement
+          start="[10, -5, 0]"
+          end="[150, 100, -50]"
+        ></vertex-viewer--element>
+      </vertex-viewer-layer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
+## Units of Measurement and Formatting
+
+The displayed units of measurement and precision can be configured by setting
+the `units` and `fractional-digits` attributes. Currently supported units
+include: `millimeters`, `centimeters`, `meters`, `inches`, `feet`, `yards`.
+
+**Example:** Settings units and fractional digits.
+
+```html
+<html>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+      <vertex-viewer-layer>
+        <vertex-viewer-distance-measurement
+          start="[10, -5, 0]"
+          end="[150, 100, -50]"
+          units="in"
+          fractional-digits="1"
+        ></vertex-viewer--element>
+      </vertex-viewer-layer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
+The default formatting can be overridden with by setting the `labelFormatter`
+property. This is a function that is passed the distance in real space and
+should return a string.
+
+**Example:** Replacing the default distance formatter.
+
+```html
+<html>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+      <vertex-viewer-layer>
+        <vertex-viewer-distance-measurement
+          id="measurement"
+          start="[10, -5, 0]"
+          end="[150, 100, -50]"
+          units="in"
+        ></vertex-viewer--element>
+      </vertex-viewer-layer>
+    </vertex-viewer>
+
+    <script type="module">
+      const measurement = document.getElementById('measurement');
+      measurement.labelFormatter = (distance) => `${distance}"`;
+    </script>
+  </body>
+</html>
+```
+
+## Styling Anchors
+
+The component exposes slots for customizing the HTML of the distance anchors.
+
+**Example:** Providing custom anchors.
+
+```html
+<html>
+  <head>
+    <style>
+      .anchor {
+        width: 10px;
+        height: 10px;
+        background-color: blue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+      <vertex-viewer-layer>
+        <vertex-viewer-distance-measurement
+          id="measurement"
+          start="[10, -5, 0]"
+          end="[150, 100, -50]"
+          units="in"
+        >
+          <div slot="start-anchor" class="anchor">A</div>
+          <div slot="end-anchor" class="anchor">B</div>
+        </vertex-viewer--element>
+      </vertex-viewer-layer>
+    </vertex-viewer>
+  </body>
+</html>
+```
 
 <!-- Auto Generated Below -->
 

@@ -10,19 +10,19 @@ viewport of a `<vertex-viewer>`.
   <head>
     <style>
       .toolbar {
-				position: absolute;
-				bottom: 20px;
-				left: 20px;
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
       }
     </style>
   </head>
   <body>
     <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
       <vertex-viewer-layer>
-				<div class="toolbar">
-					<button>Click Me</button>
-				</div>
-			</vertex-viewer-layer>
+        <div class="toolbar">
+          <button>Click Me</button>
+        </div>
+      </vertex-viewer-layer>
     </vertex-viewer>
   </body>
 </html>
