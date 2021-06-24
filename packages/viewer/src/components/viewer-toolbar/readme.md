@@ -47,9 +47,14 @@ right of the viewer.
 
  - [vertex-viewer-default-toolbar](../viewer-default-toolbar)
 
+### Depends on
+
+- [vertex-viewer-layer](../viewer-layer)
+
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-toolbar --> vertex-viewer-layer
   vertex-viewer-default-toolbar --> vertex-viewer-toolbar
   style vertex-viewer-toolbar fill:#f9f,stroke:#333,stroke-width:4px
 ```

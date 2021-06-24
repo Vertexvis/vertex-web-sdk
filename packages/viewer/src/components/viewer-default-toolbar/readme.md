@@ -95,6 +95,7 @@ graph TD;
   vertex-viewer-default-toolbar --> vertex-viewer-toolbar-group
   vertex-viewer-default-toolbar --> vertex-viewer-button
   vertex-viewer-default-toolbar --> vertex-viewer-icon
+  vertex-viewer-toolbar --> vertex-viewer-layer
   style vertex-viewer-default-toolbar fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
