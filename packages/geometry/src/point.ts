@@ -1,4 +1,5 @@
 import * as Angle from './angle';
+import { lerp as lerpNumber } from './math';
 
 /**
  * A `Point` represents a cartesian coordinate with a horizontal and vertical
@@ -55,6 +56,22 @@ export function add(a: Point, b: Point): Point {
  */
 export function isEqual(a: Point, b: Point): boolean {
   return a.x === b.x && a.y === b.y;
+}
+
+/**
+ * Performs a linear interpolation between `a` and `b` and returns the result.
+ * The value of `t` is clamped between `[0, 1]`.
+ *
+ * @param a The start value.
+ * @param b The end value.
+ * @param t A value between 0 and 1.
+ * @returns A point between `a` and `b`.
+ */
+export function lerp(a: Point, b: Point, t: number): Point {
+  return {
+    x: lerpNumber(a.x, b.x, t),
+    y: lerpNumber(a.y, b.y, t),
+  };
 }
 
 /**

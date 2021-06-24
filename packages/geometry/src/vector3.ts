@@ -1,5 +1,5 @@
 import * as Matrix4 from './matrix4';
-import { clamp } from './util';
+import { lerp as lerpNumber } from './math';
 
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a
@@ -399,7 +399,9 @@ export function negate(vector: Vector3): Vector3 {
  * @returns A point between `a` and `b`.
  */
 export function lerp(a: Vector3, b: Vector3, t: number): Vector3 {
-  t = clamp(t, 0, 1);
-  const v = scale(t, subtract(b, a));
-  return add(a, v);
+  return {
+    x: lerpNumber(a.x, b.x, t),
+    y: lerpNumber(a.y, b.y, t),
+    z: lerpNumber(a.z, b.z, t),
+  };
 }

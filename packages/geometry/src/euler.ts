@@ -1,6 +1,6 @@
 import * as Angle from './angle';
 import * as Matrix4 from './matrix4';
-import { clamp } from './util';
+import { clamp } from './math';
 
 /**
  * A string representing the axis order of rotation.

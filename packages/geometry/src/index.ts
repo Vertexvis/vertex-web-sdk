@@ -12,8 +12,11 @@ import * as Matrix4 from './matrix4';
 import * as Plane from './plane';
 import * as Point from './point';
 import * as Quaternion from './quaternion';
+import * as Ray from './ray';
 import * as Rectangle from './rectangle';
 import * as Vector3 from './vector3';
+
+export * from './math';
 
 export {
   Angle,
@@ -27,6 +30,7 @@ export {
   Plane,
   Point,
   Quaternion,
+  Ray,
   Rectangle,
   Vector3,
 };
