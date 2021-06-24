@@ -303,14 +303,17 @@ export namespace Components {
           * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
          */
         "computeElementMetrics": () => Promise<ViewerDistanceMeasurementElementMetrics>;
+        "depthBuffer"?: DepthBuffer;
+        "editable": boolean;
         /**
           * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "end": Vector3.Vector3 | string;
+        "end"?: Vector3.Vector3 | string;
         /**
           * The number of fraction digits to display.
          */
         "fractionalDigits": number;
+        "invalid": boolean;
         /**
           * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
          */
@@ -322,7 +325,7 @@ export namespace Components {
         /**
           * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "start": Vector3.Vector3 | string;
+        "start"?: Vector3.Vector3 | string;
         /**
           * The unit of measurement.
          */
@@ -730,6 +733,8 @@ declare namespace LocalJSX {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerDistanceMeasurement {
+        "depthBuffer"?: DepthBuffer;
+        "editable"?: boolean;
         /**
           * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
@@ -738,10 +743,13 @@ declare namespace LocalJSX {
           * The number of fraction digits to display.
          */
         "fractionalDigits"?: number;
+        "invalid"?: boolean;
         /**
           * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
          */
         "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        "onEditBegin"?: (event: CustomEvent<void>) => void;
+        "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
           * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
          */

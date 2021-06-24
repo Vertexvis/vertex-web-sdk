@@ -1,5 +1,5 @@
 jest.mock('../viewer/utils');
-jest.mock('./utils');
+jest.mock('./dom');
 
 import '../../testing/domMocks';
 
@@ -9,11 +9,12 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 import { Viewport } from '../../lib/types';
 import { ViewerDistanceMeasurement } from './viewer-distance-measurement';
-import { getMeasurementBoundingClientRect } from './utils';
+import { getMeasurementBoundingClientRect } from './dom';
 import { loadModelForViewer } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
+import * as Fixtures from '../../testing/fixtures';
 
 describe('vertex-viewer-distance-measurement', () => {
   const projectionViewMatrix = Matrix4.makeIdentity();
@@ -195,7 +196,26 @@ describe('vertex-viewer-distance-measurement', () => {
     });
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
-    expect(labelEl?.textContent).toBe(`~1.000 in`);
+    expect(labelEl).toEqualText(`~1.000 in`);
+  });
+
+  it('displays dashes if measurement invalid', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDistanceMeasurement],
+      template: () => (
+        <vertex-viewer-distance-measurement
+          start="[0, 0, 0]"
+          end="[25.4, 0, 0]"
+          units="inches"
+          fractionalDigits={3}
+          projectionViewMatrix={projectionViewMatrix}
+          invalid
+        ></vertex-viewer-distance-measurement>
+      ),
+    });
+
+    const labelEl = page.root?.shadowRoot?.getElementById('label');
+    expect(labelEl).toEqualText('--');
   });
 
   it('formats distance with provided label formatter', async () => {
@@ -280,6 +300,8 @@ describe('vertex-viewer-distance-measurement', () => {
         components: [ViewerDistanceMeasurement],
         template: () => (
           <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
             projectionViewMatrix={projectionViewMatrix}
           />
         ),
@@ -293,6 +315,177 @@ describe('vertex-viewer-distance-measurement', () => {
         endAnchor: expect.anything(),
         label: expect.anything(),
       });
+    });
+
+    it('returns undefined if anchors are not visible', async () => {
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => <vertex-viewer-distance-measurement />,
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const metrics = await measurement.computeElementMetrics();
+      expect(metrics).toBeUndefined();
+    });
+  });
+
+  describe('editing', () => {
+    const depthBuffer = Fixtures.createDepthBuffer(100, 50, 0);
+
+    it('does not update anchor if measurement is not editable', async () => {
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(new MouseEvent('mousedown'));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 100, clientY: 100 })
+      );
+
+      expect(measurement.start).toEqual(start);
+    });
+
+    it('emits editBegin event when anchor editing started', async () => {
+      const onEditBegin = jest.fn();
+
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            editable
+            onEditBegin={onEditBegin}
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(new MouseEvent('mousedown'));
+
+      expect(onEditBegin).toHaveBeenCalled();
+    });
+
+    it('updates start point when anchor is moved', async () => {
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            editable
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 0, clientY: 0 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 10, clientY: 10 })
+      );
+
+      expect(measurement.start).not.toEqual(start);
+    });
+
+    it('updates end point when anchor is moved', async () => {
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            editable
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('end-anchor');
+      anchor?.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 0, clientY: 0 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 10, clientY: 10 })
+      );
+
+      expect(measurement.end).not.toEqual(end);
+    });
+
+    it('emits edit end event on anchor mouse up', async () => {
+      const onEditEnd = jest.fn();
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            onEditEnd={onEditEnd}
+            editable
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 0, clientY: 0 })
+      );
+      window.dispatchEvent(new MouseEvent('mouseup'));
+
+      expect(onEditEnd).toHaveBeenCalled();
+    });
+
+    it('resets points if drag is invalid', async () => {
+      const depthBuffer = Fixtures.createDepthBuffer(100, 100, 2 ** 16 - 1);
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            editable
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 0, clientY: 0 })
+      );
+
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 10, clientY: 10 })
+      );
+      expect(measurement.invalid).toBe(true);
+
+      window.dispatchEvent(new MouseEvent('mouseup'));
+      expect(measurement.start).toEqual(start);
+      expect(measurement.invalid).toBe(false);
     });
   });
 });

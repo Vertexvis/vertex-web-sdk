@@ -1,8 +1,9 @@
+import { Dimensions, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
 import { mapFrame } from '../lib/mappers';
-import { Orientation } from '../lib/types';
+import { DepthBuffer, Orientation } from '../lib/types';
 
 const def: DrawFramePayload = {
   sequenceNumber: 1,
@@ -72,4 +73,19 @@ export function createDepthImageBytes(
     }
   }
   return data;
+}
+
+export function createDepthBuffer(
+  width: number,
+  height: number,
+  value = 2 ** 16 - 1
+): DepthBuffer {
+  const png = createDepthImageBytes(width, height, value);
+  return DepthBuffer.fromPng(
+    { width, height, data: png },
+    frame.scene.camera,
+    Dimensions.create(width, height),
+    Rectangle.create(0, 0, width, height),
+    1
+  );
 }

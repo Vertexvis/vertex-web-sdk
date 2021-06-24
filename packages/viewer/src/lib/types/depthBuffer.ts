@@ -1,4 +1,4 @@
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Ray, Rectangle } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { IDecodedPNG } from 'fast-png';
 import { FrameImageLike, FramePerspectiveCamera } from './frame';
@@ -32,7 +32,7 @@ export class DepthBuffer implements FrameImageLike {
    * @param imageDimensions The dimensions of the depth image.
    */
   public constructor(
-    private readonly camera: FramePerspectiveCamera,
+    public readonly camera: FramePerspectiveCamera,
     public readonly dimensions: Dimensions.Dimensions,
     public readonly rect: Rectangle.Rectangle,
     public readonly scale: number,
@@ -167,6 +167,21 @@ export class DepthBuffer implements FrameImageLike {
     }
   }
 
+  public getWorldPoint(point: Point.Point, ray: Ray.Ray): Vector3.Vector3 {
+    const distance = this.getLinearDepthAtPoint(point);
+    const vv = Vector3.subtract(this.camera.lookAt, this.camera.position);
+
+    // Compute the world position along the ray at the far plane.
+    // This is used to determine the angle with the view vector.
+    const worldPt = Ray.at(ray, this.camera.far);
+    const eyeToWorldPt = Vector3.subtract(worldPt, this.camera.position);
+
+    const angle =
+      Vector3.dot(vv, eyeToWorldPt) /
+      (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
+    return Ray.at(ray, distance / angle);
+  }
+
   /**
    * Returns `true` if the given point in world space is occluded by any
    * geometry.
@@ -183,7 +198,7 @@ export class DepthBuffer implements FrameImageLike {
     const distance = Vector3.magnitude(projected);
 
     const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
-    const screenPt = viewport.transformNdc(ndc);
+    const screenPt = viewport.transformPointToViewport(ndc);
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
     const depth = this.getLinearDepthAtPoint(scaledPt);
 
