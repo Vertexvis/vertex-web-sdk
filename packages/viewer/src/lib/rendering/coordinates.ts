@@ -1,4 +1,11 @@
-import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Dimensions,
+  Matrix4,
+  Point,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { Camera } from '../scenes';
 
 /**
@@ -18,30 +25,21 @@ export function computeWorldPosition(
   point: Point.Point,
   depth: number
 ): Vector3.Vector3 {
-  const viewVector = camera.viewVector();
-  const normalizedRay = normalizedRayFromPoint(camera, viewport, point);
+  const vv = camera.viewVector();
+  const ray = Ray.create({
+    direction: normalizedRayFromPoint(camera, viewport, point),
+    origin: camera.position,
+  });
 
-  // Computes the world position along the ray at the far plane.
+  // Compute the world position along the ray at the far plane.
   // This is used to determine the angle with the view vector.
-  const viewVectorToWorldPosition = Vector3.subtract(
-    Vector3.add(
-      camera.position,
-      Vector3.scale(linearDepth(1, camera.near, camera.far), normalizedRay)
-    ),
-    camera.position
-  );
+  const worldPt = Ray.at(ray, camera.far);
+  const eyeToWorldPt = Vector3.subtract(worldPt, camera.position);
 
   const angle =
-    Vector3.dot(viewVector, viewVectorToWorldPosition) /
-    (Vector3.magnitude(viewVector) *
-      Vector3.magnitude(viewVectorToWorldPosition));
-  return Vector3.add(
-    camera.position,
-    Vector3.scale(
-      linearDepth(depth, camera.near, camera.far) / angle,
-      normalizedRay
-    )
-  );
+    Vector3.dot(vv, eyeToWorldPt) /
+    (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
+  return Ray.at(ray, linearDepth(depth, camera.near, camera.far) / angle);
 }
 
 /**
@@ -58,13 +56,10 @@ export function normalizedRayFromPoint(
   viewport: Dimensions.Dimensions,
   point: Point.Point
 ): Vector3.Vector3 {
-  const viewVector = camera.viewVector();
-  const normalizedUpVector = Vector3.normalize(camera.up);
-  const normalizedViewVector = Vector3.normalize(viewVector);
-  const crossX = Vector3.normalize(
-    Vector3.cross(normalizedUpVector, normalizedViewVector)
+  const m = Matrix4.position(
+    Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up),
+    Matrix4.makeIdentity()
   );
-  const crossY = Vector3.normalize(Vector3.cross(normalizedViewVector, crossX));
 
   const direction = Vector3.create(
     (point.x / viewport.width - 0.5) * camera.aspectRatio,
@@ -72,16 +67,7 @@ export function normalizedRayFromPoint(
     -0.5 / Math.tan(Angle.toRadians(camera.fovY / 2.0))
   );
 
-  return Vector3.normalize(
-    Vector3.add(
-      Vector3.scale(direction.x, Vector3.scale(-1, crossX)),
-      Vector3.scale(direction.y, crossY),
-      Vector3.scale(
-        direction.z,
-        Vector3.scale(-1, Vector3.normalize(viewVector))
-      )
-    )
-  );
+  return Vector3.normalize(Vector3.transformMatrix(direction, m));
 }
 
 /**
