@@ -128,6 +128,15 @@ export class DepthBuffer implements FrameImageLike {
     }
   }
 
+  public getNormalizedDepthAtViewportPoint(
+    point: Point.Point,
+    viewport: Viewport,
+    fallbackNormalizedDepth?: number
+  ): number {
+    const framePt = viewport.transformPointToFrame(point, this);
+    return this.getNormalizedDepthAtPoint(framePt, fallbackNormalizedDepth);
+  }
+
   /**
    * Computes a 3D point in world space coordinates from the depth value at the
    * given pixel and ray.

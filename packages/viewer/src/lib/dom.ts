@@ -1,0 +1,21 @@
+import { Point } from '@vertexvis/geometry';
+
+export function getMouseClientPosition(
+  event: MouseEvent,
+  offsets?: DOMRect
+): Point.Point {
+  const pt = Point.create(event.clientX, event.clientY);
+  if (offsets == null) {
+    return pt;
+  } else {
+    return Point.subtract(pt, Point.create(offsets.left, offsets.top));
+  }
+}
+
+/**
+ * Returns a CSS transform that will center an element at the given position.
+ */
+export function cssTransformCenterAt(position: Point.Point): string {
+  const { x, y } = position;
+  return `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+}

@@ -3,8 +3,8 @@ import { Viewport } from '../../lib/types';
 
 export interface ElementPositions {
   startPt: Point.Point;
-  endPt: Point.Point;
-  labelPt: Point.Point;
+  endPt?: Point.Point;
+  labelPt?: Point.Point;
   distance?: number | undefined;
 }
 

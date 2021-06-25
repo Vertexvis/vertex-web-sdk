@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.measurement {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.new-measurement-anchor {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.new-measurement {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

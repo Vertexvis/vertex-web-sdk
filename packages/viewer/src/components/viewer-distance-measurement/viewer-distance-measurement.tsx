@@ -10,7 +10,7 @@ import {
   Event,
   EventEmitter,
 } from '@stencil/core';
-import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 import {
   DepthBuffer,
   MeasurementUnits,
@@ -19,6 +19,8 @@ import {
 } from '../../lib/types';
 import { ElementPositions, getViewingElementPositions } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
+import { cssTransformCenterAt, getMouseClientPosition } from '../../lib/dom';
+import classNames from 'classnames';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -41,6 +43,8 @@ export interface ViewerDistanceMeasurementElementMetrics {
 export type ViewerDistanceMeasurementLabelFormatter = (
   distance: number | undefined
 ) => string;
+
+type Anchor = 'start' | 'end';
 
 /**
  * @slot start-anchor An HTML element for the starting point anchor.
@@ -125,6 +129,12 @@ export class ViewerDistanceMeasurement {
   private viewport: Viewport = new Viewport(0, 0);
 
   @State()
+  private elementBounds?: DOMRect;
+
+  @State()
+  private interactionCount = 0;
+
+  @State()
   private internalProjectionViewMatrix?: Matrix4.Matrix4;
 
   @State()
@@ -191,48 +201,67 @@ export class ViewerDistanceMeasurement {
 
       return (
         <Host>
-          <svg class="line">
-            <line
-              x1={startPt.x}
-              y1={startPt.y}
-              x2={endPt.x}
-              y2={endPt.y}
-            ></line>
-          </svg>
+          <div class="content">
+            {endPt != null && (
+              <svg class="line">
+                <line
+                  x1={startPt.x}
+                  y1={startPt.y}
+                  x2={endPt.x}
+                  y2={endPt.y}
+                ></line>
+              </svg>
+            )}
 
-          <div
-            id="start-anchor"
-            class="anchor-container"
-            style={{ transform: cssTransformForPoint(startPt) }}
-            onMouseDown={this.handleAnchorMouseDown('start')}
-          >
-            <slot name="start">
-              <div class="anchor"></div>
-            </slot>
-          </div>
+            <div
+              id="start-anchor"
+              class="anchor-container"
+              style={{ transform: cssTransformCenterAt(startPt) }}
+              onMouseDown={this.handleEditAnchor('start')}
+            >
+              <slot name="start">
+                <div class="anchor"></div>
+              </slot>
+            </div>
 
-          <div
-            id="end-anchor"
-            class="anchor-container"
-            style={{ transform: cssTransformForPoint(endPt) }}
-            onMouseDown={this.handleAnchorMouseDown('end')}
-          >
-            <slot name="end">
-              <div class="anchor"></div>
-            </slot>
-          </div>
+            {endPt != null && (
+              <div
+                id="end-anchor"
+                class="anchor-container"
+                style={{ transform: cssTransformCenterAt(endPt) }}
+                onMouseDown={this.handleEditAnchor('end')}
+              >
+                <slot name="end">
+                  <div class="anchor"></div>
+                </slot>
+              </div>
+            )}
 
-          <div
-            id="label"
-            class="distance-label"
-            style={{ transform: cssTransformForPoint(labelPt) }}
-          >
-            {this.formatDistance(distance)}
+            {labelPt != null && (
+              <div
+                id="label"
+                class="distance-label"
+                style={{ transform: cssTransformCenterAt(labelPt) }}
+              >
+                {this.formatDistance(distance)}
+              </div>
+            )}
           </div>
         </Host>
       );
     } else {
-      return <Host></Host>;
+      return (
+        <Host>
+          <div
+            class={classNames('content', {
+              add: this.end == null,
+              'cursor-crosshair': this.start != null,
+            })}
+            onMouseMove={this.handleUpdateStartAnchor()}
+            onMouseDown={this.handleStartMeasurement()}
+          />
+        </Host>
+      );
     }
   }
 
@@ -281,6 +310,9 @@ export class ViewerDistanceMeasurement {
     this.updateProjectionViewMatrix();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('editable')
   protected handleEditableChanged(): void {
     if (this.viewer != null && this.viewer.depthBuffers == null) {
@@ -307,62 +339,120 @@ export class ViewerDistanceMeasurement {
     this.updateDepthBuffer();
   };
 
-  private handleAnchorMouseDown(
-    anchor: 'start' | 'end'
-  ): ((event: MouseEvent) => void) | undefined {
-    if (this.editable && this.internalDepthBuffer != null) {
-      const originalPt = anchor === 'start' ? this.start : this.end;
-      const originalInvalid = this.invalid;
-
-      const resetIfInvalid = (): void => {
-        if (this.invalid) {
-          if (anchor === 'start') {
-            this.start = originalPt;
-          } else {
-            this.end = originalPt;
-          }
-          this.invalid = originalInvalid;
-        }
-      };
-
-      const handleMouseMove = (event: MouseEvent): void => {
-        if (this.internalDepthBuffer != null) {
-          const { left, top } = this.hostEl.getBoundingClientRect();
-          const pt = Point.create(event.clientX - left, event.clientY - top);
-          const framePt = this.viewport.transformPointToFrame(
+  private handleUpdateStartAnchor(): ((event: MouseEvent) => void) | undefined {
+    if (this.start == null || this.end == null) {
+      return (event) => {
+        if (this.internalDepthBuffer != null && this.elementBounds != null) {
+          const pt = getMouseClientPosition(event, this.elementBounds);
+          const depth = this.internalDepthBuffer.getNormalizedDepthAtViewportPoint(
             pt,
-            this.internalDepthBuffer
+            this.viewport
           );
-          const valid =
-            this.internalDepthBuffer.getNormalizedDepthAtPoint(framePt) < 1;
           const worldPt = this.viewport.transformPointToWorldSpace(
             pt,
             this.internalDepthBuffer
           );
-
-          if (anchor === 'start') {
-            this.start = worldPt;
-          } else {
-            this.end = worldPt;
-          }
-          this.invalid = !valid;
+          this.start = depth < 1 ? worldPt : undefined;
         }
       };
+    }
+  }
 
-      const handleMouseUp = (): void => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        resetIfInvalid();
-        this.editEnd.emit();
+  private handleStartMeasurement(): ((event: MouseEvent) => void) | undefined {
+    if (this.start != null || this.end == null) {
+      return (event) => {
+        this.beginEditing();
+
+        const handleMouseMove = this.createAnchorMouseMoveHandler('end');
+
+        const handleWindowMouseDown = (event: MouseEvent): void => {
+          if (!event.defaultPrevented) {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mousedown', handleWindowMouseDown);
+            this.endEditing();
+          }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mousedown', handleWindowMouseDown);
+
+        event.preventDefault();
       };
+    }
+  }
+
+  private handleEditAnchor(
+    anchor: Anchor
+  ): ((event: MouseEvent) => void) | undefined {
+    if (this.editable && this.internalDepthBuffer != null) {
+      const handleMouseMove = this.createAnchorMouseMoveHandler(anchor);
+      const handleMouseUp = this.createAnchorMouseUpHandler(
+        anchor,
+        handleMouseMove
+      );
 
       return () => {
-        this.editBegin.emit();
+        this.beginEditing();
 
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
       };
     }
+  }
+
+  private createAnchorMouseMoveHandler(
+    anchor: Anchor
+  ): (event: MouseEvent) => void {
+    return (event) => {
+      if (this.internalDepthBuffer != null && this.elementBounds != null) {
+        const pt = getMouseClientPosition(event, this.elementBounds);
+        const framePt = this.viewport.transformPointToFrame(
+          pt,
+          this.internalDepthBuffer
+        );
+        const valid =
+          this.internalDepthBuffer.getNormalizedDepthAtPoint(framePt) < 1;
+        const worldPt = this.viewport.transformPointToWorldSpace(
+          pt,
+          this.internalDepthBuffer
+        );
+
+        if (anchor === 'start') {
+          this.start = worldPt;
+        } else {
+          this.end = worldPt;
+        }
+        this.invalid = !valid;
+      }
+    };
+  }
+
+  private createAnchorMouseUpHandler(
+    anchor: 'start' | 'end',
+    mouseMove: (event: MouseEvent) => void
+  ): (event: MouseEvent) => void {
+    const originPt = anchor === 'start' ? this.start : this.end;
+    const originInvalid = this.invalid;
+
+    const resetIfInvalid = (): void => {
+      if (this.invalid) {
+        if (anchor === 'start') {
+          this.start = originPt;
+        } else {
+          this.end = originPt;
+        }
+        this.invalid = originInvalid;
+      }
+    };
+
+    const handleMouseUp = (): void => {
+      window.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      resetIfInvalid();
+      this.endEditing();
+    };
+
+    return handleMouseUp;
   }
 
   private updateProjectionViewMatrix(): void {
@@ -390,8 +480,9 @@ export class ViewerDistanceMeasurement {
   }
 
   private updateViewport(): void {
-    const { width, height } = getMeasurementBoundingClientRect(this.hostEl);
-    this.viewport = new Viewport(width, height);
+    const rect = getMeasurementBoundingClientRect(this.hostEl);
+    this.viewport = new Viewport(rect.width, rect.height);
+    this.elementBounds = rect;
   }
 
   private formatDistance(distance: number | undefined): string {
@@ -409,8 +500,18 @@ export class ViewerDistanceMeasurement {
         : `~${realDistance.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   }
-}
 
-function cssTransformForPoint(pt: Point.Point): string {
-  return `translate(-50%, -50%) translate(${pt.x}px, ${pt.y}px)`;
+  private beginEditing(): void {
+    if (this.interactionCount === 0) {
+      this.editBegin.emit();
+    }
+    this.interactionCount = this.interactionCount + 1;
+  }
+
+  private endEditing(): void {
+    if (this.interactionCount === 1) {
+      this.editEnd.emit();
+    }
+    this.interactionCount = this.interactionCount - 1;
+  }
 }
