@@ -66,13 +66,7 @@ export function createDepthImageBytes(
   value = 2 ** 16 - 1
 ): Uint16Array {
   const data = new Uint16Array(width * height);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y + x;
-      data[i] = value;
-    }
-  }
-  return data;
+  return data.fill(value);
 }
 
 export function createDepthBuffer(

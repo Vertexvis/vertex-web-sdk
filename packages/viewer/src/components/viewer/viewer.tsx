@@ -62,9 +62,7 @@ import {
 } from './utils';
 import {
   acknowledgeFrameRequests,
-  CanvasDepthProvider,
   CanvasRenderer,
-  createCanvasDepthProvider,
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
@@ -311,7 +309,6 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
-  private depthProvider!: CanvasDepthProvider;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
@@ -340,7 +337,6 @@ export class Viewer {
     this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
     this.setupStreamListeners();
 
-    this.depthProvider = createCanvasDepthProvider();
     this.interactionApi = this.createInteractionApi();
 
     this.commands = new CommandRegistry(this.stream, () => this.getConfig());
@@ -1128,7 +1124,11 @@ export class Viewer {
       this.stream,
       () => this.getConfig().interactions,
       () => this.createScene(),
-      (point) => this.getDepth(point),
+      async () => this.frame?.depthBuffer(),
+      () =>
+        Viewport.fromDimensions(
+          this.getCanvasDimensions() || Dimensions.create(0, 0)
+        ),
       this.tap,
       this.doubletap,
       this.longpress
@@ -1158,18 +1158,6 @@ export class Viewer {
       this.sceneViewId,
       selectionMaterial
     );
-  }
-
-  private async getDepth(point: Point.Point): Promise<number> {
-    if (this.lastFrame != null && this.dimensions != null) {
-      return await this.depthProvider({
-        point,
-        dimensions: this.dimensions,
-        frame: this.lastFrame,
-      });
-    }
-
-    return -1;
   }
 
   /**

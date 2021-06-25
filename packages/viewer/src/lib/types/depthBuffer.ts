@@ -76,36 +76,20 @@ export class DepthBuffer implements FrameImageLike {
    * of the camera.
    *
    * @param point A 2D point within the viewport.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
    * @returns A depth between the near and far plane.
-   */
-  public getLinearDepthAtPoint(point: Point.Point): number;
-
-  /**
-   * Computes the depth from a 2D point within the coordinate space of a
-   * viewport. The returned depth is a value that's between the near and far
-   * plane of the camera.
-   *
-   * @param point A 2D point within the viewport.
-   * @param viewport The viewport to translate the point from.
-   * @returns A depth between the near and far plane.
-   */
-  public getLinearDepthAtPoint(point: Point.Point, viewport: Viewport): number;
-
-  /**
-   * @ignore
    */
   public getLinearDepthAtPoint(
     point: Point.Point,
-    viewport?: Viewport
+    fallbackNormalizedDepth?: number
   ): number {
-    if (viewport == null) {
-      const { near, far } = this.camera;
-      const depth = this.getNormalizedDepthAtPoint(point);
-      return depth * (far - near) + near;
-    } else {
-      const framePt = viewport.transformPointToFrame(point, this);
-      return this.getLinearDepthAtPoint(framePt);
-    }
+    const { near, far } = this.camera;
+    const depth = this.getNormalizedDepthAtPoint(
+      point,
+      fallbackNormalizedDepth
+    );
+    return depth * (far - near) + near;
   }
 
   /**
@@ -114,61 +98,52 @@ export class DepthBuffer implements FrameImageLike {
    * far plane.
    *
    * @param point A 2D point within the frame.
-   * @returns A depth between 0 and 1.
-   */
-  public getNormalizedDepthAtPoint(point: Point.Point): number;
-
-  /**
-   * Computes a depth from a 2D point within the coordinate space of the
-   * viewport. The returned depth is normalized value (`[0, 1]`) between the near
-   * and far plane.
-   *
-   * @param point A 2D point within the viewport.
-   * @param viewport The viewport to translate the point from.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
    * @returns A depth between 0 and 1.
    */
   public getNormalizedDepthAtPoint(
     point: Point.Point,
-    viewport: Viewport
-  ): number;
-
-  /**
-   * @ignore
-   */
-  public getNormalizedDepthAtPoint(
-    point: Point.Point,
-    viewport?: Viewport
+    fallbackNormalizedDepth?: number
   ): number {
-    if (viewport == null) {
-      const { width, height } = this.imageDimensions;
+    const { width, height } = this.imageDimensions;
 
-      const offset = Point.subtract(point, this.rect);
-      const scale = 1 / this.scale;
-      const pixel = Point.scale(offset, scale, scale);
+    const offset = Point.subtract(point, this.rect);
+    const scale = 1 / this.scale;
+    const pixel = Point.scale(offset, scale, scale);
 
-      if (
-        pixel.x >= 1 &&
-        pixel.y >= 1 &&
-        pixel.x <= width &&
-        pixel.y <= height
-      ) {
-        const index =
-          Math.floor(pixel.x) - 1 + (Math.floor(pixel.y) - 1) * width;
-        const depth = this.data[index];
-        return (
-          (depth || DepthBuffer.MAX_DEPTH_VALUE) / DepthBuffer.MAX_DEPTH_VALUE
-        );
-      } else {
-        return 1;
-      }
+    if (pixel.x >= 1 && pixel.y >= 1 && pixel.x <= width && pixel.y <= height) {
+      const index = Math.floor(pixel.x) - 1 + (Math.floor(pixel.y) - 1) * width;
+      const depth = this.data[index];
+      const depthOrFallback =
+        depth === DepthBuffer.MAX_DEPTH_VALUE
+          ? fallbackNormalizedDepth ?? depth
+          : depth;
+      return (
+        (depthOrFallback ?? DepthBuffer.MAX_DEPTH_VALUE) /
+        DepthBuffer.MAX_DEPTH_VALUE
+      );
     } else {
-      const framePt = viewport.transformPointToFrame(point, this);
-      return this.getNormalizedDepthAtPoint(framePt);
+      return fallbackNormalizedDepth ?? 1;
     }
   }
 
-  public getWorldPoint(point: Point.Point, ray: Ray.Ray): Vector3.Vector3 {
-    const distance = this.getLinearDepthAtPoint(point);
+  /**
+   * Computes a 3D point in world space coordinates from the depth value at the
+   * given pixel and ray.
+   *
+   * @param point A pixel to use for reading a depth value.
+   * @param ray A ray that specifies the origin and direction.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   * @returns A point in world space coordinates.
+   */
+  public getWorldPoint(
+    point: Point.Point,
+    ray: Ray.Ray,
+    fallbackNormalizedDepth?: number
+  ): Vector3.Vector3 {
+    const distance = this.getLinearDepthAtPoint(point, fallbackNormalizedDepth);
     const vv = Vector3.subtract(this.camera.lookAt, this.camera.position);
 
     // Compute the world position along the ray at the far plane.

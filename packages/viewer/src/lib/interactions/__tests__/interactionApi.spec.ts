@@ -3,9 +3,9 @@ jest.mock('@vertexvis/stream-api');
 import { Scene } from '../../scenes';
 import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
-import { frame } from '../../../testing/fixtures';
+import { createDepthBuffer, frame } from '../../../testing/fixtures';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Interactions, Orientation } from '../../types';
+import { DepthBuffer, Interactions, Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../../scenes/colorMaterial';
 import { mapFrameOrThrow } from '../../mappers';
 
@@ -24,7 +24,9 @@ describe(InteractionApi, () => {
     ColorMaterial.fromHex('#ffffff')
   );
   const sceneProvider = (): Scene => scene;
-  const depthProvider = async (): Promise<number> => 1;
+  const depthProvider = (): Promise<DepthBuffer> =>
+    Promise.resolve(createDepthBuffer(100, 100));
+  const viewportProvider = (): Viewport => new Viewport(100, 100);
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
 
@@ -39,6 +41,7 @@ describe(InteractionApi, () => {
       interactionConfigProvider,
       sceneProvider,
       depthProvider,
+      viewportProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
       { emit: emitLongPress }
@@ -148,6 +151,7 @@ describe(InteractionApi, () => {
         interactionConfigProvider,
         sceneProvider,
         depthProvider,
+        viewportProvider,
         {
           emit: emitTap,
         },

@@ -1,8 +1,7 @@
 import { FrameRenderer } from './renderer';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
-import { DepthProvider } from './depth';
 import { Frame } from '../types/frame';
 import { Viewport } from '../types';
 
@@ -15,15 +14,7 @@ export interface DrawFrame {
   viewport: Viewport;
 }
 
-export interface DrawPixel {
-  dimensions: Dimensions.Dimensions;
-  frame: Frame;
-  point: Point.Point;
-}
-
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
-
-export type CanvasDepthProvider = DepthProvider<DrawPixel>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
@@ -125,16 +116,5 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     image.dispose();
     return data.frame;
-  };
-}
-
-export function createCanvasDepthProvider(): CanvasDepthProvider {
-  return async (data) => {
-    const depthBuffer = await data.frame.depthBuffer();
-    if (depthBuffer != null) {
-      const depth = depthBuffer.getNormalizedDepthAtPoint(data.point);
-      return depth;
-    }
-    return -1;
   };
 }

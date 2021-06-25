@@ -93,15 +93,37 @@ export class Viewport implements Dimensions.Dimensions {
     return Point.scale(pt, 1 / scaleX, 1 / scaleY);
   }
 
+  /**
+   * Transforms a point in viewport coordinates to a point in world space
+   * coordinates. This method expects a depth buffer in order to compute a value
+   * for the Z axis.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param depthBuffer A depth buffer for computing the Z axis.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   * @returns
+   */
   public transformPointToWorldSpace(
     pt: Point.Point,
-    depthBuffer: DepthBuffer
+    depthBuffer: DepthBuffer,
+    fallbackNormalizedDepth?: number
   ): Vector3.Vector3 {
     const depthPt = this.transformPointToFrame(pt, depthBuffer);
     const ray = this.transformPointToRay(pt, depthBuffer, depthBuffer.camera);
-    return depthBuffer.getWorldPoint(depthPt, ray);
+    return depthBuffer.getWorldPoint(depthPt, ray, fallbackNormalizedDepth);
   }
 
+  /**
+   * Transforms a point in viewport coordinates to a ray. The returned ray will
+   * have an origin that is at the position of the camera with a direction that
+   * is pointing into world space away from the camera.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param image An image of a frame.
+   * @param camera A camera used to determine orientation of the scene.
+   * @returns
+   */
   public transformPointToRay(
     pt: Point.Point,
     image: FrameImageLike,
