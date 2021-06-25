@@ -60,3 +60,20 @@ describe(Point.scale, () => {
     expect(Point.scale(a, 2, 3)).toEqual(Point.create(2, 6));
   });
 });
+
+describe(Point.lerp, () => {
+  const pt1 = Point.create(1, 1);
+  const pt2 = Point.create(2, 2);
+
+  it('returns a point between A and B', () => {
+    expect(Point.lerp(pt1, pt2, 0.5)).toEqual(Point.create(1.5, 1.5));
+  });
+
+  it('clamps to 0', () => {
+    expect(Point.lerp(pt1, pt2, -1)).toEqual(pt1);
+  });
+
+  it('clamps to 1', () => {
+    expect(Point.lerp(pt1, pt2, 2)).toEqual(pt2);
+  });
+});

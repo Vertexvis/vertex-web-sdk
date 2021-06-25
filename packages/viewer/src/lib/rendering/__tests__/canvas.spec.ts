@@ -5,10 +5,8 @@ import {
   DrawFrame,
   measureCanvasRenderer,
   CanvasRenderer,
-  createCanvasDepthProvider,
-  DrawPixel,
 } from '../canvas';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import * as Fixtures from '../../../testing/fixtures';
 import { loadImageBytes } from '../imageLoaders';
 import { Async } from '@vertexvis/utils';
@@ -34,12 +32,6 @@ const drawFrame2: DrawFrame = {
   dimensions: Dimensions.create(100, 50),
   frame: Fixtures.frame,
   viewport: new Viewport(100, 50),
-};
-
-const drawPixel: DrawPixel = {
-  dimensions: Dimensions.create(100, 50),
-  frame: Fixtures.frame,
-  point: Point.create(0, 0),
 };
 
 describe(createCanvasRenderer, () => {
@@ -71,20 +63,6 @@ describe(createCanvasRenderer, () => {
     const renderer = createCanvasRenderer();
     await renderer(drawFrame1);
     expect(image.dispose).toHaveBeenCalled();
-  });
-});
-
-describe(createCanvasDepthProvider, () => {
-  (loadImageBytes as jest.Mock).mockResolvedValue(image);
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('returns depth from the current frame', async () => {
-    const renderer = createCanvasDepthProvider();
-    const result = await renderer(drawPixel);
-    expect(result).toBeCloseTo(1);
   });
 });
 

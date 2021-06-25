@@ -3,9 +3,7 @@ import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
-import { Interactions } from '../types';
-import { DepthProvider } from '../rendering/depth';
-import { computeWorldPosition } from '../rendering/coordinates';
+import { DepthBuffer, Interactions, Viewport } from '../types';
 
 type SceneProvider = () => Scene;
 
@@ -30,7 +28,8 @@ export class InteractionApi {
     private stream: StreamApi,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
-    private getDepth: DepthProvider<Point.Point>,
+    private getDepthBuffer: () => Promise<DepthBuffer | undefined>,
+    private getViewport: () => Viewport,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>
@@ -216,15 +215,11 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    const depth = await this.getDepthForPoint(point);
+    const depthBuffer = await this.getDepthBuffer();
 
     return this.transformCamera((camera, viewport, scale) => {
-      this.worldRotationPoint = this.getWorldRotationPoint(
-        camera,
-        viewport,
-        Point.scale(point, scale?.x || 1, scale?.y || 1),
-        depth
-      );
+      this.worldRotationPoint =
+        this.getWorldRotationPoint(point, depthBuffer) ?? camera.lookAt;
 
       if (this.worldRotationPoint != null) {
         const upVector = Vector3.normalize(camera.up);
@@ -361,29 +356,17 @@ export class InteractionApi {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 
-  private async getDepthForPoint(point: Point.Point): Promise<number> {
-    const scene = this.getScene();
-    const scale = scene.scale();
-
-    return await this.getDepth(
-      Point.scale(point, scale?.x || 1, scale?.y || 1)
-    );
-  }
-
   private getWorldRotationPoint(
-    camera: Camera,
-    viewport: Dimensions.Dimensions,
-    scaledPoint: Point.Point,
-    depth: number
-  ): Vector3.Vector3 {
+    point: Point.Point,
+    depthBuffer?: DepthBuffer
+  ): Vector3.Vector3 | undefined {
     if (this.worldRotationPoint != null) {
       return this.worldRotationPoint;
     } else {
-      // In the case that the depth is at the near or far plane, or we
-      // don't have depth info, use 0.5 to represent a value in the middle.
-      const adjustedDepth = depth >= 1 || depth <= 0 ? 0.5 : depth;
-
-      return computeWorldPosition(camera, viewport, scaledPoint, adjustedDepth);
+      const viewport = this.getViewport();
+      return depthBuffer != null
+        ? viewport.transformPointToWorldSpace(point, depthBuffer, 0.5)
+        : undefined;
     }
   }
 }

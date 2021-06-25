@@ -1,5 +1,15 @@
-import { Dimensions, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Dimensions,
+  Matrix4,
+  Point,
+  Ray,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
+import { FramePerspectiveCamera } from './frame';
 import type { FrameImageLike } from './frame';
+import { DepthBuffer } from './depthBuffer';
 
 /**
  * A `Viewport` represents the drawing area in the viewer.
@@ -68,7 +78,8 @@ export class Viewport implements Dimensions.Dimensions {
   }
 
   /**
-   * Transforms a point in viewport coordinate space to a point in a frame's coordinate space.
+   * Transforms a point in viewport coordinate space to a point in a frame's
+   * coordinate space.
    *
    * @param pt A point in viewport coordinate space.
    * @param image An image of a frame.
@@ -80,6 +91,59 @@ export class Viewport implements Dimensions.Dimensions {
   ): Point.Point {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
     return Point.scale(pt, 1 / scaleX, 1 / scaleY);
+  }
+
+  /**
+   * Transforms a point in viewport coordinates to a point in world space
+   * coordinates. This method expects a depth buffer in order to compute a value
+   * for the Z axis.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param depthBuffer A depth buffer for computing the Z axis.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   * @returns
+   */
+  public transformPointToWorldSpace(
+    pt: Point.Point,
+    depthBuffer: DepthBuffer,
+    fallbackNormalizedDepth?: number
+  ): Vector3.Vector3 {
+    const depthPt = this.transformPointToFrame(pt, depthBuffer);
+    const ray = this.transformPointToRay(pt, depthBuffer, depthBuffer.camera);
+    return depthBuffer.getWorldPoint(depthPt, ray, fallbackNormalizedDepth);
+  }
+
+  /**
+   * Transforms a point in viewport coordinates to a ray. The returned ray will
+   * have an origin that is at the position of the camera with a direction that
+   * is pointing into world space away from the camera.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param image An image of a frame.
+   * @param camera A camera used to determine orientation of the scene.
+   * @returns
+   */
+  public transformPointToRay(
+    pt: Point.Point,
+    image: FrameImageLike,
+    camera: FramePerspectiveCamera
+  ): Ray.Ray {
+    const { position, lookAt, up, aspectRatio, fovY } = camera;
+    const framePt = this.transformPointToFrame(pt, image);
+    const m = Matrix4.position(
+      Matrix4.makeLookAt(position, lookAt, up),
+      Matrix4.makeIdentity()
+    );
+    const normal = Vector3.normalize(
+      Vector3.create(
+        (framePt.x / image.dimensions.width - 0.5) * aspectRatio,
+        -(framePt.y / image.dimensions.height) + 0.5,
+        -0.5 / Math.tan(Angle.toRadians(fovY / 2.0))
+      )
+    );
+    const direction = Vector3.normalize(Vector3.transformMatrix(normal, m));
+    return Ray.create({ origin: position, direction });
   }
 
   /**

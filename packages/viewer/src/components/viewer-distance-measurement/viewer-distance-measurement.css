@@ -1,15 +1,31 @@
 :host {
   /**
+   * @prop --viewer-distance-measurement-accent-color: A CSS color that
+   * specifies the color of lines, anchors and borders.
+   */
+  --viewer-distance-measurement-accent-color: var(--blue-600);
+
+  /**
    * @prop --viewer-distance-measurement-line-stroke: A CSS color that specifies
    * the color of the measurement line.
    */
-  --viewer-distance-measurement-line-stroke: var(--blue-600);
+  --viewer-distance-measurement-line-stroke: var(
+    --viewer-distance-measurement-accent-color
+  );
 
   /**
    * @prop --viewer-distance-measurement-line-stroke-width: A CSS length that
    * width of the measurement line.
    */
   --viewer-distance-measurement-line-stroke-width: 2px;
+
+  /**
+   * @prop --viewer-distance-measurement-anchor-background: A CSS color that
+   * specifies the background color of the default anchor.
+   */
+  --viewer-distance-measurement-anchor-background: var(
+    --viewer-distance-measurement-accent-color
+  );
 
   /**
    * @prop --viewer-distance-measurement-label-background: A CSS background that
@@ -21,7 +37,8 @@
    * @prop --viewer-distance-measurement-label-border: A CSS border that
    * specifies the border color or image for the measurement's label.
    */
-  --viewer-distance-measurement-label-border: 1px solid var(--blue-600);
+  --viewer-distance-measurement-label-border: 1px solid
+    var(--viewer-distance-measurement-accent-color);
 
   /**
    * @prop --viewer-distance-measurement-label-border: A CSS length that
@@ -43,6 +60,14 @@
   pointer-events: none;
 }
 
+:host([editable]) .anchor-container {
+  cursor: move;
+}
+
+:host([invalid]) {
+  --viewer-distance-measurement-accent-color: var(--red-600);
+}
+
 .line {
   position: absolute;
   width: 100%;
@@ -55,10 +80,12 @@
   position: absolute;
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: initial;
+  display: block;
 }
 
 .anchor {
-  background-color: var(--blue-600);
+  background-color: var(--viewer-distance-measurement-anchor-background);
   width: 8px;
   height: 8px;
   border-radius: 50%;
