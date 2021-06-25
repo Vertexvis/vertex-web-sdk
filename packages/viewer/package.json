@@ -48,6 +48,7 @@
     "@improbable-eng/grpc-web": "^0.14.0",
     "@juggle/resize-observer": "^3.3.0",
     "@types/classnames": "^2.3.1",
+    "@types/three": "^0.129.1",
     "@vertexvis/frame-streaming-protos": "^0.5.12",
     "@vertexvis/geometry": "0.9.27",
     "@vertexvis/scene-tree-protos": "^0.1.0",
@@ -60,6 +61,7 @@
     "jwt-decode": "^3.1.2",
     "protobufjs": "^6.9.0",
     "requestidlecallback-polyfill": "^1.0.2",
+    "three": "^0.129.0",
     "tslib": "^2.1.0"
   },
   "devDependencies": {
