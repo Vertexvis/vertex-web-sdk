@@ -138,6 +138,18 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
+   * Returns `true` if there the normalized depth value at the given point is
+   * `1` or if the point is outside the frame. This method is useful for
+   * checking if geometry exists at a given 2D coordinate.
+   *
+   * @param point A 2D point within the frame.
+   * @returns `true` if a depth value exists.
+   */
+  public isDepthAtFarPlane(point: Point.Point): boolean {
+    return this.getNormalizedDepthAtPoint(point) < 1;
+  }
+
+  /**
    * Computes a 3D point in world space coordinates from the depth value at the
    * given pixel and ray.
    *

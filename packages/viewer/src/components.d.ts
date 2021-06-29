@@ -28,10 +28,10 @@ import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { DepthBuffer, Orientation, UnitType } from "./lib/types";
-import { ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter } from "./components/viewer-distance-measurement/viewer-distance-measurement";
+import { ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
-import { ViewerMeasurementsTool } from "./components/viewer-measurements/viewer-measurements";
+import { AddMeasurementData, ViewerMeasurementType } from "./components/viewer-measurements/viewer-measurements";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 export namespace Components {
@@ -304,21 +304,38 @@ export namespace Components {
           * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
          */
         "computeElementMetrics": () => Promise<ViewerDistanceMeasurementElementMetrics | undefined>;
+        /**
+          * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
+         */
         "depthBuffer"?: DepthBuffer;
-        "editable": boolean;
+        /**
+          * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
+         */
+        "distance"?: number;
         /**
           * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "end"?: Vector3.Vector3 | string;
+        "end"?: Vector3.Vector3;
+        /**
+          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "endJson"?: string;
         /**
           * The number of fraction digits to display.
          */
         "fractionalDigits": number;
+        /**
+          * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
+         */
         "invalid": boolean;
         /**
           * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
          */
         "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        /**
+          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+         */
+        "mode": ViewerDistanceMeasurementMode;
         /**
           * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
          */
@@ -326,7 +343,11 @@ export namespace Components {
         /**
           * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "start"?: Vector3.Vector3 | string;
+        "start"?: Vector3.Vector3;
+        /**
+          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "startJson"?: string;
         /**
           * The unit of measurement.
          */
@@ -396,9 +417,12 @@ export namespace Components {
     interface VertexViewerLayer {
     }
     interface VertexViewerMeasurements {
-        "depthBuffer"?: DepthBuffer;
-        "interactionEnabled": boolean;
-        "tool": ViewerMeasurementsTool;
+        "addMeasurement": (data: AddMeasurementData) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
+        "getMeasurements": () => Promise<HTMLVertexViewerDistanceMeasurementElement[]>;
+        "interactionOn": boolean;
+        "removeMeasurement": (id: string) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>;
+        "selectedMeasurementId"?: string;
+        "tool": ViewerMeasurementType;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerToolbar {
@@ -747,22 +771,45 @@ declare namespace LocalJSX {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerDistanceMeasurement {
+        /**
+          * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
+         */
         "depthBuffer"?: DepthBuffer;
-        "editable"?: boolean;
+        /**
+          * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
+         */
+        "distance"?: number;
         /**
           * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "end"?: Vector3.Vector3 | string;
+        "end"?: Vector3.Vector3;
+        /**
+          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "endJson"?: string;
         /**
           * The number of fraction digits to display.
          */
         "fractionalDigits"?: number;
+        /**
+          * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
+         */
         "invalid"?: boolean;
         /**
           * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
          */
         "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        /**
+          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+         */
+        "mode"?: ViewerDistanceMeasurementMode;
+        /**
+          * An event that is dispatched anytime the user begins editing the measurement.
+         */
         "onEditBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user has finished editing the measurement.
+         */
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
           * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
@@ -771,7 +818,11 @@ declare namespace LocalJSX {
         /**
           * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "start"?: Vector3.Vector3 | string;
+        "start"?: Vector3.Vector3;
+        /**
+          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "startJson"?: string;
         /**
           * The unit of measurement.
          */
@@ -845,9 +896,11 @@ declare namespace LocalJSX {
     interface VertexViewerLayer {
     }
     interface VertexViewerMeasurements {
-        "depthBuffer"?: DepthBuffer;
-        "interactionEnabled"?: boolean;
-        "tool"?: ViewerMeasurementsTool;
+        "interactionOn"?: boolean;
+        "onMeasurementAdded"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
+        "onMeasurementRemoved"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
+        "selectedMeasurementId"?: string;
+        "tool"?: ViewerMeasurementType;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerToolbar {

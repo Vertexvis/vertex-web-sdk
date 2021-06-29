@@ -35,11 +35,13 @@ viewport of a `<vertex-viewer>`.
 
 ### Used by
 
+ - [vertex-viewer-measurements](../viewer-measurements)
  - [vertex-viewer-toolbar](../viewer-toolbar)
 
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-measurements --> vertex-viewer-layer
   vertex-viewer-toolbar --> vertex-viewer-layer
   style vertex-viewer-layer fill:#f9f,stroke:#333,stroke-width:4px
 ```

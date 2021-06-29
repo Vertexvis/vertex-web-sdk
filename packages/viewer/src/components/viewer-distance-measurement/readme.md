@@ -125,12 +125,14 @@ The component exposes slots for customizing the HTML of the distance anchors.
 | ---------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
 | `depthBuffer`          | --                  |                                                                                                                                                                                    | `DepthBuffer \| undefined`                                                                                                                      | `undefined`     |
 | `editable`             | `editable`          |                                                                                                                                                                                    | `boolean`                                                                                                                                       | `false`         |
-| `end`                  | `end`               | The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.            | `Vector3 \| string \| undefined`                                                                                                                | `undefined`     |
+| `end`                  | --                  | The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.            | `Vector3 \| undefined`                                                                                                                          | `undefined`     |
+| `endJson`              | `end`               |                                                                                                                                                                                    | `string \| undefined`                                                                                                                           | `undefined`     |
 | `fractionalDigits`     | `fractional-digits` | The number of fraction digits to display.                                                                                                                                          | `number`                                                                                                                                        | `2`             |
 | `invalid`              | `invalid`           |                                                                                                                                                                                    | `boolean`                                                                                                                                       | `false`         |
 | `labelFormatter`       | --                  | An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string. | `((distance: number \| undefined) => string) \| undefined`                                                                                      | `undefined`     |
 | `projectionViewMatrix` | --                  | The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.                                       | `[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined` | `undefined`     |
-| `start`                | `start`             | The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.          | `Vector3 \| string \| undefined`                                                                                                                | `undefined`     |
+| `start`                | --                  | The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.          | `Vector3 \| undefined`                                                                                                                          | `undefined`     |
+| `startJson`            | `start`             |                                                                                                                                                                                    | `string \| undefined`                                                                                                                           | `undefined`     |
 | `units`                | `units`             | The unit of measurement.                                                                                                                                                           | `"centimeters" \| "feet" \| "inches" \| "meters" \| "millimeters" \| "yards"`                                                                   | `'millimeters'` |
 | `viewer`               | --                  | The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.                                                                      | `HTMLVertexViewerElement \| undefined`                                                                                                          | `undefined`     |
 
@@ -178,6 +180,19 @@ Type: `Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
 | `--viewer-distance-measurement-line-stroke`       | A CSS color that specifies the color of the measurement line.                              |
 | `--viewer-distance-measurement-line-stroke-width` | A CSS length that width of the measurement line.                                           |
 
+
+## Dependencies
+
+### Used by
+
+ - [vertex-viewer-measurements](../viewer-measurements)
+
+### Graph
+```mermaid
+graph TD;
+  vertex-viewer-measurements --> vertex-viewer-distance-measurement
+  style vertex-viewer-distance-measurement fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

@@ -84,10 +84,16 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:it_OCRHNMjj0jHzxn1cyQMTXXcb17sj-Wcsi"
+          depth-buffers="final"
         >
+          <vertex-viewer-measurements interaction-on>
+            <template id="distance-measurement">
+              <vertex-viewer-distance-measurement></vertex-viewer-distance-measurement>
+            </template>
+          </vertex-viewer-measurements>
+
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>

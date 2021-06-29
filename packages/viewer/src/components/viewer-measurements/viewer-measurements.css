@@ -7,23 +7,3 @@
   right: 0;
   pointer-events: none;
 }
-
-.measurement {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.new-measurement-anchor {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: red;
-  border-radius: 50%;
-}
-
-.new-measurement {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
