@@ -2,46 +2,29 @@ import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
 import {
   BoxGeometry,
   CanvasTexture,
-  ClampToEdgeWrapping,
   DataTexture,
   DepthFormat,
   DepthTexture,
-  HalfFloatType,
-  IntType,
-  LuminanceAlphaFormat,
-  LuminanceFormat,
   Mesh,
   MeshNormalMaterial,
   NearestFilter,
   OrthographicCamera,
   PerspectiveCamera,
   PlaneGeometry,
-  RedFormat,
-  RedIntegerFormat,
   RGBAFormat,
-  RGBFormat,
   Scene,
   ShaderMaterial,
   Texture,
-  UnsignedByteType,
   UnsignedIntType,
-  UnsignedShort565Type,
   UnsignedShortType,
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three';
-import { Dimensions, Matrix, Point, Rectangle } from '@vertexvis/geometry';
 import { DepthBuffer, Viewport } from '../../lib/types';
 import {
   vertexShader,
-  fragmentShader,
-  debugServerDepthShader,
-  debugObjectsShader,
-  debugDepthsShader,
-  drawServerDepthShader,
-  drawObjectShader,
-  debugServerDepth16Shader,
   computeServerDepthTextureMatrix,
+  serverDepth16FragmentShader,
 } from './shaders';
 
 interface PostProcessingState {
@@ -90,7 +73,7 @@ export class ViewerThreeJsRenderer {
 
     const postMaterial = new ShaderMaterial({
       vertexShader,
-      fragmentShader: debugServerDepth16Shader,
+      fragmentShader: serverDepth16FragmentShader,
       uniforms: {
         diffuseTexture: { value: target.texture },
         depthTexture: { value: target.depthTexture },
@@ -124,14 +107,54 @@ export class ViewerThreeJsRenderer {
 
     const geometry = new BoxGeometry(10, 10, 10);
     const material = new MeshNormalMaterial();
-    const cube = new Mesh(geometry, material);
-    cube.position.set(0, 0, 100);
-    this.scene.add(cube);
 
-    const renderer = new WebGLRenderer({ canvas, alpha: true });
+    const cubes: Mesh[] = [];
+
+    const cubeC = new Mesh(geometry, material);
+    cubeC.position.set(0, 0, 25);
+    this.scene.add(cubeC);
+    cubes.push(cubeC);
+
+    const cubeF = new Mesh(geometry, material);
+    cubeF.position.set(0, 0, 100);
+    this.scene.add(cubeF);
+    cubes.push(cubeF);
+
+    const cubeB = new Mesh(geometry, material);
+    cubeB.position.set(0, 0, -150);
+    this.scene.add(cubeB);
+    cubes.push(cubeB);
+
+    const cubeL = new Mesh(geometry, material);
+    cubeL.position.set(100, 0, 0);
+    this.scene.add(cubeL);
+    cubes.push(cubeL);
+
+    const cubeR = new Mesh(geometry, material);
+    cubeR.position.set(-100, 0, 0);
+    this.scene.add(cubeR);
+    cubes.push(cubeR);
+
+    const cubeT = new Mesh(geometry, material);
+    cubeT.position.set(0, 100, 0);
+    this.scene.add(cubeT);
+    cubes.push(cubeT);
+
+    const cubeBtm = new Mesh(geometry, material);
+    cubeBtm.position.set(0, -100, 0);
+    this.scene.add(cubeBtm);
+    cubes.push(cubeBtm);
+
+    const renderer = new WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+    });
     renderer.setAnimationLoop(() => {
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
+      cubes.forEach((cube) => {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+      });
 
       renderer.setRenderTarget(this.postProcessing.target);
       renderer.render(this.scene, this.camera);
@@ -203,25 +226,19 @@ export class ViewerThreeJsRenderer {
         frame.depthBuffer(),
       ]);
       if (depthBitmap != null && depthBuffer != null) {
-        // this.postProcessing.material.uniforms.serverDepthTexture = {
-        //   value: createDepthCanvasTexture(
-        //     depthBitmap,
-        //     this.viewport,
-        //     this.viewport.calculateDrawRect(
-        //       depthBuffer,
-        //       depthBuffer.imageDimensions
-        //     )
-        //   ),
-        // };
-
-        const { width, height } = depthBuffer.imageDimensions;
+        const { x, y, width, height } = this.viewport.calculateDrawRect(
+          depthBuffer,
+          depthBuffer.imageDimensions
+        );
         this.postProcessing.material.uniforms.serverDepthTexture = {
           value: createDepthDataTexture(depthBuffer, this.viewport),
         };
         this.postProcessing.material.uniforms.serverDepthRect = {
           value: {
-            x: 0,
-            y: 0,
+            x: x,
+            // Position server depth from top of screen. WebGL renders from
+            // bottom of screen. Consider moving to shader.
+            y: this.viewport.height - (height + y),
             width: width,
             height: height,
           },
@@ -268,36 +285,4 @@ function createDepthDataTexture(
   texture.magFilter = NearestFilter;
   texture.flipY = true;
   return texture;
-}
-
-function createDepthCanvasTexture(
-  depthBitmap: ImageBitmap,
-  imageDimensions: Dimensions.Dimensions,
-  drawRect: Rectangle.Rectangle
-): CanvasTexture {
-  const { width, height } = imageDimensions;
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const context = canvas.getContext('2d');
-  if (context != null) {
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, width, height);
-    context.drawImage(
-      depthBitmap,
-      drawRect.x,
-      drawRect.y,
-      drawRect.width,
-      drawRect.height
-    );
-  }
-
-  const depthTexture = new CanvasTexture(canvas);
-  depthTexture.format = RGBFormat;
-  depthTexture.minFilter = NearestFilter;
-  depthTexture.magFilter = NearestFilter;
-
-  console.log('internal format', depthTexture.internalFormat);
-  return depthTexture;
 }
