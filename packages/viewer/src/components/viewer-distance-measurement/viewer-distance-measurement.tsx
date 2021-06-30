@@ -21,7 +21,7 @@ import {
 import { ElementPositions, getViewingElementPositions } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
 import { getMouseClientPosition } from '../../lib/dom';
-import { DistanceMeasurement } from './viewer-distance-measurement-components';
+import { DistanceMeasurementRenderer } from './viewer-distance-measurement-components';
 import { Disposable } from '@vertexvis/utils';
 
 /**
@@ -127,6 +127,12 @@ export class ViewerDistanceMeasurement {
   public labelFormatter?: ViewerDistanceMeasurementLabelFormatter;
 
   /**
+   * The distance from an anchor to its label.
+   */
+  @Prop()
+  public anchorLabelOffset = 20;
+
+  /**
    * A mode that specifies how the measurement component should behave. When
    * unset, the component will not respond to interactions with the handles.
    * When `edit`, the measurement anchors are interactive and the user is able
@@ -136,6 +142,9 @@ export class ViewerDistanceMeasurement {
   @Prop({ reflect: true })
   public mode: ViewerDistanceMeasurementMode = '';
 
+  /**
+   * A property that reflects which anchor is currently being interacted with.
+   */
   @Prop({ reflect: true, mutable: true })
   public interactingAnchor: Anchor | 'none' = 'none';
 
@@ -209,15 +218,6 @@ export class ViewerDistanceMeasurement {
   @Element()
   private hostEl!: HTMLElement;
 
-  public static isType(
-    el: unknown
-  ): el is HTMLVertexViewerDistanceMeasurementElement {
-    return (
-      el instanceof HTMLElement &&
-      el.nodeName === 'VERTEX-VIEWER-DISTANCE-MEASUREMENT'
-    );
-  }
-
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
    * this function uses `getBoundingClientRect` internally and will cause a
@@ -280,12 +280,12 @@ export class ViewerDistanceMeasurement {
       return (
         <Host>
           <div class="measurement">
-            <DistanceMeasurement
+            <DistanceMeasurementRenderer
               startPt={startPt}
               endPt={endPt}
               centerPt={labelPt}
               distance={distance}
-              anchorLabelDistance={20}
+              anchorLabelOffset={this.anchorLabelOffset}
               onStartAnchorPointerDown={this.handleEditAnchor('start')}
               onEndAnchorPointerDown={this.handleEditAnchor('end')}
             />
@@ -302,12 +302,12 @@ export class ViewerDistanceMeasurement {
             onPointerMove={this.handleUpdateStartAnchor}
             onPointerDown={this.handleStartMeasurement}
           >
-            <DistanceMeasurement
+            <DistanceMeasurementRenderer
               startPt={startPt}
               endPt={endPt}
               centerPt={labelPt}
               distance={distance}
-              anchorLabelDistance={20}
+              anchorLabelOffset={this.anchorLabelOffset}
             />
           </div>
         </Host>
@@ -316,12 +316,12 @@ export class ViewerDistanceMeasurement {
       return (
         <Host>
           <div class="measurement">
-            <DistanceMeasurement
+            <DistanceMeasurementRenderer
               startPt={startPt}
               endPt={endPt}
               centerPt={labelPt}
               distance={distance}
-              anchorLabelDistance={20}
+              anchorLabelOffset={this.anchorLabelOffset}
             />
           </div>
         </Host>

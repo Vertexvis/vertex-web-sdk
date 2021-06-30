@@ -27,11 +27,11 @@ import { Scene } from "./lib/scenes/scene";
 import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
-import { DepthBuffer, Orientation, UnitType } from "./lib/types";
+import { DepthBuffer, Measurement, Orientation, UnitType } from "./lib/types";
 import { Anchor, ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
-import { AddMeasurementData, ViewerMeasurementType } from "./components/viewer-measurements/viewer-measurements";
+import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/viewer-measurement-tool";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 export namespace Components {
@@ -430,13 +430,21 @@ export namespace Components {
         "endCapLength": number;
         "start": Point.Point;
     }
+    interface VertexViewerMeasurementTool {
+        "disabled": boolean;
+        "distanceTemplateId"?: string;
+        "isMeasuring": boolean;
+        "tool": ViewerMeasurementToolType;
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerMeasurements {
-        "addMeasurement": (data: AddMeasurementData) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
+        "addMeasurement": (measurement: Measurement) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
+        "distanceTemplateId"?: string;
+        "editable": boolean;
+        "getMeasurement": (id: string) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>;
         "getMeasurements": () => Promise<HTMLVertexViewerDistanceMeasurementElement[]>;
-        "interactionOn": boolean;
         "removeMeasurement": (id: string) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>;
         "selectedMeasurementId"?: string;
-        "tool": ViewerMeasurementType;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerToolbar {
@@ -563,6 +571,12 @@ declare global {
         prototype: HTMLVertexViewerMeasurementLineElement;
         new (): HTMLVertexViewerMeasurementLineElement;
     };
+    interface HTMLVertexViewerMeasurementToolElement extends Components.VertexViewerMeasurementTool, HTMLStencilElement {
+    }
+    var HTMLVertexViewerMeasurementToolElement: {
+        prototype: HTMLVertexViewerMeasurementToolElement;
+        new (): HTMLVertexViewerMeasurementToolElement;
+    };
     interface HTMLVertexViewerMeasurementsElement extends Components.VertexViewerMeasurements, HTMLStencilElement {
     }
     var HTMLVertexViewerMeasurementsElement: {
@@ -599,6 +613,7 @@ declare global {
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-layer": HTMLVertexViewerLayerElement;
         "vertex-viewer-measurement-line": HTMLVertexViewerMeasurementLineElement;
+        "vertex-viewer-measurement-tool": HTMLVertexViewerMeasurementToolElement;
         "vertex-viewer-measurements": HTMLVertexViewerMeasurementsElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
@@ -930,12 +945,21 @@ declare namespace LocalJSX {
         "endCapLength"?: number;
         "start"?: Point.Point;
     }
+    interface VertexViewerMeasurementTool {
+        "disabled"?: boolean;
+        "distanceTemplateId"?: string;
+        "isMeasuring"?: boolean;
+        "onMeasureBegin"?: (event: CustomEvent<void>) => void;
+        "onMeasureEnd"?: (event: CustomEvent<Measurement>) => void;
+        "tool"?: ViewerMeasurementToolType;
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerMeasurements {
-        "interactionOn"?: boolean;
+        "distanceTemplateId"?: string;
+        "editable"?: boolean;
         "onMeasurementAdded"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
         "onMeasurementRemoved"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
         "selectedMeasurementId"?: string;
-        "tool"?: ViewerMeasurementType;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerToolbar {
@@ -1006,6 +1030,7 @@ declare namespace LocalJSX {
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-layer": VertexViewerLayer;
         "vertex-viewer-measurement-line": VertexViewerMeasurementLine;
+        "vertex-viewer-measurement-tool": VertexViewerMeasurementTool;
         "vertex-viewer-measurements": VertexViewerMeasurements;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
@@ -1027,6 +1052,7 @@ declare module "@stencil/core" {
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
             "vertex-viewer-measurement-line": LocalJSX.VertexViewerMeasurementLine & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
+            "vertex-viewer-measurement-tool": LocalJSX.VertexViewerMeasurementTool & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementToolElement>;
             "vertex-viewer-measurements": LocalJSX.VertexViewerMeasurements & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementsElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;

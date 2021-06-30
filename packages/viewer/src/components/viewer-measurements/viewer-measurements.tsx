@@ -8,18 +8,12 @@ import {
   EventEmitter,
   Event,
   Method,
+  Listen,
 } from '@stencil/core';
-import { UUID } from '@vertexvis/utils';
-import { Vector3 } from '@vertexvis/geometry';
-
-export type ViewerMeasurementType = 'distance';
-
-export interface AddMeasurementData {
-  start: Vector3.Vector3;
-  end: Vector3.Vector3;
-  type: ViewerMeasurementType;
-  id?: string;
-}
+import { stampTemplateWithId } from '../../lib/templates';
+import { DistanceMeasurement, Measurement } from '../../lib/types';
+import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
+import { ViewerMeasurementToolType } from '../viewer-measurement-tool/viewer-measurement-tool';
 
 @Component({
   tag: 'vertex-viewer-measurements',
@@ -27,53 +21,106 @@ export interface AddMeasurementData {
   shadow: true,
 })
 export class ViewerMeasurements {
+  /**
+   * An HTML template that describes the HTML to use for new distance
+   * measurements. It's expected that the template contains a
+   * `<vertex-viewer-distance-measurement>`.
+   */
   @Prop()
-  public tool: ViewerMeasurementType = 'distance';
+  public distanceTemplateId?: string;
 
+  /**
+   * The type of measurement to perform.
+   */
   @Prop()
-  public interactionOn = false;
+  public tool: ViewerMeasurementToolType = 'distance';
 
+  /**
+   * Indicates if new measurements can be added or edited through user
+   * interaction.
+   */
+  @Prop()
+  public editable = false;
+
+  /**
+   * The viewer to connect to measurements. If nested within a <vertex-viewer>,
+   * this property will be populated automatically.
+   */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * The ID of the measurement that is selected.
+   */
   @Prop({ mutable: true })
   public selectedMeasurementId?: string;
 
+  /**
+   * Dispatched when a new measurement is added, either through user interaction
+   * or programmatically.
+   */
   @Event()
   public measurementAdded!: EventEmitter<HTMLVertexViewerDistanceMeasurementElement>;
 
+  /**
+   * Dispatched when a new measurement is removed, either through user
+   * interaction or programmatically.
+   */
   @Event()
   public measurementRemoved!: EventEmitter<HTMLVertexViewerDistanceMeasurementElement>;
 
   @Element()
   private hostEl!: HTMLElement;
 
-  private measurementToolsEl?: HTMLElement;
-
+  /**
+   * Adds a new measurement as a child to this component. A new measurement
+   * component will be created from the template specified by
+   * `distance-template-id` or if undefined a default element will be created.
+   *
+   * @param measurement The measurement to add.
+   * @returns The measurement element that was created.
+   * @see {@link ViewerMeasurements.distanceTemplateId}
+   */
   @Method()
   public async addMeasurement(
-    data: AddMeasurementData
+    measurement: Measurement
   ): Promise<HTMLVertexViewerDistanceMeasurementElement> {
-    if (data.type === 'distance') {
-      const measurement = this.createDistanceMeasurement();
-      measurement.start = data.start;
-      measurement.end = data.end;
-      measurement.viewer = this.viewer;
-      measurement.id = data.id ?? `measurement-${UUID.create()}`;
-      measurement.classList.add('viewer-measurement__measurement');
-      this.hostEl.appendChild(measurement);
-      this.measurementAdded.emit(measurement);
-      return measurement;
+    if (measurement instanceof DistanceMeasurement) {
+      const { start, end, id } = measurement;
+
+      const measurementEl = this.createDistanceMeasurementElement();
+      measurementEl.id = id;
+      measurementEl.start = start;
+      measurementEl.end = end;
+      measurementEl.viewer = this.viewer;
+      measurementEl.classList.add('viewer-measurements__measurement');
+
+      measurementEl.addEventListener(
+        'pointerdown',
+        this.handleMeasurementPointerDown
+      );
+
+      this.hostEl.appendChild(measurementEl);
+      this.measurementAdded.emit(measurementEl);
+      return measurementEl;
     } else {
-      throw new Error(`Cannot add measurement. Unknown type '${data.type}'.`);
+      throw new Error(`Cannot add measurement. Unknown type '${measurement}'.`);
     }
   }
 
+  /**
+   * Removes a measurement with the given ID, and returns the HTML element
+   * associated to the measurement. Returns `undefined` if no measurement is
+   * found.
+   *
+   * @param id The ID of the measurement to remove.
+   * @returns The measurement element, or undefined.
+   */
   @Method()
   public async removeMeasurement(
     id: string
   ): Promise<HTMLVertexViewerDistanceMeasurementElement | undefined> {
-    const measurements = await this.getMeasurements();
+    const measurements = await this.getMeasurementElements();
     const measurement = measurements.find((m) => m.id === id);
 
     if (measurement != null) {
@@ -84,48 +131,103 @@ export class ViewerMeasurements {
     return measurement;
   }
 
+  /**
+   * Returns the measurement element associated to the given ID.
+   *
+   * @param id The ID of the measurement element to return.
+   * @returns A measurement element, or `undefined`.
+   * @see {@link ViewerMeasurements.getMeasurementElements}
+   */
   @Method()
-  public async getMeasurements(): Promise<
+  public async getMeasurementElement(
+    id: string
+  ): Promise<HTMLVertexViewerDistanceMeasurementElement | undefined> {
+    const measurements = await this.getMeasurementElements();
+    return measurements.find((el) => el.id === id);
+  }
+
+  /**
+   * Returns a list of measurement elements that are children of this component.
+   *
+   * @returns A list of all measurements.
+   * @see {@link ViewerMeasurements.getMeasurementElement}
+   */
+  @Method()
+  public async getMeasurementElements(): Promise<
     HTMLVertexViewerDistanceMeasurementElement[]
   > {
-    return this.internalGetMeasurements();
-  }
-
-  private internalGetMeasurements(): HTMLVertexViewerDistanceMeasurementElement[] {
-    const measurements = this.hostEl.querySelectorAll(
-      'vertex-viewer-distance-measurement:not([data-is-tool])'
+    return Array.from(this.hostEl.children).filter(
+      isVertexViewerDistanceMeasurement
     );
-    return Array.from(measurements).filter(isVertexViewerDistanceMeasurement);
   }
 
-  protected componentDidLoad(): void {
-    this.populateMeasurementTool();
-  }
-
-  @Watch('tool')
-  protected handleToolChanged(): void {
-    this.populateMeasurementTool();
-  }
-
-  @Watch('interactionOn')
-  protected handleInteractionOnChanged(): void {
-    this.populateMeasurementTool();
-  }
-
+  /**
+   * @ignore
+   */
   @Watch('selectedMeasurementId')
-  protected handleSelectedMeasurementIdChanged(): void {
-    const measurements = this.internalGetMeasurements();
+  protected async handleSelectedMeasurementIdChanged(): Promise<void> {
+    const measurements = await this.getMeasurementElements();
     measurements.forEach((m) => {
-      if (isVertexViewerDistanceMeasurement(m)) {
-        m.mode = m.id === this.selectedMeasurementId ? 'edit' : '';
-      }
+      m.mode = m.id === this.selectedMeasurementId ? 'edit' : '';
     });
   }
 
+  /**
+   * @ignore
+   */
+  @Watch('tool')
+  protected handleToolChanged(): void {
+    this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('viewer')
+  protected async handleViewerChanged(
+    newViewer: HTMLVertexViewerElement | undefined
+  ): Promise<void> {
+    const measurements = await this.getMeasurementElements();
+    measurements.forEach((el) => {
+      el.viewer = newViewer;
+    });
+
+    this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('editable')
+  protected handleEditableChanged(): void {
+    this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('measureEnd')
+  protected async handleMeasured(
+    event: CustomEvent<Measurement>
+  ): Promise<void> {
+    const e = event as CustomEvent<Measurement>;
+    await this.addMeasurement(e.detail);
+    this.selectedMeasurementId = e.detail.id;
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentDidLoad(): void {
+    this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <vertex-viewer-layer ref={(el) => (this.measurementToolsEl = el)} />
         <div id="measurements">
           <slot />
         </div>
@@ -133,86 +235,52 @@ export class ViewerMeasurements {
     );
   }
 
-  @Watch('viewer')
-  protected handleViewerChanged(
-    newViewer: HTMLVertexViewerElement | undefined
-  ): void {
-    Array.from(this.measurementToolsEl?.children || []).forEach((el) => {
-      if (isVertexViewerDistanceMeasurement(el)) {
-        const element = el as HTMLVertexViewerDistanceMeasurementElement;
-        element.viewer = newViewer;
-      }
-    });
-  }
-
-  private handleMeasurementEditEnd = async (event: Event): Promise<void> => {
-    const measurement = event.target as HTMLVertexViewerDistanceMeasurementElement;
-
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
-    const newMeasurement = await this.addMeasurement({
-      type: 'distance',
-      start: measurement.start!,
-      end: measurement.end!,
-    });
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
-
-    newMeasurement.addEventListener('pointerdown', (event) => {
-      // Prevent the viewer from handling this event.
-      event.stopPropagation();
-      this.selectedMeasurementId = newMeasurement.id;
-    });
-
-    this.selectedMeasurementId = newMeasurement.id;
-
-    measurement.start = undefined;
-    measurement.end = undefined;
+  private handleMeasurementPointerDown = (event: Event): void => {
+    if (this.editable) {
+      const el = event.target as Element;
+      this.selectedMeasurementId = el.id;
+    }
   };
 
-  private populateMeasurementTool(): void {
-    if (this.measurementToolsEl != null) {
-      const tool = this.hostEl.querySelector('#distance-measurement-tool');
-      tool?.remove();
-
-      if (this.interactionOn) {
-        const measurement = this.createDistanceMeasurement();
-        measurement.addEventListener('editEnd', this.handleMeasurementEditEnd);
-        measurement.dataset.isTool = '';
-        measurement.mode = 'replace';
-        measurement.viewer = this.viewer;
-        measurement.classList.add('viewer-measurement__measurement');
-        this.hostEl.prepend(measurement);
-      }
-    }
-  }
-
-  private createDistanceMeasurement(): HTMLVertexViewerDistanceMeasurementElement {
-    const template = this.hostEl.querySelector('#distance-measurement');
-
-    if (template instanceof HTMLTemplateElement) {
-      const fragment = template.content.cloneNode(true) as HTMLElement;
-      const element = fragment.firstElementChild;
-      if (isVertexViewerDistanceMeasurement(element)) {
-        return element;
-      } else {
-        throw new Error(
-          'Expected template with ID `distance-measurement` to contain HTMLVertexViewerDistanceMeasurementElement.'
-        );
-      }
-    } else if (template == null) {
-      return document.createElement('vertex-viewer-distance-measurement');
-    } else {
-      throw new Error(
-        'Expected element with ID `distance-measurement` to be HTMLTemplateElement.'
+  private createDistanceMeasurementElement(): HTMLVertexViewerDistanceMeasurementElement {
+    if (this.distanceTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.distanceTemplateId,
+        isVertexViewerDistanceMeasurement,
+        () =>
+          console.warn(
+            `Distance template with ID ${this.distanceTemplateId} not found. Using default distance element.`
+          ),
+        () =>
+          console.warn(
+            `Distance template does not contain a vertex-viewer-distance-measurement. Using default distance element.`
+          )
       );
+
+      if (element != null) {
+        return element;
+      }
+    }
+
+    return document.createElement('vertex-viewer-distance-measurement');
+  }
+
+  private updateMeasurementTool(): void {
+    const tool = this.getMeasurementTool();
+    if (tool != null) {
+      tool.disabled = !this.editable;
+      tool.distanceTemplateId = this.distanceTemplateId;
+      tool.tool = this.tool;
+      tool.viewer = this.viewer;
     }
   }
-}
 
-function isVertexViewerDistanceMeasurement(
-  el: unknown
-): el is HTMLVertexViewerDistanceMeasurementElement {
-  return (
-    el instanceof HTMLElement &&
-    el.nodeName === 'VERTEX-VIEWER-DISTANCE-MEASUREMENT'
-  );
+  private getMeasurementTool():
+    | HTMLVertexViewerMeasurementToolElement
+    | undefined {
+    return this.hostEl.querySelector('vertex-viewer-measurement-tool') as
+      | HTMLVertexViewerMeasurementToolElement
+      | undefined;
+  }
 }

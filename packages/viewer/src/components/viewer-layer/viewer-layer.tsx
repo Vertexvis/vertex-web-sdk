@@ -27,7 +27,7 @@ export class ViewerLayer {
     this.updateInteractionEvents();
   }
 
-  @Watch('viewerInteractionOff')
+  @Watch('viewerInteractionsOff')
   protected handleViewerInteractionsOffChanged(): void {
     this.updateInteractionEvents();
   }

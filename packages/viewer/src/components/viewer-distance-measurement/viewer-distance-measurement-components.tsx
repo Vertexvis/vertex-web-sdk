@@ -3,22 +3,22 @@ import { FunctionalComponent, h } from '@stencil/core';
 import { Angle, Point } from '@vertexvis/geometry';
 import { cssTransformCenterAt } from '../../lib/dom';
 
-export interface DistanceMeasurementProps {
+export interface DistanceMeasurementRendererProps {
   startPt?: Point.Point;
   endPt?: Point.Point;
   centerPt?: Point.Point;
-  anchorLabelDistance?: number;
+  anchorLabelOffset?: number;
   distance?: string;
   onStartAnchorPointerDown?: (event: PointerEvent) => void;
   onEndAnchorPointerDown?: (event: PointerEvent) => void;
 }
 
-export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> = ({
+export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasurementRendererProps> = ({
   startPt,
   endPt,
   centerPt,
   distance,
-  anchorLabelDistance,
+  anchorLabelOffset,
   onStartAnchorPointerDown,
   onEndAnchorPointerDown,
 }) => {
@@ -28,13 +28,13 @@ export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> 
       : undefined;
 
   const startLabelPt =
-    angle != null && startPt != null && anchorLabelDistance != null
-      ? Point.add(startPt, Point.polar(-anchorLabelDistance, angle))
+    angle != null && startPt != null && anchorLabelOffset != null
+      ? Point.add(startPt, Point.polar(-anchorLabelOffset, angle))
       : undefined;
 
   const endLabelPt =
-    angle != null && endPt != null && anchorLabelDistance != null
-      ? Point.add(endPt, Point.polar(anchorLabelDistance, angle))
+    angle != null && endPt != null && anchorLabelOffset != null
+      ? Point.add(endPt, Point.polar(anchorLabelOffset, angle))
       : undefined;
 
   return (
@@ -56,9 +56,7 @@ export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> 
           onPointerDown={onStartAnchorPointerDown}
         >
           <slot name="start-anchor">
-            <slot name="start-label">
-              <div class="anchor-placeholder"></div>
-            </slot>
+            <div class="anchor-placeholder"></div>
           </slot>
         </div>
       )}

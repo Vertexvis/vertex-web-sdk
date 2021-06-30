@@ -7,23 +7,31 @@ import { Angle, Point } from '@vertexvis/geometry';
   shadow: true,
 })
 export class ViewerMeasurementLine {
+  /**
+   * A point that specifies the starting point of the line.
+   */
   @Prop()
   public start: Point.Point = Point.create();
 
+  /**
+   * A point that specifies the ending point of the line.
+   */
   @Prop()
   public end: Point.Point = Point.create();
 
+  /**
+   * A length of the line cap. The line cap is a line at each end of a line.
+   */
   @Prop()
-  public endCapLength = 0;
+  public capLength = 0;
 
+  /**
+   * @ignore
+   */
   protected render(): h.JSX.IntrinsicElements {
     const angle = Angle.fromPoints(this.start, this.end);
-    const startEndCap = getPerpendicularLine(
-      this.start,
-      angle,
-      this.endCapLength
-    );
-    const endEndCap = getPerpendicularLine(this.end, angle, this.endCapLength);
+    const startEndCap = getPerpendicularLine(this.start, angle, this.capLength);
+    const endEndCap = getPerpendicularLine(this.end, angle, this.capLength);
 
     return (
       <svg class="line">

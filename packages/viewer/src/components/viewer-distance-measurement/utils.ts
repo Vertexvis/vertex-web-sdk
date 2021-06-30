@@ -38,3 +38,12 @@ export function getViewingElementPositions(
 
   return { startPt, endPt, labelPt };
 }
+
+export function isVertexViewerDistanceMeasurement(
+  el: unknown
+): el is HTMLVertexViewerDistanceMeasurementElement {
+  return (
+    el instanceof HTMLElement &&
+    el.nodeName === 'VERTEX-VIEWER-DISTANCE-MEASUREMENT'
+  );
+}

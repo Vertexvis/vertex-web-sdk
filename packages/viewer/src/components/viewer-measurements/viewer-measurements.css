@@ -8,15 +8,16 @@
   pointer-events: none;
 }
 
-::slotted(.viewer-measurement__measurement[mode='']) {
+::slotted(.viewer-measurements__measurement[mode='']) {
   cursor: pointer;
 }
 
-::slotted(.viewer-measurement__measurement[mode='edit']) {
+::slotted(.viewer-measurements__measurement[mode='edit']) {
   z-index: 1;
 }
 
-::slotted(.viewer-measurement__measurement[interacting-anchor='start']),
-::slotted(.viewer-measurement__measurement[interacting-anchor='end']) {
+::slotted(.viewer-measurements__measurement[interacting-anchor='start']),
+::slotted(.viewer-measurements__measurement[interacting-anchor='end']),
+::slotted(vertex-viewer-measurement-tool[is-measuring]) {
   z-index: 2;
 }

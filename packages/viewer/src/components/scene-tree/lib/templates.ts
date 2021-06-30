@@ -1,4 +1,5 @@
 import { CollectionBinding, generateBindings } from './binding';
+import { stampTemplate } from '../../../lib/templates';
 
 export interface InstancedTemplate<E extends Element> {
   element: E;
@@ -25,7 +26,7 @@ export function generateInstanceFromTemplate(
   template: HTMLTemplateElement
 ): InstancedTemplate<HTMLElement> {
   const fragment = template.content.cloneNode(true) as HTMLElement;
-  const element = fragment.firstElementChild as HTMLElement;
+  const element = stampTemplate<HTMLElement>(template);
   const bindings = new CollectionBinding(generateBindings(fragment));
   return { element, bindings };
 }
