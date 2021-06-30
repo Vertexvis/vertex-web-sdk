@@ -108,7 +108,7 @@ These examples make use of more modern EcmaScript features. You'll need a browse
 
 - Obtain a `clientId` and `streamKey` following [this guide](https://developer.vertexvis.com/docs/guides/authentication)
 - Run `yarn examples:start` to spin up a local development environment.
-- Open browser to <http://localhost:8080?clientid=YOUR_CLIENT_ID&streamkey=YOUR_STREAM_KEY> to browser the examples. The `streamKey`. The development environment supports live refresh. Any changes you make the examples will automatically refresh your browser.
+- Open browser to <http://localhost:8080?clientid=YOUR_CLIENT_ID&streamkey=YOUR_STREAM_KEY> to browse the examples. The `streamKey`. The development environment supports live refresh. Any changes you make the examples will automatically refresh your browser.
 
 ### Contributing Examples
 

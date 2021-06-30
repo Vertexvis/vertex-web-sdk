@@ -100,6 +100,7 @@ export class SceneTreeRow {
             <div class="indentation" />
             <button
               class="expand-btn no-shrink"
+              data-test-id={'expand-' + this.node.name}
               onMouseDown={(event) => {
                 event.preventDefault();
                 this.toggleExpansion();
@@ -119,6 +120,7 @@ export class SceneTreeRow {
             </div>
             <button
               class="visibility-btn no-shrink"
+              data-test-id={'visibility-btn-' + this.node.name}
               onMouseDown={(event) => {
                 event?.preventDefault();
                 this.toggleVisibility();
