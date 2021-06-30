@@ -33,15 +33,15 @@ describe(Point.polar, () => {
     expect(pt0.x).toBeCloseTo(100, 1);
     expect(pt0.y).toBeCloseTo(0, 1);
 
-    const pt90 = Point.polar(100, 90);
+    const pt90 = Point.polar(100, Math.PI / 2);
     expect(pt90.x).toBeCloseTo(0, 1);
     expect(pt90.y).toBeCloseTo(100, 1);
 
-    const pt180 = Point.polar(100, 180);
+    const pt180 = Point.polar(100, Math.PI);
     expect(pt180.x).toBeCloseTo(-100, 1);
     expect(pt180.y).toBeCloseTo(0, 1);
 
-    const pt270 = Point.polar(100, 270);
+    const pt270 = Point.polar(100, -Math.PI / 2);
     expect(pt270.x).toBeCloseTo(0, 1);
     expect(pt270.y).toBeCloseTo(-100, 1);
   });

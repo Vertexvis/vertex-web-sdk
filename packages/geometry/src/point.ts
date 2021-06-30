@@ -19,13 +19,10 @@ export function create(x = 0, y = 0): Point {
 
 /**
  * Converts a polar coordinate (length and angle) into a Cartesian coordinate.
- * An angle of 0 represents a vector to the right, and increases in a clockwise
- * direction.
  */
-export function polar(length: number, angleInDegrees: Angle.Angle): Point {
-  const normalizedAngle = Angle.normalize(angleInDegrees);
-  const x = Math.cos(Angle.toRadians(normalizedAngle)) * length;
-  const y = Math.sin(Angle.toRadians(normalizedAngle)) * length;
+export function polar(length: number, radians: Angle.Angle): Point {
+  const x = Math.cos(radians) * length;
+  const y = Math.sin(radians) * length;
   return create(x, y);
 }
 

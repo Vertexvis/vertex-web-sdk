@@ -2,8 +2,33 @@ import * as Point from '../point';
 import * as Angle from '../angle';
 
 describe(Angle.fromPoints, () => {
+  it('should return 0', () => {
+    const angle = Angle.fromPoints(Point.create(0, 0), Point.create(1, 0));
+    expect(angle).toBeCloseTo(0);
+  });
+
+  it('should return PI', () => {
+    const angle = Angle.fromPoints(Point.create(0, 0), Point.create(-1, 0));
+    expect(angle).toBeCloseTo(Math.PI);
+  });
+
+  it('should return Math.PI / 2', () => {
+    const angle = Angle.fromPoints(Point.create(0, 0), Point.create(0, 1));
+    expect(angle).toBeCloseTo(Math.PI / 2);
+  });
+
+  it('should return -Math.PI / 2', () => {
+    const angle = Angle.fromPoints(Point.create(0, 0), Point.create(0, -1));
+    expect(angle).toBeCloseTo(-Math.PI / 2);
+  });
+});
+
+describe(Angle.fromPointsInDegrees, () => {
   it('should return an angle', () => {
-    const angle = Angle.fromPoints(Point.create(0, 0), Point.create(10, 0));
+    const angle = Angle.fromPointsInDegrees(
+      Point.create(0, 0),
+      Point.create(10, 0)
+    );
     expect(angle).toEqual(90);
   });
 });
