@@ -7,3 +7,16 @@
   right: 0;
   pointer-events: none;
 }
+
+::slotted(.viewer-measurement__measurement[mode='']) {
+  cursor: pointer;
+}
+
+::slotted(.viewer-measurement__measurement[mode='edit']) {
+  z-index: 1;
+}
+
+::slotted(.viewer-measurement__measurement[interacting-anchor='start']),
+::slotted(.viewer-measurement__measurement[interacting-anchor='end']) {
+  z-index: 2;
+}

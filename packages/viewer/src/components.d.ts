@@ -17,7 +17,7 @@ import { ColorMaterial } from "./lib/scenes/colorMaterial";
 import { Frame, FramePerspectiveCamera } from "./lib/types/frame";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions, Euler, Matrix4, Quaternion, Vector3 } from "@vertexvis/geometry";
+import { Dimensions, Euler, Matrix4, Point, Quaternion, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./lib/commands/command";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
@@ -28,7 +28,7 @@ import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { DepthBuffer, Orientation, UnitType } from "./lib/types";
-import { ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
+import { Anchor, ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { AddMeasurementData, ViewerMeasurementType } from "./components/viewer-measurements/viewer-measurements";
@@ -324,6 +324,7 @@ export namespace Components {
           * The number of fraction digits to display.
          */
         "fractionalDigits": number;
+        "interactingAnchor": Anchor | 'none';
         /**
           * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
          */
@@ -423,6 +424,11 @@ export namespace Components {
           * Prevents the viewer from receiving events that would trigger camera interactions.
          */
         "viewerInteractionsOff": boolean;
+    }
+    interface VertexViewerMeasurementLine {
+        "end": Point.Point;
+        "endCapLength": number;
+        "start": Point.Point;
     }
     interface VertexViewerMeasurements {
         "addMeasurement": (data: AddMeasurementData) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
@@ -551,6 +557,12 @@ declare global {
         prototype: HTMLVertexViewerLayerElement;
         new (): HTMLVertexViewerLayerElement;
     };
+    interface HTMLVertexViewerMeasurementLineElement extends Components.VertexViewerMeasurementLine, HTMLStencilElement {
+    }
+    var HTMLVertexViewerMeasurementLineElement: {
+        prototype: HTMLVertexViewerMeasurementLineElement;
+        new (): HTMLVertexViewerMeasurementLineElement;
+    };
     interface HTMLVertexViewerMeasurementsElement extends Components.VertexViewerMeasurements, HTMLStencilElement {
     }
     var HTMLVertexViewerMeasurementsElement: {
@@ -586,6 +598,7 @@ declare global {
         "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-layer": HTMLVertexViewerLayerElement;
+        "vertex-viewer-measurement-line": HTMLVertexViewerMeasurementLineElement;
         "vertex-viewer-measurements": HTMLVertexViewerMeasurementsElement;
         "vertex-viewer-toolbar": HTMLVertexViewerToolbarElement;
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
@@ -799,6 +812,7 @@ declare namespace LocalJSX {
           * The number of fraction digits to display.
          */
         "fractionalDigits"?: number;
+        "interactingAnchor"?: Anchor | 'none';
         /**
           * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
          */
@@ -911,6 +925,11 @@ declare namespace LocalJSX {
          */
         "viewerInteractionsOff"?: boolean;
     }
+    interface VertexViewerMeasurementLine {
+        "end"?: Point.Point;
+        "endCapLength"?: number;
+        "start"?: Point.Point;
+    }
     interface VertexViewerMeasurements {
         "interactionOn"?: boolean;
         "onMeasurementAdded"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
@@ -986,6 +1005,7 @@ declare namespace LocalJSX {
         "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-layer": VertexViewerLayer;
+        "vertex-viewer-measurement-line": VertexViewerMeasurementLine;
         "vertex-viewer-measurements": VertexViewerMeasurements;
         "vertex-viewer-toolbar": VertexViewerToolbar;
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
@@ -1006,6 +1026,7 @@ declare module "@stencil/core" {
             "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
+            "vertex-viewer-measurement-line": LocalJSX.VertexViewerMeasurementLine & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
             "vertex-viewer-measurements": LocalJSX.VertexViewerMeasurements & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementsElement>;
             "vertex-viewer-toolbar": LocalJSX.VertexViewerToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;

@@ -1,0 +1,30 @@
+:host {
+  display: block;
+
+  --viewer-measurement-line-stroke: var(--blue-600);
+
+  --viewer-measurement-line-stroke-width: 3px;
+
+  --viewer-measurement-line-start-cap-visibility: initial;
+
+  --viewer-measurement-line-end-cap-visibility: initial;
+}
+
+.line {
+  width: 100%;
+  height: 100%;
+  stroke-width: var(--viewer-measurement-line-stroke-width);
+  stroke: var(--viewer-measurement-line-stroke);
+}
+
+line {
+  pointer-events: all;
+}
+
+.start-cap {
+  visibility: var(--viewer-measurement-line-start-cap-visibility);
+}
+
+.end-cap {
+  visibility: var(--viewer-measurement-line-end-cap-visibility);
+}

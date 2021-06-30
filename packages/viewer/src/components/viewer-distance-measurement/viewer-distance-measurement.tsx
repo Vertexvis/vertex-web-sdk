@@ -53,7 +53,7 @@ export type ViewerDistanceMeasurementLabelFormatter = (
  */
 export type ViewerDistanceMeasurementMode = 'edit' | 'replace' | '';
 
-type Anchor = 'start' | 'end';
+export type Anchor = 'start' | 'end';
 
 /**
  * @slot start-anchor An HTML element for the starting point anchor.
@@ -135,6 +135,9 @@ export class ViewerDistanceMeasurement {
    */
   @Prop({ reflect: true })
   public mode: ViewerDistanceMeasurementMode = '';
+
+  @Prop({ reflect: true, mutable: true })
+  public interactingAnchor: Anchor | 'none' = 'none';
 
   /**
    * Indicates if the measurement is invalid. A measurement is invalid if either
@@ -280,8 +283,9 @@ export class ViewerDistanceMeasurement {
             <DistanceMeasurement
               startPt={startPt}
               endPt={endPt}
-              labelPt={labelPt}
+              centerPt={labelPt}
               distance={distance}
+              anchorLabelDistance={20}
               onStartAnchorPointerDown={this.handleEditAnchor('start')}
               onEndAnchorPointerDown={this.handleEditAnchor('end')}
             />
@@ -301,8 +305,9 @@ export class ViewerDistanceMeasurement {
             <DistanceMeasurement
               startPt={startPt}
               endPt={endPt}
-              labelPt={labelPt}
+              centerPt={labelPt}
               distance={distance}
+              anchorLabelDistance={20}
             />
           </div>
         </Host>
@@ -314,8 +319,9 @@ export class ViewerDistanceMeasurement {
             <DistanceMeasurement
               startPt={startPt}
               endPt={endPt}
-              labelPt={labelPt}
+              centerPt={labelPt}
               distance={distance}
+              anchorLabelDistance={20}
             />
           </div>
         </Host>
@@ -531,7 +537,7 @@ export class ViewerDistanceMeasurement {
           }
         };
 
-        this.beginEditing();
+        this.beginEditing('end');
         window.addEventListener('pointermove', pointerMove);
         window.addEventListener('pointerup', pointerUp);
       };
@@ -553,7 +559,7 @@ export class ViewerDistanceMeasurement {
         // Prevent the viewer from handling this event.
         event.stopPropagation();
 
-        this.beginEditing();
+        this.beginEditing(anchor);
 
         window.addEventListener('pointermove', handlePointerMove);
         window.addEventListener('pointerup', handlePointerUp);
@@ -566,6 +572,8 @@ export class ViewerDistanceMeasurement {
   ): (event: PointerEvent) => void {
     return (event) => {
       if (this.internalDepthBuffer != null && this.elementBounds != null) {
+        event.preventDefault();
+
         const pt = getMouseClientPosition(event, this.elementBounds);
         const worldPt = this.viewport.transformPointToWorldSpace(
           pt,
@@ -601,13 +609,14 @@ export class ViewerDistanceMeasurement {
     } else {
       const abbreviated = this.measurementUnits.unit.abbreviatedName;
       return distance == null
-        ? '--'
+        ? '---'
         : `~${distance.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   }
 
-  private beginEditing(): void {
+  private beginEditing(anchor: Anchor): void {
     if (this.interactionCount === 0) {
+      this.interactingAnchor = anchor;
       this.editBegin.emit();
     }
     this.interactionCount = this.interactionCount + 1;
@@ -615,6 +624,7 @@ export class ViewerDistanceMeasurement {
 
   private endEditing(): void {
     if (this.interactionCount === 1) {
+      this.interactingAnchor = 'none';
       this.editEnd.emit();
     }
     this.interactionCount = this.interactionCount - 1;

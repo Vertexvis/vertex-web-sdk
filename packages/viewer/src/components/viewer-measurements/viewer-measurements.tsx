@@ -60,6 +60,7 @@ export class ViewerMeasurements {
       measurement.end = data.end;
       measurement.viewer = this.viewer;
       measurement.id = data.id ?? `measurement-${UUID.create()}`;
+      measurement.classList.add('viewer-measurement__measurement');
       this.hostEl.appendChild(measurement);
       this.measurementAdded.emit(measurement);
       return measurement;
@@ -147,23 +148,21 @@ export class ViewerMeasurements {
   private handleMeasurementEditEnd = async (event: Event): Promise<void> => {
     const measurement = event.target as HTMLVertexViewerDistanceMeasurementElement;
 
-    if (measurement.distance != null && measurement.distance > 0) {
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
-      const newMeasurement = await this.addMeasurement({
-        type: 'distance',
-        start: measurement.start!,
-        end: measurement.end!,
-      });
-      /* eslint-enable @typescript-eslint/no-non-null-assertion */
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
+    const newMeasurement = await this.addMeasurement({
+      type: 'distance',
+      start: measurement.start!,
+      end: measurement.end!,
+    });
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
-      newMeasurement.addEventListener('pointerdown', (event) => {
-        // Prevent the viewer from handling this event.
-        event.stopPropagation();
-        this.selectedMeasurementId = newMeasurement.id;
-      });
-
+    newMeasurement.addEventListener('pointerdown', (event) => {
+      // Prevent the viewer from handling this event.
+      event.stopPropagation();
       this.selectedMeasurementId = newMeasurement.id;
-    }
+    });
+
+    this.selectedMeasurementId = newMeasurement.id;
 
     measurement.start = undefined;
     measurement.end = undefined;
@@ -180,6 +179,7 @@ export class ViewerMeasurements {
         measurement.dataset.isTool = '';
         measurement.mode = 'replace';
         measurement.viewer = this.viewer;
+        measurement.classList.add('viewer-measurement__measurement');
         this.hostEl.prepend(measurement);
       }
     }
