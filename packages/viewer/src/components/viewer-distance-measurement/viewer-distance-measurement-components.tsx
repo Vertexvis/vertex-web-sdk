@@ -8,8 +8,8 @@ export interface DistanceMeasurementProps {
   endPt?: Point.Point;
   labelPt?: Point.Point;
   distance?: string;
-  onStartAnchorMouseDown?: (event: MouseEvent) => void;
-  onEndAnchorMouseDown?: (event: MouseEvent) => void;
+  onStartAnchorPointerDown?: (event: PointerEvent) => void;
+  onEndAnchorPointerDown?: (event: PointerEvent) => void;
 }
 
 export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> = ({
@@ -17,8 +17,8 @@ export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> 
   endPt,
   labelPt,
   distance,
-  onStartAnchorMouseDown,
-  onEndAnchorMouseDown,
+  onStartAnchorPointerDown,
+  onEndAnchorPointerDown,
 }) => {
   return (
     <div>
@@ -33,9 +33,9 @@ export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> 
           id="start-anchor"
           class="anchor-container"
           style={{ transform: cssTransformCenterAt(startPt) }}
-          onMouseDown={onStartAnchorMouseDown}
+          onPointerDown={onStartAnchorPointerDown}
         >
-          <slot name="start">
+          <slot name="start-anchor">
             <div class="anchor"></div>
           </slot>
         </div>
@@ -46,9 +46,9 @@ export const DistanceMeasurement: FunctionalComponent<DistanceMeasurementProps> 
           id="end-anchor"
           class="anchor-container"
           style={{ transform: cssTransformCenterAt(endPt) }}
-          onMouseDown={onEndAnchorMouseDown}
+          onPointerDown={onEndAnchorPointerDown}
         >
-          <slot name="end">
+          <slot name="end-anchor">
             <div class="anchor"></div>
           </slot>
         </div>

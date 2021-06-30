@@ -156,7 +156,9 @@ export class ViewerMeasurements {
       });
       /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
-      newMeasurement.addEventListener('mousedown', () => {
+      newMeasurement.addEventListener('pointerdown', (event) => {
+        // Prevent the viewer from handling this event.
+        event.stopPropagation();
         this.selectedMeasurementId = newMeasurement.id;
       });
 

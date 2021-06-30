@@ -7,18 +7,18 @@ interface Props {
   hovered: boolean;
   disabled: boolean;
   onHoverChange: (hovered: boolean) => void;
-  onMouseDown: (event: MouseEvent) => void;
+  onPointerDown: (event: MouseEvent) => void;
 }
 
 const ViewerViewCubeEdge: FunctionalComponent<Props> = (
-  { id, hovered, disabled, onHoverChange, onMouseDown },
+  { id, hovered, disabled, onHoverChange, onPointerDown },
   children
 ) => {
   return (
     <div
       id={id}
       class={classNames('cube cube-corner', { hovered, disabled })}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
       onMouseEnter={() => onHoverChange(true)}
       onMouseLeave={() => onHoverChange(false)}
     >

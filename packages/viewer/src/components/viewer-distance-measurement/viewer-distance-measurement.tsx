@@ -22,6 +22,7 @@ import { ElementPositions, getViewingElementPositions } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
 import { getMouseClientPosition } from '../../lib/dom';
 import { DistanceMeasurement } from './viewer-distance-measurement-components';
+import { Disposable } from '@vertexvis/utils';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -45,6 +46,11 @@ export type ViewerDistanceMeasurementLabelFormatter = (
   distance: number | undefined
 ) => string;
 
+/**
+ * The supported measurement modes.
+ *
+ * @see {@link ViewerDistanceMeasurement.mode} - For more details about modes.
+ */
 export type ViewerDistanceMeasurementMode = 'edit' | 'replace' | '';
 
 type Anchor = 'start' | 'end';
@@ -276,8 +282,8 @@ export class ViewerDistanceMeasurement {
               endPt={endPt}
               labelPt={labelPt}
               distance={distance}
-              onStartAnchorMouseDown={this.handleEditAnchor('start')}
-              onEndAnchorMouseDown={this.handleEditAnchor('end')}
+              onStartAnchorPointerDown={this.handleEditAnchor('start')}
+              onEndAnchorPointerDown={this.handleEditAnchor('end')}
             />
           </div>
         </Host>
@@ -289,8 +295,8 @@ export class ViewerDistanceMeasurement {
             class={classNames('measurement replace', {
               'cursor-crosshair': this.start != null,
             })}
-            onMouseMove={this.handleUpdateStartAnchor}
-            onMouseDown={this.handleStartMeasurement}
+            onPointerMove={this.handleUpdateStartAnchor}
+            onPointerDown={this.handleStartMeasurement}
           >
             <DistanceMeasurement
               startPt={startPt}
@@ -438,7 +444,7 @@ export class ViewerDistanceMeasurement {
     this.invalidateStateCounter = this.invalidateStateCounter + 1;
   }
 
-  private handleUpdateStartAnchor = (event: MouseEvent): void => {
+  private handleUpdateStartAnchor = (event: PointerEvent): void => {
     if (
       this.interactionCount === 0 &&
       this.internalDepthBuffer != null &&
@@ -458,40 +464,76 @@ export class ViewerDistanceMeasurement {
     }
   };
 
-  private handleStartMeasurement = (event: MouseEvent): void => {
+  private handleStartMeasurement = (event: PointerEvent): void => {
     if (this.interactionCount === 0 && this.start != null) {
       const startMeasurement = (start: () => void): void => {
         const dispose = (): void => {
-          window.removeEventListener('mouseup', mouseUp);
-          window.removeEventListener('mousemove', mouseMove);
+          window.removeEventListener('pointerup', pointerUp);
+          window.removeEventListener('pointermove', pointerMove);
         };
-        const mouseUp = (): void => {
+        const pointerUp = (): void => {
           dispose();
           start();
         };
-        const mouseMove = (event: MouseEvent): void => {
+        const pointerMove = (event: PointerEvent): void => {
           if (event.buttons > 0) {
             dispose();
           }
         };
-        window.addEventListener('mousemove', mouseMove);
-        window.addEventListener('mouseup', mouseUp);
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
       };
-      const measureInteraction = (): void => {
+
+      const pointerDownAndMove = (callback: () => void): Disposable => {
+        const pointerMove = (): void => callback();
+
         const dispose = (): void => {
-          window.removeEventListener('mousemove', mouseMove);
-          window.removeEventListener('mouseup', mouseUp);
+          window.removeEventListener('pointermove', pointerMove);
+          window.removeEventListener('pointerup', pointerUp);
         };
-        const mouseMove = this.createAnchorMouseMoveHandler('end');
-        const mouseUp = (event: MouseEvent): void => {
+
+        const pointerUp = (): void => dispose();
+
+        const pointerDown = (): void => {
+          window.addEventListener('pointermove', pointerMove);
+          window.addEventListener('pointerup', pointerUp);
+        };
+
+        window.addEventListener('pointerdown', pointerDown);
+
+        return {
+          dispose: () => window.removeEventListener('pointerdown', pointerDown),
+        };
+      };
+
+      const measureInteraction = (): void => {
+        let didUserInteractWithModel = false;
+
+        const handleDownAndMove = pointerDownAndMove(() => {
+          didUserInteractWithModel = true;
+        });
+
+        const dispose = (): void => {
+          window.removeEventListener('pointermove', pointerMove);
+          window.removeEventListener('pointerup', pointerUp);
+          handleDownAndMove.dispose();
+        };
+
+        const pointerMove = this.createAnchorPointerMoveHandler('end');
+        const pointerUp = (event: PointerEvent): void => {
           if (event.button === 0) {
-            dispose();
-            this.endEditing();
+            if (didUserInteractWithModel) {
+              didUserInteractWithModel = false;
+            } else {
+              dispose();
+              this.endEditing();
+            }
           }
         };
+
         this.beginEditing();
-        window.addEventListener('mousemove', mouseMove);
-        window.addEventListener('mouseup', mouseUp);
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
       };
       startMeasurement(measureInteraction);
     }
@@ -499,26 +541,29 @@ export class ViewerDistanceMeasurement {
 
   private handleEditAnchor(
     anchor: Anchor
-  ): ((event: MouseEvent) => void) | undefined {
+  ): ((event: PointerEvent) => void) | undefined {
     if (this.mode === 'edit' && this.internalDepthBuffer != null) {
-      const handleMouseMove = this.createAnchorMouseMoveHandler(anchor);
-      const handleMouseUp = this.createAnchorMouseUpHandler(
+      const handlePointerMove = this.createAnchorPointerMoveHandler(anchor);
+      const handlePointerUp = this.createAnchorPointerUpHandler(
         anchor,
-        handleMouseMove
+        handlePointerMove
       );
 
-      return () => {
+      return (event) => {
+        // Prevent the viewer from handling this event.
+        event.stopPropagation();
+
         this.beginEditing();
 
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
       };
     }
   }
 
-  private createAnchorMouseMoveHandler(
+  private createAnchorPointerMoveHandler(
     anchor: Anchor
-  ): (event: MouseEvent) => void {
+  ): (event: PointerEvent) => void {
     return (event) => {
       if (this.internalDepthBuffer != null && this.elementBounds != null) {
         const pt = getMouseClientPosition(event, this.elementBounds);
@@ -537,17 +582,17 @@ export class ViewerDistanceMeasurement {
     };
   }
 
-  private createAnchorMouseUpHandler(
+  private createAnchorPointerUpHandler(
     anchor: 'start' | 'end',
-    mouseMove: (event: MouseEvent) => void
-  ): (event: MouseEvent) => void {
-    const handleMouseUp = (): void => {
-      window.removeEventListener('mousemove', mouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+    pointerMove: (event: PointerEvent) => void
+  ): (event: PointerEvent) => void {
+    const handlePointerUp = (): void => {
+      window.removeEventListener('pointermove', pointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
       this.endEditing();
     };
 
-    return handleMouseUp;
+    return handlePointerUp;
   }
 
   private formatDistance(distance: number | undefined): string {
