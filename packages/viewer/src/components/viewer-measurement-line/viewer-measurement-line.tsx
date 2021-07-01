@@ -34,8 +34,9 @@ export class ViewerMeasurementLine {
     const endEndCap = getPerpendicularLine(this.end, angle, this.capLength);
 
     return (
-      <svg class="line">
+      <svg>
         <line
+          class="line"
           x1={this.start.x}
           y1={this.start.y}
           x2={this.end.x}

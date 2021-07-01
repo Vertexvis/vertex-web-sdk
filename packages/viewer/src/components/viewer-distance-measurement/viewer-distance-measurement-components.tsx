@@ -7,8 +7,9 @@ export interface DistanceMeasurementRendererProps {
   startPt?: Point.Point;
   endPt?: Point.Point;
   centerPt?: Point.Point;
-  anchorLabelOffset?: number;
   distance?: string;
+  anchorLabelOffset?: number;
+  lineCapLength?: number;
   onStartAnchorPointerDown?: (event: PointerEvent) => void;
   onEndAnchorPointerDown?: (event: PointerEvent) => void;
 }
@@ -19,6 +20,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
   centerPt,
   distance,
   anchorLabelOffset,
+  lineCapLength,
   onStartAnchorPointerDown,
   onEndAnchorPointerDown,
 }) => {
@@ -44,7 +46,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
           class="line"
           start={startPt}
           end={endPt}
-          endCapLength={12}
+          capLength={lineCapLength}
         />
       )}
 

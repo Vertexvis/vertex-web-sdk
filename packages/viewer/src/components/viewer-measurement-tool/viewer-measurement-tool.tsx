@@ -117,6 +117,11 @@ export class ViewerMeasurementTool {
     this.updateMeasurementElement();
   }
 
+  @Watch('disabled')
+  protected handleDisabledChanged(): void {
+    this.updateMeasurementElement();
+  }
+
   /**
    * @ignore
    */
@@ -184,19 +189,21 @@ export class ViewerMeasurementTool {
       );
     }
 
-    const newMeasurementElement = this.createDistanceMeasurementElement();
-    newMeasurementElement.mode = 'replace';
-    newMeasurementElement.viewer = this.viewer;
-    newMeasurementElement.addEventListener(
-      'editBegin',
-      this.handleMeasurementEditBegin
-    );
-    newMeasurementElement.addEventListener(
-      'editEnd',
-      this.handleMeasurementEditEnd
-    );
-    this.stateMap.measurementElement = newMeasurementElement;
-    this.hostEl.append(newMeasurementElement);
+    if (!this.disabled) {
+      const newMeasurementElement = this.createDistanceMeasurementElement();
+      newMeasurementElement.mode = 'replace';
+      newMeasurementElement.viewer = this.viewer;
+      newMeasurementElement.addEventListener(
+        'editBegin',
+        this.handleMeasurementEditBegin
+      );
+      newMeasurementElement.addEventListener(
+        'editEnd',
+        this.handleMeasurementEditEnd
+      );
+      this.stateMap.measurementElement = newMeasurementElement;
+      this.hostEl.append(newMeasurementElement);
+    }
   }
 
   private handleMeasurementEditBegin = (): void => {

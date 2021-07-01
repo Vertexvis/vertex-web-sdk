@@ -26,7 +26,7 @@
   --viewer-measurement-line-end-cap-visibility: initial;
 }
 
-.line {
+svg {
   width: 100%;
   height: 100%;
   stroke-width: var(--viewer-measurement-line-stroke-width);

@@ -32,10 +32,10 @@ export const config: Config = {
     coveragePathIgnorePatterns: ['src/testing'],
     coverageThreshold: {
       global: {
-        branches: 65,
-        functions: 77,
-        lines: 83,
-        statements: 83,
+        branches: 68,
+        functions: 80,
+        lines: 86,
+        statements: 85,
       },
     },
     roots: ['<rootDir>/src/'],

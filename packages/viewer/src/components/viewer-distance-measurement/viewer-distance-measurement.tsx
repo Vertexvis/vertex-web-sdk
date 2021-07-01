@@ -133,6 +133,12 @@ export class ViewerDistanceMeasurement {
   public anchorLabelOffset = 20;
 
   /**
+   * The length of the caps at each end of the distance measurement.
+   */
+  @Prop()
+  public lineCapLength = 12;
+
+  /**
    * A mode that specifies how the measurement component should behave. When
    * unset, the component will not respond to interactions with the handles.
    * When `edit`, the measurement anchors are interactive and the user is able
@@ -210,13 +216,12 @@ export class ViewerDistanceMeasurement {
   private internalDepthBuffer?: DepthBuffer;
 
   @State()
-  private measurementUnits = new MeasurementUnits(this.units);
-
-  @State()
   private invalidateStateCounter = 0;
 
   @Element()
   private hostEl!: HTMLElement;
+
+  private measurementUnits = new MeasurementUnits(this.units);
 
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
@@ -286,6 +291,7 @@ export class ViewerDistanceMeasurement {
               centerPt={labelPt}
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
               onStartAnchorPointerDown={this.handleEditAnchor('start')}
               onEndAnchorPointerDown={this.handleEditAnchor('end')}
             />
@@ -308,6 +314,7 @@ export class ViewerDistanceMeasurement {
               centerPt={labelPt}
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
             />
           </div>
         </Host>
@@ -322,6 +329,7 @@ export class ViewerDistanceMeasurement {
               centerPt={labelPt}
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
             />
           </div>
         </Host>

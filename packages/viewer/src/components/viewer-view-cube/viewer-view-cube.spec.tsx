@@ -195,7 +195,7 @@ describe('<vertex-viewer-view-cube> interactions', () => {
     page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.getElementById('front');
-    frontEl?.dispatchEvent(new MouseEvent('mousedown'));
+    frontEl?.dispatchEvent(new MouseEvent('pointerdown'));
 
     await awaitScene;
 
@@ -224,7 +224,7 @@ describe('<vertex-viewer-view-cube> interactions', () => {
     page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.getElementById('front');
-    frontEl?.dispatchEvent(new MouseEvent('mousedown'));
+    frontEl?.dispatchEvent(new MouseEvent('pointerdown'));
 
     await awaitScene;
 
@@ -240,7 +240,7 @@ describe('<vertex-viewer-view-cube> interactions', () => {
     page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.getElementById('front');
-    frontEl?.dispatchEvent(new MouseEvent('mousedown'));
+    frontEl?.dispatchEvent(new MouseEvent('pointerdown'));
 
     await viewer.scene();
     await awaitScene;

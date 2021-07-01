@@ -206,6 +206,14 @@ export class ViewerMeasurements {
   /**
    * @ignore
    */
+  @Watch('distanceTemplateId')
+  protected handleDistanceTemplateIdChanged(): void {
+    this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
   @Listen('measureEnd')
   protected async handleMeasured(
     event: CustomEvent<Measurement>
@@ -228,9 +236,7 @@ export class ViewerMeasurements {
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <div id="measurements">
-          <slot />
-        </div>
+        <slot />
       </Host>
     );
   }
