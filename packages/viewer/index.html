@@ -55,16 +55,6 @@
         width: 100%;
         height: 100%;
       }
-
-      .measurement {
-        --viewer-distance-measurement-accent-color: green;
-      }
-
-      .anchor {
-        width: 12px;
-        height: 12px;
-        background-color: blue;
-      }
     </style>
 
     <script type="module">
@@ -94,18 +84,10 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
+          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:cxwnA9GDLcVO-rZXI2RujBwV-lr-zMzrkU4B"
-          depth-buffers="final"
+          src="urn:vertexvis:stream-key:key"
         >
-          <vertex-viewer-measurements interaction-on>
-            <template id="distance-measurement">
-              <vertex-viewer-distance-measurement class="measurement">
-                <div slot="start" class="anchor"></div>
-              </vertex-viewer-distance-measurement>
-            </template>
-          </vertex-viewer-measurements>
-
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
