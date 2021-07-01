@@ -1,12 +1,19 @@
-import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
 import {
-  BoxGeometry,
+  Component,
+  Element,
+  h,
+  Host,
+  Method,
+  Prop,
+  State,
+  Watch,
+} from '@stencil/core';
+import {
   CanvasTexture,
   DataTexture,
   DepthFormat,
   DepthTexture,
   Mesh,
-  MeshNormalMaterial,
   NearestFilter,
   OrthographicCamera,
   PerspectiveCamera,
@@ -34,6 +41,8 @@ interface PostProcessingState {
   target: WebGLRenderTarget;
 }
 
+export type ViewerThreeJsRendererDrawMode = 'animation-frame' | 'manual';
+
 @Component({
   tag: 'vertex-viewer-threejs-renderer',
   styleUrl: 'viewer-threejs-renderer.css',
@@ -44,10 +53,16 @@ export class ViewerThreeJsRenderer {
   public scene: Scene = new Scene();
 
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public camera: PerspectiveCamera = new PerspectiveCamera();
 
-  @State()
-  private camera: PerspectiveCamera = new PerspectiveCamera();
+  @Prop()
+  public drawMode: ViewerThreeJsRendererDrawMode = 'manual';
+
+  @Prop()
+  public willDraw?: () => void;
+
+  @Prop()
+  public viewer?: HTMLVertexViewerElement;
 
   @State()
   private postProcessing: PostProcessingState;
@@ -100,75 +115,41 @@ export class ViewerThreeJsRenderer {
     };
   }
 
+  @Method()
+  public async draw(): Promise<void> {
+    if (this.renderer != null) {
+      this.willDraw?.();
+
+      this.renderer.setRenderTarget(this.postProcessing.target);
+      this.renderer.render(this.scene, this.camera);
+
+      this.renderer.setRenderTarget(null);
+      this.renderer.render(
+        this.postProcessing.scene,
+        this.postProcessing.camera
+      );
+    }
+  }
+
   protected componentDidLoad(): void {
     const canvas = this.hostEl.shadowRoot?.getElementById(
       'canvas'
     ) as HTMLCanvasElement;
-
-    const geometry = new BoxGeometry(10, 10, 10);
-    const material = new MeshNormalMaterial();
-
-    const cubes: Mesh[] = [];
-
-    const cubeC = new Mesh(geometry, material);
-    cubeC.position.set(0, 0, 25);
-    this.scene.add(cubeC);
-    cubes.push(cubeC);
-
-    const cubeF = new Mesh(geometry, material);
-    cubeF.position.set(0, 0, 100);
-    this.scene.add(cubeF);
-    cubes.push(cubeF);
-
-    const cubeB = new Mesh(geometry, material);
-    cubeB.position.set(0, 0, -150);
-    this.scene.add(cubeB);
-    cubes.push(cubeB);
-
-    const cubeL = new Mesh(geometry, material);
-    cubeL.position.set(100, 0, 0);
-    this.scene.add(cubeL);
-    cubes.push(cubeL);
-
-    const cubeR = new Mesh(geometry, material);
-    cubeR.position.set(-100, 0, 0);
-    this.scene.add(cubeR);
-    cubes.push(cubeR);
-
-    const cubeT = new Mesh(geometry, material);
-    cubeT.position.set(0, 100, 0);
-    this.scene.add(cubeT);
-    cubes.push(cubeT);
-
-    const cubeBtm = new Mesh(geometry, material);
-    cubeBtm.position.set(0, -100, 0);
-    this.scene.add(cubeBtm);
-    cubes.push(cubeBtm);
 
     const renderer = new WebGLRenderer({
       canvas,
       alpha: true,
       antialias: true,
     });
-    renderer.setAnimationLoop(() => {
-      cubes.forEach((cube) => {
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-      });
-
-      renderer.setRenderTarget(this.postProcessing.target);
-      renderer.render(this.scene, this.camera);
-
-      renderer.setRenderTarget(null);
-      renderer.render(this.postProcessing.scene, this.postProcessing.camera);
-    });
-    this.renderer = renderer;
     console.log('WebGL capabilities', renderer.capabilities);
+
+    this.renderer = renderer;
 
     const resize = new ResizeObserver(() => this.updateSize());
     resize.observe(this.hostEl);
 
     this.updateSize();
+    this.updateDrawMode();
     this.handleViewerChanged(this.viewer);
   }
 
@@ -187,6 +168,11 @@ export class ViewerThreeJsRenderer {
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleFrameDrawn);
+  }
+
+  @Watch('drawMode')
+  protected handleDrawModeChanged(): void {
+    this.updateDrawMode();
   }
 
   private handleFrameDrawn = async (): Promise<void> => {
@@ -260,6 +246,14 @@ export class ViewerThreeJsRenderer {
 
     this.renderer?.setSize(width, height);
     this.viewport = new Viewport(width, height);
+  }
+
+  private updateDrawMode(): void {
+    this.renderer?.setAnimationLoop(null);
+
+    if (this.drawMode === 'animation-frame') {
+      this.renderer?.setAnimationLoop(() => this.draw());
+    }
   }
 }
 

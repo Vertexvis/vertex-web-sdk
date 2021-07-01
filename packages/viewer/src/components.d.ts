@@ -1637,5 +1637,4 @@ declare module '@stencil/core' {
       'vertex-viewer-view-cube': LocalJSX.VertexViewerViewCube &
         JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
     }
-  }
 }
