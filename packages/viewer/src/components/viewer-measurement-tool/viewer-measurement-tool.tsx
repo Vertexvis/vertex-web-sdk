@@ -33,7 +33,7 @@ export class ViewerMeasurementTool {
    * distance measurements. It's expected that the template contains a
    * `<vertex-viewer-distance-measurement>`.
    *
-   * This property will automatically be set if a child of a
+   * This property will automatically be set when a child of a
    * `<vertex-viewer-measurements>` element.
    */
   @Prop()
@@ -42,7 +42,7 @@ export class ViewerMeasurementTool {
   /**
    * The type of measurement.
    *
-   * This property will automatically be set if a child of a
+   * This property will automatically be set when a child of a
    * `<vertex-viewer-measurements>` element.
    */
   @Prop()
@@ -51,7 +51,7 @@ export class ViewerMeasurementTool {
   /**
    * Disables measurements.
    *
-   * This property will automatically be set if a child of a
+   * This property will automatically be set when a child of a
    * `<vertex-viewer-measurements>` element.
    */
   @Prop()
@@ -60,7 +60,7 @@ export class ViewerMeasurementTool {
   /**
    * The viewer to connect to measurements.
    *
-   * This property will automatically be set if a child of a
+   * This property will automatically be set when a child of a
    * `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
    */
   @Prop()
@@ -117,6 +117,9 @@ export class ViewerMeasurementTool {
     this.updateMeasurementElement();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
     this.updateMeasurementElement();

@@ -128,15 +128,6 @@ export class DepthBuffer implements FrameImageLike {
     }
   }
 
-  public getNormalizedDepthAtViewportPoint(
-    point: Point.Point,
-    viewport: Viewport,
-    fallbackNormalizedDepth?: number
-  ): number {
-    const framePt = viewport.transformPointToFrame(point, this);
-    return this.getNormalizedDepthAtPoint(framePt, fallbackNormalizedDepth);
-  }
-
   /**
    * Returns `true` if there the normalized depth value at the given point is
    * `1` or if the point is outside the frame. This method is useful for

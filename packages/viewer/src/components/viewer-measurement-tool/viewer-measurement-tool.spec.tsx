@@ -133,6 +133,7 @@ describe('vertex-viewer-measurement-tool', () => {
     });
 
     const toolEl = page.root as HTMLVertexViewerMeasurementToolElement;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolEl.viewer = viewer as any;
     await page.waitForChanges();
 

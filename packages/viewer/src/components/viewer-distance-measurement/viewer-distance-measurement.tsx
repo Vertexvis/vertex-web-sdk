@@ -56,9 +56,15 @@ export type ViewerDistanceMeasurementMode = 'edit' | 'replace' | '';
 export type Anchor = 'start' | 'end';
 
 /**
- * @slot start-anchor An HTML element for the starting point anchor.
+ * @slot start-anchor - An HTML element for the starting point anchor.
  *
- * @slot end-anchor An HTML element for the ending point anchor.
+ * @slot start-label - An HTML or text element that displays next to the start
+ * anchor.
+ *
+ * @slot end-anchor - An HTML element for the ending point anchor.
+ *
+ * @slot end-label - An HTML or text element that displays next to the end
+ * anchor.
  */
 @Component({
   tag: 'vertex-viewer-distance-measurement',

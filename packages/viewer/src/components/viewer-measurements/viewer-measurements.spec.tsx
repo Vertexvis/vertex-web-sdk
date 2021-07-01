@@ -255,6 +255,7 @@ describe('vertex-viewer-measurements', () => {
         template: () => (
           <vertex-viewer-measurements
             distanceTemplateId="my-template"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             viewer={viewer as any}
           >
             <vertex-viewer-measurement-tool />

@@ -125,6 +125,10 @@ export class ViewerMeasurements {
 
     if (measurement != null) {
       measurement.remove();
+      measurement.removeEventListener(
+        'pointerdown',
+        this.handleMeasurementPointerDown
+      );
       this.measurementRemoved.emit(measurement);
     }
 

@@ -132,6 +132,7 @@ The component exposes slots for customizing the HTML of the distance anchors.
 | `interactingAnchor`    | `interacting-anchor`  | A property that reflects which anchor is currently being interacted with.                                                                                                                                                                                                                                                                 | `"end" \| "none" \| "start"`                                                                                                                    | `'none'`        |
 | `invalid`              | `invalid`             | Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.                                                                                                                                                                                                | `boolean`                                                                                                                                       | `false`         |
 | `labelFormatter`       | --                    | An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.                                                                                                                                                        | `((distance: number \| undefined) => string) \| undefined`                                                                                      | `undefined`     |
+| `lineCapLength`        | `line-cap-length`     | The length of the caps at each end of the distance measurement.                                                                                                                                                                                                                                                                           | `number`                                                                                                                                        | `12`            |
 | `mode`                 | `mode`                | A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed. | `"" \| "edit" \| "replace"`                                                                                                                     | `''`            |
 | `projectionViewMatrix` | --                    | The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.                                                                                                                                                                                              | `[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined` | `undefined`     |
 | `start`                | --                    | The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                                                                                                                                                                 | `Vector3 \| undefined`                                                                                                                          | `undefined`     |
@@ -165,10 +166,12 @@ Type: `Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
 
 ## Slots
 
-| Slot                                                            | Description |
-| --------------------------------------------------------------- | ----------- |
-| `"end-anchor An HTML element for the ending point anchor."`     |             |
-| `"start-anchor An HTML element for the starting point anchor."` |             |
+| Slot             | Description                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| `"end-anchor"`   | An HTML element for the ending point anchor.                    |
+| `"end-label"`    | An HTML or text element that displays next to the end anchor.   |
+| `"start-anchor"` | An HTML element for the starting point anchor.                  |
+| `"start-label"`  | An HTML or text element that displays next to the start anchor. |
 
 
 ## CSS Custom Properties
