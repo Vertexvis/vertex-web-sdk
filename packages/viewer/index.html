@@ -59,6 +59,10 @@
     </style>
 
     <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three';
+
+      const cubes = [];
+
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
@@ -68,6 +72,57 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+
+        const renderer = document.getElementById('renderer');
+        createScene(renderer);
+        renderer.willDraw = updateScene;
+      }
+
+      function createScene(renderer) {
+        const geometry = new THREE.BoxGeometry(10, 10, 10);
+        const material = new THREE.MeshNormalMaterial();
+
+        const cubeC = new THREE.Mesh(geometry, material);
+        cubeC.position.set(0, 0, 25);
+        renderer.scene.add(cubeC);
+        cubes.push(cubeC);
+
+        const cubeF = new THREE.Mesh(geometry, material);
+        cubeF.position.set(0, 0, 100);
+        renderer.scene.add(cubeF);
+        cubes.push(cubeF);
+
+        const cubeB = new THREE.Mesh(geometry, material);
+        cubeB.position.set(0, 0, -150);
+        renderer.scene.add(cubeB);
+        cubes.push(cubeB);
+
+        const cubeL = new THREE.Mesh(geometry, material);
+        cubeL.position.set(100, 0, 0);
+        renderer.scene.add(cubeL);
+        cubes.push(cubeL);
+
+        const cubeR = new THREE.Mesh(geometry, material);
+        cubeR.position.set(-100, 0, 0);
+        renderer.scene.add(cubeR);
+        cubes.push(cubeR);
+
+        const cubeT = new THREE.Mesh(geometry, material);
+        cubeT.position.set(0, 100, 0);
+        renderer.scene.add(cubeT);
+        cubes.push(cubeT);
+
+        const cubeBtm = new THREE.Mesh(geometry, material);
+        cubeBtm.position.set(0, -100, 0);
+        renderer.scene.add(cubeBtm);
+        cubes.push(cubeBtm);
+      }
+
+      function updateScene() {
+        cubes.forEach((cube) => {
+          cube.rotation.x += 0.01;
+          cube.rotation.y += 0.01;
+        });
       }
     </script>
   </head>
@@ -85,16 +140,18 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:FQRHNyrs7IA95i7nuPaqOj0noszEFUY6rnzC"
           depth-buffers="all"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
 
-          <vertex-viewer-threejs-renderer></vertex-viewer-threejs-renderer>
+          <vertex-viewer-threejs-renderer
+            id="renderer"
+            draw-mode="animation-frame"
+          ></vertex-viewer-threejs-renderer>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube
