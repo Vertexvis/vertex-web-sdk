@@ -23,3 +23,6 @@ $RECYCLE.BIN/
 Thumbs.db
 UserInterfaceState.xcuserstate
 .env
+
+# For local testing of the SDK that you don't want to commit with the project.
+*.local.html

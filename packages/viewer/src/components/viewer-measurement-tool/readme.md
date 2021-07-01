@@ -1,6 +1,12 @@
 # vertex-viewer-measurement-tool
 
+The `<vertex-viewer-measurement-tool>` component is used to manage the user
+interactions for performing new measurements.
 
+This component is normally added to a
+[`<vertex-viewer-measurements>`](../viewer-measurements/readme.md), which will
+manage the properties of this component. However, the component can be used
+independently for more advanced or custom use-cases.
 
 <!-- Auto Generated Below -->
 
