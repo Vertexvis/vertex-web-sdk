@@ -5,18 +5,18 @@ import classNames from 'classnames';
 interface Props {
   side: string;
   disabled: boolean;
-  onMouseDown: (event: MouseEvent) => void;
+  onPointerDown: (event: MouseEvent) => void;
 }
 
 export const ViewerViewCubeSide: FunctionalComponent<Props> = (
-  { side, disabled, onMouseDown },
+  { side, disabled, onPointerDown },
   children
 ) => {
   return (
     <div
       id={side}
       class={classNames(`cube-side cube-face cube-face-${side}`, { disabled })}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
     >
       {children}
     </div>

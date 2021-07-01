@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+::slotted(.viewer-measurements__measurement[mode='']) {
+  cursor: pointer;
+}
+
+::slotted(.viewer-measurements__measurement[mode='edit']) {
+  z-index: 1;
+}
+
+::slotted(.viewer-measurements__measurement[interacting-anchor='start']),
+::slotted(.viewer-measurements__measurement[interacting-anchor='end']),
+::slotted(vertex-viewer-measurement-tool[is-measuring]) {
+  z-index: 2;
+}

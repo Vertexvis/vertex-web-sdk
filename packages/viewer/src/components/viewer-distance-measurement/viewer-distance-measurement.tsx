@@ -10,7 +10,8 @@ import {
   Event,
   EventEmitter,
 } from '@stencil/core';
-import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import classNames from 'classnames';
+import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 import {
   DepthBuffer,
   MeasurementUnits,
@@ -19,6 +20,9 @@ import {
 } from '../../lib/types';
 import { ElementPositions, getViewingElementPositions } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
+import { getMouseClientPosition } from '../../lib/dom';
+import { DistanceMeasurementRenderer } from './viewer-distance-measurement-components';
+import { Disposable } from '@vertexvis/utils';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -43,9 +47,24 @@ export type ViewerDistanceMeasurementLabelFormatter = (
 ) => string;
 
 /**
- * @slot start-anchor An HTML element for the starting point anchor.
+ * The supported measurement modes.
  *
- * @slot end-anchor An HTML element for the ending point anchor.
+ * @see {@link ViewerDistanceMeasurement.mode} - For more details about modes.
+ */
+export type ViewerDistanceMeasurementMode = 'edit' | 'replace' | '';
+
+export type Anchor = 'start' | 'end';
+
+/**
+ * @slot start-anchor - An HTML element for the starting point anchor.
+ *
+ * @slot start-label - An HTML or text element that displays next to the start
+ * anchor.
+ *
+ * @slot end-anchor - An HTML element for the ending point anchor.
+ *
+ * @slot end-label - An HTML or text element that displays next to the end
+ * anchor.
  */
 @Component({
   tag: 'vertex-viewer-distance-measurement',
@@ -58,8 +77,16 @@ export class ViewerDistanceMeasurement {
    * `Vector3` or a JSON string representation in the format of `[x, y, z]` or
    * `{"x": 0, "y": 0, "z": 0}`.
    */
-  @Prop({ mutable: true })
-  public start?: Vector3.Vector3 | string;
+  @Prop({ mutable: true, attribute: null })
+  public start?: Vector3.Vector3;
+
+  /**
+   * The position of the starting anchor, as a JSON string. Can either be an
+   * instance of a `Vector3` or a JSON string representation in the format of
+   * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+   */
+  @Prop({ attribute: 'start' })
+  public startJson?: string;
 
   /**
    * The position of the ending anchor. Can either be an instance of a `Vector3`
@@ -67,7 +94,23 @@ export class ViewerDistanceMeasurement {
    * "y": 0, "z": 0}`.
    */
   @Prop({ mutable: true })
-  public end?: Vector3.Vector3 | string;
+  public end?: Vector3.Vector3;
+
+  /**
+   * The position of the ending anchor, as a JSON string. Can either be an
+   * instance of a `Vector3` or a JSON string representation in the format of
+   * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+   */
+  @Prop({ attribute: 'end' })
+  public endJson?: string;
+
+  /**
+   * The distance between `start` and `end` in real world units. Value will be
+   * undefined if the start and end positions are undefined, or if the
+   * measurement is invalid.
+   */
+  @Prop({ mutable: true })
+  public distance?: number;
 
   /**
    * The unit of measurement.
@@ -89,9 +132,38 @@ export class ViewerDistanceMeasurement {
   @Prop()
   public labelFormatter?: ViewerDistanceMeasurementLabelFormatter;
 
+  /**
+   * The distance from an anchor to its label.
+   */
   @Prop()
-  public editable = false;
+  public anchorLabelOffset = 20;
 
+  /**
+   * The length of the caps at each end of the distance measurement.
+   */
+  @Prop()
+  public lineCapLength = 12;
+
+  /**
+   * A mode that specifies how the measurement component should behave. When
+   * unset, the component will not respond to interactions with the handles.
+   * When `edit`, the measurement anchors are interactive and the user is able
+   * to reposition them. When `replace`, anytime the user clicks on the canvas,
+   * a new measurement will be performed.
+   */
+  @Prop({ reflect: true })
+  public mode: ViewerDistanceMeasurementMode = '';
+
+  /**
+   * A property that reflects which anchor is currently being interacted with.
+   */
+  @Prop({ reflect: true, mutable: true })
+  public interactingAnchor: Anchor | 'none' = 'none';
+
+  /**
+   * Indicates if the measurement is invalid. A measurement is invalid if either
+   * the start or end position are not on the surface of the model.
+   */
   @Prop({ mutable: true, reflect: true })
   public invalid = false;
 
@@ -102,6 +174,11 @@ export class ViewerDistanceMeasurement {
   @Prop()
   public projectionViewMatrix?: Matrix4.Matrix4;
 
+  /**
+   * The depth buffer that is used to optimistically determine the a depth value
+   * from a 2D screen point. If `viewer` is defined, then the depth buffer will
+   * be automatically set.
+   */
   @Prop()
   public depthBuffer?: DepthBuffer;
 
@@ -112,9 +189,17 @@ export class ViewerDistanceMeasurement {
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * An event that is dispatched anytime the user begins editing the
+   * measurement.
+   */
   @Event()
   public editBegin!: EventEmitter<void>;
 
+  /**
+   * An event that is dispatched when the user has finished editing the
+   * measurement.
+   */
   @Event()
   public editEnd!: EventEmitter<void>;
 
@@ -125,16 +210,24 @@ export class ViewerDistanceMeasurement {
   private viewport: Viewport = new Viewport(0, 0);
 
   @State()
+  private elementBounds?: DOMRect;
+
+  @State()
+  private interactionCount = 0;
+
+  @State()
   private internalProjectionViewMatrix?: Matrix4.Matrix4;
 
   @State()
   private internalDepthBuffer?: DepthBuffer;
 
   @State()
-  private measurementUnits = new MeasurementUnits(this.units);
+  private invalidateStateCounter = 0;
 
   @Element()
   private hostEl!: HTMLElement;
+
+  private measurementUnits = new MeasurementUnits(this.units);
 
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
@@ -162,15 +255,16 @@ export class ViewerDistanceMeasurement {
     }
   }
 
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.updateViewport();
-    this.updateLineFromProps();
 
     this.handleViewerChanged(this.viewer);
-    this.handleEditableChanged();
+    this.handleModeChanged();
 
-    this.updateProjectionViewMatrix();
-    this.updateDepthBuffer();
+    this.computePropsAndState();
   }
 
   /**
@@ -181,58 +275,71 @@ export class ViewerDistanceMeasurement {
     resize.observe(this.hostEl);
   }
 
+  protected componentWillUpdate(): void {
+    this.computePropsAndState();
+  }
+
   /**
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
     const positions = this.computeElementPositions();
-    if (positions != null) {
-      const { startPt, endPt, labelPt, distance } = positions;
+    const { startPt, endPt, labelPt } = positions;
+    const distance = this.formatDistance(this.distance);
 
+    if (this.mode === 'edit') {
       return (
         <Host>
-          <svg class="line">
-            <line
-              x1={startPt.x}
-              y1={startPt.y}
-              x2={endPt.x}
-              y2={endPt.y}
-            ></line>
-          </svg>
-
-          <div
-            id="start-anchor"
-            class="anchor-container"
-            style={{ transform: cssTransformForPoint(startPt) }}
-            onMouseDown={this.handleAnchorMouseDown('start')}
-          >
-            <slot name="start">
-              <div class="anchor"></div>
-            </slot>
+          <div class="measurement">
+            <DistanceMeasurementRenderer
+              startPt={startPt}
+              endPt={endPt}
+              centerPt={labelPt}
+              distance={distance}
+              anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
+              onStartAnchorPointerDown={this.handleEditAnchor('start')}
+              onEndAnchorPointerDown={this.handleEditAnchor('end')}
+            />
           </div>
-
+        </Host>
+      );
+    } else if (this.mode === 'replace') {
+      return (
+        <Host>
           <div
-            id="end-anchor"
-            class="anchor-container"
-            style={{ transform: cssTransformForPoint(endPt) }}
-            onMouseDown={this.handleAnchorMouseDown('end')}
+            class={classNames('measurement replace', {
+              'cursor-crosshair': this.start != null,
+            })}
+            onPointerMove={this.handleUpdateStartAnchor}
+            onPointerDown={this.handleStartMeasurement}
           >
-            <slot name="end">
-              <div class="anchor"></div>
-            </slot>
-          </div>
-
-          <div
-            id="label"
-            class="distance-label"
-            style={{ transform: cssTransformForPoint(labelPt) }}
-          >
-            {this.formatDistance(distance)}
+            <DistanceMeasurementRenderer
+              startPt={startPt}
+              endPt={endPt}
+              centerPt={labelPt}
+              distance={distance}
+              anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
+            />
           </div>
         </Host>
       );
     } else {
-      return <Host></Host>;
+      return (
+        <Host>
+          <div class="measurement">
+            <DistanceMeasurementRenderer
+              startPt={startPt}
+              endPt={endPt}
+              centerPt={labelPt}
+              distance={distance}
+              anchorLabelOffset={this.anchorLabelOffset}
+              lineCapLength={this.lineCapLength}
+            />
+          </div>
+        </Host>
+      );
     }
   }
 
@@ -246,23 +353,6 @@ export class ViewerDistanceMeasurement {
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleFrameDrawn);
-    this.updateProjectionViewMatrix();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('start')
-  protected handleStartChanged(): void {
-    this.updateLineFromProps();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('end')
-  protected handleEndChanged(): void {
-    this.updateLineFromProps();
   }
 
   /**
@@ -281,87 +371,30 @@ export class ViewerDistanceMeasurement {
     this.updateProjectionViewMatrix();
   }
 
-  @Watch('editable')
-  protected handleEditableChanged(): void {
-    if (this.viewer != null && this.viewer.depthBuffers == null) {
-      console.warn(
-        'Measurement editing is disabled. <vertex-viewer> must have its `depth-buffers` attribute set.'
-      );
-    }
+  /**
+   * @ignore
+   */
+  @Watch('mode')
+  protected handleModeChanged(): void {
+    this.warnIfDepthBuffersDisabled();
   }
 
-  private computeElementPositions(): ElementPositions | undefined {
+  private computePropsAndState(): void {
+    this.updateProjectionViewMatrix();
+    this.updateDepthBuffer();
+    this.updateLineFromProps();
+    this.updateInvalid();
+    this.updateDistance();
+  }
+
+  private computeElementPositions(): ElementPositions {
     if (this.internalProjectionViewMatrix != null && this.line != null) {
       return getViewingElementPositions(this.line, {
         projectionViewMatrix: this.internalProjectionViewMatrix,
         viewport: this.viewport,
-        valid: !this.invalid,
       });
     } else {
-      return undefined;
-    }
-  }
-
-  private handleFrameDrawn = (): void => {
-    this.updateProjectionViewMatrix();
-    this.updateDepthBuffer();
-  };
-
-  private handleAnchorMouseDown(
-    anchor: 'start' | 'end'
-  ): ((event: MouseEvent) => void) | undefined {
-    if (this.editable && this.internalDepthBuffer != null) {
-      const originalPt = anchor === 'start' ? this.start : this.end;
-      const originalInvalid = this.invalid;
-
-      const resetIfInvalid = (): void => {
-        if (this.invalid) {
-          if (anchor === 'start') {
-            this.start = originalPt;
-          } else {
-            this.end = originalPt;
-          }
-          this.invalid = originalInvalid;
-        }
-      };
-
-      const handleMouseMove = (event: MouseEvent): void => {
-        if (this.internalDepthBuffer != null) {
-          const { left, top } = this.hostEl.getBoundingClientRect();
-          const pt = Point.create(event.clientX - left, event.clientY - top);
-          const framePt = this.viewport.transformPointToFrame(
-            pt,
-            this.internalDepthBuffer
-          );
-          const valid =
-            this.internalDepthBuffer.getNormalizedDepthAtPoint(framePt) < 1;
-          const worldPt = this.viewport.transformPointToWorldSpace(
-            pt,
-            this.internalDepthBuffer
-          );
-
-          if (anchor === 'start') {
-            this.start = worldPt;
-          } else {
-            this.end = worldPt;
-          }
-          this.invalid = !valid;
-        }
-      };
-
-      const handleMouseUp = (): void => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        resetIfInvalid();
-        this.editEnd.emit();
-      };
-
-      return () => {
-        this.editBegin.emit();
-
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-      };
+      return {};
     }
   }
 
@@ -377,40 +410,251 @@ export class ViewerDistanceMeasurement {
   }
 
   private updateLineFromProps(): void {
-    const start = this.parseVector3(this.start);
-    const end = this.parseVector3(this.end);
+    const start = this.start || parseVector3(this.startJson);
+    const end = this.end || parseVector3(this.endJson);
     this.line =
       start != null && end != null ? Line3.create({ start, end }) : undefined;
   }
 
-  private parseVector3(
-    value: string | Vector3.Vector3 | undefined
-  ): Vector3.Vector3 | undefined {
-    return typeof value === 'string' ? Vector3.fromJson(value) : value;
+  private updateViewport(): void {
+    const rect = getMeasurementBoundingClientRect(this.hostEl);
+    this.viewport = new Viewport(rect.width, rect.height);
+    this.elementBounds = rect;
   }
 
-  private updateViewport(): void {
-    const { width, height } = getMeasurementBoundingClientRect(this.hostEl);
-    this.viewport = new Viewport(width, height);
+  private updateInvalid(): void {
+    if (this.internalDepthBuffer != null) {
+      if (this.line != null && this.internalProjectionViewMatrix != null) {
+        const lineNdc = Line3.transformMatrix(
+          this.line,
+          this.internalProjectionViewMatrix
+        );
+        const startPt = this.viewport.transformPointToFrame(
+          this.viewport.transformPointToViewport(lineNdc.start),
+          this.internalDepthBuffer
+        );
+        const endPt = this.viewport.transformPointToFrame(
+          this.viewport.transformPointToViewport(lineNdc.end),
+          this.internalDepthBuffer
+        );
+
+        this.invalid =
+          !this.internalDepthBuffer.isDepthAtFarPlane(startPt) ||
+          !this.internalDepthBuffer.isDepthAtFarPlane(endPt);
+      }
+    }
+  }
+
+  private updateDistance(): void {
+    const worldDistance =
+      this.line != null && !this.invalid
+        ? Line3.distance(this.line)
+        : undefined;
+    this.distance =
+      worldDistance != null
+        ? this.measurementUnits.translateWorldValueToReal(worldDistance)
+        : undefined;
+  }
+
+  private handleFrameDrawn = (): void => {
+    this.invalidateState();
+  };
+
+  private invalidateState(): void {
+    this.invalidateStateCounter = this.invalidateStateCounter + 1;
+  }
+
+  private handleUpdateStartAnchor = (event: PointerEvent): void => {
+    if (
+      this.interactionCount === 0 &&
+      this.internalDepthBuffer != null &&
+      this.elementBounds != null
+    ) {
+      const pt = getMouseClientPosition(event, this.elementBounds);
+      const framePt = this.viewport.transformPointToFrame(
+        pt,
+        this.internalDepthBuffer
+      );
+      const hasDepth = this.internalDepthBuffer.isDepthAtFarPlane(framePt);
+      const worldPt = this.viewport.transformPointToWorldSpace(
+        pt,
+        this.internalDepthBuffer
+      );
+      this.start = hasDepth ? worldPt : undefined;
+    }
+  };
+
+  private handleStartMeasurement = (event: PointerEvent): void => {
+    if (this.interactionCount === 0 && this.start != null) {
+      const startMeasurement = (start: () => void): void => {
+        const dispose = (): void => {
+          window.removeEventListener('pointerup', pointerUp);
+          window.removeEventListener('pointermove', pointerMove);
+        };
+        const pointerUp = (): void => {
+          dispose();
+          start();
+        };
+        const pointerMove = (event: PointerEvent): void => {
+          if (event.buttons > 0) {
+            dispose();
+          }
+        };
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
+      };
+
+      const pointerDownAndMove = (callback: () => void): Disposable => {
+        const pointerMove = (): void => callback();
+
+        const dispose = (): void => {
+          window.removeEventListener('pointermove', pointerMove);
+          window.removeEventListener('pointerup', pointerUp);
+        };
+
+        const pointerUp = (): void => dispose();
+
+        const pointerDown = (): void => {
+          window.addEventListener('pointermove', pointerMove);
+          window.addEventListener('pointerup', pointerUp);
+        };
+
+        window.addEventListener('pointerdown', pointerDown);
+
+        return {
+          dispose: () => window.removeEventListener('pointerdown', pointerDown),
+        };
+      };
+
+      const measureInteraction = (): void => {
+        let didUserInteractWithModel = false;
+
+        const handleDownAndMove = pointerDownAndMove(() => {
+          didUserInteractWithModel = true;
+        });
+
+        const dispose = (): void => {
+          window.removeEventListener('pointermove', pointerMove);
+          window.removeEventListener('pointerup', pointerUp);
+          handleDownAndMove.dispose();
+        };
+
+        const pointerMove = this.createAnchorPointerMoveHandler('end');
+        const pointerUp = (event: PointerEvent): void => {
+          if (event.button === 0) {
+            if (didUserInteractWithModel) {
+              didUserInteractWithModel = false;
+            } else {
+              dispose();
+              this.endEditing();
+            }
+          }
+        };
+
+        this.beginEditing('end');
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
+      };
+      startMeasurement(measureInteraction);
+    }
+  };
+
+  private handleEditAnchor(
+    anchor: Anchor
+  ): ((event: PointerEvent) => void) | undefined {
+    if (this.mode === 'edit' && this.internalDepthBuffer != null) {
+      const handlePointerMove = this.createAnchorPointerMoveHandler(anchor);
+      const handlePointerUp = this.createAnchorPointerUpHandler(
+        anchor,
+        handlePointerMove
+      );
+
+      return (event) => {
+        // Prevent the viewer from handling this event.
+        event.stopPropagation();
+
+        this.beginEditing(anchor);
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
+      };
+    }
+  }
+
+  private createAnchorPointerMoveHandler(
+    anchor: Anchor
+  ): (event: PointerEvent) => void {
+    return (event) => {
+      if (this.internalDepthBuffer != null && this.elementBounds != null) {
+        event.preventDefault();
+
+        const pt = getMouseClientPosition(event, this.elementBounds);
+        const worldPt = this.viewport.transformPointToWorldSpace(
+          pt,
+          this.internalDepthBuffer
+        );
+
+        if (anchor === 'start') {
+          this.start = worldPt;
+        } else {
+          this.end = worldPt;
+        }
+        this.updateInvalid();
+      }
+    };
+  }
+
+  private createAnchorPointerUpHandler(
+    anchor: 'start' | 'end',
+    pointerMove: (event: PointerEvent) => void
+  ): (event: PointerEvent) => void {
+    const handlePointerUp = (): void => {
+      window.removeEventListener('pointermove', pointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      this.endEditing();
+    };
+
+    return handlePointerUp;
   }
 
   private formatDistance(distance: number | undefined): string {
-    const realDistance =
-      distance != null
-        ? this.measurementUnits.translateWorldValueToReal(distance)
-        : undefined;
-
     if (this.labelFormatter != null) {
-      return this.labelFormatter(realDistance);
+      return this.labelFormatter(distance);
     } else {
       const abbreviated = this.measurementUnits.unit.abbreviatedName;
-      return realDistance == null
-        ? '--'
-        : `~${realDistance.toFixed(this.fractionalDigits)} ${abbreviated}`;
+      return distance == null
+        ? '---'
+        : `~${distance.toFixed(this.fractionalDigits)} ${abbreviated}`;
+    }
+  }
+
+  private beginEditing(anchor: Anchor): void {
+    if (this.interactionCount === 0) {
+      this.interactingAnchor = anchor;
+      this.editBegin.emit();
+    }
+    this.interactionCount = this.interactionCount + 1;
+  }
+
+  private endEditing(): void {
+    if (this.interactionCount === 1) {
+      this.interactingAnchor = 'none';
+      this.editEnd.emit();
+    }
+    this.interactionCount = this.interactionCount - 1;
+  }
+
+  private warnIfDepthBuffersDisabled(): void {
+    if (this.viewer != null && this.viewer.depthBuffers == null) {
+      console.warn(
+        'Measurement editing is disabled. <vertex-viewer> must have its `depth-buffers` attribute set.'
+      );
     }
   }
 }
 
-function cssTransformForPoint(pt: Point.Point): string {
-  return `translate(-50%, -50%) translate(${pt.x}px, ${pt.y}px)`;
+function parseVector3(
+  value: string | Vector3.Vector3 | undefined
+): Vector3.Vector3 | undefined {
+  return typeof value === 'string' ? Vector3.fromJson(value) : value;
 }

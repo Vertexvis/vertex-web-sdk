@@ -1100,7 +1100,7 @@ export class Viewer {
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
-    if (this.canvasElement == null) {
+    if (this.hostElement == null) {
       throw new InteractionHandlerError(
         'Cannot initialize interaction handler. Canvas element is undefined.'
       );
@@ -1110,7 +1110,7 @@ export class Viewer {
         'Cannot initialize interaction handler. Canvas element is undefined.'
       );
     }
-    handler.initialize(this.canvasElement, this.interactionApi);
+    handler.initialize(this.hostElement, this.interactionApi);
   }
 
   private createInteractionApi(): InteractionApi {

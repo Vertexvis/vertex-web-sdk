@@ -194,11 +194,11 @@ do not want your DOM element to trigger a selection of the row.
 
 ## Slots
 
-| Slot                                                                                                                                                                 | Description |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `"label An HTML element to replace the default label provided by the component. Can be used to customize the content between the expansion and visibility buttons."` |             |
-| `"left-gutter An HTML element that is placed at the left side of the row, before the indentation and expansion button."`                                             |             |
-| `"right-gutter An HTML element that is placed at the right side of the row, after the visibility button."`                                                           |             |
+| Slot             | Description                                                                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"label"`        | An HTML element to replace the default label provided by the component. Can be used to customize the content between the expansion and visibility buttons. |
+| `"left-gutter"`  | An HTML element that is placed at the left side of the row, before the indentation and expansion button.                                                   |
+| `"right-gutter"` | An HTML element that is placed at the right side of the row, after the visibility button.                                                                  |
 
 
 ## CSS Custom Properties

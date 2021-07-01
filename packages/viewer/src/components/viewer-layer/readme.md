@@ -31,15 +31,25 @@ viewport of a `<vertex-viewer>`.
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property                | Attribute                 | Description                                                                                          | Type      | Default |
+| ----------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `stretchOff`            | `stretch-off`             | Indicates if the layer should stretch to fill the size of its container's nearest positioned parent. | `boolean` | `false` |
+| `viewerInteractionsOff` | `viewer-interactions-off` | Prevents the viewer from receiving events that would trigger camera interactions.                    | `boolean` | `false` |
+
+
 ## Dependencies
 
 ### Used by
 
+ - [vertex-viewer-measurement-tool](../viewer-measurement-tool)
  - [vertex-viewer-toolbar](../viewer-toolbar)
 
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-measurement-tool --> vertex-viewer-layer
   vertex-viewer-toolbar --> vertex-viewer-layer
   style vertex-viewer-layer fill:#f9f,stroke:#333,stroke-width:4px
 ```

@@ -14,14 +14,14 @@ import classnames from 'classnames';
  * A `<vertex-scene-tree-row>` component that is responsible for rendering a row
  * within a `<vertex-scene-tree>`.
  *
- * @slot left-gutter An HTML element that is placed at the left side of the row,
- * before the indentation and expansion button.
+ * @slot left-gutter - An HTML element that is placed at the left side of the
+ * row, before the indentation and expansion button.
  *
- * @slot label An HTML element to replace the default label provided by the
+ * @slot label - An HTML element to replace the default label provided by the
  * component. Can be used to customize the content between the expansion and
  * visibility buttons.
  *
- * @slot right-gutter An HTML element that is placed at the right side of the
+ * @slot right-gutter - An HTML element that is placed at the right side of the
  * row, after the visibility button.
  */
 @Component({
