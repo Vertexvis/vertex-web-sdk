@@ -11,7 +11,7 @@ import {
   Listen,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { DistanceMeasurement, Measurement } from '../../lib/types';
+import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
 import { ViewerMeasurementToolType } from '../viewer-measurement-tool/viewer-measurement-tool';
 
@@ -34,6 +34,19 @@ export class ViewerMeasurements {
    */
   @Prop()
   public tool: ViewerMeasurementToolType = 'distance';
+
+  /**
+   * The units of measurement to use for measurements that are managed by this
+   * component.
+   */
+  @Prop()
+  public units: UnitType = 'millimeters';
+
+  /**
+   * The precision to use for measurements that are managed by this component.
+   */
+  @Prop()
+  public fractionalDigits = 2;
 
   /**
    * Indicates if new measurements can be added or edited through user
@@ -92,8 +105,8 @@ export class ViewerMeasurements {
       measurementEl.id = id;
       measurementEl.start = start;
       measurementEl.end = end;
-      measurementEl.viewer = this.viewer;
       measurementEl.classList.add('viewer-measurements__measurement');
+      this.updateMeasurement(measurementEl);
 
       measurementEl.addEventListener(
         'pointerdown',
@@ -191,11 +204,7 @@ export class ViewerMeasurements {
   protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
-    const measurements = await this.getMeasurementElements();
-    measurements.forEach((el) => {
-      el.viewer = newViewer;
-    });
-
+    this.updateMeasurements();
     this.updateMeasurementTool();
   }
 
@@ -213,6 +222,22 @@ export class ViewerMeasurements {
   @Watch('distanceTemplateId')
   protected handleDistanceTemplateIdChanged(): void {
     this.updateMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('units')
+  protected handleUnitsChanged(): void {
+    this.updateMeasurements();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('fractionalDigits')
+  protected handleFractionDigitsChanged(): void {
+    this.updateMeasurements();
   }
 
   /**
@@ -274,6 +299,19 @@ export class ViewerMeasurements {
     }
 
     return document.createElement('vertex-viewer-distance-measurement');
+  }
+
+  private async updateMeasurements(): Promise<void> {
+    const measurements = await this.getMeasurementElements();
+    measurements.forEach((el) => this.updateMeasurement(el));
+  }
+
+  private updateMeasurement(
+    measurement: HTMLVertexViewerDistanceMeasurementElement
+  ): void {
+    measurement.viewer = this.viewer;
+    measurement.units = this.units;
+    measurement.fractionalDigits = this.fractionalDigits;
   }
 
   private updateMeasurementTool(): void {

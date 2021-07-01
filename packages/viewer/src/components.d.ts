@@ -567,6 +567,10 @@ export namespace Components {
      */
     editable: boolean;
     /**
+     * The precision to use for measurements that are managed by this component.
+     */
+    fractionalDigits: number;
+    /**
      * Returns the measurement element associated to the given ID.
      * @param id The ID of the measurement element to return.
      * @returns A measurement element, or `undefined`.
@@ -601,6 +605,10 @@ export namespace Components {
      * The type of measurement to perform.
      */
     tool: ViewerMeasurementToolType;
+    /**
+     * The units of measurement to use for measurements that are managed by this component.
+     */
+    units: UnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
@@ -1176,6 +1184,10 @@ declare namespace LocalJSX {
      */
     editable?: boolean;
     /**
+     * The precision to use for measurements that are managed by this component.
+     */
+    fractionalDigits?: number;
+    /**
      * Dispatched when a new measurement is added, either through user interaction or programmatically.
      */
     onMeasurementAdded?: (
@@ -1195,6 +1207,10 @@ declare namespace LocalJSX {
      * The type of measurement to perform.
      */
     tool?: ViewerMeasurementToolType;
+    /**
+     * The units of measurement to use for measurements that are managed by this component.
+     */
+    units?: UnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */

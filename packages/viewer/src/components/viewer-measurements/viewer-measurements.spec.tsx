@@ -201,7 +201,7 @@ describe('vertex-viewer-measurements', () => {
     });
   });
 
-  describe('selecting measurements', () => {
+  describe('updating measurements', () => {
     it('sets editing mode on selected measurement', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
@@ -245,6 +245,24 @@ describe('vertex-viewer-measurements', () => {
       measurementEl.dispatchEvent(new Event('pointerdown'));
 
       expect(el.selectedMeasurementId).toBeUndefined();
+    });
+
+    it('updates measurements when props change', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
+      });
+
+      const el = page.root as HTMLVertexViewerMeasurementsElement;
+      const measurementEl = await el.addMeasurement(measurement1);
+
+      el.units = 'inches';
+      await page.waitForChanges();
+      expect(measurementEl.units).toBe('inches');
+
+      el.fractionalDigits = 4;
+      await page.waitForChanges();
+      expect(measurementEl.fractionalDigits).toBe(4);
     });
   });
 
