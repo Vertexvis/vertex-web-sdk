@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "ResponseCodeProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+// Response codes mapped to a subset of HTTP status codes.
+// DEPCRECATED, DO NOT USE
+// For Java/Scala, throw StatusRuntimeException with optional metadata.
+// Example: https://github.com/Vertexvis/partrevision-service/blob/master/src/main/scala/com/vertexvis/partrevision/Executor.scala#L31-L47
+// For other languages, follow gRPC's standard error model.
+// More info: https://grpc.io/docs/guides/error/
+enum ResponseCode {
+    RESPONSE_CODE_INVALID = 0;
+    RESPONSE_CODE_OK = 1;
+    RESPONSE_CODE_CREATED = 2;
+    RESPONSE_CODE_ACCEPTED = 3;
+    RESPONSE_CODE_MOVED_PERMANENTLY = 4;
+    RESPONSE_CODE_NOT_MODIFIED = 5;
+    RESPONSE_CODE_BAD_REQUEST = 6;
+    RESPONSE_CODE_UNAUTHORIZED = 7;
+    RESPONSE_CODE_FORBIDDEN = 8;
+    RESPONSE_CODE_NOT_FOUND = 9;
+    RESPONSE_CODE_GONE = 10;
+    RESPONSE_CODE_SERVER_ERROR = 11;
+}

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "PagingProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+message Pager {
+    uint32 limit = 1;
+    string cursor = 2;
+}
+
+message OffsetPager {
+    uint32 limit = 1;
+    oneof pager {
+        string cursor = 2;
+        uint32 offset = 3;
+    }
+}
+
+message Cursor {
+    string next = 1;
+}
+
+message OffsetCursor {
+    uint32 total = 1;
+    string next = 2;
+}

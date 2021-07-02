@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "AwsProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+message S3FileLocation {
+    string bucket = 1;
+    string key = 2;
+}

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "MaterialProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+message RGBAi {
+    uint32 r = 1;
+    uint32 g = 2;
+    uint32 b = 3;
+    uint32 a = 4;
+}
+
+message RGBi {
+    uint32 r = 1;
+    uint32 g = 2;
+    uint32 b = 3;
+}
+
+message ColorMaterial {
+    uint32 d = 1;  // Opacity
+    uint32 ns = 2; // Specular exponent (shininess)
+    RGBi ka = 3;   // Ambient
+    RGBi kd = 4;   // Diffuse
+    RGBi ks = 5;   // Specular
+    RGBi ke = 6;   // Emissive
+}
+
+message RGBf {
+    float r = 1;
+    float g = 2;
+    float b = 3;
+}
+
+message ColorMaterialf {
+    float d = 1;  // Opacity
+    float ns = 2; // Specular exponent (shininess)
+    RGBf ka = 3;   // Ambient
+    RGBf kd = 4;   // Diffuse
+    RGBf ks = 5;   // Specular
+    RGBf ke = 6;   // Emissive
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "JwtProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+// JWK, see https://tools.ietf.org/html/rfc7517#section-4
+message Jwk {
+    string alg = 1;
+    string e = 2;
+    string kid = 3;
+    string kty = 4;
+    string n = 5;
+    string use = 6; 
+}
