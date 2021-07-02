@@ -1,23 +1,21 @@
 {
   "name": "@vertexvis/flex-time-protos",
   "version": "0.0.0",
-  "main": "index.js",
   "license": "MIT",
   "private": true,
-  "files": [
-    "dist/*"
-  ],
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "clean": "rm -fr ./dist && mkdir ./dist",
+    "clean": "rm -fr ./dist && mkdir ./dist && rm -fr ./src && mkdir ./src",
     "prebuild": "yarn clean",
-    "build": "docker-compose -f ./docker-compose.yml run --rm improbable"
+    "build": "npx protoc --ts_out src --proto_path protos protos/flex-time-service/protos/*.proto protos/core/protos/*.proto protos/google/protobuf/*.proto",
+    "postbuild": "tsc"
   },
   "peerDependencies": {
-    "@improbable-eng/grpc-web": "^0.14.0",
     "google-protobuf": "^3.17.3"
   },
   "devDependencies": {
-    "@improbable-eng/grpc-web": "^0.14.0",
+    "@protobuf-ts/plugin": "^2.0.0-alpha.27",
+    "@protobuf-ts/runtime-rpc": "^2.0.0-alpha.27",
     "google-protobuf": "^3.17.3"
   }
 }
