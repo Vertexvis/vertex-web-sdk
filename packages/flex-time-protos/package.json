@@ -1,0 +1,23 @@
+{
+  "name": "@vertexvis/flex-time-protos",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "docker-compose -f ./docker-compose.yml run --rm improbable"
+  },
+  "peerDependencies": {
+    "@improbable-eng/grpc-web": "^0.14.0",
+    "google-protobuf": "^3.17.3"
+  },
+  "devDependencies": {
+    "@improbable-eng/grpc-web": "^0.14.0",
+    "google-protobuf": "^3.17.3"
+  }
+}

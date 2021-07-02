@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "GeometryProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+message Vector3f {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message Vector3d {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message Vector4f {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float w = 4;
+}
+
+message Vector4d {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+    double w = 4;
+}
+
+message BoundingBox3f {
+    float xmin = 1;
+    float xmax = 2;
+
+    float ymin = 3;
+    float ymax = 4;
+
+    float zmin = 5;
+    float zmax = 6;
+}
+
+message AffineMatrix4f {
+    Vector3f basis_x = 1;
+    Vector3f basis_y = 2;
+    Vector3f xlate = 3;
+    float scale = 4;
+    Vector3f basis_z = 5;
+}
+
+message AffineMatrix4d {
+    Vector3d basis_x = 1;
+    Vector3d basis_y = 2;
+    Vector3d xlate = 3;
+    double scale = 4;
+    Vector3d basis_z = 5;
+}
+
+message IndexedVector3fArray {
+    repeated Vector3f values  = 1;
+    repeated uint32 indices = 2 [packed=true];
+}
+
+message Indexed3DTriangleSet {
+    IndexedVector3fArray vertices = 1;
+    // Normals are bound per-vertex -- i.e. length(normals.indices) == length(vertices.indices)
+    IndexedVector3fArray normals = 2;
+    // Future work:  Per-vertex colors and/or texture coordinates
+}
+
+message Matrix4x4f {
+    Vector4f r0 = 1;
+    Vector4f r1 = 2;
+    Vector4f r2 = 3;
+    Vector4f r3 = 4;
+}
+
+message Dimension2i {
+    int32 width = 1;
+    int32 height = 2;
+}
+
+message Point2i {
+    int32 dx = 1;
+    int32 dy = 2;
+}

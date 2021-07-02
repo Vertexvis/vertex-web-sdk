@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+import "core/protos/instant.proto";
+import "core/protos/uuid.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "JobProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+enum JobStatus {
+  JOB_STATUS_INVALID = 0;
+  JOB_STATUS_RUNNING = 1;
+  JOB_STATUS_COMPLETE = 2;
+  JOB_STATUS_ERROR = 3;
+}
+
+message CoreJob {
+  vertexvis.protobuf.core.Uuid id = 1;
+
+  // The job's status.
+  JobStatus status = 2;
+
+  // The owner that created the job.
+  string owner = 3;
+
+  // When the job was created.
+  vertexvis.protobuf.core.Instant created_at = 4;
+
+  // When the job was modified.
+  vertexvis.protobuf.core.Instant modified_at = 5;
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "InstantProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+// ISO-8601 representation of date and time
+message Instant {
+    string iso = 1;
+}

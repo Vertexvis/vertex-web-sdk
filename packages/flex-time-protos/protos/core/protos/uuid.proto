@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.core;
+
+option java_multiple_files = true;
+option java_outer_classname = "UuidProto";
+option java_package = "com.vertexvis.protobuf.core";
+
+message Uuid {
+    string hex = 1;
+}
+
+message Uuid2l {
+    // To avoid overflow after `Number.MAX_VALUE`, use `string` instead of `number`.
+    sfixed64 msb = 1 [jstype = JS_STRING];
+    sfixed64 lsb = 2 [jstype = JS_STRING];
+} 

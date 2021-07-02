@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.flextime.v1alpha1;
+
+import "core/protos/uuid.proto";
+import "core/protos/geometry.proto";
+import "core/protos/material.proto";
+import "google/protobuf/wrappers.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "DomainProto";
+option java_package = "com.vertexvis.protobuf.flextime";
+
+message CompressedNormalArray {
+    repeated uint32 oct32s = 2;
+}
+
+message Indexed3DTriangleSet {
+    vertexvis.protobuf.core.IndexedVector3fArray vertices = 1;
+    CompressedNormalArray compressedNormals = 2;
+}
+
+message RenderItem {
+    vertexvis.protobuf.core.AffineMatrix4f transform = 1;
+    vertexvis.protobuf.core.ColorMaterialf material = 2;
+    Indexed3DTriangleSet triangle_set = 3;
+}

@@ -1,0 +1,11 @@
+version: '2.4'
+
+services:
+  improbable:
+    build: .
+    volumes:
+      - '${PWD}/protos:/protos'
+      - '${PWD}/dist:/compiled'
+    working_dir: /protos
+    command: >
+      bash -c "protoc --plugin=protoc-gen-ts=/usr/local/bin/protoc-gen-ts -I=. --js_out=import_style=commonjs,binary:/compiled --ts_out=service=grpc-web:/compiled $$(find . -iname \"*.proto\" | xargs)"
