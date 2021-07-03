@@ -60,6 +60,11 @@
 
     <script type="module">
       import * as THREE from 'https://cdn.skypack.dev/three';
+      import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
+
+      const sceneId = 'a842906a-cc33-41d8-b86c-936571fb92fb';
+      const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
+      const vertexScene = new VertexScene(client, sceneId);
 
       const cubes = [];
 
@@ -71,11 +76,28 @@
         await window.customElements.whenDefined('vertex-viewer');
 
         const viewer = document.getElementById('viewer');
+        viewer.addEventListener('tap', async ({ detail }) => {
+          const scene = await viewer.scene();
+          const { hits } = await scene.raycaster().hitItems(detail.position);
+          const [hit] = hits;
+
+          if (hit != null) {
+            console.log('hit', hit);
+            await vertexScene.loadSceneItem(scene.sceneViewId, hit.itemId.hex);
+            await scene
+              .items((op) =>
+                op.where((q) => q.withItemId(hit.itemId.hex)).hide()
+              )
+              .execute();
+          }
+        });
+
         const tree = document.getElementById('scene-tree');
 
         const renderer = document.getElementById('renderer');
         createScene(renderer);
         renderer.willDraw = updateScene;
+        renderer.scene.add(vertexScene);
       }
 
       function createScene(renderer) {
@@ -141,7 +163,7 @@
         <vertex-viewer
           id="viewer"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:FQRHNyrs7IA95i7nuPaqOj0noszEFUY6rnzC"
+          src="urn:vertexvis:stream-key:Tc6BMkmEgl6xHHRFsMGsnXNfg0v31n-Fkcjf"
           depth-buffers="all"
         >
           <vertex-viewer-default-toolbar

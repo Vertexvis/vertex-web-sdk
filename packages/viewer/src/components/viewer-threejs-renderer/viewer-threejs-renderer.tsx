@@ -9,10 +9,12 @@ import {
   Watch,
 } from '@stencil/core';
 import {
+  AmbientLight,
   CanvasTexture,
   DataTexture,
   DepthFormat,
   DepthTexture,
+  DirectionalLight,
   Mesh,
   NearestFilter,
   OrthographicCamera,
@@ -76,6 +78,15 @@ export class ViewerThreeJsRenderer {
   private renderer?: WebGLRenderer;
 
   public constructor() {
+    // Lighting
+    const color = 0xffffff;
+    const intensity = 0.9;
+    const light = new DirectionalLight(color, intensity);
+    light.position.set(50, 50, 50);
+    this.scene.add(light);
+
+    this.scene.add(new AmbientLight(0x666666));
+
     const target = new WebGLRenderTarget(1, 1);
     target.texture.format = RGBAFormat;
     target.texture.minFilter = NearestFilter;
@@ -139,7 +150,7 @@ export class ViewerThreeJsRenderer {
     const renderer = new WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: true,
+      antialias: false,
     });
     console.log('WebGL capabilities', renderer.capabilities);
 
