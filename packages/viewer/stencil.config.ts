@@ -9,6 +9,13 @@ import { terser } from 'rollup-plugin-terser';
 
 export const config: Config = {
   namespace: 'viewer',
+  commonjs: {
+    namedExports: {
+      '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api_pb_service.js': [
+        'FlexTimeAPIClient',
+      ],
+    },
+  },
   nodeResolve: {
     browser: true,
   },
