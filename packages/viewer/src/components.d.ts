@@ -983,6 +983,7 @@ declare global {
   }
 }
 declare namespace LocalJSX {
+<<<<<<< HEAD
   interface VertexSceneTree {
     /**
      * An object to configure the scene tree.
@@ -1591,6 +1592,495 @@ declare namespace LocalJSX {
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
     'vertex-viewer-view-cube': VertexViewerViewCube;
   }
+=======
+    interface VertexSceneTree {
+        /**
+          * An object to configure the scene tree.
+         */
+        "config"?: Config;
+        /**
+          * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+         */
+        "configEnv"?: Environment;
+        "controller"?: SceneTreeController;
+        "onConnectionError"?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
+        /**
+          * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
+         */
+        "overScanCount"?: number;
+        /**
+          * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+          * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+         */
+        "rowData"?: RowDataProvider;
+        /**
+          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
+          * @see SceneTree.selectItem *
+          * @see SceneTree.deselectItem
+         */
+        "selectionDisabled"?: boolean;
+        /**
+          * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
+         */
+        "viewer"?: HTMLVertexViewerElement | null;
+        /**
+          * A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.
+         */
+        "viewerSelector"?: string;
+    }
+    interface VertexSceneTreeRow {
+        /**
+          * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
+         */
+        "interactionsDisabled"?: boolean;
+        /**
+          * The node data that is associated to the row. Contains information related to if the node is expanded, visible, etc.
+         */
+        "node"?: Node.AsObject;
+        /**
+          * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
+         */
+        "onExpandToggled"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
+         */
+        "onSelectionToggled"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
+         */
+        "onVisibilityToggled"?: (event: CustomEvent<void>) => void;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+         */
+        "recurseParentSelectionDisabled"?: boolean;
+        /**
+          * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+         */
+        "tree"?: HTMLVertexSceneTreeElement;
+    }
+    interface VertexViewer {
+        /**
+          * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
+         */
+        "cameraControls"?: boolean;
+        /**
+          * The Client ID associated with your Vertex Application.
+         */
+        "clientId"?: string;
+        /**
+          * An object or JSON encoded string that defines configuration settings for the viewer.
+         */
+        "config"?: Config | string;
+        /**
+          * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+          * @see Viewer.config
+         */
+        "configEnv"?: Environment;
+        /**
+          * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+         */
+        "depthBuffers"?: DepthBufferFrameType;
+        /**
+          * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
+         */
+        "experimentalGhostingOpacity"?: number;
+        /**
+          * The last frame that was received, which can be used to inspect the scene and camera information.
+         */
+        "frame"?: Frame | undefined;
+        /**
+          * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
+         */
+        "keyboardControls"?: boolean;
+        /**
+          * Emits an event when the connection status changes for the viewer
+         */
+        "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
+        "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
+        /**
+          * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
+         */
+        "onDoubletap"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
+         */
+        "onFrameDrawn"?: (event: CustomEvent<Frame>) => void;
+        /**
+          * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
+         */
+        "onFrameReceived"?: (event: CustomEvent<Frame>) => void;
+        /**
+          * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
+         */
+        "onLongpress"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when the scene is ready to be interacted with.
+         */
+        "onSceneReady"?: (event: CustomEvent<void>) => void;
+        /**
+          * Used for internals or testing.
+          * @private
+         */
+        "onSessionidchange"?: (event: CustomEvent<string>) => void;
+        /**
+          * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
+         */
+        "onTap"?: (event: CustomEvent<TapEventDetails>) => void;
+        /**
+          * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
+         */
+        "onTokenExpired"?: (event: CustomEvent<void>) => void;
+        /**
+          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
+         */
+        "rotateAroundTapPoint"?: boolean;
+        /**
+          * The default hex color or material to use when selecting items.
+         */
+        "selectionMaterial"?: | string
+    | ColorMaterial;
+        /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "sessionId"?: string;
+        /**
+          * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
+         */
+        "src"?: string;
+        /**
+          * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
+          * @readonly
+         */
+        "streamAttributes"?: ViewerStreamAttributes;
+    }
+    interface VertexViewerButton {
+    }
+    interface VertexViewerDefaultToolbar {
+        /**
+          * The duration of animations, in milliseconds. Defaults to `1000`.
+         */
+        "animationMs"?: number;
+        /**
+          * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
+         */
+        "animationsDisabled"?: boolean;
+        /**
+          * Specifies the direction that UI elements are placed.
+         */
+        "direction"?: ViewerToolbarGroupDirection;
+        /**
+          * Specifies where the toolbar is positioned.
+         */
+        "placement"?: ViewerToolbarPlacement;
+        /**
+          * An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerDistanceMeasurement {
+        /**
+          * The distance from an anchor to its label.
+         */
+        "anchorLabelOffset"?: number;
+        /**
+          * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
+         */
+        "depthBuffer"?: DepthBuffer;
+        /**
+          * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
+         */
+        "distance"?: number;
+        /**
+          * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "end"?: Vector3.Vector3;
+        /**
+          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "endJson"?: string;
+        /**
+          * The number of fraction digits to display.
+         */
+        "fractionalDigits"?: number;
+        /**
+          * A property that reflects which anchor is currently being interacted with.
+         */
+        "interactingAnchor"?: Anchor | 'none';
+        /**
+          * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
+         */
+        "invalid"?: boolean;
+        /**
+          * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+         */
+        "labelFormatter"?: ViewerDistanceMeasurementLabelFormatter;
+        /**
+          * The length of the caps at each end of the distance measurement.
+         */
+        "lineCapLength"?: number;
+        /**
+          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+         */
+        "mode"?: ViewerDistanceMeasurementMode;
+        /**
+          * An event that is dispatched anytime the user begins editing the measurement.
+         */
+        "onEditBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user has finished editing the measurement.
+         */
+        "onEditEnd"?: (event: CustomEvent<void>) => void;
+        /**
+          * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+         */
+        "projectionViewMatrix"?: Matrix4.Matrix4;
+        /**
+          * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "start"?: Vector3.Vector3;
+        /**
+          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "startJson"?: string;
+        /**
+          * The unit of measurement.
+         */
+        "units"?: UnitType;
+        /**
+          * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerDomElement {
+        /**
+          * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
+         */
+        "billboardOff"?: boolean;
+        /**
+          * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
+          * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
+         */
+        "occluded"?: boolean;
+        /**
+          * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
+         */
+        "occlusionOff"?: boolean;
+        /**
+          * An event that's emitted when a property of this component changes.
+         */
+        "onPropertyChange"?: (event: CustomEvent<void>) => void;
+        /**
+          * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "position"?: Vector3.Vector3 | string;
+        /**
+          * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+         */
+        "rotation"?: | Quaternion.Quaternion
+    | Euler.Euler
+    | string;
+        /**
+          * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scale"?: Vector3.Vector3 | string;
+    }
+    interface VertexViewerDomRenderer {
+        /**
+          * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+         */
+        "camera"?: FramePerspectiveCamera;
+        /**
+          * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+         */
+        "depthBuffer"?: DepthBuffer;
+        /**
+          * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
+         */
+        "drawMode"?: ViewerDomRendererDrawMode;
+        /**
+          * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerIcon {
+        /**
+          * The name of the icon to render.
+         */
+        "name"?: ViewerIconName;
+        /**
+          * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+         */
+        "size"?: ViewerIconSize;
+    }
+    interface VertexViewerLayer {
+        /**
+          * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
+         */
+        "stretchOff"?: boolean;
+        /**
+          * Prevents the viewer from receiving events that would trigger camera interactions.
+         */
+        "viewerInteractionsOff"?: boolean;
+    }
+    interface VertexViewerMeasurementLine {
+        /**
+          * A length of the line cap. The line cap is a line at each end of a line.
+         */
+        "capLength"?: number;
+        /**
+          * A point that specifies the ending point of the line.
+         */
+        "end"?: Point.Point;
+        /**
+          * A point that specifies the starting point of the line.
+         */
+        "start"?: Point.Point;
+    }
+    interface VertexViewerMeasurementTool {
+        /**
+          * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+         */
+        "disabled"?: boolean;
+        /**
+          * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+         */
+        "distanceTemplateId"?: string;
+        /**
+          * A property that indicates if the user is performing a measurement.
+         */
+        "isMeasuring"?: boolean;
+        /**
+          * An event that is dispatched when a user begins a new measurement.
+         */
+        "onMeasureBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when a user has finished their measurement.
+         */
+        "onMeasureEnd"?: (event: CustomEvent<Measurement>) => void;
+        /**
+          * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+         */
+        "tool"?: ViewerMeasurementToolType;
+        /**
+          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerMeasurements {
+        /**
+          * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
+         */
+        "distanceTemplateId"?: string;
+        /**
+          * Indicates if new measurements can be added or edited through user interaction.
+         */
+        "editable"?: boolean;
+        /**
+          * Dispatched when a new measurement is added, either through user interaction or programmatically.
+         */
+        "onMeasurementAdded"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
+        /**
+          * Dispatched when a new measurement is removed, either through user interaction or programmatically.
+         */
+        "onMeasurementRemoved"?: (event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>) => void;
+        /**
+          * The ID of the measurement that is selected.
+         */
+        "selectedMeasurementId"?: string;
+        /**
+          * The type of measurement to perform.
+         */
+        "tool"?: ViewerMeasurementToolType;
+        /**
+          * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerThreejsRenderer {
+        "camera"?: PerspectiveCamera;
+        "drawMode"?: ViewerThreeJsRendererDrawMode;
+        "occlude"?: boolean;
+        "scene"?: Scene;
+        "viewer"?: HTMLVertexViewerElement;
+        "willDraw"?: () => void;
+    }
+    interface VertexViewerToolbar {
+        "direction"?: ViewerToolbarDirection;
+        /**
+          * Specifies where the toolbar is positioned.
+         */
+        "placement"?: ViewerToolbarPlacement;
+    }
+    interface VertexViewerToolbarGroup {
+        "direction"?: ViewerToolbarGroupDirection;
+    }
+    interface VertexViewerViewCube {
+        /**
+          * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
+         */
+        "animationDuration"?: number;
+        /**
+          * Disables standard view interactions.
+         */
+        "standardViewsDisabled"?: boolean;
+        /**
+          * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+         */
+        "viewMatrix"?: Matrix4.Matrix4;
+        /**
+          * An instance of the viewer to bind to.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+        /**
+          * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
+         */
+        "worldOrientation"?: Orientation;
+        /**
+          * The label for the side of the cube on the negative x-axis.
+         */
+        "xNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive x-axis.
+         */
+        "xPositiveLabel"?: string;
+        /**
+          * The label for the side of the cube on the negative y-axis.
+         */
+        "yNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive y-axis.
+         */
+        "yPositiveLabel"?: string;
+        /**
+          * The label for the side of the cube on the negative z-axis.
+         */
+        "zNegativeLabel"?: string;
+        /**
+          * The label for the side of the cube on the positive z-axis.
+         */
+        "zPositiveLabel"?: string;
+    }
+    interface IntrinsicElements {
+        "vertex-scene-tree": VertexSceneTree;
+        "vertex-scene-tree-row": VertexSceneTreeRow;
+        "vertex-viewer": VertexViewer;
+        "vertex-viewer-button": VertexViewerButton;
+        "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
+        "vertex-viewer-distance-measurement": VertexViewerDistanceMeasurement;
+        "vertex-viewer-dom-element": VertexViewerDomElement;
+        "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
+        "vertex-viewer-icon": VertexViewerIcon;
+        "vertex-viewer-layer": VertexViewerLayer;
+        "vertex-viewer-measurement-line": VertexViewerMeasurementLine;
+        "vertex-viewer-measurement-tool": VertexViewerMeasurementTool;
+        "vertex-viewer-measurements": VertexViewerMeasurements;
+        "vertex-viewer-threejs-renderer": VertexViewerThreejsRenderer;
+        "vertex-viewer-toolbar": VertexViewerToolbar;
+        "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
+        "vertex-viewer-view-cube": VertexViewerViewCube;
+    }
+>>>>>>> Add widget to transform parts
 }
 export { LocalJSX as JSX };
 declare module '@stencil/core' {

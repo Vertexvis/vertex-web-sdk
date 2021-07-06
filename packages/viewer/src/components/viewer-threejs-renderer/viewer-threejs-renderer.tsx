@@ -13,35 +13,15 @@ import {
   CanvasTexture,
   DataTexture,
   DepthFormat,
-  DepthTexture,
   DirectionalLight,
-  Mesh,
   NearestFilter,
-  OrthographicCamera,
   PerspectiveCamera,
-  PlaneGeometry,
-  RGBAFormat,
   Scene,
-  ShaderMaterial,
   Texture,
-  UnsignedIntType,
   UnsignedShortType,
-  WebGLRenderer,
-  WebGLRenderTarget,
 } from 'three';
-import { DepthBuffer, Viewport } from '../../lib/types';
-import {
-  vertexShader,
-  computeServerDepthTextureMatrix,
-  serverDepth16FragmentShader,
-} from './shaders';
-
-interface PostProcessingState {
-  camera: OrthographicCamera;
-  material: ShaderMaterial;
-  scene: Scene;
-  target: WebGLRenderTarget;
-}
+import { DepthBuffer, Frame, Viewport } from '../../lib/types';
+import { BlendedRenderer, OverlayRenderer, Renderer } from './renderers';
 
 export type ViewerThreeJsRendererDrawMode = 'animation-frame' | 'manual';
 
@@ -66,18 +46,39 @@ export class ViewerThreeJsRenderer {
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
-  @State()
-  private postProcessing: PostProcessingState;
+  @Prop()
+  public occlude = false;
 
   @State()
   private viewport: Viewport = new Viewport(0, 0);
 
+  @State()
+  private frame?: Frame;
+
   @Element()
   private hostEl!: HTMLElement;
 
-  private renderer?: WebGLRenderer;
+  private renderer?: Renderer;
 
-  public constructor() {
+  private animationFrameId?: number;
+
+  @Method()
+  public async draw(): Promise<void> {
+    if (this.renderer != null) {
+      this.willDraw?.();
+
+      if (this.frame != null) {
+        this.renderer.render(
+          this.scene,
+          this.camera,
+          this.frame,
+          this.viewport
+        );
+      }
+    }
+  }
+
+  protected componentWillLoad(): void {
     // Lighting
     const color = 0xffffff;
     const intensity = 0.9;
@@ -86,60 +87,6 @@ export class ViewerThreeJsRenderer {
     this.scene.add(light);
 
     this.scene.add(new AmbientLight(0x666666));
-
-    const target = new WebGLRenderTarget(1, 1);
-    target.texture.format = RGBAFormat;
-    target.texture.minFilter = NearestFilter;
-    target.texture.magFilter = NearestFilter;
-    target.texture.generateMipmaps = false;
-    target.depthBuffer = true;
-    target.depthTexture = new DepthTexture(1, 1);
-    target.depthTexture.format = DepthFormat;
-    target.depthTexture.type = UnsignedIntType;
-
-    const postMaterial = new ShaderMaterial({
-      vertexShader,
-      fragmentShader: serverDepth16FragmentShader,
-      uniforms: {
-        diffuseTexture: { value: target.texture },
-        depthTexture: { value: target.depthTexture },
-        serverDepthTexture: { value: createInitialDepthTexture(1, 1) },
-        serverDepthRect: { value: { x: 0, y: 0, width: 1, height: 1 } },
-        serverDepthMatrix: { value: [1, 0, 0, 0, 1, 0, 0, 0, 1] },
-        dimensions: { value: [1, 1] },
-        cameraNear: { value: this.camera.near },
-        cameraFar: { value: this.camera.far },
-        serverNear: { value: 0 },
-        serverFar: { value: 1 },
-      },
-    });
-    const postPlane = new PlaneGeometry(2, 2);
-    const postQuad = new Mesh(postPlane, postMaterial);
-    const postScene = new Scene();
-    postScene.add(postQuad);
-
-    this.postProcessing = {
-      camera: new OrthographicCamera(-1, 1, 1, -1, 0, 1),
-      material: postMaterial,
-      scene: postScene,
-      target,
-    };
-  }
-
-  @Method()
-  public async draw(): Promise<void> {
-    if (this.renderer != null) {
-      this.willDraw?.();
-
-      this.renderer.setRenderTarget(this.postProcessing.target);
-      this.renderer.render(this.scene, this.camera);
-
-      this.renderer.setRenderTarget(null);
-      this.renderer.render(
-        this.postProcessing.scene,
-        this.postProcessing.camera
-      );
-    }
   }
 
   protected componentDidLoad(): void {
@@ -147,14 +94,11 @@ export class ViewerThreeJsRenderer {
       'canvas'
     ) as HTMLCanvasElement;
 
-    const renderer = new WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: false,
-    });
-    console.log('WebGL capabilities', renderer.capabilities);
-
-    this.renderer = renderer;
+    if (this.occlude) {
+      this.renderer = new BlendedRenderer(canvas);
+    } else {
+      this.renderer = new OverlayRenderer(canvas);
+    }
 
     const resize = new ResizeObserver(() => this.updateSize());
     resize.observe(this.hostEl);
@@ -204,66 +148,29 @@ export class ViewerThreeJsRenderer {
       this.camera.near = threeNear;
       this.camera.far = threeFar;
       this.camera.updateProjectionMatrix();
-
-      const { material: postMat, target } = this.postProcessing;
-      postMat.uniforms.cameraNear = { value: threeNear };
-      postMat.uniforms.cameraFar = { value: threeFar };
-      postMat.uniforms.serverNear = { value: near };
-      postMat.uniforms.serverFar = { value: far };
-      postMat.uniforms.depthTexture = { value: target.depthTexture };
-      postMat.uniforms.dimensions = {
-        value: [this.viewport.width, this.viewport.height],
-      };
-
-      const depthBlob = frame.depthBufferBytes
-        ? new Blob([frame.depthBufferBytes])
-        : undefined;
-      const [depthBitmap, depthBuffer] = await Promise.all([
-        depthBlob != null ? createImageBitmap(depthBlob) : undefined,
-        frame.depthBuffer(),
-      ]);
-      if (depthBitmap != null && depthBuffer != null) {
-        const { x, y, width, height } = this.viewport.calculateDrawRect(
-          depthBuffer,
-          depthBuffer.imageDimensions
-        );
-        this.postProcessing.material.uniforms.serverDepthTexture = {
-          value: createDepthDataTexture(depthBuffer, this.viewport),
-        };
-        this.postProcessing.material.uniforms.serverDepthRect = {
-          value: {
-            x: x,
-            // Position server depth from top of screen. WebGL renders from
-            // bottom of screen. Consider moving to shader.
-            y: this.viewport.height - (height + y),
-            width: width,
-            height: height,
-          },
-        };
-        this.postProcessing.material.uniforms.serverDepthMatrix = {
-          value: computeServerDepthTextureMatrix(depthBuffer, this.viewport),
-        };
-      }
     }
+
+    this.frame = frame;
   };
 
   private updateSize(): void {
     const { width, height } = this.hostEl.getBoundingClientRect();
-
-    this.postProcessing.target.setSize(width, height);
-    this.postProcessing.target.depthTexture = new DepthTexture(width, height);
-    this.postProcessing.target.depthTexture.format = DepthFormat;
-    this.postProcessing.target.depthTexture.type = UnsignedIntType;
-
-    this.renderer?.setSize(width, height);
     this.viewport = new Viewport(width, height);
   }
 
   private updateDrawMode(): void {
-    this.renderer?.setAnimationLoop(null);
+    if (this.drawMode !== 'animation-frame' && this.animationFrameId != null) {
+      window.cancelAnimationFrame(this.animationFrameId);
+    }
 
     if (this.drawMode === 'animation-frame') {
-      this.renderer?.setAnimationLoop(() => this.draw());
+      const frameLoop = (): void => {
+        this.animationFrameId = window.requestAnimationFrame(() => {
+          this.draw();
+          frameLoop();
+        });
+      };
+      frameLoop();
     }
   }
 }
