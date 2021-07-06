@@ -383,7 +383,6 @@ export class ViewerDistanceMeasurement {
     this.updateProjectionViewMatrix();
     this.updateDepthBuffer();
     this.updateLineFromProps();
-    this.updateInvalid();
     this.updateDistance();
   }
 
@@ -605,6 +604,7 @@ export class ViewerDistanceMeasurement {
         } else {
           this.end = worldPt;
         }
+        this.updateLineFromProps();
         this.updateInvalid();
       }
     };
