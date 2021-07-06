@@ -247,7 +247,7 @@ export class ViewerMeasurements {
 
   private handleMeasurementPointerDown = (event: Event): void => {
     if (!this.disabled) {
-      const el = event.target as Element;
+      const el = event.currentTarget as Element;
       this.selectedMeasurementId = el.id;
     }
   };
