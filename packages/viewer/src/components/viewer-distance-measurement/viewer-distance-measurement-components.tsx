@@ -68,7 +68,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
           class="anchor-label anchor-label-start"
           style={{ transform: cssTransformCenterAt(startLabelPt) }}
         >
-          <div class="anchor-label-placeholder">A</div>
+          <slot name="start-label" />
         </div>
       )}
 
@@ -90,9 +90,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
           class="anchor-label anchor-label-end"
           style={{ transform: cssTransformCenterAt(endLabelPt) }}
         >
-          <slot name="end-label">
-            <div class="anchor-label-placeholder">B</div>
-          </slot>
+          <slot name="end-label" />
         </div>
       )}
 

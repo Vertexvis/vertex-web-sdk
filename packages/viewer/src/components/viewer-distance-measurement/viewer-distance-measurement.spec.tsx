@@ -172,6 +172,46 @@ describe('vertex-viewer-distance-measurement', () => {
     );
   });
 
+  it('supports slots for anchor labels', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDistanceMeasurement],
+      html: `
+        <vertex-viewer-distance-measurement>
+          <div id="start-label" slot="start-label"></div>
+          <div id="end-label" slot="end-label"></div>
+        </vertex-viewer-distance-measurement>
+      `,
+    });
+
+    const startLabelEl = page.root?.querySelector('#start-label');
+    const endLabelEl = page.root?.querySelector('#end-label');
+
+    expect(startLabelEl).toBeDefined();
+    expect(endLabelEl).toBeDefined();
+  });
+
+  it('positions anchor labels with distance property', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDistanceMeasurement],
+      html: `
+        <vertex-viewer-distance-measurement anchor-label-offset="50" start-json="[0, 0, 0]" end-json="[0, 0, 0]">
+          <div id="start-label" slot="start-label"></div>
+          <div id="end-label" slot="end-label"></div>
+        </vertex-viewer-distance-measurement>
+      `,
+    });
+
+    const startLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-start'
+    );
+    const endLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-end'
+    );
+
+    expect(startLabelEl).toBeDefined();
+    expect(endLabelEl).toBeDefined();
+  });
+
   it('is empty if start and end points cant be calculated', async () => {
     const page = await newSpecPage({
       components: [ViewerDistanceMeasurement],
