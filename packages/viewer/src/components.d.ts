@@ -559,13 +559,13 @@ export namespace Components {
       measurement: Measurement
     ) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
     /**
+     * If `true`, disables adding or editing of measurements through user interaction.
+     */
+    disabled: boolean;
+    /**
      * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
      */
     distanceTemplateId?: string;
-    /**
-     * Indicates if new measurements can be added or edited through user interaction.
-     */
-    editable: boolean;
     /**
      * Returns the measurement element associated to the given ID.
      * @param id The ID of the measurement element to return.
@@ -1168,13 +1168,13 @@ declare namespace LocalJSX {
   }
   interface VertexViewerMeasurements {
     /**
+     * If `true`, disables adding or editing of measurements through user interaction.
+     */
+    disabled?: boolean;
+    /**
      * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
      */
     distanceTemplateId?: string;
-    /**
-     * Indicates if new measurements can be added or edited through user interaction.
-     */
-    editable?: boolean;
     /**
      * Dispatched when a new measurement is added, either through user interaction or programmatically.
      */

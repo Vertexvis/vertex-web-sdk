@@ -36,11 +36,11 @@ export class ViewerMeasurements {
   public tool: ViewerMeasurementToolType = 'distance';
 
   /**
-   * Indicates if new measurements can be added or edited through user
+   * If `true`, disables adding or editing of measurements through user
    * interaction.
    */
   @Prop()
-  public editable = false;
+  public disabled = false;
 
   /**
    * The viewer to connect to measurements. If nested within a <vertex-viewer>,
@@ -202,8 +202,8 @@ export class ViewerMeasurements {
   /**
    * @ignore
    */
-  @Watch('editable')
-  protected handleEditableChanged(): void {
+  @Watch('disabled')
+  protected handleDisabledChanged(): void {
     this.updateMeasurementTool();
   }
 
@@ -246,7 +246,7 @@ export class ViewerMeasurements {
   }
 
   private handleMeasurementPointerDown = (event: Event): void => {
-    if (this.editable) {
+    if (!this.disabled) {
       const el = event.target as Element;
       this.selectedMeasurementId = el.id;
     }
@@ -279,7 +279,7 @@ export class ViewerMeasurements {
   private updateMeasurementTool(): void {
     const tool = this.getMeasurementTool();
     if (tool != null) {
-      tool.disabled = !this.editable;
+      tool.disabled = this.disabled;
       tool.distanceTemplateId = this.distanceTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;

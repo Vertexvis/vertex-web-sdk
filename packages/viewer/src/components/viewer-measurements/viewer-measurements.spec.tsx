@@ -117,9 +117,7 @@ describe('vertex-viewer-measurements', () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-measurements
-            onMeasurementAdded={onMeasurementAdded}
-          ></vertex-viewer-measurements>
+          <vertex-viewer-measurements onMeasurementAdded={onMeasurementAdded} />
         ),
       });
 
@@ -219,10 +217,10 @@ describe('vertex-viewer-measurements', () => {
       expect(measurementEl?.mode).toEqual('edit');
     });
 
-    it('selects measurement when pressed and editable', async () => {
+    it('selects measurement when pressed and not disabled', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
-        html: `<vertex-viewer-measurements editable></vertex-viewer-measurements>`,
+        html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
       });
 
       const el = page.root as HTMLVertexViewerMeasurementsElement;
@@ -233,10 +231,10 @@ describe('vertex-viewer-measurements', () => {
       expect(el.selectedMeasurementId).toEqual(measurementEl.id);
     });
 
-    it('does not select measurement when pressed and not editable', async () => {
+    it('does not select measurement when pressed and disabled', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
-        html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
+        html: `<vertex-viewer-measurements disabled></vertex-viewer-measurements>`,
       });
 
       const el = page.root as HTMLVertexViewerMeasurementsElement;
@@ -267,7 +265,7 @@ describe('vertex-viewer-measurements', () => {
         'vertex-viewer-measurement-tool'
       ) as HTMLVertexViewerMeasurementToolElement;
 
-      expect(toolEl.disabled).toBe(true);
+      expect(toolEl.disabled).toBe(false);
       expect(toolEl.viewer).toBe(viewer);
       expect(toolEl.distanceTemplateId).toBe('my-template');
       expect(toolEl.tool).toBe('distance');
@@ -292,9 +290,9 @@ describe('vertex-viewer-measurements', () => {
       await page.waitForChanges();
       expect(toolEl.distanceTemplateId).toBe('my-template');
 
-      el.editable = true;
+      el.disabled = true;
       await page.waitForChanges();
-      expect(toolEl.disabled).toBe(false);
+      expect(toolEl.disabled).toBe(true);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       el.viewer = viewer as any;
