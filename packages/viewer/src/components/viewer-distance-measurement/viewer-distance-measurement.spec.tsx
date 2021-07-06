@@ -403,6 +403,30 @@ describe('vertex-viewer-distance-measurement', () => {
       expect(measurement.start).toEqual(start);
     });
 
+    it('does not update anchor if not primary button', async () => {
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            mode="edit"
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const anchor = measurement.shadowRoot?.getElementById('start-anchor');
+      anchor?.dispatchEvent(new MouseEvent('mousedown', { button: 1 }));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 100, clientY: 100 })
+      );
+
+      expect(measurement.start).toEqual(start);
+    });
+
     it('emits editBegin event when anchor editing started', async () => {
       const onEditBegin = jest.fn();
 
@@ -422,7 +446,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
       const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
-      anchor?.dispatchEvent(new MouseEvent('pointerdown'));
+      anchor?.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
 
       expect(onEditBegin).toHaveBeenCalled();
     });
@@ -444,7 +468,7 @@ describe('vertex-viewer-distance-measurement', () => {
       const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 0, clientY: 0 })
+        new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
@@ -470,7 +494,7 @@ describe('vertex-viewer-distance-measurement', () => {
       const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
       const anchor = measurement.shadowRoot?.getElementById('end-anchor');
       anchor?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 0, clientY: 0 })
+        new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
@@ -498,7 +522,7 @@ describe('vertex-viewer-distance-measurement', () => {
       const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 0, clientY: 0 })
+        new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
       window.dispatchEvent(new MouseEvent('pointerup'));
 
@@ -532,6 +556,58 @@ describe('vertex-viewer-distance-measurement', () => {
       expect(measurement.start).not.toEqual(start);
     });
 
+    it('does nothing if not primary button', async () => {
+      const onEditBegin = jest.fn();
+      const onEditEnd = jest.fn();
+      const page = await newSpecPage({
+        components: [ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-distance-measurement
+            start={start}
+            end={end}
+            depthBuffer={depthBuffer}
+            projectionViewMatrix={projectionViewMatrix}
+            mode="replace"
+            onEditBegin={onEditBegin}
+            onEditEnd={onEditEnd}
+          />
+        ),
+      });
+
+      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
+
+      // update start
+      contentEl?.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
+      );
+
+      // begin interaction
+      contentEl?.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 1 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 10, clientY: 10 })
+      );
+      expect(onEditBegin).not.toHaveBeenCalled();
+
+      // move end anchor
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 20, clientY: 20 })
+      );
+      expect(measurement.end).toEqual(end);
+
+      // end interaction
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 20, clientY: 20 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 20, clientY: 20 })
+      );
+
+      expect(onEditEnd).not.toHaveBeenCalled();
+    });
+
     it('updates end pt on interaction', async () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
@@ -560,7 +636,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
       // begin interaction
       contentEl?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 10, clientY: 10 })
+        new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointerup', { clientX: 10, clientY: 10 })
@@ -612,7 +688,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
       // begin interaction
       contentEl?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 10, clientY: 10 })
+        new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 20, clientY: 20, buttons: 1 })
@@ -660,7 +736,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
       // begin interaction
       contentEl?.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 10, clientY: 10 })
+        new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointerup', { clientX: 10, clientY: 10 })

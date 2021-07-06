@@ -429,7 +429,10 @@ export class Viewer {
     const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
-        <div class="viewer-container">
+        <div
+          class="viewer-container"
+          onContextMenu={(event) => event.preventDefault()}
+        >
           <div
             ref={(ref) => (this.containerElement = ref)}
             class={classnames('canvas-container', {
@@ -441,7 +444,6 @@ export class Viewer {
               class="canvas"
               width={canvasDimensions != null ? canvasDimensions.width : 0}
               height={canvasDimensions != null ? canvasDimensions.height : 0}
-              onContextMenu={(event) => event.preventDefault()}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
