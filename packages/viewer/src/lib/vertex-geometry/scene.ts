@@ -6,9 +6,10 @@ import {
   Matrix4 as Mat4,
   Vector3 as Vec3,
   FrontSide,
+  Group,
+  Box3,
 } from 'three';
 import { AffineMatrix4f } from '@vertexvis/flex-time-protos/dist/core/protos/geometry';
-import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { VertexThreeJsGeometry } from './geometry';
 import { FlexTimeApi } from '../flexApi';
 import { GetGeometryResponse } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
@@ -22,21 +23,44 @@ export class VertexScene extends Scene {
     super();
   }
 
-  public async loadSceneItem(viewId: string, itemId: string): Promise<void> {
+  public async loadSceneItem(viewId: string, itemId: string): Promise<Group> {
     const call = this.client.getSceneItemGeometry(this.sceneId, viewId, itemId);
+    const group = new Group();
+    const bbox = new Box3();
     for await (const res of call.responses) {
-      this.handleGeometryResponse(res);
+      const box = this.handleGeometryResponse(group, res);
+      bbox.union(box);
     }
+    this.add(group);
+    // this.positionChildren(group, bbox);
+    return group;
   }
 
-  private handleGeometryResponse(res: GetGeometryResponse): void {
+  private positionChildren(group: Group, bbox: Box3): void {
+    const center = bbox.getCenter(new Vec3());
+    for (const child of group.children) {
+      child.position.sub(center);
+    }
+    group.position.set(center.x, center.y, center.z);
+  }
+
+  private handleGeometryResponse(group: Group, res: GetGeometryResponse): Box3 {
     console.log('received geometry', res);
+
+    const bbox = new Box3();
     for (const item of res.items) {
-      this.addMesh(item);
+      const mesh = this.addMesh(item);
+      group.add(mesh);
+      mesh.geometry.computeBoundingBox();
+
+      if (mesh.geometry.boundingBox) {
+        bbox.union(mesh.geometry.boundingBox);
+      }
     }
+    return bbox;
   }
 
-  private addMesh(item: RenderItem): void {
+  private addMesh(item: RenderItem): Mesh {
     const { material, transform, triangleSet } = item;
 
     const mat = new MeshPhongMaterial({
@@ -54,7 +78,7 @@ export class VertexScene extends Scene {
     const geometry = VertexThreeJsGeometry.fromProto(triangleSet!);
     const mesh = new Mesh(geometry, mat);
     mesh.applyMatrix4(createMat4FromAffine(transform!));
-    this.add(mesh);
+    return mesh;
   }
 }
 
