@@ -133,17 +133,6 @@
   display: block;
 }
 
-.anchor-label-placeholder {
-  color: var(--viewer-distance-measurement-contrast-color);
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--viewer-distance-measurement-accent-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 :host([mode='edit']) .anchor {
   cursor: move;
 }

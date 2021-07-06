@@ -26,6 +26,8 @@ describe('vertex-viewer-distance-measurement', () => {
   const endNdc = Vector3.transformMatrix(end, projectionViewMatrix);
   const centerNdc = Line3.center(Line3.create({ start, end }));
 
+  const depthBuffer = Fixtures.createDepthBuffer(100, 50, 0);
+
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -170,6 +172,52 @@ describe('vertex-viewer-distance-measurement', () => {
     expect(endEl?.style.transform).toContain(
       `translate(${endPt.x}px, ${endPt.y}px)`
     );
+  });
+
+  it('supports slots for anchor labels', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDistanceMeasurement],
+      html: `
+        <vertex-viewer-distance-measurement>
+          <div id="start-label" slot="start-label"></div>
+          <div id="end-label" slot="end-label"></div>
+        </vertex-viewer-distance-measurement>
+      `,
+    });
+
+    const startLabelEl = page.root?.querySelector('#start-label');
+    const endLabelEl = page.root?.querySelector('#end-label');
+
+    expect(startLabelEl).toBeDefined();
+    expect(endLabelEl).toBeDefined();
+  });
+
+  it('positions anchor labels with distance property', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDistanceMeasurement],
+      template: () => (
+        <vertex-viewer-distance-measurement
+          anchorLabelOffset={25}
+          startJson="[0, 0, 0]"
+          endJson="[0, 0, 0]"
+          projectionViewMatrix={projectionViewMatrix}
+          depthBuffer={depthBuffer}
+        >
+          <div id="start-label" slot="start-label"></div>
+          <div id="end-label" slot="end-label"></div>
+        </vertex-viewer-distance-measurement>
+      ),
+    });
+
+    const startLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-start'
+    ) as HTMLElement | undefined;
+    const endLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-end'
+    ) as HTMLElement | undefined;
+
+    expect(startLabelEl?.style.transform).toContain('translate(25px, 50px)');
+    expect(endLabelEl?.style.transform).toContain('translate(75px, 50px)');
   });
 
   it('is empty if start and end points cant be calculated', async () => {
