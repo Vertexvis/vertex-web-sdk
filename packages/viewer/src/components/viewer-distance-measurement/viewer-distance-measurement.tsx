@@ -485,7 +485,11 @@ export class ViewerDistanceMeasurement {
   };
 
   private handleStartMeasurement = (event: PointerEvent): void => {
-    if (this.interactionCount === 0 && this.start != null) {
+    if (
+      this.interactionCount === 0 &&
+      this.start != null &&
+      event.button === 0
+    ) {
       const startMeasurement = (start: () => void): void => {
         const dispose = (): void => {
           window.removeEventListener('pointerup', pointerUp);
@@ -570,13 +574,15 @@ export class ViewerDistanceMeasurement {
       );
 
       return (event) => {
-        // Prevent the viewer from handling this event.
-        event.stopPropagation();
+        if (event.button === 0) {
+          // Prevent the viewer from handling this event.
+          event.stopPropagation();
 
-        this.beginEditing(anchor);
+          this.beginEditing(anchor);
 
-        window.addEventListener('pointermove', handlePointerMove);
-        window.addEventListener('pointerup', handlePointerUp);
+          window.addEventListener('pointermove', handlePointerMove);
+          window.addEventListener('pointerup', handlePointerUp);
+        }
       };
     }
   }
