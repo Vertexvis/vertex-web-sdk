@@ -40,6 +40,7 @@ describe('vertex-viewer-measurements', () => {
       expect(measurementEl.id).toEqual(measurement1.id);
       expect(measurementEl.start).toEqual(measurement1.start);
       expect(measurementEl.end).toEqual(measurement1.end);
+      expect(measurementEl.invalid).toEqual(measurement1.invalid);
     });
 
     it('adds a measurement element with distance template', async () => {

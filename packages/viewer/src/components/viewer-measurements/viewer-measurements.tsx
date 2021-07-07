@@ -86,12 +86,13 @@ export class ViewerMeasurements {
     measurement: Measurement
   ): Promise<HTMLVertexViewerDistanceMeasurementElement> {
     if (measurement instanceof DistanceMeasurement) {
-      const { start, end, id } = measurement;
+      const { start, end, invalid, id } = measurement;
 
       const measurementEl = this.createDistanceMeasurementElement();
       measurementEl.id = id;
       measurementEl.start = start;
       measurementEl.end = end;
+      measurementEl.invalid = invalid;
       measurementEl.viewer = this.viewer;
       measurementEl.classList.add('viewer-measurements__measurement');
 
