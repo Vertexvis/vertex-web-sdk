@@ -27,6 +27,12 @@ import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
 
+export interface ConnectOptions {
+  idleReconnectInSeconds?: number;
+}
+
+export type JwtProvider = () => Promise<string | undefined>;
+
 export interface SceneTreeState {
   totalRows: number;
   rows: Row[];
@@ -41,19 +47,19 @@ interface Page {
 
 export interface DisconnectedState {
   type: 'disconnected';
-  jwt?: string;
+  jwtProvider?: JwtProvider;
   sceneViewId?: string;
 }
 
 export interface ConnectingState {
   type: 'connecting';
-  jwt: string;
+  jwtProvider: JwtProvider;
   sceneViewId: string;
 }
 
 export interface ConnectedState {
   type: 'connected';
-  jwt: string;
+  jwtProvider: JwtProvider;
   sceneViewId: string;
   subscription: Disposable;
 }
@@ -61,7 +67,7 @@ export interface ConnectedState {
 export interface ConnectionFailedState {
   type: 'failure';
   details: SceneTreeErrorDetails;
-  jwt: string;
+  jwtProvider: JwtProvider;
   sceneViewId: string;
 }
 
@@ -77,9 +83,13 @@ type ConnectionState =
  * notifying the view about state changes.
  */
 export class SceneTreeController {
+  private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
+
   private nextPageId = 0;
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
+
+  private reconnectTimer?: number;
 
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
@@ -109,67 +119,80 @@ export class SceneTreeController {
 
   public constructor(
     private client: SceneTreeAPIClient,
-    private rowLimit: number
+    private rowLimit: number,
+    private connectOptions: ConnectOptions = {}
   ) {}
 
-  public async connect(jwt: string): Promise<void> {
-    this.disconnectIfSceneViewChanged(jwt);
-    await this.connectIfDisconnected(jwt);
-  }
-
-  private disconnectIfSceneViewChanged(jwt: string): void {
+  public async connect(jwtProvider: JwtProvider): Promise<void> {
     const { connection } = this.state;
+    const jwt = await jwtProvider();
+
+    if (jwt == null) {
+      throw new Error('Cannot connect scene tree. JWT is undefined');
+    }
+
     const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
 
-    if (
-      connection.sceneViewId !== sceneViewId &&
-      connection.type !== 'disconnected'
-    ) {
-      console.debug(
-        'Scene tree controller scene view has changed. Disconnecting and clearing state.'
-      );
+    if (connection.sceneViewId !== sceneViewId) {
       this.disconnect(true);
+    } else {
+      this.disconnect(false);
+    }
+
+    const connecting: ConnectingState = {
+      type: 'connecting',
+      jwtProvider,
+      sceneViewId,
+    };
+    this.updateState({ ...this.state, connection: connecting });
+
+    try {
+      console.debug('Scene tree controller connecting.');
+
+      await this.fetchPage(0);
+      const subscription = this.subscribe();
+      this.updateState({
+        ...this.state,
+        connection: {
+          ...connecting,
+          type: 'connected',
+          subscription,
+        },
+      });
+    } catch (e) {
+      this.updateState({
+        ...this.state,
+        connection: {
+          type: 'failure',
+          jwtProvider,
+          sceneViewId,
+          details: this.getConnectionError(e),
+        },
+      });
+      throw e;
+    }
+
+    this.startReconnectTimer();
+  }
+
+  private clearReconnectTimer(): void {
+    if (this.reconnectTimer != null) {
+      window.clearTimeout(this.reconnectTimer);
     }
   }
 
-  private async connectIfDisconnected(jwt: string): Promise<void> {
-    const { connection } = this.state;
-    const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
+  private startReconnectTimer(): void {
+    const {
+      idleReconnectInSeconds = SceneTreeController.IDLE_RECONNECT_IN_SECONDS,
+    } = this.connectOptions;
 
-    if (connection.type === 'disconnected') {
-      const connecting: ConnectingState = {
-        type: 'connecting',
-        jwt,
-        sceneViewId,
-      };
-      this.updateState({ ...this.state, connection: connecting });
+    this.clearReconnectTimer();
 
-      try {
-        console.debug('Scene tree controller connecting.');
-
-        await this.fetchPage(0);
-        const subscription = this.subscribe(jwt);
-        this.updateState({
-          ...this.state,
-          connection: {
-            ...connecting,
-            type: 'connected',
-            subscription,
-          },
-        });
-      } catch (e) {
-        this.updateState({
-          ...this.state,
-          connection: {
-            type: 'failure',
-            jwt,
-            sceneViewId,
-            details: this.getConnectionError(e),
-          },
-        });
-        throw e;
+    this.reconnectTimer = window.setTimeout(() => {
+      if (this.state.connection.type === 'connected') {
+        this.connect(this.state.connection.jwtProvider);
       }
-    }
+    }, idleReconnectInSeconds * 1000);
   }
 
   public connectToViewer(viewer: HTMLVertexViewerElement): Disposable {
@@ -181,7 +204,7 @@ export class SceneTreeController {
         );
 
         try {
-          await this.connect(jwt);
+          await this.connect(() => viewer.getJwt());
         } catch (e) {
           console.error('Scene tree controller erred connecting.', e);
         }
@@ -202,6 +225,10 @@ export class SceneTreeController {
   }
 
   public disconnect(reset = false): void {
+    console.debug(`Scene tree controller disconnecting [reset=${reset}]`);
+
+    this.clearReconnectTimer();
+
     if (reset) {
       this.pages.clear();
       this.activeRowRange = [];
@@ -215,7 +242,7 @@ export class SceneTreeController {
     this.updateState({
       connection: {
         type: 'disconnected',
-        jwt: connection.jwt,
+        jwtProvider: connection.jwtProvider,
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
@@ -229,7 +256,7 @@ export class SceneTreeController {
    * @param id A node ID to collapse.
    */
   public async collapseNode(id: string): Promise<void> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       const nodeId = new Uuid();
       nodeId.setHex(id);
 
@@ -248,7 +275,7 @@ export class SceneTreeController {
    * @param id A node ID to expand.
    */
   public async expandNode(id: string): Promise<void> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       const nodeId = new Uuid();
       nodeId.setHex(id);
 
@@ -265,7 +292,7 @@ export class SceneTreeController {
    * Collapses all nodes in the tree.
    */
   public async collapseAll(): Promise<void> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       await this.requestUnary(jwt, (metadata, handler) =>
         this.client.collapseAll(new CollapseAllRequest(), metadata, handler)
       );
@@ -276,7 +303,7 @@ export class SceneTreeController {
    * Expands all nodes in the tree.
    */
   public async expandAll(): Promise<void> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       await this.requestUnary(jwt, (metadata, handler) =>
         this.client.expandAll(new ExpandAllRequest(), metadata, handler)
       );
@@ -292,7 +319,7 @@ export class SceneTreeController {
    *  expansion.
    */
   public async expandParentNodes(id: string): Promise<number> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       const nodeId = new Uuid();
       nodeId.setHex(id);
 
@@ -319,7 +346,7 @@ export class SceneTreeController {
   }
 
   public async fetchNodeAncestors(nodeId: string): Promise<Node.AsObject[]> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       const nodeUuid = new Uuid();
       nodeUuid.setHex(nodeId);
       const req = new GetNodeAncestorsRequest();
@@ -346,7 +373,7 @@ export class SceneTreeController {
    * @param index A 0 based index to fetch.
    */
   public async fetchPage(index: number): Promise<void> {
-    return this.ifConnectionHasJwt(async ({ jwt }) => {
+    return this.ifConnectionHasJwt(async (jwt) => {
       if (index < 0 || index > this.maxPages - 1) {
         return;
       }
@@ -493,7 +520,7 @@ export class SceneTreeController {
    *
    * @returns A `Disposable` that can be used to terminate the subscription.
    */
-  private subscribe(jwt: string): Disposable {
+  private subscribe(): Disposable {
     let stream: ResponseStream<SubscribeResponse> | undefined;
 
     const sub = (jwt: string): void => {
@@ -502,6 +529,8 @@ export class SceneTreeController {
       );
 
       stream.on('data', (msg) => {
+        this.startReconnectTimer();
+
         const { change } = msg.toObject();
 
         if (change?.listChange != null) {
@@ -551,11 +580,11 @@ export class SceneTreeController {
       });
 
       stream.on('end', () => {
-        this.ifConnectionHasJwt(({ jwt }) => sub(jwt));
+        this.ifConnectionHasJwt((jwt) => sub(jwt));
       });
     };
 
-    sub(jwt);
+    this.ifConnectionHasJwt((jwt) => sub(jwt));
 
     return { dispose: () => stream?.cancel() };
   }
@@ -567,11 +596,7 @@ export class SceneTreeController {
     );
 
     const pages = this.getNonLoadedPageIndexes(startPage - 1, endPage + 1);
-    pages.forEach((page) => this.fetchPage(page));
-
-    if (pages.length > 0) {
-      await this.getPage(pages[0])?.res;
-    }
+    await Promise.all(pages.map((page) => this.fetchPage(page)));
   }
 
   private patchNodesInRange(
@@ -721,12 +746,17 @@ export class SceneTreeController {
     });
   }
 
-  private ifConnectionHasJwt<T>(
-    then: (connection: ConnectingState | ConnectedState) => T
-  ): T {
+  private async ifConnectionHasJwt<T>(then: (jwt: string) => T): Promise<T> {
     const { connection } = this.state;
     if (connection.type === 'connecting' || connection.type === 'connected') {
-      return then(connection);
+      const jwt = await connection.jwtProvider();
+      if (jwt != null) {
+        return then(jwt);
+      } else {
+        throw new Error(
+          'SceneTreeController cannot perform request. Viewer JWT is undefined.'
+        );
+      }
     } else {
       throw new Error('SceneTreeController is not in connected state');
     }
