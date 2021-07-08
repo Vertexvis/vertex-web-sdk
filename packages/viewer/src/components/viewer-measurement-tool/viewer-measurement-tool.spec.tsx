@@ -126,21 +126,33 @@ describe('vertex-viewer-measurement-tool', () => {
     expect(toolEl.children).toHaveLength(0);
   });
 
-  it('updates measurement when viewer changes', async () => {
+  it('updates measurement when props change', async () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
       html: `<vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>`,
     });
 
     const toolEl = page.root as HTMLVertexViewerMeasurementToolElement;
+    let measurementEl: HTMLVertexViewerDistanceMeasurementElement | undefined;
+
+    toolEl.units = 'inches';
+    await page.waitForChanges();
+    measurementEl = page.root
+      ?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    expect(measurementEl?.units).toBe(toolEl.units);
+
+    toolEl.fractionalDigits = 0;
+    await page.waitForChanges();
+    measurementEl = page.root
+      ?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    expect(measurementEl?.fractionalDigits).toBe(toolEl.fractionalDigits);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolEl.viewer = viewer as any;
     await page.waitForChanges();
-
-    const measurementEl = page.root
+    measurementEl = page.root
       ?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
-
-    expect(measurementEl.viewer).toBe(viewer);
+    expect(measurementEl?.viewer).toBe(viewer);
   });
 
   it('emits measurement event during editing', async () => {

@@ -30,17 +30,19 @@ describe('vertex-viewer-measurements', () => {
     it('adds a measurement element with default distance measurement', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
-        html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
+        html: `<vertex-viewer-measurements units="inches" fractional-digits="1"></vertex-viewer-measurements>`,
       });
 
       const el = page.root as HTMLVertexViewerMeasurementsElement;
       const measurementEl = await el.addMeasurement(measurement1);
 
       expect(el.children).toHaveLength(1);
-      expect(measurementEl.id).toEqual(measurement1.id);
-      expect(measurementEl.start).toEqual(measurement1.start);
-      expect(measurementEl.end).toEqual(measurement1.end);
-      expect(measurementEl.invalid).toEqual(measurement1.invalid);
+      expect(measurementEl.id).toBe(measurement1.id);
+      expect(measurementEl.start).toBe(measurement1.start);
+      expect(measurementEl.end).toBe(measurement1.end);
+      expect(measurementEl.invalid).toBe(measurement1.invalid);
+      expect(measurementEl.units).toBe('inches');
+      expect(measurementEl.fractionalDigits).toBe(1);
     });
 
     it('adds a measurement element with distance template', async () => {
@@ -272,7 +274,7 @@ describe('vertex-viewer-measurements', () => {
       expect(toolEl.tool).toBe('distance');
     });
 
-    it('updates tool props when measurement props change', async () => {
+    it('updates tool props when props change', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
         template: () => (
@@ -295,10 +297,45 @@ describe('vertex-viewer-measurements', () => {
       await page.waitForChanges();
       expect(toolEl.disabled).toBe(true);
 
+      el.units = 'inches';
+      await page.waitForChanges();
+      expect(toolEl.units).toBe(el.units);
+
+      el.fractionalDigits = 0;
+      await page.waitForChanges();
+      expect(toolEl.fractionalDigits).toBe(el.fractionalDigits);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       el.viewer = viewer as any;
       await page.waitForChanges();
       expect(toolEl.viewer).toBe(viewer);
+    });
+
+    it('updates measurement props when props change', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        template: () => (
+          <vertex-viewer-measurements>
+            <vertex-viewer-measurement-tool />
+          </vertex-viewer-measurements>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerMeasurementsElement;
+      const measurementEl = await el.addMeasurement(measurement1);
+
+      el.units = 'inches';
+      await page.waitForChanges();
+      expect(measurementEl.units).toBe(el.units);
+
+      el.fractionalDigits = 0;
+      await page.waitForChanges();
+      expect(measurementEl.fractionalDigits).toBe(el.fractionalDigits);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      el.viewer = viewer as any;
+      await page.waitForChanges();
+      expect(measurementEl.viewer).toBe(viewer);
     });
   });
 });

@@ -10,7 +10,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { DistanceMeasurement, Measurement } from '../../lib/types';
+import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
 
 /**
@@ -47,6 +47,18 @@ export class ViewerMeasurementTool {
    */
   @Prop()
   public tool: ViewerMeasurementToolType = 'distance';
+
+  /**
+   * The unit type to display measurements in.
+   */
+  @Prop()
+  public units: UnitType = 'millimeters';
+
+  /**
+   * The number of fractional digits to display measurements in.
+   */
+  @Prop()
+  public fractionalDigits = 2;
 
   /**
    * Disables measurements.
@@ -128,6 +140,22 @@ export class ViewerMeasurementTool {
   /**
    * @ignore
    */
+  @Watch('units')
+  protected handleUnitsChanged(): void {
+    this.updateMeasurementElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('fractionalDigits')
+  protected handleFractionalDigitsChanged(): void {
+    this.updateMeasurementElement();
+  }
+
+  /**
+   * @ignore
+   */
   protected componentDidLoad(): void {
     this.updateMeasurementElement();
   }
@@ -195,6 +223,8 @@ export class ViewerMeasurementTool {
     if (!this.disabled) {
       const newMeasurementElement = this.createDistanceMeasurementElement();
       newMeasurementElement.mode = 'replace';
+      newMeasurementElement.units = this.units;
+      newMeasurementElement.fractionalDigits = this.fractionalDigits;
       newMeasurementElement.viewer = this.viewer;
       newMeasurementElement.addEventListener(
         'editBegin',

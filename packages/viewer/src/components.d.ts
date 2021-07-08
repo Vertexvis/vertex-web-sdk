@@ -535,6 +535,10 @@ export namespace Components {
      */
     distanceTemplateId?: string;
     /**
+     * The number of fractional digits to display measurements in.
+     */
+    fractionalDigits: number;
+    /**
      * A property that indicates if the user is performing a measurement.
      */
     isMeasuring: boolean;
@@ -542,6 +546,10 @@ export namespace Components {
      * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
      */
     tool: ViewerMeasurementToolType;
+    /**
+     * The unit type to display measurements in.
+     */
+    units: UnitType;
     /**
      * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
      */
@@ -566,6 +574,10 @@ export namespace Components {
      * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
      */
     distanceTemplateId?: string;
+    /**
+     * The number of fractional digits to display measurements in.
+     */
+    fractionalDigits: number;
     /**
      * Returns the measurement element associated to the given ID.
      * @param id The ID of the measurement element to return.
@@ -601,6 +613,10 @@ export namespace Components {
      * The type of measurement to perform.
      */
     tool: ViewerMeasurementToolType;
+    /**
+     * The unit type to display measurements in.
+     */
+    units: UnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
@@ -1146,6 +1162,10 @@ declare namespace LocalJSX {
      */
     distanceTemplateId?: string;
     /**
+     * The number of fractional digits to display measurements in.
+     */
+    fractionalDigits?: number;
+    /**
      * A property that indicates if the user is performing a measurement.
      */
     isMeasuring?: boolean;
@@ -1162,6 +1182,10 @@ declare namespace LocalJSX {
      */
     tool?: ViewerMeasurementToolType;
     /**
+     * The unit type to display measurements in.
+     */
+    units?: UnitType;
+    /**
      * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
@@ -1175,6 +1199,10 @@ declare namespace LocalJSX {
      * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
      */
     distanceTemplateId?: string;
+    /**
+     * The number of fractional digits to display measurements in.
+     */
+    fractionalDigits?: number;
     /**
      * Dispatched when a new measurement is added, either through user interaction or programmatically.
      */
@@ -1195,6 +1223,10 @@ declare namespace LocalJSX {
      * The type of measurement to perform.
      */
     tool?: ViewerMeasurementToolType;
+    /**
+     * The unit type to display measurements in.
+     */
+    units?: UnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
