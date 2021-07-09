@@ -9,7 +9,7 @@ export type LoadableResource = StreamKeyResource;
 
 export interface Resource {
   resource: LoadableResource;
-  queries?: QueryResource[];
+  queries: QueryResource[];
 }
 
 export function fromUrn(urn: string): Resource {
@@ -43,7 +43,7 @@ export interface SceneViewStateResource {
 
 export type QueryResource = SceneViewStateResource;
 
-function fromQuery(query?: string): QueryResource[] | undefined {
+function fromQuery(query?: string): QueryResource[] {
   if (query != null) {
     return query.split('&').map((queryFragment) => {
       const [resourceType, resourceId] = queryFragment.split('=');
@@ -55,5 +55,7 @@ function fromQuery(query?: string): QueryResource[] | undefined {
           throw new Error('Invalid URN. Unknown query resource type');
       }
     });
+  } else {
+    return [];
   }
 }

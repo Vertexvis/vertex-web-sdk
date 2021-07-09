@@ -36,12 +36,14 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@types/uuid": "^8.3.0",
     "is-plain-object": "^3.0.0",
+    "lodash.isequal": "^4.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
+    "@types/lodash.isequal": "^4.5.5",
+    "@types/uuid": "^8.3.0",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.4.0",
     "@vertexvis/jest-config-vertexvis": "0.5.2",
     "@vertexwebsdk/build": "0.9.27",

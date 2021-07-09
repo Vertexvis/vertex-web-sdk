@@ -1,4 +1,5 @@
 import isSimpleObject from 'is-plain-object';
+import areEqual from 'lodash.isequal';
 
 /* eslint-disable padding-line-between-statements */
 /**
@@ -62,9 +63,27 @@ export function defaults(
  * isPlainObject(Object.create(null)); //=> false
  * ```
  */
-export const isPlainObject = (obj: unknown): boolean => {
+export function isPlainObject(obj: unknown): boolean {
   return isSimpleObject(obj);
-};
+}
+
+/**
+ * Performs a deep comparison of two objects and returns `true` if they're
+ * equal.
+ *
+ * This method supports comparing arrays, array buffers, booleans, date objects,
+ * error objects, maps, numbers, Object objects, regexes, sets, strings,
+ * symbols, and typed arrays. Object objects are compared by their own, not
+ * inherited, enumerable properties. Functions and DOM nodes are compared by
+ * strict equality, i.e. ===.
+ *
+ * @param a The object to compare with `b`.
+ * @param b The object to compare with `a`.
+ * @returns `true` if the two objects are equal. Otherwise `false`.
+ */
+export function isEqual(a: unknown, b: unknown): boolean {
+  return areEqual(a, b);
+}
 
 /* eslint-disable padding-line-between-statements */
 /* eslint-disable @typescript-eslint/ban-types */
