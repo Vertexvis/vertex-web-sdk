@@ -72,6 +72,20 @@ describe(Objects.isPlainObject, () => {
   });
 });
 
+describe(Objects.isEqual, () => {
+  const a = { foo: { bar: [1] } };
+  const b = { foo: { bar: [1] } };
+  const c = { foo: { bar: [2] } };
+
+  it('returns true if deeply nested objects are equal', () => {
+    expect(Objects.isEqual(a, b)).toBe(true);
+  });
+
+  it('returns false if deeply nested objects not equal', () => {
+    expect(Objects.isEqual(a, c)).toBe(false);
+  });
+});
+
 describe(Objects.toPairs, () => {
   it('returns pairs for a plain object', () => {
     const obj = { a: 1, b: 2 };
