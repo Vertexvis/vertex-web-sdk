@@ -222,6 +222,20 @@ export class Scene {
   ) {}
 
   /**
+   * Applies the provided scene view state to the scene.
+   */
+  public async applySceneViewState(
+    sceneViewStateId: UUID.UUID
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    return await this.stream.loadSceneViewState(
+      {
+        sceneViewStateId: { hex: sceneViewStateId },
+      },
+      true
+    );
+  }
+
+  /**
    * Returns an executor that accepts a function as a parameter that contains one or many operations to apply
    * to the scene view. The operations will be applied transactionally.
    * @param operations
@@ -292,19 +306,5 @@ export class Scene {
    */
   public scale(): Point.Point {
     return this.imageScaleProvider() || Point.create(1, 1);
-  }
-
-  /**
-   * Applies the provided scene view state to the scene.
-   */
-  public async applySceneViewState(
-    sceneViewStateId: UUID.UUID
-  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
-    return await this.stream.loadSceneViewState(
-      {
-        sceneViewStateId: { hex: sceneViewStateId },
-      },
-      true
-    );
   }
 }

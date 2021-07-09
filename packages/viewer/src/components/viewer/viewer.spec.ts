@@ -11,11 +11,12 @@ import { Viewer } from './viewer';
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { newSpecPage } from '@stencil/core/testing';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
-import { Color } from '@vertexvis/utils';
+import { Async, Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../testing/fixtures';
 import { upsertStorageEntry } from '../../lib/sessions/storage';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import Chance from 'chance';
 
 describe('vertex-viewer', () => {
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -26,6 +27,15 @@ describe('vertex-viewer', () => {
     width: 200,
     height: 150,
   });
+
+  const random = new Chance();
+
+  const streamKey1 = random.hash({ length: 7 });
+  const streamKey2 = random.hash({ length: 7 });
+  const sceneViewStateId = random.hash({ length: 7 });
+
+  const urn1 = `urn:vertexvis:stream-key:${streamKey1}`;
+  const urn2 = `urn:vertexvis:stream-key:${streamKey2}`;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -117,7 +127,8 @@ describe('vertex-viewer', () => {
 
   describe(Viewer.prototype.load, () => {
     it('loads the scene view for a stream key', async () => {
-      const viewer = await createViewerWithLoadedStream('123');
+      const viewer = await createViewerWithLoadedStream(urn1);
+
       const api = viewer.stream;
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -128,7 +139,76 @@ describe('vertex-viewer', () => {
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamKey: {
-            value: '123',
+            value: streamKey1,
+          },
+        })
+      );
+    });
+
+    it('loads the scene view with a scene view state', async () => {
+      const urn = `${urn1}?scene-view-state=${sceneViewStateId}`;
+      const viewer = await createViewerWithLoadedStream(urn);
+
+      const api = viewer.stream;
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining('/ws'),
+        }),
+        expect.anything()
+      );
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamKey: {
+            value: streamKey1,
+          },
+          sceneViewStateId: {
+            hex: sceneViewStateId,
+          },
+        })
+      );
+    });
+
+    it('applies scene view state if loaded', async () => {
+      const urn = `${urn1}?scene-view-state=${sceneViewStateId}`;
+      const viewer = await createViewerWithLoadedStream(urn1);
+
+      await loadNewModelForViewer(viewer, urn);
+
+      const api = viewer.stream;
+      expect(api.loadSceneViewState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sceneViewStateId: {
+            hex: sceneViewStateId,
+          },
+        }),
+        expect.anything()
+      );
+    });
+
+    it('reloads if scene view state changed during loading', async () => {
+      const viewer = await createViewerSpec(
+        `<vertex-viewer client-id="clientId"></vertex-viewer>`
+      );
+
+      loadNewModelForViewer(viewer, urn1);
+
+      const urn = `${urn1}?scene-view-state=${sceneViewStateId}`;
+      await loadNewModelForViewer(viewer, urn);
+
+      const api = viewer.stream;
+      expect(api.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining('/ws'),
+        }),
+        expect.anything()
+      );
+      expect(api.startStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamKey: {
+            value: streamKey1,
+          },
+          sceneViewStateId: {
+            hex: sceneViewStateId,
           },
         })
       );
@@ -139,7 +219,7 @@ describe('vertex-viewer', () => {
         Color.fromHexString('#0000ff')
       );
 
-      const viewer = await createViewerWithLoadedStream('123');
+      const viewer = await createViewerWithLoadedStream(urn1);
       const api = viewer.stream;
 
       expect(api.startStream).toHaveBeenCalledWith(
@@ -154,7 +234,7 @@ describe('vertex-viewer', () => {
     });
 
     it('starts a stream with a the jwt present on the viewer', async () => {
-      const viewer = await createViewerWithLoadedStream('123');
+      const viewer = await createViewerWithLoadedStream(urn1);
       const jwt = await viewer.getJwt();
       expect(jwt).toBeDefined();
     });
@@ -166,18 +246,18 @@ describe('vertex-viewer', () => {
       (viewer.stream.connect as jest.Mock).mockRejectedValue(
         new Error('Failed')
       );
-      expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
+      expect(viewer.load(urn1)).rejects.toThrow();
     });
 
     it('throws an exception if a client id is not provided', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer`);
-      expect(viewer.load('urn:vertexvis:stream-key:123')).rejects.toThrow();
+      expect(viewer.load(urn1)).rejects.toThrow();
     });
   });
 
   describe(Viewer.prototype.unload, () => {
     it('disconnects the WS', async () => {
-      const viewer = await createViewerWithLoadedStream('123');
+      const viewer = await createViewerWithLoadedStream(urn1);
       const api = viewer.stream;
 
       viewer.unload();
@@ -185,7 +265,7 @@ describe('vertex-viewer', () => {
     });
 
     it('clears scene and received frame data', async () => {
-      const viewer = await createViewerWithLoadedStream('123');
+      const viewer = await createViewerWithLoadedStream(urn1);
       viewer.unload();
 
       const frame = await viewer.frame;
@@ -195,14 +275,11 @@ describe('vertex-viewer', () => {
 
   describe('loading a second model', () => {
     it('properly starts the stream, and does not attempt to reconnect the old stream', async () => {
-      let viewer: Viewer = await createViewerWithLoadedStream('123', () =>
+      let viewer: Viewer = await createViewerWithLoadedStream(urn1, () =>
         viewer.handleWebSocketClose()
       );
       let api = viewer.stream;
-      viewer = await loadNewModelForViewer(
-        viewer,
-        `urn:vertexvis:stream-key:234`
-      );
+      viewer = await loadNewModelForViewer(viewer, urn2);
       api = viewer.stream;
 
       expect(api.reconnect).not.toHaveBeenCalled();
@@ -223,7 +300,7 @@ describe('vertex-viewer', () => {
       );
       const api = viewer.stream;
       viewer.streamAttributes = attributes;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
       const updatedAttributes = {
         experimentalGhosting: {
           ...attributes.experimentalGhosting,
@@ -248,7 +325,7 @@ describe('vertex-viewer', () => {
       );
       const api = viewer.stream;
       viewer.streamAttributes = attributes;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -263,7 +340,7 @@ describe('vertex-viewer', () => {
       );
       const api = viewer.stream;
       viewer.streamAttributes = attributes;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       await viewer.handleWebSocketClose();
 
@@ -281,7 +358,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId" session-id="sessionId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -296,7 +373,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -314,7 +391,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       expect(api.connect).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -331,7 +408,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId" rotate-around-tap-point="true"></vertex-viewer>`
       );
       const api = viewer.stream;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -350,7 +427,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId" rotate-around-tap-point="true"></vertex-viewer>`
       );
       const api = viewer.stream;
-      await loadNewModelForViewer(viewer, '123');
+      await loadNewModelForViewer(viewer, urn1);
 
       viewer.rotateAroundTapPoint = false;
 
@@ -373,19 +450,19 @@ async function createViewerSpec(html: string): Promise<Viewer> {
 }
 
 async function createViewerWithLoadedStream(
-  key: string,
+  urn: string,
   dispose?: () => void
 ): Promise<Viewer> {
   const viewer = await createViewerSpec(
     `<vertex-viewer client-id="clientId"></vertex-viewer>`
   );
 
-  return loadNewModelForViewer(viewer, key, dispose);
+  return loadNewModelForViewer(viewer, urn, dispose);
 }
 
 async function loadNewModelForViewer(
   viewer: Viewer,
-  key: string,
+  urn: string,
   dispose?: () => void
 ): Promise<Viewer> {
   const startStream = {
@@ -412,10 +489,12 @@ async function loadNewModelForViewer(
   (api.startStream as jest.Mock).mockResolvedValue(startStream);
   (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
-  const loading = viewer.load(`urn:vertexvis:stream-key:${key}`);
+  const loading = viewer.load(urn);
 
   // Emit frame drawn on next event loop
-  setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
+  await Async.delay(0);
+  viewer.dispatchFrameDrawn(Fixtures.frame);
   await loading;
+
   return viewer;
 }

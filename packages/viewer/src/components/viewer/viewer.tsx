@@ -21,6 +21,7 @@ import {
   Color,
   Async,
   EventDispatcher,
+  Objects,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
 import {
@@ -301,7 +302,7 @@ export class Viewer {
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
-  private resource?: LoadableResource.LoadableResource;
+  private urn?: string;
 
   private lastFrame?: Frame;
   private mutationObserver?: MutationObserver;
@@ -651,18 +652,28 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     if (this.commands != null && this.dimensions != null) {
+      const {
+        resource: previousResource = undefined,
+        queries: previousQueries = undefined,
+      } = this.urn != null ? LoadableResource.fromUrn(this.urn) : {};
       const { resource, queries } = LoadableResource.fromUrn(urn);
-      const isSameResource =
-        this.resource != null &&
-        this.resource.type === resource.type &&
-        this.resource.id === resource.id;
-      if (!isSameResource) {
+
+      const hasResourceChanged = !Objects.isEqual(previousResource, resource);
+      const hasQueryChanged = !Objects.isEqual(previousQueries, queries);
+      const isSceneReady = await this.isSceneReady();
+
+      this.urn = urn;
+
+      // Do a fresh connection if the scene's not ready yet, but the query
+      // params have changed.
+      if (hasResourceChanged || (!isSceneReady && hasQueryChanged)) {
         this.unload();
-        this.resource = resource;
-        await this.connectStreamingClient(
-          this.resource,
-          queries != null && queries.length > 0 ? queries[0] : undefined
-        );
+        await this.connectStreamingClient(resource, queries[0]);
+      }
+      // If the scene's ready, use the scene to update the stream.
+      else if (isSceneReady && hasQueryChanged) {
+        const scene = await this.scene();
+        await scene.applySceneViewState(queries[0].id);
       }
     } else {
       throw new ViewerInitializationError(
@@ -686,7 +697,7 @@ export class Viewer {
       this.sceneViewId = undefined;
       this.clock = undefined;
       this.errorMessage = undefined;
-      this.resource = undefined;
+      this.urn = undefined;
       this.stateMap.streamWorldOrientation = undefined;
     }
   }
@@ -740,12 +751,9 @@ export class Viewer {
     if (this.isStreamStarted) {
       this.isStreamStarted = false;
 
-      if (
-        this.streamId != null &&
-        this.resource != null &&
-        !this.isReconnecting
-      ) {
-        await this.reconnectWebSocket(this.resource, this.streamId);
+      if (this.streamId != null && this.urn != null && !this.isReconnecting) {
+        const { resource } = LoadableResource.fromUrn(this.urn);
+        await this.reconnectWebSocket(resource, this.streamId);
       }
     }
   }
@@ -754,20 +762,11 @@ export class Viewer {
     resource: LoadableResource.LoadableResource,
     queryResource?: LoadableResource.QueryResource
   ): Promise<void> {
-    if (this.resource == null) {
-      this.errorMessage =
-        'Unable to start streaming session. Resource must be provided.';
-      console.error(
-        'Unable to start streaming session. Resource must be provided.'
-      );
-      throw new ViewerInitializationError(this.errorMessage);
-    }
-
     try {
       this.streamDisposable = await this.connectStream(resource);
 
       const { startStream } = await this.stream.startStream({
-        streamKey: { value: this.resource.id },
+        streamKey: { value: resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
         streamAttributes: toProtoStreamAttributes(this.streamAttributes),
@@ -1004,9 +1003,10 @@ export class Viewer {
   private handleGracefulReconnect(
     payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
   ): void {
-    if (payload.streamId?.hex != null && this.resource != null) {
+    if (payload.streamId?.hex != null && this.urn != null) {
+      const { resource } = LoadableResource.fromUrn(this.urn);
       this.isReconnecting = true;
-      this.reconnectStreamingClient(this.resource, payload.streamId.hex);
+      this.reconnectStreamingClient(resource, payload.streamId.hex);
     }
   }
 
