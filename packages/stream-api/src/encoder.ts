@@ -13,5 +13,8 @@ export function decode(
     bufferOrBytes instanceof ArrayBuffer
       ? new Uint8Array(bufferOrBytes)
       : bufferOrBytes;
-  return vertexvis.protobuf.stream.StreamMessage.decode(bytes);
+  const message = vertexvis.protobuf.stream.StreamMessage.decode(bytes);
+  return vertexvis.protobuf.stream.StreamMessage.toObject(message, {
+    defaults: true,
+  });
 }
