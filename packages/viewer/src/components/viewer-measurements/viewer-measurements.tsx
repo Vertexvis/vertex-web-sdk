@@ -11,7 +11,7 @@ import {
   Listen,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { DistanceMeasurement, Measurement } from '../../lib/types';
+import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
 import { ViewerMeasurementToolType } from '../viewer-measurement-tool/viewer-measurement-tool';
 
@@ -34,6 +34,18 @@ export class ViewerMeasurements {
    */
   @Prop()
   public tool: ViewerMeasurementToolType = 'distance';
+
+  /**
+   * The unit type to display measurements in.
+   */
+  @Prop()
+  public units: UnitType = 'millimeters';
+
+  /**
+   * The number of fractional digits to display measurements in.
+   */
+  @Prop()
+  public fractionalDigits = 2;
 
   /**
    * If `true`, disables adding or editing of measurements through user
@@ -88,22 +100,17 @@ export class ViewerMeasurements {
     if (measurement instanceof DistanceMeasurement) {
       const { start, end, invalid, id } = measurement;
 
-      const measurementEl = this.createDistanceMeasurementElement();
-      measurementEl.id = id;
-      measurementEl.start = start;
-      measurementEl.end = end;
-      measurementEl.invalid = invalid;
-      measurementEl.viewer = this.viewer;
-      measurementEl.classList.add('viewer-measurements__measurement');
+      const el = this.createDistanceMeasurementElement();
+      el.id = id;
+      el.start = start;
+      el.end = end;
+      el.invalid = invalid;
+      el.addEventListener('pointerdown', this.handleMeasurementPointerDown);
 
-      measurementEl.addEventListener(
-        'pointerdown',
-        this.handleMeasurementPointerDown
-      );
-
-      this.hostEl.appendChild(measurementEl);
-      this.measurementAdded.emit(measurementEl);
-      return measurementEl;
+      this.updatePropsOnMeasurement(el);
+      this.hostEl.appendChild(el);
+      this.measurementAdded.emit(el);
+      return el;
     } else {
       throw new Error(`Cannot add measurement. Unknown type '${measurement}'.`);
     }
@@ -182,7 +189,7 @@ export class ViewerMeasurements {
    */
   @Watch('tool')
   protected handleToolChanged(): void {
-    this.updateMeasurementTool();
+    this.updatePropsOnMeasurementTool();
   }
 
   /**
@@ -192,12 +199,8 @@ export class ViewerMeasurements {
   protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
-    const measurements = await this.getMeasurementElements();
-    measurements.forEach((el) => {
-      el.viewer = newViewer;
-    });
-
-    this.updateMeasurementTool();
+    this.updatePropsOnMeasurementTool();
+    this.updatePropsOnMeasurements();
   }
 
   /**
@@ -205,7 +208,7 @@ export class ViewerMeasurements {
    */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
-    this.updateMeasurementTool();
+    this.updatePropsOnMeasurementTool();
   }
 
   /**
@@ -213,14 +216,32 @@ export class ViewerMeasurements {
    */
   @Watch('distanceTemplateId')
   protected handleDistanceTemplateIdChanged(): void {
-    this.updateMeasurementTool();
+    this.updatePropsOnMeasurementTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('units')
+  protected handleUnitsChanged(): void {
+    this.updatePropsOnMeasurementTool();
+    this.updatePropsOnMeasurements();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('fractionalDigits')
+  protected handleFractionalDigitsChanged(): void {
+    this.updatePropsOnMeasurementTool();
+    this.updatePropsOnMeasurements();
   }
 
   /**
    * @ignore
    */
   @Listen('measureEnd')
-  protected async handleMeasured(
+  protected async handleMeasureEnd(
     event: CustomEvent<Measurement>
   ): Promise<void> {
     const e = event as CustomEvent<Measurement>;
@@ -232,7 +253,7 @@ export class ViewerMeasurements {
    * @ignore
    */
   protected componentDidLoad(): void {
-    this.updateMeasurementTool();
+    this.updatePropsOnMeasurementTool();
   }
 
   /**
@@ -277,12 +298,28 @@ export class ViewerMeasurements {
     return document.createElement('vertex-viewer-distance-measurement');
   }
 
-  private updateMeasurementTool(): void {
+  private async updatePropsOnMeasurements(): Promise<void> {
+    const measurements = await this.getMeasurementElements();
+    measurements.forEach((m) => this.updatePropsOnMeasurement(m));
+  }
+
+  private updatePropsOnMeasurement(
+    element: HTMLVertexViewerDistanceMeasurementElement
+  ): void {
+    element.fractionalDigits = this.fractionalDigits;
+    element.units = this.units;
+    element.viewer = this.viewer;
+    element.classList.add('viewer-measurements__measurement');
+  }
+
+  private updatePropsOnMeasurementTool(): void {
     const tool = this.getMeasurementTool();
     if (tool != null) {
       tool.disabled = this.disabled;
       tool.distanceTemplateId = this.distanceTemplateId;
       tool.tool = this.tool;
+      tool.fractionalDigits = this.fractionalDigits;
+      tool.units = this.units;
       tool.viewer = this.viewer;
     }
   }
