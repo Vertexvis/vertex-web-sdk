@@ -8,19 +8,28 @@ import {
   FrontSide,
   Group,
   Box3,
+  DirectionalLight,
+  Object3D,
 } from 'three';
 import { AffineMatrix4f } from '@vertexvis/flex-time-protos/dist/core/protos/geometry';
-import { VertexThreeJsGeometry } from './geometry';
-import { FlexTimeApi } from '../flexApi';
 import { GetGeometryResponse } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
 import { RenderItem } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/domain';
+import { VertexThreeJsGeometry } from './geometry';
+import { FlexTimeApi } from '../flexApi';
+import { FramePerspectiveCamera } from '../types';
 
 export class VertexScene extends Scene {
+  private light: DirectionalLight = new DirectionalLight(0xffffff, 0.9);
+  private lightTarget: Object3D = new Object3D();
+
   public constructor(
     private readonly client: FlexTimeApi,
     private readonly sceneId: string
   ) {
     super();
+
+    this.add(this.light);
+    this.add(this.lightTarget);
   }
 
   public async loadSceneItem(viewId: string, itemId: string): Promise<Group> {
@@ -34,6 +43,13 @@ export class VertexScene extends Scene {
     this.add(group);
     // this.positionChildren(group, bbox);
     return group;
+  }
+
+  public updateLighting(camera: FramePerspectiveCamera): void {
+    const { position, lookAt } = camera;
+
+    this.lightTarget.position.set(lookAt.x, lookAt.y, lookAt.z);
+    this.light.position.set(position.x, position.y, position.z);
   }
 
   private positionChildren(group: Group, bbox: Box3): void {

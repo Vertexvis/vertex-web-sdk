@@ -21,7 +21,7 @@ import { Matrix4 } from '@vertexvis/geometry';
 import { DepthBuffer, Frame, Viewport } from '../../lib/types';
 import {
   vertexShader,
-  serverDepth16FragmentShader,
+  blendedFragmentShader,
   computeServerDepthTextureMatrix,
 } from './shaders';
 
@@ -98,7 +98,7 @@ export class BlendedRenderer implements Renderer {
 
     this.postMaterial = new ShaderMaterial({
       vertexShader,
-      fragmentShader: serverDepth16FragmentShader,
+      fragmentShader: blendedFragmentShader,
       uniforms: {
         diffuseTexture: { value: this.target.texture },
         depthTexture: { value: this.target.depthTexture },
@@ -119,7 +119,12 @@ export class BlendedRenderer implements Renderer {
     this.postCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   }
 
-  public dispose(): void {}
+  public dispose(): void {
+    this.renderer.dispose();
+    this.target.dispose();
+    this.postMaterial.dispose();
+    this.postPlane.dispose();
+  }
 
   public async render(
     scene: Scene,
@@ -131,6 +136,8 @@ export class BlendedRenderer implements Renderer {
 
     if (this.width !== viewport.width && this.height !== viewport.height) {
       const { width, height } = viewport;
+      this.target.depthTexture.dispose();
+
       this.target.setSize(width, height);
       this.target.depthTexture = new DepthTexture(width, height);
       this.target.depthTexture.format = DepthFormat;
