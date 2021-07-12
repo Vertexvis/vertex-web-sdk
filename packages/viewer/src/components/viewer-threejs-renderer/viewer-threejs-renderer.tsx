@@ -9,21 +9,20 @@ import {
   Watch,
 } from '@stencil/core';
 import {
-  AmbientLight,
-  CanvasTexture,
-  DataTexture,
-  DepthFormat,
-  DirectionalLight,
-  NearestFilter,
   PerspectiveCamera,
   Scene,
-  Texture,
-  UnsignedShortType,
+  Intersection,
+  Raycaster,
+  Vector2,
 } from 'three';
-import { DepthBuffer, Frame, Viewport } from '../../lib/types';
+import { Point } from '@vertexvis/geometry';
+import { Frame, Viewport } from '../../lib/types';
 import { BlendedRenderer, OverlayRenderer, Renderer } from './renderers';
 
-export type ViewerThreeJsRendererDrawMode = 'animation-frame' | 'manual';
+export type ViewerThreeJsRendererDrawMode =
+  | 'animation-frame'
+  | 'manual'
+  | 'synced';
 
 @Component({
   tag: 'vertex-viewer-threejs-renderer',
@@ -38,7 +37,7 @@ export class ViewerThreeJsRenderer {
   public camera: PerspectiveCamera = new PerspectiveCamera();
 
   @Prop()
-  public drawMode: ViewerThreeJsRendererDrawMode = 'manual';
+  public drawMode: ViewerThreeJsRendererDrawMode = 'synced';
 
   @Prop()
   public willDraw?: () => void;
@@ -54,6 +53,9 @@ export class ViewerThreeJsRenderer {
 
   @State()
   private frame?: Frame;
+
+  @State()
+  private boundingRect?: DOMRect;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -78,15 +80,15 @@ export class ViewerThreeJsRenderer {
     }
   }
 
-  protected componentWillLoad(): void {
-    // Lighting
-    const color = 0xffffff;
-    const intensity = 0.9;
-    const light = new DirectionalLight(color, intensity);
-    light.position.set(50, 50, 50);
-    this.scene.add(light);
+  @Method()
+  public async hit(point: Point.Point): Promise<Intersection[]> {
+    const x = (point.x / this.viewport.width) * 2 - 1;
+    const y = -(point.y / this.viewport.height) * 2 + 1;
 
-    this.scene.add(new AmbientLight(0x666666));
+    const raycaster = new Raycaster();
+    raycaster.setFromCamera(new Vector2(x, y), this.camera);
+
+    return raycaster.intersectObjects(this.scene.children, true);
   }
 
   protected componentDidLoad(): void {
@@ -106,6 +108,10 @@ export class ViewerThreeJsRenderer {
     this.updateSize();
     this.updateDrawMode();
     this.handleViewerChanged(this.viewer);
+  }
+
+  protected disconnectedCallback(): void {
+    this.renderer?.dispose();
   }
 
   protected render(): h.JSX.IntrinsicElements {
@@ -150,12 +156,17 @@ export class ViewerThreeJsRenderer {
       this.camera.updateProjectionMatrix();
     }
 
+    if (this.drawMode === 'synced') {
+      this.draw();
+    }
+
     this.frame = frame;
   };
 
   private updateSize(): void {
-    const { width, height } = this.hostEl.getBoundingClientRect();
-    this.viewport = new Viewport(width, height);
+    const rect = this.hostEl.getBoundingClientRect();
+    this.viewport = new Viewport(rect.width, rect.height);
+    this.boundingRect = rect;
   }
 
   private updateDrawMode(): void {
@@ -173,28 +184,4 @@ export class ViewerThreeJsRenderer {
       frameLoop();
     }
   }
-}
-
-function createInitialDepthTexture(w: number, h: number): CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-
-  return new CanvasTexture(canvas);
-}
-
-function createDepthDataTexture(
-  depth: DepthBuffer,
-  viewport: Viewport
-): Texture {
-  const { width, height } = depth.imageDimensions;
-
-  const texture = new DataTexture(depth.data, width, height);
-  texture.format = DepthFormat;
-  texture.internalFormat = 'DEPTH_COMPONENT16';
-  texture.type = UnsignedShortType;
-  texture.minFilter = NearestFilter;
-  texture.magFilter = NearestFilter;
-  texture.flipY = true;
-  return texture;
 }
