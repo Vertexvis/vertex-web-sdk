@@ -1,11 +1,17 @@
 import { google, vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamAttributes as PBStreamAttributes } from '@vertexvis/stream-api';
+import { Color } from '@vertexvis/utils';
 
 // TODO: support other frame types
 // Currently only final frames are allowed to prevent performance issues
 export type DepthBufferFrameType = 'final' | 'all';
 
 type ViewerStreamAttributeBoolValue = boolean | google.protobuf.IBoolValue;
+
+export interface FeatureLineOptions {
+  width: number;
+  color?: Color.Color;
+}
 
 export interface ViewerStreamAttributes {
   depthBuffers?: {
@@ -16,6 +22,7 @@ export interface ViewerStreamAttributes {
     enabled?: ViewerStreamAttributeBoolValue;
     opacity?: number | google.protobuf.IFloatValue;
   };
+  featureLines?: FeatureLineOptions;
 }
 
 export const toProtoStreamAttributes = (
@@ -45,6 +52,16 @@ export const toProtoStreamAttributes = (
         typeof attributes.experimentalGhosting?.opacity === 'number'
           ? { value: attributes.experimentalGhosting?.opacity }
           : attributes.experimentalGhosting?.opacity,
+    },
+    featureLines: {
+      lineWidth: attributes.featureLines?.width,
+      lineColor: attributes.featureLines?.color
+        ? {
+            r: attributes.featureLines?.color.r,
+            g: attributes.featureLines?.color.g,
+            b: attributes.featureLines?.color.b,
+          }
+        : null,
     },
   };
 };

@@ -48,7 +48,7 @@
     "@improbable-eng/grpc-web": "^0.14.0",
     "@juggle/resize-observer": "^3.3.0",
     "@types/classnames": "^2.3.1",
-    "@vertexvis/frame-streaming-protos": "^0.5.5",
+    "@vertexvis/frame-streaming-protos": "^0.5.12",
     "@vertexvis/geometry": "0.9.27",
     "@vertexvis/scene-tree-protos": "^0.1.0",
     "@vertexvis/stream-api": "0.9.27",

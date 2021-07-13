@@ -292,6 +292,15 @@ describe('vertex-viewer', () => {
         enabled: { value: true },
         opacity: { value: 0.7 },
       },
+      featureLines: {
+        width: 2.0,
+        color: {
+          r: 255,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+      },
     };
 
     it('maintains configured attributes after being updated', async () => {
@@ -329,7 +338,17 @@ describe('vertex-viewer', () => {
 
       expect(api.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: expect.objectContaining(attributes),
+          streamAttributes: expect.objectContaining({
+            ...attributes,
+            featureLines: {
+              lineWidth: attributes.featureLines.width,
+              lineColor: {
+                r: attributes.featureLines.color.r,
+                g: attributes.featureLines.color.g,
+                b: attributes.featureLines.color.b,
+              },
+            },
+          }),
         })
       );
     });
@@ -346,7 +365,17 @@ describe('vertex-viewer', () => {
 
       expect(api.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: expect.objectContaining(attributes),
+          streamAttributes: expect.objectContaining({
+            ...attributes,
+            featureLines: {
+              lineWidth: attributes.featureLines.width,
+              lineColor: {
+                r: attributes.featureLines.color.r,
+                g: attributes.featureLines.color.g,
+                b: attributes.featureLines.color.b,
+              },
+            },
+          }),
         })
       );
     });
