@@ -1,6 +1,54 @@
 @import url('../../css/button-reset.css');
 
 :host {
+  /**
+   * @prop --scene-tree-search-search-icon-offset: A CSS length that specifies
+   * the horizontal offset of the search icon
+   */
+  --scene-tree-search-search-icon-offset: 8px;
+
+  /**
+   * @prop --scene-tree-search-clear-button-offset: A CSS length that specifies
+   * the horizontal offset of the clear button.
+   */
+  --scene-tree-search-clear-button-offset: 8px;
+
+  /**
+   * @prop --scene-tree-search-input-padding: A CSS padding value that specifies
+   * horizontal and vertical lengths of the internal text input.
+   */
+  --scene-tree-search-input-padding: 0.5rem 32px;
+
+  /**
+   * @prop --scene-tree-search-input-border: A CSS border value that specifies
+   * the border of the internal text input.
+   */
+  --scene-tree-search-input-border: none;
+
+  /**
+   * @prop --scene-tree-search-input-border-radius: A CSS length that specifies
+   * the radius of the internal text input.
+   */
+  --scene-tree-search-input-border-radius: 0.25rem;
+
+  /**
+   * @prop --scene-tree-search-input-background: A CSS background that specifies
+   * the background color or image of the internal text input.
+   */
+  --scene-tree-search-input-background: none;
+
+  /**
+   * @prop --scene-tree-search-focused-input-background: A CSS background value
+   * that specifies the background of the internal text input when focused.
+   */
+  --scene-tree-search-focused-input-background: var(--neutral-200);
+
+  /**
+   * @prop --scene-tree-search-focused-input-outline: A CSS outline value that
+   * specifies the outline of the internal text input when focused.
+   */
+  --scene-tree-search-focused-input-outline: none;
+
   display: block;
   width: 100%;
   font-size: 0.875rem;
@@ -12,17 +60,19 @@
 }
 
 .input {
-  border: none;
-  border-radius: 0.25rem;
+  background: var(--scene-tree-search-input-background);
+  border: var(--scene-tree-search-input-border);
+  border-radius: var(--scene-tree-search-input-border-radius);
   box-sizing: border-box;
   font-size: inherit;
-  padding: 0.5rem 32px;
+  padding: var(--scene-tree-search-input-padding);
   outline: none;
   width: 100%;
 }
 
 .input.focused {
-  background-color: var(--neutral-200);
+  background: var(--scene-tree-search-focused-input-background);
+  outline: var(--scene-tree-search-focused-input-outline);
 }
 
 .overlay {
@@ -37,7 +87,7 @@
 
 .overlay-clear {
   display: none;
-  right: 8px;
+  right: var(--scene-tree-search-clear-button-offset);
 }
 
 .overlay-clear.show {
@@ -51,7 +101,7 @@
 
 .icon-search {
   position: absolute;
-  left: 8px;
+  left: var(--scene-tree-search-search-icon-offset);
 }
 
 .clear-btn {
