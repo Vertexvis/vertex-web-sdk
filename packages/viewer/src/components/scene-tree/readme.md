@@ -234,6 +234,17 @@ Type: `Promise<void>`
 
 
 
+### `filterItems(term: string, options?: FilterTreeOptions) => Promise<void>`
+
+Performs an async request that will filter the displayed items in the tree
+that match the given term and options.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `getRowAtClientY(clientY: number) => Promise<Row>`
 
 Returns the row data from the given vertical client position.
@@ -257,8 +268,9 @@ Type: `Promise<Row>`
 
 ### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
-Returns the row data from the given mouse or pointer event. The event
-must originate from this component otherwise `undefined` is returned.
+Returns the row data from the given mouse or pointer event. The event must
+originate from a `<vertex-scene-tree-row>` contained by this element,
+otherwise `undefined` is returned.
 
 #### Returns
 
@@ -364,6 +376,30 @@ Type: `Promise<void>`
 
 
 
+
+## Slots
+
+| Slot       | Description                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `"footer"` | A slot that places content below the rows in the tree.                                                           |
+| `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. |
+
+
+## Dependencies
+
+### Depends on
+
+- [vertex-scene-tree-toolbar](../scene-tree-toolbar)
+- [vertex-scene-tree-search](../scene-tree-search)
+
+### Graph
+```mermaid
+graph TD;
+  vertex-scene-tree --> vertex-scene-tree-toolbar
+  vertex-scene-tree --> vertex-scene-tree-search
+  vertex-scene-tree-search --> vertex-viewer-icon
+  style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

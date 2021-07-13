@@ -1,0 +1,63 @@
+@import url('../../css/button-reset.css');
+
+:host {
+  display: block;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.root {
+  width: 100%;
+  position: relative;
+}
+
+.input {
+  border: none;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  font-size: inherit;
+  padding: 0.5rem 32px;
+  outline: none;
+  width: 100%;
+}
+
+.input.focused {
+  background-color: var(--neutral-200);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.overlay-clear {
+  display: none;
+  right: 8px;
+}
+
+.overlay-clear.show {
+  display: flex;
+}
+
+.icon {
+  pointer-events: none;
+  color: var(--neutral-800);
+}
+
+.icon-search {
+  position: absolute;
+  left: 8px;
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: initial;
+  cursor: pointer;
+}

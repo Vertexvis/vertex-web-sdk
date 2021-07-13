@@ -1,0 +1,5 @@
+:host {
+  display: block;
+  padding: 0.5rem;
+  border-color: var(--neutral-300);
+}

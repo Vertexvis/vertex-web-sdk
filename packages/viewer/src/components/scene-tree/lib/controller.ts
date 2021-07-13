@@ -72,7 +72,14 @@ export interface ConnectionFailedState {
   sceneViewId: string;
 }
 
+/**
+ * A set of options to configure tree filtering behavior.
+ */
 export interface FilterTreeOptions {
+  /**
+   * Indicates if the filter should include nodes that within collapsed parent
+   * nodes.
+   */
   includeCollapsed?: boolean;
 }
 
@@ -429,6 +436,13 @@ export class SceneTreeController {
     );
   }
 
+  /**
+   * Performs a network request that will filter the nodes in the tree that
+   * match the given term and options.
+   *
+   * @param term The filter term.
+   * @param options The options to apply to the filter.
+   */
   public async filter(
     term: string,
     options: FilterTreeOptions = {}
@@ -681,9 +695,8 @@ export class SceneTreeController {
   }
 
   private invalidatePage(index: number): void {
-    const boundedIndex = this.constrainPageIndex(index);
-    if (this.isPageLoaded(boundedIndex)) {
-      this.pages.delete(boundedIndex);
+    if (this.isPageLoaded(index)) {
+      this.pages.delete(index);
     }
   }
 

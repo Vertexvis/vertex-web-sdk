@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { RowArg, RowDataProvider, ScrollToOptions, SelectItemOptions } from "./components/scene-tree/scene-tree";
 import { Config } from "./lib/config";
 import { Environment } from "./lib/environment";
-import { SceneTreeController } from "./components/scene-tree/lib/controller";
+import { FilterTreeOptions, SceneTreeController } from "./components/scene-tree/lib/controller";
 import { SceneTreeErrorDetails } from "./components/scene-tree/lib/errors";
 import { Row } from "./components/scene-tree/lib/row";
 import { Node } from "@vertexvis/scene-tree-protos/scenetree/protos/domain_pb";
@@ -70,6 +70,13 @@ export namespace Components {
          */
         "expandItem": (row: RowArg) => Promise<void>;
         /**
+          * Performs an async request that will filter the displayed items in the tree that match the given term and options.
+          * @param term The filter term.
+          * @param options The options to apply to the filter.
+          * @returns A promise that completes when the request has completed. Note, items are displayed asynchronously. So the displayed items may not reflect the result of this filter when the promise completes.
+         */
+        "filterItems": (term: string, options?: FilterTreeOptions) => Promise<void>;
+        /**
           * Returns the row data from the given vertical client position.
           * @param clientY The vertical client position.
           * @returns A row or `undefined` if the row hasn't been loaded.
@@ -82,7 +89,7 @@ export namespace Components {
          */
         "getRowAtIndex": (index: number) => Promise<Row>;
         /**
-          * Returns the row data from the given mouse or pointer event. The event must originate from this component otherwise `undefined` is returned.
+          * Returns the row data from the given mouse or pointer event. The event must originate from a `vertex-scene-tree-row` contained by this element, otherwise `undefined` is returned.
           * @param event A mouse or pointer event that originated from this component.
           * @returns A row, or `undefined` if the row hasn't been loaded.
          */
@@ -171,6 +178,15 @@ export namespace Components {
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */
         "tree"?: HTMLVertexSceneTreeElement;
+    }
+    interface VertexSceneTreeSearch {
+        "debounce": number;
+        "disabled": boolean;
+        "placeholder"?: string;
+        "setFocus": () => Promise<void>;
+        "value": string;
+    }
+    interface VertexSceneTreeToolbar {
     }
     interface VertexViewer {
         /**
@@ -614,6 +630,18 @@ declare global {
         prototype: HTMLVertexSceneTreeRowElement;
         new (): HTMLVertexSceneTreeRowElement;
     };
+    interface HTMLVertexSceneTreeSearchElement extends Components.VertexSceneTreeSearch, HTMLStencilElement {
+    }
+    var HTMLVertexSceneTreeSearchElement: {
+        prototype: HTMLVertexSceneTreeSearchElement;
+        new (): HTMLVertexSceneTreeSearchElement;
+    };
+    interface HTMLVertexSceneTreeToolbarElement extends Components.VertexSceneTreeToolbar, HTMLStencilElement {
+    }
+    var HTMLVertexSceneTreeToolbarElement: {
+        prototype: HTMLVertexSceneTreeToolbarElement;
+        new (): HTMLVertexSceneTreeToolbarElement;
+    };
     interface HTMLVertexViewerElement extends Components.VertexViewer, HTMLStencilElement {
     }
     var HTMLVertexViewerElement: {
@@ -701,6 +729,8 @@ declare global {
     interface HTMLElementTagNameMap {
         "vertex-scene-tree": HTMLVertexSceneTreeElement;
         "vertex-scene-tree-row": HTMLVertexSceneTreeRowElement;
+        "vertex-scene-tree-search": HTMLVertexSceneTreeSearchElement;
+        "vertex-scene-tree-toolbar": HTMLVertexSceneTreeToolbarElement;
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
@@ -782,6 +812,15 @@ declare namespace LocalJSX {
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */
         "tree"?: HTMLVertexSceneTreeElement;
+    }
+    interface VertexSceneTreeSearch {
+        "debounce"?: number;
+        "disabled"?: boolean;
+        "onSearch"?: (event: CustomEvent<string>) => void;
+        "placeholder"?: string;
+        "value"?: string;
+    }
+    interface VertexSceneTreeToolbar {
     }
     interface VertexViewer {
         /**
@@ -1201,6 +1240,8 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "vertex-scene-tree": VertexSceneTree;
         "vertex-scene-tree-row": VertexSceneTreeRow;
+        "vertex-scene-tree-search": VertexSceneTreeSearch;
+        "vertex-scene-tree-toolbar": VertexSceneTreeToolbar;
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
@@ -1223,6 +1264,8 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "vertex-scene-tree": LocalJSX.VertexSceneTree & JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
             "vertex-scene-tree-row": LocalJSX.VertexSceneTreeRow & JSXBase.HTMLAttributes<HTMLVertexSceneTreeRowElement>;
+            "vertex-scene-tree-search": LocalJSX.VertexSceneTreeSearch & JSXBase.HTMLAttributes<HTMLVertexSceneTreeSearchElement>;
+            "vertex-scene-tree-toolbar": LocalJSX.VertexSceneTreeToolbar & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;

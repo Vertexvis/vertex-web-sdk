@@ -7,12 +7,14 @@ import {
   forceUpdate,
   h,
   Host,
+  Listen,
   Method,
   Prop,
   State,
   Watch,
 } from '@stencil/core';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, LoadedRow, Row } from './lib/row';
 import {
@@ -42,7 +44,7 @@ import {
   generateInstanceFromTemplate,
   InstancedTemplate,
 } from './lib/templates';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { isSceneTreeRowElement } from '../scene-tree-row/utils';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -110,6 +112,11 @@ export interface SelectItemOptions extends ViewerSelectItemOptions {
   recurseParent?: boolean;
 }
 
+/**
+ * @slot header - A slot that places content above the rows in the tree. By
+ *  default, a search toolbar will be placed in this slot.
+ * @slot footer - A slot that places content below the rows in the tree.
+ */
 @Component({
   tag: 'vertex-scene-tree',
   styleUrl: 'scene-tree.css',
@@ -194,9 +201,6 @@ export class SceneTree {
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
-  @Element()
-  private el!: HTMLElement;
-
   @State()
   private viewportHeight: number | undefined;
 
@@ -232,6 +236,11 @@ export class SceneTree {
   @State()
   private connectionErrorDetails: SceneTreeErrorDetails | undefined;
 
+  @Element()
+  private el!: HTMLElement;
+
+  private rowScrollEl?: HTMLElement;
+
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
    * data in your scene tree has changed, and you want to update the row's
@@ -260,7 +269,9 @@ export class SceneTree {
     const i = Math.max(0, Math.min(index, this.totalRows));
 
     const top = this.getScrollToPosition(i, position);
-    scrollToTop(this.el, top, { behavior: animate ? 'smooth' : undefined });
+    scrollToTop(this.getRowsScrollElement(), top, {
+      behavior: animate ? 'smooth' : undefined,
+    });
   }
 
   /**
@@ -466,19 +477,22 @@ export class SceneTree {
   }
 
   /**
-   * Returns the row data from the given mouse or pointer event. The event
-   * must originate from this component otherwise `undefined` is returned.
+   * Returns the row data from the given mouse or pointer event. The event must
+   * originate from a `vertex-scene-tree-row` contained by this element,
+   * otherwise `undefined` is returned.
    *
    * @param event A mouse or pointer event that originated from this component.
    * @returns A row, or `undefined` if the row hasn't been loaded.
    */
   @Method()
   public async getRowForEvent(event: MouseEvent | PointerEvent): Promise<Row> {
-    const { clientY, currentTarget } = event;
+    const { clientY, target } = event;
+
     if (
-      currentTarget != null &&
+      target != null &&
       this.connectionErrorDetails == null &&
-      getSceneTreeContainsElement(this.el, currentTarget as HTMLElement)
+      getSceneTreeContainsElement(this.el, target as HTMLElement) &&
+      isSceneTreeRowElement(target)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -494,7 +508,7 @@ export class SceneTree {
    */
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
-    const { top } = getElementBoundingClientRect(this.el);
+    const { top } = getElementBoundingClientRect(this.getRowsScrollElement());
     const index = Math.floor(
       (clientY - top + this.scrollTop) /
         this.getComputedOrPlaceholderRowHeight()
@@ -502,6 +516,17 @@ export class SceneTree {
     return this.getRowAtIndex(index);
   }
 
+  /**
+   * Performs an async request that will filter the displayed items in the tree
+   * that match the given term and options.
+   *
+   * @param term The filter term.
+   * @param options The options to apply to the filter.
+   * @returns A promise that completes when the request has completed. Note,
+   *  items are displayed asynchronously. So the displayed items may not reflect
+   *  the result of this filter when the promise completes.
+   */
+  @Method()
   public async filterItems(
     term: string,
     options: FilterTreeOptions = {}
@@ -533,15 +558,19 @@ export class SceneTree {
     }
   }
 
+  /**
+   * @ignore
+   */
   protected async componentDidLoad(): Promise<void> {
-    this.el.addEventListener('scroll', () => this.handleScroll(), {
+    const rowScrollEl = this.getRowsScrollElement();
+    rowScrollEl.addEventListener('scroll', () => this.handleScroll(), {
       passive: true,
     });
 
     const resizeObserver = new ResizeObserver(() =>
       this.updateViewportHeight()
     );
-    resizeObserver.observe(this.el);
+    resizeObserver.observe(rowScrollEl);
     this.stateMap.resizeObserver = resizeObserver;
 
     this.ensureTemplateDefined();
@@ -553,6 +582,9 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
   }
 
+  /**
+   * @ignore
+   */
   protected componentWillRender(): void {
     this.updateRenderState();
 
@@ -564,10 +596,16 @@ export class SceneTree {
     }
   }
 
+  /**
+   * @ignore
+   */
   protected componentDidRender(): void {
     this.updateElements();
   }
 
+  /**
+   * @ignore
+   */
   protected render(): h.JSX.IntrinsicElements {
     const rowHeight = this.getComputedOrPlaceholderRowHeight();
     const totalHeight = this.totalRows * rowHeight;
@@ -591,13 +629,30 @@ export class SceneTree {
           </div>
         )}
 
-        <div class="rows" style={{ height: `${totalHeight}px` }}>
-          <slot></slot>
+        <div class="header">
+          <slot name="header">
+            <vertex-scene-tree-toolbar>
+              <vertex-scene-tree-search />
+            </vertex-scene-tree-toolbar>
+          </slot>
+        </div>
+
+        <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
+          <div class="rows" style={{ height: `${totalHeight}px` }}>
+            <slot />
+          </div>
+        </div>
+
+        <div class="footer">
+          <slot name="footer" />
         </div>
       </Host>
     );
   }
 
+  /**
+   * @ignore
+   */
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
@@ -622,6 +677,9 @@ export class SceneTree {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('controller')
   protected handleControllerChanged(newController: SceneTreeController): void {
     // StencilJS will invoke this callback even before the component has been
@@ -737,8 +795,13 @@ export class SceneTree {
 
   private handleScroll(): void {
     readDOM(() => {
-      this.scrollTop = this.el.scrollTop || 0;
+      this.scrollTop = this.getRowsScrollElement().scrollTop ?? 0;
     });
+  }
+
+  @Listen('search')
+  protected handleSearch(event: CustomEvent<string>): void {
+    this.filterItems(event.detail);
   }
 
   private populateRowData(row: Row): Row {
@@ -769,7 +832,7 @@ export class SceneTree {
       bindings.bind(dummyData);
       element.style.visibility = 'hidden';
 
-      this.el.shadowRoot?.appendChild(element);
+      this.getRowsScrollElement().appendChild(element);
 
       /* eslint-disable @typescript-eslint/no-explicit-any */
       if (typeof (element as any).componentOnReady === 'function') {
@@ -839,16 +902,8 @@ export class SceneTree {
   }
 
   private createPool(): void {
-    const container = this.el.shadowRoot?.querySelector('.rows');
-
     if (this.viewportHeight == null) {
       throw new Error('Viewport height is not defined');
-    }
-
-    if (container == null) {
-      throw new Error(
-        'Cannot create scene tree pool. Row container cannot be found'
-      );
     }
 
     // When doing a live reload, this function might get called multiple times.
@@ -895,6 +950,16 @@ export class SceneTree {
   }
 
   private updateViewportHeight(): void {
-    this.viewportHeight = getSceneTreeViewportHeight(this.el);
+    this.viewportHeight = getSceneTreeViewportHeight(
+      this.getRowsScrollElement()
+    );
+  }
+
+  private getRowsScrollElement(): HTMLElement {
+    if (this.rowScrollEl != null) {
+      return this.rowScrollEl;
+    } else {
+      throw new Error('Row scroll element is undefined.');
+    }
   }
 }
