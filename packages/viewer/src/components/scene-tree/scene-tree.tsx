@@ -15,7 +15,11 @@ import {
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, LoadedRow, Row } from './lib/row';
-import { SceneTreeController, SceneTreeState } from './lib/controller';
+import {
+  FilterTreeOptions,
+  SceneTreeController,
+  SceneTreeState,
+} from './lib/controller';
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import {
@@ -496,6 +500,13 @@ export class SceneTree {
         this.getComputedOrPlaceholderRowHeight()
     );
     return this.getRowAtIndex(index);
+  }
+
+  public async filterItems(
+    term: string,
+    options: FilterTreeOptions = {}
+  ): Promise<void> {
+    return this.controller?.filter(term, options);
   }
 
   protected componentWillLoad(): void {

@@ -8,6 +8,7 @@ import {
   CollapseNodeRequest,
   ExpandAllRequest,
   ExpandNodeRequest,
+  FilterRequest,
   GetNodeAncestorsRequest,
   GetNodeAncestorsResponse,
   GetTreeRequest,
@@ -69,6 +70,10 @@ export interface ConnectionFailedState {
   details: SceneTreeErrorDetails;
   jwtProvider: JwtProvider;
   sceneViewId: string;
+}
+
+export interface FilterTreeOptions {
+  includeCollapsed?: boolean;
 }
 
 type ConnectionState =
@@ -422,6 +427,21 @@ export class SceneTreeController {
     await Promise.all(
       Array.from({ length: pageCount }).map((_, page) => this.fetchPage(page))
     );
+  }
+
+  public async filter(
+    term: string,
+    options: FilterTreeOptions = {}
+  ): Promise<void> {
+    await this.ifConnectionHasJwt((jwt) => {
+      return this.requestUnary(jwt, (metadata, handler) => {
+        const req = new FilterRequest();
+        req.setFilter(term);
+        req.setFullTree((options.includeCollapsed ?? true) === true);
+
+        this.client.filter(req, metadata, handler);
+      });
+    });
   }
 
   /**
