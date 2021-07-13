@@ -73,6 +73,7 @@ import {
   ViewerStreamAttributes,
   toProtoStreamAttributes,
   DepthBufferFrameType,
+  FeatureLineOptions,
 } from '../../lib/stream/streamAttributes';
 import {
   upsertStorageEntry,
@@ -201,6 +202,11 @@ export class Viewer {
    * **Note:** This feature is experimental, and may cause slower frame rates.
    */
   @Prop() public experimentalGhostingOpacity = 0;
+
+  /**
+   * Specifies if and how to render feature lines.
+   */
+  @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -637,6 +643,14 @@ export class Viewer {
    */
   @Watch('experimentalGhostingOpacity')
   protected handleExperimentalGhostingOpacityChanged(): void {
+    this.updateStreamAttributesProp();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('featureLines')
+  protected handleFeatureLinesChanged(): void {
     this.updateStreamAttributesProp();
   }
 
@@ -1203,6 +1217,7 @@ export class Viewer {
         enabled: this.experimentalGhostingOpacity > 0,
         opacity: this.experimentalGhostingOpacity,
       },
+      featureLines: this.featureLines,
     };
   }
 

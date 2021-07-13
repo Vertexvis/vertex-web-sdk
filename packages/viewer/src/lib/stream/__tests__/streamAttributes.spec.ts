@@ -81,6 +81,15 @@ describe(toProtoStreamAttributes, () => {
             frameType: 'final',
             enabled: { value: true },
           },
+          featureLines: {
+            width: 2.0,
+            color: {
+              r: 255,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+          },
         })
       ).toMatchObject({
         experimentalGhosting: {
@@ -89,6 +98,14 @@ describe(toProtoStreamAttributes, () => {
         depthBuffers: {
           frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
           enabled: { value: true },
+        },
+        featureLines: {
+          lineWidth: 2.0,
+          lineColor: {
+            r: 255,
+            g: 0,
+            b: 0,
+          },
         },
       });
     });
