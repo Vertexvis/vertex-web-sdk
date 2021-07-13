@@ -9,7 +9,9 @@ export type ViewerIconName =
   | 'visible'
   | 'hidden'
   | 'chevron-right'
-  | 'chevron-down';
+  | 'chevron-down'
+  | 'search'
+  | 'close-circle';
 
 /**
  * The predefined sizes for icons.
@@ -65,6 +67,14 @@ export class ViewerIcon {
           d="M11.88,9.17l-3.5-4a.51.51,0,0,0-.76,0l-3.5,4A.5.5,0,0,0,4.5,10h7a.5.5,0,0,0,.38-.83Z"
           transform="rotate(180 8 8)"
         />
+      );
+    } else if (this.name === 'search') {
+      return this.renderSvgIcon(
+        <path d="M14.85 14.15l-4-4a.37.37 0 00-.2-.12 5.45 5.45 0 10-.62.62.37.37 0 00.12.2l4 4a.49.49 0 00.7-.7zM9.71 9.71a4.51 4.51 0 01-6.42 0 4.51 4.51 0 010-6.42 4.51 4.51 0 016.42 0 4.51 4.51 0 010 6.42z" />
+      );
+    } else if (this.name === 'close-circle') {
+      return this.renderSvgIcon(
+        <path d="M8 1a7 7 0 107 7 7 7 0 00-7-7zm2.85 9.15a.49.49 0 01-.7.7L8 8.71l-2.15 2.14a.49.49 0 01-.7-.7L7.29 8 5.15 5.85a.49.49 0 01.7-.7L8 7.29l2.15-2.14a.49.49 0 01.7.7L8.71 8z" />
       );
     } else {
       return <svg />;
