@@ -1,5 +1,6 @@
 export function isSceneTreeRowElement(
   el: unknown
 ): el is HTMLVertexSceneTreeRowElement {
-  return el instanceof HTMLElement && el.nodeName === 'VERTEX-SCENE-TREE-ROW';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return el != null && (el as any).nodeName === 'VERTEX-SCENE-TREE-ROW';
 }

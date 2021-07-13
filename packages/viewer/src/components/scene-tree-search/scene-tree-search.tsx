@@ -39,7 +39,10 @@ export class SceneTreeSearch {
 
   @Method()
   public async setFocus(): Promise<void> {
-    this.inputEl?.focus();
+    // HTMLInputElement.focus() doesn't exist in tests.
+    if (typeof this.inputEl?.focus === 'function') {
+      this.inputEl?.focus();
+    }
   }
 
   protected componentDidLoad(): void {
@@ -77,6 +80,7 @@ export class SceneTreeSearch {
               class="clear-btn icon"
               tabIndex={-1}
               onMouseDown={this.handleClear}
+              disabled={this.disabled}
             >
               <slot name="clear-icon">
                 <vertex-viewer-icon name="close-circle" size="sm" />

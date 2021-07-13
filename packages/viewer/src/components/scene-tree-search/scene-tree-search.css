@@ -111,3 +111,8 @@
   pointer-events: initial;
   cursor: pointer;
 }
+
+.clear-btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
