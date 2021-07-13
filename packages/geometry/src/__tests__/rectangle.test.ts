@@ -59,6 +59,20 @@ describe(Rectangle.scaleFit, () => {
   });
 });
 
+describe(Rectangle.scale, () => {
+  const rect = Rectangle.create(100, 200, 300, 400);
+
+  it('scales a rectangle uniformly', () => {
+    const scaled = Rectangle.scale(rect, 2);
+    expect(scaled).toEqual(Rectangle.create(200, 400, 600, 800));
+  });
+
+  it('scales a rectangle by x and y scale factors', () => {
+    const scaled = Rectangle.scale(rect, 2, 3);
+    expect(scaled).toEqual(Rectangle.create(200, 600, 600, 1200));
+  });
+});
+
 describe(Rectangle.offset, () => {
   const rect = Rectangle.create(10, 20, 30, 30);
 
