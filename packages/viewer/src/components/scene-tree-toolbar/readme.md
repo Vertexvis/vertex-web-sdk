@@ -44,9 +44,9 @@ the group with a fractional gap size of this component.
 
 ## CSS Custom Properties
 
-| Name                       | Description                                                   |
-| -------------------------- | ------------------------------------------------------------- |
-| `--scene-tree-toolbar-gap` | A CSS length that specifies the horizontal gap between slots. |
+| Name                               | Description                                                   |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `--scene-tree-toolbar-content-gap` | A CSS length that specifies the horizontal gap between slots. |
 
 
 ## Dependencies
