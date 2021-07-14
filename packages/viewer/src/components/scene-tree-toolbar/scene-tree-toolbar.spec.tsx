@@ -10,7 +10,15 @@ describe('scene-tree-toolbar', () => {
     expect(page.root).toEqualHtml(`
       <vertex-scene-tree-toolbar>
         <mock:shadow-root>
-          <slot></slot>
+        <div class="content">
+          <slot name="before" />
+        </div>
+        <div class="content content-primary">
+          <slot />
+        </div>
+        <div class="content">
+          <slot name="after" />
+        </div>
         </mock:shadow-root>
       </vertex-scene-tree-toolbar>
     `);

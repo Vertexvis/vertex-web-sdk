@@ -1,5 +1,24 @@
 :host {
-  display: block;
+  /**
+   * @prop --scene-tree-toolbar-content-gap: A CSS length that specifies the
+   * horizontal gap between slots.
+   */
+  --scene-tree-toolbar-content-gap: 8px;
+
+  display: flex;
   padding: 0.5rem;
   border-color: var(--neutral-300);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+}
+
+.content-primary {
+  width: 100%;
+}
+
+::slotted(:not(:first-child)) {
+  margin-left: var(--scene-tree-toolbar-content-gap);
 }

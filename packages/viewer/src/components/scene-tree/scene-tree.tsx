@@ -631,7 +631,7 @@ export class SceneTree {
 
         <div class="header">
           <slot name="header">
-            <vertex-scene-tree-toolbar>
+            <vertex-scene-tree-toolbar class="search-toolbar">
               <vertex-scene-tree-search />
             </vertex-scene-tree-toolbar>
           </slot>

@@ -72,6 +72,7 @@
   text-align: center;
 }
 
+.search-toolbar,
 slot[name='header']::slotted(vertex-scene-tree-toolbar) {
   border-bottom-width: 1px;
   border-bottom-style: solid;

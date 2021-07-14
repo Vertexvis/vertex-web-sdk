@@ -155,6 +155,42 @@ events.
 <button event:my-camel-cased-event="{{row.data.handler}}"></button>
 ```
 
+## Headers and Footers
+
+The component supports slots for specifying a header and footer. We provide a
+[`<vertex-scene-tree-toolbar>`](../scene-tree-toolbar/readme.md) helper
+component to layout content in the header and footer.
+
+**Note:** By default, the component renders a search field in the header. If you
+replace the header and want search behavior, your header slot should include a
+[`<vertex-scene-tree-search>`](../scene-tree-search/readme.md).
+
+**Example:** Supplying a header and footer.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-toolbar slot="header">
+        <vertex-scene-tree-search></vertex-scene-tree-search>
+
+        <vertex-scene-tree-toolbar-group slot="after">
+          <button>A</button>
+          <button>B</button>
+        </vertex-scene-tree-toolbar-group>
+      </vertex-scene-tree-toolbar>
+
+      <vertex-scene-tree-toolbar slot="footer">
+        <button slot="before">A</button>
+        <div>Footer Text</div>
+        <button slot="after">A</button>
+      </vertex-scene-tree-toolbar>
+    </vertex-scene-tree>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+  </body>
+</html>
+```
+
 <!-- Auto Generated Below -->
 
 
@@ -269,7 +305,7 @@ Type: `Promise<Row>`
 ### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
 Returns the row data from the given mouse or pointer event. The event must
-originate from a `<vertex-scene-tree-row>` contained by this element,
+originate from a `vertex-scene-tree-row` contained by this element,
 otherwise `undefined` is returned.
 
 #### Returns
