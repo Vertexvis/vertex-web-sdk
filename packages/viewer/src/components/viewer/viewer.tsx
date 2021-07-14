@@ -674,6 +674,7 @@ export class Viewer {
 
       const hasResourceChanged = !Objects.isEqual(previousResource, resource);
       const hasQueryChanged = !Objects.isEqual(previousQueries, queries);
+      const hasQuery = queries[0] != null;
       const isSceneReady = await this.isSceneReady();
 
       this.urn = urn;
@@ -685,7 +686,7 @@ export class Viewer {
         await this.connectStreamingClient(resource, queries[0]);
       }
       // If the scene's ready, use the scene to update the stream.
-      else if (isSceneReady && hasQueryChanged) {
+      else if (isSceneReady && hasQueryChanged && hasQuery) {
         const scene = await this.scene();
         await scene.applySceneViewState(queries[0].id);
       }
