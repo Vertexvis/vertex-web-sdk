@@ -924,6 +924,33 @@ describe('<vertex-scene-tree>', () => {
       expect(scrollToIndex).toHaveBeenCalledWith(10, expect.anything());
     });
   });
+
+  describe('search', () => {
+    it('creates a search element if header slot is empty', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      mockGetTree({ client });
+
+      const { tree } = await newSceneTreeSpec({ controller });
+
+      const search = tree.shadowRoot?.querySelector('vertex-scene-tree-search');
+      expect(search).toBeDefined();
+    });
+
+    it('performs a search element when search event is emitted', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const filter = jest.spyOn(controller, 'filter');
+
+      mockGetTree({ client });
+
+      const { tree } = await newSceneTreeSpec({ controller });
+
+      tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
+      expect(filter).toHaveBeenCalledWith('term', expect.anything());
+    });
+  });
 });
 
 async function newSceneTreeSpec(data: {

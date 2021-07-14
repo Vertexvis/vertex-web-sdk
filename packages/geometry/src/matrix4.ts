@@ -17,7 +17,7 @@ export type Matrix4 = [
   number, number, number, number,
   number, number, number, number,
   number, number, number, number,
-  /* eslint-enable */
+  /* eslint-enable prettier/prettier */
 ];
 
 /**
