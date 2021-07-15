@@ -43,6 +43,9 @@ export class ViewerThreeJsRenderer {
   public willDraw?: () => void;
 
   @Prop()
+  public clippingExtents = 1000;
+
+  @Prop()
   public viewer?: HTMLVertexViewerElement;
 
   @Prop()
@@ -142,8 +145,8 @@ export class ViewerThreeJsRenderer {
       const { camera } = frame.scene;
       const { position, lookAt, up, fovY, aspectRatio, near, far } = camera;
 
-      const threeNear = Math.max(near - 1000, 0.1);
-      const threeFar = far + 1000;
+      const threeNear = Math.max(near - this.clippingExtents, 0.1);
+      const threeFar = far + this.clippingExtents;
 
       this.camera.position.set(position.x, position.y, position.z);
       this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
