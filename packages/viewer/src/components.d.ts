@@ -983,7 +983,6 @@ declare global {
   }
 }
 declare namespace LocalJSX {
-<<<<<<< HEAD
   interface VertexSceneTree {
     /**
      * An object to configure the scene tree.
@@ -1592,7 +1591,6 @@ declare namespace LocalJSX {
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
     'vertex-viewer-view-cube': VertexViewerViewCube;
   }
-=======
     interface VertexSceneTree {
         /**
           * An object to configure the scene tree.
@@ -1658,6 +1656,32 @@ declare namespace LocalJSX {
          */
         "tree"?: HTMLVertexSceneTreeElement;
     }
+    interface VertexSceneTreeSearch {
+        /**
+          * Specifies the delay, in milliseconds, to emit `search` events after user input.
+         */
+        "debounce"?: number;
+        /**
+          * If `true`, disables user interaction of the component.
+         */
+        "disabled"?: boolean;
+        /**
+          * An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value.
+         */
+        "onSearch"?: (event: CustomEvent<string>) => void;
+        /**
+          * Placeholder text if `value` is empty.
+         */
+        "placeholder"?: string;
+        /**
+          * The current text value of the component. Value is updated on user interaction.
+         */
+        "value"?: string;
+    }
+    interface VertexSceneTreeToolbar {
+    }
+    interface VertexSceneTreeToolbarGroup {
+    }
     interface VertexViewer {
         /**
           * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
@@ -1684,6 +1708,10 @@ declare namespace LocalJSX {
           * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
          */
         "experimentalGhostingOpacity"?: number;
+        /**
+          * Specifies if and how to render feature lines.
+         */
+        "featureLines"?: FeatureLineOptions;
         /**
           * The last frame that was received, which can be used to inspect the scene and camera information.
          */
@@ -1947,6 +1975,10 @@ declare namespace LocalJSX {
          */
         "distanceTemplateId"?: string;
         /**
+          * The number of fractional digits to display measurements in.
+         */
+        "fractionalDigits"?: number;
+        /**
           * A property that indicates if the user is performing a measurement.
          */
         "isMeasuring"?: boolean;
@@ -1963,19 +1995,27 @@ declare namespace LocalJSX {
          */
         "tool"?: ViewerMeasurementToolType;
         /**
+          * The unit type to display measurements in.
+         */
+        "units"?: UnitType;
+        /**
           * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMeasurements {
         /**
+          * If `true`, disables adding or editing of measurements through user interaction.
+         */
+        "disabled"?: boolean;
+        /**
           * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
          */
         "distanceTemplateId"?: string;
         /**
-          * Indicates if new measurements can be added or edited through user interaction.
+          * The number of fractional digits to display measurements in.
          */
-        "editable"?: boolean;
+        "fractionalDigits"?: number;
         /**
           * Dispatched when a new measurement is added, either through user interaction or programmatically.
          */
@@ -1993,12 +2033,17 @@ declare namespace LocalJSX {
          */
         "tool"?: ViewerMeasurementToolType;
         /**
+          * The unit type to display measurements in.
+         */
+        "units"?: UnitType;
+        /**
           * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerThreejsRenderer {
         "camera"?: PerspectiveCamera;
+        "clippingExtents"?: number;
         "drawMode"?: ViewerThreeJsRendererDrawMode;
         "occlude"?: boolean;
         "scene"?: Scene;
@@ -2064,6 +2109,9 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "vertex-scene-tree": VertexSceneTree;
         "vertex-scene-tree-row": VertexSceneTreeRow;
+        "vertex-scene-tree-search": VertexSceneTreeSearch;
+        "vertex-scene-tree-toolbar": VertexSceneTreeToolbar;
+        "vertex-scene-tree-toolbar-group": VertexSceneTreeToolbarGroup;
         "vertex-viewer": VertexViewer;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
@@ -2080,7 +2128,6 @@ declare namespace LocalJSX {
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
         "vertex-viewer-view-cube": VertexViewerViewCube;
     }
->>>>>>> Add widget to transform parts
 }
 export { LocalJSX as JSX };
 declare module '@stencil/core' {
