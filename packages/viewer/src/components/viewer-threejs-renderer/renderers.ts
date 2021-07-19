@@ -81,6 +81,7 @@ export class BlendedRenderer implements Renderer {
 
   private width = 0;
   private height = 0;
+  private depthBytes?: Uint8Array;
 
   public constructor(canvas: HTMLCanvasElement) {
     this.renderer = new WebGLRenderer({ canvas, alpha: true });
@@ -171,28 +172,40 @@ export class BlendedRenderer implements Renderer {
       value: [viewport.width, viewport.height],
     };
 
-    const depthBuffer = await frame.depthBuffer();
-    if (depthBuffer != null) {
-      const { x, y, width, height } = viewport.calculateDrawRect(
-        depthBuffer,
-        depthBuffer.imageDimensions
-      );
-      uniforms.serverDepthTexture = {
-        value: createDepthDataTexture(depthBuffer, viewport),
-      };
-      uniforms.serverDepthRect = {
-        value: {
-          x: x,
-          // Position server depth from top of screen. WebGL renders from
-          // bottom of screen. Consider moving to shader.
-          y: viewport.height - (height + y),
-          width: width,
-          height: height,
-        },
-      };
-      uniforms.serverDepthMatrix = {
-        value: computeServerDepthTextureMatrix(depthBuffer, viewport),
-      };
+    this.updateDepthTexture(frame, viewport);
+  }
+
+  private async updateDepthTexture(
+    frame: Frame,
+    viewport: Viewport
+  ): Promise<void> {
+    if (this.depthBytes !== frame.depthBufferBytes) {
+      this.depthBytes = frame.depthBufferBytes;
+
+      const { uniforms } = this.postMaterial;
+      const depthBuffer = await frame.depthBuffer();
+      if (depthBuffer != null) {
+        const { x, y, width, height } = viewport.calculateDrawRect(
+          depthBuffer,
+          depthBuffer.imageDimensions
+        );
+        uniforms.serverDepthTexture = {
+          value: createDepthDataTexture(depthBuffer, viewport),
+        };
+        uniforms.serverDepthRect = {
+          value: {
+            x: x,
+            // Position server depth from top of screen. WebGL renders from
+            // bottom of screen. Consider moving to shader.
+            y: viewport.height - (height + y),
+            width: width,
+            height: height,
+          },
+        };
+        uniforms.serverDepthMatrix = {
+          value: computeServerDepthTextureMatrix(depthBuffer, viewport),
+        };
+      }
     }
   }
 }
