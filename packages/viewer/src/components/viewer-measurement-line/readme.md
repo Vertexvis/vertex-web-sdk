@@ -7,11 +7,12 @@
 
 ## Properties
 
-| Property    | Attribute    | Description                                                             | Type     | Default          |
-| ----------- | ------------ | ----------------------------------------------------------------------- | -------- | ---------------- |
-| `capLength` | `cap-length` | A length of the line cap. The line cap is a line at each end of a line. | `number` | `0`              |
-| `end`       | --           | A point that specifies the ending point of the line.                    | `Point`  | `Point.create()` |
-| `start`     | --           | A point that specifies the starting point of the line.                  | `Point`  | `Point.create()` |
+| Property        | Attribute        | Description                                                                                                                                  | Type     | Default          |
+| --------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------- |
+| `capLength`     | `cap-length`     | A length of the line cap. The line cap is a line at each end of a line.                                                                      | `number` | `0`              |
+| `end`           | --               | A point that specifies the ending point of the line.                                                                                         | `Point`  | `Point.create()` |
+| `pointerEvents` | `pointer-events` | The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to. | `string` | `'none'`         |
+| `start`         | --               | A point that specifies the starting point of the line.                                                                                       | `Point`  | `Point.create()` |
 
 
 ## CSS Custom Properties

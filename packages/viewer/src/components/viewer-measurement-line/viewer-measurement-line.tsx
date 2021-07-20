@@ -26,6 +26,14 @@ export class ViewerMeasurementLine {
   public capLength = 0;
 
   /**
+   * The type of [SVG pointer
+   * events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events)
+   * that the line should respond to.
+   */
+  @Prop()
+  public pointerEvents = 'none';
+
+  /**
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
@@ -35,29 +43,31 @@ export class ViewerMeasurementLine {
 
     return (
       <svg>
-        <line
-          class="line"
-          x1={this.start.x}
-          y1={this.start.y}
-          x2={this.end.x}
-          y2={this.end.y}
-        />
+        <g pointer-events={this.pointerEvents}>
+          <line
+            class="line"
+            x1={this.start.x}
+            y1={this.start.y}
+            x2={this.end.x}
+            y2={this.end.y}
+          />
 
-        <line
-          class="start-cap"
-          x1={startEndCap.start.x}
-          y1={startEndCap.start.y}
-          x2={startEndCap.end.x}
-          y2={startEndCap.end.y}
-        />
+          <line
+            class="start-cap"
+            x1={startEndCap.start.x}
+            y1={startEndCap.start.y}
+            x2={startEndCap.end.x}
+            y2={startEndCap.end.y}
+          />
 
-        <line
-          class="end-cap"
-          x1={endEndCap.start.x}
-          y1={endEndCap.start.y}
-          x2={endEndCap.end.x}
-          y2={endEndCap.end.y}
-        />
+          <line
+            class="end-cap"
+            x1={endEndCap.start.x}
+            y1={endEndCap.start.y}
+            x2={endEndCap.end.x}
+            y2={endEndCap.end.y}
+          />
+        </g>
       </svg>
     );
   }

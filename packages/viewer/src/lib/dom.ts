@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+import { Cursor } from './cursors';
 
 export function getMouseClientPosition(
   event: MouseEvent,
@@ -18,4 +19,22 @@ export function getMouseClientPosition(
 export function cssTransformCenterAt(position: Point.Point): string {
   const { x, y } = position;
   return `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+}
+
+/**
+ * Returns a CSS value for a cursor.
+ */
+export function cssCursor(cursor: Cursor): string {
+  if (typeof cursor === 'string') {
+    return cursor;
+  } else {
+    const parts = [`url(${cursor.url})`];
+    if (cursor.offsetX != null) {
+      parts.push(cursor.offsetX.toString());
+    }
+    if (cursor.offsetY != null) {
+      parts.push(cursor.offsetY.toString());
+    }
+    return parts.join(' ');
+  }
 }

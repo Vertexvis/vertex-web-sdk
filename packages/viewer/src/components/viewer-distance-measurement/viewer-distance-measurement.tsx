@@ -9,8 +9,8 @@ import {
   Method,
   Event,
   EventEmitter,
+  Listen,
 } from '@stencil/core';
-import classNames from 'classnames';
 import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 import {
   DepthBuffer,
@@ -228,6 +228,7 @@ export class ViewerDistanceMeasurement {
   private hostEl!: HTMLElement;
 
   private measurementUnits = new MeasurementUnits(this.units);
+  private hoverCursor?: Disposable;
 
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
@@ -258,6 +259,16 @@ export class ViewerDistanceMeasurement {
   /**
    * @ignore
    */
+  @Listen('pointerdown')
+  protected stopEventPropagation(event: PointerEvent): void {
+    if (event.button === 0) {
+      event.stopPropagation();
+    }
+  }
+
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.updateViewport();
 
@@ -275,6 +286,9 @@ export class ViewerDistanceMeasurement {
     resize.observe(this.hostEl);
   }
 
+  /**
+   * @ignore
+   */
   protected componentWillUpdate(): void {
     this.computePropsAndState();
   }
@@ -300,6 +314,7 @@ export class ViewerDistanceMeasurement {
               lineCapLength={this.lineCapLength}
               onStartAnchorPointerDown={this.handleEditAnchor('start')}
               onEndAnchorPointerDown={this.handleEditAnchor('end')}
+              linePointerEvents="painted"
             />
           </div>
         </Host>
@@ -307,13 +322,7 @@ export class ViewerDistanceMeasurement {
     } else if (this.mode === 'replace') {
       return (
         <Host>
-          <div
-            class={classNames('measurement replace', {
-              'cursor-crosshair': this.start != null,
-            })}
-            onPointerMove={this.handleUpdateStartAnchor}
-            onPointerDown={this.handleStartMeasurement}
-          >
+          <div class="measurement">
             <DistanceMeasurementRenderer
               startPt={startPt}
               endPt={endPt}
@@ -336,6 +345,7 @@ export class ViewerDistanceMeasurement {
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
               lineCapLength={this.lineCapLength}
+              linePointerEvents="painted"
             />
           </div>
         </Host>
@@ -351,8 +361,15 @@ export class ViewerDistanceMeasurement {
     newViewer?: HTMLVertexViewerElement,
     oldViewer?: HTMLVertexViewerElement
   ): void {
-    oldViewer?.removeEventListener('frameDrawn', this.handleFrameDrawn);
-    newViewer?.addEventListener('frameDrawn', this.handleFrameDrawn);
+    if (oldViewer != null) {
+      oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
+      this.removeInteractionListeners(oldViewer);
+    }
+
+    if (newViewer != null) {
+      newViewer.addEventListener('frameDrawn', this.handleFrameDrawn);
+      this.addInteractionListeners(newViewer);
+    }
   }
 
   /**
@@ -463,7 +480,23 @@ export class ViewerDistanceMeasurement {
     this.invalidateStateCounter = this.invalidateStateCounter + 1;
   }
 
-  private handleUpdateStartAnchor = (event: PointerEvent): void => {
+  private addInteractionListeners(target: HTMLElement): void {
+    if (this.mode === 'replace') {
+      target.addEventListener('pointermove', this.handleUpdateStartAnchor);
+      target.addEventListener('pointerdown', this.handleStartMeasurement);
+    }
+  }
+
+  private removeInteractionListeners(target: HTMLElement): void {
+    target.removeEventListener('pointermove', this.handleUpdateStartAnchor);
+    target.removeEventListener('pointerdown', this.handleStartMeasurement);
+  }
+
+  private handleUpdateStartAnchor = async (
+    event: PointerEvent
+  ): Promise<void> => {
+    this.hoverCursor?.dispose();
+
     if (
       this.interactionCount === 0 &&
       this.internalDepthBuffer != null &&
@@ -480,6 +513,10 @@ export class ViewerDistanceMeasurement {
         this.internalDepthBuffer
       );
       this.start = hasDepth ? worldPt : undefined;
+
+      if (hasDepth) {
+        this.hoverCursor = await this.viewer?.addCursor('crosshair');
+      }
     }
   };
 
@@ -489,13 +526,16 @@ export class ViewerDistanceMeasurement {
       this.start != null &&
       event.button === 0
     ) {
+      let cursor: Disposable | undefined = undefined;
+
       const startMeasurement = (start: () => void): void => {
         const dispose = (): void => {
           window.removeEventListener('pointerup', pointerUp);
           window.removeEventListener('pointermove', pointerMove);
         };
-        const pointerUp = (): void => {
+        const pointerUp = async (): Promise<void> => {
           dispose();
+          cursor = await this.viewer?.addCursor('crosshair');
           start();
         };
         const pointerMove = (event: PointerEvent): void => {
@@ -540,6 +580,8 @@ export class ViewerDistanceMeasurement {
           window.removeEventListener('pointermove', pointerMove);
           window.removeEventListener('pointerup', pointerUp);
           handleDownAndMove.dispose();
+
+          cursor?.dispose();
         };
 
         const pointerMove = this.createAnchorPointerMoveHandler('end');
@@ -574,9 +616,6 @@ export class ViewerDistanceMeasurement {
 
       return (event) => {
         if (event.button === 0) {
-          // Prevent the viewer from handling this event.
-          event.stopPropagation();
-
           this.beginEditing(anchor);
 
           window.addEventListener('pointermove', handlePointerMove);

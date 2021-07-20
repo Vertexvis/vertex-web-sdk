@@ -41,6 +41,23 @@
 
 ## Methods
 
+### `addCursor(cursor: Cursor, priority?: number | undefined) => Promise<Disposable>`
+
+Adds a cursor to the viewer, and displays it if the cursor has the highest
+priority.
+
+Cursors are managed as a prioritized list. A cursor is displayed if it has
+the highest priority or if the cursor is the most recently added cursor in
+the set of cursors with the same priority.
+
+To remove a cursor, call `dispose()` on the returned disposable.
+
+#### Returns
+
+Type: `Promise<Disposable>`
+
+
+
 ### `dispatchFrameDrawn(frame: Frame) => Promise<void>`
 
 

@@ -75,14 +75,6 @@
   pointer-events: none;
 }
 
-.measurement.replace {
-  pointer-events: initial;
-}
-
-.cursor-crosshair {
-  cursor: crosshair;
-}
-
 .line {
   --viewer-measurement-line-stroke: var(
     --viewer-distance-measurement-accent-color
@@ -100,13 +92,13 @@
   position: absolute;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: initial;
   display: block;
 }
 
-:host([interacting-anchor='start']),
-:host([interacting-anchor='end']) {
-  cursor: crosshair;
+:host(:not([mode='replace'])) .anchor,
+:host(:not([mode='replace'])) .anchor-label,
+:host(:not([mode='replace'])) .distance-label {
+  pointer-events: auto;
 }
 
 :host([interacting-anchor='start']) .anchor-start,
@@ -129,10 +121,12 @@
   position: absolute;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: initial;
   display: block;
 }
 
+:host([mode='edit']) {
+  cursor: auto;
+}
 :host([mode='edit']) .anchor {
   cursor: move;
 }
@@ -160,5 +154,4 @@
   border: var(--viewer-distance-measurement-distance-border);
   border-radius: var(--viewer-distance-measurement-distance-border-radius);
   padding: var(--viewer-distance-measurement-distance-padding);
-  pointer-events: initial;
 }
