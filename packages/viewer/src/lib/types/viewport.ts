@@ -154,21 +154,9 @@ export class Viewport implements Dimensions.Dimensions {
    * @param imageDimensions The dimensions of the received image.
    * @returns A rectangle.
    */
-  public calculateDrawRect(
-    image: FrameImageLike,
-    // TODO(dan): This argument shouldn't be needed, but the dimensions of the rectangle returned by FSS are wrong.
-    // https://vertexvis.atlassian.net/browse/API-1960
-    imageDimensions: Dimensions.Dimensions
-  ): Rectangle.Rectangle {
-    const { rect, scale } = image;
+  public calculateDrawRect(image: FrameImageLike): Rectangle.Rectangle {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
-
-    return Rectangle.create(
-      rect.x * scaleX,
-      rect.y * scaleY,
-      imageDimensions.width * scale * scaleX,
-      imageDimensions.height * scale * scaleY
-    );
+    return Rectangle.scale(image.rect, scaleX, scaleY);
   }
 
   private calculateFrameScale(image: FrameImageLike): Point.Point {
