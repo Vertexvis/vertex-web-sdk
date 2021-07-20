@@ -32,7 +32,9 @@ export class InteractionApi {
     private getViewport: () => Viewport,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
-    private longPressEmitter: EventEmitter<TapEventDetails>
+    private longPressEmitter: EventEmitter<TapEventDetails>,
+    private interactionStartedEmitter: EventEmitter<void>,
+    private interactionFinishedEmitter: EventEmitter<void>
   ) {
     this.tap = this.tap.bind(this);
     this.doubleTap = this.doubleTap.bind(this);
@@ -89,6 +91,7 @@ export class InteractionApi {
    */
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
+      this.interactionStartedEmitter.emit();
       this.currentCamera = this.getScene().camera();
       await this.stream.beginInteraction();
     }
@@ -294,6 +297,7 @@ export class InteractionApi {
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
       this.resetLastAngle();
+      this.interactionFinishedEmitter.emit();
       await this.stream.endInteraction();
     }
   }

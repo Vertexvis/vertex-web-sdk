@@ -27,6 +27,7 @@ import {
 } from './lib/stream/streamAttributes';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FramePerspectiveCamera } from './lib/types/frame';
+import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import {
@@ -44,7 +45,6 @@ import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
 import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
 import { Scene } from './lib/scenes/scene';
-import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { DepthBuffer, Measurement, Orientation, UnitType } from './lib/types';
@@ -270,9 +270,6 @@ export namespace Components {
      * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     depthBuffers?: DepthBufferFrameType;
-    /**
-     * @private For internal use only.
-     */
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
@@ -284,6 +281,7 @@ export namespace Components {
     featureLines?: FeatureLineOptions;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
+     * @readonly
      */
     frame: Frame | undefined;
     getBaseInteractionHandler: () => Promise<
@@ -295,6 +293,7 @@ export namespace Components {
      * @private Used for internal testing.
      */
     getStream: () => Promise<ViewerStreamApi>;
+    handleWebSocketClose: () => Promise<void>;
     /**
      * Returns `true` indicating that the scene is ready to be interacted with.
      */
@@ -310,7 +309,6 @@ export namespace Components {
     load: (urn: string) => Promise<void>;
     /**
      * Internal API.
-     * @private
      */
     registerCommand: <R, T>(
       id: string,
@@ -371,6 +369,7 @@ export namespace Components {
     registerTapKeyInteraction: (
       keyInteraction: KeyInteraction<TapEventDetails>
     ) => Promise<void>;
+    resolvedConfig: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
      */
@@ -392,6 +391,7 @@ export namespace Components {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */
     src?: string;
+    stream: ViewerStreamApi;
     /**
      * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
      * @readonly
@@ -1008,6 +1008,7 @@ declare namespace LocalJSX {
     featureLines?: FeatureLineOptions;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
+     * @readonly
      */
     frame?: Frame | undefined;
     /**
@@ -1032,6 +1033,14 @@ declare namespace LocalJSX {
      */
     onFrameReceived?: (event: CustomEvent<Frame>) => void;
     /**
+     * Emits an event when the user hs finished an interaction.
+     */
+    onInteractionFinished?: (event: CustomEvent<void>) => void;
+    /**
+     * Emits an event when the user has started an interaction.
+     */
+    onInteractionStarted?: (event: CustomEvent<void>) => void;
+    /**
      * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
      */
     onLongpress?: (event: CustomEvent<TapEventDetails>) => void;
@@ -1052,6 +1061,7 @@ declare namespace LocalJSX {
      * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
      */
     onTokenExpired?: (event: CustomEvent<void>) => void;
+    resolvedConfig: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
      */
@@ -1069,6 +1079,7 @@ declare namespace LocalJSX {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */
     src?: string;
+    stream: ViewerStreamApi;
     /**
      * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
      * @readonly

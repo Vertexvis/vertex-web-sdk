@@ -165,6 +165,11 @@ export class Viewer {
   @Prop() public configEnv: Environment = 'platprod';
 
   /**
+   * @internal
+   */
+  @Prop({ mutable: true }) public resolvedConfig!: Config;
+
+  /**
    * Enables or disables the default mouse and touch interactions provided by
    * the viewer. Enabled by default.
    */
@@ -221,6 +226,8 @@ export class Viewer {
   /**
    * The last frame that was received, which can be used to inspect the scene
    * and camera information.
+   *
+   * @readonly
    */
   @Prop({ mutable: true }) public frame: Frame | undefined;
 
@@ -232,6 +239,11 @@ export class Viewer {
    * @readonly
    */
   @Prop({ mutable: true }) public streamAttributes: ViewerStreamAttributes = {};
+
+  /**
+   * @internal
+   */
+  @Prop({ mutable: true }) public stream!: ViewerStreamApi;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -283,6 +295,16 @@ export class Viewer {
   @Event() public sceneReady!: EventEmitter<void>;
 
   /**
+   * Emits an event when the user has started an interaction.
+   */
+  @Event() public interactionStarted!: EventEmitter<void>;
+
+  /**
+   * Emits an event when the user hs finished an interaction.
+   */
+  @Event() public interactionFinished!: EventEmitter<void>;
+
+  /**
    * Used for internals or testing.
    *
    * @private
@@ -310,8 +332,6 @@ export class Viewer {
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
-
-  private stream!: ViewerStreamApi;
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
@@ -344,16 +364,29 @@ export class Viewer {
     this.streamSessionId = this.sessionId;
   }
 
-  public componentDidLoad(): void {
+  /**
+   * @ignore
+   */
+  protected componentWillLoad(): void {
+    this.updateResolvedConfig();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentDidLoad(): void {
     const ws = new WebSocketClientImpl();
     ws.onClose(() => this.handleWebSocketClose());
 
-    this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
+    this.stream = new ViewerStreamApi(
+      ws,
+      this.resolvedConfig.flags.logWsMessages
+    );
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
-    this.commands = new CommandRegistry(this.stream, () => this.getConfig());
+    this.commands = new CommandRegistry(this.stream, () => this.resolvedConfig);
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
@@ -381,10 +414,10 @@ export class Viewer {
           'pointerdown',
           'pointerup',
           'pointermove',
-          () => this.getConfig()
+          () => this.resolvedConfig
         );
-        this.baseInteractionHandler = new PointerInteractionHandler(() =>
-          this.getConfig()
+        this.baseInteractionHandler = new PointerInteractionHandler(
+          () => this.resolvedConfig
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -394,12 +427,12 @@ export class Viewer {
           'mousedown',
           'mouseup',
           'mousemove',
-          () => this.getConfig()
+          () => this.resolvedConfig
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(() =>
-          this.getConfig()
+        this.baseInteractionHandler = new MouseInteractionHandler(
+          () => this.resolvedConfig
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
@@ -415,7 +448,7 @@ export class Viewer {
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(
           this.stream,
-          () => this.getConfig(),
+          () => this.resolvedConfig,
           () => this.getImageScale()
         )
       );
@@ -432,16 +465,25 @@ export class Viewer {
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
   }
 
-  public connectedCallback(): void {
+  /**
+   * @ignore
+   */
+  protected connectedCallback(): void {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
-  public disconnectedCallback(): void {
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
     this.mutationObserver?.disconnect();
     this.resizeObserver?.disconnect();
   }
 
-  public render(): h.JSX.IntrinsicElements {
+  /**
+   * @ignore
+   */
+  protected render(): h.JSX.IntrinsicElements {
     const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
@@ -475,7 +517,7 @@ export class Viewer {
   /**
    * Internal API.
    *
-   * @private
+   * @internal
    */
   @Method()
   public async registerCommand<R, T>(
@@ -487,7 +529,7 @@ export class Viewer {
   }
 
   /**
-   * @private For internal use only.
+   * @internal
    */
   @Method()
   public async dispatchFrameDrawn(frame: Frame): Promise<void> {
@@ -688,6 +730,22 @@ export class Viewer {
   }
 
   /**
+   * @ignore
+   */
+  @Watch('config')
+  protected handleConfigChanged(): void {
+    this.updateResolvedConfig();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('configEnv')
+  protected handleConfigEnvChanged(): void {
+    this.updateResolvedConfig();
+  }
+
+  /**
    * Loads the given scene into the viewer and return a `Promise` that
    * resolves when the scene has been loaded. The specified scene is
    * provided as a URN in the following format:
@@ -786,15 +844,9 @@ export class Viewer {
   }
 
   /**
-   * @private Used for internals or testing.
+   * @internal
    */
-  public getConfig(): Config {
-    return parseConfig(this.configEnv, this.config);
-  }
-
-  /**
-   * @private Used for testing.
-   */
+  @Method()
   public async handleWebSocketClose(): Promise<void> {
     if (this.isStreamStarted) {
       this.isStreamStarted = false;
@@ -897,7 +949,7 @@ export class Viewer {
     this.canvasRenderer = measureCanvasRenderer(
       paintTime,
       createCanvasRenderer(),
-      this.getConfig().flags.logFrameRate,
+      this.resolvedConfig.flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
@@ -1172,7 +1224,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
-      () => this.getConfig().interactions,
+      () => this.resolvedConfig.interactions,
       () => this.createScene(),
       async () => this.frame?.depthBuffer(),
       () =>
@@ -1181,7 +1233,9 @@ export class Viewer {
         ),
       this.tap,
       this.doubletap,
-      this.longpress
+      this.longpress,
+      this.interactionStarted,
+      this.interactionFinished
     );
   }
 
@@ -1232,7 +1286,7 @@ export class Viewer {
   }
 
   private getCanvasDimensions(): Dimensions.Dimensions | undefined {
-    return this.getConfig().flags.letterboxFrames
+    return this.resolvedConfig.flags.letterboxFrames
       ? this.dimensions
       : this.hostDimensions;
   }
@@ -1265,5 +1319,9 @@ export class Viewer {
     const depthBuffer =
       this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
     return depthBuffer;
+  }
+
+  private updateResolvedConfig(): void {
+    this.resolvedConfig = parseConfig(this.configEnv, this.config);
   }
 }
