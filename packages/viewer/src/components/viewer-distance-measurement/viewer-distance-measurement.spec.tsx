@@ -15,6 +15,7 @@ import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
 import * as Fixtures from '../../testing/fixtures';
+import { Async } from '@vertexvis/utils';
 
 describe('vertex-viewer-distance-measurement', () => {
   const projectionViewMatrix = Matrix4.makeIdentity();
@@ -535,21 +536,25 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('updates start pt on pointer move', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [Viewer, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-distance-measurement
-            start={start}
-            end={end}
-            depthBuffer={depthBuffer}
-            projectionViewMatrix={projectionViewMatrix}
-            mode="replace"
-          />
+          <vertex-viewer>
+            <vertex-viewer-distance-measurement
+              start={start}
+              end={end}
+              depthBuffer={depthBuffer}
+              projectionViewMatrix={projectionViewMatrix}
+              mode="replace"
+            />
+          </vertex-viewer>
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
-      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
-      contentEl?.dispatchEvent(
+      const viewer = page.root as HTMLVertexViewerElement;
+      const measurement = viewer.querySelector(
+        'vertex-viewer-distance-measurement'
+      ) as HTMLVertexViewerDistanceMeasurementElement;
+      viewer.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
@@ -560,30 +565,34 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [Viewer, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-distance-measurement
-            start={start}
-            end={end}
-            depthBuffer={depthBuffer}
-            projectionViewMatrix={projectionViewMatrix}
-            mode="replace"
-            onEditBegin={onEditBegin}
-            onEditEnd={onEditEnd}
-          />
+          <vertex-viewer>
+            <vertex-viewer-distance-measurement
+              start={start}
+              end={end}
+              depthBuffer={depthBuffer}
+              projectionViewMatrix={projectionViewMatrix}
+              mode="replace"
+              onEditBegin={onEditBegin}
+              onEditEnd={onEditEnd}
+            />
+          </vertex-viewer>
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
-      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
+      const viewer = page.root as HTMLVertexViewerElement;
+      const measurement = viewer.querySelector(
+        'vertex-viewer-distance-measurement'
+      ) as HTMLVertexViewerDistanceMeasurementElement;
 
       // update start
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 1 })
       );
       window.dispatchEvent(
@@ -612,35 +621,40 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [Viewer, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-distance-measurement
-            start={start}
-            end={end}
-            depthBuffer={depthBuffer}
-            projectionViewMatrix={projectionViewMatrix}
-            mode="replace"
-            onEditBegin={onEditBegin}
-            onEditEnd={onEditEnd}
-          />
+          <vertex-viewer>
+            <vertex-viewer-distance-measurement
+              start={start}
+              end={end}
+              depthBuffer={depthBuffer}
+              projectionViewMatrix={projectionViewMatrix}
+              mode="replace"
+              onEditBegin={onEditBegin}
+              onEditEnd={onEditEnd}
+            />
+          </vertex-viewer>
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
-      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
+      const viewer = page.root as HTMLVertexViewerElement;
+      const measurement = viewer.querySelector(
+        'vertex-viewer-distance-measurement'
+      ) as HTMLVertexViewerDistanceMeasurementElement;
 
       // update start
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointerup', { clientX: 10, clientY: 10 })
       );
+      await Async.delay(1); // onEditBegin will be called async, wait and delay.
       expect(onEditBegin).toHaveBeenCalled();
 
       // move end anchor
@@ -664,30 +678,34 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [Viewer, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-distance-measurement
-            start={start}
-            end={end}
-            depthBuffer={depthBuffer}
-            projectionViewMatrix={projectionViewMatrix}
-            mode="replace"
-            onEditBegin={onEditBegin}
-            onEditEnd={onEditEnd}
-          />
+          <vertex-viewer>
+            <vertex-viewer-distance-measurement
+              start={start}
+              end={end}
+              depthBuffer={depthBuffer}
+              projectionViewMatrix={projectionViewMatrix}
+              mode="replace"
+              onEditBegin={onEditBegin}
+              onEditEnd={onEditEnd}
+            />
+          </vertex-viewer>
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
-      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
+      const viewer = page.root as HTMLVertexViewerElement;
+      const measurement = viewer.querySelector(
+        'vertex-viewer-distance-measurement'
+      ) as HTMLVertexViewerDistanceMeasurementElement;
 
       // update start
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
@@ -712,35 +730,40 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [Viewer, ViewerDistanceMeasurement],
         template: () => (
-          <vertex-viewer-distance-measurement
-            start={start}
-            end={end}
-            depthBuffer={depthBuffer}
-            projectionViewMatrix={projectionViewMatrix}
-            mode="replace"
-            onEditBegin={onEditBegin}
-            onEditEnd={onEditEnd}
-          />
+          <vertex-viewer>
+            <vertex-viewer-distance-measurement
+              start={start}
+              end={end}
+              depthBuffer={depthBuffer}
+              projectionViewMatrix={projectionViewMatrix}
+              mode="replace"
+              onEditBegin={onEditBegin}
+              onEditEnd={onEditEnd}
+            />
+          </vertex-viewer>
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
-      const contentEl = page.root?.shadowRoot?.querySelector('.measurement');
+      const viewer = page.root as HTMLVertexViewerElement;
+      const measurement = viewer.querySelector(
+        'vertex-viewer-distance-measurement'
+      ) as HTMLVertexViewerDistanceMeasurementElement;
 
       // update start
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      contentEl?.dispatchEvent(
+      viewer.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
         new MouseEvent('pointerup', { clientX: 10, clientY: 10 })
       );
+      await Async.delay(1); // onEditBegin will be called async, wait and delay.
       expect(onEditBegin).toHaveBeenCalled();
 
       // move end anchor

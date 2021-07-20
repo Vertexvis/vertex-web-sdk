@@ -41,6 +41,7 @@ import { Disposable } from '@vertexvis/utils';
 import { CommandFactory } from './lib/commands/command';
 import { InteractionHandler } from './lib/interactions/interactionHandler';
 import { KeyInteraction } from './lib/interactions/keyInteraction';
+import { Cursor } from './lib/cursors';
 import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
 import { Scene } from './lib/scenes/scene';
 import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
@@ -237,6 +238,17 @@ export namespace Components {
   interface VertexSceneTreeToolbar {}
   interface VertexSceneTreeToolbarGroup {}
   interface VertexViewer {
+    /**
+     * Adds a cursor to the viewer, and displays it if the cursor has the highest priority.  Cursors are managed as a prioritized list. A cursor is displayed if it has the highest priority or if the cursor is the most recently added cursor in the set of cursors with the same priority.  To remove a cursor, call `dispose()` on the returned disposable.
+     * @param cursor The cursor to add.
+     * @param priority The priority of the cursor.
+     * @returns A disposable that can be used to remove the cursor.
+     * @see See {@link CursorManager} for constants to pass to `priority`.
+     */
+    addCursor: (
+      cursor: Cursor,
+      priority?: number | undefined
+    ) => Promise<Disposable>;
     /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
      */
@@ -545,10 +557,6 @@ export namespace Components {
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
      */
     stretchOff: boolean;
-    /**
-     * Prevents the viewer from receiving events that would trigger camera interactions.
-     */
-    viewerInteractionsOff: boolean;
   }
   interface VertexViewerMeasurementLine {
     /**
@@ -559,6 +567,10 @@ export namespace Components {
      * A point that specifies the ending point of the line.
      */
     end: Point.Point;
+    /**
+     * The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to.
+     */
+    pointerEvents: string;
     /**
      * A point that specifies the starting point of the line.
      */
@@ -1224,10 +1236,6 @@ declare namespace LocalJSX {
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
      */
     stretchOff?: boolean;
-    /**
-     * Prevents the viewer from receiving events that would trigger camera interactions.
-     */
-    viewerInteractionsOff?: boolean;
   }
   interface VertexViewerMeasurementLine {
     /**
@@ -1238,6 +1246,10 @@ declare namespace LocalJSX {
      * A point that specifies the ending point of the line.
      */
     end?: Point.Point;
+    /**
+     * The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to.
+     */
+    pointerEvents?: string;
     /**
      * A point that specifies the starting point of the line.
      */

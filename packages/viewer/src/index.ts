@@ -7,6 +7,8 @@ export { ColorMaterial };
 
 export * from './components';
 
+export * from './lib/cursors';
+
 export * from './lib/interactions/interactionHandler';
 
 export * from './lib/interactions/keyInteraction';

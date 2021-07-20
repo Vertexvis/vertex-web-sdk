@@ -33,10 +33,6 @@ svg {
   stroke: var(--viewer-measurement-line-stroke);
 }
 
-line {
-  pointer-events: all;
-}
-
 .start-cap {
   visibility: var(--viewer-measurement-line-start-cap-visibility);
 }

@@ -89,6 +89,8 @@ import {
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
 import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
+import { Cursor, CursorManager } from '../../lib/cursors';
+import { cssCursor } from '../../lib/dom';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -111,6 +113,7 @@ interface DisconnectedStatus {
  */
 interface StateMap {
   streamWorldOrientation?: Orientation;
+  cursorManager: CursorManager;
 }
 
 /** @internal */
@@ -292,12 +295,16 @@ export class Viewer {
   @State() private hostDimensions?: Dimensions.Dimensions;
   @State() private errorMessage?: string;
 
+  @State() private cursor?: Cursor;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
    * @State to allow to preserve state across live-reloads.
    */
-  @State() private stateMap: StateMap = {};
+  @State() private stateMap: StateMap = {
+    cursorManager: new CursorManager(),
+  };
 
   @Element() private hostElement!: HTMLElement;
 
@@ -421,6 +428,8 @@ export class Viewer {
     this.updateStreamAttributesProp();
     this.registerSlotChangeListeners();
     this.injectViewerApi();
+
+    this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
   }
 
   public connectedCallback(): void {
@@ -438,6 +447,7 @@ export class Viewer {
       <Host>
         <div
           class="viewer-container"
+          style={{ cursor: cssCursor(this.cursor ?? '') }}
           onContextMenu={(event) => event.preventDefault()}
         >
           <div
@@ -580,6 +590,29 @@ export class Viewer {
     keyInteraction: KeyInteraction<TapEventDetails>
   ): Promise<void> {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
+  }
+
+  /**
+   * Adds a cursor to the viewer, and displays it if the cursor has the highest
+   * priority.
+   *
+   * Cursors are managed as a prioritized list. A cursor is displayed if it has
+   * the highest priority or if the cursor is the most recently added cursor in
+   * the set of cursors with the same priority.
+   *
+   * To remove a cursor, call `dispose()` on the returned disposable.
+   *
+   * @param cursor The cursor to add.
+   * @param priority The priority of the cursor.
+   * @returns A disposable that can be used to remove the cursor.
+   * @see See {@link CursorManager} for constants to pass to `priority`.
+   */
+  @Method()
+  public async addCursor(
+    cursor: Cursor,
+    priority?: number
+  ): Promise<Disposable> {
+    return this.stateMap.cursorManager.add(cursor, priority);
   }
 
   @Method()
@@ -1117,7 +1150,7 @@ export class Viewer {
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
-    if (this.hostElement == null) {
+    if (this.canvasElement == null) {
       throw new InteractionHandlerError(
         'Cannot initialize interaction handler. Canvas element is undefined.'
       );
@@ -1127,7 +1160,7 @@ export class Viewer {
         'Cannot initialize interaction handler. Canvas element is undefined.'
       );
     }
-    handler.initialize(this.hostElement, this.interactionApi);
+    handler.initialize(this.canvasElement, this.interactionApi);
   }
 
   private createInteractionApi(): InteractionApi {
@@ -1150,6 +1183,10 @@ export class Viewer {
       this.doubletap,
       this.longpress
     );
+  }
+
+  private handleCursorChanged(): void {
+    this.cursor = this.stateMap.cursorManager.getActiveCursor();
   }
 
   private createScene(): Scene {
