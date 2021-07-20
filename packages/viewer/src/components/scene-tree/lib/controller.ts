@@ -8,6 +8,7 @@ import {
   CollapseNodeRequest,
   ExpandAllRequest,
   ExpandNodeRequest,
+  FilterRequest,
   GetNodeAncestorsRequest,
   GetNodeAncestorsResponse,
   GetTreeRequest,
@@ -69,6 +70,17 @@ export interface ConnectionFailedState {
   details: SceneTreeErrorDetails;
   jwtProvider: JwtProvider;
   sceneViewId: string;
+}
+
+/**
+ * A set of options to configure tree filtering behavior.
+ */
+export interface FilterTreeOptions {
+  /**
+   * Indicates if the filter should include nodes that within collapsed parent
+   * nodes.
+   */
+  includeCollapsed?: boolean;
 }
 
 type ConnectionState =
@@ -425,6 +437,28 @@ export class SceneTreeController {
   }
 
   /**
+   * Performs a network request that will filter the nodes in the tree that
+   * match the given term and options.
+   *
+   * @param term The filter term.
+   * @param options The options to apply to the filter.
+   */
+  public async filter(
+    term: string,
+    options: FilterTreeOptions = {}
+  ): Promise<void> {
+    await this.ifConnectionHasJwt((jwt) => {
+      return this.requestUnary(jwt, (metadata, handler) => {
+        const req = new FilterRequest();
+        req.setFilter(term);
+        req.setFullTree((options.includeCollapsed ?? true) === true);
+
+        this.client.filter(req, metadata, handler);
+      });
+    });
+  }
+
+  /**
    * Checks if the page at the given index is loaded.
    *
    * @param index A page index.
@@ -661,9 +695,8 @@ export class SceneTreeController {
   }
 
   private invalidatePage(index: number): void {
-    const boundedIndex = this.constrainPageIndex(index);
-    if (this.isPageLoaded(boundedIndex)) {
-      this.pages.delete(boundedIndex);
+    if (this.isPageLoaded(index)) {
+      this.pages.delete(index);
     }
   }
 

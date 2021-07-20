@@ -9,8 +9,8 @@ import * as FrameCamera from './frameCamera';
 import * as CrossSectioning from './crossSectioning';
 import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
-import { decodePng } from '../../workers/png-decoder.worker';
 import { Orientation } from './orientation';
+import { loadWorker } from '../workers';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
@@ -24,23 +24,28 @@ export class Frame {
     public readonly depthBufferBytes: Uint8Array | undefined
   ) {}
 
-  public depthBuffer(): Promise<DepthBuffer | undefined> {
+  public async depthBuffer(): Promise<DepthBuffer | undefined> {
     if (this.cachedDepthBuffer == null) {
-      if (this.depthBufferBytes != null) {
-        this.cachedDepthBuffer = decodePng(this.depthBufferBytes).then((png) =>
-          DepthBuffer.fromPng(
-            png,
-            this.scene.camera,
-            this.dimensions,
-            this.image.rect,
-            this.image.scale
-          )
-        );
-      } else {
-        this.cachedDepthBuffer = Promise.resolve(undefined);
-      }
+      this.cachedDepthBuffer =
+        this.depthBufferBytes != null
+          ? this.decodeDepthBuffer(this.depthBufferBytes)
+          : Promise.resolve(undefined);
     }
     return this.cachedDepthBuffer;
+  }
+
+  private async decodeDepthBuffer(bytes: Uint8Array): Promise<DepthBuffer> {
+    const { decodePng } = await loadWorker(
+      () => import('../../workers/png-decoder.worker')
+    );
+    const png = await decodePng(bytes);
+    return DepthBuffer.fromPng(
+      png,
+      this.scene.camera,
+      this.dimensions,
+      this.image.rect,
+      this.image.scale
+    );
   }
 }
 

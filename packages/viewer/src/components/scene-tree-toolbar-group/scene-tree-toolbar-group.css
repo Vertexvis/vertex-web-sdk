@@ -1,0 +1,15 @@
+:host {
+  /**
+   * @prop --scene-tree-toolbar-gap: A CSS length that specifies the horizontal
+   * gap between slots.
+   */
+  --scene-tree-toolbar-group-item-gap: calc(
+    var(--scene-tree-toolbar-content-gap) / 2
+  );
+
+  display: flex;
+}
+
+::slotted(:not(:first-child)) {
+  margin-left: var(--scene-tree-toolbar-group-item-gap);
+}

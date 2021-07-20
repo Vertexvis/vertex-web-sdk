@@ -20,6 +20,8 @@ import {
   ExpandAllResponse,
   ExpandNodeRequest,
   ExpandNodeResponse,
+  FilterRequest,
+  FilterResponse,
   GetTreeRequest,
   LocateItemResponse,
   SubscribeRequest,
@@ -784,6 +786,58 @@ describe(SceneTreeController, () => {
 
       // skips first page because its already been fetched
       expect(client.getTree).toHaveBeenCalledTimes(9);
+    });
+  });
+
+  describe(SceneTreeController.prototype.filter, () => {
+    const term = 'filter';
+
+    it('defaults to including full tree', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+      (client.filter as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new FilterResponse())
+      );
+
+      await controller.connect(jwtProvider);
+
+      const req = new FilterRequest();
+      req.setFilter(term);
+      req.setFullTree(true);
+
+      await controller.filter(term);
+
+      expect(client.filter).toHaveBeenCalledWith(
+        req,
+        metadata,
+        expect.anything()
+      );
+    });
+
+    it('does not filter whole tree when include collapsed is false', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+      (client.filter as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(new FilterResponse())
+      );
+
+      await controller.connect(jwtProvider);
+
+      const req = new FilterRequest();
+      req.setFilter(term);
+      req.setFullTree(false);
+
+      await controller.filter(term, { includeCollapsed: false });
+
+      expect(client.filter).toHaveBeenCalledWith(
+        req,
+        metadata,
+        expect.anything()
+      );
     });
   });
 

@@ -1,8 +1,14 @@
 :host {
   width: 300px;
   height: 100%;
-  overflow-y: auto;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.rows-scroll {
+  overflow-y: auto;
+  height: 100%;
 }
 
 .rows {
@@ -64,4 +70,15 @@
   padding: 0.25rem;
   box-sizing: border-box;
   text-align: center;
+}
+
+.search-toolbar,
+slot[name='header']::slotted(vertex-scene-tree-toolbar) {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+slot[name='footer']::slotted(vertex-scene-tree-toolbar) {
+  border-top-width: 1px;
+  border-top-style: solid;
 }
