@@ -557,10 +557,6 @@ export namespace Components {
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
      */
     stretchOff: boolean;
-    /**
-     * Prevents the viewer from receiving events that would trigger camera interactions.
-     */
-    viewerInteractionsOff: boolean;
   }
   interface VertexViewerMeasurementLine {
     /**
@@ -1240,10 +1236,6 @@ declare namespace LocalJSX {
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
      */
     stretchOff?: boolean;
-    /**
-     * Prevents the viewer from receiving events that would trigger camera interactions.
-     */
-    viewerInteractionsOff?: boolean;
   }
   interface VertexViewerMeasurementLine {
     /**

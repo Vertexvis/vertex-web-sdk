@@ -33,10 +33,9 @@ viewport of a `<vertex-viewer>`.
 
 ## Properties
 
-| Property                | Attribute                 | Description                                                                                          | Type      | Default |
-| ----------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | --------- | ------- |
-| `stretchOff`            | `stretch-off`             | Indicates if the layer should stretch to fill the size of its container's nearest positioned parent. | `boolean` | `false` |
-| `viewerInteractionsOff` | `viewer-interactions-off` | Prevents the viewer from receiving events that would trigger camera interactions.                    | `boolean` | `false` |
+| Property     | Attribute     | Description                                                                                          | Type      | Default |
+| ------------ | ------------- | ---------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `stretchOff` | `stretch-off` | Indicates if the layer should stretch to fill the size of its container's nearest positioned parent. | `boolean` | `false` |
 
 
 ## Dependencies

@@ -44,7 +44,6 @@ export class ViewerToolbar {
           'position-center': horizontal === 'center',
           'position-right': horizontal === 'right',
         })}
-        viewerInteractionsOff
       >
         <div
           class={classname('inner', {
