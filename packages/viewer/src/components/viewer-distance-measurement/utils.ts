@@ -1,4 +1,4 @@
-import { Line3, Matrix4, Point } from '@vertexvis/geometry';
+import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Viewport } from '../../lib/types';
 
 export interface ElementPositions {
@@ -12,6 +12,15 @@ export interface RenderParams {
   viewport: Viewport;
 }
 
+export function translateWorldPtToViewport(
+  pt: Vector3.Vector3,
+  projectionViewMatrix: Matrix4.Matrix4,
+  viewport: Viewport
+): Point.Point {
+  const ndc = Vector3.transformMatrix(pt, projectionViewMatrix);
+  return viewport.transformVectorToViewport(ndc);
+}
+
 export function translateWorldLineToViewport(
   line: Line3.Line3,
   projectionViewMatrix: Matrix4.Matrix4,
@@ -19,8 +28,8 @@ export function translateWorldLineToViewport(
 ): { start: Point.Point; end: Point.Point } {
   const ndc = Line3.transformMatrix(line, projectionViewMatrix);
   return {
-    start: viewport.transformPointToViewport(ndc.start),
-    end: viewport.transformPointToViewport(ndc.end),
+    start: viewport.transformVectorToViewport(ndc.start),
+    end: viewport.transformVectorToViewport(ndc.end),
   };
 }
 

@@ -11,14 +11,19 @@ import {
   EventEmitter,
   Listen,
 } from '@stencil/core';
-import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import {
   DepthBuffer,
   MeasurementUnits,
+  StencilBuffer,
   UnitType,
   Viewport,
 } from '../../lib/types';
-import { ElementPositions, getViewingElementPositions } from './utils';
+import {
+  ElementPositions,
+  getViewingElementPositions,
+  translateWorldPtToViewport,
+} from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
 import { getMouseClientPosition } from '../../lib/dom';
 import { DistanceMeasurementRenderer } from './viewer-distance-measurement-components';
@@ -229,6 +234,7 @@ export class ViewerDistanceMeasurement {
 
   private measurementUnits = new MeasurementUnits(this.units);
   private hoverCursor?: Disposable;
+  private pendingStencilBuffer?: Promise<StencilBuffer | undefined>;
 
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
@@ -297,7 +303,7 @@ export class ViewerDistanceMeasurement {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const positions = this.computeElementPositions();
+    const positions = this.computeLinePositions();
     const { startPt, endPt, labelPt } = positions;
     const distance = this.formatDistance(this.distance);
 
@@ -320,6 +326,7 @@ export class ViewerDistanceMeasurement {
         </Host>
       );
     } else if (this.mode === 'replace') {
+      const targetPt = this.computeStartPosition();
       return (
         <Host>
           <div class="measurement">
@@ -327,6 +334,7 @@ export class ViewerDistanceMeasurement {
               startPt={startPt}
               endPt={endPt}
               centerPt={labelPt}
+              targetPt={startPt == null ? targetPt : undefined}
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
               lineCapLength={this.lineCapLength}
@@ -403,7 +411,7 @@ export class ViewerDistanceMeasurement {
     this.updateDistance();
   }
 
-  private computeElementPositions(): ElementPositions {
+  private computeLinePositions(): ElementPositions {
     if (this.internalProjectionViewMatrix != null && this.line != null) {
       return getViewingElementPositions(this.line, {
         projectionViewMatrix: this.internalProjectionViewMatrix,
@@ -411,6 +419,16 @@ export class ViewerDistanceMeasurement {
       });
     } else {
       return {};
+    }
+  }
+
+  private computeStartPosition(): Point.Point | undefined {
+    if (this.internalProjectionViewMatrix != null && this.start != null) {
+      return translateWorldPtToViewport(
+        this.start,
+        this.internalProjectionViewMatrix,
+        this.viewport
+      );
     }
   }
 
@@ -446,11 +464,11 @@ export class ViewerDistanceMeasurement {
           this.internalProjectionViewMatrix
         );
         const startPt = this.viewport.transformPointToFrame(
-          this.viewport.transformPointToViewport(lineNdc.start),
+          this.viewport.transformVectorToViewport(lineNdc.start),
           this.internalDepthBuffer
         );
         const endPt = this.viewport.transformPointToFrame(
-          this.viewport.transformPointToViewport(lineNdc.end),
+          this.viewport.transformVectorToViewport(lineNdc.end),
           this.internalDepthBuffer
         );
 
@@ -497,25 +515,27 @@ export class ViewerDistanceMeasurement {
   ): Promise<void> => {
     this.hoverCursor?.dispose();
 
-    if (
-      this.interactionCount === 0 &&
-      this.internalDepthBuffer != null &&
-      this.elementBounds != null
-    ) {
-      const pt = getMouseClientPosition(event, this.elementBounds);
-      const framePt = this.viewport.transformPointToFrame(
-        pt,
-        this.internalDepthBuffer
-      );
-      const hasDepth = this.internalDepthBuffer.isDepthAtFarPlane(framePt);
-      const worldPt = this.viewport.transformPointToWorldSpace(
-        pt,
-        this.internalDepthBuffer
-      );
-      this.start = hasDepth ? worldPt : undefined;
+    if (this.interactionCount === 0 && this.elementBounds != null) {
+      this.pendingStencilBuffer = this.viewer?.stencilBuffer.latest();
 
-      if (hasDepth) {
-        this.hoverCursor = await this.viewer?.addCursor('crosshair');
+      const pt = getMouseClientPosition(event, this.elementBounds);
+      const snappedPt = await this.snapPoint(pt);
+
+      if (this.internalDepthBuffer != null) {
+        const framePt = this.viewport.transformPointToFrame(
+          snappedPt,
+          this.internalDepthBuffer
+        );
+        const hasDepth = this.internalDepthBuffer.isDepthAtFarPlane(framePt);
+        const worldPt = this.viewport.transformPointToWorldSpace(
+          snappedPt,
+          this.internalDepthBuffer
+        );
+        this.start = hasDepth ? worldPt : undefined;
+
+        if (hasDepth) {
+          this.hoverCursor = await this.viewer?.addCursor('none');
+        }
       }
     }
   };
@@ -660,6 +680,19 @@ export class ViewerDistanceMeasurement {
     };
 
     return handlePointerUp;
+  }
+
+  private async snapPoint(pt: Point.Point): Promise<Point.Point> {
+    const stencil = await this.viewer?.stencilBuffer.latest();
+    if (stencil != null && this.pendingStencilBuffer != null) {
+      const framePt = this.viewport.transformPointToFrame(pt, stencil);
+      const nearestPt = stencil.getNearestPixel(framePt, 10);
+
+      if (nearestPt != null) {
+        return this.viewport.transformPointToViewport(nearestPt, stencil);
+      }
+    }
+    return pt;
   }
 
   private formatDistance(distance: number | undefined): string {

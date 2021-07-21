@@ -10,7 +10,7 @@ import * as CrossSectioning from './crossSectioning';
 import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
 import { Orientation } from './orientation';
-import { loadWorker } from '../workers';
+import { loadDecodePngWorker } from '../../workers';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
@@ -35,28 +35,30 @@ export class Frame {
   }
 
   private async decodeDepthBuffer(bytes: Uint8Array): Promise<DepthBuffer> {
-    const { decodePng } = await loadWorker(
-      () => import('../../workers/png-decoder.worker')
-    );
+    const { decodePng } = await loadDecodePngWorker();
     const png = await decodePng(bytes);
     return DepthBuffer.fromPng(
       png,
       this.scene.camera,
       this.dimensions,
-      this.image.rect,
-      this.image.scale
+      this.image.imageRect,
+      this.image.imageScale
     );
   }
 }
 
-export type FrameImageLike = Pick<FrameImage, 'dimensions' | 'rect' | 'scale'>;
+export interface FrameImageLike {
+  readonly frameDimensions: Dimensions.Dimensions;
+  readonly imageRect: Rectangle.Rectangle;
+  readonly imageScale: number;
+}
 
 export class FrameImage implements FrameImageLike {
   public constructor(
-    public readonly dimensions: Dimensions.Dimensions,
-    public readonly rect: Rectangle.Rectangle,
-    public readonly scale: number,
-    public readonly data: Uint8Array
+    public readonly frameDimensions: Dimensions.Dimensions,
+    public readonly imageRect: Rectangle.Rectangle,
+    public readonly imageScale: number,
+    public readonly imageBytes: Uint8Array
   ) {}
 }
 

@@ -58,8 +58,8 @@ describe('vertex-viewer-distance-measurement', () => {
     const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
     const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
 
-    const startPt = viewport.transformPointToViewport(startNdc);
-    const endPt = viewport.transformPointToViewport(endNdc);
+    const startPt = viewport.transformVectorToViewport(startNdc);
+    const endPt = viewport.transformVectorToViewport(endNdc);
 
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`
@@ -84,8 +84,8 @@ describe('vertex-viewer-distance-measurement', () => {
     const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
     const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
 
-    const startPt = viewport.transformPointToViewport(startNdc);
-    const endPt = viewport.transformPointToViewport(endNdc);
+    const startPt = viewport.transformVectorToViewport(startNdc);
+    const endPt = viewport.transformVectorToViewport(endNdc);
 
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`
@@ -108,7 +108,7 @@ describe('vertex-viewer-distance-measurement', () => {
     });
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
-    const centerPt = viewport.transformPointToViewport(centerNdc);
+    const centerPt = viewport.transformVectorToViewport(centerNdc);
 
     expect(labelEl?.style.transform).toContain(
       `translate(${centerPt.x}px, ${centerPt.y}px)`
@@ -164,8 +164,8 @@ describe('vertex-viewer-distance-measurement', () => {
     const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
     const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
 
-    const startPt = viewport.transformPointToViewport(newStartNdc);
-    const endPt = viewport.transformPointToViewport(newEndNdc);
+    const startPt = viewport.transformVectorToViewport(newStartNdc);
+    const endPt = viewport.transformVectorToViewport(newEndNdc);
 
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`
@@ -333,7 +333,7 @@ describe('vertex-viewer-distance-measurement', () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       viewer.frame!.scene.camera.projectionViewMatrix
     );
-    const startPt = viewport.transformPointToViewport(startNdc);
+    const startPt = viewport.transformVectorToViewport(startNdc);
     const startEl = page.body
       .querySelector('vertex-viewer-distance-measurement')
       ?.shadowRoot?.getElementById('start-anchor');

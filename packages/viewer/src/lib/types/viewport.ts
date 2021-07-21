@@ -60,7 +60,7 @@ export class Viewport implements Dimensions.Dimensions {
    * @returns A 2D point in the coordinate space of the viewport.
    */
   public transformNdc(ndc: Vector3.Vector3): Point.Point {
-    return this.transformPointToViewport(ndc);
+    return this.transformVectorToViewport(ndc);
   }
 
   /**
@@ -70,11 +70,19 @@ export class Viewport implements Dimensions.Dimensions {
    * @param ndc A 3D point in NDC.
    * @returns A 2D point in the coordinate space of the viewport.
    */
-  public transformPointToViewport(ndc: Vector3.Vector3): Point.Point {
+  public transformVectorToViewport(ndc: Vector3.Vector3): Point.Point {
     return Point.create(
       ndc.x * this.center.x + this.center.x,
       -ndc.y * this.center.y + this.center.y
     );
+  }
+
+  public transformPointToViewport(
+    pt: Point.Point,
+    image: FrameImageLike
+  ): Point.Point {
+    const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
+    return Point.scale(pt, 1 * scaleX, 1 * scaleY);
   }
 
   /**
@@ -137,8 +145,8 @@ export class Viewport implements Dimensions.Dimensions {
     );
     const normal = Vector3.normalize(
       Vector3.create(
-        (framePt.x / image.dimensions.width - 0.5) * aspectRatio,
-        -(framePt.y / image.dimensions.height) + 0.5,
+        (framePt.x / image.frameDimensions.width - 0.5) * aspectRatio,
+        -(framePt.y / image.frameDimensions.height) + 0.5,
         -0.5 / Math.tan(Angle.toRadians(fovY / 2.0))
       )
     );
@@ -156,11 +164,11 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public calculateDrawRect(image: FrameImageLike): Rectangle.Rectangle {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
-    return Rectangle.scale(image.rect, scaleX, scaleY);
+    return Rectangle.scale(image.imageRect, scaleX, scaleY);
   }
 
   private calculateFrameScale(image: FrameImageLike): Point.Point {
-    const { dimensions } = image;
+    const { frameDimensions: dimensions } = image;
 
     const imageRect = Rectangle.fromDimensions(dimensions);
     const viewport = Rectangle.fromDimensions(this.dimensions);

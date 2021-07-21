@@ -1,6 +1,6 @@
-import { Dimensions, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
-import { Mapper } from '@vertexvis/utils';
+import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
 import { mapFrame } from '../lib/mappers';
 import { DepthBuffer, Orientation } from '../lib/types';
@@ -82,4 +82,23 @@ export function createDepthBuffer(
     Rectangle.create(0, 0, width, height),
     1
   );
+}
+
+export function createStencilImageBytes(
+  width: number,
+  height: number,
+  fill: (pixel: Point.Point) => Color.Color
+): Uint8Array {
+  const data = new Uint8Array(width * height * 3);
+  for (let i = 0; i < width * height; i++) {
+    const offset = i * 3;
+    const x = i % width;
+    const y = Math.floor(i / width);
+    const color = fill(Point.create(x, y));
+
+    data[offset + 0] = color.r;
+    data[offset + 1] = color.g;
+    data[offset + 2] = color.b;
+  }
+  return data;
 }

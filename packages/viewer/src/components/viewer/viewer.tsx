@@ -29,6 +29,7 @@ import {
   SynchronizedClock,
   Viewport,
   Orientation,
+  StencilBufferManager,
 } from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
@@ -246,6 +247,11 @@ export class Viewer {
   @Prop({ mutable: true }) public stream!: ViewerStreamApi;
 
   /**
+   * @internal
+   */
+  @Prop({ mutable: true }) public stencilBuffer!: StencilBufferManager;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    */
@@ -328,7 +334,7 @@ export class Viewer {
     cursorManager: new CursorManager(),
   };
 
-  @Element() private hostElement!: HTMLElement;
+  @Element() private hostElement!: HTMLVertexViewerElement;
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
@@ -369,6 +375,8 @@ export class Viewer {
    */
   protected componentWillLoad(): void {
     this.updateResolvedConfig();
+
+    this.stencilBuffer = new StencilBufferManager(this.hostElement);
   }
 
   /**

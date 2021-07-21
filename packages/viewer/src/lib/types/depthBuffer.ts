@@ -24,19 +24,20 @@ export class DepthBuffer implements FrameImageLike {
    * Constructs a new depth buffer.
    *
    * @param camera The camera data that generated this depth buffer.
-   * @param dimensions The dimensions of the frame used to generate this depth
+   * @param frameDimensions The dimensions of the frame used to generate this depth
    *   buffer.
-   * @param rect The placement of the depth image within the viewport.
-   * @param scale The scale factor of the depth image.
+   * @param imageRect The placement of the depth image within the viewport.
+   * @param imageScale The scale factor of the depth image.
    * @param data A 16-bit typed array of depth values.
    * @param imageDimensions The dimensions of the depth image.
    */
   public constructor(
     public readonly camera: FramePerspectiveCamera,
-    public readonly dimensions: Dimensions.Dimensions,
-    public readonly rect: Rectangle.Rectangle,
-    public readonly scale: number,
+    public readonly frameDimensions: Dimensions.Dimensions,
+    public readonly imageRect: Rectangle.Rectangle,
+    public readonly imageScale: number,
     public readonly data: Uint16Array,
+    // TODO(dan): See if we can remove this prop now.
     public readonly imageDimensions: Dimensions.Dimensions
   ) {}
 
@@ -108,8 +109,8 @@ export class DepthBuffer implements FrameImageLike {
   ): number {
     const { width, height } = this.imageDimensions;
 
-    const offset = Point.subtract(point, this.rect);
-    const scale = 1 / this.scale;
+    const offset = Point.subtract(point, this.imageRect);
+    const scale = 1 / this.imageScale;
     const pixel = Point.scale(offset, scale, scale);
 
     if (pixel.x >= 1 && pixel.y >= 1 && pixel.x <= width && pixel.y <= height) {
@@ -185,7 +186,7 @@ export class DepthBuffer implements FrameImageLike {
     const distance = Vector3.magnitude(projected);
 
     const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
-    const screenPt = viewport.transformPointToViewport(ndc);
+    const screenPt = viewport.transformVectorToViewport(ndc);
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
     const depth = this.getLinearDepthAtPoint(scaledPt);
 
