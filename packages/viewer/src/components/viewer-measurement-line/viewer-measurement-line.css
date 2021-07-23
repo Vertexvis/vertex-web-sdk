@@ -5,13 +5,31 @@
    * @prop --viewer-measurement-line-stroke: An SVG stroke that specifies the
    * color stroke of the line.
    */
-  --viewer-measurement-line-stroke: var(--blue-600);
+  --viewer-measurement-line-stroke: var(--white);
 
   /**
-   * @prop --viewer-measurement-line-stroke-width: A CSS length that specifies
-   * the width of the line.
+   * @prop --viewer-measurement-line-stroke-opacity: An SVG stroke that
+   * specifies the stroke opacity of the line.
    */
-  --viewer-measurement-line-stroke-width: 3px;
+  --viewer-measurement-line-stroke-opacity: 0.75;
+
+  /**
+    * @prop --viewer-measurement-line-stroke-width: A CSS length that specifies
+    * the width of the stroke.
+    */
+  --viewer-measurement-line-stroke-width: 1.25px;
+
+  /**
+   * @prop --viewer-measurement-line-fill: An SVG stroke that specifies the
+   * color fill of the line.
+   */
+  --viewer-measurement-line-fill: var(--neutral-900);
+
+  /**
+   * @prop --viewer-measurement-line-fill-width: A CSS length that specifies
+   * the width of the fill.
+   */
+  --viewer-measurement-line-fill-width: 2px;
 
   /**
    * @prop --viewer-measurement-line-start-cap-visibility: An CSS visibility
@@ -29,8 +47,20 @@
 svg {
   width: 100%;
   height: 100%;
-  stroke-width: var(--viewer-measurement-line-stroke-width);
+}
+
+.line-stroke {
+  stroke-width: calc(
+    var(--viewer-measurement-line-fill-width) +
+      var(--viewer-measurement-line-stroke-width)
+  );
   stroke: var(--viewer-measurement-line-stroke);
+  opacity: var(--viewer-measurement-line-stroke-opacity);
+}
+
+.line-fill {
+  stroke-width: var(--viewer-measurement-line-fill-width);
+  stroke: var(--viewer-measurement-line-fill);
 }
 
 .start-cap {

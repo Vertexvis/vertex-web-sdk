@@ -29,7 +29,8 @@ import { BaseInteractionHandler } from "./lib/interactions/baseInteractionHandle
 import { Scene } from "./lib/scenes/scene";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
-import { Anchor, ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
+import { ViewerDistanceMeasurementElementMetrics, ViewerDistanceMeasurementLabelFormatter, ViewerDistanceMeasurementMode } from "./components/viewer-distance-measurement/viewer-distance-measurement";
+import { Anchor } from "./components/viewer-distance-measurement/utils";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/viewer-measurement-tool";
@@ -259,6 +260,10 @@ export namespace Components {
         "getStream": () => Promise<ViewerStreamApi>;
         "handleWebSocketClose": () => Promise<void>;
         /**
+          * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
+         */
+        "interactionTarget"?: HTMLElement;
+        /**
           * Returns `true` indicating that the scene is ready to be interacted with.
          */
         "isSceneReady": () => Promise<boolean>;
@@ -401,6 +406,10 @@ export namespace Components {
          */
         "projectionViewMatrix"?: Matrix4.Matrix4;
         /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance": number;
+        /**
           * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
         "start"?: Vector3.Vector3;
@@ -516,6 +525,10 @@ export namespace Components {
          */
         "isMeasuring": boolean;
         /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance": number;
+        /**
           * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
          */
         "tool": ViewerMeasurementToolType;
@@ -574,6 +587,10 @@ export namespace Components {
           * The ID of the measurement that is selected.
          */
         "selectedMeasurementId"?: string;
+        /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance": number;
         /**
           * The type of measurement to perform.
          */
@@ -909,6 +926,10 @@ declare namespace LocalJSX {
          */
         "frame"?: Frame | undefined;
         /**
+          * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
+         */
+        "interactionTarget"?: HTMLElement;
+        /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */
         "keyboardControls"?: boolean;
@@ -1067,6 +1088,10 @@ declare namespace LocalJSX {
          */
         "projectionViewMatrix"?: Matrix4.Matrix4;
         /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance"?: number;
+        /**
           * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
         "start"?: Vector3.Vector3;
@@ -1194,6 +1219,10 @@ declare namespace LocalJSX {
          */
         "onMeasureEnd"?: (event: CustomEvent<Measurement>) => void;
         /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance"?: number;
+        /**
           * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
          */
         "tool"?: ViewerMeasurementToolType;
@@ -1231,6 +1260,10 @@ declare namespace LocalJSX {
           * The ID of the measurement that is selected.
          */
         "selectedMeasurementId"?: string;
+        /**
+          * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+         */
+        "snapDistance"?: number;
         /**
           * The type of measurement to perform.
          */

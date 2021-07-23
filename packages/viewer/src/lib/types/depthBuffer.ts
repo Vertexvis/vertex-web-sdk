@@ -113,8 +113,8 @@ export class DepthBuffer implements FrameImageLike {
     const scale = 1 / this.imageScale;
     const pixel = Point.scale(offset, scale, scale);
 
-    if (pixel.x >= 1 && pixel.y >= 1 && pixel.x <= width && pixel.y <= height) {
-      const index = Math.floor(pixel.x) - 1 + (Math.floor(pixel.y) - 1) * width;
+    if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
+      const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
       const depth = this.data[index];
       const depthOrFallback =
         depth === DepthBuffer.MAX_DEPTH_VALUE

@@ -1,15 +1,32 @@
 import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-import { Viewport } from '../../lib/types';
+import { DepthBuffer, Viewport } from '../../lib/types';
 
-export interface ElementPositions {
+export type Anchor = 'start' | 'end';
+
+export interface MeasurementElementPositions {
   startPt?: Point.Point;
   endPt?: Point.Point;
   labelPt?: Point.Point;
+  indicatorPt?: Point.Point;
 }
 
 export interface RenderParams {
   projectionViewMatrix: Matrix4.Matrix4;
   viewport: Viewport;
+}
+
+export function translatePointToWorld(
+  pt: Point.Point,
+  depthBuffer: DepthBuffer | undefined,
+  viewport: Viewport,
+  { ignoreDepthTest = false }: { ignoreDepthTest?: boolean } = {}
+): Vector3.Vector3 | undefined {
+  if (depthBuffer != null) {
+    const framePt = viewport.transformPointToFrame(pt, depthBuffer);
+    const hasDepth = depthBuffer.isDepthAtFarPlane(framePt);
+    const worldPt = viewport.transformPointToWorldSpace(pt, depthBuffer);
+    return hasDepth || ignoreDepthTest ? worldPt : undefined;
+  }
 }
 
 export function translateWorldPtToViewport(
@@ -35,8 +52,9 @@ export function translateWorldLineToViewport(
 
 export function getViewingElementPositions(
   line: Line3.Line3,
+  interactingAnchor: Anchor | 'none',
   params: RenderParams
-): ElementPositions {
+): MeasurementElementPositions {
   const { projectionViewMatrix, viewport } = params;
   const { start: startPt, end: endPt } = translateWorldLineToViewport(
     line,
@@ -44,8 +62,12 @@ export function getViewingElementPositions(
     viewport
   );
   const labelPt = Point.lerp(startPt, endPt, 0.5);
+  const indicatorPt =
+    interactingAnchor !== 'none'
+      ? getIndicatorPtForAnchor(line, interactingAnchor, params)
+      : undefined;
 
-  return { startPt, endPt, labelPt };
+  return { startPt, endPt, labelPt, indicatorPt };
 }
 
 export function isVertexViewerDistanceMeasurement(
@@ -54,5 +76,17 @@ export function isVertexViewerDistanceMeasurement(
   return (
     el instanceof HTMLElement &&
     el.nodeName === 'VERTEX-VIEWER-DISTANCE-MEASUREMENT'
+  );
+}
+
+function getIndicatorPtForAnchor(
+  line: Line3.Line3,
+  anchor: Anchor,
+  params: RenderParams
+): Point.Point {
+  return translateWorldPtToViewport(
+    anchor === 'start' ? line.start : line.end,
+    params.projectionViewMatrix,
+    params.viewport
   );
 }

@@ -252,6 +252,16 @@ export class Viewer {
   @Prop({ mutable: true }) public stencilBuffer!: StencilBufferManager;
 
   /**
+   * The HTML element that will handle interaction events from the user. Used by
+   * components to listen for interaction events from the same element as the
+   * viewer. Note, this property maybe removed in the future when refactoring
+   * our interaction handling.
+   *
+   * @internal
+   */
+  @Prop({ mutable: true }) public interactionTarget?: HTMLElement;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    */
@@ -507,7 +517,10 @@ export class Viewer {
             })}
           >
             <canvas
-              ref={(ref) => (this.canvasElement = ref)}
+              ref={(ref) => {
+                this.canvasElement = ref;
+                this.interactionTarget = ref;
+              }}
               class="canvas"
               width={canvasDimensions != null ? canvasDimensions.width : 0}
               height={canvasDimensions != null ? canvasDimensions.height : 0}
@@ -1248,12 +1261,14 @@ export class Viewer {
   }
 
   private handleCursorChanged(): void {
-    this.cursor = this.stateMap.cursorManager.getActiveCursor();
+    window.requestAnimationFrame(() => {
+      this.cursor = this.stateMap.cursorManager.getActiveCursor();
+    });
   }
 
   private createScene(): Scene {
     if (
-      this.lastFrame == null ||
+      this.frame == null ||
       this.sceneViewId == null ||
       this.stateMap.streamWorldOrientation == null
     ) {
@@ -1268,7 +1283,7 @@ export class Viewer {
         : this.selectionMaterial;
     return new Scene(
       this.stream,
-      this.lastFrame,
+      this.frame,
       mapFrameOrThrow(this.stateMap.streamWorldOrientation),
       () => this.getImageScale(),
       this.sceneViewId,

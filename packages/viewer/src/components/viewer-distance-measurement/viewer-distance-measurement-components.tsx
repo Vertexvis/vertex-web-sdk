@@ -7,7 +7,7 @@ export interface DistanceMeasurementRendererProps {
   startPt?: Point.Point;
   endPt?: Point.Point;
   centerPt?: Point.Point;
-  targetPt?: Point.Point;
+  indicatorPt?: Point.Point;
   distance?: string;
   anchorLabelOffset?: number;
   lineCapLength?: number;
@@ -20,7 +20,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
   startPt,
   endPt,
   centerPt,
-  targetPt,
+  indicatorPt,
   distance,
   anchorLabelOffset,
   lineCapLength,
@@ -109,11 +109,15 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
         </div>
       )}
 
-      {targetPt != null && (
+      {indicatorPt != null && (
         <div
-          class="target-point"
-          style={{ transform: cssTransformCenterAt(targetPt) }}
-        />
+          class="indicator"
+          style={{ transform: cssTransformCenterAt(indicatorPt) }}
+        >
+          <slot name="indicator">
+            <div class="indicator-placeholder" />
+          </slot>
+        </div>
       )}
     </div>
   );

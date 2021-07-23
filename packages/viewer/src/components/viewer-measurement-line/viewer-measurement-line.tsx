@@ -38,12 +38,22 @@ export class ViewerMeasurementLine {
    */
   protected render(): h.JSX.IntrinsicElements {
     const angle = Angle.fromPoints(this.start, this.end);
-    const startEndCap = getPerpendicularLine(this.start, angle, this.capLength);
-    const endEndCap = getPerpendicularLine(this.end, angle, this.capLength);
+    const lineFillEndCaps = getEndCapPoints(
+      this.start,
+      this.end,
+      angle,
+      this.capLength
+    );
+    const lineStrokeEndCaps = getEndCapPoints(
+      this.start,
+      this.end,
+      angle,
+      this.capLength + 1
+    );
 
     return (
       <svg>
-        <g pointer-events={this.pointerEvents}>
+        <g class="line-stroke" pointer-events={this.pointerEvents}>
           <line
             class="line"
             x1={this.start.x}
@@ -54,23 +64,71 @@ export class ViewerMeasurementLine {
 
           <line
             class="start-cap"
-            x1={startEndCap.start.x}
-            y1={startEndCap.start.y}
-            x2={startEndCap.end.x}
-            y2={startEndCap.end.y}
+            x1={lineStrokeEndCaps.startEndCap.start.x}
+            y1={lineStrokeEndCaps.startEndCap.start.y}
+            x2={lineStrokeEndCaps.startEndCap.end.x}
+            y2={lineStrokeEndCaps.startEndCap.end.y}
           />
 
           <line
             class="end-cap"
-            x1={endEndCap.start.x}
-            y1={endEndCap.start.y}
-            x2={endEndCap.end.x}
-            y2={endEndCap.end.y}
+            x1={lineStrokeEndCaps.endEndCap.start.x}
+            y1={lineStrokeEndCaps.endEndCap.start.y}
+            x2={lineStrokeEndCaps.endEndCap.end.x}
+            y2={lineStrokeEndCaps.endEndCap.end.y}
+          />
+        </g>
+
+        <g class="line-fill" pointer-events={this.pointerEvents}>
+          <line
+            class="line"
+            x1={this.start.x}
+            y1={this.start.y}
+            x2={this.end.x}
+            y2={this.end.y}
+          />
+
+          <line
+            class="start-cap"
+            x1={lineFillEndCaps.startEndCap.start.x}
+            y1={lineFillEndCaps.startEndCap.start.y}
+            x2={lineFillEndCaps.startEndCap.end.x}
+            y2={lineFillEndCaps.startEndCap.end.y}
+          />
+
+          <line
+            class="end-cap"
+            x1={lineFillEndCaps.endEndCap.start.x}
+            y1={lineFillEndCaps.endEndCap.start.y}
+            x2={lineFillEndCaps.endEndCap.end.x}
+            y2={lineFillEndCaps.endEndCap.end.y}
           />
         </g>
       </svg>
     );
   }
+}
+
+interface EndCapPoints {
+  start: Point.Point;
+  end: Point.Point;
+}
+
+interface LinePoints {
+  startEndCap: EndCapPoints;
+  endEndCap: EndCapPoints;
+}
+
+function getEndCapPoints(
+  start: Point.Point,
+  end: Point.Point,
+  angle: number,
+  length: number
+): LinePoints {
+  return {
+    startEndCap: getPerpendicularLine(start, angle, length),
+    endEndCap: getPerpendicularLine(end, angle, length),
+  };
 }
 
 function getPerpendicularLine(
