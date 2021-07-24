@@ -7,6 +7,15 @@ const line = Line3.create({
   end: { x: 2, y: 2, z: 2 },
 });
 
+describe(Line3.create, () => {
+  it('creates a default line at origin', () => {
+    const line = Line3.create();
+    expect(line).toEqual(
+      Line3.create({ start: Vector3.origin(), end: Vector3.origin() })
+    );
+  });
+});
+
 describe(Line3.center, () => {
   it('returns the center point between start and end', () => {
     const center = Line3.center(line);
@@ -19,6 +28,12 @@ describe(Line3.distance, () => {
     const distance = Line3.distance(line);
     expect(distance).toEqual(Vector3.distance(line.start, line.end));
   });
+});
+
+describe(Line3.direction, () => {
+  const direction = Line3.direction(line);
+  const expected = Vector3.create(1, 1, 1);
+  expect(direction).toEqual(expected);
 });
 
 describe(Line3.distanceSquared, () => {

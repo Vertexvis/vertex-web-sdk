@@ -64,3 +64,10 @@ export function distance(line: Line3): number {
 export function distanceSquared(line: Line3): number {
   return Vector3.distanceSquared(line.start, line.end);
 }
+
+/**
+ * Returns a vector describing the direction of the line from start to end.
+ */
+export function direction(line: Line3): Vector3.Vector3 {
+  return Vector3.subtract(line.end, line.start);
+}
