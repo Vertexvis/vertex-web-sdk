@@ -185,10 +185,7 @@ export class BlendedRenderer implements Renderer {
       const { uniforms } = this.postMaterial;
       const depthBuffer = await frame.depthBuffer();
       if (depthBuffer != null) {
-        const { x, y, width, height } = viewport.calculateDrawRect(
-          depthBuffer,
-          depthBuffer.imageDimensions
-        );
+        const { x, y, width, height } = viewport.calculateDrawRect(depthBuffer);
         uniforms.serverDepthTexture = {
           value: createDepthDataTexture(depthBuffer, viewport),
         };

@@ -1815,10 +1815,6 @@ declare namespace LocalJSX {
           * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
          */
         "stretchOff"?: boolean;
-        /**
-          * Prevents the viewer from receiving events that would trigger camera interactions.
-         */
-        "viewerInteractionsOff"?: boolean;
     }
     interface VertexViewerMeasurementLine {
         /**
@@ -1829,6 +1825,10 @@ declare namespace LocalJSX {
           * A point that specifies the ending point of the line.
          */
         "end"?: Point.Point;
+        /**
+          * The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to.
+         */
+        "pointerEvents"?: string;
         /**
           * A point that specifies the starting point of the line.
          */
