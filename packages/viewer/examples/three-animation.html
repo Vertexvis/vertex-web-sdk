@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .tree {
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
+        border-right: 1px solid lightgray;
+      }
+
+      .workarea {
+        width: 100%;
+        height: 100%;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three';
+      import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
+      import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
+      import { getStreamKeyFromUrlParams } from './utils.js';
+
+      const streamKey = '' || getStreamKeyFromUrlParams();
+      const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
+      const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
+      const vertexScene = new VertexScene(client, sceneId);
+
+      const animations = [];
+
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
+
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+
+        const gridHelper = new THREE.GridHelper(10000, 50, 0x444444, 0xbbbbbb);
+        gridHelper.position.z = -500;
+        gridHelper.rotation.x = Math.PI / 2;
+        vertexScene.add(gridHelper);
+
+        const viewer = document.getElementById('viewer');
+        await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
+
+        const tree = document.getElementById('scene-tree');
+
+        const blendedRenderer = document.getElementById('blended-renderer');
+        blendedRenderer.willDraw = updateScene(viewer, vertexScene);
+        blendedRenderer.scene.add(vertexScene);
+        blendedRenderer.scene.fog = new THREE.Fog(0xffffff, 0, 10000);
+
+        viewer.addEventListener('pointerdown', async (event) => {
+          const pt = { x: event.clientX, y: event.clientY };
+        });
+
+        const overlayRenderer = document.getElementById('overlay-renderer');
+
+        await viewer.load(
+          'urn:vertexvis:stream-key:oHOB0HkapT5rQ_tahl0s1OcQyZkNz9aFBaXW'
+        );
+
+        viewer.addEventListener('tap', async ({ detail }) => {
+          const { position } = detail;
+          const [localHit] = await blendedRenderer.hit(position);
+
+          if (localHit != null) {
+            select(localHit.object.parent);
+          } else {
+            const scene = await viewer.scene();
+            const { hits } = await scene.raycaster().hitItems(detail.position);
+            const [hit] = hits;
+
+            if (hit != null) {
+              console.log('hit', hit);
+            }
+          }
+        });
+
+        const players = await loadAnimations(viewer);
+        players.forEach((player) => animations.push(player));
+
+        const playBtn = document.getElementById('play-btn');
+        playBtn.addEventListener('click', async () => {
+          for (let animation of animations) {
+            await animation.play(viewer, blendedRenderer);
+          }
+        });
+        playBtn.disabled = false;
+      }
+
+      function updateScene(viewer, scene) {
+        return () => {
+          if (viewer.frame != null) {
+            scene.updateLighting(viewer.frame.scene.camera);
+          }
+        };
+      }
+
+      async function hideItem(scene, itemId) {
+        await scene
+          .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+          .execute();
+      }
+
+      async function loadAnimations(viewer) {
+        const scene = await viewer.scene();
+
+        const animation1 = createAnimation1(scene);
+        const animation2 = createAnimation2(scene);
+        const animation3 = createAnimation3(scene);
+
+        return Promise.all([animation1, animation2, animation3]);
+      }
+
+      async function createAnimation1(scene) {
+        const camera = {
+          position: {
+            x: 2057.6181640625,
+            y: -1906.5308837890625,
+            z: 291.9079284667969,
+          },
+          lookAt: {
+            x: 186.59506225585938,
+            y: 209.99395751953125,
+            z: 103.05535125732422,
+          },
+          up: {
+            x: 0.3198494017124176,
+            y: -0.35385632514953613,
+            z: 0.8789095878601074,
+          },
+        };
+
+        return createAnimation(camera, async () => {
+          const clips = [];
+
+          // Tire
+          const tireAnimation = await createClip(
+            scene,
+            '090f1025-f379-4759-8466-8e7d90ad9412',
+            { x: 0, y: -1123, z: 0 },
+            0,
+            2
+          );
+          clips.push(tireAnimation);
+
+          // Wheel
+          const wheelAnimation = await createClip(
+            scene,
+            '1842aca6-c81a-438b-863c-cb71bfb2d1f8',
+            { x: 0, y: -1123, z: 0 },
+            0,
+            2
+          );
+          clips.push(wheelAnimation);
+
+          // Lug nut #1
+          const lug1Animation = await createClip(
+            scene,
+            'a6f244d7-ee44-42a5-a82c-8d4c2b902275',
+            { x: 0, y: -1123, z: 0 },
+            1,
+            2
+          );
+          clips.push(lug1Animation);
+
+          // Lug nut #2
+          const lug2Animation = await createClip(
+            scene,
+            '9f3c3b11-579b-4935-a329-f58c701d9814',
+            { x: 0, y: -1123, z: 0 },
+            1.1,
+            2
+          );
+          clips.push(lug2Animation);
+
+          // Lug nut #3
+          const lug3Animation = await createClip(
+            scene,
+            '14df841f-4023-4f90-8276-e57d86565995',
+            { x: 0, y: -1123, z: 0 },
+            1.2,
+            2
+          );
+          clips.push(lug3Animation);
+
+          // Lug nut #4
+          const lug4Animation = await createClip(
+            scene,
+            '68e55207-039f-40cd-9ec2-c1f7c2104bf0',
+            { x: 0, y: -1123, z: 0 },
+            1.3,
+            2
+          );
+          clips.push(lug4Animation);
+
+          // Lug nut #5
+          const lug5Animation = await createClip(
+            scene,
+            'c37b0fc6-09ab-4899-a58e-299de893c12f',
+            { x: 0, y: -1123, z: 0 },
+            1.4,
+            2
+          );
+          clips.push(lug5Animation);
+
+          return clips;
+        });
+      }
+
+      async function createAnimation2(scene) {
+        const camera = {
+          position: {
+            x: -1723.260009765625,
+            y: -2326.852294921875,
+            z: 255.1303253173828,
+          },
+          lookAt: {
+            x: -1347.046142578125,
+            y: -827.128662109375,
+            z: 199.2436981201172,
+          },
+          up: {
+            x: -0.1363450586795807,
+            y: -0.4850524067878723,
+            z: 0.8637906312942505,
+          },
+        };
+
+        return createAnimation(camera, async () => {
+          const clips = [];
+
+          // Tire
+          const tireAnimation = await createClip(
+            scene,
+            '5498bfb7-345f-44b8-8ae5-ba1c8422c31f',
+            { x: 0, y: -2000, z: 0 },
+            0,
+            2
+          );
+          clips.push(tireAnimation);
+
+          // Wheel
+          const wheelAnimation = await createClip(
+            scene,
+            'b2f3fffa-89e2-4485-b60c-55ffdb69f898',
+            { x: 0, y: -2000, z: 0 },
+            0,
+            2
+          );
+          clips.push(wheelAnimation);
+
+          // Lug nut #1
+          const lug1Animation = await createClip(
+            scene,
+            'd94260ab-0c3c-43ba-a43a-936cfa556533',
+            { x: 0, y: -2000, z: 0 },
+            1,
+            2
+          );
+          clips.push(lug1Animation);
+
+          // Lug nut #2
+          const lug2Animation = await createClip(
+            scene,
+            '6ab29eb5-1714-44f7-8d8f-e15278834354',
+            { x: 0, y: -2000, z: 0 },
+            1.1,
+            2
+          );
+          clips.push(lug2Animation);
+
+          // Lug nut #3
+          const lug3Animation = await createClip(
+            scene,
+            '781a3352-aa38-44a8-8a25-12a9f9079280',
+            { x: 0, y: -2000, z: 0 },
+            1.2,
+            2
+          );
+          clips.push(lug3Animation);
+
+          // Lug nut #4
+          const lug4Animation = await createClip(
+            scene,
+            'dea6384e-d489-4916-b732-603d295ae6ec',
+            { x: 0, y: -2000, z: 0 },
+            1.3,
+            2
+          );
+          clips.push(lug4Animation);
+
+          // Lug nut #5
+          const lug5Animation = await createClip(
+            scene,
+            'dc5a9ba6-ef75-40fc-96e4-9389ba229f50',
+            { x: 0, y: -2000, z: 0 },
+            1.4,
+            2
+          );
+          clips.push(lug5Animation);
+
+          return clips;
+        });
+      }
+
+      async function createAnimation3(scene) {
+        const camera = {
+          position: {
+            x: -1978.46044921875,
+            y: 3154.98193359375,
+            z: 2327.971923828125,
+          },
+          lookAt: {
+            x: -59.64923095703125,
+            y: 0.027099609375,
+            z: 398.14013671875,
+          },
+          up: {
+            x: -0.046076707541942596,
+            y: 0.06827622652053833,
+            z: 0.9966018795967102,
+          },
+        };
+
+        return createAnimation(camera, async () => {
+          const clips = [];
+
+          const chair1 = await createClip(
+            scene,
+            '95339bf4-7b84-4fff-af01-dec4ec383669',
+            { x: 0, y: 0, z: 1500 },
+            0,
+            2
+          );
+          clips.push(chair1);
+
+          const chair2 = await createClip(
+            scene,
+            'eccb70c0-de55-4f83-94cd-17bb00d78a65',
+            { x: 0, y: 0, z: 1500 },
+            1,
+            2
+          );
+          clips.push(chair2);
+
+          return clips;
+        });
+      }
+
+      async function createAnimation(camera, clipFactory) {
+        const clips = await clipFactory();
+
+        return {
+          play: async (viewer, renderer) => {
+            const scene = await viewer.scene();
+
+            const animation = await scene
+              .camera()
+              .update(camera)
+              .render({ animation: { milliseconds: 2000 } });
+
+            await animation.onAnimationCompleted.once();
+
+            const clock = new THREE.Clock();
+            const mixer = createMixer(clips);
+            await mixer(clock, renderer);
+            console.log('finished');
+          },
+        };
+      }
+
+      async function createClip(scene, itemId, startPos, delay, duration) {
+        const mesh = await vertexScene.loadSceneItem(scene.sceneViewId, itemId);
+        mesh.position.set(startPos.x, startPos.y, startPos.z);
+        await hideItem(scene, itemId);
+
+        const track = new THREE.VectorKeyframeTrack(
+          '.position',
+          [0, 1],
+          [startPos.x, startPos.y, startPos.z, 0, 0, 0],
+          THREE.InterpolateSmooth
+        );
+        const clip = new THREE.AnimationClip('Action', duration, [track]);
+
+        return { mesh, delay, clip };
+      }
+
+      function createMixer(animations) {
+        let finishedCount = 0;
+
+        return (clock, renderer) => {
+          return new Promise((resolve) => {
+            const mixer = new THREE.AnimationMixer(vertexScene);
+
+            for (let animation of animations) {
+              const { mesh, delay, clip } = animation;
+
+              setTimeout(() => {
+                const clipAction = mixer.clipAction(clip, mesh);
+                clipAction.clampWhenFinished = true;
+                clipAction.setLoop(THREE.LoopOnce, 0);
+                clipAction.play();
+              }, delay * 1000);
+            }
+
+            const stop = runAnimation(clock, mixer, renderer);
+
+            mixer.addEventListener('finished', () => {
+              finishedCount = finishedCount + 1;
+
+              if (finishedCount === animations.length) {
+                console.log('stop');
+                stop();
+                resolve();
+              }
+            });
+          });
+        };
+      }
+
+      function runAnimation(clock, mixer, renderer) {
+        let stop = false;
+        const animationLoop = () => {
+          window.requestAnimationFrame(() => {
+            const delta = clock.getDelta();
+            mixer.update(delta);
+            renderer.draw();
+
+            if (!stop) {
+              animationLoop();
+            }
+          });
+        };
+        animationLoop();
+
+        return () => {
+          stop = true;
+        };
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree
+          id="scene-tree"
+          config-env="platdev"
+          viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+          <vertex-viewer-threejs-renderer
+            id="blended-renderer"
+            clipping-extents="10000"
+            occlude
+          ></vertex-viewer-threejs-renderer>
+
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-toolbar placement="bottom-center">
+            <button id="play-btn" disabled>Play</button>
+          </vertex-viewer-toolbar>
+
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
+      </div>
+    </div>
+  </body>
+</html>

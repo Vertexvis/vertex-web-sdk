@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .tree {
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
+        border-right: 1px solid lightgray;
+      }
+
+      .workarea {
+        width: 100%;
+        height: 100%;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three';
+      import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
+      import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
+      import { getStreamKeyFromUrlParams } from './utils.js';
+
+      const streamKey = '' || getStreamKeyFromUrlParams();
+      const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
+      const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
+      const vertexScene = new VertexScene(client, sceneId);
+
+      let transformControl;
+
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
+
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+
+        const viewer = document.getElementById('viewer');
+        await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
+
+        const tree = document.getElementById('scene-tree');
+
+        const blendedRenderer = document.getElementById('blended-renderer');
+        blendedRenderer.willDraw = updateScene(viewer, vertexScene);
+        blendedRenderer.scene.add(vertexScene);
+        viewer.addEventListener('pointerdown', async (event) => {
+          const pt = { x: event.clientX, y: event.clientY };
+        });
+
+        const overlayRenderer = document.getElementById('overlay-renderer');
+
+        viewer.addEventListener('tap', async ({ detail }) => {
+          const { position } = detail;
+          const [localHit] = await blendedRenderer.hit(position);
+
+          if (localHit != null) {
+            select(localHit.object.parent);
+          } else {
+            const scene = await viewer.scene();
+            const { hits } = await scene.raycaster().hitItems(detail.position);
+            const [hit] = hits;
+
+            if (hit != null) {
+              console.log('hit', hit);
+              const mesh = await vertexScene.loadSceneItem(
+                scene.sceneViewId,
+                hit.itemId.hex
+              );
+              await scene
+                .items((op) =>
+                  op.where((q) => q.withItemId(hit.itemId.hex)).hide()
+                )
+                .execute();
+              blendedRenderer.draw();
+
+              select(mesh);
+            } else {
+              deselect();
+            }
+          }
+        });
+
+        transformControl = createTransformControl(
+          viewer,
+          overlayRenderer,
+          blendedRenderer
+        );
+      }
+
+      function updateScene(viewer, scene) {
+        return () => {
+          if (viewer.frame != null) {
+            scene.updateLighting(viewer.frame.scene.camera);
+          }
+        };
+      }
+
+      function createTransformControl(viewer, renderer, blendedRenderer) {
+        const handleViewerPointerMove = (event) => {
+          event.stopImmediatePropagation();
+        };
+
+        const transformControl = new TransformControls(
+          renderer.camera,
+          viewer.interactionTarget
+        );
+        transformControl.size = 0.5;
+        transformControl.addEventListener('mouseDown', () => {
+          document.addEventListener('pointermove', handleViewerPointerMove);
+          renderer.draw();
+        });
+        transformControl.addEventListener('mouseUp', () => {
+          document.removeEventListener('pointermove', handleViewerPointerMove);
+          renderer.draw();
+        });
+        transformControl.addEventListener('change', () => {
+          renderer.draw();
+        });
+        transformControl.addEventListener('objectChange', () => {
+          blendedRenderer.draw();
+          renderer.draw();
+        });
+        renderer.scene.add(transformControl);
+        return transformControl;
+      }
+
+      function select(mesh) {
+        transformControl.attach(mesh);
+      }
+
+      function deselect() {
+        transformControl.detach();
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree
+          id="scene-tree"
+          config-env="platdev"
+          viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-threejs-renderer
+            id="blended-renderer"
+            occlude
+          ></vertex-viewer-threejs-renderer>
+
+          <vertex-viewer-threejs-renderer
+            id="overlay-renderer"
+          ></vertex-viewer-threejs-renderer>
+
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1716,6 +1716,7 @@ declare namespace LocalJSX {
           * The last frame that was received, which can be used to inspect the scene and camera information.
          */
         "frame"?: Frame | undefined;
+        "interactionTarget"?: HTMLElement;
         /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */
