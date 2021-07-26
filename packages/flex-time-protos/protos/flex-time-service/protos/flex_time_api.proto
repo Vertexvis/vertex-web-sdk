@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package vertexvis.protobuf.flextime.v1alpha1;
 
-import "core/protos/uuid.proto";
 import "google/protobuf/wrappers.proto";
 import "flex-time-service/protos/domain.proto";
 
@@ -12,14 +11,26 @@ option java_package = "com.vertexvis.protobuf.flextime";
 
 service FlexTimeAPI {
     rpc GetGeometry (GetGeometryRequest) returns (stream GetGeometryResponse);
+    rpc GetCompressedGeometry (GetCompressedGeometryRequest) returns (stream GetCompressedGeometryResponse);
 }
 
 message GetGeometryRequest {
     string scene_id = 1;
     google.protobuf.StringValue scene_view_id = 2;
     google.protobuf.StringValue scene_item_id = 3;
+    bool exclude_sent_triangle_sets = 4;
 }
 
 message GetGeometryResponse {
     repeated RenderItem items = 1;
+}
+message GetCompressedGeometryRequest {
+    string scene_id = 1;
+    google.protobuf.StringValue scene_view_id = 2;
+    google.protobuf.StringValue scene_item_id = 3;
+    bool exclude_sent_triangle_sets = 4;
+}
+
+message GetCompressedGeometryResponse {
+    repeated CompressedRenderItem items = 1;
 }

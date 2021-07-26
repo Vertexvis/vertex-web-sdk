@@ -60,13 +60,20 @@
     <script type="module">
       import * as THREE from 'https://cdn.skypack.dev/three';
       import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
-      import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
+      import {
+        FlexTimeApi,
+        VertexScene,
+        VertexGeometryLoader,
+      } from '/dist/viewer/index.esm.js';
       import { getStreamKeyFromUrlParams } from './utils.js';
 
       const streamKey = '' || getStreamKeyFromUrlParams();
       const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
       const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
       const vertexScene = new VertexScene(client, sceneId);
+      const geometryLoader = new VertexGeometryLoader(client, {
+        compressed: true,
+      });
 
       let transformControl;
 
@@ -103,11 +110,13 @@
             const [hit] = hits;
 
             if (hit != null) {
-              console.log('hit', hit);
-              const mesh = await vertexScene.loadSceneItem(
+              const mesh = await geometryLoader.load(
+                sceneId,
                 scene.sceneViewId,
                 hit.itemId.hex
               );
+              vertexScene.add(mesh);
+
               await scene
                 .items((op) =>
                   op.where((q) => q.withItemId(hit.itemId.hex)).hide()
