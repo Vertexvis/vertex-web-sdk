@@ -2,6 +2,7 @@ import {
   Angle,
   Dimensions,
   Matrix4,
+  Plane,
   Point,
   Ray,
   Rectangle,
@@ -48,6 +49,21 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public static fromDimensions(dimensions: Dimensions.Dimensions): Viewport {
     return new Viewport(dimensions.width, dimensions.height);
+  }
+
+  /**
+   * Returns the screen plane for this viewport and given `camera`.
+   *
+   * @param camera A camera.
+   * @returns The screen plane.
+   */
+  public plane(camera: FramePerspectiveCamera): Plane.Plane {
+    const direction = camera.direction;
+    const distance = Vector3.distance(camera.position, camera.lookAt);
+    return Plane.create({
+      normal: direction,
+      constant: distance - camera.near,
+    });
   }
 
   /**

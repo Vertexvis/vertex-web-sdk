@@ -265,6 +265,7 @@ export class ViewerDistanceMeasurement {
   private hostEl!: HTMLElement;
 
   private measurementUnits = new MeasurementUnits(this.units);
+  private isUserInteractingWithModel = false;
 
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
@@ -334,7 +335,14 @@ export class ViewerDistanceMeasurement {
    */
   protected render(): h.JSX.IntrinsicElements {
     const positions = this.computeElementPositions();
-    const { startPt, endPt, labelPt, indicatorPt } = positions;
+    const {
+      startPt,
+      endPt,
+      labelPt,
+      indicatorPt,
+      hideStart,
+      hideEnd,
+    } = positions;
     const distance = this.formatDistance(this.distance);
 
     if (this.mode === 'edit') {
@@ -349,9 +357,10 @@ export class ViewerDistanceMeasurement {
               distance={distance}
               anchorLabelOffset={this.anchorLabelOffset}
               lineCapLength={this.lineCapLength}
+              hideStartAnchor={hideStart}
+              hideEndAnchor={hideEnd}
               onStartAnchorPointerDown={this.handleEditAnchor('start')}
               onEndAnchorPointerDown={this.handleEditAnchor('end')}
-              linePointerEvents="painted"
             />
           </div>
         </Host>
@@ -366,6 +375,8 @@ export class ViewerDistanceMeasurement {
               centerPt={labelPt}
               indicatorPt={indicatorPt}
               distance={distance}
+              hideStartAnchor={hideStart}
+              hideEndAnchor={hideEnd}
               anchorLabelOffset={this.anchorLabelOffset}
               lineCapLength={this.lineCapLength}
             />
@@ -382,6 +393,8 @@ export class ViewerDistanceMeasurement {
               centerPt={labelPt}
               indicatorPt={indicatorPt}
               distance={distance}
+              hideStartAnchor={hideStart}
+              hideEndAnchor={hideEnd}
               anchorLabelOffset={this.anchorLabelOffset}
               lineCapLength={this.lineCapLength}
               linePointerEvents="painted"
@@ -517,7 +530,10 @@ export class ViewerDistanceMeasurement {
 
   private async setCursor(cursor: Cursor): Promise<void> {
     this.stateMap.hoverCursor?.dispose();
-    this.stateMap.hoverCursor = await this.viewer?.addCursor(cursor);
+
+    if (!this.isUserInteractingWithModel) {
+      this.stateMap.hoverCursor = await this.viewer?.addCursor(cursor);
+    }
   }
 
   private computeElementPositions(): MeasurementElementPositions {
@@ -563,10 +579,16 @@ export class ViewerDistanceMeasurement {
     matrix: Matrix4.Matrix4,
     line: Line3.Line3
   ): MeasurementElementPositions {
-    return getViewingElementPositions(line, this.interactingAnchor, {
-      projectionViewMatrix: matrix,
-      viewport: this.viewport,
-    });
+    const camera = this.viewer?.frame?.scene.camera;
+    if (camera != null) {
+      return getViewingElementPositions(line, this.interactingAnchor, {
+        projectionViewMatrix: matrix,
+        viewport: this.viewport,
+        camera: camera,
+      });
+    } else {
+      return {};
+    }
   }
 
   private updateProjectionViewMatrix(): void {
@@ -682,8 +704,10 @@ export class ViewerDistanceMeasurement {
   };
 
   private resetStartAnchor = (): void => {
-    this.start = undefined;
-    this.interactiveStartPoint = undefined;
+    if (this.interactionCount === 0) {
+      this.start = undefined;
+      this.interactiveStartPoint = undefined;
+    }
   };
 
   private startMeasurement = (event: PointerEvent): void => {
@@ -733,10 +757,9 @@ export class ViewerDistanceMeasurement {
       };
 
       const measureInteraction = (): void => {
-        let didUserInteractWithModel = false;
-
         const handleDownAndMove = pointerDownAndMove(() => {
-          didUserInteractWithModel = true;
+          this.isUserInteractingWithModel = true;
+          this.stateMap.hoverCursor?.dispose();
         });
 
         const dispose = (): void => {
@@ -748,8 +771,8 @@ export class ViewerDistanceMeasurement {
         const pointerMove = this.createAnchorPointerMoveHandler('end');
         const pointerUp = (event: PointerEvent): void => {
           if (event.button === 0) {
-            if (didUserInteractWithModel) {
-              didUserInteractWithModel = false;
+            if (this.isUserInteractingWithModel) {
+              this.isUserInteractingWithModel = false;
             } else {
               dispose();
               this.endEditing();

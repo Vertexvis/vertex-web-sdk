@@ -118,8 +118,9 @@
 :host([interacting-anchor='start']) .anchor-label-start {
   visibility: hidden;
 }
-:host([interacting-anchor='start']) .line-fill,
-:host([interacting-anchor='start']) .line-stroke {
+
+.hide-start-line-cap,
+:host([interacting-anchor='start']) .line {
   --viewer-measurement-line-start-cap-visibility: hidden;
 }
 
@@ -127,8 +128,9 @@
 :host([interacting-anchor='end']) .anchor-label-end {
   visibility: hidden;
 }
-:host([interacting-anchor='end']) .line-fill,
-:host([interacting-anchor='end']) .line-stroke {
+
+.hide-end-line-cap,
+:host([interacting-anchor='end']) .line {
   --viewer-measurement-line-end-cap-visibility: hidden;
 }
 

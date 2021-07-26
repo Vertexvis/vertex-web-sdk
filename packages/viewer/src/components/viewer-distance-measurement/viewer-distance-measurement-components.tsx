@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Angle, Point } from '@vertexvis/geometry';
+import classNames from 'classnames';
 import { cssTransformCenterAt } from '../../lib/dom';
 
 export interface DistanceMeasurementRendererProps {
@@ -12,6 +13,8 @@ export interface DistanceMeasurementRendererProps {
   anchorLabelOffset?: number;
   lineCapLength?: number;
   linePointerEvents?: string;
+  hideStartAnchor?: boolean;
+  hideEndAnchor?: boolean;
   onStartAnchorPointerDown?: (event: PointerEvent) => void;
   onEndAnchorPointerDown?: (event: PointerEvent) => void;
 }
@@ -25,6 +28,8 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
   anchorLabelOffset,
   lineCapLength,
   linePointerEvents,
+  hideStartAnchor,
+  hideEndAnchor,
   onStartAnchorPointerDown,
   onEndAnchorPointerDown,
 }) => {
@@ -47,7 +52,10 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
     <div>
       {startPt != null && endPt != null && (
         <vertex-viewer-measurement-line
-          class="line"
+          class={classNames('line', {
+            'hide-start-line-cap': hideStartAnchor,
+            'hide-end-line-cap': hideEndAnchor,
+          })}
           start={startPt}
           end={endPt}
           capLength={lineCapLength}
@@ -55,7 +63,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
         />
       )}
 
-      {startPt != null && (
+      {!hideStartAnchor && startPt != null && (
         <div
           id="start-anchor"
           class="anchor anchor-start"
@@ -68,7 +76,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
         </div>
       )}
 
-      {startLabelPt && (
+      {!hideStartAnchor && startLabelPt && (
         <div
           class="anchor-label anchor-label-start"
           style={{ transform: cssTransformCenterAt(startLabelPt) }}
@@ -77,7 +85,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
         </div>
       )}
 
-      {endPt != null && (
+      {!hideEndAnchor && endPt != null && (
         <div
           id="end-anchor"
           class="anchor anchor-end"
@@ -90,7 +98,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<DistanceMeasuremen
         </div>
       )}
 
-      {endLabelPt && (
+      {!hideEndAnchor && endLabelPt && (
         <div
           class="anchor-label anchor-label-end"
           style={{ transform: cssTransformCenterAt(endLabelPt) }}

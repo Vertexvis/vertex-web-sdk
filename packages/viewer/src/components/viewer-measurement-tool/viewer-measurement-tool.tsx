@@ -261,6 +261,7 @@ export class ViewerMeasurementTool {
       this.isMeasuring = false;
       measurementElement.start = undefined;
       measurementElement.end = undefined;
+      measurementElement.invalid = false;
 
       if (start != null && end != null) {
         this.measureEnd.emit(new DistanceMeasurement({ start, end, invalid }));
