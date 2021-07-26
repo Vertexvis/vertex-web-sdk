@@ -14,6 +14,7 @@ import {
 import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import {
   DepthBuffer,
+  FramePerspectiveCamera,
   MeasurementUnits,
   StencilBuffer,
   UnitType,
@@ -136,7 +137,7 @@ export class ViewerDistanceMeasurement {
    * value of 0 disables snapping.
    */
   @Prop()
-  public snapDistance = MEASUREMENT_SNAP_DISTANCE;
+  public snapDistance: number = MEASUREMENT_SNAP_DISTANCE;
 
   /**
    * The unit of measurement.
@@ -194,11 +195,11 @@ export class ViewerDistanceMeasurement {
   public invalid = false;
 
   /**
-   * The projection view matrix used to position the anchors. If `viewer` is
-   * defined, then the projection view matrix of the viewer will be used.
+   * The camera used to position the anchors. If `viewer` is defined, then the
+   * projection view matrix of the viewer will be used.
    */
   @Prop()
-  public projectionViewMatrix?: Matrix4.Matrix4;
+  public camera?: FramePerspectiveCamera;
 
   /**
    * The depth buffer that is used to optimistically determine the a depth value
@@ -242,7 +243,7 @@ export class ViewerDistanceMeasurement {
   private interactionCount = 0;
 
   @State()
-  private internalProjectionViewMatrix?: Matrix4.Matrix4;
+  private internalCamera?: FramePerspectiveCamera;
 
   @State()
   private internalDepthBuffer?: DepthBuffer;
@@ -435,9 +436,9 @@ export class ViewerDistanceMeasurement {
   /**
    * @ignore
    */
-  @Watch('projectionViewMatrix')
-  protected handleProjectionViewMatrixChanged(): void {
-    this.updateProjectionViewMatrix();
+  @Watch('camera')
+  protected handleCameraChanged(): void {
+    this.updateCamera();
   }
 
   /**
@@ -449,7 +450,7 @@ export class ViewerDistanceMeasurement {
   }
 
   private computePropsAndState(): void {
-    this.updateProjectionViewMatrix();
+    this.updateCamera();
     this.updateDepthBuffer();
     this.updateLineFromProps();
     this.updateDistance();
@@ -545,9 +546,9 @@ export class ViewerDistanceMeasurement {
   }
 
   private computeEditOrViewElementPositions(): MeasurementElementPositions {
-    if (this.internalProjectionViewMatrix != null && this.line != null) {
+    if (this.internalCamera != null && this.line != null) {
       return this.computeLineElementPositions(
-        this.internalProjectionViewMatrix,
+        this.internalCamera.projectionViewMatrix,
         this.line
       );
     } else {
@@ -556,17 +557,17 @@ export class ViewerDistanceMeasurement {
   }
 
   private computeReplaceElementPositions(): MeasurementElementPositions {
-    if (this.internalProjectionViewMatrix != null) {
+    if (this.internalCamera != null) {
       if (this.line != null) {
         return this.computeLineElementPositions(
-          this.internalProjectionViewMatrix,
+          this.internalCamera.projectionViewMatrix,
           this.line
         );
       } else if (this.start != null) {
         return {
           indicatorPt: translateWorldPtToViewport(
             this.start,
-            this.internalProjectionViewMatrix,
+            this.internalCamera.projectionViewMatrix,
             this.viewport
           ),
         };
@@ -579,22 +580,19 @@ export class ViewerDistanceMeasurement {
     matrix: Matrix4.Matrix4,
     line: Line3.Line3
   ): MeasurementElementPositions {
-    const camera = this.viewer?.frame?.scene.camera;
-    if (camera != null) {
+    if (this.internalCamera != null) {
       return getViewingElementPositions(line, this.interactingAnchor, {
         projectionViewMatrix: matrix,
         viewport: this.viewport,
-        camera: camera,
+        camera: this.internalCamera,
       });
     } else {
       return {};
     }
   }
 
-  private updateProjectionViewMatrix(): void {
-    this.internalProjectionViewMatrix =
-      this.projectionViewMatrix ||
-      this.viewer?.frame?.scene.camera.projectionViewMatrix;
+  private updateCamera(): void {
+    this.internalCamera = this.camera || this.viewer?.frame?.scene.camera;
   }
 
   private async updateDepthBuffer(): Promise<void> {
@@ -617,10 +615,10 @@ export class ViewerDistanceMeasurement {
 
   private updateInvalid(): void {
     if (this.internalDepthBuffer != null) {
-      if (this.line != null && this.internalProjectionViewMatrix != null) {
+      if (this.line != null && this.internalCamera != null) {
         const lineNdc = Line3.transformMatrix(
           this.line,
-          this.internalProjectionViewMatrix
+          this.internalCamera.projectionViewMatrix
         );
         const startPt = this.viewport.transformPointToFrame(
           this.viewport.transformVectorToViewport(lineNdc.start),
@@ -698,8 +696,8 @@ export class ViewerDistanceMeasurement {
     if (this.interactionCount === 0) {
       const pt = getMouseClientPosition(event, this.elementBounds);
       const snapPt = this.snapPoint(pt, event);
-      this.interactiveStartPoint = snapPt;
       this.getStencilBuffer();
+      this.interactiveStartPoint = snapPt;
     }
   };
 
@@ -801,6 +799,7 @@ export class ViewerDistanceMeasurement {
       return (event) => {
         if (event.button === 0) {
           this.beginEditing(anchor);
+          this.getStencilBuffer();
 
           window.addEventListener('pointermove', handlePointerMove);
           window.addEventListener('pointerup', handlePointerUp);
@@ -843,7 +842,8 @@ export class ViewerDistanceMeasurement {
   }
 
   private async getStencilBuffer(): Promise<void> {
-    this.stateMap.stencil = await this.viewer?.stencilBuffer.latestAfterInteraction();
+    const stencil = await this.viewer?.stencilBuffer.latestAfterInteraction();
+    this.stateMap.stencil = stencil;
   }
 
   private snapPoint(pt: Point.Point, event: MouseEvent): Point.Point {

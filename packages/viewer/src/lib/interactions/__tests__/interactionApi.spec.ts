@@ -13,6 +13,8 @@ describe(InteractionApi, () => {
   const emitTap = jest.fn();
   const emitDoubleTap = jest.fn();
   const emitLongPress = jest.fn();
+  const emitInteractionStarted = jest.fn();
+  const emitInteractionFinished = jest.fn();
   const streamApi = new StreamApi();
   const sceneViewId = 'scene-view-id';
   const scene = new Scene(
@@ -44,7 +46,9 @@ describe(InteractionApi, () => {
       viewportProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
-      { emit: emitLongPress }
+      { emit: emitLongPress },
+      { emit: emitInteractionStarted },
+      { emit: emitInteractionFinished }
     );
   });
 
@@ -52,12 +56,14 @@ describe(InteractionApi, () => {
     it('begins interaction on the stream', () => {
       api.beginInteraction();
       expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
+      expect(emitInteractionStarted).toHaveBeenCalledTimes(1);
     });
 
     it('does not begin interaction if in interaction state', () => {
       api.beginInteraction();
       api.beginInteraction();
       expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
+      expect(emitInteractionStarted).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -66,11 +72,13 @@ describe(InteractionApi, () => {
       api.beginInteraction();
       api.endInteraction();
       expect(streamApi.endInteraction).toHaveBeenCalledTimes(1);
+      expect(emitInteractionFinished).toHaveBeenCalledTimes(1);
     });
 
     it('does not end interaction if not interacting', () => {
       api.endInteraction();
       expect(streamApi.endInteraction).not.toHaveBeenCalled();
+      expect(emitInteractionFinished).not.toHaveBeenCalled();
     });
   });
 

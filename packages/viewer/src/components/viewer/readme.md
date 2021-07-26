@@ -90,16 +90,6 @@ Type: `Promise<string | undefined>`
 
 
 
-### `getStream() => Promise<ViewerStreamApi>`
-
-
-
-#### Returns
-
-Type: `Promise<ViewerStreamApi>`
-
-
-
 ### `isSceneReady() => Promise<boolean>`
 
 Returns `true` indicating that the scene is ready to be interacted with.

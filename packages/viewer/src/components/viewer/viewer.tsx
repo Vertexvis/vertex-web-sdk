@@ -129,6 +129,8 @@ export type ConnectionStatus =
   shadow: true,
 })
 export class Viewer {
+  @Element() private hostElement!: HTMLVertexViewerElement;
+
   /**
    * A URN of the scene resource to load when the component is mounted in the
    * DOM tree. The specified resource is a URN in the following format:
@@ -168,7 +170,7 @@ export class Viewer {
   /**
    * @internal
    */
-  @Prop({ mutable: true }) public resolvedConfig!: Config;
+  @Prop({ mutable: true }) public resolvedConfig?: Config;
 
   /**
    * Enables or disables the default mouse and touch interactions provided by
@@ -244,12 +246,15 @@ export class Viewer {
   /**
    * @internal
    */
-  @Prop({ mutable: true }) public stream!: ViewerStreamApi;
+  @Prop({ mutable: true }) public stream?: ViewerStreamApi;
 
   /**
    * @internal
    */
-  @Prop({ mutable: true }) public stencilBuffer!: StencilBufferManager;
+  @Prop({ mutable: true })
+  public stencilBuffer: StencilBufferManager = new StencilBufferManager(
+    this.hostElement
+  );
 
   /**
    * The HTML element that will handle interaction events from the user. Used by
@@ -344,8 +349,6 @@ export class Viewer {
     cursorManager: new CursorManager(),
   };
 
-  @Element() private hostElement!: HTMLVertexViewerElement;
-
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
 
@@ -385,8 +388,6 @@ export class Viewer {
    */
   protected componentWillLoad(): void {
     this.updateResolvedConfig();
-
-    this.stencilBuffer = new StencilBufferManager(this.hostElement);
   }
 
   /**
@@ -398,13 +399,15 @@ export class Viewer {
 
     this.stream = new ViewerStreamApi(
       ws,
-      this.resolvedConfig.flags.logWsMessages
+      this.getResolvedConfig().flags.logWsMessages
     );
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
-    this.commands = new CommandRegistry(this.stream, () => this.resolvedConfig);
+    this.commands = new CommandRegistry(this.stream, () =>
+      this.getResolvedConfig()
+    );
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
@@ -432,10 +435,10 @@ export class Viewer {
           'pointerdown',
           'pointerup',
           'pointermove',
-          () => this.resolvedConfig
+          () => this.getResolvedConfig()
         );
-        this.baseInteractionHandler = new PointerInteractionHandler(
-          () => this.resolvedConfig
+        this.baseInteractionHandler = new PointerInteractionHandler(() =>
+          this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -445,12 +448,12 @@ export class Viewer {
           'mousedown',
           'mouseup',
           'mousemove',
-          () => this.resolvedConfig
+          () => this.getResolvedConfig()
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(
-          () => this.resolvedConfig
+        this.baseInteractionHandler = new MouseInteractionHandler(() =>
+          this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
@@ -466,7 +469,7 @@ export class Viewer {
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(
           this.stream,
-          () => this.resolvedConfig,
+          () => this.getResolvedConfig(),
           () => this.getImageScale()
         )
       );
@@ -712,7 +715,7 @@ export class Viewer {
     streamAttributes: ViewerStreamAttributes
   ): void {
     if (this.isStreamStarted) {
-      this.stream.updateStream({
+      this.getStream().updateStream({
         streamAttributes: toProtoStreamAttributes(streamAttributes),
       });
     }
@@ -847,14 +850,6 @@ export class Viewer {
     return this.lastFrame != null && this.sceneViewId != null;
   }
 
-  /**
-   * @private Used for internal testing.
-   */
-  @Method()
-  public async getStream(): Promise<ViewerStreamApi> {
-    return this.stream;
-  }
-
   @Listen('tap')
   private async handleTapEvent(
     event: CustomEvent<TapEventDetails>
@@ -886,7 +881,7 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
-      const { startStream } = await this.stream.startStream({
+      const { startStream } = await this.getStream().startStream({
         streamKey: { value: resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -970,7 +965,7 @@ export class Viewer {
     this.canvasRenderer = measureCanvasRenderer(
       paintTime,
       createCanvasRenderer(),
-      this.resolvedConfig.flags.logFrameRate,
+      this.getResolvedConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
@@ -981,7 +976,7 @@ export class Viewer {
 
   private async synchronizeTime(): Promise<void> {
     try {
-      const resp = await this.stream.syncTime({
+      const resp = await this.getStream().syncTime({
         requestTime: currentDateAsProtoTimestamp(),
       });
 
@@ -1011,7 +1006,7 @@ export class Viewer {
       this.emitConnectionChange({ status: 'connecting' });
 
       this.streamDisposable = await this.connectStream(resource);
-      const result = await this.stream.reconnect({
+      const result = await this.getStream().reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -1199,7 +1194,7 @@ export class Viewer {
       this.dimensionschange.emit(this.dimensions);
 
       if (this.isStreamStarted) {
-        this.stream.updateDimensions({ dimensions: this.dimensions });
+        this.getStream().updateDimensions({ dimensions: this.dimensions });
       }
     }
   }
@@ -1211,29 +1206,29 @@ export class Viewer {
           receiveToPaintDuration: toProtoDuration(t.duration),
         })),
       };
-      this.stream.recordPerformance(payload, false);
+      this.getStream().recordPerformance(payload, false);
     }
   }
 
   private setupStreamListeners(): void {
-    this.stream.onRequest((msg) => this.handleStreamRequest(msg.request));
-    this.stream.onRequest(
-      acknowledgeFrameRequests(this.stream, () => this.clock)
+    this.getStream().onRequest((msg) => this.handleStreamRequest(msg.request));
+    this.getStream().onRequest(
+      acknowledgeFrameRequests(this.getStream(), () => this.clock)
     );
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
-    if (this.canvasElement == null) {
+    if (this.interactionTarget == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Canvas element is undefined.'
+        'Cannot initialize interaction handler. Interaction target is undefined.'
       );
     }
     if (this.interactionApi == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Canvas element is undefined.'
+        'Cannot initialize interaction handler. Interaction APi is undefined.'
       );
     }
-    handler.initialize(this.canvasElement, this.interactionApi);
+    handler.initialize(this.interactionTarget, this.interactionApi);
   }
 
   private createInteractionApi(): InteractionApi {
@@ -1245,7 +1240,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
-      () => this.resolvedConfig.interactions,
+      () => this.getResolvedConfig().interactions,
       () => this.createScene(),
       async () => this.frame?.depthBuffer(),
       () =>
@@ -1282,7 +1277,7 @@ export class Viewer {
         ? fromHex(this.selectionMaterial)
         : this.selectionMaterial;
     return new Scene(
-      this.stream,
+      this.getStream(),
       this.frame,
       mapFrameOrThrow(this.stateMap.streamWorldOrientation),
       () => this.getImageScale(),
@@ -1309,7 +1304,7 @@ export class Viewer {
   }
 
   private getCanvasDimensions(): Dimensions.Dimensions | undefined {
-    return this.resolvedConfig.flags.letterboxFrames
+    return this.getResolvedConfig().flags.letterboxFrames
       ? this.dimensions
       : this.hostDimensions;
   }
@@ -1347,4 +1342,22 @@ export class Viewer {
   private updateResolvedConfig(): void {
     this.resolvedConfig = parseConfig(this.configEnv, this.config);
   }
+
+  private getResolvedConfig(): Config {
+    return getRequiredProp(
+      'Resolved config is undefined',
+      () => this.resolvedConfig
+    );
+  }
+
+  private getStream(): ViewerStreamApi {
+    return getRequiredProp('Stream is undefined', () => this.stream);
+  }
+}
+
+function getRequiredProp<T>(errorMsg: string, getter: () => T | undefined): T {
+  const value = getter();
+  if (value != null) {
+    return value;
+  } else throw new Error(errorMsg);
 }

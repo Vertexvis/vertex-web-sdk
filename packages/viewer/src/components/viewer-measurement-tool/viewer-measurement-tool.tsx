@@ -90,7 +90,7 @@ export class ViewerMeasurementTool {
    * value of 0 disables snapping.
    */
   @Prop()
-  public snapDistance = MEASUREMENT_SNAP_DISTANCE;
+  public snapDistance: number = MEASUREMENT_SNAP_DISTANCE;
 
   /**
    * An event that is dispatched when a user begins a new measurement.
@@ -158,6 +158,14 @@ export class ViewerMeasurementTool {
    */
   @Watch('fractionalDigits')
   protected handleFractionalDigitsChanged(): void {
+    this.updateMeasurementElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('snapDistance')
+  protected handleSnapDistanceChanged(): void {
     this.updateMeasurementElement();
   }
 

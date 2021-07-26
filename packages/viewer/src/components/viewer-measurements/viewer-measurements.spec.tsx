@@ -30,7 +30,7 @@ describe('vertex-viewer-measurements', () => {
     it('adds a measurement element with default distance measurement', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
-        html: `<vertex-viewer-measurements units="inches" fractional-digits="1"></vertex-viewer-measurements>`,
+        html: `<vertex-viewer-measurements units="inches" fractional-digits="1" snap-distance="10"></vertex-viewer-measurements>`,
       });
 
       const el = page.root as HTMLVertexViewerMeasurementsElement;
@@ -43,6 +43,7 @@ describe('vertex-viewer-measurements', () => {
       expect(measurementEl.invalid).toBe(measurement1.invalid);
       expect(measurementEl.units).toBe('inches');
       expect(measurementEl.fractionalDigits).toBe(1);
+      expect(measurementEl.snapDistance).toBe(10);
     });
 
     it('adds a measurement element with distance template', async () => {
@@ -305,6 +306,10 @@ describe('vertex-viewer-measurements', () => {
       await page.waitForChanges();
       expect(toolEl.fractionalDigits).toBe(el.fractionalDigits);
 
+      el.snapDistance = 10;
+      await page.waitForChanges();
+      expect(toolEl.snapDistance).toBe(el.snapDistance);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       el.viewer = viewer as any;
       await page.waitForChanges();
@@ -331,6 +336,10 @@ describe('vertex-viewer-measurements', () => {
       el.fractionalDigits = 0;
       await page.waitForChanges();
       expect(measurementEl.fractionalDigits).toBe(el.fractionalDigits);
+
+      el.snapDistance = 10;
+      await page.waitForChanges();
+      expect(measurementEl.snapDistance).toBe(el.snapDistance);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       el.viewer = viewer as any;

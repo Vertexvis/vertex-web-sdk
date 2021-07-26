@@ -3,7 +3,7 @@ import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
 import { mapFrame } from '../lib/mappers';
-import { DepthBuffer, Orientation } from '../lib/types';
+import { DepthBuffer, Orientation, StencilBuffer } from '../lib/types';
 
 const def: DrawFramePayload = {
   sequenceNumber: 1,
@@ -101,4 +101,18 @@ export function createStencilImageBytes(
     data[offset + 2] = color.b;
   }
   return data;
+}
+
+export function createStencilBuffer(
+  width: number,
+  height: number,
+  fill: (pixel: Point.Point) => Color.Color
+): StencilBuffer {
+  const png = createStencilImageBytes(width, height, fill);
+  return StencilBuffer.fromPng(
+    { data: png, channels: 3 },
+    Dimensions.create(width, height),
+    Rectangle.create(0, 0, width, height),
+    1
+  );
 }

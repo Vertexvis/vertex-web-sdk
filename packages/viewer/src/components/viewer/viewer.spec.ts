@@ -110,7 +110,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer camera-controls="false"></vertex-viewer>`
       );
 
-      viewer.registerInteractionHandler(handler);
+      await viewer.registerInteractionHandler(handler);
       expect(handler.initialize).toHaveBeenCalled();
     });
 
@@ -263,13 +263,13 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream(urn1);
       const api = viewer.stream;
 
-      viewer.unload();
+      await viewer.unload();
       expect(api.dispose).toHaveBeenCalled();
     });
 
     it('clears scene and received frame data', async () => {
       const viewer = await createViewerWithLoadedStream(urn1);
-      viewer.unload();
+      await viewer.unload();
 
       const frame = await viewer.frame;
       expect(frame).toBeUndefined();

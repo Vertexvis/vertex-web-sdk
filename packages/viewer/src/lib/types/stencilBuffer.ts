@@ -59,7 +59,7 @@ export class StencilBufferManager {
           this.viewer.featureLines != null
         : false;
 
-    if (hasStencil) {
+    if (hasStencil && this.viewer.stream != null) {
       const [res, { decodePng }] = await Promise.all([
         this.viewer.stream.getStencilBuffer(true),
         loadDecodePngWorker(),
