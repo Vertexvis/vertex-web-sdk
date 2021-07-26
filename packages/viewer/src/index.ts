@@ -32,6 +32,6 @@ import { TapEventDetails } from './lib/interactions/tapEventDetails';
 
 export { TapEventDetails };
 
-export * from './lib/flexApi';
+export * from './lib/vertex-geometry/flexApi';
 
 export * from './lib/vertex-geometry';

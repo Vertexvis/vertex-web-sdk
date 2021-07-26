@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package vertexvis.protobuf.flextime.v1alpha1;
 
-import "core/protos/uuid.proto";
 import "core/protos/geometry.proto";
 import "core/protos/material.proto";
 import "google/protobuf/wrappers.proto";
@@ -24,4 +23,10 @@ message RenderItem {
     vertexvis.protobuf.core.AffineMatrix4f transform = 1;
     vertexvis.protobuf.core.ColorMaterialf material = 2;
     Indexed3DTriangleSet triangle_set = 3;
+}
+
+message CompressedRenderItem {
+    vertexvis.protobuf.core.AffineMatrix4f transform = 1;
+    vertexvis.protobuf.core.ColorMaterialf material = 2;
+    google.protobuf.BytesValue draco_bytes = 3;
 }
