@@ -60,3 +60,15 @@ describe(Plane.intersectLine, () => {
     expect(pt).toEqual(line.start);
   });
 });
+
+describe(Plane.projectPoint, () => {
+  it('projects a point onto a plane', () => {
+    const plane = Plane.create({
+      normal: Vector3.create(0, 0, -1),
+      constant: 10,
+    });
+    const pt = Vector3.create(5, 0, 20);
+
+    expect(Plane.projectPoint(plane, pt)).toEqual(Vector3.create(5, 0, 10));
+  });
+});

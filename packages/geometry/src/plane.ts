@@ -63,3 +63,18 @@ export function intersectLine(
     return Vector3.add(line.start, Vector3.scale(t, direction));
   }
 }
+
+/**
+ * Project's the given `point` onto the given `plane`.
+ *
+ * @param plane The plane to project onto.
+ * @param point The point to project.
+ * @returns The projected point.
+ */
+export function projectPoint(
+  plane: Plane,
+  point: Vector3.Vector3
+): Vector3.Vector3 {
+  const d = distanceToPoint(plane, point);
+  return Vector3.add(point, Vector3.scale(-d, plane.normal));
+}
