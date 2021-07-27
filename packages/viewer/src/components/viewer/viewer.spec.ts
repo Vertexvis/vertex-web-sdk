@@ -37,6 +37,9 @@ describe('vertex-viewer', () => {
   const urn1 = `urn:vertexvis:stream-key:${streamKey1}`;
   const urn2 = `urn:vertexvis:stream-key:${streamKey2}`;
 
+  const screenPos0 = { screenX: 0, screenY: 0 };
+  const screenPos50 = { screenX: 50, screenY: 50 };
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
@@ -46,7 +49,7 @@ describe('vertex-viewer', () => {
     it('defaults to production', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
 
-      expect(viewer.getConfig()).toMatchObject({
+      expect(viewer.resolvedConfig).toMatchObject({
         network: {
           apiHost: 'https://platform.platprod.vertexvis.io',
           renderingHost: 'wss://stream.platprod.vertexvis.io',
@@ -57,7 +60,7 @@ describe('vertex-viewer', () => {
     it('allows for platdev via the config route', async () => {
       const viewer = await createViewerSpec(`<vertex-viewer></vertex-viewer>`);
       viewer.configEnv = 'platdev';
-      expect(viewer.getConfig()).toMatchObject({
+      expect(viewer.resolvedConfig).toMatchObject({
         network: {
           apiHost: 'https://platform.platdev.vertexvis.io',
           renderingHost: 'wss://stream.platdev.vertexvis.io',
@@ -107,7 +110,7 @@ describe('vertex-viewer', () => {
         `<vertex-viewer camera-controls="false"></vertex-viewer>`
       );
 
-      viewer.registerInteractionHandler(handler);
+      await viewer.registerInteractionHandler(handler);
       expect(handler.initialize).toHaveBeenCalled();
     });
 
@@ -260,13 +263,13 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream(urn1);
       const api = viewer.stream;
 
-      viewer.unload();
+      await viewer.unload();
       expect(api.dispose).toHaveBeenCalled();
     });
 
     it('clears scene and received frame data', async () => {
       const viewer = await createViewerWithLoadedStream(urn1);
-      viewer.unload();
+      await viewer.unload();
 
       const frame = await viewer.frame;
       expect(frame).toBeUndefined();
@@ -275,8 +278,9 @@ describe('vertex-viewer', () => {
 
   describe('loading a second model', () => {
     it('properly starts the stream, and does not attempt to reconnect the old stream', async () => {
-      let viewer: Viewer = await createViewerWithLoadedStream(urn1, () =>
-        viewer.handleWebSocketClose()
+      let viewer: HTMLVertexViewerElement = await createViewerWithLoadedStream(
+        urn1,
+        () => viewer.handleWebSocketClose()
       );
       let api = viewer.stream;
       viewer = await loadNewModelForViewer(viewer, urn2);
@@ -471,17 +475,73 @@ describe('vertex-viewer', () => {
       );
     });
   });
+
+  describe('interaction events', () => {
+    it('emits an interaction started event on first interaction', async () => {
+      const onInteractionStarted = jest.fn();
+
+      const viewer = await createViewerWithLoadedStream(urn1);
+      const canvas = viewer.shadowRoot?.querySelector('canvas');
+
+      viewer.addEventListener('interactionStarted', onInteractionStarted);
+
+      canvas?.dispatchEvent(
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
+      );
+
+      await Async.delay(
+        viewer.resolvedConfig.interactions.interactionDelay + 5
+      );
+
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
+      );
+
+      expect(onInteractionStarted).toHaveBeenCalled();
+    });
+
+    it('emits an interaction finished event on last interaction', async () => {
+      const onInteractionEnded = jest.fn();
+
+      const viewer = await createViewerWithLoadedStream(urn1);
+      const canvas = viewer.shadowRoot?.querySelector('canvas');
+
+      viewer.addEventListener('interactionFinished', onInteractionEnded);
+
+      canvas?.dispatchEvent(
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
+      );
+
+      await Async.delay(
+        viewer.resolvedConfig.interactions.interactionDelay + 5
+      );
+
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
+      );
+      window.dispatchEvent(
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
+      );
+
+      expect(onInteractionEnded).toHaveBeenCalled();
+    });
+  });
 });
 
-async function createViewerSpec(html: string): Promise<Viewer> {
+async function createViewerSpec(
+  html: string
+): Promise<HTMLVertexViewerElement> {
   const page = await newSpecPage({ components: [Viewer], html });
-  return page.rootInstance as Viewer;
+  return page.root as HTMLVertexViewerElement;
 }
 
 async function createViewerWithLoadedStream(
   urn: string,
   dispose?: () => void
-): Promise<Viewer> {
+): Promise<HTMLVertexViewerElement> {
   const viewer = await createViewerSpec(
     `<vertex-viewer client-id="clientId"></vertex-viewer>`
   );
@@ -490,10 +550,10 @@ async function createViewerWithLoadedStream(
 }
 
 async function loadNewModelForViewer(
-  viewer: Viewer,
+  viewer: HTMLVertexViewerElement,
   urn: string,
   dispose?: () => void
-): Promise<Viewer> {
+): Promise<HTMLVertexViewerElement> {
   const startStream = {
     startStream: {
       sceneViewId: { hex: 'scene-view-id' },

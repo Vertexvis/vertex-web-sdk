@@ -107,7 +107,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 
   return async (data) => {
     const frameNumber = data.frame.sequenceNumber;
-    const image = await loadImageBytes(data.frame.image.data);
+    const image = await loadImageBytes(data.frame.image.imageBytes);
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;

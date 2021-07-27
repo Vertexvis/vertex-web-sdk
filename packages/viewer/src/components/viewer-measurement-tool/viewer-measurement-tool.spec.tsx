@@ -147,6 +147,12 @@ describe('vertex-viewer-measurement-tool', () => {
       ?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
     expect(measurementEl?.fractionalDigits).toBe(toolEl.fractionalDigits);
 
+    toolEl.snapDistance = 10;
+    await page.waitForChanges();
+    measurementEl = page.root
+      ?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    expect(measurementEl?.snapDistance).toBe(toolEl.snapDistance);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolEl.viewer = viewer as any;
     await page.waitForChanges();

@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Object } from 'ts-toolbelt';
 import { Color, Mapper as M } from '@vertexvis/utils';
 import {
   BoundingBox,
@@ -290,3 +291,35 @@ export const mapWorldOrientationOrThrow: M.ThrowIfInvalidFunc<
   vertexvis.protobuf.stream.IOrientation | null | undefined,
   Orientation
 > = M.ifInvalidThrow(mapWorldOrientation);
+
+const mapStencilBufferResult: M.Func<
+  vertexvis.protobuf.stream.IGetStencilBufferResult,
+  Object.Compulsory<
+    vertexvis.protobuf.stream.IGetStencilBufferResult,
+    keyof vertexvis.protobuf.stream.IGetStencilBufferResult,
+    'deep'
+  >
+> = M.defineMapper(
+  M.read(
+    M.mapRequiredProp('imageAttributes', mapImageAttributes),
+    M.requiredProp('stencilBuffer')
+  ),
+  ([imageAttributes, stencilBuffer]) => ({ imageAttributes, stencilBuffer })
+);
+
+export const mapStencilBuffer = mapStreamResponse(
+  'stencilBuffer',
+  mapStencilBufferResult
+);
+
+export const mapStencilBufferOrThrow = M.ifInvalidThrow(mapStencilBuffer);
+
+function mapStreamResponse<
+  P extends keyof vertexvis.protobuf.stream.IStreamResponse,
+  R
+>(
+  prop: P,
+  mapper: M.Func<NonNullable<vertexvis.protobuf.stream.IStreamResponse[P]>, R>
+): M.Func<vertexvis.protobuf.stream.IStreamResponse, R> {
+  return M.mapRequiredProp(prop, mapper);
+}

@@ -29,6 +29,7 @@ import {
   SynchronizedClock,
   Viewport,
   Orientation,
+  StencilBufferManager,
 } from '../../lib/types';
 import { registerCommands } from '../../lib/commands/streamCommands';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
@@ -128,6 +129,8 @@ export type ConnectionStatus =
   shadow: true,
 })
 export class Viewer {
+  @Element() private hostElement!: HTMLVertexViewerElement;
+
   /**
    * A URN of the scene resource to load when the component is mounted in the
    * DOM tree. The specified resource is a URN in the following format:
@@ -163,6 +166,11 @@ export class Viewer {
    * @see Viewer.config
    */
   @Prop() public configEnv: Environment = 'platprod';
+
+  /**
+   * @internal
+   */
+  @Prop({ mutable: true }) public resolvedConfig?: Config;
 
   /**
    * Enables or disables the default mouse and touch interactions provided by
@@ -221,6 +229,8 @@ export class Viewer {
   /**
    * The last frame that was received, which can be used to inspect the scene
    * and camera information.
+   *
+   * @readonly
    */
   @Prop({ mutable: true }) public frame: Frame | undefined;
 
@@ -232,6 +242,29 @@ export class Viewer {
    * @readonly
    */
   @Prop({ mutable: true }) public streamAttributes: ViewerStreamAttributes = {};
+
+  /**
+   * @internal
+   */
+  @Prop({ mutable: true }) public stream?: ViewerStreamApi;
+
+  /**
+   * @internal
+   */
+  @Prop({ mutable: true })
+  public stencilBuffer: StencilBufferManager = new StencilBufferManager(
+    this.hostElement
+  );
+
+  /**
+   * The HTML element that will handle interaction events from the user. Used by
+   * components to listen for interaction events from the same element as the
+   * viewer. Note, this property maybe removed in the future when refactoring
+   * our interaction handling.
+   *
+   * @internal
+   */
+  @Prop({ mutable: true }) public interactionTarget?: HTMLElement;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -283,6 +316,16 @@ export class Viewer {
   @Event() public sceneReady!: EventEmitter<void>;
 
   /**
+   * Emits an event when the user has started an interaction.
+   */
+  @Event() public interactionStarted!: EventEmitter<void>;
+
+  /**
+   * Emits an event when the user hs finished an interaction.
+   */
+  @Event() public interactionFinished!: EventEmitter<void>;
+
+  /**
    * Used for internals or testing.
    *
    * @private
@@ -306,12 +349,8 @@ export class Viewer {
     cursorManager: new CursorManager(),
   };
 
-  @Element() private hostElement!: HTMLElement;
-
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
-
-  private stream!: ViewerStreamApi;
 
   private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
@@ -344,16 +383,31 @@ export class Viewer {
     this.streamSessionId = this.sessionId;
   }
 
-  public componentDidLoad(): void {
+  /**
+   * @ignore
+   */
+  protected componentWillLoad(): void {
+    this.updateResolvedConfig();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentDidLoad(): void {
     const ws = new WebSocketClientImpl();
     ws.onClose(() => this.handleWebSocketClose());
 
-    this.stream = new ViewerStreamApi(ws, this.getConfig().flags.logWsMessages);
+    this.stream = new ViewerStreamApi(
+      ws,
+      this.getResolvedConfig().flags.logWsMessages
+    );
     this.setupStreamListeners();
 
     this.interactionApi = this.createInteractionApi();
 
-    this.commands = new CommandRegistry(this.stream, () => this.getConfig());
+    this.commands = new CommandRegistry(this.stream, () =>
+      this.getResolvedConfig()
+    );
     registerCommands(this.commands);
 
     this.calculateComponentDimensions();
@@ -381,10 +435,10 @@ export class Viewer {
           'pointerdown',
           'pointerup',
           'pointermove',
-          () => this.getConfig()
+          () => this.getResolvedConfig()
         );
         this.baseInteractionHandler = new PointerInteractionHandler(() =>
-          this.getConfig()
+          this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -394,12 +448,12 @@ export class Viewer {
           'mousedown',
           'mouseup',
           'mousemove',
-          () => this.getConfig()
+          () => this.getResolvedConfig()
         );
 
         // fallback to touch events and mouse events as a default
         this.baseInteractionHandler = new MouseInteractionHandler(() =>
-          this.getConfig()
+          this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new TouchInteractionHandler());
@@ -415,7 +469,7 @@ export class Viewer {
       this.registerTapKeyInteraction(
         new FlyToPartKeyInteraction(
           this.stream,
-          () => this.getConfig(),
+          () => this.getResolvedConfig(),
           () => this.getImageScale()
         )
       );
@@ -432,16 +486,25 @@ export class Viewer {
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
   }
 
-  public connectedCallback(): void {
+  /**
+   * @ignore
+   */
+  protected connectedCallback(): void {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
-  public disconnectedCallback(): void {
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
     this.mutationObserver?.disconnect();
     this.resizeObserver?.disconnect();
   }
 
-  public render(): h.JSX.IntrinsicElements {
+  /**
+   * @ignore
+   */
+  protected render(): h.JSX.IntrinsicElements {
     const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
@@ -457,7 +520,10 @@ export class Viewer {
             })}
           >
             <canvas
-              ref={(ref) => (this.canvasElement = ref)}
+              ref={(ref) => {
+                this.canvasElement = ref;
+                this.interactionTarget = ref;
+              }}
               class="canvas"
               width={canvasDimensions != null ? canvasDimensions.width : 0}
               height={canvasDimensions != null ? canvasDimensions.height : 0}
@@ -475,7 +541,7 @@ export class Viewer {
   /**
    * Internal API.
    *
-   * @private
+   * @internal
    */
   @Method()
   public async registerCommand<R, T>(
@@ -487,7 +553,7 @@ export class Viewer {
   }
 
   /**
-   * @private For internal use only.
+   * @internal
    */
   @Method()
   public async dispatchFrameDrawn(frame: Frame): Promise<void> {
@@ -649,7 +715,7 @@ export class Viewer {
     streamAttributes: ViewerStreamAttributes
   ): void {
     if (this.isStreamStarted) {
-      this.stream.updateStream({
+      this.getStream().updateStream({
         streamAttributes: toProtoStreamAttributes(streamAttributes),
       });
     }
@@ -685,6 +751,22 @@ export class Viewer {
   @Watch('featureLines')
   protected handleFeatureLinesChanged(): void {
     this.updateStreamAttributesProp();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('config')
+  protected handleConfigChanged(): void {
+    this.updateResolvedConfig();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('configEnv')
+  protected handleConfigEnvChanged(): void {
+    this.updateResolvedConfig();
   }
 
   /**
@@ -768,14 +850,6 @@ export class Viewer {
     return this.lastFrame != null && this.sceneViewId != null;
   }
 
-  /**
-   * @private Used for internal testing.
-   */
-  @Method()
-  public async getStream(): Promise<ViewerStreamApi> {
-    return this.stream;
-  }
-
   @Listen('tap')
   private async handleTapEvent(
     event: CustomEvent<TapEventDetails>
@@ -786,15 +860,9 @@ export class Viewer {
   }
 
   /**
-   * @private Used for internals or testing.
+   * @internal
    */
-  public getConfig(): Config {
-    return parseConfig(this.configEnv, this.config);
-  }
-
-  /**
-   * @private Used for testing.
-   */
+  @Method()
   public async handleWebSocketClose(): Promise<void> {
     if (this.isStreamStarted) {
       this.isStreamStarted = false;
@@ -813,7 +881,7 @@ export class Viewer {
     try {
       this.streamDisposable = await this.connectStream(resource);
 
-      const { startStream } = await this.stream.startStream({
+      const { startStream } = await this.getStream().startStream({
         streamKey: { value: resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -897,7 +965,7 @@ export class Viewer {
     this.canvasRenderer = measureCanvasRenderer(
       paintTime,
       createCanvasRenderer(),
-      this.getConfig().flags.logFrameRate,
+      this.getResolvedConfig().flags.logFrameRate,
       (timings) => this.reportPerformance(timings)
     );
     if (this.containerElement != null) {
@@ -908,7 +976,7 @@ export class Viewer {
 
   private async synchronizeTime(): Promise<void> {
     try {
-      const resp = await this.stream.syncTime({
+      const resp = await this.getStream().syncTime({
         requestTime: currentDateAsProtoTimestamp(),
       });
 
@@ -938,7 +1006,7 @@ export class Viewer {
       this.emitConnectionChange({ status: 'connecting' });
 
       this.streamDisposable = await this.connectStream(resource);
-      const result = await this.stream.reconnect({
+      const result = await this.getStream().reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
@@ -1126,7 +1194,7 @@ export class Viewer {
       this.dimensionschange.emit(this.dimensions);
 
       if (this.isStreamStarted) {
-        this.stream.updateDimensions({ dimensions: this.dimensions });
+        this.getStream().updateDimensions({ dimensions: this.dimensions });
       }
     }
   }
@@ -1138,29 +1206,29 @@ export class Viewer {
           receiveToPaintDuration: toProtoDuration(t.duration),
         })),
       };
-      this.stream.recordPerformance(payload, false);
+      this.getStream().recordPerformance(payload, false);
     }
   }
 
   private setupStreamListeners(): void {
-    this.stream.onRequest((msg) => this.handleStreamRequest(msg.request));
-    this.stream.onRequest(
-      acknowledgeFrameRequests(this.stream, () => this.clock)
+    this.getStream().onRequest((msg) => this.handleStreamRequest(msg.request));
+    this.getStream().onRequest(
+      acknowledgeFrameRequests(this.getStream(), () => this.clock)
     );
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
-    if (this.canvasElement == null) {
+    if (this.interactionTarget == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Canvas element is undefined.'
+        'Cannot initialize interaction handler. Interaction target is undefined.'
       );
     }
     if (this.interactionApi == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Canvas element is undefined.'
+        'Cannot initialize interaction handler. Interaction APi is undefined.'
       );
     }
-    handler.initialize(this.canvasElement, this.interactionApi);
+    handler.initialize(this.interactionTarget, this.interactionApi);
   }
 
   private createInteractionApi(): InteractionApi {
@@ -1172,7 +1240,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
-      () => this.getConfig().interactions,
+      () => this.getResolvedConfig().interactions,
       () => this.createScene(),
       async () => this.frame?.depthBuffer(),
       () =>
@@ -1181,17 +1249,21 @@ export class Viewer {
         ),
       this.tap,
       this.doubletap,
-      this.longpress
+      this.longpress,
+      this.interactionStarted,
+      this.interactionFinished
     );
   }
 
   private handleCursorChanged(): void {
-    this.cursor = this.stateMap.cursorManager.getActiveCursor();
+    window.requestAnimationFrame(() => {
+      this.cursor = this.stateMap.cursorManager.getActiveCursor();
+    });
   }
 
   private createScene(): Scene {
     if (
-      this.lastFrame == null ||
+      this.frame == null ||
       this.sceneViewId == null ||
       this.stateMap.streamWorldOrientation == null
     ) {
@@ -1205,8 +1277,8 @@ export class Viewer {
         ? fromHex(this.selectionMaterial)
         : this.selectionMaterial;
     return new Scene(
-      this.stream,
-      this.lastFrame,
+      this.getStream(),
+      this.frame,
       mapFrameOrThrow(this.stateMap.streamWorldOrientation),
       () => this.getImageScale(),
       this.sceneViewId,
@@ -1232,7 +1304,7 @@ export class Viewer {
   }
 
   private getCanvasDimensions(): Dimensions.Dimensions | undefined {
-    return this.getConfig().flags.letterboxFrames
+    return this.getResolvedConfig().flags.letterboxFrames
       ? this.dimensions
       : this.hostDimensions;
   }
@@ -1266,4 +1338,26 @@ export class Viewer {
       this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
     return depthBuffer;
   }
+
+  private updateResolvedConfig(): void {
+    this.resolvedConfig = parseConfig(this.configEnv, this.config);
+  }
+
+  private getResolvedConfig(): Config {
+    return getRequiredProp(
+      'Resolved config is undefined',
+      () => this.resolvedConfig
+    );
+  }
+
+  private getStream(): ViewerStreamApi {
+    return getRequiredProp('Stream is undefined', () => this.stream);
+  }
+}
+
+function getRequiredProp<T>(errorMsg: string, getter: () => T | undefined): T {
+  const value = getter();
+  if (value != null) {
+    return value;
+  } else throw new Error(errorMsg);
 }

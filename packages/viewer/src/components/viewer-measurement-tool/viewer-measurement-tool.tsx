@@ -12,6 +12,7 @@ import {
 import { stampTemplateWithId } from '../../lib/templates';
 import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
+import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 
 /**
  * The types of measurements that can be performed by this tool.
@@ -85,6 +86,13 @@ export class ViewerMeasurementTool {
   public isMeasuring = false;
 
   /**
+   * The distance, in pixels, between the mouse and nearest snappable edge. A
+   * value of 0 disables snapping.
+   */
+  @Prop()
+  public snapDistance: number = MEASUREMENT_SNAP_DISTANCE;
+
+  /**
    * An event that is dispatched when a user begins a new measurement.
    */
   @Event({ bubbles: true })
@@ -150,6 +158,14 @@ export class ViewerMeasurementTool {
    */
   @Watch('fractionalDigits')
   protected handleFractionalDigitsChanged(): void {
+    this.updateMeasurementElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('snapDistance')
+  protected handleSnapDistanceChanged(): void {
     this.updateMeasurementElement();
   }
 
@@ -224,6 +240,7 @@ export class ViewerMeasurementTool {
       const newMeasurementElement = this.createDistanceMeasurementElement();
       newMeasurementElement.mode = 'replace';
       newMeasurementElement.units = this.units;
+      newMeasurementElement.snapDistance = this.snapDistance;
       newMeasurementElement.fractionalDigits = this.fractionalDigits;
       newMeasurementElement.viewer = this.viewer;
       newMeasurementElement.addEventListener(
@@ -252,6 +269,7 @@ export class ViewerMeasurementTool {
       this.isMeasuring = false;
       measurementElement.start = undefined;
       measurementElement.end = undefined;
+      measurementElement.invalid = false;
 
       if (start != null && end != null) {
         this.measureEnd.emit(new DistanceMeasurement({ start, end, invalid }));

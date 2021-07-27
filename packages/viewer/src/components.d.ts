@@ -26,7 +26,19 @@ import {
   ViewerStreamAttributes,
 } from './lib/stream/streamAttributes';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
-import { Frame, FramePerspectiveCamera } from './lib/types/frame';
+import {
+  Frame,
+  FramePerspectiveCamera as FramePerspectiveCamera1,
+} from './lib/types/frame';
+import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
+import {
+  DepthBuffer,
+  FramePerspectiveCamera,
+  Measurement,
+  Orientation,
+  StencilBufferManager,
+  UnitType,
+} from './lib/types';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import {
@@ -44,16 +56,14 @@ import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
 import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
 import { Scene } from './lib/scenes/scene';
-import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
-import { DepthBuffer, Measurement, Orientation, UnitType } from './lib/types';
 import {
-  Anchor,
   ViewerDistanceMeasurementElementMetrics,
   ViewerDistanceMeasurementLabelFormatter,
   ViewerDistanceMeasurementMode,
 } from './components/viewer-distance-measurement/viewer-distance-measurement';
+import { Anchor } from './components/viewer-distance-measurement/utils';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
 import {
   ViewerIconName,
@@ -270,9 +280,6 @@ export namespace Components {
      * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     depthBuffers?: DepthBufferFrameType;
-    /**
-     * @private For internal use only.
-     */
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
@@ -284,6 +291,7 @@ export namespace Components {
     featureLines?: FeatureLineOptions;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
+     * @readonly
      */
     frame: Frame | undefined;
     getBaseInteractionHandler: () => Promise<
@@ -291,10 +299,11 @@ export namespace Components {
     >;
     getInteractionHandlers: () => Promise<InteractionHandler[]>;
     getJwt: () => Promise<string | undefined>;
+    handleWebSocketClose: () => Promise<void>;
     /**
-     * @private Used for internal testing.
+     * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
      */
-    getStream: () => Promise<ViewerStreamApi>;
+    interactionTarget?: HTMLElement;
     /**
      * Returns `true` indicating that the scene is ready to be interacted with.
      */
@@ -310,7 +319,6 @@ export namespace Components {
     load: (urn: string) => Promise<void>;
     /**
      * Internal API.
-     * @private
      */
     registerCommand: <R, T>(
       id: string,
@@ -371,6 +379,7 @@ export namespace Components {
     registerTapKeyInteraction: (
       keyInteraction: KeyInteraction<TapEventDetails>
     ) => Promise<void>;
+    resolvedConfig?: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
      */
@@ -392,6 +401,8 @@ export namespace Components {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */
     src?: string;
+    stencilBuffer: StencilBufferManager;
+    stream?: ViewerStreamApi;
     /**
      * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
      * @readonly
@@ -430,6 +441,10 @@ export namespace Components {
      * The distance from an anchor to its label.
      */
     anchorLabelOffset: number;
+    /**
+     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     */
+    camera?: FramePerspectiveCamera;
     /**
      * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
      */
@@ -477,9 +492,9 @@ export namespace Components {
      */
     mode: ViewerDistanceMeasurementMode;
     /**
-     * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
-    projectionViewMatrix?: Matrix4.Matrix4;
+    snapDistance: number;
     /**
      * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
@@ -594,6 +609,10 @@ export namespace Components {
      */
     isMeasuring: boolean;
     /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance: number;
+    /**
      * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
      */
     tool: ViewerMeasurementToolType;
@@ -660,6 +679,10 @@ export namespace Components {
      * The ID of the measurement that is selected.
      */
     selectedMeasurementId?: string;
+    /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance: number;
     /**
      * The type of measurement to perform.
      */
@@ -1008,8 +1031,13 @@ declare namespace LocalJSX {
     featureLines?: FeatureLineOptions;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
+     * @readonly
      */
     frame?: Frame | undefined;
+    /**
+     * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
+     */
+    interactionTarget?: HTMLElement;
     /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
@@ -1032,6 +1060,14 @@ declare namespace LocalJSX {
      */
     onFrameReceived?: (event: CustomEvent<Frame>) => void;
     /**
+     * Emits an event when the user hs finished an interaction.
+     */
+    onInteractionFinished?: (event: CustomEvent<void>) => void;
+    /**
+     * Emits an event when the user has started an interaction.
+     */
+    onInteractionStarted?: (event: CustomEvent<void>) => void;
+    /**
      * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
      */
     onLongpress?: (event: CustomEvent<TapEventDetails>) => void;
@@ -1052,6 +1088,7 @@ declare namespace LocalJSX {
      * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
      */
     onTokenExpired?: (event: CustomEvent<void>) => void;
+    resolvedConfig?: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
      */
@@ -1069,6 +1106,8 @@ declare namespace LocalJSX {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */
     src?: string;
+    stencilBuffer?: StencilBufferManager;
+    stream?: ViewerStreamApi;
     /**
      * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
      * @readonly
@@ -1103,6 +1142,10 @@ declare namespace LocalJSX {
      * The distance from an anchor to its label.
      */
     anchorLabelOffset?: number;
+    /**
+     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     */
+    camera?: FramePerspectiveCamera;
     /**
      * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
      */
@@ -1152,9 +1195,9 @@ declare namespace LocalJSX {
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
     /**
-     * The projection view matrix used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
-    projectionViewMatrix?: Matrix4.Matrix4;
+    snapDistance?: number;
     /**
      * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
@@ -1281,6 +1324,10 @@ declare namespace LocalJSX {
      */
     onMeasureEnd?: (event: CustomEvent<Measurement>) => void;
     /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance?: number;
+    /**
      * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
      */
     tool?: ViewerMeasurementToolType;
@@ -1322,6 +1369,10 @@ declare namespace LocalJSX {
      * The ID of the measurement that is selected.
      */
     selectedMeasurementId?: string;
+    /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance?: number;
     /**
      * The type of measurement to perform.
      */

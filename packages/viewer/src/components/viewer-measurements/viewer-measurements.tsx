@@ -10,6 +10,7 @@ import {
   Method,
   Listen,
 } from '@stencil/core';
+import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 import { stampTemplateWithId } from '../../lib/templates';
 import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
@@ -66,6 +67,13 @@ export class ViewerMeasurements {
    */
   @Prop({ mutable: true })
   public selectedMeasurementId?: string;
+
+  /**
+   * The distance, in pixels, between the mouse and nearest snappable edge. A
+   * value of 0 disables snapping.
+   */
+  @Prop()
+  public snapDistance: number = MEASUREMENT_SNAP_DISTANCE;
 
   /**
    * Dispatched when a new measurement is added, either through user interaction
@@ -240,6 +248,15 @@ export class ViewerMeasurements {
   /**
    * @ignore
    */
+  @Watch('snapDistance')
+  protected handleSnapDistanceChanged(): void {
+    this.updatePropsOnMeasurementTool();
+    this.updatePropsOnMeasurements();
+  }
+
+  /**
+   * @ignore
+   */
   @Listen('measureEnd')
   protected async handleMeasureEnd(
     event: CustomEvent<Measurement>
@@ -308,6 +325,7 @@ export class ViewerMeasurements {
   ): void {
     element.fractionalDigits = this.fractionalDigits;
     element.units = this.units;
+    element.snapDistance = this.snapDistance;
     element.viewer = this.viewer;
     element.classList.add('viewer-measurements__measurement');
   }
@@ -320,6 +338,7 @@ export class ViewerMeasurements {
       tool.tool = this.tool;
       tool.fractionalDigits = this.fractionalDigits;
       tool.units = this.units;
+      tool.snapDistance = this.snapDistance;
       tool.viewer = this.viewer;
     }
   }

@@ -28,13 +28,12 @@ export function cssCursor(cursor: Cursor): string {
   if (typeof cursor === 'string') {
     return cursor;
   } else {
-    const parts = [`url(${cursor.url})`];
-    if (cursor.offsetX != null) {
-      parts.push(cursor.offsetX.toString());
-    }
-    if (cursor.offsetY != null) {
-      parts.push(cursor.offsetY.toString());
-    }
+    const parts = [
+      `url("${cursor.url}")`,
+      cursor.offsetX ?? 0,
+      cursor.offsetY ?? 0,
+      ', auto',
+    ];
     return parts.join(' ');
   }
 }

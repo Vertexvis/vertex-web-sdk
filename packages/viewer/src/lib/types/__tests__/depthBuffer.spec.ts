@@ -41,12 +41,12 @@ describe(DepthBuffer, () => {
     });
 
     it('returns far plane if point outside viewport', () => {
-      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(0, 0));
+      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(-1, -1));
       expect(depth).toBeCloseTo(camera.far);
     });
 
     it('returns fallback depth', () => {
-      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(0, 0), 0);
+      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(-1, -1), 0);
       expect(depth).toBeCloseTo(camera.near);
     });
   });
@@ -58,13 +58,13 @@ describe(DepthBuffer, () => {
     });
 
     it('returns 1 if point outside viewport', () => {
-      const depth = depthBuffer.getNormalizedDepthAtPoint(Point.create(0, 0));
+      const depth = depthBuffer.getNormalizedDepthAtPoint(Point.create(-1, -1));
       expect(depth).toBe(1);
     });
 
     it('returns fallback depth', () => {
       const depth = depthBuffer.getNormalizedDepthAtPoint(
-        Point.create(0, 0),
+        Point.create(-1, -1),
         0.5
       );
       expect(depth).toBe(0.5);

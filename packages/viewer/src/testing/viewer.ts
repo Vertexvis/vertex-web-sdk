@@ -25,17 +25,16 @@ export async function loadModelForViewer(
     },
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-  const api = await viewer.getStream();
-  (api.connect as jest.Mock).mockResolvedValue({
+  (viewer.stream?.connect as jest.Mock).mockResolvedValue({
     dispose: () => {
       if (dispose != null) {
         dispose();
       }
-      api.dispose();
+      viewer.stream?.dispose();
     },
   });
-  (api.startStream as jest.Mock).mockResolvedValue(startStream);
-  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
+  (viewer.stream?.startStream as jest.Mock).mockResolvedValue(startStream);
+  (viewer.stream?.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
   const loading = viewer.load(`urn:vertexvis:stream-key:${streamKey || 'key'}`);
 

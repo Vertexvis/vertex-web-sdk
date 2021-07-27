@@ -3,7 +3,7 @@
    * @prop --viewer-distance-measurement-accent-color: A CSS color that
    * specifies the color of lines, anchors and borders.
    */
-  --viewer-distance-measurement-accent-color: var(--blue-600);
+  --viewer-distance-measurement-accent-color: var(--neutral-900);
 
   /**
    * @prop --viewer-distance-measurement-contrast-color: A CSS color that
@@ -27,9 +27,15 @@
 
   /**
    * @prop --viewer-distance-measurement-line-stroke-width: A CSS length that
-   * width of the measurement line.
+   * width of the measurement line's stroke.
    */
-  --viewer-distance-measurement-line-stroke-width: 3px;
+  --viewer-distance-measurement-line-stroke-width: 1.25px;
+
+  /**
+   * @prop --viewer-distance-measurement-line-fill-width: A CSS length that
+   * width of the measurement line's fill.
+   */
+  --viewer-distance-measurement-line-fill-width: 2px;
 
   /**
    * @prop --viewer-distance-measurement-distance-border: A CSS border that
@@ -77,10 +83,17 @@
 
 .line {
   --viewer-measurement-line-stroke: var(
-    --viewer-distance-measurement-accent-color
+    --viewer-distance-measurement-contrast-color
   );
+  --viewer-measurement-line-stroke-opacity: 0.75;
   --viewer-measurement-line-stroke-width: var(
     --viewer-distance-measurement-line-stroke-width
+  );
+  --viewer-measurement-line-fill: var(
+    --viewer-distance-measurement-accent-color
+  );
+  --viewer-measurement-line-fill-width: var(
+    --viewer-distance-measurement-line-fill-width
   );
 
   position: absolute;
@@ -105,6 +118,8 @@
 :host([interacting-anchor='start']) .anchor-label-start {
   visibility: hidden;
 }
+
+.hide-start-line-cap,
 :host([interacting-anchor='start']) .line {
   --viewer-measurement-line-start-cap-visibility: hidden;
 }
@@ -113,6 +128,8 @@
 :host([interacting-anchor='end']) .anchor-label-end {
   visibility: hidden;
 }
+
+.hide-end-line-cap,
 :host([interacting-anchor='end']) .line {
   --viewer-measurement-line-end-cap-visibility: hidden;
 }
@@ -125,7 +142,7 @@
 }
 
 :host([mode='edit']) {
-  cursor: auto;
+  cursor: inherit;
 }
 :host([mode='edit']) .anchor {
   cursor: move;
@@ -148,10 +165,28 @@
   background: var(--viewer-distance-measurement-contrast-color);
 }
 
+:host([mode='']) .distance-label {
+  color: var(--viewer-distance-measurement-contrast-color);
+  background: var(--viewer-distance-measurement-accent-color);
+}
+
 .distance-label {
   position: absolute;
   background: var(--viewer-distance-measurement-contrast-color);
   border: var(--viewer-distance-measurement-distance-border);
   border-radius: var(--viewer-distance-measurement-distance-border-radius);
   padding: var(--viewer-distance-measurement-distance-padding);
+}
+
+.indicator {
+  position: absolute;
+}
+
+.indicator-placeholder {
+  background: var(--viewer-distance-measurement-accent-color);
+  border: 1px solid var(--viewer-distance-measurement-contrast-color);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-sizing: border-box;
 }
