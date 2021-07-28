@@ -224,15 +224,34 @@ describe('vertex-viewer-measurements', () => {
     it('selects measurement when pressed and not disabled', async () => {
       const page = await newSpecPage({
         components: [ViewerMeasurements, ViewerDistanceMeasurement],
-        html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
+        html: `
+          <vertex-viewer-measurements>
+            <vertex-viewer-distance-measurement id="m1" class="provided"></vertex-viewer-distance-measurement>
+            <vertex-viewer-distance-measurement class="provided"></vertex-viewer-distance-measurement>
+          </vertex-viewer-measurements>
+        `,
       });
 
       const el = page.root as HTMLVertexViewerMeasurementsElement;
-      const measurementEl = await el.addMeasurement(measurement1);
+      const provided = el.querySelectorAll('.provided');
+      const measurementEl1 = provided[0];
+      const measurementEl2 = provided[1];
+      const measurementEl3 = await el.addMeasurement(measurement1);
 
-      measurementEl.dispatchEvent(new Event('pointerdown'));
+      // Should select, measurement has ID
+      measurementEl1.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
+      expect(el.selectedMeasurementId).toEqual(measurementEl1.id);
 
-      expect(el.selectedMeasurementId).toEqual(measurementEl.id);
+      // Should not select, measurement does not have ID
+      measurementEl2.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
+      expect(el.selectedMeasurementId).toEqual(measurementEl1.id);
+
+      // Should select, measurement has ID
+      measurementEl3.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
+      expect(el.selectedMeasurementId).toEqual(measurementEl3.id);
     });
 
     it('does not select measurement when pressed and disabled', async () => {
@@ -244,7 +263,7 @@ describe('vertex-viewer-measurements', () => {
       const el = page.root as HTMLVertexViewerMeasurementsElement;
       const measurementEl = await el.addMeasurement(measurement1);
 
-      measurementEl.dispatchEvent(new Event('pointerdown'));
+      measurementEl.dispatchEvent(new Event('pointerdown', { bubbles: true }));
 
       expect(el.selectedMeasurementId).toBeUndefined();
     });

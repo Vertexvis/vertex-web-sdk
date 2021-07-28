@@ -113,7 +113,6 @@ export class ViewerMeasurements {
       el.start = start;
       el.end = end;
       el.invalid = invalid;
-      el.addEventListener('pointerdown', this.handleMeasurementPointerDown);
 
       this.updatePropsOnMeasurement(el);
       this.hostEl.appendChild(el);
@@ -141,10 +140,6 @@ export class ViewerMeasurements {
 
     if (measurement != null) {
       measurement.remove();
-      measurement.removeEventListener(
-        'pointerdown',
-        this.handleMeasurementPointerDown
-      );
       this.measurementRemoved.emit(measurement);
     }
 
@@ -269,6 +264,21 @@ export class ViewerMeasurements {
   /**
    * @ignore
    */
+  @Listen('pointerdown')
+  protected async handleMeasurementPointerDown(event: Event): Promise<void> {
+    if (!this.disabled) {
+      const el = event.target as Element;
+      const measurements = await this.getMeasurementElements();
+      const measurement = measurements.find((m) => m === el);
+      if (measurement?.id != null && measurement?.id !== '') {
+        this.selectedMeasurementId = el.id;
+      }
+    }
+  }
+
+  /**
+   * @ignore
+   */
   protected componentDidLoad(): void {
     this.updatePropsOnMeasurementTool();
   }
@@ -283,13 +293,6 @@ export class ViewerMeasurements {
       </Host>
     );
   }
-
-  private handleMeasurementPointerDown = (event: Event): void => {
-    if (!this.disabled) {
-      const el = event.currentTarget as Element;
-      this.selectedMeasurementId = el.id;
-    }
-  };
 
   private createDistanceMeasurementElement(): HTMLVertexViewerDistanceMeasurementElement {
     if (this.distanceTemplateId != null) {
