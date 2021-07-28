@@ -1,9 +1,17 @@
-import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Dimensions,
+  Plane,
+  Point,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
 import { DepthBuffer, Interactions, Viewport } from '../types';
+import { ReceivedFrame } from '../..';
 
 type SceneProvider = () => Scene;
 
@@ -28,7 +36,7 @@ export class InteractionApi {
     private stream: StreamApi,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
-    private getDepthBuffer: () => Promise<DepthBuffer | undefined>,
+    private getFrame: () => ReceivedFrame | undefined,
     private getViewport: () => Viewport,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
@@ -40,6 +48,26 @@ export class InteractionApi {
     this.doubleTap = this.doubleTap.bind(this);
     this.longPress = this.longPress.bind(this);
     this.emitTapEvent = this.emitTapEvent.bind(this);
+  }
+
+  /**
+   * Generates a ray from the given point, in viewport coordinates.
+   *
+   * @param point A point in viewport coordinates.
+   * @returns A ray representing the direction of the point in world
+   * coordinates.
+   */
+  public getRayFromPoint(point: Point.Point): Ray.Ray {
+    const viewport = this.getViewport();
+    const frame = this.getFrame();
+
+    if (frame != null) {
+      return viewport.transformPointToRay(
+        point,
+        frame.image,
+        frame.scene.camera
+      );
+    } else throw new Error('Cannot get camera. Frame is undefined.');
   }
 
   /**
@@ -218,9 +246,10 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    const depthBuffer = await this.getDepthBuffer();
+    const frame = this.getFrame();
+    const depthBuffer = await frame?.depthBuffer();
 
-    return this.transformCamera((camera, viewport, scale) => {
+    return this.transformCamera((camera, viewport) => {
       this.worldRotationPoint =
         this.getWorldRotationPoint(point, depthBuffer) ?? camera.lookAt;
 
@@ -275,17 +304,28 @@ export class InteractionApi {
    * @param delta The distance to zoom. Positive values zoom in and negative
    *  values zoom out.
    */
-  public async zoomCamera(delta: number): Promise<void> {
+  public async zoomCamera(delta: number, ray?: Ray.Ray): Promise<void> {
     return this.transformCamera((camera, viewport) => {
       const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
-      const distance = Vector3.magnitude(vv);
+      const lookAtPlane = Plane.create({
+        normal: v,
+        constant: Vector3.dot(camera.lookAt, v),
+      });
+      const pt = ray != null ? Ray.intersectPlane(ray, lookAtPlane) : undefined;
+      const zv = pt != null ? Vector3.subtract(pt, camera.position) : vv;
+
+      const direction = Vector3.normalize(zv);
+      const distance = Vector3.magnitude(zv);
       const epsilon = (3 * distance * delta) / viewport.height;
 
-      const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
-      const newCamera = camera.update({ position });
-      return newCamera;
+      const position = Vector3.add(
+        camera.position,
+        Vector3.scale(epsilon, direction)
+      );
+      const lookAt = Plane.projectPoint(lookAtPlane, position);
+      return camera.update({ position, lookAt });
     });
   }
 

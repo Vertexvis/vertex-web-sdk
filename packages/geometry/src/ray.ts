@@ -1,3 +1,4 @@
+import * as Plane from './plane';
 import * as Vector3 from './vector3';
 
 /**
@@ -39,4 +40,45 @@ export function create(value: Partial<Ray> = {}): Ray {
  */
 export function at(ray: Ray, distance: number): Vector3.Vector3 {
   return Vector3.add(Vector3.scale(distance, ray.direction), ray.origin);
+}
+
+/**
+ * Computes the distance of the `ray`s origin to the given `plane`. Returns a
+ * distance of 0 if the ray is coplanar and returns `undefined` if the ray does
+ * not intersect with the plane.
+ *
+ * @param ray The ray to get the distance for.
+ * @param plane The plane to compute the distance to.
+ * @returns The distance to the plane, or `undefined` if it cannot be computed.
+ */
+export function distanceToPlane(
+  ray: Ray,
+  plane: Plane.Plane
+): number | undefined {
+  const d = Vector3.dot(plane.normal, ray.direction);
+  if (d === 0) {
+    // Ray is on plane.
+    return Plane.distanceToPoint(plane, ray.origin) === 0 ? 0 : undefined;
+  } else {
+    const t = -(Vector3.dot(ray.origin, plane.normal) + plane.constant) / d;
+    // Checks if ray intersects plane.
+    return t >= 0 ? t : undefined;
+  }
+}
+
+/**
+ * Computes the intersection point of the given `ray` to the given `plane`. If
+ * the ray does not intersect with the plane, then `undefined` is returned.
+ *
+ * @param ray The ray to intersect.
+ * @param plane The plane to intersect with.
+ * @returns The intersection point, or `undefined` if the ray does not
+ * intersect.
+ */
+export function intersectPlane(
+  ray: Ray,
+  plane: Plane.Plane
+): Vector3.Vector3 | undefined {
+  const t = distanceToPlane(ray, plane);
+  return t != null ? at(ray, t) : undefined;
 }
