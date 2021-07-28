@@ -58,6 +58,9 @@ the component.
 Measurements can be added programmatically using the `addMeasurement()` or by
 adding a measurement as a child of this component.
 
+**Note:** For the component to manage selection for measurements added
+as children, provide a unique ID to the element.
+
 ```html
 <html>
 <body>

@@ -9,7 +9,6 @@ import {
   Method,
   Event,
   EventEmitter,
-  Listen,
 } from '@stencil/core';
 import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import {
@@ -291,16 +290,6 @@ export class ViewerDistanceMeasurement {
       };
     } else {
       return undefined;
-    }
-  }
-
-  /**
-   * @ignore
-   */
-  @Listen('pointerdown')
-  protected stopEventPropagation(event: PointerEvent): void {
-    if (event.button === 0) {
-      event.stopPropagation();
     }
   }
 
