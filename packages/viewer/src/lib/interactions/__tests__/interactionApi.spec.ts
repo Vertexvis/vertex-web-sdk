@@ -3,11 +3,12 @@ jest.mock('@vertexvis/stream-api');
 import { Scene } from '../../scenes';
 import { Point } from '@vertexvis/geometry';
 import { InteractionApi } from '../interactionApi';
-import { createDepthBuffer, frame } from '../../../testing/fixtures';
+import { frame } from '../../../testing/fixtures';
 import { StreamApi } from '@vertexvis/stream-api';
-import { DepthBuffer, Interactions, Orientation, Viewport } from '../../types';
+import { Interactions, Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../../scenes/colorMaterial';
 import { mapFrameOrThrow } from '../../mappers';
+import { Frame } from '../../types/frame';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
@@ -25,9 +26,8 @@ describe(InteractionApi, () => {
     sceneViewId,
     ColorMaterial.fromHex('#ffffff')
   );
+  const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = (): Scene => scene;
-  const depthProvider = (): Promise<DepthBuffer> =>
-    Promise.resolve(createDepthBuffer(100, 100));
   const viewportProvider = (): Viewport => new Viewport(100, 100);
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
@@ -42,7 +42,7 @@ describe(InteractionApi, () => {
       streamApi,
       interactionConfigProvider,
       sceneProvider,
-      depthProvider,
+      frameProvider,
       viewportProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
@@ -158,17 +158,13 @@ describe(InteractionApi, () => {
         streamApi,
         interactionConfigProvider,
         sceneProvider,
-        depthProvider,
+        frameProvider,
         viewportProvider,
-        {
-          emit: emitTap,
-        },
-        {
-          emit: emitDoubleTap,
-        },
-        {
-          emit: emitLongPress,
-        }
+        { emit: emitTap },
+        { emit: emitDoubleTap },
+        { emit: emitLongPress },
+        { emit: emitInteractionStarted },
+        { emit: emitInteractionFinished }
       );
     });
 

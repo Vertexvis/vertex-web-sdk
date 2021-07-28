@@ -1242,7 +1242,7 @@ export class Viewer {
       this.stream,
       () => this.getResolvedConfig().interactions,
       () => this.createScene(),
-      async () => this.frame?.depthBuffer(),
+      () => this.frame,
       () =>
         Viewport.fromDimensions(
           this.getCanvasDimensions() || Dimensions.create(0, 0)

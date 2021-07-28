@@ -14,6 +14,7 @@ import {
 import { Point } from '@vertexvis/geometry';
 import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
 import { ConfigProvider } from '../config';
+import { getMouseClientPosition } from '../dom';
 
 export type InteractionType =
   | 'rotate'
@@ -251,16 +252,22 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected handleMouseWheel(event: WheelEvent): void {
     event.preventDefault();
 
-    SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
+    if (this.element != null && this.interactionApi != null) {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
+      const rect = this.element.getBoundingClientRect();
+      const point = getMouseClientPosition(event, rect);
+      const ray = this.interactionApi.getRayFromPoint(point);
 
-      window.setTimeout(() => {
-        if (this.interactionApi != null) {
-          this.zoomInteraction.zoom(delta * percentage, this.interactionApi);
-        }
-      }, index * 2);
-    });
+      SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
+        window.setTimeout(() => {
+          if (this.interactionApi != null) {
+            const zoomDelta = delta * percentage;
+            this.zoomInteraction.zoomOnRay(zoomDelta, ray, this.interactionApi);
+          }
+        }, index * 2);
+      });
+    }
   }
 
   protected wheelDeltaToPixels(deltaY: number, deltaMode: number): number {

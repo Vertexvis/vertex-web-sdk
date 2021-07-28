@@ -1,5 +1,5 @@
 import { InteractionApi } from './interactionApi';
-import { Point } from '@vertexvis/geometry';
+import { Point, Ray } from '@vertexvis/geometry';
 import { InteractionType } from './baseInteractionHandler';
 
 export abstract class MouseInteraction {
@@ -142,12 +142,11 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   public zoom(delta: number, api: InteractionApi): void {
-    if (!this.didTransformBegin) {
-      this.beginInteraction(api);
-    }
+    this.operateWithTimer(api, () => api.zoomCamera(delta));
+  }
 
-    this.resetInteractionTimer(api);
-    api.zoomCamera(delta);
+  public zoomOnRay(delta: number, ray: Ray.Ray, api: InteractionApi): void {
+    this.operateWithTimer(api, () => api.zoomCamera(delta, ray));
   }
 
   private beginInteraction(api: InteractionApi): void {
@@ -177,6 +176,15 @@ export class ZoomInteraction extends MouseInteraction {
       window.clearTimeout(this.interactionTimer);
       this.interactionTimer = undefined;
     }
+  }
+
+  private operateWithTimer(api: InteractionApi, f: () => void): void {
+    if (!this.didTransformBegin) {
+      this.beginInteraction(api);
+    }
+
+    this.resetInteractionTimer(api);
+    f();
   }
 }
 
