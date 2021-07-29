@@ -1,6 +1,6 @@
-# vertex-viewer-distance-measurement
+# vertex-viewer-measurement-distance
 
-The `<vertex-viewer-distance-measurement>` is a component for displaying
+The `<vertex-viewer-measurement-distance>` is a component for displaying
 point-to-point measurements between two 3D points. The component will place
 anchors at each point with a line between the two anchors and display the
 approximate distance between the two points.
@@ -15,10 +15,10 @@ displayed correctly.
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
     <vertex-viewer-measurements>
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         start-json="[10, -5, 0]"
         end-json="[150, 100, -50]"
-      ></vertex-viewer-distance-measurement>
+      ></vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 </body>
@@ -38,12 +38,12 @@ include: `millimeters`, `centimeters`, `meters`, `inches`, `feet`, `yards`.
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
     <vertex-viewer-measurements>
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         start-json="[10, -5, 0]"
         end-json="[150, 100, -50]"
         units="inches"
         fractional-digits="1"
-      ></vertex-viewer-distance-measurement>
+      ></vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 </body>
@@ -61,12 +61,12 @@ string.
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
     <vertex-viewer-measurements>
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         id="measurement"
         start-json="[10, -5, 0]"
         end-json="[150, 100, -50]"
         units="in"
-      ></vertex-viewer-distance-measurement>
+      ></vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 
@@ -99,7 +99,7 @@ The component exposes slots for customizing the HTML of the anchors.
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
     <vertex-viewer-measurements>
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         id="measurement"
         start-json="[10, -5, 0]"
         end-json="[150, 100, -50]"
@@ -107,7 +107,7 @@ The component exposes slots for customizing the HTML of the anchors.
       >
         <div slot="start-anchor" class="anchor"></div>
         <div slot="end-anchor" class="anchor"></div>
-      </vertex-viewer-distance-measurement>
+      </vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 </body>
@@ -137,7 +137,7 @@ using the `anchor-label-offset` attribute.
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
     <vertex-viewer-measurements>
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         id="measurement"
         start-json="[10, -5, 0]"
         end-json="[150, 100, -50]"
@@ -145,7 +145,7 @@ using the `anchor-label-offset` attribute.
       >
         <div slot="start-label" class="label">A</div>
         <div slot="end-label" class="label">B</div>
-      </vertex-viewer-distance-measurement>
+      </vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 </body>
@@ -188,7 +188,7 @@ using the `anchor-label-offset` attribute.
 
 ## Methods
 
-### `computeElementMetrics() => Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
+### `computeElementMetrics() => Promise<ViewerMeasurementDistanceElementMetrics | undefined>`
 
 Computes the bounding boxes of the anchors and label. **Note:** invoking
 this function uses `getBoundingClientRect` internally and will cause a
@@ -196,7 +196,7 @@ relayout of the DOM.
 
 #### Returns
 
-Type: `Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
+Type: `Promise<ViewerMeasurementDistanceElementMetrics | undefined>`
 
 
 
@@ -216,15 +216,15 @@ Type: `Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
 
 | Name                                                   | Description                                                                                         |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `--viewer-distance-measurement-accent-color`           | A CSS color that specifies the color of lines, anchors and borders.                                 |
-| `--viewer-distance-measurement-contrast-color`         | A CSS color that specifies a color opposite of the accent color.                                    |
-| `--viewer-distance-measurement-distance-border`        | A CSS border that specifies the border color or image for the measurement's label.                  |
-| `--viewer-distance-measurement-distance-border-radius` | A CSS length that specifies the border radius for the measurement's label.                          |
-| `--viewer-distance-measurement-distance-padding`       | A CSS length that specifies the padding of the measurement's label.                                 |
-| `--viewer-distance-measurement-invalid-accent-color`   | A CSS color that specifies the color of lines, anchors and borders when the measurement is invalid. |
-| `--viewer-distance-measurement-invalid-contrast-color` | A CSS color that specifies a color opposite of the accent color when the measurement is invalid.    |
-| `--viewer-distance-measurement-line-fill-width`        | A CSS length that width of the measurement line's fill.                                             |
-| `--viewer-distance-measurement-line-stroke-width`      | A CSS length that width of the measurement line's stroke.                                           |
+| `--viewer-measurement-distance-accent-color`           | A CSS color that specifies the color of lines, anchors and borders.                                 |
+| `--viewer-measurement-distance-contrast-color`         | A CSS color that specifies a color opposite of the accent color.                                    |
+| `--viewer-measurement-distance-distance-border`        | A CSS border that specifies the border color or image for the measurement's label.                  |
+| `--viewer-measurement-distance-distance-border-radius` | A CSS length that specifies the border radius for the measurement's label.                          |
+| `--viewer-measurement-distance-distance-padding`       | A CSS length that specifies the padding of the measurement's label.                                 |
+| `--viewer-measurement-distance-invalid-accent-color`   | A CSS color that specifies the color of lines, anchors and borders when the measurement is invalid. |
+| `--viewer-measurement-distance-invalid-contrast-color` | A CSS color that specifies a color opposite of the accent color when the measurement is invalid.    |
+| `--viewer-measurement-distance-line-fill-width`        | A CSS length that width of the measurement line's fill.                                             |
+| `--viewer-measurement-distance-line-stroke-width`      | A CSS length that width of the measurement line's stroke.                                           |
 
 
 ## Dependencies
@@ -241,10 +241,10 @@ Type: `Promise<ViewerDistanceMeasurementElementMetrics | undefined>`
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-distance-measurement --> vertex-viewer-measurement-line
-  vertex-viewer-measurement-tool --> vertex-viewer-distance-measurement
-  vertex-viewer-measurements --> vertex-viewer-distance-measurement
-  style vertex-viewer-distance-measurement fill:#f9f,stroke:#333,stroke-width:4px
+  vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-tool --> vertex-viewer-measurement-distance
+  vertex-viewer-measurements --> vertex-viewer-measurement-distance
+  style vertex-viewer-measurement-distance fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

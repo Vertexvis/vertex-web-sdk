@@ -1,62 +1,62 @@
 :host {
   /**
-   * @prop --viewer-distance-measurement-accent-color: A CSS color that
+   * @prop --viewer-measurement-distance-accent-color: A CSS color that
    * specifies the color of lines, anchors and borders.
    */
-  --viewer-distance-measurement-accent-color: var(--neutral-900);
+  --viewer-measurement-distance-accent-color: var(--neutral-900);
 
   /**
-   * @prop --viewer-distance-measurement-contrast-color: A CSS color that
+   * @prop --viewer-measurement-distance-contrast-color: A CSS color that
    * specifies a color opposite of the accent color.
    */
-  --viewer-distance-measurement-contrast-color: var(--white);
+  --viewer-measurement-distance-contrast-color: var(--white);
 
   /**
-   * @prop --viewer-distance-measurement-invalid-accent-color: A CSS color that
+   * @prop --viewer-measurement-distance-invalid-accent-color: A CSS color that
    * specifies the color of lines, anchors and borders when the measurement is
    * invalid.
    */
-  --viewer-distance-measurement-invalid-accent-color: var(--red-600);
+  --viewer-measurement-distance-invalid-accent-color: var(--red-600);
 
   /**
-   * @prop --viewer-distance-measurement-invalid-contrast-color: A CSS color
+   * @prop --viewer-measurement-distance-invalid-contrast-color: A CSS color
    * that specifies a color opposite of the accent color when the measurement
    * is invalid.
    */
-  --viewer-distance-measurement-invalid-contrast-color: var(--white);
+  --viewer-measurement-distance-invalid-contrast-color: var(--white);
 
   /**
-   * @prop --viewer-distance-measurement-line-stroke-width: A CSS length that
+   * @prop --viewer-measurement-distance-line-stroke-width: A CSS length that
    * width of the measurement line's stroke.
    */
-  --viewer-distance-measurement-line-stroke-width: 1.25px;
+  --viewer-measurement-distance-line-stroke-width: 1.25px;
 
   /**
-   * @prop --viewer-distance-measurement-line-fill-width: A CSS length that
+   * @prop --viewer-measurement-distance-line-fill-width: A CSS length that
    * width of the measurement line's fill.
    */
-  --viewer-distance-measurement-line-fill-width: 2px;
+  --viewer-measurement-distance-line-fill-width: 2px;
 
   /**
-   * @prop --viewer-distance-measurement-distance-border: A CSS border that
+   * @prop --viewer-measurement-distance-distance-border: A CSS border that
    * specifies the border color or image for the measurement's label.
    */
-  --viewer-distance-measurement-distance-border: 1px solid
-    var(--viewer-distance-measurement-accent-color);
+  --viewer-measurement-distance-distance-border: 1px solid
+    var(--viewer-measurement-distance-accent-color);
 
   /**
-   * @prop --viewer-distance-measurement-distance-border-radius: A CSS length
+   * @prop --viewer-measurement-distance-distance-border-radius: A CSS length
    * that specifies the border radius for the measurement's label.
    */
-  --viewer-distance-measurement-distance-border-radius: 0.25rem;
+  --viewer-measurement-distance-distance-border-radius: 0.25rem;
 
   /**
-   * @prop --viewer-distance-measurement-distance-padding: A CSS length that
+   * @prop --viewer-measurement-distance-distance-padding: A CSS length that
    * specifies the padding of the measurement's label.
    */
-  --viewer-distance-measurement-distance-padding: 0.375rem 0.5rem;
+  --viewer-measurement-distance-distance-padding: 0.375rem 0.5rem;
 
-  color: var(--viewer-distance-measurement-accent-color);
+  color: var(--viewer-measurement-distance-accent-color);
   font-size: 0.75rem;
   position: absolute;
   width: 100%;
@@ -65,12 +65,12 @@
 }
 
 :host([invalid]) {
-  --viewer-distance-measurement-accent-color: var(
-    --viewer-distance-measurement-invalid-accent-color
+  --viewer-measurement-distance-accent-color: var(
+    --viewer-measurement-distance-invalid-accent-color
   ) !important;
 
-  --viewer-distance-measurement-contrast-color: var(
-    --viewer-distance-measurement-invalid-contrast-color
+  --viewer-measurement-distance-contrast-color: var(
+    --viewer-measurement-distance-invalid-contrast-color
   ) !important;
 }
 
@@ -83,17 +83,17 @@
 
 .line {
   --viewer-measurement-line-stroke: var(
-    --viewer-distance-measurement-contrast-color
+    --viewer-measurement-distance-contrast-color
   );
   --viewer-measurement-line-stroke-opacity: 0.75;
   --viewer-measurement-line-stroke-width: var(
-    --viewer-distance-measurement-line-stroke-width
+    --viewer-measurement-distance-line-stroke-width
   );
   --viewer-measurement-line-fill: var(
-    --viewer-distance-measurement-accent-color
+    --viewer-measurement-distance-accent-color
   );
   --viewer-measurement-line-fill-width: var(
-    --viewer-distance-measurement-line-fill-width
+    --viewer-measurement-distance-line-fill-width
   );
 
   position: absolute;
@@ -153,7 +153,7 @@
 }
 
 .anchor-placeholder {
-  background: var(--viewer-distance-measurement-contrast-color);
+  background: var(--viewer-measurement-distance-contrast-color);
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -161,21 +161,21 @@
 }
 
 :host([mode='edit']) .anchor-placeholder {
-  border: 2px solid var(--viewer-distance-measurement-accent-color);
-  background: var(--viewer-distance-measurement-contrast-color);
+  border: 2px solid var(--viewer-measurement-distance-accent-color);
+  background: var(--viewer-measurement-distance-contrast-color);
 }
 
 :host([mode='']) .distance-label {
-  color: var(--viewer-distance-measurement-contrast-color);
-  background: var(--viewer-distance-measurement-accent-color);
+  color: var(--viewer-measurement-distance-contrast-color);
+  background: var(--viewer-measurement-distance-accent-color);
 }
 
 .distance-label {
   position: absolute;
-  background: var(--viewer-distance-measurement-contrast-color);
-  border: var(--viewer-distance-measurement-distance-border);
-  border-radius: var(--viewer-distance-measurement-distance-border-radius);
-  padding: var(--viewer-distance-measurement-distance-padding);
+  background: var(--viewer-measurement-distance-contrast-color);
+  border: var(--viewer-measurement-distance-distance-border);
+  border-radius: var(--viewer-measurement-distance-distance-border-radius);
+  padding: var(--viewer-measurement-distance-distance-padding);
 }
 
 .indicator {
@@ -183,8 +183,8 @@
 }
 
 .indicator-placeholder {
-  background: var(--viewer-distance-measurement-accent-color);
-  border: 1px solid var(--viewer-distance-measurement-contrast-color);
+  background: var(--viewer-measurement-distance-accent-color);
+  border: 1px solid var(--viewer-measurement-distance-contrast-color);
   width: 6px;
   height: 6px;
   border-radius: 50%;

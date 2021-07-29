@@ -4,7 +4,7 @@ import '../../testing/domMocks';
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
-import { ViewerDistanceMeasurement } from '../viewer-distance-measurement/viewer-distance-measurement';
+import { ViewerMeasurementDistance } from '../viewer-measurement-distance/viewer-measurement-distance';
 import { ViewerMeasurementTool } from './viewer-measurement-tool';
 
 describe('vertex-viewer-measurement-tool', () => {
@@ -18,7 +18,7 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('creates default measurement for editing', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `<vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>`,
     });
 
@@ -30,10 +30,10 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('creates measurement from template if specified', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `
         <template id="my-template">
-          <vertex-viewer-distance-measurement class="my-measurement"></vertex-viewer-distance-measurement>
+          <vertex-viewer-measurement-distance class="my-measurement"></vertex-viewer-measurement-distance>
         </template>
         <vertex-viewer-measurement-tool distance-template-id="my-template"></vertex-viewer-measurement-tool>
       `,
@@ -47,10 +47,10 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('creates default measurement if template not found', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `
         <template id="my-template">
-          <vertex-viewer-distance-measurement class="my-measurement"></vertex-viewer-distance-measurement>
+          <vertex-viewer-measurement-distance class="my-measurement"></vertex-viewer-measurement-distance>
         </template>
         <vertex-viewer-measurement-tool distance-template-id="not-my-template"></vertex-viewer-measurement-tool>
       `,
@@ -64,7 +64,7 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('creates default measurement if template does not contain measurement', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `
         <template id="my-template">
           <div></div>
@@ -90,10 +90,10 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('updates measurement when template id changes', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `
       <template id="my-template">
-        <vertex-viewer-distance-measurement class="my-measurement"></vertex-viewer-distance-measurement>
+        <vertex-viewer-measurement-distance class="my-measurement"></vertex-viewer-measurement-distance>
       </template>
       <vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>
       `,
@@ -112,7 +112,7 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('removes measurement when disabled', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `<vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>`,
     });
 
@@ -128,7 +128,7 @@ describe('vertex-viewer-measurement-tool', () => {
 
   it('updates measurement when props change', async () => {
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       html: `<vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>`,
     });
 
@@ -166,7 +166,7 @@ describe('vertex-viewer-measurement-tool', () => {
     const onMeasureEnd = jest.fn();
 
     const page = await newSpecPage({
-      components: [ViewerMeasurementTool, ViewerDistanceMeasurement],
+      components: [ViewerMeasurementTool, ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-tool
           onMeasureBegin={onMeasureBegin}

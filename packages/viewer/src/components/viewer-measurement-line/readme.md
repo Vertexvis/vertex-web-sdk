@@ -32,12 +32,12 @@
 
 ### Used by
 
- - [vertex-viewer-distance-measurement](../viewer-distance-measurement)
+ - [vertex-viewer-measurement-distance](../viewer-measurement-distance)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-distance-measurement --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
   style vertex-viewer-measurement-line fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

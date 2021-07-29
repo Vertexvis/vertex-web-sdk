@@ -11,7 +11,7 @@ import {
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
 import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
-import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
+import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
 import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 
 /**
@@ -20,7 +20,7 @@ import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 export type ViewerMeasurementToolType = 'distance' /* | 'angle' */;
 
 interface StateMap {
-  measurementElement?: HTMLVertexViewerDistanceMeasurementElement;
+  measurementElement?: HTMLVertexViewerMeasurementDistanceElement;
 }
 
 @Component({
@@ -32,7 +32,7 @@ export class ViewerMeasurementTool {
   /**
    * An ID to an HTML template that describes the HTML content to use for
    * distance measurements. It's expected that the template contains a
-   * `<vertex-viewer-distance-measurement>`.
+   * `<vertex-viewer-measurement-distance>`.
    *
    * This property will automatically be set when a child of a
    * `<vertex-viewer-measurements>` element.
@@ -197,7 +197,7 @@ export class ViewerMeasurementTool {
     }
   }
 
-  private createDistanceMeasurementElement(): HTMLVertexViewerDistanceMeasurementElement {
+  private createDistanceMeasurementElement(): HTMLVertexViewerMeasurementDistanceElement {
     if (this.distanceTemplateId != null) {
       const element = stampTemplateWithId(
         window.document.body,
@@ -209,7 +209,7 @@ export class ViewerMeasurementTool {
           ),
         () =>
           console.warn(
-            `Distance template does not contain a vertex-viewer-distance-measurement. Using default distance element.`
+            `Distance template does not contain a vertex-viewer-measurement-distance. Using default distance element.`
           )
       );
 
@@ -218,7 +218,7 @@ export class ViewerMeasurementTool {
       }
     }
 
-    return document.createElement('vertex-viewer-distance-measurement');
+    return document.createElement('vertex-viewer-measurement-distance');
   }
 
   private updateMeasurementElement(): void {
