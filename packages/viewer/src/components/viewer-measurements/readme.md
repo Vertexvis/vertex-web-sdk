@@ -71,11 +71,11 @@ as children, provide a unique ID to the element.
       <vertex-viewer-measurement-tool></vertex-viewer-measurement-tool>
 
       <!-- A measurement added as a child component -->
-      <vertex-viewer-distance-measurement
+      <vertex-viewer-measurement-distance
         id="my-measurement-id"
         start-json="[100, -50, 200]"
         end-json="[500, 50, 100]"
-      ></vertex-viewer-distance-measurement>
+      ></vertex-viewer-measurement-distance>
     </vertex-viewer-measurements>
   </vertex-viewer>
 
@@ -123,7 +123,7 @@ attribute.
 HTML templates and CSS variables are used to customize the styling of
 measurements that are added programmatically or through user interaction. See
 the documentation of
-[`<vertex-viewer-distance-measurement>`](../viewer-distance-measurement/readme.md)
+[`<vertex-viewer-measurement-distance>`](../viewer-distance-measurement/readme.md)
 for all styling options.
 
 When a new measurement is added, the measurement's HTML from the template will
@@ -154,10 +154,10 @@ be cloned and added to the component.
 <body>
   <!-- The template for distance measurement -->
   <template id="my-distance-measurement">
-    <vertex-viewer-distance-measurement class="distance-measurement">
+    <vertex-viewer-measurement-distance class="distance-measurement">
       <div slot="start-label" class="label">A</div>
       <div slot="start-label" class="label">B</div>
-    </vertex-viewer-distance-measurement>
+    </vertex-viewer-measurement-distance>
   </template>
 
   <vertex-viewer src="urn:vertexvis:stream-key:my-key" depth-buffers="final">
@@ -178,7 +178,7 @@ be cloned and added to the component.
 | Property                | Attribute                 | Description                                                                                                                                                       | Type                                                                          | Default                     |
 | ----------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------- |
 | `disabled`              | `disabled`                | If `true`, disables adding or editing of measurements through user interaction.                                                                                   | `boolean`                                                                     | `false`                     |
-| `distanceTemplateId`    | `distance-template-id`    | An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`. | `string \| undefined`                                                         | `undefined`                 |
+| `distanceTemplateId`    | `distance-template-id`    | An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`. | `string \| undefined`                                                         | `undefined`                 |
 | `fractionalDigits`      | `fractional-digits`       | The number of fractional digits to display measurements in.                                                                                                       | `number`                                                                      | `2`                         |
 | `selectedMeasurementId` | `selected-measurement-id` | The ID of the measurement that is selected.                                                                                                                       | `string \| undefined`                                                         | `undefined`                 |
 | `snapDistance`          | `snap-distance`           | The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.                                                            | `number`                                                                      | `MEASUREMENT_SNAP_DISTANCE` |
@@ -191,13 +191,13 @@ be cloned and added to the component.
 
 | Event                | Description                                                                                        | Type                                                      |
 | -------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `measurementAdded`   | Dispatched when a new measurement is added, either through user interaction or programmatically.   | `CustomEvent<HTMLVertexViewerDistanceMeasurementElement>` |
-| `measurementRemoved` | Dispatched when a new measurement is removed, either through user interaction or programmatically. | `CustomEvent<HTMLVertexViewerDistanceMeasurementElement>` |
+| `measurementAdded`   | Dispatched when a new measurement is added, either through user interaction or programmatically.   | `CustomEvent<HTMLVertexViewerMeasurementDistanceElement>` |
+| `measurementRemoved` | Dispatched when a new measurement is removed, either through user interaction or programmatically. | `CustomEvent<HTMLVertexViewerMeasurementDistanceElement>` |
 
 
 ## Methods
 
-### `addMeasurement(measurement: Measurement) => Promise<HTMLVertexViewerDistanceMeasurementElement>`
+### `addMeasurement(measurement: Measurement) => Promise<HTMLVertexViewerMeasurementDistanceElement>`
 
 Adds a new measurement as a child to this component. A new measurement
 component will be created from the template specified by
@@ -205,31 +205,31 @@ component will be created from the template specified by
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerDistanceMeasurementElement>`
+Type: `Promise<HTMLVertexViewerMeasurementDistanceElement>`
 
 
 
-### `getMeasurementElement(id: string) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>`
+### `getMeasurementElement(id: string) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
 Returns the measurement element associated to the given ID.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>`
+Type: `Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
 
 
-### `getMeasurementElements() => Promise<HTMLVertexViewerDistanceMeasurementElement[]>`
+### `getMeasurementElements() => Promise<HTMLVertexViewerMeasurementDistanceElement[]>`
 
 Returns a list of measurement elements that are children of this component.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerDistanceMeasurementElement[]>`
+Type: `Promise<HTMLVertexViewerMeasurementDistanceElement[]>`
 
 
 
-### `removeMeasurement(id: string) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>`
+### `removeMeasurement(id: string) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
 Removes a measurement with the given ID, and returns the HTML element
 associated to the measurement. Returns `undefined` if no measurement is
@@ -237,7 +237,7 @@ found.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>`
+Type: `Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
 
 
@@ -246,13 +246,13 @@ Type: `Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>`
 
 ### Depends on
 
-- [vertex-viewer-distance-measurement](../viewer-distance-measurement)
+- [vertex-viewer-measurement-distance](../viewer-measurement-distance)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-measurements --> vertex-viewer-distance-measurement
-  vertex-viewer-distance-measurement --> vertex-viewer-measurement-line
+  vertex-viewer-measurements --> vertex-viewer-measurement-distance
+  vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
   style vertex-viewer-measurements fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

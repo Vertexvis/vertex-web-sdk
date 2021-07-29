@@ -28,7 +28,7 @@ import {
 } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
 import { getMouseClientPosition } from '../../lib/dom';
-import { DistanceMeasurementRenderer } from './viewer-distance-measurement-components';
+import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
 import { Disposable } from '@vertexvis/utils';
 import {
   MEASUREMENT_LINE_CAP_LENGTH,
@@ -44,7 +44,7 @@ import { Cursor, measurementCursor } from '../../lib/cursors';
  * @see {@link ViewerDistanceMeasurement.computeElementMetrics} - For
  * calculating element metrics.
  */
-export interface ViewerDistanceMeasurementElementMetrics {
+export interface ViewerMeasurementDistanceElementMetrics {
   startAnchor: DOMRect;
   endAnchor: DOMRect;
   label: DOMRect;
@@ -54,7 +54,7 @@ export interface ViewerDistanceMeasurementElementMetrics {
  * A type that represents a function that takes a real-world distance and
  * returns a formatted string.
  */
-export type ViewerDistanceMeasurementLabelFormatter = (
+export type ViewerMeasurementDistanceLabelFormatter = (
   distance: number | undefined
 ) => string;
 
@@ -63,7 +63,7 @@ export type ViewerDistanceMeasurementLabelFormatter = (
  *
  * @see {@link ViewerDistanceMeasurement.mode} - For more details about modes.
  */
-export type ViewerDistanceMeasurementMode = 'edit' | 'replace' | '';
+export type ViewerMeasurementDistanceMode = 'edit' | 'replace' | '';
 
 interface StateMap {
   hoverCursor?: Disposable;
@@ -86,11 +86,11 @@ interface StateMap {
  * editing.
  */
 @Component({
-  tag: 'vertex-viewer-distance-measurement',
-  styleUrl: 'viewer-distance-measurement.css',
+  tag: 'vertex-viewer-measurement-distance',
+  styleUrl: 'viewer-measurement-distance.css',
   shadow: true,
 })
-export class ViewerDistanceMeasurement {
+export class ViewerMeasurementDistance {
   /**
    * The position of the starting anchor. Can either be an instance of a
    * `Vector3` or a JSON string representation in the format of `[x, y, z]` or
@@ -156,7 +156,7 @@ export class ViewerDistanceMeasurement {
    * expected to return a string.
    */
   @Prop()
-  public labelFormatter?: ViewerDistanceMeasurementLabelFormatter;
+  public labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
 
   /**
    * The distance from an anchor to its label.
@@ -178,7 +178,7 @@ export class ViewerDistanceMeasurement {
    * a new measurement will be performed.
    */
   @Prop({ reflect: true })
-  public mode: ViewerDistanceMeasurementMode = '';
+  public mode: ViewerMeasurementDistanceMode = '';
 
   /**
    * A property that reflects which anchor is currently being interacted with.
@@ -274,7 +274,7 @@ export class ViewerDistanceMeasurement {
    */
   @Method()
   public async computeElementMetrics(): Promise<
-    ViewerDistanceMeasurementElementMetrics | undefined
+    ViewerMeasurementDistanceElementMetrics | undefined
   > {
     const startAnchorEl = this.hostEl.shadowRoot?.getElementById(
       'start-anchor'

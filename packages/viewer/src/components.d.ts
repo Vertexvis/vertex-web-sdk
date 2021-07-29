@@ -26,14 +26,11 @@ import {
   ViewerStreamAttributes,
 } from './lib/stream/streamAttributes';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
-import {
-  Frame,
-  FramePerspectiveCamera as FramePerspectiveCamera1,
-} from './lib/types/frame';
+import { Frame, FramePerspectiveCamera } from './lib/types/frame';
 import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import {
   DepthBuffer,
-  FramePerspectiveCamera,
+  FramePerspectiveCamera as FramePerspectiveCamera1,
   Measurement,
   Orientation,
   StencilBufferManager,
@@ -58,17 +55,17 @@ import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandle
 import { Scene } from './lib/scenes/scene';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
-import {
-  ViewerDistanceMeasurementElementMetrics,
-  ViewerDistanceMeasurementLabelFormatter,
-  ViewerDistanceMeasurementMode,
-} from './components/viewer-distance-measurement/viewer-distance-measurement';
-import { Anchor } from './components/viewer-distance-measurement/utils';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
 import {
   ViewerIconName,
   ViewerIconSize,
 } from './components/viewer-icon/viewer-icon';
+import {
+  ViewerMeasurementDistanceElementMetrics,
+  ViewerMeasurementDistanceLabelFormatter,
+  ViewerMeasurementDistanceMode,
+} from './components/viewer-measurement-distance/viewer-measurement-distance';
+import { Anchor } from './components/viewer-measurement-distance/utils';
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
@@ -436,82 +433,6 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerDistanceMeasurement {
-    /**
-     * The distance from an anchor to its label.
-     */
-    anchorLabelOffset: number;
-    /**
-     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
-     */
-    camera?: FramePerspectiveCamera;
-    /**
-     * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
-     */
-    computeElementMetrics: () => Promise<
-      ViewerDistanceMeasurementElementMetrics | undefined
-    >;
-    /**
-     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
-     * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
-     */
-    distance?: number;
-    /**
-     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    end?: Vector3.Vector3;
-    /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    endJson?: string;
-    /**
-     * The number of fraction digits to display.
-     */
-    fractionalDigits: number;
-    /**
-     * A property that reflects which anchor is currently being interacted with.
-     */
-    interactingAnchor: Anchor | 'none';
-    /**
-     * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
-     */
-    invalid: boolean;
-    /**
-     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
-     */
-    labelFormatter?: ViewerDistanceMeasurementLabelFormatter;
-    /**
-     * The length of the caps at each end of the distance measurement.
-     */
-    lineCapLength: number;
-    /**
-     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
-     */
-    mode: ViewerDistanceMeasurementMode;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance: number;
-    /**
-     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    start?: Vector3.Vector3;
-    /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    startJson?: string;
-    /**
-     * The unit of measurement.
-     */
-    units: UnitType;
-    /**
-     * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -573,6 +494,82 @@ export namespace Components {
      */
     stretchOff: boolean;
   }
+  interface VertexViewerMeasurementDistance {
+    /**
+     * The distance from an anchor to its label.
+     */
+    anchorLabelOffset: number;
+    /**
+     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     */
+    camera?: FramePerspectiveCamera;
+    /**
+     * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
+     */
+    computeElementMetrics: () => Promise<
+      ViewerMeasurementDistanceElementMetrics | undefined
+    >;
+    /**
+     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
+     * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
+     */
+    distance?: number;
+    /**
+     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    end?: Vector3.Vector3;
+    /**
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    endJson?: string;
+    /**
+     * The number of fraction digits to display.
+     */
+    fractionalDigits: number;
+    /**
+     * A property that reflects which anchor is currently being interacted with.
+     */
+    interactingAnchor: Anchor | 'none';
+    /**
+     * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
+     */
+    invalid: boolean;
+    /**
+     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+     */
+    labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
+    /**
+     * The length of the caps at each end of the distance measurement.
+     */
+    lineCapLength: number;
+    /**
+     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+     */
+    mode: ViewerMeasurementDistanceMode;
+    /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance: number;
+    /**
+     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    start?: Vector3.Vector3;
+    /**
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    startJson?: string;
+    /**
+     * The unit of measurement.
+     */
+    units: UnitType;
+    /**
+     * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementLine {
     /**
      * A length of the line cap. The line cap is a line at each end of a line.
@@ -597,7 +594,7 @@ export namespace Components {
      */
     disabled: boolean;
     /**
-     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
      */
     distanceTemplateId?: string;
     /**
@@ -635,13 +632,13 @@ export namespace Components {
      */
     addMeasurement: (
       measurement: Measurement
-    ) => Promise<HTMLVertexViewerDistanceMeasurementElement>;
+    ) => Promise<HTMLVertexViewerMeasurementDistanceElement>;
     /**
      * If `true`, disables adding or editing of measurements through user interaction.
      */
     disabled: boolean;
     /**
-     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
+     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.
      */
     distanceTemplateId?: string;
     /**
@@ -657,7 +654,7 @@ export namespace Components {
      */
     getMeasurementElement: (
       id: string
-    ) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>;
+    ) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>;
     /**
      * Returns a list of measurement elements that are children of this component.
      * @returns A list of all measurements.
@@ -665,7 +662,7 @@ export namespace Components {
      * @link ViewerMeasurements.getMeasurementElement}
      */
     getMeasurementElements: () => Promise<
-      HTMLVertexViewerDistanceMeasurementElement[]
+      HTMLVertexViewerMeasurementDistanceElement[]
     >;
     /**
      * Removes a measurement with the given ID, and returns the HTML element associated to the measurement. Returns `undefined` if no measurement is found.
@@ -674,7 +671,7 @@ export namespace Components {
      */
     removeMeasurement: (
       id: string
-    ) => Promise<HTMLVertexViewerDistanceMeasurementElement | undefined>;
+    ) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>;
     /**
      * The ID of the measurement that is selected.
      */
@@ -810,13 +807,6 @@ declare global {
     prototype: HTMLVertexViewerDefaultToolbarElement;
     new (): HTMLVertexViewerDefaultToolbarElement;
   };
-  interface HTMLVertexViewerDistanceMeasurementElement
-    extends Components.VertexViewerDistanceMeasurement,
-      HTMLStencilElement {}
-  var HTMLVertexViewerDistanceMeasurementElement: {
-    prototype: HTMLVertexViewerDistanceMeasurementElement;
-    new (): HTMLVertexViewerDistanceMeasurementElement;
-  };
   interface HTMLVertexViewerDomElementElement
     extends Components.VertexViewerDomElement,
       HTMLStencilElement {}
@@ -844,6 +834,13 @@ declare global {
   var HTMLVertexViewerLayerElement: {
     prototype: HTMLVertexViewerLayerElement;
     new (): HTMLVertexViewerLayerElement;
+  };
+  interface HTMLVertexViewerMeasurementDistanceElement
+    extends Components.VertexViewerMeasurementDistance,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMeasurementDistanceElement: {
+    prototype: HTMLVertexViewerMeasurementDistanceElement;
+    new (): HTMLVertexViewerMeasurementDistanceElement;
   };
   interface HTMLVertexViewerMeasurementLineElement
     extends Components.VertexViewerMeasurementLine,
@@ -896,11 +893,11 @@ declare global {
     'vertex-viewer': HTMLVertexViewerElement;
     'vertex-viewer-button': HTMLVertexViewerButtonElement;
     'vertex-viewer-default-toolbar': HTMLVertexViewerDefaultToolbarElement;
-    'vertex-viewer-distance-measurement': HTMLVertexViewerDistanceMeasurementElement;
     'vertex-viewer-dom-element': HTMLVertexViewerDomElementElement;
     'vertex-viewer-dom-renderer': HTMLVertexViewerDomRendererElement;
     'vertex-viewer-icon': HTMLVertexViewerIconElement;
     'vertex-viewer-layer': HTMLVertexViewerLayerElement;
+    'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
     'vertex-viewer-measurements': HTMLVertexViewerMeasurementsElement;
@@ -1137,84 +1134,6 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerDistanceMeasurement {
-    /**
-     * The distance from an anchor to its label.
-     */
-    anchorLabelOffset?: number;
-    /**
-     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
-     */
-    camera?: FramePerspectiveCamera;
-    /**
-     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
-     * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
-     */
-    distance?: number;
-    /**
-     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    end?: Vector3.Vector3;
-    /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    endJson?: string;
-    /**
-     * The number of fraction digits to display.
-     */
-    fractionalDigits?: number;
-    /**
-     * A property that reflects which anchor is currently being interacted with.
-     */
-    interactingAnchor?: Anchor | 'none';
-    /**
-     * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
-     */
-    invalid?: boolean;
-    /**
-     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
-     */
-    labelFormatter?: ViewerDistanceMeasurementLabelFormatter;
-    /**
-     * The length of the caps at each end of the distance measurement.
-     */
-    lineCapLength?: number;
-    /**
-     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
-     */
-    mode?: ViewerDistanceMeasurementMode;
-    /**
-     * An event that is dispatched anytime the user begins editing the measurement.
-     */
-    onEditBegin?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is dispatched when the user has finished editing the measurement.
-     */
-    onEditEnd?: (event: CustomEvent<void>) => void;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance?: number;
-    /**
-     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    start?: Vector3.Vector3;
-    /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     */
-    startJson?: string;
-    /**
-     * The unit of measurement.
-     */
-    units?: UnitType;
-    /**
-     * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -1280,6 +1199,84 @@ declare namespace LocalJSX {
      */
     stretchOff?: boolean;
   }
+  interface VertexViewerMeasurementDistance {
+    /**
+     * The distance from an anchor to its label.
+     */
+    anchorLabelOffset?: number;
+    /**
+     * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
+     */
+    camera?: FramePerspectiveCamera;
+    /**
+     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
+     * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
+     */
+    distance?: number;
+    /**
+     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    end?: Vector3.Vector3;
+    /**
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    endJson?: string;
+    /**
+     * The number of fraction digits to display.
+     */
+    fractionalDigits?: number;
+    /**
+     * A property that reflects which anchor is currently being interacted with.
+     */
+    interactingAnchor?: Anchor | 'none';
+    /**
+     * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
+     */
+    invalid?: boolean;
+    /**
+     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+     */
+    labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
+    /**
+     * The length of the caps at each end of the distance measurement.
+     */
+    lineCapLength?: number;
+    /**
+     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+     */
+    mode?: ViewerMeasurementDistanceMode;
+    /**
+     * An event that is dispatched anytime the user begins editing the measurement.
+     */
+    onEditBegin?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user has finished editing the measurement.
+     */
+    onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
+     */
+    snapDistance?: number;
+    /**
+     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    start?: Vector3.Vector3;
+    /**
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    startJson?: string;
+    /**
+     * The unit of measurement.
+     */
+    units?: UnitType;
+    /**
+     * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementLine {
     /**
      * A length of the line cap. The line cap is a line at each end of a line.
@@ -1304,7 +1301,7 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
-     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
      */
     distanceTemplateId?: string;
     /**
@@ -1346,7 +1343,7 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
-     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.
+     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.
      */
     distanceTemplateId?: string;
     /**
@@ -1357,13 +1354,13 @@ declare namespace LocalJSX {
      * Dispatched when a new measurement is added, either through user interaction or programmatically.
      */
     onMeasurementAdded?: (
-      event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>
+      event: CustomEvent<HTMLVertexViewerMeasurementDistanceElement>
     ) => void;
     /**
      * Dispatched when a new measurement is removed, either through user interaction or programmatically.
      */
     onMeasurementRemoved?: (
-      event: CustomEvent<HTMLVertexViewerDistanceMeasurementElement>
+      event: CustomEvent<HTMLVertexViewerMeasurementDistanceElement>
     ) => void;
     /**
      * The ID of the measurement that is selected.
@@ -1451,11 +1448,11 @@ declare namespace LocalJSX {
     'vertex-viewer': VertexViewer;
     'vertex-viewer-button': VertexViewerButton;
     'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
-    'vertex-viewer-distance-measurement': VertexViewerDistanceMeasurement;
     'vertex-viewer-dom-element': VertexViewerDomElement;
     'vertex-viewer-dom-renderer': VertexViewerDomRenderer;
     'vertex-viewer-icon': VertexViewerIcon;
     'vertex-viewer-layer': VertexViewerLayer;
+    'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
     'vertex-viewer-measurements': VertexViewerMeasurements;
@@ -1484,8 +1481,6 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
       'vertex-viewer-default-toolbar': LocalJSX.VertexViewerDefaultToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
-      'vertex-viewer-distance-measurement': LocalJSX.VertexViewerDistanceMeasurement &
-        JSXBase.HTMLAttributes<HTMLVertexViewerDistanceMeasurementElement>;
       'vertex-viewer-dom-element': LocalJSX.VertexViewerDomElement &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
       'vertex-viewer-dom-renderer': LocalJSX.VertexViewerDomRenderer &
@@ -1494,6 +1489,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
       'vertex-viewer-layer': LocalJSX.VertexViewerLayer &
         JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
+      'vertex-viewer-measurement-distance': LocalJSX.VertexViewerMeasurementDistance &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
       'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
       'vertex-viewer-measurement-tool': LocalJSX.VertexViewerMeasurementTool &

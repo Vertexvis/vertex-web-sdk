@@ -12,7 +12,7 @@ import {
   STENCIL_BUFFER_EMPTY_COLOR,
   Viewport,
 } from '../../lib/types';
-import { ViewerDistanceMeasurement } from './viewer-distance-measurement';
+import { ViewerMeasurementDistance } from './viewer-measurement-distance';
 import { getMeasurementBoundingClientRect } from './dom';
 import { loadModelForViewer } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
@@ -21,7 +21,7 @@ import { ViewerLayer } from '../viewer-layer/viewer-layer';
 import * as Fixtures from '../../testing/fixtures';
 import { Color } from '@vertexvis/utils';
 
-describe('vertex-viewer-distance-measurement', () => {
+describe('vertex-viewer-measurement-distance', () => {
   const camera = new FramePerspectiveCamera(
     Vector3.create(0, 0, 100),
     Vector3.origin(),
@@ -60,9 +60,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('positions the start and end anchors as Vector3 objects', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           start={start}
           end={end}
           camera={camera}
@@ -86,9 +86,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('positions the start and end anchors as JSON strings', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           startJson={`[${start.x}, ${start.y}, ${start.z}]`}
           endJson={`[${end.x}, ${end.y}, ${end.z}]`}
           camera={camera}
@@ -112,9 +112,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('positions the label between the start and end anchors', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           start={start}
           end={end}
           camera={camera}
@@ -134,9 +134,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('positions anchors and labels to element center', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           start={start}
           end={end}
           camera={camera}
@@ -157,9 +157,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('update positions of anchors when start or end changes', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           start={start}
           end={end}
           camera={camera}
@@ -172,7 +172,7 @@ describe('vertex-viewer-distance-measurement', () => {
 
     const newStartNdc = Vector3.transformMatrix(newStart, projectionViewMatrix);
     const newEndNdc = Vector3.transformMatrix(newEnd, projectionViewMatrix);
-    const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+    const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
     measurement.start = newStart;
     measurement.end = newEnd;
 
@@ -194,12 +194,12 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('supports slots for anchor labels', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       html: `
-        <vertex-viewer-distance-measurement>
+        <vertex-viewer-measurement-distance>
           <div id="start-label" slot="start-label"></div>
           <div id="end-label" slot="end-label"></div>
-        </vertex-viewer-distance-measurement>
+        </vertex-viewer-measurement-distance>
       `,
     });
 
@@ -212,9 +212,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('positions anchor labels with distance property', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           anchorLabelOffset={25}
           startJson="[0, 0, 0]"
           endJson="[0, 0, 0]"
@@ -223,7 +223,7 @@ describe('vertex-viewer-distance-measurement', () => {
         >
           <div id="start-label" slot="start-label"></div>
           <div id="end-label" slot="end-label"></div>
-        </vertex-viewer-distance-measurement>
+        </vertex-viewer-measurement-distance>
       ),
     });
 
@@ -240,8 +240,8 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('is empty if start and end points cant be calculated', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
-      html: `<vertex-viewer-distance-measurement></vertex-viewer-distance-measurement>`,
+      components: [ViewerMeasurementDistance],
+      html: `<vertex-viewer-measurement-distance></vertex-viewer-measurement-distance>`,
     });
 
     expect(page.root?.shadowRoot?.getElementById('start-anchor')).toBeNull();
@@ -249,15 +249,15 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('formats distance with specified units and fractional digits', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           startJson="[0, 0, 0]"
           endJson="[25.4, 0, 0]"
           units="inches"
           fractionalDigits={3}
           camera={camera}
-        ></vertex-viewer-distance-measurement>
+        ></vertex-viewer-measurement-distance>
       ),
     });
 
@@ -267,16 +267,16 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('displays dashes if measurement invalid', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           startJson="[0, 0, 0]"
           endJson="[25.4, 0, 0]"
           units="inches"
           fractionalDigits={3}
           camera={camera}
           invalid
-        ></vertex-viewer-distance-measurement>
+        ></vertex-viewer-measurement-distance>
       ),
     });
 
@@ -287,9 +287,9 @@ describe('vertex-viewer-distance-measurement', () => {
   it('formats distance with provided label formatter', async () => {
     const labelFormatter = jest.fn().mockReturnValue('test');
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           startJson="[0, 0, 0]"
           endJson="[1000, 0, 0]"
           units="meters"
@@ -306,9 +306,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('updates label when units change', async () => {
     const page = await newSpecPage({
-      components: [ViewerDistanceMeasurement],
+      components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-distance-measurement
+        <vertex-viewer-measurement-distance
           startJson="[0, 0, 0]"
           endJson="[1000, 0, 0]"
           units="millimeters"
@@ -317,7 +317,7 @@ describe('vertex-viewer-distance-measurement', () => {
       ),
     });
 
-    const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+    const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
     measurement.units = 'meters';
 
     await page.waitForChanges();
@@ -328,11 +328,11 @@ describe('vertex-viewer-distance-measurement', () => {
 
   it('rerenders when viewer renders', async () => {
     const page = await newSpecPage({
-      components: [Viewer, ViewerLayer, ViewerDistanceMeasurement],
+      components: [Viewer, ViewerLayer, ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer>
           <vertex-viewer-measurements>
-            <vertex-viewer-distance-measurement start={start} end={end} />
+            <vertex-viewer-measurement-distance start={start} end={end} />
           </vertex-viewer-measurements>
         </vertex-viewer>
       ),
@@ -352,7 +352,7 @@ describe('vertex-viewer-distance-measurement', () => {
     );
     const startPt = viewport.transformVectorToViewport(startNdc);
     const startEl = page.body
-      .querySelector('vertex-viewer-distance-measurement')
+      .querySelector('vertex-viewer-measurement-distance')
       ?.shadowRoot?.getElementById('start-anchor');
 
     expect(startEl?.style.transform).toContain(
@@ -360,12 +360,12 @@ describe('vertex-viewer-distance-measurement', () => {
     );
   });
 
-  describe(ViewerDistanceMeasurement.prototype.computeElementMetrics, () => {
+  describe(ViewerMeasurementDistance.prototype.computeElementMetrics, () => {
     it('returns metrics for rendered elements', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             camera={camera}
@@ -373,7 +373,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
 
       expect(metrics).toMatchObject({
@@ -385,11 +385,11 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('returns undefined if anchors are not visible', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
-        template: () => <vertex-viewer-distance-measurement />,
+        components: [ViewerMeasurementDistance],
+        template: () => <vertex-viewer-measurement-distance />,
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
       expect(metrics).toBeUndefined();
     });
@@ -405,9 +405,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('does not update anchor if measurement is not editable', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             depthBuffer={depthBuffer}
@@ -416,7 +416,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown'));
       window.dispatchEvent(
@@ -428,9 +428,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('does not update anchor if not primary button', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             depthBuffer={depthBuffer}
@@ -440,7 +440,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown', { button: 1 }));
       window.dispatchEvent(
@@ -454,9 +454,9 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
 
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             depthBuffer={depthBuffer}
@@ -467,7 +467,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
 
@@ -476,10 +476,10 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('updates start point when anchor is moved', async () => {
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -496,8 +496,8 @@ describe('vertex-viewer-distance-measurement', () => {
         .mockResolvedValue(stencilBuffer);
 
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
 
       anchor?.dispatchEvent(
@@ -524,9 +524,9 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('updates end point when anchor is moved', async () => {
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             depthBuffer={depthBuffer}
@@ -536,7 +536,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('end-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
@@ -553,9 +553,9 @@ describe('vertex-viewer-distance-measurement', () => {
     it('emits edit end event on anchor mouse up', async () => {
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerDistanceMeasurement],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-distance-measurement
+          <vertex-viewer-measurement-distance
             start={start}
             end={end}
             depthBuffer={depthBuffer}
@@ -566,7 +566,7 @@ describe('vertex-viewer-distance-measurement', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerDistanceMeasurementElement;
+      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
@@ -589,10 +589,10 @@ describe('vertex-viewer-distance-measurement', () => {
 
     it('updates start pt on pointer move', async () => {
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -609,8 +609,8 @@ describe('vertex-viewer-distance-measurement', () => {
         .mockResolvedValue(stencilBuffer);
 
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
 
       viewer.interactionTarget?.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
@@ -631,10 +631,10 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -649,8 +649,8 @@ describe('vertex-viewer-distance-measurement', () => {
 
       const viewer = page.root as HTMLVertexViewerElement;
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
 
       // update start
       viewer.interactionTarget?.dispatchEvent(
@@ -689,10 +689,10 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -711,8 +711,8 @@ describe('vertex-viewer-distance-measurement', () => {
         .mockResolvedValue(stencilBuffer);
 
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
 
       // update start
       viewer.interactionTarget?.dispatchEvent(
@@ -757,10 +757,10 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -775,8 +775,8 @@ describe('vertex-viewer-distance-measurement', () => {
 
       const viewer = page.root as HTMLVertexViewerElement;
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
 
       // update start
       viewer.interactionTarget?.dispatchEvent(
@@ -811,10 +811,10 @@ describe('vertex-viewer-distance-measurement', () => {
       const onEditBegin = jest.fn();
       const onEditEnd = jest.fn();
       const page = await newSpecPage({
-        components: [Viewer, ViewerDistanceMeasurement],
+        components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-distance-measurement
+            <vertex-viewer-measurement-distance
               start={start}
               end={end}
               depthBuffer={depthBuffer}
@@ -829,8 +829,8 @@ describe('vertex-viewer-distance-measurement', () => {
 
       const viewer = page.root as HTMLVertexViewerElement;
       const measurement = viewer.querySelector(
-        'vertex-viewer-distance-measurement'
-      ) as HTMLVertexViewerDistanceMeasurementElement;
+        'vertex-viewer-measurement-distance'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
 
       // update start
       viewer.interactionTarget?.dispatchEvent(

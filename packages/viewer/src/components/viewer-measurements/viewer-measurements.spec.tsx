@@ -5,7 +5,7 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
 import { DistanceMeasurement } from '../../lib/types';
-import { ViewerDistanceMeasurement } from '../viewer-distance-measurement/viewer-distance-measurement';
+import { ViewerMeasurementDistance } from '../viewer-measurement-distance/viewer-measurement-distance';
 import { ViewerMeasurements } from './viewer-measurements';
 
 describe('vertex-viewer-measurements', () => {
@@ -29,7 +29,7 @@ describe('vertex-viewer-measurements', () => {
   describe('adding measurements', () => {
     it('adds a measurement element with default distance measurement', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements units="inches" fractional-digits="1" snap-distance="10"></vertex-viewer-measurements>`,
       });
 
@@ -48,10 +48,10 @@ describe('vertex-viewer-measurements', () => {
 
     it('adds a measurement element with distance template', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `
           <template id="my-template">
-            <vertex-viewer-distance-measurement class="my-class"></vertex-viewer-distance-measurement>
+            <vertex-viewer-measurement-distance class="my-class"></vertex-viewer-measurement-distance>
           </template>
           <vertex-viewer-measurements distance-template-id="my-template"></vertex-viewer-measurements>
         `,
@@ -65,10 +65,10 @@ describe('vertex-viewer-measurements', () => {
 
     it('adds a default measurement element if distance template not found', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `
           <template id="my-template">
-            <vertex-viewer-distance-measurement class="my-class"></vertex-viewer-distance-measurement>
+            <vertex-viewer-measurement-distance class="my-class"></vertex-viewer-measurement-distance>
           </template>
           <vertex-viewer-measurements distance-template-id="not-my-template"></vertex-viewer-measurements>
         `,
@@ -82,7 +82,7 @@ describe('vertex-viewer-measurements', () => {
 
     it('adds a default measurement element if template does not contain measurement', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `
           <template id="my-template">
             <div></div>
@@ -100,7 +100,7 @@ describe('vertex-viewer-measurements', () => {
     it('emits event when measurement added programmatically', async () => {
       const onMeasurementAdded = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements onMeasurementAdded={onMeasurementAdded} />
         ),
@@ -119,7 +119,7 @@ describe('vertex-viewer-measurements', () => {
     it('emits event when measurement added through user interaction', async () => {
       const onMeasurementAdded = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements onMeasurementAdded={onMeasurementAdded} />
         ),
@@ -139,7 +139,7 @@ describe('vertex-viewer-measurements', () => {
   describe('removing measurements', () => {
     it('removes measurement containing id', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
       });
 
@@ -153,7 +153,7 @@ describe('vertex-viewer-measurements', () => {
     it('emits event when measurement removed programmatically', async () => {
       const onMeasurementRemoved = jest.fn();
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements
             onMeasurementRemoved={onMeasurementRemoved}
@@ -176,7 +176,7 @@ describe('vertex-viewer-measurements', () => {
   describe('query measurements', () => {
     it('returns measurement with id', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
       });
 
@@ -190,7 +190,7 @@ describe('vertex-viewer-measurements', () => {
 
     it('returns all measurements', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
       });
 
@@ -206,7 +206,7 @@ describe('vertex-viewer-measurements', () => {
   describe('selecting measurements', () => {
     it('sets editing mode on selected measurement', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements></vertex-viewer-measurements>`,
       });
 
@@ -223,11 +223,11 @@ describe('vertex-viewer-measurements', () => {
 
     it('selects measurement when pressed and not disabled', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `
           <vertex-viewer-measurements>
-            <vertex-viewer-distance-measurement id="m1" class="provided"></vertex-viewer-distance-measurement>
-            <vertex-viewer-distance-measurement class="provided"></vertex-viewer-distance-measurement>
+            <vertex-viewer-measurement-distance id="m1" class="provided"></vertex-viewer-measurement-distance>
+            <vertex-viewer-measurement-distance class="provided"></vertex-viewer-measurement-distance>
           </vertex-viewer-measurements>
         `,
       });
@@ -256,7 +256,7 @@ describe('vertex-viewer-measurements', () => {
 
     it('does not select measurement when pressed and disabled', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         html: `<vertex-viewer-measurements disabled></vertex-viewer-measurements>`,
       });
 
@@ -272,7 +272,7 @@ describe('vertex-viewer-measurements', () => {
   describe('measurement tool', () => {
     it('sets measurement tool with correct props', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements
             distanceTemplateId="my-template"
@@ -296,7 +296,7 @@ describe('vertex-viewer-measurements', () => {
 
     it('updates tool props when props change', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements>
             <vertex-viewer-measurement-tool />
@@ -337,7 +337,7 @@ describe('vertex-viewer-measurements', () => {
 
     it('updates measurement props when props change', async () => {
       const page = await newSpecPage({
-        components: [ViewerMeasurements, ViewerDistanceMeasurement],
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurements>
             <vertex-viewer-measurement-tool />

@@ -16,7 +16,7 @@ independently for more advanced or custom use-cases.
 | Property             | Attribute              | Description                                                                                                                                                                                                                                                                       | Type                                                                          | Default                     |
 | -------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------- |
 | `disabled`           | `disabled`             | Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.                                                                                                                                                         | `boolean`                                                                     | `false`                     |
-| `distanceTemplateId` | `distance-template-id` | An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-distance-measurement>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element. | `string \| undefined`                                                         | `undefined`                 |
+| `distanceTemplateId` | `distance-template-id` | An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element. | `string \| undefined`                                                         | `undefined`                 |
 | `fractionalDigits`   | `fractional-digits`    | The number of fractional digits to display measurements in.                                                                                                                                                                                                                       | `number`                                                                      | `2`                         |
 | `isMeasuring`        | `is-measuring`         | A property that indicates if the user is performing a measurement.                                                                                                                                                                                                                | `boolean`                                                                     | `false`                     |
 | `snapDistance`       | `snap-distance`        | The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.                                                                                                                                                                            | `number`                                                                      | `MEASUREMENT_SNAP_DISTANCE` |
@@ -38,14 +38,14 @@ independently for more advanced or custom use-cases.
 ### Depends on
 
 - [vertex-viewer-layer](../viewer-layer)
-- [vertex-viewer-distance-measurement](../viewer-distance-measurement)
+- [vertex-viewer-measurement-distance](../viewer-measurement-distance)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-viewer-measurement-tool --> vertex-viewer-layer
-  vertex-viewer-measurement-tool --> vertex-viewer-distance-measurement
-  vertex-viewer-distance-measurement --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-tool --> vertex-viewer-measurement-distance
+  vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
   style vertex-viewer-measurement-tool fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

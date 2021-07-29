@@ -13,7 +13,7 @@ import {
 import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 import { stampTemplateWithId } from '../../lib/templates';
 import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
-import { isVertexViewerDistanceMeasurement } from '../viewer-distance-measurement/utils';
+import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
 import { ViewerMeasurementToolType } from '../viewer-measurement-tool/viewer-measurement-tool';
 
 @Component({
@@ -25,7 +25,7 @@ export class ViewerMeasurements {
   /**
    * An HTML template that describes the HTML to use for new distance
    * measurements. It's expected that the template contains a
-   * `<vertex-viewer-distance-measurement>`.
+   * `<vertex-viewer-measurement-distance>`.
    */
   @Prop()
   public distanceTemplateId?: string;
@@ -80,14 +80,14 @@ export class ViewerMeasurements {
    * or programmatically.
    */
   @Event()
-  public measurementAdded!: EventEmitter<HTMLVertexViewerDistanceMeasurementElement>;
+  public measurementAdded!: EventEmitter<HTMLVertexViewerMeasurementDistanceElement>;
 
   /**
    * Dispatched when a new measurement is removed, either through user
    * interaction or programmatically.
    */
   @Event()
-  public measurementRemoved!: EventEmitter<HTMLVertexViewerDistanceMeasurementElement>;
+  public measurementRemoved!: EventEmitter<HTMLVertexViewerMeasurementDistanceElement>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -104,7 +104,7 @@ export class ViewerMeasurements {
   @Method()
   public async addMeasurement(
     measurement: Measurement
-  ): Promise<HTMLVertexViewerDistanceMeasurementElement> {
+  ): Promise<HTMLVertexViewerMeasurementDistanceElement> {
     if (measurement instanceof DistanceMeasurement) {
       const { start, end, invalid, id } = measurement;
 
@@ -134,7 +134,7 @@ export class ViewerMeasurements {
   @Method()
   public async removeMeasurement(
     id: string
-  ): Promise<HTMLVertexViewerDistanceMeasurementElement | undefined> {
+  ): Promise<HTMLVertexViewerMeasurementDistanceElement | undefined> {
     const measurements = await this.getMeasurementElements();
     const measurement = measurements.find((m) => m.id === id);
 
@@ -156,7 +156,7 @@ export class ViewerMeasurements {
   @Method()
   public async getMeasurementElement(
     id: string
-  ): Promise<HTMLVertexViewerDistanceMeasurementElement | undefined> {
+  ): Promise<HTMLVertexViewerMeasurementDistanceElement | undefined> {
     const measurements = await this.getMeasurementElements();
     return measurements.find((el) => el.id === id);
   }
@@ -169,7 +169,7 @@ export class ViewerMeasurements {
    */
   @Method()
   public async getMeasurementElements(): Promise<
-    HTMLVertexViewerDistanceMeasurementElement[]
+    HTMLVertexViewerMeasurementDistanceElement[]
   > {
     return Array.from(this.hostEl.children).filter(
       isVertexViewerDistanceMeasurement
@@ -294,7 +294,7 @@ export class ViewerMeasurements {
     );
   }
 
-  private createDistanceMeasurementElement(): HTMLVertexViewerDistanceMeasurementElement {
+  private createDistanceMeasurementElement(): HTMLVertexViewerMeasurementDistanceElement {
     if (this.distanceTemplateId != null) {
       const element = stampTemplateWithId(
         window.document.body,
@@ -306,7 +306,7 @@ export class ViewerMeasurements {
           ),
         () =>
           console.warn(
-            `Distance template does not contain a vertex-viewer-distance-measurement. Using default distance element.`
+            `Distance template does not contain a vertex-viewer-measurement-distance. Using default distance element.`
           )
       );
 
@@ -315,7 +315,7 @@ export class ViewerMeasurements {
       }
     }
 
-    return document.createElement('vertex-viewer-distance-measurement');
+    return document.createElement('vertex-viewer-measurement-distance');
   }
 
   private async updatePropsOnMeasurements(): Promise<void> {
@@ -324,7 +324,7 @@ export class ViewerMeasurements {
   }
 
   private updatePropsOnMeasurement(
-    element: HTMLVertexViewerDistanceMeasurementElement
+    element: HTMLVertexViewerMeasurementDistanceElement
   ): void {
     element.fractionalDigits = this.fractionalDigits;
     element.units = this.units;
