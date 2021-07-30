@@ -246,7 +246,6 @@ export class Viewer {
   /**
    * @internal
    */
-<<<<<<< HEAD
   @Prop({ mutable: true }) public stream?: ViewerStreamApi;
 
   /**
@@ -266,9 +265,6 @@ export class Viewer {
    * @internal
    */
   @Prop({ mutable: true }) public interactionTarget?: HTMLElement;
-=======
-  @Prop() public interactionTarget?: HTMLElement;
->>>>>>> Add examples folder for demos
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
