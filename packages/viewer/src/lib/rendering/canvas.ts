@@ -12,6 +12,7 @@ export interface DrawFrame {
   dimensions: Dimensions.Dimensions;
   frame: Frame;
   viewport: Viewport;
+  renderers: FrameRenderer<Frame, void>[];
 }
 
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
@@ -110,6 +111,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
+      data.renderers.forEach((r) => r(data.frame));
       drawImage(image, data);
     }
 
