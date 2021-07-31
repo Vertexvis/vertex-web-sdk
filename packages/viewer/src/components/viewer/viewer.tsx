@@ -66,6 +66,7 @@ import {
   acknowledgeFrameRequests,
   CanvasRenderer,
   createCanvasRenderer,
+  FrameRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { paintTime, Timing } from '../../lib/meters';
@@ -92,6 +93,7 @@ import { Frame } from '../../lib/types/frame';
 import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
+import { Renderer } from '../viewer-threejs-renderer/renderers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -116,6 +118,7 @@ interface StateMap {
   streamWorldOrientation?: Orientation;
   cursorManager: CursorManager;
   interactionTarget?: HTMLElement;
+  renderers: FrameRenderer<Frame, void>[];
 }
 
 /** @internal */
@@ -338,6 +341,7 @@ export class Viewer {
    */
   @State() private stateMap: StateMap = {
     cursorManager: new CursorManager(),
+    renderers: [],
   };
 
   private containerElement?: HTMLElement;
@@ -512,6 +516,22 @@ export class Viewer {
           <slot></slot>
         </div>
       </Host>
+    );
+  }
+
+  @Method()
+  public async registerRenderer(
+    renderer: FrameRenderer<Frame, void>
+  ): Promise<void> {
+    this.stateMap.renderers = [...this.stateMap.renderers, renderer];
+  }
+
+  @Method()
+  public async deregisterRenderer(
+    renderer: FrameRenderer<Frame, void>
+  ): Promise<void> {
+    this.stateMap.renderers = this.stateMap.renderers.filter(
+      (r) => r !== renderer
     );
   }
 
@@ -1152,6 +1172,7 @@ export class Viewer {
           viewport: Viewport.fromDimensions(
             this.getCanvasDimensions() || Dimensions.create(0, 0)
           ),
+          renderers: this.stateMap.renderers,
         };
 
         this.frameReceived.emit(this.frame);

@@ -20,6 +20,7 @@ import { DepthBuffer, FramePerspectiveCamera as FramePerspectiveCamera1, Measure
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
 import { Dimensions, Euler, Matrix4, Point, Quaternion, Vector3 } from "@vertexvis/geometry";
+import { FrameRenderer } from "./lib/rendering";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./lib/commands/command";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
@@ -239,6 +240,7 @@ export namespace Components {
           * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
          */
         "depthBuffers"?: DepthBufferFrameType;
+        "deregisterRenderer": (renderer: FrameRenderer<Frame, void>) => Promise<void>;
         "dispatchFrameDrawn": (frame: Frame) => Promise<void>;
         /**
           * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
@@ -285,6 +287,7 @@ export namespace Components {
           * @returns A promise containing the disposable to use to deregister the handler.
          */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
+        "registerRenderer": (renderer: FrameRenderer<Frame, void>) => Promise<void>;
         /**
           * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
           * @example ``` class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {   constructor(private viewer: HTMLVertexViewerElement) {}    public predicate(keyState: KeyState): boolean {     return keyState['Alt'];   }    public async fn(event: TapEventDetails) {     const scene = await this.viewer.scene();     const result = await scene.raycaster().hitItems(event.position);      if (result.hits.length > 0) {       await scene         .camera()         .fitTo(q => q.withItemId(result.hits[0].itemId))         .render();     }   } } ```

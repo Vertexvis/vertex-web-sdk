@@ -54,12 +54,6 @@ export class ViewerThreeJsRenderer {
   @State()
   private viewport: Viewport = new Viewport(0, 0);
 
-  @State()
-  private frame?: Frame;
-
-  @State()
-  private boundingRect?: DOMRect;
-
   @Element()
   private hostEl!: HTMLElement;
 
@@ -69,20 +63,9 @@ export class ViewerThreeJsRenderer {
 
   @Method()
   public async draw(): Promise<void> {
-    requestAnimationFrame(() => {
-      if (this.renderer != null) {
-        this.willDraw?.();
-
-        if (this.frame != null) {
-          this.renderer.render(
-            this.scene,
-            this.camera,
-            this.frame,
-            this.viewport
-          );
-        }
-      }
-    });
+    if (this.viewer?.frame != null) {
+      this.frameRenderer(this.viewer.frame);
+    }
   }
 
   @Method()
@@ -132,8 +115,8 @@ export class ViewerThreeJsRenderer {
     newViewer?: HTMLVertexViewerElement,
     oldViewer?: HTMLVertexViewerElement
   ): void {
-    oldViewer?.removeEventListener('frameDrawn', this.handleFrameDrawn);
-    newViewer?.addEventListener('frameDrawn', this.handleFrameDrawn);
+    oldViewer?.deregisterRenderer(this.frameRenderer);
+    newViewer?.registerRenderer(this.frameRenderer);
   }
 
   @Watch('drawMode')
@@ -141,9 +124,10 @@ export class ViewerThreeJsRenderer {
     this.updateDrawMode();
   }
 
-  private handleFrameDrawn = async (): Promise<void> => {
-    const frame = this.viewer?.frame;
-    if (frame != null) {
+  private frameRenderer = async (frame: Frame): Promise<void> => {
+    if (this.renderer != null) {
+      this.willDraw?.();
+
       const { camera } = frame.scene;
       const { position, lookAt, up, fovY, aspectRatio, near, far } = camera;
 
@@ -151,27 +135,22 @@ export class ViewerThreeJsRenderer {
       const threeFar = far + this.clippingExtents;
 
       this.camera.position.set(position.x, position.y, position.z);
-      this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
       this.camera.up.set(up.x, up.y, up.z);
+      this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
 
       this.camera.fov = fovY;
       this.camera.aspect = aspectRatio;
       this.camera.near = threeNear;
       this.camera.far = threeFar;
       this.camera.updateProjectionMatrix();
-    }
 
-    if (this.drawMode === 'synced') {
-      this.draw();
+      this.renderer.render(this.scene, this.camera, frame, this.viewport);
     }
-
-    this.frame = frame;
   };
 
   private updateSize(): void {
     const rect = this.hostEl.getBoundingClientRect();
     this.viewport = new Viewport(rect.width, rect.height);
-    this.boundingRect = rect;
   }
 
   private updateDrawMode(): void {
