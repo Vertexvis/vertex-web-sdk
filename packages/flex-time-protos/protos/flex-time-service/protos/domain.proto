@@ -4,6 +4,7 @@ package vertexvis.protobuf.flextime.v1alpha1;
 
 import "core/protos/geometry.proto";
 import "core/protos/material.proto";
+import "core/protos/uuid.proto";
 import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
@@ -29,4 +30,5 @@ message CompressedRenderItem {
     vertexvis.protobuf.core.AffineMatrix4f transform = 1;
     vertexvis.protobuf.core.ColorMaterialf material = 2;
     google.protobuf.BytesValue draco_bytes = 3;
+    vertexvis.protobuf.core.Uuid shape_id = 4;
 }

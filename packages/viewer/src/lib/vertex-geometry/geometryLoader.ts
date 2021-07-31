@@ -1,7 +1,6 @@
 import {
   Color,
   FrontSide,
-  Group,
   Mesh,
   MeshPhongMaterial,
   Matrix4 as Mat4,
@@ -24,7 +23,6 @@ import { isCompressedRenderItem } from './typeGuards';
 import {
   makeGeometryFromCompressedRenderItem,
   makeGeometryFromRenderItem,
-  makeIndexedGeometryFromRenderItem,
 } from './geometry';
 
 export interface VertexGeometryLoaderOptions {
@@ -55,26 +53,22 @@ export class VertexGeometryLoader {
     }
   }
 
-  public async load(
+  public async *load(
     sceneId: string,
-    sceneViewId: string,
-    sceneItemId: string
-  ): Promise<Group> {
+    sceneViewId?: string,
+    sceneItemId?: string
+  ): AsyncGenerator<Mesh[], void, void> {
     const req = { sceneId, sceneViewId, sceneItemId };
     const call = this.options.compressed
       ? this.client.getCompressedSceneGeometry(req)
       : this.client.getSceneGeometry(req);
 
-    const group = new Group();
     for await (const res of call.responses) {
       // There could be a perf improvement here if this didn't block processing
       // incoming responses.
       const meshes = await Promise.all(this.makeMeshesFromResponse(res));
-      for (const mesh of meshes) {
-        group.add(mesh);
-      }
+      yield meshes;
     }
-    return group;
   }
 
   private makeMeshesFromResponse(

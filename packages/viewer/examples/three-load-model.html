@@ -60,6 +60,7 @@
     <script type="module">
       import * as THREE from 'https://cdn.skypack.dev/three';
       import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
+      import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
       import {
         FlexTimeApi,
         VertexScene,
@@ -71,14 +72,13 @@
       } from './utils.js';
 
       const streamKey = '' || getStreamKeyFromUrlParams();
+      // const sceneId = '0911e812-b6ba-4a27-bc7c-0af6e6970c52';
       const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
       const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
       const vertexScene = new VertexScene(client, sceneId);
       const geometryLoader = new VertexGeometryLoader(client, {
         compressed: true,
       });
-
-      let transformControl;
 
       window.addEventListener('DOMContentLoaded', () => {
         main();
@@ -92,14 +92,14 @@
         const viewer = document.getElementById('viewer');
         await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
 
+        const scene = await viewer.scene();
+
         const blendedRenderer = document.getElementById('blended-renderer');
         blendedRenderer.willDraw = updateScene(viewer, vertexScene);
         blendedRenderer.scene.add(vertexScene);
-        viewer.addEventListener('pointerdown', async (event) => {
-          const pt = { x: event.clientX, y: event.clientY };
-        });
 
-        const overlayRenderer = document.getElementById('overlay-renderer');
+        const meshes = geometryLoader.load(sceneId, scene.sceneViewId);
+        addGeometryLoaderMeshes(blendedRenderer, vertexScene, meshes);
 
         viewer.addEventListener('tap', async ({ detail }) => {
           const { position } = detail;
@@ -113,34 +113,10 @@
             const [hit] = hits;
 
             if (hit != null) {
-              const obj = new THREE.Group();
-              const meshes = await geometryLoader.load(
-                sceneId,
-                scene.sceneViewId,
-                hit.itemId.hex
-              );
-              await addGeometryLoaderMeshes(blendedRenderer, obj, meshes);
-              vertexScene.add(obj);
-
-              await scene
-                .items((op) =>
-                  op.where((q) => q.withItemId(hit.itemId.hex)).hide()
-                )
-                .execute();
-              blendedRenderer.draw();
-
-              select(obj);
-            } else {
-              deselect();
+              console.log('hit', hit);
             }
           }
         });
-
-        transformControl = createTransformControl(
-          viewer,
-          overlayRenderer,
-          blendedRenderer
-        );
       }
 
       function updateScene(viewer, scene) {
@@ -149,43 +125,6 @@
             scene.updateLighting(viewer.frame.scene.camera);
           }
         };
-      }
-
-      function createTransformControl(viewer, renderer, blendedRenderer) {
-        const handleViewerPointerMove = (event) => {
-          event.stopImmediatePropagation();
-        };
-
-        const transformControl = new TransformControls(
-          renderer.camera,
-          viewer.interactionTarget
-        );
-        transformControl.size = 0.5;
-        transformControl.addEventListener('mouseDown', () => {
-          document.addEventListener('pointermove', handleViewerPointerMove);
-          renderer.draw();
-        });
-        transformControl.addEventListener('mouseUp', () => {
-          document.removeEventListener('pointermove', handleViewerPointerMove);
-          renderer.draw();
-        });
-        transformControl.addEventListener('change', () => {
-          renderer.draw();
-        });
-        transformControl.addEventListener('objectChange', () => {
-          blendedRenderer.draw();
-          renderer.draw();
-        });
-        renderer.scene.add(transformControl);
-        return transformControl;
-      }
-
-      function select(mesh) {
-        transformControl.attach(mesh);
-      }
-
-      function deselect() {
-        transformControl.detach();
       }
     </script>
   </head>
@@ -201,18 +140,19 @@
         </vertex-scene-tree>
       </div>
       <div class="workarea">
-        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+        <vertex-viewer
+          id="viewer"
+          config-env="platdev"
+          depth-buffers="all"
+          camera-controls="false"
+        >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
 
           <vertex-viewer-threejs-renderer
             id="blended-renderer"
-            occlude
-          ></vertex-viewer-threejs-renderer>
-
-          <vertex-viewer-threejs-renderer
-            id="overlay-renderer"
+            draw-mode="manual"
           ></vertex-viewer-threejs-renderer>
 
           <vertex-viewer-toolbar placement="top-right">
