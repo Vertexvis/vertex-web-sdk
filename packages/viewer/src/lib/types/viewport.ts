@@ -183,7 +183,7 @@ export class Viewport implements Dimensions.Dimensions {
     return Rectangle.scale(image.imageRect, scaleX, scaleY);
   }
 
-  private calculateFrameScale(image: FrameImageLike): Point.Point {
+  public calculateFrameScale(image: FrameImageLike): Point.Point {
     const { frameDimensions: dimensions } = image;
 
     const imageRect = Rectangle.fromDimensions(dimensions);

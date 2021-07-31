@@ -185,15 +185,11 @@ export async function makeGeometryFromCompressedRenderItem(
 ): Promise<BufferGeometry> {
   const bytes = proto.dracoBytes?.value;
   if (bytes != null) {
-    const timer = 'Construct ThreeJS geometry from CompressedRenderItem';
-
-    console.time(timer);
     const geometry = await new Promise<BufferGeometry>((resolve) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (loader as any).decodeDracoFile(bytes.buffer, resolve);
     });
-    console.log('Created ThreeJS geometry', geometry);
-    console.timeEnd(timer);
+    // console.log('Created ThreeJS geometry', geometry);
 
     return geometry;
   } else throw new Error('Draco bytes are undefined.');

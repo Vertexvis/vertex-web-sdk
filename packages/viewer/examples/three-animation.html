@@ -60,13 +60,23 @@
     <script type="module">
       import * as THREE from 'https://cdn.skypack.dev/three';
       import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
-      import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
-      import { getStreamKeyFromUrlParams } from './utils.js';
+      import {
+        FlexTimeApi,
+        VertexScene,
+        VertexGeometryLoader,
+      } from '/dist/viewer/index.esm.js';
+      import {
+        getStreamKeyFromUrlParams,
+        addGeometryLoaderMeshes,
+      } from './utils.js';
 
       const streamKey = '' || getStreamKeyFromUrlParams();
       const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
       const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
       const vertexScene = new VertexScene(client, sceneId);
+      const geometryLoader = new VertexGeometryLoader(client, {
+        compressed: true,
+      });
 
       const animations = [];
 
@@ -82,10 +92,11 @@
         gridHelper.rotation.x = Math.PI / 2;
         vertexScene.add(gridHelper);
 
+        const tree = document.getElementById('scene-tree');
+
         const viewer = document.getElementById('viewer');
         await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
-
-        const tree = document.getElementById('scene-tree');
+        const scene = await viewer.scene();
 
         const blendedRenderer = document.getElementById('blended-renderer');
         blendedRenderer.willDraw = updateScene(viewer, vertexScene);
@@ -97,10 +108,6 @@
         });
 
         const overlayRenderer = document.getElementById('overlay-renderer');
-
-        await viewer.load(
-          'urn:vertexvis:stream-key:oHOB0HkapT5rQ_tahl0s1OcQyZkNz9aFBaXW'
-        );
 
         viewer.addEventListener('tap', async ({ detail }) => {
           const { position } = detail;
@@ -119,7 +126,12 @@
           }
         });
 
-        const players = await loadAnimations(viewer);
+        const players = await loadAnimations(
+          blendedRenderer,
+          geometryLoader,
+          sceneId,
+          scene
+        );
         players.forEach((player) => animations.push(player));
 
         const playBtn = document.getElementById('play-btn');
@@ -145,17 +157,15 @@
           .execute();
       }
 
-      async function loadAnimations(viewer) {
-        const scene = await viewer.scene();
-
-        const animation1 = createAnimation1(scene);
-        const animation2 = createAnimation2(scene);
-        const animation3 = createAnimation3(scene);
+      async function loadAnimations(renderer, loader, sceneId, scene) {
+        const animation1 = createAnimation1(renderer, loader, sceneId, scene);
+        const animation2 = createAnimation2(renderer, loader, sceneId, scene);
+        const animation3 = createAnimation3(renderer, loader, sceneId, scene);
 
         return Promise.all([animation1, animation2, animation3]);
       }
 
-      async function createAnimation1(scene) {
+      async function createAnimation1(renderer, loader, sceneId, scene) {
         const camera = {
           position: {
             x: 2057.6181640625,
@@ -179,6 +189,9 @@
 
           // Tire
           const tireAnimation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '090f1025-f379-4759-8466-8e7d90ad9412',
             { x: 0, y: -1123, z: 0 },
@@ -189,6 +202,9 @@
 
           // Wheel
           const wheelAnimation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '1842aca6-c81a-438b-863c-cb71bfb2d1f8',
             { x: 0, y: -1123, z: 0 },
@@ -199,6 +215,9 @@
 
           // Lug nut #1
           const lug1Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'a6f244d7-ee44-42a5-a82c-8d4c2b902275',
             { x: 0, y: -1123, z: 0 },
@@ -209,6 +228,9 @@
 
           // Lug nut #2
           const lug2Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '9f3c3b11-579b-4935-a329-f58c701d9814',
             { x: 0, y: -1123, z: 0 },
@@ -219,6 +241,9 @@
 
           // Lug nut #3
           const lug3Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '14df841f-4023-4f90-8276-e57d86565995',
             { x: 0, y: -1123, z: 0 },
@@ -229,6 +254,9 @@
 
           // Lug nut #4
           const lug4Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '68e55207-039f-40cd-9ec2-c1f7c2104bf0',
             { x: 0, y: -1123, z: 0 },
@@ -239,6 +267,9 @@
 
           // Lug nut #5
           const lug5Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'c37b0fc6-09ab-4899-a58e-299de893c12f',
             { x: 0, y: -1123, z: 0 },
@@ -251,7 +282,7 @@
         });
       }
 
-      async function createAnimation2(scene) {
+      async function createAnimation2(renderer, loader, sceneId, scene) {
         const camera = {
           position: {
             x: -1723.260009765625,
@@ -275,6 +306,9 @@
 
           // Tire
           const tireAnimation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '5498bfb7-345f-44b8-8ae5-ba1c8422c31f',
             { x: 0, y: -2000, z: 0 },
@@ -285,6 +319,9 @@
 
           // Wheel
           const wheelAnimation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'b2f3fffa-89e2-4485-b60c-55ffdb69f898',
             { x: 0, y: -2000, z: 0 },
@@ -295,6 +332,9 @@
 
           // Lug nut #1
           const lug1Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'd94260ab-0c3c-43ba-a43a-936cfa556533',
             { x: 0, y: -2000, z: 0 },
@@ -305,6 +345,9 @@
 
           // Lug nut #2
           const lug2Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '6ab29eb5-1714-44f7-8d8f-e15278834354',
             { x: 0, y: -2000, z: 0 },
@@ -315,6 +358,9 @@
 
           // Lug nut #3
           const lug3Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '781a3352-aa38-44a8-8a25-12a9f9079280',
             { x: 0, y: -2000, z: 0 },
@@ -325,6 +371,9 @@
 
           // Lug nut #4
           const lug4Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'dea6384e-d489-4916-b732-603d295ae6ec',
             { x: 0, y: -2000, z: 0 },
@@ -335,6 +384,9 @@
 
           // Lug nut #5
           const lug5Animation = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'dc5a9ba6-ef75-40fc-96e4-9389ba229f50',
             { x: 0, y: -2000, z: 0 },
@@ -347,7 +399,7 @@
         });
       }
 
-      async function createAnimation3(scene) {
+      async function createAnimation3(renderer, loader, sceneId, scene) {
         const camera = {
           position: {
             x: -1978.46044921875,
@@ -370,6 +422,9 @@
           const clips = [];
 
           const chair1 = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             '95339bf4-7b84-4fff-af01-dec4ec383669',
             { x: 0, y: 0, z: 1500 },
@@ -379,6 +434,9 @@
           clips.push(chair1);
 
           const chair2 = await createClip(
+            renderer,
+            loader,
+            sceneId,
             scene,
             'eccb70c0-de55-4f83-94cd-17bb00d78a65',
             { x: 0, y: 0, z: 1500 },
@@ -413,10 +471,23 @@
         };
       }
 
-      async function createClip(scene, itemId, startPos, delay, duration) {
-        const mesh = await vertexScene.loadSceneItem(scene.sceneViewId, itemId);
-        mesh.position.set(startPos.x, startPos.y, startPos.z);
+      async function createClip(
+        renderer,
+        loader,
+        sceneId,
+        scene,
+        itemId,
+        startPos,
+        delay,
+        duration
+      ) {
+        const obj = new THREE.Group();
+        const meshes = await loader.load(sceneId, scene.sceneViewId, itemId);
+        await addGeometryLoaderMeshes(renderer, obj, meshes);
         await hideItem(scene, itemId);
+        obj.position.set(startPos.x, startPos.y, startPos.z);
+        renderer.scene.add(obj);
+        renderer.draw();
 
         const track = new THREE.VectorKeyframeTrack(
           '.position',
@@ -426,7 +497,7 @@
         );
         const clip = new THREE.AnimationClip('Action', duration, [track]);
 
-        return { mesh, delay, clip };
+        return { obj, delay, clip };
       }
 
       function createMixer(animations) {
@@ -437,10 +508,10 @@
             const mixer = new THREE.AnimationMixer(vertexScene);
 
             for (let animation of animations) {
-              const { mesh, delay, clip } = animation;
+              const { obj, delay, clip } = animation;
 
               setTimeout(() => {
-                const clipAction = mixer.clipAction(clip, mesh);
+                const clipAction = mixer.clipAction(clip, obj);
                 clipAction.clampWhenFinished = true;
                 clipAction.setLoop(THREE.LoopOnce, 0);
                 clipAction.play();

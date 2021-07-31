@@ -20,7 +20,6 @@ export type ReportTimingsCallback = (timing: Timing[]) => void;
 
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const rect = data.viewport.calculateDrawRect(data.frame.image);
-
   data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
   data.canvas.drawImage(image.image, rect.x, rect.y, rect.width, rect.height);
 }

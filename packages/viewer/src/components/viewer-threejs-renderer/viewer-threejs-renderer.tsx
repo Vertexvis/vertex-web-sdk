@@ -69,18 +69,20 @@ export class ViewerThreeJsRenderer {
 
   @Method()
   public async draw(): Promise<void> {
-    if (this.renderer != null) {
-      this.willDraw?.();
+    requestAnimationFrame(() => {
+      if (this.renderer != null) {
+        this.willDraw?.();
 
-      if (this.frame != null) {
-        this.renderer.render(
-          this.scene,
-          this.camera,
-          this.frame,
-          this.viewport
-        );
+        if (this.frame != null) {
+          this.renderer.render(
+            this.scene,
+            this.camera,
+            this.frame,
+            this.viewport
+          );
+        }
       }
-    }
+    });
   }
 
   @Method()

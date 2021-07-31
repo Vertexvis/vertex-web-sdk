@@ -5,8 +5,8 @@ export function computeServerDepthTextureMatrix(
   viewport: Viewport
 ): number[] {
   const scale = viewport.calculateFrameScale(depthBuffer);
-  const scaleX = 1 / (depthBuffer.scale * scale.x);
-  const scaleY = 1 / (depthBuffer.scale * scale.y);
+  const scaleX = 1 / (depthBuffer.imageScale * scale.x);
+  const scaleY = 1 / (depthBuffer.imageScale * scale.y);
 
   // const tx = -drawRect.x / viewport.width - 0.5;
   // const ty = -drawRect.y / viewport.height - 0.5;
