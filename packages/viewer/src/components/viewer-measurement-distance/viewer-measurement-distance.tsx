@@ -649,33 +649,27 @@ export class ViewerMeasurementDistance {
     this.invalidateStateCounter = this.invalidateStateCounter + 1;
   }
 
-  private addInteractionListeners(viewer: HTMLVertexViewerElement): void {
+  private async addInteractionListeners(
+    viewer: HTMLVertexViewerElement
+  ): Promise<void> {
+    const interactionTarget = await viewer.getInteractionTarget();
     if (this.mode === 'replace') {
-      viewer.interactionTarget?.addEventListener(
-        'pointermove',
-        this.updateStartAnchor
-      );
-      viewer.interactionTarget?.addEventListener(
-        'pointerdown',
-        this.startMeasurement
-      );
-      viewer.interactionTarget?.addEventListener(
-        'pointerleave',
-        this.resetStartAnchor
-      );
+      interactionTarget.addEventListener('pointermove', this.updateStartAnchor);
+      interactionTarget.addEventListener('pointerdown', this.startMeasurement);
+      interactionTarget.addEventListener('pointerleave', this.resetStartAnchor);
     }
   }
 
-  private removeInteractionListeners(viewer: HTMLVertexViewerElement): void {
-    viewer.interactionTarget?.removeEventListener(
+  private async removeInteractionListeners(
+    viewer: HTMLVertexViewerElement
+  ): Promise<void> {
+    const interactionTarget = await viewer.getInteractionTarget();
+    interactionTarget.removeEventListener(
       'pointermove',
       this.updateStartAnchor
     );
-    viewer.interactionTarget?.removeEventListener(
-      'pointerdown',
-      this.startMeasurement
-    );
-    viewer.interactionTarget?.removeEventListener(
+    interactionTarget.removeEventListener('pointerdown', this.startMeasurement);
+    interactionTarget.removeEventListener(
       'pointerleave',
       this.resetStartAnchor
     );

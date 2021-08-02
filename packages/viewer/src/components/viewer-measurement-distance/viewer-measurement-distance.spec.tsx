@@ -611,8 +611,9 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
+      const interactionTarget = await viewer.getInteractionTarget();
 
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
       await page.waitForChanges();
@@ -620,9 +621,7 @@ describe('vertex-viewer-measurement-distance', () => {
 
       // Test snapping
       await viewer.stencilBuffer.latestAfterInteraction();
-      viewer.interactionTarget?.dispatchEvent(
-        new MouseEvent('pointermove', snapEvent)
-      );
+      interactionTarget.dispatchEvent(new MouseEvent('pointermove', snapEvent));
       await page.waitForChanges();
       expect(measurement.start).toEqual(snapPt);
     });
@@ -651,14 +650,15 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
+      const interactionTarget = await viewer.getInteractionTarget();
 
       // update start
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 1 })
       );
       window.dispatchEvent(
@@ -713,14 +713,15 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
+      const interactionTarget = await viewer.getInteractionTarget();
 
       // update start
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
@@ -777,14 +778,15 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
+      const interactionTarget = await viewer.getInteractionTarget();
 
       // update start
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(
@@ -831,14 +833,15 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
+      const interactionTarget = await viewer.getInteractionTarget();
 
       // update start
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
 
       // begin interaction
-      viewer.interactionTarget?.dispatchEvent(
+      interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
       );
       window.dispatchEvent(

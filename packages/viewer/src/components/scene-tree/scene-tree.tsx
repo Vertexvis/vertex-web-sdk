@@ -74,6 +74,7 @@ interface StateMap {
   endIndex: number;
   viewportRows: Row[];
   viewportRowMap: Map<string, Row>;
+  viewportHeight?: number;
 
   selectionPath?: string[];
 }
@@ -200,9 +201,6 @@ export class SceneTree {
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
-
-  @State()
-  private viewportHeight: number | undefined;
 
   @State()
   private isComputingRowHeight = true;
@@ -567,15 +565,15 @@ export class SceneTree {
       passive: true,
     });
 
-    const resizeObserver = new ResizeObserver(() =>
-      this.updateViewportHeight()
-    );
+    const resizeObserver = new ResizeObserver(() => {
+      this.clearViewportHeight();
+      this.invalidateRows();
+    });
     resizeObserver.observe(rowScrollEl);
     this.stateMap.resizeObserver = resizeObserver;
 
     this.ensureTemplateDefined();
 
-    this.updateViewportHeight();
     await this.computeRowHeight();
     this.createPool();
 
@@ -760,9 +758,10 @@ export class SceneTree {
   }
 
   private updateRenderState(): void {
-    if (this.viewportHeight != null) {
+    const viewportHeight = this.getViewportHeight();
+    if (viewportHeight != null) {
       const rowHeight = this.getComputedOrPlaceholderRowHeight();
-      const viewportCount = Math.ceil(this.viewportHeight / rowHeight);
+      const viewportCount = Math.ceil(viewportHeight / rowHeight);
 
       const viewportStartIndex = Math.floor(this.scrollTop / rowHeight);
       const viewportEndIndex = viewportStartIndex + viewportCount;
@@ -863,7 +862,7 @@ export class SceneTree {
     position: ScrollToOptions['position']
   ): number {
     const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
-    const viewportHeight = this.viewportHeight || 0;
+    const viewportHeight = this.getViewportHeight() || 0;
     const rowHeight = this.getComputedOrPlaceholderRowHeight();
 
     if (position === 'start') {
@@ -902,10 +901,6 @@ export class SceneTree {
   }
 
   private createPool(): void {
-    if (this.viewportHeight == null) {
-      throw new Error('Viewport height is not defined');
-    }
-
     // When doing a live reload, this function might get called multiple times.
     // Only create the pool if on hasn't been created yet.
     if (this.stateMap.elementPool == null) {
@@ -949,10 +944,17 @@ export class SceneTree {
     });
   }
 
-  private updateViewportHeight(): void {
-    this.viewportHeight = getSceneTreeViewportHeight(
-      this.getRowsScrollElement()
-    );
+  private getViewportHeight(): number | undefined {
+    if (this.stateMap.viewportHeight == null && this.rowScrollEl != null) {
+      this.stateMap.viewportHeight = getSceneTreeViewportHeight(
+        this.rowScrollEl
+      );
+    }
+    return this.stateMap.viewportHeight;
+  }
+
+  private clearViewportHeight(): void {
+    this.stateMap.viewportHeight = undefined;
   }
 
   private getRowsScrollElement(): HTMLElement {
