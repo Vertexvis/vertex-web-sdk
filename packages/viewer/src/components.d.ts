@@ -295,12 +295,12 @@ export namespace Components {
       BaseInteractionHandler | undefined
     >;
     getInteractionHandlers: () => Promise<InteractionHandler[]>;
-    getJwt: () => Promise<string | undefined>;
-    handleWebSocketClose: () => Promise<void>;
     /**
      * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
      */
-    interactionTarget?: HTMLElement;
+    getInteractionTarget: () => Promise<HTMLElement>;
+    getJwt: () => Promise<string | undefined>;
+    handleWebSocketClose: () => Promise<void>;
     /**
      * Returns `true` indicating that the scene is ready to be interacted with.
      */
@@ -1031,10 +1031,6 @@ declare namespace LocalJSX {
      * @readonly
      */
     frame?: Frame | undefined;
-    /**
-     * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
-     */
-    interactionTarget?: HTMLElement;
     /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */

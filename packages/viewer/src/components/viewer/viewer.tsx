@@ -115,6 +115,7 @@ interface DisconnectedStatus {
 interface StateMap {
   streamWorldOrientation?: Orientation;
   cursorManager: CursorManager;
+  interactionTarget?: HTMLElement;
 }
 
 /** @internal */
@@ -257,16 +258,6 @@ export class Viewer {
   );
 
   /**
-   * The HTML element that will handle interaction events from the user. Used by
-   * components to listen for interaction events from the same element as the
-   * viewer. Note, this property maybe removed in the future when refactoring
-   * our interaction handling.
-   *
-   * @internal
-   */
-  @Prop({ mutable: true }) public interactionTarget?: HTMLElement;
-
-  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    */
@@ -388,12 +379,11 @@ export class Viewer {
    */
   protected componentWillLoad(): void {
     this.updateResolvedConfig();
-  }
+    this.calculateComponentDimensions();
 
-  /**
-   * @ignore
-   */
-  protected componentDidLoad(): void {
+    this.resizeObserver = new ResizeObserver(this.handleElementResize);
+    this.registerSlotChangeListeners();
+
     const ws = new WebSocketClientImpl();
     ws.onClose(() => this.handleWebSocketClose());
 
@@ -403,14 +393,10 @@ export class Viewer {
     );
     this.setupStreamListeners();
 
-    this.interactionApi = this.createInteractionApi();
-
     this.commands = new CommandRegistry(this.stream, () =>
       this.getResolvedConfig()
     );
     registerCommands(this.commands);
-
-    this.calculateComponentDimensions();
 
     this.streamSessionId = this.sessionId;
     if (this.streamSessionId == null) {
@@ -423,6 +409,16 @@ export class Viewer {
         // Ignore the case where we can't access local storage for fetching a session
       }
     }
+
+    this.updateStreamAttributesProp();
+    this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentDidLoad(): void {
+    this.interactionApi = this.createInteractionApi();
 
     if (this.src != null) {
       this.load(this.src);
@@ -461,7 +457,7 @@ export class Viewer {
       }
     }
 
-    if (this.keyboardControls) {
+    if (this.keyboardControls && this.stream != null) {
       this.baseInteractionHandler?.setDefaultKeyboardControls(
         this.keyboardControls
       );
@@ -479,26 +475,7 @@ export class Viewer {
       this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
     }
 
-    this.updateStreamAttributesProp();
-    this.registerSlotChangeListeners();
     this.injectViewerApi();
-
-    this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
-  }
-
-  /**
-   * @ignore
-   */
-  protected connectedCallback(): void {
-    this.resizeObserver = new ResizeObserver(this.handleElementResize);
-  }
-
-  /**
-   * @ignore
-   */
-  protected disconnectedCallback(): void {
-    this.mutationObserver?.disconnect();
-    this.resizeObserver?.disconnect();
   }
 
   /**
@@ -522,7 +499,7 @@ export class Viewer {
             <canvas
               ref={(ref) => {
                 this.canvasElement = ref;
-                this.interactionTarget = ref;
+                this.stateMap.interactionTarget = ref;
               }}
               class="canvas"
               width={canvasDimensions != null ? canvasDimensions.width : 0}
@@ -656,6 +633,21 @@ export class Viewer {
     keyInteraction: KeyInteraction<TapEventDetails>
   ): Promise<void> {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
+  }
+
+  /**
+   * The HTML element that will handle interaction events from the user. Used by
+   * components to listen for interaction events from the same element as the
+   * viewer. Note, this property maybe removed in the future when refactoring
+   * our interaction handling.
+   *
+   * @internal
+   */
+  @Method()
+  public async getInteractionTarget(): Promise<HTMLElement> {
+    if (this.stateMap.interactionTarget != null) {
+      return this.stateMap.interactionTarget;
+    } else throw new Error('Interaction target is undefined.');
   }
 
   /**
@@ -880,6 +872,7 @@ export class Viewer {
   ): Promise<void> {
     try {
       this.streamDisposable = await this.connectStream(resource);
+      this.calculateComponentDimensions();
 
       const { startStream } = await this.getStream().startStream({
         streamKey: { value: resource.id },
@@ -1218,7 +1211,7 @@ export class Viewer {
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
-    if (this.interactionTarget == null) {
+    if (this.stateMap.interactionTarget == null) {
       throw new InteractionHandlerError(
         'Cannot initialize interaction handler. Interaction target is undefined.'
       );
@@ -1228,7 +1221,7 @@ export class Viewer {
         'Cannot initialize interaction handler. Interaction APi is undefined.'
       );
     }
-    handler.initialize(this.interactionTarget, this.interactionApi);
+    handler.initialize(this.stateMap.interactionTarget, this.interactionApi);
   }
 
   private createInteractionApi(): InteractionApi {
@@ -1298,9 +1291,7 @@ export class Viewer {
   }
 
   private getBounds(): ClientRect | undefined {
-    if (this.hostElement != null) {
-      return getElementBoundingClientRect(this.hostElement);
-    }
+    return getElementBoundingClientRect(this.hostElement);
   }
 
   private getCanvasDimensions(): Dimensions.Dimensions | undefined {
