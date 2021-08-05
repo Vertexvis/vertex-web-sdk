@@ -822,6 +822,7 @@ export class SceneTree {
           expanded: false,
           selected: false,
           visible: false,
+          partiallyVisible: false,
           isLeaf: false,
           depth: 0,
         },

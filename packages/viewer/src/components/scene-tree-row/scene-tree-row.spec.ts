@@ -63,6 +63,7 @@ describe('<vertex-scene-tree-row>', () => {
       node,
     });
 
+    expect(row).not.toHaveAttribute('is-hidden');
     expect(row.shadowRoot?.querySelector('.icon-visible')).toBeDefined();
   });
 
@@ -73,7 +74,19 @@ describe('<vertex-scene-tree-row>', () => {
       node,
     });
 
+    expect(row).toHaveAttribute('is-hidden');
     expect(row.shadowRoot?.querySelector('.icon-hidden')).toBeDefined();
+  });
+
+  it('renders partial icon if partially visible', async () => {
+    const node = createNode({ partiallyVisible: true });
+    const { row } = await newComponentSpec({
+      html: `<vertex-scene-tree-row></vertex-scene-tree-row>`,
+      node,
+    });
+
+    expect(row).toHaveAttribute('is-partial');
+    expect(row.shadowRoot?.querySelector('.icon-partial')).toBeDefined();
   });
 
   it('sets indentation based on depth', async () => {
@@ -394,6 +407,7 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     isLeaf: false,
     selected: false,
     visible: false,
+    partiallyVisible: false,
     ...values,
   };
 }

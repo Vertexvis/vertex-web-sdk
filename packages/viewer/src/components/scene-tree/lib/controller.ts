@@ -576,27 +576,47 @@ export class SceneTreeController {
         const {
           hiddenList = [],
           shownList = [],
+          partiallyVisibleList = [],
           deselectedList = [],
           selectedList = [],
         } = change?.ranges || {};
 
-        if (hiddenList != null && hiddenList.length > 0) {
+        if (partiallyVisibleList.length > 0) {
+          console.debug(
+            'Received partial visibility list change',
+            partiallyVisibleList
+          );
+
+          partiallyVisibleList.forEach(({ start, end }) =>
+            this.patchNodesInRange(start, end, () => ({
+              partiallyVisible: true,
+            }))
+          );
+        }
+
+        if (hiddenList.length > 0) {
           console.debug('Received hidden list change', hiddenList);
 
           hiddenList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({ visible: false }))
+            this.patchNodesInRange(start, end, () => ({
+              visible: false,
+              partiallyVisible: false,
+            }))
           );
         }
 
-        if (shownList != null && shownList.length > 0) {
+        if (shownList.length > 0) {
           console.debug('Received shown list change', shownList);
 
           shownList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({ visible: true }))
+            this.patchNodesInRange(start, end, () => ({
+              visible: true,
+              partiallyVisible: false,
+            }))
           );
         }
 
-        if (deselectedList != null && deselectedList.length > 0) {
+        if (deselectedList.length > 0) {
           console.debug('Received deselected list change', deselectedList);
 
           deselectedList.forEach(({ start, end }) =>
@@ -604,7 +624,7 @@ export class SceneTreeController {
           );
         }
 
-        if (selectedList != null && selectedList.length > 0) {
+        if (selectedList.length > 0) {
           console.debug('Received selected list change', selectedList);
 
           selectedList.forEach(({ start, end }) =>

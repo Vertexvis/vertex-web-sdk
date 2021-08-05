@@ -12,20 +12,30 @@ describe('<vertex-viewer-icon>', () => {
     expect(svg?.innerHTML).toContain('path');
   });
 
-  it('render a visible icon', async () => {
+  it('render an eye open icon', async () => {
     const page = await newSpecPage({
       components: [ViewerIcon],
-      html: `<vertex-viewer-icon name="visible"></vertex-viewer-button>`,
+      html: `<vertex-viewer-icon name="eye-open"></vertex-viewer-button>`,
     });
 
     const svg = page.root?.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
-  it('render a visible icon', async () => {
+  it('render a half eye icon', async () => {
     const page = await newSpecPage({
       components: [ViewerIcon],
-      html: `<vertex-viewer-icon name="hidden"></vertex-viewer-button>`,
+      html: `<vertex-viewer-icon name="eye-half"></vertex-viewer-button>`,
+    });
+
+    const svg = page.root?.shadowRoot?.querySelector('svg');
+    expect(svg?.innerHTML).toContain('path');
+  });
+
+  it('render a half eye dotted icon', async () => {
+    const page = await newSpecPage({
+      components: [ViewerIcon],
+      html: `<vertex-viewer-icon name="eye-half-dotted"></vertex-viewer-button>`,
     });
 
     const svg = page.root?.shadowRoot?.querySelector('svg');
