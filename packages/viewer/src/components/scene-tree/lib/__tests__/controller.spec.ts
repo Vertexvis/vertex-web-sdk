@@ -321,7 +321,10 @@ describe(SceneTreeController, () => {
 
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(
-          createGetTreeResponse(100, 100, (node) => node.setVisible(true))
+          createGetTreeResponse(100, 100, (node) => {
+            node.setVisible(true);
+            node.setPartiallyVisible(true);
+          })
         )
       );
 
@@ -347,9 +350,18 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], node: { ...rows[0]?.node, visible: false } },
-        { ...rows[1], node: { ...rows[1]?.node, visible: false } },
-        { ...rows[2], node: { ...rows[2]?.node, visible: true } },
+        {
+          ...rows[0],
+          node: { ...rows[0]?.node, visible: false, partiallyVisible: false },
+        },
+        {
+          ...rows[1],
+          node: { ...rows[1]?.node, visible: false, partiallyVisible: false },
+        },
+        {
+          ...rows[2],
+          node: { ...rows[2]?.node, visible: true, partiallyVisible: true },
+        },
       ]);
     });
 
@@ -358,7 +370,10 @@ describe(SceneTreeController, () => {
 
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(
-          createGetTreeResponse(100, 100, (node) => node.setVisible(false))
+          createGetTreeResponse(100, 100, (node) => {
+            node.setVisible(false);
+            node.setPartiallyVisible(true);
+          })
         )
       );
 
@@ -384,9 +399,57 @@ describe(SceneTreeController, () => {
       const rows = await pendingRows;
 
       expect(rows.slice(0, 3)).toMatchObject([
-        { ...rows[0], node: { ...rows[0]?.node, visible: true } },
-        { ...rows[1], node: { ...rows[1]?.node, visible: true } },
-        { ...rows[2], node: { ...rows[2]?.node, visible: false } },
+        {
+          ...rows[0],
+          node: { ...rows[0]?.node, visible: true, partiallyVisible: false },
+        },
+        {
+          ...rows[1],
+          node: { ...rows[1]?.node, visible: true, partiallyVisible: false },
+        },
+        {
+          ...rows[2],
+          node: { ...rows[2]?.node, visible: false, partiallyVisible: true },
+        },
+      ]);
+    });
+
+    it('patches data that is partially visible', async () => {
+      const { controller, client, stream } = createController(100);
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(
+          createGetTreeResponse(100, 100, (node) => {
+            node.setPartiallyVisible(false);
+          })
+        )
+      );
+
+      await controller.connect(jwtProvider);
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          resolve(state.rows);
+        });
+      });
+
+      const range = new Range();
+      range.setStart(0);
+      range.setEnd(1);
+      const stateChange = new StateChange();
+      stateChange.setPartiallyVisibleList([range]);
+      const changeType = new TreeChangeType();
+      changeType.setRanges(stateChange);
+      const resp = new SubscribeResponse();
+      resp.setChange(changeType);
+      stream.invokeOnData(resp);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 3)).toMatchObject([
+        { ...rows[0], node: { ...rows[0]?.node, partiallyVisible: true } },
+        { ...rows[1], node: { ...rows[1]?.node, partiallyVisible: true } },
+        { ...rows[2], node: { ...rows[2]?.node, partiallyVisible: false } },
       ]);
     });
 

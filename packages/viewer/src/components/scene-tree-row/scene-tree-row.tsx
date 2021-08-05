@@ -8,7 +8,7 @@ import {
   Prop,
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import classnames from 'classnames';
+import classNames from 'classnames';
 
 /**
  * A `<vertex-scene-tree-row>` component that is responsible for rendering a row
@@ -108,7 +108,7 @@ export class SceneTreeRow {
             >
               {!this.node.isLeaf && (
                 <div
-                  class={classnames('icon', {
+                  class={classNames('icon', {
                     'icon-expanded': this.node.expanded,
                     'icon-collapsed': !this.node.expanded,
                   })}
@@ -127,9 +127,12 @@ export class SceneTreeRow {
               }}
             >
               <div
-                class={classnames('icon', {
-                  'icon-visible': this.node.visible,
-                  'icon-hidden': !this.node.visible,
+                class={classNames('icon', {
+                  'icon-visible':
+                    !this.node.partiallyVisible && this.node.visible,
+                  'icon-hidden':
+                    !this.node.partiallyVisible && !this.node.visible,
+                  'icon-partial': this.node.partiallyVisible,
                 })}
               />
             </button>
@@ -152,12 +155,15 @@ export class SceneTreeRow {
   }
 
   protected componentWillRender(): void {
-    this.ifNodeDefined(({ visible, selected, expanded, isLeaf }) => {
-      this.toggleAttribute('is-hidden', !visible);
-      this.toggleAttribute('is-selected', selected);
-      this.toggleAttribute('is-expanded', expanded);
-      this.toggleAttribute('is-leaf', isLeaf);
-    });
+    this.ifNodeDefined(
+      ({ visible, selected, expanded, isLeaf, partiallyVisible }) => {
+        this.toggleAttribute('is-hidden', !visible);
+        this.toggleAttribute('is-selected', selected);
+        this.toggleAttribute('is-expanded', expanded);
+        this.toggleAttribute('is-leaf', isLeaf);
+        this.toggleAttribute('is-partial', partiallyVisible);
+      }
+    );
   }
 
   /**
