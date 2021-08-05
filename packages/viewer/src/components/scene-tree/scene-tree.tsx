@@ -115,8 +115,10 @@ export interface SelectItemOptions extends ViewerSelectItemOptions {
 
 /**
  * @slot header - A slot that places content above the rows in the tree. By
- *  default, a search toolbar will be placed in this slot.
+ *  default, a search toolbar will be placed in this slot. Elements can be
+ *  stacked by assigning multiple elements to this slot.
  * @slot footer - A slot that places content below the rows in the tree.
+ * Elements can be stacked by assigning multiple elements to this slot.
  */
 @Component({
   tag: 'vertex-scene-tree',
