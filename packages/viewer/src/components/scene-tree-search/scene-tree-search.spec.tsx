@@ -68,10 +68,10 @@ describe('vertex-scene-tree-search', () => {
     expect(input).toHaveClass('show');
   });
 
-  it('shows focused state when input has focus', async () => {
+  it('shows textfield background when input has focus', async () => {
     const page = await newSpecPage({
       components: [SceneTreeSearch],
-      html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
+      html: `<vertex-scene-tree-search></vertex-scene-tree-search>`,
     });
 
     const input = page.root?.shadowRoot?.querySelector(
@@ -81,7 +81,20 @@ describe('vertex-scene-tree-search', () => {
 
     await page.waitForChanges();
 
-    expect(input).toHaveClass('focused');
+    expect(input).toHaveClass('background');
+  });
+
+  it('shows textfield background when value is non-empty', async () => {
+    const page = await newSpecPage({
+      components: [SceneTreeSearch],
+      html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
+    });
+
+    const input = page.root?.shadowRoot?.querySelector(
+      '.input'
+    ) as HTMLInputElement;
+
+    expect(input).toHaveClass('background');
   });
 
   it('shows blurred state when input blurs', async () => {

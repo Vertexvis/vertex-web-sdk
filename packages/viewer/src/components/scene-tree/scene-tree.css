@@ -1,4 +1,10 @@
 :host {
+  /**
+   * @prop --scene-tree-toolbar-separator: A CSS border value that specifies the
+   * border between scene tree toolbars.
+   */
+  --scene-tree-toolbar-separator: 1px solid var(--neutral-300);
+
   width: 300px;
   height: 100%;
   user-select: none;
@@ -73,12 +79,20 @@
 }
 
 .search-toolbar,
-slot[name='header']::slotted(vertex-scene-tree-toolbar) {
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+slot[name='header']::slotted(*) {
+  border-bottom: var(--scene-tree-toolbar-separator);
 }
 
-slot[name='footer']::slotted(vertex-scene-tree-toolbar) {
-  border-top-width: 1px;
-  border-top-style: solid;
+slot[name='footer']::slotted(:not(:last-child)) {
+  border-top: var(--scene-tree-toolbar-separator);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
 }

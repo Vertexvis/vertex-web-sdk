@@ -143,7 +143,7 @@ work for an attribute, but not for a property binding.
 ### Camel Cased Properties and Events
 
 The DOM lowercases property names and events that you assign in your templates
-HTML. Bind to a camel cased property or event by separating words with a dash.
+HTML. Bind to a camel-cased property or event by separating words with a dash.
 The binding syntax will convert dash case to camel case for properties and
 events.
 
@@ -180,6 +180,42 @@ replace the header and want search behavior, your header slot should include a
         </vertex-scene-tree-toolbar-group>
       </vertex-scene-tree-toolbar>
 
+      <vertex-scene-tree-toolbar slot="footer">
+        <button slot="before">A</button>
+        <div>Footer Text</div>
+        <button slot="after">A</button>
+      </vertex-scene-tree-toolbar>
+    </vertex-scene-tree>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+  </body>
+</html>
+```
+
+**Example:** Stacking headers and footers.
+
+Pass multiple elements with a slot name of `header` or `footer` to vertically
+stack toolbars.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <!-- Main header toolbar -->
+      <vertex-scene-tree-toolbar slot="header">
+        <vertex-scene-tree-search></vertex-scene-tree-search>
+      </vertex-scene-tree-toolbar>
+      <!-- Secondary header toolbar -->
+      <vertex-scene-tree-toolbar slot="header">
+        <button>A</button>
+        <button>B</button>
+      </vertex-scene-tree-toolbar>
+
+      <!-- Main footer toolbar -->
+      <vertex-scene-tree-toolbar slot="footer">
+        <button>A</button>
+        <button>B</button>
+      </vertex-scene-tree-toolbar>
+      <!-- Secondary footer toolbar -->
       <vertex-scene-tree-toolbar slot="footer">
         <button slot="before">A</button>
         <div>Footer Text</div>
@@ -415,10 +451,17 @@ Type: `Promise<void>`
 
 ## Slots
 
-| Slot       | Description                                                                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------------------------- |
-| `"footer"` | A slot that places content below the rows in the tree.                                                           |
-| `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. |
+| Slot       | Description                                                                                                                                                                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"footer"` | A slot that places content below the rows in the tree. Elements can be stacked by assigning multiple elements to this slot.                                                           |
+| `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
+
+
+## CSS Custom Properties
+
+| Name                             | Description                                                               |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `--scene-tree-toolbar-separator` | A CSS border value that specifies the border between scene tree toolbars. |
 
 
 ## Dependencies
