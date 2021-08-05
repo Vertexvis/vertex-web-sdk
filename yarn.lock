@@ -1831,9 +1831,9 @@
     rollup "^1.19.4"
 
 "@vertexvis/scene-tree-protos@^0.1.0":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.1.tgz#34de747436452d2d8d6c11f06d238dc540f9b7ad"
-  integrity sha512-hio9clK2rmaoQKuBPcprK3bmDp/d9xnZ0M0qv5MR67SvuwnZGzilbTCPckbBr9CRjw2CFtz2HLWos8a3hyxeng==
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.2.tgz#61d6649d128262099e23b36df438a70d985ebc04"
+  integrity sha512-j+3rhyv/vyIozbn9rgAxgkDx37nI1Y3Z3QfP7B3hnuvZpZ8nILKRdprGt+enbyk24qvWJmv8hkHFO23YOvb63A==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"
