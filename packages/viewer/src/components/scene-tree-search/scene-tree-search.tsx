@@ -91,7 +91,9 @@ export class SceneTreeSearch {
           </div>
 
           <input
-            class={classNames('input', { focused: this.focused })}
+            class={classNames('input', {
+              background: this.focused || this.value.length > 0,
+            })}
             type="text"
             ref={(ref) => (this.inputEl = ref)}
             placeholder={this.placeholder}

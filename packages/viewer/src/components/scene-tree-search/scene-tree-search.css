@@ -70,7 +70,7 @@
   width: 100%;
 }
 
-.input.focused {
+.input.background {
   background: var(--scene-tree-search-focused-input-background);
   outline: var(--scene-tree-search-focused-input-outline);
 }
@@ -95,13 +95,13 @@
 }
 
 .icon {
-  pointer-events: none;
-  color: var(--neutral-800);
+  color: var(--neutral-700);
 }
 
 .icon-search {
   position: absolute;
   left: var(--scene-tree-search-search-icon-offset);
+  pointer-events: none;
 }
 
 .clear-btn {
@@ -111,7 +111,9 @@
   pointer-events: initial;
   cursor: pointer;
 }
-
+.clear-btn:hover {
+  color: var(--neutral-800);
+}
 .clear-btn:disabled {
   pointer-events: none;
   opacity: 0.5;
