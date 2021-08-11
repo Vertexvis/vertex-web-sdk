@@ -31,3 +31,6 @@ export const decodePng: DecodePngFn = async (bytes) => {
     return decode(bytes);
   });
 };
+
+// Prefetch the worker and initialize the pool.
+getPool();
