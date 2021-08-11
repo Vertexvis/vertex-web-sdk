@@ -1830,9 +1830,10 @@
   dependencies:
     rollup "^1.19.4"
 
-"@vertexvis/rollup-plugin-web-workers@../../../web-workers/packages/rollup-plugin-web-workers/vertexvis-rollup-plugin-web-workers-0.0.0-4.tgz":
-  version "0.0.0-4"
-  resolved "../../../web-workers/packages/rollup-plugin-web-workers/vertexvis-rollup-plugin-web-workers-0.0.0-4.tgz#3c6aec8bd6f9c7fdcfc6ff9ca42d91e0e797a02c"
+"@vertexvis/rollup-plugin-web-workers@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-web-workers/-/rollup-plugin-web-workers-0.1.0.tgz#53c0981df8127125e3fd3c67ddc0169693efec58"
+  integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
 "@vertexvis/scene-tree-protos@^0.1.0":
   version "0.1.2"
@@ -1844,9 +1845,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/typescript-config-vertexvis/-/typescript-config-vertexvis-1.1.0.tgz#371602ea2ebff0ec3da90a019ea654a1e50736ae"
   integrity sha512-XB8K37u2wSuK1EHxL6haW5jBhdvT5IQ/zcae80NcnZuO85pSRC6Yy4R36Khm77hV0NkZkKMWMKVP9U0OYGe11g==
 
-"@vertexvis/web-workers@../../../web-workers/packages/web-workers/vertexvis-web-workers-0.0.0-0.tgz":
-  version "0.0.0-0"
-  resolved "../../../web-workers/packages/web-workers/vertexvis-web-workers-0.0.0-0.tgz#6fe07994d41effc5d82170ff4584e2c999abb13e"
+"@vertexvis/web-workers@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@vertexvis/web-workers/-/web-workers-0.1.0.tgz#7be9cb65309d913cfe760472551cbeb32a60c139"
+  integrity sha512-X5in1Zh2z6z1V8prVLIUWB9QHrZXCetbaQixgIBRCOo7T7wIgBbj14Ybq6k7dEAqU6DG5O3JMA78/c8ss0dWPA==
 
 JSONStream@^1.0.4:
   version "1.3.5"
