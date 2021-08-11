@@ -1,3 +1,6 @@
-const jestConfig = require('@stencil/core/testing/jest-preset.js');
-
-module.exports = jestConfig;
+module.exports = {
+  preset: '@stencil/core/testing',
+  moduleNameMapper: {
+    '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
+  },
+};

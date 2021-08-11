@@ -1,13 +1,28 @@
 import { Config } from '@stencil/core';
 import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import workers from '@vertexvis/rollup-plugin-web-workers';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import typescript2 from 'rollup-plugin-typescript2';
+import { terser } from 'rollup-plugin-terser';
 
 export const config: Config = {
   namespace: 'viewer',
   nodeResolve: {
     browser: true,
   },
-  plugins: [copyright()],
+  plugins: [
+    copyright(),
+    workers({
+      plugins: [
+        commonjs(),
+        resolve({ browser: true }),
+        typescript2(),
+        terser(),
+      ],
+    }),
+  ],
   globalStyle: 'src/css/global.css',
   outputTargets: [
     reactOutputTarget({
@@ -39,6 +54,9 @@ export const config: Config = {
       },
     },
     roots: ['<rootDir>/src/'],
+    moduleNameMapper: {
+      '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
+    },
   },
   extras: {
     dynamicImportShim: true,

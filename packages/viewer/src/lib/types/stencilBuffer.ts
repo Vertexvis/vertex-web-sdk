@@ -2,8 +2,8 @@ import { Color } from '@vertexvis/utils';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import type { IDecodedPNG } from 'fast-png';
 import { FrameImageLike } from './frame';
-import { loadDecodePngWorker } from '../../workers';
 import { mapStencilBufferOrThrow } from '../mappers';
+import { decodePng } from '../../workers/png-decoder-pool';
 
 /**
  * A color that represents if a pixel does not contain a stencil value.
@@ -60,11 +60,7 @@ export class StencilBufferManager {
         : false;
 
     if (hasStencil && this.viewer.stream != null) {
-      const [res, { decodePng }] = await Promise.all([
-        this.viewer.stream.getStencilBuffer(true),
-        loadDecodePngWorker(),
-      ]);
-
+      const res = await this.viewer.stream.getStencilBuffer(true);
       const {
         stencilBuffer: stencilBytes,
         imageAttributes,

@@ -53,6 +53,7 @@
     "@vertexvis/scene-tree-protos": "^0.1.0",
     "@vertexvis/stream-api": "0.9.27",
     "@vertexvis/utils": "0.9.27",
+    "@vertexvis/web-workers": "^0.1.0",
     "camel-case": "^4.1.2",
     "classnames": "^2.3.1",
     "fast-png": "^5.0.4",
@@ -60,6 +61,7 @@
     "jwt-decode": "^3.1.2",
     "protobufjs": "^6.9.0",
     "requestidlecallback-polyfill": "^1.0.2",
+    "threads": "^1.6.5",
     "tslib": "^2.1.0"
   },
   "devDependencies": {
@@ -71,6 +73,7 @@
     "@types/jsonwebtoken": "^8.5.1",
     "@vertexvis/eslint-config-vertexvis-typescript": "0.4.0",
     "@vertexvis/rollup-plugin-vertexvis-copyright": "0.3.0",
+    "@vertexvis/rollup-plugin-web-workers": "^0.1.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "@vertexwebsdk/build": "0.9.27",
     "chance": "^1.1.7",

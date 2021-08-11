@@ -10,7 +10,7 @@ import * as CrossSectioning from './crossSectioning';
 import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
 import { Orientation } from './orientation';
-import { loadDecodePngWorker } from '../../workers';
+import { decodePng } from '../../workers/png-decoder-pool';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
@@ -35,7 +35,6 @@ export class Frame {
   }
 
   private async decodeDepthBuffer(bytes: Uint8Array): Promise<DepthBuffer> {
-    const { decodePng } = await loadDecodePngWorker();
     const png = await decodePng(bytes);
     return DepthBuffer.fromPng(
       png,
