@@ -1,4 +1,5 @@
 jest.mock('@vertexvis/stream-api');
+jest.mock('../../../workers/png-decoder-pool');
 
 import { Scene } from '../../scenes';
 import { Point } from '@vertexvis/geometry';

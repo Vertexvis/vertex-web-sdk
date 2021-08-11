@@ -54,6 +54,9 @@ export const config: Config = {
       },
     },
     roots: ['<rootDir>/src/'],
+    moduleNameMapper: {
+      '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
+    },
   },
   extras: {
     dynamicImportShim: true,
