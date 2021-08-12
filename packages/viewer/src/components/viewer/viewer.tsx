@@ -188,7 +188,7 @@ export class Viewer {
 
   /**
    * Enables or disables the default rotation interaction being changed to
-   * rotate around the mouse down location.
+   * rotate around the pointer down location.
    */
   @Prop() public rotateAroundTapPoint = false;
 
@@ -719,6 +719,11 @@ export class Viewer {
   @Watch('rotateAroundTapPoint')
   protected handleRotateAboutTapPointChanged(): void {
     this.updateStreamAttributesProp();
+    if (this.rotateAroundTapPoint) {
+      this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
+    } else {
+      this.baseInteractionHandler?.setPrimaryInteractionType('rotate');
+    }
   }
 
   /**

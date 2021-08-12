@@ -378,7 +378,7 @@ export namespace Components {
     ) => Promise<void>;
     resolvedConfig?: Config;
     /**
-     * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
+     * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
      */
     rotateAroundTapPoint: boolean;
     /**
@@ -1083,7 +1083,7 @@ declare namespace LocalJSX {
     onTokenExpired?: (event: CustomEvent<void>) => void;
     resolvedConfig?: Config;
     /**
-     * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
+     * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
      */
     rotateAroundTapPoint?: boolean;
     /**
