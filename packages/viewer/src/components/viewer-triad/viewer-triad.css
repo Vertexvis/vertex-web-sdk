@@ -1,0 +1,92 @@
+:host {
+  /**
+   * @prop --viewer-view-cube-side-background: A CSS background value that
+   * defines the background of a side of the cube.
+   */
+  --viewer-view-cube-side-background: var(--white);
+
+  /**
+    * @prop --viewer-view-cube-side-background-hover: A CSS background value that
+    * defines the background of the hovered side of the cube. Note, the hover
+    * background is rendered on-top of the side's background.
+    */
+  --viewer-view-cube-side-background-hover: var(--blue-500);
+
+  /**
+    * @prop --viewer-view-cube-side-background-hover-opacity: A CSS number that
+    * defines the opacity of the background for a hovered side of the cube.
+    */
+  --viewer-view-cube-side-background-hover-opacity: 0.25;
+
+  /**
+    * @prop --viewer-view-cube-side-border: A CSS border value that defines the
+    * border of each side of the cube.
+    */
+  --viewer-view-cube-side-border: 1px solid var(--neutral-500);
+
+  display: block;
+  color: var(--neutral-700);
+  width: 80px;
+  height: 80px;
+  margin: 20px;
+  background-color: yellow;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.renderer {
+  position: unset;
+  width: 80px;
+  height: 80px;
+  overflow: visible;
+}
+
+.reference-point {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: black;
+}
+
+.label {
+  font-size: 0.6875rem;
+}
+.label-x {
+  color: red;
+}
+.label-y {
+  color: green;
+}
+.label-z {
+  color: blue;
+}
+
+.axis {
+  width: 100%;
+  height: 1.3px;
+  transform: translateX(50%);
+}
+.axis-x {
+  background-color: red;
+}
+.axis-y {
+  background-color: green;
+}
+.axis-z {
+  background-color: blue;
+}
+
+.cube-side {
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  width: 100%;
+  height: 100%;
+  background-color: var(--viewer-view-cube-side-background);
+  border: var(--viewer-view-cube-side-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
