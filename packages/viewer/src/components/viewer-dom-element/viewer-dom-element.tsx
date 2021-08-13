@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/member-ordering */
+
 import {
   Component,
   Event,
@@ -7,7 +9,7 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
+import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
 /**
  * The `ViewerDomElement` is responsible for managing a
@@ -22,35 +24,133 @@ import { Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
 })
 export class ViewerDomElement {
   /**
-   * The 3D position where this element is located. Can either be an instance of
-   * a `Vector3` or a JSON string representation in the format of `[x, y, z]` or
-   * `{"x": 0, "y": 0, "z": 0}`.
+   * The local 3D position of where this element is located.
    */
-  @Prop()
-  public position: Vector3.Vector3 | string = Vector3.origin();
+  @Prop({ mutable: true, attribute: null })
+  public position: Vector3.Vector3 = Vector3.origin();
 
   /**
-   * The rotation of this this element, represented as a `Quaternion`, `Euler`
-   * or a JSON string representation in one of the following formats:
-   *
-   * * `[x, y, z, w]`
-   * * `{"x": 0, "y": 0, "z": 0, "w": 0}`
-   * * `[x, y, z, order]`
-   * * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+   * @ignore
    */
-  @Prop()
-  public rotation:
-    | Quaternion.Quaternion
-    | Euler.Euler
-    | string = Quaternion.create();
+  @Watch('position')
+  protected handlePositionChange(): void {
+    this.syncMatrix();
+    this.dispatchPropertyChange();
+  }
 
   /**
-   * The scale of this element. Can either be an instance of a `Vector3` or a
-   * JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y":
+   * The local 3D position of where this element is located, as a JSON string.
+   * JSON representation can either be in the format of `[x, y, z]` or `{"x": 0,
+   * "y": 0, "z": 0}`.
+   */
+  @Prop({ attribute: 'position' })
+  public positionJson = '';
+
+  /**
+   * @ignore
+   */
+  @Watch('positionJson')
+  protected handlePositionJsonChanged(): void {
+    this.syncPosition();
+  }
+
+  /**
+   * The local rotation of this element in Euler angles.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public rotation?: Euler.Euler;
+
+  /**
+   * @ignore
+   */
+  @Watch('rotation')
+  protected handleRotationChanged(): void {
+    this.syncQuaternionWithRotation();
+  }
+
+  /**
+   * The local rotation of this element in Euler angles, as a JSON string. JSON
+   * representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z":
+   * 0, "order": "xyz"}`.
+   */
+  @Prop({ attribute: 'rotation' })
+  public rotationJson?: string;
+
+  /**
+   * @ignore
+   */
+  @Watch('rotationJson')
+  protected handleRotationJsonChanged(): void {
+    this.syncRotation();
+  }
+
+  /**
+   * The local rotation of this element.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public quaternion: Quaternion.Quaternion = Quaternion.create();
+
+  /**
+   * @ignore
+   */
+  @Watch('quaternion')
+  protected handleQuaternionChange(): void {
+    this.syncMatrix();
+    this.dispatchPropertyChange();
+  }
+
+  /**
+   * The local rotation of this element, as a JSON string. JSON
+   * representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z":
+   * 0, "w": 1}`.
+   */
+  @Prop({ attribute: 'quaternion' })
+  public quaternionJson = '';
+
+  /**
+   * @ignore
+   */
+  @Watch('quaternionJson')
+  protected handleQuaternionJsonChanged(): void {
+    this.syncQuaternion();
+  }
+
+  /**
+   * The local scale of this element.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public scale: Vector3.Vector3 = Vector3.create(1, 1, 1);
+
+  /**
+   * @ignore
+   */
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    this.syncMatrix();
+    this.dispatchPropertyChange();
+  }
+
+  /**
+   * The local scale of this element, as a JSON string. JSON string
+   * representation can either be in the format of `[x, y, z]` or `{"x": 0, "y":
    * 0, "z": 0}`.
    */
-  @Prop()
-  public scale: Vector3.Vector3 | string = Vector3.create(1, 1, 1);
+  @Prop({ attribute: 'scale' })
+  public scaleJson = '';
+
+  /**
+   * @ignore
+   */
+  @Watch('scaleJson')
+  protected handleScaleJsonChanged(): void {
+    this.syncScale();
+  }
+
+  /**
+   * The local matrix of this element.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public matrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
   /**
    * Disables occlusion testing for this element. Defaults to enabled. When
@@ -89,45 +189,89 @@ export class ViewerDomElement {
   /**
    * An event that's emitted when a property of this component changes.
    */
-  @Event()
+  @Event({ bubbles: true })
   public propertyChange!: EventEmitter<void>;
+
+  protected componentWillLoad(): void {
+    this.syncProperties();
+  }
+
+  private syncProperties(): void {
+    this.syncPosition();
+    this.syncRotation();
+    this.syncQuaternion();
+    this.syncScale();
+    this.syncMatrix();
+  }
+
+  private syncPosition(): void {
+    this.position =
+      this.positionJson.length > 0
+        ? this.parseJson('positionJson', this.positionJson, Vector3.fromJson)
+        : this.position;
+  }
+
+  private syncRotation(): void {
+    this.rotation =
+      this.rotationJson != null && this.rotationJson.length > 0
+        ? this.parseJson('rotationJson', this.rotationJson, Euler.fromJson)
+        : this.rotation;
+    this.syncQuaternionWithRotation();
+  }
+
+  private syncQuaternionWithRotation(): void {
+    this.quaternion =
+      this.rotation != null
+        ? Quaternion.fromEuler(this.rotation)
+        : this.quaternion;
+  }
+
+  private syncQuaternion(): void {
+    this.quaternion =
+      this.quaternionJson.length > 0
+        ? this.parseJson(
+            'quaternionJson',
+            this.quaternionJson,
+            Quaternion.fromJson
+          )
+        : this.quaternion;
+  }
+
+  private syncScale(): void {
+    this.scale =
+      this.scaleJson.length > 0
+        ? this.parseJson('scaleJson', this.scaleJson, Vector3.fromJson)
+        : this.scale;
+  }
+
+  private syncMatrix(): void {
+    this.matrix = Matrix4.makeTRS(this.position, this.quaternion, this.scale);
+  }
+
+  private parseJson<T>(
+    propName: string,
+    value: string,
+    parse: (str: string) => T
+  ): T {
+    try {
+      return parse(value);
+    } catch (e) {
+      console.warn(`Could not parse \`${propName}\`. Invalid JSON.`);
+    }
+  }
+
+  private dispatchPropertyChange(): void {
+    this.propertyChange.emit();
+  }
 
   /**
    * @ignore
    */
-  public render(): h.JSX.IntrinsicElements {
+  protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
         <slot></slot>
       </Host>
     );
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('position')
-  protected handlePositionChange(): void {
-    this.dispatchPropertyChange();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('rotation')
-  protected handleRotationChange(): void {
-    this.dispatchPropertyChange();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('scale')
-  protected handleScaleChange(): void {
-    this.dispatchPropertyChange();
-  }
-
-  private dispatchPropertyChange(): void {
-    this.propertyChange.emit();
   }
 }

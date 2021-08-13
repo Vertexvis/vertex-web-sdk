@@ -439,6 +439,10 @@ export namespace Components {
      */
     billboardOff: boolean;
     /**
+     * The local matrix of this element.
+     */
+    matrix: Matrix4.Matrix4;
+    /**
      * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
      * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
      */
@@ -448,17 +452,37 @@ export namespace Components {
      */
     occlusionOff: boolean;
     /**
-     * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The local 3D position of where this element is located.
      */
-    position: Vector3.Vector3 | string;
+    position: Vector3.Vector3;
     /**
-     * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+     * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
-    rotation: Quaternion.Quaternion | Euler.Euler | string;
+    positionJson: string;
     /**
-     * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The local rotation of this element.
      */
-    scale: Vector3.Vector3 | string;
+    quaternion: Quaternion.Quaternion;
+    /**
+     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     */
+    quaternionJson: string;
+    /**
+     * The local rotation of this element in Euler angles.
+     */
+    rotation?: Euler.Euler;
+    /**
+     * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+     */
+    rotationJson?: string;
+    /**
+     * The local scale of this element.
+     */
+    scale: Vector3.Vector3;
+    /**
+     * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    scaleJson: string;
   }
   interface VertexViewerDomRenderer {
     /**
@@ -1136,6 +1160,10 @@ declare namespace LocalJSX {
      */
     billboardOff?: boolean;
     /**
+     * The local matrix of this element.
+     */
+    matrix?: Matrix4.Matrix4;
+    /**
      * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
      * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
      */
@@ -1149,17 +1177,37 @@ declare namespace LocalJSX {
      */
     onPropertyChange?: (event: CustomEvent<void>) => void;
     /**
-     * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The local 3D position of where this element is located.
      */
-    position?: Vector3.Vector3 | string;
+    position?: Vector3.Vector3;
     /**
-     * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+     * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
-    rotation?: Quaternion.Quaternion | Euler.Euler | string;
+    positionJson?: string;
     /**
-     * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The local rotation of this element.
      */
-    scale?: Vector3.Vector3 | string;
+    quaternion?: Quaternion.Quaternion;
+    /**
+     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     */
+    quaternionJson?: string;
+    /**
+     * The local rotation of this element in Euler angles.
+     */
+    rotation?: Euler.Euler;
+    /**
+     * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+     */
+    rotationJson?: string;
+    /**
+     * The local scale of this element.
+     */
+    scale?: Vector3.Vector3;
+    /**
+     * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    scaleJson?: string;
   }
   interface VertexViewerDomRenderer {
     /**
