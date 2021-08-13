@@ -6,19 +6,20 @@ import { FramePerspectiveCamera } from '../../lib/types/frame';
 import { parseDomElement } from './renderer-element';
 
 interface Props {
-  camera: FramePerspectiveCamera;
+  viewMatrix: Matrix4.Matrix4;
+  projectionMatrix: Matrix4.Matrix4;
   viewport: Viewport;
 }
 
 export const Renderer3d: FunctionalComponent<Props> = (
-  { camera, viewport },
+  { projectionMatrix, viewMatrix, viewport },
   children
 ) => {
-  const pMatrix = Matrix4.toObject(camera.projectionMatrix);
+  const pMatrix = Matrix4.toObject(projectionMatrix);
   const fovY = pMatrix.m22 * (viewport.height / 2);
   const cameraTransform = [
     `translateZ(${fovY}px)`,
-    getCameraCssMatrix(camera.viewMatrix),
+    getCameraCssMatrix(viewMatrix),
     `translate(${viewport.width / 2}px, ${viewport.height / 2}px)`,
   ].join(' ');
 
@@ -34,7 +35,7 @@ export const Renderer3d: FunctionalComponent<Props> = (
 export function update3d(
   hostEl: HTMLElement,
   viewport: Viewport,
-  camera: FramePerspectiveCamera,
+  viewMatrix: Matrix4.Matrix4,
   depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < hostEl.children.length; i++) {
@@ -43,7 +44,7 @@ export function update3d(
       updateElement(
         el as HTMLVertexViewerDomElementElement,
         viewport,
-        camera,
+        viewMatrix,
         depthBuffer
       );
     }
@@ -53,7 +54,7 @@ export function update3d(
 function updateElement(
   element: HTMLVertexViewerDomElementElement,
   viewport: Viewport,
-  camera: FramePerspectiveCamera,
+  viewMatrix: Matrix4.Matrix4,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const { position, quaternion, scale } = parseDomElement(element);
@@ -68,7 +69,7 @@ function updateElement(
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(matrixWorld);
   } else {
-    let m = camera.viewMatrix;
+    let m = viewMatrix;
     m = Matrix4.transpose(m);
     m = Matrix4.position(m, matrixWorld);
     m = Matrix4.scale(m, scale);

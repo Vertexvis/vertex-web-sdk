@@ -12,6 +12,7 @@ import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FramePerspectiveCamera } from '../../lib/types/frame';
+import { Matrix4 } from '@vertexvis/geometry';
 
 export type ViewerDomRendererDrawMode = '2d' | '3d';
 
@@ -49,8 +50,14 @@ export class ViewerDomRenderer {
    * This property will automatically be set when supplying a viewer to the
    * component, or when added as a child to `<vertex-viewer>`.
    */
+  // @Prop({ mutable: true })
+  // public camera?: FramePerspectiveCamera;
+
   @Prop({ mutable: true })
-  public camera?: FramePerspectiveCamera;
+  public viewMatrix?: Matrix4.Matrix4;
+
+  @Prop({ mutable: true })
+  public projectionMatrix?: Matrix4.Matrix4;
 
   /**
    * The current depth buffer of the frame.
@@ -85,7 +92,7 @@ export class ViewerDomRenderer {
    * @ignore
    */
   public render(): h.JSX.IntrinsicElements {
-    if (this.camera != null) {
+    if (this.viewMatrix != null && this.projectionMatrix != null) {
       if (this.drawMode === '2d') {
         return (
           <Host>
@@ -97,7 +104,11 @@ export class ViewerDomRenderer {
       } else {
         return (
           <Host>
-            <Renderer3d camera={this.camera} viewport={this.viewport}>
+            <Renderer3d
+              projectionMatrix={this.projectionMatrix}
+              viewMatrix={this.viewMatrix}
+              viewport={this.viewport}
+            >
               <slot></slot>
             </Renderer3d>
           </Host>
@@ -140,13 +151,19 @@ export class ViewerDomRenderer {
   }
 
   private async updateElements(): Promise<void> {
-    const { viewport, camera } = this;
+    const { viewport, viewMatrix, projectionMatrix } = this;
 
-    if (camera != null) {
+    if (viewMatrix != null && projectionMatrix != null) {
       if (this.drawMode === '3d') {
-        update3d(this.hostEl, viewport, camera, this.depthBuffer);
+        update3d(this.hostEl, viewport, viewMatrix, this.depthBuffer);
       } else {
-        update2d(this.hostEl, viewport, camera, this.depthBuffer);
+        update2d(
+          this.hostEl,
+          viewport,
+          projectionMatrix,
+          viewMatrix,
+          this.depthBuffer
+        );
       }
     }
   }
@@ -172,6 +189,8 @@ export class ViewerDomRenderer {
       streamAttributes.depthBuffers.frameType === 'all'
         ? await frame?.depthBuffer()
         : undefined;
-    this.camera = frame?.scene?.camera;
+    // this.camera = frame?.scene?.camera;
+    this.projectionMatrix = frame?.scene.camera.projectionMatrix;
+    this.viewMatrix = frame?.scene.camera.viewMatrix;
   }
 }
