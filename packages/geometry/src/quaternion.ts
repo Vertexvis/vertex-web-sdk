@@ -1,6 +1,7 @@
 import * as Matrix4 from './matrix4';
 import * as Vector3 from './vector3';
 import * as Euler from './euler';
+import { Quaternion } from '.';
 
 /**
  * A type that represents a
@@ -183,6 +184,17 @@ export function fromEuler(euler: Euler.Euler): Quaternion {
   }
 
   return { x, y, z, w };
+}
+
+export function multiply(a: Quaternion, b: Quaternion): Quaternion {
+  // http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+
+  return Quaternion.create({
+    x: a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y,
+    y: a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z,
+    z: a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x,
+    w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+  });
 }
 
 /**

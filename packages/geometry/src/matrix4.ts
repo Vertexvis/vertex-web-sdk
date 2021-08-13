@@ -426,6 +426,32 @@ export function makeLookAt(
   /* eslint-enable prettier/prettier */
 }
 
+export function makeOrthographic(
+  left: number,
+  right: number,
+  bottom: number,
+  top: number,
+  near: number,
+  far: number
+): Matrix4 {
+  const w = right - left;
+  const h = top - bottom;
+  const p = far - near;
+
+  const tx = -(right + left) / w;
+  const ty = -(top + bottom) / h;
+  const tz = -(far + near) / p;
+
+  /* eslint-disable prettier/prettier */
+  return [
+    2 / w,  0,      0,       0,
+    0,      2 / h,  0,       0,
+    0,      0,      -2 / p,  0,
+    tx,     ty,     tz,      1
+  ]
+  /* eslint-enable prettier/prettier */
+}
+
 /**
  * Returns the inverse of the given matrix. If the determinate of the matrix is
  * zero, then a zero matrix is returned.
