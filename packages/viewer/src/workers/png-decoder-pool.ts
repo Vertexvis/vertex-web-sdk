@@ -15,7 +15,7 @@ function loadWorkerModule(): Promise<DecodePngModule> {
 }
 
 async function getPool(): Promise<DecodePngPool> {
-  if (poolLoader == null) {
+  if (poolLoader == null && window != null) {
     poolLoader = loadWorkerModule().then(({ spawnPool }) =>
       spawnPool({
         size: Math.ceil(window.navigator.hardwareConcurrency / 4),
