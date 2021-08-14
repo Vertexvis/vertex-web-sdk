@@ -15,7 +15,7 @@ function loadWorkerModule(): Promise<DecodePngModule> {
 }
 
 async function getPool(): Promise<DecodePngPool> {
-  if (poolLoader == null && window != null) {
+  if (poolLoader == null) {
     poolLoader = loadWorkerModule().then(({ spawnPool }) =>
       spawnPool({
         size: Math.ceil(window.navigator.hardwareConcurrency / 4),
@@ -33,4 +33,6 @@ export const decodePng: DecodePngFn = async (bytes) => {
 };
 
 // Prefetch the worker and initialize the pool.
-getPool();
+if (window != null) {
+  getPool();
+}
