@@ -484,6 +484,44 @@ export namespace Components {
      */
     scaleJson: string;
   }
+  interface VertexViewerDomGroup {
+    /**
+     * The local matrix of this element.
+     */
+    matrix: Matrix4.Matrix4;
+    /**
+     * The local 3D position of where this element is located.
+     */
+    position: Vector3.Vector3;
+    /**
+     * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    positionJson: string;
+    /**
+     * The local rotation of this element.
+     */
+    quaternion: Quaternion.Quaternion;
+    /**
+     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     */
+    quaternionJson: string;
+    /**
+     * The local rotation of this element in Euler angles.
+     */
+    rotation?: Euler.Euler;
+    /**
+     * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+     */
+    rotationJson?: string;
+    /**
+     * The local scale of this element.
+     */
+    scale: Vector3.Vector3;
+    /**
+     * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    scaleJson: string;
+  }
   interface VertexViewerDomRenderer {
     /**
      * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
@@ -838,6 +876,13 @@ declare global {
     prototype: HTMLVertexViewerDomElementElement;
     new (): HTMLVertexViewerDomElementElement;
   };
+  interface HTMLVertexViewerDomGroupElement
+    extends Components.VertexViewerDomGroup,
+      HTMLStencilElement {}
+  var HTMLVertexViewerDomGroupElement: {
+    prototype: HTMLVertexViewerDomGroupElement;
+    new (): HTMLVertexViewerDomGroupElement;
+  };
   interface HTMLVertexViewerDomRendererElement
     extends Components.VertexViewerDomRenderer,
       HTMLStencilElement {}
@@ -918,6 +963,7 @@ declare global {
     'vertex-viewer-button': HTMLVertexViewerButtonElement;
     'vertex-viewer-default-toolbar': HTMLVertexViewerDefaultToolbarElement;
     'vertex-viewer-dom-element': HTMLVertexViewerDomElementElement;
+    'vertex-viewer-dom-group': HTMLVertexViewerDomGroupElement;
     'vertex-viewer-dom-renderer': HTMLVertexViewerDomRendererElement;
     'vertex-viewer-icon': HTMLVertexViewerIconElement;
     'vertex-viewer-layer': HTMLVertexViewerLayerElement;
@@ -1172,6 +1218,48 @@ declare namespace LocalJSX {
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
      */
     occlusionOff?: boolean;
+    /**
+     * An event that's emitted when a property of this component changes.
+     */
+    onPropertyChange?: (event: CustomEvent<void>) => void;
+    /**
+     * The local 3D position of where this element is located.
+     */
+    position?: Vector3.Vector3;
+    /**
+     * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    positionJson?: string;
+    /**
+     * The local rotation of this element.
+     */
+    quaternion?: Quaternion.Quaternion;
+    /**
+     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     */
+    quaternionJson?: string;
+    /**
+     * The local rotation of this element in Euler angles.
+     */
+    rotation?: Euler.Euler;
+    /**
+     * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+     */
+    rotationJson?: string;
+    /**
+     * The local scale of this element.
+     */
+    scale?: Vector3.Vector3;
+    /**
+     * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     */
+    scaleJson?: string;
+  }
+  interface VertexViewerDomGroup {
+    /**
+     * The local matrix of this element.
+     */
+    matrix?: Matrix4.Matrix4;
     /**
      * An event that's emitted when a property of this component changes.
      */
@@ -1493,6 +1581,7 @@ declare namespace LocalJSX {
     'vertex-viewer-button': VertexViewerButton;
     'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
     'vertex-viewer-dom-element': VertexViewerDomElement;
+    'vertex-viewer-dom-group': VertexViewerDomGroup;
     'vertex-viewer-dom-renderer': VertexViewerDomRenderer;
     'vertex-viewer-icon': VertexViewerIcon;
     'vertex-viewer-layer': VertexViewerLayer;
@@ -1527,6 +1616,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
       'vertex-viewer-dom-element': LocalJSX.VertexViewerDomElement &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
+      'vertex-viewer-dom-group': LocalJSX.VertexViewerDomGroup &
+        JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
       'vertex-viewer-dom-renderer': LocalJSX.VertexViewerDomRenderer &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
       'vertex-viewer-icon': LocalJSX.VertexViewerIcon &

@@ -8,6 +8,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+import { Matrix4 } from '@vertexvis/geometry';
 import { update3d, Renderer3d } from './renderer3d';
 import { Renderer2d, update2d } from './renderer2d';
 import { DepthBuffer, Viewport } from '../../lib/types';
@@ -141,12 +142,13 @@ export class ViewerDomRenderer {
 
   private async updateElements(): Promise<void> {
     const { viewport, camera } = this;
+    const worldMatrix = Matrix4.makeIdentity();
 
     if (camera != null) {
       if (this.drawMode === '3d') {
-        update3d(this.hostEl, viewport, camera, this.depthBuffer);
+        update3d(this.hostEl, worldMatrix, viewport, camera, this.depthBuffer);
       } else {
-        update2d(this.hostEl, viewport, camera, this.depthBuffer);
+        update2d(this.hostEl, worldMatrix, viewport, camera, this.depthBuffer);
       }
     }
   }

@@ -110,6 +110,43 @@ is a helper library for common 3D math operations.
 </html>
 ```
 
+## Grouping and Hierarchies
+
+Use the `<vertex-viewer-dom-group>` to create groupings and hierarchies of
+elements. This is useful for sharing positioning, rotating, and scaling for a
+group of elements.
+
+**Example:** Positioning a group of elements.
+
+```html
+<html>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+      <vertex-viewer-dom-renderer>
+        <vertex-viewer-dom-group position="[500, 0, 0]" scale="[0.5, 0.5, 0.5]">
+          <!-- Pin 1 -->
+          <vertex-viewer-dom-element position="[0, 100, 0]" rotation="[90, 180, 0]">
+            <div class="pin">1</div>
+          </vertex-viewer-dom-element>
+
+          <vertex-viewer-dom-group position="[0, 500, 0]" rotation="[90, 180, 0]">
+            <!-- Pin 2 -->
+            <vertex-viewer-dom-element position="[0, 100, 0]">
+              <div class="pin">2</div>
+            </vertex-viewer-dom-element>
+
+            <!-- Pin 3 -->
+            <vertex-viewer-dom-element position="[0, 0, 100]">
+              <div class="pin">3</div>
+            </vertex-viewer-dom-element>
+          </vertex-viewer-dom-group>
+        </vertex-viewer-dom-group>
+      </vertex-viewer-dom-renderer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
 ## Billboarding
 
 When using a 3D draw mode, elements will always be reoriented towards the

@@ -3,7 +3,8 @@ import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FramePerspectiveCamera } from '../../lib/types/frame';
-import { parseDomElement } from './renderer-element';
+import { isVertexViewerDomGroup } from '../viewer-dom-group/utils';
+import { isVertexViewerDomElement } from '../viewer-dom-element/utils';
 
 interface Props {
   camera: FramePerspectiveCamera;
@@ -32,46 +33,49 @@ export const Renderer3d: FunctionalComponent<Props> = (
 };
 
 export function update3d(
-  hostEl: HTMLElement,
+  element: HTMLElement,
+  parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FramePerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
-  for (let i = 0; i < hostEl.children.length; i++) {
-    const el = hostEl.children[i];
-    if (el.nodeName === 'VERTEX-VIEWER-DOM-ELEMENT') {
+  for (let i = 0; i < element.children.length; i++) {
+    const el = element.children[i];
+    if (isVertexViewerDomElement(el)) {
       updateElement(
         el as HTMLVertexViewerDomElementElement,
+        parentWorldMatrix,
         viewport,
         camera,
         depthBuffer
       );
+    } else if (isVertexViewerDomGroup(el)) {
+      updateGroup(el, parentWorldMatrix, viewport, camera, depthBuffer);
     }
   }
 }
 
 function updateElement(
   element: HTMLVertexViewerDomElementElement,
+  parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FramePerspectiveCamera,
   depthBuffer: DepthBuffer | undefined
 ): void {
-  const { position, quaternion, scale } = parseDomElement(element);
+  const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
 
-  const matrixWorld = Matrix4.makeTRS(position, quaternion, scale);
-  const positionWorld = Vector3.fromMatrixPosition(matrixWorld);
-
+  const positionWorld = Vector3.fromMatrixPosition(worldMatrix);
   const occluded =
     !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
   element.occluded = occluded ?? false;
 
   if (element.billboardOff) {
-    element.style.transform = getElementCssMatrix(matrixWorld);
+    element.style.transform = getElementCssMatrix(worldMatrix);
   } else {
     let m = camera.viewMatrix;
     m = Matrix4.transpose(m);
-    m = Matrix4.position(m, matrixWorld);
-    m = Matrix4.scale(m, scale);
+    m = Matrix4.position(m, worldMatrix);
+    m = Matrix4.scale(m, element.scale);
 
     m[3] = 0;
     m[7] = 0;
@@ -80,6 +84,19 @@ function updateElement(
 
     element.style.transform = getElementCssMatrix(m);
   }
+
+  update3d(element, worldMatrix, viewport, camera, depthBuffer);
+}
+
+function updateGroup(
+  element: HTMLVertexViewerDomGroupElement,
+  parentWorldMatrix: Matrix4.Matrix4,
+  viewport: Viewport,
+  camera: FramePerspectiveCamera,
+  depthBuffer: DepthBuffer | undefined
+): void {
+  const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
+  update3d(element, worldMatrix, viewport, camera, depthBuffer);
 }
 
 function getCameraCssMatrix(viewMatrix: Matrix4.Matrix4): string {

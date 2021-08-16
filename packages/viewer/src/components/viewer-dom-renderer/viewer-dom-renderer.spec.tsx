@@ -13,6 +13,7 @@ import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
 import { createDepthImageBytes } from '../../testing/fixtures';
 
 import '../../testing/domMocks';
+import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
 
 describe('<vertex-viewer-dom-renderer>', () => {
   const camera = FramePerspectiveCamera.fromBoundingBox(
@@ -38,10 +39,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
   describe('2d draw mode', () => {
     it('positions children using matrix3d', async () => {
       const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
+        components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer drawMode="2d" camera={camera}>
-            <vertex-viewer-dom-element></vertex-viewer-dom-element>
+            <vertex-viewer-dom-group>
+              <vertex-viewer-dom-element />
+            </vertex-viewer-dom-group>
           </vertex-viewer-dom-renderer>
         ),
       });
@@ -125,10 +128,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
   describe('3d draw mode', () => {
     it('positions children using matrix3d', async () => {
       const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
+        components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
-            <vertex-viewer-dom-element></vertex-viewer-dom-element>
+            <vertex-viewer-dom-group>
+              <vertex-viewer-dom-element />
+            </vertex-viewer-dom-group>
           </vertex-viewer-dom-renderer>
         ),
       });
@@ -226,72 +231,6 @@ describe('<vertex-viewer-dom-renderer>', () => {
         'vertex-viewer-dom-element'
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
-    });
-  });
-
-  describe('attribute parsing', () => {
-    it('parses position as array', async () => {
-      const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
-        template: () => (
-          <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
-            <vertex-viewer-dom-element position="[0, 0, 0]"></vertex-viewer-dom-element>
-          </vertex-viewer-dom-renderer>
-        ),
-      });
-
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
-      expect(el.style.transform).toContain('matrix3d');
-    });
-
-    it('parses euler rotation as array', async () => {
-      const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
-        template: () => (
-          <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
-            <vertex-viewer-dom-element rotation="[0, 0, 0]"></vertex-viewer-dom-element>
-          </vertex-viewer-dom-renderer>
-        ),
-      });
-
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
-      expect(el.style.transform).toContain('matrix3d');
-    });
-
-    it('parses quaternion rotation as array', async () => {
-      const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
-        template: () => (
-          <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
-            <vertex-viewer-dom-element rotation="[0, 0, 0, 1]"></vertex-viewer-dom-element>
-          </vertex-viewer-dom-renderer>
-        ),
-      });
-
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
-      expect(el.style.transform).toContain('matrix3d');
-    });
-
-    it('parses scale as array', async () => {
-      const page = await newSpecPage({
-        components: [ViewerDomRenderer, ViewerDomElement],
-        template: () => (
-          <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
-            <vertex-viewer-dom-element scale="[1, 1, 1]"></vertex-viewer-dom-element>
-          </vertex-viewer-dom-renderer>
-        ),
-      });
-
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
-      expect(el.style.transform).toContain('matrix3d');
     });
   });
 });
