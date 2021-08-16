@@ -188,16 +188,6 @@ export class SceneTree {
   @Prop()
   public configEnv: Environment = 'platprod';
 
-  /**
-   * Disables the default selection behavior of the tree. Can be used to
-   * implement custom selection behavior via the trees selection methods.
-   *
-   * @see SceneTree.selectItem
-   * @see SceneTree.deselectItem
-   */
-  @Prop()
-  public selectionDisabled = false;
-
   @Prop({ mutable: true })
   public controller?: SceneTreeController;
 
