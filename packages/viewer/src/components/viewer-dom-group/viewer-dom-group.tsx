@@ -2,28 +2,22 @@
 
 import {
   Component,
+  Host,
+  h,
+  Watch,
+  Prop,
   Event,
   EventEmitter,
-  h,
-  Host,
-  Prop,
-  Watch,
 } from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
-/**
- * The `ViewerDomElement` is responsible for managing a
- * `<vertex-viewer-dom-element>` element. These elements are intended to be
- * added as children to a `<vertex-viewer-dom-renderer>` and represent an
- * individual DOM element within a local 3D scene.
- */
 @Component({
-  tag: 'vertex-viewer-dom-element',
-  styleUrl: 'viewer-dom-element.css',
+  tag: 'vertex-viewer-dom-group',
+  styleUrl: 'viewer-dom-group.css',
   shadow: true,
 })
-export class ViewerDomElement implements HTMLDomRendererPositionableElement {
+export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   /**
    * The local 3D position of where this element is located.
    */
@@ -154,40 +148,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public matrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
   /**
-   * Disables occlusion testing for this element. Defaults to enabled. When
-   * enabled, the elements position will be tested against the current depth
-   * buffer. If the position is occluded, then the `occluded` attribute will be
-   * set.
-   */
-  @Prop()
-  public occlusionOff = false;
-
-  /**
-   * Indicates if the element is hidden by geometry. This property can be used
-   * with a CSS selector to modify the appearance of the element when its
-   * occluded.
-   *
-   * @example
-   *
-   * ```html
-   * <style>
-   *   vertex-viewer-dom-element[occluded] {
-   *     opacity: 0;
-   *   }
-   * </style>
-   * ```
-   */
-  @Prop({ reflect: true })
-  public occluded = false;
-
-  /**
-   * Disables the billboarding behavior of the element. When billboarding is
-   * enabled, the element will always be oriented towards the screen.
-   */
-  @Prop()
-  public billboardOff = false;
-
-  /**
    * An event that's emitted when a property of this component changes.
    */
   @Event({ bubbles: true })
@@ -266,10 +226,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
     this.propertyChange.emit();
   }
 
-  /**
-   * @ignore
-   */
-  protected render(): h.JSX.IntrinsicElements {
+  public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
         <slot></slot>

@@ -67,19 +67,6 @@ export class Viewport implements Dimensions.Dimensions {
   }
 
   /**
-   * @deprecated
-   *
-   * Transforms a normalized device coordinate to a 2D point within the
-   * viewport.
-   *
-   * @param ndc A 3D point in NDC.
-   * @returns A 2D point in the coordinate space of the viewport.
-   */
-  public transformNdc(ndc: Vector3.Vector3): Point.Point {
-    return this.transformVectorToViewport(ndc);
-  }
-
-  /**
    * Transforms a normalized device coordinate to a 2D point within the
    * viewport.
    *
