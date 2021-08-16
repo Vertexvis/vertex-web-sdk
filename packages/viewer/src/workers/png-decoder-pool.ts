@@ -33,6 +33,6 @@ export const decodePng: DecodePngFn = async (bytes) => {
 };
 
 // Prefetch the worker and initialize the pool.
-if (window != null) {
+if (typeof window !== 'undefined') {
   getPool();
 }
