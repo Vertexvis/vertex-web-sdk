@@ -4,8 +4,8 @@ The `<vertex-viewer-dom-element>` is an element that specifies the 3D position,
 rotation, and scale of a DOM element. They're expected to be added as children
 to a `<vertex-viewer-dom-renderer>`.
 
-**Note:** This element cannot contain other `<vertex-viewer-dom-element>`. If
-Use [`<vertex-viewer-dom-group>`](../viewer-dom-group/readme.md) for representing
+**Note:** This element cannot contain other `<vertex-viewer-dom-element>`. Use
+[`<vertex-viewer-dom-group>`](../viewer-dom-group/readme.md) for representing
 element hierarchies.
 
 See [`<vertex-viewer-dom-renderer>`](../viewer-dom-renderer/readme.md) for more
