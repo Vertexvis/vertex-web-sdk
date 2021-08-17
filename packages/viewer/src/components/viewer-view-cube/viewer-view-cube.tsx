@@ -1,30 +1,20 @@
-import { Component, h, Prop, State, Watch } from '@stencil/core';
-import { Matrix4 } from '@vertexvis/geometry';
-import classNames from 'classnames';
-import { Orientation, StandardView } from '../../lib/types';
+/* eslint-disable @typescript-eslint/member-ordering */
+
+import { Component, Host, h, State, Prop, Watch } from '@stencil/core';
+import { Vector3 } from '@vertexvis/geometry';
+import { readDOM } from '../../lib/stencil';
 import {
-  ViewerViewCubeBackRightEdge,
-  ViewerViewCubeBackLeftEdge,
-  ViewerViewCubeBottomBackEdge,
-  ViewerViewCubeBottomBackRightEdge,
-  ViewerViewCubeBottomBackLeftEdge,
-  ViewerViewCubeBottomFrontEdge,
-  ViewerViewCubeBottomFrontRightEdge,
-  ViewerViewCubeBottomFrontLeftEdge,
-  ViewerViewCubeBottomRightEdge,
-  ViewerViewCubeBottomLeftEdge,
-  ViewerViewCubeFrontRightEdge,
-  ViewerViewCubeFrontLeftEdge,
-  ViewerViewCubeTopBackEdge,
-  ViewerViewCubeTopBackRightEdge,
-  ViewerViewCubeTopBackLeftEdge,
-  ViewerViewCubeTopFrontEdge,
-  ViewerViewCubeTopFrontRightEdge,
-  ViewerViewCubeTopFrontLeftEdge,
-  ViewerViewCubeTopRightEdge,
-  ViewerViewCubeTopLeftEdge,
-} from './viewer-view-cube-edges';
-import { ViewerViewCubeSide } from './viewer-view-cube-sides';
+  FramePerspectiveCamera,
+  Orientation,
+  StandardView,
+} from '../../lib/types';
+import {
+  TriadAxis,
+  ViewCubeCorner,
+  ViewCubeEdge,
+  ViewCubeShadow,
+  ViewCubeSide,
+} from './viewer-view-cube-components';
 
 @Component({
   tag: 'vertex-viewer-view-cube',
@@ -32,6 +22,14 @@ import { ViewerViewCubeSide } from './viewer-view-cube-sides';
   shadow: true,
 })
 export class ViewerViewCube {
+  private rendererEl?: HTMLVertexViewerDomRendererElement;
+
+  @State()
+  private boxLength = 80;
+
+  @State()
+  private triadPosition = Vector3.origin();
+
   /**
    * The label for the side of the cube on the positive x-axis.
    */
@@ -69,6 +67,12 @@ export class ViewerViewCube {
   public zNegativeLabel = 'Back';
 
   /**
+   * Disables interactions for standard views.
+   */
+  @Prop()
+  public standardViewsOff = false;
+
+  /**
    * The duration of the animation, in milliseconds, when a user performs a
    * standard view interaction. Set to 0 to disable animations.
    */
@@ -76,379 +80,72 @@ export class ViewerViewCube {
   public animationDuration = 500;
 
   /**
-   * Disables standard view interactions.
+   * Disables the display of the triad.
    */
   @Prop()
-  public standardViewsDisabled = false;
+  public triadOff = false;
 
   /**
-   * An orientation that defines the X and Z vectors to orient the world. If
-   * `viewer` is set, this property will be populated automatically.
+   * @internal
    */
   @Prop({ mutable: true })
   public worldOrientation: Orientation = Orientation.DEFAULT;
 
   /**
-   * The view matrix that specifies the camera's orientation. If `viewer` is
-   * set, this property will be populated automatically.
+   * @internal
    */
   @Prop({ mutable: true })
-  public viewMatrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
+  public camera?: FramePerspectiveCamera;
 
   /**
-   * An instance of the viewer to bind to.
+   * The viewer element that is connected to the view cube.
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
-  @State()
-  private hoveredStandardView?: StandardView;
-
-  protected componentDidLoad(): void {
-    this.handleViewerChange(this.viewer, undefined);
-  }
-
-  protected render(): h.JSX.IntrinsicElements {
-    const rotationMatrix = Matrix4.position(
-      this.viewMatrix,
-      Matrix4.makeIdentity()
-    );
-    const m = Matrix4.multiply(rotationMatrix, this.worldOrientation.matrix);
-
-    const style = {
-      transform: [
-        // Scales the cube so a face is the same size as this element. We can't
-        // apply percentage sizes using `translateZ`, so we rotate the cube and
-        // use translateX which support percentage values.
-        'rotateY(-90deg)',
-        'translateX(calc(100% / -2))',
-        'rotateY(90deg)',
-
-        // Flips the coordinate space because we're working in CSS.
-        'scale3d(-1, 1, -1)',
-
-        // Applies the view matrix using a column major matrix.
-        `matrix3d(${m.join(', ')})`,
-      ].join(' '),
-    };
-
-    return (
-      <div class={classNames('scene', { ready: this.viewMatrix != null })}>
-        <div class="cube" style={style}>
-          <ViewerViewCubeSide
-            side="front"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.FRONT)}
-          >
-            {this.zPositiveLabel}
-          </ViewerViewCubeSide>
-          <ViewerViewCubeSide
-            side="back"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BACK)}
-          >
-            {this.zNegativeLabel}
-          </ViewerViewCubeSide>
-          <ViewerViewCubeSide
-            side="right"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.RIGHT)}
-          >
-            {this.xNegativeLabel}
-          </ViewerViewCubeSide>
-          <ViewerViewCubeSide
-            side="left"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.LEFT)}
-          >
-            {this.xPositiveLabel}
-          </ViewerViewCubeSide>
-          <ViewerViewCubeSide
-            side="top"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP)}
-          >
-            {this.yPositiveLabel}
-          </ViewerViewCubeSide>
-          <ViewerViewCubeSide
-            side="bottom"
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BOTTOM)}
-          >
-            {this.yNegativeLabel}
-          </ViewerViewCubeSide>
-
-          <ViewerViewCubeTopFrontRightEdge
-            id="top-front-right"
-            hovered={this.hoveredStandardView === StandardView.TOP_FRONT_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(
-              StandardView.TOP_FRONT_RIGHT
-            )}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_FRONT_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeTopFrontLeftEdge
-            id="top-front-left"
-            hovered={this.hoveredStandardView === StandardView.TOP_FRONT_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_FRONT_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_FRONT_LEFT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomFrontRightEdge
-            id="bottom-front-right"
-            hovered={
-              this.hoveredStandardView === StandardView.BOTTOM_FRONT_RIGHT
-            }
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(
-              StandardView.BOTTOM_FRONT_RIGHT
-            )}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_FRONT_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomFrontLeftEdge
-            id="bottom-front-left"
-            hovered={
-              this.hoveredStandardView === StandardView.BOTTOM_FRONT_LEFT
-            }
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(
-              StandardView.BOTTOM_FRONT_LEFT
-            )}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_FRONT_LEFT
-                : undefined)
-            }
-          />
-
-          <ViewerViewCubeTopBackRightEdge
-            id="top-back-right"
-            hovered={this.hoveredStandardView === StandardView.TOP_BACK_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_BACK_RIGHT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_BACK_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeTopBackLeftEdge
-            id="top-back-left"
-            hovered={this.hoveredStandardView === StandardView.TOP_BACK_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_BACK_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_BACK_LEFT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomBackRightEdge
-            id="bottom-back-right"
-            hovered={
-              this.hoveredStandardView === StandardView.BOTTOM_BACK_RIGHT
-            }
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(
-              StandardView.BOTTOM_BACK_RIGHT
-            )}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_BACK_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomBackLeftEdge
-            id="bottom-back-left"
-            hovered={this.hoveredStandardView === StandardView.BOTTOM_BACK_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(
-              StandardView.BOTTOM_BACK_LEFT
-            )}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_BACK_LEFT
-                : undefined)
-            }
-          />
-
-          <ViewerViewCubeTopFrontEdge
-            id="top-front"
-            hovered={this.hoveredStandardView === StandardView.TOP_FRONT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_FRONT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_FRONT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomFrontEdge
-            id="bottom-front"
-            hovered={this.hoveredStandardView === StandardView.BOTTOM_FRONT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BOTTOM_FRONT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_FRONT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeFrontRightEdge
-            id="front-right"
-            hovered={this.hoveredStandardView === StandardView.FRONT_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.FRONT_RIGHT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.FRONT_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeFrontLeftEdge
-            id="front-left"
-            hovered={this.hoveredStandardView === StandardView.FRONT_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.FRONT_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.FRONT_LEFT
-                : undefined)
-            }
-          />
-
-          <ViewerViewCubeTopBackEdge
-            id="top-back"
-            hovered={this.hoveredStandardView === StandardView.TOP_BACK}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_BACK)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_BACK
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomBackEdge
-            id="bottom-back"
-            hovered={this.hoveredStandardView === StandardView.BOTTOM_BACK}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BOTTOM_BACK)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_BACK
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBackRightEdge
-            id="back-right"
-            hovered={this.hoveredStandardView === StandardView.BACK_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BACK_RIGHT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BACK_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBackLeftEdge
-            id="back-left"
-            hovered={this.hoveredStandardView === StandardView.BACK_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BACK_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BACK_LEFT
-                : undefined)
-            }
-          />
-
-          <ViewerViewCubeTopRightEdge
-            id="top-right"
-            hovered={this.hoveredStandardView === StandardView.TOP_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_RIGHT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeTopLeftEdge
-            id="top-left"
-            hovered={this.hoveredStandardView === StandardView.TOP_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.TOP_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.TOP_LEFT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomRightEdge
-            id="bottom-right"
-            hovered={this.hoveredStandardView === StandardView.BOTTOM_RIGHT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BOTTOM_RIGHT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_RIGHT
-                : undefined)
-            }
-          />
-          <ViewerViewCubeBottomLeftEdge
-            id="bottom-left"
-            hovered={this.hoveredStandardView === StandardView.BOTTOM_LEFT}
-            disabled={this.standardViewsDisabled}
-            onPointerDown={this.handleStandardView(StandardView.BOTTOM_LEFT)}
-            onHoverChange={(hovered) =>
-              (this.hoveredStandardView = hovered
-                ? StandardView.BOTTOM_LEFT
-                : undefined)
-            }
-          />
-        </div>
-      </div>
-    );
-  }
-
   @Watch('viewer')
-  protected handleViewerChange(
-    newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
+  protected handleViewerChanged(
+    newViewer?: HTMLVertexViewerElement,
+    oldViewer?: HTMLVertexViewerElement
   ): void {
-    oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
+    oldViewer?.removeEventListener('frameDrawn', this.updateMatrices);
+    newViewer?.addEventListener('frameDrawn', this.updateMatrices);
+    this.updateMatrices();
   }
 
-  private handleViewerFrameDrawn = async (): Promise<void> => {
-    const scene = await this.viewer?.scene();
-    const camera = scene?.camera();
+  private updateMatrices = (): void => {
+    if (this.viewer?.frame != null) {
+      const { camera } = this.viewer.frame.scene;
 
-    this.worldOrientation =
-      this.viewer?.frame?.scene.worldOrientation ?? Orientation.DEFAULT;
+      const halfLength = this.boxLength / 2;
+      this.triadPosition = Vector3.create(
+        -halfLength - 5,
+        -halfLength - 5,
+        -halfLength - 5
+      );
 
-    if (camera != null) {
-      const { position, lookAt, up } = camera;
-      this.viewMatrix = Matrix4.makeLookAtView(position, lookAt, up);
-    } else {
-      this.viewMatrix = Matrix4.makeIdentity();
+      // Used to scale the camera position so the cube is the same size as the
+      // container. This isn't exact, but pretty close.
+      const lengthScalar = 3.125;
+      const scale = this.boxLength * lengthScalar;
+      const fovY = 21.5;
+
+      this.camera = new FramePerspectiveCamera(
+        Vector3.scale(scale, Vector3.negate(camera.direction)),
+        Vector3.origin(),
+        camera.up,
+        0.1,
+        100,
+        1,
+        fovY
+      );
+
+      this.worldOrientation = this.viewer.frame.scene.worldOrientation;
     }
   };
 
   private handleStandardView(standardView: StandardView): () => Promise<void> {
-    if (this.standardViewsDisabled) {
+    if (this.standardViewsOff) {
       return async () => undefined;
     } else {
       return async () => {
@@ -470,5 +167,339 @@ export class ViewerViewCube {
         }
       };
     }
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentWillLoad(): void {
+    this.handleViewerChanged(this.viewer);
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentDidLoad(): void {
+    if (this.rendererEl != null) {
+      const observer = new ResizeObserver(() => this.handleRendererResized());
+      observer.observe(this.rendererEl);
+      this.handleRendererResized();
+    }
+  }
+
+  private handleRendererResized(): void {
+    readDOM(() => {
+      if (this.rendererEl != null) {
+        const rect = this.rendererEl.getBoundingClientRect();
+        this.boxLength = Math.min(rect.width, rect.height);
+      }
+    });
+  }
+
+  /**
+   * @ignore
+   */
+  protected render(): h.JSX.IntrinsicElements {
+    return (
+      <Host>
+        <vertex-viewer-dom-renderer
+          ref={(ref) => (this.rendererEl = ref)}
+          class="renderer"
+          camera={this.camera}
+        >
+          {/* Triad */}
+          {!this.triadOff && (
+            <vertex-viewer-dom-group
+              class="triad"
+              position={this.triadPosition}
+            >
+              <TriadAxis
+                label="X"
+                length={this.boxLength}
+                rotationAxis={Vector3.origin()}
+              />
+              <TriadAxis
+                label="Y"
+                length={this.boxLength}
+                rotationAxis={Vector3.forward()}
+              />
+              <TriadAxis
+                label="Z"
+                length={this.boxLength}
+                rotationAxis={Vector3.up()}
+              />
+            </vertex-viewer-dom-group>
+          )}
+
+          {/* Cube */}
+          <vertex-viewer-dom-group
+            class="cube"
+            matrix={this.worldOrientation.matrix}
+          >
+            <ViewCubeShadow length={this.boxLength + 10} />
+
+            {/* Sides */}
+            <ViewCubeSide
+              label={this.zPositiveLabel}
+              length={this.boxLength}
+              side="front"
+              onPointerDown={this.handleStandardView(StandardView.FRONT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeSide
+              label={this.zNegativeLabel}
+              length={this.boxLength}
+              side="back"
+              onPointerDown={this.handleStandardView(StandardView.BACK)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeSide
+              label={this.xNegativeLabel}
+              length={this.boxLength}
+              side="left"
+              onPointerDown={this.handleStandardView(StandardView.LEFT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeSide
+              label={this.xPositiveLabel}
+              length={this.boxLength}
+              side="right"
+              onPointerDown={this.handleStandardView(StandardView.RIGHT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeSide
+              label={this.yPositiveLabel}
+              length={this.boxLength}
+              side="top"
+              onPointerDown={this.handleStandardView(StandardView.TOP)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeSide
+              label={this.yNegativeLabel}
+              length={this.boxLength}
+              side="bottom"
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM)}
+              disabled={this.standardViewsOff}
+            />
+
+            {/* Edges */}
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="top"
+              face1Edge="bottom"
+              face2Side="front"
+              face2Edge="top"
+              onPointerDown={this.handleStandardView(StandardView.TOP_FRONT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="front"
+              face1Edge="right"
+              face2Side="left"
+              face2Edge="left"
+              onPointerDown={this.handleStandardView(StandardView.FRONT_LEFT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Edge="top"
+              face2Side="front"
+              face2Edge="bottom"
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_FRONT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="front"
+              face1Edge="left"
+              face2Side="right"
+              face2Edge="right"
+              onPointerDown={this.handleStandardView(StandardView.FRONT_RIGHT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="top"
+              face1Edge="right"
+              face2Side="left"
+              face2Edge="top"
+              onPointerDown={this.handleStandardView(StandardView.TOP_LEFT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="back"
+              face1Edge="left"
+              face2Side="left"
+              face2Edge="right"
+              onPointerDown={this.handleStandardView(StandardView.BACK_LEFT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Edge="right"
+              face2Side="left"
+              face2Edge="bottom"
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_LEFT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="top"
+              face1Edge="top"
+              face2Side="back"
+              face2Edge="top"
+              onPointerDown={this.handleStandardView(StandardView.TOP_BACK)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="back"
+              face1Edge="right"
+              face2Side="right"
+              face2Edge="left"
+              onPointerDown={this.handleStandardView(StandardView.BACK_RIGHT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Edge="bottom"
+              face2Side="back"
+              face2Edge="bottom"
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_BACK)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="top"
+              face1Edge="left"
+              face2Side="right"
+              face2Edge="top"
+              onPointerDown={this.handleStandardView(StandardView.TOP_RIGHT)}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeEdge
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Edge="left"
+              face2Side="right"
+              face2Edge="bottom"
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_RIGHT)}
+              disabled={this.standardViewsOff}
+            />
+
+            {/* Corners */}
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="top"
+              face1Corner="bottom-left"
+              face2Side="front"
+              face2Corner="top-left"
+              face3Side="right"
+              face3Corner="top-right"
+              onPointerDown={this.handleStandardView(
+                StandardView.TOP_FRONT_RIGHT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="top"
+              face1Corner="bottom-right"
+              face2Side="front"
+              face2Corner="top-right"
+              face3Side="left"
+              face3Corner="top-left"
+              onPointerDown={this.handleStandardView(
+                StandardView.TOP_FRONT_LEFT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Corner="top-right"
+              face2Side="front"
+              face2Corner="bottom-right"
+              face3Side="left"
+              face3Corner="bottom-left"
+              onPointerDown={this.handleStandardView(
+                StandardView.BOTTOM_FRONT_LEFT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Corner="top-left"
+              face2Side="front"
+              face2Corner="bottom-left"
+              face3Side="right"
+              face3Corner="bottom-right"
+              onPointerDown={this.handleStandardView(
+                StandardView.BOTTOM_FRONT_RIGHT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="top"
+              face1Corner="top-right"
+              face2Side="back"
+              face2Corner="top-left"
+              face3Side="left"
+              face3Corner="top-right"
+              onPointerDown={this.handleStandardView(
+                StandardView.TOP_BACK_LEFT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="top"
+              face1Corner="top-left"
+              face2Side="back"
+              face2Corner="top-right"
+              face3Side="right"
+              face3Corner="top-left"
+              onPointerDown={this.handleStandardView(
+                StandardView.TOP_BACK_RIGHT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Corner="bottom-left"
+              face2Side="back"
+              face2Corner="bottom-right"
+              face3Side="right"
+              face3Corner="bottom-left"
+              onPointerDown={this.handleStandardView(
+                StandardView.BOTTOM_BACK_RIGHT
+              )}
+              disabled={this.standardViewsOff}
+            />
+            <ViewCubeCorner
+              length={this.boxLength}
+              face1Side="bottom"
+              face1Corner="bottom-right"
+              face2Side="back"
+              face2Corner="bottom-left"
+              face3Side="left"
+              face3Corner="bottom-right"
+              onPointerDown={this.handleStandardView(
+                StandardView.BOTTOM_BACK_LEFT
+              )}
+              disabled={this.standardViewsOff}
+            />
+          </vertex-viewer-dom-group>
+        </vertex-viewer-dom-renderer>
+      </Host>
+    );
   }
 }

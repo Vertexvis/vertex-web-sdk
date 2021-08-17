@@ -1,17 +1,28 @@
 :host {
-  width: 80px;
-  height: 80px;
-  perspective: 240px;
-  opacity: 85%;
-  margin: 20px;
+  /**
+   * @prop --viewer-view-cube-side-background: A CSS background value that
+   * defines the background of a side of the cube.
+   */
+  --viewer-view-cube-side-background: var(--white);
 
-  font-size: 0.875rem;
-  color: var(--neutral-700);
-  text-transform: uppercase;
+  /**
+    * @prop --viewer-view-cube-side-background-hover: A CSS background value that
+    * defines the background of the hovered side of the cube. Note, the hover
+    * background is rendered on-top of the side's background.
+    */
+  --viewer-view-cube-side-background-hover: var(--blue-500);
 
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  /**
+    * @prop --viewer-view-cube-side-background-hover-opacity: A CSS number that
+    * defines the opacity of the background for a hovered side of the cube.
+    */
+  --viewer-view-cube-side-background-hover-opacity: 0.25;
 
-  transition: opacity 200ms ease-in-out;
+  /**
+    * @prop --viewer-view-cube-side-border: A CSS border value that defines the
+    * border of each side of the cube.
+    */
+  --viewer-view-cube-side-border: 1.5px solid var(--neutral-500);
 
   /**
    * @prop --viewer-view-cube-edge-length: A CSS length value that defines the
@@ -20,75 +31,98 @@
   --viewer-view-cube-edge-length: 12px;
 
   /**
-   * @prop --viewer-view-cube-edge-background: A CSS background value that
-   * defines a background color of an edge when hovered.
+   * @prop --viewer-view-cube-opacity: A CSS opacity for when the cube is not
+   * hovered.
    */
-  --viewer-view-cube-edge-background: var(--blue-500);
+  --viewer-view-cube-opacity: 0.8;
 
-  /**
-   * @prop --viewer-view-cube-edge-opacity: A CSS number that defines the
-   * opacity of an edge when hovered.
-   */
-  --viewer-view-cube-edge-opacity: 0.25;
-
-  /**
-   * @prop --viewer-view-cube-side-background: A CSS background value that
-   * defines the background of a side of the cube.
-   */
-  --viewer-view-cube-side-background: var(--white);
-
-  /**
-   * @prop --viewer-view-cube-side-background-hover: A CSS background value that
-   * defines the background of the hovered side of the cube. Note, the hover
-   * background is rendered on-top of the side's background.
-   */
-  --viewer-view-cube-side-background-hover: var(--blue-500);
-
-  /**
-   * @prop --viewer-view-cube-side-background-hover-opacity: A CSS number that
-   * defines the opacity of the background for a hovered side of the cube.
-   */
-  --viewer-view-cube-side-background-hover-opacity: 0.25;
-
-  /**
-   * @prop --viewer-view-cube-side-border: A CSS border value that defines the
-   * border of each side of the cube.
-   */
-  --viewer-view-cube-side-border: 1px solid var(--neutral-500);
-}
-
-:host(:hover) {
-  opacity: 0.95;
-}
-
-.scene {
-  width: 100%;
-  height: 100%;
-  perspective: inherit;
-  visibility: hidden;
+  display: block;
+  color: var(--neutral-700);
+  width: 80px;
+  height: 80px;
+  margin: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   user-select: none;
 }
 
-.scene.ready {
-  visibility: inherit;
+.renderer {
+  position: unset;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.reference-point {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: black;
+}
+
+.triad {
+  pointer-events: none;
+}
+
+.triad-axis {
+  width: 100%;
+  height: 1.5px;
+  outline: 1px solid transparent;
+  transform: translateX(50%);
+}
+.triad-axis-x {
+  background-color: #ea3324;
+}
+.triad-axis-y {
+  background-color: #4faf32;
+}
+.triad-axis-z {
+  background-color: #0000ff;
+}
+
+.triad-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.6875rem;
+}
+.triad-label-x {
+  color: #ea3324;
+}
+.triad-label-y {
+  color: #4faf32;
+}
+.triad-label-z {
+  color: #0000ff;
 }
 
 .cube {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
+  pointer-events: initial;
+}
+.cube:hover .cube-side-face {
+  opacity: 1;
 }
 
 .cube-side {
-  position: relative;
-  justify-content: center;
-  align-items: center;
-  background: var(--viewer-view-cube-side-background);
-  border: var(--viewer-view-cube-side-border);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
-
-.cube-side::before {
+.cube-side-face {
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  width: 100%;
+  height: 100%;
+  background-color: var(--viewer-view-cube-side-background);
+  border: var(--viewer-view-cube-side-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: 1px solid transparent;
+  opacity: var(--viewer-view-cube-opacity);
+  transition: opacity 0.2s ease-in-out;
+}
+.cube-side-face::before {
   content: '';
   position: absolute;
   left: calc(var(--viewer-view-cube-edge-length) - 4px);
@@ -97,100 +131,93 @@
   bottom: calc(var(--viewer-view-cube-edge-length) - 4px);
 }
 
-.cube-side:hover::before {
-  background: var(--viewer-view-cube-side-background-hover);
-  opacity: var(--viewer-view-cube-side-background-hover-opacity);
+.cube-corner,
+.cube-edge {
+  position: relative;
 }
 
-.cube-side.disabled {
-  pointer-events: none;
-}
-
-.cube-face {
-  display: flex;
+.cube-corner-face,
+.cube-edge-face {
   position: absolute;
-  width: 100%;
-  height: 100%;
   backface-visibility: hidden;
-
-  box-sizing: border-box;
+  -webkit-backface-visibility: hidden;
 }
-
-.cube-face-back {
-  transform: rotateY(0deg) rotateY(-90deg) translateX(calc(100% / 2))
-    rotateY(90deg);
+.cube-edge-face.top {
+  top: 0;
+  left: var(--viewer-view-cube-edge-length);
+  right: var(--viewer-view-cube-edge-length);
+  height: var(--viewer-view-cube-edge-length);
 }
-.cube-face-right {
-  transform: rotateY(90deg) rotateY(-90deg) translateX(calc(100% / 2))
-    rotateY(90deg);
+.cube-edge-face.bottom {
+  bottom: 0;
+  left: var(--viewer-view-cube-edge-length);
+  right: var(--viewer-view-cube-edge-length);
+  height: var(--viewer-view-cube-edge-length);
 }
-.cube-face-front {
-  transform: rotateY(180deg) rotateY(-90deg) translateX(calc(100% / 2))
-    rotateY(90deg);
+.cube-edge-face.left {
+  left: 0;
+  top: var(--viewer-view-cube-edge-length);
+  bottom: var(--viewer-view-cube-edge-length);
+  width: var(--viewer-view-cube-edge-length);
 }
-.cube-face-left {
-  transform: rotateY(-90deg) rotateY(-90deg) translateX(calc(100% / 2))
-    rotateY(90deg);
-}
-.cube-face-top {
-  transform: rotateX(90deg) rotateZ(180deg) rotateY(-90deg)
-    translateX(calc(100% / 2)) rotateY(90deg);
-}
-.cube-face-bottom {
-  transform: rotateX(-90deg) rotateZ(180deg) rotateY(-90deg)
-    translateX(calc(100% / 2)) rotateY(90deg);
-}
-
-.cube-corner {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-
-.cube-corner.hovered .cube-edge-face {
-  opacity: var(--viewer-view-cube-edge-opacity);
-}
-
-.cube-corner.disabled {
-  display: none;
+.cube-edge-face.right {
+  right: 0;
+  top: var(--viewer-view-cube-edge-length);
+  bottom: var(--viewer-view-cube-edge-length);
+  width: var(--viewer-view-cube-edge-length);
 }
 
 .cube-corner-face {
   width: var(--viewer-view-cube-edge-length);
   height: var(--viewer-view-cube-edge-length);
 }
+.cube-corner-face.top-left {
+  top: 0;
+  left: 0;
+}
+.cube-corner-face.top-right {
+  top: 0;
+  right: 0;
+}
+.cube-corner-face.bottom-right {
+  bottom: 0;
+  right: 0;
+}
+.cube-corner-face.bottom-left {
+  bottom: 0;
+  left: 0;
+}
 
-.cube-edge-face {
+.cube-shadow {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.cube-shadow-face {
   position: absolute;
-  background: var(--viewer-view-cube-edge-background);
-  pointer-events: initial;
+  left: 4px;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  background-color: black;
+  opacity: 0.12;
+  filter: blur(4px);
+}
+
+.cube-corner .cube-corner-face,
+.cube-edge .cube-edge-face,
+.cube-side .cube-side-face::before {
+  background: var(--viewer-view-cube-side-background-hover);
   opacity: 0;
 }
 
-.cube-edge-face-horiz {
-  width: calc(100% - var(--viewer-view-cube-edge-length) * 2);
-  height: var(--viewer-view-cube-edge-length);
+.cube-corner:hover .cube-corner-face,
+.cube-edge:hover .cube-edge-face,
+.cube-side:hover .cube-side-face::before {
+  opacity: var(--viewer-view-cube-side-background-hover-opacity);
 }
 
-.cube-edge-face-vert {
-  width: var(--viewer-view-cube-edge-length);
-  height: calc(100% - var(--viewer-view-cube-edge-length) * 2);
-}
-
-.vert-center {
-  align-items: center;
-}
-
-.vert-end {
-  align-items: flex-end;
-}
-
-.horiz-center {
-  justify-content: center;
-}
-
-.horiz-end {
-  justify-content: flex-end;
+.cube-corner.disabled,
+.cube-edge.disabled,
+.cube-side.disabled {
+  pointer-events: none;
 }

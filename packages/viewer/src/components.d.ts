@@ -173,12 +173,6 @@ export namespace Components {
       { recurseParent, ...options }?: SelectItemOptions
     ) => Promise<void>;
     /**
-     * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
-     * @see SceneTree.selectItem *
-     * @see SceneTree.deselectItem
-     */
-    selectionDisabled: boolean;
-    /**
      * Performs an API call that will show the item associated to the given row or row index.
      * @param row The row, row index, or node to show.
      */
@@ -438,6 +432,10 @@ export namespace Components {
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
      */
     billboardOff: boolean;
+    /**
+     * Disables interaction events from children.
+     */
+    interactionsOff: boolean;
     /**
      * The local matrix of this element.
      */
@@ -770,21 +768,19 @@ export namespace Components {
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
      */
     animationDuration: number;
+    camera?: FramePerspectiveCamera;
     /**
-     * Disables standard view interactions.
+     * Disables interactions for standard views.
      */
-    standardViewsDisabled: boolean;
+    standardViewsOff: boolean;
     /**
-     * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+     * Disables the display of the triad.
      */
-    viewMatrix: Matrix4.Matrix4;
+    triadOff: boolean;
     /**
-     * An instance of the viewer to bind to.
+     * The viewer element that is connected to the view cube.
      */
     viewer?: HTMLVertexViewerElement;
-    /**
-     * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
-     */
     worldOrientation: Orientation;
     /**
      * The label for the side of the cube on the negative x-axis.
@@ -998,12 +994,6 @@ declare namespace LocalJSX {
      */
     rowData?: RowDataProvider;
     /**
-     * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
-     * @see SceneTree.selectItem *
-     * @see SceneTree.deselectItem
-     */
-    selectionDisabled?: boolean;
-    /**
      * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
      */
     viewer?: HTMLVertexViewerElement | null;
@@ -1206,6 +1196,10 @@ declare namespace LocalJSX {
      */
     billboardOff?: boolean;
     /**
+     * Disables interaction events from children.
+     */
+    interactionsOff?: boolean;
+    /**
      * The local matrix of this element.
      */
     matrix?: Matrix4.Matrix4;
@@ -1218,10 +1212,6 @@ declare namespace LocalJSX {
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
      */
     occlusionOff?: boolean;
-    /**
-     * An event that's emitted when a property of this component changes.
-     */
-    onPropertyChange?: (event: CustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
      */
@@ -1260,10 +1250,6 @@ declare namespace LocalJSX {
      * The local matrix of this element.
      */
     matrix?: Matrix4.Matrix4;
-    /**
-     * An event that's emitted when a property of this component changes.
-     */
-    onPropertyChange?: (event: CustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
      */
@@ -1530,21 +1516,19 @@ declare namespace LocalJSX {
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
      */
     animationDuration?: number;
+    camera?: FramePerspectiveCamera;
     /**
-     * Disables standard view interactions.
+     * Disables interactions for standard views.
      */
-    standardViewsDisabled?: boolean;
+    standardViewsOff?: boolean;
     /**
-     * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+     * Disables the display of the triad.
      */
-    viewMatrix?: Matrix4.Matrix4;
+    triadOff?: boolean;
     /**
-     * An instance of the viewer to bind to.
+     * The viewer element that is connected to the view cube.
      */
     viewer?: HTMLVertexViewerElement;
-    /**
-     * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
-     */
     worldOrientation?: Orientation;
     /**
      * The label for the side of the cube on the negative x-axis.

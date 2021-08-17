@@ -30,33 +30,48 @@ viewer's scene changes. The cube can be embedded within a
 
 ## Properties
 
-| Property                | Attribute                 | Description                                                                                                                             | Type                                                                                                                               | Default                  |
-| ----------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `animationDuration`     | `animation-duration`      | The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.       | `number`                                                                                                                           | `500`                    |
-| `standardViewsDisabled` | `standard-views-disabled` | Disables standard view interactions.                                                                                                    | `boolean`                                                                                                                          | `false`                  |
-| `viewMatrix`            | --                        | The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.             | `[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]` | `Matrix4.makeIdentity()` |
-| `viewer`                | --                        | An instance of the viewer to bind to.                                                                                                   | `HTMLVertexViewerElement \| undefined`                                                                                             | `undefined`              |
-| `worldOrientation`      | --                        | An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically. | `Orientation`                                                                                                                      | `Orientation.DEFAULT`    |
-| `xNegativeLabel`        | `x-negative-label`        | The label for the side of the cube on the negative x-axis.                                                                              | `string`                                                                                                                           | `'Right'`                |
-| `xPositiveLabel`        | `x-positive-label`        | The label for the side of the cube on the positive x-axis.                                                                              | `string`                                                                                                                           | `'Left'`                 |
-| `yNegativeLabel`        | `y-negative-label`        | The label for the side of the cube on the negative y-axis.                                                                              | `string`                                                                                                                           | `'Bottom'`               |
-| `yPositiveLabel`        | `y-positive-label`        | The label for the side of the cube on the positive y-axis.                                                                              | `string`                                                                                                                           | `'Top'`                  |
-| `zNegativeLabel`        | `z-negative-label`        | The label for the side of the cube on the negative z-axis.                                                                              | `string`                                                                                                                           | `'Back'`                 |
-| `zPositiveLabel`        | `z-positive-label`        | The label for the side of the cube on the positive z-axis.                                                                              | `string`                                                                                                                           | `'Front'`                |
+| Property            | Attribute            | Description                                                                                                                       | Type                                   | Default     |
+| ------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `animationDuration` | `animation-duration` | The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations. | `number`                               | `500`       |
+| `standardViewsOff`  | `standard-views-off` | Disables interactions for standard views.                                                                                         | `boolean`                              | `false`     |
+| `triadOff`          | `triad-off`          | Disables the display of the triad.                                                                                                | `boolean`                              | `false`     |
+| `viewer`            | --                   | The viewer element that is connected to the view cube.                                                                            | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| `xNegativeLabel`    | `x-negative-label`   | The label for the side of the cube on the negative x-axis.                                                                        | `string`                               | `'Right'`   |
+| `xPositiveLabel`    | `x-positive-label`   | The label for the side of the cube on the positive x-axis.                                                                        | `string`                               | `'Left'`    |
+| `yNegativeLabel`    | `y-negative-label`   | The label for the side of the cube on the negative y-axis.                                                                        | `string`                               | `'Bottom'`  |
+| `yPositiveLabel`    | `y-positive-label`   | The label for the side of the cube on the positive y-axis.                                                                        | `string`                               | `'Top'`     |
+| `zNegativeLabel`    | `z-negative-label`   | The label for the side of the cube on the negative z-axis.                                                                        | `string`                               | `'Back'`    |
+| `zPositiveLabel`    | `z-positive-label`   | The label for the side of the cube on the positive z-axis.                                                                        | `string`                               | `'Front'`   |
 
 
 ## CSS Custom Properties
 
 | Name                                               | Description                                                                                                                                                 |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--viewer-view-cube-edge-background`               | A CSS background value that defines a background color of an edge when hovered.                                                                             |
 | `--viewer-view-cube-edge-length`                   | A CSS length value that defines the size of an edge when hovered.                                                                                           |
-| `--viewer-view-cube-edge-opacity`                  | A CSS number that defines the opacity of an edge when hovered.                                                                                              |
+| `--viewer-view-cube-opacity`                       | A CSS opacity for when the cube is not hovered.                                                                                                             |
 | `--viewer-view-cube-side-background`               | A CSS background value that defines the background of a side of the cube.                                                                                   |
 | `--viewer-view-cube-side-background-hover`         | A CSS background value that defines the background of the hovered side of the cube. Note, the hover background is rendered on-top of the side's background. |
 | `--viewer-view-cube-side-background-hover-opacity` | A CSS number that defines the opacity of the background for a hovered side of the cube.                                                                     |
 | `--viewer-view-cube-side-border`                   | A CSS border value that defines the border of each side of the cube.                                                                                        |
 
+
+## Dependencies
+
+### Depends on
+
+- [vertex-viewer-dom-renderer](../viewer-dom-renderer)
+- [vertex-viewer-dom-group](../viewer-dom-group)
+- [vertex-viewer-dom-element](../viewer-dom-element)
+
+### Graph
+```mermaid
+graph TD;
+  vertex-viewer-view-cube --> vertex-viewer-dom-renderer
+  vertex-viewer-view-cube --> vertex-viewer-dom-group
+  vertex-viewer-view-cube --> vertex-viewer-dom-element
+  style vertex-viewer-view-cube fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

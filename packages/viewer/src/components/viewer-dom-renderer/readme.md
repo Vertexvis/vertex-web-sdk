@@ -219,6 +219,19 @@ attribute.
 | `viewer`      | --          | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                    | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
+## Dependencies
+
+### Used by
+
+ - [vertex-viewer-view-cube](../viewer-view-cube)
+
+### Graph
+```mermaid
+graph TD;
+  vertex-viewer-view-cube --> vertex-viewer-dom-renderer
+  style vertex-viewer-dom-renderer fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*
