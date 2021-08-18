@@ -1,6 +1,7 @@
 import { InteractionApi } from './interactionApi';
 import { Point, Ray } from '@vertexvis/geometry';
 import { InteractionType } from './baseInteractionHandler';
+import { getMouseClientPosition } from '../dom';
 
 export abstract class MouseInteraction {
   protected currentPosition: Point.Point | undefined;
@@ -22,7 +23,8 @@ export abstract class MouseInteraction {
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
+    element?: HTMLElement
   ): void {
     // noop
   }
@@ -109,6 +111,7 @@ export class ZoomInteraction extends MouseInteraction {
 
   private didTransformBegin = false;
   private interactionTimer: number | undefined;
+  private startRay?: Ray.Ray;
 
   public constructor(private interactionTimeout = 1000) {
     super();
@@ -117,10 +120,14 @@ export class ZoomInteraction extends MouseInteraction {
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
+    element?: HTMLElement
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
+      const rect = element?.getBoundingClientRect();
+      const point = getMouseClientPosition(event, rect);
+      this.startRay = api.getRayFromPoint(point);
       api.beginInteraction();
     }
   }
@@ -130,7 +137,7 @@ export class ZoomInteraction extends MouseInteraction {
       const position = Point.create(event.screenX, event.screenY);
       const delta = Point.subtract(position, this.currentPosition);
 
-      api.zoomCamera(delta.y);
+      api.zoomCamera(delta.y, this.startRay);
       this.currentPosition = position;
     }
   }
@@ -139,6 +146,7 @@ export class ZoomInteraction extends MouseInteraction {
     super.endDrag(event, api);
     this.stopInteractionTimer();
     this.didTransformBegin = false;
+    this.startRay = undefined;
   }
 
   public zoom(delta: number, api: InteractionApi): void {
