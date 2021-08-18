@@ -222,7 +222,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.draggingInteraction.beginDrag(
         event,
         this.downPositionCanvas || Point.create(event.clientX, event.clientY),
-        this.interactionApi
+        this.interactionApi,
+        this.element
       );
     }
   }
