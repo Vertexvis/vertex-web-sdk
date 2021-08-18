@@ -135,7 +135,6 @@ export class InteractionApi {
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
       const scene = this.getScene();
-      console.log(this.currentCamera);
       this.currentCamera =
         this.currentCamera != null
           ? t(this.currentCamera, scene.viewport(), scene.scale())
