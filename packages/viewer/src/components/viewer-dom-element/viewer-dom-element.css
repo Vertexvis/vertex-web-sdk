@@ -3,6 +3,6 @@
   pointer-events: none;
 }
 
-:host > * {
+:host(:not([interactions-off])) {
   pointer-events: auto;
 }

@@ -30,15 +30,12 @@ describe('vertex-viewer-dom-group', () => {
   });
 
   it('syncs properties when json attributes change', async () => {
-    const onPropertyChange = jest.fn();
-
     const page = await newSpecPage({
       components: [ViewerDomGroup],
       html: `<vertex-viewer-dom-group></vertex-viewer-dom-group>`,
     });
 
     const el = page.root as HTMLVertexViewerDomElementElement;
-    el.addEventListener('propertyChange', onPropertyChange);
 
     const position = Vector3.create(1, 2, 3);
     const rotation = Euler.create({ x: 2, y: 3, z: 4 });
@@ -49,45 +46,33 @@ describe('vertex-viewer-dom-group', () => {
     el.setAttribute('position', '[1, 2, 3]');
     await page.waitForChanges();
     expect(el.position).toEqual(position);
-    expect(onPropertyChange).toHaveBeenCalled();
-    onPropertyChange.mockReset();
 
     el.setAttribute('rotation', '[2, 3, 4]');
     await page.waitForChanges();
     expect(el.rotation).toEqual(rotation);
-    expect(onPropertyChange).toHaveBeenCalled();
-    onPropertyChange.mockReset();
 
     el.setAttribute('quaternion', '[1, 2, 3, 4]');
     await page.waitForChanges();
     expect(el.quaternion).toEqual(quat);
-    expect(onPropertyChange).toHaveBeenCalled();
-    onPropertyChange.mockReset();
 
     el.setAttribute('scale', '[3, 4, 5]');
     await page.waitForChanges();
     expect(el.scale).toEqual(scale);
-    expect(onPropertyChange).toHaveBeenCalled();
-    onPropertyChange.mockReset();
 
     expect(el.matrix).toEqual(matrix);
   });
 
   it('updates quaternion when rotation changes', async () => {
-    const onPropertyChange = jest.fn();
-
     const page = await newSpecPage({
       components: [ViewerDomGroup],
       html: `<vertex-viewer-dom-group></vertex-viewer-dom-group>`,
     });
 
     const el = page.root as HTMLVertexViewerDomElementElement;
-    el.addEventListener('propertyChange', onPropertyChange);
 
     const rotation = Euler.create({ x: 2, y: 3, z: 4 });
     el.setAttribute('rotation', '[2, 3, 4]');
     await page.waitForChanges();
     expect(el.quaternion).toEqual(Quaternion.fromEuler(rotation));
-    expect(onPropertyChange).toHaveBeenCalled();
   });
 });
