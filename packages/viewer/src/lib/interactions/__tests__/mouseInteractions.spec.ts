@@ -7,7 +7,7 @@ import {
   TwistInteraction,
 } from '../mouseInteractions';
 import { InteractionApi } from '../interactionApi';
-import { Point } from '@vertexvis/geometry';
+import { Point, Ray } from '@vertexvis/geometry';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 
@@ -167,7 +167,7 @@ describe(ZoomInteraction, () => {
       interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
 
-      expect(api.zoomCamera).toHaveBeenCalledWith(5);
+      expect(api.zoomCamera).toHaveBeenCalledWith(5, undefined);
     });
 
     it('continuous drags rotate camera using delta between calls', () => {
@@ -176,7 +176,22 @@ describe(ZoomInteraction, () => {
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
-      expect(api.zoomCamera).toHaveBeenNthCalledWith(2, 10);
+      expect(api.zoomCamera).toHaveBeenNthCalledWith(2, 10, undefined);
+    });
+
+    it.only('uses the starting point ray', () => {
+      const div = document.createElement('div');
+      jest
+        .spyOn(div, 'getBoundingClientRect')
+        .mockReturnValue({ left: 0, top: 0 } as DOMRect);
+      jest.spyOn(api, 'getRayFromPoint').mockReturnValue(Ray.create());
+      const interaction = new ZoomInteraction();
+      interaction.beginDrag(event1, canvasPoint, api, div);
+      interaction.drag(event2, api);
+      interaction.drag(event3, api);
+
+      expect(api.zoomCamera).toBeCalledWith(5, Ray.create());
+      expect(api.zoomCamera).toBeCalledWith(10, Ray.create());
     });
 
     it('does nothing if begin drag has not been called', () => {
