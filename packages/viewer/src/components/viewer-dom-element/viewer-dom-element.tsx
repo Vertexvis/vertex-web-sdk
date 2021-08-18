@@ -182,10 +182,16 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Prop({ reflect: true })
   public interactionsOff = false;
 
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.syncProperties();
   }
 
+  /**
+   * @ignore
+   */
   protected componentShouldUpdate(): boolean {
     return false;
   }

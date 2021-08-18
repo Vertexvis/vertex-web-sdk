@@ -136,8 +136,18 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   @Prop({ mutable: true, attribute: null })
   public matrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.syncProperties();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentShouldUpdate(): boolean {
+    return false;
   }
 
   private syncProperties(): void {
@@ -205,7 +215,10 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
     }
   }
 
-  public render(): h.JSX.IntrinsicElements {
+  /**
+   * @ignore
+   */
+  protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
         <slot></slot>
