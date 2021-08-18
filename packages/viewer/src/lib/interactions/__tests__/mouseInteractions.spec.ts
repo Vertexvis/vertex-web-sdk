@@ -179,7 +179,7 @@ describe(ZoomInteraction, () => {
       expect(api.zoomCamera).toHaveBeenNthCalledWith(2, 10, undefined);
     });
 
-    it.only('uses the starting point ray', () => {
+    it('uses the starting point ray', () => {
       const div = document.createElement('div');
       jest
         .spyOn(div, 'getBoundingClientRect')
