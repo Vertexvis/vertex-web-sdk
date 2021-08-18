@@ -135,6 +135,7 @@ export class InteractionApi {
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
       const scene = this.getScene();
+      console.log(this.currentCamera);
       this.currentCamera =
         this.currentCamera != null
           ? t(this.currentCamera, scene.viewport(), scene.scale())
@@ -309,11 +310,10 @@ export class InteractionApi {
       const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
-      const lookAtPlane = Plane.create({
+      const vvPlane = Plane.create({
         normal: v,
-        constant: Vector3.dot(camera.lookAt, v),
       });
-      const pt = ray != null ? Ray.intersectPlane(ray, lookAtPlane) : undefined;
+      const pt = ray != null ? Ray.intersectPlane(ray, vvPlane) : undefined;
       const zv = pt != null ? Vector3.subtract(pt, camera.position) : vv;
 
       const direction = Vector3.normalize(zv);
@@ -324,7 +324,7 @@ export class InteractionApi {
         camera.position,
         Vector3.scale(epsilon, direction)
       );
-      const lookAt = Plane.projectPoint(lookAtPlane, position);
+      const lookAt = Plane.projectPoint(vvPlane, position);
       return camera.update({ position, lookAt });
     });
   }
