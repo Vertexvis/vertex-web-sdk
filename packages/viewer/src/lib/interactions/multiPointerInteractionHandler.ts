@@ -24,7 +24,6 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
   }
 
   private handlePointerDown(event: PointerEvent): void {
-    event.preventDefault();
     const point = Point.create(event.screenX, event.screenY);
     this.touchPoints = {
       ...this.touchPoints,
@@ -38,8 +37,6 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
   }
 
   private handlePointerMove(event: PointerEvent): void {
-    event.preventDefault();
-
     if (this.touchPoints[event.pointerId] != null) {
       this.touchPoints[event.pointerId] = Point.create(
         event.screenX,
