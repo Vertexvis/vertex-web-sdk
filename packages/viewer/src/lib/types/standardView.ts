@@ -35,15 +35,6 @@ export class StandardView {
   public static BOTTOM = new StandardView(Vector3.down(), Vector3.back());
 
   /**
-   * A standard view that positions the camera facing the top-front-left of the
-   * scene.
-   */
-  public static TOP_FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
-    Vector3.up()
-  );
-
-  /**
    * A standard view that positions the camera facing the top-front-right of the
    * scene.
    */
@@ -53,11 +44,11 @@ export class StandardView {
   );
 
   /**
-   * A standard view that positions the camera facing the bottom-front-left of
-   * the scene.
+   * A standard view that positions the camera facing the top-front-left of the
+   * scene.
    */
-  public static BOTTOM_FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
+  public static TOP_FRONT_LEFT = new StandardView(
+    Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
     Vector3.up()
   );
 
@@ -67,6 +58,15 @@ export class StandardView {
    */
   public static BOTTOM_FRONT_RIGHT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.down(), Vector3.left()),
+    Vector3.up()
+  );
+
+  /**
+   * A standard view that positions the camera facing the bottom-front-left of
+   * the scene.
+   */
+  public static BOTTOM_FRONT_LEFT = new StandardView(
+    Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
     Vector3.up()
   );
 
@@ -125,20 +125,20 @@ export class StandardView {
   );
 
   /**
-   * A standard view that positions the camera facing the front-left of the
-   * scene.
-   */
-  public static FRONT_LEFT = new StandardView(
-    Vector3.add(Vector3.back(), Vector3.right()),
-    Vector3.up()
-  );
-
-  /**
    * A standard view that positions the camera facing the front-right of the
    * scene.
    */
   public static FRONT_RIGHT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.left()),
+    Vector3.up()
+  );
+
+  /**
+   * A standard view that positions the camera facing the front-left of the
+   * scene.
+   */
+  public static FRONT_LEFT = new StandardView(
+    Vector3.add(Vector3.back(), Vector3.right()),
     Vector3.up()
   );
 

@@ -1,14 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import {
-  Component,
-  Event,
-  EventEmitter,
-  h,
-  Host,
-  Prop,
-  Watch,
-} from '@stencil/core';
+import { Component, h, Host, Prop, Watch } from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
@@ -36,7 +28,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('position')
   protected handlePositionChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -97,7 +88,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('quaternion')
   protected handleQuaternionChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -128,7 +118,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('scale')
   protected handleScaleChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -188,13 +177,23 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public billboardOff = false;
 
   /**
-   * An event that's emitted when a property of this component changes.
+   * Disables interaction events from children.
    */
-  @Event({ bubbles: true })
-  public propertyChange!: EventEmitter<void>;
+  @Prop({ reflect: true })
+  public interactionsOff = false;
 
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.syncProperties();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentShouldUpdate(): boolean {
+    return false;
   }
 
   private syncProperties(): void {
@@ -260,10 +259,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
       console.warn(`Could not parse \`${propName}\`. Invalid JSON.`);
       throw e;
     }
-  }
-
-  private dispatchPropertyChange(): void {
-    this.propertyChange.emit();
   }
 
   /**

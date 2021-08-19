@@ -1,14 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import {
-  Component,
-  Host,
-  h,
-  Watch,
-  Prop,
-  Event,
-  EventEmitter,
-} from '@stencil/core';
+import { Component, Host, h, Watch, Prop } from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
@@ -30,7 +22,6 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   @Watch('position')
   protected handlePositionChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -91,7 +82,6 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   @Watch('quaternion')
   protected handleQuaternionChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -122,7 +112,6 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   @Watch('scale')
   protected handleScaleChange(): void {
     this.syncMatrix();
-    this.dispatchPropertyChange();
   }
 
   /**
@@ -148,13 +137,17 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   public matrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
   /**
-   * An event that's emitted when a property of this component changes.
+   * @ignore
    */
-  @Event({ bubbles: true })
-  public propertyChange!: EventEmitter<void>;
-
   protected componentWillLoad(): void {
     this.syncProperties();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentShouldUpdate(): boolean {
+    return false;
   }
 
   private syncProperties(): void {
@@ -222,11 +215,10 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
     }
   }
 
-  private dispatchPropertyChange(): void {
-    this.propertyChange.emit();
-  }
-
-  public render(): h.JSX.IntrinsicElements {
+  /**
+   * @ignore
+   */
+  protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
         <slot></slot>

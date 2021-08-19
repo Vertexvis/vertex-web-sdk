@@ -28,12 +28,18 @@ information.
 | `scaleJson`      | `scale`      | The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                   | `string`                                                                                                                           | `''`                      |
 
 
-## Events
+## Dependencies
 
-| Event            | Description                                                        | Type                |
-| ---------------- | ------------------------------------------------------------------ | ------------------- |
-| `propertyChange` | An event that's emitted when a property of this component changes. | `CustomEvent<void>` |
+### Used by
 
+ - [vertex-viewer-view-cube](../viewer-view-cube)
+
+### Graph
+```mermaid
+graph TD;
+  vertex-viewer-view-cube --> vertex-viewer-dom-group
+  style vertex-viewer-dom-group fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 
