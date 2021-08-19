@@ -141,8 +141,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleDownEvent(event: BaseEvent): void {
-    event.preventDefault();
-
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.downPositionCanvas = this.getCanvasPosition(event);

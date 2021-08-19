@@ -37,7 +37,6 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
   }
 
   private handlePointerDown(event: PointerEvent): void {
-    event.preventDefault();
     this.downPosition = Point.create(event.screenX, event.screenY);
     this.touchPoints.add(event.pointerId);
 
