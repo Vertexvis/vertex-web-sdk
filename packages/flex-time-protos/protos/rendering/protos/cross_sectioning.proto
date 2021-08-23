@@ -1,0 +1,21 @@
+
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+import "core/protos/geometry.proto";
+import "core/protos/material.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "CrossSectioningProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message SectionPlane {
+    vertexvis.protobuf.core.Vector3f normal = 1;
+    float offset = 2;
+}
+
+message CrossSectioning {
+    repeated SectionPlane section_planes = 1;
+    vertexvis.protobuf.core.RGBi highlight_color = 2;
+}

@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+
+package vertexvis.protobuf.measurement;
+
+import "core/protos/uuid.proto";
+import "core/protos/geometry.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "DomainProto";
+option java_package = "com.vertexvis.protobuf.measurement";
+
+// Entity reference based on a "pick".
+message PickedEntityReference {
+  vertexvis.protobuf.core.Uuid geometry_set_id = 1;
+  vertexvis.protobuf.core.Matrix4x4f local_to_world_transform = 2;
+  vertexvis.protobuf.core.Vector3f world_hit_point = 3;
+  vertexvis.protobuf.core.Vector3f world_hit_normal = 4;
+  uint64 face_id = 5;
+}
+
+// BRep entity reference
+message BRepEntityReference {
+  oneof brep_entity {
+    PickedEntityReference pick_reference = 1;
+  }
+}
+
+// Planar distance by "pick references" between two surfaces
+message PlanarDistanceOpParams {
+  // Planar Distance between two points
+  BRepEntityReference start = 1;
+  BRepEntityReference end = 2;
+}
+
+message MeasurementOpDetails {
+  // The measurements to attempt to perform.
+  oneof params {
+    PlanarDistanceOpParams planar_distance_by_picks = 1;
+  }
+}
+
+// Evaluated planar distance between two picked surfaces
+message PlanarDistanceResult {
+  double distance = 1;
+  vertexvis.protobuf.core.Vector3f plane_normal = 2;
+}
+
+// Evaluated minimum distance between two picked surfaces
+message MinimumDistanceResult {
+  double distance = 1;
+  vertexvis.protobuf.core.Vector3f closest_point_1 = 2;
+  vertexvis.protobuf.core.Vector3f closest_point_2 = 3;
+}
+
+// Evaluated angle between two picked surfaces
+message AngleResult {
+  double angle_in_radians = 1;
+  vertexvis.protobuf.core.Vector3f reference_point = 2;
+  vertexvis.protobuf.core.Vector3f primary_vector = 3;
+  vertexvis.protobuf.core.Vector3f secondary_vector = 4;
+}
+
+message MeasurementResult {
+  oneof details {
+    PlanarDistanceResult planar_distance = 1;
+    AngleResult angle = 2;
+    MinimumDistanceResult minimum_distance = 3;
+  }
+}
+
+// The result of the measurement operation
+message MeasurementOutcome {
+  repeated MeasurementResult results = 1;
+}

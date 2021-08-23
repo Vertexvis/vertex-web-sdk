@@ -1,0 +1,16 @@
+
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+import "core/protos/geometry.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "OrientationProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message Orientation {
+    vertexvis.protobuf.core.Vector3f up = 1;
+    vertexvis.protobuf.core.Vector3f front = 2;
+}
+

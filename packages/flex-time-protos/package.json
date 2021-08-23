@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist && rm -fr ./src && mkdir ./src",
     "prebuild": "yarn clean",
-    "build": "npx protoc --ts_out src --proto_path protos protos/flex-time-service/protos/*.proto protos/core/protos/*.proto protos/google/protobuf/*.proto",
+    "build": "npx protoc --ts_out src --proto_path protos protos/flex-time-service/protos/*.proto protos/core/protos/*.proto protos/google/protobuf/*.proto protos/measurement-service/protos/*.proto protos/rendering/protos/*.proto ",
     "postbuild": "tsc"
   },
   "peerDependencies": {

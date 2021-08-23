@@ -4,7 +4,6 @@ package vertexvis.protobuf.flextime.v1alpha1;
 
 import "core/protos/geometry.proto";
 import "core/protos/material.proto";
-import "core/protos/uuid.proto";
 import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
@@ -12,23 +11,31 @@ option java_outer_classname = "DomainProto";
 option java_package = "com.vertexvis.protobuf.flextime";
 
 message CompressedNormalArray {
-    repeated uint32 oct32s = 2;
+  repeated uint32 oct32s = 2;
 }
 
 message Indexed3DTriangleSet {
-    vertexvis.protobuf.core.IndexedVector3fArray vertices = 1;
-    CompressedNormalArray compressedNormals = 2;
+  vertexvis.protobuf.core.IndexedVector3fArray vertices = 1;
+  CompressedNormalArray compressedNormals = 2;
 }
 
 message RenderItem {
-    vertexvis.protobuf.core.AffineMatrix4f transform = 1;
-    vertexvis.protobuf.core.ColorMaterialf material = 2;
-    Indexed3DTriangleSet triangle_set = 3;
+  vertexvis.protobuf.core.AffineMatrix4f transform = 1;
+  vertexvis.protobuf.core.ColorMaterialf material = 2;
+  Indexed3DTriangleSet triangle_set = 3;
 }
 
 message CompressedRenderItem {
-    vertexvis.protobuf.core.AffineMatrix4f transform = 1;
-    vertexvis.protobuf.core.ColorMaterialf material = 2;
-    google.protobuf.BytesValue draco_bytes = 3;
-    vertexvis.protobuf.core.Uuid shape_id = 4;
+  vertexvis.protobuf.core.AffineMatrix4f transform = 1;
+  vertexvis.protobuf.core.ColorMaterialf material = 2;
+  google.protobuf.BytesValue draco_bytes = 3;
+}
+message FeatureEntity {
+  enum EntityType {
+    FEATURE_MAP_ENTITY_FACES = 0;
+    FEATURE_MAP_ENTITY_EDGES = 1;
+    FEATURE_MAP_ENTITY_CROSS_SECTIONS = 2;
+    FEATURE_MAP_ENTITY_ALL = 3;
+  }
+  EntityType entity_type = 3;
 }

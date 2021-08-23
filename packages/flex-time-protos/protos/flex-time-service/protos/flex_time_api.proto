@@ -3,34 +3,60 @@ syntax = "proto3";
 package vertexvis.protobuf.flextime.v1alpha1;
 
 import "google/protobuf/wrappers.proto";
+import "core/protos/geometry.proto";
+import "measurement-service/protos/domain.proto";
 import "flex-time-service/protos/domain.proto";
+import "rendering/protos/camera.proto";
 
 option java_multiple_files = true;
 option java_outer_classname = "FlexTimeApiProto";
 option java_package = "com.vertexvis.protobuf.flextime";
 
 service FlexTimeAPI {
-    rpc GetGeometry (GetGeometryRequest) returns (stream GetGeometryResponse);
-    rpc GetCompressedGeometry (GetCompressedGeometryRequest) returns (stream GetCompressedGeometryResponse);
+  rpc GetGeometry (GetGeometryRequest) returns (stream GetGeometryResponse);
+  rpc GetCompressedGeometry (GetCompressedGeometryRequest) returns (stream GetCompressedGeometryResponse);
+  rpc Measure (MeasureRequest) returns (stream MeasureResponse);
+  rpc GetFeatureEntityMap(GetFeatureEntityMapRequest) returns (stream GetFeatureEntityMapResponse);
 }
 
 message GetGeometryRequest {
-    string scene_id = 1;
-    google.protobuf.StringValue scene_view_id = 2;
-    google.protobuf.StringValue scene_item_id = 3;
-    bool exclude_sent_triangle_sets = 4;
+  string scene_id = 1;
+  google.protobuf.StringValue scene_view_id = 2;
+  google.protobuf.StringValue scene_item_id = 3;
+  bool exclude_sent_triangle_sets = 4;
 }
 
 message GetGeometryResponse {
-    repeated RenderItem items = 1;
+  repeated RenderItem items = 1;
 }
 message GetCompressedGeometryRequest {
-    string scene_id = 1;
-    google.protobuf.StringValue scene_view_id = 2;
-    google.protobuf.StringValue scene_item_id = 3;
-    bool exclude_sent_triangle_sets = 4;
+  string scene_id = 1;
+  google.protobuf.StringValue scene_view_id = 2;
+  google.protobuf.StringValue scene_item_id = 3;
+  bool exclude_sent_triangle_sets = 4;
 }
 
 message GetCompressedGeometryResponse {
-    repeated CompressedRenderItem items = 1;
+  repeated CompressedRenderItem items = 1;
+}
+
+message MeasureRequest {
+  google.protobuf.StringValue scene_item_id_a = 1;
+  vertexvis.protobuf.core.Vector3f hit_point_a = 2;
+  google.protobuf.StringValue scene_item_id_b = 3;
+  vertexvis.protobuf.core.Vector3f hit_point_b = 4;
+}
+
+message MeasureResponse {
+  vertexvis.protobuf.measurement.MeasurementOutcome outcome = 1;
+}
+message GetFeatureEntityMapRequest {
+  string scene_id = 1;
+  string scene_view_id = 2;
+  vertexvis.protobuf.core.Dimension2i dimensions = 3;
+  vertexvis.protobuf.rendering.Camera camera = 4;
+  repeated FeatureEntity entities = 5;
+}
+message GetFeatureEntityMapResponse {
+  bytes feature_entity_map = 1;
 }
