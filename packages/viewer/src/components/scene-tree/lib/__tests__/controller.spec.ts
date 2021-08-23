@@ -69,7 +69,9 @@ function createController(
   stream: ResponseStreamMock<unknown>;
 } {
   const client = new SceneTreeAPIClient('https://example.com');
-  const controller = new SceneTreeController(client, rowLimit);
+  const controller = new SceneTreeController(client, rowLimit, {
+    lostConnectionReconnectInSeconds: 0.025,
+  });
 
   const stream = new ResponseStreamMock<SubscribeResponse>();
   (client.subscribe as jest.Mock).mockReturnValue(stream);
@@ -276,7 +278,7 @@ describe(SceneTreeController, () => {
       await controller.connect(jwtProvider);
 
       stream.invokeOnEnd();
-      await Async.delay(25);
+      await Async.delay(50);
 
       expect(client.subscribe).toHaveBeenCalledTimes(2);
     });
