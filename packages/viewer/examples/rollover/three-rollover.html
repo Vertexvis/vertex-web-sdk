@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <script type="module" src="./main.js"></script>
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree
+          id="scene-tree"
+          config-env="platdev"
+          viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+          <vertex-viewer-threejs-renderer
+            id="blended-renderer"
+            clipping-extents="10000"
+            occlude
+          ></vertex-viewer-threejs-renderer>
+
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-toolbar placement="bottom-center">
+            <button id="play-btn" disabled>Play</button>
+          </vertex-viewer-toolbar>
+
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
+      </div>
+    </div>
+  </body>
+</html>
