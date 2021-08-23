@@ -11,6 +11,7 @@ const DEFAULT_POOL_SIZE = 1;
 
 function loadWorkerModule(): Promise<DecodePngModule> {
   if (workerLoader == null) {
+    console.debug(`Loading PNG worker module`);
     workerLoader = loadWorker();
   }
   return workerLoader;
@@ -18,7 +19,8 @@ function loadWorkerModule(): Promise<DecodePngModule> {
 
 function getPoolSize(): number {
   if (typeof window !== 'undefined') {
-    return Math.ceil(window.navigator.hardwareConcurrency / 4);
+    const concurrency = window.navigator.hardwareConcurrency ?? 8;
+    return Math.ceil(concurrency / 4);
   } else {
     return DEFAULT_POOL_SIZE;
   }
@@ -26,17 +28,17 @@ function getPoolSize(): number {
 
 async function getPool(): Promise<DecodePngPool> {
   if (poolLoader == null) {
-    poolLoader = loadWorkerModule().then(({ spawnPool }) =>
-      spawnPool({ size: getPoolSize() })
-    );
+    poolLoader = loadWorkerModule().then(async ({ spawnPool }) => {
+      const size = getPoolSize();
+      console.debug(`Spawning PNG worker pool [size=${size}]`);
+      return spawnPool({ size });
+    });
   }
   return poolLoader;
 }
 export const decodePng: DecodePngFn = async (bytes) => {
   const pool = await getPool();
-  return pool.queue((decode) => {
-    return decode(bytes);
-  });
+  return pool.queue((decode) => decode(bytes));
 };
 
 // Prefetch the worker and initialize the pool.
