@@ -30,6 +30,7 @@ import { decodeSceneTreeJwt } from './jwt';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;
+  lostConnectionReconnectInSeconds?: number;
 }
 
 export type JwtProvider = () => Promise<string | undefined>;
@@ -96,6 +97,7 @@ type ConnectionState =
  */
 export class SceneTreeController {
   private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
+  private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
 
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -162,13 +164,16 @@ export class SceneTreeController {
       console.debug('Scene tree controller connecting.');
 
       await this.fetchPage(0);
-      const subscription = this.subscribe();
+
+      const stream = await this.subscribe();
+      stream.on('end', () => this.startConnectionLostReconnectTimer());
+
       this.updateState({
         ...this.state,
         connection: {
           ...connecting,
           type: 'connected',
-          subscription,
+          subscription: { dispose: () => stream.cancel() },
         },
       });
     } catch (e) {
@@ -184,7 +189,7 @@ export class SceneTreeController {
       throw e;
     }
 
-    this.startReconnectTimer();
+    this.startIdleReconnectTimer();
   }
 
   private clearReconnectTimer(): void {
@@ -193,18 +198,28 @@ export class SceneTreeController {
     }
   }
 
-  private startReconnectTimer(): void {
-    const {
-      idleReconnectInSeconds = SceneTreeController.IDLE_RECONNECT_IN_SECONDS,
-    } = this.connectOptions;
+  private startIdleReconnectTimer(): void {
+    this.startReconnectTimer(
+      this.connectOptions.idleReconnectInSeconds ||
+        SceneTreeController.IDLE_RECONNECT_IN_SECONDS
+    );
+  }
 
+  private startConnectionLostReconnectTimer(): void {
+    this.startReconnectTimer(
+      this.connectOptions.lostConnectionReconnectInSeconds ||
+        SceneTreeController.LOST_CONNECTION_RECONNECT_IN_SECONDS
+    );
+  }
+
+  private startReconnectTimer(delayInSeconds: number): void {
     this.clearReconnectTimer();
 
     this.reconnectTimer = window.setTimeout(() => {
       if (this.state.connection.type === 'connected') {
         this.connect(this.state.connection.jwtProvider);
       }
-    }, idleReconnectInSeconds * 1000);
+    }, delayInSeconds * 1000);
   }
 
   public connectToViewer(viewer: HTMLVertexViewerElement): Disposable {
@@ -549,21 +564,16 @@ export class SceneTreeController {
 
   /**
    * Performs a network request that will listen to server-side changes of the
-   * scene tree's data. If the server terminates the connection, this will
-   * automatically attempt to resubscribe to changes.
-   *
-   * @returns A `Disposable` that can be used to terminate the subscription.
+   * scene tree's data.
    */
-  private subscribe(): Disposable {
-    let stream: ResponseStream<SubscribeResponse> | undefined;
-
-    const sub = (jwt: string): void => {
-      stream = this.requestServerStream(jwt, (metadata) =>
+  private subscribe(): Promise<ResponseStream<SubscribeResponse>> {
+    return this.ifConnectionHasJwt((jwt) => {
+      const stream = this.requestServerStream(jwt, (metadata) =>
         this.client.subscribe(new SubscribeRequest(), metadata)
       );
 
       stream.on('data', (msg) => {
-        this.startReconnectTimer();
+        this.startIdleReconnectTimer();
 
         const { change } = msg.toObject();
 
@@ -633,14 +643,8 @@ export class SceneTreeController {
         }
       });
 
-      stream.on('end', () => {
-        this.ifConnectionHasJwt((jwt) => sub(jwt));
-      });
-    };
-
-    this.ifConnectionHasJwt((jwt) => sub(jwt));
-
-    return { dispose: () => stream?.cancel() };
+      return stream;
+    });
   }
 
   private async fetchUnloadedPagesInActiveRows(): Promise<void> {
