@@ -1,6 +1,7 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
 jest.mock('../../lib/sessions/storage');
+jest.mock('../../workers/png-decoder-pool');
 
 import '../../testing/domMocks';
 import {

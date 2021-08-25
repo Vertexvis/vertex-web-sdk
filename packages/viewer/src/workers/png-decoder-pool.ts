@@ -36,6 +36,7 @@ async function getPool(): Promise<DecodePngPool> {
   }
   return poolLoader;
 }
+
 export const decodePng: DecodePngFn = async (bytes) => {
   const pool = await getPool();
   return pool.queue((decode) => decode(bytes));

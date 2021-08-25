@@ -1,5 +1,6 @@
 import {
   Angle,
+  BoundingBox,
   Dimensions,
   Plane,
   Point,
@@ -17,11 +18,12 @@ type SceneProvider = () => Scene;
 
 type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
-type CameraTransform = (
-  camera: Camera,
-  viewport: Dimensions.Dimensions,
-  scale: Point.Point
-) => Camera;
+type CameraTransform = (data: {
+  camera: Camera;
+  viewport: Dimensions.Dimensions;
+  scale: Point.Point;
+  boundingBox: BoundingBox.BoundingBox;
+}) => Camera;
 
 /**
  * The `InteractionApi` provides methods that API developers can use to modify
@@ -137,7 +139,12 @@ export class InteractionApi {
       const scene = this.getScene();
       this.currentCamera =
         this.currentCamera != null
-          ? t(this.currentCamera, scene.viewport(), scene.scale())
+          ? t({
+              camera: this.currentCamera,
+              viewport: scene.viewport(),
+              scale: scene.scale(),
+              boundingBox: scene.boundingBox(),
+            })
           : undefined;
 
       await this.currentCamera?.render();
@@ -154,7 +161,7 @@ export class InteractionApi {
   public async twistCamera(delta: number): Promise<void>;
   public async twistCamera(delta: Point.Point): Promise<void>;
   public async twistCamera(...args: any[]): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera(({ camera, viewport }) => {
       const axis = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
       );
@@ -187,7 +194,7 @@ export class InteractionApi {
    *  viewer.
    */
   public async panCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera(({ camera, viewport }) => {
       const vv = camera.viewVector();
 
       const u = Vector3.normalize(camera.up);
@@ -217,7 +224,7 @@ export class InteractionApi {
    *  viewer.
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera(({ camera, viewport }) => {
       const upVector = Vector3.normalize(camera.up);
       const lookAt = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
@@ -249,51 +256,53 @@ export class InteractionApi {
     const frame = this.getFrame();
     const depthBuffer = await frame?.depthBuffer();
 
-    return this.transformCamera((camera, viewport) => {
-      this.worldRotationPoint =
-        this.getWorldRotationPoint(point, depthBuffer) ?? camera.lookAt;
-
-      if (this.worldRotationPoint != null) {
-        const upVector = Vector3.normalize(camera.up);
-        const vv = Vector3.normalize(
-          Vector3.subtract(camera.lookAt, camera.position)
-        );
-
-        const crossX = Vector3.cross(upVector, vv);
-        const crossY = Vector3.cross(vv, crossX);
-
-        const mouseToWorld = Vector3.normalize({
-          x: delta.x * crossX.x + delta.y * crossY.x,
-          y: delta.x * crossX.y + delta.y * crossY.y,
-          z: delta.x * crossX.z + delta.y * crossY.z,
-        });
-
-        const rotationAxis = Vector3.cross(mouseToWorld, vv);
-
-        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
-        const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
-
-        const updated = camera.rotateAroundAxisAtPoint(
-          angle,
-          this.worldRotationPoint,
-          rotationAxis
-        );
-
-        return updated.update({
-          // Scale the lookAt point to the same length as the distance to the center
-          // of the bounding box to maintain zoom and pan behavior.
-          lookAt: Vector3.add(
-            Vector3.scale(
-              camera.distanceToBoundingBoxCenter() /
-                Vector3.magnitude(updated.viewVector()),
-              updated.viewVector()
-            ),
-            updated.position
-          ),
-        });
+    return this.transformCamera(({ camera, viewport, boundingBox }) => {
+      if (this.worldRotationPoint == null) {
+        const worldCenter = BoundingBox.center(boundingBox);
+        this.worldRotationPoint =
+          depthBuffer != null
+            ? this.getWorldRotationPoint(point, depthBuffer, worldCenter)
+            : camera.lookAt;
       }
-      return camera;
+
+      const upVector = Vector3.normalize(camera.up);
+      const vv = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+
+      const crossX = Vector3.cross(upVector, vv);
+      const crossY = Vector3.cross(vv, crossX);
+
+      const mouseToWorld = Vector3.normalize({
+        x: delta.x * crossX.x + delta.y * crossY.x,
+        y: delta.x * crossX.y + delta.y * crossY.y,
+        z: delta.x * crossX.z + delta.y * crossY.z,
+      });
+
+      const rotationAxis = Vector3.cross(mouseToWorld, vv);
+
+      const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
+      const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+      const updated = camera.rotateAroundAxisAtPoint(
+        angle,
+        this.worldRotationPoint,
+        rotationAxis
+      );
+
+      return updated.update({
+        // Scale the lookAt point to the same length as the distance to the center
+        // of the bounding box to maintain zoom and pan behavior.
+        lookAt: Vector3.add(
+          Vector3.scale(
+            camera.distanceToBoundingBoxCenter() /
+              Vector3.magnitude(updated.viewVector()),
+            updated.viewVector()
+          ),
+          updated.position
+        ),
+      });
     });
   }
 
@@ -305,7 +314,7 @@ export class InteractionApi {
    *  values zoom out.
    */
   public async zoomCamera(delta: number, ray?: Ray.Ray): Promise<void> {
-    return this.transformCamera((camera, viewport) => {
+    return this.transformCamera(({ camera, viewport }) => {
       const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
@@ -401,15 +410,14 @@ export class InteractionApi {
 
   private getWorldRotationPoint(
     point: Point.Point,
-    depthBuffer?: DepthBuffer
-  ): Vector3.Vector3 | undefined {
-    if (this.worldRotationPoint != null) {
-      return this.worldRotationPoint;
-    } else {
-      const viewport = this.getViewport();
-      return depthBuffer != null
-        ? viewport.transformPointToWorldSpace(point, depthBuffer, 0.5)
-        : undefined;
-    }
+    depthBuffer: DepthBuffer,
+    fallbackPoint: Vector3.Vector3
+  ): Vector3.Vector3 {
+    const viewport = this.getViewport();
+    const framePt = viewport.transformPointToFrame(point, depthBuffer);
+    const hasDepth = depthBuffer.isDepthAtFarPlane(framePt);
+    return hasDepth
+      ? viewport.transformPointToWorldSpace(point, depthBuffer)
+      : fallbackPoint;
   }
 }
