@@ -7,6 +7,7 @@ import "core/protos/geometry.proto";
 import "measurement-service/protos/domain.proto";
 import "flex-time-service/protos/domain.proto";
 import "rendering/protos/camera.proto";
+import "rendering/protos/image_type.proto";
 
 option java_multiple_files = true;
 option java_outer_classname = "FlexTimeApiProto";
@@ -56,7 +57,9 @@ message GetFeatureEntityMapRequest {
   vertexvis.protobuf.core.Dimension2i dimensions = 3;
   vertexvis.protobuf.rendering.Camera camera = 4;
   repeated FeatureEntity entities = 5;
+  vertexvis.protobuf.rendering.ImageType image_type = 6;
 }
 message GetFeatureEntityMapResponse {
   bytes feature_entity_map = 1;
+  vertexvis.protobuf.rendering.ImageType image_type = 2;
 }
