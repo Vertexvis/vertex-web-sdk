@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer-react",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "React bindings for the Vertex Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -32,13 +32,13 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
-    "@vertexvis/viewer": "0.10.0"
+    "@vertexvis/viewer": "0.10.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.0",
-    "@vertexwebsdk/build": "0.10.0",
+    "@vertexwebsdk/build": "0.10.1",
     "eslint": "^7.20.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
