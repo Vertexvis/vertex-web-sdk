@@ -77,6 +77,8 @@ interface StateMap {
   viewportHeight?: number;
 
   selectionPath?: string[];
+
+  layoutEl?: HTMLVertexSceneTreeTableLayoutElement;
 }
 
 type OperationHandler = (data: {
@@ -546,6 +548,12 @@ export class SceneTree {
         this.viewer
       );
     }
+
+    this.stateMap.layoutEl =
+      this.el.querySelector('vertex-scene-tree-table-layout') || undefined;
+    this.stateMap.layoutEl?.addEventListener('scrollOffsetChanged', () => {
+      this.scrollTop = this.stateMap.layoutEl?.scrollOffset ?? 0;
+    });
   }
 
   /**
@@ -584,13 +592,26 @@ export class SceneTree {
         this.stateMap.endIndex
       );
     }
+
+    this.updateLayout();
   }
 
   /**
    * @ignore
    */
   protected componentDidRender(): void {
-    this.updateElements();
+    // this.updateElements();
+  }
+
+  private updateLayout(): void {
+    const layout = this.el.querySelector('vertex-scene-tree-table-layout');
+    if (layout != null) {
+      layout.rowHeight = this.computedRowHeight ?? 24;
+      layout.rows = this.rows;
+      layout.visibleRows = this.stateMap.viewportRows;
+      layout.visibleStartIndex = this.stateMap.startIndex;
+      layout.visibleEndIndex = this.stateMap.endIndex;
+    }
   }
 
   /**
@@ -628,9 +649,7 @@ export class SceneTree {
         </div>
 
         <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
-          <div class="rows" style={{ height: `${totalHeight}px` }}>
-            <slot />
-          </div>
+          <slot />
         </div>
 
         <div class="footer">
