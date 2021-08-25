@@ -1,6 +1,6 @@
 import { StreamApi } from '@vertexvis/stream-api';
 import { Camera } from './camera';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { BoundingBox, Dimensions, Point } from '@vertexvis/geometry';
 import { Raycaster } from './raycaster';
 import { CrossSectioner } from './crossSectioner';
 import { ColorMaterial, fromHex } from './colorMaterial';
@@ -278,6 +278,10 @@ export class Scene {
       this.frame.scene.boundingBox,
       this.decodeFrame
     );
+  }
+
+  public boundingBox(): BoundingBox.BoundingBox {
+    return this.frame.scene.boundingBox;
   }
 
   /**

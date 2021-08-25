@@ -190,7 +190,7 @@ export class Viewer {
    * Enables or disables the default rotation interaction being changed to
    * rotate around the pointer down location.
    */
-  @Prop() public rotateAroundTapPoint = false;
+  @Prop() public rotateAroundTapPoint = true;
 
   /**
    * Specifies when a depth buffer is requested from rendering. Possible values
