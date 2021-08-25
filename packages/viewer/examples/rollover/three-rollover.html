@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
-    <title>Viewer SDK Playground</title>
+    <title>Feature Highlight</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -18,21 +18,27 @@
     <script type="module" src="/dist/viewer/viewer.esm.js"></script>
     <script nomodule src="/dist/viewer.js"></script>
     <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <script type="module" src="./UPNG.js"></script>
     <script type="module" src="./main.js"></script>
   </head>
 
   <body>
     <div class="app">
       <div class="tree">
-        <vertex-scene-tree
+        <!-- <vertex-scene-tree
           id="scene-tree"
           config-env="platdev"
           viewer-selector="#viewer"
         >
-        </vertex-scene-tree>
+        </vertex-scene-tree> -->
+        <!-- <canvas id="offscreen" class="tree" width="100" height="100"></canvas> -->
       </div>
       <div class="workarea">
-        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+        <vertex-viewer
+          id="viewer"
+          config-env="platdev"
+          depth-buffers="all"
+        >
           <vertex-viewer-threejs-renderer
             id="blended-renderer"
             clipping-extents="10000"

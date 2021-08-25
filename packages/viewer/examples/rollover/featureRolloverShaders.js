@@ -2,7 +2,7 @@ const featureEntity = `
     vec4 featureEntity(sampler2D featureEntityMap, vec2 mouseNormalized, vec2 uv, vec4 currentColor,vec4 featureHightlightColor)
     {
         vec4 feature = texture(featureEntityMap, mouseNormalized);
-        if (feature == currentColor){
+        if (feature == currentColor && feature.a > 0.0){
           // return the hightlight color
           return vec4(featureHightlightColor.xyz,1);
         } else {
