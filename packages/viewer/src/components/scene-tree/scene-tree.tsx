@@ -817,6 +817,7 @@ export class SceneTree {
           partiallyVisible: false,
           isLeaf: false,
           depth: 0,
+          columnsList: [],
         },
         data: {},
       };
