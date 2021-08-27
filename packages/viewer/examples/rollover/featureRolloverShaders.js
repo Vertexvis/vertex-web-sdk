@@ -25,15 +25,18 @@ export const glassPaneFragmentShader = `
 
   varying vec2 vUv;
   uniform sampler2D featureMap;
+  uniform sampler2D diffuseMap;
   uniform vec2 u_mouse;
   uniform vec4 u_featureHighlightColor;
   uniform bool u_highlightFeature;
   void main()
 {
     if(u_highlightFeature){
-       vec4 currentColor = texture(featureMap,vUv);
+       vec4 currentFeatureColor = texture(featureMap,vUv);
+       vec4 currentFragmentColor = texture(diffuseMap,vUv);
+       vec4 featureHighlightColor = mix(currentFragmentColor,u_featureHighlightColor,.5);
        // Output to screen
-       gl_FragColor = featureEntity(featureMap, u_mouse.xy,vUv,currentColor, u_featureHighlightColor);
+       gl_FragColor = featureEntity(featureMap, u_mouse.xy,vUv,currentFeatureColor, featureHighlightColor);
     }else{
         gl_FragColor = vec4(0,0,0,0);
     }

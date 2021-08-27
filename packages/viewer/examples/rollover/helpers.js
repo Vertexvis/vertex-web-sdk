@@ -26,7 +26,7 @@ export function readDebugFeatureMap() {
 
 export function readSceneId() {
   const urlParams = readUrlParams();
-  return urlParams.sceneid || '';
+  return urlParams.sceneid || '464b4f18-387e-4a8e-8d6f-fffe289dd892'; //TODO: Lookout!!!
 }
 
 function readUrlParams() {

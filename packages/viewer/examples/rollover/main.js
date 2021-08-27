@@ -133,6 +133,7 @@ class FeatureRolloverInteractionHandler {
         .then(() => {
           this.quadUniforms.featureMap.value.needsUpdate = true;
           this.quadUniforms.u_highlightFeature.value = true;
+          this.quadUniforms.diffuseMap.value.needsUpdate = true;
         });
     }
     this.api.endInteraction();
@@ -229,12 +230,17 @@ async function main() {
   // TODO this setup can probably be pulled out into it's own class/module
   // TODO setup the feature map using the content of the canvas
   const featureMapCanvas = getCanvasForFeatureMapTexture();
-  const texture = new THREE.CanvasTexture(featureMapCanvas);
-  texture.magFilter = THREE.NearestFilter;
-  texture.minFilter = THREE.NearestFilter;
+  const featureMapTexture = new THREE.CanvasTexture(featureMapCanvas);
+  featureMapTexture.magFilter = THREE.NearestFilter;
+  featureMapTexture.minFilter = THREE.NearestFilter;
+  const diffuseCanvas = viewer.shadowRoot.querySelector('canvas');
+  const diffuseMapTexture = new THREE.CanvasTexture(diffuseCanvas);
+  diffuseMapTexture.magFilter = THREE.NearestFilter;
+  diffuseMapTexture.minFilter = THREE.NearestFilter;
   // initialize uniforms for the hightlight shaders
   var uniforms = {
-    featureMap: { type: 't', value: texture },
+    featureMap: { type: 't', value: featureMapTexture },
+    diffuseMap: { type: 't', value: diffuseMapTexture },
     u_mouse: { value: [0, 0] },
     u_featureHighlightColor: { value: [0, 1, 0, 1] },
     u_highlightFeature: { value: false },
