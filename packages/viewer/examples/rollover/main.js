@@ -87,7 +87,7 @@ class FeatureRolloverInteractionHandler {
       var mouse_y = event.clientY - rect.top;
       const x = mouse_x / this.api.getViewport().width;
       const y = 1 - mouse_y / this.api.getViewport().height;
-      this.quadUniforms.featureMap.value.needsUpdate = true;
+      this.quadUniforms.featureMap.needsUpdate = true;
       this.quadUniforms.u_mouse = {
         value: [x, y],
       };
@@ -225,6 +225,15 @@ async function* getQuadAsMeshes(uniforms) {
 async function main() {
   await window.customElements.whenDefined('vertex-viewer');
   const viewer = document.getElementById('viewer');
+  viewer.featureLines = {
+    width: 1.0,
+    color: {
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 1,
+    },
+  };
   await loadViewerWithQueryParams(viewer);
   const blendedRenderer = document.getElementById('blended-renderer');
   // TODO this setup can probably be pulled out into it's own class/module
@@ -267,7 +276,11 @@ async function main() {
     rolloverHandler.enableShowFeatureMap(debugFeatureMapChk.checked);
   };
   debugFeatureMapChk.checked = readDebugFeatureMap();
-
+  // const enableRolloverChk = document.getElementById('enable-rollover');
+  // enableRolloverChk.onchange = () => {
+  //   uniforms.u_highlightFeature.value = enableRolloverChk.checked;
+  //   uniforms.u_highlightFeature.needsUpdate = true;
+  // };
   // interaciton handler that updates mouse position for the shader on mouse moves
   viewer.registerInteractionHandler(rolloverHandler);
 

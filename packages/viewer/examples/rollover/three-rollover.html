@@ -35,7 +35,8 @@
         <vertex-viewer
           id="viewer"
           config-env="platdev"
-          depth-buffers="all"
+          depth-buffers="all",
+          featureLines
         >
           <vertex-viewer-threejs-renderer
             id="blended-renderer"
@@ -50,6 +51,8 @@
           <vertex-viewer-toolbar placement="bottom-center">
             <input type="checkbox" id="debug-feature-map" name="db-feature-map-chkbx">
             <label for="db-feature-map-chbx">Debug Feature Map</label>
+            <!-- <input type="checkbox" id="enable-rollover" name="feature-highlight-chkbx">
+            <label for="feature-highlight-chkbx">Rollover Highlight</label> -->
           </vertex-viewer-toolbar>
 
           <vertex-viewer-toolbar placement="top-right">
