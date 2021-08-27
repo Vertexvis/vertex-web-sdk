@@ -17,7 +17,7 @@ import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
-import { ColumnKey } from './components/scene-tree/interfaces';
+import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
@@ -86,10 +86,6 @@ export namespace Components {
      */
     collapseItem: (row: RowArg) => Promise<void>;
     /**
-     * A list of column keys to include in the fetched row data.
-     */
-    columnKeys: ColumnKey[];
-    /**
      * An object to configure the scene tree.
      */
     config?: Config;
@@ -113,10 +109,10 @@ export namespace Components {
      */
     expandItem: (row: RowArg) => Promise<void>;
     /**
-     * Fetches the names of the columns for the current scene view. These column names can be used to request additional data for each row of the tree.
-     * @returns A promise that resolves with the names of available column.
+     * Fetches the metadata keys that are available to the scene tree. Metadata keys can be assigned to the scene tree using the `metadataKeys` property. The scene tree will fetch this metadata and make these values available for data binding.
+     * @returns A promise that resolves with the names of available keys.
      */
-    fetchAvailableColumnKeys: () => Promise<ColumnKey[]>;
+    fetchMetadataKeys: () => Promise<MetadataKey[]>;
     /**
      * Performs an async request that will filter the displayed items in the tree that match the given term and options.
      * @param term The filter term.
@@ -151,6 +147,10 @@ export namespace Components {
      * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
      */
     invalidateRows: () => Promise<void>;
+    /**
+     * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
+     */
+    metadataKeys: MetadataKey[];
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
@@ -985,10 +985,6 @@ declare global {
 declare namespace LocalJSX {
   interface VertexSceneTree {
     /**
-     * A list of column keys to include in the fetched row data.
-     */
-    columnKeys?: ColumnKey[];
-    /**
      * An object to configure the scene tree.
      */
     config?: Config;
@@ -997,6 +993,10 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     controller?: SceneTreeController;
+    /**
+     * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
+     */
+    metadataKeys?: MetadataKey[];
     onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.

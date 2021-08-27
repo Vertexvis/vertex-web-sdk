@@ -1,1 +1,1 @@
-export type ColumnKey = string;
+export type MetadataKey = string;

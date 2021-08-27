@@ -29,7 +29,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
-import { ColumnKey } from '../interfaces';
+import { MetadataKey } from '../interfaces';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;
@@ -47,7 +47,7 @@ export interface SceneTreeState {
 interface Page {
   id: number;
   index: number;
-  columnKeys: ColumnKey[];
+  metadataKeys: MetadataKey[];
   res: Promise<GetTreeResponse>;
 }
 
@@ -106,7 +106,7 @@ export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
-  private columnKeys: ColumnKey[] = [];
+  private metadataKeys: MetadataKey[] = [];
 
   private reconnectTimer?: number;
 
@@ -415,7 +415,7 @@ export class SceneTreeController {
         console.debug('Scene tree fetching page', index, offset);
         const res = this.fetchTree(offset, this.rowLimit, jwt);
         const id = this.nextPageId++;
-        const page = { id, res, index, columnKeys: this.columnKeys };
+        const page = { id, res, index, metadataKeys: this.metadataKeys };
         this.pages.set(index, page);
         this.handlePageResult(page);
       }
@@ -457,12 +457,9 @@ export class SceneTreeController {
   }
 
   /**
-   * Fetches the names of the columns for the current scene view. These column
-   * names can be used to request additional data for each row of the tree.
-   *
-   * @returns A promise that resolves with the names of each available column
+   * Fetches the metadata keys for the current scene view.
    */
-  public async fetchAvailableColumnKeys(): Promise<ColumnKey[]> {
+  public async fetchMetadataKeys(): Promise<MetadataKey[]> {
     return this.ifConnectionHasJwt(async (jwt) => {
       const res = await this.requestUnary<GetAvailableColumnsResponse>(
         jwt,
@@ -573,8 +570,8 @@ export class SceneTreeController {
     }
   }
 
-  public setColumnKeys(keys: ColumnKey[]): Promise<void> {
-    this.columnKeys = keys;
+  public setMetadataKeys(keys: MetadataKey[]): Promise<void> {
+    this.metadataKeys = keys;
 
     if (this.state.connection.type === 'connected') {
       const [start, end] = this.activeRowRange;
@@ -729,7 +726,7 @@ export class SceneTreeController {
         const fetchedRows = fromNodeProto(
           offset,
           itemsList,
-          currentPage.columnKeys
+          currentPage.metadataKeys
         );
 
         const start = this.state.rows.slice(0, offset);
@@ -803,7 +800,7 @@ export class SceneTreeController {
 
       const req = new GetTreeRequest();
       req.setPager(pager);
-      req.setAdditionalColumnKeysList(this.columnKeys);
+      req.setAdditionalColumnKeysList(this.metadataKeys);
 
       this.client.getTree(req, metadata, handler);
     });

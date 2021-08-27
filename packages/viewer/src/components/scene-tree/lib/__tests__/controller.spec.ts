@@ -1060,7 +1060,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.fetchAvailableColumnKeys, () => {
+  describe(SceneTreeController.prototype.fetchMetadataKeys, () => {
     it('returns column keys', async () => {
       const key1 = new ColumnKey();
       key1.setValue('key1');
@@ -1079,13 +1079,13 @@ describe(SceneTreeController, () => {
 
       await controller.connect(jwtProvider);
 
-      const res = await controller.fetchAvailableColumnKeys();
+      const res = await controller.fetchMetadataKeys();
       expect(res).toEqual(['key1', 'key2']);
     });
   });
 
-  describe(SceneTreeController.prototype.setColumnKeys, () => {
-    it('refetches pages in active rows with additional column values', async () => {
+  describe(SceneTreeController.prototype.setMetadataKeys, () => {
+    it('refetches pages in active rows with additional metadata values', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
@@ -1105,14 +1105,15 @@ describe(SceneTreeController, () => {
           })
         )
       );
-      await controller.setColumnKeys(['key1', 'key2']);
+      await controller.setMetadataKeys(['key1', 'key2']);
 
       const rows = await pendingRows;
       expect(
         rows
           .slice(0, 10)
           .every(
-            (row) => row?.columns.key1 === 'val1' && row.columns.key2 === 'val2'
+            (row) =>
+              row?.metadata.key1 === 'val1' && row.metadata.key2 === 'val2'
           )
       ).toBe(true);
     });

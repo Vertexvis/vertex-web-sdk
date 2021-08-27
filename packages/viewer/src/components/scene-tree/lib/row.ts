@@ -1,12 +1,12 @@
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { ColumnKey } from '../interfaces';
+import { MetadataKey } from '../interfaces';
 
-export type ColumnMap = Record<ColumnKey, string>;
+export type MetadataMap = Record<MetadataKey, string>;
 
 export interface LoadedRow {
   index: number;
   node: Node.AsObject;
-  columns: ColumnMap;
+  metadata: MetadataMap;
   data: Record<string, unknown>;
 }
 
@@ -16,17 +16,17 @@ export type Row = LoadedRow | undefined;
 export function fromNodeProto(
   index: number,
   node: Node,
-  columns: ColumnKey[]
+  columns: MetadataKey[]
 ): Row;
 export function fromNodeProto(
   index: number,
   nodes: Node[],
-  columns: ColumnKey[]
+  columns: MetadataKey[]
 ): Row[];
 export function fromNodeProto(
   index: number,
   nodes: Node | Node[],
-  columns: ColumnKey[]
+  columns: MetadataKey[]
 ): Row | Row[] {
   if (Array.isArray(nodes)) {
     return nodes.map((node, i) => fromNodeProto(index + i, node, columns));
@@ -35,21 +35,21 @@ export function fromNodeProto(
     return {
       index,
       node,
-      columns: makeColumns(columns, node.columnsList),
+      metadata: makeMetadataMap(columns, node.columnsList),
       data: {},
     };
   }
 }
 /* eslint-enable padding-line-between-statements */
 
-function makeColumns(keys: ColumnKey[], values: string[]): ColumnMap {
+function makeMetadataMap(keys: MetadataKey[], values: string[]): MetadataMap {
   if (keys.length !== values.length) {
     throw new Error('Column key length and column value length mismatch');
   } else {
     return keys.reduce((map, key, i) => {
       map[key] = values[i];
       return map;
-    }, {} as ColumnMap);
+    }, {} as MetadataMap);
   }
 }
 

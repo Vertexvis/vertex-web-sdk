@@ -45,7 +45,7 @@ import {
   InstancedTemplate,
 } from './lib/templates';
 import { isSceneTreeRowElement } from '../scene-tree-row/utils';
-import { ColumnKey } from './interfaces';
+import { MetadataKey } from './interfaces';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -193,10 +193,11 @@ export class SceneTree {
   public controller?: SceneTreeController;
 
   /**
-   * A list of column keys to include in the fetched row data.
+   * A list of part metadata keys that will be made available to each row. This
+   * metadata can be used for data binding inside the scene tree's template.
    */
   @Prop()
-  public columnKeys: ColumnKey[] = [];
+  public metadataKeys: MetadataKey[] = [];
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
@@ -532,14 +533,16 @@ export class SceneTree {
   }
 
   /**
-   * Fetches the names of the columns for the current scene view. These column
-   * names can be used to request additional data for each row of the tree.
+   * Fetches the metadata keys that are available to the scene tree. Metadata
+   * keys can be assigned to the scene tree using the `metadataKeys` property.
+   * The scene tree will fetch this metadata and make these values available
+   * for data binding.
    *
-   * @returns A promise that resolves with the names of available column.
+   * @returns A promise that resolves with the names of available keys.
    */
   @Method()
-  public async fetchAvailableColumnKeys(): Promise<ColumnKey[]> {
-    return this.controller?.fetchAvailableColumnKeys() ?? [];
+  public async fetchMetadataKeys(): Promise<MetadataKey[]> {
+    return this.controller?.fetchMetadataKeys() ?? [];
   }
 
   protected componentWillLoad(): void {
@@ -704,15 +707,15 @@ export class SceneTree {
       (state) => this.handleControllerStateChange(state)
     );
 
-    newController.setColumnKeys(this.columnKeys);
+    newController.setMetadataKeys(this.metadataKeys);
   }
 
   /**
    * @ignore
    */
-  @Watch('columnKeys')
-  protected handleColumnKeysChanged(): void {
-    this.controller?.setColumnKeys(this.columnKeys);
+  @Watch('metadataKeys')
+  protected handleMetadataKeysChanged(): void {
+    this.controller?.setMetadataKeys(this.metadataKeys);
   }
 
   private scheduleClearUnusedData(): void {
@@ -847,7 +850,7 @@ export class SceneTree {
           depth: 0,
           columnsList: [],
         },
-        columns: {},
+        metadata: {},
         data: {},
       };
       const { bindings, element } = this.createInstancedTemplate();

@@ -929,8 +929,8 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe('fetch column keys', () => {
-    it('fetches available column keys', async () => {
+  describe('fetch metadata keys', () => {
+    it('fetches available metadata keys', async () => {
       const key = new ColumnKey();
       key.setValue('val1');
       const res = new GetAvailableColumnsResponse();
@@ -952,13 +952,13 @@ describe('<vertex-scene-tree>', () => {
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
-      const keys = await tree.fetchAvailableColumnKeys();
+      const keys = await tree.fetchMetadataKeys();
       expect(keys).toEqual(['val1']);
     });
   });
 
-  describe('column keys', () => {
-    it('fetches columns when tree is initialized', async () => {
+  describe('metadata keys', () => {
+    it('fetches metadata when tree is initialized', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       const rowData = jest.fn();
@@ -975,18 +975,18 @@ describe('<vertex-scene-tree>', () => {
       } = await newSceneTreeSpec({ controller });
 
       tree.rowData = rowData;
-      tree.columnKeys = ['key1', 'key2'];
+      tree.metadataKeys = ['key1', 'key2'];
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
       expect(rowData).toHaveBeenCalledWith(
         expect.objectContaining({
-          columns: { key1: 'val1', key2: 'val2' },
+          metadata: { key1: 'val1', key2: 'val2' },
         })
       );
     });
 
-    it('fetches columns when column keys are set', async () => {
+    it('fetches metadata when metadata keys are set', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       const rowData = jest.fn();
@@ -1007,7 +1007,7 @@ describe('<vertex-scene-tree>', () => {
         transform: (node) => node.setColumnsList(['val1', 'val2']),
       });
       tree.rowData = rowData;
-      tree.columnKeys = ['key1', 'key2'];
+      tree.metadataKeys = ['key1', 'key2'];
 
       // Wait for the controller to fetch and emit new pages and for Stencil to
       // rerender.
@@ -1018,7 +1018,7 @@ describe('<vertex-scene-tree>', () => {
 
       expect(rowData).toHaveBeenCalledWith(
         expect.objectContaining({
-          columns: { key1: 'val1', key2: 'val2' },
+          metadata: { key1: 'val1', key2: 'val2' },
         })
       );
     });
