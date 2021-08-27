@@ -21,7 +21,12 @@ export function readDefaultStreamKey() {
 
 export function readDebugFeatureMap() {
   const urlParams = readUrlParams();
-  return urlParams.debugFeatureMap || '';
+  return urlParams.debugfeaturemap || '';
+}
+
+export function readSceneId() {
+  const urlParams = readUrlParams();
+  return urlParams.sceneid || '';
 }
 
 function readUrlParams() {
