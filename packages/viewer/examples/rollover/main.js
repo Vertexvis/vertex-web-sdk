@@ -17,7 +17,7 @@ class FeatureRolloverInteractionHandler {
     flexClient,
     featureMapContext,
     uniforms,
-    showFeatureMap
+    showFeatureMap = false
   ) {
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -58,6 +58,10 @@ class FeatureRolloverInteractionHandler {
     this.scene = this.api.getScene();
     this.element.addEventListener('pointerdown', this.handleMouseDown);
     this.element.addEventListener('pointermove', this.handleMouseMove);
+  }
+
+  enableShowFeatureMap(show) {
+    this.showFeatureMap = show;
   }
 
   async handleMouseDown(event) {
@@ -217,9 +221,9 @@ async function main() {
   const viewer = document.getElementById('viewer');
   await loadViewerWithQueryParams(viewer);
   const blendedRenderer = document.getElementById('blended-renderer');
-  // TODO this can probably be pulled out into it's own class/module
+  // TODO this setup can probably be pulled out into it's own class/module
   // TODO setup the feature map using the content of the canvas
-  const featureMapCanvas = getCanvasForFeatureMapTexture(false, viewer);
+  const featureMapCanvas = getCanvasForFeatureMapTexture();
   const texture = new THREE.CanvasTexture(featureMapCanvas);
   texture.magFilter = THREE.NearestFilter;
   texture.minFilter = THREE.NearestFilter;
@@ -240,16 +244,20 @@ async function main() {
   const meshes = getQuadAsMeshes(uniforms);
   // hijacked from three-animation example
   await addGeometryLoaderMeshes(blendedRenderer, vertexScene, meshes);
-  // interaciton handler that updates mouse position for the shader on mouse moves
-  viewer.registerInteractionHandler(
-    new FeatureRolloverInteractionHandler(
-      blendedRenderer,
-      client,
-      featureMapCanvas.getContext('2d'), //CAREFUL!!!!
-      uniforms,
-      readDebugFeatureMap()
-    )
+  const rolloverHandler = new FeatureRolloverInteractionHandler(
+    blendedRenderer,
+    client,
+    featureMapCanvas.getContext('2d'),
+    uniforms
   );
+  const debugFeatureMapChk = document.getElementById('debug-feature-map');
+  debugFeatureMapChk.onchange = () => {
+    rolloverHandler.enableShowFeatureMap(debugFeatureMapChk.checked);
+  };
+  debugFeatureMapChk.checked = readDebugFeatureMap();
+
+  // interaciton handler that updates mouse position for the shader on mouse moves
+  viewer.registerInteractionHandler(rolloverHandler);
 
   // this handles picking separately from the rollover...
   // maybe should be in the same handelr but it is leftover from the example
@@ -279,12 +287,8 @@ function updateScene(viewer, scene) {
   };
 }
 
-function getCanvasForFeatureMapTexture(useDiffuse, mainViewer) {
-  // if (useDiffuse) {
-  //   return mainViewer.shadowRoot.querySelector('canvas');
-  // } else {
+function getCanvasForFeatureMapTexture() {
   const offscreen = document.createElement('canvas');
   offscreen.setAttribute('id', 'offscreen');
   return offscreen;
-  // }
 }
