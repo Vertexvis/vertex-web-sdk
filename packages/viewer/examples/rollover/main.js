@@ -9,10 +9,16 @@ import {
   glassPaneFragmentShader,
   quadVertexShader,
 } from './featureRolloverShaders.js';
-import { loadViewerWithQueryParams } from './helpers.js';
+import { loadViewerWithQueryParams, readDebugFeatureMap } from './helpers.js';
 
 class FeatureRolloverInteractionHandler {
-  constructor(renderer, flexClient, featureMapContext, uniforms) {
+  constructor(
+    renderer,
+    flexClient,
+    featureMapContext,
+    uniforms,
+    showFeatureMap
+  ) {
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -21,6 +27,7 @@ class FeatureRolloverInteractionHandler {
     this.flexClient = flexClient;
     this.featureMapContext = featureMapContext;
     this.degrees_to_radians = (deg) => (deg * Math.PI) / 180.0;
+    this.showFeatureMap = showFeatureMap;
   }
 
   dispose() {
@@ -104,6 +111,12 @@ class FeatureRolloverInteractionHandler {
     for await (let message of this.flexClient.getFeatureMap(request)
       .responses) {
       console.log(message);
+      if (this.showFeatureMap) {
+        this.showFeatureMapFromReponse(message).then(() => {
+          console.log('Image displayed for ' + message);
+        });
+      }
+
       loadImageBytes(message.featureEntityMap)
         .then((image) => {
           return this.updateFeatureMapTexture(image.image, width, height);
@@ -117,27 +130,12 @@ class FeatureRolloverInteractionHandler {
     this.isInteracting = false;
   }
 
-  toCanvasImage(imageBytes, imageFormat) {
-    const encoding = imageFormat === 2 ? 'image/png' : 'image/jpeg';
+  async showFeatureMapFromReponse(response) {
+    const encoding = response.imageType === 2 ? 'image/png' : 'image/jpeg';
+    const imageData = response.featureEntityMap;
     // debug display the feature map
-    // const blick = new Blob([imageBytes], { type: encoding });
-    // window.open(URL.createObjectURL(blick), 'Name', 'resizable=1');
-    return new Promise((resolve, reject) => {
-      const blob = new Blob([imageBytes], { type: encoding });
-      var urlCreator = window.URL || window.webkitURL;
-      const blobUrl = urlCreator.createObjectURL(blob);
-      const img = new Image();
-      img.onload = (event) => {
-        resolve(img);
-        URL.revokeObjectURL(img);
-      };
-      img.onerror = (err) => {
-        reject(err);
-        URL.revokeObjectURL(blobUrl);
-      };
-      img.dispose = () => undefined;
-      img.src = blobUrl;
-    });
+    const blick = new Blob([imageData], { type: encoding });
+    window.open(URL.createObjectURL(blick), 'Name', 'resizable=1');
   }
 
   /**
@@ -189,7 +187,6 @@ class FeatureRolloverInteractionHandler {
   }
 
   async updateFeatureMapTexture(data, width, height) {
-    const rect = this.api.getScene().frame.image.imageRect;
     this.featureMapContext.canvas.width = width;
     this.featureMapContext.canvas.height = height;
     this.featureMapContext.clearRect(0, 0, width, height);
@@ -249,7 +246,8 @@ async function main() {
       blendedRenderer,
       client,
       featureMapCanvas.getContext('2d'), //CAREFUL!!!!
-      uniforms
+      uniforms,
+      readDebugFeatureMap()
     )
   );
 

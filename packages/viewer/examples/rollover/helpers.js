@@ -4,7 +4,7 @@ export async function loadViewerWithQueryParams(viewer) {
   viewer.setAttribute('client-id', clientId);
   console.log(readUrlParams());
   await viewer.load(`urn:vertexvis:stream-key:${key}`);
-  console.log("loaded")
+  console.log('loaded');
 }
 
 export function readDefaultClientId() {
@@ -17,6 +17,11 @@ export function readDefaultStreamKey() {
   const urlParams = readUrlParams();
 
   return urlParams.streamkey || '';
+}
+
+export function readDebugFeatureMap() {
+  const urlParams = readUrlParams();
+  return urlParams.debugFeatureMap || '';
 }
 
 function readUrlParams() {
