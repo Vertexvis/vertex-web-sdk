@@ -745,8 +745,9 @@ export class SceneTreeController {
         this.updateState({ ...this.state, totalRows, rows });
       }
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
       console.error(
-        `Request error fetching page at index ${page.index} (${e.toString()})`
+        `Request error fetching page at index ${page.index} (${errorMessage})`
       );
 
       const currentPage = this.getPage(page.index);
