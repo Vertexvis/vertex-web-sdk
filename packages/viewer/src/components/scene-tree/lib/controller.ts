@@ -9,6 +9,8 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   FilterRequest,
+  GetAvailableColumnsRequest,
+  GetAvailableColumnsResponse,
   GetNodeAncestorsRequest,
   GetNodeAncestorsResponse,
   GetTreeRequest,
@@ -27,6 +29,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
+import { MetadataKey } from '../interfaces';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;
@@ -44,6 +47,7 @@ export interface SceneTreeState {
 interface Page {
   id: number;
   index: number;
+  metadataKeys: MetadataKey[];
   res: Promise<GetTreeResponse>;
 }
 
@@ -102,6 +106,7 @@ export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
+  private metadataKeys: MetadataKey[] = [];
 
   private reconnectTimer?: number;
 
@@ -410,7 +415,7 @@ export class SceneTreeController {
         console.debug('Scene tree fetching page', index, offset);
         const res = this.fetchTree(offset, this.rowLimit, jwt);
         const id = this.nextPageId++;
-        const page = { id, res, index };
+        const page = { id, res, index, metadataKeys: this.metadataKeys };
         this.pages.set(index, page);
         this.handlePageResult(page);
       }
@@ -449,6 +454,23 @@ export class SceneTreeController {
     await Promise.all(
       Array.from({ length: pageCount }).map((_, page) => this.fetchPage(page))
     );
+  }
+
+  /**
+   * Fetches the metadata keys for the current scene view.
+   */
+  public async fetchMetadataKeys(): Promise<MetadataKey[]> {
+    return this.ifConnectionHasJwt(async (jwt) => {
+      const res = await this.requestUnary<GetAvailableColumnsResponse>(
+        jwt,
+        (meta, handler) => {
+          const req = new GetAvailableColumnsRequest();
+          this.client.getAvailableColumns(req, meta, handler);
+        }
+      );
+
+      return res.getKeysList().map((value) => value.getValue());
+    });
   }
 
   /**
@@ -545,6 +567,18 @@ export class SceneTreeController {
         `Scene tree dropped ${pages.length - this.fetchedPageCount} pages`,
         this.pages
       );
+    }
+  }
+
+  public setMetadataKeys(keys: MetadataKey[]): Promise<void> {
+    this.metadataKeys = keys;
+
+    if (this.state.connection.type === 'connected') {
+      const [start, end] = this.activeRowRange;
+      this.invalidateAfterOffset(0);
+      return this.updateActiveRowRange(start, end);
+    } else {
+      return Promise.resolve();
     }
   }
 
@@ -689,7 +723,11 @@ export class SceneTreeController {
 
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
-        const fetchedRows = fromNodeProto(offset, itemsList);
+        const fetchedRows = fromNodeProto(
+          offset,
+          itemsList,
+          currentPage.metadataKeys
+        );
 
         const start = this.state.rows.slice(0, offset);
         const end = this.state.rows.slice(
@@ -707,8 +745,9 @@ export class SceneTreeController {
         this.updateState({ ...this.state, totalRows, rows });
       }
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
       console.error(
-        `Request error fetching page at index ${page.index} (${e.toString()})`
+        `Request error fetching page at index ${page.index} (${errorMessage})`
       );
 
       const currentPage = this.getPage(page.index);
@@ -762,6 +801,7 @@ export class SceneTreeController {
 
       const req = new GetTreeRequest();
       req.setPager(pager);
+      req.setAdditionalColumnKeysList(this.metadataKeys);
 
       this.client.getTree(req, metadata, handler);
     });

@@ -45,6 +45,7 @@ import {
   InstancedTemplate,
 } from './lib/templates';
 import { isSceneTreeRowElement } from '../scene-tree-row/utils';
+import { MetadataKey } from './interfaces';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -190,6 +191,13 @@ export class SceneTree {
 
   @Prop({ mutable: true })
   public controller?: SceneTreeController;
+
+  /**
+   * A list of part metadata keys that will be made available to each row. This
+   * metadata can be used for data binding inside the scene tree's template.
+   */
+  @Prop()
+  public metadataKeys: MetadataKey[] = [];
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
@@ -524,6 +532,19 @@ export class SceneTree {
     return this.controller?.filter(term, options);
   }
 
+  /**
+   * Fetches the metadata keys that are available to the scene tree. Metadata
+   * keys can be assigned to the scene tree using the `metadataKeys` property.
+   * The scene tree will fetch this metadata and make these values available
+   * for data binding.
+   *
+   * @returns A promise that resolves with the names of available keys.
+   */
+  @Method()
+  public async fetchMetadataKeys(): Promise<MetadataKey[]> {
+    return this.controller?.fetchMetadataKeys() ?? [];
+  }
+
   protected componentWillLoad(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
@@ -685,6 +706,16 @@ export class SceneTree {
     this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
       (state) => this.handleControllerStateChange(state)
     );
+
+    newController.setMetadataKeys(this.metadataKeys);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('metadataKeys')
+  protected handleMetadataKeysChanged(): void {
+    this.controller?.setMetadataKeys(this.metadataKeys);
   }
 
   private scheduleClearUnusedData(): void {
@@ -817,7 +848,9 @@ export class SceneTree {
           partiallyVisible: false,
           isLeaf: false,
           depth: 0,
+          columnsList: [],
         },
+        metadata: {},
         data: {},
       };
       const { bindings, element } = this.createInstancedTemplate();

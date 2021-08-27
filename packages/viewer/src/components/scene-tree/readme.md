@@ -237,6 +237,7 @@ stack toolbars.
 | `config`         | --                | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
 | `configEnv`      | `config-env`      | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
 | `controller`     | --                |                                                                                                                                                                     | `SceneTreeController \| undefined`                     | `undefined`  |
+| `metadataKeys`   | --                | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.                  | `string[]`                                             | `[]`         |
 | `overScanCount`  | `over-scan-count` | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `25`         |
 | `rowData`        | --                | A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
 | `viewer`         | --                | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                   | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
@@ -302,6 +303,19 @@ row or row index.
 #### Returns
 
 Type: `Promise<void>`
+
+
+
+### `fetchMetadataKeys() => Promise<MetadataKey[]>`
+
+Fetches the metadata keys that are available to the scene tree. Metadata
+keys can be assigned to the scene tree using the `metadataKeys` property.
+The scene tree will fetch this metadata and make these values available
+for data binding.
+
+#### Returns
+
+Type: `Promise<string[]>`
 
 
 

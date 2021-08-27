@@ -937,7 +937,10 @@ export class Viewer {
         this.errorMessage = 'Unable to establish connection to Vertex.';
         console.error('Failed to establish WS connection', e);
 
-        throw new WebsocketConnectionError(this.errorMessage, e);
+        throw new WebsocketConnectionError(
+          this.errorMessage,
+          e instanceof Error ? e : undefined
+        );
       }
     }
   }
@@ -1031,7 +1034,10 @@ export class Viewer {
         this.errorMessage = this.errorMessage || message;
         console.error('Failed to establish WS connection', e);
       }
-      throw new WebsocketConnectionError(message, e);
+      throw new WebsocketConnectionError(
+        message,
+        e instanceof Error ? e : undefined
+      );
     }
   }
 
