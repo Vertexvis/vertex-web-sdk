@@ -9,6 +9,8 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   FilterRequest,
+  GetAvailableColumnsRequest,
+  GetAvailableColumnsResponse,
   GetNodeAncestorsRequest,
   GetNodeAncestorsResponse,
   GetTreeRequest,
@@ -27,6 +29,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
+import { ColumnKey } from '../interfaces';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;
@@ -44,6 +47,7 @@ export interface SceneTreeState {
 interface Page {
   id: number;
   index: number;
+  columnKeys: ColumnKey[];
   res: Promise<GetTreeResponse>;
 }
 
@@ -102,6 +106,7 @@ export class SceneTreeController {
   private nextPageId = 0;
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
+  private columnKeys: ColumnKey[] = [];
 
   private reconnectTimer?: number;
 
@@ -410,7 +415,7 @@ export class SceneTreeController {
         console.debug('Scene tree fetching page', index, offset);
         const res = this.fetchTree(offset, this.rowLimit, jwt);
         const id = this.nextPageId++;
-        const page = { id, res, index };
+        const page = { id, res, index, columnKeys: this.columnKeys };
         this.pages.set(index, page);
         this.handlePageResult(page);
       }
@@ -449,6 +454,26 @@ export class SceneTreeController {
     await Promise.all(
       Array.from({ length: pageCount }).map((_, page) => this.fetchPage(page))
     );
+  }
+
+  /**
+   * Fetches the names of the columns for the current scene view. These column
+   * names can be used to request additional data for each row of the tree.
+   *
+   * @returns A promise that resolves with the names of each available column
+   */
+  public async fetchAvailableColumnKeys(): Promise<ColumnKey[]> {
+    return this.ifConnectionHasJwt(async (jwt) => {
+      const res = await this.requestUnary<GetAvailableColumnsResponse>(
+        jwt,
+        (meta, handler) => {
+          const req = new GetAvailableColumnsRequest();
+          this.client.getAvailableColumns(req, meta, handler);
+        }
+      );
+
+      return res.getKeysList().map((value) => value.getValue());
+    });
   }
 
   /**
@@ -545,6 +570,18 @@ export class SceneTreeController {
         `Scene tree dropped ${pages.length - this.fetchedPageCount} pages`,
         this.pages
       );
+    }
+  }
+
+  public setColumnKeys(keys: ColumnKey[]): Promise<void> {
+    this.columnKeys = keys;
+
+    if (this.state.connection.type === 'connected') {
+      const [start, end] = this.activeRowRange;
+      this.invalidateAfterOffset(0);
+      return this.updateActiveRowRange(start, end);
+    } else {
+      return Promise.resolve();
     }
   }
 
@@ -689,7 +726,11 @@ export class SceneTreeController {
 
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
-        const fetchedRows = fromNodeProto(offset, itemsList);
+        const fetchedRows = fromNodeProto(
+          offset,
+          itemsList,
+          currentPage.columnKeys
+        );
 
         const start = this.state.rows.slice(0, offset);
         const end = this.state.rows.slice(
@@ -762,6 +803,7 @@ export class SceneTreeController {
 
       const req = new GetTreeRequest();
       req.setPager(pager);
+      req.setAdditionalColumnKeysList(this.columnKeys);
 
       this.client.getTree(req, metadata, handler);
     });

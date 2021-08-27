@@ -17,6 +17,7 @@ import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
+import { ColumnKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
@@ -85,6 +86,10 @@ export namespace Components {
      */
     collapseItem: (row: RowArg) => Promise<void>;
     /**
+     * A list of column keys to include in the fetched row data.
+     */
+    columnKeys: ColumnKey[];
+    /**
      * An object to configure the scene tree.
      */
     config?: Config;
@@ -107,6 +112,11 @@ export namespace Components {
      * @param row A row, row index, or node to expand.
      */
     expandItem: (row: RowArg) => Promise<void>;
+    /**
+     * Fetches the names of the columns for the current scene view. These column names can be used to request additional data for each row of the tree.
+     * @returns A promise that resolves with the names of available column.
+     */
+    fetchAvailableColumnKeys: () => Promise<ColumnKey[]>;
     /**
      * Performs an async request that will filter the displayed items in the tree that match the given term and options.
      * @param term The filter term.
@@ -974,6 +984,10 @@ declare global {
 }
 declare namespace LocalJSX {
   interface VertexSceneTree {
+    /**
+     * A list of column keys to include in the fetched row data.
+     */
+    columnKeys?: ColumnKey[];
     /**
      * An object to configure the scene tree.
      */

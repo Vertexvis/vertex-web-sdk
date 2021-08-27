@@ -6,6 +6,7 @@ import { grpc } from '@improbable-eng/grpc-web';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import {
+  ColumnKey,
   ListChange,
   Range,
   StateChange,
@@ -22,6 +23,7 @@ import {
   ExpandNodeResponse,
   FilterRequest,
   FilterResponse,
+  GetAvailableColumnsResponse,
   GetTreeRequest,
   LocateItemResponse,
   SubscribeRequest,
@@ -187,7 +189,7 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           rows: [
-            ...fromNodeProto(0, getTree2.getItemsList()),
+            ...fromNodeProto(0, getTree2.getItemsList(), []),
             ...new Array(90),
           ],
           totalRows: 100,
@@ -721,7 +723,7 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           rows: [
-            ...fromNodeProto(0, getTree1.getItemsList()),
+            ...fromNodeProto(0, getTree1.getItemsList(), []),
             ...new Array(90),
           ],
           totalRows: 100,
@@ -732,8 +734,8 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           rows: [
-            ...fromNodeProto(0, getTree1.getItemsList()),
-            ...fromNodeProto(10, getTree2.getItemsList()),
+            ...fromNodeProto(0, getTree1.getItemsList(), []),
+            ...fromNodeProto(10, getTree2.getItemsList(), []),
             ...new Array(80),
           ],
           totalRows: 100,
@@ -1037,7 +1039,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.updateActiveRowRange, () => [
+  describe(SceneTreeController.prototype.updateActiveRowRange, () => {
     it('fetches pages in active rows that have not been fetched', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
@@ -1055,6 +1057,64 @@ describe(SceneTreeController, () => {
 
       const rows = await pendingRows;
       expect(rows.slice(0, 20).every((row) => row != null)).toBe(true);
-    }),
-  ]);
+    });
+  });
+
+  describe(SceneTreeController.prototype.fetchAvailableColumnKeys, () => {
+    it('returns column keys', async () => {
+      const key1 = new ColumnKey();
+      key1.setValue('key1');
+      const key2 = new ColumnKey();
+      key2.setValue('key2');
+      const columnRes = new GetAvailableColumnsResponse();
+      columnRes.setKeysList([key1, key2]);
+
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+      (client.getAvailableColumns as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(columnRes)
+      );
+
+      await controller.connect(jwtProvider);
+
+      const res = await controller.fetchAvailableColumnKeys();
+      expect(res).toEqual(['key1', 'key2']);
+    });
+  });
+
+  describe(SceneTreeController.prototype.setColumnKeys, () => {
+    it('refetches pages in active rows with additional column values', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      await controller.connect(jwtProvider);
+      await controller.updateActiveRowRange(0, 9);
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => resolve(state.rows));
+      });
+
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(
+          createGetTreeResponse(10, 100, (node) => {
+            node.setColumnsList(['val1', 'val2']);
+          })
+        )
+      );
+      await controller.setColumnKeys(['key1', 'key2']);
+
+      const rows = await pendingRows;
+      expect(
+        rows
+          .slice(0, 10)
+          .every(
+            (row) => row?.columns.key1 === 'val1' && row.columns.key2 === 'val2'
+          )
+      ).toBe(true);
+    });
+  });
 });

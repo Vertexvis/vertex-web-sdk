@@ -234,6 +234,7 @@ stack toolbars.
 
 | Property         | Attribute         | Description                                                                                                                                                         | Type                                                   | Default      |
 | ---------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `columnKeys`     | --                | A list of column keys to include in the fetched row data.                                                                                                           | `string[]`                                             | `[]`         |
 | `config`         | --                | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
 | `configEnv`      | `config-env`      | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
 | `controller`     | --                |                                                                                                                                                                     | `SceneTreeController \| undefined`                     | `undefined`  |
@@ -302,6 +303,17 @@ row or row index.
 #### Returns
 
 Type: `Promise<void>`
+
+
+
+### `fetchAvailableColumnKeys() => Promise<ColumnKey[]>`
+
+Fetches the names of the columns for the current scene view. These column
+names can be used to request additional data for each row of the tree.
+
+#### Returns
+
+Type: `Promise<string[]>`
 
 
 

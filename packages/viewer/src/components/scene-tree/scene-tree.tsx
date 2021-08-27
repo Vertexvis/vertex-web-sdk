@@ -45,6 +45,7 @@ import {
   InstancedTemplate,
 } from './lib/templates';
 import { isSceneTreeRowElement } from '../scene-tree-row/utils';
+import { ColumnKey } from './interfaces';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -190,6 +191,12 @@ export class SceneTree {
 
   @Prop({ mutable: true })
   public controller?: SceneTreeController;
+
+  /**
+   * A list of column keys to include in the fetched row data.
+   */
+  @Prop()
+  public columnKeys: ColumnKey[] = [];
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
@@ -524,6 +531,17 @@ export class SceneTree {
     return this.controller?.filter(term, options);
   }
 
+  /**
+   * Fetches the names of the columns for the current scene view. These column
+   * names can be used to request additional data for each row of the tree.
+   *
+   * @returns A promise that resolves with the names of available column.
+   */
+  @Method()
+  public async fetchAvailableColumnKeys(): Promise<ColumnKey[]> {
+    return this.controller?.fetchAvailableColumnKeys() ?? [];
+  }
+
   protected componentWillLoad(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
@@ -685,6 +703,16 @@ export class SceneTree {
     this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
       (state) => this.handleControllerStateChange(state)
     );
+
+    newController.setColumnKeys(this.columnKeys);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('columnKeys')
+  protected handleColumnKeysChanged(): void {
+    this.controller?.setColumnKeys(this.columnKeys);
   }
 
   private scheduleClearUnusedData(): void {
@@ -819,6 +847,7 @@ export class SceneTree {
           depth: 0,
           columnsList: [],
         },
+        columns: {},
         data: {},
       };
       const { bindings, element } = this.createInstancedTemplate();

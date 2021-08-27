@@ -21,11 +21,15 @@ import { SceneTreeController } from './lib/controller';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
+  GetAvailableColumnsResponse,
   GetNodeAncestorsResponse,
   GetTreeResponse,
   LocateItemResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import {
+  ColumnKey,
+  Node,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
@@ -925,12 +929,105 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe('search', () => {
-    it('creates a search element if header slot is empty', async () => {
+  describe('fetch column keys', () => {
+    it('fetches available column keys', async () => {
+      const key = new ColumnKey();
+      key.setValue('val1');
+      const res = new GetAvailableColumnsResponse();
+      res.addKeys(key);
+
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client });
+      (client.getAvailableColumns as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const {
+        tree,
+        viewer,
+        waitForSceneTreeConnected,
+      } = await newSceneTreeSpec({ controller });
+      await loadModelForViewer(viewer, { jwt });
+      await waitForSceneTreeConnected();
+
+      const keys = await tree.fetchAvailableColumnKeys();
+      expect(keys).toEqual(['val1']);
+    });
+  });
+
+  describe('column keys', () => {
+    it('fetches columns when tree is initialized', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const rowData = jest.fn();
+
+      mockGetTree({
+        client,
+        transform: (node) => node.setColumnsList(['val1', 'val2']),
+      });
+
+      const {
+        tree,
+        viewer,
+        waitForSceneTreeConnected,
+      } = await newSceneTreeSpec({ controller });
+
+      tree.rowData = rowData;
+      tree.columnKeys = ['key1', 'key2'];
+      await loadModelForViewer(viewer, { jwt });
+      await waitForSceneTreeConnected();
+
+      expect(rowData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          columns: { key1: 'val1', key2: 'val2' },
+        })
+      );
+    });
+
+    it('fetches columns when column keys are set', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const rowData = jest.fn();
+
+      mockGetTree({ client });
+
+      const {
+        tree,
+        viewer,
+        waitForSceneTreeConnected,
+        page,
+      } = await newSceneTreeSpec({ controller });
+      await loadModelForViewer(viewer, { jwt });
+      await waitForSceneTreeConnected();
+
+      mockGetTree({
+        client,
+        transform: (node) => node.setColumnsList(['val1', 'val2']),
+      });
+      tree.rowData = rowData;
+      tree.columnKeys = ['key1', 'key2'];
+
+      // Wait for the controller to fetch and emit new pages and for Stencil to
+      // rerender.
+      await new Promise((resolve) => {
+        controller.onStateChange.on(resolve);
+      });
+      await page.waitForChanges();
+
+      expect(rowData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          columns: { key1: 'val1', key2: 'val2' },
+        })
+      );
+    });
+  });
+
+  describe('search', () => {
+    it('creates a search element if header slot is empty', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
 
       const { tree } = await newSceneTreeSpec({ controller });
 
@@ -942,8 +1039,6 @@ describe('<vertex-scene-tree>', () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       const filter = jest.spyOn(controller, 'filter');
-
-      mockGetTree({ client });
 
       const { tree } = await newSceneTreeSpec({ controller });
 
@@ -972,8 +1067,8 @@ async function newSceneTreeSpec(data: {
             <vertex-scene-tree
               controller={data.controller}
               viewerSelector="#viewer"
-            ></vertex-scene-tree>
-            <vertex-viewer id="viewer"></vertex-viewer>
+            />
+            <vertex-viewer id="viewer" />
           </div>
         )
       );
