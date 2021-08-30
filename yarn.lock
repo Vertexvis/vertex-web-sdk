@@ -1741,10 +1741,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
-"@types/three@^0.129.1":
-  version "0.129.1"
-  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.129.1.tgz#e488e686132256dfd61cffd4d97ea6cf176a4a8d"
-  integrity sha512-31VTcjAQNggIrCH9NVotTYsr5Ws/QMGGTaMK6RP3EgyzW2WEuZdm25TNidd6PJ3e4a6/hbswNacnTsjwc7ksbw==
+"@types/three@^0.131.0":
+  version "0.131.0"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.131.0.tgz#98f59887b05f71e665cf2fbdf04e0e4ceb9f89b6"
+  integrity sha512-4VCtsDi6mIId96GcGKG91e2Y6VwU2T0u/YB7vCFJh1kXik93arxn7l9tVZHo1LXOtgCJJDdC+e1fwf2Vu/4ySw==
 
 "@types/uuid@^8.3.0":
   version "8.3.1"
@@ -8073,10 +8073,10 @@ threads@^1.6.5:
   optionalDependencies:
     tiny-worker ">= 2"
 
-three@^0.129.0:
-  version "0.129.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.129.0.tgz#f5e530bbc96eac5d5b4749cb5da886ef0d42f554"
-  integrity sha512-wiWio1yVRg2Oj6WEWsTHQo5eSzYpEwSBtPSi3OofNpvFbf26HFfb9kw4FZJNjII4qxzp0b1xLB11+tKkBGB1ZA==
+three@^0.132.2:
+  version "0.132.2"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.132.2.tgz#95eb1856147237c03e887cbbe56f964b6fb40b5e"
+  integrity sha512-0wcR7LxxkXMn6Gi58gEs3QvY8WpTVXA31L2VOvpjm4ZPYFRHCZC13UqynheFoS5OXDYgtBneN0dhbaNBE8iLhQ==
 
 throat@^5.0.0:
   version "5.0.0"

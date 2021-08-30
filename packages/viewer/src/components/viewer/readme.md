@@ -60,6 +60,16 @@ Type: `Promise<Disposable>`
 
 
 
+### `deregisterRenderer(renderer: FrameRenderer<Frame, void>) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
 
 
@@ -126,6 +136,16 @@ the default camera controls provided by the viewer.
 #### Returns
 
 Type: `Promise<Disposable>`
+
+
+
+### `registerRenderer(renderer: FrameRenderer<Frame, void>) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
 
 
 

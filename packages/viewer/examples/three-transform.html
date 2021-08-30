@@ -136,7 +136,7 @@
           }
         });
 
-        transformControl = createTransformControl(
+        transformControl = await createTransformControl(
           viewer,
           overlayRenderer,
           blendedRenderer
@@ -151,14 +151,16 @@
         };
       }
 
-      function createTransformControl(viewer, renderer, blendedRenderer) {
+      async function createTransformControl(viewer, renderer, blendedRenderer) {
+        const interactionTarget = await viewer.getInteractionTarget();
+
         const handleViewerPointerMove = (event) => {
           event.stopImmediatePropagation();
         };
 
         const transformControl = new TransformControls(
           renderer.camera,
-          viewer.interactionTarget
+          interactionTarget
         );
         transformControl.size = 0.5;
         transformControl.addEventListener('mouseDown', () => {

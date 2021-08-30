@@ -9,6 +9,7 @@ import { RowArg, RowDataProvider, ScrollToOptions, SelectItemOptions } from "./c
 import { Config } from "./lib/config";
 import { Environment } from "./lib/environment";
 import { FilterTreeOptions, SceneTreeController } from "./components/scene-tree/lib/controller";
+import { MetadataKey } from "./components/scene-tree/interfaces";
 import { SceneTreeErrorDetails } from "./components/scene-tree/lib/errors";
 import { Row } from "./components/scene-tree/lib/row";
 import { Node } from "@vertexvis/scene-tree-protos/scenetree/protos/domain_pb";
@@ -75,6 +76,11 @@ export namespace Components {
          */
         "expandItem": (row: RowArg) => Promise<void>;
         /**
+          * Fetches the metadata keys that are available to the scene tree. Metadata keys can be assigned to the scene tree using the `metadataKeys` property. The scene tree will fetch this metadata and make these values available for data binding.
+          * @returns A promise that resolves with the names of available keys.
+         */
+        "fetchMetadataKeys": () => Promise<MetadataKey[]>;
+        /**
           * Performs an async request that will filter the displayed items in the tree that match the given term and options.
           * @param term The filter term.
           * @param options The options to apply to the filter.
@@ -109,6 +115,10 @@ export namespace Components {
          */
         "invalidateRows": () => Promise<void>;
         /**
+          * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
+         */
+        "metadataKeys": MetadataKey[];
+        /**
           * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
          */
         "overScanCount": number;
@@ -136,12 +146,6 @@ export namespace Components {
           * @param options A set of options to configure selection behavior.
          */
         "selectItem": (row: RowArg, { recurseParent, ...options }?: SelectItemOptions) => Promise<void>;
-        /**
-          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
-          * @see SceneTree.selectItem *
-          * @see SceneTree.deselectItem
-         */
-        "selectionDisabled": boolean;
         /**
           * Performs an API call that will show the item associated to the given row or row index.
           * @param row The row, row index, or node to show.
@@ -257,12 +261,12 @@ export namespace Components {
         "frame": Frame | undefined;
         "getBaseInteractionHandler": () => Promise<BaseInteractionHandler | undefined>;
         "getInteractionHandlers": () => Promise<InteractionHandler[]>;
-        "getJwt": () => Promise<string | undefined>;
-        "handleWebSocketClose": () => Promise<void>;
         /**
           * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
          */
-        "interactionTarget"?: HTMLElement;
+        "getInteractionTarget": () => Promise<HTMLElement>;
+        "getJwt": () => Promise<string | undefined>;
+        "handleWebSocketClose": () => Promise<void>;
         /**
           * Returns `true` indicating that the scene is ready to be interacted with.
          */
@@ -296,7 +300,7 @@ export namespace Components {
         "registerTapKeyInteraction": (keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>;
         "resolvedConfig"?: Config;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
+          * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
          */
         "rotateAroundTapPoint": boolean;
         /**
@@ -359,6 +363,14 @@ export namespace Components {
          */
         "billboardOff": boolean;
         /**
+          * Disables interaction events from children.
+         */
+        "interactionsOff": boolean;
+        /**
+          * The local matrix of this element.
+         */
+        "matrix": Matrix4.Matrix4;
+        /**
           * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
           * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
          */
@@ -368,19 +380,75 @@ export namespace Components {
          */
         "occlusionOff": boolean;
         /**
-          * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+          * The local 3D position of where this element is located.
          */
-        "position": Vector3.Vector3 | string;
+        "position": Vector3.Vector3;
         /**
-          * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+          * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "rotation": | Quaternion.Quaternion
-    | Euler.Euler
-    | string;
+        "positionJson": string;
         /**
-          * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+          * The local rotation of this element.
          */
-        "scale": Vector3.Vector3 | string;
+        "quaternion": Quaternion.Quaternion;
+        /**
+          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+         */
+        "quaternionJson": string;
+        /**
+          * The local rotation of this element in Euler angles.
+         */
+        "rotation"?: Euler.Euler;
+        /**
+          * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+         */
+        "rotationJson"?: string;
+        /**
+          * The local scale of this element.
+         */
+        "scale": Vector3.Vector3;
+        /**
+          * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scaleJson": string;
+    }
+    interface VertexViewerDomGroup {
+        /**
+          * The local matrix of this element.
+         */
+        "matrix": Matrix4.Matrix4;
+        /**
+          * The local 3D position of where this element is located.
+         */
+        "position": Vector3.Vector3;
+        /**
+          * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "positionJson": string;
+        /**
+          * The local rotation of this element.
+         */
+        "quaternion": Quaternion.Quaternion;
+        /**
+          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+         */
+        "quaternionJson": string;
+        /**
+          * The local rotation of this element in Euler angles.
+         */
+        "rotation"?: Euler.Euler;
+        /**
+          * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+         */
+        "rotationJson"?: string;
+        /**
+          * The local scale of this element.
+         */
+        "scale": Vector3.Vector3;
+        /**
+          * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scaleJson": string;
     }
     interface VertexViewerDomRenderer {
         /**
@@ -631,21 +699,19 @@ export namespace Components {
           * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
          */
         "animationDuration": number;
+        "camera"?: FramePerspectiveCamera;
         /**
-          * Disables standard view interactions.
+          * Disables interactions for standard views.
          */
-        "standardViewsDisabled": boolean;
+        "standardViewsOff": boolean;
         /**
-          * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+          * Disables the display of the triad.
          */
-        "viewMatrix": Matrix4.Matrix4;
+        "triadOff": boolean;
         /**
-          * An instance of the viewer to bind to.
+          * The viewer element that is connected to the view cube.
          */
         "viewer"?: HTMLVertexViewerElement;
-        /**
-          * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
-         */
         "worldOrientation": Orientation;
         /**
           * The label for the side of the cube on the negative x-axis.
@@ -728,6 +794,12 @@ declare global {
         prototype: HTMLVertexViewerDomElementElement;
         new (): HTMLVertexViewerDomElementElement;
     };
+    interface HTMLVertexViewerDomGroupElement extends Components.VertexViewerDomGroup, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDomGroupElement: {
+        prototype: HTMLVertexViewerDomGroupElement;
+        new (): HTMLVertexViewerDomGroupElement;
+    };
     interface HTMLVertexViewerDomRendererElement extends Components.VertexViewerDomRenderer, HTMLStencilElement {
     }
     var HTMLVertexViewerDomRendererElement: {
@@ -804,6 +876,7 @@ declare global {
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
         "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
+        "vertex-viewer-dom-group": HTMLVertexViewerDomGroupElement;
         "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-layer": HTMLVertexViewerLayerElement;
@@ -828,6 +901,10 @@ declare namespace LocalJSX {
          */
         "configEnv"?: Environment;
         "controller"?: SceneTreeController;
+        /**
+          * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
+         */
+        "metadataKeys"?: MetadataKey[];
         "onConnectionError"?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
         /**
           * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
@@ -838,12 +915,6 @@ declare namespace LocalJSX {
           * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
          */
         "rowData"?: RowDataProvider;
-        /**
-          * Disables the default selection behavior of the tree. Can be used to implement custom selection behavior via the trees selection methods.
-          * @see SceneTree.selectItem *
-          * @see SceneTree.deselectItem
-         */
-        "selectionDisabled"?: boolean;
         /**
           * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
          */
@@ -945,10 +1016,6 @@ declare namespace LocalJSX {
          */
         "frame"?: Frame | undefined;
         /**
-          * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
-         */
-        "interactionTarget"?: HTMLElement;
-        /**
           * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
          */
         "keyboardControls"?: boolean;
@@ -1000,7 +1067,7 @@ declare namespace LocalJSX {
         "onTokenExpired"?: (event: CustomEvent<void>) => void;
         "resolvedConfig"?: Config;
         /**
-          * Enables or disables the default rotation interaction being changed to rotate around the mouse down location.
+          * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
          */
         "rotateAroundTapPoint"?: boolean;
         /**
@@ -1055,6 +1122,14 @@ declare namespace LocalJSX {
          */
         "billboardOff"?: boolean;
         /**
+          * Disables interaction events from children.
+         */
+        "interactionsOff"?: boolean;
+        /**
+          * The local matrix of this element.
+         */
+        "matrix"?: Matrix4.Matrix4;
+        /**
           * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
           * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
          */
@@ -1064,23 +1139,75 @@ declare namespace LocalJSX {
          */
         "occlusionOff"?: boolean;
         /**
-          * An event that's emitted when a property of this component changes.
+          * The local 3D position of where this element is located.
          */
-        "onPropertyChange"?: (event: CustomEvent<void>) => void;
+        "position"?: Vector3.Vector3;
         /**
-          * The 3D position where this element is located. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+          * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
          */
-        "position"?: Vector3.Vector3 | string;
+        "positionJson"?: string;
         /**
-          * The rotation of this this element, represented as a `Quaternion`, `Euler` or a JSON string representation in one of the following formats:  * `[x, y, z, w]` * `{"x": 0, "y": 0, "z": 0, "w": 0}` * `[x, y, z, order]` * `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`
+          * The local rotation of this element.
          */
-        "rotation"?: | Quaternion.Quaternion
-    | Euler.Euler
-    | string;
+        "quaternion"?: Quaternion.Quaternion;
         /**
-          * The scale of this element. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
          */
-        "scale"?: Vector3.Vector3 | string;
+        "quaternionJson"?: string;
+        /**
+          * The local rotation of this element in Euler angles.
+         */
+        "rotation"?: Euler.Euler;
+        /**
+          * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+         */
+        "rotationJson"?: string;
+        /**
+          * The local scale of this element.
+         */
+        "scale"?: Vector3.Vector3;
+        /**
+          * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scaleJson"?: string;
+    }
+    interface VertexViewerDomGroup {
+        /**
+          * The local matrix of this element.
+         */
+        "matrix"?: Matrix4.Matrix4;
+        /**
+          * The local 3D position of where this element is located.
+         */
+        "position"?: Vector3.Vector3;
+        /**
+          * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "positionJson"?: string;
+        /**
+          * The local rotation of this element.
+         */
+        "quaternion"?: Quaternion.Quaternion;
+        /**
+          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+         */
+        "quaternionJson"?: string;
+        /**
+          * The local rotation of this element in Euler angles.
+         */
+        "rotation"?: Euler.Euler;
+        /**
+          * The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.
+         */
+        "rotationJson"?: string;
+        /**
+          * The local scale of this element.
+         */
+        "scale"?: Vector3.Vector3;
+        /**
+          * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+         */
+        "scaleJson"?: string;
     }
     interface VertexViewerDomRenderer {
         /**
@@ -1320,21 +1447,19 @@ declare namespace LocalJSX {
           * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
          */
         "animationDuration"?: number;
+        "camera"?: FramePerspectiveCamera;
         /**
-          * Disables standard view interactions.
+          * Disables interactions for standard views.
          */
-        "standardViewsDisabled"?: boolean;
+        "standardViewsOff"?: boolean;
         /**
-          * The view matrix that specifies the camera's orientation. If `viewer` is set, this property will be populated automatically.
+          * Disables the display of the triad.
          */
-        "viewMatrix"?: Matrix4.Matrix4;
+        "triadOff"?: boolean;
         /**
-          * An instance of the viewer to bind to.
+          * The viewer element that is connected to the view cube.
          */
         "viewer"?: HTMLVertexViewerElement;
-        /**
-          * An orientation that defines the X and Z vectors to orient the world. If `viewer` is set, this property will be populated automatically.
-         */
         "worldOrientation"?: Orientation;
         /**
           * The label for the side of the cube on the negative x-axis.
@@ -1371,6 +1496,7 @@ declare namespace LocalJSX {
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
         "vertex-viewer-dom-element": VertexViewerDomElement;
+        "vertex-viewer-dom-group": VertexViewerDomGroup;
         "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-layer": VertexViewerLayer;
@@ -1397,6 +1523,7 @@ declare module "@stencil/core" {
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
             "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
+            "vertex-viewer-dom-group": LocalJSX.VertexViewerDomGroup & JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
             "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
