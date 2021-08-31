@@ -35,3 +35,7 @@ export { TapEventDetails };
 export * from './lib/vertex-geometry/flexApi';
 
 export * from './lib/vertex-geometry';
+
+import { loadImageBytes } from './lib/rendering/imageLoaders';
+
+export { loadImageBytes };
