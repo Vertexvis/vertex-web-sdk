@@ -5,6 +5,10 @@ import {
   GetCompressedGeometryResponse,
   GetGeometryRequest,
   GetGeometryResponse,
+  MeasureRequest,
+  MeasureResponse,
+  GetFeatureEntityMapRequest,
+  GetFeatureEntityMapResponse,
 } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
 import { ServerStreamingCall } from '@protobuf-ts/runtime-rpc';
 
@@ -51,5 +55,20 @@ export class FlexTimeApi {
       excludeSentTriangleSets: false,
     };
     return this.client.getCompressedGeometry(newReq);
+  }
+
+  public measure(
+    req: MeasureRequest
+  ): ServerStreamingCall<MeasureRequest, MeasureResponse> {
+    return this.client.measure(req);
+  }
+
+  public getFeatureMap(
+    request: GetFeatureEntityMapRequest
+  ): ServerStreamingCall<
+    GetFeatureEntityMapRequest,
+    GetFeatureEntityMapResponse
+  > {
+    return this.client.getFeatureEntityMap(request);
   }
 }

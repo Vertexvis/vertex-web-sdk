@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.measurement;
+
+option java_multiple_files = true;
+option java_outer_classname = "MeasurementApiProto";
+option java_package = "com.vertexvis.protobuf.measurement";
+import "core/protos/uuid.proto";
+import "measurement-service/protos/domain.proto";
+
+service MeasurementAPI {
+  rpc GetMeasurement(GetMeasurementRequest) returns (stream GetMeasurementResponse);
+}
+
+message GetMeasurementRequest {
+    repeated MeasurementOpDetails op_details = 1;
+}
+
+message GetMeasurementResponse {
+  // The evaluated measurements
+  vertexvis.protobuf.measurement.MeasurementOutcome measurements = 1;
+}

@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+option java_multiple_files = true;
+option java_outer_classname = "FrustumProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message Frustum {
+    float near = 1;
+    float far = 2;
+    float left = 3;
+    float right = 4;
+    float bottom = 5;
+    float top = 6;
+}
+

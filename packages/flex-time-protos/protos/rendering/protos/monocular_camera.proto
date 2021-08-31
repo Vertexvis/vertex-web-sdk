@@ -1,0 +1,26 @@
+
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+import "core/protos/geometry.proto";
+import "rendering/protos/frustum.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "MonocularCameraProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message MonocularCamera {
+    vertexvis.protobuf.core.Vector3f up = 1;
+    vertexvis.protobuf.core.Vector3f at = 2;
+    vertexvis.protobuf.core.Vector3f direction = 3;
+    Frustum frustum = 4;
+
+    // If not defined, the camera is interpreted to be an orthographic projection
+    // If defined, the camera is interpreted to be a perspective projection
+    vertexvis.protobuf.core.Vector3f from = 5;
+
+    // For perspective projections, the field-of-view angle (in radians)
+    // For orthographic projections, the frustum height in WCS units
+    float fov = 6;
+}

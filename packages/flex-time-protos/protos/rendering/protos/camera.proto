@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+import "core/protos/geometry.proto";
+import "rendering/protos/monocular_camera.proto";
+import "rendering/protos/binocular_camera.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "CameraProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message BasicCamera {
+    vertexvis.protobuf.core.Vector3f position = 1;
+    vertexvis.protobuf.core.Vector3f look_at = 2;
+    vertexvis.protobuf.core.Vector3f up = 3;
+}
+ 
+message Camera {
+    oneof value {
+        vertexvis.protobuf.rendering.MonocularCamera monocular_camera = 1;
+        vertexvis.protobuf.rendering.BinocularCamera binocular_camera = 2;
+        vertexvis.protobuf.rendering.BasicCamera basic_camera = 3;
+    }
+}

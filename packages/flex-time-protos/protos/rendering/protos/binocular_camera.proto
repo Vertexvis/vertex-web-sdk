@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package vertexvis.protobuf.rendering;
+
+import "rendering/protos/monocular_camera.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "BinocularCameraProto";
+option java_package = "com.vertexvis.protobuf.rendering";
+
+message BinocularCamera {
+    MonocularCamera tracking_camera = 1;
+    float eye_separation = 2;
+}
