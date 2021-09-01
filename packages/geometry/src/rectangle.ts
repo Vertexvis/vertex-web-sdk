@@ -190,3 +190,20 @@ export function isLandscape(rect: Rectangle): boolean {
 export function isSquare(rect: Rectangle): boolean {
   return rect.width === rect.height;
 }
+
+/**
+ * Parses a JSON string representation of a Rectangle and returns an object.
+ *
+ * @param json A JSON string, either in the form `[x,y,width,height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`
+ * @returns A parsed Point.
+ */
+export function fromJson(json: string): Rectangle {
+  const obj = JSON.parse(json);
+  if (Array.isArray(obj)) {
+    const [x, y, width, height] = obj;
+    return create(x, y, width, height);
+  } else {
+    const { x, y, width, height } = obj;
+    return create(x, y, width, height);
+  }
+}

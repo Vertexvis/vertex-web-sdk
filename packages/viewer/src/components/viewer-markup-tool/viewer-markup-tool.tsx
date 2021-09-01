@@ -12,12 +12,13 @@ import {
 import { stampTemplateWithId } from '../../lib/templates';
 import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
-import { ArrowMarkup, Markup } from '../../lib/types/markup';
+import { ArrowMarkup, CircleMarkup, Markup } from '../../lib/types/markup';
+import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 
 /**
  * The types of measurements that can be performed by this tool.
  */
-export type ViewerMarkupToolType = 'arrow' /* | 'circle' */;
+export type ViewerMarkupToolType = 'arrow' | 'circle';
 
 interface StateMap {
   markupElement?: HTMLVertexViewerMarkupArrowElement;
@@ -41,6 +42,9 @@ export class ViewerMarkupTool {
   // public distanceTemplateId?: string;
   @Prop()
   public arrowTemplateId?: string;
+
+  @Prop()
+  public circleTemplateId?: string;
 
   /**
    * The type of measurement.
@@ -131,7 +135,7 @@ export class ViewerMarkupTool {
    */
   protected render(): h.JSX.IntrinsicElements {
     if (!this.disabled) {
-      if (this.tool === 'arrow') {
+      if (this.tool === 'arrow' || this.tool === 'circle') {
         return (
           <Host>
             <vertex-viewer-layer>
@@ -171,6 +175,30 @@ export class ViewerMarkupTool {
     return document.createElement('vertex-viewer-markup-arrow');
   }
 
+  private createCircleMarkupElement(): HTMLVertexViewerMarkupCircleElement {
+    if (this.circleTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.circleTemplateId,
+        isVertexViewerArrowMarkup,
+        () =>
+          console.warn(
+            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
+          ),
+        () =>
+          console.warn(
+            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`
+          )
+      );
+
+      if (element != null) {
+        return element;
+      }
+    }
+
+    return document.createElement('vertex-viewer-markup-circle');
+  }
+
   private updateMarkupElement(): void {
     console.log('updating');
     const { markupElement } = this.stateMap;
@@ -185,7 +213,10 @@ export class ViewerMarkupTool {
     }
 
     if (!this.disabled) {
-      const newMarkupElement = this.createArrowMarkupElement();
+      const newMarkupElement =
+        this.tool === 'arrow'
+          ? this.createArrowMarkupElement()
+          : this.createCircleMarkupElement();
       newMarkupElement.mode = 'replace';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(
@@ -205,8 +236,16 @@ export class ViewerMarkupTool {
 
   private handleMarkupEditEnd = (): void => {
     const { markupElement } = this.stateMap;
-    console.log('edit ended', isVertexViewerArrowMarkup(markupElement));
-    if (isVertexViewerArrowMarkup(markupElement)) {
+    if (isVertexViewerCircleMarkup(markupElement)) {
+      const { bounds } = markupElement;
+
+      this.isMarkingUp = false;
+      markupElement.bounds = undefined;
+
+      if (bounds != null) {
+        this.markupEnd.emit(new CircleMarkup({ bounds }));
+      }
+    } else if (isVertexViewerArrowMarkup(markupElement)) {
       const { start, end } = markupElement;
 
       this.isMarkingUp = false;

@@ -11,7 +11,7 @@ import {
   Listen,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { Markup, ArrowMarkup } from '../../lib/types/markup';
+import { Markup, ArrowMarkup, CircleMarkup } from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 
@@ -28,6 +28,9 @@ export class ViewerMarkup {
   //  */
   @Prop()
   public arrowTemplateId?: string;
+
+  @Prop()
+  public circleTemplateId?: string;
 
   /**
    * The type of markup to perform.
@@ -70,7 +73,9 @@ export class ViewerMarkup {
   @Method()
   public async addMarkup(
     markup: Markup
-  ): Promise<HTMLVertexViewerMarkupArrowElement> {
+  ): Promise<
+    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+  > {
     if (markup instanceof ArrowMarkup) {
       const { start, end, id } = markup;
 
@@ -82,6 +87,16 @@ export class ViewerMarkup {
       this.updatePropsOnMarkup(el);
       this.hostEl.appendChild(el);
       // this.markupAdded.emit(el);
+      return el;
+    } else if (markup instanceof CircleMarkup) {
+      const { bounds, id } = markup;
+
+      const el = this.createCircleMarkupElement();
+      el.id = id;
+      el.bounds = bounds;
+
+      this.updatePropsOnMarkup(el);
+      this.hostEl.appendChild(el);
       return el;
     } else {
       throw new Error(`Cannot add markup. Unknown type '${markup}'.`);
@@ -207,6 +222,30 @@ export class ViewerMarkup {
     return document.createElement('vertex-viewer-markup-arrow');
   }
 
+  private createCircleMarkupElement(): HTMLVertexViewerMarkupCircleElement {
+    if (this.circleTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.circleTemplateId,
+        isVertexViewerArrowMarkup,
+        () =>
+          console.warn(
+            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
+          ),
+        () =>
+          console.warn(
+            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`
+          )
+      );
+
+      if (element != null) {
+        return element;
+      }
+    }
+
+    return document.createElement('vertex-viewer-markup-circle');
+  }
+
   private async updatePropsOnMarkups(): Promise<void> {
     const markup = await this.getMarkupElements();
     markup.forEach((m) => this.updatePropsOnMarkup(m));
@@ -226,6 +265,7 @@ export class ViewerMarkup {
     if (tool != null) {
       tool.disabled = this.disabled;
       tool.arrowTemplateId = this.arrowTemplateId;
+      tool.circleTemplateId = this.circleTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;
     }

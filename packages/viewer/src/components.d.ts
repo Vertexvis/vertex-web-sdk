@@ -20,7 +20,7 @@ import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
 import { DepthBuffer, FramePerspectiveCamera as FramePerspectiveCamera1, Measurement, Orientation, StencilBufferManager, UnitType } from "./lib/types";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions, Euler, Matrix4, Point, Quaternion, Vector3 } from "@vertexvis/geometry";
+import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { CommandFactory } from "./lib/commands/command";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
@@ -35,6 +35,7 @@ import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-
 import { ViewerMarkupToolType } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { Markup } from "./lib/types/markup";
 import { ViewerMarkupArrowMode } from "./components/viewer-markup-arrow/viewer-markup-arrow";
+import { ViewerMarkupCircleMode } from "./components/viewer-markup-circle/viewer-markup-circle";
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { ViewerMeasurementDistanceElementMetrics, ViewerMeasurementDistanceLabelFormatter, ViewerMeasurementDistanceMode } from "./components/viewer-measurement-distance/viewer-measurement-distance";
 import { Anchor } from "./components/viewer-measurement-distance/utils";
@@ -491,8 +492,9 @@ export namespace Components {
           * @see {
           * @link ViewerMarkups.arrowTemplateId}
          */
-        "addMarkup": (markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement>;
+        "addMarkup": (markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>;
         "arrowTemplateId"?: string;
+        "circleTemplateId"?: string;
         /**
           * If `true`, disables adding or editing of markup through user interaction.
          */
@@ -543,11 +545,30 @@ export namespace Components {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerMarkupCircle {
+        /**
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+         */
+        "bounds"?: Rectangle.Rectangle;
+        /**
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+         */
+        "boundsJson"?: string;
+        /**
+          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+         */
+        "mode": ViewerMarkupCircleMode;
+        /**
+          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerMarkupTool {
         /**
           * //  * An ID to an HTML template that describes the HTML content to use for //  * distance measurements. It's expected that the template contains a //  * `<vertex-viewer-measurement-distance>`. //  * //  * This property will automatically be set when a child of a //  * `<vertex-viewer-measurements>` element. //
          */
         "arrowTemplateId"?: string;
+        "circleTemplateId"?: string;
         /**
           * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
          */
@@ -896,6 +917,12 @@ declare global {
         prototype: HTMLVertexViewerMarkupArrowElement;
         new (): HTMLVertexViewerMarkupArrowElement;
     };
+    interface HTMLVertexViewerMarkupCircleElement extends Components.VertexViewerMarkupCircle, HTMLStencilElement {
+    }
+    var HTMLVertexViewerMarkupCircleElement: {
+        prototype: HTMLVertexViewerMarkupCircleElement;
+        new (): HTMLVertexViewerMarkupCircleElement;
+    };
     interface HTMLVertexViewerMarkupToolElement extends Components.VertexViewerMarkupTool, HTMLStencilElement {
     }
     var HTMLVertexViewerMarkupToolElement: {
@@ -960,6 +987,7 @@ declare global {
         "vertex-viewer-layer": HTMLVertexViewerLayerElement;
         "vertex-viewer-markup": HTMLVertexViewerMarkupElement;
         "vertex-viewer-markup-arrow": HTMLVertexViewerMarkupArrowElement;
+        "vertex-viewer-markup-circle": HTMLVertexViewerMarkupCircleElement;
         "vertex-viewer-markup-tool": HTMLVertexViewerMarkupToolElement;
         "vertex-viewer-measurement-distance": HTMLVertexViewerMeasurementDistanceElement;
         "vertex-viewer-measurement-line": HTMLVertexViewerMeasurementLineElement;
@@ -1325,6 +1353,7 @@ declare namespace LocalJSX {
     }
     interface VertexViewerMarkup {
         "arrowTemplateId"?: string;
+        "circleTemplateId"?: string;
         /**
           * If `true`, disables adding or editing of markup through user interaction.
          */
@@ -1370,11 +1399,32 @@ declare namespace LocalJSX {
          */
         "viewer"?: HTMLVertexViewerElement;
     }
+    interface VertexViewerMarkupCircle {
+        /**
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+         */
+        "bounds"?: Rectangle.Rectangle;
+        /**
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+         */
+        "boundsJson"?: string;
+        /**
+          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+         */
+        "mode"?: ViewerMarkupCircleMode;
+        "onEditBegin"?: (event: CustomEvent<void>) => void;
+        "onEditEnd"?: (event: CustomEvent<void>) => void;
+        /**
+          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface VertexViewerMarkupTool {
         /**
           * //  * An ID to an HTML template that describes the HTML content to use for //  * distance measurements. It's expected that the template contains a //  * `<vertex-viewer-measurement-distance>`. //  * //  * This property will automatically be set when a child of a //  * `<vertex-viewer-measurements>` element. //
          */
         "arrowTemplateId"?: string;
+        "circleTemplateId"?: string;
         /**
           * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
          */
@@ -1640,6 +1690,7 @@ declare namespace LocalJSX {
         "vertex-viewer-layer": VertexViewerLayer;
         "vertex-viewer-markup": VertexViewerMarkup;
         "vertex-viewer-markup-arrow": VertexViewerMarkupArrow;
+        "vertex-viewer-markup-circle": VertexViewerMarkupCircle;
         "vertex-viewer-markup-tool": VertexViewerMarkupTool;
         "vertex-viewer-measurement-distance": VertexViewerMeasurementDistance;
         "vertex-viewer-measurement-line": VertexViewerMeasurementLine;
@@ -1669,6 +1720,7 @@ declare module "@stencil/core" {
             "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
             "vertex-viewer-markup": LocalJSX.VertexViewerMarkup & JSXBase.HTMLAttributes<HTMLVertexViewerMarkupElement>;
             "vertex-viewer-markup-arrow": LocalJSX.VertexViewerMarkupArrow & JSXBase.HTMLAttributes<HTMLVertexViewerMarkupArrowElement>;
+            "vertex-viewer-markup-circle": LocalJSX.VertexViewerMarkupCircle & JSXBase.HTMLAttributes<HTMLVertexViewerMarkupCircleElement>;
             "vertex-viewer-markup-tool": LocalJSX.VertexViewerMarkupTool & JSXBase.HTMLAttributes<HTMLVertexViewerMarkupToolElement>;
             "vertex-viewer-measurement-distance": LocalJSX.VertexViewerMeasurementDistance & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
             "vertex-viewer-measurement-line": LocalJSX.VertexViewerMeasurementLine & JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;

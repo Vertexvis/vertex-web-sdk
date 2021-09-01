@@ -92,7 +92,7 @@ export function scale(pt: Point, scaleX: number, scaleY: number): Point {
 /**
  * Parses a JSON string representation of a Point and returns an object.
  *
- * @param json A JSON string, either in the form `[x,y,z]` or `{"x": 0, "y": 0, "z": 0}`
+ * @param json A JSON string, either in the form `[x,y]` or `{"x": 0, "y": 0}`
  * @returns A parsed Point.
  */
 export function fromJson(json: string): Point {

@@ -1,4 +1,4 @@
-import { Point } from '@vertexvis/geometry';
+import { Point, Rectangle } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
 
 export interface ArrowMarkupInit {
@@ -15,8 +15,23 @@ export class ArrowMarkup {
   public constructor(init: ArrowMarkupInit) {
     this.start = init.start ?? Point.create();
     this.end = init.end ?? Point.create();
-    this.id = init.id ?? `measurement--${UUID.create()}`;
+    this.id = init.id ?? `arrow-markup--${UUID.create()}`;
   }
 }
 
-export type Markup = ArrowMarkup;
+export interface CircleMarkupInit {
+  bounds?: Rectangle.Rectangle;
+  id?: string;
+}
+
+export class CircleMarkup {
+  public readonly bounds: Rectangle.Rectangle;
+  public readonly id: string;
+
+  public constructor(init: CircleMarkupInit) {
+    this.bounds = init.bounds ?? Rectangle.create(0, 0, 0, 0);
+    this.id = init.id ?? `circle-markup--${UUID.create()}`;
+  }
+}
+
+export type Markup = ArrowMarkup | CircleMarkup;
