@@ -1,0 +1,23 @@
+:host {
+  font-size: 0.75rem;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+}
+
+.line {
+  pointer-events: auto;
+}
+
+.head {
+  pointer-events: auto;
+}
