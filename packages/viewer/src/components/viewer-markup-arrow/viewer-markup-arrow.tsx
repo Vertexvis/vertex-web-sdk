@@ -7,21 +7,18 @@ import {
   Watch,
   EventEmitter,
   Event,
-  Method,
   Listen,
   State,
 } from '@stencil/core';
-import { Matrix, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-import { Color } from '@vertexvis/utils';
+import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
 import { Viewport } from '../../lib/types';
-import { ArrowMarkup, Markup } from '../../lib/types/markup';
-import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 import {
   createArrowheadPoints,
   arrowheadPointsToPolygonPoints,
   parsePoint,
 } from './utils';
+import { BoundingBox1d } from '../viewer-markup/viewer-markup-components';
 
 /**
  * The supported markup modes.
@@ -105,6 +102,8 @@ export class ViewerMarkupArrow {
   @State()
   private drawing = false;
 
+  private editAnchor: 'start' | 'end' = 'end';
+
   /**
    * @ignore
    */
@@ -131,7 +130,6 @@ export class ViewerMarkupArrow {
     newViewer?: HTMLVertexViewerElement,
     oldViewer?: HTMLVertexViewerElement
   ): void {
-    console.log(oldViewer, newViewer);
     if (oldViewer != null) {
       // oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
       this.removeInteractionListeners(oldViewer);
@@ -155,8 +153,8 @@ export class ViewerMarkupArrow {
 
   @Listen('pointerup')
   protected handlePointerUp(event: PointerEvent): void {
-    if (this.mode === 'replace') {
-      this.endMarkup(event);
+    if (this.mode !== '') {
+      this.endMarkup();
     }
   }
 
@@ -177,9 +175,7 @@ export class ViewerMarkupArrow {
         ? createArrowheadPoints(this.start, this.end)
         : undefined;
 
-    console.log(this.start, this.end);
-
-    return this.start != null && arrowheadPoints != null ? (
+    return this.start != null && this.end != null && arrowheadPoints != null ? (
       <Host>
         <svg class="svg">
           <g>
@@ -203,6 +199,14 @@ export class ViewerMarkupArrow {
               fill-opacity={0}
             />
           </g>
+          {this.mode === 'edit' && (
+            <BoundingBox1d
+              start={this.start}
+              end={this.end}
+              onStartAnchorPointerDown={this.editStartPoint}
+              onEndAnchorPointerDown={this.editEndPoint}
+            />
+          )}
         </svg>
       </Host>
     ) : (
@@ -215,9 +219,16 @@ export class ViewerMarkupArrow {
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
     if (this.mode === 'replace') {
-      interactionTarget.addEventListener('pointermove', this.updateEnd);
       interactionTarget.addEventListener('pointerdown', this.startMarkup);
-      interactionTarget.addEventListener('pointerleave', this.reset);
+    }
+  }
+
+  private async addDrawingInteractionListeners(
+    viewer: HTMLVertexViewerElement
+  ): Promise<void> {
+    const interactionTarget = await viewer.getInteractionTarget();
+    if (this.mode !== '') {
+      interactionTarget.addEventListener('pointermove', this.updatePoints);
       interactionTarget.addEventListener('pointerup', this.endMarkup);
     }
   }
@@ -226,46 +237,55 @@ export class ViewerMarkupArrow {
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
-    interactionTarget.removeEventListener('pointermove', this.updateEnd);
     interactionTarget.removeEventListener('pointerdown', this.startMarkup);
-    interactionTarget.removeEventListener('pointerleave', this.reset);
-    interactionTarget.removeEventListener('pointerup', this.endMarkup);
   }
 
-  private updateEnd = (event: PointerEvent): void => {
-    if (this.drawing) {
-      // event.preventDefault();
-      // event.stopImmediatePropagation();
+  private async removeDrawingInteractionListeners(
+    viewer: HTMLVertexViewerElement
+  ): Promise<void> {
+    const interactionTarget = await viewer.getInteractionTarget();
+    if (this.mode !== '') {
+      interactionTarget.removeEventListener('pointermove', this.updatePoints);
+      interactionTarget.removeEventListener('pointerup', this.endMarkup);
+    }
+  }
+
+  private editStartPoint = (event: PointerEvent): void => {
+    this.editAnchor = 'start';
+    this.startMarkup(event);
+  };
+
+  private editEndPoint = (event: PointerEvent): void => {
+    this.editAnchor = 'end';
+    this.startMarkup(event);
+  };
+
+  private updatePoints = (event: PointerEvent): void => {
+    if (this.editAnchor === 'start') {
+      this.start = getMouseClientPosition(event, this.elementBounds);
+    } else {
       this.end = getMouseClientPosition(event, this.elementBounds);
-      this.start = this.start ?? this.end;
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode === 'replace') {
-      console.log(event);
-      // event.preventDefault();
-      // event.stopImmediatePropagation();
-      this.start = getMouseClientPosition(event, this.elementBounds);
-      this.drawing = true;
+    if (this.mode !== '' && this.viewer != null) {
+      this.start =
+        this.start ?? getMouseClientPosition(event, this.elementBounds);
       this.editBegin.emit();
+      this.addDrawingInteractionListeners(this.viewer);
       this.hostEl.addEventListener('pointerup', this.endMarkup);
     }
   };
 
-  private endMarkup = (event: PointerEvent): void => {
-    if (this.drawing) {
-      this.end = getMouseClientPosition(event, this.elementBounds);
-      this.drawing = false;
-      console.log('emitting edit end');
+  private endMarkup = (): void => {
+    if (this.mode !== '') {
       this.editEnd.emit();
+
+      if (this.viewer != null) {
+        this.removeDrawingInteractionListeners(this.viewer);
+      }
       this.hostEl.removeEventListener('pointerup', this.endMarkup);
     }
-  };
-
-  private reset = (): void => {
-    // this.start = undefined;
-    // this.end = undefined;
-    // this.drawing = false;
   };
 }

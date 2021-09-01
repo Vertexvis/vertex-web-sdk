@@ -21,3 +21,21 @@
 .head {
   pointer-events: auto;
 }
+
+.bounds-line, .bounds-outline, .bounds-rect {
+  pointer-events: auto;
+  stroke: var(--blue-400);
+  stroke-width: 1px;
+}
+
+.bounds-line, .bounds-outline {
+  pointer-events: auto;
+  fill: none;
+}
+
+.bounds-circle {
+  pointer-events: auto;
+  fill: var(--blue-400);
+  stroke-width: 1px;
+  stroke: #ffffff;
+}
