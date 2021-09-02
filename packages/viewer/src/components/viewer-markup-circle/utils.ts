@@ -15,11 +15,44 @@ export function parseBounds(
   return typeof value === 'string' ? Rectangle.fromJson(value) : value;
 }
 
+export const createCircle = (
+  initialPoint: Point.Point,
+  currentPoint: Point.Point,
+  maintainAspectRatio: boolean
+): Rectangle.Rectangle => {
+  const bounds = Rectangle.fromPoints(initialPoint, currentPoint);
+  if (maintainAspectRatio) {
+    const fitBoundsSize = Math.max(bounds.width, bounds.height);
+    const isPortrait = bounds.height > bounds.width;
+    const currentIsLeftOfInitial = currentPoint.x <= initialPoint.x;
+    const currentIsAboveInitial = currentPoint.y <= initialPoint.y;
+    const fitBoundsX = currentIsLeftOfInitial
+      ? isPortrait
+        ? initialPoint.x - fitBoundsSize
+        : currentPoint.x
+      : initialPoint.x;
+    const fitBoundsY = currentIsAboveInitial
+      ? isPortrait
+        ? currentPoint.y
+        : initialPoint.y - fitBoundsSize
+      : initialPoint.y;
+    return Rectangle.create(
+      fitBoundsX,
+      fitBoundsY,
+      fitBoundsSize,
+      fitBoundsSize
+    );
+  } else {
+    return bounds;
+  }
+};
+
 export const transformCircle = (
   bounds: Rectangle.Rectangle,
   start: Point.Point,
   current: Point.Point,
-  anchor: BoundingBox2dAnchorPosition
+  anchor: BoundingBox2dAnchorPosition,
+  maintainAspectRatio?: boolean
 ): Rectangle.Rectangle => {
   const delta = Point.subtract(current, start);
   const { x: left, y: top, width: w, height: h } = bounds;
@@ -31,21 +64,37 @@ export const transformCircle = (
   const bottomRight = Point.create(right, bottom);
   switch (anchor) {
     case 'top-left':
-      return Rectangle.fromPoints(bottomRight, current);
+      return createCircle(bottomRight, current, !!maintainAspectRatio);
     case 'top':
-      return Rectangle.fromPoints(bottomRight, Point.create(left, current.y));
+      return createCircle(
+        bottomRight,
+        Point.create(left, current.y),
+        !!maintainAspectRatio
+      );
     case 'top-right':
-      return Rectangle.fromPoints(bottomLeft, current);
+      return createCircle(bottomLeft, current, !!maintainAspectRatio);
     case 'right':
-      return Rectangle.fromPoints(bottomLeft, Point.create(current.x, top));
+      return createCircle(
+        bottomLeft,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
     case 'bottom-right':
-      return Rectangle.fromPoints(topLeft, current);
+      return createCircle(topLeft, current, !!maintainAspectRatio);
     case 'bottom':
-      return Rectangle.fromPoints(topLeft, Point.create(right, current.y));
+      return createCircle(
+        topLeft,
+        Point.create(right, current.y),
+        !!maintainAspectRatio
+      );
     case 'bottom-left':
-      return Rectangle.fromPoints(topRight, current);
+      return createCircle(topRight, current, !!maintainAspectRatio);
     case 'left':
-      return Rectangle.fromPoints(bottomRight, Point.create(current.x, top));
+      return createCircle(
+        bottomRight,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
     case 'center':
       return Rectangle.create(
         bounds.x + delta.x,

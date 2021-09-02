@@ -169,68 +169,72 @@ export class ViewerMarkupCircle {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const relativeBounds =
-      this.bounds != null && this.elementBounds != null
-        ? translateRectToScreen(this.bounds, this.elementBounds)
-        : this.bounds;
-    const center = relativeBounds
-      ? Rectangle.center(relativeBounds)
-      : undefined;
+    if (
+      this.bounds != null &&
+      this.deviceSize != null &&
+      this.elementBounds != null
+    ) {
+      const relativeBounds = translateRectToScreen(
+        this.bounds,
+        this.elementBounds
+      );
+      const center = Rectangle.center(relativeBounds);
 
-    console.log(this.bounds, relativeBounds);
-
-    return relativeBounds && center != null && this.deviceSize != null ? (
-      <Host>
-        <svg class="svg">
-          <defs>
-            <SvgShadow id="circle-shadow" />
-          </defs>
-          <g filter="url(#circle-shadow)">
-            <ellipse
-              class="ellipse"
-              cx={center.x}
-              cy={center.y}
-              rx={relativeBounds.width / 2}
-              ry={relativeBounds.height / 2}
-              stroke={'#000ff0'}
-              stroke-width={4}
-              fill={'none'}
-            />
-          </g>
-          {this.mode === 'edit' && (
-            <BoundingBox2d
-              bounds={relativeBounds}
-              deviceSize={this.deviceSize}
-              onTopLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-left')
-              }
-              onTopRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-right')
-              }
-              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
-              onBottomLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-left')
-              }
-              onBottomRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-right')
-              }
-              onBottomAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom')
-              }
-              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
-              onRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'right')
-              }
-              onCenterAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'center')
-              }
-            />
-          )}
-        </svg>
-      </Host>
-    ) : (
-      <Host />
-    );
+      return (
+        <Host>
+          <svg class="svg">
+            <defs>
+              <SvgShadow id="circle-shadow" />
+            </defs>
+            <g filter="url(#circle-shadow)">
+              <ellipse
+                class="ellipse"
+                cx={center.x}
+                cy={center.y}
+                rx={relativeBounds.width / 2}
+                ry={relativeBounds.height / 2}
+                stroke={'#000ff0'}
+                stroke-width={4}
+                fill={'none'}
+              />
+            </g>
+            {this.mode === 'edit' && (
+              <BoundingBox2d
+                bounds={relativeBounds}
+                deviceSize={this.deviceSize}
+                onTopLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'top-left')
+                }
+                onTopRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'top-right')
+                }
+                onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+                onBottomLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom-left')
+                }
+                onBottomRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom-right')
+                }
+                onBottomAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom')
+                }
+                onLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'left')
+                }
+                onRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'right')
+                }
+                onCenterAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'center')
+                }
+              />
+            )}
+          </svg>
+        </Host>
+      );
+    } else {
+      return <Host />;
+    }
   }
 
   private async addInteractionListeners(
@@ -285,7 +289,8 @@ export class ViewerMarkupCircle {
         this.resizeBounds ?? this.bounds,
         this.startPosition,
         position,
-        this.editAnchor
+        this.editAnchor,
+        event.shiftKey
       );
     }
   };
