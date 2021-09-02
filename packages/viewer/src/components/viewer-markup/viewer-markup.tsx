@@ -105,10 +105,37 @@ export class ViewerMarkup {
   }
 
   /**
-   * Returns a list of measurement elements that are children of this component.
+   * Removes a markup with the given ID, and returns the HTML element
+   * associated to the markup. Returns `undefined` if no markup is
+   * found.
    *
-   * @returns A list of all measurements.
-   * @see {@link ViewerMeasurements.getMeasurementElement}
+   * @param id The ID of the markup to remove.
+   * @returns The markup element, or undefined.
+   */
+  @Method()
+  public async removeMarkup(
+    id: string
+  ): Promise<
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | undefined
+  > {
+    const markups = await this.getMarkupElements();
+    const markup = markups.find((m) => m.id === id);
+
+    if (markup != null) {
+      markup.remove();
+      // this.markupRemoved.emit(markup);
+    }
+
+    return markup;
+  }
+
+  /**
+   * Returns a list of markup elements that are children of this component.
+   *
+   * @returns A list of all markups.
+   * @see {@link ViewerMarkup.getMarkupElement}
    */
   @Method()
   public async getMarkupElements(): Promise<
@@ -154,6 +181,10 @@ export class ViewerMarkup {
   ): Promise<void> {
     this.updatePropsOnMarkupTool();
     this.updatePropsOnMarkups();
+
+    if (newViewer != null) {
+      newViewer.cameraControls = false;
+    }
   }
 
   /**

@@ -17,7 +17,10 @@ import {
   arrowheadPointsToPolygonPoints,
   parsePoint,
 } from './utils';
-import { BoundingBox1d } from '../viewer-markup/viewer-markup-components';
+import {
+  BoundingBox1d,
+  SvgShadow,
+} from '../viewer-markup/viewer-markup-components';
 
 /**
  * The supported markup modes.
@@ -166,14 +169,13 @@ export class ViewerMarkupArrow {
     return this.start != null && this.end != null && arrowheadPoints != null ? (
       <Host>
         <svg class="svg">
-          <g>
+          <defs>
+            <SvgShadow id="arrow-shadow" />
+          </defs>
+          <g filter="url(#arrow-shadow)">
             <polygon
               class="head"
               points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-              stroke={'#00ff00'}
-              stroke-width={4}
-              fill={'#00ff00'}
-              fill-opacity={1}
             />
             <line
               class="line"
@@ -181,10 +183,6 @@ export class ViewerMarkupArrow {
               y1={this.start.y}
               x2={arrowheadPoints.base.x}
               y2={arrowheadPoints.base.y}
-              stroke={'#00ff00'}
-              stroke-width={4}
-              fill={'#00ff00'}
-              fill-opacity={0}
             />
           </g>
           {this.mode === 'edit' && (

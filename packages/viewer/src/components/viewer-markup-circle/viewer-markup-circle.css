@@ -7,6 +7,24 @@
   left: 0;
   top: 0;
   pointer-events: none;
+
+  --ellipse-stroke-color: var(--red-700);
+  --ellipse-stroke-width: 4;
+  --ellipse-fill-color: none;
+  --ellipse-fill-opacity: 0;
+
+  --bounds-outline-stroke-color: var(--blue-400);
+  --bounds-outline-stroke-width: 1;
+
+  --bounds-edge-anchor-stroke-color: var(--blue-400);
+  --bounds-edge-anchor-stroke-width: 1;
+  --bounds-edge-anchor-fill-color: white;
+  --bounds-edge-anchor-fill-opacity: 1;
+
+  --bounds-circle-anchor-stroke-color: white;
+  --bounds-circle-anchor-stroke-width: 1;
+  --bounds-circle-anchor-fill-color: var(--blue-400);
+  --bounds-circle-anchor-fill-opacity: 1;
 }
 
 .svg {
@@ -16,17 +34,25 @@
 
 .ellipse {
   pointer-events: auto;
-}
-
-.bounds-line, .bounds-outline, .bounds-rect {
-  pointer-events: auto;
-  stroke: var(--blue-400);
-  stroke-width: 1px;
+  stroke: var(--ellipse-stroke-color);
+  stroke-width: var(--ellipse-stroke-width);
+  fill: var(--ellipse-fill-color);
+  fill-opacity: var(--ellipse-fill-opacity);
 }
 
 .bounds-line, .bounds-outline {
   pointer-events: auto;
+  stroke: var(--bounds-outline-stroke-color);
+  stroke-width: var(--bounds-outline-stroke-width);
   fill: none;
+}
+
+.bounds-rect {
+  pointer-events: auto;
+  stroke: var(--bounds-edge-anchor-stroke-color);
+  stroke-width: var(--bounds-edge-anchor-stroke-width);
+  fill: var(--bounds-edge-anchor-fill-color);
+  fill-opacity: var(--bounds-edge-anchor-fill-opacity);
 }
 
 .bounds-click-target {
@@ -38,7 +64,8 @@
 
 .bounds-circle {
   pointer-events: auto;
-  fill: var(--blue-400);
-  stroke-width: 1px;
-  stroke: #ffffff;
+  stroke: var(--bounds-circle-anchor-stroke-color);
+  stroke-width: var(--bounds-circle-anchor-stroke-width);
+  fill: var(--bounds-circle-anchor-fill-color);
+  fill-opacity: var(--bounds-circle-anchor-fill-opacity);
 }

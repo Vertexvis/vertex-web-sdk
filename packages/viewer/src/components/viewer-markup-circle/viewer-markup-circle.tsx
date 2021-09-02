@@ -24,7 +24,10 @@ import { Viewport } from '../../lib/types';
 import { CircleMarkup, Markup } from '../../lib/types/markup';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 import { BoundingBox2dAnchorPosition } from '../viewer-markup/utils';
-import { BoundingBox2d } from '../viewer-markup/viewer-markup-components';
+import {
+  BoundingBox2d,
+  SvgShadow,
+} from '../viewer-markup/viewer-markup-components';
 import { parseBounds, transformCircle } from './utils';
 
 /**
@@ -128,14 +131,11 @@ export class ViewerMarkupCircle {
     newViewer?: HTMLVertexViewerElement,
     oldViewer?: HTMLVertexViewerElement
   ): void {
-    console.log(oldViewer, newViewer);
     if (oldViewer != null) {
-      // oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
       this.removeInteractionListeners(oldViewer);
     }
 
     if (newViewer != null) {
-      // newViewer.addEventListener('frameDrawn', this.handleFrameDrawn);
       this.addInteractionListeners(newViewer);
     }
   }
@@ -159,21 +159,24 @@ export class ViewerMarkupCircle {
     const center =
       this.bounds != null ? Rectangle.center(this.bounds) : undefined;
 
-    console.log(this.mode);
-
     return this.bounds != null && center != null ? (
       <Host>
         <svg class="svg">
-          <ellipse
-            class="ellipse"
-            cx={center.x}
-            cy={center.y}
-            rx={this.bounds.width / 2}
-            ry={this.bounds.height / 2}
-            stroke={'#000ff0'}
-            stroke-width={4}
-            fill={'none'}
-          />
+          <defs>
+            <SvgShadow id="circle-shadow" />
+          </defs>
+          <g filter="url(#circle-shadow)">
+            <ellipse
+              class="ellipse"
+              cx={center.x}
+              cy={center.y}
+              rx={this.bounds.width / 2}
+              ry={this.bounds.height / 2}
+              stroke={'#000ff0'}
+              stroke-width={4}
+              fill={'none'}
+            />
+          </g>
           {this.mode === 'edit' && (
             <BoundingBox2d
               bounds={this.bounds}
@@ -265,15 +268,23 @@ export class ViewerMarkupCircle {
       this.startPosition = position;
       this.bounds =
         this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
+      this.resizeBounds = this.bounds;
       this.editBegin.emit();
       this.addDrawingInteractionListeners();
     }
   };
 
   private endMarkup = (): void => {
-    console.log('end');
-    if (this.mode !== '') {
+    if (
+      this.mode !== '' &&
+      this.bounds != null &&
+      this.bounds?.width > 0 &&
+      this.bounds?.height > 0
+    ) {
+      this.editAnchor = 'bottom-right';
       this.editEnd.emit();
+    } else {
+      this.bounds = undefined;
     }
     this.removeDrawingInteractionListeners();
   };

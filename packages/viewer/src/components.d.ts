@@ -500,12 +500,18 @@ export namespace Components {
          */
         "disabled": boolean;
         /**
-          * Returns a list of measurement elements that are children of this component.
-          * @returns A list of all measurements.
+          * Returns a list of markup elements that are children of this component.
+          * @returns A list of all markups.
           * @see {
-          * @link ViewerMeasurements.getMeasurementElement}
+          * @link ViewerMarkup.getMarkupElement}
          */
         "getMarkupElements": () => Promise<Array<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>>;
+        /**
+          * Removes a markup with the given ID, and returns the HTML element associated to the markup. Returns `undefined` if no markup is found.
+          * @param id The ID of the markup to remove.
+          * @returns The markup element, or undefined.
+         */
+        "removeMarkup": (id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>;
         /**
           * The ID of the markup that is selected.
          */
