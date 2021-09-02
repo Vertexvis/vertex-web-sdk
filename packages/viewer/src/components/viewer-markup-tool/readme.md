@@ -7,21 +7,23 @@
 
 ## Properties
 
-| Property           | Attribute            | Description                                                                                                                                                                                                                                                                                                             | Type                                   | Default     |
-| ------------------ | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `arrowTemplateId`  | `arrow-template-id`  | //  * An ID to an HTML template that describes the HTML content to use for //  * distance measurements. It's expected that the template contains a //  * `<vertex-viewer-measurement-distance>`. //  * //  * This property will automatically be set when a child of a //  * `<vertex-viewer-measurements>` element. // | `string \| undefined`                  | `undefined` |
-| `circleTemplateId` | `circle-template-id` |                                                                                                                                                                                                                                                                                                                         | `string \| undefined`                  | `undefined` |
-| `disabled`         | `disabled`           | Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.                                                                                                                                                                                               | `boolean`                              | `false`     |
-| `tool`             | `tool`               | The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.                                                                                                                                                                                             | `"arrow" \| "circle"`                  | `'arrow'`   |
-| `viewer`           | --                   | The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.                                                                                                                                                          | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property           | Attribute            | Description                                                                                                                                             | Type                                   | Default     |
+| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `arrowTemplateId`  | `arrow-template-id`  | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.        | `string \| undefined`                  | `undefined` |
+| `cameraControls`   | `camera-controls`    | Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled. | `boolean`                              | `false`     |
+| `circleTemplateId` | `circle-template-id` | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.      | `string \| undefined`                  | `undefined` |
+| `disabled`         | `disabled`           | Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                          | `boolean`                              | `false`     |
+| `tool`             | `tool`               | The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                        | `"arrow" \| "circle"`                  | `'arrow'`   |
+| `viewer`           | --                   | The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.      | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ## Events
 
-| Event         | Description | Type                                       |
-| ------------- | ----------- | ------------------------------------------ |
-| `markupBegin` |             | `CustomEvent<void>`                        |
-| `markupEnd`   |             | `CustomEvent<ArrowMarkup \| CircleMarkup>` |
+| Event              | Description                                                          | Type                                       |
+| ------------------ | -------------------------------------------------------------------- | ------------------------------------------ |
+| `markupBegin`      | An event that is dispatched when a user begins a new markup.         | `CustomEvent<void>`                        |
+| `markupEditCancel` | An event that is dispatched when a user has cancelled a markup edit. | `CustomEvent<void>`                        |
+| `markupEnd`        | An event that is dispatched when a user has finished their markup.   | `CustomEvent<ArrowMarkup \| CircleMarkup>` |
 
 
 ## Dependencies

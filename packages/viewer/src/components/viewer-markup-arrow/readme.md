@@ -7,22 +7,58 @@
 
 ## Properties
 
-| Property    | Attribute | Description                                                                                                                                                                                                                                                                                                                               | Type                                   | Default     |
-| ----------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `end`       | --        | The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.                                                                                                                                                                                | `Point \| undefined`                   | `undefined` |
-| `endJson`   | `end`     | The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.                                                                                                                                                              | `string \| undefined`                  | `undefined` |
-| `mode`      | `mode`    | A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed. | `"" \| "edit" \| "replace"`            | `''`        |
-| `start`     | --        | The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.                                                                                                                                                                              | `Point \| undefined`                   | `undefined` |
-| `startJson` | `start`   | The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.                                                                                                                                                            | `string \| undefined`                  | `undefined` |
-| `viewer`    | --        | The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.                                                                                                                                                                            | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property    | Attribute | Description                                                                                                                                                                                                                                                                                                                | Type                                   | Default     |
+| ----------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `end`       | --        | The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.                                        | `Point \| undefined`                   | `undefined` |
+| `endJson`   | `end`     | The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.                      | `string \| undefined`                  | `undefined` |
+| `mode`      | `mode`    | A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed. | `"" \| "edit" \| "replace"`            | `''`        |
+| `start`     | --        | The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.                                      | `Point \| undefined`                   | `undefined` |
+| `startJson` | `start`   | The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.                    | `string \| undefined`                  | `undefined` |
+| `viewer`    | --        | The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.                                                                                                                                                                        | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ## Events
 
-| Event       | Description | Type                |
-| ----------- | ----------- | ------------------- |
-| `editBegin` |             | `CustomEvent<void>` |
-| `editEnd`   |             | `CustomEvent<void>` |
+| Event        | Description                                                                | Type                |
+| ------------ | -------------------------------------------------------------------------- | ------------------- |
+| `editBegin`  | An event that is dispatched anytime the user begins editing the markup.    | `CustomEvent<void>` |
+| `editCancel` | An event that is dispatched when the user cancels editing of the markup.   | `CustomEvent<void>` |
+| `editEnd`    | An event that is dispatched when the user has finished editing the markup. | `CustomEvent<void>` |
+
+
+## Methods
+
+### `dispose() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
+## CSS Custom Properties
+
+| Name                                                      | Description                                                                                      |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `--viewer-markup-arrow-bounds-center-anchor-fill-color`   | A CSS color that specifies the color of the center resize anchor's fill.                         |
+| `--viewer-markup-arrow-bounds-center-anchor-fill-opacity` | A number between 0 and 1 that specifies the opacity of the center resize anchor's fill.          |
+| `--viewer-markup-arrow-bounds-center-anchor-stroke-color` | A CSS color that specifies the color of the center resize anchor's outline.                      |
+| `--viewer-markup-arrow-bounds-center-anchor-stroke-width` | A CSS length that specifies the width of the center resize anchor's outline.                     |
+| `--viewer-markup-arrow-bounds-end-anchor-fill-color`      | A CSS color that specifies the color of the edge and corner resize anchor fill.                  |
+| `--viewer-markup-arrow-bounds-end-anchor-fill-opacity`    | A number between 0 and 1 that specifies the opacity of the edge and corner resize anchors' fill. |
+| `--viewer-markup-arrow-bounds-end-anchor-stroke-color`    | A CSS color that specifies the color of the edge and corner resize anchors' outlines.            |
+| `--viewer-markup-arrow-bounds-end-anchor-stroke-width`    | A CSS length that specifies the width of the edge and corner resize anchors' outlines.           |
+| `--viewer-markup-arrow-head-fill-color`                   | A CSS color that specifies the color of the arrow head's fill.                                   |
+| `--viewer-markup-arrow-head-fill-opacity`                 | A number between 0 and 1 that specifies the opacity of the arrow head's fill.                    |
+| `--viewer-markup-arrow-head-stroke-color`                 | A CSS color that specifies the color of the arrow head's outline.                                |
+| `--viewer-markup-arrow-head-stroke-width`                 | A CSS length that specifies the width of the arrow head's outline.                               |
+| `--viewer-markup-arrow-line-fill-color`                   | A CSS color that specifies the color of the arrow line's fill.                                   |
+| `--viewer-markup-arrow-line-fill-opacity`                 | A number between 0 and 1 that specifies the opacity of the arrow line's fill.                    |
+| `--viewer-markup-arrow-line-stroke-color`                 | A CSS color that specifies the color of the arrow line's outline.                                |
+| `--viewer-markup-arrow-line-stroke-width`                 | A CSS length that specifies the width of the arrow line's outline.                               |
 
 
 ## Dependencies
