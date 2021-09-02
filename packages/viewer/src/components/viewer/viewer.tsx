@@ -93,7 +93,6 @@ import { Frame } from '../../lib/types/frame';
 import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
-import { Renderer } from '../viewer-threejs-renderer/renderers';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -259,6 +258,9 @@ export class Viewer {
   public stencilBuffer: StencilBufferManager = new StencilBufferManager(
     this.hostElement
   );
+
+  @Prop({ mutable: true })
+  public viewport: Viewport = new Viewport(0, 0);
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -1208,6 +1210,11 @@ export class Viewer {
         trimmedViewport != null
           ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
           : undefined;
+
+      this.viewport = new Viewport(
+        this.hostDimensions.width,
+        this.hostDimensions.height
+      );
     }
   }
 

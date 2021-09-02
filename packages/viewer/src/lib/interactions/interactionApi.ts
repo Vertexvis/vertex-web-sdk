@@ -11,7 +11,12 @@ import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
-import { DepthBuffer, Interactions, Viewport } from '../types';
+import {
+  DepthBuffer,
+  FramePerspectiveCamera,
+  Interactions,
+  Viewport,
+} from '../types';
 import { ReceivedFrame } from '../..';
 
 type SceneProvider = () => Scene;
@@ -35,7 +40,7 @@ export class InteractionApi {
   private worldRotationPoint?: Vector3.Vector3;
 
   public constructor(
-    private stream: StreamApi,
+    public stream: StreamApi,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private getFrame: () => ReceivedFrame | undefined,
@@ -419,5 +424,37 @@ export class InteractionApi {
     return hasDepth
       ? viewport.transformPointToWorldSpace(point, depthBuffer)
       : fallbackPoint;
+  }
+
+  public async transformViewportToWorld(
+    pt: Point.Point,
+    { depthTest = false }: { depthTest?: boolean } = {}
+  ): Promise<Vector3.Vector3 | undefined> {
+    const viewport = this.getViewport();
+    const frame = this.getFrame();
+    const depthBuffer = await frame?.depthBuffer();
+
+    if (depthBuffer != null) {
+      const framePt = viewport.transformPointToFrame(pt, depthBuffer);
+
+      if (depthTest) {
+        const hasDepth = depthBuffer.isDepthAtFarPlane(framePt);
+        return hasDepth
+          ? viewport.transformPointToWorldSpace(pt, depthBuffer)
+          : undefined;
+      } else {
+        return viewport.transformPointToWorldSpace(pt, depthBuffer);
+      }
+    } else {
+      return undefined;
+    }
+  }
+
+  public get camera(): FramePerspectiveCamera | undefined {
+    return this.getFrame()?.scene.camera;
+  }
+
+  public get scene(): Scene {
+    return this.getScene();
   }
 }

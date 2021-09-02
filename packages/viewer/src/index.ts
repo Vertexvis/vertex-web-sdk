@@ -39,3 +39,5 @@ export * from './lib/vertex-geometry';
 import { loadImageBytes } from './lib/rendering/imageLoaders';
 
 export { loadImageBytes };
+
+export * from './lib/measurement';

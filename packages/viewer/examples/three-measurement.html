@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .tree {
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
+        border-right: 1px solid lightgray;
+      }
+
+      .workarea {
+        width: 100%;
+        height: 100%;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three';
+      import { TransformControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/TransformControls.js';
+      import {
+        FlexTimeApi,
+        SurfaceMeasurement,
+        VertexScene,
+      } from '/dist/viewer/index.esm.js';
+      import { getStreamKeyFromUrlParams } from './utils.js';
+
+      const streamKey = '' || getStreamKeyFromUrlParams();
+      const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
+      const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
+
+      const scene = new VertexScene();
+
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
+
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+
+        const tree = document.getElementById('scene-tree');
+        const viewer = document.getElementById('viewer');
+        const clearMeasurementsBtn = document.getElementById(
+          'clear-measurements-btn'
+        );
+        const showHelpersCheckbox = document.getElementById(
+          'show-helpers-checkbox'
+        );
+        const renderer = document.getElementById('renderer');
+        renderer.willDraw = updateScene(viewer, scene);
+        renderer.scene.add(scene);
+
+        const interactionTarget = await viewer.getInteractionTarget();
+
+        const surfaceMeasurement = new SurfaceMeasurement(renderer, scene);
+        viewer.registerInteractionHandler(surfaceMeasurement);
+        clearMeasurementsBtn.addEventListener('click', () => {
+          surfaceMeasurement.clear();
+        });
+
+        showHelpersCheckbox.addEventListener('change', () => {
+          surfaceMeasurement.showHelpers = showHelpersCheckbox.checked;
+        });
+
+        viewer.addEventListener('tap', async ({ detail }) => {
+          const { position } = detail;
+
+          const scene = await viewer.scene();
+          const { hits } = await scene.raycaster().hitItems(detail.position);
+          const [hit] = hits;
+
+          if (hit != null) {
+            console.log('hit', hit);
+          }
+        });
+
+        await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
+      }
+
+      function updateScene(viewer, scene) {
+        return () => {
+          if (viewer.frame != null) {
+            scene.updateLighting(viewer.frame.scene.camera);
+          }
+        };
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree
+          id="scene-tree"
+          config-env="platdev"
+          viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer id="viewer" config-env="platdev" depth-buffers="all">
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-threejs-renderer
+            id="renderer"
+            occlude
+          ></vertex-viewer-threejs-renderer>
+
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+
+          <vertex-viewer-toolbar placement="bottom-center">
+            <button id="clear-measurements-btn">Clear Measurements</button>
+            <label>
+              <input id="show-helpers-checkbox" type="checkbox" />
+              <span>Show Helpers</span>
+            </label>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
+      </div>
+    </div>
+  </body>
+</html>

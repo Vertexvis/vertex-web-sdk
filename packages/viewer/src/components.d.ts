@@ -17,7 +17,7 @@ import { DepthBufferFrameType, FeatureLineOptions, ViewerStreamAttributes } from
 import { ColorMaterial } from "./lib/scenes/colorMaterial";
 import { Frame, FramePerspectiveCamera } from "./lib/types/frame";
 import { ViewerStreamApi } from "./lib/stream/viewerStreamApi";
-import { DepthBuffer, FramePerspectiveCamera as FramePerspectiveCamera1, Measurement, Orientation, StencilBufferManager, UnitType } from "./lib/types";
+import { DepthBuffer, FramePerspectiveCamera as FramePerspectiveCamera1, Measurement, Orientation, StencilBufferManager, UnitType, Viewport } from "./lib/types";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
 import { Dimensions, Euler, Matrix4, Point, Quaternion, Vector3 } from "@vertexvis/geometry";
@@ -37,7 +37,6 @@ import { ViewerMeasurementDistanceElementMetrics, ViewerMeasurementDistanceLabel
 import { Anchor } from "./components/viewer-measurement-distance/utils";
 import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/viewer-measurement-tool";
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from "./components/viewer-measurement-tool/viewer-measurement-tool";
-import { Intersection, PerspectiveCamera, Scene as Scene1 } from "three";
 import { ViewerThreeJsRendererDrawMode } from "./components/viewer-threejs-renderer/viewer-threejs-renderer";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -332,6 +331,7 @@ export namespace Components {
           * Disconnects the websocket and removes any internal state associated with the scene.
          */
         "unload": () => Promise<void>;
+        "viewport": Viewport;
     }
     interface VertexViewerButton {
     }
@@ -674,13 +674,13 @@ export namespace Components {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerThreejsRenderer {
-        "camera": PerspectiveCamera;
+        "camera": THREE.PerspectiveCamera;
         "clippingExtents": number;
         "draw": () => Promise<void>;
         "drawMode": ViewerThreeJsRendererDrawMode;
-        "hit": (point: Point.Point) => Promise<Intersection[]>;
+        "hit": (point: Point.Point) => Promise<THREE.Intersection[]>;
         "occlude": boolean;
-        "scene": Scene;
+        "scene": THREE.Scene;
         "viewer"?: HTMLVertexViewerElement;
         "willDraw"?: () => void;
     }
@@ -1091,6 +1091,7 @@ declare namespace LocalJSX {
           * @readonly
          */
         "streamAttributes"?: ViewerStreamAttributes;
+        "viewport"?: Viewport;
     }
     interface VertexViewerButton {
     }
@@ -1424,11 +1425,11 @@ declare namespace LocalJSX {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerThreejsRenderer {
-        "camera"?: PerspectiveCamera;
+        "camera"?: THREE.PerspectiveCamera;
         "clippingExtents"?: number;
         "drawMode"?: ViewerThreeJsRendererDrawMode;
         "occlude"?: boolean;
-        "scene"?: Scene;
+        "scene"?: THREE.Scene;
         "viewer"?: HTMLVertexViewerElement;
         "willDraw"?: () => void;
     }

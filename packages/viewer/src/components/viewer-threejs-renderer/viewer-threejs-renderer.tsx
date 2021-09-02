@@ -8,13 +8,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import {
-  PerspectiveCamera,
-  Scene,
-  Intersection,
-  Raycaster,
-  Vector2,
-} from 'three';
+import * as THREE from 'three';
 import { Point } from '@vertexvis/geometry';
 import { Frame, Viewport } from '../../lib/types';
 import { BlendedRenderer, OverlayRenderer, Renderer } from './renderers';
@@ -31,10 +25,10 @@ export type ViewerThreeJsRendererDrawMode =
 })
 export class ViewerThreeJsRenderer {
   @Prop()
-  public scene: Scene = new Scene();
+  public scene: THREE.Scene = new THREE.Scene();
 
   @Prop()
-  public camera: PerspectiveCamera = new PerspectiveCamera();
+  public camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera();
 
   @Prop()
   public drawMode: ViewerThreeJsRendererDrawMode = 'synced';
@@ -69,12 +63,12 @@ export class ViewerThreeJsRenderer {
   }
 
   @Method()
-  public async hit(point: Point.Point): Promise<Intersection[]> {
+  public async hit(point: Point.Point): Promise<THREE.Intersection[]> {
     const x = (point.x / this.viewport.width) * 2 - 1;
     const y = -(point.y / this.viewport.height) * 2 + 1;
 
-    const raycaster = new Raycaster();
-    raycaster.setFromCamera(new Vector2(x, y), this.camera);
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera);
 
     return raycaster.intersectObjects(this.scene.children, true);
   }
