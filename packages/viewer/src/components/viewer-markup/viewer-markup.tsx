@@ -13,6 +13,7 @@ import {
 import { stampTemplateWithId } from '../../lib/templates';
 import { Markup, ArrowMarkup, CircleMarkup } from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
+import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 
 @Component({
@@ -111,9 +112,18 @@ export class ViewerMarkup {
    */
   @Method()
   public async getMarkupElements(): Promise<
-    HTMLVertexViewerMarkupArrowElement[]
+    Array<
+      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    >
   > {
-    return Array.from(this.hostEl.children).filter(isVertexViewerArrowMarkup);
+    const circleMarkup = Array.from(this.hostEl.children).filter(
+      isVertexViewerCircleMarkup
+    );
+    const arrowMarkup = Array.from(this.hostEl.children).filter(
+      isVertexViewerArrowMarkup
+    );
+
+    return [...arrowMarkup, ...circleMarkup];
   }
 
   /**

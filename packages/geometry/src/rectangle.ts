@@ -192,6 +192,21 @@ export function isSquare(rect: Rectangle): boolean {
 }
 
 /**
+ * Pads a rectangle by the given amount, maintaining the center position.
+ *
+ * @param rect The rectangle to apply padding to.
+ * @param padding The padding to add.
+ */
+export function pad(rect: Rectangle, padding: number): Rectangle {
+  return create(
+    rect.x - padding,
+    rect.y - padding,
+    rect.width + padding * 2,
+    rect.height + padding * 2
+  );
+}
+
+/**
  * Parses a JSON string representation of a Rectangle and returns an object.
  *
  * @param json A JSON string, either in the form `[x,y,width,height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`

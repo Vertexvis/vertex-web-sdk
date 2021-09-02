@@ -14,6 +14,31 @@
   height: 100%;
 }
 
-.line {
+.ellipse {
   pointer-events: auto;
+}
+
+.bounds-line, .bounds-outline, .bounds-rect {
+  pointer-events: auto;
+  stroke: var(--blue-400);
+  stroke-width: 1px;
+}
+
+.bounds-line, .bounds-outline {
+  pointer-events: auto;
+  fill: none;
+}
+
+.bounds-click-target {
+  fill: none;
+  stroke-width: 5px;
+  stroke: transparent;
+  pointer-events: stroke;
+}
+
+.bounds-circle {
+  pointer-events: auto;
+  fill: var(--blue-400);
+  stroke-width: 1px;
+  stroke: #ffffff;
 }

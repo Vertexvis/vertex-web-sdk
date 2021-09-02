@@ -7,7 +7,6 @@ import {
   Watch,
   EventEmitter,
   Event,
-  Listen,
   State,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
@@ -26,6 +25,8 @@ import { BoundingBox1d } from '../viewer-markup/viewer-markup-components';
  * @see {@link ViewerMarkupArrowMode.mode} - For more details about modes.
  */
 export type ViewerMarkupArrowMode = 'edit' | 'replace' | '';
+
+type ViewerMarkupArrowEditAnchor = 'start' | 'end' | 'center';
 
 @Component({
   tag: 'vertex-viewer-markup-arrow',
@@ -97,12 +98,7 @@ export class ViewerMarkupArrow {
   private elementBounds?: DOMRect;
 
   @State()
-  private viewport: Viewport = new Viewport(0, 0);
-
-  @State()
-  private drawing = false;
-
-  private editAnchor: 'start' | 'end' = 'end';
+  private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
 
   /**
    * @ignore
@@ -151,16 +147,8 @@ export class ViewerMarkupArrow {
     this.updatePointsFromProps();
   }
 
-  @Listen('pointerup')
-  protected handlePointerUp(event: PointerEvent): void {
-    if (this.mode !== '') {
-      this.endMarkup();
-    }
-  }
-
   private updateViewport(): void {
     const rect = this.hostEl.getBoundingClientRect();
-    this.viewport = new Viewport(rect.width, rect.height);
     this.elementBounds = rect;
   }
 
@@ -204,6 +192,7 @@ export class ViewerMarkupArrow {
               start={this.start}
               end={this.end}
               onStartAnchorPointerDown={this.editStartPoint}
+              onCenterAnchorPointerDown={this.editCenterPoint}
               onEndAnchorPointerDown={this.editEndPoint}
             />
           )}
@@ -223,13 +212,10 @@ export class ViewerMarkupArrow {
     }
   }
 
-  private async addDrawingInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
+  private async addDrawingInteractionListeners(): Promise<void> {
     if (this.mode !== '') {
-      interactionTarget.addEventListener('pointermove', this.updatePoints);
-      interactionTarget.addEventListener('pointerup', this.endMarkup);
+      window.addEventListener('pointermove', this.updatePoints);
+      window.addEventListener('pointerup', this.endMarkup);
     }
   }
 
@@ -240,18 +226,18 @@ export class ViewerMarkupArrow {
     interactionTarget.removeEventListener('pointerdown', this.startMarkup);
   }
 
-  private async removeDrawingInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode !== '') {
-      interactionTarget.removeEventListener('pointermove', this.updatePoints);
-      interactionTarget.removeEventListener('pointerup', this.endMarkup);
-    }
+  private async removeDrawingInteractionListeners(): Promise<void> {
+    window.removeEventListener('pointermove', this.updatePoints);
+    window.removeEventListener('pointerup', this.endMarkup);
   }
 
   private editStartPoint = (event: PointerEvent): void => {
     this.editAnchor = 'start';
+    this.startMarkup(event);
+  };
+
+  private editCenterPoint = (event: PointerEvent): void => {
+    this.editAnchor = 'center';
     this.startMarkup(event);
   };
 
@@ -261,20 +247,36 @@ export class ViewerMarkupArrow {
   };
 
   private updatePoints = (event: PointerEvent): void => {
+    const position = getMouseClientPosition(event, this.elementBounds);
     if (this.editAnchor === 'start') {
-      this.start = getMouseClientPosition(event, this.elementBounds);
-    } else {
-      this.end = getMouseClientPosition(event, this.elementBounds);
+      this.start = position;
+    } else if (this.editAnchor === 'end') {
+      this.end = position;
+    } else if (this.start != null && this.end != null) {
+      const center = Point.create(
+        (this.start.x + this.end.x) / 2,
+        (this.start.y + this.end.y) / 2
+      );
+      const xDifference = center.x - position.x;
+      const yDifference = center.y - position.y;
+
+      this.start = Point.create(
+        this.start.x - xDifference,
+        this.start.y - yDifference
+      );
+      this.end = Point.create(
+        this.end.x - xDifference,
+        this.end.y - yDifference
+      );
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.viewer != null) {
+    if (this.mode !== '') {
       this.start =
         this.start ?? getMouseClientPosition(event, this.elementBounds);
       this.editBegin.emit();
-      this.addDrawingInteractionListeners(this.viewer);
-      this.hostEl.addEventListener('pointerup', this.endMarkup);
+      this.addDrawingInteractionListeners();
     }
   };
 
@@ -282,10 +284,7 @@ export class ViewerMarkupArrow {
     if (this.mode !== '') {
       this.editEnd.emit();
 
-      if (this.viewer != null) {
-        this.removeDrawingInteractionListeners(this.viewer);
-      }
-      this.hostEl.removeEventListener('pointerup', this.endMarkup);
+      this.removeDrawingInteractionListeners();
     }
   };
 }

@@ -180,7 +180,7 @@ export class ViewerMarkupTool {
       const element = stampTemplateWithId(
         window.document.body,
         this.circleTemplateId,
-        isVertexViewerArrowMarkup,
+        isVertexViewerCircleMarkup,
         () =>
           console.warn(
             `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
@@ -200,7 +200,6 @@ export class ViewerMarkupTool {
   }
 
   private updateMarkupElement(): void {
-    console.log('updating');
     const { markupElement } = this.stateMap;
     if (markupElement != null) {
       markupElement.remove();
@@ -241,6 +240,8 @@ export class ViewerMarkupTool {
 
       this.isMarkingUp = false;
       markupElement.bounds = undefined;
+
+      console.log(markupElement);
 
       if (bounds != null) {
         this.markupEnd.emit(new CircleMarkup({ bounds }));

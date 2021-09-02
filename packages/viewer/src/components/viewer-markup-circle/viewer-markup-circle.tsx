@@ -23,7 +23,9 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { Viewport } from '../../lib/types';
 import { CircleMarkup, Markup } from '../../lib/types/markup';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
-import { parseBounds } from './utils';
+import { BoundingBox2dAnchorPosition } from '../viewer-markup/utils';
+import { BoundingBox2d } from '../viewer-markup/viewer-markup-components';
+import { parseBounds, transformCircle } from './utils';
 
 /**
  * The supported markup modes.
@@ -94,6 +96,9 @@ export class ViewerMarkupCircle {
   @State()
   private startPosition?: Point.Point;
 
+  @State()
+  private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
+
   /**
    * @ignore
    */
@@ -137,13 +142,6 @@ export class ViewerMarkupCircle {
     this.updateBoundsFromProps();
   }
 
-  @Listen('pointerup')
-  protected handlePointerUp(event: PointerEvent): void {
-    if (this.mode === 'replace') {
-      this.endMarkup(event);
-    }
-  }
-
   private updateViewport(): void {
     const rect = this.hostEl.getBoundingClientRect();
     this.viewport = new Viewport(rect.width, rect.height);
@@ -158,10 +156,13 @@ export class ViewerMarkupCircle {
     const center =
       this.bounds != null ? Rectangle.center(this.bounds) : undefined;
 
+    console.log(this.mode);
+
     return this.bounds != null && center != null ? (
       <Host>
         <svg class="svg">
           <ellipse
+            class="ellipse"
             cx={center.x}
             cy={center.y}
             rx={this.bounds.width / 2}
@@ -170,6 +171,17 @@ export class ViewerMarkupCircle {
             stroke-width={4}
             fill={'none'}
           />
+          {this.mode === 'edit' && (
+            <BoundingBox2d
+              bounds={this.bounds}
+              onTopLeftAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'top-left')
+              }
+              onBottomAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom')
+              }
+            />
+          )}
         </svg>
       </Host>
     ) : (
@@ -182,10 +194,14 @@ export class ViewerMarkupCircle {
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
     if (this.mode === 'replace') {
-      interactionTarget.addEventListener('pointermove', this.updateEnd);
       interactionTarget.addEventListener('pointerdown', this.startMarkup);
-      interactionTarget.addEventListener('pointerleave', this.reset);
-      interactionTarget.addEventListener('pointerup', this.endMarkup);
+    }
+  }
+
+  private async addDrawingInteractionListeners(): Promise<void> {
+    if (this.mode !== '') {
+      window.addEventListener('pointermove', this.updatePoints);
+      window.addEventListener('pointerup', this.endMarkup);
     }
   }
 
@@ -193,62 +209,51 @@ export class ViewerMarkupCircle {
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
-    interactionTarget.removeEventListener('pointermove', this.updateEnd);
     interactionTarget.removeEventListener('pointerdown', this.startMarkup);
-    interactionTarget.removeEventListener('pointerleave', this.reset);
-    interactionTarget.removeEventListener('pointerup', this.endMarkup);
   }
 
-  private updateEnd = (event: PointerEvent): void => {
-    if (this.drawing && this.bounds != null && this.startPosition != null) {
-      // event.preventDefault();
-      // event.stopImmediatePropagation();
+  private async removeDrawingInteractionListeners(): Promise<void> {
+    window.removeEventListener('pointermove', this.updatePoints);
+    window.removeEventListener('pointerup', this.endMarkup);
+  }
+
+  private updateEditAnchor = (
+    event: PointerEvent,
+    anchor: BoundingBox2dAnchorPosition
+  ): void => {
+    this.editAnchor = anchor;
+    this.startMarkup(event);
+  };
+
+  private updatePoints = (event: PointerEvent): void => {
+    if (this.bounds != null && this.startPosition != null) {
       const position = getMouseClientPosition(event, this.elementBounds);
 
-      const xDifference = position.x - (this.startPosition?.x ?? 0);
-      const yDifference = position.y - (this.startPosition?.y ?? 0);
-
-      this.bounds = Rectangle.create(
-        xDifference < 0 ? position.x : this.bounds.x,
-        yDifference < 0 ? position.y : this.bounds.y,
-        xDifference < 0 ? this.startPosition.x - position.x : xDifference,
-        yDifference < 0 ? this.startPosition.y - position.y : yDifference
+      this.bounds = transformCircle(
+        this.bounds,
+        this.startPosition,
+        position,
+        this.editAnchor
       );
-
-      console.log(this.bounds);
-
-      // this.bounds = Rectangle.create(position.x, position.y);
-      // this.startPosition = position;
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode === 'replace') {
-      console.log(event);
-      // event.preventDefault();
-      // event.stopImmediatePropagation();
+    if (this.mode !== '') {
       const position = getMouseClientPosition(event, this.elementBounds);
-      this.bounds = Rectangle.create(position.x, position.y, 0, 0);
-      this.drawing = true;
-      this.editBegin.emit();
-      this.hostEl.addEventListener('pointerup', this.endMarkup);
       this.startPosition = position;
+      this.bounds =
+        this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
+      this.editBegin.emit();
+      this.addDrawingInteractionListeners();
     }
   };
 
-  private endMarkup = (event: PointerEvent): void => {
-    if (this.drawing) {
-      this.drawing = false;
-      console.log('emitting edit end');
+  private endMarkup = (): void => {
+    console.log('end');
+    if (this.mode !== '') {
       this.editEnd.emit();
-      this.hostEl.removeEventListener('pointerup', this.endMarkup);
-      this.startPosition = undefined;
     }
-  };
-
-  private reset = (): void => {
-    // this.start = undefined;
-    // this.end = undefined;
-    // this.drawing = false;
+    this.removeDrawingInteractionListeners();
   };
 }

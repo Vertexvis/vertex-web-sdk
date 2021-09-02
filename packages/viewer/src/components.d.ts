@@ -505,7 +505,7 @@ export namespace Components {
           * @see {
           * @link ViewerMeasurements.getMeasurementElement}
          */
-        "getMarkupElements": () => Promise<HTMLVertexViewerMarkupArrowElement[]>;
+        "getMarkupElements": () => Promise<Array<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>>;
         /**
           * The ID of the markup that is selected.
          */
