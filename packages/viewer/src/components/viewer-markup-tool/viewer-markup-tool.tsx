@@ -20,7 +20,9 @@ import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 export type ViewerMarkupToolType = 'arrow' | 'circle';
 
 interface StateMap {
-  markupElement?: HTMLVertexViewerMarkupArrowElement;
+  markupElement?:
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement;
 }
 
 @Component({
@@ -239,6 +241,7 @@ export class ViewerMarkupTool {
     const { markupElement } = this.stateMap;
     if (markupElement != null) {
       markupElement.remove();
+      markupElement.dispose();
       markupElement.viewer = undefined;
       markupElement.removeEventListener(
         'editBegin',

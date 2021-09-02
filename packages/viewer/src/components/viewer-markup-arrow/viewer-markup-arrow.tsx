@@ -8,6 +8,7 @@ import {
   EventEmitter,
   Event,
   State,
+  Method,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
@@ -153,6 +154,14 @@ export class ViewerMarkupArrow {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+  }
+
+  @Method()
+  public async dispose(): Promise<void> {
+    if (this.viewer != null) {
+      this.removeInteractionListeners(this.viewer);
+    }
+    this.removeDrawingInteractionListeners();
   }
 
   /**

@@ -8,6 +8,7 @@ import {
   EventEmitter,
   Event,
   State,
+  Method,
 } from '@stencil/core';
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { DeviceSize, getDeviceSize } from '../../lib/device';
@@ -134,6 +135,14 @@ export class ViewerMarkupCircle {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+  }
+
+  @Method()
+  public async dispose(): Promise<void> {
+    if (this.viewer != null) {
+      this.removeInteractionListeners(this.viewer);
+    }
+    this.removeDrawingInteractionListeners();
   }
 
   /**

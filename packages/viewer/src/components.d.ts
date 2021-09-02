@@ -534,6 +534,7 @@ export namespace Components {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupArrow {
+        "dispose": () => Promise<void>;
         /**
           * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
@@ -568,6 +569,7 @@ export namespace Components {
           * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]` corresponds to a circle with a diameter of half the viewport width in the center of the viewport.
          */
         "boundsJson"?: string;
+        "dispose": () => Promise<void>;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
          */
