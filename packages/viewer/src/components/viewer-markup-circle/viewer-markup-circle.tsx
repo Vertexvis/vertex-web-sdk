@@ -7,22 +7,11 @@ import {
   Watch,
   EventEmitter,
   Event,
-  Method,
-  Listen,
   State,
 } from '@stencil/core';
-import {
-  Matrix,
-  Matrix4,
-  Point,
-  Rectangle,
-  Vector3,
-} from '@vertexvis/geometry';
-import { Color } from '@vertexvis/utils';
+import { Point, Rectangle } from '@vertexvis/geometry';
+import { DeviceSize, getDeviceSize } from '../../lib/device';
 import { getMouseClientPosition } from '../../lib/dom';
-import { Viewport } from '../../lib/types';
-import { CircleMarkup, Markup } from '../../lib/types/markup';
-import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 import { BoundingBox2dAnchorPosition } from '../viewer-markup/utils';
 import {
   BoundingBox2d,
@@ -84,6 +73,9 @@ export class ViewerMarkupCircle {
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
 
+  @Event({ bubbles: true })
+  public editCancel!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -91,10 +83,7 @@ export class ViewerMarkupCircle {
   private elementBounds?: DOMRect;
 
   @State()
-  private viewport: Viewport = new Viewport(0, 0);
-
-  @State()
-  private drawing = false;
+  private deviceSize?: DeviceSize;
 
   @State()
   private startPosition?: Point.Point;
@@ -147,7 +136,7 @@ export class ViewerMarkupCircle {
 
   private updateViewport(): void {
     const rect = this.hostEl.getBoundingClientRect();
-    this.viewport = new Viewport(rect.width, rect.height);
+    this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }
 
@@ -159,7 +148,7 @@ export class ViewerMarkupCircle {
     const center =
       this.bounds != null ? Rectangle.center(this.bounds) : undefined;
 
-    return this.bounds != null && center != null ? (
+    return this.bounds != null && center != null && this.deviceSize != null ? (
       <Host>
         <svg class="svg">
           <defs>
@@ -180,6 +169,7 @@ export class ViewerMarkupCircle {
           {this.mode === 'edit' && (
             <BoundingBox2d
               bounds={this.bounds}
+              deviceSize={this.deviceSize}
               onTopLeftAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'top-left')
               }
@@ -285,6 +275,7 @@ export class ViewerMarkupCircle {
       this.editEnd.emit();
     } else {
       this.bounds = undefined;
+      this.editCancel.emit();
     }
     this.removeDrawingInteractionListeners();
   };

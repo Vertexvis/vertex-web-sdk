@@ -11,7 +11,7 @@ import {
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
-import { Viewport } from '../../lib/types';
+import { getDeviceSize, DeviceSize } from '../../lib/device';
 import {
   createArrowheadPoints,
   arrowheadPointsToPolygonPoints,
@@ -94,11 +94,17 @@ export class ViewerMarkupArrow {
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
 
+  @Event({ bubbles: true })
+  public editCancel!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
   @State()
   private elementBounds?: DOMRect;
+
+  @State()
+  private deviceSize?: DeviceSize;
 
   @State()
   private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
@@ -152,6 +158,7 @@ export class ViewerMarkupArrow {
 
   private updateViewport(): void {
     const rect = this.hostEl.getBoundingClientRect();
+    this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }
 
@@ -166,7 +173,10 @@ export class ViewerMarkupArrow {
         ? createArrowheadPoints(this.start, this.end)
         : undefined;
 
-    return this.start != null && this.end != null && arrowheadPoints != null ? (
+    return this.start != null &&
+      this.end != null &&
+      arrowheadPoints != null &&
+      this.deviceSize != null ? (
       <Host>
         <svg class="svg">
           <defs>
@@ -189,6 +199,7 @@ export class ViewerMarkupArrow {
             <BoundingBox1d
               start={this.start}
               end={this.end}
+              deviceSize={this.deviceSize}
               onStartAnchorPointerDown={this.editStartPoint}
               onCenterAnchorPointerDown={this.editCenterPoint}
               onEndAnchorPointerDown={this.editEndPoint}
@@ -279,10 +290,13 @@ export class ViewerMarkupArrow {
   };
 
   private endMarkup = (): void => {
-    if (this.mode !== '') {
+    if (this.mode !== '' && this.end != null) {
       this.editEnd.emit();
-
-      this.removeDrawingInteractionListeners();
+    } else {
+      this.start = undefined;
+      this.editCancel.emit();
     }
+
+    this.removeDrawingInteractionListeners();
   };
 }

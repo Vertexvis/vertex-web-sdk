@@ -200,10 +200,17 @@ export class ViewerMarkup {
    */
   @Listen('markupEnd')
   protected async handleMarkupEnd(event: CustomEvent<Markup>): Promise<void> {
-    console.log(event);
     const e = event as CustomEvent<Markup>;
     await this.addMarkup(e.detail);
     this.selectedMarkupId = e.detail.id;
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('markupEditCancel')
+  protected async handleMarkupEditCancel(): Promise<void> {
+    this.selectedMarkupId = undefined;
   }
 
   /**
@@ -295,14 +302,12 @@ export class ViewerMarkup {
   private updatePropsOnMarkup(
     element: HTMLVertexViewerMarkupArrowElement
   ): void {
-    console.log(this.viewer);
     element.viewer = this.viewer;
     element.classList.add('viewer-markup__markup');
   }
 
   private updatePropsOnMarkupTool(): void {
     const tool = this.getMarkupTool();
-    console.log(this.viewer);
     if (tool != null) {
       tool.disabled = this.disabled;
       tool.arrowTemplateId = this.arrowTemplateId;

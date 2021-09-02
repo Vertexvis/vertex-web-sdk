@@ -61,6 +61,7 @@
   stroke-width: var(--bounds-edge-anchor-stroke-width);
   fill: var(--bounds-edge-anchor-fill-color);
   fill-opacity: var(--bounds-edge-anchor-fill-opacity);
+  cursor: default;
 }
 
 .bounds-circle {
@@ -69,4 +70,5 @@
   stroke-width: var(--bounds-circle-anchor-stroke-width);
   fill: var(--bounds-circle-anchor-fill-color);
   fill-opacity: var(--bounds-circle-anchor-fill-opacity);
+  cursor: default;
 }

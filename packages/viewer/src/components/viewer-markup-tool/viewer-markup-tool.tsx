@@ -10,7 +10,6 @@ import {
   Watch,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { ArrowMarkup, CircleMarkup, Markup } from '../../lib/types/markup';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
@@ -79,6 +78,9 @@ export class ViewerMarkupTool {
   @Event({ bubbles: true })
   public markupEnd!: EventEmitter<Markup>;
 
+  @Event({ bubbles: true })
+  public markupEditCancel!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -93,9 +95,10 @@ export class ViewerMarkupTool {
   private isMarkingUp = false;
 
   @Watch('viewer')
-  protected handleViewerChanged(): void {
+  protected async handleViewerChanged(): Promise<void> {
     if (this.stateMap.markupElement != null) {
       this.stateMap.markupElement.viewer = this.viewer;
+      await this.viewer?.addCursor('crosshair');
     }
   }
 
@@ -209,6 +212,10 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       markupElement.removeEventListener('editEnd', this.handleMarkupEditEnd);
+      markupElement.removeEventListener(
+        'editCancel',
+        this.handleMarkupEditCancel
+      );
     }
 
     if (!this.disabled) {
@@ -223,6 +230,10 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       newMarkupElement.addEventListener('editEnd', this.handleMarkupEditEnd);
+      newMarkupElement.addEventListener(
+        'editCancel',
+        this.handleMarkupEditCancel
+      );
       this.stateMap.markupElement = newMarkupElement;
       this.hostEl.append(newMarkupElement);
     }
@@ -241,8 +252,6 @@ export class ViewerMarkupTool {
       this.isMarkingUp = false;
       markupElement.bounds = undefined;
 
-      console.log(markupElement);
-
       if (bounds != null) {
         this.markupEnd.emit(new CircleMarkup({ bounds }));
       }
@@ -258,5 +267,9 @@ export class ViewerMarkupTool {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
     }
+  };
+
+  private handleMarkupEditCancel = (): void => {
+    this.markupEditCancel.emit();
   };
 }

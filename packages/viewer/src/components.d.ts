@@ -1391,6 +1391,7 @@ declare namespace LocalJSX {
          */
         "mode"?: ViewerMarkupArrowMode;
         "onEditBegin"?: (event: CustomEvent<void>) => void;
+        "onEditCancel"?: (event: CustomEvent<void>) => void;
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
           * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
@@ -1419,6 +1420,7 @@ declare namespace LocalJSX {
          */
         "mode"?: ViewerMarkupCircleMode;
         "onEditBegin"?: (event: CustomEvent<void>) => void;
+        "onEditCancel"?: (event: CustomEvent<void>) => void;
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
           * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
@@ -1436,6 +1438,7 @@ declare namespace LocalJSX {
          */
         "disabled"?: boolean;
         "onMarkupBegin"?: (event: CustomEvent<void>) => void;
+        "onMarkupEditCancel"?: (event: CustomEvent<void>) => void;
         "onMarkupEnd"?: (event: CustomEvent<Markup>) => void;
         /**
           * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
