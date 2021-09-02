@@ -138,7 +138,15 @@ export class ViewerMarkupTool {
    * @ignore
    */
   @Watch('arrowTemplateId')
-  protected handleDistanceTemplateIdChanged(): void {
+  protected handleArrowTemplateIdChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('circleTemplateId')
+  protected handleCircleTemplateIdChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -150,11 +158,6 @@ export class ViewerMarkupTool {
     this.updateMarkupElement();
 
     if (this.viewer != null) {
-      console.log(
-        this.disabled,
-        this.cameraControls,
-        this.viewerCameraControls
-      );
       this.viewer.cameraControls = this.disabled
         ? this.viewerCameraControls
         : this.cameraControls;

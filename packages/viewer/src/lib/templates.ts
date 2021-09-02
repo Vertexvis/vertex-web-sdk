@@ -26,7 +26,6 @@ export function stampTemplateWithId<E extends Element>(
   templateNotFoundErrorMsg: () => void,
   validationErrorMsg: () => void
 ): E | undefined {
-  console.log(id);
   const template = getTemplateWithId(parent, id, templateNotFoundErrorMsg);
   if (template != null) {
     return stampTemplateWithValidation(

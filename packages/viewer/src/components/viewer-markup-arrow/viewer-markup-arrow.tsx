@@ -26,6 +26,7 @@ import {
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
+import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 /**
  * The supported arrow markup modes.
@@ -192,7 +193,7 @@ export class ViewerMarkupArrow {
   }
 
   private updateViewport(): void {
-    const rect = this.hostEl.getBoundingClientRect();
+    const rect = getMarkupBoundingClientRect(this.hostEl);
     this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }
@@ -203,6 +204,7 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    console.log(this.start, this.end, this.deviceSize, this.elementBounds);
     if (
       this.start != null &&
       this.end != null &&
@@ -216,6 +218,7 @@ export class ViewerMarkupArrow {
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
       const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
 
+      console.log(screenStart, screenEnd, arrowheadPoints);
       return (
         <Host>
           <svg class="svg">
@@ -224,10 +227,12 @@ export class ViewerMarkupArrow {
             </defs>
             <g filter="url(#arrow-shadow)">
               <polygon
+                id="arrow-head"
                 class="head"
                 points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
               />
               <line
+                id="arrow-line"
                 class="line"
                 x1={screenStart.x}
                 y1={screenStart.y}

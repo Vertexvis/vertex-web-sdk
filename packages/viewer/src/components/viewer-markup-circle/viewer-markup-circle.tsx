@@ -23,6 +23,7 @@ import {
   SvgShadow,
 } from '../viewer-markup/viewer-markup-components';
 import { parseBounds, transformCircle } from './utils';
+import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 /**
  * The supported markup modes.
@@ -168,7 +169,7 @@ export class ViewerMarkupCircle {
   }
 
   private updateViewport(): void {
-    const rect = this.hostEl.getBoundingClientRect();
+    const rect = getMarkupBoundingClientRect(this.hostEl);
     this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }

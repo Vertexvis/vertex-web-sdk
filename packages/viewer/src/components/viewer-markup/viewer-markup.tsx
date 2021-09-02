@@ -179,6 +179,25 @@ export class ViewerMarkup {
   }
 
   /**
+   * Returns the markup element associated to the given ID.
+   *
+   * @param id The ID of the markup element to return.
+   * @returns A markup element, or `undefined`.
+   * @see {@link ViewerMarkup.getMarkupElements}
+   */
+  @Method()
+  public async getMarkupElement(
+    id: string
+  ): Promise<
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | undefined
+  > {
+    const markup = await this.getMarkupElements();
+    return markup.find((el) => el.id === id);
+  }
+
+  /**
    * @ignore
    */
   @Watch('selectedMarkupId')
@@ -194,6 +213,22 @@ export class ViewerMarkup {
    */
   @Watch('tool')
   protected handleToolChanged(): void {
+    this.updatePropsOnMarkupTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('arrowTemplateId')
+  protected handleArrowTemplateIdChanged(): void {
+    this.updatePropsOnMarkupTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('circleTemplateId')
+  protected handleCircleTemplateIdChanged(): void {
     this.updatePropsOnMarkupTool();
   }
 
@@ -296,7 +331,7 @@ export class ViewerMarkup {
       const element = stampTemplateWithId(
         window.document.body,
         this.circleTemplateId,
-        isVertexViewerArrowMarkup,
+        isVertexViewerCircleMarkup,
         () =>
           console.warn(
             `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`

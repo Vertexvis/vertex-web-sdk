@@ -4,8 +4,6 @@ import { Point, Angle, Rectangle } from '@vertexvis/geometry';
 import { DeviceSize } from '../../lib/device';
 import { getBoundingBox2dAnchorPosition } from './utils';
 
-export type BoundingAnchorBoxSize = 'small' | 'large';
-
 export interface SvgShadowProps {
   id: string;
 }
@@ -25,7 +23,8 @@ export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id }) => {
   );
 };
 
-interface BoundingBoxAnchorProps {
+export interface BoundingBoxAnchorProps {
+  id?: string;
   center: Point.Point;
   angle?: number;
   width?: number;
@@ -33,7 +32,8 @@ interface BoundingBoxAnchorProps {
   onGrab?: (event: PointerEvent) => void;
 }
 
-const BoundingBoxAnchor: FunctionalComponent<BoundingBoxAnchorProps> = ({
+export const BoundingBoxAnchor: FunctionalComponent<BoundingBoxAnchorProps> = ({
+  id,
   angle,
   center,
   width,
@@ -42,6 +42,7 @@ const BoundingBoxAnchor: FunctionalComponent<BoundingBoxAnchorProps> = ({
 }) => {
   return (
     <rect
+      id={id}
       class="bounds-rect"
       height={height ?? 8}
       width={width ?? 8}
@@ -105,6 +106,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
           onGrab={onEndAnchorPointerDown}
         />
         <circle
+          id="bounding-box-1d-center"
           class="bounds-circle"
           cx={center.x}
           cy={center.y}
