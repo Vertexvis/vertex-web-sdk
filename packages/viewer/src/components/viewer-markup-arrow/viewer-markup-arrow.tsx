@@ -21,6 +21,10 @@ import {
   BoundingBox1d,
   SvgShadow,
 } from '../viewer-markup/viewer-markup-components';
+import {
+  translatePointToRelative,
+  translatePointToScreen,
+} from '../viewer-markup/utils';
 
 /**
  * The supported arrow markup modes.
@@ -41,6 +45,9 @@ export class ViewerMarkupArrow {
    * The position of the starting anchor. Can either be an instance of a
    * `Point` or a JSON string representation in the format of `[x, y]` or
    * `{"x": 0, "y": 0}`.
+   *
+   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
+   * corresponds to a point in the center of the viewport.
    */
   @Prop({ mutable: true, attribute: null })
   public start?: Point.Point;
@@ -49,6 +56,9 @@ export class ViewerMarkupArrow {
    * The position of the starting anchor, as a JSON string. Can either be an
    * instance of a `Point` or a JSON string representation in the format of
    * `[x, y]` or `{"x": 0, "y": 0}`.
+   *
+   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
+   * corresponds to a point in the center of the viewport.
    */
   @Prop({ attribute: 'start' })
   public startJson?: string;
@@ -57,6 +67,9 @@ export class ViewerMarkupArrow {
    * The position of the ending anchor. Can either be an instance of a `Point`
    * or a JSON string representation in the format of `[x, y]` or `{"x": 0,
    * "y": 0}`.
+   *
+   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
+   * corresponds to a point in the center of the viewport.
    */
   @Prop({ mutable: true })
   public end?: Point.Point;
@@ -65,6 +78,9 @@ export class ViewerMarkupArrow {
    * The position of the ending anchor, as a JSON string. Can either be an
    * instance of a `Point` or a JSON string representation in the format of
    * `[x, y]` or `{"x": 0, "y": 0}`.
+   *
+   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
+   * corresponds to a point in the center of the viewport.
    */
   @Prop({ attribute: 'end' })
   public endJson?: string;
@@ -178,48 +194,54 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const arrowheadPoints =
-      this.start != null && this.end != null
-        ? createArrowheadPoints(this.start, this.end)
-        : undefined;
-
-    return this.start != null &&
+    if (
+      this.start != null &&
       this.end != null &&
-      arrowheadPoints != null &&
-      this.deviceSize != null ? (
-      <Host>
-        <svg class="svg">
-          <defs>
-            <SvgShadow id="arrow-shadow" />
-          </defs>
-          <g filter="url(#arrow-shadow)">
-            <polygon
-              class="head"
-              points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-            />
-            <line
-              class="line"
-              x1={this.start.x}
-              y1={this.start.y}
-              x2={arrowheadPoints.base.x}
-              y2={arrowheadPoints.base.y}
-            />
-          </g>
-          {this.mode === 'edit' && (
-            <BoundingBox1d
-              start={this.start}
-              end={this.end}
-              deviceSize={this.deviceSize}
-              onStartAnchorPointerDown={this.editStartPoint}
-              onCenterAnchorPointerDown={this.editCenterPoint}
-              onEndAnchorPointerDown={this.editEndPoint}
-            />
-          )}
-        </svg>
-      </Host>
-    ) : (
-      <Host />
-    );
+      this.deviceSize != null &&
+      this.elementBounds != null
+    ) {
+      const screenStart = translatePointToScreen(
+        this.start,
+        this.elementBounds
+      );
+      const screenEnd = translatePointToScreen(this.end, this.elementBounds);
+      const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
+
+      return (
+        <Host>
+          <svg class="svg">
+            <defs>
+              <SvgShadow id="arrow-shadow" />
+            </defs>
+            <g filter="url(#arrow-shadow)">
+              <polygon
+                class="head"
+                points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+              />
+              <line
+                class="line"
+                x1={screenStart.x}
+                y1={screenStart.y}
+                x2={arrowheadPoints.base.x}
+                y2={arrowheadPoints.base.y}
+              />
+            </g>
+            {this.mode === 'edit' && (
+              <BoundingBox1d
+                start={screenStart}
+                end={screenEnd}
+                deviceSize={this.deviceSize}
+                onStartAnchorPointerDown={this.editStartPoint}
+                onCenterAnchorPointerDown={this.editCenterPoint}
+                onEndAnchorPointerDown={this.editEndPoint}
+              />
+            )}
+          </svg>
+        </Host>
+      );
+    } else {
+      return <Host />;
+    }
   }
 
   private async addInteractionListeners(
@@ -266,34 +288,43 @@ export class ViewerMarkupArrow {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    const position = getMouseClientPosition(event, this.elementBounds);
-    if (this.editAnchor === 'start') {
-      this.start = position;
-    } else if (this.editAnchor === 'end') {
-      this.end = position;
-    } else if (this.start != null && this.end != null) {
-      const center = Point.create(
-        (this.start.x + this.end.x) / 2,
-        (this.start.y + this.end.y) / 2
+    if (this.elementBounds != null) {
+      const position = translatePointToRelative(
+        getMouseClientPosition(event, this.elementBounds),
+        this.elementBounds
       );
-      const xDifference = center.x - position.x;
-      const yDifference = center.y - position.y;
+      if (this.editAnchor === 'start') {
+        this.start = position;
+      } else if (this.editAnchor === 'end') {
+        this.end = position;
+      } else if (this.start != null && this.end != null) {
+        const center = Point.create(
+          (this.start.x + this.end.x) / 2,
+          (this.start.y + this.end.y) / 2
+        );
+        const xDifference = center.x - position.x;
+        const yDifference = center.y - position.y;
 
-      this.start = Point.create(
-        this.start.x - xDifference,
-        this.start.y - yDifference
-      );
-      this.end = Point.create(
-        this.end.x - xDifference,
-        this.end.y - yDifference
-      );
+        this.start = Point.create(
+          this.start.x - xDifference,
+          this.start.y - yDifference
+        );
+        this.end = Point.create(
+          this.end.x - xDifference,
+          this.end.y - yDifference
+        );
+      }
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '') {
+    if (this.mode !== '' && this.elementBounds != null) {
       this.start =
-        this.start ?? getMouseClientPosition(event, this.elementBounds);
+        this.start ??
+        translatePointToRelative(
+          getMouseClientPosition(event, this.elementBounds),
+          this.elementBounds
+        );
       this.editBegin.emit();
       this.addDrawingInteractionListeners();
     }

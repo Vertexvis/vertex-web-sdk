@@ -535,11 +535,11 @@ export namespace Components {
     }
     interface VertexViewerMarkupArrow {
         /**
-          * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "end"?: Point.Point;
         /**
-          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "endJson"?: string;
         /**
@@ -547,11 +547,11 @@ export namespace Components {
          */
         "mode": ViewerMarkupArrowMode;
         /**
-          * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "start"?: Point.Point;
         /**
-          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "startJson"?: string;
         /**
@@ -561,11 +561,11 @@ export namespace Components {
     }
     interface VertexViewerMarkupCircle {
         /**
-          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]` corresponds to a circle with a diameter of half the viewport width in the center of the viewport.
          */
         "bounds"?: Rectangle.Rectangle;
         /**
-          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]` corresponds to a circle with a diameter of half the viewport width in the center of the viewport.
          */
         "boundsJson"?: string;
         /**
@@ -1408,11 +1408,11 @@ declare namespace LocalJSX {
     }
     interface VertexViewerMarkupArrow {
         /**
-          * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "end"?: Point.Point;
         /**
-          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "endJson"?: string;
         /**
@@ -1432,11 +1432,11 @@ declare namespace LocalJSX {
          */
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
-          * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "start"?: Point.Point;
         /**
-          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+          * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates, e.g. `[0.5, 0.5]` corresponds to a point in the center of the viewport.
          */
         "startJson"?: string;
         /**
@@ -1446,11 +1446,11 @@ declare namespace LocalJSX {
     }
     interface VertexViewerMarkupCircle {
         /**
-          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]` corresponds to a circle with a diameter of half the viewport width in the center of the viewport.
          */
         "bounds"?: Rectangle.Rectangle;
         /**
-          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+          * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]` corresponds to a circle with a diameter of half the viewport width in the center of the viewport.
          */
         "boundsJson"?: string;
         /**

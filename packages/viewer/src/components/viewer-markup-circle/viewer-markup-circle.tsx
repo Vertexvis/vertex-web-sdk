@@ -12,7 +12,11 @@ import {
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { DeviceSize, getDeviceSize } from '../../lib/device';
 import { getMouseClientPosition } from '../../lib/dom';
-import { BoundingBox2dAnchorPosition } from '../viewer-markup/utils';
+import {
+  BoundingBox2dAnchorPosition,
+  translateRectToScreen,
+  translatePointToRelative,
+} from '../viewer-markup/utils';
 import {
   BoundingBox2d,
   SvgShadow,
@@ -36,6 +40,10 @@ export class ViewerMarkupCircle {
    * The bounds of the circle. Can either be an instance of a `Rectangle` or
    * a JSON string representation in the format of `[x, y, width, height]` or
    * `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+   *
+   * Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]`
+   * corresponds to a circle with a diameter of half the viewport width in the
+   * center of the viewport.
    */
   @Prop({ mutable: true, attribute: null })
   public bounds?: Rectangle.Rectangle;
@@ -44,6 +52,10 @@ export class ViewerMarkupCircle {
    * The bounds of the circle. Can either be an instance of a `Rectangle` or
    * a JSON string representation in the format of `[x, y, width, height]` or
    * `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+   *
+   * Bounds are expected to have relative coordinates, e.g. `[0.5, 0.5, 0.5, 0.5]`
+   * corresponds to a circle with a diameter of half the viewport width in the
+   * center of the viewport.
    */
   @Prop({ attribute: 'bounds' })
   public boundsJson?: string;
@@ -157,10 +169,17 @@ export class ViewerMarkupCircle {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    const center =
-      this.bounds != null ? Rectangle.center(this.bounds) : undefined;
+    const relativeBounds =
+      this.bounds != null && this.elementBounds != null
+        ? translateRectToScreen(this.bounds, this.elementBounds)
+        : this.bounds;
+    const center = relativeBounds
+      ? Rectangle.center(relativeBounds)
+      : undefined;
 
-    return this.bounds != null && center != null && this.deviceSize != null ? (
+    console.log(this.bounds, relativeBounds);
+
+    return relativeBounds && center != null && this.deviceSize != null ? (
       <Host>
         <svg class="svg">
           <defs>
@@ -171,8 +190,8 @@ export class ViewerMarkupCircle {
               class="ellipse"
               cx={center.x}
               cy={center.y}
-              rx={this.bounds.width / 2}
-              ry={this.bounds.height / 2}
+              rx={relativeBounds.width / 2}
+              ry={relativeBounds.height / 2}
               stroke={'#000ff0'}
               stroke-width={4}
               fill={'none'}
@@ -180,7 +199,7 @@ export class ViewerMarkupCircle {
           </g>
           {this.mode === 'edit' && (
             <BoundingBox2d
-              bounds={this.bounds}
+              bounds={relativeBounds}
               deviceSize={this.deviceSize}
               onTopLeftAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'top-left')
@@ -252,8 +271,15 @@ export class ViewerMarkupCircle {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (this.bounds != null && this.startPosition != null) {
-      const position = getMouseClientPosition(event, this.elementBounds);
+    if (
+      this.bounds != null &&
+      this.startPosition != null &&
+      this.elementBounds != null
+    ) {
+      const position = translatePointToRelative(
+        getMouseClientPosition(event, this.elementBounds),
+        this.elementBounds
+      );
 
       this.bounds = transformCircle(
         this.resizeBounds ?? this.bounds,
@@ -265,8 +291,11 @@ export class ViewerMarkupCircle {
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '') {
-      const position = getMouseClientPosition(event, this.elementBounds);
+    if (this.mode !== '' && this.elementBounds != null) {
+      const position = translatePointToRelative(
+        getMouseClientPosition(event, this.elementBounds),
+        this.elementBounds
+      );
       this.startPosition = position;
       this.bounds =
         this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
