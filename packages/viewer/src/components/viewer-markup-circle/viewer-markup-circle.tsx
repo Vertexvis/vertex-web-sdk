@@ -49,30 +49,42 @@ export class ViewerMarkupCircle {
   public boundsJson?: string;
 
   /**
-   * A mode that specifies how the measurement component should behave. When
+   * A mode that specifies how the markup component should behave. When
    * unset, the component will not respond to interactions with the handles.
-   * When `edit`, the measurement anchors are interactive and the user is able
+   * When `edit`, the markup anchors are interactive and the user is able
    * to reposition them. When `replace`, anytime the user clicks on the canvas,
-   * a new measurement will be performed.
+   * a new markup will be performed.
    */
   @Prop({ reflect: true })
   public mode: ViewerMarkupCircleMode = '';
 
   /**
-   * The viewer to connect to measurements.
+   * The viewer to connect to markups.
    *
    * This property will automatically be set when a child of a
-   * `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+   * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * An event that is dispatched anytime the user begins editing the
+   * markup.
+   */
   @Event({ bubbles: true })
   public editBegin!: EventEmitter<void>;
 
+  /**
+   * An event that is dispatched when the user has finished editing the
+   * markup.
+   */
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
 
+  /**
+   * An event that is dispatched when the user cancels editing of the
+   * markup.
+   */
   @Event({ bubbles: true })
   public editCancel!: EventEmitter<void>;
 

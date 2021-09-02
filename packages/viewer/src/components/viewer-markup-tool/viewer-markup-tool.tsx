@@ -15,7 +15,7 @@ import { ArrowMarkup, CircleMarkup, Markup } from '../../lib/types/markup';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 
 /**
- * The types of measurements that can be performed by this tool.
+ * The types of markup that can be performed by this tool.
  */
 export type ViewerMarkupToolType = 'arrow' | 'circle';
 
@@ -30,54 +30,71 @@ interface StateMap {
 })
 export class ViewerMarkupTool {
   /**
-  //  * An ID to an HTML template that describes the HTML content to use for
-  //  * distance measurements. It's expected that the template contains a
-  //  * `<vertex-viewer-measurement-distance>`.
-  //  *
-  //  * This property will automatically be set when a child of a
-  //  * `<vertex-viewer-measurements>` element.
-  //  */
-  // @Prop()
-  // public distanceTemplateId?: string;
+   * An HTML template that describes the HTML to use for new arrow
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-arrow>`.
+   */
   @Prop()
   public arrowTemplateId?: string;
 
+  /**
+   * An HTML template that describes the HTML to use for new circle
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-circle>`.
+   */
   @Prop()
   public circleTemplateId?: string;
 
   /**
-   * The type of measurement.
+   * The type of markup.
    *
    * This property will automatically be set when a child of a
-   * `<vertex-viewer-measurements>` element.
+   * `<vertex-viewer-markup>` element.
    */
   @Prop()
   public tool: ViewerMarkupToolType = 'arrow';
 
   /**
-   * Disables measurements.
+   * Disables markups.
    *
    * This property will automatically be set when a child of a
-   * `<vertex-viewer-measurements>` element.
+   * `<vertex-viewer-markup>` element.
    */
   @Prop()
   public disabled = false;
 
   /**
-   * The viewer to connect to measurements.
+   * Whether camera controls are allowed for the underlying viewer.
+   * This defaults to `false`, and is applied to the viewer when this
+   * markup tool is enabled.
+   */
+  @Prop()
+  public cameraControls = false;
+
+  /**
+   * The viewer to connect to markup.
    *
    * This property will automatically be set when a child of a
-   * `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+   * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * An event that is dispatched when a user begins a new markup.
+   */
   @Event({ bubbles: true })
   public markupBegin!: EventEmitter<void>;
 
+  /**
+   * An event that is dispatched when a user has finished their markup.
+   */
   @Event({ bubbles: true })
   public markupEnd!: EventEmitter<Markup>;
 
+  /**
+   * An event that is dispatched when a user has cancelled a markup edit.
+   */
   @Event({ bubbles: true })
   public markupEditCancel!: EventEmitter<void>;
 
@@ -92,13 +109,18 @@ export class ViewerMarkupTool {
   private stateMap: StateMap = {};
 
   @State()
-  private isMarkingUp = false;
+  private viewerCameraControls = true;
 
   @Watch('viewer')
   protected async handleViewerChanged(): Promise<void> {
     if (this.stateMap.markupElement != null) {
       this.stateMap.markupElement.viewer = this.viewer;
       await this.viewer?.addCursor('crosshair');
+    }
+
+    if (this.viewer != null) {
+      this.viewerCameraControls = this.viewer.cameraControls;
+      this.viewer.cameraControls = this.cameraControls;
     }
   }
 
@@ -124,6 +146,12 @@ export class ViewerMarkupTool {
   @Watch('disabled')
   protected handleDisabledChanged(): void {
     this.updateMarkupElement();
+
+    if (this.viewer != null) {
+      this.viewer.cameraControls = this.disabled
+        ? this.viewerCameraControls
+        : this.cameraControls;
+    }
   }
 
   /**
@@ -240,7 +268,6 @@ export class ViewerMarkupTool {
   }
 
   private handleMarkupEditBegin = (): void => {
-    this.isMarkingUp = true;
     this.markupBegin.emit();
   };
 
@@ -249,7 +276,6 @@ export class ViewerMarkupTool {
     if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
 
-      this.isMarkingUp = false;
       markupElement.bounds = undefined;
 
       if (bounds != null) {
@@ -258,7 +284,6 @@ export class ViewerMarkupTool {
     } else if (isVertexViewerArrowMarkup(markupElement)) {
       const { start, end } = markupElement;
 
-      this.isMarkingUp = false;
       markupElement.start = undefined;
       markupElement.end = undefined;
       markupElement.mode = 'replace';

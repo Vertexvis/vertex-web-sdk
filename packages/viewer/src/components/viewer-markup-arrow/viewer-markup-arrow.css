@@ -8,24 +8,24 @@
   top: 0;
   pointer-events: none;
 
-  --line-stroke-color: var(--red-800);
-  --line-stroke-width: 4;
-  --line-fill-color: var(--red-800);
-  --line-fill-opacity: 0;
-  --head-stroke-color: var(--red-800);
-  --head-stroke-width: 4;
-  --head-fill-color: var(--red-800);
-  --head-fill-opacity: 1;
+  --viewer-markup-arrow-line-stroke-color: var(--red-800);
+  --viewer-markup-arrow-line-stroke-width: 4;
+  --viewer-markup-arrow-line-fill-color: var(--red-800);
+  --viewer-markup-arrow-line-fill-opacity: 0;
+  --viewer-markup-arrow-head-stroke-color: var(--red-800);
+  --viewer-markup-arrow-head-stroke-width: 4;
+  --viewer-markup-arrow-head-fill-color: var(--red-800);
+  --viewer-markup-arrow-head-fill-opacity: 1;
 
-  --bounds-edge-anchor-stroke-color: var(--blue-400);
-  --bounds-edge-anchor-stroke-width: 1;
-  --bounds-edge-anchor-fill-color: white;
-  --bounds-edge-anchor-fill-opacity: 1;
+  --viewer-markup-arrow-bounds-edge-anchor-stroke-color: var(--blue-400);
+  --viewer-markup-arrow-bounds-edge-anchor-stroke-width: 1;
+  --viewer-markup-arrow-bounds-edge-anchor-fill-color: white;
+  --viewer-markup-arrow-bounds-edge-anchor-fill-opacity: 1;
 
-  --bounds-circle-anchor-stroke-color: white;
-  --bounds-circle-anchor-stroke-width: 1;
-  --bounds-circle-anchor-fill-color: var(--blue-400);
-  --bounds-circle-anchor-fill-opacity: 1;
+  --viewer-markup-arrow-bounds-circle-anchor-stroke-color: white;
+  --viewer-markup-arrow-bounds-circle-anchor-stroke-width: 1;
+  --viewer-markup-arrow-bounds-circle-anchor-fill-color: var(--blue-400);
+  --viewer-markup-arrow-bounds-circle-anchor-fill-opacity: 1;
 }
 
 .svg {
@@ -35,42 +35,42 @@
 
 .line {
   pointer-events: auto;
-  stroke: var(--line-stroke-color);
-  stroke-width: var(--line-stroke-width);
-  fill: var(--line-fill-color);
-  fill-opacity: var(--line-fill-opacity);
+  stroke: var(--viewer-markup-arrow-line-stroke-color);
+  stroke-width: var(--viewer-markup-arrow-line-stroke-width);
+  fill: var(--viewer-markup-arrow-line-fill-color);
+  fill-opacity: var(--viewer-markup-arrow-line-fill-opacity);
   cursor: default;
 }
 
 .head {
   pointer-events: auto;
-  stroke: var(--head-stroke-color);
-  stroke-width: var(--head-stroke-width);
-  fill: var(--head-fill-color);
-  fill-opacity: var(--head-fill-opacity);
+  stroke: var(--viewer-markup-arrow-head-stroke-color);
+  stroke-width: var(--viewer-markup-arrow-head-stroke-width);
+  fill: var(--viewer-markup-arrow-head-fill-color);
+  fill-opacity: var(--viewer-markup-arrow-head-fill-opacity);
   cursor: default;
 }
 
 .bounds-line, .bounds-outline {
   pointer-events: auto;
-  stroke: var(--bounds-outline-stroke-color);
-  stroke-width: var(--bounds-outline-stroke-width);
+  stroke: var(--viewer-markup-arrow-bounds-outline-stroke-color);
+  stroke-width: var(--viewer-markup-arrow-bounds-outline-stroke-width);
 }
 
 .bounds-rect {
   pointer-events: auto;
-  stroke: var(--bounds-edge-anchor-stroke-color);
-  stroke-width: var(--bounds-edge-anchor-stroke-width);
-  fill: var(--bounds-edge-anchor-fill-color);
-  fill-opacity: var(--bounds-edge-anchor-fill-opacity);
+  stroke: var(--viewer-markup-arrow-bounds-edge-anchor-stroke-color);
+  stroke-width: var(--viewer-markup-arrow-bounds-edge-anchor-stroke-width);
+  fill: var(--viewer-markup-arrow-bounds-edge-anchor-fill-color);
+  fill-opacity: var(--viewer-markup-arrow-bounds-edge-anchor-fill-opacity);
   cursor: default;
 }
 
 .bounds-circle {
   pointer-events: auto;
-  stroke: var(--bounds-circle-anchor-stroke-color);
-  stroke-width: var(--bounds-circle-anchor-stroke-width);
-  fill: var(--bounds-circle-anchor-fill-color);
-  fill-opacity: var(--bounds-circle-anchor-fill-opacity);
+  stroke: var(--viewer-markup-arrow-bounds-circle-anchor-stroke-color);
+  stroke-width: var(--viewer-markup-arrow-bounds-circle-anchor-stroke-width);
+  fill: var(--viewer-markup-arrow-bounds-circle-anchor-fill-color);
+  fill-opacity: var(--viewer-markup-arrow-bounds-circle-anchor-fill-opacity);
   cursor: default;
 }

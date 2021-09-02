@@ -486,14 +486,22 @@ export namespace Components {
     }
     interface VertexViewerMarkup {
         /**
-          * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id` or if undefined a default element will be created.
+          * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
           * @param markup The markup to add.
           * @returns The markup element that was created.
           * @see {
           * @link ViewerMarkups.arrowTemplateId}
+          * @see {
+          * @link ViewerMarkups.circleTemplateId}
          */
         "addMarkup": (markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>;
+        /**
+          * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+         */
         "arrowTemplateId"?: string;
+        /**
+          * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+         */
         "circleTemplateId"?: string;
         /**
           * If `true`, disables adding or editing of markup through user interaction.
@@ -535,7 +543,7 @@ export namespace Components {
          */
         "endJson"?: string;
         /**
-          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode": ViewerMarkupArrowMode;
         /**
@@ -547,7 +555,7 @@ export namespace Components {
          */
         "startJson"?: string;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -561,30 +569,37 @@ export namespace Components {
          */
         "boundsJson"?: string;
         /**
-          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode": ViewerMarkupCircleMode;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupTool {
         /**
-          * //  * An ID to an HTML template that describes the HTML content to use for //  * distance measurements. It's expected that the template contains a //  * `<vertex-viewer-measurement-distance>`. //  * //  * This property will automatically be set when a child of a //  * `<vertex-viewer-measurements>` element. //
+          * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
          */
         "arrowTemplateId"?: string;
+        /**
+          * Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled.
+         */
+        "cameraControls": boolean;
+        /**
+          * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+         */
         "circleTemplateId"?: string;
         /**
-          * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+          * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "disabled": boolean;
         /**
-          * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+          * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "tool": ViewerMarkupToolType;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -1358,7 +1373,13 @@ declare namespace LocalJSX {
         "stretchOff"?: boolean;
     }
     interface VertexViewerMarkup {
+        /**
+          * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+         */
         "arrowTemplateId"?: string;
+        /**
+          * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+         */
         "circleTemplateId"?: string;
         /**
           * If `true`, disables adding or editing of markup through user interaction.
@@ -1369,7 +1390,7 @@ declare namespace LocalJSX {
          */
         "onMarkupAdded"?: (event: CustomEvent<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>) => void;
         /**
-          * Dispatched when a new measurement is removed, either through user interaction or programmatically.
+          * Dispatched when a markup is removed, either through user interaction or programmatically.
          */
         "onMarkupRemoved"?: (event: CustomEvent<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>) => void;
         /**
@@ -1395,11 +1416,20 @@ declare namespace LocalJSX {
          */
         "endJson"?: string;
         /**
-          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode"?: ViewerMarkupArrowMode;
+        /**
+          * An event that is dispatched anytime the user begins editing the markup.
+         */
         "onEditBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user cancels editing of the markup.
+         */
         "onEditCancel"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user has finished editing the markup.
+         */
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
           * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
@@ -1410,7 +1440,7 @@ declare namespace LocalJSX {
          */
         "startJson"?: string;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -1424,36 +1454,61 @@ declare namespace LocalJSX {
          */
         "boundsJson"?: string;
         /**
-          * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode"?: ViewerMarkupCircleMode;
+        /**
+          * An event that is dispatched anytime the user begins editing the markup.
+         */
         "onEditBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user cancels editing of the markup.
+         */
         "onEditCancel"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when the user has finished editing the markup.
+         */
         "onEditEnd"?: (event: CustomEvent<void>) => void;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupTool {
         /**
-          * //  * An ID to an HTML template that describes the HTML content to use for //  * distance measurements. It's expected that the template contains a //  * `<vertex-viewer-measurement-distance>`. //  * //  * This property will automatically be set when a child of a //  * `<vertex-viewer-measurements>` element. //
+          * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
          */
         "arrowTemplateId"?: string;
+        /**
+          * Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled.
+         */
+        "cameraControls"?: boolean;
+        /**
+          * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+         */
         "circleTemplateId"?: string;
         /**
-          * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+          * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "disabled"?: boolean;
+        /**
+          * An event that is dispatched when a user begins a new markup.
+         */
         "onMarkupBegin"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when a user has cancelled a markup edit.
+         */
         "onMarkupEditCancel"?: (event: CustomEvent<void>) => void;
+        /**
+          * An event that is dispatched when a user has finished their markup.
+         */
         "onMarkupEnd"?: (event: CustomEvent<Markup>) => void;
         /**
-          * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
+          * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "tool"?: ViewerMarkupToolType;
         /**
-          * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
+          * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }

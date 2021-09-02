@@ -22,14 +22,19 @@ import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
   shadow: true,
 })
 export class ViewerMarkup {
-  // /**
-  //  * An HTML template that describes the HTML to use for new distance
-  //  * measurements. It's expected that the template contains a
-  //  * `<vertex-viewer-measurement-distance>`.
-  //  */
+  /**
+   * An HTML template that describes the HTML to use for new arrow
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-arrow>`.
+   */
   @Prop()
   public arrowTemplateId?: string;
 
+  /**
+   * An HTML template that describes the HTML to use for new circle
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-circle>`.
+   */
   @Prop()
   public circleTemplateId?: string;
 
@@ -69,7 +74,7 @@ export class ViewerMarkup {
   >;
 
   /**
-   * Dispatched when a new measurement is removed, either through user
+   * Dispatched when a markup is removed, either through user
    * interaction or programmatically.
    */
   @Event()
@@ -83,11 +88,13 @@ export class ViewerMarkup {
   /**
    * Adds a new markup as a child to this component. A new markup
    * component will be created from the template specified by
-   * `arrow-template-id` or if undefined a default element will be created.
+   * `arrow-template-id`, `circle-template-id`, or if undefined
+   * a default element will be created.
    *
    * @param markup The markup to add.
    * @returns The markup element that was created.
    * @see {@link ViewerMarkups.arrowTemplateId}
+   * @see {@link ViewerMarkups.circleTemplateId}
    */
   @Method()
   public async addMarkup(
@@ -199,10 +206,6 @@ export class ViewerMarkup {
   ): Promise<void> {
     this.updatePropsOnMarkupTool();
     this.updatePropsOnMarkups();
-
-    if (newViewer != null) {
-      newViewer.cameraControls = false;
-    }
   }
 
   /**
