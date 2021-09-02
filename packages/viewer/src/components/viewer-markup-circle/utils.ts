@@ -21,7 +21,7 @@ export const transformCircle = (
   current: Point.Point,
   anchor: BoundingBox2dAnchorPosition
 ): Rectangle.Rectangle => {
-  const delta = Point.create(current.x - start.x, current.y - start.y);
+  const delta = Point.subtract(current, start);
   const { x: left, y: top, width: w, height: h } = bounds;
   const right = left + w;
   const bottom = top + h;

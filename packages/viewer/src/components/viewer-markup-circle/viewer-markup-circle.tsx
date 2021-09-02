@@ -99,6 +99,9 @@ export class ViewerMarkupCircle {
   @State()
   private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
 
+  @State()
+  private resizeBounds?: Rectangle.Rectangle;
+
   /**
    * @ignore
    */
@@ -177,8 +180,25 @@ export class ViewerMarkupCircle {
               onTopLeftAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'top-left')
               }
+              onTopRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'top-right')
+              }
+              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+              onBottomLeftAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom-left')
+              }
+              onBottomRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom-right')
+              }
               onBottomAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'bottom')
+              }
+              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
+              onRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'right')
+              }
+              onCenterAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'center')
               }
             />
           )}
@@ -221,6 +241,7 @@ export class ViewerMarkupCircle {
     event: PointerEvent,
     anchor: BoundingBox2dAnchorPosition
   ): void => {
+    this.resizeBounds = this.bounds;
     this.editAnchor = anchor;
     this.startMarkup(event);
   };
@@ -230,7 +251,7 @@ export class ViewerMarkupCircle {
       const position = getMouseClientPosition(event, this.elementBounds);
 
       this.bounds = transformCircle(
-        this.bounds,
+        this.resizeBounds ?? this.bounds,
         this.startPosition,
         position,
         this.editAnchor
