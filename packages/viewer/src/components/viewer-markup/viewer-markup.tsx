@@ -59,6 +59,24 @@ export class ViewerMarkup {
   @Prop({ mutable: true })
   public selectedMarkupId?: string;
 
+  /**
+   * Dispatched when a new markup is added, either through user interaction
+   * or programmatically.
+   */
+  @Event()
+  public markupAdded!: EventEmitter<
+    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+  >;
+
+  /**
+   * Dispatched when a new measurement is removed, either through user
+   * interaction or programmatically.
+   */
+  @Event()
+  public markupRemoved!: EventEmitter<
+    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+  >;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -87,7 +105,7 @@ export class ViewerMarkup {
 
       this.updatePropsOnMarkup(el);
       this.hostEl.appendChild(el);
-      // this.markupAdded.emit(el);
+      this.markupAdded.emit(el);
       return el;
     } else if (markup instanceof CircleMarkup) {
       const { bounds, id } = markup;
@@ -125,7 +143,7 @@ export class ViewerMarkup {
 
     if (markup != null) {
       markup.remove();
-      // this.markupRemoved.emit(markup);
+      this.markupRemoved.emit(markup);
     }
 
     return markup;

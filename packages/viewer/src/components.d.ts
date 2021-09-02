@@ -1365,6 +1365,14 @@ declare namespace LocalJSX {
          */
         "disabled"?: boolean;
         /**
+          * Dispatched when a new markup is added, either through user interaction or programmatically.
+         */
+        "onMarkupAdded"?: (event: CustomEvent<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>) => void;
+        /**
+          * Dispatched when a new measurement is removed, either through user interaction or programmatically.
+         */
+        "onMarkupRemoved"?: (event: CustomEvent<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>) => void;
+        /**
           * The ID of the markup that is selected.
          */
         "selectedMarkupId"?: string;
