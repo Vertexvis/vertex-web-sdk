@@ -38,6 +38,7 @@
   stroke-width: var(--ellipse-stroke-width);
   fill: var(--ellipse-fill-color);
   fill-opacity: var(--ellipse-fill-opacity);
+  cursor: default;
 }
 
 .bounds-line, .bounds-outline {

@@ -39,6 +39,7 @@
   stroke-width: var(--line-stroke-width);
   fill: var(--line-fill-color);
   fill-opacity: var(--line-fill-opacity);
+  cursor: default;
 }
 
 .head {
@@ -47,6 +48,7 @@
   stroke-width: var(--head-stroke-width);
   fill: var(--head-fill-color);
   fill-opacity: var(--head-fill-opacity);
+  cursor: default;
 }
 
 .bounds-line, .bounds-outline {
