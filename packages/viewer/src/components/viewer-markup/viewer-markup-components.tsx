@@ -85,6 +85,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
       </defs>
       <g filter="url(#bounding-box-1d-shadow)">
         <line
+          id="bounding-box-1d-line"
           class="bounds-line"
           x1={start.x}
           y1={start.y}
@@ -92,6 +93,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
           y2={end.y}
         />
         <BoundingBoxAnchor
+          id="bounding-box-1d-start-anchor"
           center={start}
           angle={angle}
           width={anchorWidth}
@@ -99,6 +101,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
           onGrab={onStartAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-1d-end-anchor"
           center={end}
           angle={angle}
           width={anchorWidth}
@@ -106,7 +109,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
           onGrab={onEndAnchorPointerDown}
         />
         <circle
-          id="bounding-box-1d-center"
+          id="bounding-box-1d-center-anchor"
           class="bounds-circle"
           cx={center.x}
           cy={center.y}
@@ -156,57 +159,71 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         <SvgShadow id="bounding-box-2d-shadow" />
       </defs>
       <g filter="url(#bounding-box-2d-shadow)">
-        <rect class="bounds-outline" {...padded} />
-        <rect class="bounds-click-target" {...padded} fill="none" />
+        <rect id="bounding-box-2d-outline" class="bounds-outline" {...padded} />
+        <rect
+          id="bounding-box-2d-click-target"
+          class="bounds-click-target"
+          {...padded}
+          fill="none"
+        />
         <BoundingBoxAnchor
+          id="bounding-box-2d-top-left-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'top-left')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onTopLeftAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-left-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'left')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onLeftAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-top-right-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'top-right')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onTopRightAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-right-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'right')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onRightAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-bottom-left-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'bottom-left')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onBottomLeftAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-bottom-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'bottom')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onBottomAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-bottom-right-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'bottom-right')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onBottomRightAnchorPointerDown}
         />
         <BoundingBoxAnchor
+          id="bounding-box-2d-top-anchor"
           center={getBoundingBox2dAnchorPosition(padded, 'top')}
           width={anchorWidth}
           height={anchorHeight}
           onGrab={onTopAnchorPointerDown}
         />
         <circle
+          id="bounding-box-2d-center-anchor"
           class="bounds-circle"
           cx={center.x}
           cy={center.y}

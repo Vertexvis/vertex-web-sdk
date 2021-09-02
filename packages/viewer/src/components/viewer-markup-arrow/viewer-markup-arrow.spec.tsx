@@ -9,19 +9,15 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
 import { ViewerMarkupArrow } from './viewer-markup-arrow';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import {
-  BoundingBox1d,
-  BoundingBoxAnchor,
-} from '../viewer-markup/viewer-markup-components';
 
 describe('vertex-viewer-markup-arrow', () => {
-  const start = Point.create(0.5, 0);
-  const end = Point.create(0.5, 0.5);
+  const start = Point.create(0, -0.5);
+  const end = Point.create(0, 0);
   (getMarkupBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
-    bottom: 150,
-    right: 200,
+    bottom: 0,
+    right: 0,
     width: 100,
     height: 100,
   });
@@ -33,23 +29,25 @@ describe('vertex-viewer-markup-arrow', () => {
         <vertex-viewer-markup-arrow
           start={start}
           end={end}
+          mode="edit"
         ></vertex-viewer-markup-arrow>
       ),
     });
 
     const el = page.root as HTMLVertexViewerMarkupArrowElement;
-    await page.waitForChanges();
+    const startEl = el?.shadowRoot?.getElementById(
+      'bounding-box-1d-start-anchor'
+    );
+    const endEl = el?.shadowRoot?.getElementById('bounding-box-1d-end-anchor');
+    const centerEl = el?.shadowRoot?.getElementById(
+      'bounding-box-1d-center-anchor'
+    );
 
-    console.log(el.firstChild);
-    console.log(el.firstElementChild);
-    console.log(el.shadowRoot?.firstChild?.lastChild);
-    console.log(el?.shadowRoot?.querySelector('rect'));
-    console.log(el?.firstChild);
-
-    expect(
-      (el.shadowRoot?.querySelector(
-        '#bounding-box-1d-start-anchor'
-      ) as SVGRectElement).x
-    ).toBe(4);
+    expect(startEl?.getAttribute('x')).toBe('46');
+    expect(startEl?.getAttribute('y')).toBe('-4');
+    expect(endEl?.getAttribute('x')).toBe('46');
+    expect(endEl?.getAttribute('y')).toBe('46');
+    expect(centerEl?.getAttribute('cx')).toBe('50');
+    expect(centerEl?.getAttribute('cy')).toBe('25');
   });
 });

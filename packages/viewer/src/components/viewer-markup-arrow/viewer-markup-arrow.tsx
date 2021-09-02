@@ -48,8 +48,8 @@ export class ViewerMarkupArrow {
    * `Point` or a JSON string representation in the format of `[x, y]` or
    * `{"x": 0, "y": 0}`.
    *
-   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
-   * corresponds to a point in the center of the viewport.
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
    */
   @Prop({ mutable: true, attribute: null })
   public start?: Point.Point;
@@ -59,8 +59,8 @@ export class ViewerMarkupArrow {
    * instance of a `Point` or a JSON string representation in the format of
    * `[x, y]` or `{"x": 0, "y": 0}`.
    *
-   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
-   * corresponds to a point in the center of the viewport.
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
    */
   @Prop({ attribute: 'start' })
   public startJson?: string;
@@ -70,8 +70,8 @@ export class ViewerMarkupArrow {
    * or a JSON string representation in the format of `[x, y]` or `{"x": 0,
    * "y": 0}`.
    *
-   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
-   * corresponds to a point in the center of the viewport.
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
    */
   @Prop({ mutable: true })
   public end?: Point.Point;
@@ -81,8 +81,8 @@ export class ViewerMarkupArrow {
    * instance of a `Point` or a JSON string representation in the format of
    * `[x, y]` or `{"x": 0, "y": 0}`.
    *
-   * Points are expected to be relative coordinates, e.g. `[0.5, 0.5]`
-   * corresponds to a point in the center of the viewport.
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
    */
   @Prop({ attribute: 'end' })
   public endJson?: string;
@@ -204,7 +204,6 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    console.log(this.start, this.end, this.deviceSize, this.elementBounds);
     if (
       this.start != null &&
       this.end != null &&
@@ -218,7 +217,6 @@ export class ViewerMarkupArrow {
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
       const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
 
-      console.log(screenStart, screenEnd, arrowheadPoints);
       return (
         <Host>
           <svg class="svg">
