@@ -328,6 +328,7 @@ describe('vertex-viewer-markup-circle', () => {
       template: () => (
         <vertex-viewer-markup-circle
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
           onEditCancel={onEditCancel}
         ></vertex-viewer-markup-circle>
@@ -350,12 +351,14 @@ describe('vertex-viewer-markup-circle', () => {
       template: () => (
         <vertex-viewer-markup-circle
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-circle>
       ),
     });
 
     const el = page.root as HTMLVertexViewerMarkupCircleElement;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     el.viewer = newViewer as any;
     await page.waitForChanges();
 
@@ -371,6 +374,7 @@ describe('vertex-viewer-markup-circle', () => {
       template: () => (
         <vertex-viewer-markup-circle
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-circle>
       ),

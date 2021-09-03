@@ -141,6 +141,7 @@ describe('vertex-viewer-markup-arrow', () => {
       template: () => (
         <vertex-viewer-markup-arrow
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
           onEditCancel={onEditCancel}
         ></vertex-viewer-markup-arrow>
@@ -163,12 +164,14 @@ describe('vertex-viewer-markup-arrow', () => {
       template: () => (
         <vertex-viewer-markup-arrow
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-arrow>
       ),
     });
 
     const el = page.root as HTMLVertexViewerMarkupArrowElement;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     el.viewer = newViewer as any;
     await page.waitForChanges();
 
@@ -184,6 +187,7 @@ describe('vertex-viewer-markup-arrow', () => {
       template: () => (
         <vertex-viewer-markup-arrow
           mode="replace"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-arrow>
       ),

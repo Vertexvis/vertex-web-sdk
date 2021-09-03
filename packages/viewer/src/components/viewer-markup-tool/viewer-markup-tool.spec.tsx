@@ -197,12 +197,11 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.root as HTMLVertexViewerMarkupToolElement;
-    let markupEl: HTMLVertexViewerMarkupArrowElement | undefined;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolEl.viewer = viewer as any;
     await page.waitForChanges();
-    markupEl = page.root
+    const markupEl = page.root
       ?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
     expect(markupEl?.viewer).toBe(viewer);
   });
