@@ -429,7 +429,7 @@ describe('vertex-viewer-markup', () => {
       el.disabled = true;
 
       await page.waitForChanges();
-      expect(el.viewer.cameraControls).toBe(toolEl.cameraControls);
+      expect(el.viewer?.cameraControls).toBe(toolEl.cameraControls);
     });
   });
 });
