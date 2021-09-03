@@ -129,7 +129,12 @@ function setupMeasurement(viewer, measurementScene) {
 
   // const interactionTarget = await viewer.getInteractionTarget();
 
-  const surfaceMeasurement = new SurfaceMeasurement(renderer, measurementScene);
+  const surfaceMeasurement = new SurfaceMeasurement(
+    renderer,
+    measurementScene,
+    sceneId,
+    'https://flex.platdev.vertexvis.io'
+  );
   viewer.registerInteractionHandler(surfaceMeasurement);
   clearMeasurementsBtn.addEventListener('click', () => {
     surfaceMeasurement.clear();

@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { MeasureResponse } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
 import { Point, Vector3 } from '@vertexvis/geometry';
 import {
   BufferGeometry,
@@ -27,6 +28,10 @@ import '../../components';
 import { getMouseClientPosition } from '../dom';
 import { InteractionApi } from '../interactions';
 import { Raycaster } from '../scenes';
+import { FlexTimeApi } from '../vertex-geometry/flexApi';
+import { StringValue } from '../../../../flex-time-protos/dist/google/protobuf/wrappers';
+import { Message } from 'google-protobuf';
+import { MeasurementOutcome } from '../../../../flex-time-protos/dist/measurement-service/protos/domain';
 
 interface IdleState {
   type: 'idle';
@@ -91,6 +96,8 @@ export class SurfaceMeasurement implements InteractionHandler {
 
   private api?: InteractionApi;
   private element?: HTMLElement;
+  private flexClient: FlexTimeApi;
+  private sceneId: string;
 
   /* eslint-disable lines-between-class-members */
   public _showHelpers = false;
@@ -105,7 +112,9 @@ export class SurfaceMeasurement implements InteractionHandler {
 
   public constructor(
     private renderer: HTMLVertexViewerThreejsRendererElement,
-    private scene: Scene
+    private scene: Scene,
+    private scene_id: string,
+    private flexHost: string = 'https://flex.platdev.vertexvis.io'
   ) {
     const sphere = new SphereGeometry();
     const pointerMaterial = new MeshPhongMaterial({ color: 0xff0000 });
@@ -174,6 +183,8 @@ export class SurfaceMeasurement implements InteractionHandler {
     this.zPlaneMesh = new GridHelper(1000, 10, 0x0000ff, 0xa5a5ff);
     this.zPlaneMesh.rotation.set(Math.PI / 2, 0, Math.PI / 2);
     this.scene.add(this.zPlaneMesh);
+    this.flexClient = FlexTimeApi.create(flexHost);
+    this.sceneId = scene_id;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -246,17 +257,50 @@ export class SurfaceMeasurement implements InteractionHandler {
       const startNormal = startHit?.hitNormal;
       const endHitPt = endHit?.hitPoint;
       const endNormal = endHit?.hitNormal;
+      const startHitItem = startHit?.itemId?.hex;
+      const endHitItem = endHit?.itemId?.hex;
 
       if (
         startHitPt != null &&
         startNormal != null &&
         endHitPt != null &&
-        endNormal != null
+        endNormal != null &&
+        startHitItem != null &&
+        endHitItem != null
       ) {
         const startDir = makeVector3(startNormal);
         const endDir = makeVector3(endNormal);
         const dot = startDir.dot(endDir);
-
+        // make the MeasureRequest...all this casting seems incorect but ¯\_(ツ)_/¯
+        const request = {
+          sceneItemIdA: { value: startHitItem } as StringValue,
+          hitPointA: {
+            x: startHitPt.x as number,
+            y: startHitPt.y as number,
+            z: startHitPt.z as number,
+          },
+          sceneItemIdB: { value: endHitItem },
+          hitPointB: {
+            x: endHitPt.x as number,
+            y: endHitPt.y as number,
+            z: endHitPt.z as number,
+          },
+          scene: { value: this.sceneId },
+          sceneView: { value: this.api?.scene.sceneViewId as string },
+        };
+        // call flexy-time for measurement
+        for await (const message of this.flexClient.measure(request)
+          .responses) {
+          const outcome = message.outcome as MeasurementOutcome;
+          for (const result of outcome?.results) {
+            //todo convert these results to annotations
+            // possibilities are
+            // planar distance -- just has a scalar
+            // minimum distance -- has a scalar and 2 vector3f representing the points where the measurements are taken
+            // angular -- scalar of angle in radians
+            console.log(result);
+          }
+        }
         if (Math.abs(dot) === 1) {
           const startWorldPt = makeVector3(startHitPt);
           const endWorldPt = makeVector3(endHitPt);
