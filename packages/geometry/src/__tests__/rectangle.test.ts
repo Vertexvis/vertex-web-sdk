@@ -138,3 +138,25 @@ describe(Rectangle.bottomRight, () => {
     expect(result).toEqual(Point.create(11, 22));
   });
 });
+
+describe(Rectangle.pad, () => {
+  it('adds padding to the rectangle', () => {
+    const rect = Rectangle.create(1, 1, 10, 10);
+    const result = Rectangle.pad(rect, 1);
+    expect(result).toEqual(Rectangle.create(0, 0, 12, 12));
+  });
+});
+
+describe(Rectangle.fromJson, () => {
+  it('parses json obj', () => {
+    const v = Rectangle.fromJson(
+      JSON.stringify({ x: 1, y: 2, width: 10, height: 10 })
+    );
+    expect(v).toEqual(Rectangle.create(1, 2, 10, 10));
+  });
+
+  it('parses json array', () => {
+    const v = Rectangle.fromJson('[1, 2, 10, 10]');
+    expect(v).toEqual(Rectangle.create(1, 2, 10, 10));
+  });
+});
