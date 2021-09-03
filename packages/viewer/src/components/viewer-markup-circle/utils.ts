@@ -15,11 +15,11 @@ export function parseBounds(
   return typeof value === 'string' ? Rectangle.fromJson(value) : value;
 }
 
-export const createCircle = (
+export function createCircle(
   initialPoint: Point.Point,
   currentPoint: Point.Point,
   maintainAspectRatio: boolean
-): Rectangle.Rectangle => {
+): Rectangle.Rectangle {
   const bounds = Rectangle.fromPoints(initialPoint, currentPoint);
   if (maintainAspectRatio) {
     const fitBoundsSize = Math.max(bounds.width, bounds.height);
@@ -45,15 +45,15 @@ export const createCircle = (
   } else {
     return bounds;
   }
-};
+}
 
-export const transformCircle = (
+export function transformCircle(
   bounds: Rectangle.Rectangle,
   start: Point.Point,
   current: Point.Point,
   anchor: BoundingBox2dAnchorPosition,
   maintainAspectRatio?: boolean
-): Rectangle.Rectangle => {
+): Rectangle.Rectangle {
   const delta = Point.subtract(current, start);
   const { x: left, y: top, width: w, height: h } = bounds;
   const right = left + w;
@@ -103,4 +103,4 @@ export const transformCircle = (
         bounds.height
       );
   }
-};
+}

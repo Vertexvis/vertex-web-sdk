@@ -33,7 +33,7 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
  *
  * @see {@link ViewerMarkupArrowMode.mode} - For more details about modes.
  */
-export type ViewerMarkupArrowMode = 'edit' | 'replace' | '';
+export type ViewerMarkupArrowMode = 'edit' | 'create' | '';
 
 type ViewerMarkupArrowEditAnchor = 'start' | 'end' | 'center';
 
@@ -91,7 +91,7 @@ export class ViewerMarkupArrow {
    * A mode that specifies how the markup component should behave. When
    * unset, the component will not respond to interactions with the handles.
    * When `edit`, the markup anchors are interactive and the user is able
-   * to reposition them. When `replace`, anytime the user clicks on the canvas,
+   * to reposition them. When `create`, anytime the user clicks on the canvas,
    * a new markup will be performed.
    */
   @Prop({ reflect: true })
@@ -260,7 +260,7 @@ export class ViewerMarkupArrow {
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode === 'replace') {
+    if (this.mode === 'create') {
       interactionTarget.addEventListener('pointerdown', this.startMarkup);
     }
   }

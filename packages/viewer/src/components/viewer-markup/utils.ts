@@ -46,11 +46,9 @@ export function getBoundingBox2dAnchorPosition(
  *
  * @see toRelativeScaleFactor
  */
-export const toScreenScaleFactor = (
-  dimensions: Dimensions.Dimensions
-): number => {
+export function toScreenScaleFactor(dimensions: Dimensions.Dimensions): number {
   return Math.min(dimensions.width, dimensions.height);
-};
+}
 
 /**
  * Returns the scale factor to convert canvas coordinates to screen coordinates.
@@ -61,30 +59,30 @@ export const toScreenScaleFactor = (
  *
  * @see toScreenScaleFactor
  */
-export const toRelativeScaleFactor = (
+export function toRelativeScaleFactor(
   dimensions: Dimensions.Dimensions
-): number => {
+): number {
   return 1 / toScreenScaleFactor(dimensions);
-};
+}
 
-export const translatePointToScreen = (
+export function translatePointToScreen(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
-): Point.Point => {
+): Point.Point {
   const scaleFactor = toScreenScaleFactor(canvasDimensions);
   return Point.add(
     Point.scale(pt, scaleFactor, scaleFactor),
     Dimensions.center(canvasDimensions)
   );
-};
+}
 
-export const translateDimensionsToScreen = (
+export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
   canvasDimensions: Dimensions.Dimensions
-): Dimensions.Dimensions => {
+): Dimensions.Dimensions {
   const scaleFactor = toScreenScaleFactor(canvasDimensions);
   return Dimensions.scale(scaleFactor, scaleFactor, dimensions);
-};
+}
 
 /**
  * Translates a rectangle in relative units, to a rectangle in screen units.
@@ -92,26 +90,26 @@ export const translateDimensionsToScreen = (
  * Shape coordinates are persisted in relative units, so they can be presented
  * at any size.
  */
-export const translateRectToScreen = (
+export function translateRectToScreen(
   rect: Rectangle.Rectangle,
   canvasDimensions: Dimensions.Dimensions
-): Rectangle.Rectangle => {
+): Rectangle.Rectangle {
   const position = translatePointToScreen(rect, canvasDimensions);
   const dimensions = translateDimensionsToScreen(rect, canvasDimensions);
   return Rectangle.fromPointAndDimensions(position, dimensions);
-};
+}
 
 /**
  * Translates a point in screen units, to a point in relative units.
  */
-export const translatePointToRelative = (
+export function translatePointToRelative(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
-): Point.Point => {
+): Point.Point {
   const scaleFactor = toRelativeScaleFactor(canvasDimensions);
   return Point.scale(
     Point.subtract(pt, Dimensions.center(canvasDimensions)),
     scaleFactor,
     scaleFactor
   );
-};
+}

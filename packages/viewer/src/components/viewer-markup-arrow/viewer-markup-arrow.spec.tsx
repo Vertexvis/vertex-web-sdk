@@ -140,7 +140,7 @@ describe('vertex-viewer-markup-arrow', () => {
       components: [ViewerMarkupArrow],
       template: () => (
         <vertex-viewer-markup-arrow
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
           onEditCancel={onEditCancel}
@@ -163,7 +163,7 @@ describe('vertex-viewer-markup-arrow', () => {
       components: [ViewerMarkupArrow],
       template: () => (
         <vertex-viewer-markup-arrow
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-arrow>
@@ -186,7 +186,7 @@ describe('vertex-viewer-markup-arrow', () => {
       components: [ViewerMarkupArrow],
       template: () => (
         <vertex-viewer-markup-arrow
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-arrow>

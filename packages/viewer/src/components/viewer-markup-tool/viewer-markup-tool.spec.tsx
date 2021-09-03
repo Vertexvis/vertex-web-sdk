@@ -26,7 +26,7 @@ describe('vertex-viewer-markup-tool', () => {
     const markupEl = page.root
       ?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
-    expect(markupEl.mode).toBe('replace');
+    expect(markupEl.mode).toBe('create');
   });
 
   it('creates markup from arrow template if specified', async () => {
@@ -89,7 +89,7 @@ describe('vertex-viewer-markup-tool', () => {
     const markupEl = page.root
       ?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
-    expect(markupEl.mode).toBe('replace');
+    expect(markupEl.mode).toBe('create');
   });
 
   it('creates markup from circle template if specified', async () => {

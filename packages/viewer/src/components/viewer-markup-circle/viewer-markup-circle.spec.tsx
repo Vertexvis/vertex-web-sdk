@@ -327,7 +327,7 @@ describe('vertex-viewer-markup-circle', () => {
       components: [ViewerMarkupCircle],
       template: () => (
         <vertex-viewer-markup-circle
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
           onEditCancel={onEditCancel}
@@ -350,7 +350,7 @@ describe('vertex-viewer-markup-circle', () => {
       components: [ViewerMarkupCircle],
       template: () => (
         <vertex-viewer-markup-circle
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-circle>
@@ -373,7 +373,7 @@ describe('vertex-viewer-markup-circle', () => {
       components: [ViewerMarkupCircle],
       template: () => (
         <vertex-viewer-markup-circle
-          mode="replace"
+          mode="create"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           viewer={viewer as any}
         ></vertex-viewer-markup-circle>

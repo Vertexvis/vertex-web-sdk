@@ -552,7 +552,7 @@ export namespace Components {
          */
         "endJson"?: string;
         /**
-          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode": ViewerMarkupArrowMode;
         /**
@@ -579,7 +579,7 @@ export namespace Components {
         "boundsJson"?: string;
         "dispose": () => Promise<void>;
         /**
-          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode": ViewerMarkupCircleMode;
         /**
@@ -1426,7 +1426,7 @@ declare namespace LocalJSX {
          */
         "endJson"?: string;
         /**
-          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode"?: ViewerMarkupArrowMode;
         /**
@@ -1464,7 +1464,7 @@ declare namespace LocalJSX {
          */
         "boundsJson"?: string;
         /**
-          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new markup will be performed.
+          * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode"?: ViewerMarkupCircleMode;
         /**

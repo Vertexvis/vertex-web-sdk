@@ -262,7 +262,7 @@ export class ViewerMarkupTool {
         this.tool === 'arrow'
           ? this.createArrowMarkupElement()
           : this.createCircleMarkupElement();
-      newMarkupElement.mode = 'replace';
+      newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(
         'editBegin',
@@ -297,7 +297,7 @@ export class ViewerMarkupTool {
 
       markupElement.start = undefined;
       markupElement.end = undefined;
-      markupElement.mode = 'replace';
+      markupElement.mode = 'create';
 
       if (start != null && end != null) {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));

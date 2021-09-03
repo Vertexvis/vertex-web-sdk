@@ -30,7 +30,7 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
  *
  * @see {@link ViewerMarkupCircleMode.mode} - For more details about modes.
  */
-export type ViewerMarkupCircleMode = 'edit' | 'replace' | '';
+export type ViewerMarkupCircleMode = 'edit' | 'create' | '';
 
 @Component({
   tag: 'vertex-viewer-markup-circle',
@@ -66,7 +66,7 @@ export class ViewerMarkupCircle {
    * A mode that specifies how the markup component should behave. When
    * unset, the component will not respond to interactions with the handles.
    * When `edit`, the markup anchors are interactive and the user is able
-   * to reposition them. When `replace`, anytime the user clicks on the canvas,
+   * to reposition them. When `create`, anytime the user clicks on the canvas,
    * a new markup will be performed.
    */
   @Prop({ reflect: true })
@@ -251,7 +251,7 @@ export class ViewerMarkupCircle {
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode === 'replace') {
+    if (this.mode === 'create') {
       interactionTarget.addEventListener('pointerdown', this.startMarkup);
     }
   }

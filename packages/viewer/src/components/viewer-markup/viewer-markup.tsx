@@ -168,14 +168,11 @@ export class ViewerMarkup {
       HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
     >
   > {
-    const circleMarkup = Array.from(this.hostEl.children).filter(
-      isVertexViewerCircleMarkup
-    );
-    const arrowMarkup = Array.from(this.hostEl.children).filter(
-      isVertexViewerArrowMarkup
-    );
-
-    return [...arrowMarkup, ...circleMarkup];
+    return Array.from(this.hostEl.children).filter(
+      (e) => isVertexViewerArrowMarkup(e) || isVertexViewerCircleMarkup(e)
+    ) as Array<
+      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    >;
   }
 
   /**

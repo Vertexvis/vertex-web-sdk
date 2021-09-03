@@ -17,13 +17,15 @@ export function createArrowheadPoints(
     Angle.toDegrees(Angle.fromPoints(start, end)) - 270
   );
 
+  // Adjust the arrow height in relation to the distance between the to and from
+  // points. Uses a min and max size so the arrow doesn't become cartoonish.
   const height = Math.max(4, Math.min(16, distance * 0.25));
   const sideLength = height / Math.cos(Angle.toRadians(90 - arrowAngle));
 
   const rotation = Matrix.rotation(angle);
   const arrowLeft = Point.polar(sideLength, Angle.toRadians(arrowAngle * 2));
   const arrowRight = Point.polar(sideLength, Angle.toRadians(arrowAngle));
-  const arrowBase = Point.polar(height, Angle.toRadians(90)); //  * 0.8
+  const arrowBase = Point.polar(height, Angle.toRadians(90));
 
   return {
     tip: end,
