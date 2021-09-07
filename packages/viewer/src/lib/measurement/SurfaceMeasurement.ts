@@ -1,5 +1,4 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { MeasureResponse } from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
 import { Point, Vector3 } from '@vertexvis/geometry';
 import {
   BufferGeometry,
@@ -30,8 +29,10 @@ import { InteractionApi } from '../interactions';
 import { Raycaster } from '../scenes';
 import { FlexTimeApi } from '../vertex-geometry/flexApi';
 import { StringValue } from '../../../../flex-time-protos/dist/google/protobuf/wrappers';
-import { Message } from 'google-protobuf';
-import { MeasurementOutcome } from '../../../../flex-time-protos/dist/measurement-service/protos/domain';
+import {
+  MeasureRequest,
+  MeasureResponse,
+} from '@vertexvis/flex-time-protos/dist/flex-time-service/protos/flex_time_api';
 
 interface IdleState {
   type: 'idle';
@@ -62,13 +63,16 @@ interface PlacementState {
   placementPlane: Plane;
   placementPosition: Vec3;
   measurementLine: Line3;
-  distance: number;
-
+  text: string;
   xWorldPt: Vec3;
   yWorldPt: Vec3;
   zWorldPt: Vec3;
 }
-
+interface MeasurementResult {
+  distance?: number;
+  minimumDistance?: number;
+  angleInRadians?: number;
+}
 type InteractionState = IdleState | StartedState | PickedState | PlacementState;
 
 export class SurfaceMeasurement implements InteractionHandler {
@@ -246,6 +250,110 @@ export class SurfaceMeasurement implements InteractionHandler {
     });
   };
 
+  private radiansToDegrees(rad?: number): number | undefined {
+    if (typeof rad === 'number') {
+      return (rad * 180.0) / Math.PI;
+    }
+  }
+
+  private measureResultToText(measure: MeasurementResult): string {
+    return [
+      {
+        value: measure?.angleInRadians,
+        toString: (v: MeasurementResult) =>
+          `${this.radiansToDegrees(v.angleInRadians)?.toFixed(2)} deg`,
+      },
+      {
+        value: measure?.distance,
+        toString: (v: MeasurementResult) =>
+          `${v?.distance?.toFixed(2)} mm (planar)`,
+      },
+      {
+        value: measure?.minimumDistance,
+        toString: (v: MeasurementResult) =>
+          `${v?.minimumDistance?.toFixed(2)} mm (min)`,
+      },
+    ]
+      .filter((v) => typeof v.value !== 'undefined')
+      .map((v) => v.toString(measure))
+      .join('\n');
+  }
+
+  private async requestFromPick(state: PickedState): Promise<MeasureRequest> {
+    const [startHit, endHit] = await Promise.all([
+      state.startHit,
+      state.endHit,
+    ]);
+    const startHitPt = startHit?.hitPoint;
+    const endHitPt = endHit?.hitPoint;
+    const startHitItem = startHit?.itemId?.hex;
+    const endHitItem = endHit?.itemId?.hex;
+
+    //todo look out!
+    return {
+      sceneItemIdA: { value: startHitItem } as StringValue,
+      hitPointA: {
+        x: startHitPt?.x as number,
+        y: startHitPt?.y as number,
+        z: startHitPt?.z as number,
+      },
+      sceneItemIdB: { value: endHitItem } as StringValue,
+      hitPointB: {
+        x: endHitPt?.x as number,
+        y: endHitPt?.y as number,
+        z: endHitPt?.z as number,
+      },
+      scene: { value: this.sceneId },
+      sceneView: { value: this.api?.scene.sceneViewId as string },
+    };
+  }
+
+  private async measure(
+    request: MeasureRequest,
+    fn: (a: string) => void
+  ): Promise<void> {
+    const serverCall = this.flexClient.measure(request);
+    let measurementResult = {};
+    serverCall.responses.onNext(
+      (message?: MeasureResponse, error?: Error, complete?: boolean) => {
+        //this hefty callback takes the measurement response (one currently) and
+        // updates the text displayed in the sprite
+        if (message !== undefined && message?.outcome !== undefined) {
+          for (const result of message.outcome.results) {
+            if (result.details.oneofKind === 'planarDistance') {
+              measurementResult = {
+                ...measurementResult,
+                distance: result.details.planarDistance.distance,
+              };
+            } else if (result.details.oneofKind === 'angle') {
+              measurementResult = {
+                ...measurementResult,
+                angleInRadians: result.details.angle.angleInRadians,
+              };
+            } else if (result.details.oneofKind === 'minimumDistance') {
+              measurementResult = {
+                ...measurementResult,
+                minimumDistance: result.details.minimumDistance.distance,
+              };
+            }
+          }
+        } else if (error || complete) {
+          if (error) {
+            console.error(
+              'Encountered error during measurement computation!' + error
+            );
+          } else {
+            console.info(`Measurement result complete! ${measurementResult}`);
+          }
+        }
+        // convert the result to text...in the future, this processing would be more intricate, using
+        // more of the returned data to place the annotations
+        const measurementAsText = this.measureResultToText(measurementResult);
+        fn(measurementAsText);
+      }
+    );
+  }
+
   private async handlePicked(state: PickedState): Promise<void> {
     this.ifInitialized(async ({ element, api }) => {
       const [startHit, endHit] = await Promise.all([
@@ -270,208 +378,186 @@ export class SurfaceMeasurement implements InteractionHandler {
       ) {
         const startDir = makeVector3(startNormal);
         const endDir = makeVector3(endNormal);
-        const dot = startDir.dot(endDir);
-        // make the MeasureRequest...all this casting seems incorect but ¯\_(ツ)_/¯
-        const request = {
-          sceneItemIdA: { value: startHitItem } as StringValue,
-          hitPointA: {
-            x: startHitPt.x as number,
-            y: startHitPt.y as number,
-            z: startHitPt.z as number,
-          },
-          sceneItemIdB: { value: endHitItem },
-          hitPointB: {
-            x: endHitPt.x as number,
-            y: endHitPt.y as number,
-            z: endHitPt.z as number,
-          },
-          scene: { value: this.sceneId },
-          sceneView: { value: this.api?.scene.sceneViewId as string },
-        };
-        // call flexy-time for measurement
-        for await (const message of this.flexClient.measure(request)
-          .responses) {
-          const outcome = message.outcome as MeasurementOutcome;
-          for (const result of outcome?.results) {
-            //todo convert these results to annotations
-            // possibilities are
-            // planar distance -- just has a scalar
-            // minimum distance -- has a scalar and 2 vector3f representing the points where the measurements are taken
-            // angular -- scalar of angle in radians
-            console.log(result);
-          }
-        }
-        if (Math.abs(dot) === 1) {
-          const startWorldPt = makeVector3(startHitPt);
-          const endWorldPt = makeVector3(endHitPt);
-          const startPlane = new Plane().setFromNormalAndCoplanarPoint(
-            startDir,
-            startWorldPt
-          );
-          const endPlane = new Plane().setFromNormalAndCoplanarPoint(
-            endDir,
-            endWorldPt
-          );
-          const projectedWorldPt = startPlane.projectPoint(
-            new Vec3(endWorldPt.x, endWorldPt.y, endWorldPt.z),
-            new Vec3()
-          );
-          const distance = projectedWorldPt.distanceTo(endWorldPt);
-          const placementPlane = new Plane().setFromNormalAndCoplanarPoint(
-            new Vec3(0, 0, 1),
-            endWorldPt
-          );
-          const interaction: Disposable = {
-            dispose: () => {
-              window.removeEventListener('pointermove', handlePointerMove);
-              window.removeEventListener('pointerdown', handlePointerDown);
-            },
-          };
+        // todo pull this out somehow
+        this.requestFromPick(state).then((req) =>
+          this.measure(req, (measurementAsText) => {
+            const dot = startDir.dot(endDir);
+            if (true) {
+              // Always true here to allow angle measurements
+              // TODO add this back to prevent angle measurements
+              //Math.abs(dot) === 1) {
+              const startWorldPt = makeVector3(startHitPt);
+              const endWorldPt = makeVector3(endHitPt);
+              const startPlane = new Plane().setFromNormalAndCoplanarPoint(
+                startDir,
+                startWorldPt
+              );
+              const endPlane = new Plane().setFromNormalAndCoplanarPoint(
+                endDir,
+                endWorldPt
+              );
+              const projectedWorldPt = startPlane.projectPoint(
+                new Vec3(endWorldPt.x, endWorldPt.y, endWorldPt.z),
+                new Vec3()
+              );
 
-          const xPlane = new Plane().setFromNormalAndCoplanarPoint(
-            new Vec3(0, 1, 0),
-            endWorldPt
-          );
-          const yPlane = new Plane().setFromNormalAndCoplanarPoint(
-            new Vec3(0, 0, 1),
-            endWorldPt
-          );
-          const zPlane = new Plane().setFromNormalAndCoplanarPoint(
-            new Vec3(1, 0, 0),
-            endWorldPt
-          );
+              const placementPlane = new Plane().setFromNormalAndCoplanarPoint(
+                new Vec3(0, 0, 1),
+                endWorldPt
+              );
+              const interaction: Disposable = {
+                dispose: () => {
+                  window.removeEventListener('pointermove', handlePointerMove);
+                  window.removeEventListener('pointerdown', handlePointerDown);
+                },
+              };
 
-          const handlePointerMove = (event: PointerEvent): void => {
-            const pt = getMouseClientPosition(
-              event,
-              element.getBoundingClientRect()
-            );
-            const ray = api.getRayFromPoint(pt);
-            const pickRay = new Ray(
-              new Vec3(ray.origin.x, ray.origin.y, ray.origin.z),
-              new Vec3(ray.direction.x, ray.direction.y, ray.direction.z)
-            );
+              const xPlane = new Plane().setFromNormalAndCoplanarPoint(
+                new Vec3(0, 1, 0),
+                endWorldPt
+              );
+              const yPlane = new Plane().setFromNormalAndCoplanarPoint(
+                new Vec3(0, 0, 1),
+                endWorldPt
+              );
+              const zPlane = new Plane().setFromNormalAndCoplanarPoint(
+                new Vec3(1, 0, 0),
+                endWorldPt
+              );
 
-            const xPlanePt =
-              pickRay.intersectPlane(xPlane, new Vec3()) ?? endWorldPt;
-            const yPlanePt =
-              pickRay.intersectPlane(yPlane, new Vec3()) ?? endWorldPt;
-            const zPlanePt =
-              pickRay.intersectPlane(zPlane, new Vec3()) ?? endWorldPt;
+              const handlePointerMove = (event: PointerEvent): void => {
+                const pt = getMouseClientPosition(
+                  event,
+                  element.getBoundingClientRect()
+                );
+                const ray = api.getRayFromPoint(pt);
+                const pickRay = new Ray(
+                  new Vec3(ray.origin.x, ray.origin.y, ray.origin.z),
+                  new Vec3(ray.direction.x, ray.direction.y, ray.direction.z)
+                );
 
-            const xPt = new Vec3()
-              .subVectors(xPlanePt, endWorldPt)
-              .projectOnVector(new Vec3(1, 0, 0))
-              .add(endWorldPt);
-            const yPt = new Vec3()
-              .subVectors(yPlanePt, endWorldPt)
-              .projectOnVector(new Vec3(0, 1, 0))
-              .add(endWorldPt);
-            const zPt = new Vec3()
-              .subVectors(zPlanePt, endWorldPt)
-              .projectOnVector(new Vec3(0, 0, 1))
-              .add(endWorldPt);
+                const xPlanePt =
+                  pickRay.intersectPlane(xPlane, new Vec3()) ?? endWorldPt;
+                const yPlanePt =
+                  pickRay.intersectPlane(yPlane, new Vec3()) ?? endWorldPt;
+                const zPlanePt =
+                  pickRay.intersectPlane(zPlane, new Vec3()) ?? endWorldPt;
 
-            const lineDir = new Vec3()
-              .subVectors(endWorldPt, projectedWorldPt)
-              .normalize();
-            const xDot = Math.abs(lineDir.dot(new Vec3(1, 0, 0)));
-            const yDot = Math.abs(lineDir.dot(new Vec3(0, 1, 0)));
-            const zDot = Math.abs(lineDir.dot(new Vec3(0, 0, 1)));
+                const xPt = new Vec3()
+                  .subVectors(xPlanePt, endWorldPt)
+                  .projectOnVector(new Vec3(1, 0, 0))
+                  .add(endWorldPt);
+                const yPt = new Vec3()
+                  .subVectors(yPlanePt, endWorldPt)
+                  .projectOnVector(new Vec3(0, 1, 0))
+                  .add(endWorldPt);
+                const zPt = new Vec3()
+                  .subVectors(zPlanePt, endWorldPt)
+                  .projectOnVector(new Vec3(0, 0, 1))
+                  .add(endWorldPt);
 
-            const xDist = xPt.distanceTo(endWorldPt);
-            const yDist = yPt.distanceTo(endWorldPt);
-            const zDist = zPt.distanceTo(endWorldPt);
+                const lineDir = new Vec3()
+                  .subVectors(endWorldPt, projectedWorldPt)
+                  .normalize();
+                const xDot = Math.abs(lineDir.dot(new Vec3(1, 0, 0)));
+                const yDot = Math.abs(lineDir.dot(new Vec3(0, 1, 0)));
+                const zDot = Math.abs(lineDir.dot(new Vec3(0, 0, 1)));
 
-            const axises = [
-              { plane: xPlane, pt: xPt, dot: xDot, dist: xDist },
-              { plane: yPlane, pt: yPt, dot: yDot, dist: yDist },
-              { plane: zPlane, pt: zPt, dot: zDot, dist: zDist },
-            ];
+                const xDist = xPt.distanceTo(endWorldPt);
+                const yDist = yPt.distanceTo(endWorldPt);
+                const zDist = zPt.distanceTo(endWorldPt);
 
-            const possibleAxes = axises
-              .sort((a, b) => a.dot - b.dot)
-              .slice(0, 2);
+                const axises = [
+                  { plane: xPlane, pt: xPt, dot: xDot, dist: xDist },
+                  { plane: yPlane, pt: yPt, dot: yDot, dist: yDist },
+                  { plane: zPlane, pt: zPt, dot: zDot, dist: zDist },
+                ];
 
-            const axis = possibleAxes.sort((a, b) => b.dist - a.dist)[0];
+                const possibleAxes = axises
+                  .sort((a, b) => a.dot - b.dot)
+                  .slice(0, 2);
 
-            let newLineStartPt = new Vec3();
-            let newLineEndPt = new Vec3();
-            let placementPosition = new Vec3();
+                const axis = possibleAxes.sort((a, b) => b.dist - a.dist)[0];
 
-            if (axis.pt === xPt) {
-              newLineStartPt = new Vec3()
-                .subVectors(xPt, projectedWorldPt)
-                .projectOnVector(new Vec3(1, 0, 0))
-                .add(projectedWorldPt);
-              newLineEndPt = new Vec3()
-                .subVectors(xPt, endWorldPt)
-                .projectOnVector(new Vec3(1, 0, 0))
-                .add(endWorldPt);
-              placementPosition = xPt;
-            } else if (axis.pt === yPt) {
-              newLineStartPt = new Vec3()
-                .subVectors(yPt, projectedWorldPt)
-                .projectOnVector(new Vec3(0, 1, 0))
-                .add(projectedWorldPt);
-              newLineEndPt = new Vec3()
-                .subVectors(yPt, endWorldPt)
-                .projectOnVector(new Vec3(0, 1, 0))
-                .add(endWorldPt);
-              placementPosition = yPt;
+                let newLineStartPt = new Vec3();
+                let newLineEndPt = new Vec3();
+                let placementPosition = new Vec3();
+
+                if (axis.pt === xPt) {
+                  newLineStartPt = new Vec3()
+                    .subVectors(xPt, projectedWorldPt)
+                    .projectOnVector(new Vec3(1, 0, 0))
+                    .add(projectedWorldPt);
+                  newLineEndPt = new Vec3()
+                    .subVectors(xPt, endWorldPt)
+                    .projectOnVector(new Vec3(1, 0, 0))
+                    .add(endWorldPt);
+                  placementPosition = xPt;
+                } else if (axis.pt === yPt) {
+                  newLineStartPt = new Vec3()
+                    .subVectors(yPt, projectedWorldPt)
+                    .projectOnVector(new Vec3(0, 1, 0))
+                    .add(projectedWorldPt);
+                  newLineEndPt = new Vec3()
+                    .subVectors(yPt, endWorldPt)
+                    .projectOnVector(new Vec3(0, 1, 0))
+                    .add(endWorldPt);
+                  placementPosition = yPt;
+                } else {
+                  newLineStartPt = new Vec3()
+                    .subVectors(zPt, projectedWorldPt)
+                    .projectOnVector(new Vec3(0, 0, 1))
+                    .add(projectedWorldPt);
+                  newLineEndPt = new Vec3()
+                    .subVectors(zPt, endWorldPt)
+                    .projectOnVector(new Vec3(0, 0, 1))
+                    .add(endWorldPt);
+                  placementPosition = zPt;
+                }
+
+                this.updateState({
+                  type: 'placement',
+                  text: measurementAsText,
+                  startWorldPt,
+                  startPlane,
+                  endWorldPt,
+                  endPlane,
+                  placementPlane,
+                  placementPosition: placementPosition,
+                  measurementLine: new Line3(newLineStartPt, newLineEndPt),
+                  xWorldPt: xPt,
+                  yWorldPt: yPt,
+                  zWorldPt: zPt,
+                });
+              };
+
+              const handlePointerDown = (): void => {
+                console.log('done');
+                interaction.dispose();
+              };
+
+              window.addEventListener('pointermove', handlePointerMove);
+              window.addEventListener('pointerdown', handlePointerDown);
+
+              this.updateState({
+                type: 'placement',
+                text: measurementAsText,
+                startWorldPt,
+                startPlane,
+                endWorldPt,
+                endPlane,
+                placementPlane,
+                placementPosition: endWorldPt,
+                measurementLine: new Line3(projectedWorldPt, endWorldPt),
+                xWorldPt: new Vec3(),
+                yWorldPt: new Vec3(),
+                zWorldPt: new Vec3(),
+              });
             } else {
-              newLineStartPt = new Vec3()
-                .subVectors(zPt, projectedWorldPt)
-                .projectOnVector(new Vec3(0, 0, 1))
-                .add(projectedWorldPt);
-              newLineEndPt = new Vec3()
-                .subVectors(zPt, endWorldPt)
-                .projectOnVector(new Vec3(0, 0, 1))
-                .add(endWorldPt);
-              placementPosition = zPt;
+              this.updateState({ type: 'idle' });
             }
-
-            this.updateState({
-              type: 'placement',
-              distance,
-              startWorldPt,
-              startPlane,
-              endWorldPt,
-              endPlane,
-              placementPlane,
-              placementPosition: placementPosition,
-              measurementLine: new Line3(newLineStartPt, newLineEndPt),
-              xWorldPt: xPt,
-              yWorldPt: yPt,
-              zWorldPt: zPt,
-            });
-          };
-
-          const handlePointerDown = (): void => {
-            console.log('done');
-            interaction.dispose();
-          };
-
-          window.addEventListener('pointermove', handlePointerMove);
-          window.addEventListener('pointerdown', handlePointerDown);
-
-          this.updateState({
-            type: 'placement',
-            distance,
-            startWorldPt,
-            startPlane,
-            endWorldPt,
-            endPlane,
-            placementPlane,
-            placementPosition: endWorldPt,
-            measurementLine: new Line3(projectedWorldPt, endWorldPt),
-            xWorldPt: new Vec3(),
-            yWorldPt: new Vec3(),
-            zWorldPt: new Vec3(),
-          });
-        } else {
-          this.updateState({ type: 'idle' });
-        }
+          })
+        );
       }
     });
   }
@@ -555,21 +641,27 @@ export class SurfaceMeasurement implements InteractionHandler {
       ]);
       this.measurementLineMesh.visible = true;
 
-      const distance = Vector3.distance(state.startWorldPt, state.endWorldPt);
-      const text = `${distance.toFixed(2)} mm`;
-      if (this.textTexture.text !== text) {
-        this.textTexture.text = text;
-        this.textTexture.update();
+      //TODO: this could/should be updated to use the result of the measure call
+      // const distance = Vector3.distance(state.startWorldPt, state.endWorldPt);
+      // todo pull this out somehow
+      this.requestFromPick(state).then((req) => {
+        this.measure(req, (measurementAsText) => {
+          const text = measurementAsText;
+          if (this.textTexture.text !== text) {
+            this.textTexture.text = text;
+            this.textTexture.update();
 
-        const aspect = this.textTexture.width / this.textTexture.height;
-        const size = 50;
-        this.planeSprite.scale.set(size, size / aspect, 1);
-      }
+            const aspect = this.textTexture.width / this.textTexture.height;
+            const size = 1024;
+            this.planeSprite.scale.set(size, size / aspect, 1);
+          }
 
-      if (api.camera) {
-        this.planeSprite.position.set(center.x, center.y, center.z);
-        this.planeSprite.visible = true;
-      }
+          if (api.camera) {
+            this.planeSprite.position.set(center.x, center.y, center.z);
+            this.planeSprite.visible = true;
+          }
+        });
+      });
     });
   }
 
@@ -606,13 +698,13 @@ export class SurfaceMeasurement implements InteractionHandler {
       ]);
       this.endLeaderLineMesh.visible = true;
 
-      const text = `${state.distance.toFixed(2)} mm`;
+      const text = `${state.text}`;
       if (this.textTexture.text !== text) {
         this.textTexture.text = text;
         this.textTexture.update();
 
         const aspect = this.textTexture.width / this.textTexture.height;
-        const size = 50;
+        const size = 1024;
         this.planeSprite.scale.set(size, size / aspect, 1);
       }
 
@@ -714,13 +806,21 @@ class TextTexture extends CanvasTexture {
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       this.canvas.width = metrics.width > 1 ? metrics.width : 1;
-      this.canvas.height = this.opts.fontSize;
-
       ctx.font = this.font;
-      ctx.textBaseline = 'top';
+      // ctx.textBaseline = 'top';
 
       ctx.fillStyle = this.opts.color;
-      ctx.fillText(this.text, 0, 0);
+      // support multiline text
+      const lines = this.text.split('\n');
+      const x = 0;
+      const actualHeight =
+        metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+      const lineHeight = 15;
+      const y = lineHeight;
+      this.canvas.height = actualHeight * lines.length;
+      for (let i = 0; i < lines.length; i++)
+        ctx.fillText(lines[i], x, y + i * lineHeight);
     }
   }
 
@@ -728,7 +828,11 @@ class TextTexture extends CanvasTexture {
     const ctx = this.canvas.getContext('2d');
     if (ctx != null) {
       ctx.font = this.font;
-      return ctx.measureText(this.text);
+      const lines = this.text.split('\n');
+      const sorted = lines.sort((a, b) => {
+        return b.length - a.length;
+      });
+      return ctx.measureText(sorted[0]);
     }
   }
 
