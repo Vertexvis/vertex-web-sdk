@@ -110,10 +110,7 @@ export class ViewerMarkup {
       el.start = start;
       el.end = end;
 
-      this.updatePropsOnMarkup(el);
-      this.hostEl.appendChild(el);
-      this.markupAdded.emit(el);
-      return el;
+      return this.appendMarkupElement(el);
     } else if (markup instanceof CircleMarkup) {
       const { bounds, id } = markup;
 
@@ -121,9 +118,7 @@ export class ViewerMarkup {
       el.id = id;
       el.bounds = bounds;
 
-      this.updatePropsOnMarkup(el);
-      this.hostEl.appendChild(el);
-      return el;
+      return this.appendMarkupElement(el);
     } else {
       throw new Error(`Cannot add markup. Unknown type '${markup}'.`);
     }
@@ -145,8 +140,7 @@ export class ViewerMarkup {
     | HTMLVertexViewerMarkupCircleElement
     | undefined
   > {
-    const markups = await this.getMarkupElements();
-    const markup = markups.find((m) => m.id === id);
+    const markup = await this.getMarkupElement(id);
 
     if (markup != null) {
       markup.remove();
@@ -297,6 +291,16 @@ export class ViewerMarkup {
         <slot />
       </Host>
     );
+  }
+
+  private appendMarkupElement(
+    el: HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupArrowElement
+  ): HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupArrowElement {
+    this.updatePropsOnMarkup(el);
+    this.hostEl.appendChild(el);
+    this.markupAdded.emit(el);
+
+    return el;
   }
 
   private createArrowMarkupElement(): HTMLVertexViewerMarkupArrowElement {
