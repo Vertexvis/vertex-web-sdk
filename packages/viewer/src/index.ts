@@ -19,6 +19,8 @@ export { Environment } from './lib/environment';
 
 export { Scene } from './lib/scenes';
 
+export * from './lib/types';
+
 export {
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,

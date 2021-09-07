@@ -1,6 +1,152 @@
 # vertex-viewer-markup
 
+The `<vertex-viewer-markup>` component manages the presentation, creation
+and editing of markup for the viewer.
 
+## Create markup UI
+
+The `<vertex-viewer-markup-tool>` can be added as a child to this component
+to manage the creation of new markup through user interactions. When a new
+markup is added, it's assigned an ID. This ID can be passed to
+`getMarkupElement` or `selected-markup-id` to select a markup.
+
+**Example:** Creating new markup through user interaction.
+
+```html
+<html>
+<body>
+  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer-markup id="markup">
+      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+    </vertex-viewer-markup>
+  </vertex-viewer>
+
+  <script type="module">
+    const markup = document.getElementById('markup');
+
+    // An event is dispatched whenever a new markup is added.
+    markup.addEventListener('markupAdded', (event) => {
+      console.log(`markup added`, event.detail.id, event.detail.distance);
+    })
+  </script>
+</body>
+</html>
+```
+
+The markup type to create can be customized using the `tool` attribute on
+the component.
+
+**Example:** Changing the markup tool.
+
+```html
+<html>
+<body>
+  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer-markup tool="circle">
+      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+    </vertex-viewer-markup>
+  </vertex-viewer>
+</body>
+</html>
+```
+
+## Create Markup Programmatically.
+
+Markup can be added programmatically using the `addMarkup()` or by
+adding a markup as a child of this component.
+
+**Note:** For the component to manage selection for markup added
+as children, provide a unique ID to the element.
+
+```html
+<html>
+<body>
+  <button id="add-markup-btn">Add markup</button>
+
+  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer-markup id="markup">
+      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+
+      <!-- A markup added as a child component -->
+      <vertex-viewer-markup-arrow
+        id="my-markup-id"
+        start="[-0.25, 0.25]"
+        end="[0, 0]"
+      ></vertex-viewer-markup-arrow>
+    </vertex-viewer-markup>
+  </vertex-viewer>
+
+  <script type="module">
+    import { ArrowMarkup } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/viewer/index.esm.js'
+
+    const markup = document.getElementById('markup');
+    const button = document.getElementById('add-markup-btn');
+    button.addEventListener('click', async () => {
+      const arrow = new ArrowMarkup({
+        start: { x: -0.25, y: 0.5 },
+        end: { x: 0, y: 0 },
+      });
+
+      // Returns the HTML element for the newly added markup.
+      const element = await markup.addMarkup(arrow);
+    });
+  </script>
+</body>
+</html>
+```
+
+## Styling markup
+
+HTML templates and CSS variables are used to customize the styling of
+markup that are added programmatically or through user interaction. See
+the documentation of
+[`<vertex-viewer-markup-arrow>`](../viewer-markup-arrow/readme.md)/[`<vertex-viewer-markup-circle>`](../viewer-markup-circle/readme.md)
+for all styling options.
+
+When a new markup is added, the markup's HTML from the template will
+be cloned and added to the component.
+
+**Example:** Styling markup.
+
+```html
+<html>
+<head>
+  <style>
+    /* Styling for the markup resize and reposition anchors */
+    .arrow-markup {
+      --viewer-arrow-markup-background-color: black;
+      --viewer-arrow-markup-border-color: white;
+    }
+
+    .arrow-markup .anchor {
+      background-color: var(--viewer-arrow-markup-background-color);
+      border: 1px solid var(--viewer-arrow-markup-border-color);
+      box-sizing: border-box;
+      width: 10px;
+      height: 10px;
+      border-radius: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- The template for arrow markup -->
+  <template id="my-arrow-markup">
+    <vertex-viewer-markup-arrow class="arrow-markup">
+      <div slot="start-anchor" class="anchor"></div>
+      <div slot="end-anchor" class="anchor"></div>
+    </vertex-viewer-markup-arrow>
+  </template>
+
+  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+    <!-- Pass the template ID to use for arrow markup -->
+    <vertex-viewer-markup arrow-template-id="my-arrow-markup">
+      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+    </vertex-viewer-markup>
+  </vertex-viewer>
+</body>
+</html>
+```
 
 <!-- Auto Generated Below -->
 
@@ -37,6 +183,16 @@ a default element will be created.
 #### Returns
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>`
+
+
+
+### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
+
+Returns the markup element associated to the given ID.
+
+#### Returns
+
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
 
 
 
