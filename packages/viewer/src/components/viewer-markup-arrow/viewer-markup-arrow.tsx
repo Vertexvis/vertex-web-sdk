@@ -12,16 +12,13 @@ import {
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
-import { getDeviceSize, DeviceSize } from '../../lib/device';
 import {
   createArrowheadPoints,
   arrowheadPointsToPolygonPoints,
   parsePoint,
 } from './utils';
-import {
-  BoundingBox1d,
-  SvgShadow,
-} from '../viewer-markup/viewer-markup-components';
+import { SvgShadow } from '../viewer-markup/viewer-markup-components';
+import { BoundingBox1d } from './viewer-markup-arrow-components';
 import {
   translatePointToRelative,
   translatePointToScreen,
@@ -134,9 +131,6 @@ export class ViewerMarkupArrow {
   private elementBounds?: DOMRect;
 
   @State()
-  private deviceSize?: DeviceSize;
-
-  @State()
   private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
 
   /**
@@ -194,7 +188,6 @@ export class ViewerMarkupArrow {
 
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
-    this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }
 
@@ -204,12 +197,7 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (
-      this.start != null &&
-      this.end != null &&
-      this.deviceSize != null &&
-      this.elementBounds != null
-    ) {
+    if (this.start != null && this.end != null && this.elementBounds != null) {
       const screenStart = translatePointToScreen(
         this.start,
         this.elementBounds
@@ -237,18 +225,27 @@ export class ViewerMarkupArrow {
                 x2={arrowheadPoints.base.x}
                 y2={arrowheadPoints.base.y}
               />
+              {this.mode === 'edit' && (
+                <line
+                  id="bounding-box-1d-line"
+                  class="bounds-line"
+                  x1={screenStart.x}
+                  y1={screenStart.y}
+                  x2={screenEnd.x}
+                  y2={screenEnd.y}
+                />
+              )}
             </g>
-            {this.mode === 'edit' && (
-              <BoundingBox1d
-                start={screenStart}
-                end={screenEnd}
-                deviceSize={this.deviceSize}
-                onStartAnchorPointerDown={this.editStartPoint}
-                onCenterAnchorPointerDown={this.editCenterPoint}
-                onEndAnchorPointerDown={this.editEndPoint}
-              />
-            )}
           </svg>
+          {this.mode === 'edit' && (
+            <BoundingBox1d
+              start={screenStart}
+              end={screenEnd}
+              onStartAnchorPointerDown={this.editStartPoint}
+              onCenterAnchorPointerDown={this.editCenterPoint}
+              onEndAnchorPointerDown={this.editEndPoint}
+            />
+          )}
         </Host>
       );
     } else {

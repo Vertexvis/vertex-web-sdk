@@ -11,17 +11,14 @@ import {
   Method,
 } from '@stencil/core';
 import { Point, Rectangle } from '@vertexvis/geometry';
-import { DeviceSize, getDeviceSize } from '../../lib/device';
 import { getMouseClientPosition } from '../../lib/dom';
 import {
   BoundingBox2dAnchorPosition,
   translateRectToScreen,
   translatePointToRelative,
 } from '../viewer-markup/utils';
-import {
-  BoundingBox2d,
-  SvgShadow,
-} from '../viewer-markup/viewer-markup-components';
+import { SvgShadow } from '../viewer-markup/viewer-markup-components';
+import { BoundingBox2d } from './viewer-markup-circle-components';
 import { parseBounds, transformCircle } from './utils';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
@@ -109,9 +106,6 @@ export class ViewerMarkupCircle {
   private elementBounds?: DOMRect;
 
   @State()
-  private deviceSize?: DeviceSize;
-
-  @State()
   private startPosition?: Point.Point;
 
   @State()
@@ -170,7 +164,6 @@ export class ViewerMarkupCircle {
 
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
-    this.deviceSize = getDeviceSize();
     this.elementBounds = rect;
   }
 
@@ -179,11 +172,7 @@ export class ViewerMarkupCircle {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (
-      this.bounds != null &&
-      this.deviceSize != null &&
-      this.elementBounds != null
-    ) {
+    if (this.bounds != null && this.elementBounds != null) {
       const relativeBounds = translateRectToScreen(
         this.bounds,
         this.elementBounds
@@ -208,38 +197,35 @@ export class ViewerMarkupCircle {
                 fill={'none'}
               />
             </g>
-            {this.mode === 'edit' && (
-              <BoundingBox2d
-                bounds={relativeBounds}
-                deviceSize={this.deviceSize}
-                onTopLeftAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'top-left')
-                }
-                onTopRightAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'top-right')
-                }
-                onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
-                onBottomLeftAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'bottom-left')
-                }
-                onBottomRightAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'bottom-right')
-                }
-                onBottomAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'bottom')
-                }
-                onLeftAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'left')
-                }
-                onRightAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'right')
-                }
-                onCenterAnchorPointerDown={(e) =>
-                  this.updateEditAnchor(e, 'center')
-                }
-              />
-            )}
           </svg>
+          {this.mode === 'edit' && (
+            <BoundingBox2d
+              bounds={relativeBounds}
+              onTopLeftAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'top-left')
+              }
+              onTopRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'top-right')
+              }
+              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+              onBottomLeftAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom-left')
+              }
+              onBottomRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom-right')
+              }
+              onBottomAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'bottom')
+              }
+              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
+              onRightAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'right')
+              }
+              onCenterAnchorPointerDown={(e) =>
+                this.updateEditAnchor(e, 'center')
+              }
+            />
+          )}
         </Host>
       );
     } else {

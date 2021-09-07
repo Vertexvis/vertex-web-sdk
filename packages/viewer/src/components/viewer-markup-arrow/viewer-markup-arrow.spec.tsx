@@ -64,12 +64,12 @@ describe('vertex-viewer-markup-arrow', () => {
       'bounding-box-1d-center-anchor'
     );
 
-    expect(startEl?.getAttribute('x')).toBe('46');
-    expect(startEl?.getAttribute('y')).toBe('-4');
-    expect(endEl?.getAttribute('x')).toBe('46');
-    expect(endEl?.getAttribute('y')).toBe('46');
-    expect(centerEl?.getAttribute('cx')).toBe('50');
-    expect(centerEl?.getAttribute('cy')).toBe('25');
+    expect(startEl?.getAttribute('style')).toContain('left: 50px');
+    expect(startEl?.getAttribute('style')).toContain('top: 0px');
+    expect(endEl?.getAttribute('style')).toContain('left: 50px');
+    expect(endEl?.getAttribute('style')).toContain('top: 50px');
+    expect(centerEl?.getAttribute('style')).toContain('left: 50px');
+    expect(centerEl?.getAttribute('style')).toContain('top: 25px');
   });
 
   it('handles resizes', async () => {
@@ -102,8 +102,8 @@ describe('vertex-viewer-markup-arrow', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(startEl?.getAttribute('x')).toBe('96');
-    expect(startEl?.getAttribute('y')).toBe('-4');
+    expect(startEl?.getAttribute('style')).toContain('left: 100px');
+    expect(startEl?.getAttribute('style')).toContain('top: 0px');
 
     endEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -114,8 +114,8 @@ describe('vertex-viewer-markup-arrow', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(endEl?.getAttribute('x')).toBe('96');
-    expect(endEl?.getAttribute('y')).toBe('46');
+    expect(endEl?.getAttribute('style')).toContain('left: 100px');
+    expect(endEl?.getAttribute('style')).toContain('top: 50px');
 
     centerEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -126,12 +126,12 @@ describe('vertex-viewer-markup-arrow', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(startEl?.getAttribute('x')).toBe('46');
-    expect(startEl?.getAttribute('y')).toBe('21');
-    expect(endEl?.getAttribute('x')).toBe('46');
-    expect(endEl?.getAttribute('y')).toBe('71');
-    expect(centerEl?.getAttribute('cx')).toBe('50');
-    expect(centerEl?.getAttribute('cy')).toBe('50');
+    expect(startEl?.getAttribute('style')).toContain('left: 50px');
+    expect(startEl?.getAttribute('style')).toContain('top: 25px');
+    expect(endEl?.getAttribute('style')).toContain('left: 50px');
+    expect(endEl?.getAttribute('style')).toContain('top: 75px');
+    expect(centerEl?.getAttribute('style')).toContain('left: 50px');
+    expect(centerEl?.getAttribute('style')).toContain('top: 50px');
   });
 
   it('should cancel markup editing if no movement occurs', async () => {

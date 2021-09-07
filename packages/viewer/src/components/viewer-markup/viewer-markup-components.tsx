@@ -1,8 +1,40 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
-import { Point, Angle, Rectangle } from '@vertexvis/geometry';
-import { DeviceSize } from '../../lib/device';
-import { getBoundingBox2dAnchorPosition } from './utils';
+import { Point } from '@vertexvis/geometry';
+
+export interface RelativeAnchorProps {
+  id?: string;
+  rotation?: number;
+  name: string;
+  point: Point.Point;
+  onPointerDown?: (event: PointerEvent) => void;
+}
+
+export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
+  { id, rotation, name, point, onPointerDown },
+  children
+) => {
+  return (
+    <div
+      id={id}
+      class="bounds-anchor-position"
+      style={{
+        top: `${point.y}px`,
+        left: `${point.x}px`,
+      }}
+      onPointerDown={onPointerDown}
+    >
+      <div
+        class="bounds-anchor"
+        style={{
+          transform: `rotateZ(${rotation ?? 0}deg)`,
+        }}
+      >
+        <slot name={name}>{children}</slot>
+      </div>
+    </div>
+  );
+};
 
 export interface SvgShadowProps {
   id: string;
@@ -20,217 +52,5 @@ export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id }) => {
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
-  );
-};
-
-export interface BoundingBoxAnchorProps {
-  id?: string;
-  center: Point.Point;
-  angle?: number;
-  width?: number;
-  height?: number;
-  onGrab?: (event: PointerEvent) => void;
-}
-
-export const BoundingBoxAnchor: FunctionalComponent<BoundingBoxAnchorProps> = ({
-  id,
-  angle,
-  center,
-  width,
-  height,
-  onGrab,
-}) => {
-  return (
-    <rect
-      id={id}
-      class="bounds-rect"
-      height={height ?? 8}
-      width={width ?? 8}
-      x={center.x - (width != null ? width / 2 : 4)}
-      y={center.y - (height != null ? height / 2 : 4)}
-      transform={angle ? `rotate(${angle},${center.x},${center.y})` : undefined}
-      onPointerDown={onGrab}
-    />
-  );
-};
-
-export interface BoundingBox1dProps {
-  start: Point.Point;
-  end: Point.Point;
-  deviceSize?: DeviceSize;
-  onStartAnchorPointerDown?: (event: PointerEvent) => void;
-  onCenterAnchorPointerDown?: (event: PointerEvent) => void;
-  onEndAnchorPointerDown?: (event: PointerEvent) => void;
-}
-
-export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
-  start,
-  end,
-  deviceSize,
-  onStartAnchorPointerDown,
-  onCenterAnchorPointerDown,
-  onEndAnchorPointerDown,
-}) => {
-  const angle = Angle.normalize(
-    Angle.toDegrees(Angle.fromPoints(start, end)) - 270
-  );
-  const center = Point.create((start.x + end.x) / 2, (start.y + end.y) / 2);
-  const anchorWidth = deviceSize === 'small' ? 14 : 8;
-  const anchorHeight = deviceSize === 'small' ? 14 : 8;
-
-  return (
-    <g>
-      <defs>
-        <SvgShadow id="bounding-box-1d-shadow" />
-      </defs>
-      <g filter="url(#bounding-box-1d-shadow)">
-        <line
-          id="bounding-box-1d-line"
-          class="bounds-line"
-          x1={start.x}
-          y1={start.y}
-          x2={end.x}
-          y2={end.y}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-1d-start-anchor"
-          center={start}
-          angle={angle}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onStartAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-1d-end-anchor"
-          center={end}
-          angle={angle}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onEndAnchorPointerDown}
-        />
-        <circle
-          id="bounding-box-1d-center-anchor"
-          class="bounds-circle"
-          cx={center.x}
-          cy={center.y}
-          r={deviceSize === 'small' ? 6 : 4}
-          onPointerDown={onCenterAnchorPointerDown}
-        />
-      </g>
-    </g>
-  );
-};
-
-export interface BoundingBox2dProps {
-  bounds: Rectangle.Rectangle;
-  deviceSize?: DeviceSize;
-  onTopLeftAnchorPointerDown?: (event: PointerEvent) => void;
-  onLeftAnchorPointerDown?: (event: PointerEvent) => void;
-  onTopRightAnchorPointerDown?: (event: PointerEvent) => void;
-  onRightAnchorPointerDown?: (event: PointerEvent) => void;
-  onBottomLeftAnchorPointerDown?: (event: PointerEvent) => void;
-  onBottomAnchorPointerDown?: (event: PointerEvent) => void;
-  onBottomRightAnchorPointerDown?: (event: PointerEvent) => void;
-  onTopAnchorPointerDown?: (event: PointerEvent) => void;
-  onCenterAnchorPointerDown?: (event: PointerEvent) => void;
-}
-
-export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
-  bounds,
-  deviceSize,
-  onTopLeftAnchorPointerDown,
-  onLeftAnchorPointerDown,
-  onTopRightAnchorPointerDown,
-  onRightAnchorPointerDown,
-  onBottomLeftAnchorPointerDown,
-  onBottomAnchorPointerDown,
-  onBottomRightAnchorPointerDown,
-  onTopAnchorPointerDown,
-  onCenterAnchorPointerDown,
-}) => {
-  const padded = Rectangle.pad(bounds, 6);
-  const center = Rectangle.center(padded);
-  const anchorWidth = deviceSize === 'small' ? 14 : 8;
-  const anchorHeight = deviceSize === 'small' ? 14 : 8;
-
-  return (
-    <g>
-      <defs>
-        <SvgShadow id="bounding-box-2d-shadow" />
-      </defs>
-      <g filter="url(#bounding-box-2d-shadow)">
-        <rect id="bounding-box-2d-outline" class="bounds-outline" {...padded} />
-        <rect
-          id="bounding-box-2d-click-target"
-          class="bounds-click-target"
-          {...padded}
-          fill="none"
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-top-left-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'top-left')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onTopLeftAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-left-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'left')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onLeftAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-top-right-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'top-right')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onTopRightAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-right-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'right')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onRightAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-bottom-left-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'bottom-left')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onBottomLeftAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-bottom-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'bottom')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onBottomAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-bottom-right-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'bottom-right')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onBottomRightAnchorPointerDown}
-        />
-        <BoundingBoxAnchor
-          id="bounding-box-2d-top-anchor"
-          center={getBoundingBox2dAnchorPosition(padded, 'top')}
-          width={anchorWidth}
-          height={anchorHeight}
-          onGrab={onTopAnchorPointerDown}
-        />
-        <circle
-          id="bounding-box-2d-center-anchor"
-          class="bounds-circle"
-          cx={center.x}
-          cy={center.y}
-          r={deviceSize === 'small' ? 6 : 4}
-          onPointerDown={onCenterAnchorPointerDown}
-        />
-      </g>
-    </g>
   );
 };

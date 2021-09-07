@@ -82,29 +82,28 @@ describe('vertex-viewer-markup-circle', () => {
 
     /**
      * Circle after padding has bounds of `[-6, -6, 62, 62]`.
-     * Side anchors are offset by `-4`.
      */
 
-    expect(leftEl?.getAttribute('x')).toBe('-10');
-    expect(leftEl?.getAttribute('y')).toBe('21');
-    expect(rightEl?.getAttribute('x')).toBe('52');
-    expect(rightEl?.getAttribute('y')).toBe('21');
-    expect(bottomEl?.getAttribute('x')).toBe('21');
-    expect(bottomEl?.getAttribute('y')).toBe('52');
-    expect(topEl?.getAttribute('x')).toBe('21');
-    expect(topEl?.getAttribute('y')).toBe('-10');
+    expect(leftEl?.getAttribute('style')).toContain('left: -6px');
+    expect(leftEl?.getAttribute('style')).toContain('top: 25px');
+    expect(rightEl?.getAttribute('style')).toContain('left: 56px');
+    expect(rightEl?.getAttribute('style')).toContain('top: 25px');
+    expect(bottomEl?.getAttribute('style')).toContain('left: 25px');
+    expect(bottomEl?.getAttribute('style')).toContain('top: 56px');
+    expect(topEl?.getAttribute('style')).toContain('left: 25px');
+    expect(topEl?.getAttribute('style')).toContain('top: -6px');
 
-    expect(topLeftEl?.getAttribute('x')).toBe('-10');
-    expect(topLeftEl?.getAttribute('y')).toBe('-10');
-    expect(topRightEl?.getAttribute('x')).toBe('52');
-    expect(topRightEl?.getAttribute('y')).toBe('-10');
-    expect(bottomLeftEl?.getAttribute('x')).toBe('-10');
-    expect(bottomLeftEl?.getAttribute('y')).toBe('52');
-    expect(bottomRightEl?.getAttribute('x')).toBe('52');
-    expect(bottomRightEl?.getAttribute('y')).toBe('52');
+    expect(topLeftEl?.getAttribute('style')).toContain('left: -6px');
+    expect(topLeftEl?.getAttribute('style')).toContain('top: -6px');
+    expect(topRightEl?.getAttribute('style')).toContain('left: 56px');
+    expect(topRightEl?.getAttribute('style')).toContain('top: -6px');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('left: -6px');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('top: 56px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('left: 56px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('top: 56px');
 
-    expect(centerEl?.getAttribute('cx')).toBe('25');
-    expect(centerEl?.getAttribute('cy')).toBe('25');
+    expect(centerEl?.getAttribute('style')).toContain('left: 25px');
+    expect(centerEl?.getAttribute('style')).toContain('top: 25px');
   });
 
   it('handles resizes', async () => {
@@ -159,8 +158,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(rightEl?.getAttribute('x')).toBe('77');
-    expect(rightEl?.getAttribute('y')).toBe('21');
+    expect(rightEl?.getAttribute('style')).toContain('left: 81px');
+    expect(rightEl?.getAttribute('style')).toContain('top: 25px');
 
     bottomRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -171,8 +170,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(bottomRightEl?.getAttribute('x')).toBe('102');
-    expect(bottomRightEl?.getAttribute('y')).toBe('102');
+    expect(bottomRightEl?.getAttribute('style')).toContain('left: 106px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('top: 106px');
 
     topRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -183,8 +182,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(topRightEl?.getAttribute('x')).toBe('92');
-    expect(topRightEl?.getAttribute('y')).toBe('0');
+    expect(topRightEl?.getAttribute('style')).toContain('left: 96px');
+    expect(topRightEl?.getAttribute('style')).toContain('top: 4px');
 
     leftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -195,8 +194,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(leftEl?.getAttribute('x')).toBe('40');
-    expect(leftEl?.getAttribute('y')).toBe('51');
+    expect(leftEl?.getAttribute('style')).toContain('left: 44px');
+    expect(leftEl?.getAttribute('style')).toContain('top: 55px');
 
     topLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -207,8 +206,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(topLeftEl?.getAttribute('x')).toBe('50');
-    expect(topLeftEl?.getAttribute('y')).toBe('10');
+    expect(topLeftEl?.getAttribute('style')).toContain('left: 54px');
+    expect(topLeftEl?.getAttribute('style')).toContain('top: 14px');
 
     bottomLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -219,8 +218,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(bottomLeftEl?.getAttribute('x')).toBe('30');
-    expect(bottomLeftEl?.getAttribute('y')).toBe('92');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('left: 34px');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('top: 96px');
 
     topEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -231,8 +230,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(topEl?.getAttribute('x')).toBe('61');
-    expect(topEl?.getAttribute('y')).toBe('20');
+    expect(topEl?.getAttribute('style')).toContain('left: 65px');
+    expect(topEl?.getAttribute('style')).toContain('top: 24px');
 
     bottomEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
@@ -243,8 +242,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(bottomEl?.getAttribute('x')).toBe('61');
-    expect(bottomEl?.getAttribute('y')).toBe('82');
+    expect(bottomEl?.getAttribute('style')).toContain('left: 65px');
+    expect(bottomEl?.getAttribute('style')).toContain('top: 86px');
 
     /**
      * Circle should have its top left corner at this point at [40, 30],
@@ -270,25 +269,25 @@ describe('vertex-viewer-markup-circle', () => {
      * Circle should have its top left corner at this point at [25, 25],
      * with a width and height of 50px, placing the center at [50, 50].
      */
-    expect(centerEl?.getAttribute('cx')).toBe('50');
-    expect(centerEl?.getAttribute('cy')).toBe('50');
+    expect(centerEl?.getAttribute('style')).toContain('left: 50px');
+    expect(centerEl?.getAttribute('style')).toContain('top: 50px');
 
-    expect(rightEl?.getAttribute('x')).toBe('77');
-    expect(rightEl?.getAttribute('y')).toBe('46');
-    expect(bottomRightEl?.getAttribute('x')).toBe('77');
-    expect(bottomRightEl?.getAttribute('y')).toBe('77');
-    expect(topRightEl?.getAttribute('x')).toBe('77');
-    expect(topRightEl?.getAttribute('y')).toBe('15');
-    expect(leftEl?.getAttribute('x')).toBe('15');
-    expect(leftEl?.getAttribute('y')).toBe('46');
-    expect(topLeftEl?.getAttribute('x')).toBe('15');
-    expect(topLeftEl?.getAttribute('y')).toBe('15');
-    expect(bottomLeftEl?.getAttribute('x')).toBe('15');
-    expect(bottomLeftEl?.getAttribute('y')).toBe('77');
-    expect(topEl?.getAttribute('x')).toBe('46');
-    expect(topEl?.getAttribute('y')).toBe('15');
-    expect(bottomEl?.getAttribute('x')).toBe('46');
-    expect(bottomEl?.getAttribute('y')).toBe('77');
+    expect(rightEl?.getAttribute('style')).toContain('left: 81px');
+    expect(rightEl?.getAttribute('style')).toContain('top: 50px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('left: 81px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('top: 81px');
+    expect(topRightEl?.getAttribute('style')).toContain('left: 81px');
+    expect(topRightEl?.getAttribute('style')).toContain('top: 19px');
+    expect(leftEl?.getAttribute('style')).toContain('left: 19px');
+    expect(leftEl?.getAttribute('style')).toContain('top: 50px');
+    expect(topLeftEl?.getAttribute('style')).toContain('left: 19px');
+    expect(topLeftEl?.getAttribute('style')).toContain('top: 19px');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('left: 19px');
+    expect(bottomLeftEl?.getAttribute('style')).toContain('top: 81px');
+    expect(topEl?.getAttribute('style')).toContain('left: 50px');
+    expect(topEl?.getAttribute('style')).toContain('top: 19px');
+    expect(bottomEl?.getAttribute('style')).toContain('left: 50px');
+    expect(bottomEl?.getAttribute('style')).toContain('top: 81px');
   });
 
   it('should support maintaining aspect ratio', async () => {
@@ -317,8 +316,8 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
-    expect(bottomRightEl?.getAttribute('x')).toBe('102');
-    expect(bottomRightEl?.getAttribute('y')).toBe('102');
+    expect(bottomRightEl?.getAttribute('style')).toContain('left: 106px');
+    expect(bottomRightEl?.getAttribute('style')).toContain('top: 106px');
   });
 
   it('should cancel markup editing if no movement occurs', async () => {
