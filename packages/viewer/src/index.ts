@@ -19,7 +19,7 @@ export { Environment } from './lib/environment';
 
 export { Scene } from './lib/scenes';
 
-export * from './lib/types';
+export * from './lib/types/markup';
 
 export {
   Frame as ReceivedFrame,
