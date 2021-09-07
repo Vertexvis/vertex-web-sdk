@@ -28,6 +28,7 @@ export {
   FramePerspectiveCamera as ReceivedPerspectiveCamera,
   LoadableResource,
   SynchronizedClock,
+  Viewport,
 } from './lib/types';
 
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
