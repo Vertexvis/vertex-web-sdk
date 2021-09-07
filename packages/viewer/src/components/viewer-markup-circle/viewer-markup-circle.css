@@ -78,6 +78,14 @@
 }
 
 .svg {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.create-overlay {
+  pointer-events: auto;
+  position: absolute;
   width: 100%;
   height: 100%;
 }
@@ -92,6 +100,7 @@
 }
 
 .bounds-container {
+  pointer-events: none;
   position: absolute;
   width: 100%;
   height: 100%;

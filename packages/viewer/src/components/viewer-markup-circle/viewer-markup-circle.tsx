@@ -229,7 +229,14 @@ export class ViewerMarkupCircle {
         </Host>
       );
     } else {
-      return <Host />;
+      return (
+        <Host>
+          <div
+            class="create-overlay"
+            onPointerDown={(event) => this.startMarkup(event)}
+          ></div>
+        </Host>
+      );
     }
   }
 

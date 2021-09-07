@@ -66,14 +66,6 @@ export class ViewerMarkupTool {
   public disabled = false;
 
   /**
-   * Whether camera controls are allowed for the underlying viewer.
-   * This defaults to `false`, and is applied to the viewer when this
-   * markup tool is enabled.
-   */
-  @Prop()
-  public cameraControls = false;
-
-  /**
    * The viewer to connect to markup.
    *
    * This property will automatically be set when a child of a
@@ -110,19 +102,11 @@ export class ViewerMarkupTool {
   @State()
   private stateMap: StateMap = {};
 
-  @State()
-  private viewerCameraControls = true;
-
   @Watch('viewer')
   protected async handleViewerChanged(): Promise<void> {
     if (this.stateMap.markupElement != null) {
       this.stateMap.markupElement.viewer = this.viewer;
       await this.viewer?.addCursor('crosshair');
-    }
-
-    if (this.viewer != null) {
-      this.viewerCameraControls = this.viewer.cameraControls;
-      this.viewer.cameraControls = this.cameraControls;
     }
   }
 
@@ -156,12 +140,6 @@ export class ViewerMarkupTool {
   @Watch('disabled')
   protected handleDisabledChanged(): void {
     this.updateMarkupElement();
-
-    if (this.viewer != null) {
-      this.viewer.cameraControls = this.disabled
-        ? this.viewerCameraControls
-        : this.cameraControls;
-    }
   }
 
   /**
@@ -179,9 +157,7 @@ export class ViewerMarkupTool {
       if (this.tool === 'arrow' || this.tool === 'circle') {
         return (
           <Host>
-            <vertex-viewer-layer>
-              <slot />
-            </vertex-viewer-layer>
+            <slot />
           </Host>
         );
       } else {

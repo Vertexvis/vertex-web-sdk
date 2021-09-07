@@ -593,10 +593,6 @@ export namespace Components {
          */
         "arrowTemplateId"?: string;
         /**
-          * Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled.
-         */
-        "cameraControls": boolean;
-        /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */
         "circleTemplateId"?: string;
@@ -1489,10 +1485,6 @@ declare namespace LocalJSX {
           * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
          */
         "arrowTemplateId"?: string;
-        /**
-          * Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled.
-         */
-        "cameraControls"?: boolean;
         /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */

@@ -249,7 +249,14 @@ export class ViewerMarkupArrow {
         </Host>
       );
     } else {
-      return <Host />;
+      return (
+        <Host>
+          <div
+            class="create-overlay"
+            onPointerDown={(event) => this.startMarkup(event)}
+          ></div>
+        </Host>
+      );
     }
   }
 

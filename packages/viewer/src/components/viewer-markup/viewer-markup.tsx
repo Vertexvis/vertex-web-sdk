@@ -371,10 +371,6 @@ export class ViewerMarkup {
       tool.circleTemplateId = this.circleTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;
-
-      if (this.viewer != null) {
-        this.viewer.cameraControls = tool.cameraControls;
-      }
     }
   }
 
