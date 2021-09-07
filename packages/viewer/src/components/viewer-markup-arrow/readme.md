@@ -57,8 +57,6 @@ Type: `Promise<void>`
 | `--viewer-markup-arrow-head-fill-opacity`                     | A number between 0 and 1 that specifies the opacity of the arrow head's fill.          |
 | `--viewer-markup-arrow-head-stroke-color`                     | A CSS color that specifies the color of the arrow head's outline.                      |
 | `--viewer-markup-arrow-head-stroke-width`                     | A CSS length that specifies the width of the arrow head's outline.                     |
-| `--viewer-markup-arrow-line-fill-color`                       | A CSS color that specifies the color of the arrow line's fill.                         |
-| `--viewer-markup-arrow-line-fill-opacity`                     | A number between 0 and 1 that specifies the opacity of the arrow line's fill.          |
 | `--viewer-markup-arrow-line-stroke-color`                     | A CSS color that specifies the color of the arrow line's outline.                      |
 | `--viewer-markup-arrow-line-stroke-width`                     | A CSS length that specifies the width of the arrow line's outline.                     |
 

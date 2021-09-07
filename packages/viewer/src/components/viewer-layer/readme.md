@@ -42,14 +42,12 @@ viewport of a `<vertex-viewer>`.
 
 ### Used by
 
- - [vertex-viewer-markup-tool](../viewer-markup-tool)
  - [vertex-viewer-measurement-tool](../viewer-measurement-tool)
  - [vertex-viewer-toolbar](../viewer-toolbar)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-markup-tool --> vertex-viewer-layer
   vertex-viewer-measurement-tool --> vertex-viewer-layer
   vertex-viewer-toolbar --> vertex-viewer-layer
   style vertex-viewer-layer fill:#f9f,stroke:#333,stroke-width:4px

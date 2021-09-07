@@ -7,14 +7,13 @@
 
 ## Properties
 
-| Property           | Attribute            | Description                                                                                                                                             | Type                                   | Default     |
-| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `arrowTemplateId`  | `arrow-template-id`  | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.        | `string \| undefined`                  | `undefined` |
-| `cameraControls`   | `camera-controls`    | Whether camera controls are allowed for the underlying viewer. This defaults to `false`, and is applied to the viewer when this markup tool is enabled. | `boolean`                              | `false`     |
-| `circleTemplateId` | `circle-template-id` | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.      | `string \| undefined`                  | `undefined` |
-| `disabled`         | `disabled`           | Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                          | `boolean`                              | `false`     |
-| `tool`             | `tool`               | The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                        | `"arrow" \| "circle"`                  | `'arrow'`   |
-| `viewer`           | --                   | The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property           | Attribute            | Description                                                                                                                                        | Type                                   | Default     |
+| ------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `arrowTemplateId`  | `arrow-template-id`  | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.   | `string \| undefined`                  | `undefined` |
+| `circleTemplateId` | `circle-template-id` | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`. | `string \| undefined`                  | `undefined` |
+| `disabled`         | `disabled`           | Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                     | `boolean`                              | `false`     |
+| `tool`             | `tool`               | The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                   | `"arrow" \| "circle"`                  | `'arrow'`   |
+| `viewer`           | --                   | The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element. | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ## Events
@@ -30,14 +29,12 @@
 
 ### Depends on
 
-- [vertex-viewer-layer](../viewer-layer)
 - [vertex-viewer-markup-arrow](../viewer-markup-arrow)
 - [vertex-viewer-markup-circle](../viewer-markup-circle)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-markup-tool --> vertex-viewer-layer
   vertex-viewer-markup-tool --> vertex-viewer-markup-arrow
   vertex-viewer-markup-tool --> vertex-viewer-markup-circle
   style vertex-viewer-markup-tool fill:#f9f,stroke:#333,stroke-width:4px
