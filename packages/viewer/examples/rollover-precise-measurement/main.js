@@ -13,7 +13,7 @@ import {
   loadViewerWithQueryParams,
   readDebugFeatureMap,
   readSceneId,
-} from '../rollover/helpers.js';
+} from '../utils.js';
 import { FeatureRolloverInteractionHandler } from '../rollover/featureRolloverHandler.js';
 
 const sceneId = readSceneId(); //'464b4f18-387e-4a8e-8d6f-fffe289dd892'; //'54c7a35a-a818-4b35-bd5e-c26d78945f98';

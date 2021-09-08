@@ -1,15 +1,16 @@
 import * as THREE from 'https://cdn.skypack.dev/three';
 import { FlexTimeApi, VertexScene } from '/dist/viewer/index.esm.js';
-import { addGeometryLoaderMeshes } from '../utils.js';
+import {
+  addGeometryLoaderMeshes,
+  loadViewerWithQueryParams,
+  readDebugFeatureMap,
+  readSceneId,
+} from '../utils.js';
 import {
   glassPaneFragmentShader,
   quadVertexShader,
 } from './featureRolloverShaders.js';
-import {
-  loadViewerWithQueryParams,
-  readDebugFeatureMap,
-  readSceneId,
-} from './helpers.js';
+
 import { FeatureRolloverInteractionHandler } from './featureRolloverHandler.js';
 
 const sceneId = readSceneId(); //'464b4f18-387e-4a8e-8d6f-fffe289dd892'; //'54c7a35a-a818-4b35-bd5e-c26d78945f98';
