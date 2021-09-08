@@ -65,10 +65,10 @@
         SurfaceMeasurement,
         VertexScene,
       } from '/dist/viewer/index.esm.js';
-      import { getStreamKeyFromUrlParams } from './utils.js';
+      import { getStreamKeyFromUrlParams, readSceneId } from './utils.js';
 
       const streamKey = '' || getStreamKeyFromUrlParams();
-      const sceneId = '54c7a35a-a818-4b35-bd5e-c26d78945f98';
+      const sceneId = readSceneId(); //'b123741b-b489-49ec-b7ad-c4187d305065' ;
       const client = FlexTimeApi.create('https://flex.platdev.vertexvis.io');
 
       const scene = new VertexScene();
@@ -94,7 +94,12 @@
 
         const interactionTarget = await viewer.getInteractionTarget();
 
-        const surfaceMeasurement = new SurfaceMeasurement(renderer, scene);
+        const surfaceMeasurement = new SurfaceMeasurement(
+          renderer,
+          scene,
+          sceneId,
+          'https://flex.platdev.vertexvis.io'
+        );
         viewer.registerInteractionHandler(surfaceMeasurement);
         clearMeasurementsBtn.addEventListener('click', () => {
           surfaceMeasurement.clear();
