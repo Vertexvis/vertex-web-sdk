@@ -106,7 +106,6 @@ export class ViewerMarkupTool {
   protected async handleViewerChanged(): Promise<void> {
     if (this.stateMap.markupElement != null) {
       this.stateMap.markupElement.viewer = this.viewer;
-      await this.viewer?.addCursor('crosshair');
     }
   }
 
