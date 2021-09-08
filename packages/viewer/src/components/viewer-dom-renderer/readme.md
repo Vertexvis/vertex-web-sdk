@@ -11,6 +11,8 @@ Renderer needs to be connected to a `<vertex-viewer>` in order to be notified
 when the scene is rendered. If added as a child of a `<vertex-viewer>` element,
 the renderer will be connected automatically.
 
+_note: In order to support multiple viewer-dom-renderer components in your viewer, be sure to give a unique #id element to the renderer_
+
 **Example:** Creating a DOM renderer.
 
 ```html
