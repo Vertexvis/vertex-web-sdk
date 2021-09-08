@@ -45,6 +45,7 @@ import {
   Matrix4,
   Point,
   Quaternion,
+  Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
@@ -61,6 +62,11 @@ import {
   ViewerIconName,
   ViewerIconSize,
 } from './components/viewer-icon/viewer-icon';
+import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
+import { Markup } from './lib/types/markup';
+import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
+import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
+import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
 import {
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceLabelFormatter,
@@ -564,6 +570,151 @@ export namespace Components {
      */
     stretchOff: boolean;
   }
+  interface VertexViewerMarkup {
+    /**
+     * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
+     * @param markup The markup to add.
+     * @returns The markup element that was created.
+     * @see {
+     * @link ViewerMarkups.arrowTemplateId}
+     * @see {
+     * @link ViewerMarkups.circleTemplateId}
+     */
+    addMarkup: (
+      markup: Markup
+    ) => Promise<
+      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    >;
+    /**
+     * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+     */
+    arrowTemplateId?: string;
+    /**
+     * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+     */
+    circleTemplateId?: string;
+    /**
+     * If `true`, disables adding or editing of markup through user interaction.
+     */
+    disabled: boolean;
+    /**
+     * Returns the markup element associated to the given ID.
+     * @param id The ID of the markup element to return.
+     * @returns A markup element, or `undefined`.
+     * @see {
+     * @link ViewerMarkup.getMarkupElements}
+     */
+    getMarkupElement: (
+      id: string
+    ) => Promise<
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | undefined
+    >;
+    /**
+     * Returns a list of markup elements that are children of this component.
+     * @returns A list of all markups.
+     * @see {
+     * @link ViewerMarkup.getMarkupElement}
+     */
+    getMarkupElements: () => Promise<
+      Array<
+        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      >
+    >;
+    /**
+     * Removes a markup with the given ID, and returns the HTML element associated to the markup. Returns `undefined` if no markup is found.
+     * @param id The ID of the markup to remove.
+     * @returns The markup element, or undefined.
+     */
+    removeMarkup: (
+      id: string
+    ) => Promise<
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | undefined
+    >;
+    /**
+     * The ID of the markup that is selected.
+     */
+    selectedMarkupId?: string;
+    /**
+     * The type of markup to perform.
+     */
+    tool: ViewerMarkupToolType;
+    /**
+     * The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupArrow {
+    dispose: () => Promise<void>;
+    /**
+     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    end?: Point.Point;
+    /**
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    endJson?: string;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode: ViewerMarkupArrowMode;
+    /**
+     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    start?: Point.Point;
+    /**
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    startJson?: string;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupCircle {
+    /**
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    bounds?: Rectangle.Rectangle;
+    /**
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    boundsJson?: string;
+    dispose: () => Promise<void>;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode: ViewerMarkupCircleMode;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupTool {
+    /**
+     * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+     */
+    arrowTemplateId?: string;
+    /**
+     * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+     */
+    circleTemplateId?: string;
+    /**
+     * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     */
+    disabled: boolean;
+    /**
+     * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     */
+    tool: ViewerMarkupToolType;
+    /**
+     * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
@@ -910,6 +1061,34 @@ declare global {
     prototype: HTMLVertexViewerLayerElement;
     new (): HTMLVertexViewerLayerElement;
   };
+  interface HTMLVertexViewerMarkupElement
+    extends Components.VertexViewerMarkup,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMarkupElement: {
+    prototype: HTMLVertexViewerMarkupElement;
+    new (): HTMLVertexViewerMarkupElement;
+  };
+  interface HTMLVertexViewerMarkupArrowElement
+    extends Components.VertexViewerMarkupArrow,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMarkupArrowElement: {
+    prototype: HTMLVertexViewerMarkupArrowElement;
+    new (): HTMLVertexViewerMarkupArrowElement;
+  };
+  interface HTMLVertexViewerMarkupCircleElement
+    extends Components.VertexViewerMarkupCircle,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMarkupCircleElement: {
+    prototype: HTMLVertexViewerMarkupCircleElement;
+    new (): HTMLVertexViewerMarkupCircleElement;
+  };
+  interface HTMLVertexViewerMarkupToolElement
+    extends Components.VertexViewerMarkupTool,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMarkupToolElement: {
+    prototype: HTMLVertexViewerMarkupToolElement;
+    new (): HTMLVertexViewerMarkupToolElement;
+  };
   interface HTMLVertexViewerMeasurementDistanceElement
     extends Components.VertexViewerMeasurementDistance,
       HTMLStencilElement {}
@@ -973,6 +1152,10 @@ declare global {
     'vertex-viewer-dom-renderer': HTMLVertexViewerDomRendererElement;
     'vertex-viewer-icon': HTMLVertexViewerIconElement;
     'vertex-viewer-layer': HTMLVertexViewerLayerElement;
+    'vertex-viewer-markup': HTMLVertexViewerMarkupElement;
+    'vertex-viewer-markup-arrow': HTMLVertexViewerMarkupArrowElement;
+    'vertex-viewer-markup-circle': HTMLVertexViewerMarkupCircleElement;
+    'vertex-viewer-markup-tool': HTMLVertexViewerMarkupToolElement;
     'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
@@ -1331,6 +1514,150 @@ declare namespace LocalJSX {
      */
     stretchOff?: boolean;
   }
+  interface VertexViewerMarkup {
+    /**
+     * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+     */
+    arrowTemplateId?: string;
+    /**
+     * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+     */
+    circleTemplateId?: string;
+    /**
+     * If `true`, disables adding or editing of markup through user interaction.
+     */
+    disabled?: boolean;
+    /**
+     * Dispatched when a new markup is added, either through user interaction or programmatically.
+     */
+    onMarkupAdded?: (
+      event: CustomEvent<
+        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      >
+    ) => void;
+    /**
+     * Dispatched when a markup is removed, either through user interaction or programmatically.
+     */
+    onMarkupRemoved?: (
+      event: CustomEvent<
+        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      >
+    ) => void;
+    /**
+     * The ID of the markup that is selected.
+     */
+    selectedMarkupId?: string;
+    /**
+     * The type of markup to perform.
+     */
+    tool?: ViewerMarkupToolType;
+    /**
+     * The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupArrow {
+    /**
+     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    end?: Point.Point;
+    /**
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    endJson?: string;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode?: ViewerMarkupArrowMode;
+    /**
+     * An event that is dispatched anytime the user begins editing the markup.
+     */
+    onEditBegin?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user cancels editing of the markup.
+     */
+    onEditCancel?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user has finished editing the markup.
+     */
+    onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    start?: Point.Point;
+    /**
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    startJson?: string;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupCircle {
+    /**
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    bounds?: Rectangle.Rectangle;
+    /**
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    boundsJson?: string;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode?: ViewerMarkupCircleMode;
+    /**
+     * An event that is dispatched anytime the user begins editing the markup.
+     */
+    onEditBegin?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user cancels editing of the markup.
+     */
+    onEditCancel?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user has finished editing the markup.
+     */
+    onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerMarkupTool {
+    /**
+     * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
+     */
+    arrowTemplateId?: string;
+    /**
+     * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
+     */
+    circleTemplateId?: string;
+    /**
+     * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     */
+    disabled?: boolean;
+    /**
+     * An event that is dispatched when a user begins a new markup.
+     */
+    onMarkupBegin?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when a user has cancelled a markup edit.
+     */
+    onMarkupEditCancel?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when a user has finished their markup.
+     */
+    onMarkupEnd?: (event: CustomEvent<Markup>) => void;
+    /**
+     * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     */
+    tool?: ViewerMarkupToolType;
+    /**
+     * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
@@ -1583,6 +1910,10 @@ declare namespace LocalJSX {
     'vertex-viewer-dom-renderer': VertexViewerDomRenderer;
     'vertex-viewer-icon': VertexViewerIcon;
     'vertex-viewer-layer': VertexViewerLayer;
+    'vertex-viewer-markup': VertexViewerMarkup;
+    'vertex-viewer-markup-arrow': VertexViewerMarkupArrow;
+    'vertex-viewer-markup-circle': VertexViewerMarkupCircle;
+    'vertex-viewer-markup-tool': VertexViewerMarkupTool;
     'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
@@ -1622,6 +1953,14 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
       'vertex-viewer-layer': LocalJSX.VertexViewerLayer &
         JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
+      'vertex-viewer-markup': LocalJSX.VertexViewerMarkup &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMarkupElement>;
+      'vertex-viewer-markup-arrow': LocalJSX.VertexViewerMarkupArrow &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMarkupArrowElement>;
+      'vertex-viewer-markup-circle': LocalJSX.VertexViewerMarkupCircle &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMarkupCircleElement>;
+      'vertex-viewer-markup-tool': LocalJSX.VertexViewerMarkupTool &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMarkupToolElement>;
       'vertex-viewer-measurement-distance': LocalJSX.VertexViewerMeasurementDistance &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
       'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &

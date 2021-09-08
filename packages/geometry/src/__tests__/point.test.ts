@@ -77,3 +77,15 @@ describe(Point.lerp, () => {
     expect(Point.lerp(pt1, pt2, 2)).toEqual(pt2);
   });
 });
+
+describe(Point.fromJson, () => {
+  it('parses json obj', () => {
+    const v = Point.fromJson(JSON.stringify({ x: 1, y: 2 }));
+    expect(v).toEqual(Point.create(1, 2));
+  });
+
+  it('parses json array', () => {
+    const v = Point.fromJson('[1, 2]');
+    expect(v).toEqual(Point.create(1, 2));
+  });
+});

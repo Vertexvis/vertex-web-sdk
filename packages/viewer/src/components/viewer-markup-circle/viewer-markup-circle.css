@@ -1,0 +1,154 @@
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /**
+   * @prop --viewer-markup-circle-ellipse-stroke-color: A CSS color that
+   * specifies the color of the circle's outline.
+   */
+  --viewer-markup-circle-ellipse-stroke-color: var(--red-700);
+  /**
+   * @prop --viewer-markup-circle-ellipse-stroke-width: A CSS length that
+   * specifies the width of the circle's outline.
+   */
+  --viewer-markup-circle-ellipse-stroke-width: 4;
+  /**
+   * @prop --viewer-markup-circle-ellipse-fill-color: A CSS color that
+   * specifies the color of the circle's fill.
+   */
+  --viewer-markup-circle-ellipse-fill-color: none;
+  /**
+   * @prop --viewer-markup-circle-ellipse-fill-opacity: A number between 
+   * 0 and 1 that specifies the opacity of the circle's fill.
+   */
+  --viewer-markup-circle-ellipse-fill-opacity: 0;
+  /**
+   * @prop --viewer-markup-circle-bounds-outline-border-color: A CSS color that
+   * specifies the color of the circle's selected bounding box border.
+   */
+  --viewer-markup-circle-bounds-outline-border-color: var(--blue-400);
+  /**
+   * @prop --viewer-markup-circle-bounds-outline-border-width: A CSS length that
+   * specifies the width of the circle's selected bounding box border.
+   */
+  --viewer-markup-circle-bounds-outline-border-width: 1px;
+  /**
+   * @prop --viewer-markup-circle-bounds-edge-anchor-border-color: A CSS color that
+   * specifies the color of the edge and corner resize anchors' borders.
+   */
+  --viewer-markup-circle-bounds-edge-anchor-border-color: var(--blue-400);
+  /**
+   * @prop --viewer-markup-circle-bounds-edge-anchor-border-width: A CSS length that
+   * specifies the width of the edge and corner resize anchors' borders.
+   */
+  --viewer-markup-circle-bounds-edge-anchor-border-width: 1px;
+  /**
+   * @prop --viewer-markup-circle-bounds-edge-anchor-background-color: A CSS color that
+   * specifies the background color of the edge and corner resize anchors.
+   */
+  --viewer-markup-circle-bounds-edge-anchor-background-color: white;
+  /**
+   * @prop --viewer-markup-circle-bounds-center-anchor-border-color: A CSS color that
+   * specifies the color of the center reposition anchor's border.
+   */
+  --viewer-markup-circle-bounds-center-anchor-border-color: white;
+  /**
+   * @prop --viewer-markup-circle-bounds-center-anchor-border-width: A CSS length that
+   * specifies the width of the center reposition anchor's border.
+   */
+  --viewer-markup-circle-bounds-center-anchor-border-width: 1px;
+  /**
+   * @prop --viewer-markup-circle-bounds-center-anchor-background-color: A CSS color that
+   * specifies the background color of the center reposition anchor.
+   */
+  --viewer-markup-circle-bounds-center-anchor-background-color: var(--blue-400);
+  /**
+   * @prop --viewer-markup-circle-bounds-anchor-width: A CSS length that
+   * specifies the width of the resize and reposition anchors.
+   */
+  --viewer-markup-circle-bounds-anchor-width: 9px;
+  /**
+   * @prop --viewer-markup-circle-bounds-anchor-height: A CSS length that
+   * specifies the height of the resize and reposition anchors.
+   */
+  --viewer-markup-circle-bounds-anchor-height: 9px;
+}
+
+.svg {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.create-overlay {
+  pointer-events: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.ellipse {
+  pointer-events: auto;
+  stroke: var(--viewer-markup-circle-ellipse-stroke-color);
+  stroke-width: var(--viewer-markup-circle-ellipse-stroke-width);
+  fill: var(--viewer-markup-circle-ellipse-fill-color);
+  fill-opacity: var(--viewer-markup-circle-ellipse-fill-opacity);
+  cursor: default;
+}
+
+.bounds-container {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.bounds-outline {
+  position: absolute;
+  border-width: var(--viewer-markup-circle-bounds-outline-border-width);
+  border-color: var(--viewer-markup-circle-bounds-outline-border-color);
+  border-style: solid;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.bounds-anchor-position {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.bounds-anchor {
+  pointer-events: auto;
+  cursor: default;
+  user-select: none;
+}
+
+.bounds-default-anchor {
+  width: var(--viewer-markup-circle-bounds-anchor-width);
+  height: var(--viewer-markup-circle-bounds-anchor-height);
+  box-sizing: border-box;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.bounds-center-anchor {
+  border-radius: 100%;
+  border-width: var(--viewer-markup-circle-bounds-center-anchor-border-width);
+  border-color: var(--viewer-markup-circle-bounds-center-anchor-border-color);
+  border-style: solid;
+  background-color: var(--viewer-markup-circle-bounds-center-anchor-background-color);
+}
+
+.bounds-edge-anchor {
+  border-width: var(--viewer-markup-circle-bounds-edge-anchor-border-width);
+  border-color: var(--viewer-markup-circle-bounds-edge-anchor-border-color);
+  border-style: solid;
+  background-color: var(--viewer-markup-circle-bounds-edge-anchor-background-color);
+}

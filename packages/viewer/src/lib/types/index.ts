@@ -15,6 +15,8 @@ export * from './depthBuffer';
 
 export * from './frame';
 
+export * from './markup';
+
 export * from './measurement';
 
 export * from './measurementUnits';

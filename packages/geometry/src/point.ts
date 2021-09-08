@@ -88,3 +88,20 @@ export function scale(pt: Point, scaleX: number, scaleY: number): Point {
     y: pt.y * scaleY,
   };
 }
+
+/**
+ * Parses a JSON string representation of a Point and returns an object.
+ *
+ * @param json A JSON string, either in the form `[x,y]` or `{"x": 0, "y": 0}`
+ * @returns A parsed Point.
+ */
+export function fromJson(json: string): Point {
+  const obj = JSON.parse(json);
+  if (Array.isArray(obj)) {
+    const [x, y] = obj;
+    return create(x, y);
+  } else {
+    const { x, y } = obj;
+    return create(x, y);
+  }
+}
