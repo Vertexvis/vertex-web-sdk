@@ -17,7 +17,6 @@ import {
   arrowheadPointsToPolygonPoints,
   parsePoint,
 } from './utils';
-import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { BoundingBox1d } from './viewer-markup-arrow-components';
 import {
   translatePointToRelative,
@@ -207,45 +206,44 @@ export class ViewerMarkupArrow {
 
       return (
         <Host>
-          <svg class="svg">
-            <defs>
-              <SvgShadow id="arrow-shadow" />
-            </defs>
-            <g filter="/_display/url(#arrow-shadow)">
-              <polygon
-                id="arrow-head"
-                class="head"
-                points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-              />
-              <line
-                id="arrow-line"
-                class="line"
-                x1={screenStart.x}
-                y1={screenStart.y}
-                x2={arrowheadPoints.base.x}
-                y2={arrowheadPoints.base.y}
-              />
-              {this.mode === 'edit' && (
+          <div class="root">
+            <svg class="svg">
+              <g>
+                <polygon
+                  id="arrow-head"
+                  class="head"
+                  points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+                />
                 <line
-                  id="bounding-box-1d-line"
-                  class="bounds-line"
+                  id="arrow-line"
+                  class="line"
                   x1={screenStart.x}
                   y1={screenStart.y}
-                  x2={screenEnd.x}
-                  y2={screenEnd.y}
+                  x2={arrowheadPoints.base.x}
+                  y2={arrowheadPoints.base.y}
                 />
-              )}
-            </g>
-          </svg>
-          {this.mode === 'edit' && (
-            <BoundingBox1d
-              start={screenStart}
-              end={screenEnd}
-              onStartAnchorPointerDown={this.editStartPoint}
-              onCenterAnchorPointerDown={this.editCenterPoint}
-              onEndAnchorPointerDown={this.editEndPoint}
-            />
-          )}
+                {this.mode === 'edit' && (
+                  <line
+                    id="bounding-box-1d-line"
+                    class="bounds-line"
+                    x1={screenStart.x}
+                    y1={screenStart.y}
+                    x2={screenEnd.x}
+                    y2={screenEnd.y}
+                  />
+                )}
+              </g>
+            </svg>
+            {this.mode === 'edit' && (
+              <BoundingBox1d
+                start={screenStart}
+                end={screenEnd}
+                onStartAnchorPointerDown={this.editStartPoint}
+                onCenterAnchorPointerDown={this.editCenterPoint}
+                onEndAnchorPointerDown={this.editEndPoint}
+              />
+            )}
+          </div>
         </Host>
       );
     } else {

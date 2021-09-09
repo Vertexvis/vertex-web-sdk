@@ -17,7 +17,6 @@ import {
   translateRectToScreen,
   translatePointToRelative,
 } from '../viewer-markup/utils';
-import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { BoundingBox2d } from './viewer-markup-circle-components';
 import { parseBounds, transformCircle } from './utils';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -181,51 +180,52 @@ export class ViewerMarkupCircle {
 
       return (
         <Host>
-          <svg class="svg">
-            <defs>
-              <SvgShadow id="circle-shadow" />
-            </defs>
-            <g filter="/_display/url(#circle-shadow)">
-              <ellipse
-                class="ellipse"
-                cx={center.x}
-                cy={center.y}
-                rx={relativeBounds.width / 2}
-                ry={relativeBounds.height / 2}
-                stroke={'#000ff0'}
-                stroke-width={4}
-                fill={'none'}
+          <div class="root">
+            <svg class="svg">
+              <g>
+                <ellipse
+                  class="ellipse"
+                  cx={center.x}
+                  cy={center.y}
+                  rx={relativeBounds.width / 2}
+                  ry={relativeBounds.height / 2}
+                  stroke={'#000ff0'}
+                  stroke-width={4}
+                  fill={'none'}
+                />
+              </g>
+            </svg>
+            {this.mode === 'edit' && (
+              <BoundingBox2d
+                bounds={relativeBounds}
+                onTopLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'top-left')
+                }
+                onTopRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'top-right')
+                }
+                onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+                onBottomLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom-left')
+                }
+                onBottomRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom-right')
+                }
+                onBottomAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'bottom')
+                }
+                onLeftAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'left')
+                }
+                onRightAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'right')
+                }
+                onCenterAnchorPointerDown={(e) =>
+                  this.updateEditAnchor(e, 'center')
+                }
               />
-            </g>
-          </svg>
-          {this.mode === 'edit' && (
-            <BoundingBox2d
-              bounds={relativeBounds}
-              onTopLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-left')
-              }
-              onTopRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-right')
-              }
-              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
-              onBottomLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-left')
-              }
-              onBottomRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-right')
-              }
-              onBottomAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom')
-              }
-              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
-              onRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'right')
-              }
-              onCenterAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'center')
-              }
-            />
-          )}
+            )}
+          </div>
         </Host>
       );
     } else {

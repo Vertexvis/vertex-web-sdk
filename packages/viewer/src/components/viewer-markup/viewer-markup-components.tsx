@@ -35,22 +35,3 @@ export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
     </div>
   );
 };
-
-export interface SvgShadowProps {
-  id: string;
-}
-
-export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id }) => {
-  return (
-    <filter id={id} filterUnits="userSpaceOnUse">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-      <feOffset dx="0" dy="1" result="offsetblur" />
-      <feFlood flood-color="#000000" flood-opacity="0.25" />
-      <feComposite in2="offsetblur" operator="in" />
-      <feMerge>
-        <feMergeNode />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-  );
-};
