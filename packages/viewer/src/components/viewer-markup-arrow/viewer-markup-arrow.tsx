@@ -211,7 +211,7 @@ export class ViewerMarkupArrow {
             <defs>
               <SvgShadow id="arrow-shadow" />
             </defs>
-            <g filter="url(#arrow-shadow)">
+            <g filter="/_display/url(#arrow-shadow)">
               <polygon
                 id="arrow-head"
                 class="head"

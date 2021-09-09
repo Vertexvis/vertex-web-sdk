@@ -185,7 +185,7 @@ export class ViewerMarkupCircle {
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
-            <g filter="url(#circle-shadow)">
+            <g filter="/_display/url(#circle-shadow)">
               <ellipse
                 class="ellipse"
                 cx={center.x}
