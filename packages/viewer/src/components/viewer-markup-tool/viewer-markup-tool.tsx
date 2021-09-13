@@ -321,7 +321,18 @@ export class ViewerMarkupTool {
 
   private handleMarkupEditEnd = (): void => {
     const { markupElement } = this.stateMap;
-    if (isVertexViewerCircleMarkup(markupElement)) {
+    if (isVertexViewerFreeformMarkup(markupElement)) {
+      const { points, bounds } = markupElement;
+
+      console.log(points, bounds);
+
+      markupElement.points = undefined;
+      markupElement.bounds = undefined;
+
+      if (points != null && points.length > 0 && bounds != null) {
+        this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
+      }
+    } else if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
 
       markupElement.bounds = undefined;
@@ -338,17 +349,6 @@ export class ViewerMarkupTool {
 
       if (start != null && end != null) {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
-      }
-    } else if (isVertexViewerFreeformMarkup(markupElement)) {
-      const { points, bounds } = markupElement;
-
-      console.log(points, bounds);
-
-      markupElement.points = undefined;
-      markupElement.bounds = undefined;
-
-      if (points != null && points.length > 0 && bounds != null) {
-        this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
       }
     }
   };

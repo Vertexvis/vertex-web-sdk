@@ -39,17 +39,51 @@ export type ViewerMarkupFreeformMode = 'edit' | 'create' | '';
   shadow: true,
 })
 export class ViewerMarkupFreeform {
+  /**
+   * The positions of the various points of this freeform markup. Can either be an array of
+   * `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or
+   * `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+   *
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+   */
   @Prop({ mutable: true, attribute: null })
   public points?: Point.Point[];
 
+  /**
+   * The positions of the various points of this freeform markup. Can either be an array of
+   * `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or
+   * `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+   *
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+   */
   @Prop({ attribute: 'points' })
   public pointsJson?: string;
 
-  @Prop({ mutable: true })
+  /**
+   * The bounds of the freeform. Can either be an instance of a `Rectangle` or
+   * a JSON string representation in the format of `[x, y, width, height]` or
+   * `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+   *
+   * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]`
+   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform
+   * with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+   */
+  @Prop({ mutable: true, attribute: null })
   public bounds?: Rectangle.Rectangle;
 
+  /**
+   * The bounds of the freeform. Can either be an instance of a `Rectangle` or
+   * a JSON string representation in the format of `[x, y, width, height]` or
+   * `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
+   *
+   * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]`
+   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform
+   * with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+   */
   @Prop({ attribute: 'bounds' })
-  public boundsJson?: Rectangle.Rectangle;
+  public boundsJson?: string;
 
   /**
    * A mode that specifies how the markup component should behave. When
