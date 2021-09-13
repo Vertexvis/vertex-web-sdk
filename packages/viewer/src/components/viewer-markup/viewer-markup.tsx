@@ -45,6 +45,14 @@ export class ViewerMarkup {
   public circleTemplateId?: string;
 
   /**
+   * An HTML template that describes the HTML to use for new freeform
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-freeform>`.
+   */
+  @Prop()
+  public freeformTemplateId?: string;
+
+  /**
    * The type of markup to perform.
    */
   @Prop()
@@ -388,6 +396,26 @@ export class ViewerMarkup {
   }
 
   private createFreeformMarkupElement(): HTMLVertexViewerMarkupFreeformElement {
+    if (this.freeformTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.freeformTemplateId,
+        isVertexViewerFreeformMarkup,
+        () =>
+          console.warn(
+            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`
+          ),
+        () =>
+          console.warn(
+            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`
+          )
+      );
+
+      if (element != null) {
+        return element;
+      }
+    }
+
     return document.createElement('vertex-viewer-markup-freeform');
   }
 
@@ -409,6 +437,7 @@ export class ViewerMarkup {
       tool.disabled = this.disabled;
       tool.arrowTemplateId = this.arrowTemplateId;
       tool.circleTemplateId = this.circleTemplateId;
+      tool.freeformTemplateId = this.freeformTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;
     }

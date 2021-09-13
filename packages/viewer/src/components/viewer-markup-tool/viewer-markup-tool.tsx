@@ -55,6 +55,14 @@ export class ViewerMarkupTool {
   public circleTemplateId?: string;
 
   /**
+   * An HTML template that describes the HTML to use for new freeform
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-freeform>`.
+   */
+  @Prop()
+  public freeformTemplateId?: string;
+
+  /**
    * The type of markup.
    *
    * This property will automatically be set when a child of a
@@ -137,6 +145,14 @@ export class ViewerMarkupTool {
    */
   @Watch('circleTemplateId')
   protected handleCircleTemplateIdChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('freeformTemplateId')
+  protected handleFreeformTemplateIdChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -227,25 +243,25 @@ export class ViewerMarkupTool {
   }
 
   private createFreeformMarkupElement(): HTMLVertexViewerMarkupFreeformElement {
-    // if (this.circleTemplateId != null) {
-    //   const element = stampTemplateWithId(
-    //     window.document.body,
-    //     this.circleTemplateId,
-    //     isVertexViewerCircleMarkup,
-    //     () =>
-    //       console.warn(
-    //         `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
-    //       ),
-    //     () =>
-    //       console.warn(
-    //         `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`
-    //       )
-    //   );
+    if (this.freeformTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.freeformTemplateId,
+        isVertexViewerFreeformMarkup,
+        () =>
+          console.warn(
+            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`
+          ),
+        () =>
+          console.warn(
+            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`
+          )
+      );
 
-    //   if (element != null) {
-    //     return element;
-    //   }
-    // }
+      if (element != null) {
+        return element;
+      }
+    }
 
     return document.createElement('vertex-viewer-markup-freeform');
   }

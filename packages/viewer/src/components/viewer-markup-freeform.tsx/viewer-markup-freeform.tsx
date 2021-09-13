@@ -24,6 +24,7 @@ import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import { parsePoints } from './utils';
 import { BoundingBox2d } from '../viewer-markup-circle/viewer-markup-circle-components';
+import { parseBounds } from '../viewer-markup-circle/utils';
 
 /**
  * The supported markup modes.
@@ -45,10 +46,10 @@ export class ViewerMarkupFreeform {
   public pointsJson?: string;
 
   @Prop({ mutable: true })
-  public path?: string;
-
-  @Prop({ mutable: true })
   public bounds?: Rectangle.Rectangle;
+
+  @Prop({ attribute: 'bounds' })
+  public boundsJson?: Rectangle.Rectangle;
 
   /**
    * A mode that specifies how the markup component should behave. When
@@ -162,6 +163,11 @@ export class ViewerMarkupFreeform {
     this.updatePointsFromProps();
   }
 
+  @Watch('bounds')
+  protected handleBoundsJsonChange(): void {
+    this.updatePointsFromProps();
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -171,6 +177,7 @@ export class ViewerMarkupFreeform {
   private updatePointsFromProps(): void {
     this.points = this.points ?? parsePoints(this.pointsJson);
     this.screenPoints = this.convertPointsToScreen() ?? [];
+    this.bounds = this.bounds ?? parseBounds(this.boundsJson);
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -188,9 +195,6 @@ export class ViewerMarkupFreeform {
                   (d, pt) => `${d}L${pt.x},${pt.y}`,
                   `M${this.screenPoints[0].x},${this.screenPoints[0].y}`
                 )}
-                stroke="#0000ff"
-                stroke-width={3}
-                stroke-linejoin="round"
                 fill="none"
               />
             </g>
@@ -356,7 +360,7 @@ export class ViewerMarkupFreeform {
     if (
       this.mode !== '' &&
       this.points != null &&
-      this.points.length > 0 &&
+      this.points.length > 1 &&
       this.elementBounds != null
     ) {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);

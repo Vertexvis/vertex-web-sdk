@@ -48,7 +48,7 @@ export class FreeformMarkup {
   public constructor(init: FreeformMarkupInit) {
     this.bounds = init.bounds ?? Rectangle.create(0, 0, 0, 0);
     this.points = init.points ?? [];
-    this.id = init.id ?? `circle-markup--${UUID.create()}`;
+    this.id = init.id ?? `freeform-markup--${UUID.create()}`;
   }
 }
 

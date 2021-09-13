@@ -4,7 +4,9 @@ export function parsePoints(
   value: string | Point.Point[] | undefined
 ): Point.Point[] | undefined {
   return typeof value === 'string'
-    ? value.split(' ').map(Point.fromJson)
+    ? JSON.parse(value).map((values: number[]) =>
+        Point.create(values[0], values[1])
+      )
     : value;
 }
 

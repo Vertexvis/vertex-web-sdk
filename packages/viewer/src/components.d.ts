@@ -509,6 +509,10 @@ export namespace Components {
          */
         "disabled": boolean;
         /**
+          * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+         */
+        "freeformTemplateId"?: string;
+        /**
           * Returns the markup element associated to the given ID.
           * @param id The ID of the markup element to return.
           * @returns A markup element, or `undefined`.
@@ -590,12 +594,12 @@ export namespace Components {
     }
     interface VertexViewerMarkupFreeform {
         "bounds"?: Rectangle.Rectangle;
+        "boundsJson"?: Rectangle.Rectangle;
         "dispose": () => Promise<void>;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode": ViewerMarkupFreeformMode;
-        "path"?: string;
         "points"?: Point.Point[];
         "pointsJson"?: string;
         /**
@@ -616,6 +620,10 @@ export namespace Components {
           * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "disabled": boolean;
+        /**
+          * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+         */
+        "freeformTemplateId"?: string;
         /**
           * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
@@ -1415,6 +1423,10 @@ declare namespace LocalJSX {
          */
         "disabled"?: boolean;
         /**
+          * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+         */
+        "freeformTemplateId"?: string;
+        /**
           * Dispatched when a new markup is added, either through user interaction or programmatically.
          */
         "onMarkupAdded"?: (event: CustomEvent<| HTMLVertexViewerMarkupArrowElement
@@ -1509,6 +1521,7 @@ declare namespace LocalJSX {
     }
     interface VertexViewerMarkupFreeform {
         "bounds"?: Rectangle.Rectangle;
+        "boundsJson"?: Rectangle.Rectangle;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
@@ -1525,7 +1538,6 @@ declare namespace LocalJSX {
           * An event that is dispatched when the user has finished editing the markup.
          */
         "onEditEnd"?: (event: CustomEvent<void>) => void;
-        "path"?: string;
         "points"?: Point.Point[];
         "pointsJson"?: string;
         /**
@@ -1546,6 +1558,10 @@ declare namespace LocalJSX {
           * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
          */
         "disabled"?: boolean;
+        /**
+          * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+         */
+        "freeformTemplateId"?: string;
         /**
           * An event that is dispatched when a user begins a new markup.
          */
