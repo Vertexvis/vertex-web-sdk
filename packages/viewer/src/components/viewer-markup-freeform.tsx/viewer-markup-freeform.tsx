@@ -16,23 +16,14 @@ import {
   translateRectToScreen,
   translatePointToRelative,
   translatePointToScreen,
-  toRelativeScaleFactor,
   BoundingBox2dAnchorPosition,
-  convertPointsToBounds,
+  translatePointsToBounds,
+  transformRectangle,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import {
-  isCurve,
-  parsePoints,
-  smoothPointsCurve,
-  smoothPointsRollingAvg,
-  smoothPointsSignificant,
-  toCurvePath,
-  toPath,
-} from './utils';
+import { parsePoints } from './utils';
 import { BoundingBox2d } from '../viewer-markup-circle/viewer-markup-circle-components';
-import { transformCircle } from '../viewer-markup-circle/utils';
 
 /**
  * The supported markup modes.
@@ -106,16 +97,7 @@ export class ViewerMarkupFreeform {
   private elementBounds?: DOMRect;
 
   @State()
-  private startPosition?: Point.Point;
-
-  @State()
-  private lastPosition?: Point.Point;
-
-  @State()
-  private lastClientPosition?: Point.Point;
-
-  @State()
-  private pendingPoints: Point.Point[] = [];
+  private resizeStartPosition?: Point.Point;
 
   @State()
   private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
@@ -125,6 +107,9 @@ export class ViewerMarkupFreeform {
 
   @State()
   private resizePoints?: Point.Point[];
+
+  @State()
+  private screenPoints: Point.Point[] = [];
 
   private min?: Point.Point;
   private max?: Point.Point;
@@ -180,72 +165,39 @@ export class ViewerMarkupFreeform {
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
+    this.screenPoints = this.convertPointsToScreen() ?? this.screenPoints;
   }
 
   private updatePointsFromProps(): void {
     this.points = this.points ?? parsePoints(this.pointsJson);
+    this.screenPoints = this.convertPointsToScreen() ?? [];
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (
-      this.points != null &&
-      this.points.length > 0 &&
-      this.bounds != null &&
-      this.elementBounds != null
-    ) {
-      const withStart =
-        this.startPosition != null
-          ? [this.startPosition, ...this.points]
-          : this.points;
-      const withLast =
-        this.lastPosition != null
-          ? [...withStart, this.lastPosition]
-          : this.points;
-      const relativePoints = smoothPointsSignificant(
-        withLast
-          .map((pt) => translatePointToScreen(pt, this.elementBounds!))
-          .map((pt) =>
-            Point.create(
-              parseFloat(pt.x.toFixed(1)),
-              parseFloat(pt.y.toFixed(1))
-            )
-          )
-      );
-      const relativeBounds = translateRectToScreen(
-        this.bounds,
-        this.elementBounds
-      );
-      const path = relativePoints.reduce(
-        (d, pt) => `${d}L${pt.x},${pt.y}`,
-        `M${relativePoints[0].x},${relativePoints[0].y}`
-      );
-
+    if (this.screenPoints.length > 0 && this.elementBounds != null) {
       return (
         <Host>
           <svg class="svg">
-            <path
-              class="path"
-              d={path}
-              stroke="#0000ff"
-              stroke-width={3}
-              fill="none"
-            />
-            {/* {relativePoints.map((pt) => (
-              <rect
-                x={pt.x}
-                y={pt.y}
-                width={4}
-                height={4}
-                stroke="#000000"
-                stroke-width="2"
-                stroke-opacity="0.25"
-                fill-opacity="0.2"
+            <defs>
+              <SvgShadow id="freeform-markup-shadow" />
+            </defs>
+            <g filter="url(#freeform-markup-shadow)">
+              <path
+                class="path"
+                d={this.screenPoints.reduce(
+                  (d, pt) => `${d}L${pt.x},${pt.y}`,
+                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`
+                )}
+                stroke="#0000ff"
+                stroke-width={3}
+                stroke-linejoin="round"
+                fill="none"
               />
-            ))} */}
+            </g>
           </svg>
-          {this.mode === 'edit' && (
+          {this.mode === 'edit' && this.bounds != null && (
             <BoundingBox2d
-              bounds={relativeBounds}
+              bounds={translateRectToScreen(this.bounds, this.elementBounds)}
               onTopLeftAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'top-left')
               }
@@ -335,19 +287,17 @@ export class ViewerMarkupFreeform {
       this.resizeBounds = this.bounds;
       this.resizePoints = this.points;
       this.editAnchor = anchor;
-      this.startPosition = translatePointToRelative(
+      this.resizeStartPosition = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
       );
       this.addEditingInteractionListeners();
     }
-    // this.startMarkup(event);
   };
 
   private updateBounds = (event: PointerEvent): void => {
-    // console.log(this.startPosition, this.elementBounds, this.resizeBounds);
     if (
-      this.startPosition != null &&
+      this.resizeStartPosition != null &&
       this.elementBounds != null &&
       this.resizeBounds != null &&
       this.resizePoints != null
@@ -357,96 +307,69 @@ export class ViewerMarkupFreeform {
         this.elementBounds
       );
 
-      const updatedBounds = transformCircle(
+      const updatedBounds = transformRectangle(
         this.resizeBounds,
-        this.startPosition,
+        this.resizeStartPosition,
         position,
         this.editAnchor,
         event.shiftKey
       );
-      this.points = convertPointsToBounds(
+      this.points = translatePointsToBounds(
         this.resizePoints,
         this.resizeBounds,
-        updatedBounds,
-        this.startPosition,
-        position,
-        this.elementBounds
+        updatedBounds
       );
+      this.screenPoints = this.convertPointsToScreen() ?? this.screenPoints;
       this.bounds = updatedBounds;
     }
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (
-      this.points != null &&
-      this.lastPosition != null &&
-      this.lastClientPosition != null &&
-      this.elementBounds != null
-    ) {
+    if (this.points != null && this.elementBounds != null) {
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
+        screenPosition,
         this.elementBounds
       );
-      const clientPosition = Point.create(event.clientX, event.clientY);
-
-      if (
-        Math.abs(clientPosition.x - this.lastClientPosition.x) > 1 &&
-        Math.abs(clientPosition.y - this.lastClientPosition.y) > 1
-      ) {
-        this.points = [...this.points, position];
-        this.lastClientPosition = clientPosition;
-
-        this.min =
-          this.min != null
-            ? Point.create(
-                Math.min(this.min.x, position.x),
-                Math.min(this.min.y, position.y)
-              )
-            : position;
-        this.max =
-          this.max != null
-            ? Point.create(
-                Math.max(this.max.x, position.x),
-                Math.max(this.max.y, position.y)
-              )
-            : position;
-        this.bounds = Rectangle.create(
-          this.min.x,
-          this.min.y,
-          this.max.x - this.min.x,
-          this.max.y - this.min.y
-        );
-      }
-
-      this.lastPosition = position;
+      this.updateMinAndMax(position);
+      this.points = [...this.points, position];
+      this.screenPoints = [...this.screenPoints, screenPosition];
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
     if (this.mode !== '' && this.elementBounds != null) {
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
+        screenPosition,
         this.elementBounds
       );
-      this.lastClientPosition = Point.create(event.clientX, event.clientY);
-      this.lastPosition = position;
-      this.startPosition = position;
-      this.min = position;
-      this.max = position;
+      this.updateMinAndMax(position);
       this.points = this.points ?? [position];
+      this.screenPoints = this.screenPoints ?? [screenPosition];
       this.editBegin.emit();
       this.addDrawingInteractionListeners();
     }
   };
 
   private endMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.points != null && this.points.length > 0) {
+    if (
+      this.mode !== '' &&
+      this.points != null &&
+      this.points.length > 0 &&
+      this.elementBounds != null
+    ) {
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds!
+        screenPosition,
+        this.elementBounds
       );
 
+      this.updateMinAndMax(position);
+
       this.points = [...this.points, position];
+      this.screenPoints = [...this.screenPoints, screenPosition];
+
       this.editEnd.emit();
     } else {
       this.points = undefined;
@@ -458,9 +381,41 @@ export class ViewerMarkupFreeform {
     this.removeDrawingInteractionListeners();
   };
 
-  private endEdit = (event: PointerEvent): void => {
+  private endEdit = (): void => {
     this.resizeBounds = undefined;
     this.removeEditingInteractionListeners();
     this.editEnd.emit();
   };
+
+  private updateMinAndMax(position: Point.Point): void {
+    this.min =
+      this.min != null
+        ? Point.create(
+            Math.min(this.min.x, position.x),
+            Math.min(this.min.y, position.y)
+          )
+        : position;
+    this.max =
+      this.max != null
+        ? Point.create(
+            Math.max(this.max.x, position.x),
+            Math.max(this.max.y, position.y)
+          )
+        : position;
+    this.bounds = Rectangle.create(
+      this.min.x,
+      this.min.y,
+      this.max.x - this.min.x,
+      this.max.y - this.min.y
+    );
+  }
+
+  private convertPointsToScreen(): Point.Point[] | undefined {
+    const elementBounds = this.elementBounds;
+    if (elementBounds != null) {
+      return this.points?.map((pt) =>
+        translatePointToScreen(pt, elementBounds)
+      );
+    }
+  }
 }

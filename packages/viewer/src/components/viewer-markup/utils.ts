@@ -123,80 +123,113 @@ export function translatePointToRelative(
   );
 }
 
-export function convertPointsToBounds(
+/**
+ * Translates a set of points in relative `original` units to
+ * points in relative `bounds` units.
+ */
+export function translatePointsToBounds(
   points: Point.Point[],
   original: Rectangle.Rectangle,
+  bounds: Rectangle.Rectangle
+): Point.Point[] {
+  return points.map((pt) =>
+    Point.add(
+      Point.scale(
+        Point.subtract(pt, original),
+        bounds.width / (original.width || 1),
+        bounds.height / (original.height || 1)
+      ),
+      bounds
+    )
+  );
+}
+
+export function createRectangle(
+  initialPoint: Point.Point,
+  currentPoint: Point.Point,
+  maintainAspectRatio: boolean
+): Rectangle.Rectangle {
+  const bounds = Rectangle.fromPoints(initialPoint, currentPoint);
+  if (maintainAspectRatio) {
+    const fitBoundsSize = Math.max(bounds.width, bounds.height);
+    const isPortrait = bounds.height > bounds.width;
+    const currentIsLeftOfInitial = currentPoint.x <= initialPoint.x;
+    const currentIsAboveInitial = currentPoint.y <= initialPoint.y;
+    const fitBoundsX = currentIsLeftOfInitial
+      ? isPortrait
+        ? initialPoint.x - fitBoundsSize
+        : currentPoint.x
+      : initialPoint.x;
+    const fitBoundsY = currentIsAboveInitial
+      ? isPortrait
+        ? currentPoint.y
+        : initialPoint.y - fitBoundsSize
+      : initialPoint.y;
+    return Rectangle.create(
+      fitBoundsX,
+      fitBoundsY,
+      fitBoundsSize,
+      fitBoundsSize
+    );
+  } else {
+    return bounds;
+  }
+}
+
+export function transformRectangle(
   bounds: Rectangle.Rectangle,
   start: Point.Point,
   current: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
-): Point.Point[] {
-  const originalScreen = translateRectToScreen(original, canvasDimensions);
-  const boundsScreen = translateRectToScreen(bounds, canvasDimensions);
-
-  return points
-    .map((pt) => translatePointToScreen(pt, canvasDimensions))
-    .map((pt) =>
-      Point.scale(
-        Point.subtract(pt, originalScreen),
-        1 / originalScreen.width,
-        1 / originalScreen.height
-      )
-    )
-    .map((pt) => Point.scale(pt, boundsScreen.width, boundsScreen.height))
-    .map((pt) => Point.add(pt, boundsScreen))
-    .map((pt) => translatePointToRelative(pt, canvasDimensions));
-}
-
-export function pointsToAlternateRelative(
-  points: Point.Point[],
-  original: Rectangle.Rectangle,
-  updated: Rectangle.Rectangle,
-  canvasDimensions: Dimensions.Dimensions
-): Point.Point[] {
-  // const originalScaleFactor = toRelativeScaleFactor(
-  //   translateDimensionsToScreen(original, canvasDimensions)
-  // );
-  // const originalScreen = translateDimensionsToScreen(
-  //   original,
-  //   canvasDimensions
-  // );
-  // const updatedScaleFactor = toRelativeScaleFactor(
-  //   translateDimensionsToScreen(updated, canvasDimensions)
-  // );
-  // const updatedScreen = translateDimensionsToScreen(updated, canvasDimensions);
-
-  // console.log(translatePointToScreen(points[0], originalScreen));
-  // console.log(
-  //   translatePointToRelative(
-  //     Point.scale(
-  //       translatePointToScreen(points[0], originalScreen),
-  //       originalScaleFactor / updatedScaleFactor,
-  //       originalScaleFactor / updatedScaleFactor
-  //     ),
-  //     updatedScreen
-  //   )
-  // );
-
-  // return points.map((pt) =>
-  //   translatePointToRelative(
-  //     Point.scale(
-  //       translatePointToScreen(pt, originalScreen),
-  //       originalScaleFactor / updatedScaleFactor,
-  //       originalScaleFactor / updatedScaleFactor
-  //     ),
-  //     updatedScreen
-  //   )
-  // );
-
-  const originalAreaX = original.width; //- (original.x + 0.5);
-  const updatedAreaX = updated.width; //- (updated.x + 0.5);
-
-  const widthScaleFactor = updatedAreaX / originalAreaX;
-
-  return points
-    .map((pt) => Point.add(pt, Point.create(0.5, 0.5)))
-    .map((pt) => Point.subtract(pt, Point.create(updated.x + 0.5, 0)))
-    .map((pt) => Point.scale(pt, 1 / widthScaleFactor, 1))
-    .map((pt) => Point.subtract(pt, Point.create(0.5, 0.5)));
+  anchor: BoundingBox2dAnchorPosition,
+  maintainAspectRatio?: boolean
+): Rectangle.Rectangle {
+  const delta = Point.subtract(current, start);
+  const { x: left, y: top, width: w, height: h } = bounds;
+  const right = left + w;
+  const bottom = top + h;
+  const topLeft = Point.create(left, top);
+  const bottomLeft = Point.create(left, bottom);
+  const topRight = Point.create(right, top);
+  const bottomRight = Point.create(right, bottom);
+  switch (anchor) {
+    case 'top-left':
+      return createRectangle(bottomRight, current, !!maintainAspectRatio);
+    case 'top':
+      return createRectangle(
+        bottomRight,
+        Point.create(left, current.y),
+        !!maintainAspectRatio
+      );
+    case 'top-right':
+      return createRectangle(bottomLeft, current, !!maintainAspectRatio);
+    case 'right':
+      return createRectangle(
+        bottomLeft,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
+    case 'bottom-right':
+      return createRectangle(topLeft, current, !!maintainAspectRatio);
+    case 'bottom':
+      return createRectangle(
+        topLeft,
+        Point.create(right, current.y),
+        !!maintainAspectRatio
+      );
+    case 'bottom-left':
+      return createRectangle(topRight, current, !!maintainAspectRatio);
+    case 'left':
+      return createRectangle(
+        bottomRight,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
+    case 'center':
+      return Rectangle.create(
+        bounds.x + delta.x,
+        bounds.y + delta.y,
+        bounds.width,
+        bounds.height
+      );
+  }
 }

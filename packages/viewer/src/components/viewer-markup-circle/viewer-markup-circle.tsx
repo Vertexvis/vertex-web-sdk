@@ -16,10 +16,11 @@ import {
   BoundingBox2dAnchorPosition,
   translateRectToScreen,
   translatePointToRelative,
+  transformRectangle,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { BoundingBox2d } from './viewer-markup-circle-components';
-import { parseBounds, transformCircle } from './utils';
+import { parseBounds } from './utils';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 /**
@@ -288,7 +289,7 @@ export class ViewerMarkupCircle {
         this.elementBounds
       );
 
-      this.bounds = transformCircle(
+      this.bounds = transformRectangle(
         this.resizeBounds ?? this.bounds,
         this.startPosition,
         position,
