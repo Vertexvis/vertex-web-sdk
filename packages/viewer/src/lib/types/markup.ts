@@ -34,4 +34,22 @@ export class CircleMarkup {
   }
 }
 
-export type Markup = ArrowMarkup | CircleMarkup;
+export interface FreeformMarkupInit {
+  bounds?: Rectangle.Rectangle;
+  points?: Point.Point[];
+  id?: string;
+}
+
+export class FreeformMarkup {
+  public readonly bounds: Rectangle.Rectangle;
+  public readonly points: Point.Point[];
+  public readonly id: string;
+
+  public constructor(init: FreeformMarkupInit) {
+    this.bounds = init.bounds ?? Rectangle.create(0, 0, 0, 0);
+    this.points = init.points ?? [];
+    this.id = init.id ?? `circle-markup--${UUID.create()}`;
+  }
+}
+
+export type Markup = ArrowMarkup | CircleMarkup | FreeformMarkup;

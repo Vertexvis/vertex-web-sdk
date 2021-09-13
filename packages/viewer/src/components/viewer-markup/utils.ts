@@ -76,6 +76,15 @@ export function translatePointToScreen(
   );
 }
 
+export function translatePointToBounds(
+  pt: Point.Point,
+  rect: Rectangle.Rectangle,
+  canvasDimensions: Dimensions.Dimensions
+): Point.Point {
+  const rectToScreen = translateRectToScreen(rect, canvasDimensions);
+  return Point.add(pt, rectToScreen);
+}
+
 export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
   canvasDimensions: Dimensions.Dimensions
@@ -112,4 +121,82 @@ export function translatePointToRelative(
     scaleFactor,
     scaleFactor
   );
+}
+
+export function convertPointsToBounds(
+  points: Point.Point[],
+  original: Rectangle.Rectangle,
+  bounds: Rectangle.Rectangle,
+  start: Point.Point,
+  current: Point.Point,
+  canvasDimensions: Dimensions.Dimensions
+): Point.Point[] {
+  const originalScreen = translateRectToScreen(original, canvasDimensions);
+  const boundsScreen = translateRectToScreen(bounds, canvasDimensions);
+
+  return points
+    .map((pt) => translatePointToScreen(pt, canvasDimensions))
+    .map((pt) =>
+      Point.scale(
+        Point.subtract(pt, originalScreen),
+        1 / originalScreen.width,
+        1 / originalScreen.height
+      )
+    )
+    .map((pt) => Point.scale(pt, boundsScreen.width, boundsScreen.height))
+    .map((pt) => Point.add(pt, boundsScreen))
+    .map((pt) => translatePointToRelative(pt, canvasDimensions));
+}
+
+export function pointsToAlternateRelative(
+  points: Point.Point[],
+  original: Rectangle.Rectangle,
+  updated: Rectangle.Rectangle,
+  canvasDimensions: Dimensions.Dimensions
+): Point.Point[] {
+  // const originalScaleFactor = toRelativeScaleFactor(
+  //   translateDimensionsToScreen(original, canvasDimensions)
+  // );
+  // const originalScreen = translateDimensionsToScreen(
+  //   original,
+  //   canvasDimensions
+  // );
+  // const updatedScaleFactor = toRelativeScaleFactor(
+  //   translateDimensionsToScreen(updated, canvasDimensions)
+  // );
+  // const updatedScreen = translateDimensionsToScreen(updated, canvasDimensions);
+
+  // console.log(translatePointToScreen(points[0], originalScreen));
+  // console.log(
+  //   translatePointToRelative(
+  //     Point.scale(
+  //       translatePointToScreen(points[0], originalScreen),
+  //       originalScaleFactor / updatedScaleFactor,
+  //       originalScaleFactor / updatedScaleFactor
+  //     ),
+  //     updatedScreen
+  //   )
+  // );
+
+  // return points.map((pt) =>
+  //   translatePointToRelative(
+  //     Point.scale(
+  //       translatePointToScreen(pt, originalScreen),
+  //       originalScaleFactor / updatedScaleFactor,
+  //       originalScaleFactor / updatedScaleFactor
+  //     ),
+  //     updatedScreen
+  //   )
+  // );
+
+  const originalAreaX = original.width; //- (original.x + 0.5);
+  const updatedAreaX = updated.width; //- (updated.x + 0.5);
+
+  const widthScaleFactor = updatedAreaX / originalAreaX;
+
+  return points
+    .map((pt) => Point.add(pt, Point.create(0.5, 0.5)))
+    .map((pt) => Point.subtract(pt, Point.create(updated.x + 0.5, 0)))
+    .map((pt) => Point.scale(pt, 1 / widthScaleFactor, 1))
+    .map((pt) => Point.subtract(pt, Point.create(0.5, 0.5)));
 }

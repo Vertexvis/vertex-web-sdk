@@ -11,9 +11,15 @@ import {
   Listen,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { Markup, ArrowMarkup, CircleMarkup } from '../../lib/types/markup';
+import {
+  Markup,
+  ArrowMarkup,
+  CircleMarkup,
+  FreeformMarkup,
+} from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 
 @Component({
@@ -70,7 +76,9 @@ export class ViewerMarkup {
    */
   @Event()
   public markupAdded!: EventEmitter<
-    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
   >;
 
   /**
@@ -79,7 +87,9 @@ export class ViewerMarkup {
    */
   @Event()
   public markupRemoved!: EventEmitter<
-    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
   >;
 
   @Element()
@@ -100,7 +110,9 @@ export class ViewerMarkup {
   public async addMarkup(
     markup: Markup
   ): Promise<
-    HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
   > {
     if (markup instanceof ArrowMarkup) {
       const { start, end, id } = markup;
@@ -116,6 +128,15 @@ export class ViewerMarkup {
 
       const el = this.createCircleMarkupElement();
       el.id = id;
+      el.bounds = bounds;
+
+      return this.appendMarkupElement(el);
+    } else if (markup instanceof FreeformMarkup) {
+      const { bounds, points, id } = markup;
+
+      const el = this.createFreeformMarkupElement();
+      el.id = id;
+      el.points = points;
       el.bounds = bounds;
 
       return this.appendMarkupElement(el);
@@ -138,6 +159,7 @@ export class ViewerMarkup {
   ): Promise<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
     | undefined
   > {
     const markup = await this.getMarkupElement(id);
@@ -159,13 +181,20 @@ export class ViewerMarkup {
   @Method()
   public async getMarkupElements(): Promise<
     Array<
-      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
     >
   > {
     return Array.from(this.hostEl.children).filter(
-      (e) => isVertexViewerArrowMarkup(e) || isVertexViewerCircleMarkup(e)
+      (e) =>
+        isVertexViewerArrowMarkup(e) ||
+        isVertexViewerCircleMarkup(e) ||
+        isVertexViewerFreeformMarkup(e)
     ) as Array<
-      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
     >;
   }
 
@@ -182,6 +211,7 @@ export class ViewerMarkup {
   ): Promise<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
     | undefined
   > {
     const markup = await this.getMarkupElements();
@@ -294,8 +324,14 @@ export class ViewerMarkup {
   }
 
   private appendMarkupElement(
-    el: HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupArrowElement
-  ): HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupArrowElement {
+    el:
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupFreeformElement
+  ):
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupFreeformElement {
     this.updatePropsOnMarkup(el);
     this.hostEl.appendChild(el);
     this.markupAdded.emit(el);
@@ -349,6 +385,10 @@ export class ViewerMarkup {
     }
 
     return document.createElement('vertex-viewer-markup-circle');
+  }
+
+  private createFreeformMarkupElement(): HTMLVertexViewerMarkupFreeformElement {
+    return document.createElement('vertex-viewer-markup-freeform');
   }
 
   private async updatePropsOnMarkups(): Promise<void> {
