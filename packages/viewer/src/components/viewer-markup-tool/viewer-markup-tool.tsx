@@ -324,8 +324,6 @@ export class ViewerMarkupTool {
     if (isVertexViewerFreeformMarkup(markupElement)) {
       const { points, bounds } = markupElement;
 
-      console.log(points, bounds);
-
       markupElement.points = undefined;
       markupElement.bounds = undefined;
 
