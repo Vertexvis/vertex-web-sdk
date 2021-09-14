@@ -11,18 +11,25 @@ import {
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
-import { ArrowMarkup, CircleMarkup, Markup } from '../../lib/types/markup';
+import {
+  ArrowMarkup,
+  CircleMarkup,
+  FreeformMarkup,
+  Markup,
+} from '../../lib/types/markup';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
 
 /**
  * The types of markup that can be performed by this tool.
  */
-export type ViewerMarkupToolType = 'arrow' | 'circle';
+export type ViewerMarkupToolType = 'arrow' | 'circle' | 'freeform';
 
 interface StateMap {
   markupElement?:
     | HTMLVertexViewerMarkupArrowElement
-    | HTMLVertexViewerMarkupCircleElement;
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement;
 }
 
 @Component({
@@ -46,6 +53,14 @@ export class ViewerMarkupTool {
    */
   @Prop()
   public circleTemplateId?: string;
+
+  /**
+   * An HTML template that describes the HTML to use for new freeform
+   * markup. It's expected that the template contains a
+   * `<vertex-viewer-markup-freeform>`.
+   */
+  @Prop()
+  public freeformTemplateId?: string;
 
   /**
    * The type of markup.
@@ -136,6 +151,14 @@ export class ViewerMarkupTool {
   /**
    * @ignore
    */
+  @Watch('freeformTemplateId')
+  protected handleFreeformTemplateIdChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
     this.updateMarkupElement();
@@ -153,7 +176,11 @@ export class ViewerMarkupTool {
    */
   protected render(): h.JSX.IntrinsicElements {
     if (!this.disabled) {
-      if (this.tool === 'arrow' || this.tool === 'circle') {
+      if (
+        this.tool === 'arrow' ||
+        this.tool === 'circle' ||
+        this.tool === 'freeform'
+      ) {
         return (
           <Host>
             <slot />
@@ -215,6 +242,44 @@ export class ViewerMarkupTool {
     return document.createElement('vertex-viewer-markup-circle');
   }
 
+  private createFreeformMarkupElement(): HTMLVertexViewerMarkupFreeformElement {
+    if (this.freeformTemplateId != null) {
+      const element = stampTemplateWithId(
+        window.document.body,
+        this.freeformTemplateId,
+        isVertexViewerFreeformMarkup,
+        () =>
+          console.warn(
+            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`
+          ),
+        () =>
+          console.warn(
+            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`
+          )
+      );
+
+      if (element != null) {
+        return element;
+      }
+    }
+
+    return document.createElement('vertex-viewer-markup-freeform');
+  }
+
+  private createNewMarkupElement():
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement {
+    switch (this.tool) {
+      case 'arrow':
+        return this.createArrowMarkupElement();
+      case 'circle':
+        return this.createCircleMarkupElement();
+      case 'freeform':
+        return this.createFreeformMarkupElement();
+    }
+  }
+
   private updateMarkupElement(): void {
     const { markupElement } = this.stateMap;
     if (markupElement != null) {
@@ -233,10 +298,7 @@ export class ViewerMarkupTool {
     }
 
     if (!this.disabled) {
-      const newMarkupElement =
-        this.tool === 'arrow'
-          ? this.createArrowMarkupElement()
-          : this.createCircleMarkupElement();
+      const newMarkupElement = this.createNewMarkupElement();
       newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(
@@ -259,7 +321,16 @@ export class ViewerMarkupTool {
 
   private handleMarkupEditEnd = (): void => {
     const { markupElement } = this.stateMap;
-    if (isVertexViewerCircleMarkup(markupElement)) {
+    if (isVertexViewerFreeformMarkup(markupElement)) {
+      const { points, bounds } = markupElement;
+
+      markupElement.points = undefined;
+      markupElement.bounds = undefined;
+
+      if (points != null && points.length > 0 && bounds != null) {
+        this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
+      }
+    } else if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
 
       markupElement.bounds = undefined;

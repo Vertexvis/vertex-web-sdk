@@ -66,6 +66,7 @@ import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-mar
 import { Markup } from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
+import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.tsx/viewer-markup-freeform';
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
 import {
   ViewerMeasurementDistanceElementMetrics,
@@ -583,7 +584,9 @@ export namespace Components {
     addMarkup: (
       markup: Markup
     ) => Promise<
-      HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
     >;
     /**
      * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
@@ -598,6 +601,10 @@ export namespace Components {
      */
     disabled: boolean;
     /**
+     * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+     */
+    freeformTemplateId?: string;
+    /**
      * Returns the markup element associated to the given ID.
      * @param id The ID of the markup element to return.
      * @returns A markup element, or `undefined`.
@@ -609,6 +616,7 @@ export namespace Components {
     ) => Promise<
       | HTMLVertexViewerMarkupArrowElement
       | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
       | undefined
     >;
     /**
@@ -619,7 +627,9 @@ export namespace Components {
      */
     getMarkupElements: () => Promise<
       Array<
-        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupArrowElement
+        | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupFreeformElement
       >
     >;
     /**
@@ -632,6 +642,7 @@ export namespace Components {
     ) => Promise<
       | HTMLVertexViewerMarkupArrowElement
       | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
       | undefined
     >;
     /**
@@ -693,6 +704,33 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerMarkupFreeform {
+    /**
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    bounds?: Rectangle.Rectangle;
+    /**
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    boundsJson?: string;
+    dispose: () => Promise<void>;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode: ViewerMarkupFreeformMode;
+    /**
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    points?: Point.Point[];
+    /**
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    pointsJson?: string;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMarkupTool {
     /**
      * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
@@ -706,6 +744,10 @@ export namespace Components {
      * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     disabled: boolean;
+    /**
+     * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+     */
+    freeformTemplateId?: string;
     /**
      * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
@@ -1082,6 +1124,13 @@ declare global {
     prototype: HTMLVertexViewerMarkupCircleElement;
     new (): HTMLVertexViewerMarkupCircleElement;
   };
+  interface HTMLVertexViewerMarkupFreeformElement
+    extends Components.VertexViewerMarkupFreeform,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMarkupFreeformElement: {
+    prototype: HTMLVertexViewerMarkupFreeformElement;
+    new (): HTMLVertexViewerMarkupFreeformElement;
+  };
   interface HTMLVertexViewerMarkupToolElement
     extends Components.VertexViewerMarkupTool,
       HTMLStencilElement {}
@@ -1155,6 +1204,7 @@ declare global {
     'vertex-viewer-markup': HTMLVertexViewerMarkupElement;
     'vertex-viewer-markup-arrow': HTMLVertexViewerMarkupArrowElement;
     'vertex-viewer-markup-circle': HTMLVertexViewerMarkupCircleElement;
+    'vertex-viewer-markup-freeform': HTMLVertexViewerMarkupFreeformElement;
     'vertex-viewer-markup-tool': HTMLVertexViewerMarkupToolElement;
     'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
@@ -1528,11 +1578,17 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
+     * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+     */
+    freeformTemplateId?: string;
+    /**
      * Dispatched when a new markup is added, either through user interaction or programmatically.
      */
     onMarkupAdded?: (
       event: CustomEvent<
-        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupArrowElement
+        | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupFreeformElement
       >
     ) => void;
     /**
@@ -1540,7 +1596,9 @@ declare namespace LocalJSX {
      */
     onMarkupRemoved?: (
       event: CustomEvent<
-        HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupArrowElement
+        | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupFreeformElement
       >
     ) => void;
     /**
@@ -1624,6 +1682,44 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerMarkupFreeform {
+    /**
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    bounds?: Rectangle.Rectangle;
+    /**
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     */
+    boundsJson?: string;
+    /**
+     * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
+     */
+    mode?: ViewerMarkupFreeformMode;
+    /**
+     * An event that is dispatched anytime the user begins editing the markup.
+     */
+    onEditBegin?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user cancels editing of the markup.
+     */
+    onEditCancel?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when the user has finished editing the markup.
+     */
+    onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    points?: Point.Point[];
+    /**
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     */
+    pointsJson?: string;
+    /**
+     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMarkupTool {
     /**
      * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
@@ -1637,6 +1733,10 @@ declare namespace LocalJSX {
      * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     disabled?: boolean;
+    /**
+     * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
+     */
+    freeformTemplateId?: string;
     /**
      * An event that is dispatched when a user begins a new markup.
      */
@@ -1913,6 +2013,7 @@ declare namespace LocalJSX {
     'vertex-viewer-markup': VertexViewerMarkup;
     'vertex-viewer-markup-arrow': VertexViewerMarkupArrow;
     'vertex-viewer-markup-circle': VertexViewerMarkupCircle;
+    'vertex-viewer-markup-freeform': VertexViewerMarkupFreeform;
     'vertex-viewer-markup-tool': VertexViewerMarkupTool;
     'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
@@ -1959,6 +2060,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupArrowElement>;
       'vertex-viewer-markup-circle': LocalJSX.VertexViewerMarkupCircle &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupCircleElement>;
+      'vertex-viewer-markup-freeform': LocalJSX.VertexViewerMarkupFreeform &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMarkupFreeformElement>;
       'vertex-viewer-markup-tool': LocalJSX.VertexViewerMarkupTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupToolElement>;
       'vertex-viewer-measurement-distance': LocalJSX.VertexViewerMeasurementDistance &

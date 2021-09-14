@@ -153,27 +153,28 @@ be cloned and added to the component.
 
 ## Properties
 
-| Property           | Attribute            | Description                                                                                                                                        | Type                                   | Default     |
-| ------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
-| `arrowTemplateId`  | `arrow-template-id`  | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.   | `string \| undefined`                  | `undefined` |
-| `circleTemplateId` | `circle-template-id` | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`. | `string \| undefined`                  | `undefined` |
-| `disabled`         | `disabled`           | If `true`, disables adding or editing of markup through user interaction.                                                                          | `boolean`                              | `false`     |
-| `selectedMarkupId` | `selected-markup-id` | The ID of the markup that is selected.                                                                                                             | `string \| undefined`                  | `undefined` |
-| `tool`             | `tool`               | The type of markup to perform.                                                                                                                     | `"arrow" \| "circle"`                  | `'arrow'`   |
-| `viewer`           | --                   | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property             | Attribute              | Description                                                                                                                                            | Type                                   | Default     |
+| -------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
+| `arrowTemplateId`    | `arrow-template-id`    | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.       | `string \| undefined`                  | `undefined` |
+| `circleTemplateId`   | `circle-template-id`   | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.     | `string \| undefined`                  | `undefined` |
+| `disabled`           | `disabled`             | If `true`, disables adding or editing of markup through user interaction.                                                                              | `boolean`                              | `false`     |
+| `freeformTemplateId` | `freeform-template-id` | An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`. | `string \| undefined`                  | `undefined` |
+| `selectedMarkupId`   | `selected-markup-id`   | The ID of the markup that is selected.                                                                                                                 | `string \| undefined`                  | `undefined` |
+| `tool`               | `tool`                 | The type of markup to perform.                                                                                                                         | `"arrow" \| "circle" \| "freeform"`    | `'arrow'`   |
+| `viewer`             | --                     | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                    | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ## Events
 
-| Event           | Description                                                                                 | Type                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `markupAdded`   | Dispatched when a new markup is added, either through user interaction or programmatically. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement>` |
-| `markupRemoved` | Dispatched when a markup is removed, either through user interaction or programmatically.   | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement>` |
+| Event           | Description                                                                                 | Type                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `markupAdded`   | Dispatched when a new markup is added, either through user interaction or programmatically. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>` |
+| `markupRemoved` | Dispatched when a markup is removed, either through user interaction or programmatically.   | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>` |
 
 
 ## Methods
 
-### `addMarkup(markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>`
+### `addMarkup(markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
 
 Adds a new markup as a child to this component. A new markup
 component will be created from the template specified by
@@ -182,31 +183,31 @@ a default element will be created.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
 
 
 
-### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
+### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 Returns the markup element associated to the given ID.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 
 
-### `getMarkupElements() => Promise<Array<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement>>`
+### `getMarkupElements() => Promise<Array<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>>`
 
 Returns a list of markup elements that are children of this component.
 
 #### Returns
 
-Type: `Promise<(HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement)[]>`
+Type: `Promise<(HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement)[]>`
 
 
 
-### `removeMarkup(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
+### `removeMarkup(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 Removes a markup with the given ID, and returns the HTML element
 associated to the markup. Returns `undefined` if no markup is
@@ -214,7 +215,7 @@ found.
 
 #### Returns
 
-Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | undefined>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 
 
@@ -225,12 +226,14 @@ Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircle
 
 - [vertex-viewer-markup-arrow](../viewer-markup-arrow)
 - [vertex-viewer-markup-circle](../viewer-markup-circle)
+- [vertex-viewer-markup-freeform](../viewer-markup-freeform.tsx)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-viewer-markup --> vertex-viewer-markup-arrow
   vertex-viewer-markup --> vertex-viewer-markup-circle
+  vertex-viewer-markup --> vertex-viewer-markup-freeform
   style vertex-viewer-markup fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

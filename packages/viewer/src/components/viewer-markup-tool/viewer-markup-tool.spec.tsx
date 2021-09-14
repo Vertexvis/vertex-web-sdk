@@ -7,6 +7,7 @@ import { Vector3 } from '@vertexvis/geometry';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupTool } from './viewer-markup-tool';
+import { ViewerMarkupFreeform } from '../viewer-markup-freeform.tsx/viewer-markup-freeform';
 
 describe('vertex-viewer-markup-tool', () => {
   const viewer = {
@@ -161,6 +162,91 @@ describe('vertex-viewer-markup-tool', () => {
     await page.waitForChanges();
 
     const markupEl = toolEl.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+
+    expect(markupEl.className).toBe('my-markup');
+  });
+
+  it('creates default freeform markup for editing', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMarkupTool, ViewerMarkupFreeform],
+      html: `<vertex-viewer-markup-tool tool="freeform"></vertex-viewer-markup-tool>`,
+    });
+
+    const markupEl = page.root
+      ?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+
+    expect(markupEl.mode).toBe('create');
+  });
+
+  it('creates markup from freeform template if specified', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMarkupTool, ViewerMarkupFreeform],
+      html: `
+        <template id="my-template">
+          <vertex-viewer-markup-freeform class="my-markup"></vertex-viewer-markup-freeform>
+        </template>
+        <vertex-viewer-markup-tool freeform-template-id="my-template" tool="freeform"></vertex-viewer-markup-tool>
+      `,
+    });
+
+    const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+
+    expect(markupEl).toHaveClass('my-markup');
+  });
+
+  it('creates default markup if freeform template not found', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMarkupTool, ViewerMarkupFreeform],
+      html: `
+        <template id="my-template">
+          <vertex-viewer-markup-freeform class="my-markup"></vertex-viewer-markup-freeform>
+        </template>
+        <vertex-viewer-markup-tool freeform-template-id="not-my-template" tool="freeform"></vertex-viewer-markup-tool>
+      `,
+    });
+
+    const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+
+    expect(markupEl).not.toHaveClass('my-markup');
+  });
+
+  it('creates default markup if freeform template does not contain a freeform', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMarkupTool, ViewerMarkupFreeform],
+      html: `
+        <template id="my-template">
+          <div></div>
+        </template>
+        <vertex-viewer-markup-tool freeform-template-id="my-template" tool="freeform"></vertex-viewer-markup-tool>
+      `,
+    });
+
+    const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+
+    expect(markupEl).not.toHaveClass('my-markup');
+  });
+
+  it('updates markup when freeform template id changes', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMarkupTool, ViewerMarkupFreeform],
+      html: `
+      <template id="my-template">
+        <vertex-viewer-markup-freeform class="my-markup"></vertex-viewer-markup-freeform>
+      </template>
+      <vertex-viewer-markup-tool tool="freeform"></vertex-viewer-markup-tool>
+      `,
+    });
+
+    const toolEl = page.body.querySelector(
+      'vertex-viewer-markup-tool'
+    ) as HTMLVertexViewerMarkupToolElement;
+    toolEl.freeformTemplateId = 'my-template';
+    await page.waitForChanges();
+
+    const markupEl = toolEl.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
 
     expect(markupEl.className).toBe('my-markup');
   });

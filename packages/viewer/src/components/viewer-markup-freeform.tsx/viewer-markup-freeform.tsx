@@ -13,48 +13,73 @@ import {
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
 import {
-  BoundingBox2dAnchorPosition,
   translateRectToScreen,
   translatePointToRelative,
+  translatePointToScreen,
+  BoundingBox2dAnchorPosition,
+  translatePointsToBounds,
   transformRectangle,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
-import { BoundingBox2d } from './viewer-markup-circle-components';
-import { parseBounds } from './utils';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { parsePoints } from './utils';
+import { BoundingBox2d } from '../viewer-markup-circle/viewer-markup-circle-components';
+import { parseBounds } from '../viewer-markup-circle/utils';
 
 /**
  * The supported markup modes.
  *
- * @see {@link ViewerMarkupCircleMode.mode} - For more details about modes.
+ * @see {@link ViewerMarkupFreeformMode.mode} - For more details about modes.
  */
-export type ViewerMarkupCircleMode = 'edit' | 'create' | '';
+export type ViewerMarkupFreeformMode = 'edit' | 'create' | '';
 
 @Component({
-  tag: 'vertex-viewer-markup-circle',
-  styleUrl: 'viewer-markup-circle.css',
+  tag: 'vertex-viewer-markup-freeform',
+  styleUrl: 'viewer-markup-freeform.css',
   shadow: true,
 })
-export class ViewerMarkupCircle {
+export class ViewerMarkupFreeform {
   /**
-   * The bounds of the circle. Can either be an instance of a `Rectangle` or
+   * The positions of the various points of this freeform markup. Can either be an array of
+   * `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or
+   * `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+   *
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public points?: Point.Point[];
+
+  /**
+   * The positions of the various points of this freeform markup. Can either be an array of
+   * `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or
+   * `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+   *
+   * Points are expected to be relative coordinates from `[-0.5, 0.5]`,
+   * e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+   */
+  @Prop({ attribute: 'points' })
+  public pointsJson?: string;
+
+  /**
+   * The bounds of the freeform. Can either be an instance of a `Rectangle` or
    * a JSON string representation in the format of `[x, y, width, height]` or
    * `{"x": 0, "y": 0, "width": 10, "height": 10}`.
    *
    * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]`
-   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle
+   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform
    * with a diameter of one fourth the viewport's smallest size in the center of the viewport.
    */
   @Prop({ mutable: true, attribute: null })
   public bounds?: Rectangle.Rectangle;
 
   /**
-   * The bounds of the circle. Can either be an instance of a `Rectangle` or
+   * The bounds of the freeform. Can either be an instance of a `Rectangle` or
    * a JSON string representation in the format of `[x, y, width, height]` or
    * `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
    *
    * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]`
-   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle
+   * and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform
    * with a diameter of one fourth the viewport's smallest size in the center of the viewport.
    */
   @Prop({ attribute: 'bounds' })
@@ -68,7 +93,7 @@ export class ViewerMarkupCircle {
    * a new markup will be performed.
    */
   @Prop({ reflect: true })
-  public mode: ViewerMarkupCircleMode = '';
+  public mode: ViewerMarkupFreeformMode = '';
 
   /**
    * The viewer to connect to markups.
@@ -107,13 +132,22 @@ export class ViewerMarkupCircle {
   private elementBounds?: DOMRect;
 
   @State()
-  private startPosition?: Point.Point;
+  private resizeStartPosition?: Point.Point;
 
   @State()
   private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
 
   @State()
   private resizeBounds?: Rectangle.Rectangle;
+
+  @State()
+  private resizePoints?: Point.Point[];
+
+  @State()
+  private screenPoints: Point.Point[] = [];
+
+  private min?: Point.Point;
+  private max?: Point.Point;
 
   /**
    * @ignore
@@ -123,11 +157,11 @@ export class ViewerMarkupCircle {
 
     this.handleViewerChanged(this.viewer);
 
-    this.updateBoundsFromProps();
+    this.updatePointsFromProps();
   }
 
   protected componentDidLoad(): void {
-    this.updateBoundsFromProps();
+    this.updatePointsFromProps();
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
@@ -158,50 +192,50 @@ export class ViewerMarkupCircle {
     }
   }
 
+  @Watch('points')
+  protected handlePointsJsonChange(): void {
+    this.updatePointsFromProps();
+  }
+
   @Watch('bounds')
   protected handleBoundsJsonChange(): void {
-    this.updateBoundsFromProps();
+    this.updatePointsFromProps();
   }
 
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
+    this.screenPoints = this.convertPointsToScreen() ?? this.screenPoints;
   }
 
-  private updateBoundsFromProps(): void {
+  private updatePointsFromProps(): void {
+    this.points = this.points ?? parsePoints(this.pointsJson);
+    this.screenPoints = this.convertPointsToScreen() ?? [];
     this.bounds = this.bounds ?? parseBounds(this.boundsJson);
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (this.bounds != null && this.elementBounds != null) {
-      const relativeBounds = translateRectToScreen(
-        this.bounds,
-        this.elementBounds
-      );
-      const center = Rectangle.center(relativeBounds);
-
+    if (this.screenPoints.length > 0 && this.elementBounds != null) {
       return (
         <Host>
           <svg class="svg">
             <defs>
-              <SvgShadow id="circle-shadow" />
+              <SvgShadow id="freeform-markup-shadow" />
             </defs>
-            <g filter="url(#circle-shadow)">
-              <ellipse
-                class="ellipse"
-                cx={center.x}
-                cy={center.y}
-                rx={relativeBounds.width / 2}
-                ry={relativeBounds.height / 2}
-                stroke={'#000ff0'}
-                stroke-width={4}
-                fill={'none'}
+            <g filter="url(#freeform-markup-shadow)">
+              <path
+                class="path"
+                d={this.screenPoints.reduce(
+                  (d, pt) => `${d}L${pt.x},${pt.y}`,
+                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`
+                )}
+                fill="none"
               />
             </g>
           </svg>
-          {this.mode === 'edit' && (
+          {this.mode === 'edit' && this.bounds != null && (
             <BoundingBox2d
-              bounds={relativeBounds}
+              bounds={translateRectToScreen(this.bounds, this.elementBounds)}
               onTopLeftAnchorPointerDown={(e) =>
                 this.updateEditAnchor(e, 'top-left')
               }
@@ -257,6 +291,13 @@ export class ViewerMarkupCircle {
     }
   }
 
+  private async addEditingInteractionListeners(): Promise<void> {
+    if (this.mode === 'edit') {
+      window.addEventListener('pointermove', this.updateBounds);
+      window.addEventListener('pointerup', this.endEdit);
+    }
+  }
+
   private async removeInteractionListeners(
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
@@ -269,64 +310,150 @@ export class ViewerMarkupCircle {
     window.removeEventListener('pointerup', this.endMarkup);
   }
 
+  private async removeEditingInteractionListeners(): Promise<void> {
+    if (this.mode === 'edit') {
+      window.removeEventListener('pointermove', this.updateBounds);
+      window.removeEventListener('pointerup', this.endEdit);
+    }
+  }
+
   private updateEditAnchor = (
     event: PointerEvent,
     anchor: BoundingBox2dAnchorPosition
   ): void => {
-    this.resizeBounds = this.bounds;
-    this.editAnchor = anchor;
-    this.startMarkup(event);
+    if (this.elementBounds != null) {
+      this.resizeBounds = this.bounds;
+      this.resizePoints = this.points;
+      this.editAnchor = anchor;
+      this.resizeStartPosition = translatePointToRelative(
+        getMouseClientPosition(event, this.elementBounds),
+        this.elementBounds
+      );
+      this.addEditingInteractionListeners();
+    }
   };
 
-  private updatePoints = (event: PointerEvent): void => {
+  private updateBounds = (event: PointerEvent): void => {
     if (
-      this.bounds != null &&
-      this.startPosition != null &&
-      this.elementBounds != null
+      this.resizeStartPosition != null &&
+      this.elementBounds != null &&
+      this.resizeBounds != null &&
+      this.resizePoints != null
     ) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
       );
 
-      this.bounds = transformRectangle(
-        this.resizeBounds ?? this.bounds,
-        this.startPosition,
+      const updatedBounds = transformRectangle(
+        this.resizeBounds,
+        this.resizeStartPosition,
         position,
         this.editAnchor,
         event.shiftKey
       );
+      this.points = translatePointsToBounds(
+        this.resizePoints,
+        this.resizeBounds,
+        updatedBounds
+      );
+      this.screenPoints = this.convertPointsToScreen() ?? this.screenPoints;
+      this.bounds = updatedBounds;
+    }
+  };
+
+  private updatePoints = (event: PointerEvent): void => {
+    if (this.points != null && this.elementBounds != null) {
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
+      const position = translatePointToRelative(
+        screenPosition,
+        this.elementBounds
+      );
+      this.updateMinAndMax(position);
+      this.points = [...this.points, position];
+      this.screenPoints = [...this.screenPoints, screenPosition];
     }
   };
 
   private startMarkup = (event: PointerEvent): void => {
     if (this.mode !== '' && this.elementBounds != null) {
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
+        screenPosition,
         this.elementBounds
       );
-      this.startPosition = position;
-      this.bounds =
-        this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
-      this.resizeBounds = this.bounds;
+      this.updateMinAndMax(position);
+      this.points = this.points ?? [position];
+      this.screenPoints = this.screenPoints ?? [screenPosition];
       this.editBegin.emit();
       this.addDrawingInteractionListeners();
     }
   };
 
-  private endMarkup = (): void => {
+  private endMarkup = (event: PointerEvent): void => {
     if (
       this.mode !== '' &&
-      this.bounds != null &&
-      this.bounds?.width > 0 &&
-      this.bounds?.height > 0
+      this.points != null &&
+      this.points.length > 1 &&
+      this.elementBounds != null
     ) {
-      this.editAnchor = 'bottom-right';
+      const screenPosition = getMouseClientPosition(event, this.elementBounds);
+      const position = translatePointToRelative(
+        screenPosition,
+        this.elementBounds
+      );
+
+      this.updateMinAndMax(position);
+
+      this.points = [...this.points, position];
+      this.screenPoints = [...this.screenPoints, screenPosition];
+
       this.editEnd.emit();
     } else {
-      this.bounds = undefined;
+      this.points = undefined;
       this.editCancel.emit();
     }
+
+    this.min = undefined;
+    this.max = undefined;
     this.removeDrawingInteractionListeners();
   };
+
+  private endEdit = (): void => {
+    this.resizeBounds = undefined;
+    this.removeEditingInteractionListeners();
+    this.editEnd.emit();
+  };
+
+  private updateMinAndMax(position: Point.Point): void {
+    this.min =
+      this.min != null
+        ? Point.create(
+            Math.min(this.min.x, position.x),
+            Math.min(this.min.y, position.y)
+          )
+        : position;
+    this.max =
+      this.max != null
+        ? Point.create(
+            Math.max(this.max.x, position.x),
+            Math.max(this.max.y, position.y)
+          )
+        : position;
+    this.bounds = Rectangle.create(
+      this.min.x,
+      this.min.y,
+      this.max.x - this.min.x,
+      this.max.y - this.min.y
+    );
+  }
+
+  private convertPointsToScreen(): Point.Point[] | undefined {
+    const elementBounds = this.elementBounds;
+    if (elementBounds != null) {
+      return this.points?.map((pt) =>
+        translatePointToScreen(pt, elementBounds)
+      );
+    }
+  }
 }

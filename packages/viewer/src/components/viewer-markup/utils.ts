@@ -76,6 +76,15 @@ export function translatePointToScreen(
   );
 }
 
+export function translatePointToBounds(
+  pt: Point.Point,
+  rect: Rectangle.Rectangle,
+  canvasDimensions: Dimensions.Dimensions
+): Point.Point {
+  const rectToScreen = translateRectToScreen(rect, canvasDimensions);
+  return Point.add(pt, rectToScreen);
+}
+
 export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
   canvasDimensions: Dimensions.Dimensions
@@ -112,4 +121,115 @@ export function translatePointToRelative(
     scaleFactor,
     scaleFactor
   );
+}
+
+/**
+ * Translates a set of points in relative `original` units to
+ * points in relative `bounds` units.
+ */
+export function translatePointsToBounds(
+  points: Point.Point[],
+  original: Rectangle.Rectangle,
+  bounds: Rectangle.Rectangle
+): Point.Point[] {
+  return points.map((pt) =>
+    Point.add(
+      Point.scale(
+        Point.subtract(pt, original),
+        bounds.width / (original.width || 1),
+        bounds.height / (original.height || 1)
+      ),
+      bounds
+    )
+  );
+}
+
+export function createRectangle(
+  initialPoint: Point.Point,
+  currentPoint: Point.Point,
+  maintainAspectRatio: boolean
+): Rectangle.Rectangle {
+  const bounds = Rectangle.fromPoints(initialPoint, currentPoint);
+  if (maintainAspectRatio) {
+    const fitBoundsSize = Math.max(bounds.width, bounds.height);
+    const isPortrait = bounds.height > bounds.width;
+    const currentIsLeftOfInitial = currentPoint.x <= initialPoint.x;
+    const currentIsAboveInitial = currentPoint.y <= initialPoint.y;
+    const fitBoundsX = currentIsLeftOfInitial
+      ? isPortrait
+        ? initialPoint.x - fitBoundsSize
+        : currentPoint.x
+      : initialPoint.x;
+    const fitBoundsY = currentIsAboveInitial
+      ? isPortrait
+        ? currentPoint.y
+        : initialPoint.y - fitBoundsSize
+      : initialPoint.y;
+    return Rectangle.create(
+      fitBoundsX,
+      fitBoundsY,
+      fitBoundsSize,
+      fitBoundsSize
+    );
+  } else {
+    return bounds;
+  }
+}
+
+export function transformRectangle(
+  bounds: Rectangle.Rectangle,
+  start: Point.Point,
+  current: Point.Point,
+  anchor: BoundingBox2dAnchorPosition,
+  maintainAspectRatio?: boolean
+): Rectangle.Rectangle {
+  const delta = Point.subtract(current, start);
+  const { x: left, y: top, width: w, height: h } = bounds;
+  const right = left + w;
+  const bottom = top + h;
+  const topLeft = Point.create(left, top);
+  const bottomLeft = Point.create(left, bottom);
+  const topRight = Point.create(right, top);
+  const bottomRight = Point.create(right, bottom);
+  switch (anchor) {
+    case 'top-left':
+      return createRectangle(bottomRight, current, !!maintainAspectRatio);
+    case 'top':
+      return createRectangle(
+        bottomRight,
+        Point.create(left, current.y),
+        !!maintainAspectRatio
+      );
+    case 'top-right':
+      return createRectangle(bottomLeft, current, !!maintainAspectRatio);
+    case 'right':
+      return createRectangle(
+        bottomLeft,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
+    case 'bottom-right':
+      return createRectangle(topLeft, current, !!maintainAspectRatio);
+    case 'bottom':
+      return createRectangle(
+        topLeft,
+        Point.create(right, current.y),
+        !!maintainAspectRatio
+      );
+    case 'bottom-left':
+      return createRectangle(topRight, current, !!maintainAspectRatio);
+    case 'left':
+      return createRectangle(
+        bottomRight,
+        Point.create(current.x, top),
+        !!maintainAspectRatio
+      );
+    case 'center':
+      return Rectangle.create(
+        bounds.x + delta.x,
+        bounds.y + delta.y,
+        bounds.width,
+        bounds.height
+      );
+  }
 }

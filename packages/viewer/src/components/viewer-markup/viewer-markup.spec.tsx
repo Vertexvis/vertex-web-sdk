@@ -5,10 +5,15 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { ViewerMarkup } from './viewer-markup';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
-import { ArrowMarkup, CircleMarkup } from '../../lib/types/markup';
+import {
+  ArrowMarkup,
+  CircleMarkup,
+  FreeformMarkup,
+} from '../../lib/types/markup';
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
+import { ViewerMarkupFreeform } from '../viewer-markup-freeform.tsx/viewer-markup-freeform';
 
 describe('vertex-viewer-markup', () => {
   const viewer = {
@@ -20,6 +25,17 @@ describe('vertex-viewer-markup', () => {
     end: Point.create(0.5, 0.5),
   });
   const circleMarkup = new CircleMarkup({
+    bounds: Rectangle.create(0, 0, 0.5, 0.5),
+  });
+  const freeformMarkup = new FreeformMarkup({
+    points: [
+      Point.create(0, 0),
+      Point.create(0, -0.5),
+      Point.create(0, 0),
+      Point.create(0, 0),
+      Point.create(-0.5, 0),
+      Point.create(0, 0),
+    ],
     bounds: Rectangle.create(0, 0, 0.5, 0.5),
   });
 
@@ -139,6 +155,57 @@ describe('vertex-viewer-markup', () => {
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(circleMarkup);
+
+      expect(markupEl).not.toHaveClass('my-class');
+    });
+
+    it('adds a freeform markup element with freeform template', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMarkup, ViewerMarkupFreeform],
+        html: `
+          <template id="my-template">
+            <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
+          </template>
+          <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
+        `,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const markupEl = await el.addMarkup(freeformMarkup);
+
+      expect(markupEl).toHaveClass('my-class');
+    });
+
+    it('adds a default freeform markup element if freeform template not found', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMarkup, ViewerMarkupFreeform],
+        html: `
+          <template id="my-template">
+            <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
+          </template>
+          <vertex-viewer-markup freeform-template-id="not-my-template"></vertex-viewer-markup>
+        `,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const markupEl = await el.addMarkup(freeformMarkup);
+
+      expect(markupEl).not.toHaveClass('my-class');
+    });
+
+    it('adds a default freeform markup element if freeform template does not contain a freeform markup', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMarkup, ViewerMarkupFreeform],
+        html: `
+          <template id="my-template">
+            <div></div>
+          </template>
+          <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
+        `,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const markupEl = await el.addMarkup(freeformMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
@@ -401,35 +468,6 @@ describe('vertex-viewer-markup', () => {
       el.viewer = viewer as any;
       await page.waitForChanges();
       expect(markupEl.viewer).toBe(viewer);
-    });
-
-    it('updates viewer interactions when props change', async () => {
-      const page = await newSpecPage({
-        components: [
-          ViewerMarkup,
-          ViewerMarkupTool,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-        ],
-        template: () => (
-          <vertex-viewer-markup
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            viewer={viewer as any}
-          >
-            <vertex-viewer-markup-tool camera-controls="false" />
-          </vertex-viewer-markup>
-        ),
-      });
-
-      const el = page.root as HTMLVertexViewerMarkupElement;
-      const toolEl = el.querySelector(
-        'vertex-viewer-markup-tool'
-      ) as HTMLVertexViewerMarkupToolElement;
-
-      el.disabled = true;
-
-      await page.waitForChanges();
-      expect(el.viewer?.cameraControls).toBe(toolEl.cameraControls);
     });
   });
 });
