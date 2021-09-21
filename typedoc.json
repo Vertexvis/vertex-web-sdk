@@ -6,7 +6,6 @@
     "./packages/utils/src/index.ts",
     "./packages/viewer/src/index.ts"
   ],
-  "theme": "minimal",
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,

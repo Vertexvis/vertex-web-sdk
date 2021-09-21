@@ -35,7 +35,7 @@
     "@vertexvis/viewer": "0.10.1"
   },
   "devDependencies": {
-    "@types/react": "^17.0.3",
+    "@types/react": "^17.0.22",
     "@types/react-dom": "^17.0.2",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.0",
     "@vertexwebsdk/build": "0.10.1",
