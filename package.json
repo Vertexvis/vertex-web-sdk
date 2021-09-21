@@ -4,12 +4,12 @@
   "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^7.20.0",
-    "http-server": "^0.12.1",
+    "http-server": "^13.0.2",
     "lerna": "^4.0.0",
     "livereload": "^0.9.1",
     "semver": "^7.3.4",
-    "typedoc": "^0.21.0",
-    "typescript": "^4.2.2"
+    "typedoc": "^0.22.4",
+    "typescript": "^4.4.3"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc && yarn bootstrap",
