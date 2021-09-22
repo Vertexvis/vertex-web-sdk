@@ -827,6 +827,17 @@ export class Viewer {
       this.urn = undefined;
       this.stateMap.streamWorldOrientation = undefined;
     }
+    if (this.canvasElement != null) {
+      const context = this.canvasElement.getContext('2d');
+      if (context != null) {
+        context.clearRect(
+          0,
+          0,
+          this.canvasElement.width,
+          this.canvasElement.height
+        );
+      }
+    }
   }
 
   /**
