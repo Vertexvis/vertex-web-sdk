@@ -35,13 +35,11 @@ export type DeepRequired<T, P extends string[]> = T extends unknown[]
   ? T
   : T extends Record<string, unknown>
   ? Pick<T, Extract<keyof T, P[0]>> &
-      Required<
-        {
-          [K in Exclude<keyof T, P[0]>]: NonNullable<
-            DeepRequired<T[K], ShiftUnion<K, P>>
-          >;
-        }
-      >
+      Required<{
+        [K in Exclude<keyof T, P[0]>]: NonNullable<
+          DeepRequired<T[K], ShiftUnion<K, P>>
+        >;
+      }>
   : T;
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -68,8 +66,6 @@ type ShiftUnion<
  * type Bar = RequiredAndNonNullable<Bar>; // { a: number }
  * ```
  */
-export type RequiredAndNonNullable<T> = Required<
-  {
-    [P in keyof T]: NonNullable<T[P]>;
-  }
->;
+export type RequiredAndNonNullable<T> = Required<{
+  [P in keyof T]: NonNullable<T[P]>;
+}>;

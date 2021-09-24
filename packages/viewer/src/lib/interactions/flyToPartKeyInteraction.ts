@@ -6,7 +6,8 @@ import { ImageScaleProvider } from '../scenes';
 import { Point } from '@vertexvis/geometry';
 
 export class FlyToPartKeyInteraction
-  implements KeyInteraction<TapEventDetails> {
+  implements KeyInteraction<TapEventDetails>
+{
   public constructor(
     private stream: StreamApi,
     private configProvider: ConfigProvider,

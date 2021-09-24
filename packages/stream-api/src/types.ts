@@ -25,7 +25,8 @@ export type ReconnectPayload = DeepRequired<
   ['frameCorrelationId'] | ['frameBackgroundColor']
 >;
 
-export type UpdateStreamPayload = vertexvis.protobuf.stream.IUpdateStreamPayload;
+export type UpdateStreamPayload =
+  vertexvis.protobuf.stream.IUpdateStreamPayload;
 
 export type ReplaceCameraPayload = DeepRequired<
   vertexvis.protobuf.stream.IUpdateCameraPayload,

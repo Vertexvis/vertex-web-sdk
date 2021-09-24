@@ -63,9 +63,7 @@ function signJwt(viewId: string): string {
   );
 }
 
-function createController(
-  rowLimit: number
-): {
+function createController(rowLimit: number): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
   stream: ResponseStreamMock<unknown>;

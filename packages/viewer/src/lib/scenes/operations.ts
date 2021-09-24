@@ -54,7 +54,8 @@ export interface SceneItemOperations<T> {
  * A class to handle the building of operations for a scene.
  */
 export class SceneOperationBuilder
-  implements SceneItemOperations<SceneOperationBuilder> {
+  implements SceneItemOperations<SceneOperationBuilder>
+{
   public constructor(private operations: ItemOperation[] = []) {}
 
   /**

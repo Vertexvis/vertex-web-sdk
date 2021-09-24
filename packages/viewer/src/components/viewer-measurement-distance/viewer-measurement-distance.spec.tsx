@@ -373,7 +373,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
 
       expect(metrics).toMatchObject({
@@ -389,7 +390,8 @@ describe('vertex-viewer-measurement-distance', () => {
         template: () => <vertex-viewer-measurement-distance />,
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
       expect(metrics).toBeUndefined();
     });
@@ -416,7 +418,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown'));
       window.dispatchEvent(
@@ -440,7 +443,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown', { button: 1 }));
       window.dispatchEvent(
@@ -467,7 +471,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
 
@@ -536,7 +541,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('end-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
@@ -566,7 +572,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })

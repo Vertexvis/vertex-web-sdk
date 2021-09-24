@@ -149,8 +149,7 @@ export class CursorManager {
 }
 
 export const measurementCursor = {
-  url:
-    "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' stroke='%23fff' stroke-width='1.25' stroke-opacity='0.5' stroke-miterlimit='10' shape-rendering='crispEdges'/%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' shape-rendering='crispEdges'/%3E%3C/svg%3E",
+  url: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' stroke='%23fff' stroke-width='1.25' stroke-opacity='0.5' stroke-miterlimit='10' shape-rendering='crispEdges'/%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' shape-rendering='crispEdges'/%3E%3C/svg%3E",
   offsetX: -24,
   offsetY: -24,
 };
