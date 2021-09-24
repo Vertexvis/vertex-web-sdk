@@ -25,7 +25,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js --silent",
+    "build": "rollup --config ./rollup.config.js",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
@@ -43,9 +43,10 @@
     "@vertexvis/jest-config-vertexvis": "^0.5.3",
     "eslint": "^7.20.0",
     "jest": "^26.6.3",
+    "rollup": "^2.57.0",
     "ts-jest": "^26.5.2"
   },
   "peerDependencies": {
-    "rollup": "^1.19.4"
+    "rollup": "^2"
   }
 }

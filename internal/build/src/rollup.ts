@@ -23,7 +23,8 @@ export function rollupConfig({ isMultiPlatform = false }: Config = {}):
   if (!isMultiPlatform) {
     return config(
       input('src/index.ts'),
-      external({ modules: ['tslib'] }),
+      resolve(),
+      external({ peerDependencies: true }),
       typescript(),
       output()
     );
@@ -31,17 +32,15 @@ export function rollupConfig({ isMultiPlatform = false }: Config = {}):
     return [
       config(
         input('src/index.ts'),
-        resolve(),
-        external({ modules: ['tslib'] }),
+        resolve({ resolve: { exportConditions: ['node'] } }),
+        external({ peerDependencies: true }),
         typescript(),
         output()
       ),
       config(
         input('src/index.ts'),
-        resolve({
-          resolve: { browser: true },
-        }),
-        external({ modules: ['tslib'] }),
+        resolve({ resolve: { browser: true } }),
+        external({ peerDependencies: true }),
         typescript(),
         output({ bundleName: 'browser' })
       ),
@@ -67,7 +66,7 @@ interface CdnConfig {
 export function rollupCdnConfig({ entrypoint }: CdnConfig = {}): RollupConfig {
   return config(
     input(entrypoint || 'src/index.ts'),
-    external({ peerDependencies: false }),
+    external({ peerDependencies: false, dependencies: false }),
     typescript(),
     resolve({ resolve: { browser: true } }),
     output({

@@ -28,7 +28,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js --silent",
+    "build": "rollup --config ./rollup.config.js",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
