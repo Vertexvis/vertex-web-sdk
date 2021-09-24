@@ -1,13 +1,11 @@
 import {
   config,
-  commonJs,
   typescript,
-  minify,
   output,
   input,
   external,
   RollupConfig,
-  autoExternal,
+  resolve,
 } from '@vertexvis/build-tools';
 
 interface Config {
@@ -25,31 +23,27 @@ export function rollupConfig({ isMultiPlatform = false }: Config = {}):
   if (!isMultiPlatform) {
     return config(
       input('src/index.ts'),
-      external('tslib'),
+      external({ modules: ['tslib'] }),
       typescript(),
-      output(),
-      minify()
+      output()
     );
   } else {
     return [
       config(
         input('src/index.ts'),
-        commonJs({ commonjs: { namedExports: { uuid: ['v1'] } } }),
-        external('tslib'),
+        resolve(),
+        external({ modules: ['tslib'] }),
         typescript(),
-        output(),
-        minify()
+        output()
       ),
       config(
         input('src/index.ts'),
-        commonJs({
-          commonjs: { namedExports: { uuid: ['v1'] } },
-          nodeResolve: { browser: true },
+        resolve({
+          resolve: { browser: true },
         }),
-        external('tslib'),
+        external({ modules: ['tslib'] }),
         typescript(),
-        output({ bundleName: 'browser' }),
-        minify()
+        output({ bundleName: 'browser' })
       ),
     ];
   }
@@ -73,15 +67,13 @@ interface CdnConfig {
 export function rollupCdnConfig({ entrypoint }: CdnConfig = {}): RollupConfig {
   return config(
     input(entrypoint || 'src/index.ts'),
-    autoExternal({
-      peerDependencies: false,
-    }),
+    external({ peerDependencies: false }),
     typescript(),
-    commonJs({ nodeResolve: { browser: true } }),
+    resolve({ resolve: { browser: true } }),
     output({
       formats: ['esm'],
       bundleName: 'cdn/bundle',
-    }),
-    minify()
+      minify: true,
+    })
   );
 }
