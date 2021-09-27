@@ -35,14 +35,14 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.6.0"
+    "@vertexvis/frame-streaming-protos": "^0.6.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.1",
     "@vertexvis/jest-config-vertexvis": "^0.5.3",
-    "@vertexwebsdk/build": "0.10.1",
     "@vertexvis/utils": "0.10.1",
+    "@vertexwebsdk/build": "0.10.1",
     "eslint": "^7.20.0",
     "jest": "^26.6.3",
     "protobufjs": "^6.9.0",
