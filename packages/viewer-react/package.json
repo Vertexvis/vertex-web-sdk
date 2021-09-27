@@ -25,7 +25,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js",
+    "build": "rollup --config rollup.config.js",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "test": "echo 'No unit tests defined'",
@@ -38,14 +38,14 @@
     "@types/react": "^17.0.22",
     "@types/react-dom": "^17.0.2",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.1",
-    "@vertexwebsdk/build": "0.10.1",
     "eslint": "^7.20.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "rollup": "^2.57.0"
+    "tslib": "^2.1.0"
   },
   "peerDependencies": {
     "react": ">=16.0.0 <18.0.0",
-    "react-dom": ">=16.0.0 <18.0.0"
+    "react-dom": ">=16.0.0 <18.0.0",
+    "tslib": ">=2.1.0"
   }
 }

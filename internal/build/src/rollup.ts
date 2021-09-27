@@ -15,16 +15,22 @@ interface Config {
    * environments.
    */
   isMultiPlatform?: boolean;
+
+  /**
+   * Any modules that you want to keep external.
+   */
+  external?: RollupConfig['external'];
 }
 
-export function rollupConfig({ isMultiPlatform = false }: Config = {}):
-  | RollupConfig
-  | RollupConfig[] {
+export function rollupConfig({
+  isMultiPlatform = false,
+  external: externalModules,
+}: Config = {}): RollupConfig | RollupConfig[] {
   if (!isMultiPlatform) {
     return config(
       input('src/index.ts'),
       resolve(),
-      external({ peerDependencies: true }),
+      external({ peerDependencies: true, modules: externalModules }),
       typescript(),
       output()
     );
@@ -33,7 +39,7 @@ export function rollupConfig({ isMultiPlatform = false }: Config = {}):
       config(
         input('src/index.ts'),
         resolve({ resolve: { exportConditions: ['node'] } }),
-        external({ peerDependencies: true }),
+        external({ peerDependencies: true, modules: externalModules }),
         typescript(),
         output()
       ),
