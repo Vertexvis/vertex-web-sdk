@@ -100,9 +100,11 @@ describe(DepthBuffer, () => {
       1
     );
 
-    function createDepthBufferWithDepth(
-      depthValue: number
-    ): { ray: Ray.Ray; depthBuffer: DepthBuffer; pt: Point.Point } {
+    function createDepthBufferWithDepth(depthValue: number): {
+      ray: Ray.Ray;
+      depthBuffer: DepthBuffer;
+      pt: Point.Point;
+    } {
       const depthBuffer = new DepthBuffer(
         camera,
         Dimensions.create(100, 100),

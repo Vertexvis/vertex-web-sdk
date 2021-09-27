@@ -27,7 +27,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js --silent",
+    "build": "rollup --config ./rollup.config.js",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
@@ -35,23 +35,24 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.6.0",
-    "@vertexvis/utils": "0.10.1"
+    "@vertexvis/frame-streaming-protos": "^0.6.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
-    "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.0",
-    "@vertexvis/jest-config-vertexvis": "^0.5.0",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.1",
+    "@vertexvis/jest-config-vertexvis": "^0.5.3",
     "@vertexwebsdk/build": "0.10.1",
+    "@vertexvis/utils": "0.10.1",
     "eslint": "^7.20.0",
     "jest": "^26.6.3",
     "protobufjs": "^6.9.0",
-    "rollup": "^1.19.4",
+    "rollup": "^2.57.0",
     "ts-jest": "^26.5.2",
     "tslib": "^2.1.0",
     "typescript": "^4.4.3"
   },
   "peerDependencies": {
+    "@vertexvis/utils": "^0.10.1",
     "protobufjs": ">=6.9.0 <7.0.0",
     "tslib": ">=2.1.0"
   }

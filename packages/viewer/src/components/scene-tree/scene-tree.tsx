@@ -682,9 +682,8 @@ export class SceneTree {
     }
 
     if (newViewer != null) {
-      this.stateMap.viewerDisposable = this.controller?.connectToViewer(
-        newViewer
-      );
+      this.stateMap.viewerDisposable =
+        this.controller?.connectToViewer(newViewer);
     }
   }
 

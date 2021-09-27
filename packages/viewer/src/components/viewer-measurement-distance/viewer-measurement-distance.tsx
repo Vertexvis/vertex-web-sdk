@@ -276,9 +276,8 @@ export class ViewerMeasurementDistance {
   public async computeElementMetrics(): Promise<
     ViewerMeasurementDistanceElementMetrics | undefined
   > {
-    const startAnchorEl = this.hostEl.shadowRoot?.getElementById(
-      'start-anchor'
-    );
+    const startAnchorEl =
+      this.hostEl.shadowRoot?.getElementById('start-anchor');
     const endAnchorEl = this.hostEl.shadowRoot?.getElementById('end-anchor');
     const labelEl = this.hostEl.shadowRoot?.getElementById('label');
 
@@ -325,14 +324,8 @@ export class ViewerMeasurementDistance {
    */
   protected render(): h.JSX.IntrinsicElements {
     const positions = this.computeElementPositions();
-    const {
-      startPt,
-      endPt,
-      labelPt,
-      indicatorPt,
-      hideStart,
-      hideEnd,
-    } = positions;
+    const { startPt, endPt, labelPt, indicatorPt, hideStart, hideEnd } =
+      positions;
     const distance = this.formatDistance(this.distance);
 
     if (this.mode === 'edit') {

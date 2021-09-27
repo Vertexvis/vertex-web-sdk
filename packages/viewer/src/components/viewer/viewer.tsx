@@ -223,9 +223,8 @@ export class Viewer {
   /**
    * The default hex color or material to use when selecting items.
    */
-  @Prop() public selectionMaterial:
-    | string
-    | ColorMaterial = defaultSelectionMaterial;
+  @Prop() public selectionMaterial: string | ColorMaterial =
+    defaultSelectionMaterial;
 
   /**
    * The last frame that was received, which can be used to inspect the scene
@@ -927,9 +926,8 @@ export class Viewer {
       }
 
       // Need to parse world orientation.
-      this.stateMap.streamWorldOrientation = mapWorldOrientationOrThrow(
-        worldOrientation
-      );
+      this.stateMap.streamWorldOrientation =
+        mapWorldOrientationOrThrow(worldOrientation);
 
       console.debug(
         `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`

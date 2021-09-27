@@ -27,7 +27,8 @@ interface SceneExecutionOptions {
  * for the changes to take effect.
  */
 export class SceneItemOperationsBuilder
-  implements SceneItemOperations<SceneItemOperationsBuilder> {
+  implements SceneItemOperations<SceneItemOperationsBuilder>
+{
   private builder: SceneOperationBuilder;
 
   public constructor(

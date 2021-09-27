@@ -3,7 +3,8 @@ import { InteractionApi } from './interactionApi';
 import { Point, Matrix2, Angle } from '@vertexvis/geometry';
 
 export abstract class MultiTouchInteractionHandler
-  implements InteractionHandler {
+  implements InteractionHandler
+{
   protected element?: HTMLElement;
   protected interactionApi?: InteractionApi;
   protected currentPosition1?: Point.Point;

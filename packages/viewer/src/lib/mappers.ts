@@ -17,13 +17,11 @@ import {
   Orientation,
 } from './types';
 
-export const mapRGBi: M.Func<
-  vertexvis.protobuf.core.IRGBi,
-  Color.Color
-> = M.defineMapper(
-  M.read(M.requiredProp('r'), M.requiredProp('g'), M.requiredProp('b')),
-  ([r, g, b]) => Color.create(r, g, b)
-);
+export const mapRGBi: M.Func<vertexvis.protobuf.core.IRGBi, Color.Color> =
+  M.defineMapper(
+    M.read(M.requiredProp('r'), M.requiredProp('g'), M.requiredProp('b')),
+    ([r, g, b]) => Color.create(r, g, b)
+  );
 
 export const mapVector3f: M.Func<
   vertexvis.protobuf.core.IVector3f,

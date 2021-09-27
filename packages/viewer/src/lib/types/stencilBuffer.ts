@@ -61,10 +61,8 @@ export class StencilBufferManager {
 
     if (hasStencil && this.viewer.stream != null) {
       const res = await this.viewer.stream.getStencilBuffer(true);
-      const {
-        stencilBuffer: stencilBytes,
-        imageAttributes,
-      } = mapStencilBufferOrThrow(res);
+      const { stencilBuffer: stencilBytes, imageAttributes } =
+        mapStencilBufferOrThrow(res);
 
       const png = await decodePng(stencilBytes as Uint8Array);
       return StencilBuffer.fromPng(

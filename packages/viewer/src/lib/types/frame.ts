@@ -88,7 +88,8 @@ interface FramePerspectiveCameraLike {
 }
 
 export class FramePerspectiveCamera
-  implements FrameCameraMatrices, FramePerspectiveCameraLike {
+  implements FrameCameraMatrices, FramePerspectiveCameraLike
+{
   private cameraMatrices?: FrameCameraMatrices;
 
   public constructor(

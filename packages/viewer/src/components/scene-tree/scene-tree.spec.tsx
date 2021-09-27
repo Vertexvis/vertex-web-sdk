@@ -101,11 +101,8 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client });
 
       const controller = new SceneTreeController(client, 100);
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
 
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
@@ -121,23 +118,20 @@ describe('<vertex-scene-tree>', () => {
 
       const rowData = jest.fn();
       const controller = new SceneTreeController(client, 100);
-      const {
-        viewer,
-        page,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({
-        controller,
-        template: () => (
-          <div>
-            <vertex-scene-tree
-              controller={controller}
-              rowData={rowData}
-              viewerSelector="#viewer"
-            ></vertex-scene-tree>
-            <vertex-viewer id="viewer"></vertex-viewer>
-          </div>
-        ),
-      });
+      const { viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({
+          controller,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                rowData={rowData}
+                viewerSelector="#viewer"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer"></vertex-viewer>
+            </div>
+          ),
+        });
 
       await loadModelForViewer(viewer, {
         jwt,
@@ -197,24 +191,20 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client });
 
       const controller = new SceneTreeController(client, 100);
-      const {
-        tree,
-        viewer,
-        page,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({
-        controller,
-        template: () => (
-          <div>
-            <vertex-scene-tree
-              controller={controller}
-              viewerSelector="#viewer1"
-            ></vertex-scene-tree>
-            <vertex-viewer id="viewer1"></vertex-viewer>
-            <vertex-viewer id="viewer2"></vertex-viewer>
-          </div>
-        ),
-      });
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({
+          controller,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                viewerSelector="#viewer1"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer1"></vertex-viewer>
+              <vertex-viewer id="viewer2"></vertex-viewer>
+            </div>
+          ),
+        });
 
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
@@ -243,24 +233,20 @@ describe('<vertex-scene-tree>', () => {
 
       const rowData = jest.fn();
       const controller = new SceneTreeController(client, 100);
-      const {
-        tree,
-        viewer,
-        page,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({
-        controller,
-        template: () => (
-          <div>
-            <vertex-scene-tree
-              controller={controller}
-              rowData={rowData}
-              viewerSelector="#viewer"
-            ></vertex-scene-tree>
-            <vertex-viewer id="viewer"></vertex-viewer>
-          </div>
-        ),
-      });
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({
+          controller,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                rowData={rowData}
+                viewerSelector="#viewer"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer"></vertex-viewer>
+            </div>
+          ),
+        });
 
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
@@ -280,11 +266,8 @@ describe('<vertex-scene-tree>', () => {
 
       const res = mockGetTree({ client });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -301,12 +284,8 @@ describe('<vertex-scene-tree>', () => {
       const res = mockGetTree({ client });
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
-      const {
-        tree,
-        page,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, page, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -332,11 +311,8 @@ describe('<vertex-scene-tree>', () => {
 
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -355,11 +331,8 @@ describe('<vertex-scene-tree>', () => {
       const res = mockGetTree({ client });
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -378,11 +351,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(new ExpandNodeResponse())
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -395,11 +365,8 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
       mockGetTree({ client, transform: (node) => node.setExpanded(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -418,11 +385,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(new CollapseNodeResponse())
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -435,11 +399,8 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
       mockGetTree({ client, transform: (node) => node.setExpanded(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -458,11 +419,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(new CollapseNodeResponse())
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -479,11 +437,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(new ExpandNodeResponse())
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -499,11 +454,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -517,13 +469,10 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({
-        controller,
-      });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({
+          controller,
+        });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -537,11 +486,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -558,11 +504,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -577,11 +520,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -595,11 +535,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -615,11 +552,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -634,11 +568,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -652,11 +583,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setVisible(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -677,11 +605,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -701,11 +626,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -725,11 +647,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -764,11 +683,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -792,11 +708,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setSelected(true) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -811,11 +724,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -835,11 +745,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -857,11 +764,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -879,11 +783,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -912,11 +813,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        viewer,
-        waitForSceneTreeConnected,
-        page,
-      } = await newSceneTreeSpec({ controller });
+      const { viewer, waitForSceneTreeConnected, page } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -944,11 +842,8 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res)
       );
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 
@@ -968,11 +863,8 @@ describe('<vertex-scene-tree>', () => {
         transform: (node) => node.setColumnsList(['val1', 'val2']),
       });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller });
 
       tree.rowData = rowData;
       tree.metadataKeys = ['key1', 'key2'];
@@ -993,12 +885,8 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client });
 
-      const {
-        tree,
-        viewer,
-        waitForSceneTreeConnected,
-        page,
-      } = await newSceneTreeSpec({ controller });
+      const { tree, viewer, waitForSceneTreeConnected, page } =
+        await newSceneTreeSpec({ controller });
       await loadModelForViewer(viewer, { jwt });
       await waitForSceneTreeConnected();
 

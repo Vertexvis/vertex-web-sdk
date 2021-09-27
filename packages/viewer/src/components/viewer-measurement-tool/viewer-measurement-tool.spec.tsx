@@ -40,7 +40,8 @@ describe('vertex-viewer-measurement-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-measurement-tool');
-    const measurementEl = toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    const measurementEl =
+      toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
 
     expect(measurementEl).toHaveClass('my-measurement');
   });
@@ -57,7 +58,8 @@ describe('vertex-viewer-measurement-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-measurement-tool');
-    const measurementEl = toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    const measurementEl =
+      toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
 
     expect(measurementEl).not.toHaveClass('my-measurement');
   });
@@ -74,7 +76,8 @@ describe('vertex-viewer-measurement-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-measurement-tool');
-    const measurementEl = toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    const measurementEl =
+      toolEl?.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
 
     expect(measurementEl).not.toHaveClass('my-measurement');
   });
@@ -105,7 +108,8 @@ describe('vertex-viewer-measurement-tool', () => {
     toolEl.distanceTemplateId = 'my-template';
     await page.waitForChanges();
 
-    const measurementEl = toolEl.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    const measurementEl =
+      toolEl.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
 
     expect(measurementEl.className).toBe('my-measurement');
   });
@@ -176,7 +180,8 @@ describe('vertex-viewer-measurement-tool', () => {
     });
 
     const toolEl = page.root as HTMLVertexViewerMeasurementToolElement;
-    const measurementEl = toolEl.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
+    const measurementEl =
+      toolEl.firstElementChild as HTMLVertexViewerDistanceMeasurementElement;
 
     measurementEl.dispatchEvent(new CustomEvent('editBegin'));
     expect(onMeasureBegin).toHaveBeenCalled();

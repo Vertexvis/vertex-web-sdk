@@ -16,7 +16,8 @@ const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
-const RotatePointInteractionMock = RotateInteraction as jest.Mock<RotatePointInteraction>;
+const RotatePointInteractionMock =
+  RotateInteraction as jest.Mock<RotatePointInteraction>;
 const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
@@ -57,10 +58,10 @@ describe(MouseInteractionHandler, () => {
     altKey: true,
     shiftKey: true,
   });
-  const wheelEvent = new Event('wheel', ({
+  const wheelEvent = new Event('wheel', {
     deltaY: 100,
     deltaMode: 0,
-  } as unknown) as EventInit);
+  } as unknown as EventInit);
 
   const config = parseConfig('platdev');
   const handler = new MouseInteractionHandler(
