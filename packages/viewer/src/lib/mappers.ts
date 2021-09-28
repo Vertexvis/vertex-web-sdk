@@ -172,6 +172,7 @@ const mapSceneAttributes: M.Func<
     camera: FrameCamera.FrameCamera;
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
+    hasChanged: boolean;
   }
 > = M.defineMapper(
   M.read(
@@ -183,12 +184,14 @@ const mapSceneAttributes: M.Func<
     M.mapProp(
       'crossSectioning',
       M.compose(M.required('crossSectioning'), mapCrossSectioning)
-    )
+    ),
+    M.requiredProp('hasChanged')
   ),
-  ([camera, boundingBox, crossSectioning]) => ({
+  ([camera, boundingBox, crossSectioning, hasChanged]) => ({
     camera,
     boundingBox,
     crossSectioning,
+    hasChanged,
   })
 );
 
@@ -198,6 +201,7 @@ const mapFrameSceneAttributes: M.Func<
     camera: FrameCamera.FrameCamera;
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
+    hasChanged: boolean;
   }
 > = M.defineMapper(
   M.read(
@@ -232,7 +236,8 @@ function mapFrameScene(
         camera,
         sceneAttr.boundingBox,
         sceneAttr.crossSectioning,
-        worldOrientation
+        worldOrientation,
+        sceneAttr.hasChanged
       )
   );
 }

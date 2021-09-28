@@ -24,6 +24,7 @@ const def: DrawFramePayload = {
     crossSectioning: {
       sectionPlanes: [{ normal: { x: 0, y: 0, z: 0 }, offset: 0 }],
     },
+    hasChanged: false,
   },
   imageAttributes: {
     frameDimensions: { width: 100, height: 50 },
