@@ -306,6 +306,11 @@ export class Viewer {
   @Event() public sceneReady!: EventEmitter<void>;
 
   /**
+   * Emits an event when a frame is received with a different scene attribute.
+   */
+  @Event() public sceneChanged!: EventEmitter<void>;
+
+  /**
    * Emits an event when the user has started an interaction.
    */
   @Event() public interactionStarted!: EventEmitter<void>;
@@ -1164,6 +1169,11 @@ export class Viewer {
         };
 
         this.frameReceived.emit(this.frame);
+
+        if (this.frame.scene.hasChanged) {
+          this.sceneChanged.emit();
+        }
+
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }

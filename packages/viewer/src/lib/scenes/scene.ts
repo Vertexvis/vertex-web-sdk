@@ -226,11 +226,15 @@ export class Scene {
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID
+    sceneViewStateId: UUID.UUID,
+    opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     return await this.stream.loadSceneViewState(
       {
         sceneViewStateId: { hex: sceneViewStateId },
+        frameCorrelationId: opts.suppliedCorrelationId
+          ? { value: opts.suppliedCorrelationId }
+          : undefined,
       },
       true
     );

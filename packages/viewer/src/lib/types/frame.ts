@@ -66,7 +66,8 @@ export class FrameScene {
     public readonly camera: FramePerspectiveCamera,
     public readonly boundingBox: BoundingBox.BoundingBox,
     public readonly crossSection: CrossSectioning.CrossSectioning,
-    public readonly worldOrientation: Orientation
+    public readonly worldOrientation: Orientation,
+    public readonly hasChanged: boolean
   ) {}
 }
 
