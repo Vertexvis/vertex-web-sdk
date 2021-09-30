@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.skypack.dev/three';
+import { THREE } from '../dependencies.js';
 import {
   FlexTimeApi,
   SurfaceMeasurement,
