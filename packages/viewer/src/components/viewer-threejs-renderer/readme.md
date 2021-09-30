@@ -9,11 +9,11 @@
 
 | Property          | Attribute          | Description | Type                                        | Default                   |
 | ----------------- | ------------------ | ----------- | ------------------------------------------- | ------------------------- |
-| `camera`          | `camera`           |             | `any`                                       | `new PerspectiveCamera()` |
+| `camera`          | --                 |             | `PerspectiveCamera`                         | `new PerspectiveCamera()` |
 | `clippingExtents` | `clipping-extents` |             | `number`                                    | `1000`                    |
 | `drawMode`        | `draw-mode`        |             | `"animation-frame" \| "manual" \| "synced"` | `'synced'`                |
 | `occlude`         | `occlude`          |             | `boolean`                                   | `false`                   |
-| `scene`           | `scene`            |             | `any`                                       | `new Scene()`             |
+| `scene`           | --                 |             | `Scene`                                     | `new Scene()`             |
 | `viewer`          | --                 |             | `HTMLVertexViewerElement \| undefined`      | `undefined`               |
 | `willDraw`        | --                 |             | `(() => void) \| undefined`                 | `undefined`               |
 
@@ -36,7 +36,7 @@ Type: `Promise<void>`
 
 #### Returns
 
-Type: `Promise<any[]>`
+Type: `Promise<Intersection[]>`
 
 
 
