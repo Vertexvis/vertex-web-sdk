@@ -83,16 +83,16 @@ describe(InteractionApi, () => {
     });
   });
 
-  describe(InteractionApi.prototype.panCamera, () => {
+  describe(InteractionApi.prototype.panCameraByDelta, () => {
     it('replaces the camera if interacting', () => {
       api.beginInteraction();
-      api.panCamera(Point.create(10, 0));
+      api.panCameraByDelta(Point.create(10, 0));
       api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing if not interacting', () => {
-      api.panCamera(Point.create(10, 0));
+      api.panCameraByDelta(Point.create(10, 0));
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });

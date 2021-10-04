@@ -75,6 +75,7 @@ interface FrameCameraMatrices {
   readonly worldMatrix: Matrix4.Matrix4;
   readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionMatrix: Matrix4.Matrix4;
+  readonly projectionMatrixInverse: Matrix4.Matrix4;
   readonly projectionViewMatrix: Matrix4.Matrix4;
 }
 
@@ -137,6 +138,7 @@ export class FramePerspectiveCamera
         this.fovY,
         this.aspectRatio
       );
+      const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
       const projectionViewMatrix = Matrix4.multiply(
         projectionMatrix,
         viewMatrix
@@ -146,6 +148,7 @@ export class FramePerspectiveCamera
         viewMatrix,
         worldMatrix,
         projectionMatrix,
+        projectionMatrixInverse,
         projectionViewMatrix,
       };
     }
@@ -166,6 +169,10 @@ export class FramePerspectiveCamera
 
   public get projectionMatrix(): Matrix4.Matrix4 {
     return this.computeCameraMatrices().projectionMatrix;
+  }
+
+  public get projectionMatrixInverse(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().projectionMatrixInverse;
   }
 
   public get projectionViewMatrix(): Matrix4.Matrix4 {

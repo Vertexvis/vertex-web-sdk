@@ -24,7 +24,7 @@ export abstract class MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element?: HTMLElement
+    element: HTMLElement
   ): void {
     // noop
   }
@@ -121,11 +121,11 @@ export class ZoomInteraction extends MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element?: HTMLElement
+    element: HTMLElement
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
-      const rect = element?.getBoundingClientRect();
+      const rect = element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
       this.startRay = api.getRayFromPoint(point);
       api.beginInteraction();
@@ -199,23 +199,25 @@ export class ZoomInteraction extends MouseInteraction {
 export class PanInteraction extends MouseInteraction {
   public type: InteractionType = 'pan';
 
+  private canvasRect?: DOMRect;
+
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
+    element: HTMLElement
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
+      this.canvasRect = element.getBoundingClientRect();
       api.beginInteraction();
     }
   }
 
   public drag(event: MouseEvent, api: InteractionApi): void {
-    if (this.currentPosition != null) {
-      const position = Point.create(event.screenX, event.screenY);
-      const delta = Point.subtract(position, this.currentPosition);
-
-      api.panCamera(delta);
+    if (this.currentPosition != null && this.canvasRect != null) {
+      const position = getMouseClientPosition(event, this.canvasRect);
+      api.panCameraToScreenPoint(position);
       this.currentPosition = position;
     }
   }
