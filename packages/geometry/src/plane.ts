@@ -21,6 +21,21 @@ export function create(values: Partial<Plane> = {}): Plane {
 }
 
 /**
+ * Creates a plane from a normal and an arbitrary point on a plane.
+ *
+ * @param normal A normal.
+ * @param point A point on the plane.
+ * @returns A new plane.
+ */
+export function fromNormalAndCoplanarPoint(
+  normal: Vector3.Vector3,
+  point: Vector3.Vector3
+): Plane {
+  const constant = -Vector3.dot(point, normal);
+  return create({ normal, constant });
+}
+
+/**
  * Returns the perpendicular distance from the plane to the given point.
  *
  * @param plane The plane.
