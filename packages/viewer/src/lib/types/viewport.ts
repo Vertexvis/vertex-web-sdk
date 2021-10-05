@@ -1,7 +1,5 @@
 import {
-  Angle,
   Dimensions,
-  Matrix4,
   Plane,
   Point,
   Ray,
@@ -140,21 +138,53 @@ export class Viewport implements Dimensions.Dimensions {
     image: FrameImageLike,
     camera: FramePerspectiveCamera
   ): Ray.Ray {
-    const { position, lookAt, up, aspectRatio, fovY } = camera;
-    const framePt = this.transformPointToFrame(pt, image);
-    const m = Matrix4.position(
-      Matrix4.makeLookAt(position, lookAt, up),
-      Matrix4.makeIdentity()
+    const ndc = this.transformScreenPointToNdc(pt, image);
+    const origin = Vector3.fromMatrixPosition(camera.worldMatrix);
+    const world = Vector3.transformNdcToWorldSpace(
+      Vector3.create(ndc.x, ndc.y, 0.5),
+      camera.worldMatrix,
+      camera.projectionMatrixInverse
     );
-    const normal = Vector3.normalize(
-      Vector3.create(
-        (framePt.x / image.frameDimensions.width - 0.5) * aspectRatio,
-        -(framePt.y / image.frameDimensions.height) + 0.5,
-        -0.5 / Math.tan(Angle.toRadians(fovY / 2.0))
-      )
+    const direction = Vector3.normalize(Vector3.subtract(world, origin));
+    return Ray.create({ origin, direction });
+  }
+
+  /**
+   * Maps a screen point to normalized device coordinates (NDC). A screen point
+   * at 0,0 represents the top-left of the viewport.
+   *
+   * @param screenPt A screen point.
+   */
+  public transformScreenPointToNdc(
+    screenPt: Point.Point,
+    image: FrameImageLike
+  ): Point.Point {
+    const framePt = this.transformPointToFrame(screenPt, image);
+    return Point.create(
+      (framePt.x / image.frameDimensions.width) * 2 - 1,
+      -(framePt.y / image.frameDimensions.height) * 2 + 1
     );
-    const direction = Vector3.normalize(Vector3.transformMatrix(normal, m));
-    return Ray.create({ origin: position, direction });
+  }
+
+  /**
+   * Maps a point in screen space to a world point that is coplanar with the
+   * camera's near plane.
+   *
+   * @param screenPt The screen point to transform.
+   * @param image An image of frame.
+   * @param camera The camera used to map a 2D point to 3D point.
+   * @returns A point on the screen in world space.
+   */
+  public transformPointToScreenWorld(
+    screenPt: Point.Point,
+    image: FrameImageLike,
+    camera: FramePerspectiveCamera
+  ): Vector3.Vector3 | undefined {
+    const { direction, near } = camera;
+
+    const ray = this.transformPointToRay(screenPt, image, camera);
+    const screen = Plane.create({ normal: direction, constant: near });
+    return Ray.intersectPlane(ray, screen);
   }
 
   /**

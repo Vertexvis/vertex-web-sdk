@@ -405,3 +405,22 @@ export function lerp(a: Vector3, b: Vector3, t: number): Vector3 {
     z: lerpNumber(a.z, b.z, t),
   };
 }
+
+/**
+ * Maps a normalized device coordinate (NDC) space to world space coordinates.
+ *
+ * @param ndc A point in normalized device coordinates.
+ * @param worldMatrix A camera's world matrix.
+ * @param projectionMatrixInverse A camera's inverse projection matrix.
+ * @returns A point in world space coordinates.
+ */
+export function transformNdcToWorldSpace(
+  ndc: Vector3,
+  worldMatrix: Matrix4.Matrix4,
+  projectionMatrixInverse: Matrix4.Matrix4
+): Vector3 {
+  return transformMatrix(
+    transformMatrix(ndc, projectionMatrixInverse),
+    worldMatrix
+  );
+}

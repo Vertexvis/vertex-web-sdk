@@ -73,7 +73,7 @@ describe(TouchInteractionHandler, () => {
     window.dispatchEvent(touchEnd1);
 
     expect(api.beginInteraction).toHaveBeenCalledTimes(1);
-    expect(api.panCamera).toHaveBeenCalledTimes(1);
+    expect(api.panCameraByDelta).toHaveBeenCalledTimes(1);
     expect(api.zoomCamera).toHaveBeenCalledTimes(1);
     expect(api.endInteraction).toHaveBeenCalledTimes(1);
   });

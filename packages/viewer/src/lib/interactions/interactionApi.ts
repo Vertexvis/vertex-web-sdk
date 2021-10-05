@@ -1,7 +1,6 @@
 import {
   Angle,
   BoundingBox,
-  Dimensions,
   Plane,
   Point,
   Ray,
@@ -11,7 +10,12 @@ import { EventEmitter } from '@stencil/core';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Scene, Camera } from '../scenes';
-import { DepthBuffer, Interactions, Viewport } from '../types';
+import {
+  DepthBuffer,
+  FramePerspectiveCamera,
+  Interactions,
+  Viewport,
+} from '../types';
 import { ReceivedFrame } from '../..';
 
 type SceneProvider = () => Scene;
@@ -20,10 +24,17 @@ type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 type CameraTransform = (data: {
   camera: Camera;
-  viewport: Dimensions.Dimensions;
+  viewport: Viewport;
   scale: Point.Point;
   boundingBox: BoundingBox.BoundingBox;
+  frame: ReceivedFrame;
 }) => Camera;
+
+interface PanData {
+  hitPt: Vector3.Vector3;
+  startingCamera: FramePerspectiveCamera;
+  hitPlane: Plane.Plane;
+}
 
 /**
  * The `InteractionApi` provides methods that API developers can use to modify
@@ -33,6 +44,7 @@ export class InteractionApi {
   private currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
+  private panData?: PanData;
 
   public constructor(
     private stream: StreamApi,
@@ -137,13 +149,16 @@ export class InteractionApi {
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
       const scene = this.getScene();
+      const viewport = this.getViewport();
+      const frame = this.getFrame();
       this.currentCamera =
-        this.currentCamera != null
+        this.currentCamera != null && viewport != null && frame != null
           ? t({
               camera: this.currentCamera,
-              viewport: scene.viewport(),
+              viewport,
               scale: scene.scale(),
               boundingBox: scene.boundingBox(),
+              frame,
             })
           : undefined;
 
@@ -187,13 +202,75 @@ export class InteractionApi {
   }
 
   /**
+   * Moves the camera's position and look at to the given screen coordinate.
+   *
+   * If the screen coordinate intersects with an object, the camera will track
+   * the hit point so the mouse position is always under the mouse.
+   *
+   * If the screen coordinate doesn't intersect with an object, then ???.
+   *
+   * @param screenPt A point in screen coordinates.
+   */
+  public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
+    const frame = this.getFrame();
+    const depthBuffer = await frame?.depthBuffer();
+
+    return this.transformCamera(({ camera, frame, viewport }) => {
+      // Capture the starting state of the pan.
+      if (this.panData == null && depthBuffer != null) {
+        const startingCamera = frame.scene.camera;
+        const direction = startingCamera.direction;
+
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera
+        );
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+          direction,
+          camera.lookAt
+        );
+        const fallback =
+          Ray.intersectPlane(ray, fallbackPlane) ?? Vector3.origin(); // NOTE(dan): Should never hit origin.
+
+        // Create a plane for the hit point that will be used to determine the
+        // delta of future mouse movements to the original hit point. Fallback
+        // to a plane placed at the look at point, in case there's no hit.
+        const hitPt = this.getWorldPoint(screenPt, depthBuffer, fallback);
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
+
+        this.panData = { hitPt, hitPlane, startingCamera };
+      }
+
+      if (this.panData != null) {
+        const { hitPt, hitPlane, startingCamera } = this.panData;
+
+        // Use a ray that originates at the screen and intersects with the hit
+        // plane to determine the move distance.
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera
+        );
+        const movePt = Ray.intersectPlane(ray, hitPlane);
+
+        if (movePt != null) {
+          const delta = Vector3.subtract(hitPt, movePt);
+          return camera.update(startingCamera).moveBy(delta);
+        }
+      }
+      return camera;
+    });
+  }
+
+  /**
    * Performs a pan operation of the scene's camera, and requests a new image
    * for the updated scene.
    *
    * @param delta A position delta `{x, y}` in the 2D coordinate space of the
    *  viewer.
    */
-  public async panCamera(delta: Point.Point): Promise<void> {
+  public async panCameraByDelta(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
       const vv = camera.viewVector();
 
@@ -261,7 +338,7 @@ export class InteractionApi {
         const worldCenter = BoundingBox.center(boundingBox);
         this.worldRotationPoint =
           depthBuffer != null
-            ? this.getWorldRotationPoint(point, depthBuffer, worldCenter)
+            ? this.getWorldPoint(point, depthBuffer, worldCenter)
             : camera.lookAt;
       }
 
@@ -318,9 +395,7 @@ export class InteractionApi {
       const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
-      const vvPlane = Plane.create({
-        normal: v,
-      });
+      const vvPlane = Plane.create({ normal: v });
       const pt = ray != null ? Ray.intersectPlane(ray, vvPlane) : undefined;
       const zv = pt != null ? Vector3.subtract(pt, camera.position) : vv;
 
@@ -344,7 +419,9 @@ export class InteractionApi {
     if (this.isInteracting()) {
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
+      this.panData = undefined;
       this.resetLastAngle();
+
       this.interactionFinishedEmitter.emit();
       await this.stream.endInteraction();
     }
@@ -408,7 +485,7 @@ export class InteractionApi {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 
-  private getWorldRotationPoint(
+  private getWorldPoint(
     point: Point.Point,
     depthBuffer: DepthBuffer,
     fallbackPoint: Vector3.Vector3
