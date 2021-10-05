@@ -7,7 +7,7 @@ import {
   TwistInteraction,
 } from '../mouseInteractions';
 import { InteractionApi } from '../interactionApi';
-import { Point, Ray } from '@vertexvis/geometry';
+import { Point } from '@vertexvis/geometry';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const element = document.createElement('canvas');
@@ -151,9 +151,9 @@ describe(ZoomInteraction, () => {
   const api = new (InteractionApi as jest.Mock<InteractionApi>)();
   api.transformCamera;
 
-  const event1 = new MouseEvent('mousemove', { screenX: 10, screenY: 5 });
-  const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
-  const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
+  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
+  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
+  const event3 = new MouseEvent('mousemove', { clientX: 25, clientY: 20 });
 
   const canvasPoint = Point.create(0, 0);
 
@@ -173,7 +173,8 @@ describe(ZoomInteraction, () => {
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
 
-      expect(api.zoomCamera).toHaveBeenCalledWith(5, undefined);
+      const pt = Point.create(event1.clientX, event1.clientY);
+      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, 5);
     });
 
     it('continuous drags rotate camera using delta between calls', () => {
@@ -182,22 +183,8 @@ describe(ZoomInteraction, () => {
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
-      expect(api.zoomCamera).toHaveBeenNthCalledWith(2, 10, undefined);
-    });
-
-    it('uses the starting point ray', () => {
-      const div = document.createElement('div');
-      jest
-        .spyOn(div, 'getBoundingClientRect')
-        .mockReturnValue({ left: 0, top: 0 } as DOMRect);
-      jest.spyOn(api, 'getRayFromPoint').mockReturnValue(Ray.create());
-      const interaction = new ZoomInteraction();
-      interaction.beginDrag(event1, canvasPoint, api, div);
-      interaction.drag(event2, api);
-      interaction.drag(event3, api);
-
-      expect(api.zoomCamera).toBeCalledWith(5, Ray.create());
-      expect(api.zoomCamera).toBeCalledWith(10, Ray.create());
+      const pt = Point.create(event1.clientX, event1.clientY);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
     });
 
     it('does nothing if begin drag has not been called', () => {

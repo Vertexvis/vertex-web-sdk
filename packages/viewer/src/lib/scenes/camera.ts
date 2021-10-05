@@ -3,6 +3,7 @@ import {
   ClippingPlanes,
   FlyTo,
   FrameCamera,
+  FramePerspectiveCamera,
   StandardView,
 } from '../types';
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
@@ -316,6 +317,21 @@ export class Camera implements FrameCamera.FrameCamera {
       },
       this.boundingBox,
       this.decodeFrame
+    );
+  }
+
+  /**
+   * Returns a `FramePerspectiveCamera` representation.
+   */
+  public toFrameCamera(): FramePerspectiveCamera {
+    return new FramePerspectiveCamera(
+      this.position,
+      this.lookAt,
+      this.up,
+      this.near,
+      this.far,
+      this.aspectRatio,
+      this.fovY
     );
   }
 
