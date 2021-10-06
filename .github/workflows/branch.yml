@@ -117,3 +117,5 @@ jobs:
         run: "yarn install"
       - name: "Generate docs"
         run: "yarn generate:docs"
+      - name: "Test docs"
+        run: git add -f docs/
