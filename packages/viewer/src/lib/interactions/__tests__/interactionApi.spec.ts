@@ -54,101 +54,115 @@ describe(InteractionApi, () => {
   });
 
   describe(InteractionApi.prototype.beginInteraction, () => {
-    it('begins interaction on the stream', () => {
-      api.beginInteraction();
+    it('begins interaction on the stream', async () => {
+      await api.beginInteraction();
       expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
       expect(emitInteractionStarted).toHaveBeenCalledTimes(1);
     });
 
-    it('does not begin interaction if in interaction state', () => {
-      api.beginInteraction();
-      api.beginInteraction();
+    it('does not begin interaction if in interaction state', async () => {
+      await api.beginInteraction();
+      await api.beginInteraction();
       expect(streamApi.beginInteraction).toHaveBeenCalledTimes(1);
       expect(emitInteractionStarted).toHaveBeenCalledTimes(1);
     });
   });
 
   describe(InteractionApi.prototype.endInteraction, () => {
-    it('ends interaction on stream if interacting', () => {
-      api.beginInteraction();
-      api.endInteraction();
+    it('ends interaction on stream if interacting', async () => {
+      await api.beginInteraction();
+      await api.endInteraction();
       expect(streamApi.endInteraction).toHaveBeenCalledTimes(1);
       expect(emitInteractionFinished).toHaveBeenCalledTimes(1);
     });
 
-    it('does not end interaction if not interacting', () => {
-      api.endInteraction();
+    it('does not end interaction if not interacting', async () => {
+      await api.endInteraction();
       expect(streamApi.endInteraction).not.toHaveBeenCalled();
       expect(emitInteractionFinished).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.panCameraByDelta, () => {
-    it('replaces the camera if interacting', () => {
-      api.beginInteraction();
-      api.panCameraByDelta(Point.create(10, 0));
-      api.endInteraction();
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.panCameraByDelta(Point.create(10, 0));
+      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing if not interacting', () => {
-      api.panCameraByDelta(Point.create(10, 0));
+    it('does nothing if not interacting', async () => {
+      await api.panCameraByDelta(Point.create(10, 0));
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.rotateCamera, () => {
-    it('replaces the camera if interacting', () => {
-      api.beginInteraction();
-      api.rotateCamera(Point.create(10, 0));
-      api.endInteraction();
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.rotateCamera(Point.create(10, 0));
+      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing if not interacting', () => {
-      api.rotateCamera(Point.create(10, 0));
+    it('does nothing if not interacting', async () => {
+      await api.rotateCamera(Point.create(10, 0));
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.rotateCameraAtPoint, () => {
     it('replaces the camera if interacting', async () => {
-      api.beginInteraction();
+      await api.beginInteraction();
       await api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
-      api.endInteraction();
+      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing if not interacting', () => {
-      api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
+    it('does nothing if not interacting', async () => {
+      await api.rotateCameraAtPoint(Point.create(10, 0), Point.create(0, 0));
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.zoomCamera, () => {
-    it('replaces the camera if interacting', () => {
-      api.beginInteraction();
-      api.zoomCamera(1);
-      api.endInteraction();
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.zoomCamera(1);
+      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing if not interacting', () => {
-      api.zoomCamera(1);
+    it('does nothing if not interacting', async () => {
+      await api.zoomCamera(1);
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(InteractionApi.prototype.zoomCameraToPoint, () => {
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.zoomCameraToPoint(Point.create(10, 10), 1);
+      await api.endInteraction();
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if not interacting', async () => {
+      await api.zoomCameraToPoint(Point.create(10, 10), 1);
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 
   describe(InteractionApi.prototype.twistCamera, () => {
-    it('replaces the camera if interacting', () => {
-      api.beginInteraction();
-      api.twistCamera(Point.create(10, 0));
-      api.endInteraction();
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.twistCamera(Point.create(10, 0));
+      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
-    it('does nothing if not interacting', () => {
-      api.zoomCamera(1);
+    it('does nothing if not interacting', async () => {
+      await api.zoomCamera(1);
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });

@@ -28,11 +28,17 @@ type CameraTransform = (data: {
   scale: Point.Point;
   boundingBox: BoundingBox.BoundingBox;
   frame: ReceivedFrame;
+  depthBuffer?: DepthBuffer;
 }) => Camera;
 
 interface PanData {
   hitPt: Vector3.Vector3;
+  hitPlane: Plane.Plane;
   startingCamera: FramePerspectiveCamera;
+}
+
+interface ZoomData {
+  hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
 }
 
@@ -44,7 +50,9 @@ export class InteractionApi {
   private currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
+
   private panData?: PanData;
+  private zoomData?: ZoomData;
 
   public constructor(
     private stream: StreamApi,
@@ -151,6 +159,8 @@ export class InteractionApi {
       const scene = this.getScene();
       const viewport = this.getViewport();
       const frame = this.getFrame();
+      const depthBuffer = await frame?.depthBuffer();
+
       this.currentCamera =
         this.currentCamera != null && viewport != null && frame != null
           ? t({
@@ -159,6 +169,7 @@ export class InteractionApi {
               scale: scene.scale(),
               boundingBox: scene.boundingBox(),
               frame,
+              depthBuffer,
             })
           : undefined;
 
@@ -212,13 +223,10 @@ export class InteractionApi {
    * @param screenPt A point in screen coordinates.
    */
   public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
-    const frame = this.getFrame();
-    const depthBuffer = await frame?.depthBuffer();
-
-    return this.transformCamera(({ camera, frame, viewport }) => {
+    return this.transformCamera(({ camera, frame, viewport, depthBuffer }) => {
       // Capture the starting state of the pan.
-      if (this.panData == null && depthBuffer != null) {
-        const startingCamera = frame.scene.camera;
+      if (this.panData == null) {
+        const startingCamera = camera.toFrameCamera();
         const direction = startingCamera.direction;
 
         const ray = viewport.transformPointToRay(
@@ -230,13 +238,21 @@ export class InteractionApi {
           direction,
           camera.lookAt
         );
-        const fallback =
-          Ray.intersectPlane(ray, fallbackPlane) ?? Vector3.origin(); // NOTE(dan): Should never hit origin.
+        const fallback = Ray.intersectPlane(ray, fallbackPlane);
+        if (fallback == null) {
+          console.warn(
+            'Cannot determine fallback for pan. Ray does not intersect plane.'
+          );
+          return camera;
+        }
 
         // Create a plane for the hit point that will be used to determine the
         // delta of future mouse movements to the original hit point. Fallback
         // to a plane placed at the look at point, in case there's no hit.
-        const hitPt = this.getWorldPoint(screenPt, depthBuffer, fallback);
+        const hitPt =
+          depthBuffer != null
+            ? this.getWorldPoint(screenPt, depthBuffer, fallback)
+            : fallback;
         const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
@@ -330,57 +346,56 @@ export class InteractionApi {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    const frame = this.getFrame();
-    const depthBuffer = await frame?.depthBuffer();
+    return this.transformCamera(
+      ({ camera, viewport, boundingBox, depthBuffer }) => {
+        if (this.worldRotationPoint == null) {
+          const worldCenter = BoundingBox.center(boundingBox);
+          this.worldRotationPoint =
+            depthBuffer != null
+              ? this.getWorldPoint(point, depthBuffer, worldCenter)
+              : camera.lookAt;
+        }
 
-    return this.transformCamera(({ camera, viewport, boundingBox }) => {
-      if (this.worldRotationPoint == null) {
-        const worldCenter = BoundingBox.center(boundingBox);
-        this.worldRotationPoint =
-          depthBuffer != null
-            ? this.getWorldPoint(point, depthBuffer, worldCenter)
-            : camera.lookAt;
-      }
+        const upVector = Vector3.normalize(camera.up);
+        const vv = Vector3.normalize(
+          Vector3.subtract(camera.lookAt, camera.position)
+        );
 
-      const upVector = Vector3.normalize(camera.up);
-      const vv = Vector3.normalize(
-        Vector3.subtract(camera.lookAt, camera.position)
-      );
+        const crossX = Vector3.cross(upVector, vv);
+        const crossY = Vector3.cross(vv, crossX);
 
-      const crossX = Vector3.cross(upVector, vv);
-      const crossY = Vector3.cross(vv, crossX);
+        const mouseToWorld = Vector3.normalize({
+          x: delta.x * crossX.x + delta.y * crossY.x,
+          y: delta.x * crossX.y + delta.y * crossY.y,
+          z: delta.x * crossX.z + delta.y * crossY.z,
+        });
 
-      const mouseToWorld = Vector3.normalize({
-        x: delta.x * crossX.x + delta.y * crossY.x,
-        y: delta.x * crossX.y + delta.y * crossY.y,
-        z: delta.x * crossX.z + delta.y * crossY.z,
-      });
+        const rotationAxis = Vector3.cross(mouseToWorld, vv);
 
-      const rotationAxis = Vector3.cross(mouseToWorld, vv);
+        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
+        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+        const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
-      const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-      const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
-      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+        const updated = camera.rotateAroundAxisAtPoint(
+          angle,
+          this.worldRotationPoint,
+          rotationAxis
+        );
 
-      const updated = camera.rotateAroundAxisAtPoint(
-        angle,
-        this.worldRotationPoint,
-        rotationAxis
-      );
-
-      return updated.update({
-        // Scale the lookAt point to the same length as the distance to the center
-        // of the bounding box to maintain zoom and pan behavior.
-        lookAt: Vector3.add(
-          Vector3.scale(
-            camera.distanceToBoundingBoxCenter() /
-              Vector3.magnitude(updated.viewVector()),
-            updated.viewVector()
+        return updated.update({
+          // Scale the lookAt point to the same length as the distance to the
+          // center of the bounding box to maintain zoom and pan behavior.
+          lookAt: Vector3.add(
+            Vector3.scale(
+              camera.distanceToBoundingBoxCenter() /
+                Vector3.magnitude(updated.viewVector()),
+              updated.viewVector()
+            ),
+            updated.position
           ),
-          updated.position
-        ),
-      });
-    });
+        });
+      }
+    );
   }
 
   /**
@@ -390,25 +405,64 @@ export class InteractionApi {
    * @param delta The distance to zoom. Positive values zoom in and negative
    *  values zoom out.
    */
-  public async zoomCamera(delta: number, ray?: Ray.Ray): Promise<void> {
+  public async zoomCamera(delta: number): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
       const vv = camera.viewVector();
       const v = Vector3.normalize(vv);
 
-      const vvPlane = Plane.create({ normal: v });
-      const pt = ray != null ? Ray.intersectPlane(ray, vvPlane) : undefined;
-      const zv = pt != null ? Vector3.subtract(pt, camera.position) : vv;
-
-      const direction = Vector3.normalize(zv);
-      const distance = Vector3.magnitude(zv);
+      const distance = Vector3.magnitude(vv);
       const epsilon = (3 * distance * delta) / viewport.height;
 
-      const position = Vector3.add(
-        camera.position,
-        Vector3.scale(epsilon, direction)
-      );
-      const lookAt = Plane.projectPoint(vvPlane, position);
-      return camera.update({ position, lookAt });
+      const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
+      const newCamera = camera.update({ position });
+      return newCamera;
+    });
+  }
+
+  public async zoomCameraToPoint(
+    point: Point.Point,
+    delta: number
+  ): Promise<void> {
+    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
+      const cam = frame.scene.camera;
+      const dir = cam.direction;
+
+      const frameCam = camera.toFrameCamera();
+      const ray = viewport.transformPointToRay(point, frame.image, frameCam);
+
+      if (this.zoomData == null) {
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, cam.lookAt);
+        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+        if (fallbackPt == null) {
+          console.warn(
+            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+          );
+          return camera;
+        }
+
+        const hitPt =
+          depthBuffer != null
+            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+            : fallbackPt;
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+        this.zoomData = { hitPt, hitPlane };
+      }
+
+      if (this.zoomData != null) {
+        const { hitPt, hitPlane } = this.zoomData;
+        const distance = Vector3.distance(camera.position, hitPt);
+        const epsilon = (6 * distance * delta) / viewport.height;
+
+        const position = Ray.at(ray, epsilon);
+        const lookAt = Plane.projectPoint(hitPlane, position);
+        const newCamera = camera.update({ position, lookAt });
+        const newDistance = Vector3.distance(position, lookAt);
+
+        if (newDistance >= newCamera.near) {
+          return newCamera;
+        }
+      }
+      return camera;
     });
   }
 
@@ -420,6 +474,7 @@ export class InteractionApi {
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
       this.panData = undefined;
+      this.zoomData = undefined;
       this.resetLastAngle();
 
       this.interactionFinishedEmitter.emit();

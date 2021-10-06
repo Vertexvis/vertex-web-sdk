@@ -134,7 +134,7 @@ describe(MouseInteractionHandler, () => {
 
     await delay(50);
 
-    expect(zoomInteraction.zoomOnRay).toHaveBeenCalled();
+    expect(zoomInteraction.zoomToPoint).toHaveBeenCalled();
   });
 
   it('ends zoom interaction on drag', async () => {
@@ -142,7 +142,7 @@ describe(MouseInteractionHandler, () => {
 
     await delay(50);
 
-    expect(zoomInteraction.zoomOnRay).toHaveBeenCalled();
+    expect(zoomInteraction.zoomToPoint).toHaveBeenCalled();
 
     await simulatePrimaryInteractions(50);
 

@@ -1,5 +1,5 @@
 import { InteractionApi } from './interactionApi';
-import { Point, Ray } from '@vertexvis/geometry';
+import { Point } from '@vertexvis/geometry';
 import { InteractionType } from './baseInteractionHandler';
 import { getMouseClientPosition } from '../dom';
 
@@ -111,7 +111,7 @@ export class ZoomInteraction extends MouseInteraction {
 
   private didTransformBegin = false;
   private interactionTimer: number | undefined;
-  private startRay?: Ray.Ray;
+  private startPt?: Point.Point;
 
   public constructor(private interactionTimeout = 1000) {
     super();
@@ -124,21 +124,23 @@ export class ZoomInteraction extends MouseInteraction {
     element: HTMLElement
   ): void {
     if (this.currentPosition == null) {
-      this.currentPosition = Point.create(event.screenX, event.screenY);
+      this.currentPosition = Point.create(event.clientX, event.clientY);
       const rect = element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
-      this.startRay = api.getRayFromPoint(point);
+      this.startPt = point;
       api.beginInteraction();
     }
   }
 
   public drag(event: MouseEvent, api: InteractionApi): void {
     if (this.currentPosition != null) {
-      const position = Point.create(event.screenX, event.screenY);
+      const position = Point.create(event.clientX, event.clientY);
       const delta = Point.subtract(position, this.currentPosition);
 
-      api.zoomCamera(delta.y, this.startRay);
-      this.currentPosition = position;
+      if (this.startPt != null) {
+        api.zoomCameraToPoint(this.startPt, delta.y);
+        this.currentPosition = position;
+      }
     }
   }
 
@@ -146,15 +148,19 @@ export class ZoomInteraction extends MouseInteraction {
     super.endDrag(event, api);
     this.stopInteractionTimer();
     this.didTransformBegin = false;
-    this.startRay = undefined;
+    this.startPt = undefined;
   }
 
   public zoom(delta: number, api: InteractionApi): void {
     this.operateWithTimer(api, () => api.zoomCamera(delta));
   }
 
-  public zoomOnRay(delta: number, ray: Ray.Ray, api: InteractionApi): void {
-    this.operateWithTimer(api, () => api.zoomCamera(delta, ray));
+  public zoomToPoint(
+    pt: Point.Point,
+    delta: number,
+    api: InteractionApi
+  ): void {
+    this.operateWithTimer(api, () => api.zoomCameraToPoint(pt, delta));
   }
 
   private beginInteraction(api: InteractionApi): void {

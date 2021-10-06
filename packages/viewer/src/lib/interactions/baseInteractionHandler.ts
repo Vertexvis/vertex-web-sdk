@@ -260,13 +260,16 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
-      const ray = this.interactionApi.getRayFromPoint(point);
 
       SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
         window.setTimeout(() => {
           if (this.interactionApi != null) {
             const zoomDelta = delta * percentage;
-            this.zoomInteraction.zoomOnRay(zoomDelta, ray, this.interactionApi);
+            this.zoomInteraction.zoomToPoint(
+              point,
+              zoomDelta,
+              this.interactionApi
+            );
           }
         }, index * 2);
       });
