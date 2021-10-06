@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/utils",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Utility library for Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -46,7 +46,7 @@
     "@types/uuid": "^8.3.0",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.4.1",
     "@vertexvis/jest-config-vertexvis": "^0.5.3",
-    "@vertexwebsdk/build": "0.10.1",
+    "@vertexwebsdk/build": "0.11.0",
     "eslint": "^7.20.0",
     "jest": "^26.6.3",
     "rollup": "^2.57.0",
