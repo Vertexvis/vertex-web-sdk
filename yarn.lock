@@ -1732,10 +1732,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^17", "@types/react@^17.0.22":
-  version "17.0.30"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.30.tgz#2f8e6f5ab6415c091cc5e571942ee9064b17609e"
-  integrity sha512-3Dt/A8gd3TCXi2aRe84y7cK1K8G+N9CZRDG8kDGguOKa0kf/ZkSwTmVIDPsm/KbQOVMaDJXwhBtuOXxqwdpWVg==
+"@types/react@*", "@types/react@^17.0.22":
+  version "17.0.31"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.31.tgz#fe05ebf91ff3ae35bb6b13f6c1b461db8089dff8"
+  integrity sha512-MQSR5EL4JZtdWRvqDgz9kXhSDDoy2zMTYyg7UhP+FZ5ttUOocWyxiqFJiI57sUG0BtaEX7WDXYQlkCYkb3X9vQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -1883,10 +1883,10 @@
     eslint-plugin-prettier "^4.0.0"
     prettier "^2.4.1"
 
-"@vertexvis/frame-streaming-protos@^0.6.3":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.6.3.tgz#dcb059ab294f13d287d3dde6cf19b4aa47d11382"
-  integrity sha512-jERZ1wSw+ny6n2wdHkPabhiOMKCvT3x+xM3393U+6K3yNxVxK59ScXbMFJJgWcf/fj3pKe9wtiX2ynhxB3d2lg==
+"@vertexvis/frame-streaming-protos@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.6.4.tgz#58d44a5f7dfcd8a5f495446a3189824596c59123"
+  integrity sha512-IfXe86Y2cSzFUFtbX1XAlXp6if+IUqTgQ5FD31xvueVgIzM5W4DqYIzLx0K0fmHgYps/b0X7QiB450qCWm+1Dw==
 
 "@vertexvis/jest-config-vertexvis@^0.5.3":
   version "0.5.3"
@@ -1907,10 +1907,15 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-web-workers/-/rollup-plugin-web-workers-0.1.0.tgz#53c0981df8127125e3fd3c67ddc0169693efec58"
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
-"@vertexvis/scene-tree-protos@^0.1.6":
+"@vertexvis/scene-tree-protos@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.7.tgz#d8a167e803a73d08cfdee14f5ab468ce45ae6872"
+  integrity sha512-KqyWzdr3hqYZY8qFHPwx4u2OGWUoydL+DBRsWRIvHFEb7FnNgSeAQ0YJ/4XyLcyhWn1uxNDQXviHAymgKx2AOg==
+
+"@vertexvis/scene-view-protos@^0.1.6":
   version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.6.tgz#c202ad9b769b191b30f84e5c4207ed7f66e35ed0"
-  integrity sha512-yrQZLUOgILVxFmPHELhMTf3z3kw9ZA++8H7WuyzbfCPZ1UaVa/Z0BPH4DXbGzyvQVU/z3GXwHhyyyk4fn1zAFA==
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.1.6.tgz#2a61ca99a856b08f4acd119532d7688ecc9df48e"
+  integrity sha512-FE604/R6aCWDcwf0+irQR0dJN8A0fmr9hy7ldPysUQT8t9Swc+YGDAN2+TUgQ2eT+QTpfuxoFQoZE3CHsoyMZg==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"
