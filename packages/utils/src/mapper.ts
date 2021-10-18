@@ -510,3 +510,83 @@ export function compose(
   };
 }
 /* eslint-enable padding-line-between-statements */
+
+/* eslint-disable padding-line-between-statements */
+/**
+ * Returns a mapper that returns the first defined result of a mapper. If all
+ * mappers return `undefined`, then `undefined` is returned.
+ */
+export function pickFirst<T, A, B>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>
+): Func<T, A | B | undefined>;
+export function pickFirst<T, A, B, C>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>
+): Func<T, A | B | C | undefined>;
+export function pickFirst<T, A, B, C, D>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>
+): Func<T, A | B | C | undefined>;
+export function pickFirst<T, A, B, C, D, E>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>
+): Func<T, A | B | C | D | E | undefined>;
+export function pickFirst<T, A, B, C, D, E, F>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>,
+  f: Func<T, F | undefined>
+): Func<T, A | B | C | D | E | F | undefined>;
+export function pickFirst<T, A, B, C, D, E, F, G>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>,
+  f: Func<T, F | undefined>,
+  g: Func<T, G | undefined>
+): Func<T, A | B | C | D | E | F | G | undefined>;
+export function pickFirst<T, A, B, C, D, E, F, G, H>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>,
+  f: Func<T, F | undefined>,
+  g: Func<T, G | undefined>,
+  h: Func<T, H | undefined>
+): Func<T, A | B | C | D | E | F | G | H | undefined>;
+export function pickFirst<T, A, B, C, D, E, F, G, H, I>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>,
+  f: Func<T, F | undefined>,
+  g: Func<T, G | undefined>,
+  h: Func<T, H | undefined>,
+  i: Func<T, I | undefined>
+): Func<T, A | B | C | D | E | F | G | H | I | undefined>;
+export function pickFirst(
+  ...decoders: Func<unknown, unknown | undefined>[]
+): Func<unknown, unknown | undefined> {
+  return (input) => {
+    return decoders.reduce((value, decoder) => {
+      if (value === undefined) {
+        return decoder(input);
+      } else {
+        return value;
+      }
+    }, undefined as unknown);
+  };
+}
+/* eslint-enable padding-line-between-statements */
