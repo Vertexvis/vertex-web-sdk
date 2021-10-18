@@ -1,6 +1,6 @@
 import { Dimensions, Point, Ray, Rectangle } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
-import type { IDecodedPNG } from 'fast-png';
+import type { DecodedPng } from 'fast-png';
 import { FrameImageLike, FramePerspectiveCamera } from './frame';
 import { Viewport } from './viewport';
 
@@ -51,7 +51,7 @@ export class DepthBuffer implements FrameImageLike {
    * @returns A depth buffer.
    */
   public static fromPng(
-    png: Pick<IDecodedPNG, 'width' | 'height' | 'data'>,
+    png: Pick<DecodedPng, 'width' | 'height' | 'data'>,
     camera: FramePerspectiveCamera,
     dimensions: Dimensions.Dimensions,
     imageRect: Rectangle.Rectangle,
