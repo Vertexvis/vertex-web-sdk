@@ -1,6 +1,6 @@
 import { Color } from '@vertexvis/utils';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
-import type { IDecodedPNG } from 'fast-png';
+import type { DecodedPng } from 'fast-png';
 import { FrameImageLike } from './frame';
 import { mapStencilBufferOrThrow } from '../mappers';
 import { decodePng } from '../../workers/png-decoder-pool';
@@ -161,7 +161,7 @@ export class StencilBuffer implements FrameImageLike {
    * @param imageScale The amount of scaling that was applied to fill the frame.
    */
   public static fromPng(
-    png: Pick<IDecodedPNG, 'data' | 'channels'>,
+    png: Pick<DecodedPng, 'data' | 'channels'>,
     frameDimensions: Dimensions.Dimensions,
     imageRect: Rectangle.Rectangle,
     imageScale: number
