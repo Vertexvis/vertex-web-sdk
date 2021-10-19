@@ -13,8 +13,8 @@ import {
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
-} from '../measurement/measurement';
-import { mapPlane, mapVector3f } from './geometry';
+} from '../measurement/model';
+import { mapPlane, mapVector3f } from '../mappers';
 import { Plane } from '@vertexvis/geometry';
 
 const mapPlanePair: M.Func<
@@ -28,7 +28,7 @@ const mapPlanePair: M.Func<
   ([start, end]) => ({ start, end })
 );
 
-export const mapPlanarDistance: M.Func<
+const mapPlanarDistance: M.Func<
   PbPlanarDistanceResult.AsObject,
   PlanarDistanceMeasurementResult
 > = M.defineMapper(
@@ -48,7 +48,7 @@ export const mapPlanarDistance: M.Func<
   })
 );
 
-export const mapPlanarAngle: M.Func<
+const mapPlanarAngle: M.Func<
   PbPlanarAngleResult.AsObject,
   PlanarAngleMeasurementResult
 > = M.defineMapper(
@@ -68,7 +68,7 @@ export const mapPlanarAngle: M.Func<
   })
 );
 
-export const mapMinimumDistance: M.Func<
+const mapMinimumDistance: M.Func<
   PbMinimumDistanceResult.AsObject,
   MinimumDistanceMeasurementResult
 > = M.defineMapper(
@@ -85,22 +85,22 @@ export const mapMinimumDistance: M.Func<
   })
 );
 
-export const mapPlanarDistanceFromResult: M.Func<
+const mapPlanarDistanceFromResult: M.Func<
   PbMeasurementResult.AsObject,
   PlanarDistanceMeasurementResult | undefined | null
 > = M.mapProp('planarDistance', M.ifDefined(mapPlanarDistance));
 
-export const mapPlanarAngleFromResult: M.Func<
+const mapPlanarAngleFromResult: M.Func<
   PbMeasurementResult.AsObject,
   PlanarAngleMeasurementResult | undefined | null
 > = M.mapProp('planarAngle', M.ifDefined(mapPlanarAngle));
 
-export const mapMinimumDistanceFromResult: M.Func<
+const mapMinimumDistanceFromResult: M.Func<
   PbMeasurementResult.AsObject,
   MinimumDistanceMeasurementResult | undefined | null
 > = M.mapProp('minimumDistance', M.ifDefined(mapMinimumDistance));
 
-export const mapMeasurementResult: M.Func<
+const mapMeasurementResult: M.Func<
   PbMeasurementResult.AsObject,
   MeasurementResult
 > = M.compose(
@@ -124,3 +124,5 @@ export const mapMeasureResponse: M.Func<
   ),
   ([results]) => ({ results })
 );
+
+export const mapMeasureResponseOrThrow = M.ifInvalidThrow(mapMeasureResponse);

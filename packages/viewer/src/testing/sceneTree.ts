@@ -1,16 +1,13 @@
 import { EventDispatcher } from '@vertexvis/utils';
 import type {
   ResponseStream,
-  ServiceError,
   Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import Chance from 'chance';
 import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
-
-const random = new Chance();
+import { random } from './random';
 
 export class ResponseStreamMock<T> implements ResponseStream<T> {
   private onData = new EventDispatcher<T>();
@@ -43,28 +40,6 @@ export class ResponseStreamMock<T> implements ResponseStream<T> {
   public invokeOnStatus(status: Status): void {
     this.onStatus.emit(status);
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mockGrpcUnaryResult(
-  result: unknown
-): (...args: any[]) => unknown {
-  return (_, __, handler) => {
-    setTimeout(() => {
-      handler(null, result);
-    }, 10);
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mockGrpcUnaryError(
-  error: Error | ServiceError
-): (...args: any[]) => unknown {
-  return (_, __, handler) => {
-    setTimeout(() => {
-      handler(error);
-    }, 10);
-  };
 }
 
 export function createGetTreeResponse(

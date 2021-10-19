@@ -38,13 +38,13 @@ import Chance from 'chance';
 import { Async } from '@vertexvis/utils';
 import { SceneTreeController, SceneTreeState } from '../controller';
 import { fromNodeProto, Row } from '../row';
+import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
   mockGrpcUnaryResult,
   ResponseStreamMock,
-} from '../testing';
-import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
+} from '../../../../testing';
 
 const random = new Chance();
 
