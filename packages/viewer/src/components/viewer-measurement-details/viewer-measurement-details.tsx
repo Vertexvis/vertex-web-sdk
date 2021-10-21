@@ -28,9 +28,9 @@ export type ViewerMeasurementDetailsAngleUnit = 'degrees' | 'radians';
 })
 export class ViewerMeasurementDetails {
   /**
-   * The `MeasurementModel` that this popover should reflect.
+   * The `MeasurementModel` that should be reflected in these details.
    * If not specified, a new `MeasurementModel` will be created,
-   * which can then be used to update the display of this popover.
+   * which can then be used to update the display.
    */
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();

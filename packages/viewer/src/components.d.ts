@@ -786,7 +786,7 @@ export namespace Components {
      */
     fractionalDigits: number;
     /**
-     * The `MeasurementModel` that this popover should reflect. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display of this popover.
+     * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel: MeasurementModel;
     /**
@@ -1833,7 +1833,7 @@ declare namespace LocalJSX {
      */
     fractionalDigits?: number;
     /**
-     * The `MeasurementModel` that this popover should reflect. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display of this popover.
+     * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel?: MeasurementModel;
     /**
