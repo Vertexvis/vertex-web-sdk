@@ -30,12 +30,6 @@ import {
   ColumnKey,
   Node,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import {
-  createGetTreeResponse,
-  mockGrpcUnaryError,
-  mockGrpcUnaryResult,
-  ResponseStreamMock,
-} from './lib/testing';
 import { Viewer } from '../viewer/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import {
@@ -51,6 +45,12 @@ import { grpc } from '@improbable-eng/grpc-web';
 import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import { loadModelForViewer } from '../../testing/viewer';
+import {
+  createGetTreeResponse,
+  mockGrpcUnaryError,
+  mockGrpcUnaryResult,
+  ResponseStreamMock,
+} from '../../testing';
 
 const random = new Chance();
 

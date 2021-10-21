@@ -184,3 +184,30 @@ describe(Mapper.defineMapper, () => {
     });
   });
 });
+
+describe(Mapper.pickFirst, () => {
+  const mapper = Mapper.pickFirst<number, number, number>(
+    (input) => {
+      if (input >= 0 && input < 10) {
+        return input;
+      } else {
+        return undefined;
+      }
+    },
+    (input) => {
+      if (input >= 20 && input < 30) {
+        return input;
+      } else {
+        return undefined;
+      }
+    }
+  );
+
+  it('returns first defined result', () => {
+    expect(mapper(20)).toBe(20);
+  });
+
+  it('returns undefined if no defined result', () => {
+    expect(mapper(50)).toBeUndefined();
+  });
+});

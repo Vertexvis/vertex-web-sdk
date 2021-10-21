@@ -1,12 +1,7 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Object } from 'ts-toolbelt';
-import { Color, Mapper as M } from '@vertexvis/utils';
-import {
-  BoundingBox,
-  Dimensions,
-  Rectangle,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Mapper as M } from '@vertexvis/utils';
+import { BoundingBox, Dimensions, Rectangle } from '@vertexvis/geometry';
 import {
   CrossSectioning,
   FrameCamera,
@@ -15,61 +10,9 @@ import {
   FrameScene,
   FramePerspectiveCamera,
   Orientation,
-} from './types';
-
-export const mapRGBi: M.Func<vertexvis.protobuf.core.IRGBi, Color.Color> =
-  M.defineMapper(
-    M.read(M.requiredProp('r'), M.requiredProp('g'), M.requiredProp('b')),
-    ([r, g, b]) => Color.create(r, g, b)
-  );
-
-export const mapVector3f: M.Func<
-  vertexvis.protobuf.core.IVector3f,
-  Vector3.Vector3
-> = M.defineMapper(
-  M.read(M.requiredProp('x'), M.requiredProp('y'), M.requiredProp('z')),
-  ([x, y, z]) => Vector3.create(x, y, z)
-);
-
-export const mapBoundingBox3f: M.Func<
-  vertexvis.protobuf.core.IBoundingBox3f,
-  BoundingBox.BoundingBox
-> = M.defineMapper(
-  M.read(
-    M.requiredProp('xmin'),
-    M.requiredProp('ymin'),
-    M.requiredProp('zmin'),
-    M.requiredProp('xmax'),
-    M.requiredProp('ymax'),
-    M.requiredProp('zmax')
-  ),
-  ([xmin, ymin, zmin, xmax, ymax, zmax]) =>
-    BoundingBox.create(
-      Vector3.create(xmin, ymin, zmin),
-      Vector3.create(xmax, ymax, zmax)
-    )
-);
-
-export const mapDim: M.Func<
-  vertexvis.protobuf.stream.IDimensions,
-  Dimensions.Dimensions
-> = M.defineMapper(
-  M.read(M.requiredProp('width'), M.requiredProp('height')),
-  ([width, height]) => Dimensions.create(width, height)
-);
-
-export const mapRect: M.Func<
-  vertexvis.protobuf.stream.IRectangle,
-  Rectangle.Rectangle
-> = M.defineMapper(
-  M.read(
-    M.requiredProp('x'),
-    M.requiredProp('y'),
-    M.requiredProp('width'),
-    M.requiredProp('height')
-  ),
-  ([x, y, width, height]) => Rectangle.create(x, y, width, height)
-);
+} from '../types';
+import { mapRGBi } from './material';
+import { mapVector3f, mapBoundingBox3f, mapDim, mapRect } from './geometry';
 
 export const mapCamera: M.Func<
   vertexvis.protobuf.stream.ICamera,
