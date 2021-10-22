@@ -2,8 +2,10 @@ jest.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
 );
 
-import { MeasureEntity } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
+import { Vector3 } from '@vertexvis/geometry';
+import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
+import { MeasurementEntity } from '..';
 import {
   createMeasureResponse,
   createMinimumDistanceResult,
@@ -15,6 +17,15 @@ import { MeasurementModel } from '../model';
 
 describe('MeasurementController', () => {
   const model = new MeasurementModel();
+  const entity1 = new MeasurementEntity(
+    Vector3.create(),
+    new ModelEntity().serializeBinary()
+  );
+  const entity2 = new MeasurementEntity(
+    Vector3.create(),
+    new ModelEntity().serializeBinary()
+  );
+
   const client = new SceneViewAPIClient(random.url());
   const jwtProvider = (): string => random.string();
   const controller = new MeasurementController(model, client, jwtProvider);
@@ -33,8 +44,8 @@ describe('MeasurementController', () => {
         )
       );
 
-      const entity = new MeasureEntity();
-      const results = await controller.addEntity(entity);
+      await controller.addEntity(entity1);
+      const results = await controller.addEntity(entity2);
 
       expect(results).toEqual([
         expect.objectContaining({ type: 'minimum-distance' }),
@@ -48,9 +59,9 @@ describe('MeasurementController', () => {
         )
       );
 
-      const entity = new MeasureEntity();
-      controller.addEntity(entity);
-      const results = await controller.addEntity(entity);
+      controller.addEntity(entity1);
+      await controller.addEntity(entity2);
+      const results = await controller.addEntity(entity2);
 
       expect(client.measure).toHaveBeenCalledTimes(1);
       expect(results).toEqual([
@@ -67,14 +78,14 @@ describe('MeasurementController', () => {
         )
       );
 
-      const entity = new MeasureEntity();
-      await controller.addEntity(entity);
+      await controller.addEntity(entity1);
+      await controller.addEntity(entity2);
 
       (client.measure as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createMeasureResponse())
       );
 
-      const results = await controller.removeEntity(entity);
+      const results = await controller.removeEntity(entity2);
       expect(results).toEqual([]);
     });
   });

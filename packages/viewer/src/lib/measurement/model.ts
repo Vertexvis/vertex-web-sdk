@@ -1,6 +1,15 @@
 import { Plane, Vector3 } from '@vertexvis/geometry';
+import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 import { MeasureEntity } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import {
+  Disposable,
+  EventDispatcher,
+  Listener,
+  Mapper,
+} from '@vertexvis/utils';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { mapVector3f } from '../mappers';
+import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 
 /**
  * A measurement result that represents the closets point between two entities.
@@ -93,6 +102,44 @@ export interface MeasurementOutcome {
   results: MeasurementResult[];
 }
 
+export class MeasurementEntity {
+  public constructor(
+    private point: Vector3.Vector3,
+    private modelEntity: Uint8Array
+  ) {}
+
+  public static fromHit(
+    hit: vertexvis.protobuf.stream.IHit
+  ): MeasurementEntity {
+    if (hit.hitPoint != null && hit.modelEntity != null) {
+      const hitPoint = Mapper.ifInvalidThrow(mapVector3f)(hit.hitPoint);
+      const modelEntity = vertexvis.protobuf.core.ModelEntity.encode(
+        hit.modelEntity
+      ).finish();
+      return new MeasurementEntity(hitPoint, modelEntity);
+    } else {
+      throw new Error(
+        'Cannot create MeasurementEntity from Hit. Hit is missing hit point and model entity'
+      );
+    }
+  }
+
+  public toProto(): MeasureEntity {
+    const entity = new MeasureEntity();
+
+    const point = new Vector3f();
+    point.setX(this.point.x);
+    point.setY(this.point.y);
+    point.setZ(this.point.z);
+    entity.setPoint(point);
+
+    const modelEntity = ModelEntity.deserializeBinary(this.modelEntity);
+    entity.setModelEntity(modelEntity);
+
+    return entity;
+  }
+}
+
 /**
  * A model representing the state of measurement.
  *
@@ -104,7 +151,7 @@ export interface MeasurementOutcome {
  * measurements have been added.
  */
 export class MeasurementModel {
-  private entities = new Set<MeasureEntity>();
+  private entities = new Set<MeasurementEntity>();
   private results = new Set<MeasurementResult>();
   private resultsChanged = new EventDispatcher<MeasurementResult[]>();
 
@@ -114,7 +161,7 @@ export class MeasurementModel {
    * @param entity An entity to measure.
    * @returns `true` if the entity has been added.
    */
-  public addEntity(entity: MeasureEntity): boolean {
+  public addEntity(entity: MeasurementEntity): boolean {
     if (!this.entities.has(entity)) {
       this.entities.add(entity);
       return true;
@@ -172,7 +219,7 @@ export class MeasurementModel {
   /**
    * Returns all the entities registered with the model.
    */
-  public getEntities(): MeasureEntity[] {
+  public getEntities(): MeasurementEntity[] {
     return Array.from(this.entities);
   }
 
@@ -189,7 +236,7 @@ export class MeasurementModel {
    * @param entity The entity to remove.
    * @returns `true` if the entity was removed.
    */
-  public removeEntity(entity: MeasureEntity): boolean {
+  public removeEntity(entity: MeasurementEntity): boolean {
     if (this.entities.has(entity)) {
       this.entities.delete(entity);
       return true;
