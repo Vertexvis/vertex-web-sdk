@@ -8,10 +8,7 @@ import {
   MeasurementResult,
 } from '../../lib/measurement/model';
 import { MeasurementUnits, UnitType } from '../../lib/types';
-import {
-  getMeasurementDetailsSummary,
-  MeasurementDetailsSummary,
-} from './utils';
+import { formatResults } from './utils';
 
 export type ViewerMeasurementDetailsDistanceFormatter = (
   distance: number
@@ -20,6 +17,17 @@ export type ViewerMeasurementDetailsDistanceFormatter = (
 export type ViewerMeasurementDetailsAngleFormatter = (angle: number) => string;
 
 export type ViewerMeasurementDetailsAngleUnit = 'degrees' | 'radians';
+
+export interface ViewerMeasurementDetailsSummary {
+  parallelDistance?: number;
+  minDistance?: number;
+  maxDistance?: number;
+  area?: number;
+  angle?: number;
+  x?: number;
+  y?: number;
+  z?: number;
+}
 
 @Component({
   tag: 'vertex-viewer-measurement-details',
@@ -70,6 +78,24 @@ export class ViewerMeasurementDetails {
   public angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
 
   /**
+   * An optional set of details to hide. This can be used to display
+   * reduced sets of details for more a more focused representation.
+   * Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary`
+   * type, or as a JSON array with the format '["angle", "minDistance"]'.
+   */
+  @Prop({ mutable: true })
+  public hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+
+  /**
+   * An optional set of details to hide. This can be used to display
+   * reduced sets of details for more a more focused representation.
+   * Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary`
+   * type, or as a JSON array with the format '["angle", "minDistance"]'.
+   */
+  @Prop({ attribute: 'hidden-details' })
+  public hiddenDetailsJson?: string;
+
+  /**
    * @readonly
    *
    * The current `MeasurementResult` displayed.
@@ -88,15 +114,23 @@ export class ViewerMeasurementDetails {
   @Prop({
     mutable: true,
   })
-  public summary?: MeasurementDetailsSummary;
+  public summary?: ViewerMeasurementDetailsSummary;
 
   private distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;
 
-  public async connectedCallback(): Promise<void> {
+  public connectedCallback(): void {
     this.resultsChangeListener = this.measurementModel.onResultsChanged(
       this.handleResultsChange
     );
+  }
+
+  public componentWillLoad(): void {
+    this.parseHiddenDetails();
+  }
+
+  public componentWillUpdate(): void {
+    this.parseHiddenDetails();
   }
 
   public disconnectedCallback(): void {
@@ -106,6 +140,14 @@ export class ViewerMeasurementDetails {
   @Watch('distanceUnits')
   protected handleDistanceUnitsChanged(): void {
     this.distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
+  }
+
+  @Watch('measurementModel')
+  protected handleMeasurementModelChanged(): void {
+    this.resultsChangeListener?.dispose();
+    this.resultsChangeListener = this.measurementModel.onResultsChanged(
+      this.handleResultsChange
+    );
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -153,9 +195,15 @@ export class ViewerMeasurementDetails {
     );
   }
 
+  private parseHiddenDetails(): void {
+    if (this.hiddenDetailsJson != null) {
+      this.hiddenDetails = JSON.parse(this.hiddenDetailsJson);
+    }
+  }
+
   private handleResultsChange = (results: MeasurementResult[]): void => {
     this.results = results;
-    this.summary = getMeasurementDetailsSummary(results);
+    this.createSummary();
   };
 
   private formatDistance = (distance: number): string => {
@@ -180,5 +228,22 @@ export class ViewerMeasurementDetails {
     } else {
       return `${Angle.toRadians(angle).toFixed(this.fractionalDigits)} rad`;
     }
+  };
+
+  private createSummary = (): void => {
+    const baseSummary = formatResults(this.results);
+    const hidden = this.hiddenDetails ?? [];
+
+    this.summary = (
+      Object.keys(baseSummary) as Array<keyof ViewerMeasurementDetailsSummary>
+    )
+      .filter((k) => !hidden.includes(k))
+      .reduce(
+        (reducedSummary, key) => ({
+          ...reducedSummary,
+          [key]: baseSummary[key],
+        }),
+        {}
+      );
   };
 }

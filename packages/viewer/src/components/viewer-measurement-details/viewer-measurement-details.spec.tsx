@@ -4,7 +4,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
 import { ViewerMeasurementDetails } from './viewer-measurement-details';
 import '../../testing/domMocks';
-import { getMeasurementDetailsSummary } from './utils';
+import { formatResults } from './utils';
 import { MeasurementModel } from '../..';
 
 describe('vertex-viewer-measurement-details', () => {
@@ -23,7 +23,7 @@ describe('vertex-viewer-measurement-details', () => {
       )
     ).toBeNull();
 
-    measurementDetails.summary = getMeasurementDetailsSummary([
+    measurementDetails.summary = formatResults([
       {
         type: 'minimum-distance',
         distance: 2,
@@ -151,5 +151,134 @@ describe('vertex-viewer-measurement-details', () => {
     expect(entries[1].innerText).toContain('X:-3.00 mm');
     expect(entries[2].innerText).toContain('Y:3.00 mm');
     expect(entries[3].innerText).toContain('Z:-3.00 mm');
+  });
+
+  it('responds to model changes', async () => {
+    const model = new MeasurementModel();
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => (
+        <vertex-viewer-measurement-details measurementModel={model} />
+      ),
+    });
+
+    const measurementDetails =
+      page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    model.replaceResultsWithOutcome({
+      results: [
+        {
+          type: 'minimum-distance',
+          distance: 10,
+          closestPoint1: Vector3.create(1, 5, 3),
+          closestPoint2: Vector3.create(4, 2, 6),
+        },
+      ],
+    });
+
+    await page.waitForChanges();
+
+    const model2 = new MeasurementModel();
+    measurementDetails.measurementModel = model2;
+
+    await page.waitForChanges();
+
+    model2.replaceResultsWithOutcome({
+      results: [
+        {
+          type: 'planar-distance',
+          distance: 10,
+          plane1: Plane.create(),
+          plane2: Plane.create(),
+        },
+      ],
+    });
+
+    await page.waitForChanges();
+
+    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+      'div.measurement-details-entry'
+    ) as NodeListOf<HTMLDivElement>;
+
+    expect(entries.length).toBe(1);
+    expect(entries[0].innerText).toContain('Parallel Dist:10.00 mm');
+  });
+
+  it('hides details', async () => {
+    const model = new MeasurementModel();
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => (
+        <vertex-viewer-measurement-details
+          measurementModel={model}
+          hiddenDetails={['x']}
+        />
+      ),
+    });
+
+    const measurementDetails =
+      page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    model.replaceResultsWithOutcome({
+      results: [
+        {
+          type: 'minimum-distance',
+          distance: 10,
+          closestPoint1: Vector3.create(1, 5, 3),
+          closestPoint2: Vector3.create(4, 2, 6),
+        },
+      ],
+    });
+
+    await page.waitForChanges();
+
+    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+      'div.measurement-details-entry'
+    ) as NodeListOf<HTMLDivElement>;
+
+    expect(entries.length).toBe(3);
+    expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
+    expect(entries[1].innerText).toContain('Y:3.00 mm');
+    expect(entries[2].innerText).toContain('Z:-3.00 mm');
+  });
+
+  it('hides details from json string', async () => {
+    const model = new MeasurementModel();
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      html: `
+        <vertex-viewer-measurement-details
+          hidden-details='["minDistance"]'
+        />`,
+    });
+
+    const measurementDetails =
+      page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    measurementDetails.measurementModel = model;
+
+    await page.waitForChanges();
+
+    model.replaceResultsWithOutcome({
+      results: [
+        {
+          type: 'minimum-distance',
+          distance: 10,
+          closestPoint1: Vector3.create(1, 5, 3),
+          closestPoint2: Vector3.create(4, 2, 6),
+        },
+      ],
+    });
+
+    await page.waitForChanges();
+
+    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+      'div.measurement-details-entry'
+    ) as NodeListOf<HTMLDivElement>;
+
+    expect(entries.length).toBe(3);
+    expect(entries[0].innerText).toContain('X:-3.00 mm');
+    expect(entries[1].innerText).toContain('Y:3.00 mm');
+    expect(entries[2].innerText).toContain('Z:-3.00 mm');
   });
 });

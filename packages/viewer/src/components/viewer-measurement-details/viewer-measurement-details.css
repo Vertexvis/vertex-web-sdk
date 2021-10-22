@@ -1,41 +1,5 @@
 :host {
   /**
-   * @prop --viewer-measurement-details-padding:
-   * The padding to display around the measurement details
-   * as well as between individual rows.
-   * Defaults to 0.5rem.
-   */
-  --viewer-measurement-details-padding: 0.5rem;
-
-  /**
-   * @prop --viewer-measurement-details-background-color:
-   * The background color to display behind the measurement details.
-   * Defaults to var(--white).
-   */
-  --viewer-measurement-details-background-color: var(--white);
-
-  /**
-   * @prop --viewer-measurement-details-opacity:
-   * The opacity of the measurement details.
-   * Defaults to 0.95.
-   */
-  --viewer-measurement-details-opacity: 0.95;
-
-  /**
-   * @prop --viewer-measurement-details-shadow:
-   * The box shadow of the measurement details.
-   * Defaults to 0 0 5px rgba(0, 0, 0, 0.25).
-   */
-  --viewer-measurement-details-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
-
-  /**
-   * @prop --viewer-measurement-details-font-size:
-   * The font size to display the measurement details at.
-   * Defaults to 0.75rem.
-   */
-  --viewer-measurement-details-font-size: 0.75rem;
-
-  /**
    * @prop --viewer-measurement-details-x-color:
    * The color of the `X` label in measurements.
    * Defaults to red.
@@ -60,12 +24,6 @@
 .measurement-details {
   display: flex;
   flex-direction: column;
-  row-gap: var(--viewer-measurement-details-padding);
-  font-size: var(--viewer-measurement-details-font-size);
-  background-color: var(--viewer-measurement-details-background-color);
-  opacity: var(--viewer-measurement-details-opacity);
-  padding: var(--viewer-measurement-details-padding);
-  box-shadow: var(--viewer-measurement-details-shadow);
 }
 
 .measurement-details-entry {

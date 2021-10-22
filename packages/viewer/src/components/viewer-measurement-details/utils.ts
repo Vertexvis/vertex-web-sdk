@@ -1,38 +1,64 @@
 import { Vector3 } from '@vertexvis/geometry';
-import { MeasurementResult } from '../../lib/measurement/model';
+import {
+  MeasurementResult,
+  MinimumDistanceMeasurementResult,
+  PlanarDistanceMeasurementResult,
+  PlanarAngleMeasurementResult,
+} from '../../lib/measurement/model';
+import { ViewerMeasurementDetailsSummary } from './viewer-measurement-details';
 
-export interface MeasurementDetailsSummary {
-  parallelDistance?: number;
-  minDistance?: number;
-  maxDistance?: number;
-  area?: number;
-  angle?: number;
-  x?: number;
-  y?: number;
-  z?: number;
+export type MeasurementResultSummaryFormatter<T extends MeasurementResult> = (
+  result: T,
+  summary?: ViewerMeasurementDetailsSummary
+) => ViewerMeasurementDetailsSummary;
+
+export function summaryFromMinDistanceResult(
+  result: MinimumDistanceMeasurementResult,
+  summary: ViewerMeasurementDetailsSummary = {}
+): ViewerMeasurementDetailsSummary {
+  const distanceVector = Vector3.subtract(
+    result.closestPoint1,
+    result.closestPoint2
+  );
+
+  return {
+    ...summary,
+    minDistance: result.distance,
+    ...distanceVector,
+  };
 }
 
-export function getMeasurementDetailsSummary(
-  results: MeasurementResult[]
-): MeasurementDetailsSummary {
-  return results.reduce((d, result) => {
-    const distanceVector =
-      result.type === 'minimum-distance'
-        ? Vector3.subtract(result.closestPoint1, result.closestPoint2)
-        : undefined;
+export function summaryFromPlanarDistanceResult(
+  result: PlanarDistanceMeasurementResult,
+  summary: ViewerMeasurementDetailsSummary = {}
+): ViewerMeasurementDetailsSummary {
+  return {
+    ...summary,
+    parallelDistance: result.distance,
+  };
+}
 
-    return {
-      ...d,
-      minDistance:
-        result.type === 'minimum-distance' ? result.distance : d.minDistance,
-      angle: result.type === 'planar-angle' ? result.angle : d.angle,
-      parallelDistance:
-        result.type === 'planar-distance'
-          ? result.distance
-          : d.parallelDistance,
-      x: distanceVector != null ? distanceVector.x : d.x,
-      y: distanceVector != null ? distanceVector.y : d.y,
-      z: distanceVector != null ? distanceVector.z : d.z,
-    };
-  }, {} as MeasurementDetailsSummary);
+export function summaryFromPlanarAngleResult(
+  result: PlanarAngleMeasurementResult,
+  summary: ViewerMeasurementDetailsSummary = {}
+): ViewerMeasurementDetailsSummary {
+  return {
+    ...summary,
+    angle: result.angle,
+  };
+}
+
+export function formatResults(
+  results: MeasurementResult[]
+): ViewerMeasurementDetailsSummary {
+  return results.reduce((summary, result) => {
+    switch (result.type) {
+      case 'minimum-distance':
+        return summaryFromMinDistanceResult(result, summary);
+      case 'planar-angle':
+        return summaryFromPlanarAngleResult(result, summary);
+      case 'planar-distance':
+        return summaryFromPlanarDistanceResult(result, summary);
+    }
+  }, {});
 }
