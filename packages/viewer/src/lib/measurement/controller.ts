@@ -1,5 +1,4 @@
 import {
-  MeasureEntity,
   MeasureRequest,
   MeasureResponse,
 } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
@@ -11,6 +10,7 @@ import {
   MeasurementResult,
 } from './model';
 import { mapMeasureResponseOrThrow } from './mapper';
+import { MeasurementEntity } from '.';
 
 /**
  * The `MeasurementController` is responsible for performing measurements of
@@ -33,7 +33,9 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after registering this
    * entity.
    */
-  public async addEntity(entity: MeasureEntity): Promise<MeasurementResult[]> {
+  public async addEntity(
+    entity: MeasurementEntity
+  ): Promise<MeasurementResult[]> {
     if (this.model.addEntity(entity)) {
       this.measureAndUpdateModel();
     }
@@ -49,7 +51,7 @@ export class MeasurementController {
    * entity.
    */
   public async removeEntity(
-    entity: MeasureEntity
+    entity: MeasurementEntity
   ): Promise<MeasurementResult[]> {
     if (this.model.removeEntity(entity)) {
       this.measureAndUpdateModel();
@@ -58,14 +60,21 @@ export class MeasurementController {
   }
 
   private measureAndUpdateModel(): void {
-    this.results = this.measureEntities().then((outcome) => {
-      this.model.replaceResultsWithOutcome(outcome);
-      return this.model.getResults();
-    });
+    // For now, only request measurements if there are more than two entities.
+    // This is temporary as we'll need to support passing a single entity for
+    // area measurements.
+    if (this.model.getEntities().length > 1) {
+      this.results = this.measureEntities().then((outcome) => {
+        this.model.replaceResultsWithOutcome(outcome);
+        return this.model.getResults();
+      });
+    } else {
+      this.results = Promise.resolve([]);
+    }
   }
 
   private async measureEntities(): Promise<MeasurementOutcome> {
-    const entities = this.model.getEntities();
+    const entities = this.model.getEntities().map((e) => e.toProto());
 
     const res = await requestUnary<MeasureResponse>((handler) => {
       const meta = createMetadata(this.jwtProvider);
