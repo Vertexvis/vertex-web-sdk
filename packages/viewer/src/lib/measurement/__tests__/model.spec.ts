@@ -1,43 +1,44 @@
-import { MeasureEntity } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { MeasurementModel, MinimumDistanceMeasurementResult } from '../model';
 import { random } from '../../../testing';
 import { Vector3 } from '@vertexvis/geometry';
+import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
+import { MeasurementEntity } from '..';
 
 describe('MeasurementModel', () => {
+  const point = Vector3.create();
+  const modelEntity = new ModelEntity().serializeBinary();
+  const measureEntity = new MeasurementEntity(point, modelEntity);
+
   describe(MeasurementModel.prototype.addEntity, () => {
     it('adds the entity if not registered', () => {
       const model = new MeasurementModel();
-      const entity = new MeasureEntity();
 
-      expect(model.addEntity(entity)).toBe(true);
-      expect(model.getEntities()).toEqual([entity]);
+      expect(model.addEntity(measureEntity)).toBe(true);
+      expect(model.getEntities()).toEqual([measureEntity]);
     });
 
     it('wont duplicate entities', () => {
       const model = new MeasurementModel();
-      const entity = new MeasureEntity();
-      model.addEntity(entity);
+      model.addEntity(measureEntity);
 
-      expect(model.addEntity(entity)).toBe(false);
-      expect(model.getEntities()).toEqual([entity]);
+      expect(model.addEntity(measureEntity)).toBe(false);
+      expect(model.getEntities()).toEqual([measureEntity]);
     });
   });
 
   describe(MeasurementModel.prototype.removeEntity, () => {
     it('removes entity if registered', () => {
       const model = new MeasurementModel();
-      const entity = new MeasureEntity();
-      model.addEntity(entity);
+      model.addEntity(measureEntity);
 
-      expect(model.removeEntity(entity)).toBe(true);
+      expect(model.removeEntity(measureEntity)).toBe(true);
       expect(model.getEntities()).toEqual([]);
     });
 
     it('does not remove entity if unregistered', () => {
       const model = new MeasurementModel();
-      const entity = new MeasureEntity();
 
-      expect(model.removeEntity(entity)).toBe(false);
+      expect(model.removeEntity(measureEntity)).toBe(false);
       expect(model.getEntities()).toEqual([]);
     });
   });
@@ -95,8 +96,7 @@ describe('MeasurementModel', () => {
   describe(MeasurementModel.prototype.clearEntities, () => {
     it('removes all results', () => {
       const model = new MeasurementModel();
-      const entity = new MeasureEntity();
-      model.addEntity(entity);
+      model.addEntity(measureEntity);
 
       model.clearEntities();
       expect(model.getEntities()).toEqual([]);
