@@ -1,6 +1,8 @@
 import {
   MeasureRequest,
   MeasureResponse,
+  ModelEntityUpdate,
+  UpdateModelEntitiesRequest,
 } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
@@ -11,6 +13,8 @@ import {
 } from './model';
 import { mapMeasureResponseOrThrow } from './mapper';
 import { MeasurementEntity } from './model';
+import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
+import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 /**
  * The `MeasurementController` is responsible for performing measurements of
@@ -33,24 +37,20 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after registering this
    * entity.
    */
-  public async addEntity(
-    entity: MeasurementEntity
-  ): Promise<MeasurementResult[]> {
-    if (this.model.addEntity(entity)) {
-      this.measureAndUpdateModel();
-    }
-    return this.results;
+  public addEntity(entity: MeasurementEntity): Promise<MeasurementResult[]> {
+    return this.performMeasurement(() => this.model.addEntity(entity));
   }
 
   /**
    * Clears all entities and returns a promise that resolves with an empty list
    * of measurement results.
    */
-  public async clearEntities(): Promise<MeasurementResult[]> {
-    this.model.clearEntities();
-    this.model.clearResults();
-    this.measureAndUpdateModel();
-    return this.results;
+  public clearEntities(): Promise<MeasurementResult[]> {
+    return this.performMeasurement(() => {
+      this.model.clearEntities();
+      this.model.clearResults();
+      return true;
+    });
   }
 
   /**
@@ -61,20 +61,26 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after removing this
    * entity.
    */
-  public async removeEntity(
-    entity: MeasurementEntity
-  ): Promise<MeasurementResult[]> {
-    if (this.model.removeEntity(entity)) {
-      this.measureAndUpdateModel();
+  public removeEntity(entity: MeasurementEntity): Promise<MeasurementResult[]> {
+    return this.performMeasurement(() => this.model.removeEntity(entity));
+  }
+
+  private performMeasurement(f: () => boolean): Promise<MeasurementResult[]> {
+    const previous = this.model.getEntities();
+    const changed = f();
+    const entities = this.model.getEntities();
+    if (changed) {
+      this.measureAndUpdateModel(entities);
+      this.highlightEntities(previous, entities);
     }
     return this.results;
   }
 
-  private measureAndUpdateModel(): void {
+  private measureAndUpdateModel(entities: MeasurementEntity[]): void {
     // For now, only request measurements if there are more than two entities.
     // This is temporary as we'll need to support passing a single entity for
     // area measurements.
-    if (this.model.getEntities().length > 1) {
+    if (entities.length > 1) {
       this.results = this.measureEntities().then((outcome) => {
         this.model.replaceResultsWithOutcome(outcome);
         return this.model.getResults();
@@ -96,5 +102,32 @@ export class MeasurementController {
     });
 
     return mapMeasureResponseOrThrow(res.toObject());
+  }
+
+  private async highlightEntities(
+    previous: MeasurementEntity[],
+    entities: MeasurementEntity[]
+  ): Promise<void> {
+    await requestUnary(async (handler) => {
+      const meta = await createMetadata(this.jwtProvider);
+
+      const clearEntities = previous.map((e) => {
+        const update = new ModelEntityUpdate();
+        update.setModelEntity(ModelEntity.deserializeBinary(e.modelEntity));
+        update.setHighlight(new BoolValue().setValue(false));
+        return update;
+      });
+      const highlightEntities = entities.map((e) => {
+        const update = new ModelEntityUpdate();
+        update.setModelEntity(ModelEntity.deserializeBinary(e.modelEntity));
+        update.setHighlight(new BoolValue().setValue(true));
+        return update;
+      });
+
+      const req = new UpdateModelEntitiesRequest();
+      req.setUpdatesList([...clearEntities, ...highlightEntities]);
+
+      this.client.updateModelEntities(req, meta, handler);
+    });
   }
 }
