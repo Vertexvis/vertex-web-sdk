@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-imports */
-import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, Watch } from '@stencil/core';
 /* eslint-enable no-restricted-imports */
 import { Angle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
