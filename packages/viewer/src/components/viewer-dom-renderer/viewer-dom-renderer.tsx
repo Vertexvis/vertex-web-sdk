@@ -80,6 +80,8 @@ export class ViewerDomRenderer {
 
     const mutation = new MutationObserver(() => this.handleChildrenChange());
     mutation.observe(this.hostEl, { childList: true });
+
+    this.handleViewerChange(this.viewer, undefined);
   }
 
   /**
