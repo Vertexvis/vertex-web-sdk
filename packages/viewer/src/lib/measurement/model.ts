@@ -104,8 +104,8 @@ export interface MeasurementOutcome {
 
 export class MeasurementEntity {
   public constructor(
-    private point: Vector3.Vector3,
-    private modelEntity: Uint8Array
+    public readonly point: Vector3.Vector3,
+    public readonly modelEntity: Uint8Array
   ) {}
 
   public static fromHit(
@@ -154,6 +154,7 @@ export class MeasurementModel {
   private entities = new Set<MeasurementEntity>();
   private results = new Set<MeasurementResult>();
   private resultsChanged = new EventDispatcher<MeasurementResult[]>();
+  private entitiesChanged = new EventDispatcher<MeasurementEntity[]>();
 
   /**
    * Registers an entity to be measured with the model.
@@ -164,6 +165,7 @@ export class MeasurementModel {
   public addEntity(entity: MeasurementEntity): boolean {
     if (!this.entities.has(entity)) {
       this.entities.add(entity);
+      this.entitiesChanged.emit(this.getEntities());
       return true;
     } else {
       return false;
@@ -239,6 +241,7 @@ export class MeasurementModel {
   public removeEntity(entity: MeasurementEntity): boolean {
     if (this.entities.has(entity)) {
       this.entities.delete(entity);
+      this.entitiesChanged.emit(this.getEntities());
       return true;
     } else {
       return false;
@@ -271,5 +274,18 @@ export class MeasurementModel {
    */
   public onResultsChanged(listener: Listener<MeasurementResult[]>): Disposable {
     return this.resultsChanged.on(listener);
+  }
+
+  /**
+   * Registers an event listener that will be invoked when the model's
+   * measurement entities change.
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onEntitiesChanged(
+    listener: Listener<MeasurementEntity[]>
+  ): Disposable {
+    return this.entitiesChanged.on(listener);
   }
 }

@@ -17,6 +17,7 @@ import {
   Viewport,
 } from '../types';
 import { ReceivedFrame } from '../..';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 type SceneProvider = () => Scene;
 
@@ -512,6 +513,20 @@ export class InteractionApi {
       : this.getConfig().finePointerThreshold;
 
     return pixelThreshold * window.devicePixelRatio;
+  }
+
+  /**
+   * Performs a hit test at the given point and returns a list of hit results
+   * indicating any scene items that exist at the given point.
+   *
+   * @param pt A point, in viewport coordinates.
+   * @returns A promise that resolves with the list of hit results.
+   */
+  public async hitItems(
+    pt: Point.Point
+  ): Promise<vertexvis.protobuf.stream.IHit[]> {
+    const res = await this.getScene().raycaster().hitItems(pt);
+    return res?.hits ?? [];
   }
 
   private emitTapEvent(

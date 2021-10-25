@@ -10,7 +10,7 @@ import {
   MeasurementResult,
 } from './model';
 import { mapMeasureResponseOrThrow } from './mapper';
-import { MeasurementEntity } from '.';
+import { MeasurementEntity } from './model';
 
 /**
  * The `MeasurementController` is responsible for performing measurements of
@@ -39,6 +39,16 @@ export class MeasurementController {
     if (this.model.addEntity(entity)) {
       this.measureAndUpdateModel();
     }
+    return this.results;
+  }
+
+  /**
+   * Clears all entities and returns a promise that resolves with an empty list
+   * of measurement results.
+   */
+  public async clearEntities(): Promise<MeasurementResult[]> {
+    this.model.clearEntities();
+    this.measureAndUpdateModel();
     return this.results;
   }
 
@@ -76,8 +86,8 @@ export class MeasurementController {
   private async measureEntities(): Promise<MeasurementOutcome> {
     const entities = this.model.getEntities().map((e) => e.toProto());
 
-    const res = await requestUnary<MeasureResponse>((handler) => {
-      const meta = createMetadata(this.jwtProvider);
+    const res = await requestUnary<MeasureResponse>(async (handler) => {
+      const meta = await createMetadata(this.jwtProvider);
       const req = new MeasureRequest();
       req.setEntitiesList(entities);
 

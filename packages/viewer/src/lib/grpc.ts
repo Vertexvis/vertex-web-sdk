@@ -4,7 +4,10 @@ type GrpcCaller<R, E> = (handler: GrpcHandler<R, E>) => void;
 
 type GrpcHandler<R, E> = (err: E | null, res: R | null) => void;
 
-export type JwtProvider = () => string;
+export type JwtProvider = () =>
+  | Promise<string | undefined>
+  | string
+  | undefined;
 
 export function requestUnary<R, E = unknown>(
   caller: GrpcCaller<R, E>
@@ -22,8 +25,10 @@ export function requestUnary<R, E = unknown>(
   });
 }
 
-export function createMetadata(jwtProvider: JwtProvider): grpc.Metadata {
-  const jwt = jwtProvider();
+export async function createMetadata(
+  jwtProvider: JwtProvider
+): Promise<grpc.Metadata> {
+  const jwt = await jwtProvider();
   return new grpc.Metadata({
     'jwt-context': JSON.stringify({ jwt }),
   });

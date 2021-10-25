@@ -185,7 +185,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  protected componentWillLoad(): void {
+  protected connectedCallback(): void {
     this.syncProperties();
   }
 
