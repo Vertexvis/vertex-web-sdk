@@ -68,6 +68,13 @@ import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-m
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.tsx/viewer-markup-freeform';
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
+import { MeasurementModel, MeasurementResult } from './lib/measurement/model';
+import {
+  ViewerMeasurementDetailsAngleFormatter,
+  ViewerMeasurementDetailsAngleUnit,
+  ViewerMeasurementDetailsDistanceFormatter,
+  ViewerMeasurementDetailsSummary,
+} from './components/viewer-measurement-details/viewer-measurement-details';
 import {
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceLabelFormatter,
@@ -757,6 +764,48 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerMeasurementDetails {
+    /**
+     * An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.
+     */
+    angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
+    /**
+     * The unit of angle-based measurement.
+     */
+    angleUnits: ViewerMeasurementDetailsAngleUnit;
+    /**
+     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+     */
+    distanceFormatter?: ViewerMeasurementDetailsDistanceFormatter;
+    /**
+     * The unit of distance-based measurement.
+     */
+    distanceUnits: UnitType;
+    /**
+     * The number of fraction digits to display.
+     */
+    fractionalDigits: number;
+    /**
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     */
+    hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+    /**
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     */
+    hiddenDetailsJson?: string;
+    /**
+     * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+     */
+    measurementModel: MeasurementModel;
+    /**
+     * @readonly The current `MeasurementResult` displayed.
+     */
+    results: MeasurementResult[];
+    /**
+     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     */
+    summary?: ViewerMeasurementDetailsSummary;
+  }
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
@@ -1138,6 +1187,13 @@ declare global {
     prototype: HTMLVertexViewerMarkupToolElement;
     new (): HTMLVertexViewerMarkupToolElement;
   };
+  interface HTMLVertexViewerMeasurementDetailsElement
+    extends Components.VertexViewerMeasurementDetails,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMeasurementDetailsElement: {
+    prototype: HTMLVertexViewerMeasurementDetailsElement;
+    new (): HTMLVertexViewerMeasurementDetailsElement;
+  };
   interface HTMLVertexViewerMeasurementDistanceElement
     extends Components.VertexViewerMeasurementDistance,
       HTMLStencilElement {}
@@ -1206,6 +1262,7 @@ declare global {
     'vertex-viewer-markup-circle': HTMLVertexViewerMarkupCircleElement;
     'vertex-viewer-markup-freeform': HTMLVertexViewerMarkupFreeformElement;
     'vertex-viewer-markup-tool': HTMLVertexViewerMarkupToolElement;
+    'vertex-viewer-measurement-details': HTMLVertexViewerMeasurementDetailsElement;
     'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
@@ -1762,6 +1819,48 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerMeasurementDetails {
+    /**
+     * An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.
+     */
+    angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
+    /**
+     * The unit of angle-based measurement.
+     */
+    angleUnits?: ViewerMeasurementDetailsAngleUnit;
+    /**
+     * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
+     */
+    distanceFormatter?: ViewerMeasurementDetailsDistanceFormatter;
+    /**
+     * The unit of distance-based measurement.
+     */
+    distanceUnits?: UnitType;
+    /**
+     * The number of fraction digits to display.
+     */
+    fractionalDigits?: number;
+    /**
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     */
+    hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+    /**
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     */
+    hiddenDetailsJson?: string;
+    /**
+     * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+     */
+    measurementModel?: MeasurementModel;
+    /**
+     * @readonly The current `MeasurementResult` displayed.
+     */
+    results?: MeasurementResult[];
+    /**
+     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     */
+    summary?: ViewerMeasurementDetailsSummary;
+  }
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
@@ -2019,6 +2118,7 @@ declare namespace LocalJSX {
     'vertex-viewer-markup-circle': VertexViewerMarkupCircle;
     'vertex-viewer-markup-freeform': VertexViewerMarkupFreeform;
     'vertex-viewer-markup-tool': VertexViewerMarkupTool;
+    'vertex-viewer-measurement-details': VertexViewerMeasurementDetails;
     'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
@@ -2068,6 +2168,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupFreeformElement>;
       'vertex-viewer-markup-tool': LocalJSX.VertexViewerMarkupTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupToolElement>;
+      'vertex-viewer-measurement-details': LocalJSX.VertexViewerMeasurementDetails &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDetailsElement>;
       'vertex-viewer-measurement-distance': LocalJSX.VertexViewerMeasurementDistance &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
       'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &
