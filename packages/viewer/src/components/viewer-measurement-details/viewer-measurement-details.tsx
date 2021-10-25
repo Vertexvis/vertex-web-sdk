@@ -96,9 +96,9 @@ export class ViewerMeasurementDetails {
   public hiddenDetailsJson?: string;
 
   /**
-   * @readonly
-   *
    * The current `MeasurementResult` displayed.
+   *
+   * @readonly
    */
   @Prop({
     mutable: true,
@@ -106,10 +106,10 @@ export class ViewerMeasurementDetails {
   public results: MeasurementResult[] = [];
 
   /**
-   * @readonly
-   *
    * A summary representing all available measurements based on
    * the current `MeasurementResult` set.
+   *
+   * @readonly
    */
   @Prop({
     mutable: true,
@@ -117,10 +117,10 @@ export class ViewerMeasurementDetails {
   public summary?: ViewerMeasurementDetailsSummary;
 
   /**
-   * @readonly
-   *
    * The visible measurements based on the current `summary`
    * and `hiddenDetails`.
+   *
+   * @readonly
    */
   @Prop({
     mutable: true,

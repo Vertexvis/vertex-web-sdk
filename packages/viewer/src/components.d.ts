@@ -798,15 +798,18 @@ export namespace Components {
      */
     measurementModel: MeasurementModel;
     /**
-     * @readonly The current `MeasurementResult` displayed.
+     * The current `MeasurementResult` displayed.
+     * @readonly
      */
     results: MeasurementResult[];
     /**
-     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     * A summary representing all available measurements based on the current `MeasurementResult` set.
+     * @readonly
      */
     summary?: ViewerMeasurementDetailsSummary;
     /**
-     * @readonly The visible measurements based on the current `summary` and `hiddenDetails`.
+     * The visible measurements based on the current `summary` and `hiddenDetails`.
+     * @readonly
      */
     visibleSummary?: ViewerMeasurementDetailsSummary;
   }
@@ -1857,15 +1860,18 @@ declare namespace LocalJSX {
      */
     measurementModel?: MeasurementModel;
     /**
-     * @readonly The current `MeasurementResult` displayed.
+     * The current `MeasurementResult` displayed.
+     * @readonly
      */
     results?: MeasurementResult[];
     /**
-     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     * A summary representing all available measurements based on the current `MeasurementResult` set.
+     * @readonly
      */
     summary?: ViewerMeasurementDetailsSummary;
     /**
-     * @readonly The visible measurements based on the current `summary` and `hiddenDetails`.
+     * The visible measurements based on the current `summary` and `hiddenDetails`.
+     * @readonly
      */
     visibleSummary?: ViewerMeasurementDetailsSummary;
   }
