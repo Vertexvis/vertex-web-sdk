@@ -116,8 +116,16 @@ export class ViewerMeasurementDetails {
   })
   public summary?: ViewerMeasurementDetailsSummary;
 
-  @State()
-  private visibleSummary?: ViewerMeasurementDetailsSummary;
+  /**
+   * @readonly
+   *
+   * The visible measurements based on the current `summary`
+   * and `hiddenDetails`.
+   */
+  @Prop({
+    mutable: true,
+  })
+  public visibleSummary?: ViewerMeasurementDetailsSummary;
 
   private distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;

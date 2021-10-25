@@ -805,6 +805,10 @@ export namespace Components {
      * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
      */
     summary?: ViewerMeasurementDetailsSummary;
+    /**
+     * @readonly The visible measurements based on the current `summary` and `hiddenDetails`.
+     */
+    visibleSummary?: ViewerMeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
@@ -1860,6 +1864,10 @@ declare namespace LocalJSX {
      * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
      */
     summary?: ViewerMeasurementDetailsSummary;
+    /**
+     * @readonly The visible measurements based on the current `summary` and `hiddenDetails`.
+     */
+    visibleSummary?: ViewerMeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
