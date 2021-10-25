@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-imports */
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 /* eslint-enable no-restricted-imports */
 import { Angle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
@@ -116,6 +116,9 @@ export class ViewerMeasurementDetails {
   })
   public summary?: ViewerMeasurementDetailsSummary;
 
+  @State()
+  private visibleSummary?: ViewerMeasurementDetailsSummary;
+
   private distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;
 
@@ -150,46 +153,51 @@ export class ViewerMeasurementDetails {
     );
   }
 
+  @Watch('hiddenDetails')
+  protected handleHiddenDetailsChanged(): void {
+    this.createSummary();
+  }
+
   public render(): h.JSX.IntrinsicElements {
-    return this.summary != null ? (
-      <div class="measurement-details">
-        {this.summary?.angle != null && (
+    return this.visibleSummary != null ? (
+      <Host>
+        {this.visibleSummary?.angle != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label">Angle:</div>
-            {this.formatAngle(this.summary.angle)}
+            {this.formatAngle(this.visibleSummary.angle)}
           </div>
         )}
-        {this.summary?.parallelDistance != null && (
+        {this.visibleSummary?.parallelDistance != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label">Parallel Dist:</div>
-            {this.formatDistance(this.summary.parallelDistance)}
+            {this.formatDistance(this.visibleSummary.parallelDistance)}
           </div>
         )}
-        {this.summary?.minDistance != null && (
+        {this.visibleSummary?.minDistance != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label">Min Dist:</div>
-            {this.formatDistance(this.summary.minDistance)}
+            {this.formatDistance(this.visibleSummary.minDistance)}
           </div>
         )}
-        {this.summary?.x != null && (
+        {this.visibleSummary?.x != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label x-label">X:</div>
-            {this.formatDistance(this.summary.x)}
+            {this.formatDistance(this.visibleSummary.x)}
           </div>
         )}
-        {this.summary?.y != null && (
+        {this.visibleSummary?.y != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label y-label">Y:</div>
-            {this.formatDistance(this.summary.y)}
+            {this.formatDistance(this.visibleSummary.y)}
           </div>
         )}
-        {this.summary?.z != null && (
+        {this.visibleSummary?.z != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label z-label">Z:</div>
-            {this.formatDistance(this.summary.z)}
+            {this.formatDistance(this.visibleSummary.z)}
           </div>
         )}
-      </div>
+      </Host>
     ) : (
       <Host />
     );
@@ -234,7 +242,8 @@ export class ViewerMeasurementDetails {
     const baseSummary = formatResults(this.results);
     const hidden = this.hiddenDetails ?? [];
 
-    this.summary = (
+    this.summary = baseSummary;
+    this.visibleSummary = (
       Object.keys(baseSummary) as Array<keyof ViewerMeasurementDetailsSummary>
     )
       .filter((k) => !hidden.includes(k))
