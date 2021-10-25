@@ -23,7 +23,7 @@ describe('vertex-viewer-measurement-details', () => {
       )
     ).toBeNull();
 
-    measurementDetails.summary = formatResults([
+    measurementDetails.visibleSummary = formatResults([
       {
         type: 'minimum-distance',
         distance: 2,
@@ -57,7 +57,7 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
-    measurementDetails.summary = {
+    measurementDetails.visibleSummary = {
       minDistance: 100,
     };
 
@@ -89,7 +89,7 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
-    measurementDetails.summary = {
+    measurementDetails.visibleSummary = {
       angle: 90,
     };
 

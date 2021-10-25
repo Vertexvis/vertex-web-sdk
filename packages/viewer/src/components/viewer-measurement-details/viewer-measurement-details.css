@@ -1,4 +1,7 @@
 :host {
+  display: flex;
+  flex-direction: column;
+
   /**
    * @prop --viewer-measurement-details-x-color:
    * The color of the `X` label in measurements.
@@ -19,11 +22,6 @@
    * Defaults to blue.
    */
   --viewer-measurement-details-z-color: blue;
-}
-
-.measurement-details {
-  display: flex;
-  flex-direction: column;
 }
 
 .measurement-details-entry {

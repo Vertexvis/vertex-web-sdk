@@ -798,13 +798,20 @@ export namespace Components {
      */
     measurementModel: MeasurementModel;
     /**
-     * @readonly The current `MeasurementResult` displayed.
+     * The current `MeasurementResult` displayed.
+     * @readonly
      */
     results: MeasurementResult[];
     /**
-     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     * A summary representing all available measurements based on the current `MeasurementResult` set.
+     * @readonly
      */
     summary?: ViewerMeasurementDetailsSummary;
+    /**
+     * The visible measurements based on the current `summary` and `hiddenDetails`.
+     * @readonly
+     */
+    visibleSummary?: ViewerMeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
@@ -1853,13 +1860,20 @@ declare namespace LocalJSX {
      */
     measurementModel?: MeasurementModel;
     /**
-     * @readonly The current `MeasurementResult` displayed.
+     * The current `MeasurementResult` displayed.
+     * @readonly
      */
     results?: MeasurementResult[];
     /**
-     * @readonly A summary representing all available measurements based on the current `MeasurementResult` set.
+     * A summary representing all available measurements based on the current `MeasurementResult` set.
+     * @readonly
      */
     summary?: ViewerMeasurementDetailsSummary;
+    /**
+     * The visible measurements based on the current `summary` and `hiddenDetails`.
+     * @readonly
+     */
+    visibleSummary?: ViewerMeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
