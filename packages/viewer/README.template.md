@@ -15,7 +15,7 @@ can run in any browser supporting the Custom Elements v1 specification. For
 browsers that do not support the Custom Elements v1 spec, a polyfill will
 automatically be used.
 
-## Getting Started
+## Installation
 
 ### Script Tag
 
@@ -32,10 +32,6 @@ file that references our published JS bundles from a CDN.
     <script
       type="module"
       src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer/viewer.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://unpkg.com/@vertexvis/viewer@{{version}}/dist/viewer.js"
     ></script>
   </head>
 
@@ -69,26 +65,26 @@ These utilities can be imported from a CDN as shown below:
 
 ---
 
-If you want to interact with the web component via JavaScript, you'll need to ensure the browser has registered the custom elements prior to use.
+If you want to interact with a web component via JavaScript, you should ensure
+the browser has registered the custom elements prior to calling the elements
+methods. You can use
+[`window.customElements.whenDefined`](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/whenDefined)
+to check if the component has been loaded.
 
-Import `defineCustomElements`, and this will register all custom elements in your DOM.
 ```js
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@{{version}}/dist/esm/loader.mjs';
-
 async function main() {
   const viewer = document.querySelector('#viewer');
+
+  // Wait for the component to be registered.
+  await customElements.whenDefined('vertex-viewer');
   viewer.load("urn:vertexvis:stream-key:123")
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  defineCustomElements(window).then(() => main());
-});
 ```
 
 ### NPM Dependency
 
-Our components can also be installed as an NPM dependency and imported through a
-bundler such as Webpack or Rollup. First, add `@vertexvis/viewer` as an NPM
+Our components support being installed as an NPM dependency and packaged through
+a bundler such as Webpack or Rollup. First, add `@vertexvis/viewer` as an NPM
 dependency to your `package.json`:
 
 ```json
@@ -99,41 +95,80 @@ dependency to your `package.json`:
 }
 ```
 
-Next, import `defineCustomElements` from the loader that is included as part of
-the package. Calling the loader will analyze the components defined in your HTML
-and load any components it finds. The returned promise will resolve once the
-components are loaded.
+Next, import `defineCustomElements` from the loader included as part of the
+package. Using the loader will self lazy-load the components used in your
+application.
+
+**Note:** Certain bundler settings may have issues with using the self
+lazy-loading strategy. See [Manually Registering
+Components](#manually-registering-components) for an alternative to register
+components.
 
 ```js
 import { defineCustomElements } from '@vertexvis/viewer/loader';
 
 async function main() {
+  await defineCustomElements();
+
   const viewer = document.querySelector("viewer");
   await viewer.load("urn:vertexvis:stream-key:123");
   console.log("Loaded!");
 }
 
-defineCustomElements(window).then(() => main());
+main();
 ```
 
+## Manually Registering Components
+
+We recommended using self lazy-loading to load components, which helps keep
+bundle sizes to a minimum and only loads components as they're needed. However,
+some bundler configurations may have problems with this option.
+
+You can manually register components by importing them and registering them
+with the browser.
+
+```js
+import { VertexViewer, VertexViewerDefaultToolbar } from '@vertexvis/viewer';
+
+customElements.define('vertex-viewer', VertexViewer);
+customElements.define('vertex-viewer-default-toolbar', VertexViewerDefaultToolbar);
+```
+
+If a component depends on other components, you'll need to register each one
+individually. As this can be tedious, we export a `defineCustomElements()`
+method to register all components. **Note:** this will add all components to
+your bundle.
+
+```js
+import { defineCustomElements } from '@vertexvis/viewer';
+
+defineCustomElements();
+```
+
+## Polyfills
+
 If you plan on targeting IE11 or Edge <= 18, you'll also need to supply
-polyfills for the Web Components APIs (Custom Elements, Shadow DOM, CSS
-Variables, etc). To include the polyfills, import `applyPolyfills` from the
-loader.
+polyfills for the Web Component APIs (Custom Elements, Shadow DOM, CSS
+Variables, etc).
+
+To include the polyfills, import `applyPolyfills` from the loader.
 
 ```js
 import { applyPolyfills, defineCustomElements } from '@vertexvis/viewer/loader';
 
 function main() {
+  await applyPolyfills();
+  await defineCustomElements();
+
   console.log("Loaded!");
 }
-
-applyPolyfills().then(() => defineCustomElements(window)).then(() => main());
 ```
 
 ## Examples
 
-Check out our [examples](../../examples) directory and [Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to get an idea of what you can do with Vertex's Viewer component.
+Check out our [examples](../../examples) directory and
+[Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to
+get an idea of what you can do with Vertex's Viewer component.
 
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
