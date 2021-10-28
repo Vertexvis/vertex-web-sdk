@@ -13,34 +13,20 @@ to add the project as an NPM dependency.
 
 ## Usage
 
-The project includes a component loader, `defineCustomElements`, that needs to
-be invoked in order for the elements to be loaded and rendered.
+`@vertexvis/viewer` includes a component loader, `defineCustomElements`, that
+needs to be invoked to register the components with the browser. It also
+includes a global stylesheet with default styling. Consult your bundlers
+documentation on how to bundle CSS with your project's bundler.
 
 ```jsx
 import React from 'react';
 import ReactDom from 'react-dom';
-import { defineCustomElements } from '@vertexvis/viewer-react';
 
-function main() {
-  defineCustomElement(window);
-  ReactDom.render(<App />, document.querySelector("#app"));
-}
+import { defineCustomElements } from '@vertexvis/viewer/loader';
+import '@vertexvis/viewer/dist/viewer/viewer.css';
 
-main();
-```
-
-If you plan on targeting IE11 or Edge <= 18, you'll also need to supply
-polyfills for the Web Components APIs (Custom Elements, Shadow DOM, CSS
-Variables, etc). To include the polyfills, import `applyPolyfills` from the
-loader.
-
-```jsx
-import React from 'react';
-import ReactDom from 'react-dom';
-import { applyPolyfills, defineCustomElements } from '@vertexvis/viewer-react';
-
-function main() {
-  applyPolyfills().then(() => defineCustomElement(window));
+async function main() {
+  await defineCustomElement(window);
   ReactDom.render(<App />, document.querySelector("#app"));
 }
 
@@ -59,27 +45,6 @@ export function App() {
   </div>);
 }
 ```
-
-## Styles
-
-The project includes a set of [global styles] that you should bundle as part of
-your application. These styles define [CSS variables] that specify the default
-component colors. You can override these variables to match your application's
-branding.
-
-If you're using a bundler like Webpack, import these styles from one of your JS
-files.
-
-```jsx
-import '@vertexvis/viewer/dist/viewer/viewer.css';
-
-export function MyApp() {
-  return <div></div>;
-}
-```
-
-Consult your bundler's documentation on approaches and best practices for
-bundling CSS.
 
 ## Documentation
 

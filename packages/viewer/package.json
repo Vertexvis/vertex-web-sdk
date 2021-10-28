@@ -13,13 +13,13 @@
     "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
   },
   "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
+  "module": "dist/custom-elements/index.js",
   "es2015": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/custom-elements/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/viewer/viewer.js",
+  "unpkg": "dist/viewer/viewer.esm.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -48,6 +48,7 @@
     "@improbable-eng/grpc-web": "^0.14.0",
     "@juggle/resize-observer": "^3.3.0",
     "@types/classnames": "^2.3.1",
+    "@stencil/core": "^2.4.0",
     "@vertexvis/frame-streaming-protos": "^0.6.4",
     "@vertexvis/geometry": "0.11.0",
     "@vertexvis/scene-tree-protos": "^0.1.7",
@@ -66,7 +67,6 @@
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@stencil/core": "^2.4.0",
     "@stencil/react-output-target": "^0.0.9",
     "@types/chance": "^1.1.1",
     "@types/google-protobuf": "^3.7.4",
