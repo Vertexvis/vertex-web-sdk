@@ -80,8 +80,8 @@ describe(PreciseMeasurementInteractionHandler, () => {
     const addEntities = jest.spyOn(controller, 'addEntity');
     const clearEntities = jest.spyOn(controller, 'clearEntities');
 
-    const down = new MouseEvent('pointerdown');
-    const move = new MouseEvent('pointermove');
+    const down = new MouseEvent('pointerdown', { clientX: 0, clientY: 0 });
+    const move = new MouseEvent('pointermove', { clientX: 10, clientY: 10 });
     const up = new MouseEvent('pointerup');
 
     element.dispatchEvent(down);
