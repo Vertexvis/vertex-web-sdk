@@ -11,33 +11,38 @@ import {
   FramePerspectiveCamera,
   Orientation,
 } from '../types';
-import { mapRGBi } from './material';
-import { mapVector3f, mapBoundingBox3f, mapDim, mapRect } from './geometry';
+import { fromPbRGBi } from './material';
+import {
+  fromPbVector3f,
+  fromPbBoundingBox3f,
+  fromPbDim,
+  fromPbRect,
+} from './geometry';
 
-export const mapCamera: M.Func<
+export const fromPbCamera: M.Func<
   vertexvis.protobuf.stream.ICamera,
   FrameCamera.FrameCamera
 > = M.defineMapper(
   M.read(
-    M.mapProp('position', M.compose(M.required('position'), mapVector3f)),
-    M.mapProp('lookAt', M.compose(M.required('lookAt'), mapVector3f)),
-    M.mapProp('up', M.compose(M.required('up'), mapVector3f))
+    M.mapProp('position', M.compose(M.required('position'), fromPbVector3f)),
+    M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
+    M.mapProp('up', M.compose(M.required('up'), fromPbVector3f))
   ),
   ([position, lookAt, up]) => ({ position, lookAt, up })
 );
 
-export const mapSectionPlane: M.Func<
+export const fromPbSectionPlane: M.Func<
   vertexvis.protobuf.stream.ISectionPlane,
   CrossSectioning.SectionPlane
 > = M.defineMapper(
   M.read(
-    M.mapProp('normal', M.compose(M.required('normal'), mapVector3f)),
+    M.mapProp('normal', M.compose(M.required('normal'), fromPbVector3f)),
     M.requiredProp('offset')
   ),
   ([normal, offset]) => ({ normal, offset })
 );
 
-const mapImageAttributes: M.Func<
+const fromPbImageAttributes: M.Func<
   vertexvis.protobuf.stream.IImageAttributes,
   {
     frameDimensions: Dimensions.Dimensions;
@@ -48,9 +53,9 @@ const mapImageAttributes: M.Func<
   M.read(
     M.mapProp(
       'frameDimensions',
-      M.compose(M.required('frameDimensions'), mapDim)
+      M.compose(M.required('frameDimensions'), fromPbDim)
     ),
-    M.mapProp('imageRect', M.compose(M.required('imageRect'), mapRect)),
+    M.mapProp('imageRect', M.compose(M.required('imageRect'), fromPbRect)),
     M.mapProp('scaleFactor', M.required('scaleFactor'))
   ),
   ([frameDimensions, imageRect, scaleFactor]) => ({
@@ -60,16 +65,16 @@ const mapImageAttributes: M.Func<
   })
 );
 
-export const mapCrossSectioning: M.Func<
+export const fromPbCrossSectioning: M.Func<
   vertexvis.protobuf.stream.ICrossSectioning,
   CrossSectioning.CrossSectioning
 > = M.defineMapper(
   M.read(
     M.mapProp(
       'sectionPlanes',
-      M.compose(M.required('sectionPlanes'), M.mapArray(mapSectionPlane))
+      M.compose(M.required('sectionPlanes'), M.mapArray(fromPbSectionPlane))
     ),
-    M.mapProp('highlightColor', M.ifDefined(mapRGBi))
+    M.mapProp('highlightColor', M.ifDefined(fromPbRGBi))
   ),
   ([sectionPlanes, highlightColor]) =>
     CrossSectioning.create({
@@ -78,7 +83,7 @@ export const mapCrossSectioning: M.Func<
     })
 );
 
-const mapFrameImageAttributes: M.Func<
+const fromPbFrameImageAttributes: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   {
     frameDimensions: Dimensions.Dimensions;
@@ -89,17 +94,17 @@ const mapFrameImageAttributes: M.Func<
   M.read(
     M.mapProp(
       'imageAttributes',
-      M.compose(M.required('imageAttributes'), mapImageAttributes)
+      M.compose(M.required('imageAttributes'), fromPbImageAttributes)
     )
   ),
   ([imageAttr]) => imageAttr
 );
 
-const mapFrameImage: M.Func<
+const fromPbFrameImage: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   FrameImage
 > = M.defineMapper(
-  M.read(mapFrameImageAttributes, M.mapProp('image', M.required('image'))),
+  M.read(fromPbFrameImageAttributes, M.mapProp('image', M.required('image'))),
   ([imageAttr, image]) =>
     new FrameImage(
       imageAttr.frameDimensions,
@@ -109,7 +114,7 @@ const mapFrameImage: M.Func<
     )
 );
 
-const mapSceneAttributes: M.Func<
+const fromPbSceneAttributes: M.Func<
   vertexvis.protobuf.stream.ISceneAttributes,
   {
     camera: FrameCamera.FrameCamera;
@@ -119,14 +124,14 @@ const mapSceneAttributes: M.Func<
   }
 > = M.defineMapper(
   M.read(
-    M.mapProp('camera', M.compose(M.required('camera'), mapCamera)),
+    M.mapProp('camera', M.compose(M.required('camera'), fromPbCamera)),
     M.mapProp(
       'visibleBoundingBox',
-      M.compose(M.required('visibleBoundingBox'), mapBoundingBox3f)
+      M.compose(M.required('visibleBoundingBox'), fromPbBoundingBox3f)
     ),
     M.mapProp(
       'crossSectioning',
-      M.compose(M.required('crossSectioning'), mapCrossSectioning)
+      M.compose(M.required('crossSectioning'), fromPbCrossSectioning)
     ),
     M.requiredProp('hasChanged')
   ),
@@ -138,7 +143,7 @@ const mapSceneAttributes: M.Func<
   })
 );
 
-const mapFrameSceneAttributes: M.Func<
+const fromPbFrameSceneAttributes: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   {
     camera: FrameCamera.FrameCamera;
@@ -150,17 +155,17 @@ const mapFrameSceneAttributes: M.Func<
   M.read(
     M.mapProp(
       'sceneAttributes',
-      M.compose(M.required('sceneAttributes'), mapSceneAttributes)
+      M.compose(M.required('sceneAttributes'), fromPbSceneAttributes)
     )
   ),
   ([sceneAttr]) => sceneAttr
 );
 
-const mapFrameCamera: M.Func<
+const fromPbFrameCamera: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   FramePerspectiveCamera
 > = M.defineMapper(
-  M.read(mapFrameSceneAttributes, mapFrameImageAttributes),
+  M.read(fromPbFrameSceneAttributes, fromPbFrameImageAttributes),
   ([sceneAttr, imageAttr]) =>
     FramePerspectiveCamera.fromBoundingBox(
       sceneAttr.camera,
@@ -169,11 +174,11 @@ const mapFrameCamera: M.Func<
     )
 );
 
-function mapFrameScene(
+function fromPbFrameScene(
   worldOrientation: Orientation
 ): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, FrameScene> {
   return M.defineMapper(
-    M.read(mapFrameSceneAttributes, mapFrameCamera),
+    M.read(fromPbFrameSceneAttributes, fromPbFrameCamera),
     ([sceneAttr, camera]) =>
       new FrameScene(
         camera,
@@ -185,16 +190,16 @@ function mapFrameScene(
   );
 }
 
-export function mapFrame(
+export function fromPbFrame(
   worldOrientation: Orientation
 ): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, Frame> {
   return M.defineMapper(
     M.read(
       M.mapProp('frameCorrelationIds', (ids) => (ids != null ? ids : [])),
       M.requiredProp('sequenceNumber'),
-      M.compose(mapFrameImageAttributes, M.getProp('frameDimensions')),
-      mapFrameScene(worldOrientation),
-      mapFrameImage,
+      M.compose(fromPbFrameImageAttributes, M.getProp('frameDimensions')),
+      fromPbFrameScene(worldOrientation),
+      fromPbFrameImage,
       M.getProp('depthBuffer')
     ),
     ([correlationIds, seqNum, frameDimensions, scene, image, depthBuffer]) => {
@@ -215,30 +220,32 @@ export type FrameDecoder = M.ThrowIfInvalidFunc<
   Frame
 >;
 
-export function mapFrameOrThrow(worldOrientation: Orientation): FrameDecoder {
-  return M.ifInvalidThrow(mapFrame(worldOrientation));
+export function fromPbFrameOrThrow(
+  worldOrientation: Orientation
+): FrameDecoder {
+  return M.ifInvalidThrow(fromPbFrame(worldOrientation));
 }
 
-export const mapWorldOrientation: M.Func<
+export const fromPbWorldOrientation: M.Func<
   vertexvis.protobuf.stream.IOrientation | null | undefined,
   Orientation
 > = M.defineMapper(
   M.compose(
     M.required('orientation'),
     M.read(
-      M.mapProp('up', M.compose(M.required('up'), mapVector3f)),
-      M.mapProp('front', M.compose(M.required('front'), mapVector3f))
+      M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
+      M.mapProp('front', M.compose(M.required('front'), fromPbVector3f))
     )
   ),
   ([up, front]) => new Orientation(up, front)
 );
 
-export const mapWorldOrientationOrThrow: M.ThrowIfInvalidFunc<
+export const fromPbWorldOrientationOrThrow: M.ThrowIfInvalidFunc<
   vertexvis.protobuf.stream.IOrientation | null | undefined,
   Orientation
-> = M.ifInvalidThrow(mapWorldOrientation);
+> = M.ifInvalidThrow(fromPbWorldOrientation);
 
-const mapStencilBufferResult: M.Func<
+const fromPbStencilBufferResult: M.Func<
   vertexvis.protobuf.stream.IGetStencilBufferResult,
   Object.Compulsory<
     vertexvis.protobuf.stream.IGetStencilBufferResult,
@@ -247,20 +254,20 @@ const mapStencilBufferResult: M.Func<
   >
 > = M.defineMapper(
   M.read(
-    M.mapRequiredProp('imageAttributes', mapImageAttributes),
+    M.mapRequiredProp('imageAttributes', fromPbImageAttributes),
     M.requiredProp('stencilBuffer')
   ),
   ([imageAttributes, stencilBuffer]) => ({ imageAttributes, stencilBuffer })
 );
 
-export const mapStencilBuffer = mapStreamResponse(
+export const fromPbStencilBuffer = fromPbStreamResponse(
   'stencilBuffer',
-  mapStencilBufferResult
+  fromPbStencilBufferResult
 );
 
-export const mapStencilBufferOrThrow = M.ifInvalidThrow(mapStencilBuffer);
+export const fromPbStencilBufferOrThrow = M.ifInvalidThrow(fromPbStencilBuffer);
 
-function mapStreamResponse<
+function fromPbStreamResponse<
   P extends keyof vertexvis.protobuf.stream.IStreamResponse,
   R
 >(

@@ -2,7 +2,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
-import { mapFrame } from '../lib/mappers';
+import { fromPbFrame } from '../lib/mappers';
 import { DepthBuffer, Orientation, StencilBuffer } from '../lib/types';
 
 const def: DrawFramePayload = {
@@ -36,7 +36,9 @@ const def: DrawFramePayload = {
   depthBuffer: { value: createDepthImagePng(100, 50) },
 };
 
-export const frame = Mapper.ifInvalidThrow(mapFrame(Orientation.DEFAULT))(def);
+export const frame = Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
+  def
+);
 
 export function createImagePng(width: number, height: number): Uint8Array {
   const data = new Uint8ClampedArray(width * height * 4);
