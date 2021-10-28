@@ -169,13 +169,10 @@ export class ViewerDomRenderer {
   }
 
   private async updatePropsFromViewer(): Promise<void> {
-    const { frame, streamAttributes } = this.viewer || {};
+    const { frame, depthBuffers } = this.viewer || {};
 
     this.depthBuffer =
-      streamAttributes?.depthBuffers?.enabled &&
-      streamAttributes.depthBuffers.frameType === 'all'
-        ? await frame?.depthBuffer()
-        : undefined;
+      depthBuffers === 'all' ? await frame?.depthBuffer() : undefined;
     this.camera = frame?.scene?.camera;
   }
 }

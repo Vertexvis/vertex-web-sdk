@@ -23,9 +23,9 @@ import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   DepthBufferFrameType,
+  FeatureHighlightOptions,
   FeatureLineOptions,
-  ViewerStreamAttributes,
-} from './lib/stream/streamAttributes';
+} from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FramePerspectiveCamera } from './lib/types/frame';
 import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
@@ -81,6 +81,10 @@ import {
   ViewerMeasurementDistanceMode,
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
 import { Anchor } from './components/viewer-measurement-distance/utils';
+import {
+  MeasurementController,
+  MeasurementModel as MeasurementModel1,
+} from './lib/measurement';
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
@@ -301,6 +305,10 @@ export namespace Components {
      */
     experimentalGhostingOpacity: number;
     /**
+     * Specifies how selected features should be highlighted.
+     */
+    featureHighlighting?: FeatureHighlightOptions;
+    /**
      * Specifies if and how to render feature lines.
      */
     featureLines?: FeatureLineOptions;
@@ -418,11 +426,6 @@ export namespace Components {
     src?: string;
     stencilBuffer: StencilBufferManager;
     stream?: ViewerStreamApi;
-    /**
-     * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
-     * @readonly
-     */
-    streamAttributes: ViewerStreamAttributes;
     /**
      * Disconnects the websocket and removes any internal state associated with the scene.
      */
@@ -907,6 +910,13 @@ export namespace Components {
      */
     start: Point.Point;
   }
+  interface VertexViewerMeasurementPrecise {
+    config?: Config;
+    configEnv: Environment;
+    measurementController?: MeasurementController;
+    measurementModel: MeasurementModel;
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementTool {
     /**
      * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
@@ -1215,6 +1225,13 @@ declare global {
     prototype: HTMLVertexViewerMeasurementLineElement;
     new (): HTMLVertexViewerMeasurementLineElement;
   };
+  interface HTMLVertexViewerMeasurementPreciseElement
+    extends Components.VertexViewerMeasurementPrecise,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMeasurementPreciseElement: {
+    prototype: HTMLVertexViewerMeasurementPreciseElement;
+    new (): HTMLVertexViewerMeasurementPreciseElement;
+  };
   interface HTMLVertexViewerMeasurementToolElement
     extends Components.VertexViewerMeasurementTool,
       HTMLStencilElement {}
@@ -1272,6 +1289,7 @@ declare global {
     'vertex-viewer-measurement-details': HTMLVertexViewerMeasurementDetailsElement;
     'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
+    'vertex-viewer-measurement-precise': HTMLVertexViewerMeasurementPreciseElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
     'vertex-viewer-measurements': HTMLVertexViewerMeasurementsElement;
     'vertex-viewer-toolbar': HTMLVertexViewerToolbarElement;
@@ -1394,6 +1412,10 @@ declare namespace LocalJSX {
      */
     experimentalGhostingOpacity?: number;
     /**
+     * Specifies how selected features should be highlighted.
+     */
+    featureHighlighting?: FeatureHighlightOptions;
+    /**
      * Specifies if and how to render feature lines.
      */
     featureLines?: FeatureLineOptions;
@@ -1476,11 +1498,6 @@ declare namespace LocalJSX {
     src?: string;
     stencilBuffer?: StencilBufferManager;
     stream?: ViewerStreamApi;
-    /**
-     * An object containing the stream attribute values sent to rendering. This value is updated automatically when properties like `depthBuffers` are set. You should not set this value directly, as it may be overridden.
-     * @readonly
-     */
-    streamAttributes?: ViewerStreamAttributes;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
@@ -1971,6 +1988,13 @@ declare namespace LocalJSX {
      */
     start?: Point.Point;
   }
+  interface VertexViewerMeasurementPrecise {
+    config?: Config;
+    configEnv?: Environment;
+    measurementController?: MeasurementController;
+    measurementModel?: MeasurementModel;
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerMeasurementTool {
     /**
      * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
@@ -2135,6 +2159,7 @@ declare namespace LocalJSX {
     'vertex-viewer-measurement-details': VertexViewerMeasurementDetails;
     'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
+    'vertex-viewer-measurement-precise': VertexViewerMeasurementPrecise;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
     'vertex-viewer-measurements': VertexViewerMeasurements;
     'vertex-viewer-toolbar': VertexViewerToolbar;
@@ -2188,6 +2213,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
       'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
+      'vertex-viewer-measurement-precise': LocalJSX.VertexViewerMeasurementPrecise &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementPreciseElement>;
       'vertex-viewer-measurement-tool': LocalJSX.VertexViewerMeasurementTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementToolElement>;
       'vertex-viewer-measurements': LocalJSX.VertexViewerMeasurements &

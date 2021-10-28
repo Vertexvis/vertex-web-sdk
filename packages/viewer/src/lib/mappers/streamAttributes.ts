@@ -43,7 +43,7 @@ const toPbExperimentalGhosting: M.Func<
     const enabled = opacity != null && opacity > 0;
     return {
       enabled: { value: enabled },
-      opacity: enabled ? { value: clamp(opacity, 0, 1) } : undefined,
+      opacity: enabled ? { value: clamp(opacity ?? 0, 0, 1) } : undefined,
     };
   },
   (attr) => attr
