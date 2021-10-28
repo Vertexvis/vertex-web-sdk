@@ -40,6 +40,7 @@ import { MultiPointerInteractionHandler } from '../../lib/interactions/multiPoin
 import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
+import { KeyInteractionHandler } from '../../lib/interactions/keyInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
 import { CommandFactory } from '../../lib/commands/command';
 import { Environment } from '../../lib/environment';
@@ -358,6 +359,7 @@ export class Viewer {
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
+  private keyInteractions: KeyInteraction<KeyboardEvent>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
   private isResizing?: boolean;
@@ -428,7 +430,7 @@ export class Viewer {
       this.load(this.src);
     }
 
-    if (this.cameraControls) {
+    if (this.cameraControls && this.stream != null) {
       // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
         const tapInteractionHandler = new TapInteractionHandler(
@@ -439,6 +441,11 @@ export class Viewer {
         );
         this.baseInteractionHandler = new PointerInteractionHandler(() =>
           this.getResolvedConfig()
+        );
+        this.registerInteractionHandler(this.baseInteractionHandler);
+        this.baseInteractionHandler = new KeyInteractionHandler(
+          () => this.getResolvedConfig(),
+          this.stream
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
@@ -473,6 +480,11 @@ export class Viewer {
           () => this.getImageScale()
         )
       );
+      //      this.registerTapKeyInteraction(
+      //        new KeyInteractionHandler(
+      //          this.stream
+      //        )
+      //      );
     }
 
     if (this.rotateAroundTapPoint) {
@@ -637,6 +649,13 @@ export class Viewer {
     keyInteraction: KeyInteraction<TapEventDetails>
   ): Promise<void> {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
+  }
+
+  @Method()
+  public async registerKeyInteraction(
+    keyInteraction: KeyInteraction<KeyboardEvent>
+  ): Promise<void> {
+    this.keyInteractions = [...this.keyInteractions, keyInteraction];
   }
 
   /**
