@@ -1,6 +1,6 @@
 import { InteractionHandler } from './interactionHandler';
 import { InteractionApi } from './interactionApi';
-import { Scene, Camera } from '../scenes';
+import { Scene } from '../scenes';
 
 type SceneProvider = () => Scene;
 
