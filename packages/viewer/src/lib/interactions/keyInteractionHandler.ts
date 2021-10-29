@@ -1,49 +1,33 @@
-import { BaseInteractionHandler } from './baseInteractionHandler';
-import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
-import { Point } from '@vertexvis/geometry';
-import {
-  ZoomInteraction,
-  PanInteraction,
-  RotateInteraction,
-  TwistInteraction,
-  RotatePointInteraction,
-} from './mouseInteractions';
+import { InteractionHandler } from './interactionHandler';
 import { InteractionApi } from './interactionApi';
-import { ConfigProvider } from '../config';
+import { Scene, Camera } from '../scenes';
 
-export class KeyInteractionHandler extends BaseInteractionHandler {
-  // private viewer: HTMLVertexViewerElement;
-  // private stream?: StreamApi;
+type SceneProvider = () => Scene;
 
-  public constructor(getConfig: ConfigProvider, private stream: StreamApi) {
-    super(
-      'pointerdown',
-      'pointerup',
-      'pointermove',
-      new RotateInteraction(),
-      new RotatePointInteraction(),
-      new ZoomInteraction(),
-      new PanInteraction(),
-      new TwistInteraction(),
-      getConfig
-    );
-    this.stream = stream;
-    // this.viewer = viewer;
+export class KeyInteractionHandler implements InteractionHandler {
+  private element?: HTMLElement;
+  private interactionApi?: InteractionApi;
+
+  public constructor(private getScene: SceneProvider) {
+    this.fitAllWithFKey = this.fitAllWithFKey.bind(this);
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
-    super.initialize(element, api);
+    this.element = element;
+    this.interactionApi = api;
 
     window.addEventListener('keypress', this.fitAllWithFKey);
   }
 
+  public dispose(): void {
+    this.element?.removeEventListener('keypress', this.fitAllWithFKey);
+    this.element = undefined;
+  }
+
   private async fitAllWithFKey(event: KeyboardEvent): Promise<void> {
     if (event.key === 'f') {
-      console.log('The F key was pressed.');
-      // console.log("this.stream: " + this.stream);
-      // console.log("this.viewer.scene: " + this.viewer.scene());
-      // const scene = await this.element.scene();
-      // scene.camera().viewAll().render();
+      const scene = this.getScene();
+      scene.camera().viewAll().render();
     }
   }
 }
