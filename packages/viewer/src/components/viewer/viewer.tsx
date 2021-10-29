@@ -442,10 +442,9 @@ export class Viewer {
           this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
-        this.baseInteractionHandler = new KeyInteractionHandler(() =>
-          this.createScene()
+        this.registerInteractionHandler(
+          new KeyInteractionHandler(() => this.createScene())
         );
-        this.registerInteractionHandler(this.baseInteractionHandler);
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
       } else {
