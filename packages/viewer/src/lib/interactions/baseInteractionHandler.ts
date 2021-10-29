@@ -205,7 +205,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.currentInteraction = this.rotatePointInteraction;
     } else if (this.keyboardControls && event.shiftKey) {
       this.currentInteraction = this.zoomInteraction;
-    } else if (this.keyboardControls && event.ctrlKey) {
+    } else if (this.keyboardControls && event.metaKey) {
       this.currentInteraction = this.panInteraction;
     } else if (this.keyboardControls && event.altKey) {
       this.currentInteraction = this.rotateInteraction;

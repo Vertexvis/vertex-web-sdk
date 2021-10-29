@@ -119,10 +119,10 @@ describe(MouseInteractionHandler, () => {
     expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
   });
 
-  it('begins a drag and pans if ctrl is pressed', async () => {
+  it('begins a drag and pans if meta is pressed', async () => {
     const panKeyboardEvent = new MouseEvent('mousemove', {
       ...mouseMovePrimaryButton,
-      ctrlKey: true,
+      metaKey: true,
     });
 
     handler.setDefaultKeyboardControls(true);
