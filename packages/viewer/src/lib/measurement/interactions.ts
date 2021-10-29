@@ -1,3 +1,4 @@
+import { Point } from '@vertexvis/geometry';
 import { MeasurementController, MeasurementEntity } from '../..';
 import { getMouseClientPosition } from '../dom';
 import { InteractionApi, InteractionHandler } from '../interactions';
@@ -25,7 +26,7 @@ export class PreciseMeasurementInteractionHandler
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
-    this.ifNoInteraction(() => {
+    this.ifNoInteraction(event, () => {
       this.ifInitialized(async ({ element, api }) => {
         const pt = getMouseClientPosition(
           event,
@@ -42,10 +43,14 @@ export class PreciseMeasurementInteractionHandler
     });
   };
 
-  private ifNoInteraction(f: () => void): void {
+  private ifNoInteraction(event: PointerEvent, f: () => void): void {
+    const startPos = Point.create(event.clientX, event.clientY);
     let didInteract = false;
-    function handleMouseMove(): void {
-      didInteract = true;
+
+    function handleMouseMove(event: PointerEvent): void {
+      const pos = Point.create(event.clientX, event.clientY);
+      const dis = Point.distance(startPos, pos);
+      didInteract = dis > 2;
     }
 
     function handleMouseUp(): void {

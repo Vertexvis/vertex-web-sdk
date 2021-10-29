@@ -48,6 +48,7 @@ export class MeasurementController {
    */
   public async clearEntities(): Promise<MeasurementResult[]> {
     this.model.clearEntities();
+    this.model.clearResults();
     this.measureAndUpdateModel();
     return this.results;
   }
