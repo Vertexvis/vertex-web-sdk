@@ -8,7 +8,7 @@ import { frame } from '../../../testing/fixtures';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Interactions, Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../../scenes/colorMaterial';
-import { mapFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow } from '../../mappers';
 import { Frame } from '../../types/frame';
 
 describe(InteractionApi, () => {
@@ -22,7 +22,7 @@ describe(InteractionApi, () => {
   const scene = new Scene(
     streamApi,
     frame,
-    mapFrameOrThrow(Orientation.DEFAULT),
+    fromPbFrameOrThrow(Orientation.DEFAULT),
     () => Point.create(1, 1),
     sceneViewId,
     ColorMaterial.fromHex('#ffffff')

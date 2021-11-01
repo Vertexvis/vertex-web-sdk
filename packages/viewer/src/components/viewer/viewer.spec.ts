@@ -134,13 +134,13 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream(urn1);
 
       const api = viewer.stream;
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/ws'),
         }),
         expect.anything()
       );
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamKey: {
             value: streamKey1,
@@ -154,13 +154,13 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream(urn);
 
       const api = viewer.stream;
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/ws'),
         }),
         expect.anything()
       );
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamKey: {
             value: streamKey1,
@@ -179,7 +179,7 @@ describe('vertex-viewer', () => {
       await loadNewModelForViewer(viewer, urn);
 
       const api = viewer.stream;
-      expect(api.loadSceneViewState).toHaveBeenCalledWith(
+      expect(api?.loadSceneViewState).toHaveBeenCalledWith(
         expect.objectContaining({
           sceneViewStateId: {
             hex: sceneViewStateId,
@@ -200,13 +200,13 @@ describe('vertex-viewer', () => {
       await loadNewModelForViewer(viewer, urn);
 
       const api = viewer.stream;
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringContaining('/ws'),
         }),
         expect.anything()
       );
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamKey: {
             value: streamKey1,
@@ -226,7 +226,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerWithLoadedStream(urn1);
       const api = viewer.stream;
 
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           frameBackgroundColor: expect.objectContaining({
             r: 0,
@@ -247,7 +247,7 @@ describe('vertex-viewer', () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id=clientId></vertex-viewer`
       );
-      (viewer.stream.connect as jest.Mock).mockRejectedValue(
+      (viewer.stream?.connect as jest.Mock).mockRejectedValue(
         new Error('Failed')
       );
       expect(viewer.load(urn1)).rejects.toThrow();
@@ -265,7 +265,7 @@ describe('vertex-viewer', () => {
       const api = viewer.stream;
 
       await viewer.unload();
-      expect(api.dispose).toHaveBeenCalled();
+      expect(api?.dispose).toHaveBeenCalled();
     });
 
     it('clears scene and received frame data', async () => {
@@ -287,48 +287,58 @@ describe('vertex-viewer', () => {
       viewer = await loadNewModelForViewer(viewer, urn2);
       api = viewer.stream;
 
-      expect(api.reconnect).not.toHaveBeenCalled();
+      expect(api?.reconnect).not.toHaveBeenCalled();
     });
   });
 
   describe('stream attributes', () => {
-    const attributes = {
-      experimentalGhosting: {
-        enabled: { value: true },
-        opacity: { value: 0.7 },
-      },
-      featureLines: {
-        width: 2.0,
-        color: {
-          r: 255,
-          g: 0,
-          b: 0,
-          a: 1,
-        },
-      },
-    };
-
-    it('maintains configured attributes after being updated', async () => {
+    it('sends update stream when stream attribute changes', async () => {
       const viewer = await createViewerSpec(
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      viewer.streamAttributes = attributes;
+
       await loadNewModelForViewer(viewer, urn1);
-      const updatedAttributes = {
-        experimentalGhosting: {
-          ...attributes.experimentalGhosting,
-          enabled: { value: false },
-        },
-      };
 
-      viewer.streamAttributes = updatedAttributes;
-
-      await viewer.handleWebSocketClose();
-
-      expect(api.reconnect).toHaveBeenCalledWith(
+      viewer.depthBuffers = 'final';
+      expect(api?.updateStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          streamAttributes: expect.objectContaining(updatedAttributes),
+          streamAttributes: expect.objectContaining({
+            depthBuffers: {
+              enabled: { value: true },
+              frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
+            },
+          }),
+        })
+      );
+
+      viewer.experimentalGhostingOpacity = 1;
+      expect(api?.updateStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            experimentalGhosting: {
+              enabled: { value: true },
+              opacity: { value: 1 },
+            },
+          }),
+        })
+      );
+
+      viewer.featureLines = { width: 1 };
+      expect(api?.updateStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            featureLines: { lineWidth: 1 },
+          }),
+        })
+      );
+
+      viewer.featureHighlighting = { highlightColor: 0xff0000 };
+      expect(api?.updateStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            featureHighlighting: { highlightColor: { r: 255, g: 0, b: 0 } },
+          }),
         })
       );
     });
@@ -338,21 +348,24 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      viewer.streamAttributes = attributes;
+
+      viewer.experimentalGhostingOpacity = 1;
+      viewer.featureLines = { width: 1 };
+      viewer.featureHighlighting = { highlightColor: 0xff0000 };
+      viewer.depthBuffers = 'all';
       await loadNewModelForViewer(viewer, urn1);
 
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
-            ...attributes,
-            featureLines: {
-              lineWidth: attributes.featureLines.width,
-              lineColor: {
-                r: attributes.featureLines.color.r,
-                g: attributes.featureLines.color.g,
-                b: attributes.featureLines.color.b,
-              },
-            },
+            depthBuffers: expect.objectContaining({ enabled: { value: true } }),
+            experimentalGhosting: expect.objectContaining({
+              enabled: { value: true },
+            }),
+            featureLines: { lineWidth: 1 },
+            featureHighlighting: expect.objectContaining({
+              highlightColor: { r: 255, g: 0, b: 0 },
+            }),
           }),
         })
       );
@@ -363,23 +376,26 @@ describe('vertex-viewer', () => {
         `<vertex-viewer client-id="clientId"></vertex-viewer>`
       );
       const api = viewer.stream;
-      viewer.streamAttributes = attributes;
+
+      viewer.experimentalGhostingOpacity = 1;
+      viewer.featureLines = { width: 1 };
+      viewer.featureHighlighting = { highlightColor: 0xff0000 };
+      viewer.depthBuffers = 'all';
       await loadNewModelForViewer(viewer, urn1);
 
       await viewer.handleWebSocketClose();
 
-      expect(api.reconnect).toHaveBeenCalledWith(
+      expect(api?.reconnect).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
-            ...attributes,
-            featureLines: {
-              lineWidth: attributes.featureLines.width,
-              lineColor: {
-                r: attributes.featureLines.color.r,
-                g: attributes.featureLines.color.g,
-                b: attributes.featureLines.color.b,
-              },
-            },
+            depthBuffers: expect.objectContaining({ enabled: { value: true } }),
+            experimentalGhosting: expect.objectContaining({
+              enabled: { value: true },
+            }),
+            featureLines: { lineWidth: 1 },
+            featureHighlighting: expect.objectContaining({
+              highlightColor: { r: 255, g: 0, b: 0 },
+            }),
           }),
         })
       );
@@ -394,7 +410,7 @@ describe('vertex-viewer', () => {
       const api = viewer.stream;
       await loadNewModelForViewer(viewer, urn1);
 
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringMatching(/sessionId=sessionId/),
         }),
@@ -409,7 +425,7 @@ describe('vertex-viewer', () => {
       const api = viewer.stream;
       await loadNewModelForViewer(viewer, urn1);
 
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.not.stringMatching(/sessionId=sessionId/),
         }),
@@ -427,7 +443,7 @@ describe('vertex-viewer', () => {
       const api = viewer.stream;
       await loadNewModelForViewer(viewer, urn1);
 
-      expect(api.connect).toHaveBeenCalledWith(
+      expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.stringMatching(/sessionId=sessionId1/),
         }),
@@ -444,7 +460,7 @@ describe('vertex-viewer', () => {
       const api = viewer.stream;
       await loadNewModelForViewer(viewer, urn1);
 
-      expect(api.startStream).toHaveBeenCalledWith(
+      expect(api?.startStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
             depthBuffers: {
@@ -465,7 +481,7 @@ describe('vertex-viewer', () => {
 
       viewer.rotateAroundTapPoint = false;
 
-      expect(api.updateStream).toHaveBeenCalledWith(
+      expect(api?.updateStream).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
             depthBuffers: expect.objectContaining({
@@ -490,9 +506,8 @@ describe('vertex-viewer', () => {
         new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
       );
 
-      await Async.delay(
-        viewer.resolvedConfig.interactions.interactionDelay + 5
-      );
+      const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
+      await Async.delay(delay + 5);
 
       window.dispatchEvent(
         new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
@@ -516,9 +531,8 @@ describe('vertex-viewer', () => {
         new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
       );
 
-      await Async.delay(
-        viewer.resolvedConfig.interactions.interactionDelay + 5
-      );
+      const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
+      await Async.delay(delay + 5);
 
       window.dispatchEvent(
         new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
@@ -568,16 +582,16 @@ async function loadNewModelForViewer(
   };
   const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
   const api = viewer.stream;
-  (api.connect as jest.Mock).mockResolvedValue({
+  (api?.connect as jest.Mock).mockResolvedValue({
     dispose: () => {
       if (dispose != null) {
         dispose();
       }
-      api.dispose();
+      api?.dispose();
     },
   });
-  (api.startStream as jest.Mock).mockResolvedValue(startStream);
-  (api.syncTime as jest.Mock).mockResolvedValue(syncTime);
+  (api?.startStream as jest.Mock).mockResolvedValue(startStream);
+  (api?.syncTime as jest.Mock).mockResolvedValue(syncTime);
 
   const loading = viewer.load(urn);
 

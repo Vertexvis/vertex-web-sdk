@@ -8,7 +8,7 @@ import {
 } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
 
-export const mapDim: M.Func<
+export const fromPbDim: M.Func<
   vertexvis.protobuf.stream.IDimensions,
   Dimensions.Dimensions
 > = M.defineMapper(
@@ -16,7 +16,7 @@ export const mapDim: M.Func<
   ([width, height]) => Dimensions.create(width, height)
 );
 
-export const mapRect: M.Func<
+export const fromPbRect: M.Func<
   vertexvis.protobuf.stream.IRectangle,
   Rectangle.Rectangle
 > = M.defineMapper(
@@ -29,7 +29,7 @@ export const mapRect: M.Func<
   ([x, y, width, height]) => Rectangle.create(x, y, width, height)
 );
 
-export const mapVector3f: M.Func<
+export const fromPbVector3f: M.Func<
   vertexvis.protobuf.core.IVector3f,
   Vector3.Vector3
 > = M.defineMapper(
@@ -37,7 +37,7 @@ export const mapVector3f: M.Func<
   ([x, y, z]) => Vector3.create(x, y, z)
 );
 
-export const mapBoundingBox3f: M.Func<
+export const fromPbBoundingBox3f: M.Func<
   vertexvis.protobuf.core.IBoundingBox3f,
   BoundingBox.BoundingBox
 > = M.defineMapper(
@@ -56,8 +56,8 @@ export const mapBoundingBox3f: M.Func<
     )
 );
 
-export const mapPlane: M.Func<vertexvis.protobuf.core.IPlane, Plane.Plane> =
+export const fromPbPlane: M.Func<vertexvis.protobuf.core.IPlane, Plane.Plane> =
   M.defineMapper(
-    M.read(M.requiredProp('d'), M.mapRequiredProp('normal', mapVector3f)),
+    M.read(M.requiredProp('d'), M.mapRequiredProp('normal', fromPbVector3f)),
     ([constant, normal]) => Plane.create({ normal, constant })
   );

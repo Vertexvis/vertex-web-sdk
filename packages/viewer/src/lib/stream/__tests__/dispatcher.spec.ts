@@ -6,7 +6,7 @@ import {
 } from '@vertexvis/stream-api';
 import { StreamApiEventDispatcher } from '../dispatcher';
 import '../../../testing/domMocks';
-import { mapFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
 
 describe(StreamApiEventDispatcher, () => {
@@ -21,7 +21,7 @@ describe(StreamApiEventDispatcher, () => {
       ) ?? false,
     (msg) =>
       msg.request?.drawFrame != null
-        ? mapFrameOrThrow(Orientation.DEFAULT)(msg.request.drawFrame)
+        ? fromPbFrameOrThrow(Orientation.DEFAULT)(msg.request.drawFrame)
         : undefined,
     5
   );
