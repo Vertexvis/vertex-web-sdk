@@ -65,9 +65,11 @@ export class MeasurementController {
     return this.performMeasurement(() => this.model.removeEntity(entity));
   }
 
-  private performMeasurement(f: () => boolean): Promise<MeasurementResult[]> {
+  private performMeasurement(
+    effect: () => boolean
+  ): Promise<MeasurementResult[]> {
     const previous = this.model.getEntities();
-    const changed = f();
+    const changed = effect();
     const entities = this.model.getEntities();
     if (changed) {
       this.measureAndUpdateModel(entities);
