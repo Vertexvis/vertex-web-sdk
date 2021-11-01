@@ -7,15 +7,3 @@
   right: 0;
   pointer-events: none;
 }
-
-.root {
-  width: 100%;
-  height: 100%;
-}
-
-.hit-point {
-  width: 12px;
-  height: 12px;
-  background-color: red;
-  border-radius: 50%;
-}

@@ -111,7 +111,10 @@ export class MeasurementController {
     await requestUnary(async (handler) => {
       const meta = await createMetadata(this.jwtProvider);
 
-      const clearEntities = previous.map((e) => {
+      const entitySet = new Set(entities);
+      const newPrevious = previous.filter((e) => !entitySet.has(e));
+
+      const clearEntities = newPrevious.map((e) => {
         const update = new ModelEntityUpdate();
         update.setModelEntity(ModelEntity.deserializeBinary(e.modelEntity));
         update.setHighlight(new BoolValue().setValue(false));
