@@ -37,13 +37,11 @@ information.
 
 ### Used by
 
- - [vertex-viewer-measurement-precise](../viewer-measurement-precise)
  - [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-measurement-precise --> vertex-viewer-dom-element
   vertex-viewer-view-cube --> vertex-viewer-dom-element
   style vertex-viewer-dom-element fill:#f9f,stroke:#333,stroke-width:4px
 ```
