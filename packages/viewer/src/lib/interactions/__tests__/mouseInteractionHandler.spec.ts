@@ -107,6 +107,42 @@ describe(MouseInteractionHandler, () => {
     expect(twistInteraction.drag).toHaveBeenCalledTimes(1);
   });
 
+  it('begins a drag and rotates if alt is pressed', async () => {
+    const rotateKeyboardEvent = new MouseEvent('mousemove', {
+      ...mouseMovePrimaryButton,
+      altKey: true,
+    });
+
+    handler.setDefaultKeyboardControls(true);
+    await simulateCustomMouseEvent(rotateKeyboardEvent, 50);
+
+    expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
+  });
+
+  it('begins a drag and pans if control is pressed', async () => {
+    const panKeyboardEvent = new MouseEvent('mousemove', {
+      ...mouseMovePrimaryButton,
+      ctrlKey: true,
+    });
+
+    handler.setDefaultKeyboardControls(true);
+    await simulateCustomMouseEvent(panKeyboardEvent, 50);
+
+    expect(panInteraction.drag).toHaveBeenCalledTimes(1);
+  });
+
+  it('begins a drag and zooms if shift is pressed', async () => {
+    const zoomKeyboardEvent = new MouseEvent('mousemove', {
+      ...mouseMovePrimaryButton,
+      shiftKey: true,
+    });
+
+    handler.setDefaultKeyboardControls(true);
+    await simulateCustomMouseEvent(zoomKeyboardEvent, 50);
+
+    expect(zoomInteraction.drag).toHaveBeenCalledTimes(1);
+  });
+
   it('should not twist if the default keyboard controls are off', async () => {
     handler.setDefaultKeyboardControls(false);
     await simulateTwistEvent(50);
@@ -222,6 +258,16 @@ describe(MouseInteractionHandler, () => {
   async function simulateTwistEvent(interactionDelay?: number): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(twistEvent);
+    await delay(interactionDelay || 0);
+    window.dispatchEvent(mouseUp);
+  }
+
+  async function simulateCustomMouseEvent(
+    mouseEvent?: MouseEvent,
+    interactionDelay?: number
+  ): Promise<void> {
+    div.dispatchEvent(mouseDown);
+    window.dispatchEvent(mouseEvent);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
