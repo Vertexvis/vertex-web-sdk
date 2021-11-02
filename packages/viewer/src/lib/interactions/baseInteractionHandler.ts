@@ -201,16 +201,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected beginDrag(event: BaseEvent): void {
-    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
-
     if (this.keyboardControls && event.metaKey && event.shiftKey) {
       this.currentInteraction = this.rotatePointInteraction;
     } else if (this.keyboardControls && event.shiftKey) {
       this.currentInteraction = this.zoomInteraction;
-    } else if (
-      this.keyboardControls &&
-      ((isMac && event.metaKey) || (!isMac && event.ctrlKey))
-    ) {
+    } else if (this.keyboardControls && (event.metaKey || event.ctrlKey)) {
       this.currentInteraction = this.panInteraction;
     } else if (this.keyboardControls && event.altKey) {
       this.currentInteraction = this.rotateInteraction;
