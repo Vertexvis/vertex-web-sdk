@@ -40,7 +40,6 @@ import { MultiPointerInteractionHandler } from '../../lib/interactions/multiPoin
 import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
-import { KeyInteractionHandler } from '../../lib/interactions/keyInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
 import { CommandFactory } from '../../lib/commands/command';
 import { Environment } from '../../lib/environment';
@@ -442,9 +441,6 @@ export class Viewer {
           this.getResolvedConfig()
         );
         this.registerInteractionHandler(this.baseInteractionHandler);
-        this.registerInteractionHandler(
-          new KeyInteractionHandler(() => this.createScene())
-        );
         this.registerInteractionHandler(new MultiPointerInteractionHandler());
         this.registerInteractionHandler(tapInteractionHandler);
       } else {
