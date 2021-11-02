@@ -70,6 +70,23 @@ describe('MeasurementController', () => {
     });
   });
 
+  describe(MeasurementController.prototype.clearEntities, () => {
+    it('clears entities and results', async () => {
+      (client.measure as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(
+          createMeasureResponse(createMinimumDistanceResult())
+        )
+      );
+
+      controller.addEntity(entity1);
+      await controller.addEntity(entity2);
+
+      await controller.clearEntities();
+      expect(model.getEntities()).toEqual([]);
+      expect(model.getResults()).toEqual([]);
+    });
+  });
+
   describe(MeasurementController.prototype.removeEntity, () => {
     it('returns measurement results if entity registered', async () => {
       (client.measure as jest.Mock).mockImplementation(

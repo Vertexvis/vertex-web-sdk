@@ -22,6 +22,7 @@ import {
   Async,
   EventDispatcher,
   Objects,
+  Mapper,
 } from '@vertexvis/utils';
 import { CommandRegistry } from '../../lib/commands/commandRegistry';
 import {
@@ -71,12 +72,6 @@ import {
 import { paintTime, Timing } from '../../lib/meters';
 import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
 import {
-  ViewerStreamAttributes,
-  toProtoStreamAttributes,
-  DepthBufferFrameType,
-  FeatureLineOptions,
-} from '../../lib/stream/streamAttributes';
-import {
   upsertStorageEntry,
   getStorageEntry,
 } from '../../lib/sessions/storage';
@@ -89,9 +84,18 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import { mapFrameOrThrow, mapWorldOrientationOrThrow } from '../../lib/mappers';
+import {
+  fromPbFrameOrThrow,
+  fromPbWorldOrientationOrThrow,
+  toPbStreamAttributes,
+} from '../../lib/mappers';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
+import {
+  DepthBufferFrameType,
+  FeatureHighlightOptions,
+  FeatureLineOptions,
+} from '../../interfaces';
 
 const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
@@ -221,6 +225,12 @@ export class Viewer {
   @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
 
   /**
+   * Specifies how selected features should be highlighted.
+   */
+  @Prop({ attribute: null })
+  public featureHighlighting?: FeatureHighlightOptions;
+
+  /**
    * The default hex color or material to use when selecting items.
    */
   @Prop() public selectionMaterial: string | ColorMaterial =
@@ -233,15 +243,6 @@ export class Viewer {
    * @readonly
    */
   @Prop({ mutable: true }) public frame: Frame | undefined;
-
-  /**
-   * An object containing the stream attribute values sent to rendering. This
-   * value is updated automatically when properties like `depthBuffers` are
-   * set. You should not set this value directly, as it may be overridden.
-   *
-   * @readonly
-   */
-  @Prop({ mutable: true }) public streamAttributes: ViewerStreamAttributes = {};
 
   /**
    * @internal
@@ -414,7 +415,7 @@ export class Viewer {
       }
     }
 
-    this.updateStreamAttributesProp();
+    this.updateStreamAttributes();
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
   }
 
@@ -706,23 +707,9 @@ export class Viewer {
   /**
    * @ignore
    */
-  @Watch('streamAttributes')
-  protected handleStreamAttributesChanged(
-    streamAttributes: ViewerStreamAttributes
-  ): void {
-    if (this.isStreamStarted) {
-      this.getStream().updateStream({
-        streamAttributes: toProtoStreamAttributes(streamAttributes),
-      });
-    }
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('rotateAroundTapPoint')
   protected handleRotateAboutTapPointChanged(): void {
-    this.updateStreamAttributesProp();
+    this.updateStreamAttributes();
     if (this.rotateAroundTapPoint) {
       this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
     } else {
@@ -735,7 +722,7 @@ export class Viewer {
    */
   @Watch('depthBuffers')
   protected handleDepthBuffersChanged(): void {
-    this.updateStreamAttributesProp();
+    this.updateStreamAttributes();
   }
 
   /**
@@ -743,7 +730,7 @@ export class Viewer {
    */
   @Watch('experimentalGhostingOpacity')
   protected handleExperimentalGhostingOpacityChanged(): void {
-    this.updateStreamAttributesProp();
+    this.updateStreamAttributes();
   }
 
   /**
@@ -751,7 +738,15 @@ export class Viewer {
    */
   @Watch('featureLines')
   protected handleFeatureLinesChanged(): void {
-    this.updateStreamAttributesProp();
+    this.updateStreamAttributes();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('featureHighlighting')
+  protected handleFeatureHighlightingChanged(): void {
+    this.updateStreamAttributes();
   }
 
   /**
@@ -898,7 +893,7 @@ export class Viewer {
         streamKey: { value: resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: toProtoStreamAttributes(this.streamAttributes),
+        streamAttributes: this.getStreamAttributes(),
         ...(queryResource?.type === 'scene-view-state' && {
           sceneViewStateId: { hex: queryResource.id },
         }),
@@ -932,7 +927,7 @@ export class Viewer {
 
       // Need to parse world orientation.
       this.stateMap.streamWorldOrientation =
-        mapWorldOrientationOrThrow(worldOrientation);
+        fromPbWorldOrientationOrThrow(worldOrientation);
 
       console.debug(
         `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
@@ -1019,13 +1014,13 @@ export class Viewer {
       this.clock = undefined;
 
       this.emitConnectionChange({ status: 'connecting' });
-
       this.streamDisposable = await this.connectStream(resource);
+
       const result = await this.getStream().reconnect({
         streamId: { hex: streamId },
         dimensions: this.dimensions,
         frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: toProtoStreamAttributes(this.streamAttributes),
+        streamAttributes: this.getStreamAttributes(),
       });
       this.isStreamStarted = true;
       this.isReconnecting = false;
@@ -1157,7 +1152,7 @@ export class Viewer {
     ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
-        this.frame = mapFrameOrThrow(worldOrientation)(payload);
+        this.frame = fromPbFrameOrThrow(worldOrientation)(payload);
 
         const data = {
           canvas,
@@ -1302,7 +1297,7 @@ export class Viewer {
     return new Scene(
       this.getStream(),
       this.frame,
-      mapFrameOrThrow(this.stateMap.streamWorldOrientation),
+      fromPbFrameOrThrow(this.stateMap.streamWorldOrientation),
       () => this.getImageScale(),
       this.sceneViewId,
       selectionMaterial
@@ -1340,21 +1335,24 @@ export class Viewer {
     }
   }
 
-  private updateStreamAttributesProp(): void {
-    const depthBuffers = this.getDepthBufferStreamAttributesValue();
-    this.streamAttributes = {
-      depthBuffers: { enabled: depthBuffers != null, frameType: depthBuffers },
-      experimentalGhosting: {
-        enabled: this.experimentalGhostingOpacity > 0,
-        opacity: this.experimentalGhostingOpacity,
-      },
+  private getStreamAttributes(): vertexvis.protobuf.stream.IStreamAttributes {
+    const attr = {
+      depthBuffers: this.getDepthBufferStreamAttributesValue(),
+      experimentalGhosting: this.experimentalGhostingOpacity,
       featureLines: this.featureLines,
+      featureHighlighting: this.featureHighlighting,
     };
+    return Mapper.ifInvalidThrow(toPbStreamAttributes)(attr);
   }
 
-  private getDepthBufferStreamAttributesValue():
-    | DepthBufferFrameType
-    | undefined {
+  private updateStreamAttributes(): void {
+    if (this.isStreamStarted) {
+      const streamAttributes = this.getStreamAttributes();
+      this.getStream().updateStream({ streamAttributes });
+    }
+  }
+
+  private getDepthBufferStreamAttributesValue(): DepthBufferFrameType {
     const depthBuffer =
       this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
     return depthBuffer;

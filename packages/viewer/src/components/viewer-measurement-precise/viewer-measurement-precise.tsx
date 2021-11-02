@@ -61,17 +61,7 @@ export class ViewerMeasurementPrecise {
   }
 
   public render(): JSX.Element {
-    return (
-      <Host>
-        <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
-          {this.entities.map((e) => (
-            <vertex-viewer-dom-element position={e.point}>
-              <div class="hit-point" />
-            </vertex-viewer-dom-element>
-          ))}
-        </vertex-viewer-dom-renderer>
-      </Host>
-    );
+    return <Host></Host>;
   }
 
   private setupController(): void {

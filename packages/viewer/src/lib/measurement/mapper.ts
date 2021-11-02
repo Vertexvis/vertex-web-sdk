@@ -14,7 +14,7 @@ import {
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
 } from '../measurement/model';
-import { mapPlane, mapVector3f } from '../mappers';
+import { fromPbPlane, fromPbVector3f } from '../mappers';
 import { Plane } from '@vertexvis/geometry';
 
 const mapPlanePair: M.Func<
@@ -22,8 +22,8 @@ const mapPlanePair: M.Func<
   { start: Plane.Plane; end: Plane.Plane }
 > = M.defineMapper(
   M.read(
-    M.mapRequiredProp('start', mapPlane),
-    M.mapRequiredProp('end', mapPlane)
+    M.mapRequiredProp('start', fromPbPlane),
+    M.mapRequiredProp('end', fromPbPlane)
   ),
   ([start, end]) => ({ start, end })
 );
@@ -74,8 +74,8 @@ const mapMinimumDistance: M.Func<
 > = M.defineMapper(
   M.read(
     M.getProp('distance'),
-    M.mapRequiredProp('closestPoint1', mapVector3f),
-    M.mapRequiredProp('closestPoint2', mapVector3f)
+    M.mapRequiredProp('closestPoint1', fromPbVector3f),
+    M.mapRequiredProp('closestPoint2', fromPbVector3f)
   ),
   ([distance, closestPoint1, closestPoint2]) => ({
     type: 'minimum-distance',

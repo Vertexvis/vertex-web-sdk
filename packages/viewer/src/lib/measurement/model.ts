@@ -8,7 +8,7 @@ import {
   Mapper,
 } from '@vertexvis/utils';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { mapVector3f } from '../mappers';
+import { fromPbVector3f } from '../mappers';
 import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 
 /**
@@ -112,7 +112,7 @@ export class MeasurementEntity {
     hit: vertexvis.protobuf.stream.IHit
   ): MeasurementEntity {
     if (hit.hitPoint != null && hit.modelEntity != null) {
-      const hitPoint = Mapper.ifInvalidThrow(mapVector3f)(hit.hitPoint);
+      const hitPoint = Mapper.ifInvalidThrow(fromPbVector3f)(hit.hitPoint);
       const modelEntity = vertexvis.protobuf.core.ModelEntity.encode(
         hit.modelEntity
       ).finish();

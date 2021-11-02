@@ -2,7 +2,7 @@ import { Color } from '@vertexvis/utils';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
 import { FrameImageLike } from './frame';
-import { mapStencilBufferOrThrow } from '../mappers';
+import { fromPbStencilBufferOrThrow } from '../mappers';
 import { decodePng } from '../../workers/png-decoder-pool';
 
 /**
@@ -62,7 +62,7 @@ export class StencilBufferManager {
     if (hasStencil && this.viewer.stream != null) {
       const res = await this.viewer.stream.getStencilBuffer(true);
       const { stencilBuffer: stencilBytes, imageAttributes } =
-        mapStencilBufferOrThrow(res);
+        fromPbStencilBufferOrThrow(res);
 
       const png = await decodePng(stencilBytes as Uint8Array);
       return StencilBuffer.fromPng(
