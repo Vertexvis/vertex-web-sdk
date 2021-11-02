@@ -203,6 +203,12 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected beginDrag(event: BaseEvent): void {
     if (this.keyboardControls && event.metaKey && event.shiftKey) {
       this.currentInteraction = this.rotatePointInteraction;
+    } else if (this.keyboardControls && event.shiftKey) {
+      this.currentInteraction = this.zoomInteraction;
+    } else if (this.keyboardControls && (event.metaKey || event.ctrlKey)) {
+      this.currentInteraction = this.panInteraction;
+    } else if (this.keyboardControls && event.altKey) {
+      this.currentInteraction = this.rotateInteraction;
     }
 
     if (event.buttons === 1) {
