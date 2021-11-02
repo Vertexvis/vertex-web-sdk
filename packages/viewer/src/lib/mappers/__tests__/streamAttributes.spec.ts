@@ -94,7 +94,7 @@ describe(toPbStreamAttributes, () => {
       expect(res).toMatchObject({
         featureHighlighting: {
           highlightColor: { r: 255, g: 0, b: 0 },
-          occludedOpacity: 0.5,
+          occludedOpacity: { value: 0.5 },
           outline: { lineWidth: 2, lineColor: { r: 0, g: 255, b: 0 } },
         },
       });

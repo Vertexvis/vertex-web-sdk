@@ -7,6 +7,7 @@ import {
   FeatureLineOptions,
   StreamAttributes,
 } from '../../interfaces';
+import { toPbFloatValue } from './scalar';
 import { toPbRGBi } from './material';
 
 const toPbDepthBuffers: M.Func<
@@ -66,7 +67,7 @@ const toPbFeatureHighlight: M.Func<
 > = M.defineMapper(
   M.read(
     M.ifDefined(M.mapProp('highlightColor', M.ifDefined(toPbRGBi))),
-    M.ifDefined(M.getProp('occludedOpacity')),
+    M.ifDefined(M.mapProp('occludedOpacity', toPbFloatValue)),
     M.ifDefined(M.mapProp('outline', M.ifDefined(toPbFeatureLines)))
   ),
   ([highlightColor, occludedOpacity, outline]) => ({
