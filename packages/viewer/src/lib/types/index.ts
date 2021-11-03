@@ -13,6 +13,8 @@ import * as CrossSectioning from './crossSectioning';
 
 export * from './depthBuffer';
 
+export * from './featureMap';
+
 export * from './frame';
 
 export * from './markup';

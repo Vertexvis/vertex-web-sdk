@@ -9,11 +9,13 @@ import * as FrameCamera from './frameCamera';
 import * as CrossSectioning from './crossSectioning';
 import * as ClippingPlanes from './clippingPlanes';
 import { DepthBuffer } from './depthBuffer';
+import { FeatureMap } from './featureMap';
 import { Orientation } from './orientation';
 import { decodePng } from '../../workers/png-decoder-pool';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
+  private cachedFeatureMap?: Promise<FeatureMap | undefined>;
 
   public constructor(
     public readonly correlationIds: string[],
@@ -21,7 +23,8 @@ export class Frame {
     public readonly dimensions: Dimensions.Dimensions,
     public readonly image: FrameImage,
     public readonly scene: FrameScene,
-    public readonly depthBufferBytes: Uint8Array | undefined
+    private readonly depthBufferBytes: Uint8Array | undefined,
+    private readonly featureMapBytes: Uint8Array | undefined
   ) {}
 
   public async depthBuffer(): Promise<DepthBuffer | undefined> {
@@ -43,6 +46,23 @@ export class Frame {
       this.image.imageRect,
       this.image.imageScale
     );
+  }
+
+  public async featureMap(): Promise<FeatureMap | undefined> {
+    if (this.cachedFeatureMap == null) {
+      this.cachedFeatureMap =
+        this.featureMapBytes != null
+          ? this.decodeFeatureMap(this.featureMapBytes)
+          : Promise.resolve(undefined);
+    }
+    return this.cachedFeatureMap;
+  }
+
+  private async decodeFeatureMap(bytes: Uint8Array): Promise<FeatureMap> {
+    const png = await decodePng(bytes);
+    if (png.data instanceof Uint8Array) {
+      return new FeatureMap(png.data);
+    } else throw new Error('Feature map could not be decoded as a Uint8Array');
   }
 }
 
