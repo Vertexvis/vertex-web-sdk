@@ -22,9 +22,9 @@ import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
-  DepthBufferFrameType,
   FeatureHighlightOptions,
   FeatureLineOptions,
+  FrameType,
 } from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FramePerspectiveCamera } from './lib/types/frame';
@@ -298,7 +298,7 @@ export namespace Components {
     /**
      * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
-    depthBuffers?: DepthBufferFrameType;
+    depthBuffers?: FrameType;
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
@@ -312,6 +312,10 @@ export namespace Components {
      * Specifies if and how to render feature lines.
      */
     featureLines?: FeatureLineOptions;
+    /**
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.
+     */
+    featureMaps?: FrameType;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
      * @readonly
@@ -1406,7 +1410,7 @@ declare namespace LocalJSX {
     /**
      * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
-    depthBuffers?: DepthBufferFrameType;
+    depthBuffers?: FrameType;
     /**
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
      */
@@ -1419,6 +1423,10 @@ declare namespace LocalJSX {
      * Specifies if and how to render feature lines.
      */
     featureLines?: FeatureLineOptions;
+    /**
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.
+     */
+    featureMaps?: FrameType;
     /**
      * The last frame that was received, which can be used to inspect the scene and camera information.
      * @readonly
