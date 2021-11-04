@@ -13,8 +13,9 @@
 }
 
 .rows-scroll {
-  overflow-y: auto;
-  height: 100%;
+  position: relative;
+  height: var(--scene-tree-row-height, 0);
+  flex-grow: 1;
 }
 
 .rows {

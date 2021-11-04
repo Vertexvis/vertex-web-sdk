@@ -1,0 +1,116 @@
+@import url('../../css/button-reset.css');
+
+:host {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+
+  /**
+   * @prop --scene-tree-cell-background-hover: A CSS background of a cell when
+   * hovered.
+   */
+   --scene-tree-cell-background-hover: var(--blue-200);
+
+   /**
+     * @prop --scene-tree-cell-background-selected: A CSS background color of a
+     * cell when selected.
+     */
+   --scene-tree-cell-background-selected: var(--blue-300);
+
+   /**
+     * @prop --scene-tree-cell-text-positioning: A CSS text alignment
+     * value that indicates how text should be positioned.
+     */
+   --scene-tree-cell-text-positioning: left;
+
+   /**
+     * @prop --scene-tree-cell-padding: CSS lengths that specifies the amount of
+     * padding between the cell's border and content.
+     */
+   --scene-tree-cell-padding: 0.25rem 0;
+}
+
+:host([is-hovered]) {
+  background: var(--scene-tree-cell-background-hover);
+}
+
+:host([is-selected]) {
+  background: var(--scene-tree-cell-background-selected);
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: var(--scene-tree-cell-padding);
+}
+
+.content {
+  width: 100%;
+  text-align: var(--scene-tree-cell-text-positioning);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.column-spacer {
+  width: var(--scene-tree-table-column-gap);
+}
+
+.expand-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+
+:host([is-leaf]) .expand-btn {
+  visibility: hidden;
+  cursor: default;
+}
+
+.visibility-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  width: 24px;
+  height: 24px;
+}
+
+:host([is-hidden]) .visibility-btn,
+:host([is-partial]) .visibility-btn,
+:host([is-hovered]) .visibility-btn {
+  visibility: inherit;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+}
+
+.icon-expanded {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' class='icon' %3E%3Cpath fill='%23444444' d='M11.88,9.17l-3.5-4a.51.51,0,0,0-.76,0l-3.5,4A.5.5,0,0,0,4.5,10h7a.5.5,0,0,0,.38-.83Z' transform='rotate(180 8 8)' /%3E%3C/svg%3E");
+}
+
+.icon-collapsed {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' class='icon' %3E%3Cpath fill='%23444444' d='M10.83,7.62l-4-3.5A.5.5,0,0,0,6,4.5v7a.5.5,0,0,0,.83.38l4-3.5a.51.51,0,0,0,0-.76Z' /%3E%3C/svg%3E");
+}
+
+.icon-visible {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' class='icon' %3E%3Cpath fill='%23444444' d='M8 5a3 3 0 103 3 3 3 0 00-3-3zm4.65-1.17A8.53 8.53 0 008 2.5a8.53 8.53 0 00-4.65 1.33A6.57 6.57 0 00.51 7.89v.22a6.57 6.57 0 002.84 4.06A8.53 8.53 0 008 13.5a8.53 8.53 0 004.65-1.33 6.57 6.57 0 002.84-4.06v-.22a6.57 6.57 0 00-2.84-4.06zm-.55 7.5A7.52 7.52 0 018 12.5a7.52 7.52 0 01-4.1-1.17A5.49 5.49 0 011.53 8 5.49 5.49 0 013.9 4.67 7.52 7.52 0 018 3.5a7.52 7.52 0 014.1 1.17A5.49 5.49 0 0114.47 8a5.49 5.49 0 01-2.37 3.33z' /%3E%3C/svg%3E");
+}
+
+.icon-hidden {
+  background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' class='icon' %3E%3Cpath fill='%23444444' d='M13.35 2.65a.48.48 0 00-.7 0l-.78.77a8.71 8.71 0 00-8.52.41A6.57 6.57 0 00.51 7.89v.22a6.58 6.58 0 002.71 4l-.57.58a.49.49 0 00.7.7l10-10a.48.48 0 000-.74zM9.73 5.56a3 3 0 00-4.17 4.17l-1.62 1.62A5.49 5.49 0 011.53 8 5.49 5.49 0 013.9 4.67 7.52 7.52 0 018 3.5a7.67 7.67 0 013.12.67zm3.61-1.2l-.72.72A5.45 5.45 0 0114.47 8a5.49 5.49 0 01-2.37 3.33A7.52 7.52 0 018 12.5a8.15 8.15 0 01-2.41-.38l-.78.78a8.9 8.9 0 003.19.6 8.53 8.53 0 004.65-1.33 6.57 6.57 0 002.84-4.06v-.22a6.56 6.56 0 00-2.15-3.53z' /%3E%3C/svg%3E%0A");
+}
+
+.icon-partial {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4.12 11.46A5.62 5.62 0 011.52 8 5.57 5.57 0 013.9 4.67 7.52 7.52 0 018 3.5a7.7 7.7 0 013.33.75l.74-.74A8.67 8.67 0 008 2.5a8.53 8.53 0 00-4.65 1.33A6.57 6.57 0 00.51 7.89v.22a6.54 6.54 0 002.88 4.08z' fill='%23444'/%3E%3Cpath d='M8 5a3 3 0 00-3 3 3 3 0 00.69 1.89l4.2-4.2A3 3 0 008 5zM5.88 5.88zM9.2 12.41a.51.51 0 00-.42.57.5.5 0 00.56.42.5.5 0 00.43-.57.51.51 0 00-.57-.42zM6.77 12.41a.5.5 0 00-.57.42.49.49 0 00.41.57.5.5 0 10.15-1zM14.48 5.61a.5.5 0 00-.7-.12.49.49 0 00-.12.69.5.5 0 00.82-.57zM11.5 11.68a.5.5 0 00-.22.67.51.51 0 00.68.22.5.5 0 00-.46-.89zM15.07 7.77a.52.52 0 00-.62.35.51.51 0 00.35.62.5.5 0 00.61-.35.52.52 0 00-.34-.62zM13.36 10.21a.5.5 0 10.76.64.49.49 0 00-.06-.7.51.51 0 00-.7.06z' fill='%23444'/%3E%3C/svg%3E");
+}

@@ -195,6 +195,7 @@ export class SceneTreeController {
     }
 
     this.startIdleReconnectTimer();
+    this.setMetadataKeys(this.metadataKeys);
   }
 
   private clearReconnectTimer(): void {

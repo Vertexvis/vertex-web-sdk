@@ -1,0 +1,29 @@
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  /**
+    * @prop --scene-tree-table-row-padding: CSS lengths that specifies the amount of
+    * padding between the row's border and content.
+    */
+    --scene-tree-table-row-padding: 2px 0px;
+
+  /**
+    * @prop --scene-tree-table-column-gap: CSS length that specifies the amount of
+    * padding between columns in the table.
+    */
+    --scene-tree-table-column-gap: 0.5rem;
+}
+
+.table {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  font-size: 0.825rem;
+  overflow: auto;
+}

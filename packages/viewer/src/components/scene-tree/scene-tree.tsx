@@ -78,6 +78,8 @@ interface StateMap {
   viewportHeight?: number;
 
   selectionPath?: string[];
+
+  layoutEl?: HTMLVertexSceneTreeTableElement;
 }
 
 type OperationHandler = (data: {
@@ -506,7 +508,7 @@ export class SceneTree {
    */
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
-    const { top } = getElementBoundingClientRect(this.getRowsScrollElement());
+    const top = this.getLayoutElement().layoutOffset;
     const index = Math.floor(
       (clientY - top + this.scrollTop) /
         this.getComputedOrPlaceholderRowHeight()
@@ -573,24 +575,24 @@ export class SceneTree {
    * @ignore
    */
   protected async componentDidLoad(): Promise<void> {
-    const rowScrollEl = this.getRowsScrollElement();
-    rowScrollEl.addEventListener('scroll', () => this.handleScroll(), {
-      passive: true,
-    });
+    this.ensureLayoutDefined();
+
+    const layoutEl = this.getLayoutElement();
+    layoutEl.addEventListener('scrollOffsetChanged', this.handleScroll);
 
     const resizeObserver = new ResizeObserver(() => {
       this.clearViewportHeight();
       this.invalidateRows();
     });
-    resizeObserver.observe(rowScrollEl);
+    resizeObserver.observe(layoutEl);
     this.stateMap.resizeObserver = resizeObserver;
 
-    this.ensureTemplateDefined();
-
-    await this.computeRowHeight();
-    this.createPool();
+    // await this.computeRowHeight();
+    // this.createPool();
 
     this.stateMap.componentLoaded = true;
+
+    this.controller?.setMetadataKeys(this.metadataKeys);
   }
 
   /**
@@ -605,21 +607,21 @@ export class SceneTree {
         this.stateMap.endIndex
       );
     }
+
+    this.updateLayoutElement();
   }
 
   /**
    * @ignore
    */
   protected componentDidRender(): void {
-    this.updateElements();
+    // this.updateElements();
   }
 
   /**
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
-    const totalHeight = this.totalRows * rowHeight;
     return (
       <Host>
         {this.connectionErrorDetails != null && (
@@ -649,9 +651,7 @@ export class SceneTree {
         </div>
 
         <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
-          <div class="rows" style={{ height: `${totalHeight}px` }}>
-            <slot />
-          </div>
+          <slot />
         </div>
 
         <div class="footer">
@@ -814,11 +814,11 @@ export class SceneTree {
     return rows.map((row) => (row != null ? this.populateRowData(row) : row));
   }
 
-  private handleScroll(): void {
+  private handleScroll = (): void => {
     readDOM(() => {
-      this.scrollTop = this.getRowsScrollElement().scrollTop ?? 0;
+      this.scrollTop = this.getLayoutElement().scrollOffset ?? 0;
     });
-  }
+  };
 
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
@@ -905,16 +905,21 @@ export class SceneTree {
     return parseConfig(this.configEnv, this.config);
   }
 
-  private ensureTemplateDefined(): void {
-    let template = this.el.querySelector('template');
-    if (template == null) {
-      template = document.createElement('template');
-      template.innerHTML = `
-      <vertex-scene-tree-row prop:node="{{row.node}}"></vertex-scene-tree-row>
+  private ensureLayoutDefined(): void {
+    let layout = this.el.querySelector('vertex-scene-tree-table');
+    if (layout == null) {
+      layout = document.createElement('vertex-scene-tree-table');
+      layout.innerHTML = `
+      <vertex-scene-tree-table-column>
+        <template>
+          <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" />
+        </template>
+      </vertex-scene-tree-table-column>
       `;
-      this.el.appendChild(template);
+
+      this.el.appendChild(layout);
     }
-    this.stateMap.template = template;
+    this.stateMap.layoutEl = layout;
   }
 
   private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
@@ -939,6 +944,18 @@ export class SceneTree {
     this.updatePool();
     this.bindData();
     this.positionElements();
+  }
+
+  private updateLayoutElement(): void {
+    const layout = this.el.querySelector('vertex-scene-tree-table');
+    if (layout != null) {
+      layout.rows = this.rows;
+      layout.visibleStartIndex = this.stateMap.startIndex;
+      layout.visibleEndIndex = this.stateMap.endIndex;
+      layout.visibleRows = this.stateMap.viewportRows;
+      layout.tree = this.el as HTMLVertexSceneTreeElement;
+      layout.totalRows = this.totalRows;
+    }
   }
 
   private updatePool(): void {
@@ -987,6 +1004,14 @@ export class SceneTree {
       return this.rowScrollEl;
     } else {
       throw new Error('Row scroll element is undefined.');
+    }
+  }
+
+  private getLayoutElement(): HTMLVertexSceneTreeTableElement {
+    if (this.stateMap.layoutEl != null) {
+      return this.stateMap.layoutEl;
+    } else {
+      throw new Error('Layout element is undefined');
     }
   }
 }

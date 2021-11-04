@@ -43,14 +43,14 @@ export function fromNodeProto(
 /* eslint-enable padding-line-between-statements */
 
 function makeMetadataMap(keys: MetadataKey[], values: string[]): MetadataMap {
-  if (keys.length !== values.length) {
-    throw new Error('Column key length and column value length mismatch');
-  } else {
-    return keys.reduce((map, key, i) => {
-      map[key] = values[i];
-      return map;
-    }, {} as MetadataMap);
-  }
+  // if (keys.length !== values.length) {
+  //   throw new Error('Column key length and column value length mismatch');
+  // } else {
+  return keys.reduce((map, key, i) => {
+    map[key] = values[i] ?? '--';
+    return map;
+  }, {} as MetadataMap);
+  // }
 }
 
 export function isLoadedRow(obj: unknown): obj is LoadedRow {
