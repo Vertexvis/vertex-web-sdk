@@ -13,6 +13,7 @@ import {
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';
+import { Binding } from '../scene-tree/lib/binding';
 import { ElementPool } from '../scene-tree/lib/element-pool';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import {
@@ -164,42 +165,96 @@ export class SceneTreeTable {
 
       col.style.minHeight = `${this.rowHeight * this.totalRows}px`;
 
-      pool.iterateElements((el, binding, rowIndex) => {
-        const cell = el as HTMLVertexSceneTreeTableCellElement;
-        const row = this.visibleRows[rowIndex];
-        if (row != null) {
-          cell.style.position = 'absolute';
-          cell.style.top = `${
-            (this.visibleStartIndex + rowIndex) * this.rowHeight
-          }px`;
-
-          cell.style.height = `${this.rowHeight}px`;
-          if (colIndex === 0) {
-            cell.style.paddingLeft = `calc(${row.node.depth} * 0.5rem)`;
-            cell.expandToggle = true;
+      if (colIndex === 0) {
+        pool.iterateElements((el, binding, rowIndex) => {
+          const row = this.visibleRows[rowIndex];
+          if (row != null) {
+            this.updateLeftmostCell(
+              row,
+              el as HTMLVertexSceneTreeTableCellElement,
+              binding,
+              rowIndex
+            );
           }
-          cell.visibilityToggle = colIndex === this.columnElements.length - 1;
-          cell.style.width =
-            col.initialWidth != null
-              ? `min(${col.initialWidth}px, 100%)`
-              : '100%';
-          cell.tree = this.tree;
-          cell.node = row.node;
-
-          this.toggleAttribute(
-            cell,
-            'is-hovered',
-            this.hoveredNodeId === row.node.id?.hex
-          );
-          this.toggleAttribute(cell, 'is-hidden', !row.node.visible);
-          this.toggleAttribute(cell, 'is-selected', row.node.selected);
-          this.toggleAttribute(cell, 'is-partial', row.node.partiallyVisible);
-          this.toggleAttribute(cell, 'is-leaf', row.node.isLeaf);
-
-          binding.bind(row);
-        }
-      });
+        });
+      } else if (colIndex === this.columnElements.length - 1) {
+        pool.iterateElements((el, binding, rowIndex) => {
+          const row = this.visibleRows[rowIndex];
+          if (row != null) {
+            this.updateRightmostCell(
+              row,
+              el as HTMLVertexSceneTreeTableCellElement,
+              binding,
+              rowIndex
+            );
+          }
+        });
+      } else {
+        pool.iterateElements((el, binding, rowIndex) => {
+          const row = this.visibleRows[rowIndex];
+          if (row != null) {
+            this.updateCell(
+              row,
+              el as HTMLVertexSceneTreeTableCellElement,
+              binding,
+              rowIndex
+            );
+          }
+        });
+      }
     });
+  };
+
+  private updateLeftmostCell = (
+    row: LoadedRow,
+    cell: HTMLVertexSceneTreeTableCellElement,
+    binding: Binding,
+    rowIndex: number
+  ): void => {
+    cell.style.paddingLeft = `calc(${row.node.depth} * 0.5rem)`;
+    cell.expandToggle = true;
+
+    this.updateCell(row, cell, binding, rowIndex);
+  };
+
+  private updateRightmostCell = (
+    row: LoadedRow,
+    cell: HTMLVertexSceneTreeTableCellElement,
+    binding: Binding,
+    rowIndex: number
+  ): void => {
+    cell.visibilityToggle = true;
+
+    this.updateCell(row, cell, binding, rowIndex);
+  };
+
+  private updateCell = (
+    row: LoadedRow,
+    cell: HTMLVertexSceneTreeTableCellElement,
+    binding: Binding,
+    rowIndex: number
+  ): void => {
+    cell.style.position = 'absolute';
+    cell.style.top = `${
+      (this.visibleStartIndex + rowIndex) * this.rowHeight
+    }px`;
+
+    cell.style.height = `${this.rowHeight}px`;
+    cell.style.width = '100%';
+    cell.tree = this.tree;
+    cell.node = row.node;
+
+    this.toggleAttribute(
+      cell,
+      'is-hovered',
+      this.hoveredNodeId === row.node.id?.hex
+    );
+    this.toggleAttribute(cell, 'is-hidden', !row.node.visible);
+    this.toggleAttribute(cell, 'is-selected', row.node.selected);
+    this.toggleAttribute(cell, 'is-partial', row.node.partiallyVisible);
+    this.toggleAttribute(cell, 'is-leaf', row.node.isLeaf);
+
+    binding.bind(row);
   };
 
   private updateLayoutPosition = (): void => {

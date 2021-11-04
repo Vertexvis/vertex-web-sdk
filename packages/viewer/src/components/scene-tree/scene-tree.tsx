@@ -16,7 +16,7 @@ import {
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
-import { isLoadedRow, LoadedRow, Row } from './lib/row';
+import { isLoadedRow, Row } from './lib/row';
 import {
   FilterTreeOptions,
   SceneTreeController,
@@ -38,12 +38,7 @@ import {
 } from './lib/viewer-ops';
 import { readDOM, writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
-import { getElementBoundingClientRect } from '../viewer/utils';
 import { ElementPool } from './lib/element-pool';
-import {
-  generateInstanceFromTemplate,
-  InstancedTemplate,
-} from './lib/templates';
 import { isSceneTreeRowElement } from '../scene-tree-row/utils';
 import { MetadataKey } from './interfaces';
 
@@ -587,9 +582,6 @@ export class SceneTree {
     resizeObserver.observe(layoutEl);
     this.stateMap.resizeObserver = resizeObserver;
 
-    // await this.computeRowHeight();
-    // this.createPool();
-
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
@@ -609,13 +601,6 @@ export class SceneTree {
     }
 
     this.updateLayoutElement();
-  }
-
-  /**
-   * @ignore
-   */
-  protected componentDidRender(): void {
-    // this.updateElements();
   }
 
   /**
@@ -834,52 +819,8 @@ export class SceneTree {
     }
   }
 
-  private async computeRowHeight(): Promise<void> {
-    if (this.isComputingRowHeight) {
-      const dummyData: LoadedRow = {
-        index: 0,
-        node: {
-          id: { hex: '' },
-          name: 'Dummy row',
-          expanded: false,
-          selected: false,
-          visible: false,
-          partiallyVisible: false,
-          isLeaf: false,
-          depth: 0,
-          columnsList: [],
-        },
-        metadata: {},
-        data: {},
-      };
-      const { bindings, element } = this.createInstancedTemplate();
-      bindings.bind(dummyData);
-      element.style.visibility = 'hidden';
-
-      this.getRowsScrollElement().appendChild(element);
-
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      if (typeof (element as any).componentOnReady === 'function') {
-        await (element as any).componentOnReady();
-      }
-      /* eslint-enable @typescript-eslint/no-explicit-any */
-
-      let height = element.clientHeight;
-      let attempts = 0;
-
-      while (height === 0 && attempts < 10) {
-        height = await new Promise((resolve) => {
-          setTimeout(() => resolve(element.getBoundingClientRect().height), 5);
-        });
-        attempts = attempts + 1;
-      }
-      this.computedRowHeight = height;
-      element.remove();
-    }
-  }
-
   private getComputedOrPlaceholderRowHeight(): number {
-    return this.computedRowHeight || 24;
+    return this.getLayoutElement().rowHeight ?? 24;
   }
 
   private getScrollToPosition(
@@ -922,30 +863,6 @@ export class SceneTree {
     this.stateMap.layoutEl = layout;
   }
 
-  private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
-    if (this.stateMap.template != null) {
-      return generateInstanceFromTemplate(this.stateMap.template);
-    } else {
-      throw new Error('No template defined for scene tree.');
-    }
-  }
-
-  private createPool(): void {
-    // When doing a live reload, this function might get called multiple times.
-    // Only create the pool if on hasn't been created yet.
-    if (this.stateMap.elementPool == null) {
-      this.stateMap.elementPool = new ElementPool(this.el, () =>
-        this.createInstancedTemplate()
-      );
-    }
-  }
-
-  private async updateElements(): Promise<void> {
-    this.updatePool();
-    this.bindData();
-    this.positionElements();
-  }
-
   private updateLayoutElement(): void {
     const layout = this.el.querySelector('vertex-scene-tree-table');
     if (layout != null) {
@@ -956,34 +873,6 @@ export class SceneTree {
       layout.tree = this.el as HTMLVertexSceneTreeElement;
       layout.totalRows = this.totalRows;
     }
-  }
-
-  private updatePool(): void {
-    const count = this.stateMap.endIndex - this.stateMap.startIndex + 1;
-    this.stateMap.elementPool?.updateElements(count);
-  }
-
-  private bindData(): void {
-    this.stateMap.elementPool?.iterateElements((el, binding, i) => {
-      const row = this.stateMap.viewportRows[i];
-      if (row != null) {
-        el.style.visibility = 'inherit';
-        binding.bind(row);
-      } else {
-        el.style.visibility = 'hidden';
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (el as any).tree = this;
-    });
-  }
-
-  private positionElements(): void {
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
-    this.stateMap.elementPool?.iterateElements((el, _, i) => {
-      el.style.position = 'absolute';
-      el.style.top = `${rowHeight * (this.stateMap.startIndex + i)}px`;
-      el.style.height = `${rowHeight}px`;
-    });
   }
 
   private getViewportHeight(): number | undefined {
