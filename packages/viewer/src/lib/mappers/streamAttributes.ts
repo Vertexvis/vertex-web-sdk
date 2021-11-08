@@ -2,7 +2,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { clamp } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
 import {
-  DepthBufferFrameType,
+  FrameType,
   FeatureHighlightOptions,
   FeatureLineOptions,
   StreamAttributes,
@@ -10,9 +10,10 @@ import {
 import { toPbFloatValue } from './scalar';
 import { toPbRGBi } from './material';
 
-const toPbDepthBuffers: M.Func<
-  DepthBufferFrameType,
-  vertexvis.protobuf.stream.IDepthBufferAttributes
+const toPbFrameType: M.Func<
+  FrameType,
+  | vertexvis.protobuf.stream.IDepthBufferAttributes
+  | vertexvis.protobuf.stream.IFeatureMapAttributes
 > = M.defineMapper(
   (type) => {
     switch (type) {
@@ -82,15 +83,17 @@ export const toPbStreamAttributes: M.Func<
   vertexvis.protobuf.stream.IStreamAttributes
 > = M.defineMapper(
   M.read(
-    M.mapProp('depthBuffers', toPbDepthBuffers),
+    M.mapProp('depthBuffers', toPbFrameType),
     M.mapProp('experimentalGhosting', toPbExperimentalGhosting),
     M.mapProp('featureLines', toPbFeatureLines),
-    M.mapProp('featureHighlighting', toPbFeatureHighlight)
+    M.mapProp('featureHighlighting', toPbFeatureHighlight),
+    M.mapProp('featureMaps', toPbFrameType)
   ),
-  ([db, eg, fl, fh]) => ({
+  ([db, eg, fl, fh, fm]) => ({
     depthBuffers: db,
     experimentalGhosting: eg,
     featureLines: fl,
     featureHighlighting: fh,
+    featureMaps: fm,
   })
 );

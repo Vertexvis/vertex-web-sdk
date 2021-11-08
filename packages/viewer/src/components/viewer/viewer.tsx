@@ -92,7 +92,7 @@ import {
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
 import {
-  DepthBufferFrameType,
+  FrameType,
   FeatureHighlightOptions,
   FeatureLineOptions,
 } from '../../interfaces';
@@ -208,7 +208,7 @@ export class Viewer {
    * can impact rendering performance. Values of `undefined` or `final` should
    * be used when needing the highest rendering performance.
    */
-  @Prop() public depthBuffers?: DepthBufferFrameType;
+  @Prop() public depthBuffers?: FrameType;
 
   /**
    * Specifies the opacity, between 0 and 100, for an experimental ghosting
@@ -229,6 +229,23 @@ export class Viewer {
    */
   @Prop({ attribute: null })
   public featureHighlighting?: FeatureHighlightOptions;
+
+  /**
+   * Specifies when a feature map is returned from rendering. Feature maps
+   * include information about the surfaces, edges and cross sections that are
+   * in a frame.
+   *
+   * Possible values are:
+   *
+   * * `undefined`: A feature map is never requested.
+   * * `final`: A feature map is only requested on the final frame.
+   * * `all`: A feature map is requested for every frame.
+   *
+   * Feature maps can increase the amount of data that's sent to a client and
+   * can impact rendering performance. Values of `undefined` or `final` should
+   * be used when needing the highest rendering performance.
+   */
+  @Prop() public featureMaps?: FrameType;
 
   /**
    * The default hex color or material to use when selecting items.
@@ -746,6 +763,14 @@ export class Viewer {
    */
   @Watch('featureHighlighting')
   protected handleFeatureHighlightingChanged(): void {
+    this.updateStreamAttributes();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('featureMaps')
+  protected handleFeatureMapsChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -1341,6 +1366,7 @@ export class Viewer {
       experimentalGhosting: this.experimentalGhostingOpacity,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,
+      featureMaps: this.featureMaps,
     };
     return Mapper.ifInvalidThrow(toPbStreamAttributes)(attr);
   }
@@ -1352,7 +1378,7 @@ export class Viewer {
     }
   }
 
-  private getDepthBufferStreamAttributesValue(): DepthBufferFrameType {
+  private getDepthBufferStreamAttributesValue(): FrameType {
     const depthBuffer =
       this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
     return depthBuffer;

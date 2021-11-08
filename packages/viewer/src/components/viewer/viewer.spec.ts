@@ -341,6 +341,18 @@ describe('vertex-viewer', () => {
           }),
         })
       );
+
+      viewer.featureMaps = 'final';
+      expect(api?.updateStream).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            featureMaps: {
+              enabled: { value: true },
+              frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
+            },
+          }),
+        })
+      );
     });
 
     it('sends configured stream attributes on stream start', async () => {
@@ -353,6 +365,7 @@ describe('vertex-viewer', () => {
       viewer.featureLines = { width: 1 };
       viewer.featureHighlighting = { highlightColor: 0xff0000 };
       viewer.depthBuffers = 'all';
+      viewer.featureMaps = 'all';
       await loadNewModelForViewer(viewer, urn1);
 
       expect(api?.startStream).toHaveBeenCalledWith(
@@ -366,6 +379,7 @@ describe('vertex-viewer', () => {
             featureHighlighting: expect.objectContaining({
               highlightColor: { r: 255, g: 0, b: 0 },
             }),
+            featureMaps: expect.objectContaining({ enabled: { value: true } }),
           }),
         })
       );
@@ -381,6 +395,7 @@ describe('vertex-viewer', () => {
       viewer.featureLines = { width: 1 };
       viewer.featureHighlighting = { highlightColor: 0xff0000 };
       viewer.depthBuffers = 'all';
+      viewer.featureMaps = 'all';
       await loadNewModelForViewer(viewer, urn1);
 
       await viewer.handleWebSocketClose();
@@ -396,6 +411,7 @@ describe('vertex-viewer', () => {
             featureHighlighting: expect.objectContaining({
               highlightColor: { r: 255, g: 0, b: 0 },
             }),
+            featureMaps: expect.objectContaining({ enabled: { value: true } }),
           }),
         })
       );
