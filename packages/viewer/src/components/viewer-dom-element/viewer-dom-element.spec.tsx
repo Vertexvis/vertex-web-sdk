@@ -77,4 +77,17 @@ describe('vertex-viewer-dom-element', () => {
     await page.waitForChanges();
     expect(el.quaternion).toEqual(Quaternion.fromEuler(rotation));
   });
+
+  it('sets occluded attribute if occluded', async () => {
+    const page = await newSpecPage({
+      components: [ViewerDomElement],
+      html: `<vertex-viewer-dom-element></vertex-viewer-dom-element>`,
+    });
+
+    const el = page.root as HTMLVertexViewerDomElementElement;
+    el.occluded = true;
+
+    await page.waitForChanges();
+    expect(el).toHaveAttribute('occluded');
+  });
 });

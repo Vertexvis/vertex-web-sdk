@@ -192,8 +192,12 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  protected componentShouldUpdate(): boolean {
-    return false;
+  protected componentShouldUpdate(
+    newValue: unknown,
+    oldValue: unknown,
+    prop: string
+  ): boolean {
+    return prop === 'occluded';
   }
 
   private syncProperties(): void {
