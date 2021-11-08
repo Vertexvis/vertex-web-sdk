@@ -240,6 +240,10 @@ export class Viewer {
    * * `undefined`: A feature map is never requested.
    * * `final`: A feature map is only requested on the final frame.
    * * `all`: A feature map is requested for every frame.
+   *
+   * Feature maps can increase the amount of data that's sent to a client and
+   * can impact rendering performance. Values of `undefined` or `final` should
+   * be used when needing the highest rendering performance.
    */
   @Prop() public featureMaps?: FrameType;
 
