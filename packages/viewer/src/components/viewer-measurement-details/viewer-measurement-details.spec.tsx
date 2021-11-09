@@ -109,7 +109,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain(`${radians} rad`);
+    ).toContain(`${radians.toFixed(2)} rad`);
 
     measurementDetails.angleFormatter = () => 'formatted angle';
     await page.waitForChanges();
