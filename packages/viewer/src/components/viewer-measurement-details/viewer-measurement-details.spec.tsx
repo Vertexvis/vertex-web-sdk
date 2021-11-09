@@ -6,6 +6,7 @@ import { ViewerMeasurementDetails } from './viewer-measurement-details';
 import '../../testing/domMocks';
 import { formatResults } from './utils';
 import { MeasurementModel } from '../..';
+import { Angle } from '@vertexvis/geometry';
 
 describe('vertex-viewer-measurement-details', () => {
   it('renders a details with measurement details', async () => {
@@ -89,8 +90,9 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
+    const radians = Angle.toRadians(90);
     measurementDetails.visibleSummary = {
-      angle: 90,
+      angle: radians,
     };
 
     await page.waitForChanges();
@@ -107,7 +109,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain(`${(Math.PI / 2).toFixed(2)} rad`);
+    ).toContain(`${radians.toFixed(2)} rad`);
 
     measurementDetails.angleFormatter = () => 'formatted angle';
     await page.waitForChanges();

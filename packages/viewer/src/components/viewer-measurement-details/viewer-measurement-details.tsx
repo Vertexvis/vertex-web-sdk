@@ -236,13 +236,15 @@ export class ViewerMeasurementDetails {
     }
   };
 
-  private formatAngle = (angle: number): string => {
+  private formatAngle = (angleInRadians: number): string => {
     if (this.angleFormatter != null) {
-      return this.angleFormatter(angle);
+      return this.angleFormatter(angleInRadians);
     } else if (this.angleUnits === 'degrees') {
-      return `${angle.toFixed(this.fractionalDigits)}º`;
+      return `${Angle.toDegrees(angleInRadians).toFixed(
+        this.fractionalDigits
+      )}º`;
     } else {
-      return `${Angle.toRadians(angle).toFixed(this.fractionalDigits)} rad`;
+      return `${angleInRadians.toFixed(this.fractionalDigits)} rad`;
     }
   };
 
