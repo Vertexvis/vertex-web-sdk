@@ -19,6 +19,7 @@ import {
   InstancedTemplate,
 } from '../scene-tree/lib/templates';
 import { RowDataProvider } from '../scene-tree/scene-tree';
+import { getSceneTreeTableOffsetTop } from './lib/dom';
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -335,7 +336,9 @@ export class SceneTreeTable {
 
   private updateLayoutPosition = (): void => {
     readDOM(() => {
-      this.layoutOffset = this.tableElement?.getBoundingClientRect().top ?? 0;
+      if (this.tableElement != null) {
+        this.layoutOffset = getSceneTreeTableOffsetTop(this.tableElement);
+      }
     });
   };
 
