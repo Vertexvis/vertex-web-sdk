@@ -465,10 +465,12 @@ export class SceneTreeTable {
   private bindHeaderData = (): void => {
     if (this.stateMap.headerInstances == null) {
       this.stateMap.headerInstances = this.columnElements
-        .map((c) => {
+        .map((c, i) => {
           const instance = this.createHeaderInstance(c);
 
           if (instance != null) {
+            instance.element.style.gridColumnStart = `${i}`;
+            instance.element.style.gridColumnEnd = `${i + 1}`;
             this.headerElement?.appendChild(instance.element);
           }
 
