@@ -131,7 +131,7 @@ export namespace Components {
         "overScanCount": number;
         /**
           * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-          * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+          * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
          */
         "rowData"?: RowDataProvider;
         /**
@@ -221,11 +221,24 @@ export namespace Components {
         "controller"?: SceneTreeController;
         "getViewportEndIndex": () => Promise<number>;
         "getViewportStartIndex": () => Promise<number>;
+        /**
+          * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
+         */
         "interactionsDisabled": boolean;
         "layoutHeight"?: number;
         "layoutOffset": number;
+        /**
+          * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+         */
         "overScanCount": number;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+         */
         "recurseParentSelectionDisabled": boolean;
+        /**
+          * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+          * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+         */
         "rowData"?: RowDataProvider;
         "rowHeight": number;
         "rows": Row[];
@@ -237,19 +250,46 @@ export namespace Components {
         "tree"?: HTMLVertexSceneTreeElement;
     }
     interface VertexSceneTreeTableCell {
+        /**
+          * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
+         */
         "expandToggle"?: boolean;
         "hoveredNodeId"?: string;
-        "interactionsDisabled": boolean;
+        /**
+          * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.  This prop will be automatically populated based on the `interactionsDisabled` prop specified in the parent `<vertex-scene-tree-table />` element.
+         */
+        "interactionsDisabled"?: boolean;
+        /**
+          * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
+         */
         "node"?: Node.AsObject;
-        "recurseParentSelectionDisabled": boolean;
-        "tree"?: HTMLVertexSceneTreeElement | null;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.  This prop will be automatically populated based on the `recurseParentSelectionDisabled` prop specified in the parent `<vertex-scene-tree-table />` element.
+         */
+        "recurseParentSelectionDisabled"?: boolean;
+        /**
+          * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+         */
+        "tree"?: HTMLVertexSceneTreeElement;
+        /**
+          * The value to display in this cell.
+         */
         "value"?: string;
+        /**
+          * Indicates whether to display a button for toggling the visibility state of the node associated with this cell.
+         */
         "visibilityToggle"?: boolean;
     }
     interface VertexSceneTreeTableColumn {
+        /**
+          * The initial width of this column.
+         */
         "initialWidth"?: number;
     }
     interface VertexSceneTreeTableHeader {
+        /**
+          * The label to display in this header.
+         */
         "label"?: string;
     }
     interface VertexSceneTreeToolbar {
@@ -1225,7 +1265,7 @@ declare namespace LocalJSX {
         "overScanCount"?: number;
         /**
           * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-          * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+          * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
          */
         "rowData"?: RowDataProvider;
         /**
@@ -1291,11 +1331,24 @@ declare namespace LocalJSX {
     }
     interface VertexSceneTreeTable {
         "controller"?: SceneTreeController;
+        /**
+          * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
+         */
         "interactionsDisabled"?: boolean;
         "layoutHeight"?: number;
         "layoutOffset"?: number;
+        /**
+          * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+         */
         "overScanCount"?: number;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+         */
         "recurseParentSelectionDisabled"?: boolean;
+        /**
+          * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+          * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+         */
         "rowData"?: RowDataProvider;
         "rowHeight"?: number;
         "rows"?: Row[];
@@ -1307,23 +1360,59 @@ declare namespace LocalJSX {
         "tree"?: HTMLVertexSceneTreeElement;
     }
     interface VertexSceneTreeTableCell {
+        /**
+          * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
+         */
         "expandToggle"?: boolean;
         "hoveredNodeId"?: string;
+        /**
+          * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.  This prop will be automatically populated based on the `interactionsDisabled` prop specified in the parent `<vertex-scene-tree-table />` element.
+         */
         "interactionsDisabled"?: boolean;
+        /**
+          * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
+         */
         "node"?: Node.AsObject;
-        "onExpansionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
+        /**
+          * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
+         */
+        "onExpandToggled"?: (event: CustomEvent<Node.AsObject>) => void;
         "onHovered"?: (event: CustomEvent<Node.AsObject | undefined>) => void;
+        /**
+          * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
+         */
         "onSelectionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
+        /**
+          * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
+         */
         "onVisibilityToggled"?: (event: CustomEvent<Node.AsObject>) => void;
+        /**
+          * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.  This prop will be automatically populated based on the `recurseParentSelectionDisabled` prop specified in the parent `<vertex-scene-tree-table />` element.
+         */
         "recurseParentSelectionDisabled"?: boolean;
-        "tree"?: HTMLVertexSceneTreeElement | null;
+        /**
+          * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+         */
+        "tree"?: HTMLVertexSceneTreeElement;
+        /**
+          * The value to display in this cell.
+         */
         "value"?: string;
+        /**
+          * Indicates whether to display a button for toggling the visibility state of the node associated with this cell.
+         */
         "visibilityToggle"?: boolean;
     }
     interface VertexSceneTreeTableColumn {
+        /**
+          * The initial width of this column.
+         */
         "initialWidth"?: number;
     }
     interface VertexSceneTreeTableHeader {
+        /**
+          * The label to display in this header.
+         */
         "label"?: string;
     }
     interface VertexSceneTreeToolbar {

@@ -16,41 +16,92 @@ import classNames from 'classnames';
   shadow: true,
 })
 export class SceneTreeTableCell {
-  @Prop()
-  public tree?: HTMLVertexSceneTreeElement | null;
-
-  @Prop()
-  public value?: string;
-
+  /**
+   * The node data that is associated to the row that this cell belongs to.
+   * Contains information related to if the node is expanded, visible, etc.
+   */
   @Prop()
   public node?: Node.AsObject;
 
+  /**
+   * A reference to the scene tree to perform operations for interactions. Such
+   * as expansion, visibility and selection.
+   */
+  @Prop()
+  public tree?: HTMLVertexSceneTreeElement;
+
+  /**
+   * The value to display in this cell.
+   */
+  @Prop()
+  public value?: string;
+
+  /**
+   * @internal
+   */
   @Prop()
   public hoveredNodeId?: string;
 
+  /**
+   * Indicates whether to display a button for toggling the expanded state of
+   * the node associated with this cell.
+   */
   @Prop()
   public expandToggle?: boolean;
 
+  /**
+   * Indicates whether to display a button for toggling the visibility state of
+   * the node associated with this cell.
+   */
   @Prop()
   public visibilityToggle?: boolean;
 
+  /**
+   * A flag that disables the default interactions of this component. If
+   * disabled, you can use the event handlers to be notified when certain
+   * operations are performed by the user.
+   *
+   * This prop will be automatically populated based on the `interactionsDisabled` prop
+   * specified in the parent `<vertex-scene-tree-table />` element.
+   */
   @Prop()
-  public interactionsDisabled = false;
+  public interactionsDisabled?: boolean;
 
+  /**
+   * A flag that disables selection of the node's parent if the user selects
+   * the row multiple times. When enabled, selection of the same row multiple
+   * times will recursively select the next unselected parent until the root
+   * node is selected.
+   *
+   * This prop will be automatically populated based on the `recurseParentSelectionDisabled`
+   * prop specified in the parent `<vertex-scene-tree-table />` element.
+   */
   @Prop()
-  public recurseParentSelectionDisabled = false;
+  public recurseParentSelectionDisabled?: boolean;
 
   @Event({ bubbles: true })
   public hovered!: EventEmitter<Node.AsObject | undefined>;
 
+  /**
+   * An event that is emitted when a user requests to expand the node. This is
+   * emitted even if interactions are disabled.
+   */
   @Event({ bubbles: true })
-  public expansionToggled!: EventEmitter<Node.AsObject>;
+  public expandToggled!: EventEmitter<Node.AsObject>;
 
-  @Event({ bubbles: true })
-  public selectionToggled!: EventEmitter<Node.AsObject>;
-
+  /**
+   * An event that is emitted when a user requests to change the node's
+   * visibility. This event is emitted even if interactions are disabled.
+   */
   @Event({ bubbles: true })
   public visibilityToggled!: EventEmitter<Node.AsObject>;
+
+  /**
+   * An event that is emitted when a user requests to change the node's selection
+   * state. This event is emitted even if interactions are disabled.
+   */
+  @Event({ bubbles: true })
+  public selectionToggled!: EventEmitter<Node.AsObject>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -159,17 +210,17 @@ export class SceneTreeTableCell {
   };
 
   private toggleExpansion = (): void => {
-    if (this.tree != null && this.node != null) {
+    if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleExpandItem(this.node);
-      this.expansionToggled.emit(this.node);
     }
+    this.expandToggled.emit(this.node);
   };
 
   private toggleVisibility = (): void => {
     if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleItemVisibility(this.node);
-      this.visibilityToggled.emit(this.node);
     }
+    this.visibilityToggled.emit(this.node);
   };
 
   private toggleAttribute(attr: string, value: boolean): void {

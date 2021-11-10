@@ -44,36 +44,105 @@ export class SceneTreeTable {
   @Prop()
   public tree?: HTMLVertexSceneTreeElement;
 
+  /**
+   * @internal
+   */
   @Prop()
   public controller?: SceneTreeController;
 
+  /**
+   * @internal
+   */
   @Prop()
   public rows: Row[] = [];
 
+  /**
+   * @internal
+   */
   @Prop()
   public totalRows = 0;
 
+  /**
+   * @internal
+   */
   @Prop({ mutable: true })
   public rowHeight = 24;
 
+  /**
+   * The number of offscreen rows above and below the viewport to render. Having
+   * a higher number reduces the chance of the browser not displaying a row
+   * while scrolling.
+   *
+   * This prop will be automatically populated based on the `overScanCount` prop
+   * specified in the parent `<vertex-scene-tree />` element.
+   */
   @Prop()
   public overScanCount = 25;
 
+  /**
+   * A callback that is invoked immediately before a row is about to rendered.
+   * This callback can return additional data that can be bound to in a
+   * template.
+   *
+   * This prop will be automatically populated based on the `rowData` prop
+   * specified in the parent `<vertex-scene-tree />` element.
+   *
+   * @example
+   *
+   * ```html
+   * <script>
+   *   const table = document.querySelector('vertex-scene-tree-table');
+   *   table.rowData = (row) => {
+   *     return { func: () => console.log('row', row.node.name) };
+   *   }
+   * </script>
+   *
+   * <vertex-scene-tree>
+   *  <vertex-scene-tree-table>
+   *    <vertex-scene-tree-table-column>
+   *      <template>
+   *        <button event:click="{{row.data.func}}">Hi</button>
+   *      </template>
+   *    </vertex-scene-tree-table-column>
+   *  </vertex-scene-tree-table>
+   * </vertex-scene-tree>
+   * ```
+   */
   @Prop()
   public rowData?: RowDataProvider;
 
+  /**
+   * @internal
+   */
   @Prop({ mutable: true })
   public layoutOffset = 0;
 
+  /**
+   * @internal
+   */
   @Prop({ mutable: true })
   public scrollOffset = 0;
 
+  /**
+   * @internal
+   */
   @Prop({ mutable: true })
   public layoutHeight?: number;
 
+  /**
+   * A flag that disables the default interactions of this component. If
+   * disabled, you can use the event handlers to be notified when certain
+   * operations are performed by the user.
+   */
   @Prop()
   public interactionsDisabled = false;
 
+  /**
+   * A flag that disables selection of the node's parent if the user selects
+   * the row multiple times. When enabled, selection of the same row multiple
+   * times will recursively select the next unselected parent until the root
+   * node is selected.
+   */
   @Prop()
   public recurseParentSelectionDisabled = false;
 
@@ -260,6 +329,7 @@ export class SceneTreeTable {
     cell.interactionsDisabled = this.interactionsDisabled;
     cell.recurseParentSelectionDisabled = this.recurseParentSelectionDisabled;
 
+    console.log(binding);
     binding.bind(row);
   };
 

@@ -145,16 +145,20 @@ export class SceneTree {
    *
    * ```html
    * <script>
-   *   const tree = document.querySelector('vertex-scene-tree');
-   *   tree.rowData = (row) => {
-   *     return { func: () => console.log('row', row.name) };
+   *   const table = document.querySelector('vertex-scene-tree-table');
+   *   table.rowData = (row) => {
+   *     return { func: () => console.log('row', row.node.name) };
    *   }
    * </script>
    *
    * <vertex-scene-tree>
-   *   <template slot="right">
-   *     <button onclick="row.data.func">Hi</button>
-   *   </template>
+   *  <vertex-scene-tree-table>
+   *    <vertex-scene-tree-table-column>
+   *      <template>
+   *        <button event:click="{{row.data.func}}">Hi</button>
+   *      </template>
+   *    </vertex-scene-tree-table-column>
+   *  </vertex-scene-tree-table>
    * </vertex-scene-tree>
    * ```
    */
@@ -194,9 +198,6 @@ export class SceneTree {
 
   @State()
   private totalRows = 0;
-
-  @State()
-  private scrollTop = 0;
 
   /**
    * This stores internal state that you want to preserve across live-reloads,

@@ -6,6 +6,9 @@ import { Component, Host, h, Prop } from '@stencil/core';
   shadow: true,
 })
 export class SceneTreeTableColumn {
+  /**
+   * The initial width of this column.
+   */
   @Prop()
   public initialWidth?: number;
 
