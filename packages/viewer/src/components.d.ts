@@ -107,7 +107,7 @@ export namespace Components {
          */
         "getRowAtIndex": (index: number) => Promise<Row>;
         /**
-          * Returns the row data from the given mouse or pointer event. The event must originate from a `vertex-scene-tree-row` contained by this element, otherwise `undefined` is returned.
+          * Returns the row data from the given mouse or pointer event. The event must originate from a `vertex-scene-tree-table-cell` contained by this element, otherwise `undefined` is returned.
           * @param event A mouse or pointer event that originated from this component.
           * @returns A row, or `undefined` if the row hasn't been loaded.
          */

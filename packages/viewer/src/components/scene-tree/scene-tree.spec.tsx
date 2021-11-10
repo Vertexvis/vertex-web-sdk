@@ -51,6 +51,7 @@ import {
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from '../../testing';
+import { SceneTreeTable } from '../scene-tree-table/scene-tree-table';
 
 const random = new Chance();
 
@@ -108,7 +109,7 @@ describe('<vertex-scene-tree>', () => {
       await waitForSceneTreeConnected();
 
       expect(
-        tree?.querySelectorAll('vertex-scene-tree-row')?.length
+        tree?.querySelectorAll('vertex-scene-tree-table-cell')?.length
       ).toBeGreaterThan(0);
     });
 
@@ -138,7 +139,8 @@ describe('<vertex-scene-tree>', () => {
         streamKey: decodeSceneTreeJwt(jwt).view,
       });
       await waitForSceneTreeConnected();
-
+      await page.waitForChanges();
+      expect(rowData).toHaveBeenCalled();
       rowData.mockClear();
       const newJwt = signJwt(random.guid());
       await loadModelForViewer(viewer, {
@@ -220,7 +222,7 @@ describe('<vertex-scene-tree>', () => {
       await waitForSceneTreeConnected();
 
       const row = tree.querySelectorAll(
-        'vertex-scene-tree-row'
+        'vertex-scene-tree-table-cell'
       )[0] as HTMLVertexSceneTreeRowElement;
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
@@ -290,14 +292,18 @@ describe('<vertex-scene-tree>', () => {
       await waitForSceneTreeConnected();
 
       const pendingEvent = new Promise<MouseEvent>((resolve) => {
-        const rowEl = page.root?.querySelectorAll('vertex-scene-tree-row')[1];
-        rowEl?.addEventListener('click', (event) =>
+        const cellEl = page.root?.querySelectorAll(
+          'vertex-scene-tree-table-cell'
+        )[1];
+        cellEl?.addEventListener('click', (event) =>
           resolve(event as MouseEvent)
         );
       });
 
-      const rowEl = page.root?.querySelectorAll('vertex-scene-tree-row')[1];
-      rowEl?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
+      const cellEl = page.root?.querySelectorAll(
+        'vertex-scene-tree-table-cell'
+      )[1];
+      cellEl?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
 
       const event = await pendingEvent;
       const row = await tree.getRowForEvent(event);
@@ -947,7 +953,7 @@ async function newSceneTreeSpec(data: {
   waitForSceneTreeConnected: () => Promise<void>;
 }> {
   const page = await newSpecPage({
-    components: [SceneTree, Viewer],
+    components: [SceneTree, SceneTreeTable, Viewer],
     template: () => {
       return (
         data.template?.() || (

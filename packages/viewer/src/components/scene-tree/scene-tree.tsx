@@ -35,8 +35,8 @@ import {
 import { writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
 import { ElementPool } from './lib/element-pool';
-import { isSceneTreeRowElement } from '../scene-tree-row/utils';
 import { MetadataKey } from './interfaces';
+import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -227,7 +227,7 @@ export class SceneTree {
    */
   @Method()
   public async invalidateRows(): Promise<void> {
-    forceUpdate(this.el);
+    forceUpdate(this.getLayoutElement());
   }
 
   /**
@@ -454,7 +454,7 @@ export class SceneTree {
 
   /**
    * Returns the row data from the given mouse or pointer event. The event must
-   * originate from a `vertex-scene-tree-row` contained by this element,
+   * originate from a `vertex-scene-tree-table-cell` contained by this element,
    * otherwise `undefined` is returned.
    *
    * @param event A mouse or pointer event that originated from this component.
@@ -468,7 +468,7 @@ export class SceneTree {
       target != null &&
       this.connectionErrorDetails == null &&
       getSceneTreeContainsElement(this.el, target as HTMLElement) &&
-      isSceneTreeRowElement(target)
+      isSceneTreeTableCellElement(target)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -563,6 +563,8 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
+
+    this.updateLayoutElement();
   }
 
   /**
@@ -742,9 +744,10 @@ export class SceneTree {
     index: number,
     position: ScrollToOptions['position']
   ): number {
+    const layoutEl = this.getLayoutElement();
     const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
-    const viewportHeight = this.getLayoutElement().layoutHeight ?? 0;
-    const rowHeight = this.getLayoutElement().rowHeight;
+    const viewportHeight = layoutEl.layoutHeight ?? 0;
+    const rowHeight = layoutEl.rowHeight;
 
     if (position === 'start') {
       return constrainedIndex * rowHeight;

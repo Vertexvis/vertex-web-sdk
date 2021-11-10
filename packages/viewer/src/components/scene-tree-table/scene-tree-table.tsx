@@ -11,6 +11,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
 import { Binding } from '../scene-tree/lib/binding';
 import { SceneTreeController } from '../scene-tree/lib/controller';
+import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { ElementPool } from '../scene-tree/lib/element-pool';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import {
@@ -329,7 +330,6 @@ export class SceneTreeTable {
     cell.interactionsDisabled = this.interactionsDisabled;
     cell.recurseParentSelectionDisabled = this.recurseParentSelectionDisabled;
 
-    console.log(binding);
     binding.bind(row);
   };
 
@@ -440,7 +440,7 @@ export class SceneTreeTable {
         });
         attempts = attempts + 1;
       }
-      this.rowHeight = height;
+      this.rowHeight = height ?? this.rowHeight;
       element.remove();
       this.isComputingCellHeight = false;
     }
@@ -495,7 +495,7 @@ export class SceneTreeTable {
 
   private getLayoutHeight(): number | undefined {
     if (this.layoutHeight == null && this.tableElement != null) {
-      this.layoutHeight = this.tableElement?.clientHeight;
+      this.layoutHeight = getSceneTreeViewportHeight(this.tableElement);
     }
     return this.layoutHeight;
   }

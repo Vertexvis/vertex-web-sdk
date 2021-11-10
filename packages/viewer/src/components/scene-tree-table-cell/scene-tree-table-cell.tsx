@@ -79,6 +79,9 @@ export class SceneTreeTableCell {
   @Prop()
   public recurseParentSelectionDisabled?: boolean;
 
+  /**
+   * @internal
+   */
   @Event({ bubbles: true })
   public hovered!: EventEmitter<Node.AsObject | undefined>;
 
@@ -120,10 +123,10 @@ export class SceneTreeTableCell {
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host
-        onMouseEnter={() => {
+        onPointerEnter={() => {
           this.hovered.emit(this.node);
         }}
-        onMouseLeave={() => {
+        onPointerLeave={() => {
           this.hovered.emit(undefined);
         }}
         onPointerDown={this.handleCellPointerDown}
