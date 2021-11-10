@@ -13,6 +13,7 @@ import { MetadataKey } from "./components/scene-tree/interfaces";
 import { SceneTreeErrorDetails } from "./components/scene-tree/lib/errors";
 import { Row } from "./components/scene-tree/lib/row";
 import { Node } from "@vertexvis/scene-tree-protos/scenetree/protos/domain_pb";
+import { RowDataProvider as RowDataProvider1 } from "./components/scene-tree/scene-tree";
 import { DepthBufferFrameType, FeatureHighlightOptions, FeatureLineOptions } from "./interfaces";
 import { ColorMaterial } from "./lib/scenes/colorMaterial";
 import { Frame, FramePerspectiveCamera } from "./lib/types/frame";
@@ -217,7 +218,11 @@ export namespace Components {
         "value": string;
     }
     interface VertexSceneTreeTable {
+        "controller"?: SceneTreeController;
+        "layoutHeight"?: number;
         "layoutOffset": number;
+        "overScanCount": number;
+        "rowData"?: RowDataProvider;
         "rowHeight": number;
         "rows": Row[];
         "scrollOffset": number;
@@ -226,12 +231,10 @@ export namespace Components {
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */
         "tree"?: HTMLVertexSceneTreeElement;
-        "visibleEndIndex": number;
-        "visibleRows": Row[];
-        "visibleStartIndex": number;
     }
     interface VertexSceneTreeTableCell {
         "expandToggle"?: boolean;
+        "hoveredNodeId"?: string;
         "node"?: Node.AsObject;
         "tree"?: HTMLVertexSceneTreeElement | null;
         "value"?: string;
@@ -239,11 +242,9 @@ export namespace Components {
     }
     interface VertexSceneTreeTableColumn {
         "initialWidth"?: number;
-        "label"?: string;
     }
     interface VertexSceneTreeTableHeader {
-        "columnLabels": Array<string | undefined>;
-        "columnWidths": Array<number | undefined>;
+        "label"?: string;
     }
     interface VertexSceneTreeToolbar {
     }
@@ -1283,8 +1284,11 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     interface VertexSceneTreeTable {
+        "controller"?: SceneTreeController;
+        "layoutHeight"?: number;
         "layoutOffset"?: number;
-        "onScrollOffsetChanged"?: (event: CustomEvent<void>) => void;
+        "overScanCount"?: number;
+        "rowData"?: RowDataProvider;
         "rowHeight"?: number;
         "rows"?: Row[];
         "scrollOffset"?: number;
@@ -1293,25 +1297,24 @@ declare namespace LocalJSX {
           * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
          */
         "tree"?: HTMLVertexSceneTreeElement;
-        "visibleEndIndex"?: number;
-        "visibleRows"?: Row[];
-        "visibleStartIndex"?: number;
     }
     interface VertexSceneTreeTableCell {
         "expandToggle"?: boolean;
+        "hoveredNodeId"?: string;
         "node"?: Node.AsObject;
+        "onExpansionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
         "onHovered"?: (event: CustomEvent<Node.AsObject | undefined>) => void;
+        "onSelectionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
+        "onVisibilityToggled"?: (event: CustomEvent<Node.AsObject>) => void;
         "tree"?: HTMLVertexSceneTreeElement | null;
         "value"?: string;
         "visibilityToggle"?: boolean;
     }
     interface VertexSceneTreeTableColumn {
         "initialWidth"?: number;
-        "label"?: string;
     }
     interface VertexSceneTreeTableHeader {
-        "columnLabels"?: Array<string | undefined>;
-        "columnWidths"?: Array<number | undefined>;
+        "label"?: string;
     }
     interface VertexSceneTreeToolbar {
     }

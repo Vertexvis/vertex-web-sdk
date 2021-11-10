@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property       | Attribute       | Description | Type     | Default |
-| -------------- | --------------- | ----------- | -------- | ------- |
-| `initialWidth` | `initial-width` |             | `number` | `100`   |
+| Property       | Attribute       | Description | Type                  | Default     |
+| -------------- | --------------- | ----------- | --------------------- | ----------- |
+| `initialWidth` | `initial-width` |             | `number \| undefined` | `undefined` |
 
 
 ----------------------------------------------

@@ -1,34 +1,26 @@
-import {
-  Component,
-  Host,
-  h,
-  Prop,
-  EventEmitter,
-  Event,
-  State,
-  Method,
-  Element,
-  Watch,
-  readTask,
-} from '@stencil/core';
+import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import classNames from 'classnames';
+import { readDOM } from '../../lib/stencil';
 import { Binding } from '../scene-tree/lib/binding';
+import { SceneTreeController } from '../scene-tree/lib/controller';
 import { ElementPool } from '../scene-tree/lib/element-pool';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import {
   generateInstanceFromTemplate,
   InstancedTemplate,
 } from '../scene-tree/lib/templates';
+import { RowDataProvider } from '../scene-tree/scene-tree';
 
 interface StateMap {
   columnElementPools?: WeakMap<
     HTMLVertexSceneTreeTableColumnElement,
     ElementPool
   >;
-  headerTemplate?: HTMLTemplateElement;
-  headerInstance?: InstancedTemplate<HTMLElement>;
-  headerElementPool?: ElementPool;
+  headerInstances?: Array<InstancedTemplate<HTMLElement>>;
+
+  startIndex: number;
+  endIndex: number;
+  viewportRows: Row[];
 }
 
 @Component({
@@ -45,16 +37,10 @@ export class SceneTreeTable {
   public tree?: HTMLVertexSceneTreeElement;
 
   @Prop()
+  public controller?: SceneTreeController;
+
+  @Prop()
   public rows: Row[] = [];
-
-  @Prop()
-  public visibleRows: Row[] = [];
-
-  @Prop()
-  public visibleStartIndex = 0;
-
-  @Prop()
-  public visibleEndIndex = 0;
 
   @Prop()
   public totalRows = 0;
@@ -62,23 +48,26 @@ export class SceneTreeTable {
   @Prop({ mutable: true })
   public rowHeight = 24;
 
-  @Prop({ mutable: true })
-  public scrollOffset = 0;
+  @Prop()
+  public overScanCount = 25;
+
+  @Prop()
+  public rowData?: RowDataProvider;
 
   @Prop({ mutable: true })
   public layoutOffset = 0;
 
-  @Event()
-  public scrollOffsetChanged!: EventEmitter<void>;
+  @Prop({ mutable: true })
+  public scrollOffset = 0;
+
+  @Prop({ mutable: true })
+  public layoutHeight?: number;
 
   @Element()
   private hostEl!: HTMLElement;
 
   @State()
-  private columnWidths: Array<number | undefined> = [];
-
-  @State()
-  private columnLabels: Array<string | undefined> = [];
+  private columnGridLayout = '1fr';
 
   @State()
   private hoveredNodeId?: string;
@@ -92,31 +81,53 @@ export class SceneTreeTable {
    * @State to allow to preserve state across live-reloads.
    */
   @State()
-  private stateMap: StateMap = {};
+  private stateMap: StateMap = {
+    startIndex: 0,
+    endIndex: 0,
+    viewportRows: [],
+  };
 
   private lastStartIndex = 0;
   private resizeObserver?: ResizeObserver;
 
   private tableElement?: HTMLDivElement;
+  private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
   public componentWillLoad(): void {
     this.updateColumnElements();
-    this.computeColumnWidths();
-    this.validateHeaderTemplate();
+    this.computeColumnGridLayout();
     this.createPools();
-    this.bindHeaderData();
 
     this.columnElements.forEach((c) => {
       c.addEventListener('hovered', this.handleCellHover as EventListener);
     });
 
-    this.resizeObserver = new ResizeObserver(this.updateLayoutPosition);
+    this.resizeObserver = new ResizeObserver(() => {
+      this.updateLayoutPosition();
+      this.clearLayoutHeight();
+    });
     this.resizeObserver.observe(this.hostEl);
   }
 
   public componentDidLoad(): void {
     this.computeCellHeight();
+    this.bindHeaderData();
+
+    this.tableElement?.addEventListener('scroll', this.handleScrollChanged, {
+      passive: true,
+    });
+  }
+
+  public async componentWillRender(): Promise<void> {
+    if (this.controller?.isConnected) {
+      await this.controller.updateActiveRowRange(
+        this.stateMap.startIndex,
+        this.stateMap.endIndex
+      );
+    }
+
+    this.computeViewportRows();
   }
 
   public componentDidRender(): void {
@@ -127,19 +138,24 @@ export class SceneTreeTable {
     this.columnElements.forEach((c) => {
       c.removeEventListener('hovered', this.handleCellHover as EventListener);
     });
+    this.tableElement?.removeEventListener('scroll', this.handleScrollChanged);
   }
 
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <slot name="header" />
+        <div
+          class="header"
+          ref={(ref) => (this.headerElement = ref)}
+          style={{
+            gridTemplateColumns: this.columnGridLayout,
+          }}
+        />
         <div
           class="table"
           ref={(ref) => (this.tableElement = ref)}
           style={{
-            gridTemplateColumns: `${this.columnWidths
-              .slice(0, -1)
-              .reduce((res, w) => `${res} ${w}px`, '')} 1fr`,
+            gridTemplateColumns: this.columnGridLayout,
           }}
           onScroll={this.handleScrollChanged}
         >
@@ -149,12 +165,35 @@ export class SceneTreeTable {
     );
   }
 
-  private layoutColumns = (): void => {
-    const visibleRowCount = this.visibleEndIndex - this.visibleStartIndex + 1;
-    const diff = this.visibleStartIndex - this.lastStartIndex;
-    this.lastStartIndex = this.visibleStartIndex;
+  private computeViewportRows(): void {
+    const viewportHeight = this.getLayoutHeight();
+    if (viewportHeight != null) {
+      const viewportCount = Math.ceil(viewportHeight / this.rowHeight);
 
-    this.iterateColumns((col, pool, colIndex) => {
+      const viewportStartIndex = Math.floor(this.scrollOffset / this.rowHeight);
+      const viewportEndIndex = viewportStartIndex + viewportCount;
+
+      const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
+      const endIndex = Math.min(
+        this.totalRows - 1,
+        viewportEndIndex + this.overScanCount
+      );
+
+      const rows = this.getViewportRows(startIndex, endIndex);
+
+      this.stateMap.startIndex = startIndex;
+      this.stateMap.endIndex = endIndex;
+      this.stateMap.viewportRows = rows;
+    }
+  }
+
+  private layoutColumns = (): void => {
+    const visibleRowCount =
+      this.stateMap.endIndex - this.stateMap.startIndex + 1;
+    const diff = this.stateMap.startIndex - this.lastStartIndex;
+    this.lastStartIndex = this.stateMap.startIndex;
+
+    this.iterateColumns((col, pool) => {
       pool.updateElements(visibleRowCount);
 
       if (diff > 0) {
@@ -165,67 +204,18 @@ export class SceneTreeTable {
 
       col.style.minHeight = `${this.rowHeight * this.totalRows}px`;
 
-      if (colIndex === 0) {
-        pool.iterateElements((el, binding, rowIndex) => {
-          const row = this.visibleRows[rowIndex];
-          if (row != null) {
-            this.updateLeftmostCell(
-              row,
-              el as HTMLVertexSceneTreeTableCellElement,
-              binding,
-              rowIndex
-            );
-          }
-        });
-      } else if (colIndex === this.columnElements.length - 1) {
-        pool.iterateElements((el, binding, rowIndex) => {
-          const row = this.visibleRows[rowIndex];
-          if (row != null) {
-            this.updateRightmostCell(
-              row,
-              el as HTMLVertexSceneTreeTableCellElement,
-              binding,
-              rowIndex
-            );
-          }
-        });
-      } else {
-        pool.iterateElements((el, binding, rowIndex) => {
-          const row = this.visibleRows[rowIndex];
-          if (row != null) {
-            this.updateCell(
-              row,
-              el as HTMLVertexSceneTreeTableCellElement,
-              binding,
-              rowIndex
-            );
-          }
-        });
-      }
+      pool.iterateElements((el, binding, rowIndex) => {
+        const row = this.stateMap.viewportRows[rowIndex];
+        if (row != null) {
+          this.updateCell(
+            row,
+            el as HTMLVertexSceneTreeTableCellElement,
+            binding,
+            rowIndex
+          );
+        }
+      });
     });
-  };
-
-  private updateLeftmostCell = (
-    row: LoadedRow,
-    cell: HTMLVertexSceneTreeTableCellElement,
-    binding: Binding,
-    rowIndex: number
-  ): void => {
-    cell.style.paddingLeft = `calc(${row.node.depth} * 0.5rem)`;
-    cell.expandToggle = true;
-
-    this.updateCell(row, cell, binding, rowIndex);
-  };
-
-  private updateRightmostCell = (
-    row: LoadedRow,
-    cell: HTMLVertexSceneTreeTableCellElement,
-    binding: Binding,
-    rowIndex: number
-  ): void => {
-    cell.visibilityToggle = true;
-
-    this.updateCell(row, cell, binding, rowIndex);
   };
 
   private updateCell = (
@@ -236,29 +226,19 @@ export class SceneTreeTable {
   ): void => {
     cell.style.position = 'absolute';
     cell.style.top = `${
-      (this.visibleStartIndex + rowIndex) * this.rowHeight
+      (this.stateMap.startIndex + rowIndex) * this.rowHeight
     }px`;
-
     cell.style.height = `${this.rowHeight}px`;
     cell.style.width = '100%';
     cell.tree = this.tree;
     cell.node = row.node;
-
-    this.toggleAttribute(
-      cell,
-      'is-hovered',
-      this.hoveredNodeId === row.node.id?.hex
-    );
-    this.toggleAttribute(cell, 'is-hidden', !row.node.visible);
-    this.toggleAttribute(cell, 'is-selected', row.node.selected);
-    this.toggleAttribute(cell, 'is-partial', row.node.partiallyVisible);
-    this.toggleAttribute(cell, 'is-leaf', row.node.isLeaf);
+    cell.hoveredNodeId = this.hoveredNodeId;
 
     binding.bind(row);
   };
 
   private updateLayoutPosition = (): void => {
-    readTask(() => {
+    readDOM(() => {
       this.layoutOffset = this.tableElement?.getBoundingClientRect().top ?? 0;
     });
   };
@@ -299,23 +279,23 @@ export class SceneTreeTable {
     });
   }
 
-  private validateHeaderTemplate(): void {
-    const template = this.hostEl.querySelector(
+  private createHeaderInstance(
+    column: HTMLVertexSceneTreeTableColumnElement
+  ): InstancedTemplate<HTMLElement> | undefined {
+    const template = column.querySelector(
       'template[slot="header"]'
     ) as HTMLTemplateElement;
-    this.stateMap.headerTemplate = template ?? undefined;
-  }
-
-  private createHeaderInstance(): InstancedTemplate<HTMLElement> | undefined {
-    if (this.stateMap.headerTemplate != null) {
-      return generateInstanceFromTemplate(this.stateMap.headerTemplate);
+    if (template != null) {
+      return generateInstanceFromTemplate(template);
     }
   }
 
   private createColumnCellInstance(
     column: HTMLVertexSceneTreeTableColumnElement
   ): InstancedTemplate<HTMLElement> {
-    const template = column.querySelector('template');
+    const template = column.querySelector(
+      'template:not([slot="header"])'
+    ) as HTMLTemplateElement;
     if (template != null) {
       return generateInstanceFromTemplate(template);
     } else {
@@ -370,9 +350,11 @@ export class SceneTreeTable {
     }
   };
 
-  private computeColumnWidths = (): void => {
-    this.columnWidths = this.columnElements.map((c) => c.initialWidth);
-    this.columnLabels = this.columnElements.map((c) => c.label);
+  private computeColumnGridLayout = (): void => {
+    this.columnGridLayout = `${this.columnElements
+      .map((c) => c.initialWidth)
+      .slice(0, -1)
+      .reduce((res, w) => `${res} ${w}px`, '')} 1fr`;
   };
 
   private handleCellHover = (
@@ -382,31 +364,47 @@ export class SceneTreeTable {
   };
 
   private bindHeaderData = (): void => {
-    if (this.stateMap.headerInstance == null) {
-      const instance = this.createHeaderInstance();
-      this.stateMap.headerInstance = instance;
+    if (this.stateMap.headerInstances == null) {
+      this.stateMap.headerInstances = this.columnElements
+        .map((c) => {
+          const instance = this.createHeaderInstance(c);
 
-      if (instance != null) {
-        this.hostEl.appendChild(instance.element);
-      }
+          if (instance != null) {
+            this.headerElement?.appendChild(instance.element);
+          }
+
+          return instance;
+        })
+        .filter((i) => i != null) as Array<InstancedTemplate<HTMLElement>>;
     }
-
-    this.stateMap.headerInstance?.bindings.bind({
-      columnWidths: this.columnWidths,
-      columnLabels: this.columnLabels,
-    });
   };
 
   private handleScrollChanged = (event: Event): void => {
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
-    this.scrollOffsetChanged.emit();
   };
 
-  private toggleAttribute(el: HTMLElement, attr: string, value: boolean): void {
-    if (value) {
-      el.setAttribute(attr, '');
+  private getViewportRows(startIndex: number, endIndex: number): Row[] {
+    const rows = this.rows.slice(startIndex, endIndex + 1);
+    return rows.map((row) => (row != null ? this.populateRowData(row) : row));
+  }
+
+  private populateRowData(row: Row): Row {
+    if (this.rowData != null && row != null) {
+      const data = this.rowData?.(row) || {};
+      return { ...row, data };
     } else {
-      el.removeAttribute(attr);
+      return row;
     }
+  }
+
+  private getLayoutHeight(): number | undefined {
+    if (this.layoutHeight == null && this.tableElement != null) {
+      this.layoutHeight = this.tableElement?.clientHeight;
+    }
+    return this.layoutHeight;
+  }
+
+  private clearLayoutHeight(): void {
+    this.layoutHeight = undefined;
   }
 }

@@ -4,6 +4,11 @@
   position: relative;
 }
 
+.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .column {
   display: flex;
   flex-direction: column;

@@ -483,12 +483,14 @@ Type: `Promise<void>`
 
 - [vertex-scene-tree-toolbar](../scene-tree-toolbar)
 - [vertex-scene-tree-search](../scene-tree-search)
+- [vertex-scene-tree-table](../scene-tree-table)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   vertex-scene-tree --> vertex-scene-tree-search
+  vertex-scene-tree --> vertex-scene-tree-table
   vertex-scene-tree-search --> vertex-viewer-icon
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```

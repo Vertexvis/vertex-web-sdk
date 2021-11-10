@@ -36,7 +36,7 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { readDOM, writeDOM } from '../../lib/stencil';
+import { writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
 import { ElementPool } from './lib/element-pool';
 import { isSceneTreeRowElement } from '../scene-tree-row/utils';
@@ -65,12 +65,6 @@ interface StateMap {
 
   elementPool?: ElementPool;
   template?: HTMLTemplateElement;
-
-  startIndex: number;
-  endIndex: number;
-  viewportRows: Row[];
-  viewportRowMap: Map<string, Row>;
-  viewportHeight?: number;
 
   selectionPath?: string[];
 
@@ -200,9 +194,6 @@ export class SceneTree {
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
   @State()
-  private isComputingRowHeight = true;
-
-  @State()
   private rows: Row[] = [];
 
   @State()
@@ -210,9 +201,6 @@ export class SceneTree {
 
   @State()
   private scrollTop = 0;
-
-  @State()
-  private computedRowHeight: number | undefined;
 
   /**
    * This stores internal state that you want to preserve across live-reloads,
@@ -222,10 +210,6 @@ export class SceneTree {
   @State()
   private stateMap: StateMap = {
     componentLoaded: false,
-    startIndex: 0,
-    endIndex: 0,
-    viewportRows: [],
-    viewportRowMap: new Map(),
   };
 
   @State()
@@ -505,8 +489,7 @@ export class SceneTree {
   public getRowAtClientY(clientY: number): Promise<Row> {
     const top = this.getLayoutElement().layoutOffset;
     const index = Math.floor(
-      (clientY - top + this.scrollTop) /
-        this.getComputedOrPlaceholderRowHeight()
+      (clientY - top + this.scrollTop) / this.getLayoutElement().rowHeight
     );
     return this.getRowAtIndex(index);
   }
@@ -573,10 +556,7 @@ export class SceneTree {
     this.ensureLayoutDefined();
 
     const layoutEl = this.getLayoutElement();
-    layoutEl.addEventListener('scrollOffsetChanged', this.handleScroll);
-
     const resizeObserver = new ResizeObserver(() => {
-      this.clearViewportHeight();
       this.invalidateRows();
     });
     resizeObserver.observe(layoutEl);
@@ -591,15 +571,6 @@ export class SceneTree {
    * @ignore
    */
   protected componentWillRender(): void {
-    this.updateRenderState();
-
-    if (this.controller?.isConnected) {
-      this.controller.updateActiveRowRange(
-        this.stateMap.startIndex,
-        this.stateMap.endIndex
-      );
-    }
-
     this.updateLayoutElement();
   }
 
@@ -702,29 +673,29 @@ export class SceneTree {
     this.controller?.setMetadataKeys(this.metadataKeys);
   }
 
-  private scheduleClearUnusedData(): void {
-    if (this.stateMap.idleCallbackId != null) {
-      window.cancelIdleCallback(this.stateMap.idleCallbackId);
-    }
+  // private scheduleClearUnusedData(): void {
+  //   if (this.stateMap.idleCallbackId != null) {
+  //     window.cancelIdleCallback(this.stateMap.idleCallbackId);
+  //   }
 
-    this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
-      const remaining = foo.timeRemaining?.();
+  //   this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
+  //     const remaining = foo.timeRemaining?.();
 
-      if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
-        const [start, end] =
-          this.controller?.getPageIndexesForRange(
-            this.stateMap.startIndex,
-            this.stateMap.endIndex
-          ) || [];
+  //     if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
+  //       const [start, end] =
+  //         this.controller?.getPageIndexesForRange(
+  //           this.stateMap.startIndex,
+  //           this.stateMap.endIndex
+  //         ) || [];
 
-        if (start != null && end != null) {
-          this.controller?.invalidatePagesOutsideRange(start, end, 50);
-        }
-      } else {
-        this.scheduleClearUnusedData();
-      }
-    });
-  }
+  //       if (start != null && end != null) {
+  //         this.controller?.invalidatePagesOutsideRange(start, end, 50);
+  //       }
+  //     } else {
+  //       this.scheduleClearUnusedData();
+  //     }
+  //   });
+  // }
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
@@ -764,63 +735,9 @@ export class SceneTree {
     await op({ viewer: this.viewer, id: node.id.hex, node });
   }
 
-  private updateRenderState(): void {
-    const viewportHeight = this.getViewportHeight();
-    if (viewportHeight != null) {
-      const rowHeight = this.getComputedOrPlaceholderRowHeight();
-      const viewportCount = Math.ceil(viewportHeight / rowHeight);
-
-      const viewportStartIndex = Math.floor(this.scrollTop / rowHeight);
-      const viewportEndIndex = viewportStartIndex + viewportCount;
-
-      const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
-      const endIndex = Math.min(
-        this.totalRows - 1,
-        viewportEndIndex + this.overScanCount
-      );
-
-      const rows = this.getViewportRows(startIndex, endIndex);
-
-      const diff = startIndex - this.stateMap.startIndex;
-      if (diff > 0) {
-        this.stateMap.elementPool?.swapHeadToTail(diff);
-      } else {
-        this.stateMap.elementPool?.swapTailToHead(-diff);
-      }
-
-      this.stateMap.startIndex = startIndex;
-      this.stateMap.endIndex = endIndex;
-      this.stateMap.viewportRows = rows;
-    }
-  }
-
-  private getViewportRows(startIndex: number, endIndex: number): Row[] {
-    const rows = this.rows.slice(startIndex, endIndex + 1);
-    return rows.map((row) => (row != null ? this.populateRowData(row) : row));
-  }
-
-  private handleScroll = (): void => {
-    readDOM(() => {
-      this.scrollTop = this.getLayoutElement().scrollOffset ?? 0;
-    });
-  };
-
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
     this.filterItems(event.detail);
-  }
-
-  private populateRowData(row: Row): Row {
-    if (this.rowData != null && row != null) {
-      const data = this.rowData?.(row) || {};
-      return { ...row, data };
-    } else {
-      return row;
-    }
-  }
-
-  private getComputedOrPlaceholderRowHeight(): number {
-    return this.getLayoutElement().rowHeight ?? 24;
   }
 
   private getScrollToPosition(
@@ -828,8 +745,8 @@ export class SceneTree {
     position: ScrollToOptions['position']
   ): number {
     const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
-    const viewportHeight = this.getViewportHeight() || 0;
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+    const viewportHeight = this.getLayoutElement().layoutHeight ?? 0;
+    const rowHeight = this.getLayoutElement().rowHeight;
 
     if (position === 'start') {
       return constrainedIndex * rowHeight;
@@ -853,7 +770,7 @@ export class SceneTree {
       layout.innerHTML = `
       <vertex-scene-tree-table-column>
         <template>
-          <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" />
+          <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle />
         </template>
       </vertex-scene-tree-table-column>
       `;
@@ -867,25 +784,11 @@ export class SceneTree {
     const layout = this.el.querySelector('vertex-scene-tree-table');
     if (layout != null) {
       layout.rows = this.rows;
-      layout.visibleStartIndex = this.stateMap.startIndex;
-      layout.visibleEndIndex = this.stateMap.endIndex;
-      layout.visibleRows = this.stateMap.viewportRows;
       layout.tree = this.el as HTMLVertexSceneTreeElement;
       layout.totalRows = this.totalRows;
+      layout.controller = this.controller;
+      layout.rowData = this.rowData;
     }
-  }
-
-  private getViewportHeight(): number | undefined {
-    if (this.stateMap.viewportHeight == null && this.rowScrollEl != null) {
-      this.stateMap.viewportHeight = getSceneTreeViewportHeight(
-        this.rowScrollEl
-      );
-    }
-    return this.stateMap.viewportHeight;
-  }
-
-  private clearViewportHeight(): void {
-    this.stateMap.viewportHeight = undefined;
   }
 
   private getRowsScrollElement(): HTMLElement {

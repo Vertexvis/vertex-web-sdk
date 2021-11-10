@@ -1,4 +1,12 @@
-import { Component, Host, h, Prop, EventEmitter, Event } from '@stencil/core';
+import {
+  Component,
+  Host,
+  h,
+  Prop,
+  EventEmitter,
+  Event,
+  Element,
+} from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';
 
@@ -18,6 +26,9 @@ export class SceneTreeTableCell {
   public node?: Node.AsObject;
 
   @Prop()
+  public hoveredNodeId?: string;
+
+  @Prop()
   public expandToggle?: boolean;
 
   @Prop()
@@ -25,6 +36,29 @@ export class SceneTreeTableCell {
 
   @Event({ bubbles: true })
   public hovered!: EventEmitter<Node.AsObject | undefined>;
+
+  @Event({ bubbles: true })
+  public expansionToggled!: EventEmitter<Node.AsObject>;
+
+  @Event({ bubbles: true })
+  public selectionToggled!: EventEmitter<Node.AsObject>;
+
+  @Event({ bubbles: true })
+  public visibilityToggled!: EventEmitter<Node.AsObject>;
+
+  @Element()
+  private hostEl!: HTMLElement;
+
+  public componentWillRender(): void {
+    this.toggleAttribute(
+      'is-hovered',
+      this.hoveredNodeId === this.node?.id?.hex
+    );
+    this.toggleAttribute('is-hidden', !this.node?.visible);
+    this.toggleAttribute('is-selected', !!this.node?.selected);
+    this.toggleAttribute('is-partial', !!this.node?.partiallyVisible);
+    this.toggleAttribute('is-leaf', !!this.node?.isLeaf);
+  }
 
   public render(): h.JSX.IntrinsicElements {
     return (
@@ -132,4 +166,12 @@ export class SceneTreeTableCell {
       this.tree.toggleItemVisibility(this.node);
     }
   };
+
+  private toggleAttribute(attr: string, value: boolean): void {
+    if (value) {
+      this.hostEl.setAttribute(attr, '');
+    } else {
+      this.hostEl.removeAttribute(attr);
+    }
+  }
 }

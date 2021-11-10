@@ -1,16 +1,4 @@
-import {
-  Component,
-  Host,
-  h,
-  Prop,
-  EventEmitter,
-  Event,
-  State,
-  Method,
-  Element,
-} from '@stencil/core';
-import classNames from 'classnames';
-import { Row } from '../scene-tree/lib/row';
+import { Component, Host, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'vertex-scene-tree-table-column',
@@ -21,12 +9,12 @@ export class SceneTreeTableColumn {
   @Prop()
   public initialWidth?: number;
 
-  @Prop()
-  public label?: string;
-
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
+        <div class="hidden">
+          <slot name="header" />
+        </div>
         <div class="column">
           <slot />
         </div>

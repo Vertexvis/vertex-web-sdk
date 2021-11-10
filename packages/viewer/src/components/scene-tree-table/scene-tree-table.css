@@ -5,6 +5,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  font-size: 0.825rem;
 
   /**
     * @prop --scene-tree-table-row-padding: CSS lengths that specifies the amount of
@@ -19,11 +20,25 @@
     --scene-tree-table-column-gap: 0.5rem;
 }
 
+.header {
+  position: relative;
+  display: grid;
+  width: 100%;
+  border-bottom: var(--scene-tree-toolbar-separator);
+}
+
+.header > *:not(:last-child) {
+  padding-right: var(--scene-tree-table-column-gap);
+}
+
+.header > *:first-child {
+  padding-left: var(--scene-tree-table-column-gap);
+}
+
 .table {
   position: relative;
   display: grid;
   width: 100%;
   height: 100%;
-  font-size: 0.825rem;
   overflow: auto;
 }
