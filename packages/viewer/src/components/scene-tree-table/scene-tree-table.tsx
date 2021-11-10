@@ -469,8 +469,8 @@ export class SceneTreeTable {
           const instance = this.createHeaderInstance(c);
 
           if (instance != null) {
-            instance.element.style.gridColumnStart = `${i}`;
-            instance.element.style.gridColumnEnd = `${i + 1}`;
+            instance.element.style.gridColumnStart = `${i + 1}`;
+            instance.element.style.gridColumnEnd = `${i + 2}`;
             this.headerElement?.appendChild(instance.element);
           }
 
