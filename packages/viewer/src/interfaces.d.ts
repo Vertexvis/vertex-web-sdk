@@ -3,7 +3,7 @@ import { Color } from '@vertexvis/utils';
 
 export type Color3 = Color.Color | string | number;
 
-export type DepthBufferFrameType = 'final' | 'all' | undefined;
+export type FrameType = 'final' | 'all' | undefined;
 
 export interface FeatureLineOptions {
   width: number;
@@ -29,8 +29,9 @@ export interface HTMLDomRendererPositionableElement {
 }
 
 export interface StreamAttributes {
-  depthBuffers?: DepthBufferFrameType;
+  depthBuffers?: FrameType;
   experimentalGhosting?: number;
   featureLines?: FeatureLineOptions;
   featureHighlighting?: FeatureHighlightOptions;
+  featureMaps?: FrameType;
 }

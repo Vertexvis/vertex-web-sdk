@@ -34,6 +34,38 @@ describe(toPbStreamAttributes, () => {
     });
   });
 
+  describe('feature map', () => {
+    it('enables feature map if type is all', () => {
+      const res = toPbStreamAttributes({ featureMaps: 'all' });
+      expect(res).toMatchObject({
+        featureMaps: expect.objectContaining({
+          enabled: { value: true },
+          frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_ALL,
+        }),
+      });
+    });
+
+    it('enables depth buffer if type is final', () => {
+      const res = toPbStreamAttributes({ featureMaps: 'final' });
+      expect(res).toMatchObject({
+        featureMaps: expect.objectContaining({
+          enabled: { value: true },
+          frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_FINAL,
+        }),
+      });
+    });
+
+    it('disables depth buffer if not valid type', () => {
+      const res = toPbStreamAttributes({ featureMaps: undefined });
+      expect(res).toMatchObject({
+        featureMaps: expect.objectContaining({
+          enabled: { value: false },
+          frameType: vertexvis.protobuf.stream.FrameType.FRAME_TYPE_INVALID,
+        }),
+      });
+    });
+  });
+
   describe('ghosting', () => {
     it('enables ghosting if opacity is > 0', () => {
       const res = toPbStreamAttributes({ experimentalGhosting: 1 });
