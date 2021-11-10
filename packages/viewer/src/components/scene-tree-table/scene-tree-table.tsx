@@ -1,4 +1,12 @@
-import { Component, Host, h, Prop, State, Element } from '@stencil/core';
+import {
+  Component,
+  Host,
+  h,
+  Prop,
+  State,
+  Element,
+  Method,
+} from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
 import { Binding } from '../scene-tree/lib/binding';
@@ -62,6 +70,12 @@ export class SceneTreeTable {
 
   @Prop({ mutable: true })
   public layoutHeight?: number;
+
+  @Prop()
+  public interactionsDisabled = false;
+
+  @Prop()
+  public recurseParentSelectionDisabled = false;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -139,6 +153,16 @@ export class SceneTreeTable {
       c.removeEventListener('hovered', this.handleCellHover as EventListener);
     });
     this.tableElement?.removeEventListener('scroll', this.handleScrollChanged);
+  }
+
+  @Method()
+  public async getViewportStartIndex(): Promise<number> {
+    return this.stateMap.startIndex;
+  }
+
+  @Method()
+  public async getViewportEndIndex(): Promise<number> {
+    return this.stateMap.endIndex;
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -233,6 +257,8 @@ export class SceneTreeTable {
     cell.tree = this.tree;
     cell.node = row.node;
     cell.hoveredNodeId = this.hoveredNodeId;
+    cell.interactionsDisabled = this.interactionsDisabled;
+    cell.recurseParentSelectionDisabled = this.recurseParentSelectionDisabled;
 
     binding.bind(row);
   };

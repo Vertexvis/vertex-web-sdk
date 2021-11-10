@@ -219,9 +219,13 @@ export namespace Components {
     }
     interface VertexSceneTreeTable {
         "controller"?: SceneTreeController;
+        "getViewportEndIndex": () => Promise<number>;
+        "getViewportStartIndex": () => Promise<number>;
+        "interactionsDisabled": boolean;
         "layoutHeight"?: number;
         "layoutOffset": number;
         "overScanCount": number;
+        "recurseParentSelectionDisabled": boolean;
         "rowData"?: RowDataProvider;
         "rowHeight": number;
         "rows": Row[];
@@ -235,7 +239,9 @@ export namespace Components {
     interface VertexSceneTreeTableCell {
         "expandToggle"?: boolean;
         "hoveredNodeId"?: string;
+        "interactionsDisabled": boolean;
         "node"?: Node.AsObject;
+        "recurseParentSelectionDisabled": boolean;
         "tree"?: HTMLVertexSceneTreeElement | null;
         "value"?: string;
         "visibilityToggle"?: boolean;
@@ -1285,9 +1291,11 @@ declare namespace LocalJSX {
     }
     interface VertexSceneTreeTable {
         "controller"?: SceneTreeController;
+        "interactionsDisabled"?: boolean;
         "layoutHeight"?: number;
         "layoutOffset"?: number;
         "overScanCount"?: number;
+        "recurseParentSelectionDisabled"?: boolean;
         "rowData"?: RowDataProvider;
         "rowHeight"?: number;
         "rows"?: Row[];
@@ -1301,11 +1309,13 @@ declare namespace LocalJSX {
     interface VertexSceneTreeTableCell {
         "expandToggle"?: boolean;
         "hoveredNodeId"?: string;
+        "interactionsDisabled"?: boolean;
         "node"?: Node.AsObject;
         "onExpansionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
         "onHovered"?: (event: CustomEvent<Node.AsObject | undefined>) => void;
         "onSelectionToggled"?: (event: CustomEvent<Node.AsObject>) => void;
         "onVisibilityToggled"?: (event: CustomEvent<Node.AsObject>) => void;
+        "recurseParentSelectionDisabled"?: boolean;
         "tree"?: HTMLVertexSceneTreeElement | null;
         "value"?: string;
         "visibilityToggle"?: boolean;

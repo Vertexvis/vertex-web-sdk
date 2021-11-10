@@ -68,6 +68,9 @@
   min-height: 24px;
 }
 
+.no-shrink {
+  flex-shrink: 0;
+}
 
 :host([is-leaf]) .expand-btn {
   visibility: hidden;

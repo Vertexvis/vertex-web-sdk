@@ -24,11 +24,7 @@ import {
 } from './lib/controller';
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import {
-  getSceneTreeContainsElement,
-  getSceneTreeViewportHeight,
-  scrollToTop,
-} from './lib/dom';
+import { getSceneTreeContainsElement, scrollToTop } from './lib/dom';
 import {
   deselectItem,
   hideItem,
@@ -487,9 +483,10 @@ export class SceneTree {
    */
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
-    const top = this.getLayoutElement().layoutOffset;
+    const layoutEl = this.getLayoutElement();
+    const top = layoutEl.layoutOffset;
     const index = Math.floor(
-      (clientY - top + this.scrollTop) / this.getLayoutElement().rowHeight
+      (clientY - top + layoutEl.scrollOffset) / layoutEl.rowHeight
     );
     return this.getRowAtIndex(index);
   }
@@ -673,29 +670,29 @@ export class SceneTree {
     this.controller?.setMetadataKeys(this.metadataKeys);
   }
 
-  // private scheduleClearUnusedData(): void {
-  //   if (this.stateMap.idleCallbackId != null) {
-  //     window.cancelIdleCallback(this.stateMap.idleCallbackId);
-  //   }
+  private scheduleClearUnusedData(): void {
+    if (this.stateMap.idleCallbackId != null) {
+      window.cancelIdleCallback(this.stateMap.idleCallbackId);
+    }
 
-  //   this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
-  //     const remaining = foo.timeRemaining?.();
+    this.stateMap.idleCallbackId = window.requestIdleCallback(async (foo) => {
+      const remaining = foo.timeRemaining?.();
 
-  //     if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
-  //       const [start, end] =
-  //         this.controller?.getPageIndexesForRange(
-  //           this.stateMap.startIndex,
-  //           this.stateMap.endIndex
-  //         ) || [];
+      if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
+        const layoutEl = this.getLayoutElement();
+        const startIndex = await layoutEl.getViewportStartIndex();
+        const endIndex = await layoutEl.getViewportEndIndex();
+        const [start, end] =
+          this.controller?.getPageIndexesForRange(startIndex, endIndex) || [];
 
-  //       if (start != null && end != null) {
-  //         this.controller?.invalidatePagesOutsideRange(start, end, 50);
-  //       }
-  //     } else {
-  //       this.scheduleClearUnusedData();
-  //     }
-  //   });
-  // }
+        if (start != null && end != null) {
+          this.controller?.invalidatePagesOutsideRange(start, end, 50);
+        }
+      } else {
+        this.scheduleClearUnusedData();
+      }
+    });
+  }
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;

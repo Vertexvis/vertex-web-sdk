@@ -34,6 +34,12 @@ export class SceneTreeTableCell {
   @Prop()
   public visibilityToggle?: boolean;
 
+  @Prop()
+  public interactionsDisabled = false;
+
+  @Prop()
+  public recurseParentSelectionDisabled = false;
+
   @Event({ bubbles: true })
   public hovered!: EventEmitter<Node.AsObject | undefined>;
 
@@ -96,7 +102,7 @@ export class SceneTreeTableCell {
             </button>
           )}
           <div class="content">{this.displayValue()}</div>
-          {this.visibilityToggle ? (
+          {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
               data-test-id={'visibility-btn-' + this.node?.name}
@@ -115,12 +121,11 @@ export class SceneTreeTableCell {
                 })}
               />
             </button>
-          ) : (
-            <div class="column-spacer" />
           )}
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
+          {!this.visibilityToggle && <div class="column-spacer" />}
         </div>
       </Host>
     );
@@ -135,14 +140,12 @@ export class SceneTreeTableCell {
   private handleCellPointerDown = (event: PointerEvent): void => {
     if (
       !event.defaultPrevented &&
-      event.button === 0
-      // && !this.interactionsDisabled
+      event.button === 0 &&
+      !this.interactionsDisabled
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
-      } else if (
-        this.node?.selected /* && !this.recurseParentSelectionDisabled */
-      ) {
+      } else if (this.node?.selected && !this.recurseParentSelectionDisabled) {
         this.tree?.selectItem(this.node, {
           recurseParent: true,
         });
@@ -151,19 +154,21 @@ export class SceneTreeTableCell {
           append: event.ctrlKey || event.metaKey,
         });
       }
-      // this.selectionToggled.emit();
+      this.selectionToggled.emit(this.node);
     }
   };
 
   private toggleExpansion = (): void => {
     if (this.tree != null && this.node != null) {
       this.tree.toggleExpandItem(this.node);
+      this.expansionToggled.emit(this.node);
     }
   };
 
   private toggleVisibility = (): void => {
-    if (this.tree != null && this.node != null) {
+    if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleItemVisibility(this.node);
+      this.visibilityToggled.emit(this.node);
     }
   };
 
