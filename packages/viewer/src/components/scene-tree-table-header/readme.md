@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type                  | Default     |
-| -------- | --------- | ----------- | --------------------- | ----------- |
-| `label`  | `label`   |             | `string \| undefined` | `undefined` |
+| Property | Attribute | Description                          | Type                  | Default     |
+| -------- | --------- | ------------------------------------ | --------------------- | ----------- |
+| `label`  | `label`   | The label to display in this header. | `string \| undefined` | `undefined` |
 
 
 ----------------------------------------------

@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property       | Attribute       | Description | Type                  | Default     |
-| -------------- | --------------- | ----------- | --------------------- | ----------- |
-| `initialWidth` | `initial-width` |             | `number \| undefined` | `undefined` |
+| Property       | Attribute       | Description                       | Type                  | Default     |
+| -------------- | --------------- | --------------------------------- | --------------------- | ----------- |
+| `initialWidth` | `initial-width` | The initial width of this column. | `number \| undefined` | `undefined` |
 
 
 ----------------------------------------------

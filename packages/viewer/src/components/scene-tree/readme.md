@@ -354,7 +354,7 @@ Type: `Promise<Row>`
 ### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
 Returns the row data from the given mouse or pointer event. The event must
-originate from a `vertex-scene-tree-row` contained by this element,
+originate from a `vertex-scene-tree-table-cell` contained by this element,
 otherwise `undefined` is returned.
 
 #### Returns
