@@ -166,7 +166,11 @@ export class StencilBuffer implements FrameImageLike {
     imageRect: Rectangle.Rectangle,
     imageScale: number
   ): StencilBuffer {
-    if (png.data instanceof Uint8Array) {
+    if (!(png.data instanceof Uint8Array)) {
+      throw new Error('Expected stencil PNG to have depth of 8-bit');
+    } else if (png.channels !== 1) {
+      throw new Error('Expected stencil PNG to have 1 color channel');
+    } else {
       return new StencilBuffer(
         frameDimensions,
         png.data,
@@ -174,8 +178,6 @@ export class StencilBuffer implements FrameImageLike {
         imageRect,
         imageScale
       );
-    } else {
-      throw new Error('Expected stencil PNG to have depth of 8-bit');
     }
   }
 
@@ -196,11 +198,11 @@ export class StencilBuffer implements FrameImageLike {
 
     if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
       const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
-      const offset = index * this.imageChannels;
-      const r = this.imageBytes[offset + 0];
-      const g = this.imageBytes[offset + 1];
-      const b = this.imageBytes[offset + 2];
-      const color = Color.create(r, g, b);
+      const color = Color.create(
+        this.pixelBytes[index],
+        this.pixelBytes[index],
+        this.pixelBytes[index]
+      );
       return isEmptyColor(color) ? undefined : color;
     }
   }
@@ -244,7 +246,10 @@ export class StencilBuffer implements FrameImageLike {
     const sorted = pixels.sort(
       (a, b) => Point.distance(a, pt) - Point.distance(b, pt)
     );
-    return sorted[0];
+    const closest = sorted[0];
+    return closest != null
+      ? Point.create(Math.floor(closest.x) + 0.5, Math.floor(closest.y) + 0.5)
+      : undefined;
   }
 }
 

@@ -2,13 +2,31 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { StencilBuffer, STENCIL_BUFFER_EMPTY_COLOR } from '../stencilBuffer';
 import { createStencilImageBytes } from '../../../testing/fixtures';
 import { Color } from '@vertexvis/utils';
+import fs from 'fs/promises';
+import path from 'path';
+import { decode as decodePng } from 'fast-png';
 
 describe(StencilBuffer, () => {
   const color = Color.create(1, 2, 3);
 
+  const stencilBuffer = fs
+    .readFile(path.resolve(__dirname, 'stencil-buffer.png'))
+    .then((bytes) => ({ bytes, png: decodePng(bytes) }))
+    .then(({ bytes, png }) => {
+      return new StencilBuffer(
+        Dimensions.create(618, 632),
+        bytes,
+        new Uint8Array(png.data),
+        png.channels,
+        Rectangle.create(0, 0, 618, 632),
+        1
+      );
+    });
+
   describe('getColor', () => {
     const shaded = new StencilBuffer(
       Dimensions.create(200, 100),
+      createStencilImageBytes(100, 50, () => color),
       createStencilImageBytes(100, 50, () => color),
       3,
       Rectangle.create(50, 25, 100, 50),
@@ -17,6 +35,7 @@ describe(StencilBuffer, () => {
 
     const white = new StencilBuffer(
       Dimensions.create(200, 100),
+      createStencilImageBytes(100, 50, () => STENCIL_BUFFER_EMPTY_COLOR),
       createStencilImageBytes(100, 50, () => STENCIL_BUFFER_EMPTY_COLOR),
       3,
       Rectangle.create(50, 25, 100, 50),
@@ -45,6 +64,9 @@ describe(StencilBuffer, () => {
       createStencilImageBytes(10, 10, ({ x, y }) =>
         x < 5 && y < 5 ? color : STENCIL_BUFFER_EMPTY_COLOR
       ),
+      createStencilImageBytes(10, 10, ({ x, y }) =>
+        x < 5 && y < 5 ? color : STENCIL_BUFFER_EMPTY_COLOR
+      ),
       3,
       Rectangle.create(0, 0, 10, 10),
       1
@@ -55,10 +77,21 @@ describe(StencilBuffer, () => {
       createStencilImageBytes(10, 10, ({ x, y }) =>
         x >= 5 && y >= 5 ? color : STENCIL_BUFFER_EMPTY_COLOR
       ),
+      createStencilImageBytes(10, 10, ({ x, y }) =>
+        x >= 5 && y >= 5 ? color : STENCIL_BUFFER_EMPTY_COLOR
+      ),
       3,
       Rectangle.create(0, 0, 10, 10),
       1
     );
+
+    it('returns pixel if point is non-white', async () => {
+      const pt = Point.create(99, 0);
+      const stencil = await stencilBuffer;
+      const actual = stencil.getNearestPixel(pt, 1);
+
+      expect(actual).toEqual(Point.create(99.5, 0.5));
+    });
 
     it('returns point if non-white pixel', () => {
       const pt = Point.create(0, 0);
