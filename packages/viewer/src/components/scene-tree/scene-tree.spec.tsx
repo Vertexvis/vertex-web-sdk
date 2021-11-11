@@ -51,7 +51,7 @@ import {
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from '../../testing';
-import { SceneTreeTable } from '../scene-tree-table/scene-tree-table';
+import { SceneTreeTableLayout } from '../scene-tree-table-layout/scene-tree-table-layout';
 
 const random = new Chance();
 
@@ -953,7 +953,7 @@ async function newSceneTreeSpec(data: {
   waitForSceneTreeConnected: () => Promise<void>;
 }> {
   const page = await newSpecPage({
-    components: [SceneTree, SceneTreeTable, Viewer],
+    components: [SceneTree, SceneTreeTableLayout, Viewer],
     template: () => {
       return (
         data.template?.() || (

@@ -15,7 +15,9 @@ export class SceneTreeTableHeader {
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <div class="header">{this.label}</div>
+        <div class="header">
+          <slot>{this.label}</slot>
+        </div>
       </Host>
     );
   }

@@ -22,14 +22,14 @@ import {
   mockGrpcUnaryResult,
   ResponseStreamMock,
 } from '../../testing';
-import { SceneTreeTable } from '../scene-tree-table/scene-tree-table';
+import { SceneTreeTableLayout } from './scene-tree-table-layout';
 import { triggerResizeObserver } from '../../testing/domMocks';
 import { readDOM } from '../../lib/stencil';
 import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
 import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
 
-describe('<vertex-scene-tree-table>', () => {
+describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(0);
@@ -48,13 +48,6 @@ describe('<vertex-scene-tree-table>', () => {
     expect(table.layoutOffset).toBe(1000);
   });
 
-  it('provides the viewport start and end indices', async () => {
-    const { table } = await newSceneTreeTableSpec();
-
-    expect(await table.getViewportStartIndex()).toBe(0);
-    expect(await table.getViewportEndIndex()).toBe(0);
-  });
-
   it('creates cells from column template', async () => {
     const client = mockSceneTreeClient();
     mockGetTree({ client });
@@ -63,13 +56,13 @@ describe('<vertex-scene-tree-table>', () => {
     const { table } = await newSceneTreeTableSpec({
       controller,
       html: `
-          <vertex-scene-tree-table>
+          <vertex-scene-tree-table-layout>
             <vertex-scene-tree-table-column>
               <template>
                 <div class="templated-div" />
               </template>
             </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table> 
+          </vertex-scene-tree-table-layout> 
       `,
     });
 
@@ -89,10 +82,10 @@ describe('<vertex-scene-tree-table>', () => {
       newSceneTreeTableSpec({
         controller,
         html: `
-          <vertex-scene-tree-table>
+          <vertex-scene-tree-table-layout>
             <vertex-scene-tree-table-column>
             </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table> 
+          </vertex-scene-tree-table-layout> 
       `,
       })
     ).rejects.toThrow(new Error('Column is missing cell template element'));
@@ -106,7 +99,7 @@ describe('<vertex-scene-tree-table>', () => {
     const { table } = await newSceneTreeTableSpec({
       controller,
       html: `
-        <vertex-scene-tree-table>
+        <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template slot="header">
             <div class="templated-header-div" />
@@ -115,7 +108,7 @@ describe('<vertex-scene-tree-table>', () => {
             <div class="templated-div" />
           </template>
         </vertex-scene-tree-table-column>
-      </vertex-scene-tree-table>
+      </vertex-scene-tree-table-layout>
       `,
     });
 
@@ -132,13 +125,13 @@ async function newSceneTreeTableSpec(data?: {
   template?: () => unknown;
   html?: string;
 }): Promise<{
-  table: HTMLVertexSceneTreeTableElement;
+  table: HTMLVertexSceneTreeTableLayoutElement;
   page: SpecPage;
   waitForControllerConnected: () => Promise<void>;
 }> {
   const page = await newSpecPage({
     components: [
-      SceneTreeTable,
+      SceneTreeTableLayout,
       SceneTreeTableColumn,
       SceneTreeTableCell,
       SceneTreeTableHeader,
@@ -148,7 +141,7 @@ async function newSceneTreeTableSpec(data?: {
         ? () => {
             return (
               data?.template?.() || (
-                <vertex-scene-tree-table controller={data?.controller} />
+                <vertex-scene-tree-table-layout controller={data?.controller} />
               )
             );
           }
@@ -157,8 +150,8 @@ async function newSceneTreeTableSpec(data?: {
   });
 
   const table = page.body.querySelector(
-    'vertex-scene-tree-table'
-  ) as HTMLVertexSceneTreeTableElement;
+    'vertex-scene-tree-table-layout'
+  ) as HTMLVertexSceneTreeTableLayoutElement;
 
   return {
     table,

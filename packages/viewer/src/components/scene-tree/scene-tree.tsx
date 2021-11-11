@@ -64,7 +64,7 @@ interface StateMap {
 
   selectionPath?: string[];
 
-  layoutEl?: HTMLVertexSceneTreeTableElement;
+  layoutEl?: HTMLVertexSceneTreeTableLayoutElement;
 }
 
 type OperationHandler = (data: {
@@ -678,13 +678,13 @@ export class SceneTree {
       window.cancelIdleCallback(this.stateMap.idleCallbackId);
     }
 
-    this.stateMap.idleCallbackId = window.requestIdleCallback(async (foo) => {
+    this.stateMap.idleCallbackId = window.requestIdleCallback((foo) => {
       const remaining = foo.timeRemaining?.();
 
       if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
         const layoutEl = this.getLayoutElement();
-        const startIndex = await layoutEl.getViewportStartIndex();
-        const endIndex = await layoutEl.getViewportEndIndex();
+        const startIndex = layoutEl.viewportStartIndex;
+        const endIndex = layoutEl.viewportEndIndex;
         const [start, end] =
           this.controller?.getPageIndexesForRange(startIndex, endIndex) || [];
 
@@ -765,9 +765,9 @@ export class SceneTree {
   }
 
   private ensureLayoutDefined(): void {
-    let layout = this.el.querySelector('vertex-scene-tree-table');
+    let layout = this.el.querySelector('vertex-scene-tree-table-layout');
     if (layout == null) {
-      layout = document.createElement('vertex-scene-tree-table');
+      layout = document.createElement('vertex-scene-tree-table-layout');
       layout.innerHTML = `
       <vertex-scene-tree-table-column>
         <template>
@@ -782,7 +782,7 @@ export class SceneTree {
   }
 
   private updateLayoutElement(): void {
-    const layout = this.el.querySelector('vertex-scene-tree-table');
+    const layout = this.el.querySelector('vertex-scene-tree-table-layout');
     if (layout != null) {
       layout.rows = this.rows;
       layout.tree = this.el as HTMLVertexSceneTreeElement;
@@ -800,7 +800,7 @@ export class SceneTree {
     }
   }
 
-  private getLayoutElement(): HTMLVertexSceneTreeTableElement {
+  private getLayoutElement(): HTMLVertexSceneTreeTableLayoutElement {
     if (this.stateMap.layoutEl != null) {
       return this.stateMap.layoutEl;
     } else {

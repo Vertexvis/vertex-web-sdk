@@ -37,6 +37,13 @@ export class SceneTreeTableCell {
   public value?: string;
 
   /**
+   * The value to display in this cell if the `value` specified is
+   * undefined. Defaults to "--".
+   */
+  @Prop()
+  public placeholder = '--';
+
+  /**
    * @internal
    */
   @Prop()
@@ -60,24 +67,18 @@ export class SceneTreeTableCell {
    * A flag that disables the default interactions of this component. If
    * disabled, you can use the event handlers to be notified when certain
    * operations are performed by the user.
-   *
-   * This prop will be automatically populated based on the `interactionsDisabled` prop
-   * specified in the parent `<vertex-scene-tree-table />` element.
    */
   @Prop()
-  public interactionsDisabled?: boolean;
+  public interactionsDisabled = false;
 
   /**
    * A flag that disables selection of the node's parent if the user selects
    * the row multiple times. When enabled, selection of the same row multiple
    * times will recursively select the next unselected parent until the root
    * node is selected.
-   *
-   * This prop will be automatically populated based on the `recurseParentSelectionDisabled`
-   * prop specified in the parent `<vertex-scene-tree-table />` element.
    */
   @Prop()
-  public recurseParentSelectionDisabled?: boolean;
+  public recurseParentSelectionDisabled = false;
 
   /**
    * @internal
@@ -187,7 +188,7 @@ export class SceneTreeTableCell {
 
   private displayValue = (): string => {
     return this.value == null || this.value.replace(' ', '') === ''
-      ? '--'
+      ? this.placeholder
       : this.value;
   };
 

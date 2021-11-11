@@ -1,12 +1,4 @@
-import {
-  Component,
-  Host,
-  h,
-  Prop,
-  State,
-  Element,
-  Method,
-} from '@stencil/core';
+import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
 import { Binding } from '../scene-tree/lib/binding';
@@ -28,17 +20,15 @@ interface StateMap {
   >;
   headerInstances?: Array<InstancedTemplate<HTMLElement>>;
 
-  startIndex: number;
-  endIndex: number;
   viewportRows: Row[];
 }
 
 @Component({
-  tag: 'vertex-scene-tree-table',
-  styleUrl: 'scene-tree-table.css',
+  tag: 'vertex-scene-tree-table-layout',
+  styleUrl: 'scene-tree-table-layout.css',
   shadow: true,
 })
-export class SceneTreeTable {
+export class SceneTreeTableLayout {
   /**
    * A reference to the scene tree to perform operations for interactions. Such
    * as expansion, visibility and selection.
@@ -132,21 +122,16 @@ export class SceneTreeTable {
   public layoutHeight?: number;
 
   /**
-   * A flag that disables the default interactions of this component. If
-   * disabled, you can use the event handlers to be notified when certain
-   * operations are performed by the user.
+   * @internal
    */
-  @Prop()
-  public interactionsDisabled = false;
+  @Prop({ mutable: true })
+  public viewportStartIndex = 0;
 
   /**
-   * A flag that disables selection of the node's parent if the user selects
-   * the row multiple times. When enabled, selection of the same row multiple
-   * times will recursively select the next unselected parent until the root
-   * node is selected.
+   * @internal
    */
-  @Prop()
-  public recurseParentSelectionDisabled = false;
+  @Prop({ mutable: true })
+  public viewportEndIndex = 0;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -167,8 +152,6 @@ export class SceneTreeTable {
    */
   @State()
   private stateMap: StateMap = {
-    startIndex: 0,
-    endIndex: 0,
     viewportRows: [],
   };
 
@@ -205,14 +188,14 @@ export class SceneTreeTable {
   }
 
   public async componentWillRender(): Promise<void> {
+    this.computeViewportRows();
+
     if (this.controller?.isConnected) {
       await this.controller.updateActiveRowRange(
-        this.stateMap.startIndex,
-        this.stateMap.endIndex
+        this.viewportStartIndex,
+        this.viewportEndIndex
       );
     }
-
-    this.computeViewportRows();
   }
 
   public componentDidRender(): void {
@@ -224,16 +207,6 @@ export class SceneTreeTable {
       c.removeEventListener('hovered', this.handleCellHover as EventListener);
     });
     this.tableElement?.removeEventListener('scroll', this.handleScrollChanged);
-  }
-
-  @Method()
-  public async getViewportStartIndex(): Promise<number> {
-    return this.stateMap.startIndex;
-  }
-
-  @Method()
-  public async getViewportEndIndex(): Promise<number> {
-    return this.stateMap.endIndex;
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -252,7 +225,6 @@ export class SceneTreeTable {
           style={{
             gridTemplateColumns: this.columnGridLayout,
           }}
-          onScroll={this.handleScrollChanged}
         >
           <slot onSlotchange={this.bindHeaderData} />
         </div>
@@ -276,17 +248,16 @@ export class SceneTreeTable {
 
       const rows = this.getViewportRows(startIndex, endIndex);
 
-      this.stateMap.startIndex = startIndex;
-      this.stateMap.endIndex = endIndex;
+      this.viewportStartIndex = startIndex;
+      this.viewportEndIndex = endIndex;
       this.stateMap.viewportRows = rows;
     }
   }
 
   private layoutColumns = (): void => {
-    const visibleRowCount =
-      this.stateMap.endIndex - this.stateMap.startIndex + 1;
-    const diff = this.stateMap.startIndex - this.lastStartIndex;
-    this.lastStartIndex = this.stateMap.startIndex;
+    const visibleRowCount = this.viewportEndIndex - this.viewportStartIndex + 1;
+    const diff = this.viewportStartIndex - this.lastStartIndex;
+    this.lastStartIndex = this.viewportStartIndex;
 
     this.iterateColumns((col, pool) => {
       pool.updateElements(visibleRowCount);
@@ -302,12 +273,7 @@ export class SceneTreeTable {
       pool.iterateElements((el, binding, rowIndex) => {
         const row = this.stateMap.viewportRows[rowIndex];
         if (row != null) {
-          this.updateCell(
-            row,
-            el as HTMLVertexSceneTreeTableCellElement,
-            binding,
-            rowIndex
-          );
+          this.updateCell(row, el, binding, rowIndex);
         }
       });
     });
@@ -315,21 +281,22 @@ export class SceneTreeTable {
 
   private updateCell = (
     row: LoadedRow,
-    cell: HTMLVertexSceneTreeTableCellElement,
+    cell: HTMLElement,
     binding: Binding,
     rowIndex: number
   ): void => {
     cell.style.position = 'absolute';
     cell.style.top = `${
-      (this.stateMap.startIndex + rowIndex) * this.rowHeight
+      (this.viewportStartIndex + rowIndex) * this.rowHeight
     }px`;
     cell.style.height = `${this.rowHeight}px`;
     cell.style.width = '100%';
-    cell.tree = this.tree;
-    cell.node = row.node;
-    cell.hoveredNodeId = this.hoveredNodeId;
-    cell.interactionsDisabled = this.interactionsDisabled;
-    cell.recurseParentSelectionDisabled = this.recurseParentSelectionDisabled;
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    (cell as any).tree = this.tree;
+    (cell as any).node = row.node;
+    (cell as any).hoveredNodeId = this.hoveredNodeId;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);
   };
