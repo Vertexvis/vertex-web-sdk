@@ -24,10 +24,15 @@ jest.mock('@juggle/resize-observer', () => ({
   observe() {}
 };
 
+export const triggerResizeObserver = jest.fn();
 (global as any).ResizeObserver = class {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  private fn;
+  constructor(fn: VoidFunction) {
+    this.fn = fn;
+  }
+  disconnect = jest.fn()
+  observe = jest.fn()
+  trigger = triggerResizeObserver.mockImplementation(() => this.fn())
 };
 
 Object.defineProperty(window, 'matchMedia', {

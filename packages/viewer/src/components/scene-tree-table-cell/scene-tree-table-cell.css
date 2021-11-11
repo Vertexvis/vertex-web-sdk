@@ -1,67 +1,62 @@
 @import url('../../css/button-reset.css');
 
 :host {
-  width: 100%;
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 
   /**
-   * @prop --scene-tree-row-background: A CSS background of a row.
-   */
-  --scene-tree-row-background: unset;
-
-  /**
-   * @prop --scene-tree-row-background-hover: A CSS background of a row when
+   * @prop --scene-tree-cell-background-hover: A CSS background of a cell when
    * hovered.
    */
-  --scene-tree-row-background-hover: var(--blue-200);
+   --scene-tree-cell-background-hover: var(--blue-200);
 
-  /**
-    * @prop --scene-tree-row-background-selected: A CSS background color of a
-    * row when selected.
-    */
-  --scene-tree-row-background-selected: var(--blue-300);
+   /**
+     * @prop --scene-tree-cell-background-selected: A CSS background color of a
+     * cell when selected.
+     */
+   --scene-tree-cell-background-selected: var(--blue-300);
 
-  /**
-    * @prop --scene-tree-row-indentation-size: A CSS length that specifies the
-    * size of indenting a node's child from its parent.
-    */
-  --scene-tree-row-indentation-size: 0.75rem;
+   /**
+     * @prop --scene-tree-cell-text-positioning: A CSS text alignment
+     * value that indicates how text should be positioned.
+     */
+   --scene-tree-cell-text-positioning: left;
 
-  /**
-    * @prop --scene-tree-row-padding: CSS lengths that specifies the amount of
-    * padding between the row's border and content.
-    */
-  --scene-tree-row-padding: 2px 0px;
+   /**
+     * @prop --scene-tree-cell-padding: CSS lengths that specifies the amount of
+     * padding between the cell's border and content.
+     */
+   --scene-tree-cell-padding: 0.25rem 0;
 }
 
-.root {
-  align-items: center;
-  background: var(--scene-tree-row-background);
-  box-sizing: border-box;
+:host([is-hovered]) {
+  background: var(--scene-tree-cell-background-hover);
+}
+
+:host([is-selected]) {
+  background: var(--scene-tree-cell-background-selected);
+}
+
+.wrapper {
   display: flex;
-  padding: var(--scene-tree-row-padding);
+  align-items: center;
+  box-sizing: border-box;
   width: 100%;
-
-  --depth: 0;
+  height: 100%;
+  padding: var(--scene-tree-cell-padding);
 }
 
-:host(:hover) .root {
-  background: var(--scene-tree-row-background-hover);
-}
-
-:host([is-selected]) .root {
-  background: var(--scene-tree-row-background-selected);
-}
-
-.no-shrink {
-  flex-shrink: 0;
-}
-
-.label {
+.content {
   width: 100%;
+  text-align: var(--scene-tree-cell-text-positioning);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.column-spacer {
+  width: var(--scene-tree-table-column-gap);
 }
 
 .expand-btn {
@@ -73,8 +68,13 @@
   min-height: 24px;
 }
 
+.no-shrink {
+  flex-shrink: 0;
+}
+
 :host([is-leaf]) .expand-btn {
   visibility: hidden;
+  cursor: default;
 }
 
 .visibility-btn {
@@ -87,17 +87,10 @@
   height: 24px;
 }
 
-:host(:hover) .visibility-btn {
-  visibility: inherit;
-}
-
 :host([is-hidden]) .visibility-btn,
-:host([is-partial]) .visibility-btn {
+:host([is-partial]) .visibility-btn,
+:host([is-hovered]) .visibility-btn {
   visibility: inherit;
-}
-
-.indentation {
-  min-width: calc(var(--scene-tree-row-indentation-size) * var(--depth));
 }
 
 .icon {

@@ -1,7 +1,7 @@
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { MetadataKey } from '../interfaces';
 
-export type MetadataMap = Record<MetadataKey, string>;
+export type MetadataMap = Record<MetadataKey, string | undefined>;
 
 export interface LoadedRow {
   index: number;
@@ -43,14 +43,10 @@ export function fromNodeProto(
 /* eslint-enable padding-line-between-statements */
 
 function makeMetadataMap(keys: MetadataKey[], values: string[]): MetadataMap {
-  if (keys.length !== values.length) {
-    throw new Error('Column key length and column value length mismatch');
-  } else {
-    return keys.reduce((map, key, i) => {
-      map[key] = values[i];
-      return map;
-    }, {} as MetadataMap);
-  }
+  return keys.reduce((map, key, i) => {
+    map[key] = values[i];
+    return map;
+  }, {} as MetadataMap);
 }
 
 export function isLoadedRow(obj: unknown): obj is LoadedRow {

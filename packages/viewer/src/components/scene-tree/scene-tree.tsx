@@ -16,7 +16,7 @@ import {
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
-import { isLoadedRow, LoadedRow, Row } from './lib/row';
+import { isLoadedRow, Row } from './lib/row';
 import {
   FilterTreeOptions,
   SceneTreeController,
@@ -24,11 +24,7 @@ import {
 } from './lib/controller';
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import {
-  getSceneTreeContainsElement,
-  getSceneTreeViewportHeight,
-  scrollToTop,
-} from './lib/dom';
+import { getSceneTreeContainsElement, scrollToTop } from './lib/dom';
 import {
   deselectItem,
   hideItem,
@@ -36,16 +32,11 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { readDOM, writeDOM } from '../../lib/stencil';
+import { writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
-import { getElementBoundingClientRect } from '../viewer/utils';
 import { ElementPool } from './lib/element-pool';
-import {
-  generateInstanceFromTemplate,
-  InstancedTemplate,
-} from './lib/templates';
-import { isSceneTreeRowElement } from '../scene-tree-row/utils';
 import { MetadataKey } from './interfaces';
+import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -71,13 +62,9 @@ interface StateMap {
   elementPool?: ElementPool;
   template?: HTMLTemplateElement;
 
-  startIndex: number;
-  endIndex: number;
-  viewportRows: Row[];
-  viewportRowMap: Map<string, Row>;
-  viewportHeight?: number;
-
   selectionPath?: string[];
+
+  layoutEl?: HTMLVertexSceneTreeTableLayoutElement;
 }
 
 type OperationHandler = (data: {
@@ -158,16 +145,20 @@ export class SceneTree {
    *
    * ```html
    * <script>
-   *   const tree = document.querySelector('vertex-scene-tree');
-   *   tree.rowData = (row) => {
-   *     return { func: () => console.log('row', row.name) };
+   *   const table = document.querySelector('vertex-scene-tree-table');
+   *   table.rowData = (row) => {
+   *     return { func: () => console.log('row', row.node.name) };
    *   }
    * </script>
    *
    * <vertex-scene-tree>
-   *   <template slot="right">
-   *     <button onclick="row.data.func">Hi</button>
-   *   </template>
+   *  <vertex-scene-tree-table>
+   *    <vertex-scene-tree-table-column>
+   *      <template>
+   *        <button event:click="{{row.data.func}}">Hi</button>
+   *      </template>
+   *    </vertex-scene-tree-table-column>
+   *  </vertex-scene-tree-table>
    * </vertex-scene-tree>
    * ```
    */
@@ -203,19 +194,10 @@ export class SceneTree {
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
 
   @State()
-  private isComputingRowHeight = true;
-
-  @State()
   private rows: Row[] = [];
 
   @State()
   private totalRows = 0;
-
-  @State()
-  private scrollTop = 0;
-
-  @State()
-  private computedRowHeight: number | undefined;
 
   /**
    * This stores internal state that you want to preserve across live-reloads,
@@ -225,10 +207,6 @@ export class SceneTree {
   @State()
   private stateMap: StateMap = {
     componentLoaded: false,
-    startIndex: 0,
-    endIndex: 0,
-    viewportRows: [],
-    viewportRowMap: new Map(),
   };
 
   @State()
@@ -249,7 +227,7 @@ export class SceneTree {
    */
   @Method()
   public async invalidateRows(): Promise<void> {
-    forceUpdate(this.el);
+    forceUpdate(this.getLayoutElement());
   }
 
   /**
@@ -476,7 +454,7 @@ export class SceneTree {
 
   /**
    * Returns the row data from the given mouse or pointer event. The event must
-   * originate from a `vertex-scene-tree-row` contained by this element,
+   * originate from a `vertex-scene-tree-table-cell` contained by this element,
    * otherwise `undefined` is returned.
    *
    * @param event A mouse or pointer event that originated from this component.
@@ -490,7 +468,7 @@ export class SceneTree {
       target != null &&
       this.connectionErrorDetails == null &&
       getSceneTreeContainsElement(this.el, target as HTMLElement) &&
-      isSceneTreeRowElement(target)
+      isSceneTreeTableCellElement(target)
     ) {
       return this.getRowAtClientY(clientY);
     } else {
@@ -506,10 +484,10 @@ export class SceneTree {
    */
   @Method()
   public getRowAtClientY(clientY: number): Promise<Row> {
-    const { top } = getElementBoundingClientRect(this.getRowsScrollElement());
+    const layoutEl = this.getLayoutElement();
+    const top = layoutEl.layoutOffset;
     const index = Math.floor(
-      (clientY - top + this.scrollTop) /
-        this.getComputedOrPlaceholderRowHeight()
+      (clientY - top + layoutEl.scrollOffset) / layoutEl.rowHeight
     );
     return this.getRowAtIndex(index);
   }
@@ -573,53 +551,33 @@ export class SceneTree {
    * @ignore
    */
   protected async componentDidLoad(): Promise<void> {
-    const rowScrollEl = this.getRowsScrollElement();
-    rowScrollEl.addEventListener('scroll', () => this.handleScroll(), {
-      passive: true,
-    });
+    this.ensureLayoutDefined();
 
+    const layoutEl = this.getLayoutElement();
     const resizeObserver = new ResizeObserver(() => {
-      this.clearViewportHeight();
       this.invalidateRows();
     });
-    resizeObserver.observe(rowScrollEl);
+    resizeObserver.observe(layoutEl);
     this.stateMap.resizeObserver = resizeObserver;
 
-    this.ensureTemplateDefined();
-
-    await this.computeRowHeight();
-    this.createPool();
-
     this.stateMap.componentLoaded = true;
+
+    this.controller?.setMetadataKeys(this.metadataKeys);
+
+    this.updateLayoutElement();
   }
 
   /**
    * @ignore
    */
   protected componentWillRender(): void {
-    this.updateRenderState();
-
-    if (this.controller?.isConnected) {
-      this.controller.updateActiveRowRange(
-        this.stateMap.startIndex,
-        this.stateMap.endIndex
-      );
-    }
-  }
-
-  /**
-   * @ignore
-   */
-  protected componentDidRender(): void {
-    this.updateElements();
+    this.updateLayoutElement();
   }
 
   /**
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
-    const totalHeight = this.totalRows * rowHeight;
     return (
       <Host>
         {this.connectionErrorDetails != null && (
@@ -649,9 +607,7 @@ export class SceneTree {
         </div>
 
         <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
-          <div class="rows" style={{ height: `${totalHeight}px` }}>
-            <slot />
-          </div>
+          <slot />
         </div>
 
         <div class="footer">
@@ -726,11 +682,11 @@ export class SceneTree {
       const remaining = foo.timeRemaining?.();
 
       if (remaining == null || remaining >= MIN_CLEAR_UNUSED_DATA_MS) {
+        const layoutEl = this.getLayoutElement();
+        const startIndex = layoutEl.viewportStartIndex;
+        const endIndex = layoutEl.viewportEndIndex;
         const [start, end] =
-          this.controller?.getPageIndexesForRange(
-            this.stateMap.startIndex,
-            this.stateMap.endIndex
-          ) || [];
+          this.controller?.getPageIndexesForRange(startIndex, endIndex) || [];
 
         if (start != null && end != null) {
           this.controller?.invalidatePagesOutsideRange(start, end, 50);
@@ -779,116 +735,19 @@ export class SceneTree {
     await op({ viewer: this.viewer, id: node.id.hex, node });
   }
 
-  private updateRenderState(): void {
-    const viewportHeight = this.getViewportHeight();
-    if (viewportHeight != null) {
-      const rowHeight = this.getComputedOrPlaceholderRowHeight();
-      const viewportCount = Math.ceil(viewportHeight / rowHeight);
-
-      const viewportStartIndex = Math.floor(this.scrollTop / rowHeight);
-      const viewportEndIndex = viewportStartIndex + viewportCount;
-
-      const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
-      const endIndex = Math.min(
-        this.totalRows - 1,
-        viewportEndIndex + this.overScanCount
-      );
-
-      const rows = this.getViewportRows(startIndex, endIndex);
-
-      const diff = startIndex - this.stateMap.startIndex;
-      if (diff > 0) {
-        this.stateMap.elementPool?.swapHeadToTail(diff);
-      } else {
-        this.stateMap.elementPool?.swapTailToHead(-diff);
-      }
-
-      this.stateMap.startIndex = startIndex;
-      this.stateMap.endIndex = endIndex;
-      this.stateMap.viewportRows = rows;
-    }
-  }
-
-  private getViewportRows(startIndex: number, endIndex: number): Row[] {
-    const rows = this.rows.slice(startIndex, endIndex + 1);
-    return rows.map((row) => (row != null ? this.populateRowData(row) : row));
-  }
-
-  private handleScroll(): void {
-    readDOM(() => {
-      this.scrollTop = this.getRowsScrollElement().scrollTop ?? 0;
-    });
-  }
-
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
     this.filterItems(event.detail);
-  }
-
-  private populateRowData(row: Row): Row {
-    if (this.rowData != null && row != null) {
-      const data = this.rowData?.(row) || {};
-      return { ...row, data };
-    } else {
-      return row;
-    }
-  }
-
-  private async computeRowHeight(): Promise<void> {
-    if (this.isComputingRowHeight) {
-      const dummyData: LoadedRow = {
-        index: 0,
-        node: {
-          id: { hex: '' },
-          name: 'Dummy row',
-          expanded: false,
-          selected: false,
-          visible: false,
-          partiallyVisible: false,
-          isLeaf: false,
-          depth: 0,
-          columnsList: [],
-        },
-        metadata: {},
-        data: {},
-      };
-      const { bindings, element } = this.createInstancedTemplate();
-      bindings.bind(dummyData);
-      element.style.visibility = 'hidden';
-
-      this.getRowsScrollElement().appendChild(element);
-
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      if (typeof (element as any).componentOnReady === 'function') {
-        await (element as any).componentOnReady();
-      }
-      /* eslint-enable @typescript-eslint/no-explicit-any */
-
-      let height = element.clientHeight;
-      let attempts = 0;
-
-      while (height === 0 && attempts < 10) {
-        height = await new Promise((resolve) => {
-          setTimeout(() => resolve(element.getBoundingClientRect().height), 5);
-        });
-        attempts = attempts + 1;
-      }
-      this.computedRowHeight = height;
-      element.remove();
-    }
-  }
-
-  private getComputedOrPlaceholderRowHeight(): number {
-    return this.computedRowHeight || 24;
   }
 
   private getScrollToPosition(
     index: number,
     position: ScrollToOptions['position']
   ): number {
+    const layoutEl = this.getLayoutElement();
     const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
-    const viewportHeight = this.getViewportHeight() || 0;
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
+    const viewportHeight = layoutEl.layoutHeight ?? 0;
+    const rowHeight = layoutEl.rowHeight;
 
     if (position === 'start') {
       return constrainedIndex * rowHeight;
@@ -905,81 +764,32 @@ export class SceneTree {
     return parseConfig(this.configEnv, this.config);
   }
 
-  private ensureTemplateDefined(): void {
-    let template = this.el.querySelector('template');
-    if (template == null) {
-      template = document.createElement('template');
-      template.innerHTML = `
-      <vertex-scene-tree-row prop:node="{{row.node}}"></vertex-scene-tree-row>
+  private ensureLayoutDefined(): void {
+    let layout = this.el.querySelector('vertex-scene-tree-table-layout');
+    if (layout == null) {
+      layout = document.createElement('vertex-scene-tree-table-layout');
+      layout.innerHTML = `
+      <vertex-scene-tree-table-column>
+        <template>
+          <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle />
+        </template>
+      </vertex-scene-tree-table-column>
       `;
-      this.el.appendChild(template);
+
+      this.el.appendChild(layout);
     }
-    this.stateMap.template = template;
+    this.stateMap.layoutEl = layout;
   }
 
-  private createInstancedTemplate(): InstancedTemplate<HTMLElement> {
-    if (this.stateMap.template != null) {
-      return generateInstanceFromTemplate(this.stateMap.template);
-    } else {
-      throw new Error('No template defined for scene tree.');
+  private updateLayoutElement(): void {
+    const layout = this.el.querySelector('vertex-scene-tree-table-layout');
+    if (layout != null) {
+      layout.rows = this.rows;
+      layout.tree = this.el as HTMLVertexSceneTreeElement;
+      layout.totalRows = this.totalRows;
+      layout.controller = this.controller;
+      layout.rowData = this.rowData;
     }
-  }
-
-  private createPool(): void {
-    // When doing a live reload, this function might get called multiple times.
-    // Only create the pool if on hasn't been created yet.
-    if (this.stateMap.elementPool == null) {
-      this.stateMap.elementPool = new ElementPool(this.el, () =>
-        this.createInstancedTemplate()
-      );
-    }
-  }
-
-  private async updateElements(): Promise<void> {
-    this.updatePool();
-    this.bindData();
-    this.positionElements();
-  }
-
-  private updatePool(): void {
-    const count = this.stateMap.endIndex - this.stateMap.startIndex + 1;
-    this.stateMap.elementPool?.updateElements(count);
-  }
-
-  private bindData(): void {
-    this.stateMap.elementPool?.iterateElements((el, binding, i) => {
-      const row = this.stateMap.viewportRows[i];
-      if (row != null) {
-        el.style.visibility = 'inherit';
-        binding.bind(row);
-      } else {
-        el.style.visibility = 'hidden';
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (el as any).tree = this;
-    });
-  }
-
-  private positionElements(): void {
-    const rowHeight = this.getComputedOrPlaceholderRowHeight();
-    this.stateMap.elementPool?.iterateElements((el, _, i) => {
-      el.style.position = 'absolute';
-      el.style.top = `${rowHeight * (this.stateMap.startIndex + i)}px`;
-      el.style.height = `${rowHeight}px`;
-    });
-  }
-
-  private getViewportHeight(): number | undefined {
-    if (this.stateMap.viewportHeight == null && this.rowScrollEl != null) {
-      this.stateMap.viewportHeight = getSceneTreeViewportHeight(
-        this.rowScrollEl
-      );
-    }
-    return this.stateMap.viewportHeight;
-  }
-
-  private clearViewportHeight(): void {
-    this.stateMap.viewportHeight = undefined;
   }
 
   private getRowsScrollElement(): HTMLElement {
@@ -987,6 +797,14 @@ export class SceneTree {
       return this.rowScrollEl;
     } else {
       throw new Error('Row scroll element is undefined.');
+    }
+  }
+
+  private getLayoutElement(): HTMLVertexSceneTreeTableLayoutElement {
+    if (this.stateMap.layoutEl != null) {
+      return this.stateMap.layoutEl;
+    } else {
+      throw new Error('Layout element is undefined');
     }
   }
 }

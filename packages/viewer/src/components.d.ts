@@ -21,6 +21,7 @@ import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import {
   FeatureHighlightOptions,
   FeatureLineOptions,
@@ -151,7 +152,7 @@ export namespace Components {
      */
     getRowAtIndex: (index: number) => Promise<Row>;
     /**
-     * Returns the row data from the given mouse or pointer event. The event must originate from a `vertex-scene-tree-row` contained by this element, otherwise `undefined` is returned.
+     * Returns the row data from the given mouse or pointer event. The event must originate from a `vertex-scene-tree-table-cell` contained by this element, otherwise `undefined` is returned.
      * @param event A mouse or pointer event that originated from this component.
      * @returns A row, or `undefined` if the row hasn't been loaded.
      */
@@ -175,7 +176,7 @@ export namespace Components {
     overScanCount: number;
     /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-     * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
     rowData?: RowDataProvider;
     /**
@@ -224,24 +225,6 @@ export namespace Components {
      */
     viewerSelector?: string;
   }
-  interface VertexSceneTreeRow {
-    /**
-     * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
-     */
-    interactionsDisabled: boolean;
-    /**
-     * The node data that is associated to the row. Contains information related to if the node is expanded, visible, etc.
-     */
-    node?: Node.AsObject;
-    /**
-     * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
-     */
-    recurseParentSelectionDisabled: boolean;
-    /**
-     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
-     */
-    tree?: HTMLVertexSceneTreeElement;
-  }
   interface VertexSceneTreeSearch {
     /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
@@ -263,6 +246,72 @@ export namespace Components {
      * The current text value of the component. Value is updated on user interaction.
      */
     value: string;
+  }
+  interface VertexSceneTreeTableCell {
+    /**
+     * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
+     */
+    expandToggle?: boolean;
+    hoveredNodeId?: string;
+    /**
+     * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
+     */
+    interactionsDisabled: boolean;
+    /**
+     * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
+     */
+    node?: Node.AsObject;
+    /**
+     * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
+     */
+    placeholder: string;
+    /**
+     * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+     */
+    recurseParentSelectionDisabled: boolean;
+    /**
+     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+     */
+    tree?: HTMLVertexSceneTreeElement;
+    /**
+     * The value to display in this cell.
+     */
+    value?: string;
+    /**
+     * Indicates whether to display a button for toggling the visibility state of the node associated with this cell.
+     */
+    visibilityToggle?: boolean;
+  }
+  interface VertexSceneTreeTableColumn {
+    /**
+     * The initial width of this column.
+     */
+    initialWidth?: number;
+  }
+  interface VertexSceneTreeTableHeader {}
+  interface VertexSceneTreeTableLayout {
+    controller?: SceneTreeController;
+    layoutHeight?: number;
+    layoutOffset: number;
+    /**
+     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+     */
+    overScanCount: number;
+    /**
+     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     */
+    rowData?: RowDataProvider;
+    rowHeight: number;
+    rows: Row[];
+    scrollOffset: number;
+    totalRows: number;
+    /**
+     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+     */
+    tree?: HTMLVertexSceneTreeElement;
+    viewportEndIndex: number;
+    viewportStartIndex: number;
   }
   interface VertexSceneTreeToolbar {}
   interface VertexSceneTreeToolbarGroup {}
@@ -313,7 +362,7 @@ export namespace Components {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.  Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     featureMaps?: FrameType;
     /**
@@ -1089,19 +1138,40 @@ declare global {
     prototype: HTMLVertexSceneTreeElement;
     new (): HTMLVertexSceneTreeElement;
   };
-  interface HTMLVertexSceneTreeRowElement
-    extends Components.VertexSceneTreeRow,
-      HTMLStencilElement {}
-  var HTMLVertexSceneTreeRowElement: {
-    prototype: HTMLVertexSceneTreeRowElement;
-    new (): HTMLVertexSceneTreeRowElement;
-  };
   interface HTMLVertexSceneTreeSearchElement
     extends Components.VertexSceneTreeSearch,
       HTMLStencilElement {}
   var HTMLVertexSceneTreeSearchElement: {
     prototype: HTMLVertexSceneTreeSearchElement;
     new (): HTMLVertexSceneTreeSearchElement;
+  };
+  interface HTMLVertexSceneTreeTableCellElement
+    extends Components.VertexSceneTreeTableCell,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeTableCellElement: {
+    prototype: HTMLVertexSceneTreeTableCellElement;
+    new (): HTMLVertexSceneTreeTableCellElement;
+  };
+  interface HTMLVertexSceneTreeTableColumnElement
+    extends Components.VertexSceneTreeTableColumn,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeTableColumnElement: {
+    prototype: HTMLVertexSceneTreeTableColumnElement;
+    new (): HTMLVertexSceneTreeTableColumnElement;
+  };
+  interface HTMLVertexSceneTreeTableHeaderElement
+    extends Components.VertexSceneTreeTableHeader,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeTableHeaderElement: {
+    prototype: HTMLVertexSceneTreeTableHeaderElement;
+    new (): HTMLVertexSceneTreeTableHeaderElement;
+  };
+  interface HTMLVertexSceneTreeTableLayoutElement
+    extends Components.VertexSceneTreeTableLayout,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeTableLayoutElement: {
+    prototype: HTMLVertexSceneTreeTableLayoutElement;
+    new (): HTMLVertexSceneTreeTableLayoutElement;
   };
   interface HTMLVertexSceneTreeToolbarElement
     extends Components.VertexSceneTreeToolbar,
@@ -1273,8 +1343,11 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'vertex-scene-tree': HTMLVertexSceneTreeElement;
-    'vertex-scene-tree-row': HTMLVertexSceneTreeRowElement;
     'vertex-scene-tree-search': HTMLVertexSceneTreeSearchElement;
+    'vertex-scene-tree-table-cell': HTMLVertexSceneTreeTableCellElement;
+    'vertex-scene-tree-table-column': HTMLVertexSceneTreeTableColumnElement;
+    'vertex-scene-tree-table-header': HTMLVertexSceneTreeTableHeaderElement;
+    'vertex-scene-tree-table-layout': HTMLVertexSceneTreeTableLayoutElement;
     'vertex-scene-tree-toolbar': HTMLVertexSceneTreeToolbarElement;
     'vertex-scene-tree-toolbar-group': HTMLVertexSceneTreeToolbarGroupElement;
     'vertex-viewer': HTMLVertexViewerElement;
@@ -1323,7 +1396,7 @@ declare namespace LocalJSX {
     overScanCount?: number;
     /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-     * @example ```html <script>   const tree = document.querySelector('vertex-scene-tree');   tree.rowData = (row) => {     return { func: () => console.log('row', row.name) };   } </script>  <vertex-scene-tree>   <template slot="right">     <button onclick="row.data.func">Hi</button>   </template> </vertex-scene-tree> ```
+     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
     rowData?: RowDataProvider;
     /**
@@ -1334,36 +1407,6 @@ declare namespace LocalJSX {
      * A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.
      */
     viewerSelector?: string;
-  }
-  interface VertexSceneTreeRow {
-    /**
-     * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
-     */
-    interactionsDisabled?: boolean;
-    /**
-     * The node data that is associated to the row. Contains information related to if the node is expanded, visible, etc.
-     */
-    node?: Node.AsObject;
-    /**
-     * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
-     */
-    onExpandToggled?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
-     */
-    onSelectionToggled?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
-     */
-    onVisibilityToggled?: (event: CustomEvent<void>) => void;
-    /**
-     * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
-     */
-    recurseParentSelectionDisabled?: boolean;
-    /**
-     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
-     */
-    tree?: HTMLVertexSceneTreeElement;
   }
   interface VertexSceneTreeSearch {
     /**
@@ -1386,6 +1429,85 @@ declare namespace LocalJSX {
      * The current text value of the component. Value is updated on user interaction.
      */
     value?: string;
+  }
+  interface VertexSceneTreeTableCell {
+    /**
+     * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
+     */
+    expandToggle?: boolean;
+    hoveredNodeId?: string;
+    /**
+     * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
+     */
+    interactionsDisabled?: boolean;
+    /**
+     * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
+     */
+    node?: Node.AsObject;
+    /**
+     * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
+     */
+    onExpandToggled?: (event: CustomEvent<Node.AsObject>) => void;
+    onHovered?: (event: CustomEvent<Node.AsObject | undefined>) => void;
+    /**
+     * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
+     */
+    onSelectionToggled?: (event: CustomEvent<Node.AsObject>) => void;
+    /**
+     * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
+     */
+    onVisibilityToggled?: (event: CustomEvent<Node.AsObject>) => void;
+    /**
+     * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
+     */
+    placeholder?: string;
+    /**
+     * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
+     */
+    recurseParentSelectionDisabled?: boolean;
+    /**
+     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+     */
+    tree?: HTMLVertexSceneTreeElement;
+    /**
+     * The value to display in this cell.
+     */
+    value?: string;
+    /**
+     * Indicates whether to display a button for toggling the visibility state of the node associated with this cell.
+     */
+    visibilityToggle?: boolean;
+  }
+  interface VertexSceneTreeTableColumn {
+    /**
+     * The initial width of this column.
+     */
+    initialWidth?: number;
+  }
+  interface VertexSceneTreeTableHeader {}
+  interface VertexSceneTreeTableLayout {
+    controller?: SceneTreeController;
+    layoutHeight?: number;
+    layoutOffset?: number;
+    /**
+     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+     */
+    overScanCount?: number;
+    /**
+     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     */
+    rowData?: RowDataProvider;
+    rowHeight?: number;
+    rows?: Row[];
+    scrollOffset?: number;
+    totalRows?: number;
+    /**
+     * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
+     */
+    tree?: HTMLVertexSceneTreeElement;
+    viewportEndIndex?: number;
+    viewportStartIndex?: number;
   }
   interface VertexSceneTreeToolbar {}
   interface VertexSceneTreeToolbarGroup {}
@@ -1424,7 +1546,7 @@ declare namespace LocalJSX {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.  Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     featureMaps?: FrameType;
     /**
@@ -2147,8 +2269,11 @@ declare namespace LocalJSX {
   }
   interface IntrinsicElements {
     'vertex-scene-tree': VertexSceneTree;
-    'vertex-scene-tree-row': VertexSceneTreeRow;
     'vertex-scene-tree-search': VertexSceneTreeSearch;
+    'vertex-scene-tree-table-cell': VertexSceneTreeTableCell;
+    'vertex-scene-tree-table-column': VertexSceneTreeTableColumn;
+    'vertex-scene-tree-table-header': VertexSceneTreeTableHeader;
+    'vertex-scene-tree-table-layout': VertexSceneTreeTableLayout;
     'vertex-scene-tree-toolbar': VertexSceneTreeToolbar;
     'vertex-scene-tree-toolbar-group': VertexSceneTreeToolbarGroup;
     'vertex-viewer': VertexViewer;
@@ -2181,10 +2306,16 @@ declare module '@stencil/core' {
     interface IntrinsicElements {
       'vertex-scene-tree': LocalJSX.VertexSceneTree &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
-      'vertex-scene-tree-row': LocalJSX.VertexSceneTreeRow &
-        JSXBase.HTMLAttributes<HTMLVertexSceneTreeRowElement>;
       'vertex-scene-tree-search': LocalJSX.VertexSceneTreeSearch &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeSearchElement>;
+      'vertex-scene-tree-table-cell': LocalJSX.VertexSceneTreeTableCell &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableCellElement>;
+      'vertex-scene-tree-table-column': LocalJSX.VertexSceneTreeTableColumn &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableColumnElement>;
+      'vertex-scene-tree-table-header': LocalJSX.VertexSceneTreeTableHeader &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableHeaderElement>;
+      'vertex-scene-tree-table-layout': LocalJSX.VertexSceneTreeTableLayout &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableLayoutElement>;
       'vertex-scene-tree-toolbar': LocalJSX.VertexSceneTreeToolbar &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
       'vertex-scene-tree-toolbar-group': LocalJSX.VertexSceneTreeToolbarGroup &

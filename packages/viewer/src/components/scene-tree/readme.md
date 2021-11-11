@@ -354,7 +354,7 @@ Type: `Promise<Row>`
 ### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
 Returns the row data from the given mouse or pointer event. The event must
-originate from a `vertex-scene-tree-row` contained by this element,
+originate from a `vertex-scene-tree-table-cell` contained by this element,
 otherwise `undefined` is returned.
 
 #### Returns
@@ -483,12 +483,14 @@ Type: `Promise<void>`
 
 - [vertex-scene-tree-toolbar](../scene-tree-toolbar)
 - [vertex-scene-tree-search](../scene-tree-search)
+- [vertex-scene-tree-table-layout](../scene-tree-table-layout)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   vertex-scene-tree --> vertex-scene-tree-search
+  vertex-scene-tree --> vertex-scene-tree-table-layout
   vertex-scene-tree-search --> vertex-viewer-icon
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
