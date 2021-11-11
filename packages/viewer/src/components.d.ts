@@ -288,12 +288,7 @@ export namespace Components {
      */
     initialWidth?: number;
   }
-  interface VertexSceneTreeTableHeader {
-    /**
-     * The label to display in this header.
-     */
-    label?: string;
-  }
+  interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
     layoutHeight?: number;
@@ -1489,12 +1484,7 @@ declare namespace LocalJSX {
      */
     initialWidth?: number;
   }
-  interface VertexSceneTreeTableHeader {
-    /**
-     * The label to display in this header.
-     */
-    label?: string;
-  }
+  interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
     layoutHeight?: number;
