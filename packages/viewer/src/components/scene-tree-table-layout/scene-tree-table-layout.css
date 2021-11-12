@@ -27,18 +27,70 @@
   border-bottom: var(--scene-tree-toolbar-separator);
 }
 
-.header > *:not(:last-child) {
-  padding-right: var(--scene-tree-table-column-gap);
-}
-
-.header > *:first-child {
-  padding-left: var(--scene-tree-table-column-gap);
-}
-
 .table {
   position: relative;
   display: grid;
   width: 100%;
   height: 100%;
   overflow: auto;
+}
+
+.resize {
+  cursor: col-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.resize-overlay {
+  position: absolute;
+  top: 0;
+  cursor: col-resize;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+}
+
+.divider-overlay {
+  position: absolute;
+  top: 0;
+  display: grid;
+  pointer-events: none;
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+}
+
+.divider-overlay > * {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  box-sizing: border-box;
+  height: var(--header-height);
+  padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2);
+}
+
+.divider-wrapper {
+  cursor: col-resize;
+}
+
+.divider {
+  width: 1px;
+  height: 100%;
+  background-color: var(--neutral-600);
+  cursor: col-resize;
+}
+
+.divider-wrapper.grabbing {
+  height: 100%;
+  padding: 0 calc(var(--scene-tree-table-column-gap) / 2);
+}
+
+.divider-wrapper.grabbing .divider {
+  background-color: var(--blue-600);
+}
+
+.divider-wrapper:hover .divider {
+  background-color: var(--blue-600);
 }
