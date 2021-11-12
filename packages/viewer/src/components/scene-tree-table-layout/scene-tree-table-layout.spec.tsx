@@ -91,7 +91,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     ).rejects.toThrow(new Error('Column is missing cell template element'));
   });
 
-  it('creates headers from column template', async () => {
+  it('creates headers from header template', async () => {
     const client = mockSceneTreeClient();
     mockGetTree({ client });
 
@@ -117,6 +117,237 @@ describe('<vertex-scene-tree-table-layout>', () => {
         ?.querySelector('div.header')
         ?.querySelector('div.templated-header-div')
     ).not.toBeNull();
+  });
+
+  it('creates dividers from the divider template', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+          <template slot="divider">
+            <div class="templated-divider-div" />
+          </template>
+
+          <vertex-scene-tree-table-column>
+            <template slot="header">
+              <div class="templated-header-div" />
+            </template>
+            <template>
+              <div class="templated-div" />
+            </template>
+          </vertex-scene-tree-table-column>
+
+          <vertex-scene-tree-table-column>
+            <template slot="header">
+              <div class="templated-header-div" />
+            </template>
+            <template>
+              <div class="templated-div" />
+            </template>
+          </vertex-scene-tree-table-column>
+        </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(table.querySelector('div.templated-divider-div')).not.toBeNull();
+  });
+
+  it('does not render dividers for a single column', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+          <template slot="divider">
+            <div class="templated-divider-div" />
+          </template>
+
+          <vertex-scene-tree-table-column>
+            <template slot="header">
+              <div class="templated-header-div" />
+            </template>
+            <template>
+              <div class="templated-div" />
+            </template>
+          </vertex-scene-tree-table-column>
+        </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(table.querySelector('div.templated-divider-div')).toBeNull();
+  });
+
+  it('supports column resizing', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 0 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  110px 1fr');
+  });
+
+  it('constrains column resizing minimums', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="100" min-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100" min-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+  });
+
+  it('constrains column resizing minimums', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="100" max-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100" max-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
   });
 });
 
