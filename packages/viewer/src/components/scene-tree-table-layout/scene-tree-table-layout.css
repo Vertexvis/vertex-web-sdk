@@ -18,6 +18,12 @@
     * padding between columns in the table.
     */
     --scene-tree-table-column-gap: 0.5rem;
+
+  /**
+    * @prop --scene-tree-table-column-resize-cursor: A CSS cursor value that will
+    * be displayed when resizing a column. Defaults to `col-resize`.
+    */
+    --scene-tree-table-column-resize-cursor: col-resize;
 }
 
 .header {
@@ -35,16 +41,10 @@
   overflow: auto;
 }
 
-.resize {
-  cursor: col-resize;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 .resize-overlay {
   position: absolute;
   top: 0;
-  cursor: col-resize;
+  cursor: var(--scene-tree-table-column-resize-cursor);
   z-index: 1000;
   width: 100%;
   height: 100%;
@@ -58,39 +58,4 @@
   z-index: 2000;
   width: 100%;
   height: 100%;
-}
-
-.divider-overlay > * {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  position: absolute;
-  right: 0;
-  box-sizing: border-box;
-  height: var(--header-height);
-  padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2);
-}
-
-.divider-wrapper {
-  cursor: col-resize;
-}
-
-.divider {
-  width: 1px;
-  height: 100%;
-  background-color: var(--neutral-600);
-  cursor: col-resize;
-}
-
-.divider-wrapper.grabbing {
-  height: 100%;
-  padding: 0 calc(var(--scene-tree-table-column-gap) / 2);
-}
-
-.divider-wrapper.grabbing .divider {
-  background-color: var(--blue-600);
-}
-
-.divider-wrapper:hover .divider {
-  background-color: var(--blue-600);
 }

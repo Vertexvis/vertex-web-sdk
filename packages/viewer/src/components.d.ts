@@ -274,6 +274,8 @@ export namespace Components {
         "viewportEndIndex": number;
         "viewportStartIndex": number;
     }
+    interface VertexSceneTreeTableResizeDivider {
+    }
     interface VertexSceneTreeToolbar {
     }
     interface VertexSceneTreeToolbarGroup {
@@ -1045,6 +1047,12 @@ declare global {
         prototype: HTMLVertexSceneTreeTableLayoutElement;
         new (): HTMLVertexSceneTreeTableLayoutElement;
     };
+    interface HTMLVertexSceneTreeTableResizeDividerElement extends Components.VertexSceneTreeTableResizeDivider, HTMLStencilElement {
+    }
+    var HTMLVertexSceneTreeTableResizeDividerElement: {
+        prototype: HTMLVertexSceneTreeTableResizeDividerElement;
+        new (): HTMLVertexSceneTreeTableResizeDividerElement;
+    };
     interface HTMLVertexSceneTreeToolbarElement extends Components.VertexSceneTreeToolbar, HTMLStencilElement {
     }
     var HTMLVertexSceneTreeToolbarElement: {
@@ -1196,6 +1204,7 @@ declare global {
         "vertex-scene-tree-table-column": HTMLVertexSceneTreeTableColumnElement;
         "vertex-scene-tree-table-header": HTMLVertexSceneTreeTableHeaderElement;
         "vertex-scene-tree-table-layout": HTMLVertexSceneTreeTableLayoutElement;
+        "vertex-scene-tree-table-resize-divider": HTMLVertexSceneTreeTableResizeDividerElement;
         "vertex-scene-tree-toolbar": HTMLVertexSceneTreeToolbarElement;
         "vertex-scene-tree-toolbar-group": HTMLVertexSceneTreeToolbarGroupElement;
         "vertex-viewer": HTMLVertexViewerElement;
@@ -1365,6 +1374,8 @@ declare namespace LocalJSX {
         "tree"?: HTMLVertexSceneTreeElement;
         "viewportEndIndex"?: number;
         "viewportStartIndex"?: number;
+    }
+    interface VertexSceneTreeTableResizeDivider {
     }
     interface VertexSceneTreeToolbar {
     }
@@ -2122,6 +2133,7 @@ declare namespace LocalJSX {
         "vertex-scene-tree-table-column": VertexSceneTreeTableColumn;
         "vertex-scene-tree-table-header": VertexSceneTreeTableHeader;
         "vertex-scene-tree-table-layout": VertexSceneTreeTableLayout;
+        "vertex-scene-tree-table-resize-divider": VertexSceneTreeTableResizeDivider;
         "vertex-scene-tree-toolbar": VertexSceneTreeToolbar;
         "vertex-scene-tree-toolbar-group": VertexSceneTreeToolbarGroup;
         "vertex-viewer": VertexViewer;
@@ -2158,6 +2170,7 @@ declare module "@stencil/core" {
             "vertex-scene-tree-table-column": LocalJSX.VertexSceneTreeTableColumn & JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableColumnElement>;
             "vertex-scene-tree-table-header": LocalJSX.VertexSceneTreeTableHeader & JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableHeaderElement>;
             "vertex-scene-tree-table-layout": LocalJSX.VertexSceneTreeTableLayout & JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableLayoutElement>;
+            "vertex-scene-tree-table-resize-divider": LocalJSX.VertexSceneTreeTableResizeDivider & JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableResizeDividerElement>;
             "vertex-scene-tree-toolbar": LocalJSX.VertexSceneTreeToolbar & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
             "vertex-scene-tree-toolbar-group": LocalJSX.VertexSceneTreeToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;

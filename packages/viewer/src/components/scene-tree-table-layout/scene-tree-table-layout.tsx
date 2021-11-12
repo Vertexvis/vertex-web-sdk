@@ -1,13 +1,4 @@
-import {
-  Component,
-  Host,
-  h,
-  Prop,
-  State,
-  Element,
-  Fragment,
-} from '@stencil/core';
-import classNames from 'classnames';
+import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
@@ -34,6 +25,7 @@ interface StateMap {
 
   viewportRows: Row[];
 
+  headerHeight?: number;
   columnWidths: number[];
 }
 
@@ -178,10 +170,10 @@ export class SceneTreeTableLayout {
 
   private lastStartIndex = 0;
   private resizeObserver?: ResizeObserver;
+  private headerResizeObserver?: ResizeObserver;
 
   private tableElement?: HTMLDivElement;
   private headerElement?: HTMLDivElement;
-  private dividerOverlayElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
   public componentWillLoad(): void {
@@ -191,6 +183,11 @@ export class SceneTreeTableLayout {
 
     this.columnElements.forEach((c) => {
       c.addEventListener('hovered', this.handleCellHover as EventListener);
+    });
+
+    this.headerResizeObserver = new ResizeObserver(() => {
+      this.stateMap.headerHeight = undefined;
+      this.computeHeaderHeight();
     });
 
     this.resizeObserver = new ResizeObserver(() => {
@@ -203,12 +200,17 @@ export class SceneTreeTableLayout {
   public componentDidLoad(): void {
     this.ensureDividerTemplateDefined();
     this.computeCellHeight();
+    this.computeHeaderHeight();
     this.bindHeaderData();
     this.addDividerDragListeners();
 
     this.tableElement?.addEventListener('scroll', this.handleScrollChanged, {
       passive: true,
     });
+
+    if (this.headerElement != null) {
+      this.headerResizeObserver?.observe(this.headerElement);
+    }
   }
 
   public async componentWillRender(): Promise<void> {
@@ -224,13 +226,6 @@ export class SceneTreeTableLayout {
 
   public componentDidRender(): void {
     this.layoutColumns();
-
-    readDOM(() => {
-      this.hostEl.style.setProperty(
-        '--header-height',
-        `${this.headerElement?.getBoundingClientRect().height}px`
-      );
-    });
   }
 
   public disconnectedCallback(): void {
@@ -239,6 +234,7 @@ export class SceneTreeTableLayout {
     });
     this.tableElement?.removeEventListener('scroll', this.handleScrollChanged);
     this.removeDividerDragListeners();
+    this.headerResizeObserver?.disconnect();
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -258,17 +254,17 @@ export class SceneTreeTableLayout {
             gridTemplateColumns: this.columnGridLayout,
           }}
         >
-          <slot onSlotchange={this.bindHeaderData} />
+          <slot />
         </div>
         <div
           class="divider-overlay"
-          ref={(ref) => (this.dividerOverlayElement = ref)}
           style={{
             gridTemplateColumns: this.columnGridLayout,
           }}
-        />
+        >
+          <slot name="divider" />
+        </div>
         {this.resizingColumnIndex != null && <div class="resize-overlay" />}
-        <slot name="divider" />
       </Host>
     );
   }
@@ -394,9 +390,8 @@ export class SceneTreeTableLayout {
       const defaultDividerTemplate = document.createElement('template');
       defaultDividerTemplate.slot = 'divider';
       defaultDividerTemplate.innerHTML = `
-        <div class="divider-wrapper">
-          <div class="divider" />
-        </div>
+        <vertex-scene-tree-table-resize-divider slot="divider">
+        </vertex-scene-tree-table-resize-divider>
       `;
       this.hostEl.appendChild(defaultDividerTemplate);
     }
@@ -484,6 +479,17 @@ export class SceneTreeTableLayout {
     }
   };
 
+  private computeHeaderHeight = (): void => {
+    if (this.stateMap.headerHeight == null) {
+      this.stateMap.headerHeight =
+        this.headerElement?.getBoundingClientRect().height;
+      this.hostEl.style.setProperty(
+        '--header-height',
+        `${this.stateMap.headerHeight}px`
+      );
+    }
+  };
+
   private computeColumnGridLayout = (): void => {
     if (this.stateMap.columnWidths.length === 0) {
       this.stateMap.columnWidths = this.columnElements.map(
@@ -529,9 +535,13 @@ export class SceneTreeTableLayout {
         .map((_, i) => {
           const instance = this.createDividerInstance();
 
+          instance.element.slot = 'divider';
+          instance.element.style.position = 'absolute';
+          instance.element.style.right = '0';
+          instance.element.style.pointerEvents = 'auto';
           instance.element.style.gridColumnStart = `${i + 1}`;
           instance.element.style.gridColumnEnd = `${i + 2}`;
-          this.dividerOverlayElement?.appendChild(instance.element);
+          this.hostEl?.appendChild(instance.element);
 
           return instance;
         });
@@ -573,7 +583,7 @@ export class SceneTreeTableLayout {
       );
       this.resizingColumnIndex = index;
       this.stateMap.headerDividerInstances?.[index]?.element.classList.add(
-        'grabbing'
+        'dragging'
       );
 
       window.addEventListener('pointermove', this.handleDividerPointerMove);
@@ -603,19 +613,17 @@ export class SceneTreeTableLayout {
           this.stateMap.columnWidths[this.resizingColumnIndex + 1] += diff.x;
         }
 
-        console.log(this.stateMap.columnWidths);
-
         this.lastDividerPointerPosition = current;
         this.computeColumnGridLayout();
       }
     }
   };
 
-  private handleDividerPointerUp = (event: PointerEvent): void => {
+  private handleDividerPointerUp = (): void => {
     if (this.resizingColumnIndex != null) {
       this.stateMap.headerDividerInstances?.[
         this.resizingColumnIndex
-      ]?.element.classList.remove('grabbing');
+      ]?.element.classList.remove('dragging');
     }
     this.lastDividerPointerPosition = undefined;
     this.resizingColumnIndex = undefined;
