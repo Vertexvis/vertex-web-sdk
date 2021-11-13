@@ -11,6 +11,7 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 import {
   DepthBuffer,
   FramePerspectiveCamera,
@@ -23,18 +24,17 @@ import {
   Anchor,
   MeasurementElementPositions,
   getViewingElementPositions,
-  translatePointToWorld,
   translateWorldPtToViewport,
 } from './utils';
 import { getMeasurementBoundingClientRect } from './dom';
 import { getMouseClientPosition } from '../../lib/dom';
 import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
-import { Disposable } from '@vertexvis/utils';
 import {
   MEASUREMENT_LINE_CAP_LENGTH,
   MEASUREMENT_SNAP_DISTANCE,
 } from '../../lib/constants';
 import { Cursor, measurementCursor } from '../../lib/cursors';
+import { PointToPointHitTester } from './hitTest';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -455,24 +455,20 @@ export class ViewerMeasurementDistance {
   private updateReplaceInteraction(): void {
     this.stateMap.hoverCursor?.dispose();
 
+    const hitTester = this.getHitTester();
     if (this.interactiveStartPoint != null) {
-      this.start = translatePointToWorld(
-        this.interactiveStartPoint,
-        this.internalDepthBuffer,
-        this.viewport
-      );
+      this.start = hitTester?.hitTest(this.interactiveStartPoint)
+        ? hitTester?.transformPointToWorld(this.interactiveStartPoint)
+        : undefined;
     }
 
     // Don't update the end point if the depth buffer is undefined. This is
     // to not clear the measurement line if the user interacts with the model
     // while performing a measurement.
-    if (this.interactiveEndPoint != null && this.internalDepthBuffer != null) {
-      this.end = translatePointToWorld(
-        this.interactiveEndPoint,
-        this.internalDepthBuffer,
-        this.viewport,
-        { ignoreDepthTest: true }
-      );
+    if (this.interactiveEndPoint != null) {
+      this.end = hitTester?.transformPointToWorld(this.interactiveEndPoint, {
+        ignoreHitTest: true,
+      });
     }
 
     this.interactiveStartPoint = undefined;
@@ -487,22 +483,18 @@ export class ViewerMeasurementDistance {
     this.stateMap.hoverCursor?.dispose();
 
     if (this.interactionCount > 0) {
+      const hitTester = this.getHitTester();
       if (this.interactiveStartPoint != null) {
-        this.start = translatePointToWorld(
+        this.start = hitTester?.transformPointToWorld(
           this.interactiveStartPoint,
-          this.internalDepthBuffer,
-          this.viewport,
-          { ignoreDepthTest: true }
+          { ignoreHitTest: true }
         );
       }
 
       if (this.interactiveEndPoint != null) {
-        this.end = translatePointToWorld(
-          this.interactiveEndPoint,
-          this.internalDepthBuffer,
-          this.viewport,
-          { ignoreDepthTest: true }
-        );
+        this.end = hitTester?.transformPointToWorld(this.interactiveEndPoint, {
+          ignoreHitTest: true,
+        });
       }
 
       this.interactiveStartPoint = undefined;
@@ -602,21 +594,17 @@ export class ViewerMeasurementDistance {
           this.line,
           this.internalCamera.projectionViewMatrix
         );
-        const startPt = this.viewport.transformPointToFrame(
-          this.viewport.transformVectorToViewport(lineNdc.start),
-          this.internalDepthBuffer
-        );
-        const endPt = this.viewport.transformPointToFrame(
-          this.viewport.transformVectorToViewport(lineNdc.end),
-          this.internalDepthBuffer
-        );
 
+        const startPt = this.viewport.transformVectorToViewport(lineNdc.start);
+        const endPt = this.viewport.transformVectorToViewport(lineNdc.end);
+
+        const hitTester = this.getHitTester();
         const isStartInvalid =
           this.interactingAnchor === 'start' &&
-          !this.internalDepthBuffer.isDepthAtFarPlane(startPt);
+          (!hitTester?.hitTest(startPt) ?? true);
         const isEndInvalid =
           this.interactingAnchor === 'end' &&
-          !this.internalDepthBuffer.isDepthAtFarPlane(endPt);
+          (!hitTester?.hitTest(endPt) ?? true);
 
         this.invalid = isStartInvalid || isEndInvalid;
       }
@@ -861,6 +849,16 @@ export class ViewerMeasurementDistance {
       this.editEnd.emit();
     }
     this.interactionCount = this.interactionCount - 1;
+  }
+
+  private getHitTester(): PointToPointHitTester | undefined {
+    if (this.stateMap.stencil != null && this.internalDepthBuffer != null) {
+      return new PointToPointHitTester(
+        this.stateMap.stencil,
+        this.internalDepthBuffer,
+        this.viewport
+      );
+    }
   }
 
   private warnIfDepthBuffersDisabled(): void {

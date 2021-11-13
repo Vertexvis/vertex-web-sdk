@@ -37,6 +37,7 @@ import {
   Orientation,
   StencilBufferManager,
   UnitType,
+  Viewport,
 } from './lib/types';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
@@ -483,6 +484,10 @@ export namespace Components {
      * Disconnects the websocket and removes any internal state associated with the scene.
      */
     unload: () => Promise<void>;
+    /**
+     * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
+     */
+    viewport: Viewport;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
@@ -1628,6 +1633,10 @@ declare namespace LocalJSX {
     src?: string;
     stencilBuffer?: StencilBufferManager;
     stream?: ViewerStreamApi;
+    /**
+     * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
+     */
+    viewport?: Viewport;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
