@@ -1,7 +1,11 @@
-import { Dimensions, Point, Ray, Rectangle } from '@vertexvis/geometry';
+import { Point, Ray } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
-import { FrameImageLike, FramePerspectiveCamera } from './frame';
+import {
+  FrameImageLike,
+  FramePerspectiveCamera,
+  ImageAttributesLike,
+} from './frame';
 import { Viewport } from './viewport';
 
 /**
@@ -24,48 +28,31 @@ export class DepthBuffer implements FrameImageLike {
    * Constructs a new depth buffer.
    *
    * @param camera The camera data that generated this depth buffer.
-   * @param frameDimensions The dimensions of the frame used to generate this depth
-   *   buffer.
-   * @param imageRect The placement of the depth image within the viewport.
-   * @param imageScale The scale factor of the depth image.
-   * @param data A 16-bit typed array of depth values.
-   * @param imageDimensions The dimensions of the depth image.
+   * @param imageAttr The attributes of the depth buffer image.
+   * @param pixels A 16-bit typed array of depth values.
    */
   public constructor(
     public readonly camera: FramePerspectiveCamera,
-    public readonly frameDimensions: Dimensions.Dimensions,
-    public readonly imageRect: Rectangle.Rectangle,
-    public readonly imageScale: number,
-    public readonly data: Uint16Array,
-    // TODO(dan): See if we can remove this prop now.
-    public readonly imageDimensions: Dimensions.Dimensions
+    public readonly imageAttr: ImageAttributesLike,
+    public readonly pixels: Uint16Array
   ) {}
 
   /**
    * Creates a `DepthBuffer` from a decoded PNG.
    *
    * @param png An object containing the width, height and raw PNG data.
-   * @param imageRect The placement of the depth image in the viewport.
-   * @param imageScaleFactor The scale factor of the depth image.
+   * @param camera The camera that generated the depth buffer image.
+   * @param imageAttr The attributes of the depth buffer image.
    * @throws If the PNG is not a single channel, 16-bit image.
    * @returns A depth buffer.
    */
   public static fromPng(
-    png: Pick<DecodedPng, 'width' | 'height' | 'data'>,
+    png: Pick<DecodedPng, 'data'>,
     camera: FramePerspectiveCamera,
-    dimensions: Dimensions.Dimensions,
-    imageRect: Rectangle.Rectangle,
-    imageScaleFactor: number
+    imageAttr: ImageAttributesLike
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
-      return new DepthBuffer(
-        camera,
-        dimensions,
-        imageRect,
-        imageScaleFactor,
-        png.data,
-        Dimensions.create(png.width, png.height)
-      );
+      return new DepthBuffer(camera, imageAttr, png.data);
     } else {
       throw new Error('Expected depth PNG to have depth of 16-bit');
     }
@@ -107,15 +94,15 @@ export class DepthBuffer implements FrameImageLike {
     point: Point.Point,
     fallbackNormalizedDepth?: number
   ): number {
-    const { width, height } = this.imageDimensions;
+    const { width, height } = this.imageAttr.imageRect;
 
-    const offset = Point.subtract(point, this.imageRect);
-    const scale = 1 / this.imageScale;
+    const offset = Point.subtract(point, this.imageAttr.imageRect);
+    const scale = 1 / this.imageAttr.imageScale;
     const pixel = Point.scale(offset, scale, scale);
 
     if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
       const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
-      const depth = this.data[index];
+      const depth = this.pixels[index];
       const depthOrFallback =
         depth === DepthBuffer.MAX_DEPTH_VALUE
           ? fallbackNormalizedDepth ?? depth
@@ -130,14 +117,14 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
-   * Returns `true` if there the normalized depth value at the given point is
-   * `1` or if the point is outside the frame. This method is useful for
-   * checking if geometry exists at a given 2D coordinate.
+   * Returns `true` if the point is in front of the far plane and the point is
+   * inside the frame. This method is useful for checking if geometry exists at
+   * a given 2D coordinate.
    *
    * @param point A 2D point within the frame.
-   * @returns `true` if a depth value exists.
+   * @returns `true` if point is in front of far plane.
    */
-  public isDepthAtFarPlane(point: Point.Point): boolean {
+  public hitTest(point: Point.Point): boolean {
     return this.getNormalizedDepthAtPoint(point) < 1;
   }
 

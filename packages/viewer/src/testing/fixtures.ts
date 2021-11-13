@@ -78,13 +78,11 @@ export function createDepthBuffer(
   value = 2 ** 16 - 1
 ): DepthBuffer {
   const png = createDepthImageBytes(width, height, value);
-  return DepthBuffer.fromPng(
-    { width, height, data: png },
-    frame.scene.camera,
-    Dimensions.create(width, height),
-    Rectangle.create(0, 0, width, height),
-    1
-  );
+  return DepthBuffer.fromPng({ data: png }, frame.scene.camera, {
+    frameDimensions: Dimensions.create(width, height),
+    imageRect: Rectangle.create(0, 0, width, height),
+    imageScale: 1,
+  });
 }
 
 export function createStencilImageBytes(
@@ -111,11 +109,15 @@ export function createStencilBuffer(
   height: number,
   fill: (pixel: Point.Point) => Color.Color
 ): StencilBuffer {
-  const png = createStencilImageBytes(width, height, fill);
+  const data = createStencilImageBytes(width, height, fill);
   return StencilBuffer.fromPng(
-    { data: png, channels: 3 },
-    Dimensions.create(width, height),
-    Rectangle.create(0, 0, width, height),
-    1
+    { data, channels: 1 },
+    {
+      frameDimensions: Dimensions.create(width, height),
+      imageRect: Rectangle.create(0, 0, width, height),
+      imageScale: 1,
+    },
+    data,
+    createDepthBuffer(width, height)
   );
 }

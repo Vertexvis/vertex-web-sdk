@@ -562,7 +562,7 @@ export class InteractionApi {
   ): Vector3.Vector3 {
     const viewport = this.getViewport();
     const framePt = viewport.transformPointToFrame(point, depthBuffer);
-    const hasDepth = depthBuffer.isDepthAtFarPlane(framePt);
+    const hasDepth = depthBuffer.hitTest(framePt);
     return hasDepth
       ? viewport.transformPointToWorldSpace(point, depthBuffer)
       : fallbackPoint;

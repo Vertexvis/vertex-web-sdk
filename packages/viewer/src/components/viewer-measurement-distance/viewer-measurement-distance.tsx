@@ -827,7 +827,7 @@ export class ViewerMeasurementDistance {
     if (stencil != null && !event.shiftKey) {
       const framePt = this.viewport.transformPointToFrame(pt, stencil);
       const snapDistance = Math.max(0, this.snapDistance);
-      const nearestPt = stencil.getNearestPixel(framePt, snapDistance);
+      const nearestPt = stencil.snapToNearestPixel(framePt, snapDistance);
 
       if (nearestPt != null) {
         return this.viewport.transformPointToViewport(nearestPt, stencil);

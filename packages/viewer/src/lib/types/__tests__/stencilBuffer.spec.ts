@@ -88,31 +88,31 @@ describe(StencilBuffer, () => {
     it('returns pixel if point is non-white', async () => {
       const pt = Point.create(99, 0);
       const stencil = await stencilBuffer;
-      const actual = stencil.getNearestPixel(pt, 1);
+      const actual = stencil.snapToNearestPixel(pt, 1);
 
       expect(actual).toEqual(Point.create(99.5, 0.5));
     });
 
     it('returns point if non-white pixel', () => {
       const pt = Point.create(0, 0);
-      const actual = topLeft.getNearestPixel(pt, 2);
+      const actual = topLeft.snapToNearestPixel(pt, 2);
       expect(actual).toEqual(pt);
     });
 
     it('returns closest non-white pixel within radius', () => {
       const pt1 = Point.create(5, 1);
-      expect(topLeft.getNearestPixel(pt1, 2)).toEqual(Point.create(4, 1));
+      expect(topLeft.snapToNearestPixel(pt1, 2)).toEqual(Point.create(4, 1));
 
       const pt2 = Point.create(4, 9);
-      expect(bottomLeft.getNearestPixel(pt2, 2)).toEqual(Point.create(5, 9));
+      expect(bottomLeft.snapToNearestPixel(pt2, 2)).toEqual(Point.create(5, 9));
 
       const pt3 = Point.create(9, 4);
-      expect(bottomLeft.getNearestPixel(pt3, 2)).toEqual(Point.create(9, 5));
+      expect(bottomLeft.snapToNearestPixel(pt3, 2)).toEqual(Point.create(9, 5));
     });
 
     it('returns undefined if no non-white pixels within radius', () => {
       const pt = Point.create(9, 1);
-      const actual = topLeft.getNearestPixel(pt, 2);
+      const actual = topLeft.snapToNearestPixel(pt, 2);
       expect(actual).toBeUndefined();
     });
   });
