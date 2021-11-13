@@ -49,7 +49,7 @@
     "@juggle/resize-observer": "^3.3.0",
     "@stencil/core": "^2.4.0",
     "@types/classnames": "^2.3.1",
-    "@vertexvis/frame-streaming-protos": "^0.6.7",
+    "@vertexvis/frame-streaming-protos": "^0.6.8",
     "@vertexvis/geometry": "0.11.0",
     "@vertexvis/scene-tree-protos": "^0.1.7",
     "@vertexvis/scene-view-protos": "^0.1.6",
