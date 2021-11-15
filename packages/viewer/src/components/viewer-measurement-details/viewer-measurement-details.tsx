@@ -223,8 +223,9 @@ export class ViewerMeasurementDetails {
   };
 
   private formatDistance = (distance: number): string => {
-    const realDistance =
-      this.distanceMeasurementUnits.translateWorldValueToReal(distance);
+    const realDistance = Math.abs(
+      this.distanceMeasurementUnits.translateWorldValueToReal(distance)
+    );
 
     if (this.distanceFormatter != null) {
       return this.distanceFormatter(realDistance);

@@ -150,9 +150,9 @@ describe('vertex-viewer-measurement-details', () => {
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
-    expect(entries[1].innerText).toContain('X:-3.00 mm');
+    expect(entries[1].innerText).toContain('X:3.00 mm');
     expect(entries[2].innerText).toContain('Y:3.00 mm');
-    expect(entries[3].innerText).toContain('Z:-3.00 mm');
+    expect(entries[3].innerText).toContain('Z:3.00 mm');
   });
 
   it('responds to model changes', async () => {
@@ -241,7 +241,7 @@ describe('vertex-viewer-measurement-details', () => {
     expect(entries.length).toBe(3);
     expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
     expect(entries[1].innerText).toContain('Y:3.00 mm');
-    expect(entries[2].innerText).toContain('Z:-3.00 mm');
+    expect(entries[2].innerText).toContain('Z:3.00 mm');
   });
 
   it('hides details from json string', async () => {
@@ -279,8 +279,8 @@ describe('vertex-viewer-measurement-details', () => {
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries.length).toBe(3);
-    expect(entries[0].innerText).toContain('X:-3.00 mm');
+    expect(entries[0].innerText).toContain('X:3.00 mm');
     expect(entries[1].innerText).toContain('Y:3.00 mm');
-    expect(entries[2].innerText).toContain('Z:-3.00 mm');
+    expect(entries[2].innerText).toContain('Z:3.00 mm');
   });
 });
