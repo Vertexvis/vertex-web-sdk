@@ -16,7 +16,10 @@ import { h } from '@stencil/core';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { getSceneTreeTableOffsetTop } from './lib/dom';
+import {
+  getSceneTreeTableOffsetTop,
+  getSceneTreeTableViewportWidth,
+} from './lib/dom';
 import {
   createGetTreeResponse,
   mockGrpcUnaryResult,
@@ -33,6 +36,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(0);
+    (getSceneTreeTableViewportWidth as jest.Mock).mockReturnValue(0);
   });
 
   it('updates the layout position on resize', async () => {

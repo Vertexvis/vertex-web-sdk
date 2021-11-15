@@ -4,10 +4,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
 import { Binding } from '../scene-tree/lib/binding';
 import { SceneTreeController } from '../scene-tree/lib/controller';
-import {
-  getSceneTreeViewportHeight,
-  getSceneTreeViewportWidth,
-} from '../scene-tree/lib/dom';
+import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { ElementPool } from '../scene-tree/lib/element-pool';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import {
@@ -15,7 +12,10 @@ import {
   InstancedTemplate,
 } from '../scene-tree/lib/templates';
 import { RowDataProvider } from '../scene-tree/scene-tree';
-import { getSceneTreeTableOffsetTop } from './lib/dom';
+import {
+  getSceneTreeTableOffsetTop,
+  getSceneTreeTableViewportWidth,
+} from './lib/dom';
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -736,10 +736,8 @@ export class SceneTreeTableLayout {
       this.resizingColumnIndex != null
     ) {
       const diff = Point.subtract(this.lastDividerPointerPosition, current);
-      const layoutWidth = this.getLayoutHeight();
 
       if (
-        layoutWidth != null &&
         Math.abs(diff.x) >= 1 &&
         this.isValidResize(diff, this.resizingColumnIndex)
       ) {
@@ -748,8 +746,6 @@ export class SceneTreeTableLayout {
         if (this.resizingColumnIndex + 1 < this.stateMap.columnWidths.length) {
           this.stateMap.columnWidths[this.resizingColumnIndex + 1] += diff.x;
         }
-
-        console.log(this.stateMap.columnWidths);
 
         this.lastDividerPointerPosition = current;
         this.computeColumnGridLayout();
@@ -820,7 +816,7 @@ export class SceneTreeTableLayout {
 
   private getLayoutWidth(): number | undefined {
     if (this.layoutWidth == null) {
-      this.layoutWidth = getSceneTreeViewportWidth(this.hostEl);
+      this.layoutWidth = getSceneTreeTableViewportWidth(this.hostEl);
     }
     return this.layoutWidth;
   }
