@@ -31,12 +31,13 @@ import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FramePerspectiveCamera } from './lib/types/frame';
 import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
 import {
+  AngleUnitType,
   DepthBuffer,
+  DistanceUnitType,
   FramePerspectiveCamera as FramePerspectiveCamera1,
   Measurement,
   Orientation,
   StencilBufferManager,
-  UnitType,
   Viewport,
 } from './lib/types';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
@@ -71,15 +72,10 @@ import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer
 import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.tsx/viewer-markup-freeform';
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
 import { MeasurementModel, MeasurementResult } from './lib/measurement/model';
-import {
-  ViewerMeasurementDetailsAngleFormatter,
-  ViewerMeasurementDetailsAngleUnit,
-  ViewerMeasurementDetailsDistanceFormatter,
-  ViewerMeasurementDetailsSummary,
-} from './components/viewer-measurement-details/viewer-measurement-details';
+import { Formatter } from './lib/formatter';
+import { ViewerMeasurementDetailsSummary } from './components/viewer-measurement-details/interfaces';
 import {
   ViewerMeasurementDistanceElementMetrics,
-  ViewerMeasurementDistanceLabelFormatter,
   ViewerMeasurementDistanceMode,
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
 import { Anchor } from './components/viewer-measurement-distance/utils';
@@ -829,19 +825,19 @@ export namespace Components {
     /**
      * An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.
      */
-    angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
+    angleFormatter?: Formatter<number>;
     /**
      * The unit of angle-based measurement.
      */
-    angleUnits: ViewerMeasurementDetailsAngleUnit;
+    angleUnits: AngleUnitType;
     /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */
-    distanceFormatter?: ViewerMeasurementDetailsDistanceFormatter;
+    distanceFormatter?: Formatter<number>;
     /**
      * The unit of distance-based measurement.
      */
-    distanceUnits: UnitType;
+    distanceUnits: DistanceUnitType;
     /**
      * The number of fraction digits to display.
      */
@@ -920,7 +916,7 @@ export namespace Components {
     /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */
-    labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
+    labelFormatter?: Formatter<number | undefined>;
     /**
      * The length of the caps at each end of the distance measurement.
      */
@@ -944,7 +940,7 @@ export namespace Components {
     /**
      * The unit of measurement.
      */
-    units: UnitType;
+    units: DistanceUnitType;
     /**
      * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
      */
@@ -1003,7 +999,7 @@ export namespace Components {
     /**
      * The unit type to display measurements in.
      */
-    units: UnitType;
+    units: DistanceUnitType;
     /**
      * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
      */
@@ -1074,7 +1070,7 @@ export namespace Components {
     /**
      * The unit type to display measurements in.
      */
-    units: UnitType;
+    units: DistanceUnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
@@ -1986,19 +1982,19 @@ declare namespace LocalJSX {
     /**
      * An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.
      */
-    angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
+    angleFormatter?: Formatter<number>;
     /**
      * The unit of angle-based measurement.
      */
-    angleUnits?: ViewerMeasurementDetailsAngleUnit;
+    angleUnits?: AngleUnitType;
     /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */
-    distanceFormatter?: ViewerMeasurementDetailsDistanceFormatter;
+    distanceFormatter?: Formatter<number>;
     /**
      * The unit of distance-based measurement.
      */
-    distanceUnits?: UnitType;
+    distanceUnits?: DistanceUnitType;
     /**
      * The number of fraction digits to display.
      */
@@ -2071,7 +2067,7 @@ declare namespace LocalJSX {
     /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */
-    labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
+    labelFormatter?: Formatter<number | undefined>;
     /**
      * The length of the caps at each end of the distance measurement.
      */
@@ -2103,7 +2099,7 @@ declare namespace LocalJSX {
     /**
      * The unit of measurement.
      */
-    units?: UnitType;
+    units?: DistanceUnitType;
     /**
      * The viewer to connect to this measurement. The measurement will redraw any time the viewer redraws the scene.
      */
@@ -2170,7 +2166,7 @@ declare namespace LocalJSX {
     /**
      * The unit type to display measurements in.
      */
-    units?: UnitType;
+    units?: DistanceUnitType;
     /**
      * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
      */
@@ -2216,7 +2212,7 @@ declare namespace LocalJSX {
     /**
      * The unit type to display measurements in.
      */
-    units?: UnitType;
+    units?: DistanceUnitType;
     /**
      * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
