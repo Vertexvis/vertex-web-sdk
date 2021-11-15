@@ -50,7 +50,13 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.beginInteraction();
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCameraByDelta(delta);
-      this.interactionApi?.twistCamera(angle);
+
+      // Equal to about 8 degrees
+      console.log(angle);
+      if (Math.abs(angle) > 0.15) {
+        console.log('twisting!');
+        this.interactionApi?.twistCamera(angle);
+      }
     }
 
     this.currentPosition1 = point1;
