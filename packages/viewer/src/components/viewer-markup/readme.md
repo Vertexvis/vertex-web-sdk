@@ -185,7 +185,7 @@ a default element will be created.
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
 
-The markup element that was created.
+
 
 ### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
@@ -195,7 +195,7 @@ Returns the markup element associated to the given ID.
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
-A markup element, or `undefined`.
+
 
 ### `getMarkupElements() => Promise<Array<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>>`
 
@@ -205,7 +205,7 @@ Returns a list of markup elements that are children of this component.
 
 Type: `Promise<(HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement)[]>`
 
-A list of all markups.
+
 
 ### `removeMarkup(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
@@ -217,7 +217,7 @@ found.
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
-The markup element, or undefined.
+
 
 
 ## Dependencies

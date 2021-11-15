@@ -267,7 +267,9 @@ export class SceneTreeTableLayout {
           style={{
             gridTemplateColumns: this.columnGridFixedLayout,
           }}
-        />
+        >
+          <slot name="header" />
+        </div>
         <div
           class="table"
           ref={(ref) => (this.tableElement = ref)}
@@ -638,9 +640,10 @@ export class SceneTreeTableLayout {
               i === this.columnElements.length - 1
                 ? `0`
                 : `var(--scene-tree-table-column-gap)`;
+            instance.element.slot = 'header';
             instance.element.style.gridColumnStart = `${i + 1}`;
             instance.element.style.gridColumnEnd = `${i + 2}`;
-            this.headerElement?.appendChild(instance.element);
+            this.hostEl?.appendChild(instance.element);
           }
 
           return instance;

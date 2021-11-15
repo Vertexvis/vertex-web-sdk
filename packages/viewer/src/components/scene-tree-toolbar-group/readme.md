@@ -13,6 +13,13 @@ layout children. Spacing is added between each child.
 | `"The content of the group."` |             |
 
 
+## CSS Custom Properties
+
+| Name                       | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `--scene-tree-toolbar-gap` | A CSS length that specifies the horizontal gap between slots. |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*
