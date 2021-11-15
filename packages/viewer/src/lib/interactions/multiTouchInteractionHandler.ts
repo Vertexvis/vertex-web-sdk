@@ -51,10 +51,8 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCameraByDelta(delta);
 
-      // Equal to about 8 degrees
-      console.log(angle);
-      if (Math.abs(angle) > 0.15) {
-        console.log('twisting!');
+      // Setting a minimum angle to prevent wobbling
+      if (Math.abs(angle) > 0.2) {
         this.interactionApi?.twistCamera(angle);
       }
     }
