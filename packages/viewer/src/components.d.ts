@@ -71,18 +71,18 @@ import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-m
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.tsx/viewer-markup-freeform';
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
-import { MeasurementModel, MeasurementResult } from './lib/measurement/model';
+import {
+  MeasurementController,
+  MeasurementDetailsSummary,
+  MeasurementModel,
+  MeasurementResult,
+} from './lib/measurement';
 import { Formatter } from './lib/formatter';
-import { ViewerMeasurementDetailsSummary } from './components/viewer-measurement-details/interfaces';
 import {
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceMode,
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
 import { Anchor } from './components/viewer-measurement-distance/utils';
-import {
-  MeasurementController,
-  MeasurementModel as MeasurementModel1,
-} from './lib/measurement';
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
@@ -853,11 +853,11 @@ export namespace Components {
      */
     fractionalDigits: number;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
      */
-    hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+    hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
      */
     hiddenDetailsJson?: string;
     /**
@@ -873,12 +873,12 @@ export namespace Components {
      * A summary representing all available measurements based on the current `MeasurementResult` set.
      * @readonly
      */
-    summary?: ViewerMeasurementDetailsSummary;
+    summary?: MeasurementDetailsSummary;
     /**
      * The visible measurements based on the current `summary` and `hiddenDetails`.
      * @readonly
      */
-    visibleSummary?: ViewerMeasurementDetailsSummary;
+    visibleSummary?: MeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
@@ -2028,11 +2028,11 @@ declare namespace LocalJSX {
      */
     fractionalDigits?: number;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
      */
-    hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+    hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
+     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
      */
     hiddenDetailsJson?: string;
     /**
@@ -2048,12 +2048,12 @@ declare namespace LocalJSX {
      * A summary representing all available measurements based on the current `MeasurementResult` set.
      * @readonly
      */
-    summary?: ViewerMeasurementDetailsSummary;
+    summary?: MeasurementDetailsSummary;
     /**
      * The visible measurements based on the current `summary` and `hiddenDetails`.
      * @readonly
      */
-    visibleSummary?: ViewerMeasurementDetailsSummary;
+    visibleSummary?: MeasurementDetailsSummary;
   }
   interface VertexViewerMeasurementDistance {
     /**
