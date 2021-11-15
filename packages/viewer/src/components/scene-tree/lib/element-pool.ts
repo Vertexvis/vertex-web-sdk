@@ -50,6 +50,11 @@ export class ElementPool {
     });
   }
 
+  public updateElementFactory(elementFactory: ElementFactory): void {
+    this.elementFactory = elementFactory;
+    this.updateElements(0);
+  }
+
   public iterateElements(
     f: (element: HTMLElement, binding: Binding, index: number) => void
   ): void {

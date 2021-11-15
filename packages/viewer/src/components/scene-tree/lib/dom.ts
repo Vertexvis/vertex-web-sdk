@@ -2,6 +2,10 @@ export function getSceneTreeViewportHeight(el: HTMLElement): number {
   return el.clientHeight;
 }
 
+export function getSceneTreeViewportWidth(el: HTMLElement): number {
+  return el.clientWidth;
+}
+
 export function getSceneTreeOffsetTop(el: HTMLElement): number {
   return el.offsetTop;
 }

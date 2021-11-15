@@ -14,15 +14,6 @@
 | `tree`          | --                | A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.                                                                                                                                                                                        | `HTMLVertexSceneTreeElement \| undefined`              | `undefined` |
 
 
-## CSS Custom Properties
-
-| Name                                      | Description                                                                                 |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `--scene-tree-table-column-gap`           | CSS length that specifies the amount of padding between columns in the table.               |
-| `--scene-tree-table-column-resize-cursor` | A CSS cursor value that will be displayed when resizing a column. Defaults to `col-resize`. |
-| `--scene-tree-table-row-padding`          | CSS lengths that specifies the amount of padding between the row's border and content.      |
-
-
 ## Dependencies
 
 ### Used by

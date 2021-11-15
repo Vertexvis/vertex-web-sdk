@@ -42,13 +42,6 @@ the group with a fractional gap size of this component.
 | `"before"`                                                                                                           | Content that is placed before the primary content. |
 
 
-## CSS Custom Properties
-
-| Name                               | Description                                                   |
-| ---------------------------------- | ------------------------------------------------------------- |
-| `--scene-tree-toolbar-content-gap` | A CSS length that specifies the horizontal gap between slots. |
-
-
 ## Dependencies
 
 ### Used by

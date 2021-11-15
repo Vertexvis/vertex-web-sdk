@@ -28,16 +28,6 @@
 | `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<{ id?: AsObject \| undefined; depth: number; name: string; visible: boolean; selected: boolean; expanded: boolean; isLeaf: boolean; suppliedId?: AsObject \| undefined; partiallyVisible: boolean; columnsList: string[]; }>` |
 
 
-## CSS Custom Properties
-
-| Name                                    | Description                                                                             |
-| --------------------------------------- | --------------------------------------------------------------------------------------- |
-| `--scene-tree-cell-background-hover`    | A CSS background of a cell when hovered.                                                |
-| `--scene-tree-cell-background-selected` | A CSS background color of a cell when selected.                                         |
-| `--scene-tree-cell-padding`             | CSS lengths that specifies the amount of padding between the cell's border and content. |
-| `--scene-tree-cell-text-positioning`    | A CSS text alignment value that indicates how text should be positioned.                |
-
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*
