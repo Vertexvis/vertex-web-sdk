@@ -10,7 +10,11 @@ import {
   Watch,
 } from '@stencil/core';
 import { stampTemplateWithId } from '../../lib/templates';
-import { DistanceMeasurement, Measurement, UnitType } from '../../lib/types';
+import {
+  DistanceMeasurement,
+  Measurement,
+  DistanceUnitType,
+} from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
 import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 
@@ -53,7 +57,7 @@ export class ViewerMeasurementTool {
    * The unit type to display measurements in.
    */
   @Prop()
-  public units: UnitType = 'millimeters';
+  public units: DistanceUnitType = 'millimeters';
 
   /**
    * The number of fractional digits to display measurements in.

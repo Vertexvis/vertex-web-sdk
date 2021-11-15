@@ -1,6 +1,6 @@
 import { Vector3 } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
-import { MeasurementUnits } from './measurementUnits';
+import { DistanceUnits } from './measurementUnits';
 
 export interface DistanceMeasurementInit {
   start?: Vector3.Vector3;
@@ -26,8 +26,8 @@ export class DistanceMeasurement {
     return Vector3.distance(this.start, this.end);
   }
 
-  public getRealDistance(units: MeasurementUnits): number {
-    return units.translateRealValueToWorld(this.getWorldDistance());
+  public getRealDistance(units: DistanceUnits): number {
+    return units.convertRealValueToWorld(this.getWorldDistance());
   }
 }
 

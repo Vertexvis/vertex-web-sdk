@@ -1,13 +1,13 @@
 import { Vector3 } from '@vertexvis/geometry';
-import { MeasurementUnits, UnitType } from '../measurementUnits';
+import { DistanceUnits, DistanceUnitType } from '../measurementUnits';
 
 interface Test {
-  unitType: UnitType;
+  unitType: DistanceUnitType;
   worldUnit: number;
   realUnit: number;
 }
 
-describe(MeasurementUnits, () => {
+describe(DistanceUnits, () => {
   const tests: Test[] = [
     { unitType: 'millimeters', worldUnit: 1, realUnit: 1 },
     { unitType: 'centimeters', worldUnit: 1, realUnit: 1 / 100 },
@@ -17,48 +17,48 @@ describe(MeasurementUnits, () => {
     { unitType: 'yards', worldUnit: 1, realUnit: 1 / (25.4 * 12 * 3) },
   ];
 
-  describe(MeasurementUnits.prototype.translateWorldValueToReal, () => {
+  describe(DistanceUnits.prototype.convertWorldValueToReal, () => {
     it('translates a world value to real value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
-        const measurementUnit = new MeasurementUnits(unitType);
-        expect(measurementUnit.translateWorldValueToReal(worldUnit)).toEqual(
+        const measurementUnit = new DistanceUnits(unitType);
+        expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(
           realUnit
         );
       }
     });
   });
 
-  describe(MeasurementUnits.prototype.translateRealValueToWorld, () => {
+  describe(DistanceUnits.prototype.convertRealValueToWorld, () => {
     it('translates a real value to world value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
-        const measurementUnit = new MeasurementUnits(unitType);
-        expect(measurementUnit.translateRealValueToWorld(realUnit)).toEqual(
+        const measurementUnit = new DistanceUnits(unitType);
+        expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(
           worldUnit
         );
       }
     });
   });
 
-  describe(MeasurementUnits.prototype.translateWorldPointToReal, () => {
+  describe(DistanceUnits.prototype.convertWorldPointToReal, () => {
     it('translates a world point to real point', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
-        const measurementUnit = new MeasurementUnits(unitType);
+        const measurementUnit = new DistanceUnits(unitType);
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
-        expect(measurementUnit.translateWorldPointToReal(worldPt)).toEqual(
+        expect(measurementUnit.convertWorldPointToReal(worldPt)).toEqual(
           realPt
         );
       }
     });
   });
 
-  describe(MeasurementUnits.prototype.translateRealPointToWorld, () => {
+  describe(DistanceUnits.prototype.convertRealPointToWorld, () => {
     it('translates a real point to a world point', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
-        const measurementUnit = new MeasurementUnits(unitType);
+        const measurementUnit = new DistanceUnits(unitType);
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
-        expect(measurementUnit.translateRealPointToWorld(realPt)).toEqual(
+        expect(measurementUnit.convertRealPointToWorld(realPt)).toEqual(
           worldPt
         );
       }
