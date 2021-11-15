@@ -1,6 +1,6 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
-import { Color, Mapper } from '@vertexvis/utils';
+import { Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
 import { fromPbFrame } from '../lib/mappers';
 import { DepthBuffer, Orientation, StencilBuffer } from '../lib/types';
@@ -78,30 +78,23 @@ export function createDepthBuffer(
   value = 2 ** 16 - 1
 ): DepthBuffer {
   const png = createDepthImageBytes(width, height, value);
-  return DepthBuffer.fromPng(
-    { width, height, data: png },
-    frame.scene.camera,
-    Dimensions.create(width, height),
-    Rectangle.create(0, 0, width, height),
-    1
-  );
+  return DepthBuffer.fromPng({ data: png }, frame.scene.camera, {
+    frameDimensions: Dimensions.create(width, height),
+    imageRect: Rectangle.create(0, 0, width, height),
+    imageScale: 1,
+  });
 }
 
 export function createStencilImageBytes(
   width: number,
   height: number,
-  fill: (pixel: Point.Point) => Color.Color
+  fill: (pixel: Point.Point) => number
 ): Uint8Array {
   const data = new Uint8Array(width * height * 3);
   for (let i = 0; i < width * height; i++) {
-    const offset = i * 3;
     const x = i % width;
     const y = Math.floor(i / width);
-    const color = fill(Point.create(x, y));
-
-    data[offset + 0] = color.r;
-    data[offset + 1] = color.g;
-    data[offset + 2] = color.b;
+    data[i] = fill(Point.create(x, y));
   }
   return data;
 }
@@ -109,13 +102,18 @@ export function createStencilImageBytes(
 export function createStencilBuffer(
   width: number,
   height: number,
-  fill: (pixel: Point.Point) => Color.Color
+  fill: (pixel: Point.Point) => number,
+  depthBuffer?: DepthBuffer
 ): StencilBuffer {
-  const png = createStencilImageBytes(width, height, fill);
+  const data = createStencilImageBytes(width, height, fill);
   return StencilBuffer.fromPng(
-    { data: png, channels: 3 },
-    Dimensions.create(width, height),
-    Rectangle.create(0, 0, width, height),
-    1
+    { data, channels: 1 },
+    {
+      frameDimensions: Dimensions.create(width, height),
+      imageRect: Rectangle.create(0, 0, width, height),
+      imageScale: 1,
+    },
+    data,
+    depthBuffer ?? createDepthBuffer(width, height)
   );
 }

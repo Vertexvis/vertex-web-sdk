@@ -3,7 +3,7 @@ import { Dimensions } from '@vertexvis/geometry';
 import { Timing, TimingMeter } from '../meters';
 import { HtmlImage, loadImageBytes } from './imageLoaders';
 import { Frame } from '../types/frame';
-import { Viewport } from '../types';
+import { StencilBufferManager, Viewport } from '../types';
 
 const REPORTING_INTERVAL_MS = 1000;
 
@@ -116,5 +116,35 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     image.dispose();
     return data.frame;
+  };
+}
+
+export function debugStencilBuffer(
+  stencilManager: StencilBufferManager,
+  drawStencil: () => boolean,
+  renderer: CanvasRenderer
+): CanvasRenderer {
+  return async (data) => {
+    const frame = await renderer(data);
+
+    if (drawStencil()) {
+      const stencil = await stencilManager.fetch();
+      if (stencil != null) {
+        const rect = data.viewport.calculateDrawRect(stencil);
+        const stencilImage = await loadImageBytes(stencil.imageBytes);
+        data.canvas.globalAlpha = 0.25;
+        data.canvas.drawImage(
+          stencilImage.image,
+          rect.x,
+          rect.y,
+          rect.width,
+          rect.height
+        );
+        data.canvas.globalAlpha = 1;
+        stencilImage.dispose();
+      }
+    }
+
+    return frame;
   };
 }

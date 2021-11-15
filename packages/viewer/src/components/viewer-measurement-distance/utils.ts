@@ -1,5 +1,5 @@
 import { Line3, Matrix4, Plane, Point, Vector3 } from '@vertexvis/geometry';
-import { DepthBuffer, FramePerspectiveCamera, Viewport } from '../../lib/types';
+import { FramePerspectiveCamera, Viewport } from '../../lib/types';
 
 export type Anchor = 'start' | 'end';
 
@@ -16,20 +16,6 @@ export interface RenderParams {
   projectionViewMatrix: Matrix4.Matrix4;
   viewport: Viewport;
   camera: FramePerspectiveCamera;
-}
-
-export function translatePointToWorld(
-  pt: Point.Point,
-  depthBuffer: DepthBuffer | undefined,
-  viewport: Viewport,
-  { ignoreDepthTest = false }: { ignoreDepthTest?: boolean } = {}
-): Vector3.Vector3 | undefined {
-  if (depthBuffer != null) {
-    const framePt = viewport.transformPointToFrame(pt, depthBuffer);
-    const hasDepth = depthBuffer.isDepthAtFarPlane(framePt);
-    const worldPt = viewport.transformPointToWorldSpace(pt, depthBuffer);
-    return hasDepth || ignoreDepthTest ? worldPt : undefined;
-  }
 }
 
 export function translateWorldPtToViewport(

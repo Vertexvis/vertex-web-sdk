@@ -50,7 +50,11 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.beginInteraction();
       this.interactionApi?.zoomCamera(zoom);
       this.interactionApi?.panCameraByDelta(delta);
-      this.interactionApi?.twistCamera(angle);
+
+      // Setting a minimum angle to prevent wobbling
+      if (Math.abs(angle) > 0.2) {
+        this.interactionApi?.twistCamera(angle);
+      }
     }
 
     this.currentPosition1 = point1;

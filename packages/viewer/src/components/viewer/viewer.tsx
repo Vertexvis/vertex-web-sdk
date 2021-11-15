@@ -275,6 +275,15 @@ export class Viewer {
   );
 
   /**
+   * Represents the current viewport of the viewer. The viewport represents the
+   * dimensions of the canvas where a frame is rendered. It contains methods for
+   * translating between viewport coordinates, frame coordinates and world
+   * coordinates.
+   */
+  @Prop({ mutable: true })
+  public viewport: Viewport = Viewport.fromDimensions(Dimensions.create(0, 0));
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    */
@@ -1183,9 +1192,7 @@ export class Viewer {
           canvas,
           dimensions,
           frame: this.frame,
-          viewport: Viewport.fromDimensions(
-            this.getCanvasDimensions() || Dimensions.create(0, 0)
-          ),
+          viewport: this.viewport,
         };
 
         this.frameReceived.emit(this.frame);
@@ -1226,6 +1233,9 @@ export class Viewer {
         trimmedViewport != null
           ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
           : undefined;
+      this.viewport = Viewport.fromDimensions(
+        this.getCanvasDimensions() ?? Dimensions.create(0, 0)
+      );
     }
   }
 
@@ -1286,10 +1296,7 @@ export class Viewer {
       () => this.getResolvedConfig().interactions,
       () => this.createScene(),
       () => this.frame,
-      () =>
-        Viewport.fromDimensions(
-          this.getCanvasDimensions() || Dimensions.create(0, 0)
-        ),
+      () => this.viewport,
       this.tap,
       this.doubletap,
       this.longpress,

@@ -101,7 +101,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain('90.00º');
+    ).toContain('90.00 deg');
 
     measurementDetails.angleUnits = 'radians';
     await page.waitForChanges();
@@ -150,9 +150,9 @@ describe('vertex-viewer-measurement-details', () => {
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
-    expect(entries[1].innerText).toContain('X:-3.00 mm');
+    expect(entries[1].innerText).toContain('X:3.00 mm');
     expect(entries[2].innerText).toContain('Y:3.00 mm');
-    expect(entries[3].innerText).toContain('Z:-3.00 mm');
+    expect(entries[3].innerText).toContain('Z:3.00 mm');
   });
 
   it('responds to model changes', async () => {
@@ -213,7 +213,7 @@ describe('vertex-viewer-measurement-details', () => {
       template: () => (
         <vertex-viewer-measurement-details
           measurementModel={model}
-          hiddenDetails={['x']}
+          hiddenDetails={['distanceVector']}
         />
       ),
     });
@@ -238,10 +238,8 @@ describe('vertex-viewer-measurement-details', () => {
       'div.measurement-details-entry'
     ) as NodeListOf<HTMLDivElement>;
 
-    expect(entries.length).toBe(3);
+    expect(entries.length).toBe(1);
     expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
-    expect(entries[1].innerText).toContain('Y:3.00 mm');
-    expect(entries[2].innerText).toContain('Z:-3.00 mm');
   });
 
   it('hides details from json string', async () => {
@@ -279,8 +277,8 @@ describe('vertex-viewer-measurement-details', () => {
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries.length).toBe(3);
-    expect(entries[0].innerText).toContain('X:-3.00 mm');
+    expect(entries[0].innerText).toContain('X:3.00 mm');
     expect(entries[1].innerText).toContain('Y:3.00 mm');
-    expect(entries[2].innerText).toContain('Z:-3.00 mm');
+    expect(entries[2].innerText).toContain('Z:3.00 mm');
   });
 });

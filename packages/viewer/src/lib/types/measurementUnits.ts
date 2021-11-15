@@ -1,9 +1,9 @@
-import { Vector3 } from '@vertexvis/geometry';
+import { Angle, Vector3 } from '@vertexvis/geometry';
 
 /**
- * A type representing the different types of supported units.
+ * A type representing the different types of supported distance units.
  */
-export type UnitType =
+export type DistanceUnitType =
   // Metric
   | 'millimeters'
   | 'centimeters'
@@ -14,6 +14,8 @@ export type UnitType =
   | 'feet'
   | 'yards';
 
+export type AngleUnitType = 'degrees' | 'radians';
+
 interface Unit {
   name: string;
   abbreviatedName: string;
@@ -21,18 +23,18 @@ interface Unit {
 }
 
 interface UnitConverter<T> {
-  translateWorldToReal(value: T): T;
-  translateRealToWorld(value: T): T;
+  convertTo(value: T): T;
+  convertFrom(value: T): T;
 }
 
 class ScaledUnitConverter implements UnitConverter<number> {
   public constructor(private readonly scale: number) {}
 
-  public translateWorldToReal(value: number): number {
+  public convertTo(value: number): number {
     return value * this.scale;
   }
 
-  public translateRealToWorld(value: number): number {
+  public convertFrom(value: number): number {
     return value / this.scale;
   }
 }
@@ -75,10 +77,10 @@ class YardUnitConverter extends ScaledUnitConverter {
 
 /**
  * A class that contains helpers for transforming values and points between
- * world space and real space.
+ * world space distances and real space distances.
  */
-export class MeasurementUnits {
-  private static units: Record<UnitType, Unit> = {
+export class DistanceUnits {
+  private static units: Record<DistanceUnitType, Unit> = {
     millimeters: {
       name: 'Millimeters',
       abbreviatedName: 'mm',
@@ -117,8 +119,8 @@ export class MeasurementUnits {
    */
   public readonly unit: Unit;
 
-  public constructor(public readonly unitType: UnitType) {
-    this.unit = MeasurementUnits.units[unitType];
+  public constructor(public readonly unitType: DistanceUnitType) {
+    this.unit = DistanceUnits.units[unitType];
   }
 
   /**
@@ -127,8 +129,8 @@ export class MeasurementUnits {
    * @param value A world space value to translate.
    * @returns A value in real space units.
    */
-  public translateWorldValueToReal(value: number): number {
-    return this.unit.converter.translateWorldToReal(value);
+  public convertWorldValueToReal(value: number): number {
+    return this.unit.converter.convertTo(value);
   }
 
   /**
@@ -137,8 +139,8 @@ export class MeasurementUnits {
    * @param value A real space value to translate.
    * @returns A world space value.
    */
-  public translateRealValueToWorld(value: number): number {
-    return this.unit.converter.translateRealToWorld(value);
+  public convertRealValueToWorld(value: number): number {
+    return this.unit.converter.convertFrom(value);
   }
 
   /**
@@ -147,10 +149,10 @@ export class MeasurementUnits {
    * @param pt A point in world space.
    * @returns A point in real space.
    */
-  public translateWorldPointToReal(pt: Vector3.Vector3): Vector3.Vector3 {
-    const x = this.unit.converter.translateWorldToReal(pt.x);
-    const y = this.unit.converter.translateWorldToReal(pt.y);
-    const z = this.unit.converter.translateWorldToReal(pt.z);
+  public convertWorldPointToReal(pt: Vector3.Vector3): Vector3.Vector3 {
+    const x = this.unit.converter.convertTo(pt.x);
+    const y = this.unit.converter.convertTo(pt.y);
+    const z = this.unit.converter.convertTo(pt.z);
     return { x, y, z };
   }
 
@@ -160,10 +162,67 @@ export class MeasurementUnits {
    * @param pt A point in real space.
    * @returns A point in world space.
    */
-  public translateRealPointToWorld(pt: Vector3.Vector3): Vector3.Vector3 {
-    const x = this.unit.converter.translateRealToWorld(pt.x);
-    const y = this.unit.converter.translateRealToWorld(pt.y);
-    const z = this.unit.converter.translateRealToWorld(pt.z);
+  public convertRealPointToWorld(pt: Vector3.Vector3): Vector3.Vector3 {
+    const x = this.unit.converter.convertFrom(pt.x);
+    const y = this.unit.converter.convertFrom(pt.y);
+    const z = this.unit.converter.convertFrom(pt.z);
     return { x, y, z };
+  }
+}
+
+class RadiansToDegreesUnitConverter implements UnitConverter<number> {
+  public convertTo(radians: number): number {
+    return Angle.toDegrees(radians);
+  }
+
+  public convertFrom(degrees: number): number {
+    return Angle.toRadians(degrees);
+  }
+}
+
+/**
+ * A class that contains helpers for transforming angle units.
+ */
+export class AngleUnits {
+  private static units: Record<AngleUnitType, Unit> = {
+    radians: {
+      name: 'Radians',
+      abbreviatedName: 'rad',
+      converter: new ScaledUnitConverter(1),
+    },
+    degrees: {
+      name: 'Degrees',
+      abbreviatedName: 'deg',
+      converter: new RadiansToDegreesUnitConverter(),
+    },
+  };
+
+  /**
+   * The unit of this measurement.
+   */
+  public readonly unit: Unit;
+
+  public constructor(public readonly unitType: AngleUnitType) {
+    this.unit = AngleUnits.units[unitType];
+  }
+
+  /**
+   * Converts radians to the chosen unit type.
+   *
+   * @param radians An angle in radians.
+   * @returns An angle in the chosen unit type.
+   */
+  public convertTo(radians: number): number {
+    return this.unit.converter.convertTo(radians);
+  }
+
+  /**
+   * Converts the chosen unit type back to radians.
+   *
+   * @param value The value to convert
+   * @returns An angle in radians.
+   */
+  public convertFrom(value: number): number {
+    return this.unit.converter.convertFrom(value);
   }
 }
