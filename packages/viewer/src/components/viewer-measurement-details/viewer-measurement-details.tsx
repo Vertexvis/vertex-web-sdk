@@ -1,33 +1,18 @@
-/* eslint-disable no-restricted-imports */
 import { Component, h, Host, Prop, Watch } from '@stencil/core';
-/* eslint-enable no-restricted-imports */
-import { Angle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
+import { Formatter } from '../../lib/formatter';
 import {
   MeasurementModel,
   MeasurementResult,
 } from '../../lib/measurement/model';
-import { MeasurementUnits, UnitType } from '../../lib/types';
+import {
+  AngleUnits,
+  AngleUnitType,
+  DistanceUnits,
+  DistanceUnitType,
+} from '../../lib/types';
+import { ViewerMeasurementDetailsSummary } from './interfaces';
 import { formatResults } from './utils';
-
-export type ViewerMeasurementDetailsDistanceFormatter = (
-  distance: number
-) => string;
-
-export type ViewerMeasurementDetailsAngleFormatter = (angle: number) => string;
-
-export type ViewerMeasurementDetailsAngleUnit = 'degrees' | 'radians';
-
-export interface ViewerMeasurementDetailsSummary {
-  parallelDistance?: number;
-  minDistance?: number;
-  maxDistance?: number;
-  area?: number;
-  angle?: number;
-  x?: number;
-  y?: number;
-  z?: number;
-}
 
 @Component({
   tag: 'vertex-viewer-measurement-details',
@@ -47,13 +32,13 @@ export class ViewerMeasurementDetails {
    * The unit of distance-based measurement.
    */
   @Prop()
-  public distanceUnits: UnitType = 'millimeters';
+  public distanceUnits: DistanceUnitType = 'millimeters';
 
   /**
    * The unit of angle-based measurement.
    */
   @Prop()
-  public angleUnits: ViewerMeasurementDetailsAngleUnit = 'degrees';
+  public angleUnits: AngleUnitType = 'degrees';
 
   /**
    * The number of fraction digits to display.
@@ -67,7 +52,7 @@ export class ViewerMeasurementDetails {
    * expected to return a string.
    */
   @Prop()
-  public distanceFormatter?: ViewerMeasurementDetailsDistanceFormatter;
+  public distanceFormatter?: Formatter<number>;
 
   /**
    * An optional formatter that can be used to format the display of an angle.
@@ -75,7 +60,7 @@ export class ViewerMeasurementDetails {
    * expected to return a string.
    */
   @Prop()
-  public angleFormatter?: ViewerMeasurementDetailsAngleFormatter;
+  public angleFormatter?: Formatter<number>;
 
   /**
    * An optional set of details to hide. This can be used to display
@@ -127,7 +112,8 @@ export class ViewerMeasurementDetails {
   })
   public visibleSummary?: ViewerMeasurementDetailsSummary;
 
-  private distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
+  private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
+  private angleMeasurementUnits = new AngleUnits(this.angleUnits);
   private resultsChangeListener?: Disposable;
 
   public connectedCallback(): void {
@@ -150,7 +136,12 @@ export class ViewerMeasurementDetails {
 
   @Watch('distanceUnits')
   protected handleDistanceUnitsChanged(): void {
-    this.distanceMeasurementUnits = new MeasurementUnits(this.distanceUnits);
+    this.distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
+  }
+
+  @Watch('angleUnits')
+  protected handleAngleUnitsChanged(): void {
+    this.angleMeasurementUnits = new AngleUnits(this.angleUnits);
   }
 
   @Watch('measurementModel')
@@ -187,22 +178,22 @@ export class ViewerMeasurementDetails {
             {this.formatDistance(this.visibleSummary.minDistance)}
           </div>
         )}
-        {this.visibleSummary?.x != null && (
+        {this.visibleSummary?.distanceVector?.x != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label x-label">X:</div>
-            {this.formatDistance(this.visibleSummary.x)}
+            {this.formatDistance(this.visibleSummary.distanceVector?.x)}
           </div>
         )}
-        {this.visibleSummary?.y != null && (
+        {this.visibleSummary?.distanceVector?.y != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label y-label">Y:</div>
-            {this.formatDistance(this.visibleSummary.y)}
+            {this.formatDistance(this.visibleSummary.distanceVector?.y)}
           </div>
         )}
-        {this.visibleSummary?.z != null && (
+        {this.visibleSummary?.distanceVector?.z != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label z-label">Z:</div>
-            {this.formatDistance(this.visibleSummary.z)}
+            {this.formatDistance(this.visibleSummary.distanceVector?.z)}
           </div>
         )}
       </Host>
@@ -223,8 +214,9 @@ export class ViewerMeasurementDetails {
   };
 
   private formatDistance = (distance: number): string => {
-    const realDistance =
-      this.distanceMeasurementUnits.translateWorldValueToReal(distance);
+    const realDistance = Math.abs(
+      this.distanceMeasurementUnits.convertWorldValueToReal(distance)
+    );
 
     if (this.distanceFormatter != null) {
       return this.distanceFormatter(realDistance);
@@ -239,12 +231,11 @@ export class ViewerMeasurementDetails {
   private formatAngle = (angleInRadians: number): string => {
     if (this.angleFormatter != null) {
       return this.angleFormatter(angleInRadians);
-    } else if (this.angleUnits === 'degrees') {
-      return `${Angle.toDegrees(angleInRadians).toFixed(
-        this.fractionalDigits
-      )}º`;
     } else {
-      return `${angleInRadians.toFixed(this.fractionalDigits)} rad`;
+      const value = this.angleMeasurementUnits
+        .convertTo(angleInRadians)
+        .toFixed(this.fractionalDigits);
+      return `${value} ${this.angleMeasurementUnits.unit.abbreviatedName}`;
     }
   };
 

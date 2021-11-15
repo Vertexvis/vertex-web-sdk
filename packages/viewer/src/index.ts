@@ -17,6 +17,8 @@ export { Config } from './lib/config';
 
 export { Environment } from './lib/environment';
 
+export * from './lib/formatter';
+
 export * from './lib/measurement';
 
 export { Scene } from './lib/scenes';

@@ -5,7 +5,7 @@ import {
   PlanarDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
 } from '../../lib/measurement/model';
-import { ViewerMeasurementDetailsSummary } from './viewer-measurement-details';
+import { ViewerMeasurementDetailsSummary } from './interfaces';
 
 export type MeasurementResultSummaryFormatter<T extends MeasurementResult> = (
   result: T,
@@ -24,7 +24,7 @@ export function summaryFromMinDistanceResult(
   return {
     ...summary,
     minDistance: result.distance,
-    ...distanceVector,
+    distanceVector,
   };
 }
 

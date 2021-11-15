@@ -15,9 +15,9 @@ import { Disposable } from '@vertexvis/utils';
 import {
   DepthBuffer,
   FramePerspectiveCamera,
-  MeasurementUnits,
+  DistanceUnits,
   StencilBuffer,
-  UnitType,
+  DistanceUnitType,
   Viewport,
 } from '../../lib/types';
 import {
@@ -35,6 +35,7 @@ import {
 } from '../../lib/constants';
 import { Cursor, measurementCursor } from '../../lib/cursors';
 import { PointToPointHitTester } from './hitTest';
+import { Formatter } from '../../lib/formatter';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -49,14 +50,6 @@ export interface ViewerMeasurementDistanceElementMetrics {
   endAnchor: DOMRect;
   label: DOMRect;
 }
-
-/**
- * A type that represents a function that takes a real-world distance and
- * returns a formatted string.
- */
-export type ViewerMeasurementDistanceLabelFormatter = (
-  distance: number | undefined
-) => string;
 
 /**
  * The supported measurement modes.
@@ -142,7 +135,7 @@ export class ViewerMeasurementDistance {
    * The unit of measurement.
    */
   @Prop()
-  public units: UnitType = 'millimeters';
+  public units: DistanceUnitType = 'millimeters';
 
   /**
    * The number of fraction digits to display.
@@ -156,7 +149,7 @@ export class ViewerMeasurementDistance {
    * expected to return a string.
    */
   @Prop()
-  public labelFormatter?: ViewerMeasurementDistanceLabelFormatter;
+  public labelFormatter?: Formatter<number | undefined>;
 
   /**
    * The distance from an anchor to its label.
@@ -264,7 +257,7 @@ export class ViewerMeasurementDistance {
   @Element()
   private hostEl!: HTMLElement;
 
-  private measurementUnits = new MeasurementUnits(this.units);
+  private measurementUnits = new DistanceUnits(this.units);
   private isUserInteractingWithModel = false;
 
   /**
@@ -412,7 +405,7 @@ export class ViewerMeasurementDistance {
    */
   @Watch('units')
   protected handleUnitsChanged(): void {
-    this.measurementUnits = new MeasurementUnits(this.units);
+    this.measurementUnits = new DistanceUnits(this.units);
   }
 
   /**
@@ -618,7 +611,7 @@ export class ViewerMeasurementDistance {
         : undefined;
     this.distance =
       worldDistance != null
-        ? this.measurementUnits.translateWorldValueToReal(worldDistance)
+        ? this.measurementUnits.convertWorldValueToReal(worldDistance)
         : undefined;
   }
 
