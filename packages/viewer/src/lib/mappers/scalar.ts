@@ -1,18 +1,27 @@
 import { Mapper as M } from '@vertexvis/utils';
-import type { google } from '@vertexvis/frame-streaming-protos';
 
-export const toPbBoolValue: M.Func<
-  boolean | undefined,
-  google.protobuf.IBoolValue | undefined
-> = M.defineMapper(
-  (bool) => (bool != null ? { value: bool } : undefined),
-  (bool) => bool
-);
+export const toPbBoolValue = toPbScalarWrapper<boolean>();
 
-export const toPbFloatValue: M.Func<
-  number | undefined,
-  google.protobuf.IFloatValue | undefined
-> = M.defineMapper(
-  (value) => (value != null ? { value } : undefined),
-  (value) => value
-);
+export const toPbFloatValue = toPbScalarWrapper<number>();
+
+export const fromPbBytesValue = fromPbScalarWrapper<Uint8Array>();
+
+function toPbScalarWrapper<T>(): M.Func<
+  T | undefined,
+  { value: T | undefined } | undefined
+> {
+  return M.defineMapper(
+    (value) => (value != null ? { value } : undefined),
+    (value) => value
+  );
+}
+
+function fromPbScalarWrapper<T>(): M.Func<
+  { value?: T | null } | undefined | null,
+  T | undefined
+> {
+  return M.defineMapper(
+    (value) => value?.value || undefined,
+    (value) => value
+  );
+}

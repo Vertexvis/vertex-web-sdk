@@ -73,6 +73,11 @@ export type LoadSceneViewStatePayload = DeepRequired<
   []
 >;
 
+export type GetStencilBufferPayload = DeepRequired<
+  vertexvis.protobuf.stream.IGetStencilBufferPayload,
+  []
+>;
+
 export type DrawFrameResult = DeepRequired<
   Pick<vertexvis.protobuf.stream.IStreamResponse, 'drawFrame'>,
   | ['drawFrame', 'timing', 'receiveToPaintDuration']

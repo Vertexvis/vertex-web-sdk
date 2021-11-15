@@ -27,11 +27,12 @@ describe(DepthBuffer, () => {
 
   const depthBuffer = new DepthBuffer(
     camera,
-    Dimensions.create(100, 100),
-    Rectangle.create(0, 0, 100, 100),
-    1,
-    createDepthImageBytes(100, 100, (2 ** 16 - 1) / 2),
-    Dimensions.create(100, 100)
+    {
+      frameDimensions: Dimensions.create(100, 100),
+      imageRect: Rectangle.create(0, 0, 100, 100),
+      imageScale: 1,
+    },
+    createDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
   );
 
   describe(DepthBuffer.prototype.getLinearDepthAtPoint, () => {
@@ -107,11 +108,12 @@ describe(DepthBuffer, () => {
     } {
       const depthBuffer = new DepthBuffer(
         camera,
-        Dimensions.create(100, 100),
-        Rectangle.create(0, 0, 100, 100),
-        1,
-        createDepthImageBytes(100, 100, depthValue),
-        Dimensions.create(100, 100)
+        {
+          frameDimensions: Dimensions.create(100, 100),
+          imageRect: Rectangle.create(0, 0, 100, 100),
+          imageScale: 1,
+        },
+        createDepthImageBytes(100, 100, depthValue)
       );
 
       const viewport = new Viewport(100, 100);

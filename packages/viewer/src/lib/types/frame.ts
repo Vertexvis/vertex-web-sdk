@@ -39,13 +39,7 @@ export class Frame {
 
   private async decodeDepthBuffer(bytes: Uint8Array): Promise<DepthBuffer> {
     const png = await decodePng(bytes);
-    return DepthBuffer.fromPng(
-      png,
-      this.scene.camera,
-      this.dimensions,
-      this.image.imageRect,
-      this.image.imageScale
-    );
+    return DepthBuffer.fromPng(png, this.scene.camera, this.image.imageAttr);
   }
 
   public async featureMap(): Promise<FeatureMap | undefined> {
@@ -67,6 +61,10 @@ export class Frame {
 }
 
 export interface FrameImageLike {
+  readonly imageAttr: ImageAttributesLike;
+}
+
+export interface ImageAttributesLike {
   readonly frameDimensions: Dimensions.Dimensions;
   readonly imageRect: Rectangle.Rectangle;
   readonly imageScale: number;
@@ -74,9 +72,7 @@ export interface FrameImageLike {
 
 export class FrameImage implements FrameImageLike {
   public constructor(
-    public readonly frameDimensions: Dimensions.Dimensions,
-    public readonly imageRect: Rectangle.Rectangle,
-    public readonly imageScale: number,
+    public readonly imageAttr: ImageAttributesLike,
     public readonly imageBytes: Uint8Array
   ) {}
 }

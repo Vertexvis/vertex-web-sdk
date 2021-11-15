@@ -9,7 +9,8 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Point, Vector3 } from '@vertexvis/geometry';
 import {
   FramePerspectiveCamera,
-  STENCIL_BUFFER_EMPTY_COLOR,
+  STENCIL_BUFFER_EMPTY_VALUE,
+  STENCIL_BUFFER_FEATURE_VALUE,
   Viewport,
 } from '../../lib/types';
 import { ViewerMeasurementDistance } from './viewer-measurement-distance';
@@ -19,7 +20,6 @@ import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
 import * as Fixtures from '../../testing/fixtures';
-import { Color } from '@vertexvis/utils';
 
 describe('vertex-viewer-measurement-distance', () => {
   const camera = new FramePerspectiveCamera(
@@ -40,8 +40,12 @@ describe('vertex-viewer-measurement-distance', () => {
   const endNdc = Vector3.transformMatrix(end, projectionViewMatrix);
 
   const depthBuffer = Fixtures.createDepthBuffer(100, 100, 0);
-  const stencilBuffer = Fixtures.createStencilBuffer(100, 100, ({ x }) =>
-    x > 49 ? Color.create(255, 255, 255) : STENCIL_BUFFER_EMPTY_COLOR
+  const stencilBuffer = Fixtures.createStencilBuffer(
+    100,
+    100,
+    ({ x }) =>
+      x > 49 ? STENCIL_BUFFER_FEATURE_VALUE : STENCIL_BUFFER_EMPTY_VALUE,
+    depthBuffer
   );
 
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
@@ -398,10 +402,9 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   describe('edit mode', () => {
-    const depthBuffer = Fixtures.createDepthBuffer(100, 100, 0);
     const snapEvent = { clientX: 45, clientY: 50 };
     const snapPt = viewport.transformPointToWorldSpace(
-      Point.create(50, 50),
+      Point.create(50.5, 50.5),
       depthBuffer
     );
 
@@ -590,7 +593,7 @@ describe('vertex-viewer-measurement-distance', () => {
     const depthBuffer = Fixtures.createDepthBuffer(100, 100, 0);
     const snapEvent = { clientX: 45, clientY: 50 };
     const snapPt = viewport.transformPointToWorldSpace(
-      Point.create(50, 50),
+      Point.create(50.5, 50.5),
       depthBuffer
     );
 

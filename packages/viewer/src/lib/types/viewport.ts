@@ -161,8 +161,8 @@ export class Viewport implements Dimensions.Dimensions {
   ): Point.Point {
     const framePt = this.transformPointToFrame(screenPt, image);
     return Point.create(
-      (framePt.x / image.frameDimensions.width) * 2 - 1,
-      -(framePt.y / image.frameDimensions.height) * 2 + 1
+      (framePt.x / image.imageAttr.frameDimensions.width) * 2 - 1,
+      -(framePt.y / image.imageAttr.frameDimensions.height) * 2 + 1
     );
   }
 
@@ -197,11 +197,11 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public calculateDrawRect(image: FrameImageLike): Rectangle.Rectangle {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
-    return Rectangle.scale(image.imageRect, scaleX, scaleY);
+    return Rectangle.scale(image.imageAttr.imageRect, scaleX, scaleY);
   }
 
   private calculateFrameScale(image: FrameImageLike): Point.Point {
-    const { frameDimensions: dimensions } = image;
+    const { frameDimensions: dimensions } = image.imageAttr;
 
     const imageRect = Rectangle.fromDimensions(dimensions);
     const viewport = Rectangle.fromDimensions(this.dimensions);

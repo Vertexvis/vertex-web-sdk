@@ -1,7 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Object } from 'ts-toolbelt';
 import { Mapper as M } from '@vertexvis/utils';
-import { BoundingBox, Dimensions, Rectangle } from '@vertexvis/geometry';
+import { BoundingBox, Dimensions } from '@vertexvis/geometry';
 import {
   CrossSectioning,
   FrameCamera,
@@ -10,6 +9,7 @@ import {
   FrameScene,
   FramePerspectiveCamera,
   Orientation,
+  ImageAttributesLike,
 } from '../types';
 import { fromPbRGBi } from './material';
 import {
@@ -18,6 +18,7 @@ import {
   fromPbDim,
   fromPbRect,
 } from './geometry';
+import { fromPbBytesValue } from './scalar';
 
 export const fromPbCamera: M.Func<
   vertexvis.protobuf.stream.ICamera,
@@ -44,11 +45,7 @@ export const fromPbSectionPlane: M.Func<
 
 const fromPbImageAttributes: M.Func<
   vertexvis.protobuf.stream.IImageAttributes,
-  {
-    frameDimensions: Dimensions.Dimensions;
-    imageRect: Rectangle.Rectangle;
-    scaleFactor: number;
-  }
+  ImageAttributesLike
 > = M.defineMapper(
   M.read(
     M.mapProp(
@@ -58,10 +55,10 @@ const fromPbImageAttributes: M.Func<
     M.mapProp('imageRect', M.compose(M.required('imageRect'), fromPbRect)),
     M.mapProp('scaleFactor', M.required('scaleFactor'))
   ),
-  ([frameDimensions, imageRect, scaleFactor]) => ({
+  ([frameDimensions, imageRect, imageScale]) => ({
     frameDimensions,
     imageRect,
-    scaleFactor,
+    imageScale,
   })
 );
 
@@ -85,11 +82,7 @@ export const fromPbCrossSectioning: M.Func<
 
 const fromPbFrameImageAttributes: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  {
-    frameDimensions: Dimensions.Dimensions;
-    imageRect: Rectangle.Rectangle;
-    scaleFactor: number;
-  }
+  ImageAttributesLike
 > = M.defineMapper(
   M.read(
     M.mapProp(
@@ -105,13 +98,7 @@ const fromPbFrameImage: M.Func<
   FrameImage
 > = M.defineMapper(
   M.read(fromPbFrameImageAttributes, M.mapProp('image', M.required('image'))),
-  ([imageAttr, image]) =>
-    new FrameImage(
-      imageAttr.frameDimensions,
-      imageAttr.imageRect,
-      imageAttr.scaleFactor,
-      image
-    )
+  ([imageAttr, image]) => new FrameImage(imageAttr, image)
 );
 
 const fromPbSceneAttributes: M.Func<
@@ -249,17 +236,25 @@ export const fromPbWorldOrientationOrThrow: M.ThrowIfInvalidFunc<
 
 const fromPbStencilBufferResult: M.Func<
   vertexvis.protobuf.stream.IGetStencilBufferResult,
-  Object.Compulsory<
-    vertexvis.protobuf.stream.IGetStencilBufferResult,
-    keyof vertexvis.protobuf.stream.IGetStencilBufferResult,
-    'deep'
-  >
+  {
+    stencilBuffer: Uint8Array;
+    depthBuffer: Uint8Array;
+    imageAttributes: ImageAttributesLike;
+  }
 > = M.defineMapper(
   M.read(
     M.mapRequiredProp('imageAttributes', fromPbImageAttributes),
-    M.requiredProp('stencilBuffer')
+    M.requiredProp('stencilBuffer'),
+    M.mapRequiredProp(
+      'depthBuffer',
+      M.compose(fromPbBytesValue, M.required('depthBuffer'))
+    )
   ),
-  ([imageAttributes, stencilBuffer]) => ({ imageAttributes, stencilBuffer })
+  ([imageAttributes, stencilBuffer, depthBuffer]) => ({
+    imageAttributes,
+    stencilBuffer,
+    depthBuffer,
+  })
 );
 
 export const fromPbStencilBuffer = fromPbStreamResponse(

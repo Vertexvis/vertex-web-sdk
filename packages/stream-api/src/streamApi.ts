@@ -1,6 +1,7 @@
 import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
 import { ConnectionDescriptor } from './connection';
 import {
+  GetStencilBufferPayload,
   HitItemsPayload,
   ReconnectPayload,
   ReplaceCameraPayload,
@@ -376,9 +377,10 @@ export class StreamApi {
    * Sends a request to get a stencil buffer image for the current scene view.
    */
   public getStencilBuffer(
+    payload: GetStencilBufferPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest({ getStencilBuffer: {} }, true);
+    return this.sendRequest({ getStencilBuffer: payload }, withResponse);
   }
 
   /**

@@ -1,14 +1,20 @@
-import { Color } from '@vertexvis/utils';
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Point } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
 import { FrameImageLike } from './frame';
 import { fromPbStencilBufferOrThrow } from '../mappers';
 import { decodePng } from '../../workers/png-decoder-pool';
+import { DepthBuffer } from './depthBuffer';
+import { ImageAttributesLike } from './frame';
 
 /**
- * A color that represents if a pixel does not contain a stencil value.
+ * A value that represents if a pixel does not contain a stencil value.
  */
-export const STENCIL_BUFFER_EMPTY_COLOR = Color.create(0, 0, 0);
+export const STENCIL_BUFFER_EMPTY_VALUE = 0;
+
+/**
+ * A value that represents if a pixel contains a feature.
+ */
+export const STENCIL_BUFFER_FEATURE_VALUE = 255;
 
 /**
  * The `StencilBufferManager` manages the stencil buffer state for the viewer.
@@ -58,22 +64,30 @@ export class StencilBufferManager {
         ? scene.crossSectioning().current().sectionPlanes.length > 0 ||
           this.viewer.featureLines != null
         : false;
+    const camera = this.viewer.frame?.scene.camera;
 
-    if (hasStencil && this.viewer.stream != null) {
-      const res = await this.viewer.stream.getStencilBuffer(true);
-      const { stencilBuffer: stencilBytes, imageAttributes } =
-        fromPbStencilBufferOrThrow(res);
+    if (hasStencil && this.viewer.stream != null && camera != null) {
+      const res = await this.viewer.stream.getStencilBuffer({
+        includeDepthBuffer: true,
+      });
+      const {
+        stencilBuffer: sBytes,
+        depthBuffer: dBytes,
+        imageAttributes,
+      } = fromPbStencilBufferOrThrow(res);
 
-      const png = await decodePng(stencilBytes as Uint8Array);
+      const [stencilPng, depthPng] = await Promise.all([
+        decodePng(new Uint8Array(sBytes)),
+        decodePng(new Uint8Array(dBytes)),
+      ]);
+
       return StencilBuffer.fromPng(
-        png,
-        imageAttributes.frameDimensions,
-        imageAttributes.imageRect,
-        imageAttributes.scaleFactor
+        stencilPng,
+        imageAttributes,
+        sBytes,
+        DepthBuffer.fromPng(depthPng, camera, imageAttributes)
       );
-    } else {
-      return undefined;
-    }
+    } else return undefined;
   }
 
   /**
@@ -137,45 +151,46 @@ export class StencilBuffer implements FrameImageLike {
   /**
    * Constructor.
    *
-   * @param frameDimensions The dimensions of the frame.
-   * @param imageBytes The PNG image data of the stencil buffer.
+   * @param imageAttr The attributes of the stencil image.
+   * @param imageBytes The original bytes for the image of the stencil buffer.
+   * @param pixelBytes The PNG pixel data of the stencil buffer.
    * @param imageChannels The number of color channels.
-   * @param imageRect The rectangle within the frame for this buffer.
-   * @param imageScale The amount of scaling that was applied to fill the frame.
+   * @param depthBuffer The depth buffer associated with this stencil buffer.
    */
   public constructor(
-    public readonly frameDimensions: Dimensions.Dimensions,
+    public readonly imageAttr: ImageAttributesLike,
     public readonly imageBytes: Uint8Array,
+    public readonly pixelBytes: Uint8Array,
     public readonly imageChannels: number,
-    public readonly imageRect: Rectangle.Rectangle,
-    public readonly imageScale: number
+    public readonly depthBuffer: DepthBuffer
   ) {}
 
   /**
    * Constructs a new stencil buffer from a decoded PNG.
    *
    * @param png The decoded PNG.
-   * @param frameDimensions The dimensions of the frame.
-   * @param imageChannels The number of color channels.
-   * @param imageRect The rectangle within the frame for this buffer.
-   * @param imageScale The amount of scaling that was applied to fill the frame.
+   * @param imageAttr The attributes of the stencil image.
+   * * @param imageBytes The original bytes for the image of the stencil buffer.
+   * @param depthBuffer The depth buffer associated with this stencil buffer.
    */
   public static fromPng(
     png: Pick<DecodedPng, 'data' | 'channels'>,
-    frameDimensions: Dimensions.Dimensions,
-    imageRect: Rectangle.Rectangle,
-    imageScale: number
+    imageAttr: ImageAttributesLike,
+    imageBytes: Uint8Array,
+    depthBuffer: DepthBuffer
   ): StencilBuffer {
-    if (png.data instanceof Uint8Array) {
+    if (!(png.data instanceof Uint8Array)) {
+      throw new Error('Expected stencil PNG to have depth of 8-bit');
+    } else if (png.channels !== 1) {
+      throw new Error('Expected stencil PNG to have 1 color channel');
+    } else {
       return new StencilBuffer(
-        frameDimensions,
+        imageAttr,
+        imageBytes,
         png.data,
         png.channels,
-        imageRect,
-        imageScale
+        depthBuffer
       );
-    } else {
-      throw new Error('Expected stencil PNG to have depth of 8-bit');
     }
   }
 
@@ -188,40 +203,48 @@ export class StencilBuffer implements FrameImageLike {
    * @see {@link Viewport.transformPointToFrame} to convert a viewport position
    * to frame position.
    */
-  public getColor(pt: Point.Point): Color.Color | undefined {
-    const { width, height } = this.imageRect;
-    const offset = Point.subtract(pt, this.imageRect);
-    const scale = 1 / this.imageScale;
+  public getValue(pt: Point.Point): number {
+    const { width, height } = this.imageAttr.imageRect;
+    const offset = Point.subtract(pt, this.imageAttr.imageRect);
+    const scale = 1 / this.imageAttr.imageScale;
     const pixel = Point.scale(offset, scale, scale);
 
     if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
       const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
-      const offset = index * this.imageChannels;
-      const r = this.imageBytes[offset + 0];
-      const g = this.imageBytes[offset + 1];
-      const b = this.imageBytes[offset + 2];
-      const color = Color.create(r, g, b);
-      return isEmptyColor(color) ? undefined : color;
-    }
+      const value = this.pixelBytes[index];
+      return value;
+    } else return 0;
   }
 
   /**
-   * Returns the colored point that is nearest to the given `pt`. This method is
-   * useful for performing snapping operations. An optional predicate can be
-   * provided to filter the pixels that are evaluated.
+   * Performs a hit test of the given point. Returns `true` if the point hits a
+   * pixel in the stencil.
+   *
+   * @param pt A point within the stencil's frame.
+   * @returns `true` if the point hits a pixel in the stencil, `false`
+   * otherwise.
+   */
+  public hitTest(pt: Point.Point): boolean {
+    return this.getValue(pt) !== STENCIL_BUFFER_EMPTY_VALUE;
+  }
+
+  /**
+   * Returns the colored pixel nearest to the given `pt`. This method is useful
+   * for performing snapping operations. An optional predicate can be provided
+   * to filter the pixels that are evaluated.
    *
    * @param pt A position within the frame.
-   * @param radius The radius around `pt` to evalute.
+   * @param radius The radius around `pt` to evaluate.
    * @param predicate An optional predicate. If unspecified, any non-black
    * pixels are considered.
    * @returns A point within radius that matches the given predicate.
    * @see {@link Viewport.transformPointToFrame} to convert a viewport position
    * to frame position.
    */
-  public getNearestPixel(
+  public snapToNearestPixel(
     pt: Point.Point,
     radius: number,
-    predicate: (color: Color.Color) => boolean = () => true
+    predicate: (value: number) => boolean = () => true
   ): Point.Point | undefined {
     const diameter = radius * 2;
     const topLeft = Point.create(pt.x - radius, pt.y - radius);
@@ -234,8 +257,8 @@ export class StencilBuffer implements FrameImageLike {
       const pixel = Point.add(topLeft, { x, y });
 
       if (Point.distance(pixel, pt) <= radius) {
-        const color = this.getColor(pixel);
-        if (color != null && predicate(color)) {
+        const value = this.getValue(pixel);
+        if (value === STENCIL_BUFFER_FEATURE_VALUE && predicate(value)) {
           pixels.push(pixel);
         }
       }
@@ -244,16 +267,11 @@ export class StencilBuffer implements FrameImageLike {
     const sorted = pixels.sort(
       (a, b) => Point.distance(a, pt) - Point.distance(b, pt)
     );
-    return sorted[0];
+    const closest = sorted[0];
+    return closest != null
+      ? Point.create(Math.floor(closest.x) + 0.5, Math.floor(closest.y) + 0.5)
+      : undefined;
   }
-}
-
-function isEmptyColor(color: Color.Color): boolean {
-  return (
-    color.r === STENCIL_BUFFER_EMPTY_COLOR.r &&
-    color.g === STENCIL_BUFFER_EMPTY_COLOR.g &&
-    color.b === STENCIL_BUFFER_EMPTY_COLOR.b
-  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
