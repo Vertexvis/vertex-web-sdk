@@ -23,7 +23,7 @@ export class ViewerMeasurementPrecise {
   @Prop({ mutable: true })
   public measurementController?: MeasurementController;
 
-  @Prop()
+  @Prop({ mutable: true })
   public viewer?: HTMLVertexViewerElement;
 
   @Prop()
