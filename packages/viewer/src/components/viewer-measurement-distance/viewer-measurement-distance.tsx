@@ -36,6 +36,12 @@ import {
 import { Cursor, measurementCursor } from '../../lib/cursors';
 import { PointToPointHitTester } from './hitTest';
 import { Formatter } from '../../lib/formatter';
+import {
+  PointToPointInteraction,
+  PointToPointInteractionModel,
+  PointToPointHitProvider,
+  PointToPointInteractionController,
+} from './interactions';
 
 /**
  * Contains the bounding boxes of child elements of this component. This
@@ -223,9 +229,6 @@ export class ViewerMeasurementDistance {
   public editEnd!: EventEmitter<void>;
 
   @State()
-  private line?: Line3.Line3;
-
-  @State()
   private viewport: Viewport = new Viewport(0, 0);
 
   @State()
@@ -244,18 +247,19 @@ export class ViewerMeasurementDistance {
   private invalidateStateCounter = 0;
 
   @State()
-  private interactiveStartPoint?: Point.Point;
-
-  @State()
-  private interactiveEndPoint?: Point.Point;
-
-  @State()
   // Any data that should be preserved across live-reloads, but should not cause
   // a rerender if changed.
   private stateMap: StateMap = {};
 
   @Element()
   private hostEl!: HTMLElement;
+
+  @State()
+  private indicatorPt?: Vector3.Vector3;
+
+  private model = PointToPointInteractionModel.empty();
+  private controller = new PointToPointInteractionController(this.model);
+  private interaction?: PointToPointInteraction;
 
   private measurementUnits = new DistanceUnits(this.units);
   private isUserInteractingWithModel = false;
@@ -289,12 +293,17 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   protected componentWillLoad(): void {
+    this.model.setMeasurementFromValues(this.start, this.end, !this.invalid);
+
+    this.getStencilBuffer();
     this.updateViewport();
 
     this.handleViewerChanged(this.viewer);
     this.handleModeChanged();
 
     this.computePropsAndState();
+
+    this.model.onIndicatorChanged((pt) => (this.indicatorPt = pt));
   }
 
   /**
@@ -367,7 +376,7 @@ export class ViewerMeasurementDistance {
               startPt={startPt}
               endPt={endPt}
               centerPt={labelPt}
-              indicatorPt={indicatorPt}
+              indicatorPt={this.indicatorPt}
               distance={distance}
               hideStartAnchor={hideStart}
               hideEndAnchor={hideEnd}
@@ -424,76 +433,26 @@ export class ViewerMeasurementDistance {
     this.warnIfDepthBuffersDisabled();
   }
 
+  @Watch('start')
+  protected handleStartChanged(): void {
+    this.updateInteractionModel();
+  }
+
+  @Watch('end')
+  protected handleEndChanged(): void {
+    this.updateInteractionModel();
+  }
+
+  @Watch('invalid')
+  protected handleInvalidChanged(): void {
+    this.updateInteractionModel();
+  }
+
   private computePropsAndState(): void {
+    this.updatePropsFromJson();
     this.updateCamera();
     this.updateDepthBuffer();
-    this.updateLineFromProps();
-    this.updateDistance();
-    this.updateInteraction();
-  }
-
-  private updateInteraction(): void {
-    if (this.mode === 'replace') {
-      this.updateReplaceInteraction();
-    } else if (this.mode === 'edit') {
-      this.updateEditInteraction();
-    }
-
-    if (this.interactionCount > 0) {
-      this.updateLineFromProps();
-      this.updateInvalid();
-    }
-  }
-
-  private updateReplaceInteraction(): void {
-    this.stateMap.hoverCursor?.dispose();
-
-    const hitTester = this.getHitTester();
-    if (this.interactiveStartPoint != null) {
-      this.start = hitTester?.hitTest(this.interactiveStartPoint)
-        ? hitTester?.transformPointToWorld(this.interactiveStartPoint)
-        : undefined;
-    }
-
-    // Don't update the end point if the depth buffer is undefined. This is
-    // to not clear the measurement line if the user interacts with the model
-    // while performing a measurement.
-    if (this.interactiveEndPoint != null) {
-      this.end = hitTester?.transformPointToWorld(this.interactiveEndPoint, {
-        ignoreHitTest: true,
-      });
-    }
-
-    this.interactiveStartPoint = undefined;
-    this.interactiveEndPoint = undefined;
-
-    if (this.start != null) {
-      this.setCursor(measurementCursor);
-    }
-  }
-
-  private updateEditInteraction(): void {
-    this.stateMap.hoverCursor?.dispose();
-
-    if (this.interactionCount > 0) {
-      const hitTester = this.getHitTester();
-      if (this.interactiveStartPoint != null) {
-        this.start = hitTester?.transformPointToWorld(
-          this.interactiveStartPoint,
-          { ignoreHitTest: true }
-        );
-      }
-
-      if (this.interactiveEndPoint != null) {
-        this.end = hitTester?.transformPointToWorld(this.interactiveEndPoint, {
-          ignoreHitTest: true,
-        });
-      }
-
-      this.interactiveStartPoint = undefined;
-      this.interactiveEndPoint = undefined;
-      this.setCursor(measurementCursor);
-    }
+    this.updateMeasurementPropsFromModel();
   }
 
   private async setCursor(cursor: Cursor): Promise<void> {
@@ -513,10 +472,11 @@ export class ViewerMeasurementDistance {
   }
 
   private computeEditOrViewElementPositions(): MeasurementElementPositions {
-    if (this.internalCamera != null && this.line != null) {
+    const measurement = this.model.getMeasurement();
+    if (this.internalCamera != null && measurement != null) {
       return this.computeLineElementPositions(
         this.internalCamera.projectionViewMatrix,
-        this.line
+        Line3.create(measurement)
       );
     } else {
       return {};
@@ -525,15 +485,20 @@ export class ViewerMeasurementDistance {
 
   private computeReplaceElementPositions(): MeasurementElementPositions {
     if (this.internalCamera != null) {
-      if (this.line != null) {
+      const measurement = this.model.getMeasurement();
+
+      if (measurement != null) {
         return this.computeLineElementPositions(
           this.internalCamera.projectionViewMatrix,
-          this.line
+          Line3.create({
+            start: measurement.start,
+            end: measurement.end,
+          })
         );
-      } else if (this.start != null) {
+      } else if (this.indicatorPt != null) {
         return {
           indicatorPt: translateWorldPtToViewport(
-            this.start,
+            this.indicatorPt,
             this.internalCamera.projectionViewMatrix,
             this.viewport
           ),
@@ -567,52 +532,19 @@ export class ViewerMeasurementDistance {
       this.depthBuffer || (await this.viewer?.frame?.depthBuffer());
   }
 
-  private updateLineFromProps(): void {
-    const start = this.start || parseVector3(this.startJson);
-    const end = this.end || parseVector3(this.endJson);
-    this.line =
-      start != null && end != null ? Line3.create({ start, end }) : undefined;
-  }
-
   private updateViewport(): void {
     const rect = getMeasurementBoundingClientRect(this.hostEl);
     this.viewport = new Viewport(rect.width, rect.height);
     this.elementBounds = rect;
   }
 
-  private updateInvalid(): void {
-    if (this.internalDepthBuffer != null) {
-      if (this.line != null && this.internalCamera != null) {
-        const lineNdc = Line3.transformMatrix(
-          this.line,
-          this.internalCamera.projectionViewMatrix
-        );
-
-        const startPt = this.viewport.transformVectorToViewport(lineNdc.start);
-        const endPt = this.viewport.transformVectorToViewport(lineNdc.end);
-
-        const hitTester = this.getHitTester();
-        const isStartInvalid =
-          this.interactingAnchor === 'start' &&
-          (!hitTester?.hitTest(startPt) ?? true);
-        const isEndInvalid =
-          this.interactingAnchor === 'end' &&
-          (!hitTester?.hitTest(endPt) ?? true);
-
-        this.invalid = isStartInvalid || isEndInvalid;
-      }
-    }
+  private updatePropsFromJson(): void {
+    this.start = parseVector3(this.startJson ?? this.start);
+    this.end = parseVector3(this.endJson ?? this.end);
   }
 
-  private updateDistance(): void {
-    const worldDistance =
-      this.line != null && !this.invalid
-        ? Line3.distance(this.line)
-        : undefined;
-    this.distance =
-      worldDistance != null
-        ? this.measurementUnits.convertWorldValueToReal(worldDistance)
-        : undefined;
+  private updateInteractionModel(): void {
+    this.model.setMeasurementFromValues(this.start, this.end, !this.invalid);
   }
 
   private handleFrameDrawn = (): void => {
@@ -629,8 +561,8 @@ export class ViewerMeasurementDistance {
     const interactionTarget = await viewer.getInteractionTarget();
     if (this.mode === 'replace') {
       interactionTarget.addEventListener('pointermove', this.updateStartAnchor);
-      interactionTarget.addEventListener('pointerdown', this.startMeasurement);
-      interactionTarget.addEventListener('pointerleave', this.resetStartAnchor);
+      interactionTarget.addEventListener('pointerdown', this.newMeasurement);
+      interactionTarget.addEventListener('pointerleave', this.clearIndicator);
     }
   }
 
@@ -642,35 +574,27 @@ export class ViewerMeasurementDistance {
       'pointermove',
       this.updateStartAnchor
     );
-    interactionTarget.removeEventListener('pointerdown', this.startMeasurement);
-    interactionTarget.removeEventListener(
-      'pointerleave',
-      this.resetStartAnchor
-    );
+    interactionTarget.removeEventListener('pointerdown', this.newMeasurement);
+    interactionTarget.removeEventListener('pointerleave', this.clearIndicator);
   }
 
+  private clearIndicator = (): void => {
+    this.controller.clearIndicator();
+  };
+
   private updateStartAnchor = async (event: PointerEvent): Promise<void> => {
+    this.getStencilBuffer();
+
     if (this.interactionCount === 0) {
       const pt = getMouseClientPosition(event, this.elementBounds);
       const snapPt = this.snapPoint(pt, event);
-      this.getStencilBuffer();
-      this.interactiveStartPoint = snapPt;
+      this.updateIndicator(snapPt);
     }
   };
 
-  private resetStartAnchor = (): void => {
-    if (this.interactionCount === 0) {
-      this.start = undefined;
-      this.interactiveStartPoint = undefined;
-    }
-  };
-
-  private startMeasurement = (event: PointerEvent): void => {
-    if (
-      this.interactionCount === 0 &&
-      this.start != null &&
-      event.button === 0
-    ) {
+  private newMeasurement = (event: PointerEvent): void => {
+    if (this.interactionCount === 0 && event.button === 0) {
+      // Function that registers event listeners to perform a new measurement.
       const startMeasurement = (start: () => void): void => {
         const dispose = (): void => {
           window.removeEventListener('pointerup', pointerUp);
@@ -685,10 +609,14 @@ export class ViewerMeasurementDistance {
             dispose();
           }
         };
+
         window.addEventListener('pointermove', pointerMove);
         window.addEventListener('pointerup', pointerUp);
       };
 
+      // Function that registers event listeners to detect if a user is
+      // interacting with the model. If so, we temporarily disable measurement
+      // updates until the user finishes.
       const pointerDownAndMove = (callback: () => void): Disposable => {
         const pointerMove = (): void => callback();
 
@@ -711,6 +639,7 @@ export class ViewerMeasurementDistance {
         };
       };
 
+      // Function that registers event listeners to finish a measurement.
       const measureInteraction = (): void => {
         const handleDownAndMove = pointerDownAndMove(() => {
           this.isUserInteractingWithModel = true;
@@ -723,14 +652,22 @@ export class ViewerMeasurementDistance {
           handleDownAndMove.dispose();
         };
 
-        const pointerMove = this.createAnchorPointerMoveHandler('end');
-        const pointerUp = (event: PointerEvent): void => {
+        const pointerMove = this.createInteractionMoveHandler();
+        const pointerUp = async (event: PointerEvent): Promise<void> => {
           if (event.button === 0) {
             if (this.isUserInteractingWithModel) {
               this.isUserInteractingWithModel = false;
             } else {
-              dispose();
-              this.endEditing();
+              const hits = this.getHitProvider();
+              if (hits != null) {
+                const pt = getMouseClientPosition(event, this.elementBounds);
+                const snapPt = this.snapPoint(pt, event);
+                await this.interaction?.finish(snapPt, hits);
+
+                dispose();
+                this.updateMeasurementPropsFromModel();
+                this.endEditing();
+              }
             }
           }
         };
@@ -739,7 +676,15 @@ export class ViewerMeasurementDistance {
         window.addEventListener('pointermove', pointerMove);
         window.addEventListener('pointerup', pointerUp);
       };
-      startMeasurement(measureInteraction);
+
+      const hits = this.getHitProvider();
+      if (hits != null) {
+        const pt = getMouseClientPosition(event, this.elementBounds);
+        const snapPt = this.snapPoint(pt, event);
+        this.interaction = this.controller.newMeasurement(snapPt, hits);
+
+        startMeasurement(measureInteraction);
+      }
     }
   };
 
@@ -747,16 +692,29 @@ export class ViewerMeasurementDistance {
     anchor: Anchor
   ): ((event: PointerEvent) => void) | undefined {
     if (this.mode === 'edit' && this.internalDepthBuffer != null) {
-      const handlePointerMove = this.createAnchorPointerMoveHandler(anchor);
-      const handlePointerUp = this.createAnchorPointerUpHandler(
-        anchor,
-        handlePointerMove
-      );
+      const handlePointerMove = this.createInteractionMoveHandler();
+      const handlePointerUp = async (event: PointerEvent): Promise<void> => {
+        const hits = this.getHitProvider();
+        if (hits != null) {
+          window.removeEventListener('pointermove', handlePointerMove);
+          window.removeEventListener('pointerup', handlePointerUp);
+
+          const pt = getMouseClientPosition(event, this.elementBounds);
+          const snapPt = this.snapPoint(pt, event);
+          await this.interaction?.finish(snapPt, hits);
+
+          this.updateMeasurementPropsFromModel();
+          this.endEditing();
+        }
+      };
 
       return (event) => {
+        this.getStencilBuffer();
+
         if (event.button === 0) {
           this.beginEditing(anchor);
-          this.getStencilBuffer();
+
+          this.interaction = this.controller.editMeasurement(anchor);
 
           window.addEventListener('pointermove', handlePointerMove);
           window.addEventListener('pointerup', handlePointerUp);
@@ -765,37 +723,19 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private createAnchorPointerMoveHandler(
-    anchor: Anchor
-  ): (event: PointerEvent) => void {
+  private createInteractionMoveHandler(): (event: PointerEvent) => void {
     return (event) => {
-      if (this.elementBounds != null) {
+      const hits = this.getHitProvider();
+      if (this.elementBounds != null && hits != null) {
         event.preventDefault();
         this.getStencilBuffer();
 
         const pt = getMouseClientPosition(event, this.elementBounds);
         const snapPt = this.snapPoint(pt, event);
-
-        if (anchor === 'start') {
-          this.interactiveStartPoint = snapPt;
-        } else {
-          this.interactiveEndPoint = snapPt;
-        }
+        this.interaction?.update(snapPt, hits);
+        this.updateMeasurementPropsFromModel();
       }
     };
-  }
-
-  private createAnchorPointerUpHandler(
-    anchor: 'start' | 'end',
-    pointerMove: (event: PointerEvent) => void
-  ): (event: PointerEvent) => void {
-    const handlePointerUp = (): void => {
-      window.removeEventListener('pointermove', pointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-      this.endEditing();
-    };
-
-    return handlePointerUp;
   }
 
   private async getStencilBuffer(): Promise<void> {
@@ -844,6 +784,17 @@ export class ViewerMeasurementDistance {
     this.interactionCount = this.interactionCount - 1;
   }
 
+  private getHitProvider(): PointToPointHitProvider | undefined {
+    const hitTester = this.getHitTester();
+    const viewer = this.viewer;
+    if (viewer != null && hitTester != null) {
+      return {
+        hitTester: () => hitTester,
+        raycaster: async () => (await viewer.scene()).raycaster(),
+      };
+    }
+  }
+
   private getHitTester(): PointToPointHitTester | undefined {
     if (this.stateMap.stencil != null && this.internalDepthBuffer != null) {
       return new PointToPointHitTester(
@@ -851,6 +802,25 @@ export class ViewerMeasurementDistance {
         this.internalDepthBuffer,
         this.viewport
       );
+    }
+  }
+
+  private updateMeasurementPropsFromModel(): void {
+    const measurement = this.model.getMeasurement();
+    this.start = measurement?.start;
+    this.end = measurement?.end;
+    this.distance = measurement?.distance;
+    this.invalid = measurement != null && !measurement.valid;
+  }
+
+  private updateIndicator(pt: Point.Point): void {
+    const hits = this.getHitProvider();
+    const clearCursor =
+      hits == null || !this.controller.moveIndicator(pt, hits);
+    if (clearCursor) {
+      this.stateMap.hoverCursor?.dispose();
+    } else {
+      this.setCursor(measurementCursor);
     }
   }
 

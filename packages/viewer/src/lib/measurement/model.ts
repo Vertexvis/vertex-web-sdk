@@ -88,6 +88,38 @@ export interface PlanarDistanceMeasurementResult {
 }
 
 /**
+ * A measurement result that represents the distance between two points.
+ */
+export interface PointToPointMeasurementResult {
+  /**
+   * The type.
+   */
+  type: 'point-to-point';
+
+  /**
+   * The distance, in world units, between two points. This value is only
+   * populated if the result is valid.
+   */
+  distance?: number;
+
+  /**
+   * The first point, in world units.
+   */
+  start: Vector3.Vector3;
+
+  /**
+   * The second point, in world units.
+   */
+  end: Vector3.Vector3;
+
+  /**
+   * Indicates if this result is valid. A value of `false` indicates that one of
+   * the points does not touch any geometry.
+   */
+  valid: boolean;
+}
+
+/**
  * A type representing the possible measurement results.
  */
 export type MeasurementResult =
