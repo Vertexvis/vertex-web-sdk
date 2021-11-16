@@ -284,12 +284,21 @@ export namespace Components {
      * The initial width of this column.
      */
     initialWidth?: number;
+    /**
+     * The maximum width of this column.
+     */
+    maxWidth?: number;
+    /**
+     * The minimum width of this column.
+     */
+    minWidth?: number;
   }
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
     layoutHeight?: number;
     layoutOffset: number;
+    layoutWidth?: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
@@ -310,6 +319,7 @@ export namespace Components {
     viewportEndIndex: number;
     viewportStartIndex: number;
   }
+  interface VertexSceneTreeTableResizeDivider {}
   interface VertexSceneTreeToolbar {}
   interface VertexSceneTreeToolbarGroup {}
   interface VertexViewer {
@@ -1174,6 +1184,13 @@ declare global {
     prototype: HTMLVertexSceneTreeTableLayoutElement;
     new (): HTMLVertexSceneTreeTableLayoutElement;
   };
+  interface HTMLVertexSceneTreeTableResizeDividerElement
+    extends Components.VertexSceneTreeTableResizeDivider,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeTableResizeDividerElement: {
+    prototype: HTMLVertexSceneTreeTableResizeDividerElement;
+    new (): HTMLVertexSceneTreeTableResizeDividerElement;
+  };
   interface HTMLVertexSceneTreeToolbarElement
     extends Components.VertexSceneTreeToolbar,
       HTMLStencilElement {}
@@ -1349,6 +1366,7 @@ declare global {
     'vertex-scene-tree-table-column': HTMLVertexSceneTreeTableColumnElement;
     'vertex-scene-tree-table-header': HTMLVertexSceneTreeTableHeaderElement;
     'vertex-scene-tree-table-layout': HTMLVertexSceneTreeTableLayoutElement;
+    'vertex-scene-tree-table-resize-divider': HTMLVertexSceneTreeTableResizeDividerElement;
     'vertex-scene-tree-toolbar': HTMLVertexSceneTreeToolbarElement;
     'vertex-scene-tree-toolbar-group': HTMLVertexSceneTreeToolbarGroupElement;
     'vertex-viewer': HTMLVertexViewerElement;
@@ -1484,12 +1502,21 @@ declare namespace LocalJSX {
      * The initial width of this column.
      */
     initialWidth?: number;
+    /**
+     * The maximum width of this column.
+     */
+    maxWidth?: number;
+    /**
+     * The minimum width of this column.
+     */
+    minWidth?: number;
   }
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
     layoutHeight?: number;
     layoutOffset?: number;
+    layoutWidth?: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
@@ -1510,6 +1537,7 @@ declare namespace LocalJSX {
     viewportEndIndex?: number;
     viewportStartIndex?: number;
   }
+  interface VertexSceneTreeTableResizeDivider {}
   interface VertexSceneTreeToolbar {}
   interface VertexSceneTreeToolbarGroup {}
   interface VertexViewer {
@@ -2279,6 +2307,7 @@ declare namespace LocalJSX {
     'vertex-scene-tree-table-column': VertexSceneTreeTableColumn;
     'vertex-scene-tree-table-header': VertexSceneTreeTableHeader;
     'vertex-scene-tree-table-layout': VertexSceneTreeTableLayout;
+    'vertex-scene-tree-table-resize-divider': VertexSceneTreeTableResizeDivider;
     'vertex-scene-tree-toolbar': VertexSceneTreeToolbar;
     'vertex-scene-tree-toolbar-group': VertexSceneTreeToolbarGroup;
     'vertex-viewer': VertexViewer;
@@ -2321,6 +2350,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableHeaderElement>;
       'vertex-scene-tree-table-layout': LocalJSX.VertexSceneTreeTableLayout &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableLayoutElement>;
+      'vertex-scene-tree-table-resize-divider': LocalJSX.VertexSceneTreeTableResizeDivider &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableResizeDividerElement>;
       'vertex-scene-tree-toolbar': LocalJSX.VertexSceneTreeToolbar &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
       'vertex-scene-tree-toolbar-group': LocalJSX.VertexSceneTreeToolbarGroup &

@@ -1,0 +1,22 @@
+:host {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: col-resize;
+}
+
+.divider {
+  width: 1px;
+  height: 100%;
+  background-color: var(--neutral-600);
+  cursor: col-resize;
+}
+
+.divider.dragging {
+  background-color: var(--blue-600);
+}
+
+:host:hover .divider {
+  background-color: var(--blue-600);
+}

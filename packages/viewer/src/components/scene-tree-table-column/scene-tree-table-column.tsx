@@ -12,6 +12,18 @@ export class SceneTreeTableColumn {
   @Prop()
   public initialWidth?: number;
 
+  /**
+   * The minimum width of this column.
+   */
+  @Prop()
+  public minWidth?: number;
+
+  /**
+   * The maximum width of this column.
+   */
+  @Prop()
+  public maxWidth?: number;
+
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>

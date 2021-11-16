@@ -18,6 +18,12 @@
     * padding between columns in the table.
     */
     --scene-tree-table-column-gap: 0.5rem;
+
+  /**
+    * @prop --scene-tree-table-column-resize-cursor: A CSS cursor value that will
+    * be displayed when resizing a column. Defaults to `col-resize`.
+    */
+    --scene-tree-table-column-resize-cursor: col-resize;
 }
 
 .header {
@@ -27,18 +33,29 @@
   border-bottom: var(--scene-tree-toolbar-separator);
 }
 
-.header > *:not(:last-child) {
-  padding-right: var(--scene-tree-table-column-gap);
-}
-
-.header > *:first-child {
-  padding-left: var(--scene-tree-table-column-gap);
-}
-
 .table {
   position: relative;
   display: grid;
   width: 100%;
   height: 100%;
   overflow: auto;
+}
+
+.resize-overlay {
+  position: absolute;
+  top: 0;
+  cursor: var(--scene-tree-table-column-resize-cursor);
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+}
+
+.divider-overlay {
+  position: absolute;
+  top: 0;
+  display: grid;
+  pointer-events: none;
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
 }
