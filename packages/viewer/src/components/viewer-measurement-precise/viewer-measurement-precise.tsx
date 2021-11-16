@@ -38,10 +38,18 @@ export class ViewerMeasurementPrecise {
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedDisposable?: Disposable;
 
+  protected connectedCallback(): void {
+    this.setupInteractionHandler();
+  }
+
   protected componentWillLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
     this.setupModelListeners();
+  }
+
+  protected disconnectedCallback(): void {
+    this.clearInteractionHandler();
   }
 
   @Watch('measurementController')
@@ -74,9 +82,13 @@ export class ViewerMeasurementPrecise {
     );
   }
 
-  private setupInteractionHandler(): void {
+  private clearInteractionHandler(): void {
     this.registeredInteractionHandler?.then((handler) => handler.dispose());
     this.registeredInteractionHandler = undefined;
+  }
+
+  private setupInteractionHandler(): void {
+    this.clearInteractionHandler();
 
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
@@ -86,8 +98,14 @@ export class ViewerMeasurementPrecise {
     }
   }
 
-  private setupModelListeners(): void {
+  private clearModelListeners(): void {
     this.onEntitiesChangedDisposable?.dispose();
+    this.onEntitiesChangedDisposable = undefined;
+  }
+
+  private setupModelListeners(): void {
+    this.clearModelListeners();
+
     this.onEntitiesChangedDisposable = this.measurementModel?.onEntitiesChanged(
       this.handleEntitiesChanged
     );
