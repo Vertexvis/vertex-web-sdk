@@ -116,11 +116,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
       `,
     });
 
-    expect(
-      table.shadowRoot
-        ?.querySelector('div.header')
-        ?.querySelector('div.templated-header-div')
-    ).not.toBeNull();
+    expect(table.querySelector('div.templated-header-div')).not.toBeNull();
   });
 
   it('creates dividers from the divider template', async () => {
