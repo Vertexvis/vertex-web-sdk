@@ -10,10 +10,17 @@ interface RaycasterOptions {
   includeMetadata: boolean;
 }
 
+export interface RaycasterLike {
+  hitItems(
+    point: Point.Point,
+    options?: RaycasterOptions
+  ): Promise<vertexvis.protobuf.stream.IHitItemsResult | undefined>;
+}
+
 /**
  * The `Raycaster` class is here.
  */
-export class Raycaster {
+export class Raycaster implements RaycasterLike {
   public constructor(
     private stream: StreamApi,
     private imageScaleProvider: ImageScaleProvider

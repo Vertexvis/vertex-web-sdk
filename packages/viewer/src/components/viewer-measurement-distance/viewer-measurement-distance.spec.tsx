@@ -39,14 +39,20 @@ describe('vertex-viewer-measurement-distance', () => {
   const startNdc = Vector3.transformMatrix(start, projectionViewMatrix);
   const endNdc = Vector3.transformMatrix(end, projectionViewMatrix);
 
-  const depthBuffer = Fixtures.createDepthBuffer(100, 100, 0);
-  const stencilBuffer = Fixtures.createStencilBuffer(
+  const depthBuffer = Fixtures.makeDepthBuffer(100, 100, 0);
+  const stencilBuffer = Fixtures.makeStencilBuffer(
     100,
     100,
     ({ x }) =>
       x > 49 ? STENCIL_BUFFER_FEATURE_VALUE : STENCIL_BUFFER_EMPTY_VALUE,
     depthBuffer
   );
+
+  const raycaster = Fixtures.makeRaycaster();
+  const hitProvider = Fixtures.makeHitProvider({
+    hitTester: Fixtures.makeHitTester({ stencilBuffer, depthBuffer, viewport }),
+    raycaster,
+  });
 
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
@@ -223,7 +229,7 @@ describe('vertex-viewer-measurement-distance', () => {
           startJson="[0, 0, 0]"
           endJson="[0, 0, 0]"
           camera={camera}
-          depthBuffer={depthBuffer}
+          hitProvider={hitProvider}
         >
           <div id="start-label" slot="start-label"></div>
           <div id="end-label" slot="end-label"></div>
@@ -415,7 +421,7 @@ describe('vertex-viewer-measurement-distance', () => {
           <vertex-viewer-measurement-distance
             start={start}
             end={end}
-            depthBuffer={depthBuffer}
+            hitProvider={hitProvider}
             camera={camera}
           />
         ),
@@ -439,7 +445,7 @@ describe('vertex-viewer-measurement-distance', () => {
           <vertex-viewer-measurement-distance
             start={start}
             end={end}
-            depthBuffer={depthBuffer}
+            hitProvider={hitProvider}
             camera={camera}
             mode="edit"
           />
@@ -466,7 +472,7 @@ describe('vertex-viewer-measurement-distance', () => {
           <vertex-viewer-measurement-distance
             start={start}
             end={end}
-            depthBuffer={depthBuffer}
+            hitProvider={hitProvider}
             camera={camera}
             mode="edit"
             onEditBegin={onEditBegin}
@@ -484,28 +490,20 @@ describe('vertex-viewer-measurement-distance', () => {
 
     it('updates start point when anchor is moved', async () => {
       const page = await newSpecPage({
-        components: [Viewer, ViewerMeasurementDistance],
+        components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer>
-            <vertex-viewer-measurement-distance
-              start={start}
-              end={end}
-              depthBuffer={depthBuffer}
-              camera={camera}
-              mode="edit"
-            />
-          </vertex-viewer>
+          <vertex-viewer-measurement-distance
+            start={start}
+            end={end}
+            hitProvider={hitProvider}
+            camera={camera}
+            mode="edit"
+          />
         ),
       });
 
-      const viewer = page.root as HTMLVertexViewerElement;
-      jest
-        .spyOn(viewer.stencilBuffer, 'latestAfterInteraction')
-        .mockResolvedValue(stencilBuffer);
-
-      const measurement = viewer.querySelector(
-        'vertex-viewer-measurement-distance'
-      ) as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
 
       anchor?.dispatchEvent(
@@ -518,7 +516,6 @@ describe('vertex-viewer-measurement-distance', () => {
       expect(measurement.start).not.toEqual(start);
 
       // Test snapping
-      await viewer.stencilBuffer.latestAfterInteraction();
       window.dispatchEvent(new MouseEvent('pointermove', snapEvent));
       await page.waitForChanges();
       expect(measurement.start).toEqual(snapPt);
@@ -537,7 +534,7 @@ describe('vertex-viewer-measurement-distance', () => {
           <vertex-viewer-measurement-distance
             start={start}
             end={end}
-            depthBuffer={depthBuffer}
+            hitProvider={hitProvider}
             camera={camera}
             mode="edit"
           />
@@ -567,7 +564,7 @@ describe('vertex-viewer-measurement-distance', () => {
           <vertex-viewer-measurement-distance
             start={start}
             end={end}
-            depthBuffer={depthBuffer}
+            hitProvider={hitProvider}
             camera={camera}
             onEditEnd={onEditEnd}
             mode="edit"
@@ -590,22 +587,20 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   describe('replace mode', () => {
-    const depthBuffer = Fixtures.createDepthBuffer(100, 100, 0);
+    const depthBuffer = Fixtures.makeDepthBuffer(100, 100, 0);
     const snapEvent = { clientX: 45, clientY: 50 };
     const snapPt = viewport.transformPointToWorldSpace(
       Point.create(50.5, 50.5),
       depthBuffer
     );
 
-    it('updates start pt on pointer move', async () => {
+    it('updates indicator on pointer move', async () => {
       const page = await newSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
             <vertex-viewer-measurement-distance
-              start={start}
-              end={end}
-              depthBuffer={depthBuffer}
+              hitProvider={hitProvider}
               camera={camera}
               mode="replace"
             />
@@ -614,10 +609,6 @@ describe('vertex-viewer-measurement-distance', () => {
       });
 
       const viewer = page.root as HTMLVertexViewerElement;
-      jest
-        .spyOn(viewer.stencilBuffer, 'latestAfterInteraction')
-        .mockResolvedValue(stencilBuffer);
-
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
@@ -627,13 +618,18 @@ describe('vertex-viewer-measurement-distance', () => {
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
       await page.waitForChanges();
-      expect(measurement.start).not.toEqual(start);
+
+      const indicatorPt = viewport.transformPointToWorldSpace(
+        { x: 10, y: 10 },
+        depthBuffer
+      );
+      expect(measurement.indicatorPt).toEqual(indicatorPt);
+      expect(measurement.shadowRoot?.querySelector('.indicator')).toBeDefined();
 
       // Test snapping
-      await viewer.stencilBuffer.latestAfterInteraction();
       interactionTarget.dispatchEvent(new MouseEvent('pointermove', snapEvent));
       await page.waitForChanges();
-      expect(measurement.start).toEqual(snapPt);
+      expect(measurement.indicatorPt).toEqual(snapPt);
     });
 
     it('does nothing if not primary button', async () => {
@@ -646,7 +642,7 @@ describe('vertex-viewer-measurement-distance', () => {
             <vertex-viewer-measurement-distance
               start={start}
               end={end}
-              depthBuffer={depthBuffer}
+              hitProvider={hitProvider}
               camera={camera}
               mode="replace"
               onEditBegin={onEditBegin}
@@ -705,7 +701,7 @@ describe('vertex-viewer-measurement-distance', () => {
             <vertex-viewer-measurement-distance
               start={start}
               end={end}
-              depthBuffer={depthBuffer}
+              hitProvider={hitProvider}
               camera={camera}
               mode="replace"
               onEditBegin={onEditBegin}
@@ -716,10 +712,6 @@ describe('vertex-viewer-measurement-distance', () => {
       });
 
       const viewer = page.root as HTMLVertexViewerElement;
-      jest
-        .spyOn(viewer.stencilBuffer, 'latestAfterInteraction')
-        .mockResolvedValue(stencilBuffer);
-
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
@@ -774,7 +766,7 @@ describe('vertex-viewer-measurement-distance', () => {
             <vertex-viewer-measurement-distance
               start={start}
               end={end}
-              depthBuffer={depthBuffer}
+              hitProvider={hitProvider}
               camera={camera}
               mode="replace"
               onEditBegin={onEditBegin}
@@ -829,7 +821,7 @@ describe('vertex-viewer-measurement-distance', () => {
             <vertex-viewer-measurement-distance
               start={start}
               end={end}
-              depthBuffer={depthBuffer}
+              hitProvider={hitProvider}
               camera={camera}
               mode="replace"
               onEditBegin={onEditBegin}

@@ -1,11 +1,11 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
-import { Raycaster } from '../../lib/scenes';
 import { PointToPointHitTester } from './hitTest';
 import { fromPbVector3f } from '../../lib/mappers';
 import { Mapper } from '@vertexvis/utils';
 import { PointToPointMeasurementResult } from '../../lib/measurement';
 import { Anchor } from './utils';
+import { RaycasterLike } from '../../lib/scenes';
 
 /**
  * Provides APIs to perform local or remote hit tests.
@@ -20,7 +20,7 @@ export interface PointToPointHitProvider {
   /**
    * Returns a raycaster that can be used to perform hits through API calls.
    */
-  raycaster(): Promise<Raycaster>;
+  raycaster(): Promise<RaycasterLike>;
 }
 
 /**
@@ -355,8 +355,10 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
         'Cannot update new measurement interaction. End point is empty.'
       );
     } else if (!isHit) {
+      this.model.setIndicator(world);
       return this.setMeasurement(this.getInvalidMeasurement(world));
     } else {
+      this.model.setIndicator(world);
       return this.setMeasurement(this.getValidMeasurement(world));
     }
   }
@@ -367,6 +369,8 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
   ): Promise<PointToPointMeasurementResult> {
     const raycaster = await hits.raycaster();
     const hitPt = await getHit(raycaster, pt);
+
+    this.model.setIndicator(undefined);
 
     if (hitPt == null) {
       const end = hits
@@ -448,7 +452,7 @@ class EditEndAnchorInteraction
 }
 
 async function getHit(
-  raycaster: Raycaster,
+  raycaster: RaycasterLike,
   pt: Point.Point
 ): Promise<Vector3.Vector3 | undefined> {
   const hitRes = await raycaster.hitItems(pt);

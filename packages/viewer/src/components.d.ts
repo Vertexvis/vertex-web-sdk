@@ -83,6 +83,7 @@ import {
   ViewerMeasurementDistanceMode,
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
 import { Anchor } from './components/viewer-measurement-distance/utils';
+import { PointToPointHitProvider } from './components/viewer-measurement-distance/interactions';
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
@@ -896,10 +897,6 @@ export namespace Components {
       ViewerMeasurementDistanceElementMetrics | undefined
     >;
     /**
-     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
      * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
      */
     distance?: number;
@@ -915,6 +912,8 @@ export namespace Components {
      * The number of fraction digits to display.
      */
     fractionalDigits: number;
+    hitProvider?: PointToPointHitProvider;
+    indicatorPt?: Vector3.Vector3;
     /**
      * A property that reflects which anchor is currently being interacted with.
      */
@@ -2065,10 +2064,6 @@ declare namespace LocalJSX {
      */
     camera?: FramePerspectiveCamera;
     /**
-     * The depth buffer that is used to optimistically determine the a depth value from a 2D screen point. If `viewer` is defined, then the depth buffer will be automatically set.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
      * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
      */
     distance?: number;
@@ -2084,6 +2079,8 @@ declare namespace LocalJSX {
      * The number of fraction digits to display.
      */
     fractionalDigits?: number;
+    hitProvider?: PointToPointHitProvider;
+    indicatorPt?: Vector3.Vector3;
     /**
      * A property that reflects which anchor is currently being interacted with.
      */

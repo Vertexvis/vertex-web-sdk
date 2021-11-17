@@ -8,7 +8,7 @@ import {
 } from '@vertexvis/geometry';
 import { DepthBuffer } from '../depthBuffer';
 import { FramePerspectiveCamera } from '../frame';
-import { createDepthImageBytes } from '../../../testing/fixtures';
+import { makeDepthImageBytes } from '../../../testing/fixtures';
 import { Viewport } from '../viewport';
 
 describe(DepthBuffer, () => {
@@ -32,7 +32,7 @@ describe(DepthBuffer, () => {
       imageRect: Rectangle.create(0, 0, 100, 100),
       imageScale: 1,
     },
-    createDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
+    makeDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
   );
 
   describe(DepthBuffer.prototype.getLinearDepthAtPoint, () => {
@@ -113,7 +113,7 @@ describe(DepthBuffer, () => {
           imageRect: Rectangle.create(0, 0, 100, 100),
           imageScale: 1,
         },
-        createDepthImageBytes(100, 100, depthValue)
+        makeDepthImageBytes(100, 100, depthValue)
       );
 
       const viewport = new Viewport(100, 100);

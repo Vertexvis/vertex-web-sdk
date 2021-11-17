@@ -67,6 +67,7 @@ export type ViewerMeasurementDistanceMode = 'edit' | 'replace' | '';
 interface StateMap {
   hoverCursor?: Disposable;
   stencil?: StencilBuffer;
+  depthBuffer?: DepthBuffer;
 }
 
 /**
@@ -200,12 +201,16 @@ export class ViewerMeasurementDistance {
   public camera?: FramePerspectiveCamera;
 
   /**
-   * The depth buffer that is used to optimistically determine the a depth value
-   * from a 2D screen point. If `viewer` is defined, then the depth buffer will
-   * be automatically set.
+   * @internal
    */
   @Prop()
-  public depthBuffer?: DepthBuffer;
+  public hitProvider?: PointToPointHitProvider;
+
+  /**
+   * @internal
+   */
+  @Prop({ mutable: true })
+  public indicatorPt?: Vector3.Vector3;
 
   /**
    * The viewer to connect to this measurement. The measurement will redraw any
@@ -241,9 +246,6 @@ export class ViewerMeasurementDistance {
   private internalCamera?: FramePerspectiveCamera;
 
   @State()
-  private internalDepthBuffer?: DepthBuffer;
-
-  @State()
   private invalidateStateCounter = 0;
 
   @State()
@@ -253,9 +255,6 @@ export class ViewerMeasurementDistance {
 
   @Element()
   private hostEl!: HTMLElement;
-
-  @State()
-  private indicatorPt?: Vector3.Vector3;
 
   private model = PointToPointInteractionModel.empty();
   private controller = new PointToPointInteractionController(this.model);
@@ -293,6 +292,7 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   protected componentWillLoad(): void {
+    this.updatePropsFromJson();
     this.model.setMeasurementFromValues(this.start, this.end, !this.invalid);
 
     this.getStencilBuffer();
@@ -303,7 +303,9 @@ export class ViewerMeasurementDistance {
 
     this.computePropsAndState();
 
-    this.model.onIndicatorChanged((pt) => (this.indicatorPt = pt));
+    this.model.onIndicatorChanged((pt) => {
+      this.indicatorPt = pt;
+    });
   }
 
   /**
@@ -449,7 +451,6 @@ export class ViewerMeasurementDistance {
   }
 
   private computePropsAndState(): void {
-    this.updatePropsFromJson();
     this.updateCamera();
     this.updateDepthBuffer();
     this.updateMeasurementPropsFromModel();
@@ -528,8 +529,7 @@ export class ViewerMeasurementDistance {
   }
 
   private async updateDepthBuffer(): Promise<void> {
-    this.internalDepthBuffer =
-      this.depthBuffer || (await this.viewer?.frame?.depthBuffer());
+    this.stateMap.depthBuffer = await this.viewer?.frame?.depthBuffer();
   }
 
   private updateViewport(): void {
@@ -691,7 +691,7 @@ export class ViewerMeasurementDistance {
   private handleEditAnchor(
     anchor: Anchor
   ): ((event: PointerEvent) => void) | undefined {
-    if (this.mode === 'edit' && this.internalDepthBuffer != null) {
+    if (this.mode === 'edit') {
       const handlePointerMove = this.createInteractionMoveHandler();
       const handlePointerUp = async (event: PointerEvent): Promise<void> => {
         const hits = this.getHitProvider();
@@ -744,27 +744,27 @@ export class ViewerMeasurementDistance {
   }
 
   private snapPoint(pt: Point.Point, event: MouseEvent): Point.Point {
-    const { stencil } = this.stateMap;
-    if (stencil != null && !event.shiftKey) {
-      const framePt = this.viewport.transformPointToFrame(pt, stencil);
+    const hits = this.getHitProvider();
+    if (hits != null && !event.shiftKey) {
       const snapDistance = Math.max(0, this.snapDistance);
-      const nearestPt = stencil.snapToNearestPixel(framePt, snapDistance);
-
-      if (nearestPt != null) {
-        return this.viewport.transformPointToViewport(nearestPt, stencil);
-      }
+      return hits.hitTester().snapToNearestPixel(pt, snapDistance);
     }
     return pt;
   }
 
   private formatDistance(distance: number | undefined): string {
+    const dist =
+      distance != null
+        ? this.measurementUnits.convertWorldValueToReal(distance)
+        : undefined;
+
     if (this.labelFormatter != null) {
-      return this.labelFormatter(distance);
+      return this.labelFormatter(dist);
     } else {
       const abbreviated = this.measurementUnits.unit.abbreviatedName;
-      return distance == null
+      return dist == null
         ? '---'
-        : `~${distance.toFixed(this.fractionalDigits)} ${abbreviated}`;
+        : `~${dist.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   }
 
@@ -785,23 +785,22 @@ export class ViewerMeasurementDistance {
   }
 
   private getHitProvider(): PointToPointHitProvider | undefined {
-    const hitTester = this.getHitTester();
-    const viewer = this.viewer;
-    if (viewer != null && hitTester != null) {
-      return {
-        hitTester: () => hitTester,
-        raycaster: async () => (await viewer.scene()).raycaster(),
-      };
-    }
+    if (this.hitProvider == null) {
+      const hitTester = this.getHitTester();
+      const viewer = this.viewer;
+      if (viewer != null && hitTester != null) {
+        return {
+          hitTester: () => hitTester,
+          raycaster: async () => (await viewer.scene()).raycaster(),
+        };
+      }
+    } else return this.hitProvider;
   }
 
   private getHitTester(): PointToPointHitTester | undefined {
-    if (this.stateMap.stencil != null && this.internalDepthBuffer != null) {
-      return new PointToPointHitTester(
-        this.stateMap.stencil,
-        this.internalDepthBuffer,
-        this.viewport
-      );
+    const { stencil, depthBuffer } = this.stateMap;
+    if (stencil != null && depthBuffer != null) {
+      return new PointToPointHitTester(stencil, depthBuffer, this.viewport);
     }
   }
 

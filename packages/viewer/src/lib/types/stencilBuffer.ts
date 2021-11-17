@@ -245,7 +245,7 @@ export class StencilBuffer implements FrameImageLike {
     pt: Point.Point,
     radius: number,
     predicate: (value: number) => boolean = () => true
-  ): Point.Point | undefined {
+  ): Point.Point {
     const diameter = radius * 2;
     const topLeft = Point.create(pt.x - radius, pt.y - radius);
 
@@ -270,7 +270,7 @@ export class StencilBuffer implements FrameImageLike {
     const closest = sorted[0];
     return closest != null
       ? Point.create(Math.floor(closest.x) + 0.5, Math.floor(closest.y) + 0.5)
-      : undefined;
+      : pt;
   }
 }
 
