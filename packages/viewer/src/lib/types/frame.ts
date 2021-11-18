@@ -4,6 +4,8 @@ import {
   Rectangle,
   BoundingBox,
   Matrix4,
+  Line3,
+  Plane,
 } from '@vertexvis/geometry';
 import * as FrameCamera from './frameCamera';
 import * as CrossSectioning from './crossSectioning';
@@ -140,6 +142,34 @@ export class FramePerspectiveCamera
     );
   }
 
+  public get direction(): Vector3.Vector3 {
+    return Vector3.normalize(this.viewVector);
+  }
+
+  public get viewVector(): Vector3.Vector3 {
+    return Vector3.subtract(this.lookAt, this.position);
+  }
+
+  public get worldMatrix(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().worldMatrix;
+  }
+
+  public get viewMatrix(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().viewMatrix;
+  }
+
+  public get projectionMatrix(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().projectionMatrix;
+  }
+
+  public get projectionMatrixInverse(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().projectionMatrixInverse;
+  }
+
+  public get projectionViewMatrix(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().projectionViewMatrix;
+  }
+
   private computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
       const viewMatrix = Matrix4.makeLookAtView(
@@ -171,27 +201,38 @@ export class FramePerspectiveCamera
     return this.cameraMatrices;
   }
 
-  public get direction(): Vector3.Vector3 {
-    return Vector3.normalize(Vector3.subtract(this.lookAt, this.position));
+  /**
+   * Checks if the given point, in world space, is behind the near plane
+   * of the camera.
+   *
+   * @param world A point in world space.
+   * @returns `true` if the point is behind the camera.
+   */
+  public isPointBehindNear(world: Vector3.Vector3): boolean {
+    const { position, direction, near } = this;
+    const dist = Vector3.dot(Vector3.subtract(world, position), direction);
+    return dist < near;
   }
 
-  public get worldMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().worldMatrix;
-  }
+  /**
+   * Returns a point on the near plane that intersects with `line`. If `line`
+   * does not intersect, then `undefined` is returned.
+   *
+   * @param line The line to intersect.
+   * @returns A point in world space, or `undefined` if the line does not
+   * intersect with the near plane.
+   */
+  public intersectLineWithNear(line: Line3.Line3): Vector3.Vector3 | undefined {
+    const { position, lookAt, direction, near } = this;
 
-  public get viewMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().viewMatrix;
-  }
+    const vs = Vector3.subtract(line.start, lookAt);
+    const ve = Vector3.subtract(line.end, lookAt);
+    const vl = Line3.create({ start: vs, end: ve });
 
-  public get projectionMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().projectionMatrix;
-  }
+    const dist = Vector3.distance(lookAt, position) - near;
+    const nearP = Plane.create({ normal: direction, constant: dist });
+    const pt = Plane.intersectLine(nearP, vl);
 
-  public get projectionMatrixInverse(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().projectionMatrixInverse;
-  }
-
-  public get projectionViewMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().projectionViewMatrix;
+    return pt != null ? Vector3.add(pt, lookAt) : undefined;
   }
 }

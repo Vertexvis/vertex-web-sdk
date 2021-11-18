@@ -143,13 +143,13 @@ export class DepthBuffer implements FrameImageLike {
     ray: Ray.Ray,
     fallbackNormalizedDepth?: number
   ): Vector3.Vector3 {
+    const { position, viewVector: vv, far } = this.camera;
     const distance = this.getLinearDepthAtPoint(point, fallbackNormalizedDepth);
-    const vv = Vector3.subtract(this.camera.lookAt, this.camera.position);
 
     // Compute the world position along the ray at the far plane.
     // This is used to determine the angle with the view vector.
-    const worldPt = Ray.at(ray, this.camera.far);
-    const eyeToWorldPt = Vector3.subtract(worldPt, this.camera.position);
+    const worldPt = Ray.at(ray, far);
+    const eyeToWorldPt = Vector3.subtract(worldPt, position);
 
     const angle =
       Vector3.dot(vv, eyeToWorldPt) /

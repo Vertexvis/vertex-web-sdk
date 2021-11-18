@@ -75,7 +75,7 @@ export function intersectLine(
   if (t < 0 || t > 1) {
     return undefined;
   } else {
-    return Vector3.add(line.start, Vector3.scale(t, direction));
+    return Vector3.add(Vector3.scale(t, direction), line.start);
   }
 }
 

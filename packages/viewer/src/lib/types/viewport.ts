@@ -1,6 +1,5 @@
 import {
   Dimensions,
-  Plane,
   Point,
   Ray,
   Rectangle,
@@ -47,21 +46,6 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public static fromDimensions(dimensions: Dimensions.Dimensions): Viewport {
     return new Viewport(dimensions.width, dimensions.height);
-  }
-
-  /**
-   * Returns the screen plane for this viewport and given `camera`.
-   *
-   * @param camera A camera.
-   * @returns The screen plane.
-   */
-  public plane(camera: FramePerspectiveCamera): Plane.Plane {
-    const direction = camera.direction;
-    const distance = Vector3.distance(camera.position, camera.lookAt);
-    return Plane.create({
-      normal: direction,
-      constant: distance - camera.near,
-    });
   }
 
   /**
@@ -164,27 +148,6 @@ export class Viewport implements Dimensions.Dimensions {
       (framePt.x / image.imageAttr.frameDimensions.width) * 2 - 1,
       -(framePt.y / image.imageAttr.frameDimensions.height) * 2 + 1
     );
-  }
-
-  /**
-   * Maps a point in screen space to a world point that is coplanar with the
-   * camera's near plane.
-   *
-   * @param screenPt The screen point to transform.
-   * @param image An image of frame.
-   * @param camera The camera used to map a 2D point to 3D point.
-   * @returns A point on the screen in world space.
-   */
-  public transformPointToScreenWorld(
-    screenPt: Point.Point,
-    image: FrameImageLike,
-    camera: FramePerspectiveCamera
-  ): Vector3.Vector3 | undefined {
-    const { direction, near } = camera;
-
-    const ray = this.transformPointToRay(screenPt, image, camera);
-    const screen = Plane.create({ normal: direction, constant: near });
-    return Ray.intersectPlane(ray, screen);
   }
 
   /**
