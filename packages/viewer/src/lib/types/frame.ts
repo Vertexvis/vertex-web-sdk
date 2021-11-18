@@ -223,16 +223,15 @@ export class FramePerspectiveCamera
    * intersect with the near plane.
    */
   public intersectLineWithNear(line: Line3.Line3): Vector3.Vector3 | undefined {
-    const { position, lookAt, direction, near } = this;
+    const { position, direction, near } = this;
 
-    const vs = Vector3.subtract(line.start, lookAt);
-    const ve = Vector3.subtract(line.end, lookAt);
+    const vs = Vector3.subtract(line.start, position);
+    const ve = Vector3.subtract(line.end, position);
     const vl = Line3.create({ start: vs, end: ve });
 
-    const dist = Vector3.distance(lookAt, position) - near;
-    const nearP = Plane.create({ normal: direction, constant: dist });
+    const nearP = Plane.create({ normal: direction, constant: -near });
     const pt = Plane.intersectLine(nearP, vl);
 
-    return pt != null ? Vector3.add(pt, lookAt) : undefined;
+    return pt != null ? Vector3.add(pt, position) : undefined;
   }
 }
