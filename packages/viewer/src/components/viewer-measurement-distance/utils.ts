@@ -1,4 +1,4 @@
-import { Line3, Matrix4, Plane, Point, Vector3 } from '@vertexvis/geometry';
+import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { FramePerspectiveCamera, Viewport } from '../../lib/types';
 
 export type Anchor = 'start' | 'end';
@@ -38,27 +38,17 @@ export function translateWorldLineToViewport(
 } {
   const { camera, projectionViewMatrix, viewport } = params;
 
-  const startDistance = Vector3.dot(
-    Vector3.subtract(line.start, camera.position),
-    camera.direction
-  );
-  const endDistance = Vector3.dot(
-    Vector3.subtract(line.end, camera.position),
-    camera.direction
-  );
-  const isStartBehindCamera = startDistance < camera.near;
-  const isEndBehindCamera = endDistance < camera.near;
+  const isStartBehindCamera = camera.isPointBehindNear(line.start);
+  const isEndBehindCamera = camera.isPointBehindNear(line.end);
 
   // If either the start or end of the line is behind the camera, then we need
   // to truncate the line so it can be presented correctly. You cannot use a
   // projection matrix to compute a point behind the near plane.
   if (isStartBehindCamera || isEndBehindCamera) {
-    const plane = viewport.plane(camera);
-    const intersection = Plane.intersectLine(plane, line);
+    const pt = camera.intersectLineWithNear(line);
     const newLine = Line3.create({
-      start:
-        isStartBehindCamera && intersection != null ? intersection : line.start,
-      end: isEndBehindCamera && intersection != null ? intersection : line.end,
+      start: isStartBehindCamera && pt != null ? pt : line.start,
+      end: isEndBehindCamera && pt != null ? pt : line.end,
     });
 
     const ndc = Line3.transformMatrix(newLine, projectionViewMatrix);
