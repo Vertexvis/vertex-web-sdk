@@ -2,8 +2,17 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
+import { PointToPointHitTester } from '../components/viewer-measurement-distance/hitTest';
+import { PointToPointHitProvider } from '../components/viewer-measurement-distance/interactions';
 import { fromPbFrame } from '../lib/mappers';
-import { DepthBuffer, Orientation, StencilBuffer } from '../lib/types';
+import { RaycasterLike } from '../lib/scenes/raycaster';
+import {
+  DepthBuffer,
+  Orientation,
+  StencilBuffer,
+  STENCIL_BUFFER_FEATURE_VALUE,
+  Viewport,
+} from '../lib/types';
 
 const def: DrawFramePayload = {
   sequenceNumber: 1,
@@ -32,15 +41,15 @@ const def: DrawFramePayload = {
     scaleFactor: 1,
   },
   frameCorrelationIds: ['123'],
-  image: createImagePng(100, 50),
-  depthBuffer: { value: createDepthImagePng(100, 50) },
+  image: makeImagePng(100, 50),
+  depthBuffer: { value: makeDepthImagePng(100, 50) },
 };
 
 export const frame = Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
   def
 );
 
-export function createImagePng(width: number, height: number): Uint8Array {
+export function makeImagePng(width: number, height: number): Uint8Array {
   const data = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -54,16 +63,16 @@ export function createImagePng(width: number, height: number): Uint8Array {
   return encode({ width, height, data, depth: 8, channels: 4 });
 }
 
-export function createDepthImagePng(
+export function makeDepthImagePng(
   width: number,
   height: number,
   value = 2 ** 16 - 1
 ): Uint8Array {
-  const bytes = createDepthImageBytes(width, height, value);
+  const bytes = makeDepthImageBytes(width, height, value);
   return encode({ width, height, data: bytes, depth: 16, channels: 1 });
 }
 
-export function createDepthImageBytes(
+export function makeDepthImageBytes(
   width: number,
   height: number,
   value = 2 ** 16 - 1
@@ -72,12 +81,12 @@ export function createDepthImageBytes(
   return data.fill(value);
 }
 
-export function createDepthBuffer(
+export function makeDepthBuffer(
   width: number,
   height: number,
   value = 2 ** 16 - 1
 ): DepthBuffer {
-  const png = createDepthImageBytes(width, height, value);
+  const png = makeDepthImageBytes(width, height, value);
   return DepthBuffer.fromPng({ data: png }, frame.scene.camera, {
     frameDimensions: Dimensions.create(width, height),
     imageRect: Rectangle.create(0, 0, width, height),
@@ -85,7 +94,7 @@ export function createDepthBuffer(
   });
 }
 
-export function createStencilImageBytes(
+export function makeStencilImageBytes(
   width: number,
   height: number,
   fill: (pixel: Point.Point) => number
@@ -99,13 +108,13 @@ export function createStencilImageBytes(
   return data;
 }
 
-export function createStencilBuffer(
+export function makeStencilBuffer(
   width: number,
   height: number,
   fill: (pixel: Point.Point) => number,
   depthBuffer?: DepthBuffer
 ): StencilBuffer {
-  const data = createStencilImageBytes(width, height, fill);
+  const data = makeStencilImageBytes(width, height, fill);
   return StencilBuffer.fromPng(
     { data, channels: 1 },
     {
@@ -114,6 +123,43 @@ export function createStencilBuffer(
       imageScale: 1,
     },
     data,
-    depthBuffer ?? createDepthBuffer(width, height)
+    depthBuffer ?? makeDepthBuffer(width, height)
   );
+}
+
+export function makeHitTester({
+  stencilBuffer,
+  depthBuffer,
+  viewport,
+}: {
+  stencilBuffer?: StencilBuffer;
+  depthBuffer?: DepthBuffer;
+  viewport?: Viewport;
+} = {}): PointToPointHitTester {
+  return new PointToPointHitTester(
+    stencilBuffer ??
+      makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
+    depthBuffer ?? makeDepthBuffer(200, 100),
+    viewport ?? new Viewport(200, 100)
+  );
+}
+
+export function makeRaycaster(): RaycasterLike {
+  return { hitItems: jest.fn().mockResolvedValue({ hits: [] }) };
+}
+
+export function makeHitProvider({
+  hitTester,
+  raycaster,
+}: {
+  hitTester?: PointToPointHitTester;
+  raycaster?: RaycasterLike;
+}): PointToPointHitProvider {
+  const defaultHitTester = makeHitTester();
+  const defaultRaycaster = makeRaycaster();
+
+  return {
+    hitTester: () => hitTester ?? defaultHitTester,
+    raycaster: async () => raycaster ?? defaultRaycaster,
+  };
 }

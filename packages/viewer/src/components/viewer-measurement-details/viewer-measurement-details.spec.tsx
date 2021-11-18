@@ -4,8 +4,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
 import { ViewerMeasurementDetails } from './viewer-measurement-details';
 import '../../testing/domMocks';
-import { formatResults } from './utils';
-import { MeasurementModel } from '../..';
+import { MeasurementModel, summarizeResults } from '../../lib/measurement';
 import { Angle } from '@vertexvis/geometry';
 
 describe('vertex-viewer-measurement-details', () => {
@@ -24,7 +23,7 @@ describe('vertex-viewer-measurement-details', () => {
       )
     ).toBeNull();
 
-    measurementDetails.visibleSummary = formatResults([
+    measurementDetails.visibleSummary = summarizeResults([
       {
         type: 'minimum-distance',
         distance: 2,

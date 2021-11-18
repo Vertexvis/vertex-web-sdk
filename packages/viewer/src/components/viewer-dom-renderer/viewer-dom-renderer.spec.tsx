@@ -10,7 +10,7 @@ import {
 } from '@vertexvis/geometry';
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
-import { createDepthImageBytes } from '../../testing/fixtures';
+import { makeDepthImageBytes } from '../../testing/fixtures';
 
 import '../../testing/domMocks';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
@@ -30,7 +30,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     Dimensions.create(100, 100),
     Rectangle.create(0, 0, 100, 100),
     1,
-    createDepthImageBytes(100, 100, 0),
+    makeDepthImageBytes(100, 100, 0),
     Dimensions.create(100, 100)
   );
 

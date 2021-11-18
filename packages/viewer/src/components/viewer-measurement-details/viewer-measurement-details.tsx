@@ -4,15 +4,15 @@ import { Formatter } from '../../lib/formatter';
 import {
   MeasurementModel,
   MeasurementResult,
-} from '../../lib/measurement/model';
+  MeasurementDetailsSummary,
+  summarizeResults,
+} from '../../lib/measurement';
 import {
   AngleUnits,
   AngleUnitType,
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
-import { ViewerMeasurementDetailsSummary } from './interfaces';
-import { formatResults } from './utils';
 
 @Component({
   tag: 'vertex-viewer-measurement-details',
@@ -65,16 +65,16 @@ export class ViewerMeasurementDetails {
   /**
    * An optional set of details to hide. This can be used to display
    * reduced sets of details for more a more focused representation.
-   * Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary`
+   * Can be provided as an array of keys from the `MeasurementDetailsSummary`
    * type, or as a JSON array with the format '["angle", "minDistance"]'.
    */
   @Prop({ mutable: true })
-  public hiddenDetails?: Array<keyof ViewerMeasurementDetailsSummary>;
+  public hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
 
   /**
    * An optional set of details to hide. This can be used to display
    * reduced sets of details for more a more focused representation.
-   * Can be provided as an array of keys from the `ViewerMeasurementDetailsSummary`
+   * Can be provided as an array of keys from the `MeasurementDetailsSummary`
    * type, or as a JSON array with the format '["angle", "minDistance"]'.
    */
   @Prop({ attribute: 'hidden-details' })
@@ -85,9 +85,7 @@ export class ViewerMeasurementDetails {
    *
    * @readonly
    */
-  @Prop({
-    mutable: true,
-  })
+  @Prop({ mutable: true })
   public results: MeasurementResult[] = [];
 
   /**
@@ -99,7 +97,7 @@ export class ViewerMeasurementDetails {
   @Prop({
     mutable: true,
   })
-  public summary?: ViewerMeasurementDetailsSummary;
+  public summary?: MeasurementDetailsSummary;
 
   /**
    * The visible measurements based on the current `summary`
@@ -110,7 +108,7 @@ export class ViewerMeasurementDetails {
   @Prop({
     mutable: true,
   })
-  public visibleSummary?: ViewerMeasurementDetailsSummary;
+  public visibleSummary?: MeasurementDetailsSummary;
 
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
@@ -240,12 +238,12 @@ export class ViewerMeasurementDetails {
   };
 
   private createSummary = (): void => {
-    const baseSummary = formatResults(this.results);
+    const baseSummary = summarizeResults(this.results);
     const hidden = this.hiddenDetails ?? [];
 
     this.summary = baseSummary;
     this.visibleSummary = (
-      Object.keys(baseSummary) as Array<keyof ViewerMeasurementDetailsSummary>
+      Object.keys(baseSummary) as Array<keyof MeasurementDetailsSummary>
     )
       .filter((k) => !hidden.includes(k))
       .reduce(

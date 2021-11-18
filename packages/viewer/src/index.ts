@@ -25,6 +25,8 @@ export { Scene } from './lib/scenes';
 
 export * from './lib/types/markup';
 
+export * from './lib/types/measurementUnits';
+
 export {
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,

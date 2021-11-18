@@ -7,10 +7,10 @@ import {
   STENCIL_BUFFER_EMPTY_VALUE,
   STENCIL_BUFFER_FEATURE_VALUE,
 } from '../stencilBuffer';
-import { createDepthBuffer } from '../../../testing/fixtures';
+import { makeDepthBuffer } from '../../../testing/fixtures';
 
 describe(StencilBuffer, () => {
-  const depthBuffer = createDepthBuffer(200, 100);
+  const depthBuffer = makeDepthBuffer(200, 100);
 
   const stencilBuffer = fs
     .readFile(path.resolve(__dirname, 'stencil-buffer.png'))
@@ -66,11 +66,11 @@ describe(StencilBuffer, () => {
       expect(actual).toEqual(Point.create(97.5, 0.5));
     });
 
-    it('returns undefined if no pixel within radius', async () => {
+    it('returns input if no pixel within radius', async () => {
       const pt = Point.create(0, 0);
       const stencil = await stencilBuffer;
       const actual = stencil.snapToNearestPixel(pt, 2);
-      expect(actual).toBeUndefined();
+      expect(actual).toEqual(pt);
     });
   });
 });

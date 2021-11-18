@@ -14,6 +14,12 @@ export class PointToPointHitTester {
     return this.stencil.hitTest(stencilPt) || this.depthBuffer.hitTest(depthPt);
   }
 
+  public snapToNearestPixel(pt: Point.Point, radius: number): Point.Point {
+    const framePt = this.viewport.transformPointToFrame(pt, this.stencil);
+    const snapPt = this.stencil.snapToNearestPixel(framePt, radius);
+    return this.viewport.transformPointToViewport(snapPt, this.stencil);
+  }
+
   public transformPointToWorld(
     pt: Point.Point,
     { ignoreHitTest = false }: { ignoreHitTest?: boolean } = {}
