@@ -315,4 +315,30 @@ describe(Scene, () => {
       expect(cs.current()).toEqual(frame.scene.crossSection);
     });
   });
+
+  describe(Scene.prototype.reset, () => {
+    it('should reset w/o updating the camera', async () => {
+      await scene.reset({ suppliedCorrelationId: 'foo' });
+
+      expect(streamApi.resetSceneView).toHaveBeenCalledWith(
+        {
+          frameCorrelationId: { value: 'foo' },
+          includeCamera: undefined,
+        },
+        true
+      );
+    });
+
+    it('should reset with updating the camera', async () => {
+      await scene.reset({ suppliedCorrelationId: 'foo', includeCamera: true });
+
+      expect(streamApi.resetSceneView).toHaveBeenCalledWith(
+        {
+          frameCorrelationId: { value: 'foo' },
+          includeCamera: true,
+        },
+        true
+      );
+    });
+  });
 });
