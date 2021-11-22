@@ -21,6 +21,11 @@ interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
 }
 
+interface ResetViewOptions {
+  includeCamera?: boolean;
+  suppliedCorrelationId?: string;
+}
+
 /**
  * A class that is responsible for building operations for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in order
@@ -232,6 +237,23 @@ export class Scene {
     return await this.stream.loadSceneViewState(
       {
         sceneViewStateId: { hex: sceneViewStateId },
+        frameCorrelationId: opts.suppliedCorrelationId
+          ? { value: opts.suppliedCorrelationId }
+          : undefined,
+      },
+      true
+    );
+  }
+
+  /**
+   * Resets the view to its default state, with the ability to reset the camera to that of the base scene.
+   */
+  public async reset(
+    opts: ResetViewOptions = {}
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    return await this.stream.resetSceneView(
+      {
+        includeCamera: opts.includeCamera,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
