@@ -403,6 +403,19 @@ export class StreamApi {
   }
 
   /**
+   * Sends a request to retrieve a new token. This token can be used to
+   * authenticate with other Vertex services.
+   *
+   * @param withResponse Indicates if the server should reply with a response.
+   * @returns A promise that completes with the refreshed token.
+   */
+  public refreshToken(
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ refreshToken: {} }, withResponse);
+  }
+
+  /**
    * Acknowledges a successful request by sending a reply back to the server
    * with an optional result body.
    *
