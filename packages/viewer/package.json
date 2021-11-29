@@ -59,6 +59,7 @@
     "@vertexvis/web-workers": "^0.1.0",
     "camel-case": "^4.1.2",
     "classnames": "^2.3.1",
+    "date-fns": "^2.26.0",
     "fast-png": "^6.1.0",
     "google-protobuf": "^3.19.1",
     "jwt-decode": "^3.1.2",

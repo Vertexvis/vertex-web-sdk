@@ -1,3 +1,5 @@
+export * from './core';
+
 export * from './frameStreaming';
 
 export * from './geometry';

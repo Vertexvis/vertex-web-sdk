@@ -19,6 +19,9 @@ import {
   fromPbRect,
 } from './geometry';
 import { fromPbBytesValue } from './scalar';
+import { fromPbUuid } from './core';
+import { Token } from '../token';
+import { protoToDate } from '@vertexvis/stream-api';
 
 export const fromPbCamera: M.Func<
   vertexvis.protobuf.stream.ICamera,
@@ -273,3 +276,103 @@ function fromPbStreamResponse<
 ): M.Func<vertexvis.protobuf.stream.IStreamResponse, R> {
   return M.mapRequiredProp(prop, mapper);
 }
+
+export const fromPbToken: M.Func<vertexvis.protobuf.stream.IToken, Token> =
+  M.defineMapper(
+    M.read(M.requiredProp('token'), M.requiredProp('expiresIn')),
+    ([token, expiresIn]) => Token.create(token, expiresIn)
+  );
+
+export const fromPbStartStreamResponse: M.Func<
+  vertexvis.protobuf.stream.IStreamResponse,
+  {
+    streamId: string;
+    sceneViewId: string;
+    sessionId: string;
+    worldOrientation: Orientation;
+    token: Token;
+  }
+> = M.defineMapper(
+  M.read(
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('streamId', fromPbUuid)
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('sceneViewId', fromPbUuid)
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('sessionId', fromPbUuid)
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('worldOrientation', fromPbWorldOrientation)
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('token', fromPbToken)
+    )
+  ),
+  ([streamId, sceneViewId, sessionId, worldOrientation, token]) => ({
+    streamId,
+    sceneViewId,
+    sessionId,
+    worldOrientation,
+    token,
+  })
+);
+
+export const fromPbStartStreamResponseOrThrow = M.ifInvalidThrow(
+  fromPbStartStreamResponse
+);
+
+export const fromPbReconnectResponse: M.Func<
+  vertexvis.protobuf.stream.IStreamResponse,
+  { token: Token }
+> = M.defineMapper(
+  M.read(
+    M.compose(
+      M.requiredProp('reconnect'),
+      M.mapRequiredProp('token', fromPbToken)
+    )
+  ),
+  ([token]) => ({ token })
+);
+
+export const fromPbReconnectResponseOrThrow = M.ifInvalidThrow(
+  fromPbReconnectResponse
+);
+
+export const fromPbRefreshTokenResponse: M.Func<
+  vertexvis.protobuf.stream.IStreamResponse,
+  Token
+> = M.defineMapper(
+  M.compose(
+    M.requiredProp('refreshToken'),
+    M.requiredProp('token'),
+    fromPbToken
+  ),
+  (token) => token
+);
+
+export const fromPbRefreshTokenResponseOrThrow = M.ifInvalidThrow(
+  fromPbRefreshTokenResponse
+);
+
+export const fromPbSyncTimeResponse: M.Func<
+  vertexvis.protobuf.stream.IStreamResponse,
+  Date
+> = M.defineMapper(
+  M.compose(
+    M.requiredProp('syncTime'),
+    M.requiredProp('replyTime'),
+    M.read(M.requiredProp('seconds'), M.requiredProp('nanos'))
+  ),
+  ([seconds, nanos]) => protoToDate({ seconds, nanos })
+);
+
+export const fromPbSyncTimeResponseOrThrow = M.ifInvalidThrow(
+  fromPbSyncTimeResponse
+);

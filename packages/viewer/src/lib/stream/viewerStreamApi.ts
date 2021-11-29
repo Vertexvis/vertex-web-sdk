@@ -4,8 +4,6 @@ import {
   WebSocketClient,
   ConnectionDescriptor,
   Settings,
-  RequestMessage,
-  ResponseMessage,
 } from '@vertexvis/stream-api';
 import { Disposable } from '@vertexvis/utils';
 
@@ -25,7 +23,7 @@ export class ViewerStreamApi extends StreamApi {
     private uninteractiveThreshold: number = 75 * 1000,
     private offlineThreshold: number = 30 * 1000
   ) {
-    super(websocket, loggingEnabled);
+    super(websocket, { loggingEnabled });
 
     this.handleOffline = this.handleOffline.bind(this);
     this.handleOnline = this.handleOnline.bind(this);
@@ -38,12 +36,8 @@ export class ViewerStreamApi extends StreamApi {
     window.addEventListener('offline', this.handleOffline);
     window.addEventListener('online', this.handleOnline);
 
-    super.onRequest((request: RequestMessage) =>
-      this.restartUninteractiveTimeout()
-    );
-    super.onResponse((response: ResponseMessage) =>
-      this.restartUninteractiveTimeout()
-    );
+    super.onRequest(() => this.restartUninteractiveTimeout());
+    super.onResponse(() => this.restartUninteractiveTimeout());
     this.restartUninteractiveTimeout();
 
     return super.connect(descriptor, settings);
@@ -53,9 +47,7 @@ export class ViewerStreamApi extends StreamApi {
     window.removeEventListener('offline', this.handleOffline);
     window.removeEventListener('online', this.handleOnline);
     this.clearUninteractiveTimeout();
-    this.uninteractiveTimeout = undefined;
     this.clearOfflineTimeout();
-    this.offlineTimeout = undefined;
 
     super.dispose();
   }
@@ -79,6 +71,7 @@ export class ViewerStreamApi extends StreamApi {
   private clearOfflineTimeout(): void {
     if (this.offlineTimeout != null) {
       clearTimeout(this.offlineTimeout);
+      this.offlineTimeout = undefined;
     }
   }
 
@@ -93,6 +86,7 @@ export class ViewerStreamApi extends StreamApi {
   private clearUninteractiveTimeout(): void {
     if (this.uninteractiveTimeout != null) {
       clearTimeout(this.uninteractiveTimeout);
+      this.uninteractiveTimeout = undefined;
     }
   }
 }
