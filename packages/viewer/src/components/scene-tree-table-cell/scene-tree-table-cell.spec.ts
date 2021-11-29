@@ -106,10 +106,17 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('expandToggled', expandToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
-    expandBtn?.dispatchEvent(new MouseEvent('pointerdown'));
+    const originalEvent = new MouseEvent('pointerdown');
+    expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleExpandItem).toHaveBeenCalled();
-    expect(expandToggled).toHaveBeenCalled();
+    expect(expandToggled).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: expect.objectContaining({
+          originalEvent,
+        }),
+      })
+    );
   });
 
   it('does not expands cell if interaction disabled', async () => {
@@ -153,10 +160,17 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('visibilityToggled', visibilityToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.visibility-btn');
-    expandBtn?.dispatchEvent(new MouseEvent('pointerdown'));
+    const originalEvent = new MouseEvent('pointerdown');
+    expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleItemVisibility).toHaveBeenCalled();
-    expect(visibilityToggled).toHaveBeenCalled();
+    expect(visibilityToggled).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: expect.objectContaining({
+          originalEvent,
+        }),
+      })
+    );
   });
 
   it('does not toggle visibility cell if interaction disabled', async () => {
@@ -199,10 +213,18 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    cell.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
+    const originalEvent = new MouseEvent('pointerdown', { button: 0 });
+    cell.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalled();
     expect(selected).toHaveBeenCalled();
+    expect(selected).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: expect.objectContaining({
+          originalEvent,
+        }),
+      })
+    );
   });
 
   it('appends selection if unselected and meta key', async () => {
@@ -221,15 +243,23 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, metaKey: true })
-    );
+    const originalEvent = new MouseEvent('pointerdown', {
+      button: 0,
+      metaKey: true,
+    });
+    cell.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ append: true })
     );
-    expect(selected).toHaveBeenCalled();
+    expect(selected).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: expect.objectContaining({
+          originalEvent,
+        }),
+      })
+    );
   });
 
   it('appends selection if unselected and ctrl key', async () => {
@@ -339,12 +369,20 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, ctrlKey: true })
-    );
+    const originalEvent = new MouseEvent('pointerdown', {
+      button: 0,
+      ctrlKey: true,
+    });
+    cell.dispatchEvent(originalEvent);
 
     expect(tree.deselectItem).toHaveBeenCalled();
-    expect(selected).toHaveBeenCalled();
+    expect(selected).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: expect.objectContaining({
+          originalEvent,
+        }),
+      })
+    );
   });
 
   it('does not select if event default behavior prevented', async () => {
@@ -381,10 +419,16 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const hovered = jest.fn();
     cell.addEventListener('hovered', hovered);
 
-    cell.dispatchEvent(new MouseEvent('pointerenter'));
+    const originalEvent = new MouseEvent('pointerenter');
+    cell.dispatchEvent(originalEvent);
 
     expect(hovered).toHaveBeenCalledWith(
-      expect.objectContaining({ detail: node })
+      expect.objectContaining({
+        detail: {
+          node,
+          originalEvent,
+        },
+      })
     );
   });
 
@@ -400,12 +444,19 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const hovered = jest.fn();
     cell.addEventListener('hovered', hovered);
 
-    cell.dispatchEvent(new MouseEvent('pointerenter'));
+    const originalEvent = new MouseEvent('pointerenter');
+    cell.dispatchEvent(originalEvent);
     cell.dispatchEvent(new MouseEvent('pointerleave'));
 
     expect(hovered).toHaveBeenCalledWith(
-      expect.objectContaining({ detail: node })
+      expect.objectContaining({
+        detail: {
+          node,
+          originalEvent,
+        },
+      })
     );
+
     expect(hovered).toHaveBeenCalledWith(
       expect.objectContaining({ detail: undefined })
     );

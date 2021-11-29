@@ -10,6 +10,11 @@ import {
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';
 
+export interface SceneTreeTableCellEventDetails {
+  node?: Node.AsObject;
+  originalEvent: PointerEvent;
+}
+
 @Component({
   tag: 'vertex-scene-tree-table-cell',
   styleUrl: 'scene-tree-table-cell.css',
@@ -84,28 +89,28 @@ export class SceneTreeTableCell {
    * @internal
    */
   @Event({ bubbles: true })
-  public hovered!: EventEmitter<Node.AsObject | undefined>;
+  public hovered!: EventEmitter<SceneTreeTableCellEventDetails | undefined>;
 
   /**
    * An event that is emitted when a user requests to expand the node. This is
    * emitted even if interactions are disabled.
    */
   @Event({ bubbles: true })
-  public expandToggled!: EventEmitter<Node.AsObject>;
+  public expandToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   /**
    * An event that is emitted when a user requests to change the node's
    * visibility. This event is emitted even if interactions are disabled.
    */
   @Event({ bubbles: true })
-  public visibilityToggled!: EventEmitter<Node.AsObject>;
+  public visibilityToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   /**
    * An event that is emitted when a user requests to change the node's selection
    * state. This event is emitted even if interactions are disabled.
    */
   @Event({ bubbles: true })
-  public selectionToggled!: EventEmitter<Node.AsObject>;
+  public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -124,8 +129,11 @@ export class SceneTreeTableCell {
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host
-        onPointerEnter={() => {
-          this.hovered.emit(this.node);
+        onPointerEnter={(e: PointerEvent) => {
+          this.hovered.emit({
+            node: this.node,
+            originalEvent: e,
+          });
         }}
         onPointerLeave={() => {
           this.hovered.emit(undefined);
@@ -142,7 +150,7 @@ export class SceneTreeTableCell {
               data-test-id={'expand-' + this.node?.name}
               onPointerDown={(event) => {
                 event.preventDefault();
-                this.toggleExpansion();
+                this.toggleExpansion(event);
               }}
             >
               {!this.node?.isLeaf && (
@@ -163,7 +171,7 @@ export class SceneTreeTableCell {
               data-test-id={'visibility-btn-' + this.node?.name}
               onPointerDown={(event) => {
                 event?.preventDefault();
-                this.toggleVisibility();
+                this.toggleVisibility(event);
               }}
             >
               <div
@@ -209,22 +217,22 @@ export class SceneTreeTableCell {
           append: event.ctrlKey || event.metaKey,
         });
       }
-      this.selectionToggled.emit(this.node);
+      this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
-  private toggleExpansion = (): void => {
+  private toggleExpansion = (event: PointerEvent): void => {
     if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleExpandItem(this.node);
     }
-    this.expandToggled.emit(this.node);
+    this.expandToggled.emit({ node: this.node, originalEvent: event });
   };
 
-  private toggleVisibility = (): void => {
+  private toggleVisibility = (event: PointerEvent): void => {
     if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleItemVisibility(this.node);
     }
-    this.visibilityToggled.emit(this.node);
+    this.visibilityToggled.emit({ node: this.node, originalEvent: event });
   };
 
   private toggleAttribute(attr: string, value: boolean): void {
