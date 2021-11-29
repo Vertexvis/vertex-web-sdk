@@ -15,6 +15,7 @@ export interface WebSocketClient {
   close(): void;
   connect(descriptor: ConnectionDescriptor): Promise<void>;
   onMessage(handler: MessageHandler): Disposable;
+  onClose(handler: CloseHandler): Disposable;
   send(data: WebSocketSendData): void;
 }
 
