@@ -1,6 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
-  "extends": "@vertexwebsdk/build/tsconfig",
+  "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
     "downlevelIteration": true
   },
