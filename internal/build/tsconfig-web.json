@@ -2,7 +2,8 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@vertexvis/typescript-config-vertexvis/tsconfig-web",
   "compilerOptions": {
-    "importHelpers": true
+    "importHelpers": true,
+    "lib": ["DOM", "ES2019"]
   },
   "exclude": ["dist", "node_modules"]
 }
