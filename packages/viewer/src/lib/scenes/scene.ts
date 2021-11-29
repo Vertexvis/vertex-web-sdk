@@ -250,7 +250,7 @@ export class Scene {
    */
   public async reset(
     opts: ResetViewOptions = {}
-  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+  ): Promise<vertexvis.protobuf.stream.IResetViewResult | undefined> {
     return await this.stream.resetSceneView(
       {
         includeCamera: opts.includeCamera,
