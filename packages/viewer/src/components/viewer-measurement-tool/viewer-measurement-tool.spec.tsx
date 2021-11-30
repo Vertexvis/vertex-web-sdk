@@ -1,5 +1,3 @@
-import '../../testing/domMocks';
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
