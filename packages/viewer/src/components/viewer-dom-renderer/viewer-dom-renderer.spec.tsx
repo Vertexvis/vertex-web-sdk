@@ -11,8 +11,6 @@ import {
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
 import { makeDepthImageBytes } from '../../testing/fixtures';
-
-import '../../testing/domMocks';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
 
 describe('<vertex-viewer-dom-renderer>', () => {
@@ -27,11 +25,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
   );
   const depthBuffer = new DepthBuffer(
     camera,
-    Dimensions.create(100, 100),
-    Rectangle.create(0, 0, 100, 100),
-    1,
-    makeDepthImageBytes(100, 100, 0),
-    Dimensions.create(100, 100)
+    {
+      frameDimensions: Dimensions.create(100, 100),
+      imageRect: Rectangle.create(0, 0, 100, 100),
+      imageScale: 1,
+    },
+    makeDepthImageBytes(100, 100, 0)
   );
 
   beforeEach(() => jest.resetAllMocks());

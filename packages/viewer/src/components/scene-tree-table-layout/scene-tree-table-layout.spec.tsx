@@ -8,8 +8,6 @@ jest.mock('../../lib/stencil', () => ({
 }));
 jest.mock('../scene-tree/lib/dom');
 
-import '../../testing/domMocks';
-
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -28,7 +26,7 @@ import {
   ResponseStreamMock,
 } from '../../testing';
 import { SceneTreeTableLayout } from './scene-tree-table-layout';
-import { triggerResizeObserver } from '../../testing/domMocks';
+import { triggerResizeObserver } from '../../testing/resizeObserver';
 import { readDOM } from '../../lib/stencil';
 import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
 import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
@@ -70,7 +68,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
                 <div class="templated-div" />
               </template>
             </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table-layout> 
+          </vertex-scene-tree-table-layout>
       `,
     });
 
@@ -145,7 +143,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
           <vertex-scene-tree-table-layout>
             <vertex-scene-tree-table-column>
             </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table-layout> 
+          </vertex-scene-tree-table-layout>
       `,
       })
     ).rejects.toThrow(new Error('Column is missing cell template element'));
