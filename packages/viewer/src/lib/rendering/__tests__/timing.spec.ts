@@ -1,4 +1,3 @@
-import '../../../testing/domMocks';
 import { acknowledgeFrameRequests } from '../timing';
 import { SynchronizedClock } from '../../types';
 import {
