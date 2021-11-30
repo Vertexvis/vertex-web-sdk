@@ -1,6 +1,7 @@
 import add from 'date-fns/add';
 import differenceInMilliseconds from 'date-fns/differenceInMilliseconds';
 import isAfter from 'date-fns/isAfter';
+import sub from 'date-fns/sub';
 
 export class Token {
   public constructor(
@@ -18,9 +19,10 @@ export class Token {
     return isAfter(new Date(), this.expiresAt);
   }
 
-  public remainingTimeInMs(): number {
-    const bufferInMs = 1000 * 30; // 30 seconds
-    const ms = differenceInMilliseconds(this.expiresAt, new Date());
-    return Math.max(0, ms - bufferInMs);
+  public remainingTimeInMs(offsetInSeconds: number): number {
+    return differenceInMilliseconds(
+      sub(this.expiresAt, { seconds: offsetInSeconds }),
+      new Date()
+    );
   }
 }

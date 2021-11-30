@@ -60,6 +60,7 @@ export const config: Config = {
     moduleNameMapper: {
       '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
     },
+    setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts'],
   },
   extras: {
     dynamicImportShim: true,

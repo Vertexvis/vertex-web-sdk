@@ -3,7 +3,6 @@ import {
   currentDateAsProtoTimestamp,
   Settings,
   StreamApi,
-  WebSocketClient,
 } from '@vertexvis/stream-api';
 import {
   Async,
@@ -30,7 +29,6 @@ import {
   SynchronizedClock,
 } from '../types';
 import { Resource } from '../types/loadableResource';
-import { ViewerStreamApi } from './viewerStreamApi';
 import { upsertStorageEntry } from '../sessions/storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
@@ -45,28 +43,34 @@ type StreamResult = Omit<
 type Provider<T> = () => T;
 
 interface FrameStreamOptions {
-  readonly logWsMessages?: boolean;
+  /**
+   * The number of seconds before the token expires, when the token will be
+   * refreshed. Defaults to 30 seconds.
+   */
+  tokenRefreshOffsetInSeconds?: number;
 }
 
 export class FrameStream {
   private static WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
   private state: FrameStreamState = { type: 'disconnected' };
-  private stateChanged = new EventDispatcher<FrameStreamState>();
+  public readonly stateChanged = new EventDispatcher<FrameStreamState>();
 
-  private streamApi: StreamApi;
+  private opts: Required<FrameStreamOptions>;
 
   public constructor(
-    private readonly ws: WebSocketClient,
+    private readonly streamApi: StreamApi,
     private readonly clientIdProvider: Provider<string>,
     private readonly sessionIdProvider: Provider<string>,
     private readonly configProvider: Provider<Config>,
     private readonly dimensionsProvider: Provider<Dimensions.Dimensions>,
     private readonly streamAttributesProvider: Provider<vertexvis.protobuf.stream.IStreamAttributes>,
     private readonly frameBackgroundColorProvider: Provider<Color.Color>,
-    options: FrameStreamOptions = {}
+    opts: FrameStreamOptions = {}
   ) {
-    this.streamApi = new ViewerStreamApi(ws, options.logWsMessages);
+    this.opts = {
+      tokenRefreshOffsetInSeconds: opts.tokenRefreshOffsetInSeconds ?? 30,
+    };
   }
 
   public load(urn: string): Promise<void> {
@@ -76,7 +80,7 @@ export class FrameStream {
       return this.loadIfDisconnected(urn);
     } else if (this.state.type === 'connecting') {
       return this.loadIfConnectingOrConnected(urn, this.state);
-    } else if (this.state.type === 'connected') {
+    } else {
       return this.loadIfConnectingOrConnected(urn, this.state);
     }
   }
@@ -88,7 +92,7 @@ export class FrameStream {
     const { resource: pResource, queries: pQueries } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
 
-    const hasResourceChanged = !Objects.isEqual(pResource, resource);
+    const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
     const hasQueryChanged = !Objects.isEqual(pQueries, resource.queries);
     const hasQuery = resource.queries[0] != null;
     const isConnecting = state.type === 'connecting';
@@ -96,16 +100,17 @@ export class FrameStream {
 
     if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
       this.disconnect();
-      this.connectWithNewStream(state.resource);
+      this.connectWithNewStream(resource);
     } else if (isConnected && hasQuery && hasQueryChanged) {
       await this.streamApi.loadSceneViewState({
         sceneViewStateId: { hex: resource.queries[0].id },
       });
+      this.updateState({ ...state, resource });
     }
   }
 
   private connectWithNewStream(resource: Resource): Promise<void> {
-    return this.connect(resource, 'connecting', 0, () =>
+    return this.connect(resource, 'connecting', () =>
       this.requestNewStream(this.getClientId(), resource)
     );
   }
@@ -114,17 +119,16 @@ export class FrameStream {
     return this.connect(
       state.resource,
       'reconnecting',
-      Number.POSITIVE_INFINITY,
-      () => this.requestReconnectStream(state)
+      () => this.requestReconnectStream(state),
+      { maxRetries: Number.POSITIVE_INFINITY }
     );
   }
 
   private async connect(
     resource: Resource,
     type: Connecting['type'] | Reconnecting['type'],
-    maxRetries: number,
     requestStream: () => Promise<StreamResult>,
-    { maxAttempts = 0 }: { maxAttempts?: number } = {}
+    { maxRetries = 3 }: { maxRetries?: number } = {}
   ): Promise<void> {
     const clientId = this.getClientId();
     const sessionId = this.getSessionId();
@@ -142,60 +146,80 @@ export class FrameStream {
       );
       console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
+      const controller = new AbortController();
       const settings = getStreamSettings(config);
-      const connection = await Async.retry(
-        () => this.streamApi.connect(descriptor, settings),
-        { maxRetries, delaysInMs: FrameStream.WS_RECONNECT_DELAYS }
-      );
-      this.updateState({ type, resource, connection });
-      const pendingClock = this.requestClock();
-
-      const stream = await requestStream();
-      console.debug(
-        `Stream connected [stream-id=${stream.streamId}, scene-view-id=${stream.sceneViewId}]`
-      );
-
-      const onRequest = this.streamApi.onRequest((msg) => {
-        const req = msg.request.drawFrame;
-        if (req != null) {
-          const frame = fromPbFrameOrThrow(stream.worldOrientation)(req);
-
-          if (this.state.type === 'connected') {
-            this.updateState({ ...this.state, frame });
-          }
-        }
-      });
-
-      const reconnect = this.reconnectWhenNeeded();
-      const refreshToken = this.refreshTokenWhenExpired(stream.token);
-      const frame =
-        stream.frame == null
-          ? await this.waitForFrame(stream.worldOrientation, 15000)
-          : stream.frame;
-      const clock = await pendingClock;
-      console.debug(
-        `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
-      );
-
       this.updateState({
-        type: 'connected',
+        type,
+        resource,
         connection: {
           dispose: () => {
-            connection.dispose();
-            onRequest.dispose();
-            reconnect.dispose();
-            refreshToken.dispose();
+            this.streamApi.dispose();
+            controller.abort();
           },
         },
-        resource,
-        streamId: stream.streamId,
-        sceneViewId: stream.sceneViewId,
-        worldOrientation: stream.worldOrientation,
-        token: stream.token,
-        frame,
-        clock,
       });
+
+      const connection = await Async.abort(
+        controller.signal,
+        Async.retry(() => this.streamApi.connect(descriptor, settings), {
+          maxRetries,
+          delaysInMs: FrameStream.WS_RECONNECT_DELAYS,
+        })
+      );
+
+      if (!connection.aborted) {
+        const pendingClock = this.requestClock();
+
+        const stream = await requestStream();
+        console.debug(
+          `Stream connected [stream-id=${stream.streamId}, scene-view-id=${stream.sceneViewId}]`
+        );
+
+        const onRequest = this.streamApi.onRequest((msg) => {
+          const req = msg.request.drawFrame;
+          if (req != null) {
+            const frame = fromPbFrameOrThrow(stream.worldOrientation)(req);
+
+            if (this.state.type === 'connected') {
+              this.updateState({ ...this.state, frame });
+            }
+          }
+        });
+
+        const reconnect = this.reconnectWhenNeeded();
+        const refreshToken = this.refreshTokenWhenExpired(stream.token);
+        const frame =
+          stream.frame == null
+            ? await this.waitForFrame(stream.worldOrientation, 15000)
+            : stream.frame;
+        const clock = await pendingClock;
+        console.debug(
+          `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
+        );
+
+        this.updateState({
+          type: 'connected',
+          connection: {
+            dispose: () => {
+              reconnect.dispose();
+              onRequest.dispose();
+              refreshToken.dispose();
+              connection.result.dispose();
+            },
+          },
+          resource,
+          streamId: stream.streamId,
+          sceneViewId: stream.sceneViewId,
+          worldOrientation: stream.worldOrientation,
+          token: stream.token,
+          frame,
+          clock,
+        });
+      } else {
+        this.updateState({ type: 'disconnected' });
+      }
     } else {
+      this.updateState({ type: 'disconnected' });
       throw new InvalidResourceUrnError(
         `Cannot load resource. Invalid type ${resource.resource.type}`
       );
@@ -210,6 +234,7 @@ export class FrameStream {
     if (this.state.type !== 'disconnected') {
       console.debug('Disconnecting websocket');
       this.state.connection.dispose();
+      this.updateState({ type: 'disconnected' });
     }
   }
 
@@ -224,7 +249,7 @@ export class FrameStream {
         frameBackgroundColor: this.getFrameBackgroundColor(),
         streamAttributes: this.getStreamAttributes(),
         sceneViewStateId:
-          resource.queries[0].type === 'scene-view-state'
+          resource.queries[0]?.type === 'scene-view-state'
             ? { hex: resource.queries[0].id }
             : undefined,
       })
@@ -249,14 +274,13 @@ export class FrameStream {
   private async requestReconnectStream(
     state: Connected
   ): Promise<StreamResult> {
-    const res = fromPbReconnectResponseOrThrow(
-      await this.streamApi.reconnect({
-        streamId: { hex: state.streamId },
-        dimensions: this.getDimensions(),
-        frameBackgroundColor: this.getFrameBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
-      })
-    );
+    const msg = await this.streamApi.reconnect({
+      streamId: { hex: state.streamId },
+      dimensions: this.getDimensions(),
+      frameBackgroundColor: this.getFrameBackgroundColor(),
+      streamAttributes: this.getStreamAttributes(),
+    });
+    const res = fromPbReconnectResponseOrThrow(msg);
     return { ...state, token: res.token };
   }
 
@@ -278,7 +302,7 @@ export class FrameStream {
   }
 
   private reconnectWhenNeeded(): Disposable {
-    const whenDisconnected = this.ws.onClose(() => {
+    const whenDisconnected = this.streamApi.onClose(() => {
       if (this.state.type === 'connected') {
         this.closeAndReconnect(this.state);
       }
@@ -308,10 +332,11 @@ export class FrameStream {
     let timer: number;
 
     const startTimer = (token: Token): void => {
-      if (token.hasExpired()) {
-        throw new Error('Cannot refresh token. Token has already expired.');
-      }
+      // if (token.hasExpired()) {
+      //   throw new Error('Cannot refresh token. Token has already expired.');
+      // }
 
+      const ms = token.remainingTimeInMs(this.opts.tokenRefreshOffsetInSeconds);
       timer = window.setTimeout(async () => {
         const res = await this.streamApi.refreshToken();
         const newToken = fromPbRefreshTokenResponseOrThrow(res);
@@ -319,7 +344,7 @@ export class FrameStream {
         if (this.state.type === 'connected') {
           this.updateState({ ...this.state, token: newToken });
         }
-      }, token.remainingTimeInMs());
+      }, ms);
     };
 
     startTimer(token);
@@ -345,13 +370,13 @@ export class FrameStream {
                 resolve(frame);
               }
             } finally {
-              disposable.dispose();
+              disposable?.dispose();
             }
           });
         })
       );
     } finally {
-      disposable.dispose();
+      disposable?.dispose();
     }
   }
 

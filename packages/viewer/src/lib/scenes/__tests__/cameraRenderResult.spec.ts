@@ -5,7 +5,6 @@ import {
   Fixtures,
 } from '@vertexvis/stream-api';
 import { CameraRenderResult } from '../cameraRenderResult';
-import '../../../testing/domMocks';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
 
