@@ -15,7 +15,7 @@ import { decode } from '../encoder';
 
 describe(StreamApi, () => {
   const ws = new WebSocketClientMock();
-  const streamApi = new StreamApi(ws, false);
+  const streamApi = new StreamApi(ws, { loggingEnabled: false });
   const descriptor = { url: 'ws://foo.com' };
 
   const connect = jest.spyOn(ws, 'connect');
