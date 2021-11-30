@@ -57,6 +57,7 @@ export class WebSocketClientMock implements WebSocketClient {
   public reset(): void {
     this.sentMessages = [];
     this.msgHandlers.clear();
+    this.closeHandlers.clear();
   }
 
   /**

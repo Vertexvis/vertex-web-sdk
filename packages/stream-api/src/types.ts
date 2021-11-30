@@ -84,6 +84,31 @@ export type DrawFrameResult = DeepRequired<
   | ['drawFrame', 'timing', 'sendToReceiveDuration']
 >;
 
+export type StartStreamResult = DeepRequired<
+  vertexvis.protobuf.stream.IStartStreamResult,
+  []
+>;
+
+export type SyncTimeResult = DeepRequired<
+  vertexvis.protobuf.stream.ISyncTimeResult,
+  []
+>;
+
+export type ReconnectResult = DeepRequired<
+  vertexvis.protobuf.stream.IReconnectResult,
+  []
+>;
+
+export type LoadSceneViewStateResult = DeepRequired<
+  vertexvis.protobuf.stream.ILoadSceneViewStateResult,
+  []
+>;
+
+export type RefreshTokenResult = DeepRequired<
+  vertexvis.protobuf.stream.IRefreshTokenResult,
+  []
+>;
+
 export type ResponseResult = DrawFrameResult;
 
 export type ResponseError = vertexvis.protobuf.stream.IError;

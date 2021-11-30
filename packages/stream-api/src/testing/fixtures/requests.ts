@@ -89,7 +89,7 @@ export function gracefulReconnect(
   return request(
     {
       requestId: req.requestId,
-      payload: { reconnect: Objects.defaults(req.payload, def) },
+      payload: { gracefulReconnection: Objects.defaults(req.payload, def) },
     },
     meta
   );
