@@ -1,6 +1,5 @@
 import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
 import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { Binding } from '../scene-tree/lib/binding';
