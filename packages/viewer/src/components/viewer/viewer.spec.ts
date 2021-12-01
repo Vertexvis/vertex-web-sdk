@@ -1,6 +1,6 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
-jest.mock('../../lib/sessions/storage');
+jest.mock('../../lib/storage');
 jest.mock('../../workers/png-decoder-pool');
 
 import {
@@ -14,7 +14,7 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { Async, Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../testing/fixtures';
-import { upsertStorageEntry } from '../../lib/sessions/storage';
+import { StorageKeys, upsertStorageEntry } from '../../lib/storage';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import Chance from 'chance';
 
@@ -449,7 +449,7 @@ describe('vertex-viewer', () => {
     });
 
     it('passes a session id if one is present in storage', async () => {
-      upsertStorageEntry('vertexvis:stream-sessions', {
+      upsertStorageEntry(StorageKeys.STREAM_SESSION, {
         clientId: 'sessionId1',
       });
       const viewer = await createViewerSpec(

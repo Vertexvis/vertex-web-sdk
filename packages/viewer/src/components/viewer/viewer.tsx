@@ -73,7 +73,8 @@ import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
 import {
   upsertStorageEntry,
   getStorageEntry,
-} from '../../lib/sessions/storage';
+  StorageKeys,
+} from '../../lib/storage';
 import { CustomError } from '../../lib/errors';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
@@ -432,7 +433,7 @@ export class Viewer {
     if (this.streamSessionId == null) {
       try {
         this.streamSessionId = getStorageEntry(
-          'vertexvis:stream-sessions',
+          StorageKeys.STREAM_SESSION,
           (entry) => (this.clientId ? entry[this.clientId] : undefined)
         );
       } catch (e) {
@@ -942,7 +943,7 @@ export class Viewer {
         this.streamSessionId = sessionId.hex;
         this.sessionidchange.emit(this.streamSessionId);
         try {
-          upsertStorageEntry('vertexvis:stream-sessions', {
+          upsertStorageEntry(StorageKeys.STREAM_SESSION, {
             [this.clientId]: this.streamSessionId,
           });
         } catch (e) {
