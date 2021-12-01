@@ -47,11 +47,7 @@ describe('storage', () => {
 
     it('inserts the item if not present', () => {
       const value = { test: 'value' };
-      upsertStorageEntry(
-        localStorageKey,
-        { test: 'value' },
-        () => localStorage
-      );
+      upsertStorageEntry(localStorageKey, { test: 'value' }, localStorage);
 
       expect(localStorage.getStorage()).toMatchObject({
         [localStorageKey]: JSON.stringify(value),
@@ -65,7 +61,7 @@ describe('storage', () => {
         [localStorageKey]: JSON.stringify(value1),
       });
 
-      upsertStorageEntry(localStorageKey, value2, () => localStorage);
+      upsertStorageEntry(localStorageKey, value2, localStorage);
 
       expect(localStorage.getStorage()).toMatchObject({
         [localStorageKey]: JSON.stringify({ ...value1, ...value2 }),
@@ -89,7 +85,7 @@ describe('storage', () => {
         getStorageEntry(
           localStorageKey,
           (entry) => ({ ...entry, newValue: 'value' }),
-          () => localStorage
+          localStorage
         )
       ).toMatchObject({
         ...value1,
@@ -99,11 +95,7 @@ describe('storage', () => {
 
     it('returns nothing if the item does not exist', () => {
       expect(
-        getStorageEntry(
-          localStorageKey,
-          (entry) => entry,
-          () => localStorage
-        )
+        getStorageEntry(localStorageKey, (entry) => entry, localStorage)
       ).toBeUndefined();
     });
   });

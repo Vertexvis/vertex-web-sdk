@@ -29,7 +29,7 @@ import {
   SynchronizedClock,
 } from '../types';
 import { Resource } from '../types/loadableResource';
-import { upsertStorageEntry } from '../sessions/storage';
+import { StorageKeys, upsertStorageEntry } from '../storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
@@ -256,7 +256,7 @@ export class FrameStream {
     );
 
     if (clientId != null) {
-      upsertStorageEntry('vertexvis:stream-sessions', {
+      upsertStorageEntry(StorageKeys.STREAM_SESSION, {
         [clientId]: res.sessionId,
       });
     }
