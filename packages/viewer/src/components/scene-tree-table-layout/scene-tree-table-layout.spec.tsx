@@ -6,6 +6,7 @@ jest.mock('./lib/dom');
 jest.mock('../../lib/stencil', () => ({
   readDOM: jest.fn((fn) => fn()),
 }));
+jest.mock('../scene-tree/lib/dom');
 
 import '../../testing/domMocks';
 
@@ -23,6 +24,7 @@ import {
 import {
   createGetTreeResponse,
   mockGrpcUnaryResult,
+  random,
   ResponseStreamMock,
 } from '../../testing';
 import { SceneTreeTableLayout } from './scene-tree-table-layout';
@@ -31,10 +33,12 @@ import { readDOM } from '../../lib/stencil';
 import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
 import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
+import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 
 describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
     (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(0);
     (getSceneTreeTableViewportWidth as jest.Mock).mockReturnValue(0);
   });
@@ -57,7 +61,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
+    const { page, table } = await newSceneTreeTableSpec({
       controller,
       html: `
           <vertex-scene-tree-table-layout>
@@ -70,11 +74,63 @@ describe('<vertex-scene-tree-table-layout>', () => {
       `,
     });
 
+    const mockRow = {
+      index: 0,
+      node: createNode(),
+      metadata: {},
+      data: {},
+    };
+    table.rows = [mockRow];
+    table.totalRows = table.rows.length;
+
+    await page.waitForChanges();
+
     expect(
       table
         .querySelector('vertex-scene-tree-table-column')
         ?.querySelector('div.templated-div')
     ).not.toBeNull();
+  });
+
+  it('responds to hover events', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+          <vertex-scene-tree-table-layout>
+            <vertex-scene-tree-table-column>
+              <template>
+                <vertex-scene-tree-table-cell>
+                </vertex-scene-tree-table-cell>
+              </template>
+            </vertex-scene-tree-table-column>
+          </vertex-scene-tree-table-layout> 
+      `,
+    });
+
+    const mockRow = {
+      index: 0,
+      node: createNode(),
+      metadata: {},
+      data: {},
+    };
+    table.rows = [mockRow];
+    table.totalRows = table.rows.length;
+
+    await page.waitForChanges();
+
+    const cell = table.querySelector('vertex-scene-tree-table-cell');
+
+    cell?.dispatchEvent(new MouseEvent('pointerenter'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.querySelector('vertex-scene-tree-table-cell')?.hoveredNodeId
+    ).toBe(mockRow.node.id?.hex);
   });
 
   it('throws an exception if no cell template is specified for a column', async () => {
@@ -426,4 +482,19 @@ function mockGetTree({
   const res = createGetTreeResponse(itemCount, totalCount, transform);
   (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
   return res;
+}
+
+function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
+  return {
+    id: { hex: random.guid() },
+    name: random.name(),
+    depth: 0,
+    expanded: false,
+    isLeaf: false,
+    selected: false,
+    visible: false,
+    partiallyVisible: false,
+    columnsList: [],
+    ...values,
+  };
 }
