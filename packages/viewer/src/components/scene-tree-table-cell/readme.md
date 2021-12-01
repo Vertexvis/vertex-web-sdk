@@ -21,11 +21,11 @@
 
 ## Events
 
-| Event               | Description                                                                                                                                  | Type                                                                                                                                                                                                                                       |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `expandToggled`     | An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.                         | `CustomEvent<{ id?: AsObject \| undefined; depth: number; name: string; visible: boolean; selected: boolean; expanded: boolean; isLeaf: boolean; suppliedId?: AsObject \| undefined; partiallyVisible: boolean; columnsList: string[]; }>` |
-| `selectionToggled`  | An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled. | `CustomEvent<{ id?: AsObject \| undefined; depth: number; name: string; visible: boolean; selected: boolean; expanded: boolean; isLeaf: boolean; suppliedId?: AsObject \| undefined; partiallyVisible: boolean; columnsList: string[]; }>` |
-| `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<{ id?: AsObject \| undefined; depth: number; name: string; visible: boolean; selected: boolean; expanded: boolean; isLeaf: boolean; suppliedId?: AsObject \| undefined; partiallyVisible: boolean; columnsList: string[]; }>` |
+| Event               | Description                                                                                                                                  | Type                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `expandToggled`     | An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.                         | `CustomEvent<SceneTreeTableCellEventDetails>` |
+| `selectionToggled`  | An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled. | `CustomEvent<SceneTreeTableCellEventDetails>` |
+| `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<SceneTreeTableCellEventDetails>` |
 
 
 ## CSS Custom Properties
