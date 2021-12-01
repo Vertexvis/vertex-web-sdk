@@ -223,7 +223,7 @@ describe('<vertex-scene-tree>', () => {
 
       const row = tree.querySelectorAll(
         'vertex-scene-tree-table-cell'
-      )[0] as HTMLVertexSceneTreeRowElement;
+      )[0] as HTMLVertexSceneTreeTableCellElement;
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
   });
