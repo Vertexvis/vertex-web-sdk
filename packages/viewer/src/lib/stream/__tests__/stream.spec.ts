@@ -1,38 +1,34 @@
 import { Dimensions } from '@vertexvis/geometry';
-import {
-  encode,
-  Fixtures,
-  StreamApi,
-  StreamAttributes,
-  WebSocketClientMock,
-} from '@vertexvis/stream-api';
+import { encode, Fixtures, WebSocketClientMock } from '@vertexvis/stream-api';
 import { Async, Color } from '@vertexvis/utils';
 import { random } from '../../../testing';
-import { Config, parseConfig } from '../../config';
-import { FrameStream } from '../stream';
+import { parseConfig } from '../../config';
+import { getStorageEntry, StorageKeys } from '../../storage';
+import { ViewerStream } from '../stream';
 
-describe(FrameStream, () => {
-  const clientId = (): string => random.string();
-  const sessionId = (): string => random.string();
-  const config = (): Config => parseConfig('platdev');
-  const dimensions = (): Dimensions.Dimensions => Dimensions.create(100, 50);
-  const streamAttributes = (): StreamAttributes => ({});
-  const frameBgColor = (): Color.Color => Color.create(255, 255, 255);
+describe(ViewerStream, () => {
+  const clientId = random.string({ alpha: true });
+  const sessionId = random.string({ alpha: true });
+  const config = parseConfig('platdev');
+  const dimensions = Dimensions.create(100, 50);
+  const streamAttributes = {};
+  const frameBgColor = Color.create(255, 255, 255);
+  const offlineReconnectThresholdInMs = 20;
 
   const urn123 = 'urn:vertexvis:stream-key:123';
   const urn234 = 'urn:vertexvis:stream-key:234';
 
   const expiryInMs = 50;
 
-  describe(FrameStream.prototype.load, () => {
+  describe(ViewerStream.prototype.load, () => {
     it('starts stream if in disconnected state', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const connecting = stream.stateChanged.onceWhen(
@@ -50,13 +46,13 @@ describe(FrameStream, () => {
     });
 
     it('starts stream if in connected state and stream key different', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const connected123 = stream.stateChanged.onceWhen(
@@ -78,16 +74,16 @@ describe(FrameStream, () => {
     });
 
     it('uses existing websocket if changing scene view state', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
       jest
-        .spyOn(streamApi, 'loadSceneViewState')
+        .spyOn(stream, 'loadSceneViewState')
         .mockResolvedValue(Fixtures.Responses.loadSceneViewState().response);
 
       const connected123 = stream.stateChanged.onceWhen(
@@ -111,13 +107,13 @@ describe(FrameStream, () => {
     });
 
     it('opens new websocket if connecting and urn changes', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const closeWs = jest.spyOn(ws, 'close');
@@ -134,13 +130,13 @@ describe(FrameStream, () => {
     });
 
     it('opens new websocket if reconnecting and urn changes', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const closeWs = jest.spyOn(ws, 'close');
@@ -162,20 +158,74 @@ describe(FrameStream, () => {
       await simulateFrame(ws);
       await expect(connected234).resolves.toBeDefined();
     });
+
+    it('caches session', async () => {
+      const { stream, ws } = makeStream();
+
+      const startStream = Fixtures.Responses.startStream().response;
+      jest.spyOn(stream, 'startStream').mockResolvedValue(startStream);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const connecting = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+      );
+
+      stream.load(urn123);
+      await expect(connecting).resolves.toBeDefined();
+
+      await simulateFrame(ws);
+      await stream.stateChanged.onceWhen((s) => s.type === 'connected');
+
+      const sessionId = getStorageEntry(
+        StorageKeys.STREAM_SESSION,
+        (records) => records[clientId]
+      );
+      expect(sessionId).toBe(startStream.startStream?.sessionId?.hex);
+    });
+
+    it('connects with session id', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const connect = jest.spyOn(stream, 'connect');
+      const connecting = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+      );
+
+      stream.load(urn123);
+      await connecting;
+      await simulateFrame(ws);
+      await stream.stateChanged.onceWhen((s) => s.type === 'connected');
+
+      expect(connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining(sessionId),
+        }),
+        expect.anything()
+      );
+    });
   });
 
   describe('reconnect', () => {
     it('reconnects websocket if requested', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
       jest
-        .spyOn(streamApi, 'reconnect')
+        .spyOn(stream, 'reconnect')
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
       const closeWs = jest.spyOn(ws, 'close');
@@ -197,43 +247,108 @@ describe(FrameStream, () => {
     });
 
     it('reconnects websocket if websocket disconnected', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
       jest
-        .spyOn(streamApi, 'startStream')
+        .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
       jest
-        .spyOn(streamApi, 'reconnect')
+        .spyOn(stream, 'reconnect')
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
-      const connected123 = stream.stateChanged.onceWhen(
+      const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
       stream.load(urn123);
       await simulateFrame(ws);
-      await connected123;
+      await connected;
 
-      const reconnecting123 = stream.stateChanged.onceWhen(
+      const reconnecting = stream.stateChanged.onceWhen(
         (s) => s.type === 'reconnecting'
       );
-      const reconnected123 = stream.stateChanged.onceWhen((s) => {
+      const reconnected = stream.stateChanged.onceWhen((s) => {
         return s.type === 'connected' && s.resource.resource.id === '123';
       });
       ws.close();
 
-      await expect(reconnecting123).resolves.toBeDefined();
-      await expect(reconnected123).resolves.toBeDefined();
+      await expect(reconnecting).resolves.toBeDefined();
+      await expect(reconnected).resolves.toBeDefined();
+    });
+
+    it('attempts reconnect after host goes offline', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      jest
+        .spyOn(stream, 'reconnect')
+        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+
+      const connected = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123);
+      await simulateFrame(ws);
+      await connected;
+
+      const reconnected = stream.stateChanged.onceWhen((s) => {
+        return s.type === 'connected' && s.resource.resource.id === '123';
+      });
+
+      window.dispatchEvent(new Event('offline'));
+
+      await expect(reconnected).resolves.toBeDefined();
+    });
+
+    it('does not attempt reconnect if host toggles between offline/online within threshold', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      jest
+        .spyOn(stream, 'reconnect')
+        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+
+      const connected = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123);
+      await simulateFrame(ws);
+      await connected;
+
+      const reconnected = Async.timeout(
+        offlineReconnectThresholdInMs * 2,
+        stream.stateChanged.onceWhen((s) => {
+          return s.type === 'connected' && s.resource.resource.id === '123';
+        })
+      )
+        .then(() => true)
+        .catch(() => false);
+
+      window.dispatchEvent(new Event('offline'));
+      await Async.delay(offlineReconnectThresholdInMs / 2);
+      window.dispatchEvent(new Event('online'));
+
+      await expect(reconnected).resolves.toBe(false);
     });
   });
 
   describe('refresh token', () => {
     it('refreshes token when about to expire', async () => {
-      const { stream, streamApi, ws } = makeStream();
+      const { stream, ws } = makeStream();
 
-      jest.spyOn(streamApi, 'startStream').mockResolvedValue(
+      jest.spyOn(stream, 'startStream').mockResolvedValue(
         Fixtures.Responses.startStream({
           result: {
             token: { token: random.string(), expiresIn: expiryInMs / 1000 },
@@ -241,13 +356,13 @@ describe(FrameStream, () => {
         }).response
       );
       jest
-        .spyOn(streamApi, 'syncTime')
+        .spyOn(stream, 'syncTime')
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
       jest
-        .spyOn(streamApi, 'reconnect')
+        .spyOn(stream, 'reconnect')
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
-      const refreshToken = jest.spyOn(streamApi, 'refreshToken');
+      const refreshToken = jest.spyOn(stream, 'refreshToken');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
@@ -261,24 +376,25 @@ describe(FrameStream, () => {
   });
 
   function makeStream(): {
-    streamApi: StreamApi;
-    stream: FrameStream;
+    stream: ViewerStream;
     ws: WebSocketClientMock;
   } {
     const ws = new WebSocketClientMock();
-    const streamApi = new StreamApi(ws);
-    const stream = new FrameStream(
-      streamApi,
-      clientId,
-      sessionId,
-      config,
-      dimensions,
-      streamAttributes,
-      frameBgColor,
-      { tokenRefreshOffsetInSeconds: 0 }
+    const stream = new ViewerStream(
+      ws,
+      () => clientId,
+      () => sessionId,
+      () => config,
+      () => dimensions,
+      () => streamAttributes,
+      () => frameBgColor,
+      {
+        tokenRefreshOffsetInSeconds: 0,
+        offlineThresholdInSeconds: offlineReconnectThresholdInMs / 1000,
+      }
     );
 
-    return { stream, streamApi, ws };
+    return { stream, ws };
   }
 
   async function simulateFrame(
