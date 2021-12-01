@@ -1,6 +1,5 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('./utils');
-jest.mock('../../lib/storage');
 jest.mock('../../workers/png-decoder-pool');
 
 import {
@@ -14,7 +13,6 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { Async, Color } from '@vertexvis/utils';
 import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
 import * as Fixtures from '../../testing/fixtures';
-import { StorageKeys, upsertStorageEntry } from '../../lib/storage';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import Chance from 'chance';
 
@@ -443,24 +441,6 @@ describe('vertex-viewer', () => {
       expect(api?.connect).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.not.stringMatching(/sessionId=sessionId/),
-        }),
-        expect.anything()
-      );
-    });
-
-    it('passes a session id if one is present in storage', async () => {
-      upsertStorageEntry(StorageKeys.STREAM_SESSION, {
-        clientId: 'sessionId1',
-      });
-      const viewer = await createViewerSpec(
-        `<vertex-viewer client-id="clientId"></vertex-viewer>`
-      );
-      const api = viewer.stream;
-      await loadNewModelForViewer(viewer, urn1);
-
-      expect(api?.connect).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringMatching(/sessionId=sessionId1/),
         }),
         expect.anything()
       );
