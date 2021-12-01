@@ -21,6 +21,7 @@ import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
 import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import {
   FeatureHighlightOptions,
@@ -1465,16 +1466,24 @@ declare namespace LocalJSX {
     /**
      * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
      */
-    onExpandToggled?: (event: CustomEvent<Node.AsObject>) => void;
-    onHovered?: (event: CustomEvent<Node.AsObject | undefined>) => void;
+    onExpandToggled?: (
+      event: CustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
+    onHovered?: (
+      event: CustomEvent<SceneTreeTableCellEventDetails | undefined>
+    ) => void;
     /**
      * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
      */
-    onSelectionToggled?: (event: CustomEvent<Node.AsObject>) => void;
+    onSelectionToggled?: (
+      event: CustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
     /**
      * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
      */
-    onVisibilityToggled?: (event: CustomEvent<Node.AsObject>) => void;
+    onVisibilityToggled?: (
+      event: CustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
     /**
      * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
      */

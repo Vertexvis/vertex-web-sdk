@@ -2,6 +2,7 @@ import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { readDOM } from '../../lib/stencil';
+import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { Binding } from '../scene-tree/lib/binding';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
@@ -624,9 +625,9 @@ export class SceneTreeTableLayout {
   };
 
   private handleCellHover = (
-    event: CustomEvent<Node.AsObject | undefined>
+    event: CustomEvent<SceneTreeTableCellEventDetails | undefined>
   ): void => {
-    this.hoveredNodeId = event.detail?.id?.hex;
+    this.hoveredNodeId = event.detail?.node?.id?.hex;
   };
 
   private bindHeaderData = (): void => {
