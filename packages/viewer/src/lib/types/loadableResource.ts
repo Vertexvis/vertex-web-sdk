@@ -1,4 +1,5 @@
 import { Uri } from '@vertexvis/utils';
+import { InvalidResourceUrnError } from '../errors';
 
 interface StreamKeyResource {
   type: 'stream-key';
@@ -32,7 +33,9 @@ export function fromUrn(urn: string): Resource {
         queries: fromQuery(uri.query),
       };
     default:
-      throw new Error('Invalid URN. Unknown resource type');
+      throw new InvalidResourceUrnError(
+        `Invalid URN. Unknown resource type ${resourceType}`
+      );
   }
 }
 

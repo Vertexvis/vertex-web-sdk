@@ -17,12 +17,19 @@ export interface Connected {
   readonly type: 'connected';
   readonly resource: Resource;
   readonly connection: Disposable;
-  readonly sceneViewId: string;
   readonly streamId: string;
+  readonly sceneViewId: string;
+  readonly sessionId: string;
   readonly worldOrientation: Orientation;
   readonly token: Token;
   readonly frame: Frame;
   readonly clock: SynchronizedClock;
+}
+
+export interface ConnectionFailed {
+  readonly type: 'connection-failed';
+  readonly message: string;
+  readonly error?: unknown;
 }
 
 export interface Reconnecting {
@@ -31,8 +38,9 @@ export interface Reconnecting {
   readonly connection: Disposable;
 }
 
-export type FrameStreamState =
+export type ViewerStreamState =
   | Disconnected
   | Connecting
+  | ConnectionFailed
   | Connected
   | Reconnecting;

@@ -14,24 +14,8 @@ import {
 import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
-import {
-  Disposable,
-  UUID,
-  Color,
-  Async,
-  EventDispatcher,
-  Objects,
-  Mapper,
-} from '@vertexvis/utils';
-import { CommandRegistry } from '../../lib/commands/commandRegistry';
-import {
-  LoadableResource,
-  SynchronizedClock,
-  Viewport,
-  Orientation,
-  StencilBufferManager,
-} from '../../lib/types';
-import { registerCommands } from '../../lib/commands/streamCommands';
+import { Disposable, Color, EventDispatcher, Mapper } from '@vertexvis/utils';
+import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
 import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
@@ -41,41 +25,27 @@ import { PointerInteractionHandler } from '../../lib/interactions/pointerInterac
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
-import { CommandFactory } from '../../lib/commands/command';
 import { Environment } from '../../lib/environment';
 import {
-  WebsocketConnectionError,
   ViewerInitializationError,
   InteractionHandlerError,
   ComponentInitializationError,
   IllegalStateError,
 } from '../../lib/errors';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import {
-  WebSocketClientImpl,
-  currentDateAsProtoTimestamp,
-  protoToDate,
-  toProtoDuration,
-} from '@vertexvis/stream-api';
+import { WebSocketClientImpl, toProtoDuration } from '@vertexvis/stream-api';
 import { Scene } from '../../lib/scenes/scene';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
 import {
-  acknowledgeFrameRequests,
   CanvasRenderer,
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { paintTime, Timing } from '../../lib/meters';
-import { ViewerStreamApi } from '../../lib/stream/viewerStreamApi';
-import {
-  upsertStorageEntry,
-  getStorageEntry,
-  StorageKeys,
-} from '../../lib/storage';
-import { CustomError } from '../../lib/errors';
+import { getStorageEntry, StorageKeys } from '../../lib/storage';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
@@ -84,11 +54,7 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import {
-  fromPbFrameOrThrow,
-  fromPbWorldOrientationOrThrow,
-  toPbStreamAttributes,
-} from '../../lib/mappers';
+import { fromPbFrameOrThrow, toPbStreamAttributes } from '../../lib/mappers';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
 import {
@@ -96,8 +62,14 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
 } from '../../interfaces';
-
-const WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
+import { ViewerStream } from '../../lib/stream/stream';
+import {
+  Connected,
+  Connecting,
+  ConnectionFailed,
+  Disconnected,
+  ViewerStreamState,
+} from '../../lib/stream/state';
 
 interface ConnectedStatus {
   jwt: string;
@@ -120,6 +92,7 @@ interface StateMap {
   streamWorldOrientation?: Orientation;
   cursorManager: CursorManager;
   interactionTarget?: HTMLElement;
+  streamState: ViewerStreamState;
 }
 
 /** @internal */
@@ -264,7 +237,7 @@ export class Viewer {
   /**
    * @internal
    */
-  @Prop({ mutable: true }) public stream?: ViewerStreamApi;
+  @Prop({ mutable: true }) public stream?: ViewerStream;
 
   /**
    * @internal
@@ -369,40 +342,27 @@ export class Viewer {
    */
   @State() private stateMap: StateMap = {
     cursorManager: new CursorManager(),
+    streamState: { type: 'disconnected' },
   };
 
   private containerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
 
-  private commands!: CommandRegistry;
   private canvasRenderer!: CanvasRenderer;
-  private urn?: string;
 
-  private lastFrame?: Frame;
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
+  private isResizing?: boolean;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
-  private isResizing?: boolean;
-  private isReconnecting?: boolean;
-  private sceneViewId?: UUID.UUID;
-  private streamSessionId?: UUID.UUID;
-  private streamId?: UUID.UUID;
-  private streamDisposable?: Disposable;
-  private jwt?: string;
-  private isStreamStarted = false;
-
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame>();
-
-  private clock?: SynchronizedClock;
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
-    this.streamSessionId = this.sessionId;
   }
 
   /**
@@ -415,31 +375,17 @@ export class Viewer {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
     this.registerSlotChangeListeners();
 
-    const ws = new WebSocketClientImpl();
-    ws.onClose(() => this.handleWebSocketClose());
-
-    this.stream = new ViewerStreamApi(
-      ws,
-      this.getResolvedConfig().flags.logWsMessages
+    this.stream = new ViewerStream(
+      new WebSocketClientImpl(),
+      () => this.clientId,
+      () => this.getSessionId(),
+      () => this.getResolvedConfig(),
+      () => this.getCanvasDimensions() ?? Dimensions.create(0, 0),
+      () => this.getStreamAttributes(),
+      () => this.getBackgroundColor() ?? Color.create(255, 255, 255),
+      { loggingEnabled: this.getResolvedConfig().flags.logWsMessages }
     );
     this.setupStreamListeners();
-
-    this.commands = new CommandRegistry(this.stream, () =>
-      this.getResolvedConfig()
-    );
-    registerCommands(this.commands);
-
-    this.streamSessionId = this.sessionId;
-    if (this.streamSessionId == null) {
-      try {
-        this.streamSessionId = getStorageEntry(
-          StorageKeys.STREAM_SESSION,
-          (entry) => (this.clientId ? entry[this.clientId] : undefined)
-        );
-      } catch (e) {
-        // Ignore the case where we can't access local storage for fetching a session
-      }
-    }
 
     this.updateStreamAttributes();
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
@@ -451,8 +397,17 @@ export class Viewer {
   protected componentDidLoad(): void {
     this.interactionApi = this.createInteractionApi();
 
+    if (this.containerElement != null) {
+      this.resizeObserver?.observe(this.containerElement);
+    }
+
     if (this.src != null) {
-      this.load(this.src);
+      try {
+        this.load(this.src);
+      } catch (e) {
+        // Consumer cannot handle this error. Just log it.
+        console.error('Error loading scene', e);
+      }
     }
 
     if (this.cameraControls) {
@@ -547,25 +502,10 @@ export class Viewer {
   }
 
   /**
-   * Internal API.
-   *
-   * @internal
-   */
-  @Method()
-  public async registerCommand<R, T>(
-    id: string,
-    factory: CommandFactory<R>,
-    thisArg?: T
-  ): Promise<Disposable> {
-    return this.commands.register(id, factory, thisArg);
-  }
-
-  /**
    * @internal
    */
   @Method()
   public async dispatchFrameDrawn(frame: Frame): Promise<void> {
-    this.lastFrame = frame;
     this.frame = frame;
     this.internalFrameDrawnDispatcher.emit(frame);
     this.frameDrawn.emit(frame);
@@ -718,7 +658,9 @@ export class Viewer {
 
   @Method()
   public async getJwt(): Promise<string | undefined> {
-    return this.jwt;
+    if (this.stateMap.streamState.type === 'connected') {
+      return this.stateMap.streamState.token.token;
+    }
   }
 
   @Watch('src')
@@ -810,31 +752,11 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string): Promise<void> {
-    if (this.commands != null && this.dimensions != null) {
-      const {
-        resource: previousResource = undefined,
-        queries: previousQueries = undefined,
-      } = this.urn != null ? LoadableResource.fromUrn(this.urn) : {};
-      const { resource, queries } = LoadableResource.fromUrn(urn);
+    if (this.stream != null && this.dimensions != null) {
+      this.calculateComponentDimensions();
 
-      const hasResourceChanged = !Objects.isEqual(previousResource, resource);
-      const hasQueryChanged = !Objects.isEqual(previousQueries, queries);
-      const hasQuery = queries[0] != null;
-      const isSceneReady = await this.isSceneReady();
-
-      this.urn = urn;
-
-      // Do a fresh connection if the scene's not ready yet, but the query
-      // params have changed.
-      if (hasResourceChanged || (!isSceneReady && hasQueryChanged)) {
-        this.unload();
-        await this.connectStreamingClient(resource, queries[0]);
-      }
-      // If the scene's ready, use the scene to update the stream.
-      else if (isSceneReady && hasQueryChanged && hasQuery) {
-        const scene = await this.scene();
-        await scene.applySceneViewState(queries[0].id);
-      }
+      await this.stream?.load(urn);
+      this.sceneReady.emit();
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -848,18 +770,12 @@ export class Viewer {
    */
   @Method()
   public async unload(): Promise<void> {
-    if (this.streamDisposable != null) {
-      this.isStreamStarted = false;
-      this.streamId = undefined;
-      this.streamDisposable.dispose();
-      this.lastFrame = undefined;
+    if (this.stream != null) {
+      this.stream.disconnect();
       this.frame = undefined;
-      this.sceneViewId = undefined;
-      this.clock = undefined;
       this.errorMessage = undefined;
-      this.urn = undefined;
-      this.stateMap.streamWorldOrientation = undefined;
     }
+
     if (this.canvasElement != null) {
       const context = this.canvasElement.getContext('2d');
       if (context != null) {
@@ -888,7 +804,7 @@ export class Viewer {
    */
   @Method()
   public async isSceneReady(): Promise<boolean> {
-    return this.lastFrame != null && this.sceneViewId != null;
+    return this.stateMap.streamState.type === 'connected';
   }
 
   @Listen('tap')
@@ -898,206 +814,6 @@ export class Viewer {
     this.tapKeyInteractions
       .filter((i) => i.predicate(event.detail))
       .forEach((i) => i.fn(event.detail));
-  }
-
-  /**
-   * @internal
-   */
-  @Method()
-  public async handleWebSocketClose(): Promise<void> {
-    if (this.isStreamStarted) {
-      this.isStreamStarted = false;
-
-      if (this.streamId != null && this.urn != null && !this.isReconnecting) {
-        const { resource } = LoadableResource.fromUrn(this.urn);
-        await this.reconnectWebSocket(resource, this.streamId);
-      }
-    }
-  }
-
-  private async connectStreamingClient(
-    resource: LoadableResource.LoadableResource,
-    queryResource?: LoadableResource.QueryResource
-  ): Promise<void> {
-    try {
-      this.streamDisposable = await this.connectStream(resource);
-      this.calculateComponentDimensions();
-
-      const { startStream } = await this.getStream().startStream({
-        streamKey: { value: resource.id },
-        dimensions: this.dimensions,
-        frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
-        ...(queryResource?.type === 'scene-view-state' && {
-          sceneViewStateId: { hex: queryResource.id },
-        }),
-      });
-
-      const { streamId, sessionId, sceneViewId, jwt, worldOrientation } =
-        startStream || {};
-
-      this.jwt = jwt || undefined;
-      this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
-
-      if (this.clientId != null && sessionId?.hex != null) {
-        this.streamSessionId = sessionId.hex;
-        this.sessionidchange.emit(this.streamSessionId);
-        try {
-          upsertStorageEntry(StorageKeys.STREAM_SESSION, {
-            [this.clientId]: this.streamSessionId,
-          });
-        } catch (e) {
-          // Ignore the case where we can't access local storage for persisting a session
-        }
-      }
-
-      if (sceneViewId?.hex != null) {
-        this.sceneViewId = sceneViewId.hex;
-        this.isStreamStarted = true;
-      }
-      if (streamId?.hex != null) {
-        this.streamId = streamId.hex;
-      }
-
-      // Need to parse world orientation.
-      this.stateMap.streamWorldOrientation =
-        fromPbWorldOrientationOrThrow(worldOrientation);
-
-      console.debug(
-        `Stream connected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
-      );
-
-      await this.waitNextDrawnFrame(15 * 1000);
-
-      this.sceneReady.emit();
-    } catch (e) {
-      this.emitConnectionChange({ status: 'disconnected' });
-      if (e instanceof CustomError) {
-        throw e;
-      }
-
-      if (this.lastFrame == null) {
-        this.errorMessage = 'Unable to establish connection to Vertex.';
-        console.error('Failed to establish WS connection', e);
-
-        throw new WebsocketConnectionError(
-          this.errorMessage,
-          e instanceof Error ? e : undefined
-        );
-      }
-    }
-  }
-
-  private async connectStream(
-    resource: LoadableResource.LoadableResource
-  ): Promise<Disposable> {
-    if (this.clientId == null) {
-      console.warn(
-        'Client ID not provided, using legacy path. A Client ID will be required in an upcoming release.'
-      );
-    }
-
-    const connection = await this.commands.execute<Disposable>(
-      'stream.connect',
-      {
-        clientId: this.clientId,
-        sessionId: this.sessionId || this.streamSessionId,
-        resource,
-      }
-    );
-    this.synchronizeTime();
-    this.canvasRenderer = measureCanvasRenderer(
-      paintTime,
-      createCanvasRenderer(),
-      this.getResolvedConfig().flags.logFrameRate,
-      (timings) => this.reportPerformance(timings)
-    );
-    if (this.containerElement != null) {
-      this.resizeObserver?.observe(this.containerElement);
-    }
-    return connection;
-  }
-
-  private async synchronizeTime(): Promise<void> {
-    try {
-      const resp = await this.getStream().syncTime({
-        requestTime: currentDateAsProtoTimestamp(),
-      });
-
-      if (resp.syncTime?.replyTime != null) {
-        const remoteTime = protoToDate(resp.syncTime.replyTime);
-        if (remoteTime != null) {
-          this.clock = new SynchronizedClock(remoteTime);
-          console.debug(
-            `Synchronized time [local-time=${this.clock.knownLocalTime.toISOString()}, remote-time=${this.clock.knownRemoteTime.toISOString()}]`
-          );
-        }
-      }
-    } catch (e) {
-      console.error('Failed to synchronize clock', e);
-    }
-  }
-
-  private async reconnectStreamingClient(
-    resource: LoadableResource.LoadableResource,
-    streamId: UUID.UUID,
-    isReopen = false
-  ): Promise<void> {
-    try {
-      this.streamDisposable?.dispose();
-      this.clock = undefined;
-
-      this.emitConnectionChange({ status: 'connecting' });
-      this.streamDisposable = await this.connectStream(resource);
-
-      const result = await this.getStream().reconnect({
-        streamId: { hex: streamId },
-        dimensions: this.dimensions,
-        frameBackgroundColor: this.getBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
-      });
-      this.isStreamStarted = true;
-      this.isReconnecting = false;
-
-      this.jwt = result.reconnect?.jwt || undefined;
-
-      this.emitConnectionChange({ status: 'connected', jwt: this.jwt || '' });
-
-      console.debug(
-        `Stream reconnected [stream-id=${this.streamId}, scene-view-id=${this.sceneViewId}]`
-      );
-    } catch (e) {
-      this.emitConnectionChange({ status: 'disconnected' });
-      if (e instanceof CustomError) {
-        throw e;
-      }
-
-      const message = 'Unable to establish connection to Vertex.';
-      if (!isReopen) {
-        this.errorMessage = this.errorMessage || message;
-        console.error('Failed to establish WS connection', e);
-      }
-      throw new WebsocketConnectionError(
-        message,
-        e instanceof Error ? e : undefined
-      );
-    }
-  }
-
-  private async reconnectWebSocket(
-    resource: LoadableResource.LoadableResource,
-    streamId: UUID.UUID,
-    attempt = 0
-  ): Promise<void> {
-    try {
-      await this.reconnectStreamingClient(resource, streamId, true);
-    } catch (e) {
-      // Keep trying as failures are expected in loss of network connection.
-      setTimeout(
-        () => this.reconnectWebSocket(resource, streamId, attempt + 1),
-        WS_RECONNECT_DELAYS[Math.min(attempt, WS_RECONNECT_DELAYS.length - 1)]
-      );
-    }
   }
 
   private emitConnectionChange(status: ConnectionStatus): void {
@@ -1153,71 +869,6 @@ export class Viewer {
       });
   }
 
-  private async handleStreamRequest(
-    request: vertexvis.protobuf.stream.IStreamRequest
-  ): Promise<void> {
-    if (request.drawFrame != null) {
-      this.handleFrame(request.drawFrame);
-    } else if (request.gracefulReconnection != null) {
-      this.handleGracefulReconnect(request.gracefulReconnection);
-    }
-  }
-
-  private handleGracefulReconnect(
-    payload: vertexvis.protobuf.stream.IGracefulReconnectionPayload
-  ): void {
-    if (payload.streamId?.hex != null && this.urn != null) {
-      const { resource } = LoadableResource.fromUrn(this.urn);
-      this.isReconnecting = true;
-      this.reconnectStreamingClient(resource, payload.streamId.hex);
-    }
-  }
-
-  private async handleFrame(
-    payload: vertexvis.protobuf.stream.IDrawFramePayload
-  ): Promise<void> {
-    const dimensions = this.getCanvasDimensions();
-    const worldOrientation = this.stateMap.streamWorldOrientation;
-
-    if (
-      this.canvasElement != null &&
-      dimensions != null &&
-      worldOrientation != null
-    ) {
-      const canvas = this.canvasElement.getContext('2d');
-      if (canvas != null) {
-        this.frame = fromPbFrameOrThrow(worldOrientation)(payload);
-
-        const data = {
-          canvas,
-          dimensions,
-          frame: this.frame,
-          viewport: this.viewport,
-        };
-
-        this.frameReceived.emit(this.frame);
-
-        if (this.frame.scene.hasChanged) {
-          this.sceneChanged.emit();
-        }
-
-        const drawnFrame = await this.canvasRenderer(data);
-        this.dispatchFrameDrawn(drawnFrame);
-      }
-    }
-  }
-
-  private waitNextDrawnFrame(timeout?: number): Promise<Frame> {
-    const frame = new Promise<Frame>((resolve) => {
-      const disposable = this.internalFrameDrawnDispatcher.on((frame) => {
-        resolve(frame);
-        disposable.dispose();
-      });
-    });
-
-    return timeout != null ? Async.timeout(timeout, frame) : frame;
-  }
-
   private calculateComponentDimensions(): void {
     const maxPixelCount = 2073600;
     const bounds = this.getBounds();
@@ -1246,14 +897,14 @@ export class Viewer {
 
       this.dimensionschange.emit(this.dimensions);
 
-      if (this.isStreamStarted) {
+      if (this.stateMap.streamState.type === 'connected') {
         this.getStream().updateDimensions({ dimensions: this.dimensions });
       }
     }
   }
 
   private reportPerformance(timings: Timing[]): void {
-    if (this.isStreamStarted) {
+    if (this.stateMap.streamState.type === 'connected') {
       const payload = {
         timings: timings.map((t) => ({
           receiveToPaintDuration: toProtoDuration(t.duration),
@@ -1264,10 +915,108 @@ export class Viewer {
   }
 
   private setupStreamListeners(): void {
-    this.getStream().onRequest((msg) => this.handleStreamRequest(msg.request));
-    this.getStream().onRequest(
-      acknowledgeFrameRequests(this.getStream(), () => this.clock)
-    );
+    this.getStream().stateChanged.on((s) => {
+      this.handleStreamStateChanged(this.stateMap.streamState, s);
+    });
+  }
+
+  private handleStreamStateChanged(
+    previous: ViewerStreamState,
+    state: ViewerStreamState
+  ): void {
+    this.stateMap.streamState = state;
+
+    if (state.type === 'connecting') {
+      this.handleConnecting(previous, state);
+    } else if (state.type === 'connected') {
+      this.handleConnected(previous, state);
+    } else if (state.type === 'connection-failed') {
+      this.handleConnectionFailed(previous, state);
+    } else if (state.type === 'disconnected') {
+      this.handleDisconnected(previous, state);
+    }
+  }
+
+  private handleConnecting(
+    previous: ViewerStreamState,
+    state: Connecting
+  ): void {
+    if (previous.type !== 'connecting') {
+      this.errorMessage = undefined;
+      this.emitConnectionChange({ status: 'connecting' });
+    }
+  }
+
+  private handleConnected(previous: ViewerStreamState, state: Connected): void {
+    if (previous.type !== 'connected') {
+      this.errorMessage = undefined;
+      this.canvasRenderer = measureCanvasRenderer(
+        paintTime,
+        createCanvasRenderer(),
+        this.getResolvedConfig().flags.logFrameRate,
+        (timings) => this.reportPerformance(timings)
+      );
+
+      this.emitConnectionChange({
+        status: 'connected',
+        jwt: state.token.token,
+      });
+      this.sessionidchange.emit(state.sessionId);
+    }
+
+    if (this.frame !== state.frame) {
+      this.updateFrame(state.frame);
+    }
+  }
+
+  private handleConnectionFailed(
+    previous: ViewerStreamState,
+    state: ConnectionFailed
+  ): void {
+    if (previous.type !== 'connection-failed') {
+      this.errorMessage = state.message;
+    }
+  }
+
+  private handleDisconnected(
+    previous: ViewerStreamState,
+    state: Disconnected
+  ): void {
+    if (previous.type !== 'disconnected') {
+      this.errorMessage = undefined;
+      this.emitConnectionChange({ status: 'disconnected' });
+    }
+  }
+
+  private async updateFrame(frame: Frame): Promise<void> {
+    const dimensions = this.getCanvasDimensions();
+
+    if (
+      this.canvasElement != null &&
+      dimensions != null &&
+      this.frame !== frame
+    ) {
+      const canvas = this.canvasElement.getContext('2d');
+      if (canvas != null) {
+        this.frame = frame;
+
+        const data = {
+          canvas,
+          dimensions,
+          frame: this.frame,
+          viewport: this.viewport,
+        };
+
+        this.frameReceived.emit(this.frame);
+
+        if (this.frame.scene.hasChanged) {
+          this.sceneChanged.emit();
+        }
+
+        const drawnFrame = await this.canvasRenderer(data);
+        this.dispatchFrameDrawn(drawnFrame);
+      }
+    }
   }
 
   private initializeInteractionHandler(handler: InteractionHandler): void {
@@ -1312,15 +1061,13 @@ export class Viewer {
   }
 
   private createScene(): Scene {
-    if (
-      this.frame == null ||
-      this.sceneViewId == null ||
-      this.stateMap.streamWorldOrientation == null
-    ) {
+    if (this.stateMap.streamState.type !== 'connected') {
       throw new IllegalStateError(
-        'Cannot create scene. Frame has not been rendered or stream not initialized.'
+        'Cannot create scene. Viewer stream is not connected.'
       );
     }
+
+    const { frame, sceneViewId, worldOrientation } = this.stateMap.streamState;
 
     const selectionMaterial =
       typeof this.selectionMaterial === 'string'
@@ -1328,10 +1075,10 @@ export class Viewer {
         : this.selectionMaterial;
     return new Scene(
       this.getStream(),
-      this.frame,
-      fromPbFrameOrThrow(this.stateMap.streamWorldOrientation),
+      frame,
+      fromPbFrameOrThrow(worldOrientation),
       () => this.getImageScale(),
-      this.sceneViewId,
+      sceneViewId,
       selectionMaterial
     );
   }
@@ -1379,7 +1126,7 @@ export class Viewer {
   }
 
   private updateStreamAttributes(): void {
-    if (this.isStreamStarted) {
+    if (this.stateMap.streamState.type === 'connected') {
       const streamAttributes = this.getStreamAttributes();
       this.getStream().updateStream({ streamAttributes });
     }
@@ -1402,8 +1149,16 @@ export class Viewer {
     );
   }
 
-  private getStream(): ViewerStreamApi {
+  private getStream(): ViewerStream {
     return getRequiredProp('Stream is undefined', () => this.stream);
+  }
+
+  private getSessionId(): string | undefined {
+    if (this.sessionId == null) {
+      return getStorageEntry(StorageKeys.STREAM_SESSION, (entry) =>
+        this.clientId ? entry[this.clientId] : undefined
+      );
+    } else return this.sessionId;
   }
 }
 

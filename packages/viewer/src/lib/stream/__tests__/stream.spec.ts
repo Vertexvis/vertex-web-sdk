@@ -1,8 +1,17 @@
 import { Dimensions } from '@vertexvis/geometry';
-import { encode, Fixtures, WebSocketClientMock } from '@vertexvis/stream-api';
+import {
+  encode,
+  Fixtures,
+  StreamRequestError,
+  WebSocketClientMock,
+} from '@vertexvis/stream-api';
 import { Async, Color } from '@vertexvis/utils';
 import { random } from '../../../testing';
 import { parseConfig } from '../../config';
+import {
+  InvalidResourceUrnError,
+  WebsocketConnectionError,
+} from '../../errors';
 import { getStorageEntry, StorageKeys } from '../../storage';
 import { ViewerStream } from '../stream';
 
@@ -13,12 +22,13 @@ describe(ViewerStream, () => {
   const dimensions = Dimensions.create(100, 50);
   const streamAttributes = {};
   const frameBgColor = Color.create(255, 255, 255);
-  const offlineReconnectThresholdInMs = 20;
 
   const urn123 = 'urn:vertexvis:stream-key:123';
   const urn234 = 'urn:vertexvis:stream-key:234';
+  const urnMalformed = 'urn:vertexvis:invalid-type:234';
 
   const expiryInMs = 50;
+  const offlineReconnectThresholdInMs = 25;
 
   describe(ViewerStream.prototype.load, () => {
     it('starts stream if in disconnected state', async () => {
@@ -211,6 +221,41 @@ describe(ViewerStream, () => {
         }),
         expect.anything()
       );
+    });
+
+    it('sets connection-failed state if connection fails', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const connect = jest.spyOn(ws, 'connect');
+      const startStream = jest.spyOn(stream, 'startStream');
+
+      let failure = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connection-failed'
+      );
+      let load = stream.load(urnMalformed);
+      await expect(load).rejects.toThrowError(InvalidResourceUrnError);
+      await expect(failure).resolves.toBeDefined();
+
+      connect.mockRejectedValue(new Error('WS connection failed'));
+      failure = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connection-failed'
+      );
+      load = stream.load(urn123);
+      await expect(load).rejects.toThrowError(WebsocketConnectionError);
+      await expect(failure).resolves.toBeDefined();
+      connect.mockRestore();
+
+      startStream.mockRejectedValue(
+        new StreamRequestError('123', {}, 'Request failed', '')
+      );
+      load = stream.load(urn123);
+      await expect(load).rejects.toThrowError(StreamRequestError);
+      await expect(failure).resolves.toBeDefined();
+      startStream.mockRestore();
     });
   });
 
