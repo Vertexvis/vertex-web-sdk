@@ -2,37 +2,137 @@ export class CustomError extends Error {
   public constructor(message: string, e?: Error) {
     super();
 
-    this.message =
-      e != null ? `${message} Nested exception is: ${e.message}` : message;
+    this.message = message;
     this.stack = e?.stack;
     this.name = this.constructor.name;
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, CustomError.prototype);
   }
 }
 
-export class ExpiredCredentialsError extends CustomError {}
+export class ExpiredCredentialsError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class InvalidCredentialsError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, ExpiredCredentialsError.prototype);
+  }
+}
 
-export class InvalidResourceUrnError extends CustomError {}
+export class InvalidCredentialsError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class ViewerInitializationError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, InvalidCredentialsError.prototype);
+  }
+}
 
-export class ComponentInitializationError extends CustomError {}
+export class InvalidResourceUrnError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class SceneRenderError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, InvalidResourceUrnError.prototype);
+  }
+}
 
-export class UnsupportedOperationError extends CustomError {}
+export class ViewerInitializationError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class WebsocketConnectionError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, ViewerInitializationError.prototype);
+  }
+}
 
-export class InteractionHandlerError extends CustomError {}
+export class ComponentInitializationError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class MissingJWTError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, ComponentInitializationError.prototype);
+  }
+}
 
-export class ImageLoadError extends CustomError {}
+export class SceneRenderError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class IllegalStateError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, SceneRenderError.prototype);
+  }
+}
 
-export class NoImplementationFoundError extends CustomError {}
+export class UnsupportedOperationError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
 
-export class InvalidArgumentError extends CustomError {}
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, UnsupportedOperationError.prototype);
+  }
+}
+
+export class WebsocketConnectionError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, WebsocketConnectionError.prototype);
+  }
+}
+
+export class InteractionHandlerError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, InteractionHandlerError.prototype);
+  }
+}
+
+export class MissingJWTError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, MissingJWTError.prototype);
+  }
+}
+
+export class ImageLoadError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, ImageLoadError.prototype);
+  }
+}
+
+export class IllegalStateError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, IllegalStateError.prototype);
+  }
+}
+
+export class NoImplementationFoundError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, NoImplementationFoundError.prototype);
+  }
+}
+
+export class InvalidArgumentError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, InvalidArgumentError.prototype);
+  }
+}

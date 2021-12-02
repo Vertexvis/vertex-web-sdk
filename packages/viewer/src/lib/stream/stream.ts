@@ -3,6 +3,7 @@ import {
   currentDateAsProtoTimestamp,
   Settings,
   StreamApi,
+  StreamRequestError,
   WebSocketClient,
 } from '@vertexvis/stream-api';
 import {
@@ -15,7 +16,11 @@ import {
   Uri,
 } from '@vertexvis/utils';
 import { Config } from '../config';
-import { InvalidResourceUrnError } from '../errors';
+import {
+  CustomError,
+  SceneRenderError,
+  WebsocketConnectionError,
+} from '../errors';
 import {
   fromPbFrameOrThrow,
   fromPbReconnectResponseOrThrow,
@@ -34,7 +39,13 @@ import { StorageKeys, upsertStorageEntry } from '../storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Connected, Connecting, FrameStreamState, Reconnecting } from './state';
+import {
+  Connected,
+  Connecting,
+  ViewerStreamState,
+  Reconnecting,
+} from './state';
+import { acknowledgeFrameRequests } from '../rendering';
 
 type StreamResult = Omit<
   Connected,
@@ -60,20 +71,25 @@ interface FrameStreamOptions {
    * attempted.
    */
   offlineThresholdInSeconds?: number;
+
+  /**
+   * The number of seconds before we consider loading a scene failed.
+   */
+  loadTimeoutInSeconds?: number;
 }
 
 export class ViewerStream extends StreamApi {
   private static WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
 
-  private state: FrameStreamState = { type: 'disconnected' };
-  public readonly stateChanged = new EventDispatcher<FrameStreamState>();
+  private state: ViewerStreamState = { type: 'disconnected' };
+  public readonly stateChanged = new EventDispatcher<ViewerStreamState>();
 
   private options: Required<Omit<FrameStreamOptions, 'loggingEnabled'>>;
 
   public constructor(
     ws: WebSocketClient,
-    private readonly clientIdProvider: Provider<string>,
-    private readonly sessionIdProvider: Provider<string>,
+    private readonly clientIdProvider: Provider<string | undefined>,
+    private readonly sessionIdProvider: Provider<string | undefined>,
     private readonly configProvider: Provider<Config>,
     private readonly dimensionsProvider: Provider<Dimensions.Dimensions>,
     private readonly streamAttributesProvider: Provider<vertexvis.protobuf.stream.IStreamAttributes>,
@@ -84,14 +100,21 @@ export class ViewerStream extends StreamApi {
     this.options = {
       tokenRefreshOffsetInSeconds: opts.tokenRefreshOffsetInSeconds ?? 30,
       offlineThresholdInSeconds: opts.offlineThresholdInSeconds ?? 30,
+      loadTimeoutInSeconds: opts.loadTimeoutInSeconds ?? 15,
     };
+  }
+
+  public getState(): ViewerStreamState {
+    return this.state;
   }
 
   public load(urn: string): Promise<void> {
     if (this.state.type === 'disconnected') {
       return this.loadIfDisconnected(urn);
-    } else if (this.state.type === 'reconnecting') {
+    } else if (this.state.type === 'connection-failed') {
       return this.loadIfDisconnected(urn);
+    } else if (this.state.type === 'reconnecting') {
+      return this.loadIfConnectingOrConnected(urn, this.state);
     } else if (this.state.type === 'connecting') {
       return this.loadIfConnectingOrConnected(urn, this.state);
     } else {
@@ -101,7 +124,7 @@ export class ViewerStream extends StreamApi {
 
   private async loadIfConnectingOrConnected(
     urn: string,
-    state: Connected | Connecting
+    state: Connected | Connecting | Reconnecting
   ): Promise<void> {
     const { resource: pResource, queries: pQueries } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
@@ -109,12 +132,13 @@ export class ViewerStream extends StreamApi {
     const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
     const hasQueryChanged = !Objects.isEqual(pQueries, resource.queries);
     const hasQuery = resource.queries[0] != null;
-    const isConnecting = state.type === 'connecting';
+    const isConnecting =
+      state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
 
     if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
       this.disconnect();
-      this.connectWithNewStream(resource);
+      this.loadIfDisconnected(urn);
     } else if (isConnected && hasQuery && hasQueryChanged) {
       await this.loadSceneViewState({
         sceneViewStateId: { hex: resource.queries[0].id },
@@ -124,13 +148,13 @@ export class ViewerStream extends StreamApi {
   }
 
   private connectWithNewStream(resource: Resource): Promise<void> {
-    return this.connectWs(resource, 'connecting', () =>
+    return this.openWebsocketStream(resource, 'connecting', () =>
       this.requestNewStream(this.getClientId(), resource)
     );
   }
 
   private connectToExistingStream(state: Connected): Promise<void> {
-    return this.connectWs(
+    return this.openWebsocketStream(
       state.resource,
       'reconnecting',
       () => this.requestReconnectStream(state),
@@ -138,7 +162,7 @@ export class ViewerStream extends StreamApi {
     );
   }
 
-  private async connectWs(
+  private async openWebsocketStream(
     resource: Resource,
     type: Connecting['type'] | Reconnecting['type'],
     requestStream: () => Promise<StreamResult>,
@@ -154,98 +178,141 @@ export class ViewerStream extends StreamApi {
       );
     }
 
-    if (resource.resource.type === 'stream-key') {
-      const descriptor = getWebsocketDescriptor(
-        getWebsocketUri(config, resource.resource, clientId, sessionId)
-      );
-      console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
+    const descriptor = getWebsocketDescriptor(
+      getWebsocketUri(config, resource.resource, clientId, sessionId)
+    );
+    console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
-      const controller = new AbortController();
-      const settings = getStreamSettings(config);
-      this.updateState({
-        type,
-        resource,
-        connection: {
-          dispose: () => {
-            this.dispose();
-            controller.abort();
-          },
+    const controller = new AbortController();
+    const settings = getStreamSettings(config);
+    this.updateState({
+      type,
+      resource,
+      connection: {
+        dispose: () => {
+          this.dispose();
+          controller.abort();
         },
-      });
+      },
+    });
 
-      const connection = await Async.abort(
-        controller.signal,
-        Async.retry(() => this.connect(descriptor, settings), {
-          maxRetries,
-          delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
-        })
+    const connection = await Async.abort(
+      controller.signal,
+      Async.retry(() => this.connect(descriptor, settings), {
+        maxRetries,
+        delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
+      })
+    ).catch((e) => {
+      throw new WebsocketConnectionError(
+        'Websocket connection failed.',
+        e instanceof Error ? e : undefined
       );
+    });
 
-      if (!connection.aborted) {
-        const pendingClock = this.requestClock();
-
-        const stream = await requestStream();
-        console.debug(
-          `Stream connected [stream-id=${stream.streamId}, scene-view-id=${stream.sceneViewId}]`
-        );
-
-        const onRequest = this.onRequest((msg) => {
-          const req = msg.request.drawFrame;
-          if (req != null) {
-            const frame = fromPbFrameOrThrow(stream.worldOrientation)(req);
-
-            if (this.state.type === 'connected') {
-              this.updateState({ ...this.state, frame });
-            }
-          }
-        });
-
-        const reconnect = this.reconnectWhenNeeded();
-        const refreshToken = this.refreshTokenWhenExpired(stream.token);
-        const frame =
-          stream.frame == null
-            ? await this.waitForFrame(stream.worldOrientation, 15000)
-            : stream.frame;
-        const clock = await pendingClock;
-        console.debug(
-          `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
-        );
-
-        this.updateState({
-          type: 'connected',
-          connection: {
-            dispose: () => {
-              reconnect.dispose();
-              onRequest.dispose();
-              refreshToken.dispose();
-              connection.result.dispose();
-            },
-          },
-          resource,
-          streamId: stream.streamId,
-          sceneViewId: stream.sceneViewId,
-          worldOrientation: stream.worldOrientation,
-          token: stream.token,
-          frame,
-          clock,
-        });
-      } else {
-        this.updateState({ type: 'disconnected' });
-      }
+    if (!connection.aborted) {
+      await this.requestNewOrExistingStream(
+        resource,
+        connection.result,
+        requestStream
+      );
     } else {
       this.updateState({ type: 'disconnected' });
-      throw new InvalidResourceUrnError(
-        `Cannot load resource. Invalid type ${resource.resource.type}`
-      );
     }
   }
 
-  private loadIfDisconnected(urn: string): Promise<void> {
-    return this.connectWithNewStream(LoadableResource.fromUrn(urn));
+  private async requestNewOrExistingStream(
+    resource: Resource,
+    connection: Disposable,
+    requestStream: () => Promise<StreamResult>
+  ): Promise<void> {
+    const pendingClock = this.requestClock();
+
+    const stream = await requestStream();
+    console.debug(
+      `Stream connected [stream-id=${stream.streamId}, scene-view-id=${stream.sceneViewId}]`
+    );
+
+    const onRequest = this.onRequest((msg) => {
+      const req = msg.request.drawFrame;
+      if (req != null) {
+        const frame = fromPbFrameOrThrow(stream.worldOrientation)(req);
+
+        if (this.state.type === 'connected') {
+          this.updateState({ ...this.state, frame });
+        }
+      }
+    });
+
+    const reconnect = this.reconnectWhenNeeded();
+    const refreshToken = this.refreshTokenWhenExpired(stream.token);
+    const acknowledgeFrameRequests = this.acknowledgeFrameRequests();
+    const frame =
+      stream.frame == null
+        ? await this.waitForFrame(
+            stream.worldOrientation,
+            this.options.loadTimeoutInSeconds
+          )
+        : stream.frame;
+    const clock = await pendingClock;
+    console.debug(
+      `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
+    );
+
+    this.updateState({
+      type: 'connected',
+      connection: {
+        dispose: () => {
+          reconnect.dispose();
+          onRequest.dispose();
+          refreshToken.dispose();
+          acknowledgeFrameRequests.dispose();
+          connection.dispose();
+        },
+      },
+      resource,
+      streamId: stream.streamId,
+      sessionId: stream.sessionId,
+      sceneViewId: stream.sceneViewId,
+      worldOrientation: stream.worldOrientation,
+      token: stream.token,
+      frame,
+      clock,
+    });
+  }
+
+  private async loadIfDisconnected(urn: string): Promise<void> {
+    try {
+      await this.connectWithNewStream(LoadableResource.fromUrn(urn));
+    } catch (e) {
+      if (e instanceof CustomError) {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene. ${e.message}.`,
+          error: e,
+        });
+      } else if (e instanceof StreamRequestError) {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene. ${e.summary}`,
+          error: e,
+        });
+      } else {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene for unknown reason. See console logs.`,
+          error: e,
+        });
+      }
+
+      throw e;
+    }
   }
 
   public disconnect(): void {
-    if (this.state.type !== 'disconnected') {
+    if (
+      this.state.type !== 'disconnected' &&
+      this.state.type !== 'connection-failed'
+    ) {
       console.debug('Disconnecting websocket');
       this.state.connection.dispose();
       this.updateState({ type: 'disconnected' });
@@ -279,6 +346,7 @@ export class ViewerStream extends StreamApi {
       resource: resource,
       streamId: res.streamId,
       sceneViewId: res.sceneViewId,
+      sessionId: res.sessionId,
       token: res.token,
       worldOrientation: res.worldOrientation,
       frame: undefined,
@@ -308,7 +376,7 @@ export class ViewerStream extends StreamApi {
     return new SynchronizedClock(remoteTime);
   }
 
-  private updateState(state: FrameStreamState): void {
+  private updateState(state: ViewerStreamState): void {
     if (this.state !== state) {
       this.state = state;
       this.stateChanged.emit(this.state);
@@ -399,13 +467,13 @@ export class ViewerStream extends StreamApi {
 
   private async waitForFrame(
     worldOrientation: Orientation,
-    timeout: number
+    timeoutInSeconds: number
   ): Promise<Frame> {
     let disposable: Disposable | undefined;
 
     try {
       return await Async.timeout(
-        timeout,
+        timeoutInSeconds * 1000,
         new Promise<Frame>((resolve) => {
           disposable = this.onRequest((msg) => {
             try {
@@ -420,12 +488,25 @@ export class ViewerStream extends StreamApi {
           });
         })
       );
+    } catch (e) {
+      throw new SceneRenderError(
+        `Frame timed out after ${timeoutInSeconds / 1000}s`,
+        e instanceof Error ? e : undefined
+      );
     } finally {
       disposable?.dispose();
     }
   }
 
-  public onStateChanged(listener: Listener<FrameStreamState>): Disposable {
+  private acknowledgeFrameRequests(): Disposable {
+    return this.onRequest(
+      acknowledgeFrameRequests(this, () =>
+        this.state.type === 'connected' ? this.state.clock : undefined
+      )
+    );
+  }
+
+  public onStateChanged(listener: Listener<ViewerStreamState>): Disposable {
     return this.stateChanged.on(listener);
   }
 
@@ -433,11 +514,11 @@ export class ViewerStream extends StreamApi {
     return this.configProvider();
   }
 
-  private getClientId(): string {
+  private getClientId(): string | undefined {
     return this.clientIdProvider();
   }
 
-  private getSessionId(): string {
+  private getSessionId(): string | undefined {
     return this.sessionIdProvider();
   }
 
