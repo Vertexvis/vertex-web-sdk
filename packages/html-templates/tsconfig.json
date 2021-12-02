@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@vertexwebsdk/build/tsconfig-web",
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "target": "es2017"
+  },
+  "exclude": ["dist", "node_modules"]
+}

@@ -34,9 +34,9 @@ import {
 } from './lib/viewer-ops';
 import { writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
-import { ElementPool } from './lib/element-pool';
 import { MetadataKey } from './interfaces';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
+import { ElementPool } from '@vertexvis/html-templates';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
