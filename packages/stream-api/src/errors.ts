@@ -12,5 +12,8 @@ export class StreamRequestError extends Error {
         ? `Stream request failed (${summary})`
         : 'Stream request failed'
     );
+
+    // Allows for `instanceof` checks. See https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, StreamRequestError.prototype);
   }
 }
