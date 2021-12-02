@@ -1,6 +1,6 @@
-# Vertex JS Utility Library
+# Vertex JS HTML Templating Library
 
-![npm](https://img.shields.io/npm/v/@vertexvis/utils)
-![npm (scoped with tag)](https://img.shields.io/npm/v/@vertexvis/utils/canary)
+![npm](https://img.shields.io/npm/v/@vertexvis/html-templates)
+![npm (scoped with tag)](https://img.shields.io/npm/v/@vertexvis/html-templates/canary)
 
-This project contains Vertex utility libraries.
+This project contains Vertex HTML templating libraries.
