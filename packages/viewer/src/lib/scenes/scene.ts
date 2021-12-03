@@ -11,7 +11,7 @@ import {
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { UUID } from '@vertexvis/utils';
-import { buildSceneOperation } from '../commands/streamCommandsMapper';
+import { buildSceneOperation } from './mapper';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { InvalidArgumentError } from '../errors';
 import { Frame } from '../types/frame';

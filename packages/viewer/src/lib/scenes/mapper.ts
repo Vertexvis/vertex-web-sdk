@@ -1,6 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { ItemOperation } from '../scenes/operations';
-import { QueryExpression } from '../scenes/queries';
+import { ItemOperation } from './operations';
+import { QueryExpression } from './queries';
 import { FlyTo, Animation } from '../types';
 import { UUID } from '@vertexvis/utils';
 import { toProtoDuration } from '@vertexvis/stream-api';
