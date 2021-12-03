@@ -7,11 +7,12 @@ web platform.
 
 | Package      | Version | Description |
 | ------------ | ------- | ----------- |
-| [@vertexvis/geometry]      | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)     | 2D/3D geometry utilities. |
-| [@vertexvis/stream-api]    | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)   | The API client for streaming 3D images. |
-| [@vertexvis/utils]         | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)        | General Node and Web utilities used within Vertex. |
-| [@vertexvis/viewer]        | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)       | The Web SDK containing web components to view 3D models. |
-| [@vertexvis/viewer-react]  | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react) | Contains React bindings for Vertex's Web SDK. |
+| [@vertexvis/geometry]        | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)        | 2D/3D geometry utilities. |
+| [@vertexvis/stream-api]      | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)      | The API client for streaming 3D images. |
+| [@vertexvis/utils]           | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)           | General Node and Web utilities used within Vertex. |
+| [@vertexvis/html-templates]  | ![npm](https://img.shields.io/npm/v/@vertexvis/html-templates)  | HTML templating utilities used with web components. |
+| [@vertexvis/viewer]          | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)          | The Web SDK containing web components to view 3D models. |
+| [@vertexvis/viewer-react]    | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)    | Contains React bindings for Vertex's Web SDK. |
 
 ## Documentation
 
@@ -99,6 +100,7 @@ major and patch will be treated as minor.
 [@vertexvis/geometry]: ./packages/geometry
 [@vertexvis/stream-api]: ./packages/stream-api
 [@vertexvis/utils]: ./packages/utils
+[@vertexvis/html-templates]: ./packages/html-templates
 [@vertexvis/viewer]: ./packages/viewer
 [@vertexvis/viewer-react]: ./packages/viewer-react
 
