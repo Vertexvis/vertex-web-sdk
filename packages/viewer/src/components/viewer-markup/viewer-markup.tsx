@@ -79,6 +79,12 @@ export class ViewerMarkup {
   public selectedMarkupId?: string;
 
   /**
+   * Indicates if new markup should be automatically selected.
+   */
+  @Prop()
+  public selectNew = false;
+
+  /**
    * Dispatched when a new markup is added, either through user interaction
    * or programmatically.
    */
@@ -287,7 +293,10 @@ export class ViewerMarkup {
   protected async handleMarkupEnd(event: CustomEvent<Markup>): Promise<void> {
     const e = event as CustomEvent<Markup>;
     await this.addMarkup(e.detail);
-    this.selectedMarkupId = e.detail.id;
+
+    if (this.selectNew) {
+      this.selectedMarkupId = e.detail.id;
+    }
   }
 
   /**
