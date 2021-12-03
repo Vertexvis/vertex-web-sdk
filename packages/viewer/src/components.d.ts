@@ -722,6 +722,10 @@ export namespace Components {
       | undefined
     >;
     /**
+     * Indicates if new markup should be automatically selected.
+     */
+    selectNew: boolean;
+    /**
      * The ID of the markup that is selected.
      */
     selectedMarkupId?: string;
@@ -1857,6 +1861,10 @@ declare namespace LocalJSX {
         | HTMLVertexViewerMarkupFreeformElement
       >
     ) => void;
+    /**
+     * Indicates if new markup should be automatically selected.
+     */
+    selectNew?: boolean;
     /**
      * The ID of the markup that is selected.
      */
