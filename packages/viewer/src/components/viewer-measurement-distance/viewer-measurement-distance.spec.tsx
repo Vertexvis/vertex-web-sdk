@@ -1,5 +1,6 @@
 jest.mock('../viewer/utils');
 jest.mock('./dom');
+jest.mock('../../lib/rendering/imageLoaders');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -13,11 +14,16 @@ import {
 } from '../../lib/types';
 import { ViewerMeasurementDistance } from './viewer-measurement-distance';
 import { getMeasurementBoundingClientRect } from './dom';
-import { loadModelForViewer } from '../../testing/viewer';
+import {
+  loadViewerStreamKey,
+  makeViewerStream,
+  key1,
+} from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
 import * as Fixtures from '../../testing/fixtures';
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 
 describe('vertex-viewer-measurement-distance', () => {
   const camera = new FramePerspectiveCamera(
@@ -64,6 +70,12 @@ describe('vertex-viewer-measurement-distance', () => {
   (getMeasurementBoundingClientRect as jest.Mock).mockReturnValue({
     width: 100,
     height: 100,
+  });
+
+  (loadImageBytes as jest.Mock).mockReturnValue({
+    width: 100,
+    height: 100,
+    dispose: () => undefined,
   });
 
   it('positions the start and end anchors as Vector3 objects', async () => {
@@ -335,10 +347,11 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('rerenders when viewer renders', async () => {
+    const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
       components: [Viewer, ViewerLayer, ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer>
+        <vertex-viewer stream={stream}>
           <vertex-viewer-measurements>
             <vertex-viewer-measurement-distance start={start} end={end} />
           </vertex-viewer-measurements>
@@ -350,7 +363,7 @@ describe('vertex-viewer-measurement-distance', () => {
       'vertex-viewer'
     ) as HTMLVertexViewerElement;
 
-    await loadModelForViewer(viewer);
+    await loadViewerStreamKey(key1, { stream, ws, viewer });
     await page.waitForChanges();
 
     const startNdc = Vector3.transformMatrix(

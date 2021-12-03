@@ -12,10 +12,11 @@ import {
   Disposable,
   EventDispatcher,
   Listener,
+  Mapper,
   Objects,
   Uri,
 } from '@vertexvis/utils';
-import { Config } from '../config';
+import { Config, parseConfig } from '../config';
 import {
   CustomError,
   SceneRenderError,
@@ -27,6 +28,8 @@ import {
   fromPbRefreshTokenResponseOrThrow,
   fromPbStartStreamResponseOrThrow,
   fromPbSyncTimeResponseOrThrow,
+  toPbRGBi,
+  toPbStreamAttributes,
 } from '../mappers';
 import {
   Frame,
@@ -38,7 +41,6 @@ import { Resource } from '../types/loadableResource';
 import { StorageKeys, upsertStorageEntry } from '../storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Connected,
   Connecting,
@@ -46,13 +48,12 @@ import {
   Reconnecting,
 } from './state';
 import { acknowledgeFrameRequests } from '../rendering';
+import { Color3, StreamAttributes } from '../../interfaces';
 
 type StreamResult = Omit<
   Connected,
   'type' | 'frame' | 'connection' | 'clock'
 > & { frame: Frame | undefined };
-
-type Provider<T> = () => T;
 
 interface FrameStreamOptions {
   /**
@@ -78,25 +79,38 @@ interface FrameStreamOptions {
   loadTimeoutInSeconds?: number;
 }
 
+interface UpdateFields {
+  dimensions?: ViewerStream['dimensions'];
+  streamAttributes?: ViewerStream['streamAttributes'];
+  frameBgColor?: ViewerStream['frameBgColor'];
+  config?: ViewerStream['config'];
+  clientId?: ViewerStream['clientId'];
+  sessionId?: ViewerStream['sessionId'];
+}
+
 export class ViewerStream extends StreamApi {
   private static WS_RECONNECT_DELAYS = [0, 1000, 1000, 5000];
+
+  private dimensions: Dimensions.Dimensions;
+  private streamAttributes: StreamAttributes;
+  private frameBgColor: Color3;
+  private config: Config;
+  private clientId: string | undefined;
+  private sessionId: string | undefined;
 
   private state: ViewerStreamState = { type: 'disconnected' };
   public readonly stateChanged = new EventDispatcher<ViewerStreamState>();
 
   private options: Required<Omit<FrameStreamOptions, 'loggingEnabled'>>;
 
-  public constructor(
-    ws: WebSocketClient,
-    private readonly clientIdProvider: Provider<string | undefined>,
-    private readonly sessionIdProvider: Provider<string | undefined>,
-    private readonly configProvider: Provider<Config>,
-    private readonly dimensionsProvider: Provider<Dimensions.Dimensions>,
-    private readonly streamAttributesProvider: Provider<vertexvis.protobuf.stream.IStreamAttributes>,
-    private readonly frameBackgroundColorProvider: Provider<Color.Color>,
-    opts: FrameStreamOptions = {}
-  ) {
+  public constructor(ws: WebSocketClient, opts: FrameStreamOptions = {}) {
     super(ws, { loggingEnabled: opts.loggingEnabled });
+
+    this.dimensions = Dimensions.create(0, 0);
+    this.streamAttributes = {};
+    this.frameBgColor = Color.create(255, 255, 255);
+    this.config = parseConfig('platprod');
+
     this.options = {
       tokenRefreshOffsetInSeconds: opts.tokenRefreshOffsetInSeconds ?? 30,
       offlineThresholdInSeconds: opts.offlineThresholdInSeconds ?? 30,
@@ -108,7 +122,27 @@ export class ViewerStream extends StreamApi {
     return this.state;
   }
 
-  public load(urn: string): Promise<void> {
+  public disconnect(): void {
+    if (
+      this.state.type !== 'disconnected' &&
+      this.state.type !== 'connection-failed'
+    ) {
+      console.debug('Disconnecting websocket');
+      this.state.connection.dispose();
+      this.updateState({ type: 'disconnected' });
+    }
+  }
+
+  public async load(
+    urn: string,
+    clientId: string | undefined,
+    sessionId: string | undefined,
+    config: Config = parseConfig('platprod')
+  ): Promise<void> {
+    this.clientId = clientId;
+    this.sessionId = sessionId;
+    this.config = config;
+
     if (this.state.type === 'disconnected') {
       return this.loadIfDisconnected(urn);
     } else if (this.state.type === 'connection-failed') {
@@ -119,6 +153,28 @@ export class ViewerStream extends StreamApi {
       return this.loadIfConnectingOrConnected(urn, this.state);
     } else {
       return this.loadIfConnectingOrConnected(urn, this.state);
+    }
+  }
+
+  public update(fields: UpdateFields): void {
+    this.frameBgColor = fields.frameBgColor
+      ? fields.frameBgColor
+      : this.frameBgColor;
+
+    if (this.dimensions !== fields.dimensions) {
+      this.dimensions = fields.dimensions ?? Dimensions.create(0, 0);
+      this.ifState('connected', () =>
+        this.updateDimensions({ dimensions: this.dimensions })
+      );
+    }
+
+    if (this.streamAttributes !== fields.streamAttributes) {
+      this.streamAttributes = fields.streamAttributes ?? {};
+      this.ifState('connected', () =>
+        this.updateStream({
+          streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
+        })
+      );
     }
   }
 
@@ -138,7 +194,7 @@ export class ViewerStream extends StreamApi {
 
     if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
       this.disconnect();
-      this.loadIfDisconnected(urn);
+      return this.loadIfDisconnected(urn);
     } else if (isConnected && hasQuery && hasQueryChanged) {
       await this.loadSceneViewState({
         sceneViewStateId: { hex: resource.queries[0].id },
@@ -147,9 +203,37 @@ export class ViewerStream extends StreamApi {
     }
   }
 
+  private async loadIfDisconnected(urn: string): Promise<void> {
+    try {
+      await this.connectWithNewStream(LoadableResource.fromUrn(urn));
+    } catch (e) {
+      if (e instanceof CustomError) {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene. ${e.message}`,
+          error: e,
+        });
+      } else if (e instanceof StreamRequestError) {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene. Stream request failed to start stream.`,
+          error: e,
+        });
+      } else {
+        this.updateState({
+          type: 'connection-failed',
+          message: `Cannot load scene for unknown reason. See console logs.`,
+          error: e,
+        });
+      }
+
+      throw e;
+    }
+  }
+
   private connectWithNewStream(resource: Resource): Promise<void> {
     return this.openWebsocketStream(resource, 'connecting', () =>
-      this.requestNewStream(this.getClientId(), resource)
+      this.requestNewStream(this.clientId, resource)
     );
   }
 
@@ -168,23 +252,24 @@ export class ViewerStream extends StreamApi {
     requestStream: () => Promise<StreamResult>,
     { maxRetries = 3 }: { maxRetries?: number } = {}
   ): Promise<void> {
-    const clientId = this.getClientId();
-    const sessionId = this.getSessionId();
-    const config = this.getConfig();
-
-    if (clientId == null) {
+    if (this.clientId == null) {
       console.warn(
         'Client ID not provided, using legacy path. A Client ID will be required in an upcoming release.'
       );
     }
 
     const descriptor = getWebsocketDescriptor(
-      getWebsocketUri(config, resource.resource, clientId, sessionId)
+      getWebsocketUri(
+        this.config,
+        resource.resource,
+        this.clientId,
+        this.sessionId
+      )
     );
     console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
     const controller = new AbortController();
-    const settings = getStreamSettings(config);
+    const settings = getStreamSettings(this.config);
     this.updateState({
       type,
       resource,
@@ -210,7 +295,7 @@ export class ViewerStream extends StreamApi {
     });
 
     if (!connection.aborted) {
-      await this.requestNewOrExistingStream(
+      return this.requestNewOrExistingStream(
         resource,
         connection.result,
         requestStream
@@ -280,45 +365,6 @@ export class ViewerStream extends StreamApi {
     });
   }
 
-  private async loadIfDisconnected(urn: string): Promise<void> {
-    try {
-      await this.connectWithNewStream(LoadableResource.fromUrn(urn));
-    } catch (e) {
-      if (e instanceof CustomError) {
-        this.updateState({
-          type: 'connection-failed',
-          message: `Cannot load scene. ${e.message}.`,
-          error: e,
-        });
-      } else if (e instanceof StreamRequestError) {
-        this.updateState({
-          type: 'connection-failed',
-          message: `Cannot load scene. ${e.summary}`,
-          error: e,
-        });
-      } else {
-        this.updateState({
-          type: 'connection-failed',
-          message: `Cannot load scene for unknown reason. See console logs.`,
-          error: e,
-        });
-      }
-
-      throw e;
-    }
-  }
-
-  public disconnect(): void {
-    if (
-      this.state.type !== 'disconnected' &&
-      this.state.type !== 'connection-failed'
-    ) {
-      console.debug('Disconnecting websocket');
-      this.state.connection.dispose();
-      this.updateState({ type: 'disconnected' });
-    }
-  }
-
   private async requestNewStream(
     clientId: string | undefined,
     resource: Resource
@@ -326,9 +372,9 @@ export class ViewerStream extends StreamApi {
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
-        dimensions: this.getDimensions(),
-        frameBackgroundColor: this.getFrameBackgroundColor(),
-        streamAttributes: this.getStreamAttributes(),
+        dimensions: this.dimensions,
+        frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
+        streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
           resource.queries[0]?.type === 'scene-view-state'
             ? { hex: resource.queries[0].id }
@@ -356,13 +402,14 @@ export class ViewerStream extends StreamApi {
   private async requestReconnectStream(
     state: Connected
   ): Promise<StreamResult> {
-    const msg = await this.reconnect({
-      streamId: { hex: state.streamId },
-      dimensions: this.getDimensions(),
-      frameBackgroundColor: this.getFrameBackgroundColor(),
-      streamAttributes: this.getStreamAttributes(),
-    });
-    const res = fromPbReconnectResponseOrThrow(msg);
+    const res = fromPbReconnectResponseOrThrow(
+      await this.reconnect({
+        streamId: { hex: state.streamId },
+        dimensions: this.dimensions,
+        frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
+        streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
+      })
+    );
     return { ...state, token: res.token };
   }
 
@@ -374,13 +421,6 @@ export class ViewerStream extends StreamApi {
     );
 
     return new SynchronizedClock(remoteTime);
-  }
-
-  private updateState(state: ViewerStreamState): void {
-    if (this.state !== state) {
-      this.state = state;
-      this.stateChanged.emit(this.state);
-    }
   }
 
   private reconnectWhenNeeded(): Disposable {
@@ -406,11 +446,6 @@ export class ViewerStream extends StreamApi {
         whenOffline.dispose();
       },
     };
-  }
-
-  private closeAndReconnect(state: Connected): Promise<void> {
-    state.connection.dispose();
-    return this.connectToExistingStream(state);
   }
 
   private refreshTokenWhenExpired(token: Token): Disposable {
@@ -465,6 +500,11 @@ export class ViewerStream extends StreamApi {
     };
   }
 
+  private closeAndReconnect(state: Connected): Promise<void> {
+    state.connection.dispose();
+    return this.connectToExistingStream(state);
+  }
+
   private async waitForFrame(
     worldOrientation: Orientation,
     timeoutInSeconds: number
@@ -506,34 +546,29 @@ export class ViewerStream extends StreamApi {
     );
   }
 
+  private updateState(state: ViewerStreamState): void {
+    if (this.state !== state) {
+      this.state = state;
+      this.stateChanged.emit(this.state);
+    }
+  }
+
+  private ifState<T>(
+    state: ViewerStreamState['type'],
+    f: () => T
+  ): T | undefined {
+    if (this.state.type === state) {
+      return f();
+    }
+  }
+
   public onStateChanged(listener: Listener<ViewerStreamState>): Disposable {
     return this.stateChanged.on(listener);
   }
-
-  private getConfig(): Config {
-    return this.configProvider();
-  }
-
-  private getClientId(): string | undefined {
-    return this.clientIdProvider();
-  }
-
-  private getSessionId(): string | undefined {
-    return this.sessionIdProvider();
-  }
-
-  private getFrameBackgroundColor(): Color.Color {
-    return this.frameBackgroundColorProvider();
-  }
-
-  private getDimensions(): Dimensions.Dimensions {
-    return this.dimensionsProvider();
-  }
-
-  private getStreamAttributes(): vertexvis.protobuf.stream.IStreamAttributes {
-    return this.streamAttributesProvider();
-  }
 }
+
+const toPbStreamAttributesOrThrow = Mapper.ifInvalidThrow(toPbStreamAttributes);
+const toPbColorOrThrow = Mapper.ifInvalidThrow(toPbRGBi);
 
 function getStreamSettings(config: Config): Settings {
   return {

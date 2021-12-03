@@ -14,7 +14,7 @@ import {
 import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
-import { Disposable, Color, EventDispatcher, Mapper } from '@vertexvis/utils';
+import { Disposable, Color, EventDispatcher } from '@vertexvis/utils';
 import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -32,7 +32,6 @@ import {
   ComponentInitializationError,
   IllegalStateError,
 } from '../../lib/errors';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { WebSocketClientImpl, toProtoDuration } from '@vertexvis/stream-api';
 import { Scene } from '../../lib/scenes/scene';
 import {
@@ -54,13 +53,14 @@ import {
   fromHex,
 } from '../../lib/scenes/colorMaterial';
 import { Frame } from '../../lib/types/frame';
-import { fromPbFrameOrThrow, toPbStreamAttributes } from '../../lib/mappers';
+import { fromPbFrameOrThrow } from '../../lib/mappers';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
 import {
   FrameType,
   FeatureHighlightOptions,
   FeatureLineOptions,
+  StreamAttributes,
 } from '../../interfaces';
 import { ViewerStream } from '../../lib/stream/stream';
 import {
@@ -93,6 +93,7 @@ interface StateMap {
   cursorManager: CursorManager;
   interactionTarget?: HTMLElement;
   streamState: ViewerStreamState;
+  streamListeners?: Disposable;
 }
 
 /** @internal */
@@ -168,6 +169,13 @@ export class Viewer {
    * rotate around the pointer down location.
    */
   @Prop() public rotateAroundTapPoint = true;
+
+  /**
+   * A token that can be used to make API calls to other Vertex services.
+   *
+   * @internal
+   */
+  @Prop({ mutable: true }) public token?: string;
 
   /**
    * Specifies when a depth buffer is requested from rendering. Possible values
@@ -375,17 +383,12 @@ export class Viewer {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
     this.registerSlotChangeListeners();
 
-    this.stream = new ViewerStream(
-      new WebSocketClientImpl(),
-      () => this.clientId,
-      () => this.getSessionId(),
-      () => this.getResolvedConfig(),
-      () => this.getCanvasDimensions() ?? Dimensions.create(0, 0),
-      () => this.getStreamAttributes(),
-      () => this.getBackgroundColor() ?? Color.create(255, 255, 255),
-      { loggingEnabled: this.getResolvedConfig().flags.logWsMessages }
-    );
-    this.setupStreamListeners();
+    this.stream =
+      this.stream ??
+      new ViewerStream(new WebSocketClientImpl(), {
+        loggingEnabled: this.getResolvedConfig().flags.logWsMessages,
+      });
+    this.addStreamListeners();
 
     this.updateStreamAttributes();
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
@@ -656,17 +659,18 @@ export class Viewer {
     return this.baseInteractionHandler;
   }
 
+  /**
+   * @deprecated Use `token`.
+   */
   @Method()
   public async getJwt(): Promise<string | undefined> {
-    if (this.stateMap.streamState.type === 'connected') {
-      return this.stateMap.streamState.token.token;
-    }
+    return this.token;
   }
 
   @Watch('src')
-  public handleSrcChanged(scene: string | undefined): void {
-    if (scene != null) {
-      this.load(scene);
+  public handleSrcChanged(src: string | undefined): void {
+    if (src != null) {
+      this.load(src);
     } else {
       this.unload();
     }
@@ -755,7 +759,18 @@ export class Viewer {
     if (this.stream != null && this.dimensions != null) {
       this.calculateComponentDimensions();
 
-      await this.stream?.load(urn);
+      this.stream.update({
+        streamAttributes: this.getStreamAttributes(),
+        config: parseConfig(this.configEnv, this.config),
+        dimensions: this.dimensions,
+        frameBgColor: this.getBackgroundColor(),
+      });
+      await this.stream?.load(
+        urn,
+        this.clientId,
+        this.getSessionId(),
+        this.getResolvedConfig()
+      );
       this.sceneReady.emit();
     } else {
       throw new ViewerInitializationError(
@@ -895,11 +910,8 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
+      this.stream?.update({ dimensions: this.dimensions });
       this.dimensionschange.emit(this.dimensions);
-
-      if (this.stateMap.streamState.type === 'connected') {
-        this.getStream().updateDimensions({ dimensions: this.dimensions });
-      }
     }
   }
 
@@ -914,8 +926,8 @@ export class Viewer {
     }
   }
 
-  private setupStreamListeners(): void {
-    this.getStream().stateChanged.on((s) => {
+  private addStreamListeners(): void {
+    this.stateMap.streamListeners = this.getStream().stateChanged.on((s) => {
       this.handleStreamStateChanged(this.stateMap.streamState, s);
     });
   }
@@ -942,12 +954,15 @@ export class Viewer {
     state: Connecting
   ): void {
     if (previous.type !== 'connecting') {
+      this.token = undefined;
       this.errorMessage = undefined;
       this.emitConnectionChange({ status: 'connecting' });
     }
   }
 
   private handleConnected(previous: ViewerStreamState, state: Connected): void {
+    this.token = state.token.token;
+
     if (previous.type !== 'connected') {
       this.errorMessage = undefined;
       this.canvasRenderer = measureCanvasRenderer(
@@ -974,6 +989,7 @@ export class Viewer {
     state: ConnectionFailed
   ): void {
     if (previous.type !== 'connection-failed') {
+      this.token = undefined;
       this.errorMessage = state.message;
     }
   }
@@ -983,6 +999,7 @@ export class Viewer {
     state: Disconnected
   ): void {
     if (previous.type !== 'disconnected') {
+      this.token = undefined;
       this.errorMessage = undefined;
       this.emitConnectionChange({ status: 'disconnected' });
     }
@@ -1114,22 +1131,18 @@ export class Viewer {
     }
   }
 
-  private getStreamAttributes(): vertexvis.protobuf.stream.IStreamAttributes {
-    const attr = {
+  private getStreamAttributes(): StreamAttributes {
+    return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalGhosting: this.experimentalGhostingOpacity,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,
     };
-    return Mapper.ifInvalidThrow(toPbStreamAttributes)(attr);
   }
 
   private updateStreamAttributes(): void {
-    if (this.stateMap.streamState.type === 'connected') {
-      const streamAttributes = this.getStreamAttributes();
-      this.getStream().updateStream({ streamAttributes });
-    }
+    this.stream?.update({ streamAttributes: this.getStreamAttributes() });
   }
 
   private getDepthBufferStreamAttributesValue(): FrameType {

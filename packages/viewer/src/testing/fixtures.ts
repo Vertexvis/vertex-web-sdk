@@ -14,7 +14,7 @@ import {
   Viewport,
 } from '../lib/types';
 
-const def: DrawFramePayload = {
+export const drawFramePayload: DrawFramePayload = {
   sequenceNumber: 1,
   sceneAttributes: {
     camera: {
@@ -46,7 +46,7 @@ const def: DrawFramePayload = {
 };
 
 export const frame = Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-  def
+  drawFramePayload
 );
 
 export function makeImagePng(width: number, height: number): Uint8Array {

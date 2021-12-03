@@ -45,7 +45,7 @@ describe(ViewerStream, () => {
         (s) => s.type === 'connecting' && s.resource.resource.id === '123'
       );
 
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await expect(connecting).resolves.toBeDefined();
 
       await simulateFrame(ws);
@@ -68,7 +68,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
@@ -76,7 +76,7 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn234);
+      stream.load(urn234, clientId, sessionId, config);
       await simulateFrame(ws);
 
       await expect(connected234).resolves.toBeDefined();
@@ -99,7 +99,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
@@ -110,7 +110,12 @@ describe(ViewerStream, () => {
           s.resource.resource.id === '123' &&
           s.resource.queries[0]?.id === 'svs'
       );
-      stream.load(`${urn123}?scene-view-state=svs`);
+      stream.load(
+        `${urn123}?scene-view-state=svs`,
+        clientId,
+        sessionId,
+        config
+      );
 
       await expect(connectedSvs).resolves.toBeDefined();
       expect(closeWs).not.toHaveBeenCalled();
@@ -130,9 +135,9 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
 
-      stream.load(urn234);
+      stream.load(urn234, clientId, sessionId, config);
       expect(closeWs).toHaveBeenCalled();
 
       await simulateFrame(ws);
@@ -156,13 +161,13 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected123;
 
       ws.receiveMessage(encode(Fixtures.Requests.gracefulReconnect()));
 
-      stream.load(urn234);
+      stream.load(urn234, clientId, sessionId, config);
       expect(closeWs).toHaveBeenCalled();
 
       await simulateFrame(ws);
@@ -182,17 +187,17 @@ describe(ViewerStream, () => {
         (s) => s.type === 'connecting' && s.resource.resource.id === '123'
       );
 
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await expect(connecting).resolves.toBeDefined();
 
       await simulateFrame(ws);
       await stream.stateChanged.onceWhen((s) => s.type === 'connected');
 
-      const sessionId = getStorageEntry(
+      const storedSessionId = getStorageEntry(
         StorageKeys.STREAM_SESSION,
         (records) => records[clientId]
       );
-      expect(sessionId).toBe(startStream.startStream?.sessionId?.hex);
+      expect(storedSessionId).toBe(startStream.startStream?.sessionId?.hex);
     });
 
     it('connects with session id', async () => {
@@ -210,7 +215,7 @@ describe(ViewerStream, () => {
         (s) => s.type === 'connecting' && s.resource.resource.id === '123'
       );
 
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await connecting;
       await simulateFrame(ws);
       await stream.stateChanged.onceWhen((s) => s.type === 'connected');
@@ -236,7 +241,7 @@ describe(ViewerStream, () => {
       let failure = stream.stateChanged.onceWhen(
         (s) => s.type === 'connection-failed'
       );
-      let load = stream.load(urnMalformed);
+      let load = stream.load(urnMalformed, clientId, sessionId, config);
       await expect(load).rejects.toThrowError(InvalidResourceUrnError);
       await expect(failure).resolves.toBeDefined();
 
@@ -244,7 +249,7 @@ describe(ViewerStream, () => {
       failure = stream.stateChanged.onceWhen(
         (s) => s.type === 'connection-failed'
       );
-      load = stream.load(urn123);
+      load = stream.load(urn123, clientId, sessionId, config);
       await expect(load).rejects.toThrowError(WebsocketConnectionError);
       await expect(failure).resolves.toBeDefined();
       connect.mockRestore();
@@ -252,7 +257,7 @@ describe(ViewerStream, () => {
       startStream.mockRejectedValue(
         new StreamRequestError('123', {}, 'Request failed', '')
       );
-      load = stream.load(urn123);
+      load = stream.load(urn123, clientId, sessionId, config);
       await expect(load).rejects.toThrowError(StreamRequestError);
       await expect(failure).resolves.toBeDefined();
       startStream.mockRestore();
@@ -278,7 +283,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected123;
 
@@ -307,7 +312,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -339,7 +344,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -368,7 +373,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -411,7 +416,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123);
+      stream.load(urn123, clientId, sessionId, config);
       await simulateFrame(ws);
       await connected123;
 
@@ -420,24 +425,13 @@ describe(ViewerStream, () => {
     });
   });
 
-  function makeStream(): {
-    stream: ViewerStream;
-    ws: WebSocketClientMock;
-  } {
+  function makeStream(): { stream: ViewerStream; ws: WebSocketClientMock } {
     const ws = new WebSocketClientMock();
-    const stream = new ViewerStream(
-      ws,
-      () => clientId,
-      () => sessionId,
-      () => config,
-      () => dimensions,
-      () => streamAttributes,
-      () => frameBgColor,
-      {
-        tokenRefreshOffsetInSeconds: 0,
-        offlineThresholdInSeconds: offlineReconnectThresholdInMs / 1000,
-      }
-    );
+    const stream = new ViewerStream(ws, {
+      tokenRefreshOffsetInSeconds: 0,
+      offlineThresholdInSeconds: offlineReconnectThresholdInMs / 1000,
+    });
+    stream.update({ dimensions, streamAttributes, frameBgColor });
 
     return { stream, ws };
   }

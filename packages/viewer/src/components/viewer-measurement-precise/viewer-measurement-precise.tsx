@@ -78,7 +78,7 @@ export class ViewerMeasurementPrecise {
     this.measurementController = new MeasurementController(
       this.measurementModel,
       client,
-      () => this.viewer?.getJwt()
+      () => this.viewer?.token
     );
   }
 
