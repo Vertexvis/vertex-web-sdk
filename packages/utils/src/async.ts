@@ -50,16 +50,23 @@ export function timeout(ms: number): Promise<void>;
  */
 export function timeout<T>(ms: number, promise: Promise<T>): Promise<T>;
 
-export function timeout(...args: unknown[]): Promise<unknown> {
+export async function timeout(...args: unknown[]): Promise<unknown> {
   const ms = args[0];
 
   if (typeof ms === 'number') {
     const promise = args[1];
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(`Promise timed out after ${ms}ms`)), ms)
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let timer: any;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(
+        () => reject(new Error(`Promise timed out after ${ms}ms`)),
+        ms
+      );
+    });
     if (promise != null) {
-      return Promise.race([promise, timeout]);
+      const res = await Promise.race([promise, timeout]);
+      clearTimeout(timer);
+      return res;
     } else {
       return timeout;
     }
