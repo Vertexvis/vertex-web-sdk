@@ -74,7 +74,8 @@
  */
 export class MapperValidationError extends Error {
   public constructor(public readonly errors: string[]) {
-    super('Validation error while mapping object.');
+    super('Validation error mapping object.');
+    Object.setPrototypeOf(this, MapperValidationError.prototype);
   }
 }
 
