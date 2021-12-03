@@ -1,44 +1,67 @@
-jest.mock('@vertexvis/stream-api');
-
-import { currentDateAsProtoTimestamp } from '@vertexvis/stream-api';
+import {
+  encode,
+  Fixtures as StreamFixtures,
+  WebSocketClientMock,
+} from '@vertexvis/stream-api';
+import { Async } from '@vertexvis/utils';
+import { ViewerStream } from '../lib/stream/stream';
 import * as Fixtures from './fixtures';
+import { random } from './random';
 
-interface LoadViewerOptions {
-  jwt?: string;
-  streamKey?: string;
-  dispose?: () => void;
+interface LoadViewerStreamKeyCtx {
+  stream: ViewerStream;
+  ws: WebSocketClientMock;
+  viewer: HTMLVertexViewerElement;
 }
 
-export async function loadModelForViewer(
-  viewer: HTMLVertexViewerElement,
-  { jwt, streamKey, dispose }: LoadViewerOptions = {}
-): Promise<void> {
-  const startStream = {
-    startStream: {
-      sceneViewId: { hex: 'scene-view-id' },
-      streamId: { hex: 'stream-id' },
-      jwt: jwt || 'jwt-value',
-      worldOrientation: {
-        front: { x: 0, y: 0, z: 1 },
-        up: { x: 0, y: 1, z: 0 },
-      },
-    },
-  };
-  const syncTime = { syncTime: { replyTime: currentDateAsProtoTimestamp() } };
-  (viewer.stream?.connect as jest.Mock).mockResolvedValue({
-    dispose: () => {
-      if (dispose != null) {
-        dispose();
-      }
-      viewer.stream?.dispose();
-    },
-  });
-  (viewer.stream?.startStream as jest.Mock).mockResolvedValue(startStream);
-  (viewer.stream?.syncTime as jest.Mock).mockResolvedValue(syncTime);
+interface LoadViewerStreamKeyOptions {
+  token?: string;
+}
 
-  const loading = viewer.load(`urn:vertexvis:stream-key:${streamKey || 'key'}`);
+export const key1 = 'urn:vertexvis:stream-key:123';
+
+export const key2 = 'urn:vertexvis:stream-key:234';
+
+export function makeViewerStream(): {
+  stream: ViewerStream;
+  ws: WebSocketClientMock;
+} {
+  const ws = new WebSocketClientMock();
+  const stream = new ViewerStream(ws);
+  return { stream, ws };
+}
+
+export async function loadViewerStreamKey(
+  urn: string,
+  { viewer, stream, ws }: LoadViewerStreamKeyCtx,
+  { token = random.string({ alpha: true }) }: LoadViewerStreamKeyOptions = {}
+): Promise<void> {
+  jest.spyOn(stream, 'startStream').mockResolvedValue(
+    StreamFixtures.Responses.startStream({
+      result: {
+        token: {
+          token: token,
+          expiresIn: new Date().getTime() + 10000,
+        },
+      },
+    }).response
+  );
+  jest
+    .spyOn(stream, 'syncTime')
+    .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
+
+  const connecting = stream.stateChanged.onceWhen(
+    (s) => s.type === 'connecting'
+  );
+  const loaded = viewer.load(urn);
 
   // Emit frame drawn on next event loop
-  setTimeout(() => viewer.dispatchFrameDrawn(Fixtures.frame), 0);
-  await loading;
+  await connecting;
+  await Async.delay(10);
+  ws.receiveMessage(
+    encode(
+      StreamFixtures.Requests.drawFrame({ payload: Fixtures.drawFramePayload })
+    )
+  );
+  await loaded;
 }
