@@ -382,11 +382,11 @@ export class ViewerStream extends StreamApi {
       })
     );
 
-    // if (clientId != null) {
-    //   upsertStorageEntry(StorageKeys.DEVICE_ID, {
-    //     [clientId]: res.sessionId,
-    //   });
-    // }
+    if (clientId != null) {
+      upsertStorageEntry(StorageKeys.STREAM_SESSION, {
+        [clientId]: res.sessionId,
+      });
+    }
 
     return {
       resource: resource,
@@ -597,14 +597,14 @@ function getWebsocketUri(
   config: Config,
   resource: LoadableResource.LoadableResource,
   clientId?: string,
-  deviceId?: string
+  sessionId?: string
 ): Uri.Uri {
   if (clientId != null) {
     return Uri.appendPath(
       Uri.toString(
         Uri.parseAndAddParams('/ws', {
           clientId,
-          deviceId,
+          sessionId,
         })
       ),
       Uri.parse(config.network.renderingHost)

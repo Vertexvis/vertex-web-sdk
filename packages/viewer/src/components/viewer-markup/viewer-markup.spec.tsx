@@ -229,17 +229,37 @@ describe('vertex-viewer-markup', () => {
       const onMarkupAdded = jest.fn();
       const page = await newSpecPage({
         components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => <vertex-viewer-markup onMarkupAdded={onMarkupAdded} />,
+        template: () => (
+          <vertex-viewer-markup
+            onMarkupAdded={onMarkupAdded}
+            select-new={false}
+          />
+        ),
       });
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       el.dispatchEvent(new CustomEvent('markupEnd', { detail: arrowMarkup }));
 
+      await page.waitForChanges();
       expect(onMarkupAdded).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: el.firstElementChild,
         })
       );
+      expect(el.selectedMarkupId).toBeUndefined();
+    });
+
+    it('selects new markup if select-new is enabled', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
+        template: () => <vertex-viewer-markup select-new={true} />,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      el.dispatchEvent(new CustomEvent('markupEnd', { detail: arrowMarkup }));
+
+      await page.waitForChanges();
+      expect(el.selectedMarkupId).toBe(arrowMarkup.id);
     });
   });
 
