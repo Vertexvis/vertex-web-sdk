@@ -44,7 +44,11 @@ import {
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { paintTime, Timing } from '../../lib/meters';
-import { getStorageEntry, StorageKeys } from '../../lib/storage';
+import {
+  getStorageEntry,
+  StorageKeys,
+  upsertStorageEntry,
+} from '../../lib/storage';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
@@ -70,6 +74,7 @@ import {
   Disconnected,
   ViewerStreamState,
 } from '../../lib/stream/state';
+import { UUID } from '@vertexvis/utils';
 
 interface ConnectedStatus {
   jwt: string;
@@ -1168,9 +1173,17 @@ export class Viewer {
 
   private getSessionId(): string | undefined {
     if (this.sessionId == null) {
-      return getStorageEntry(StorageKeys.STREAM_SESSION, (entry) =>
-        this.clientId ? entry[this.clientId] : undefined
+      this.sessionId = getStorageEntry(
+        StorageKeys.DEVICE_ID,
+        (entry) => entry['id']
       );
+
+      if (this.sessionId == null) {
+        this.sessionId = UUID.create();
+        upsertStorageEntry(StorageKeys.DEVICE_ID, {
+          ['id']: this.sessionId,
+        });
+      }
     } else return this.sessionId;
   }
 }
