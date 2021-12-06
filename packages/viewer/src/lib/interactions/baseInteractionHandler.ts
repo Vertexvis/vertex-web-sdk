@@ -252,6 +252,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected endDrag(event: BaseEvent): void {
+    if (
+      this.keyboardControls &&
+      this.currentInteraction === this.twistInteraction
+    ) {
+      this.currentInteraction = undefined;
+    }
+
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.endDrag(event, this.interactionApi);
       this.draggingInteraction = undefined;

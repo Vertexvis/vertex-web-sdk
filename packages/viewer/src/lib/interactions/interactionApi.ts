@@ -198,7 +198,7 @@ export class InteractionApi {
         return camera.rotateAroundAxis(angleInRadians, axis);
       } else if (args.length === 1) {
         const center = Point.create(viewport.width / 2, viewport.height / 2);
-        const currentAngle = Angle.fromPointsInDegrees(center, args[0]);
+        const currentAngle = Angle.toDegrees(Angle.fromPoints(center, args[0]));
         const angleDelta =
           this.lastAngle != null ? currentAngle - this.lastAngle : 0;
 
