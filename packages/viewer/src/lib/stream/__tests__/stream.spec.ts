@@ -194,7 +194,7 @@ describe(ViewerStream, () => {
       await stream.stateChanged.onceWhen((s) => s.type === 'connected');
 
       const storedSessionId = getStorageEntry(
-        StorageKeys.STREAM_SESSION,
+        StorageKeys.DEVICE_ID,
         (records) => records[clientId]
       );
       expect(storedSessionId).toBe(startStream.startStream?.sessionId?.hex);
