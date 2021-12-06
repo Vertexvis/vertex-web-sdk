@@ -76,9 +76,15 @@ export async function timeout(...args: unknown[]): Promise<unknown> {
 }
 
 interface RetryOptions {
+  /**
+   * An array of delays that are used between each retry attempt.
+   */
   delaysInMs?: number[];
+
+  /**
+   * The maximum number of retries that will be attempted.
+   */
   maxRetries?: number;
-  abort?: AbortController;
 }
 
 /**
