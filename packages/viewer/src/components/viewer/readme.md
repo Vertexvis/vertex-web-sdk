@@ -85,7 +85,7 @@ Type: `Promise<InteractionHandler[]>`
 
 ### `getJwt() => Promise<string | undefined>`
 
-
+<span style="color:red">**[DEPRECATED]**</span> Use `token`.<br/><br/>
 
 #### Returns
 

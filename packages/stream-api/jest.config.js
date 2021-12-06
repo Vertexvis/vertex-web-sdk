@@ -10,6 +10,7 @@ module.exports = {
       statements: 65,
     },
   },
+  coveragePathIgnorePatterns: ['src/testing'],
   globals: {
     'ts-jest': {
       tsconfig: './tsconfig.json',

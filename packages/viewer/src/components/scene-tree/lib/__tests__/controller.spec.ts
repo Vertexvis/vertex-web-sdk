@@ -34,7 +34,6 @@ import {
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { sign } from 'jsonwebtoken';
-import Chance from 'chance';
 import { Async } from '@vertexvis/utils';
 import { SceneTreeController, SceneTreeState } from '../controller';
 import { fromNodeProto, Row } from '../row';
@@ -43,10 +42,9 @@ import {
   createGetTreeResponse,
   mockGrpcUnaryError,
   mockGrpcUnaryResult,
+  random,
   ResponseStreamMock,
 } from '../../../../testing';
-
-const random = new Chance();
 
 function signJwt(viewId: string): string {
   return sign(
@@ -82,7 +80,7 @@ function createController(rowLimit: number): {
 describe(SceneTreeController, () => {
   const sceneViewId = random.guid();
   const jwt = signJwt(sceneViewId);
-  const jwtProvider = (): Promise<string> => Promise.resolve(jwt);
+  const jwtProvider = (): string => jwt;
 
   const metadata = new grpc.Metadata({
     'jwt-context': JSON.stringify({ jwt }),
@@ -177,7 +175,7 @@ describe(SceneTreeController, () => {
       );
 
       const newJwt = signJwt(random.guid());
-      await controller.connect(() => Promise.resolve(newJwt));
+      await controller.connect(() => newJwt);
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -212,7 +210,7 @@ describe(SceneTreeController, () => {
 
       onStateChange.mockClear();
       const newJwt = signJwt(random.guid());
-      await controller.connect(() => Promise.resolve(newJwt));
+      await controller.connect(() => newJwt);
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({

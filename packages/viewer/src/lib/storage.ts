@@ -1,18 +1,16 @@
+export enum StorageKeys {
+  STREAM_SESSION = 'vertexvis:stream-sessions',
+}
+
 export function upsertStorageEntry<T>(
   key: string,
   values: Record<string, T>,
-  storageProvider?: () => Storage
+  storage: Storage = window.localStorage
 ): void {
-  const storage =
-    storageProvider != null ? storageProvider() : window.localStorage;
   const existing = storage.getItem(key);
 
   if (existing != null) {
-    const updated = {
-      ...JSON.parse(existing),
-      ...values,
-    };
-
+    const updated = { ...JSON.parse(existing), ...values };
     storage.setItem(key, JSON.stringify(updated));
   } else {
     storage.setItem(key, JSON.stringify(values));
@@ -22,10 +20,8 @@ export function upsertStorageEntry<T>(
 export function getStorageEntry<T>(
   key: string,
   f: (value: Record<string, T>) => T | undefined,
-  storageProvider?: () => Storage
+  storage: Storage = window.localStorage
 ): T | undefined {
-  const storage =
-    storageProvider != null ? storageProvider() : window.localStorage;
   const item = storage.getItem(key);
 
   if (item != null) {

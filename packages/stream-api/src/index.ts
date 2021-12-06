@@ -5,6 +5,8 @@ export * from './connection';
 
 export * from './encoder';
 
+export * from './errors';
+
 export {
   Settings,
   FrameDeliverySettings,

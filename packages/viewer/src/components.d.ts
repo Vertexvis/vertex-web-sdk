@@ -30,7 +30,7 @@ import {
 } from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FramePerspectiveCamera } from './lib/types/frame';
-import { ViewerStreamApi } from './lib/stream/viewerStreamApi';
+import { ViewerStream } from './lib/stream/stream';
 import {
   AngleUnitType,
   DepthBuffer,
@@ -53,7 +53,6 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
-import { CommandFactory } from './lib/commands/command';
 import { InteractionHandler } from './lib/interactions/interactionHandler';
 import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
@@ -387,8 +386,10 @@ export namespace Components {
      * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
      */
     getInteractionTarget: () => Promise<HTMLElement>;
+    /**
+     * @deprecated Use `token`.
+     */
     getJwt: () => Promise<string | undefined>;
-    handleWebSocketClose: () => Promise<void>;
     /**
      * Returns `true` indicating that the scene is ready to be interacted with.
      */
@@ -402,14 +403,6 @@ export namespace Components {
      * @param urn The URN of the resource to load.
      */
     load: (urn: string) => Promise<void>;
-    /**
-     * Internal API.
-     */
-    registerCommand: <R, T>(
-      id: string,
-      factory: CommandFactory<R>,
-      thisArg?: T | undefined
-    ) => Promise<Disposable>;
     /**
      * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
      * @example
@@ -487,7 +480,11 @@ export namespace Components {
      */
     src?: string;
     stencilBuffer: StencilBufferManager;
-    stream?: ViewerStreamApi;
+    stream?: ViewerStream;
+    /**
+     * A token that can be used to make API calls to other Vertex services.
+     */
+    token?: string;
     /**
      * Disconnects the websocket and removes any internal state associated with the scene.
      */
@@ -1668,7 +1665,11 @@ declare namespace LocalJSX {
      */
     src?: string;
     stencilBuffer?: StencilBufferManager;
-    stream?: ViewerStreamApi;
+    stream?: ViewerStream;
+    /**
+     * A token that can be used to make API calls to other Vertex services.
+     */
+    token?: string;
     /**
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
      */

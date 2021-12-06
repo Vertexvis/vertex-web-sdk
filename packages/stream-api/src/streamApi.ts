@@ -31,6 +31,12 @@ export type ResponseMessageHandler = (msg: ResponseMessage) => void;
 
 export type EventMessageHandler = (msg: EventMessage) => void;
 
+export type CloseEventHandler = (evt: CloseEvent) => void;
+
+export interface StreamApiOptions {
+  loggingEnabled?: boolean;
+}
+
 /**
  * The API client to interact with Vertex's streaming API.
  */
@@ -40,10 +46,16 @@ export class StreamApi {
   private onEventDispatcher = new EventDispatcher<EventMessage>();
   private messageSubscription?: Disposable;
 
+  private opts: Required<StreamApiOptions>;
+
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
-    private loggingEnabled = false
-  ) {}
+    opts: StreamApiOptions = {}
+  ) {
+    this.opts = {
+      loggingEnabled: opts.loggingEnabled ?? false,
+    };
+  }
 
   /**
    * Initiates a websocket connection to Vertex's streaming API. Returns a
@@ -96,6 +108,15 @@ export class StreamApi {
    */
   public onEvent(handler: EventMessageHandler): Disposable {
     return this.onEventDispatcher.on(handler);
+  }
+
+  /**
+   * Adds a callback that is invoked when the websocket connection is closed.
+   *
+   * @param handler A handler function.
+   */
+  public onClose(handler: CloseEventHandler): Disposable {
+    return this.websocket.onClose(handler);
   }
 
   /**
@@ -403,6 +424,19 @@ export class StreamApi {
   }
 
   /**
+   * Sends a request to retrieve a new token. This token can be used to
+   * authenticate with other Vertex services.
+   *
+   * @param withResponse Indicates if the server should reply with a response.
+   * @returns A promise that completes with the refreshed token.
+   */
+  public refreshToken(
+    withResponse = true
+  ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    return this.sendRequest({ refreshToken: {} }, withResponse);
+  }
+
+  /**
    * Acknowledges a successful request by sending a reply back to the server
    * with an optional result body.
    *
@@ -456,7 +490,7 @@ export class StreamApi {
   }
 
   protected log(msg: string, ...other: unknown[]): void {
-    if (this.loggingEnabled) {
+    if (this.opts.loggingEnabled) {
       console.debug(msg, ...other);
     }
   }

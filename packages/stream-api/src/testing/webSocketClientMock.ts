@@ -2,25 +2,32 @@ import {
   WebSocketClient,
   WebSocketSendData,
   MessageHandler,
+  CloseHandler,
 } from '../webSocketClient';
 import { ConnectionDescriptor } from '../connection';
 import { Disposable } from '@vertexvis/utils';
 
 export class WebSocketClientMock implements WebSocketClient {
-  private handlers = new Set<MessageHandler>();
+  private closeHandlers = new Set<CloseHandler>();
+  private msgHandlers = new Set<MessageHandler>();
   private sentMessages = new Array<WebSocketSendData>();
 
   public close(): void {
-    // NOOP
+    this.closeHandlers.forEach((handler) => handler(new CloseEvent('close')));
   }
 
   public connect(descriptor: ConnectionDescriptor): Promise<void> {
     return Promise.resolve();
   }
 
+  public onClose(handler: CloseHandler): Disposable {
+    this.closeHandlers.add(handler);
+    return { dispose: () => this.closeHandlers.delete(handler) };
+  }
+
   public onMessage(handler: MessageHandler): Disposable {
-    this.handlers.add(handler);
-    return { dispose: () => this.handlers.delete(handler) };
+    this.msgHandlers.add(handler);
+    return { dispose: () => this.msgHandlers.delete(handler) };
   }
 
   public send(data: WebSocketSendData): void {
@@ -38,7 +45,7 @@ export class WebSocketClientMock implements WebSocketClient {
    * @param data The websocket message data.
    */
   public receiveMessage(data: WebSocketSendData): void {
-    this.handlers.forEach((handler) =>
+    this.msgHandlers.forEach((handler) =>
       handler(new MessageEvent('message', { data }))
     );
   }
@@ -49,7 +56,8 @@ export class WebSocketClientMock implements WebSocketClient {
    */
   public reset(): void {
     this.sentMessages = [];
-    this.handlers.clear();
+    this.msgHandlers.clear();
+    this.closeHandlers.clear();
   }
 
   /**

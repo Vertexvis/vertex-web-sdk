@@ -1,6 +1,5 @@
 jest.mock('../viewer/utils');
-
-import '../../testing/domMocks';
+jest.mock('../../lib/rendering/imageLoaders');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -11,11 +10,21 @@ import { FramePerspectiveCamera, Orientation } from '../../lib/types';
 import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
-import { loadModelForViewer } from '../../testing/viewer';
+import {
+  loadViewerStreamKey,
+  makeViewerStream,
+  key1,
+} from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 
-describe('vertez-viewer-view-cube', () => {
+describe('vertex-viewer-view-cube', () => {
+  (loadImageBytes as jest.Mock).mockReturnValue({
+    width: 200,
+    height: 150,
+    dispose: () => undefined,
+  });
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -133,13 +142,14 @@ describe('vertez-viewer-view-cube', () => {
   });
 
   it('applies camera from viewer', async () => {
+    const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
       components: [Viewer, ViewerViewCube],
-      html: `
-        <vertex-viewer>
+      template: () => (
+        <vertex-viewer stream={stream}>
           <vertex-viewer-view-cube></vertex-viewer-view-cube>
         </vertex-viewer>
-      `,
+      ),
     });
 
     const viewer = page.body.querySelector(
@@ -149,7 +159,8 @@ describe('vertez-viewer-view-cube', () => {
       'vertex-viewer-view-cube'
     ) as HTMLVertexViewerViewCubeElement;
 
-    await loadModelForViewer(viewer);
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
     await page.waitForChanges();
 
     expect(viewCube.camera).toBeDefined();

@@ -3,7 +3,6 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
 import { ViewerMeasurementDetails } from './viewer-measurement-details';
-import '../../testing/domMocks';
 import { MeasurementModel, summarizeResults } from '../../lib/measurement';
 import { Angle } from '@vertexvis/geometry';
 

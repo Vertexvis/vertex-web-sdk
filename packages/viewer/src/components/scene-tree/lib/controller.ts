@@ -36,7 +36,7 @@ export interface ConnectOptions {
   lostConnectionReconnectInSeconds?: number;
 }
 
-export type JwtProvider = () => Promise<string | undefined>;
+export type JwtProvider = () => string | undefined;
 
 export interface SceneTreeState {
   totalRows: number;
@@ -144,7 +144,7 @@ export class SceneTreeController {
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
     const { connection } = this.state;
-    const jwt = await jwtProvider();
+    const jwt = jwtProvider();
 
     if (jwt == null) {
       throw new Error('Cannot connect scene tree. JWT is undefined');
@@ -233,14 +233,13 @@ export class SceneTreeController {
 
   public connectToViewer(viewer: HTMLVertexViewerElement): Disposable {
     const connectWithViewerJwt = async (): Promise<void> => {
-      const jwt = await viewer.getJwt();
-      if (jwt != null) {
+      if (viewer.token != null) {
         console.debug(
           'Scene tree controller found viewer JWT. Attempting connection.'
         );
 
         try {
-          await this.connect(() => viewer.getJwt());
+          await this.connect(() => viewer.token);
         } catch (e) {
           console.error('Scene tree controller erred connecting.', e);
         }
@@ -606,9 +605,10 @@ export class SceneTreeController {
    */
   private subscribe(): Promise<ResponseStream<SubscribeResponse>> {
     return this.ifConnectionHasJwt((jwt) => {
-      const stream = this.requestServerStream(jwt, (metadata) =>
-        this.client.subscribe(new SubscribeRequest(), metadata)
-      );
+      const stream = this.requestServerStream(jwt, (metadata) => {
+        const sub = this.client.subscribe(new SubscribeRequest(), metadata);
+        return sub;
+      });
 
       stream.on('data', (msg) => {
         this.startIdleReconnectTimer();

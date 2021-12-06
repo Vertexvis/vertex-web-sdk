@@ -1,4 +1,5 @@
-import * as Requests from './requests';
 import * as Events from './events';
+import * as Requests from './requests';
+import * as Responses from './responses';
 
-export { Requests, Events };
+export { Events, Requests, Responses };

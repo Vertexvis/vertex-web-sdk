@@ -9,7 +9,7 @@ import {
 import { Vector3, BoundingBox } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
-import { buildFlyToOperation } from '../commands/streamCommandsMapper';
+import { buildFlyToOperation } from './mapper';
 import { CameraRenderResult } from './cameraRenderResult';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import { FrameDecoder } from '../mappers';
