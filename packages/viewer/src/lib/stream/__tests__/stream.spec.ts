@@ -12,12 +12,11 @@ import {
   InvalidResourceUrnError,
   WebsocketConnectionError,
 } from '../../errors';
-import { getStorageEntry, StorageKeys } from '../../storage';
 import { ViewerStream } from '../stream';
 
 describe(ViewerStream, () => {
   const clientId = random.string({ alpha: true });
-  const sessionId = random.string({ alpha: true });
+  const deviceId = random.string({ alpha: true });
   const config = parseConfig('platdev');
   const dimensions = Dimensions.create(100, 50);
   const streamAttributes = {};
@@ -45,7 +44,7 @@ describe(ViewerStream, () => {
         (s) => s.type === 'connecting' && s.resource.resource.id === '123'
       );
 
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await expect(connecting).resolves.toBeDefined();
 
       await simulateFrame(ws);
@@ -68,7 +67,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
@@ -76,7 +75,7 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn234, clientId, sessionId, config);
+      stream.load(urn234, clientId, deviceId, config);
       await simulateFrame(ws);
 
       await expect(connected234).resolves.toBeDefined();
@@ -99,7 +98,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
@@ -110,12 +109,7 @@ describe(ViewerStream, () => {
           s.resource.resource.id === '123' &&
           s.resource.queries[0]?.id === 'svs'
       );
-      stream.load(
-        `${urn123}?scene-view-state=svs`,
-        clientId,
-        sessionId,
-        config
-      );
+      stream.load(`${urn123}?scene-view-state=svs`, clientId, deviceId, config);
 
       await expect(connectedSvs).resolves.toBeDefined();
       expect(closeWs).not.toHaveBeenCalled();
@@ -135,9 +129,9 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
 
-      stream.load(urn234, clientId, sessionId, config);
+      stream.load(urn234, clientId, deviceId, config);
       expect(closeWs).toHaveBeenCalled();
 
       await simulateFrame(ws);
@@ -161,46 +155,20 @@ describe(ViewerStream, () => {
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
       ws.receiveMessage(encode(Fixtures.Requests.gracefulReconnect()));
 
-      stream.load(urn234, clientId, sessionId, config);
+      stream.load(urn234, clientId, deviceId, config);
       expect(closeWs).toHaveBeenCalled();
 
       await simulateFrame(ws);
       await expect(connected234).resolves.toBeDefined();
     });
 
-    it('caches session', async () => {
-      const { stream, ws } = makeStream();
-
-      const startStream = Fixtures.Responses.startStream().response;
-      jest.spyOn(stream, 'startStream').mockResolvedValue(startStream);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-
-      const connecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
-      );
-
-      stream.load(urn123, clientId, sessionId, config);
-      await expect(connecting).resolves.toBeDefined();
-
-      await simulateFrame(ws);
-      await stream.stateChanged.onceWhen((s) => s.type === 'connected');
-
-      const storedSessionId = getStorageEntry(
-        StorageKeys.STREAM_SESSION,
-        (records) => records[clientId]
-      );
-      expect(storedSessionId).toBe(startStream.startStream?.sessionId?.hex);
-    });
-
-    it('connects with session id', async () => {
+    it('connects with device id', async () => {
       const { stream, ws } = makeStream();
 
       jest
@@ -215,14 +183,14 @@ describe(ViewerStream, () => {
         (s) => s.type === 'connecting' && s.resource.resource.id === '123'
       );
 
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await connecting;
       await simulateFrame(ws);
       await stream.stateChanged.onceWhen((s) => s.type === 'connected');
 
       expect(connect).toHaveBeenCalledWith(
         expect.objectContaining({
-          url: expect.stringContaining(sessionId),
+          url: expect.stringContaining(deviceId),
         }),
         expect.anything()
       );
@@ -241,7 +209,7 @@ describe(ViewerStream, () => {
       let failure = stream.stateChanged.onceWhen(
         (s) => s.type === 'connection-failed'
       );
-      let load = stream.load(urnMalformed, clientId, sessionId, config);
+      let load = stream.load(urnMalformed, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(InvalidResourceUrnError);
       await expect(failure).resolves.toBeDefined();
 
@@ -249,7 +217,7 @@ describe(ViewerStream, () => {
       failure = stream.stateChanged.onceWhen(
         (s) => s.type === 'connection-failed'
       );
-      load = stream.load(urn123, clientId, sessionId, config);
+      load = stream.load(urn123, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(WebsocketConnectionError);
       await expect(failure).resolves.toBeDefined();
       connect.mockRestore();
@@ -257,7 +225,7 @@ describe(ViewerStream, () => {
       startStream.mockRejectedValue(
         new StreamRequestError('123', {}, 'Request failed', '')
       );
-      load = stream.load(urn123, clientId, sessionId, config);
+      load = stream.load(urn123, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(StreamRequestError);
       await expect(failure).resolves.toBeDefined();
       startStream.mockRestore();
@@ -283,7 +251,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
@@ -312,7 +280,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -344,7 +312,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -373,7 +341,7 @@ describe(ViewerStream, () => {
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected;
 
@@ -416,7 +384,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
