@@ -38,7 +38,6 @@ import {
   SynchronizedClock,
 } from '../types';
 import { Resource } from '../types/loadableResource';
-import { StorageKeys, upsertStorageEntry } from '../storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
 import {
@@ -233,7 +232,7 @@ export class ViewerStream extends StreamApi {
 
   private connectWithNewStream(resource: Resource): Promise<void> {
     return this.openWebsocketStream(resource, 'connecting', () =>
-      this.requestNewStream(this.clientId, resource)
+      this.requestNewStream(resource)
     );
   }
 
@@ -365,10 +364,7 @@ export class ViewerStream extends StreamApi {
     });
   }
 
-  private async requestNewStream(
-    clientId: string | undefined,
-    resource: Resource
-  ): Promise<StreamResult> {
+  private async requestNewStream(resource: Resource): Promise<StreamResult> {
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
@@ -381,12 +377,6 @@ export class ViewerStream extends StreamApi {
             : undefined,
       })
     );
-
-    // if (clientId != null) {
-    //   upsertStorageEntry(StorageKeys.DEVICE_ID, {
-    //     [clientId]: res.sessionId,
-    //   });
-    // }
 
     return {
       resource: resource,

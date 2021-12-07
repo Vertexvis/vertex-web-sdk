@@ -14,7 +14,7 @@ import {
 import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
-import { Disposable, Color, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, Color, EventDispatcher, UUID } from '@vertexvis/utils';
 import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -133,7 +133,7 @@ export class Viewer {
    *
    * @private
    */
-  @Prop() public sessionId?: string;
+  @Prop() public deviceId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -376,6 +376,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.getSessionId();
   }
 
   /**
@@ -1172,19 +1173,20 @@ export class Viewer {
   }
 
   private getSessionId(): string | undefined {
-    if (this.sessionId == null) {
-      this.sessionId = getStorageEntry(
+    if (this.deviceId == null) {
+      this.deviceId = getStorageEntry(
         StorageKeys.DEVICE_ID,
         (entry) => entry['id']
       );
 
-      if (this.sessionId == null) {
-        this.sessionId = UUID.create();
+      if (this.deviceId == null) {
+        this.deviceId = UUID.create();
         upsertStorageEntry(StorageKeys.DEVICE_ID, {
-          ['id']: this.sessionId,
+          ['id']: this.deviceId,
         });
       }
-    } else return this.sessionId;
+    }
+    return this.deviceId;
   }
 }
 

@@ -311,6 +311,11 @@ export namespace Components {
           * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
          */
         "depthBuffers"?: FrameType;
+        /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "deviceId"?: string;
         "dispatchFrameDrawn": (frame: Frame) => Promise<void>;
         /**
           * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
@@ -382,11 +387,6 @@ export namespace Components {
           * The default hex color or material to use when selecting items.
          */
         "selectionMaterial": string | ColorMaterial;
-        /**
-          * Property used for internals or testing.
-          * @private
-         */
-        "sessionId"?: string;
         /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
@@ -1414,6 +1414,11 @@ declare namespace LocalJSX {
          */
         "depthBuffers"?: FrameType;
         /**
+          * Property used for internals or testing.
+          * @private
+         */
+        "deviceId"?: string;
+        /**
           * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
          */
         "experimentalGhostingOpacity"?: number;
@@ -1497,11 +1502,6 @@ declare namespace LocalJSX {
           * The default hex color or material to use when selecting items.
          */
         "selectionMaterial"?: string | ColorMaterial;
-        /**
-          * Property used for internals or testing.
-          * @private
-         */
-        "sessionId"?: string;
         /**
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
          */
