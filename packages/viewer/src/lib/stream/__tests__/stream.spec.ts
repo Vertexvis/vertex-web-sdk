@@ -408,7 +408,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
@@ -433,7 +433,7 @@ describe(ViewerStream, () => {
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.load(urn123, clientId, sessionId, config);
+      stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
