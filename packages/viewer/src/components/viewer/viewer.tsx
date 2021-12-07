@@ -14,7 +14,7 @@ import {
 import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
-import { Disposable, Color, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, Color, EventDispatcher, UUID } from '@vertexvis/utils';
 import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -44,7 +44,11 @@ import {
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { paintTime, Timing } from '../../lib/meters';
-import { getStorageEntry, StorageKeys } from '../../lib/storage';
+import {
+  getStorageEntry,
+  StorageKeys,
+  upsertStorageEntry,
+} from '../../lib/storage';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
@@ -128,7 +132,7 @@ export class Viewer {
    *
    * @private
    */
-  @Prop() public sessionId?: string;
+  @Prop() public deviceId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -371,6 +375,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.getSessionId();
   }
 
   /**
@@ -1167,11 +1172,20 @@ export class Viewer {
   }
 
   private getSessionId(): string | undefined {
-    if (this.sessionId == null) {
-      return getStorageEntry(StorageKeys.STREAM_SESSION, (entry) =>
-        this.clientId ? entry[this.clientId] : undefined
+    if (this.deviceId == null) {
+      this.deviceId = getStorageEntry(
+        StorageKeys.DEVICE_ID,
+        (entry) => entry['id']
       );
-    } else return this.sessionId;
+
+      if (this.deviceId == null) {
+        this.deviceId = UUID.create();
+        upsertStorageEntry(StorageKeys.DEVICE_ID, {
+          ['id']: this.deviceId,
+        });
+      }
+    }
+    return this.deviceId;
   }
 }
 

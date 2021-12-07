@@ -1,5 +1,5 @@
 export enum StorageKeys {
-  STREAM_SESSION = 'vertexvis:stream-sessions',
+  DEVICE_ID = 'vertexvis:device-id',
 }
 
 export function upsertStorageEntry<T>(
