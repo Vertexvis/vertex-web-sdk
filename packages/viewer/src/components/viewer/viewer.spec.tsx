@@ -330,11 +330,10 @@ describe('vertex-viewer', () => {
         (records) => records['id']
       );
 
-      expect(storedDeviceId).toBe(viewer.deviceId);
-
       const load = jest.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
+      expect(storedDeviceId).toBe(viewer.deviceId);
       expect(load).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
