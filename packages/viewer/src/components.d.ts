@@ -1447,6 +1447,11 @@ declare namespace LocalJSX {
           * Emits an event when the connection status changes for the viewer
          */
         "onConnectionChange"?: (event: CustomEvent<ConnectionStatus>) => void;
+        /**
+          * Used for internals or testing.
+          * @private
+         */
+        "onDeviceidchange"?: (event: CustomEvent<string>) => void;
         "onDimensionschange"?: (event: CustomEvent<Dimensions.Dimensions>) => void;
         /**
           * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
@@ -1480,11 +1485,6 @@ declare namespace LocalJSX {
           * Emits an event when the scene is ready to be interacted with.
          */
         "onSceneReady"?: (event: CustomEvent<void>) => void;
-        /**
-          * Used for internals or testing.
-          * @private
-         */
-        "onSessionidchange"?: (event: CustomEvent<string>) => void;
         /**
           * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
          */

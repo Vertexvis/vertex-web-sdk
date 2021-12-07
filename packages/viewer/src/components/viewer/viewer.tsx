@@ -338,7 +338,7 @@ export class Viewer {
    *
    * @private
    */
-  @Event() public sessionidchange!: EventEmitter<string>;
+  @Event() public deviceidchange!: EventEmitter<string>;
 
   @Event() public dimensionschange!: EventEmitter<Dimensions.Dimensions>;
 
@@ -376,7 +376,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
-    this.getSessionId();
+    this.getDeviceId();
   }
 
   /**
@@ -774,7 +774,7 @@ export class Viewer {
       await this.stream?.load(
         urn,
         this.clientId,
-        this.getSessionId(),
+        this.getDeviceId(),
         this.getResolvedConfig()
       );
       this.sceneReady.emit();
@@ -982,7 +982,7 @@ export class Viewer {
         status: 'connected',
         jwt: state.token.token,
       });
-      this.sessionidchange.emit(state.sessionId);
+      this.deviceidchange.emit(state.deviceId);
     }
 
     if (this.frame !== state.frame) {
@@ -1172,7 +1172,7 @@ export class Viewer {
     return getRequiredProp('Stream is undefined', () => this.stream);
   }
 
-  private getSessionId(): string | undefined {
+  private getDeviceId(): string | undefined {
     if (this.deviceId == null) {
       this.deviceId = getStorageEntry(
         StorageKeys.DEVICE_ID,
