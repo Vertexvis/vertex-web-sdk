@@ -16,6 +16,8 @@
   position: relative;
   width: 300px;
   height: 300px;
+  min-width: 1px;
+  min-height: 1px;
 }
 
 .canvas-container {

@@ -160,15 +160,18 @@ export class ViewerStream extends StreamApi {
       ? fields.frameBgColor
       : this.frameBgColor;
 
-    if (this.dimensions !== fields.dimensions) {
-      this.dimensions = fields.dimensions ?? Dimensions.create(0, 0);
+    if (fields.dimensions != null && fields.dimensions !== this.dimensions) {
+      this.dimensions = fields.dimensions;
       this.ifState('connected', () =>
         this.updateDimensions({ dimensions: this.dimensions })
       );
     }
 
-    if (this.streamAttributes !== fields.streamAttributes) {
-      this.streamAttributes = fields.streamAttributes ?? {};
+    if (
+      fields.streamAttributes != null &&
+      this.streamAttributes !== fields.streamAttributes
+    ) {
+      this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
         this.updateStream({
           streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),

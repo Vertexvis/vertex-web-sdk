@@ -393,6 +393,58 @@ describe(ViewerStream, () => {
     });
   });
 
+  describe('update', () => {
+    it('updates stream attributes if defined', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateStream = jest.spyOn(stream, 'updateStream');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, sessionId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({});
+      expect(updateStream).not.toBeCalled();
+
+      stream.update({ streamAttributes: { depthBuffers: 'final' } });
+      expect(updateStream).toHaveBeenCalled();
+    });
+
+    it('updates dimensions if defined', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, sessionId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({});
+      expect(updateDimensions).not.toBeCalled();
+
+      stream.update({ dimensions: Dimensions.create(100, 100) });
+      expect(updateDimensions).toHaveBeenCalled();
+    });
+  });
+
   function makeStream(): { stream: ViewerStream; ws: WebSocketClientMock } {
     const ws = new WebSocketClientMock();
     const stream = new ViewerStream(ws, {
