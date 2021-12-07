@@ -74,7 +74,6 @@ import {
   Disconnected,
   ViewerStreamState,
 } from '../../lib/stream/state';
-import { UUID } from '@vertexvis/utils';
 
 interface ConnectedStatus {
   jwt: string;
