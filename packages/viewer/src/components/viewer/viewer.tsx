@@ -14,7 +14,7 @@ import {
 import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import classnames from 'classnames';
-import { Disposable, Color, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, Color, EventDispatcher, UUID } from '@vertexvis/utils';
 import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
 import { InteractionHandler } from '../../lib/interactions/interactionHandler';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
@@ -44,7 +44,11 @@ import {
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { paintTime, Timing } from '../../lib/meters';
-import { getStorageEntry, StorageKeys } from '../../lib/storage';
+import {
+  getStorageEntry,
+  StorageKeys,
+  upsertStorageEntry,
+} from '../../lib/storage';
 import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
@@ -127,8 +131,9 @@ export class Viewer {
    * Property used for internals or testing.
    *
    * @private
+   * @internal
    */
-  @Prop() public sessionId?: string;
+  @Prop() public deviceId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for
@@ -333,7 +338,7 @@ export class Viewer {
    *
    * @private
    */
-  @Event() public sessionidchange!: EventEmitter<string>;
+  @Event() public deviceIdChange!: EventEmitter<string>;
 
   @Event() public dimensionschange!: EventEmitter<Dimensions.Dimensions>;
 
@@ -371,6 +376,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.getDeviceId();
   }
 
   /**
@@ -768,7 +774,7 @@ export class Viewer {
       await this.stream?.load(
         urn,
         this.clientId,
-        this.getSessionId(),
+        this.getDeviceId(),
         this.getResolvedConfig()
       );
       this.sceneReady.emit();
@@ -976,7 +982,7 @@ export class Viewer {
         status: 'connected',
         jwt: state.token.token,
       });
-      this.sessionidchange.emit(state.sessionId);
+      this.deviceIdChange.emit(state.deviceId);
     }
 
     if (this.frame !== state.frame) {
@@ -1166,12 +1172,21 @@ export class Viewer {
     return getRequiredProp('Stream is undefined', () => this.stream);
   }
 
-  private getSessionId(): string | undefined {
-    if (this.sessionId == null) {
-      return getStorageEntry(StorageKeys.STREAM_SESSION, (entry) =>
-        this.clientId ? entry[this.clientId] : undefined
+  private getDeviceId(): string | undefined {
+    if (this.deviceId == null) {
+      this.deviceId = getStorageEntry(
+        StorageKeys.DEVICE_ID,
+        (entry) => entry['device-id']
       );
-    } else return this.sessionId;
+
+      if (this.deviceId == null) {
+        this.deviceId = UUID.create();
+        upsertStorageEntry(StorageKeys.DEVICE_ID, {
+          ['device-id']: this.deviceId,
+        });
+      }
+    }
+    return this.deviceId;
   }
 }
 

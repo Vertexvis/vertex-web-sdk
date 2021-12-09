@@ -38,7 +38,6 @@ import {
   SynchronizedClock,
 } from '../types';
 import { Resource } from '../types/loadableResource';
-import { StorageKeys, upsertStorageEntry } from '../storage';
 import { Token } from '../token';
 import { Dimensions } from '@vertexvis/geometry';
 import {
@@ -85,7 +84,7 @@ interface UpdateFields {
   frameBgColor?: ViewerStream['frameBgColor'];
   config?: ViewerStream['config'];
   clientId?: ViewerStream['clientId'];
-  sessionId?: ViewerStream['sessionId'];
+  deviceId?: ViewerStream['deviceId'];
 }
 
 export class ViewerStream extends StreamApi {
@@ -96,7 +95,7 @@ export class ViewerStream extends StreamApi {
   private frameBgColor: Color3;
   private config: Config;
   private clientId: string | undefined;
-  private sessionId: string | undefined;
+  private deviceId: string | undefined;
 
   private state: ViewerStreamState = { type: 'disconnected' };
   public readonly stateChanged = new EventDispatcher<ViewerStreamState>();
@@ -136,11 +135,11 @@ export class ViewerStream extends StreamApi {
   public async load(
     urn: string,
     clientId: string | undefined,
-    sessionId: string | undefined,
+    deviceId: string | undefined,
     config: Config = parseConfig('platprod')
   ): Promise<void> {
     this.clientId = clientId;
-    this.sessionId = sessionId;
+    this.deviceId = deviceId;
     this.config = config;
 
     if (this.state.type === 'disconnected') {
@@ -236,7 +235,7 @@ export class ViewerStream extends StreamApi {
 
   private connectWithNewStream(resource: Resource): Promise<void> {
     return this.openWebsocketStream(resource, 'connecting', () =>
-      this.requestNewStream(this.clientId, resource)
+      this.requestNewStream(resource)
     );
   }
 
@@ -266,7 +265,7 @@ export class ViewerStream extends StreamApi {
         this.config,
         resource.resource,
         this.clientId,
-        this.sessionId
+        this.deviceId
       )
     );
     console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
@@ -359,7 +358,7 @@ export class ViewerStream extends StreamApi {
       },
       resource,
       streamId: stream.streamId,
-      sessionId: stream.sessionId,
+      deviceId: stream.deviceId,
       sceneViewId: stream.sceneViewId,
       worldOrientation: stream.worldOrientation,
       token: stream.token,
@@ -368,10 +367,7 @@ export class ViewerStream extends StreamApi {
     });
   }
 
-  private async requestNewStream(
-    clientId: string | undefined,
-    resource: Resource
-  ): Promise<StreamResult> {
+  private async requestNewStream(resource: Resource): Promise<StreamResult> {
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
@@ -385,17 +381,11 @@ export class ViewerStream extends StreamApi {
       })
     );
 
-    if (clientId != null) {
-      upsertStorageEntry(StorageKeys.STREAM_SESSION, {
-        [clientId]: res.sessionId,
-      });
-    }
-
     return {
       resource: resource,
       streamId: res.streamId,
       sceneViewId: res.sceneViewId,
-      sessionId: res.sessionId,
+      deviceId: res.sessionId,
       token: res.token,
       worldOrientation: res.worldOrientation,
       frame: undefined,
@@ -600,14 +590,14 @@ function getWebsocketUri(
   config: Config,
   resource: LoadableResource.LoadableResource,
   clientId?: string,
-  sessionId?: string
+  deviceId?: string
 ): Uri.Uri {
   if (clientId != null) {
     return Uri.appendPath(
       Uri.toString(
         Uri.parseAndAddParams('/ws', {
           clientId,
-          sessionId,
+          deviceId,
         })
       ),
       Uri.parse(config.network.renderingHost)

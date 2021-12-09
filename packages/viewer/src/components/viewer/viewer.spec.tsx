@@ -22,6 +22,7 @@ import {
   key1,
   key2,
 } from '../../testing/viewer';
+import * as Storage from '../../lib/storage';
 
 describe('vertex-viewer', () => {
   (loadImageBytes as jest.Mock).mockReturnValue({
@@ -39,7 +40,6 @@ describe('vertex-viewer', () => {
   });
 
   const clientId = random.string({ alpha: true });
-  const sessionId = random.string({ alpha: true });
   const token = random.string({ alpha: true });
 
   const screenPos0 = { screenX: 0, screenY: 0 };
@@ -318,26 +318,48 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe('session ids', () => {
-    it('passes the specified session id if provided', async () => {
+  describe('device id', () => {
+    it('generates and stores device id', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
-        template: () => (
-          <vertex-viewer
-            clientId={clientId}
-            stream={stream}
-            sessionId={sessionId}
-          />
-        ),
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+      });
+
+      const storedDeviceId = Storage.getStorageEntry(
+        Storage.StorageKeys.DEVICE_ID,
+        (records) => records['device-id']
+      );
+
+      const load = jest.spyOn(stream, 'load');
+      await loadViewerStreamKey(key1, { stream, ws, viewer });
+
+      expect(storedDeviceId).toBe(viewer.deviceId);
+      expect(load).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        storedDeviceId,
+        expect.anything()
+      );
+    });
+
+    it('uses stored device id if available', async () => {
+      jest
+        .spyOn(Storage, 'getStorageEntry')
+        .mockImplementation(() => 'some-device-id');
+
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
       const load = jest.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
+      expect(viewer.deviceId).toBe('some-device-id');
       expect(load).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        sessionId,
+        viewer.deviceId,
         expect.anything()
       );
     });
