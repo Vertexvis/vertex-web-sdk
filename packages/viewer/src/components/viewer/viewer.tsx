@@ -131,6 +131,7 @@ export class Viewer {
    * Property used for internals or testing.
    *
    * @private
+   * @internal
    */
   @Prop() public deviceId?: string;
 
