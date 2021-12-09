@@ -402,16 +402,16 @@ export class SceneTree {
     upperBound: number,
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
-    console.log(
-      'Updating multiselection between ' + lowerBound + ' and ' + upperBound
-    );
     const rowsToMultiSelect = this.rows.filter(
-      (row) => row.index && row.index <= upperBound && row.index >= lowerBound
+      (row) =>
+        row?.index && row?.index <= upperBound && row?.index >= lowerBound
     );
     this.multiSelectedRows = rowsToMultiSelect;
     if (viewer && rowsToMultiSelect) {
       await rowsToMultiSelect.forEach((row) => {
-        selectItem(viewer, row?.node?.id?.hex, { append: true });
+        if (row?.node?.id?.hex) {
+          selectItem(viewer, row?.node?.id?.hex, { append: true });
+        }
       });
     }
   }
@@ -445,21 +445,38 @@ export class SceneTree {
           await this.selectItem(nextNode, options);
         }
       } else if (options.inclusive) {
-        const index = await this.controller?.expandParentNodes(id);
-        const selectedRows = await this.rows.filter((row) => row.node.selected);
+        const currentRowIndex = await this.controller?.expandParentNodes(id);
+        const selectedRows = await this.rows.filter(
+          (row) => row?.node?.selected
+        );
+        const selectionLowerBoundIndex = selectedRows[0]?.index;
+        const selectionUpperBoundIndex =
+          selectedRows[selectedRows?.length - 1]?.index;
 
-        if (index < selectedRows[0].index) {
-          this.performMultiSelection(index, selectedRows[0].index, viewer);
-        } else if (index > selectedRows[selectedRows.length - 1].index) {
+        if (
+          currentRowIndex &&
+          selectionLowerBoundIndex &&
+          currentRowIndex < selectionLowerBoundIndex
+        ) {
           this.performMultiSelection(
-            selectedRows[selectedRows.length - 1].index,
-            index,
+            currentRowIndex,
+            selectionLowerBoundIndex,
             viewer
           );
-        } else {
+        } else if (
+          currentRowIndex &&
+          selectionUpperBoundIndex &&
+          currentRowIndex > selectionUpperBoundIndex
+        ) {
           this.performMultiSelection(
-            selectedRows[0].index,
-            selectedRows[selectedRows.length - 1].index,
+            selectionUpperBoundIndex,
+            currentRowIndex,
+            viewer
+          );
+        } else if (selectionLowerBoundIndex && selectionUpperBoundIndex) {
+          this.performMultiSelection(
+            selectionLowerBoundIndex,
+            selectionUpperBoundIndex,
             viewer
           );
         }
