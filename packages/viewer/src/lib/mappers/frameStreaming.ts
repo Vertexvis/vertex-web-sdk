@@ -288,7 +288,7 @@ export const fromPbStartStreamResponse: M.Func<
   {
     streamId: string;
     sceneViewId: string;
-    sessionId: string;
+    sessionId?: string;
     worldOrientation: Orientation;
     token: Token;
   }
@@ -304,7 +304,7 @@ export const fromPbStartStreamResponse: M.Func<
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sessionId', fromPbUuid)
+      M.mapProp('sessionId', M.ifDefined(fromPbUuid))
     ),
     M.compose(
       M.requiredProp('startStream'),
@@ -318,7 +318,7 @@ export const fromPbStartStreamResponse: M.Func<
   ([streamId, sceneViewId, sessionId, worldOrientation, token]) => ({
     streamId,
     sceneViewId,
-    sessionId,
+    sessionId: sessionId || undefined,
     worldOrientation,
     token,
   })
