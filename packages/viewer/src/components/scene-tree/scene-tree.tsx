@@ -32,7 +32,6 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { writeDOM } from '../../lib/stencil';
 import { SceneTreeErrorDetails } from './lib/errors';
 import { MetadataKey } from './interfaces';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
@@ -264,17 +263,23 @@ export class SceneTree {
     itemId: string,
     options: ScrollToOptions = {}
   ): Promise<void> {
+    const rowsBeforeExpand = this.totalRows;
     const index = await this.controller?.expandParentNodes(itemId);
 
-    return new Promise((resolve) => {
-      // Scroll to the row after StencilJS has updated the DOM.
-      writeDOM(async () => {
-        if (index != null) {
+    if (index != null && rowsBeforeExpand !== this.totalRows) {
+      return new Promise((resolve) => {
+        const layoutEl = this.getLayoutElement();
+        const handleLayoutRendered = async (): Promise<void> => {
+          layoutEl.removeEventListener('layoutRendered', handleLayoutRendered);
           await this.scrollToIndex(index, options);
-        }
-        resolve();
+          resolve();
+        };
+
+        layoutEl.addEventListener('layoutRendered', handleLayoutRendered);
       });
-    });
+    } else if (index != null) {
+      await this.scrollToIndex(index, options);
+    }
   }
 
   /**

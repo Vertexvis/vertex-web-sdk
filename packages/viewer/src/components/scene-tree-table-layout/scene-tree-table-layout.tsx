@@ -6,6 +6,8 @@ import {
   State,
   Element,
   Method,
+  Event,
+  EventEmitter,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
@@ -159,6 +161,9 @@ export class SceneTreeTableLayout {
   @Prop({ mutable: true })
   public viewportEndIndex = 0;
 
+  @Event()
+  public layoutRendered!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -193,8 +198,6 @@ export class SceneTreeTableLayout {
   };
 
   private lastStartIndex = 0;
-  private scrollToTop?: number;
-  private scrollToOptions?: Pick<DomScrollToOptions, 'behavior'>;
   private resizeObserver?: ResizeObserver;
   private headerResizeObserver?: ResizeObserver;
 
@@ -256,7 +259,8 @@ export class SceneTreeTableLayout {
 
   public componentDidRender(): void {
     this.layoutColumns();
-    this.updateScrollTop();
+
+    this.layoutRendered.emit();
   }
 
   public disconnectedCallback(): void {
@@ -285,9 +289,6 @@ export class SceneTreeTableLayout {
     if (this.tableElement != null) {
       scrollToTop(this.tableElement, top, options);
     }
-
-    this.scrollToTop = top;
-    this.scrollToOptions = options;
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -384,19 +385,6 @@ export class SceneTreeTableLayout {
     });
   };
 
-  private updateScrollTop = (): void => {
-    if (
-      this.tableElement != null &&
-      this.scrollToTop != null &&
-      this.scrollToOptions != null
-    ) {
-      scrollToTop(this.tableElement, this.scrollToTop, this.scrollToOptions);
-
-      this.scrollToTop = undefined;
-      this.scrollToOptions = undefined;
-    }
-  };
-
   private updateCell = (
     row: LoadedRow,
     cell: HTMLElement,
@@ -408,6 +396,7 @@ export class SceneTreeTableLayout {
     cell.style.top = `${
       (this.viewportStartIndex + rowIndex) * this.rowHeight
     }px`;
+    cell.style.boxSizing = 'border-box';
     cell.style.height = `${this.rowHeight}px`;
     cell.style.width = '100%';
     cell.style.paddingLeft = cellPaddingLeft(row.node.depth);
@@ -579,6 +568,7 @@ export class SceneTreeTableLayout {
 
   private computeCellHeight = async (): Promise<void> => {
     if (this.isComputingCellHeight && this.columnElements.length > 0) {
+      console.log('computing cell height');
       const dummyData: LoadedRow = {
         index: 0,
         node: {

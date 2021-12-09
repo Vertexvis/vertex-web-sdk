@@ -14,6 +14,13 @@
 | `tree`          | --                | A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.                                                                                                                                                                                        | `HTMLVertexSceneTreeElement \| undefined`              | `undefined` |
 
 
+## Events
+
+| Event            | Description | Type                |
+| ---------------- | ----------- | ------------------- |
+| `layoutRendered` |             | `CustomEvent<void>` |
+
+
 ## Methods
 
 ### `scrollToPosition(top: number, options: Pick<DomScrollToOptions, 'behavior'>) => Promise<void>`

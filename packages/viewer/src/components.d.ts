@@ -1536,6 +1536,7 @@ declare namespace LocalJSX {
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;
+    onLayoutRendered?: (event: CustomEvent<void>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
