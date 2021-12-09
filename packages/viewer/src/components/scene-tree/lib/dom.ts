@@ -12,11 +12,3 @@ export function getSceneTreeContainsElement(
 ): boolean {
   return el.contains(other);
 }
-
-export function scrollToTop(
-  el: HTMLElement,
-  top: number,
-  options: Pick<ScrollToOptions, 'behavior'>
-): void {
-  el.scrollTo({ top, ...options });
-}

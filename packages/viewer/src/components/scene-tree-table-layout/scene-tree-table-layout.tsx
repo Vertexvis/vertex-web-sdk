@@ -1,4 +1,12 @@
-import { Component, Host, h, Prop, State, Element } from '@stencil/core';
+import {
+  Component,
+  Host,
+  h,
+  Prop,
+  State,
+  Element,
+  Method,
+} from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
   Binding,
@@ -13,8 +21,10 @@ import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import { RowDataProvider } from '../scene-tree/scene-tree';
 import {
+  DomScrollToOptions,
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
+  scrollToTop,
 } from './lib/dom';
 
 interface StateMap {
@@ -183,6 +193,8 @@ export class SceneTreeTableLayout {
   };
 
   private lastStartIndex = 0;
+  private scrollToTop?: number;
+  private scrollToOptions?: Pick<DomScrollToOptions, 'behavior'>;
   private resizeObserver?: ResizeObserver;
   private headerResizeObserver?: ResizeObserver;
 
@@ -244,6 +256,7 @@ export class SceneTreeTableLayout {
 
   public componentDidRender(): void {
     this.layoutColumns();
+    this.updateScrollTop();
   }
 
   public disconnectedCallback(): void {
@@ -256,6 +269,25 @@ export class SceneTreeTableLayout {
     this.resizeObserver?.disconnect();
     this.stateMap.columnWidths = [];
     this.stateMap.columnWidthPercentages = [];
+  }
+
+  /**
+   * Scrolls the table to the provided top value.
+   *
+   * @param top The position to scroll to.
+   * @param options A set of options to configure the scrolling behavior.
+   */
+  @Method()
+  public async scrollToPosition(
+    top: number,
+    options: Pick<DomScrollToOptions, 'behavior'>
+  ): Promise<void> {
+    if (this.tableElement != null) {
+      scrollToTop(this.tableElement, top, options);
+    }
+
+    this.scrollToTop = top;
+    this.scrollToOptions = options;
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -350,6 +382,19 @@ export class SceneTreeTableLayout {
         }
       });
     });
+  };
+
+  private updateScrollTop = (): void => {
+    if (
+      this.tableElement != null &&
+      this.scrollToTop != null &&
+      this.scrollToOptions != null
+    ) {
+      scrollToTop(this.tableElement, this.scrollToTop, this.scrollToOptions);
+
+      this.scrollToTop = undefined;
+      this.scrollToOptions = undefined;
+    }
   };
 
   private updateCell = (

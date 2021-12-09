@@ -24,7 +24,7 @@ import {
 } from './lib/controller';
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import { getSceneTreeContainsElement, scrollToTop } from './lib/dom';
+import { getSceneTreeContainsElement } from './lib/dom';
 import {
   deselectItem,
   hideItem,
@@ -245,7 +245,8 @@ export class SceneTree {
     const i = Math.max(0, Math.min(index, this.totalRows));
 
     const top = this.getScrollToPosition(i, position);
-    scrollToTop(this.getRowsScrollElement(), top, {
+
+    this.getLayoutElement().scrollToPosition(top, {
       behavior: animate ? 'smooth' : undefined,
     });
   }
