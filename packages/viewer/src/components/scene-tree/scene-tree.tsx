@@ -394,26 +394,22 @@ export class SceneTree {
    *
    * @param lowerBound The smaller index of the set of rows to select.
    * @param upperBound The larger index of the set of rows to select.
-   * @param viewer The viewer to select in.
    */
   @Method()
-  public async performMultiSelection(
+  public async selectRange(
     lowerBound: number,
-    upperBound: number,
-    viewer: HTMLVertexViewerElement
+    upperBound: number
   ): Promise<void> {
     const rowsToMultiSelect = this.rows.filter(
       (row) =>
         row?.index && row?.index <= upperBound && row?.index >= lowerBound
     );
     this.multiSelectedRows = rowsToMultiSelect;
-    if (viewer && rowsToMultiSelect) {
-      await rowsToMultiSelect.forEach((row) => {
-        if (row?.node?.id?.hex) {
-          selectItem(viewer, row?.node?.id?.hex, { append: true });
-        }
-      });
-    }
+    await rowsToMultiSelect.forEach((row) => {
+      if (row?.node?.id?.hex && this.viewer) {
+        selectItem(this.viewer, row?.node?.id?.hex, { append: true });
+      }
+    });
   }
 
   /**
@@ -458,27 +454,15 @@ export class SceneTree {
           selectionLowerBoundIndex &&
           currentRowIndex < selectionLowerBoundIndex
         ) {
-          this.performMultiSelection(
-            currentRowIndex,
-            selectionLowerBoundIndex,
-            viewer
-          );
+          this.selectRange(currentRowIndex, selectionLowerBoundIndex);
         } else if (
           currentRowIndex &&
           selectionUpperBoundIndex &&
           currentRowIndex > selectionUpperBoundIndex
         ) {
-          this.performMultiSelection(
-            selectionUpperBoundIndex,
-            currentRowIndex,
-            viewer
-          );
+          this.selectRange(selectionUpperBoundIndex, currentRowIndex);
         } else if (selectionLowerBoundIndex && selectionUpperBoundIndex) {
-          this.performMultiSelection(
-            selectionLowerBoundIndex,
-            selectionUpperBoundIndex,
-            viewer
-          );
+          this.selectRange(selectionLowerBoundIndex, selectionUpperBoundIndex);
         }
       } else {
         await selectItem(viewer, id, options);

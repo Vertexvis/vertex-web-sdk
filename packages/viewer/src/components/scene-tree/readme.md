@@ -390,16 +390,6 @@ Type: `Promise<void>`
 
 
 
-### `performMultiSelection(lowerBound: number, upperBound: number, viewer: HTMLVertexViewerElement) => Promise<void>`
-
-Performs an API call that will select the items with indexes between the given bounds.
-
-#### Returns
-
-Type: `Promise<void>`
-
-
-
 ### `scrollToIndex(index: number, options?: ScrollToOptions) => Promise<void>`
 
 Scrolls the tree to the given row index.
@@ -432,6 +422,16 @@ stateful. Each call to `selectItem` will track the ancestry of the passed
 in `rowArg`. If calling `selectItem` with a row not belonging to the
 ancestry of a previous selection, then this method will perform a standard
 selection.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+### `selectRange(lowerBound: number, upperBound: number, viewer: HTMLVertexViewerElement) => Promise<void>`
+
+Performs an API call that will select the items with indexes between the given bounds.
 
 #### Returns
 

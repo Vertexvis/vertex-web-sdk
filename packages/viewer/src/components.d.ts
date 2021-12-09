@@ -174,17 +174,6 @@ export namespace Components {
      */
     overScanCount: number;
     /**
-     * Performs an API call that will select the items with indexes between the given bounds.
-     * @param lowerBound The smaller index of the set of rows to select.
-     * @param upperBound The larger index of the set of rows to select.
-     * @param viewer The viewer to select in.
-     */
-    performMultiSelection: (
-      lowerBound: number,
-      upperBound: number,
-      viewer: HTMLVertexViewerElement
-    ) => Promise<void>;
-    /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
@@ -210,6 +199,17 @@ export namespace Components {
     selectItem: (
       row: RowArg,
       { recurseParent, ...options }?: SelectItemOptions
+    ) => Promise<void>;
+    /**
+     * Performs an API call that will select the items with indexes between the given bounds.
+     * @param lowerBound The smaller index of the set of rows to select.
+     * @param upperBound The larger index of the set of rows to select.
+     * @param viewer The viewer to select in.
+     */
+    selectRange: (
+      lowerBound: number,
+      upperBound: number,
+      viewer: HTMLVertexViewerElement
     ) => Promise<void>;
     /**
      * Performs an API call that will show the item associated to the given row or row index.
