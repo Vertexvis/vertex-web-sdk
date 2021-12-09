@@ -337,7 +337,7 @@ export class Viewer {
    *
    * @private
    */
-  @Event() public deviceidchange!: EventEmitter<string>;
+  @Event() public deviceIdChange!: EventEmitter<string>;
 
   @Event() public dimensionschange!: EventEmitter<Dimensions.Dimensions>;
 
@@ -981,7 +981,7 @@ export class Viewer {
         status: 'connected',
         jwt: state.token.token,
       });
-      this.deviceidchange.emit(state.deviceId);
+      this.deviceIdChange.emit(state.deviceId);
     }
 
     if (this.frame !== state.frame) {
