@@ -2,6 +2,7 @@ jest.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
 );
 jest.mock('./lib/dom');
+jest.mock('../scene-tree-table-layout/lib/dom');
 jest.mock('./lib/viewer-ops');
 jest.mock('../viewer/utils');
 jest.mock('../../lib/stencil');
@@ -34,7 +35,6 @@ import {
   getSceneTreeContainsElement,
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
-  scrollToTop,
 } from './lib/dom';
 import { sign } from 'jsonwebtoken';
 import { decodeSceneTreeJwt } from './lib/jwt';
@@ -57,6 +57,7 @@ import {
 import { SceneTreeTableLayout } from '../scene-tree-table-layout/scene-tree-table-layout';
 import { ViewerStream } from '../../lib/stream/stream';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import { scrollToTop } from '../scene-tree-table-layout/lib/dom';
 
 describe('<vertex-scene-tree>', () => {
   const sceneViewId = random.guid();
