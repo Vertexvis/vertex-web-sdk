@@ -1,4 +1,14 @@
-import { Component, Host, h, Prop, State, Element } from '@stencil/core';
+import {
+  Component,
+  Host,
+  h,
+  Prop,
+  State,
+  Element,
+  Method,
+  Event,
+  EventEmitter,
+} from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
   Binding,
@@ -13,8 +23,10 @@ import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import { RowDataProvider } from '../scene-tree/scene-tree';
 import {
+  DomScrollToOptions,
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
+  scrollToTop,
 } from './lib/dom';
 
 interface StateMap {
@@ -149,6 +161,12 @@ export class SceneTreeTableLayout {
   @Prop({ mutable: true })
   public viewportEndIndex = 0;
 
+  /**
+   * @internal
+   */
+  @Event()
+  public layoutRendered!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -244,6 +262,8 @@ export class SceneTreeTableLayout {
 
   public componentDidRender(): void {
     this.layoutColumns();
+
+    this.layoutRendered.emit();
   }
 
   public disconnectedCallback(): void {
@@ -256,6 +276,22 @@ export class SceneTreeTableLayout {
     this.resizeObserver?.disconnect();
     this.stateMap.columnWidths = [];
     this.stateMap.columnWidthPercentages = [];
+  }
+
+  /**
+   * Scrolls the table to the provided top value.
+   *
+   * @param top The position to scroll to.
+   * @param options A set of options to configure the scrolling behavior.
+   */
+  @Method()
+  public async scrollToPosition(
+    top: number,
+    options: Pick<DomScrollToOptions, 'behavior'>
+  ): Promise<void> {
+    if (this.tableElement != null) {
+      scrollToTop(this.tableElement, top, options);
+    }
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -363,6 +399,7 @@ export class SceneTreeTableLayout {
     cell.style.top = `${
       (this.viewportStartIndex + rowIndex) * this.rowHeight
     }px`;
+    cell.style.boxSizing = 'border-box';
     cell.style.height = `${this.rowHeight}px`;
     cell.style.width = '100%';
     cell.style.paddingLeft = cellPaddingLeft(row.node.depth);
