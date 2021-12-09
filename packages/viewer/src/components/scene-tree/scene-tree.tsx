@@ -793,14 +793,6 @@ export class SceneTree {
     }
   }
 
-  private getRowsScrollElement(): HTMLElement {
-    if (this.rowScrollEl != null) {
-      return this.rowScrollEl;
-    } else {
-      throw new Error('Row scroll element is undefined.');
-    }
-  }
-
   private getLayoutElement(): HTMLVertexSceneTreeTableLayoutElement {
     if (this.stateMap.layoutEl != null) {
       return this.stateMap.layoutEl;
