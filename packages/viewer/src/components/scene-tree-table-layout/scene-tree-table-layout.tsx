@@ -161,6 +161,9 @@ export class SceneTreeTableLayout {
   @Prop({ mutable: true })
   public viewportEndIndex = 0;
 
+  /**
+   * @internal
+   */
   @Event()
   public layoutRendered!: EventEmitter<void>;
 
