@@ -17,9 +17,9 @@ import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
+import { Row } from './components/scene-tree/lib/row';
 import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
-import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
 import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
@@ -168,10 +168,22 @@ export namespace Components {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys: MetadataKey[];
+    multiSelectedRows?: Row[];
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
     overScanCount: number;
+    /**
+     * Performs an API call that will select the items with indexes between the given bounds.
+     * @param lowerBound The smaller index of the set of rows to select.
+     * @param upperBound The larger index of the set of rows to select.
+     * @param viewer The viewer to select in.
+     */
+    performMultiSelection: (
+      lowerBound: number,
+      upperBound: number,
+      viewer: HTMLVertexViewerElement
+    ) => Promise<void>;
     /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
@@ -1409,6 +1421,7 @@ declare namespace LocalJSX {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
+    multiSelectedRows?: Row[];
     onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.

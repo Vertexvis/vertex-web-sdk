@@ -3,6 +3,7 @@ import { ColorMaterial } from '../../..';
 export interface ViewerSelectItemOptions {
   material?: string | ColorMaterial.ColorMaterial;
   append?: boolean;
+  inclusive?: boolean;
 }
 
 export async function showItem(

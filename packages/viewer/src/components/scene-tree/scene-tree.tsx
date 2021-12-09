@@ -183,6 +183,9 @@ export class SceneTree {
   @Prop({ mutable: true })
   public controller?: SceneTreeController;
 
+  @Prop({ mutable: true })
+  public multiSelectedRows?: Row[];
+
   /**
    * A list of part metadata keys that will be made available to each row. This
    * metadata can be used for data binding inside the scene tree's template.
@@ -387,6 +390,33 @@ export class SceneTree {
   }
 
   /**
+   * Performs an API call that will select the items with indexes between the given bounds.
+   *
+   * @param lowerBound The smaller index of the set of rows to select.
+   * @param upperBound The larger index of the set of rows to select.
+   * @param viewer The viewer to select in.
+   */
+  @Method()
+  public async performMultiSelection(
+    lowerBound: number,
+    upperBound: number,
+    viewer: HTMLVertexViewerElement
+  ): Promise<void> {
+    console.log(
+      'Updating multiselection between ' + lowerBound + ' and ' + upperBound
+    );
+    const rowsToMultiSelect = this.rows.filter(
+      (row) => row.index && row.index <= upperBound && row.index >= lowerBound
+    );
+    this.multiSelectedRows = rowsToMultiSelect;
+    if (viewer && rowsToMultiSelect) {
+      await rowsToMultiSelect.forEach((row) => {
+        selectItem(viewer, row?.node?.id?.hex, { append: true });
+      });
+    }
+  }
+
+  /**
    * Performs an API call that will select the item associated to the given row
    * or row index.
    *
@@ -413,6 +443,25 @@ export class SceneTree {
         const nextNode = ancestors.find(({ selected }) => !selected);
         if (nextNode != null) {
           await this.selectItem(nextNode, options);
+        }
+      } else if (options.inclusive) {
+        const index = await this.controller?.expandParentNodes(id);
+        const selectedRows = await this.rows.filter((row) => row.node.selected);
+
+        if (index < selectedRows[0].index) {
+          this.performMultiSelection(index, selectedRows[0].index, viewer);
+        } else if (index > selectedRows[selectedRows.length - 1].index) {
+          this.performMultiSelection(
+            selectedRows[selectedRows.length - 1].index,
+            index,
+            viewer
+          );
+        } else {
+          this.performMultiSelection(
+            selectedRows[0].index,
+            selectedRows[selectedRows.length - 1].index,
+            viewer
+          );
         }
       } else {
         await selectItem(viewer, id, options);
