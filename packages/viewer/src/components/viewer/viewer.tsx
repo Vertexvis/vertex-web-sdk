@@ -1175,13 +1175,13 @@ export class Viewer {
     if (this.deviceId == null) {
       this.deviceId = getStorageEntry(
         StorageKeys.DEVICE_ID,
-        (entry) => entry['id']
+        (entry) => entry['device-id']
       );
 
       if (this.deviceId == null) {
         this.deviceId = UUID.create();
         upsertStorageEntry(StorageKeys.DEVICE_ID, {
-          ['id']: this.deviceId,
+          ['device-id']: this.deviceId,
         });
       }
     }

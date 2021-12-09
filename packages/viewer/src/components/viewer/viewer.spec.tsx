@@ -327,7 +327,7 @@ describe('vertex-viewer', () => {
 
       const storedDeviceId = Storage.getStorageEntry(
         Storage.StorageKeys.DEVICE_ID,
-        (records) => records['id']
+        (records) => records['device-id']
       );
 
       const load = jest.spyOn(stream, 'load');
