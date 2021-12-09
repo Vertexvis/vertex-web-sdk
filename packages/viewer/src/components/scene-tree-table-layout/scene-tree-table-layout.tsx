@@ -571,7 +571,6 @@ export class SceneTreeTableLayout {
 
   private computeCellHeight = async (): Promise<void> => {
     if (this.isComputingCellHeight && this.columnElements.length > 0) {
-      console.log('computing cell height');
       const dummyData: LoadedRow = {
         index: 0,
         node: {

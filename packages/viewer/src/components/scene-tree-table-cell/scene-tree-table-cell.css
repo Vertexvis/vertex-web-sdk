@@ -4,8 +4,6 @@
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  width: 50px;
-  position: relative;
 
   /**
    * @prop --scene-tree-cell-background-hover: A CSS background of a cell when
