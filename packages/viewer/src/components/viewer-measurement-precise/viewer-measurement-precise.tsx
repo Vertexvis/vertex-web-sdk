@@ -78,7 +78,8 @@ export class ViewerMeasurementPrecise {
     this.measurementController = new MeasurementController(
       this.measurementModel,
       client,
-      () => this.viewer?.token
+      () => this.viewer?.token,
+      this.viewer?.deviceId
     );
   }
 

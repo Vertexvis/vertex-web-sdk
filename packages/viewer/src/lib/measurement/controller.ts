@@ -26,7 +26,8 @@ export class MeasurementController {
   public constructor(
     private model: MeasurementModel,
     private client: SceneViewAPIClient,
-    private jwtProvider: JwtProvider
+    private jwtProvider: JwtProvider,
+    private deviceId: string | undefined
   ) {}
 
   /**
@@ -112,6 +113,10 @@ export class MeasurementController {
   ): Promise<void> {
     await requestUnary(async (handler) => {
       const meta = await createMetadata(this.jwtProvider);
+
+      if (this.deviceId !== undefined) {
+        meta.append('x-device-id', this.deviceId);
+      }
 
       const entitySet = new Set(entities);
       const newPrevious = previous.filter((e) => !entitySet.has(e));
