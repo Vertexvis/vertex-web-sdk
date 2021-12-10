@@ -97,7 +97,7 @@ export class MeasurementController {
     const entities = this.model.getEntities().map((e) => e.toProto());
 
     const res = await requestUnary<MeasureResponse>(async (handler) => {
-      const meta = await createMetadata(this.jwtProvider);
+      const meta = await createMetadata(this.jwtProvider, this.deviceId);
       const req = new MeasureRequest();
       req.setEntitiesList(entities);
 
@@ -112,11 +112,7 @@ export class MeasurementController {
     entities: MeasurementEntity[]
   ): Promise<void> {
     await requestUnary(async (handler) => {
-      const meta = await createMetadata(this.jwtProvider);
-
-      if (this.deviceId !== undefined) {
-        meta.append('x-device-id', this.deviceId);
-      }
+      const meta = await createMetadata(this.jwtProvider, this.deviceId);
 
       const entitySet = new Set(entities);
       const newPrevious = previous.filter((e) => !entitySet.has(e));
