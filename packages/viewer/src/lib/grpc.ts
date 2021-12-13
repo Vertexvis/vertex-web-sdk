@@ -31,12 +31,11 @@ export async function createMetadata(
 ): Promise<grpc.Metadata> {
   const jwt = await jwtProvider();
   const meta = new grpc.Metadata({
-    'jwt-context': JSON.stringify({ jwt }),
+    'jwt-context': JSON.stringify({
+      jwt,
+      metadata: { 'x-device-id': deviceId || '' },
+    }),
   });
-
-  if (deviceId !== undefined) {
-    meta.append('x-device-id', deviceId);
-  }
 
   return meta;
 }
