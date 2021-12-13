@@ -28,7 +28,13 @@ describe('MeasurementController', () => {
 
   const client = new SceneViewAPIClient(random.url());
   const jwtProvider = (): string => random.string();
-  const controller = new MeasurementController(model, client, jwtProvider);
+  const deviceId = random.string();
+  const controller = new MeasurementController(
+    model,
+    client,
+    jwtProvider,
+    deviceId
+  );
 
   beforeEach(() => {
     model.clearResults();

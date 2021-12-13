@@ -26,10 +26,16 @@ export function requestUnary<R, E = unknown>(
 }
 
 export async function createMetadata(
-  jwtProvider: JwtProvider
+  jwtProvider: JwtProvider,
+  deviceId?: string
 ): Promise<grpc.Metadata> {
   const jwt = await jwtProvider();
-  return new grpc.Metadata({
-    'jwt-context': JSON.stringify({ jwt }),
+  const meta = new grpc.Metadata({
+    'jwt-context': JSON.stringify({
+      jwt,
+      metadata: { 'x-device-id': deviceId || '' },
+    }),
   });
+
+  return meta;
 }
