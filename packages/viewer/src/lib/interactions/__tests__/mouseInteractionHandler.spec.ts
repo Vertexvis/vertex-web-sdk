@@ -100,6 +100,21 @@ describe(MouseInteractionHandler, () => {
     expect(rotateInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
+  it('begins a drag and performs the primary interaction if the middle mouse button is pressed', async () => {
+    const middleMouseEvent = new MouseEvent('mousemove', {
+      screenX: 110,
+      screenY: 60,
+      buttons: 4,
+      bubbles: true,
+    });
+
+    handler.setDefaultKeyboardControls(true);
+    await simulateCustomMouseEvent(middleMouseEvent, 50);
+
+    expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
+    expect(zoomInteraction.drag).not.toHaveBeenCalled();
+  });
+
   it('begins a drag and does a twist op if alt/shift are pressed', async () => {
     handler.setDefaultKeyboardControls(true);
     await simulateTwistEvent(50);

@@ -211,7 +211,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.currentInteraction = this.rotateInteraction;
     }
 
-    if (event.buttons === 1) {
+    if (event.buttons === 1 || event.buttons === 4) {
       this.draggingInteraction =
         this.currentInteraction || this.primaryInteraction;
     } else if (event.buttons === 2) {
@@ -268,7 +268,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected handleMouseWheel(event: WheelEvent): void {
     event.preventDefault();
 
-    if (this.element != null && this.interactionApi != null) {
+    if (
+      this.element != null &&
+      this.interactionApi != null &&
+      event.buttons !== 4
+    ) {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
       const rect = this.element.getBoundingClientRect();
