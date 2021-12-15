@@ -97,6 +97,20 @@ describe(InteractionApi, () => {
     });
   });
 
+  describe(InteractionApi.prototype.viewAll, () => {
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.viewAll();
+      await api.endInteraction();
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing if not interacting', async () => {
+      await api.viewAll();
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
+    });
+  });
+
   describe(InteractionApi.prototype.rotateCamera, () => {
     it('replaces the camera if interacting', async () => {
       await api.beginInteraction();

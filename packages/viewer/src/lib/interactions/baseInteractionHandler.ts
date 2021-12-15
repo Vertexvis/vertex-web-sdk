@@ -45,6 +45,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private computedBodyStyle?: CSSStyleDeclaration;
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
+  private clickCount = 0;
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -141,6 +142,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleDownEvent(event: BaseEvent): void {
+    this.clickCount = this.clickCount + 1;
+
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.downPositionCanvas = this.getCanvasPosition(event);
@@ -151,6 +154,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         this.handleWindowMove(this.lastMoveEvent);
       }
     }, this.getConfig().interactions.interactionDelay);
+
+    window.setTimeout(() => {
+      if (this.clickCount === 2) {
+        this.handleDoubleClick(event);
+      }
+      this.clickCount = 0;
+    }, 250);
 
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
@@ -198,6 +208,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
     window.removeEventListener(this.upEvent, this.handleWindowUp);
     this.lastMoveEvent = undefined;
+  }
+
+  protected async handleDoubleClick(event: BaseEvent): Promise<void> {
+    if (event.buttons === 4 && this.interactionApi != null) {
+      this.interactionApi.beginInteraction();
+      this.interactionApi.viewAll();
+    }
   }
 
   protected beginDrag(event: BaseEvent): void {
