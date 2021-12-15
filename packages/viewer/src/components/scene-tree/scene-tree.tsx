@@ -214,8 +214,6 @@ export class SceneTree {
   @Element()
   private el!: HTMLElement;
 
-  private rowScrollEl?: HTMLElement;
-
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
    * data in your scene tree has changed, and you want to update the row's
@@ -612,7 +610,7 @@ export class SceneTree {
           </slot>
         </div>
 
-        <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
+        <div class="rows-scroll">
           <slot />
         </div>
 
