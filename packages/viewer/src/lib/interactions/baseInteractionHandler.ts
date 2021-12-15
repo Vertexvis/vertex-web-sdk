@@ -160,7 +160,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         this.handleDoubleClick(event);
       }
       this.clickCount = 0;
-    }, 250);
+    }, this.getConfig().interactions.doubleClickDelay);
 
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
