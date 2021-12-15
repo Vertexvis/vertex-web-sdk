@@ -255,7 +255,10 @@ export class SceneTreeController {
 
     viewer.addEventListener('sceneReady', handleSceneReady);
     return {
-      dispose: () => viewer.removeEventListener('sceneReady', handleSceneReady),
+      dispose: () => {
+        viewer.removeEventListener('sceneReady', handleSceneReady);
+        this.disconnect();
+      },
     };
   }
 
