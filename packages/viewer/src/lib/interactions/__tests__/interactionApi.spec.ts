@@ -98,16 +98,9 @@ describe(InteractionApi, () => {
   });
 
   describe(InteractionApi.prototype.viewAll, () => {
-    it('replaces the camera if interacting', async () => {
-      await api.beginInteraction();
+    it('replaces the camera', async () => {
       await api.viewAll();
-      await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
-    });
-
-    it('does nothing if not interacting', async () => {
-      await api.viewAll();
-      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });
 

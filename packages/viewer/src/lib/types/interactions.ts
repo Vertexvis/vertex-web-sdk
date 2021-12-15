@@ -18,16 +18,10 @@ export interface InteractionConfig {
    * update the camera.
    */
   interactionDelay: number;
-
-  /**
-   * The amount of time between two clicks to be considered a double click.
-   */
-  doubleClickDelay: number;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThreshold: 1,
   coarsePointerThreshold: 3,
   interactionDelay: 75,
-  doubleClickDelay: 250,
 };

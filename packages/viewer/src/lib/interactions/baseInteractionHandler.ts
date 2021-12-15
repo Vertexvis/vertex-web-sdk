@@ -45,7 +45,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private computedBodyStyle?: CSSStyleDeclaration;
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
-  private clickCount = 0;
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -62,17 +61,20 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);
     this.handleWindowUp = this.handleWindowUp.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.interactionApi = api;
     element.addEventListener(this.downEvent, this.handleDownEvent);
+    element.addEventListener('mousedown', this.handleDoubleClick);
     element.addEventListener('wheel', this.handleMouseWheel);
   }
 
   public dispose(): void {
     this.element?.removeEventListener(this.downEvent, this.handleDownEvent);
+    this.element?.removeEventListener('mousedown', this.handleDoubleClick);
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
     this.element = undefined;
   }
@@ -142,8 +144,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleDownEvent(event: BaseEvent): void {
-    this.clickCount = this.clickCount + 1;
-
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.downPositionCanvas = this.getCanvasPosition(event);
@@ -154,13 +154,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         this.handleWindowMove(this.lastMoveEvent);
       }
     }, this.getConfig().interactions.interactionDelay);
-
-    window.setTimeout(() => {
-      if (this.clickCount === 2) {
-        this.handleDoubleClick(event);
-      }
-      this.clickCount = 0;
-    }, this.getConfig().interactions.doubleClickDelay);
 
     window.addEventListener(this.moveEvent, this.handleWindowMove);
     window.addEventListener(this.upEvent, this.handleWindowUp);
@@ -211,8 +204,12 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected async handleDoubleClick(event: BaseEvent): Promise<void> {
-    if (event.buttons === 4 && this.interactionApi != null) {
-      this.interactionApi.beginInteraction();
+    // event.detail is the number of clicks that have happened recently. If the number is 2, then the user double clicked.
+    if (
+      event.detail === 2 &&
+      event.buttons === 4 &&
+      this.interactionApi != null
+    ) {
       this.interactionApi.viewAll();
     }
   }

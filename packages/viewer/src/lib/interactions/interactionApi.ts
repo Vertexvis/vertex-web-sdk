@@ -315,9 +315,7 @@ export class InteractionApi {
    * for the updated scene.
    */
   public async viewAll(): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
-      return camera.viewAll();
-    });
+    await this.getScene().camera().viewAll().render();
   }
 
   /**
