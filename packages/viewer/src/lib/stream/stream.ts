@@ -254,12 +254,6 @@ export class ViewerStream extends StreamApi {
     requestStream: () => Promise<StreamResult>,
     { maxRetries = 3 }: { maxRetries?: number } = {}
   ): Promise<void> {
-    if (this.clientId == null) {
-      console.warn(
-        'Client ID not provided, using legacy path. A Client ID will be required in an upcoming release.'
-      );
-    }
-
     const descriptor = getWebsocketDescriptor(
       getWebsocketUri(
         this.config,
@@ -426,6 +420,9 @@ export class ViewerStream extends StreamApi {
     const whenRequested = this.onRequest((msg) => {
       const isReconnectMsg = msg.request.gracefulReconnection != null;
       if (isReconnectMsg && this.state.type === 'connected') {
+        console.debug(
+          'Received request for graceful reconnect. Closing connection and attempting reconnect.'
+        );
         this.closeAndReconnect(this.state);
       }
     });
@@ -471,18 +468,27 @@ export class ViewerStream extends StreamApi {
     const restartTimer = (): void => {
       clearTimer();
 
+      const delayInSec = this.options.offlineThresholdInSeconds;
+      console.debug(
+        `Detected that host is offline. Will attempt reconnect in ${delayInSec}s.`
+      );
+
       timer = window.setTimeout(() => {
         if (this.state.type === 'connected') {
-          super.log('Host is offline, closing WS connection.');
           this.closeAndReconnect(this.state);
         }
-      }, this.options.offlineThresholdInSeconds * 1000);
+      }, delayInSec * 1000);
     };
 
-    window.addEventListener('offline', restartTimer);
-    window.addEventListener('online', clearTimer);
+    const handleOnline = (): void => {
+      console.debug('Detected that host is online.');
+      clearTimer();
+    };
 
-    restartTimer();
+    const handleOffline = (): void => restartTimer();
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
     return {
       dispose: () => {
