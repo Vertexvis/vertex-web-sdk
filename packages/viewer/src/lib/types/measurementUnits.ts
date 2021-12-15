@@ -16,6 +16,14 @@ export type DistanceUnitType =
 
 export type AngleUnitType = 'degrees' | 'radians';
 
+export type AreaUnitType =
+  | 'mm<sup>2</sup>'
+  | 'cm<sup>2</sup>'
+  | 'm<sup>2</sup>'
+  | 'in<sup>2</sup>'
+  | 'ft<sup>2</sup>'
+  | 'yd<sup>2</sup>';
+
 interface Unit {
   name: string;
   abbreviatedName: string;
@@ -226,3 +234,49 @@ export class AngleUnits {
     return this.unit.converter.convertFrom(value);
   }
 }
+
+/**
+ * A class that contains helpers for transforming area units.
+ */
+ export class AreaUnits {
+  private static units: Record<AreaUnitType, Unit> = {
+    "mm<sup>2</sup>": {
+      name: 'Square Millimeters',
+      abbreviatedName: 'mm<sup>2</sup>',
+      converter: new MillimeterUnitConverter(),//TODO: new converters for area
+    },
+    "cm<sup>2</sup>": {
+      name: 'Square Centimeters',
+      abbreviatedName: 'cm<sup>2</sup>',
+      converter: new CentimeterUnitConverter(),
+    },
+    "m<sup>2</sup>": {
+      name: 'Square Meters',
+      abbreviatedName: 'm<sup>2</sup>',
+      converter: new MeterUnitConverter(),
+    },
+    "in<sup>2</sup>": {
+      name: 'Square Inches',
+      abbreviatedName: 'in<sup>2</sup>',
+      converter: new InchesUnitConverter(),
+    },
+    "ft<sup>2</sup>": {
+      name: 'Square Feet',
+      abbreviatedName: 'ft<sup>2</sup>',
+      converter: new FeetUnitConverter(),
+    },
+    "yd<sup>2</sup>": {
+      name: 'Square Yards',
+      abbreviatedName: 'yd<sup>2</sup>',
+      converter: new YardUnitConverter(),
+    },
+  };
+
+  /**
+   * The unit of this measurement.
+   */
+  public readonly unit: Unit;
+
+  public constructor(public readonly unitType: AreaUnitType) {
+    this.unit = AreaUnits.units[unitType];
+  }

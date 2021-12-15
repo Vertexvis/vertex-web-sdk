@@ -10,6 +10,8 @@ import {
 import {
   AngleUnits,
   AngleUnitType,
+  AreaUnits,
+  AreaUnitType,
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
@@ -41,6 +43,12 @@ export class ViewerMeasurementDetails {
   public angleUnits: AngleUnitType = 'degrees';
 
   /**
+   * The unit of area-based measurement.
+   */
+  @Prop()
+  public areaUnits: AreaUnitType = 'mm<sup>2</sup>';
+
+  /**
    * The number of fraction digits to display.
    */
   @Prop()
@@ -61,6 +69,14 @@ export class ViewerMeasurementDetails {
    */
   @Prop()
   public angleFormatter?: Formatter<number>;
+
+  /**
+   * An optional formatter that can be used to format the display of an area.
+   * The formatting function is passed a calculated area and is
+   * expected to return a string.
+   */
+  @Prop()
+  public areaFormatter?: Formatter<number>;
 
   /**
    * An optional set of details to hide. This can be used to display
@@ -112,6 +128,7 @@ export class ViewerMeasurementDetails {
 
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
+  private areaMeasurementUnits = new AreaUnits(this.areaUnits);
   private resultsChangeListener?: Disposable;
 
   public connectedCallback(): void {
@@ -176,6 +193,12 @@ export class ViewerMeasurementDetails {
             {this.formatDistance(this.visibleSummary.minDistance)}
           </div>
         )}
+        {this.visibleSummary?.area != null && (
+          <div class="measurement-details-entry">
+            <div class="measurement-details-entry-label">Area:</div>
+            {this.formatArea(this.visibleSummary.area)}
+          </div>
+        )}
         {this.visibleSummary?.distanceVector?.x != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label x-label">X:</div>
@@ -234,6 +257,17 @@ export class ViewerMeasurementDetails {
         .convertTo(angleInRadians)
         .toFixed(this.fractionalDigits);
       return `${value} ${this.angleMeasurementUnits.unit.abbreviatedName}`;
+    }
+  };
+
+  private formatArea = (area: number): string => {
+    if (this.areaFormatter != null) {
+      return this.areaFormatter(area);
+    } else {
+      const abbreviated = this.distanceMeasurementUnits.unit.abbreviatedName;
+      return area == null
+        ? '---'
+        : `${area.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   };
 
