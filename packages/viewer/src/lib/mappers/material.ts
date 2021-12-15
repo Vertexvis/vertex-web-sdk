@@ -11,7 +11,9 @@ export const fromPbRGBi: M.Func<vertexvis.protobuf.core.IRGBi, Color.Color> =
 export const toPbRGBi: M.Func<Color3, vertexvis.protobuf.core.IRGBi> =
   M.defineMapper(
     (color) => {
-      function createRGBi(color: Color.Color): vertexvis.protobuf.core.IRGBi {
+      function createRGBi(
+        color: Omit<Color.Color, 'a'>
+      ): vertexvis.protobuf.core.IRGBi {
         return { r: color.r, g: color.g, b: color.b };
       }
 
