@@ -302,6 +302,7 @@ export class SceneTreeTableLayout {
           ref={(ref) => (this.headerElement = ref)}
           style={{
             gridTemplateColumns: this.columnGridFixedLayout,
+            display: this.columnElements.length <= 1 ? 'none' : 'initial',
           }}
         >
           <slot name="header" />
