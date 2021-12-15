@@ -527,7 +527,10 @@ export class SceneTree {
     return this.controller?.fetchMetadataKeys() ?? [];
   }
 
-  protected componentWillLoad(): void {
+  /**
+   * @ignore
+   */
+  protected connectedCallback(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
@@ -549,6 +552,13 @@ export class SceneTree {
         this.viewer
       );
     }
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.stateMap.viewerDisposable?.dispose();
   }
 
   /**
