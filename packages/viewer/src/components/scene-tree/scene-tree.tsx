@@ -530,7 +530,14 @@ export class SceneTree {
   /**
    * @ignore
    */
-  protected connectedCallback(): void {
+  protected disconnectedCallback(): void {
+    this.stateMap.viewerDisposable?.dispose();
+  }
+
+  /**
+   * @ignore
+   */
+  protected componentWillLoad(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
         | HTMLVertexViewerElement
@@ -557,13 +564,6 @@ export class SceneTree {
   /**
    * @ignore
    */
-  protected disconnectedCallback(): void {
-    this.stateMap.viewerDisposable?.dispose();
-  }
-
-  /**
-   * @ignore
-   */
   protected async componentDidLoad(): Promise<void> {
     this.ensureLayoutDefined();
 
@@ -577,15 +577,6 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
-
-    this.updateLayoutElement();
-  }
-
-  /**
-   * @ignore
-   */
-  protected componentWillRender(): void {
-    this.updateLayoutElement();
   }
 
   /**
@@ -714,6 +705,7 @@ export class SceneTree {
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
+    this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
       this.connectionErrorDetails = state.connection.details;
@@ -796,7 +788,7 @@ export class SceneTree {
   }
 
   private updateLayoutElement(): void {
-    const layout = this.el.querySelector('vertex-scene-tree-table-layout');
+    const layout = this.stateMap.layoutEl;
     if (layout != null) {
       layout.rows = this.rows;
       layout.tree = this.el as HTMLVertexSceneTreeElement;
