@@ -311,6 +311,14 @@ export class InteractionApi {
   }
 
   /**
+   * Performs a view all operation for the scene's bounding box, and requests a new image
+   * for the updated scene.
+   */
+  public async viewAll(): Promise<void> {
+    await this.getScene().camera().viewAll().render();
+  }
+
+  /**
    * Performs a rotate operation of the scene around the camera's look at point,
    * and requests a new image for the updated scene.
    *
