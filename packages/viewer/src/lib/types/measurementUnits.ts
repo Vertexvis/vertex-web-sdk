@@ -28,7 +28,7 @@ interface UnitConverter<T> {
 }
 
 class ScaledUnitConverter implements UnitConverter<number> {
-  public constructor(public readonly scale: number) {}
+  public constructor(private readonly scale: number) {}
 
   public convertTo(value: number): number {
     return value * this.scale;
