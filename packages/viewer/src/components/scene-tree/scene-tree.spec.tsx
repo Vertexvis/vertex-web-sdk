@@ -205,6 +205,45 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
+  describe('disconnecting', () => {
+    it('disconnects when tree is removed from DOM', async () => {
+      const client = mockSceneTreeClient();
+      mockGetTree({ client });
+
+      const onStateChange = jest.fn();
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({
+          controller,
+          stream,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                viewerSelector="#viewer1"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
+              <vertex-viewer id="viewer2" stream={stream} clientId={clientId} />
+            </div>
+          ),
+        });
+
+      loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await waitForSceneTreeConnected();
+
+      controller.onStateChange.on(onStateChange);
+      tree.remove();
+      await page.waitForChanges();
+
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({ type: 'disconnected' }),
+        })
+      );
+    });
+  });
+
   describe('viewer', () => {
     it('fetches tree for scene view of new viewer', async () => {
       const client = mockSceneTreeClient();

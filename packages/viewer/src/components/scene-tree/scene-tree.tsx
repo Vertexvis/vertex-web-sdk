@@ -214,8 +214,6 @@ export class SceneTree {
   @Element()
   private el!: HTMLElement;
 
-  private rowScrollEl?: HTMLElement;
-
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
    * data in your scene tree has changed, and you want to update the row's
@@ -529,6 +527,16 @@ export class SceneTree {
     return this.controller?.fetchMetadataKeys() ?? [];
   }
 
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.stateMap.viewerDisposable?.dispose();
+  }
+
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     if (this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
@@ -569,15 +577,6 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
-
-    this.updateLayoutElement();
-  }
-
-  /**
-   * @ignore
-   */
-  protected componentWillRender(): void {
-    this.updateLayoutElement();
   }
 
   /**
@@ -612,7 +611,7 @@ export class SceneTree {
           </slot>
         </div>
 
-        <div ref={(ref) => (this.rowScrollEl = ref)} class="rows-scroll">
+        <div class="rows-scroll">
           <slot />
         </div>
 
@@ -706,6 +705,7 @@ export class SceneTree {
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
+    this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
       this.connectionErrorDetails = state.connection.details;
@@ -788,7 +788,7 @@ export class SceneTree {
   }
 
   private updateLayoutElement(): void {
-    const layout = this.el.querySelector('vertex-scene-tree-table-layout');
+    const layout = this.stateMap.layoutEl;
     if (layout != null) {
       layout.rows = this.rows;
       layout.tree = this.el as HTMLVertexSceneTreeElement;
