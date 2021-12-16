@@ -5,6 +5,7 @@ import {
   createMinimumDistanceResult,
   createPlanarAngleResult,
   createPlanarDistanceResult,
+  createSurfaceAreaResult,
 } from '../../../testing';
 import { mapMeasureResponse, mapMeasureResponseOrThrow } from '../mapper';
 
@@ -23,6 +24,12 @@ describe('mapMeasureResponse', () => {
 
   it('maps a response with a minimum distance', () => {
     const resp = createMeasureResponse(createMinimumDistanceResult());
+    const res = mapMeasureResponse(resp.toObject());
+    expect(M.isInvalid(res)).toBe(false);
+  });
+
+  it('maps a response with a surface area', () => {
+    const resp = createMeasureResponse(createSurfaceAreaResult());
     const res = mapMeasureResponse(resp.toObject());
     expect(M.isInvalid(res)).toBe(false);
   });

@@ -4,6 +4,7 @@ import {
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
+  SurfaceAreaMeasurementResult,
 } from './model';
 
 export interface MeasurementDetailsSummary {
@@ -26,6 +27,8 @@ export function summarizeResults(
         return { ...summary, ...summarizeFromPlanarAngleResult(result) };
       case 'planar-distance':
         return { ...summary, ...summarizePlanarDistanceResult(result) };
+      case 'surface-area':
+        return { ...summary, ...summarizeSurfaceAreaResult(result) };
     }
   }, {});
 }
@@ -57,5 +60,13 @@ function summarizeFromPlanarAngleResult(
 ): MeasurementDetailsSummary {
   return {
     angle: result.angle,
+  };
+}
+
+function summarizeSurfaceAreaResult(
+  result: SurfaceAreaMeasurementResult
+): MeasurementDetailsSummary {
+  return {
+    area: result.area,
   };
 }

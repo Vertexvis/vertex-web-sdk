@@ -10,6 +10,7 @@ import {
 import {
   AngleUnits,
   AngleUnitType,
+  AreaUnits,
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
@@ -63,6 +64,14 @@ export class ViewerMeasurementDetails {
   public angleFormatter?: Formatter<number>;
 
   /**
+   * An optional formatter that can be used to format the display of an area.
+   * The formatting function is passed a calculated area and is
+   * expected to return a string.
+   */
+  @Prop()
+  public areaFormatter?: Formatter<number>;
+
+  /**
    * An optional set of details to hide. This can be used to display
    * reduced sets of details for more a more focused representation.
    * Can be provided as an array of keys from the `MeasurementDetailsSummary`
@@ -112,6 +121,7 @@ export class ViewerMeasurementDetails {
 
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
+  private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;
 
   public connectedCallback(): void {
@@ -135,6 +145,7 @@ export class ViewerMeasurementDetails {
   @Watch('distanceUnits')
   protected handleDistanceUnitsChanged(): void {
     this.distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
+    this.areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   }
 
   @Watch('angleUnits')
@@ -174,6 +185,12 @@ export class ViewerMeasurementDetails {
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label">Min Dist:</div>
             {this.formatDistance(this.visibleSummary.minDistance)}
+          </div>
+        )}
+        {this.visibleSummary?.area != null && (
+          <div class="measurement-details-entry">
+            <div class="measurement-details-entry-label">Area:</div>
+            <div innerHTML={this.formatArea(this.visibleSummary.area)} />
           </div>
         )}
         {this.visibleSummary?.distanceVector?.x != null && (
@@ -234,6 +251,19 @@ export class ViewerMeasurementDetails {
         .convertTo(angleInRadians)
         .toFixed(this.fractionalDigits);
       return `${value} ${this.angleMeasurementUnits.unit.abbreviatedName}`;
+    }
+  };
+
+  private formatArea = (area: number): string => {
+    const realArea = this.areaMeasurementUnits.convertWorldValueToReal(area);
+
+    if (this.areaFormatter != null) {
+      return this.areaFormatter(area);
+    } else {
+      const abbreviated = this.areaMeasurementUnits.unit.abbreviatedName;
+      return realArea == null
+        ? '---'
+        : `${realArea.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   };
 

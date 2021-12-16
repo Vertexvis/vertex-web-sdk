@@ -854,6 +854,10 @@ export namespace Components {
      */
     angleUnits: AngleUnitType;
     /**
+     * An optional formatter that can be used to format the display of an area. The formatting function is passed a calculated area and is expected to return a string.
+     */
+    areaFormatter?: Formatter<number>;
+    /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */
     distanceFormatter?: Formatter<number>;
@@ -2043,6 +2047,10 @@ declare namespace LocalJSX {
      * The unit of angle-based measurement.
      */
     angleUnits?: AngleUnitType;
+    /**
+     * An optional formatter that can be used to format the display of an area. The formatting function is passed a calculated area and is expected to return a string.
+     */
+    areaFormatter?: Formatter<number>;
     /**
      * An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string.
      */

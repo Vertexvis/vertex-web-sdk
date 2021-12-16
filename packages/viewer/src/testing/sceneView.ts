@@ -9,6 +9,7 @@ import {
   PlanarAngleResult,
   PlanarDistanceResult,
   PlanePair,
+  SurfaceAreaResult,
 } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
 import { MeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { random } from './random';
@@ -48,6 +49,14 @@ export function createMinimumDistanceResult(): MeasurementResult {
   distance.setClosestPoint1(createVector3());
   distance.setClosestPoint2(createVector3());
   result.setMinimumDistance(distance);
+  return result;
+}
+
+export function createSurfaceAreaResult(): MeasurementResult {
+  const result = new MeasurementResult();
+  const area = new SurfaceAreaResult();
+  area.setArea(random.floating());
+  result.setTotalSurfaceArea(area);
   return result;
 }
 

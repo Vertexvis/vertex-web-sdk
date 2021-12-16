@@ -45,3 +45,10 @@
 .measurement-details-entry-label.z-label {
   color: var(--viewer-measurement-details-z-color);
 }
+
+.measurement-details-entry-label-superscript {
+  font-size: 0.6rem;
+  position: relative;
+  bottom: 0.3em;
+  line-height: initial;
+}
