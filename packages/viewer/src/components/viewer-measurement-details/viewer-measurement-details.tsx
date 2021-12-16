@@ -272,7 +272,6 @@ export class ViewerMeasurementDetails {
     const hidden = this.hiddenDetails ?? [];
 
     this.summary = baseSummary;
-    console.log('baseSummary', baseSummary);
     this.visibleSummary = (
       Object.keys(baseSummary) as Array<keyof MeasurementDetailsSummary>
     )
