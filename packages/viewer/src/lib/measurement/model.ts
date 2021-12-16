@@ -140,7 +140,8 @@ export interface SurfaceAreaMeasurementResult {
 export type MeasurementResult =
   | MinimumDistanceMeasurementResult
   | PlanarAngleMeasurementResult
-  | PlanarDistanceMeasurementResult;
+  | PlanarDistanceMeasurementResult
+  | SurfaceAreaMeasurementResult;
 
 /**
  * An outcome containing the results of the measurement.

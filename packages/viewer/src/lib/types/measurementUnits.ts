@@ -16,14 +16,6 @@ export type DistanceUnitType =
 
 export type AngleUnitType = 'degrees' | 'radians';
 
-export type AreaUnitType =
-  | 'mm<sup>2</sup>'
-  | 'cm<sup>2</sup>'
-  | 'm<sup>2</sup>'
-  | 'in<sup>2</sup>'
-  | 'ft<sup>2</sup>'
-  | 'yd<sup>2</sup>';
-
 interface Unit {
   name: string;
   abbreviatedName: string;
@@ -36,7 +28,7 @@ interface UnitConverter<T> {
 }
 
 class ScaledUnitConverter implements UnitConverter<number> {
-  public constructor(private readonly scale: number) {}
+  public constructor(public readonly scale: number) {}
 
   public convertTo(value: number): number {
     return value * this.scale;
@@ -54,32 +46,32 @@ class MillimeterUnitConverter extends ScaledUnitConverter {
 }
 
 class CentimeterUnitConverter extends ScaledUnitConverter {
-  public constructor() {
-    super(1 / 100);
+  public constructor(power = 1) {
+    super(1 / Math.pow(10, power));
   }
 }
 
 class MeterUnitConverter extends ScaledUnitConverter {
-  public constructor() {
-    super(1 / 1000);
+  public constructor(power = 1) {
+    super(1 / Math.pow(1000, power));
   }
 }
 
 class InchesUnitConverter extends ScaledUnitConverter {
-  public constructor() {
-    super(1 / 25.4);
+  public constructor(power = 1) {
+    super(1 / Math.pow(25.4, power));
   }
 }
 
 class FeetUnitConverter extends ScaledUnitConverter {
-  public constructor() {
-    super(1 / (25.4 * 12));
+  public constructor(power = 1) {
+    super(1 / Math.pow(25.4 * 12, power));
   }
 }
 
 class YardUnitConverter extends ScaledUnitConverter {
-  public constructor() {
-    super(1 / (25.4 * 12 * 3));
+  public constructor(power = 1) {
+    super(1 / Math.pow(25.4 * 12 * 3, power));
   }
 }
 
@@ -239,36 +231,42 @@ export class AngleUnits {
  * A class that contains helpers for transforming area units.
  */
 export class AreaUnits {
-  private static units: Record<AreaUnitType, Unit> = {
-    'mm<sup>2</sup>': {
+  private static units: Record<DistanceUnitType, Unit> = {
+    millimeters: {
       name: 'Square Millimeters',
-      abbreviatedName: 'mm<sup>2</sup>',
-      converter: new MillimeterUnitConverter(), //TODO: new converters for area
+      abbreviatedName:
+        'mm<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new MillimeterUnitConverter(),
     },
-    'cm<sup>2</sup>': {
+    centimeters: {
       name: 'Square Centimeters',
-      abbreviatedName: 'cm<sup>2</sup>',
-      converter: new CentimeterUnitConverter(),
+      abbreviatedName:
+        'cm<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new CentimeterUnitConverter(2),
     },
-    'm<sup>2</sup>': {
+    meters: {
       name: 'Square Meters',
-      abbreviatedName: 'm<sup>2</sup>',
-      converter: new MeterUnitConverter(),
+      abbreviatedName:
+        'm<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new MeterUnitConverter(2),
     },
-    'in<sup>2</sup>': {
+    inches: {
       name: 'Square Inches',
-      abbreviatedName: 'in<sup>2</sup>',
-      converter: new InchesUnitConverter(),
+      abbreviatedName:
+        'in<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new InchesUnitConverter(2),
     },
-    'ft<sup>2</sup>': {
+    feet: {
       name: 'Square Feet',
-      abbreviatedName: 'ft<sup>2</sup>',
-      converter: new FeetUnitConverter(),
+      abbreviatedName:
+        'ft<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new FeetUnitConverter(2),
     },
-    'yd<sup>2</sup>': {
+    yards: {
       name: 'Square Yards',
-      abbreviatedName: 'yd<sup>2</sup>',
-      converter: new YardUnitConverter(),
+      abbreviatedName:
+        'yd<span class=measurement-details-entry-label-superscript>2</span>',
+      converter: new YardUnitConverter(2),
     },
   };
 
@@ -277,7 +275,27 @@ export class AreaUnits {
    */
   public readonly unit: Unit;
 
-  public constructor(public readonly unitType: AreaUnitType) {
+  public constructor(public readonly unitType: DistanceUnitType) {
     this.unit = AreaUnits.units[unitType];
+  }
+
+  /**
+   * Translates a world space value to a real space value.
+   *
+   * @param value A world space value to translate.
+   * @returns A value in real space units.
+   */
+  public convertWorldValueToReal(value: number): number {
+    return this.unit.converter.convertTo(value);
+  }
+
+  /**
+   * Translates a real space value to a world space value.
+   *
+   * @param value A real space value to translate.
+   * @returns A world space value.
+   */
+  public convertRealValueToWorld(value: number): number {
+    return this.unit.converter.convertFrom(value);
   }
 }

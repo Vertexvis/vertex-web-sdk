@@ -11,7 +11,6 @@ import {
   AngleUnits,
   AngleUnitType,
   AreaUnits,
-  AreaUnitType,
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
@@ -41,12 +40,6 @@ export class ViewerMeasurementDetails {
    */
   @Prop()
   public angleUnits: AngleUnitType = 'degrees';
-
-  /**
-   * The unit of area-based measurement.
-   */
-  @Prop()
-  public areaUnits: AreaUnitType = 'mm<sup>2</sup>';
 
   /**
    * The number of fraction digits to display.
@@ -128,7 +121,7 @@ export class ViewerMeasurementDetails {
 
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
-  private areaMeasurementUnits = new AreaUnits(this.areaUnits);
+  private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;
 
   public connectedCallback(): void {
@@ -152,6 +145,7 @@ export class ViewerMeasurementDetails {
   @Watch('distanceUnits')
   protected handleDistanceUnitsChanged(): void {
     this.distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
+    this.areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   }
 
   @Watch('angleUnits')
@@ -196,7 +190,7 @@ export class ViewerMeasurementDetails {
         {this.visibleSummary?.area != null && (
           <div class="measurement-details-entry">
             <div class="measurement-details-entry-label">Area:</div>
-            {this.formatArea(this.visibleSummary.area)}
+            <div innerHTML={this.formatArea(this.visibleSummary.area)} />
           </div>
         )}
         {this.visibleSummary?.distanceVector?.x != null && (
@@ -261,13 +255,15 @@ export class ViewerMeasurementDetails {
   };
 
   private formatArea = (area: number): string => {
+    const realArea = this.areaMeasurementUnits.convertWorldValueToReal(area);
+
     if (this.areaFormatter != null) {
       return this.areaFormatter(area);
     } else {
-      const abbreviated = this.distanceMeasurementUnits.unit.abbreviatedName;
-      return area == null
+      const abbreviated = this.areaMeasurementUnits.unit.abbreviatedName;
+      return realArea == null
         ? '---'
-        : `${area.toFixed(this.fractionalDigits)} ${abbreviated}`;
+        : `${realArea.toFixed(this.fractionalDigits)} ${abbreviated}`;
     }
   };
 
