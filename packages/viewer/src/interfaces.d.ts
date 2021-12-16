@@ -1,7 +1,7 @@
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
-export type Color3 = Color.Color | string | number;
+export type Color3 = Omit<Color.Color, 'a'> | string | number;
 
 export type FrameType = 'final' | 'all' | undefined;
 

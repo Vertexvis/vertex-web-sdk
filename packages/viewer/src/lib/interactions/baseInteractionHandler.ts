@@ -61,17 +61,20 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);
     this.handleWindowUp = this.handleWindowUp.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.interactionApi = api;
     element.addEventListener(this.downEvent, this.handleDownEvent);
+    element.addEventListener('mousedown', this.handleDoubleClick);
     element.addEventListener('wheel', this.handleMouseWheel);
   }
 
   public dispose(): void {
     this.element?.removeEventListener(this.downEvent, this.handleDownEvent);
+    this.element?.removeEventListener('mousedown', this.handleDoubleClick);
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
     this.element = undefined;
   }
@@ -198,6 +201,17 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     window.removeEventListener(this.moveEvent, this.handleWindowMove);
     window.removeEventListener(this.upEvent, this.handleWindowUp);
     this.lastMoveEvent = undefined;
+  }
+
+  protected async handleDoubleClick(event: BaseEvent): Promise<void> {
+    // event.detail is the number of clicks that have happened recently. If the number is 2, then the user double clicked.
+    if (
+      event.detail === 2 &&
+      event.buttons === 4 &&
+      this.interactionApi != null
+    ) {
+      this.interactionApi.viewAll();
+    }
   }
 
   protected beginDrag(event: BaseEvent): void {
