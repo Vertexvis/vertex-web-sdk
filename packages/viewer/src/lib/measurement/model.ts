@@ -120,6 +120,21 @@ export interface PointToPointMeasurementResult {
 }
 
 /**
+ * A measurement result that represents the surface area of one or more faces.
+ */
+export interface SurfaceAreaMeasurementResult {
+  /**
+   * The type.
+   */
+  type: 'surface-area';
+
+  /**
+   * The total area of selected face or faces.
+   */
+  area: number;
+}
+
+/**
  * A type representing the possible measurement results.
  */
 export type MeasurementResult =

@@ -4,6 +4,7 @@ import type {
   PlanarDistanceResult as PbPlanarDistanceResult,
   PlanarAngleResult as PbPlanarAngleResult,
   MinimumDistanceResult as PbMinimumDistanceResult,
+  SurfaceAreaResult as PbSurfaceAreaResult,
   PlanePair as PbPlanePair,
 } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
 import { Mapper as M } from '@vertexvis/utils';
@@ -13,6 +14,7 @@ import {
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
+  SurfaceAreaMeasurementResult,
 } from '../measurement/model';
 import { fromPbPlane, fromPbVector3f } from '../mappers';
 import { Plane } from '@vertexvis/geometry';
@@ -85,6 +87,14 @@ const mapMinimumDistance: M.Func<
   })
 );
 
+const mapSurfaceArea: M.Func<
+  PbSurfaceAreaResult.AsObject,
+  SurfaceAreaMeasurementResult
+> = M.defineMapper(M.read(M.getProp('area')), ([area]) => ({
+  type: 'surface-area',
+  area,
+}));
+
 const mapPlanarDistanceFromResult: M.Func<
   PbMeasurementResult.AsObject,
   PlanarDistanceMeasurementResult | undefined | null
@@ -100,6 +110,11 @@ const mapMinimumDistanceFromResult: M.Func<
   MinimumDistanceMeasurementResult | undefined | null
 > = M.mapProp('minimumDistance', M.ifDefined(mapMinimumDistance));
 
+const mapSurfaceAreaFromResult: M.Func<
+  PbMeasurementResult.AsObject,
+  SurfaceAreaMeasurementResult | undefined | null
+> = M.mapProp('totalSurfaceArea', M.ifDefined(mapSurfaceArea));
+
 const mapMeasurementResult: M.Func<
   PbMeasurementResult.AsObject,
   MeasurementResult
@@ -107,7 +122,8 @@ const mapMeasurementResult: M.Func<
   M.pickFirst(
     mapPlanarDistanceFromResult,
     mapPlanarAngleFromResult,
-    mapMinimumDistanceFromResult
+    mapMinimumDistanceFromResult,
+    mapSurfaceAreaFromResult
   ),
   M.required('Result field')
 );
