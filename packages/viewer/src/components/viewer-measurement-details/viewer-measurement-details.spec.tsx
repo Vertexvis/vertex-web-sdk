@@ -68,7 +68,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain('1.00 cm');
+    ).toContain('10.00 cm');
 
     measurementDetails.distanceFormatter = () => 'formatted distance';
     await page.waitForChanges();
@@ -116,6 +116,40 @@ describe('vertex-viewer-measurement-details', () => {
         'div.measurement-details-entry'
       )?.innerHTML
     ).toContain('formatted angle');
+  });
+
+  it('formats areas', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => <vertex-viewer-measurement-details />,
+    });
+
+    const measurementDetails =
+      page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    measurementDetails.visibleSummary = {
+      area: 100,
+    };
+
+    await page.waitForChanges();
+
+    measurementDetails.distanceUnits = 'centimeters';
+    await page.waitForChanges();
+    expect(
+      measurementDetails.shadowRoot?.querySelector(
+        'div.measurement-details-entry'
+      )?.innerHTML
+    ).toContain(
+      '1.00 cm<span class="measurement-details-entry-label-superscript">2</span>'
+    );
+
+    measurementDetails.areaFormatter = () => 'formatted area';
+    await page.waitForChanges();
+    expect(
+      measurementDetails.shadowRoot?.querySelector(
+        'div.measurement-details-entry'
+      )?.innerHTML
+    ).toContain('formatted area');
   });
 
   it('responds to result changes', async () => {
