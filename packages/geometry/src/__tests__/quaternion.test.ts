@@ -22,7 +22,7 @@ describe(Quaternion.fromAxisAngle, () => {
     const m = Matrix4.makeRotation(q);
     const e = Euler.fromRotationMatrix(m);
 
-    expect(e.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(e.y).toBeCloseTo(Angle.toRadians(90));
   });
 });
 

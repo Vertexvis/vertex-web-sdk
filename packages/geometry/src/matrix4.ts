@@ -132,13 +132,14 @@ export function makeTranslation(translation: Vector3.Vector3): Matrix4 {
  * Creates a rotation matrix.
  *
  * ```
- * 1-2y²-2z²,    2xy+2zw,    2xz-2yw,    0,
- * 2xy-2zw,      1-2x²-2z²,  2yz+2xw,    0,
- * 2xz+2yw,      2yz-2xw,    1-2x²-2y²,  0,
+ * 1-2y²-2z²,    2xy-2zw,    2xz+2yw,    0,
+ * 2xy+2zw,      1-2x²-2z²,  2yz-2xw,    0,
+ * 2xz-2yw,      2yz+2xw,    1-2x²-2y²,  0,
  * 0,            0,          0,          1,
  * ```
  *
  * @param rotation A quaternion representing the rotation.
+ * @see https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
  * @returns A rotation matrix.
  */
 export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
@@ -159,9 +160,9 @@ export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
 
   /* eslint-disable prettier/prettier */
   return [
-    1 - ( yy + zz ), xy - wz, xz + wy, 0,
-    xy + wz, 1 - ( xx + zz ), yz - wx, 0,
-    xz - wy, yz + wx, 1 - ( xx + yy ), 0,
+    1 - ( yy + zz ), xy + wz, xz - wy, 0,
+    xy - wz, 1 - ( xx + zz ), yz + wx, 0,
+    xz + wy, yz - wx, 1 - ( xx + yy ), 0,
     0, 0, 0, 1
   ];
   /* eslint-enable prettier/prettier */

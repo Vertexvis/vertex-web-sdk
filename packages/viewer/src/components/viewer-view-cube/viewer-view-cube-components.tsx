@@ -24,20 +24,20 @@ const viewCubeSides: Record<ViewCubeSide, ViewCubeSideData> = {
     quaternion: Quaternion.fromAxisAngle(Vector3.up(), Math.PI),
   },
   left: {
-    direction: Vector3.right(),
+    direction: Vector3.left(),
     quaternion: Quaternion.fromAxisAngle(Vector3.down(), Math.PI / 2),
   },
   right: {
-    direction: Vector3.left(),
+    direction: Vector3.right(),
     quaternion: Quaternion.fromAxisAngle(Vector3.up(), Math.PI / 2),
   },
   top: {
     direction: Vector3.up(),
-    quaternion: Quaternion.fromAxisAngle(Vector3.right(), Math.PI / 2),
+    quaternion: Quaternion.fromAxisAngle(Vector3.right(), -Math.PI / 2),
   },
   bottom: {
     direction: Vector3.down(),
-    quaternion: Quaternion.fromAxisAngle(Vector3.left(), Math.PI / 2),
+    quaternion: Quaternion.fromAxisAngle(Vector3.left(), -Math.PI / 2),
   },
 };
 
