@@ -166,7 +166,7 @@ export class SceneTreeTableCell {
           )}
 
           <div class="content">
-            {this.value != null ? (
+            {this.value != null && this.value.trim() !== '' ? (
               <slot>{this.displayValue()}</slot>
             ) : (
               <slot name="placeholder">{this.placeholder}</slot>
@@ -203,7 +203,7 @@ export class SceneTreeTableCell {
 
   private displayValue = (): string => {
     const resp =
-      this.value == null || this.value.replace(' ', '') === ''
+      this.value == null || this.value.trim() === ''
         ? this.placeholder
         : this.value;
 
