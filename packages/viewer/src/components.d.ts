@@ -659,10 +659,8 @@ export namespace Components {
      * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
      * @param markup The markup to add.
      * @returns The markup element that was created.
-     * @see {
-     * @link ViewerMarkups.arrowTemplateId}
-     * @see {
-     * @link ViewerMarkups.circleTemplateId}
+     * @see {@link ViewerMarkups.arrowTemplateId}
+     * @see {@link ViewerMarkups.circleTemplateId}
      */
     addMarkup: (
       markup: Markup
@@ -691,8 +689,7 @@ export namespace Components {
      * Returns the markup element associated to the given ID.
      * @param id The ID of the markup element to return.
      * @returns A markup element, or `undefined`.
-     * @see {
-     * @link ViewerMarkup.getMarkupElements}
+     * @see {@link ViewerMarkup.getMarkupElements}
      */
     getMarkupElement: (
       id: string
@@ -705,8 +702,7 @@ export namespace Components {
     /**
      * Returns a list of markup elements that are children of this component.
      * @returns A list of all markups.
-     * @see {
-     * @link ViewerMarkup.getMarkupElement}
+     * @see {@link ViewerMarkup.getMarkupElement}
      */
     getMarkupElements: () => Promise<
       Array<
@@ -1035,8 +1031,7 @@ export namespace Components {
      * Adds a new measurement as a child to this component. A new measurement component will be created from the template specified by `distance-template-id` or if undefined a default element will be created.
      * @param measurement The measurement to add.
      * @returns The measurement element that was created.
-     * @see {
-     * @link ViewerMeasurements.distanceTemplateId}
+     * @see {@link ViewerMeasurements.distanceTemplateId}
      */
     addMeasurement: (
       measurement: Measurement
@@ -1057,8 +1052,7 @@ export namespace Components {
      * Returns the measurement element associated to the given ID.
      * @param id The ID of the measurement element to return.
      * @returns A measurement element, or `undefined`.
-     * @see {
-     * @link ViewerMeasurements.getMeasurementElements}
+     * @see {@link ViewerMeasurements.getMeasurementElements}
      */
     getMeasurementElement: (
       id: string
@@ -1066,8 +1060,7 @@ export namespace Components {
     /**
      * Returns a list of measurement elements that are children of this component.
      * @returns A list of all measurements.
-     * @see {
-     * @link ViewerMeasurements.getMeasurementElement}
+     * @see {@link ViewerMeasurements.getMeasurementElement}
      */
     getMeasurementElements: () => Promise<
       HTMLVertexViewerMeasurementDistanceElement[]
