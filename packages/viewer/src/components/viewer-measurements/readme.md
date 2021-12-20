@@ -207,7 +207,7 @@ component will be created from the template specified by
 
 Type: `Promise<HTMLVertexViewerMeasurementDistanceElement>`
 
-
+The measurement element that was created.
 
 ### `getMeasurementElement(id: string) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
@@ -217,7 +217,7 @@ Returns the measurement element associated to the given ID.
 
 Type: `Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
-
+A measurement element, or `undefined`.
 
 ### `getMeasurementElements() => Promise<HTMLVertexViewerMeasurementDistanceElement[]>`
 
@@ -227,7 +227,7 @@ Returns a list of measurement elements that are children of this component.
 
 Type: `Promise<HTMLVertexViewerMeasurementDistanceElement[]>`
 
-
+A list of all measurements.
 
 ### `removeMeasurement(id: string) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
@@ -239,7 +239,7 @@ found.
 
 Type: `Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>`
 
-
+The measurement element, or undefined.
 
 
 ## Dependencies

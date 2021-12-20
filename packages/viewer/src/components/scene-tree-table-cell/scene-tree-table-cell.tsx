@@ -164,7 +164,17 @@ export class SceneTreeTableCell {
               )}
             </button>
           )}
-          <div class="content">{this.displayValue()}</div>
+          {this.value && (
+            <slot>
+              <div class="content">{this.displayValue()}</div>
+            </slot>
+          )}
+
+          {!this.value && (
+            <slot name="placeholder">
+              <div class="content">{this.placeholder}</div>
+            </slot>
+          )}
           {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
@@ -195,9 +205,12 @@ export class SceneTreeTableCell {
   }
 
   private displayValue = (): string => {
-    return this.value == null || this.value.replace(' ', '') === ''
-      ? this.placeholder
-      : this.value;
+    const resp =
+      this.value == null || this.value.replace(' ', '') === ''
+        ? this.placeholder
+        : this.value;
+
+    return resp;
   };
 
   private handleCellPointerDown = (event: PointerEvent): void => {
