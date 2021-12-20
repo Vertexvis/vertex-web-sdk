@@ -778,7 +778,7 @@ export class SceneTree {
       <vertex-scene-tree-table-column>
         <template>
           <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle>
-            {{row.node.name}}
+            <div style="width:100%;">{{row.node.name}}</div>
           </vertex-scene-tree-table-cell>
         </template>
       </vertex-scene-tree-table-column>
