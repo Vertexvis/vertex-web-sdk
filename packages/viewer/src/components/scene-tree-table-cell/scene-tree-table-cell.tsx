@@ -164,6 +164,7 @@ export class SceneTreeTableCell {
               )}
             </button>
           )}
+
           {this.value && (
             <slot>
               <div class="content">{this.displayValue()}</div>
