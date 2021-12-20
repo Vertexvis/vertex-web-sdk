@@ -12,12 +12,12 @@ export class StandardView {
   /**
    * A standard view that positions the camera facing the left of the scene.
    */
-  public static LEFT = new StandardView(Vector3.right(), Vector3.up());
+  public static RIGHT = new StandardView(Vector3.left(), Vector3.up());
 
   /**
    * A standard view that positions the camera facing the right of the scene.
    */
-  public static RIGHT = new StandardView(Vector3.left(), Vector3.up());
+  public static LEFT = new StandardView(Vector3.right(), Vector3.up());
 
   /**
    * A standard view that positions the camera facing the back of the scene.
