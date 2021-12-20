@@ -221,12 +221,12 @@ export class ViewerViewCube {
               <TriadAxis
                 label="Y"
                 length={this.boxLength}
-                rotationAxis={Vector3.forward()}
+                rotationAxis={Vector3.back()}
               />
               <TriadAxis
                 label="Z"
                 length={this.boxLength}
-                rotationAxis={Vector3.up()}
+                rotationAxis={Vector3.down()}
               />
             </vertex-viewer-dom-group>
           )}
@@ -257,14 +257,14 @@ export class ViewerViewCube {
               label={this.xNegativeLabel}
               length={this.boxLength}
               side="left"
-              onPointerDown={this.handleStandardView(StandardView.LEFT)}
+              onPointerDown={this.handleStandardView(StandardView.RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeSide
               label={this.xPositiveLabel}
               length={this.boxLength}
               side="right"
-              onPointerDown={this.handleStandardView(StandardView.RIGHT)}
+              onPointerDown={this.handleStandardView(StandardView.LEFT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeSide
@@ -296,7 +296,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="front"
               face1Edge="right"
-              face2Side="left"
+              face2Side="right"
               face2Edge="left"
               onPointerDown={this.handleStandardView(StandardView.FRONT_LEFT)}
               disabled={this.standardViewsOff}
@@ -314,7 +314,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="front"
               face1Edge="left"
-              face2Side="right"
+              face2Side="left"
               face2Edge="right"
               onPointerDown={this.handleStandardView(StandardView.FRONT_RIGHT)}
               disabled={this.standardViewsOff}
@@ -323,7 +323,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="top"
               face1Edge="right"
-              face2Side="left"
+              face2Side="right"
               face2Edge="top"
               onPointerDown={this.handleStandardView(StandardView.TOP_LEFT)}
               disabled={this.standardViewsOff}
@@ -332,7 +332,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="back"
               face1Edge="left"
-              face2Side="left"
+              face2Side="right"
               face2Edge="right"
               onPointerDown={this.handleStandardView(StandardView.BACK_LEFT)}
               disabled={this.standardViewsOff}
@@ -341,7 +341,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="bottom"
               face1Edge="right"
-              face2Side="left"
+              face2Side="right"
               face2Edge="bottom"
               onPointerDown={this.handleStandardView(StandardView.BOTTOM_LEFT)}
               disabled={this.standardViewsOff}
@@ -359,7 +359,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="back"
               face1Edge="right"
-              face2Side="right"
+              face2Side="left"
               face2Edge="left"
               onPointerDown={this.handleStandardView(StandardView.BACK_RIGHT)}
               disabled={this.standardViewsOff}
@@ -377,7 +377,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="top"
               face1Edge="left"
-              face2Side="right"
+              face2Side="left"
               face2Edge="top"
               onPointerDown={this.handleStandardView(StandardView.TOP_RIGHT)}
               disabled={this.standardViewsOff}
@@ -386,7 +386,7 @@ export class ViewerViewCube {
               length={this.boxLength}
               face1Side="bottom"
               face1Edge="left"
-              face2Side="right"
+              face2Side="left"
               face2Edge="bottom"
               onPointerDown={this.handleStandardView(StandardView.BOTTOM_RIGHT)}
               disabled={this.standardViewsOff}
@@ -399,7 +399,7 @@ export class ViewerViewCube {
               face1Corner="bottom-left"
               face2Side="front"
               face2Corner="top-left"
-              face3Side="right"
+              face3Side="left"
               face3Corner="top-right"
               onPointerDown={this.handleStandardView(
                 StandardView.TOP_FRONT_RIGHT
@@ -412,7 +412,7 @@ export class ViewerViewCube {
               face1Corner="bottom-right"
               face2Side="front"
               face2Corner="top-right"
-              face3Side="left"
+              face3Side="right"
               face3Corner="top-left"
               onPointerDown={this.handleStandardView(
                 StandardView.TOP_FRONT_LEFT
@@ -425,7 +425,7 @@ export class ViewerViewCube {
               face1Corner="top-right"
               face2Side="front"
               face2Corner="bottom-right"
-              face3Side="left"
+              face3Side="right"
               face3Corner="bottom-left"
               onPointerDown={this.handleStandardView(
                 StandardView.BOTTOM_FRONT_LEFT
@@ -438,7 +438,7 @@ export class ViewerViewCube {
               face1Corner="top-left"
               face2Side="front"
               face2Corner="bottom-left"
-              face3Side="right"
+              face3Side="left"
               face3Corner="bottom-right"
               onPointerDown={this.handleStandardView(
                 StandardView.BOTTOM_FRONT_RIGHT
@@ -451,7 +451,7 @@ export class ViewerViewCube {
               face1Corner="top-right"
               face2Side="back"
               face2Corner="top-left"
-              face3Side="left"
+              face3Side="right"
               face3Corner="top-right"
               onPointerDown={this.handleStandardView(
                 StandardView.TOP_BACK_LEFT
@@ -464,7 +464,7 @@ export class ViewerViewCube {
               face1Corner="top-left"
               face2Side="back"
               face2Corner="top-right"
-              face3Side="right"
+              face3Side="left"
               face3Corner="top-left"
               onPointerDown={this.handleStandardView(
                 StandardView.TOP_BACK_RIGHT
@@ -477,7 +477,7 @@ export class ViewerViewCube {
               face1Corner="bottom-left"
               face2Side="back"
               face2Corner="bottom-right"
-              face3Side="right"
+              face3Side="left"
               face3Corner="bottom-left"
               onPointerDown={this.handleStandardView(
                 StandardView.BOTTOM_BACK_RIGHT
@@ -490,7 +490,7 @@ export class ViewerViewCube {
               face1Corner="bottom-right"
               face2Side="back"
               face2Corner="bottom-left"
-              face3Side="left"
+              face3Side="right"
               face3Corner="bottom-right"
               onPointerDown={this.handleStandardView(
                 StandardView.BOTTOM_BACK_LEFT
