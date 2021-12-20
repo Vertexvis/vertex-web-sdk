@@ -165,17 +165,13 @@ export class SceneTreeTableCell {
             </button>
           )}
 
-          {this.value && (
-            <slot>
-              <div class="content">{this.displayValue()}</div>
-            </slot>
-          )}
-
-          {!this.value && (
-            <slot name="placeholder">
-              <div class="content">{this.placeholder}</div>
-            </slot>
-          )}
+          <div class="content">
+            {this.value != null ? (
+              <slot>{this.displayValue()}</slot>
+            ) : (
+              <slot name="placeholder">{this.placeholder}</slot>
+            )}
+          </div>
           {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
