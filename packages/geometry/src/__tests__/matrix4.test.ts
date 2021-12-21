@@ -65,7 +65,7 @@ describe(Matrix4.makeRotation, () => {
     const q = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
     const m = Matrix4.makeRotation(q);
     const e = Euler.fromRotationMatrix(m, 'xyz');
-    expect(e.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(e.y).toBeCloseTo(Angle.toRadians(90));
   });
 });
 
@@ -122,7 +122,7 @@ describe(Matrix4.makeTRS, () => {
     const ss = Vector3.fromMatrixScale(m);
 
     expect(tt).toEqual(t);
-    expect(rr.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(rr.y).toBeCloseTo(Angle.toRadians(90));
     expect(ss).toEqual(s);
   });
 });

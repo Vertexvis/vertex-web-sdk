@@ -317,7 +317,7 @@ for data binding.
 
 Type: `Promise<string[]>`
 
-
+A promise that resolves with the names of available keys.
 
 ### `filterItems(term: string, options?: FilterTreeOptions) => Promise<void>`
 
@@ -328,7 +328,9 @@ that match the given term and options.
 
 Type: `Promise<void>`
 
-
+A promise that completes when the request has completed. Note,
+items are displayed asynchronously. So the displayed items may not reflect
+the result of this filter when the promise completes.
 
 ### `getRowAtClientY(clientY: number) => Promise<Row>`
 
@@ -338,7 +340,7 @@ Returns the row data from the given vertical client position.
 
 Type: `Promise<Row>`
 
-
+A row or `undefined` if the row hasn't been loaded.
 
 ### `getRowAtIndex(index: number) => Promise<Row>`
 
@@ -349,7 +351,7 @@ returns `undefined`.
 
 Type: `Promise<Row>`
 
-
+A row, or `undefined` if the row hasn't been loaded.
 
 ### `getRowForEvent(event: MouseEvent | PointerEvent) => Promise<Row>`
 
@@ -361,7 +363,7 @@ otherwise `undefined` is returned.
 
 Type: `Promise<Row>`
 
-
+A row, or `undefined` if the row hasn't been loaded.
 
 ### `hideItem(row: RowArg) => Promise<void>`
 
@@ -408,7 +410,7 @@ not expanded, the tree will expand each of its parent nodes.
 
 Type: `Promise<void>`
 
-
+A promise that resolves when the operation is finished.
 
 ### `selectItem(row: RowArg, { recurseParent, ...options }?: SelectItemOptions) => Promise<void>`
 
