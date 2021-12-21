@@ -80,10 +80,15 @@ export class MeasurementController {
   }
 
   private measureAndUpdateModel(entities: MeasurementEntity[]): void {
-    this.results = this.measureEntities().then((outcome) => {
-      this.model.replaceResultsWithOutcome(outcome);
-      return this.model.getResults();
-    });
+    if (entities.length > 0) {
+      console.log('measuring', entities.length, 'entities');
+      this.results = this.measureEntities().then((outcome) => {
+        this.model.replaceResultsWithOutcome(outcome);
+        return this.model.getResults();
+      });
+    } else {
+      this.results = Promise.resolve([]);
+    }
   }
 
   private async measureEntities(): Promise<MeasurementOutcome> {
