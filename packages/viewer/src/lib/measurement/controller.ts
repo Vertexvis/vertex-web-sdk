@@ -80,10 +80,7 @@ export class MeasurementController {
   }
 
   private measureAndUpdateModel(entities: MeasurementEntity[]): void {
-    // For now, only request measurements if there are more than two entities.
-    // This is temporary as we'll need to support passing a single entity for
-    // area measurements.
-    if (entities.length > 1) {
+    if (entities.length > 0) {
       this.results = this.measureEntities().then((outcome) => {
         this.model.replaceResultsWithOutcome(outcome);
         return this.model.getResults();
