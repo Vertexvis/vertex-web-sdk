@@ -34,42 +34,42 @@ describe(Euler.fromRotationMatrix, () => {
 
   it('returns xyz euler', () => {
     const euler90 = Euler.fromRotationMatrix(m, 'xyz');
-    expect(euler90.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler90.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yxz euler', () => {
     const euler90 = Euler.fromRotationMatrix(m, 'yxz');
-    expect(euler90.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler90.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zxy euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'zxy');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zyx euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'zyx');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yzx euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'yzx');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zxy euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'zxy');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yzw euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'yzx');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns xzy euler', () => {
     const euler = Euler.fromRotationMatrix(m, 'xzy');
-    expect(euler.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 });
 

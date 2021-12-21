@@ -270,6 +270,14 @@ export class ViewerMarkup {
   /**
    * @ignore
    */
+  @Watch('freeformTemplateId')
+  protected handleFreeformTemplateIdChanged(): void {
+    this.updatePropsOnMarkupTool();
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('viewer')
   protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined
