@@ -19,6 +19,6 @@ function getSceneTreeErrorMessage(code: SceneTreeErrorCode): string {
     case SceneTreeErrorCode.UNKNOWN:
       return 'An unknown error occurred.';
     case SceneTreeErrorCode.SCENE_TREE_DISABLED:
-      return 'The tree for this scene cannot be loaded, because this feature is disabled.';
+      return 'The tree for this scene is not enabled. Enable the tree for this scene to interact with the tree.';
   }
 }
