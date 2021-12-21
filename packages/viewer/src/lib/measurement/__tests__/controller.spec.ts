@@ -69,7 +69,7 @@ describe('MeasurementController', () => {
       await controller.addEntity(entity2);
       const results = await controller.addEntity(entity2);
 
-      expect(client.measure).toHaveBeenCalledTimes(1);
+      expect(client.measure).toHaveBeenCalledTimes(2);
       expect(results).toEqual([
         expect.objectContaining({ type: 'minimum-distance' }),
       ]);
