@@ -1,0 +1,27 @@
+@import url('./button-reset.css');
+
+.button {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.button-secondary {
+  color: var(--neutral-800);
+  background-color: var(--neutral-300);
+}
+
+.button-secondary:hover {
+  color: var(--neutral-900);
+}
+
+.button-secondary:hover:enabled {
+  box-shadow: 0 2px 2px rgb(0 0 0 / 20%);
+}
+
+.button-secondary:disabled {
+  opacity: 0.8;
+}
+
+.button-secondary:hover:disabled {
+  cursor: not-allowed;
+}

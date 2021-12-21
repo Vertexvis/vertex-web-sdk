@@ -872,8 +872,7 @@ export class SceneTreeController {
     if (isGrpcServiceError(e)) {
       if (e.code === grpc.Code.FailedPrecondition) {
         return new SceneTreeErrorDetails(
-          SceneTreeErrorCode.SCENE_TREE_DISABLED,
-          'https://developer.vertexvis.com'
+          SceneTreeErrorCode.SCENE_TREE_DISABLED
         );
       } else {
         return new SceneTreeErrorDetails(SceneTreeErrorCode.UNKNOWN);

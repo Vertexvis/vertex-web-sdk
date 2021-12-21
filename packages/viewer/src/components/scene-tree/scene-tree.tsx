@@ -15,6 +15,7 @@ import {
 } from '@stencil/core';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { ElementPool } from '@vertexvis/html-templates';
 import { Disposable } from '@vertexvis/utils';
 import { isLoadedRow, Row } from './lib/row';
 import {
@@ -32,10 +33,10 @@ import {
   ViewerSelectItemOptions,
   showItem,
 } from './lib/viewer-ops';
-import { SceneTreeErrorDetails } from './lib/errors';
+import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
 import { MetadataKey } from './interfaces';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
-import { ElementPool } from '@vertexvis/html-templates';
+import { SceneTreeError } from './errors';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
@@ -210,6 +211,9 @@ export class SceneTree {
 
   @State()
   private connectionErrorDetails: SceneTreeErrorDetails | undefined;
+
+  @State()
+  private attemptingRetry = false;
 
   @Element()
   private el!: HTMLElement;
@@ -554,11 +558,7 @@ export class SceneTree {
       (state) => this.handleControllerStateChange(state)
     );
 
-    if (this.viewer != null) {
-      this.stateMap.viewerDisposable = this.controller.connectToViewer(
-        this.viewer
-      );
-    }
+    this.connectToViewer();
   }
 
   /**
@@ -585,24 +585,6 @@ export class SceneTree {
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        {this.connectionErrorDetails != null && (
-          <div class="error">
-            <span>
-              {this.connectionErrorDetails.message}
-              {this.connectionErrorDetails.link && (
-                <span>
-                  {' '}
-                  See our{' '}
-                  <a href={this.connectionErrorDetails.link} target="_blank">
-                    documentation
-                  </a>{' '}
-                  for more information.
-                </span>
-              )}
-            </span>
-          </div>
-        )}
-
         <div class="header">
           <slot name="header">
             <vertex-scene-tree-toolbar class="search-toolbar">
@@ -611,15 +593,38 @@ export class SceneTree {
           </slot>
         </div>
 
-        <div class="rows-scroll">
-          <slot />
-        </div>
+        {this.connectionErrorDetails != null &&
+          this.renderError(this.connectionErrorDetails)}
+
+        {this.connectionErrorDetails == null && (
+          <div class="rows-scroll">
+            <slot />
+          </div>
+        )}
 
         <div class="footer">
           <slot name="footer" />
         </div>
       </Host>
     );
+  }
+
+  private renderError(details: SceneTreeErrorDetails): h.JSX.IntrinsicElements {
+    if (details.code === SceneTreeErrorCode.UNKNOWN) {
+      return (
+        <SceneTreeError details={details}>
+          <button
+            class="button button-secondary"
+            onClick={() => this.retryConnectToViewer()}
+            disabled={this.attemptingRetry}
+          >
+            Retry
+          </button>
+        </SceneTreeError>
+      );
+    } else {
+      return <SceneTreeError details={details} />;
+    }
   }
 
   /**
@@ -638,14 +643,7 @@ export class SceneTree {
       return;
     }
 
-    if (oldViewer != null) {
-      this.stateMap.viewerDisposable?.dispose();
-    }
-
-    if (newViewer != null) {
-      this.stateMap.viewerDisposable =
-        this.controller?.connectToViewer(newViewer);
-    }
+    this.connectToViewer();
   }
 
   /**
@@ -676,6 +674,21 @@ export class SceneTree {
   @Watch('metadataKeys')
   protected handleMetadataKeysChanged(): void {
     this.controller?.setMetadataKeys(this.metadataKeys);
+  }
+
+  private retryConnectToViewer(): void {
+    this.attemptingRetry = true;
+    this.connectToViewer();
+  }
+
+  private connectToViewer(): void {
+    this.stateMap.viewerDisposable?.dispose();
+
+    if (this.viewer != null) {
+      this.stateMap.viewerDisposable = this.controller?.connectToViewer(
+        this.viewer
+      );
+    }
   }
 
   private scheduleClearUnusedData(): void {
@@ -712,6 +725,13 @@ export class SceneTree {
       this.connectionError.emit(state.connection.details);
     } else {
       this.connectionErrorDetails = undefined;
+    }
+
+    if (
+      state.connection.type === 'connected' ||
+      state.connection.type === 'failure'
+    ) {
+      this.attemptingRetry = false;
     }
   }
 
