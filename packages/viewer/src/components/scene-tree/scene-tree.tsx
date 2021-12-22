@@ -32,6 +32,7 @@ import {
   selectItem,
   ViewerSelectItemOptions,
   showItem,
+  selectRangeInSceneTree,
 } from './lib/viewer-ops';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
 import { MetadataKey } from './interfaces';
@@ -217,6 +218,8 @@ export class SceneTree {
 
   @Element()
   private el!: HTMLElement;
+
+  private lastSelectedItemId?: string;
 
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
@@ -421,9 +424,20 @@ export class SceneTree {
         const nextNode = ancestors.find(({ selected }) => !selected);
         if (nextNode != null) {
           await this.selectItem(nextNode, options);
+          this.lastSelectedItemId = id;
+        }
+      } else if (options.range && this.lastSelectedItemId != null) {
+        const currentRowIndex = await this.controller?.expandParentNodes(id);
+        const previouslySelectedIndex =
+          await this.controller?.expandParentNodes(this.lastSelectedItemId);
+        if (previouslySelectedIndex && currentRowIndex) {
+          const start = Math.min(previouslySelectedIndex, currentRowIndex);
+          const end = Math.max(previouslySelectedIndex, currentRowIndex);
+          await selectRangeInSceneTree(viewer, start, end, options);
         }
       } else {
         await selectItem(viewer, id, options);
+        this.lastSelectedItemId = id;
       }
 
       this.stateMap.selectionPath = [
@@ -443,6 +457,7 @@ export class SceneTree {
   public async deselectItem(row: RowArg): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id, node }) => {
       if (node.selected) {
+        this.lastSelectedItemId = undefined;
         await deselectItem(viewer, id);
       }
     });
