@@ -39,6 +39,26 @@ Type: `Promise<void>`
 
 
 
+## CSS Custom Properties
+
+| Name                                                             | Description                                                                              |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `--viewer-markup-freeform-bounds-anchor-height`                  | A CSS length that specifies the height of the resize and reposition anchors.             |
+| `--viewer-markup-freeform-bounds-anchor-width`                   | A CSS length that specifies the width of the resize and reposition anchors.              |
+| `--viewer-markup-freeform-bounds-center-anchor-background-color` | A CSS color that specifies the background color of the center reposition anchor.         |
+| `--viewer-markup-freeform-bounds-center-anchor-border-color`     | A CSS color that specifies the color of the center reposition anchor's border.           |
+| `--viewer-markup-freeform-bounds-center-anchor-border-width`     | A CSS length that specifies the width of the center reposition anchor's border.          |
+| `--viewer-markup-freeform-bounds-edge-anchor-background-color`   | A CSS color that specifies the background color of the edge and corner resize anchors.   |
+| `--viewer-markup-freeform-bounds-edge-anchor-border-color`       | A CSS color that specifies the color of the edge and corner resize anchors' borders.     |
+| `--viewer-markup-freeform-bounds-edge-anchor-border-width`       | A CSS length that specifies the width of the edge and corner resize anchors' borders.    |
+| `--viewer-markup-freeform-bounds-outline-border-color`           | A CSS color that specifies the color of the circle's selected bounding box border.       |
+| `--viewer-markup-freeform-bounds-outline-border-width`           | A CSS length that specifies the width of the circle's selected bounding box border.      |
+| `--viewer-markup-freeform-line-cap`                              | The cap behavior for the lines making up this freeform markup. Defaults to `round`.      |
+| `--viewer-markup-freeform-line-join`                             | The join behavior between the lines making up this freeform markup. Defaults to `round`. |
+| `--viewer-markup-freeform-stroke-color`                          | A CSS color that specifies the color of the freeform line.                               |
+| `--viewer-markup-freeform-stroke-width`                          | A CSS length that specifies the width of the freeform line.                              |
+
+
 ## Dependencies
 
 ### Used by
