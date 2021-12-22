@@ -430,6 +430,7 @@ export class SceneTree {
         const currentRowIndex = await this.controller?.expandParentNodes(id);
         const previouslySelectedIndex =
           await this.controller?.expandParentNodes(this.lastSelectedItemId);
+
         if (previouslySelectedIndex && currentRowIndex) {
           const start = Math.min(previouslySelectedIndex, currentRowIndex);
           const end = Math.max(previouslySelectedIndex, currentRowIndex);

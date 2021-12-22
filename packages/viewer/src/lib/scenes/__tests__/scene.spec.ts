@@ -110,6 +110,45 @@ describe(Scene, () => {
       });
     });
 
+    it('should support passing scene-tree range queries', () => {
+      const itemId = UUID.create();
+      scene
+        .items((op) =>
+          op
+            .where((q) =>
+              q.withSceneTreeRange({
+                start: 0,
+                end: 19,
+              })
+            )
+            .select()
+        )
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            sceneTreeRange: {
+              end: 19,
+              start: 0,
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: colorMaterial.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     it('should support passing multiple operations in one request', () => {
       const itemId = UUID.create();
       const suppliedId = UUID.create();

@@ -39,7 +39,13 @@ import {
 import { sign } from 'jsonwebtoken';
 import { decodeSceneTreeJwt } from './lib/jwt';
 import { grpc } from '@improbable-eng/grpc-web';
-import { deselectItem, hideItem, selectItem, showItem } from './lib/viewer-ops';
+import {
+  deselectItem,
+  hideItem,
+  selectItem,
+  showItem,
+  selectRangeInSceneTree,
+} from './lib/viewer-ops';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import {
   loadViewerStreamKey,
@@ -678,6 +684,53 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node1.getId()?.getHex(),
+        expect.anything()
+      );
+    });
+
+    it('should support range queries and send the range', async () => {
+      const client = mockSceneTreeClient();
+      const index = new UInt64Value();
+      index.setValue(2);
+      const locateItemResponse = new LocateItemResponse();
+      locateItemResponse.setLocatedIndex(index);
+
+      (client.locateItem as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(locateItemResponse)
+      );
+      const controller = new SceneTreeController(client, 100);
+
+      const getTreeRes = mockGetTree({
+        client,
+        transform: (node) => node.setSelected(false),
+      });
+
+      const node1 = getTreeRes.getItemsList()[0].clone();
+      const node2 = getTreeRes.getItemsList()[1].clone();
+      node2.setSelected(true);
+      const node3 = getTreeRes.getItemsList()[2].clone();
+      node3.setSelected(true);
+      const ancestry = [node1, node2, node3];
+
+      const res = new GetNodeAncestorsResponse();
+      res.setItemsList(ancestry);
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowAtIndex(0);
+      await tree.selectItem(row, { range: true });
+
+      (selectRangeInSceneTree as jest.Mock).mockClear();
+      const row2 = await tree.getRowAtIndex(2);
+      await tree.selectItem(row2, { range: true });
+
+      expect(true).toBeTruthy();
+      expect(selectRangeInSceneTree).toHaveBeenCalledWith(
+        expect.anything(),
+        2,
+        2,
         expect.anything()
       );
     });
