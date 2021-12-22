@@ -66,6 +66,19 @@ export class MeasurementController {
     return this.performMeasurement(() => this.model.removeEntity(entity));
   }
 
+  /**
+   * Registers a set of entities and performs a measurement
+   *
+   * @param entities The entities to measure.
+   * @returns A promise that resolves with the results after registering these
+   * entities.
+   */
+  public setEntities(
+    entities: Set<MeasurementEntity>
+  ): Promise<MeasurementResult[]> {
+    return this.performMeasurement(() => this.model.setEntities(entities));
+  }
+
   private performMeasurement(
     effect: () => boolean
   ): Promise<MeasurementResult[]> {
@@ -129,7 +142,6 @@ export class MeasurementController {
 
       const req = new UpdateModelEntitiesRequest();
       req.setUpdatesList([...clearEntities, ...highlightEntities]);
-
       this.client.updateModelEntities(req, meta, handler);
     });
   }

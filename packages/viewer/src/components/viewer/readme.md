@@ -60,7 +60,7 @@ To remove a cursor, call `dispose()` on the returned disposable.
 
 Type: `Promise<Disposable>`
 
-
+A disposable that can be used to remove the cursor.
 
 ### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
 
@@ -129,7 +129,8 @@ the default camera controls provided by the viewer.
 
 Type: `Promise<Disposable>`
 
-
+A promise containing the disposable to use to
+deregister the handler.
 
 ### `registerTapKeyInteraction(keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>`
 
@@ -169,14 +170,6 @@ the scene.
 Type: `Promise<void>`
 
 
-
-
-## CSS Custom Properties
-
-| Name                  | Description                                                                                                                                                                 |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--image-background`  | The background color of the rendered image. Defaults to `--viewer-background`.                                                                                              |
-| `--viewer-background` | The background color of the viewer component. This will be visible if the size of the viewer becomes greater than the maximum image size of 1280x1280. Defaults to #FFFFFF. |
 
 
 ----------------------------------------------

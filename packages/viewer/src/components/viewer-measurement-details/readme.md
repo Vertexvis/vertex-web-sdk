@@ -123,15 +123,6 @@ in degrees, and should return a string.
 | `visibleSummary`    | --                  | The visible measurements based on the current `summary` and `hiddenDetails`.                                                                                                                                                                                                  | `MeasurementDetailsSummary \| undefined`                                      | `undefined`              |
 
 
-## CSS Custom Properties
-
-| Name                                   | Description                                                               |
-| -------------------------------------- | ------------------------------------------------------------------------- |
-| `--viewer-measurement-details-x-color` | The color of the `X` label in measurements. Defaults to red.              |
-| `--viewer-measurement-details-y-color` | The color of the `X` label in measurements. Defaults to var(--green-500). |
-| `--viewer-measurement-details-z-color` | The color of the `X` label in measurements. Defaults to blue.             |
-
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

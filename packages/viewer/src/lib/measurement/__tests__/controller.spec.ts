@@ -25,6 +25,10 @@ describe('MeasurementController', () => {
     Vector3.create(),
     new ModelEntity().serializeBinary()
   );
+  const entity3 = new MeasurementEntity(
+    Vector3.create(),
+    new ModelEntity().serializeBinary()
+  );
 
   const client = new SceneViewAPIClient(random.url());
   const jwtProvider = (): string => random.string();
@@ -110,6 +114,24 @@ describe('MeasurementController', () => {
 
       const results = await controller.removeEntity(entity2);
       expect(results).toEqual([]);
+    });
+  });
+
+  describe(MeasurementController.prototype.setEntities, () => {
+    it('replaces entities and returns measurement results', async () => {
+      (client.measure as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(
+          createMeasureResponse(createMinimumDistanceResult())
+        )
+      );
+
+      await controller.addEntity(entity1);
+      const results = await controller.setEntities(new Set([entity2, entity3]));
+
+      expect(model.getEntities()).toEqual([entity2, entity3]);
+      expect(results).toEqual([
+        expect.objectContaining({ type: 'minimum-distance' }),
+      ]);
     });
   });
 });

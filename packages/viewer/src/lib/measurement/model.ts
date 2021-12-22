@@ -314,6 +314,19 @@ export class MeasurementModel {
   }
 
   /**
+   * Sets the set of entities to be measured with the model.
+   *
+   * @param entities A set of entities to measure.
+   * @returns `true` if the entity has been added.
+   */
+  public setEntities(entities: Set<MeasurementEntity>): boolean {
+    this.entities.clear();
+    entities.forEach((e) => this.entities.add(e));
+    this.entitiesChanged.emit(this.getEntities());
+    return true;
+  }
+
+  /**
    * Registers an event listener that will be invoked when the model's
    * measurement results change.
    *
