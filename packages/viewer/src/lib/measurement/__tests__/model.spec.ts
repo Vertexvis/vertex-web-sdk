@@ -6,8 +6,12 @@ import { MeasurementEntity } from '..';
 
 describe('MeasurementModel', () => {
   const point = Vector3.create();
+  const point2 = Vector3.create();
+  const point3 = Vector3.create();
   const modelEntity = new ModelEntity().serializeBinary();
   const measureEntity = new MeasurementEntity(point, modelEntity);
+  const measureEntity2 = new MeasurementEntity(point2, modelEntity);
+  const measureEntity3 = new MeasurementEntity(point3, modelEntity);
 
   describe(MeasurementModel.prototype.addEntity, () => {
     it('adds the entity if not registered', () => {
@@ -135,6 +139,26 @@ describe('MeasurementModel', () => {
       model.replaceResultsWithOutcome(outcome);
       expect(onChange).toHaveBeenCalledWith([result2, result3]);
       expect(model.getResults()).toEqual([result2, result3]);
+    });
+  });
+
+  describe(MeasurementModel.prototype.setEntities, () => {
+    it('replaces all entities with the supplied set', () => {
+      const model = new MeasurementModel();
+
+      model.addEntity(measureEntity);
+      expect(model.setEntities(new Set([measureEntity2, measureEntity3]))).toBe(
+        true
+      );
+      expect(model.getEntities()).toEqual([measureEntity2, measureEntity3]);
+    });
+
+    it('wont duplicate entities', () => {
+      const model = new MeasurementModel();
+      model.addEntity(measureEntity);
+
+      expect(model.addEntity(measureEntity)).toBe(false);
+      expect(model.getEntities()).toEqual([measureEntity]);
     });
   });
 });
