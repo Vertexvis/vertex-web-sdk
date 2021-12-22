@@ -145,20 +145,15 @@ describe('MeasurementModel', () => {
   describe(MeasurementModel.prototype.setEntities, () => {
     it('replaces all entities with the supplied set', () => {
       const model = new MeasurementModel();
+      const onChange = jest.fn();
+      model.onEntitiesChanged(onChange);
 
       model.addEntity(measureEntity);
       expect(model.setEntities(new Set([measureEntity2, measureEntity3]))).toBe(
         true
       );
       expect(model.getEntities()).toEqual([measureEntity2, measureEntity3]);
-    });
-
-    it('wont duplicate entities', () => {
-      const model = new MeasurementModel();
-      model.addEntity(measureEntity);
-
-      expect(model.addEntity(measureEntity)).toBe(false);
-      expect(model.getEntities()).toEqual([measureEntity]);
+      expect(onChange).toHaveBeenCalledWith([measureEntity2, measureEntity3]);
     });
   });
 });
