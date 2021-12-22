@@ -111,7 +111,6 @@ describe(Scene, () => {
     });
 
     it('should support passing scene-tree range queries', () => {
-      const itemId = UUID.create();
       scene
         .items((op) =>
           op
