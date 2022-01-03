@@ -25,6 +25,7 @@ import { PointerInteractionHandler } from '../../lib/interactions/pointerInterac
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
+import { FlyToPositionKeyInteraction } from '../../lib/interactions/flyToPositionKeyInteraction';
 import { Environment } from '../../lib/environment';
 import {
   ViewerInitializationError,
@@ -462,6 +463,14 @@ export class Viewer {
           this.stream,
           () => this.getResolvedConfig(),
           () => this.getImageScale()
+        )
+      );
+      this.registerTapKeyInteraction(
+        new FlyToPositionKeyInteraction(
+          this.stream,
+          () => this.getResolvedConfig(),
+          () => this.getImageScale(),
+          () => this.createScene()
         )
       );
     }
