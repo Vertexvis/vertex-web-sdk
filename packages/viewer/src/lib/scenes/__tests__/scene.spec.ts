@@ -148,6 +148,37 @@ describe(Scene, () => {
       });
     });
 
+    it('should support passing metadata queries', () => {
+      scene
+        .items((op) =>
+          op.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
+        )
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            metadata: {
+              valueFilter: 'foo',
+              keys: ['bar', 'baz'],
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: colorMaterial.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     it('should support passing multiple operations in one request', () => {
       const itemId = UUID.create();
       const suppliedId = UUID.create();

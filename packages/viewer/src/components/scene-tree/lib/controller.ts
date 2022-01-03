@@ -86,6 +86,11 @@ export interface FilterTreeOptions {
    * nodes.
    */
   includeCollapsed?: boolean;
+
+  /**
+   * The metadata keys to filter the tree on.
+   */
+  columns?: MetadataKey[];
 }
 
 type ConnectionState =
@@ -495,6 +500,7 @@ export class SceneTreeController {
         const req = new FilterRequest();
         req.setFilter(term);
         req.setFullTree((options.includeCollapsed ?? true) === true);
+        if (options.columns) req.setColumnsKeysList(options.columns);
 
         this.client.filter(req, metadata, handler);
       });
