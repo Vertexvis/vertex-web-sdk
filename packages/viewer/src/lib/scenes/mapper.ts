@@ -35,6 +35,14 @@ export function buildSceneOperation(
         all: {},
         operationTypes,
       };
+    case 'scene-tree-range':
+      return {
+        sceneTreeRange: {
+          start: query.range.start,
+          end: query.range.end,
+        },
+        operationTypes,
+      };
     default:
       return {};
   }

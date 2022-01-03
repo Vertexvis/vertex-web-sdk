@@ -5,6 +5,11 @@ interface AllQueryExpression {
   type: 'all';
 }
 
+export interface SceneTreeRange {
+  start: number;
+  end: number;
+}
+
 interface ItemQueryExpression {
   type: 'item-id' | 'supplied-id';
   value: string;
@@ -20,6 +25,11 @@ export interface OrExpression {
   expressions: QueryExpression[];
 }
 
+interface SceneTreeRangeQueryExpression {
+  type: 'scene-tree-range';
+  range: SceneTreeRange;
+}
+
 /**
  * Represents the sum of all possible types of expressions.
  */
@@ -27,7 +37,8 @@ export type QueryExpression =
   | AllQueryExpression
   | ItemQueryExpression
   | AndExpression
-  | OrExpression;
+  | OrExpression
+  | SceneTreeRangeQueryExpression;
 
 /**
  * An interface that represents a query is "complete" and can be turned into an
@@ -68,11 +79,26 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withSuppliedId(id: string): SingleQuery {
     return new SingleQuery({ type: 'supplied-id', value: id });
   }
+
+  public withSceneTreeRange(range: SceneTreeRange): SceneTreeRangeQuery {
+    return new SceneTreeRangeQuery(range);
+  }
 }
 
 export class AllQuery implements TerminalQuery {
   public build(): QueryExpression {
     return { type: 'all' };
+  }
+}
+
+export class SceneTreeRangeQuery implements TerminalQuery {
+  public constructor(private range: SceneTreeRange) {}
+
+  public build(): SceneTreeRangeQueryExpression {
+    return {
+      type: 'scene-tree-range',
+      range: this.range,
+    };
   }
 }
 

@@ -3,6 +3,7 @@ import { ColorMaterial } from '../../..';
 export interface ViewerSelectItemOptions {
   material?: string | ColorMaterial.ColorMaterial;
   append?: boolean;
+  range?: boolean;
 }
 
 export async function showItem(
@@ -35,6 +36,21 @@ export async function selectItem(
     .items((op) => [
       ...(append ? [] : [op.where((q) => q.all()).deselect()]),
       op.where((q) => q.withItemId(id)).select(material),
+    ])
+    .execute();
+}
+
+export async function selectRangeInSceneTree(
+  viewer: HTMLVertexViewerElement,
+  start: number,
+  end: number,
+  { material, append = false }: ViewerSelectItemOptions
+): Promise<void> {
+  const scene = await viewer.scene();
+  return scene
+    .items((op) => [
+      ...(append ? [] : [op.where((q) => q.all()).deselect()]),
+      op.where((q) => q.withSceneTreeRange({ start, end })).select(material),
     ])
     .execute();
 }

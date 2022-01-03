@@ -225,6 +225,7 @@ export class SceneTreeTableCell {
       } else if (!this.node?.selected) {
         this.tree?.selectItem(this.node, {
           append: event.ctrlKey || event.metaKey,
+          range: event.shiftKey,
         });
       }
       this.selectionToggled.emit({ node: this.node, originalEvent: event });
