@@ -30,6 +30,12 @@ interface SceneTreeRangeQueryExpression {
   range: SceneTreeRange;
 }
 
+interface MetadataQueryExpression {
+  type: 'metadata';
+  filter: string;
+  keys: string[];
+}
+
 /**
  * Represents the sum of all possible types of expressions.
  */
@@ -38,7 +44,8 @@ export type QueryExpression =
   | ItemQueryExpression
   | AndExpression
   | OrExpression
-  | SceneTreeRangeQueryExpression;
+  | SceneTreeRangeQueryExpression
+  | MetadataQueryExpression;
 
 /**
  * An interface that represents a query is "complete" and can be turned into an
@@ -83,6 +90,10 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withSceneTreeRange(range: SceneTreeRange): SceneTreeRangeQuery {
     return new SceneTreeRangeQuery(range);
   }
+
+  public withMetadata(filter: string, keys: string[]): MetadataQuery {
+    return new MetadataQuery(filter, keys);
+  }
 }
 
 export class AllQuery implements TerminalQuery {
@@ -98,6 +109,18 @@ export class SceneTreeRangeQuery implements TerminalQuery {
     return {
       type: 'scene-tree-range',
       range: this.range,
+    };
+  }
+}
+
+export class MetadataQuery implements TerminalQuery {
+  public constructor(private filter: string, private keys: string[]) {}
+
+  public build(): MetadataQueryExpression {
+    return {
+      type: 'metadata',
+      filter: this.filter,
+      keys: this.keys,
     };
   }
 }

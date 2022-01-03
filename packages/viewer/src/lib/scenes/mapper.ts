@@ -43,6 +43,14 @@ export function buildSceneOperation(
         },
         operationTypes,
       };
+    case 'metadata':
+      return {
+        metadata: {
+          valueFilter: query.filter,
+          keys: query.keys,
+        },
+        operationTypes,
+      };
     default:
       return {};
   }
