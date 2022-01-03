@@ -1,6 +1,6 @@
 import { FlyToPartKeyInteraction } from '../flyToPartKeyInteraction';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Config } from '../../config/config';
+import { Config } from '../../config';
 import { TapEventDetails } from '../tapEventDetails';
 import { Point } from '@vertexvis/geometry';
 
@@ -18,14 +18,29 @@ describe(FlyToPartKeyInteraction, () => {
 
   it('Returns true for its predicate with Command or Control pressed', () => {
     expect(
-      flyToPartKeyInteraction.predicate({ ctrlKey: true } as TapEventDetails)
+      flyToPartKeyInteraction.predicate({
+        ctrlKey: true,
+        altKey: false,
+      } as TapEventDetails)
     ).toBe(false);
     expect(
-      flyToPartKeyInteraction.predicate({ metaKey: true } as TapEventDetails)
+      flyToPartKeyInteraction.predicate({
+        metaKey: true,
+        altKey: false,
+      } as TapEventDetails)
     ).toBe(false);
     expect(
       flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails)
     ).toBe(true);
+  });
+
+  it('returns false for its predicate with Shift pressed', () => {
+    expect(
+      flyToPartKeyInteraction.predicate({
+        altKey: true,
+        shiftKey: true,
+      } as TapEventDetails)
+    ).toBe(false);
   });
 
   it('Queries for hit results and fits to the item if present', async () => {
