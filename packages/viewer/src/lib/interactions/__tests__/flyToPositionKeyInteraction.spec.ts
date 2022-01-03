@@ -37,19 +37,27 @@ describe(FlyToPositionKeyInteraction, () => {
     expect(
       flyToPositionKeyInteraction.predicate({
         ctrlKey: true,
+        altKey: false,
+        shiftKey: false,
       } as TapEventDetails)
     ).toBe(false);
     expect(
       flyToPositionKeyInteraction.predicate({
         metaKey: true,
+        altKey: false,
+        shiftKey: false,
       } as TapEventDetails)
     ).toBe(false);
     expect(
-      flyToPositionKeyInteraction.predicate({ altKey: true } as TapEventDetails)
+      flyToPositionKeyInteraction.predicate({
+        altKey: true,
+        shiftKey: false,
+      } as TapEventDetails)
     ).toBe(false);
     expect(
       flyToPositionKeyInteraction.predicate({
         shiftKey: true,
+        altKey: false,
       } as TapEventDetails)
     ).toBe(false);
     expect(

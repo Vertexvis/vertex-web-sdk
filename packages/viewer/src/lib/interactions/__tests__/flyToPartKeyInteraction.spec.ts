@@ -18,10 +18,16 @@ describe(FlyToPartKeyInteraction, () => {
 
   it('Returns true for its predicate with Command or Control pressed', () => {
     expect(
-      flyToPartKeyInteraction.predicate({ ctrlKey: true } as TapEventDetails)
+      flyToPartKeyInteraction.predicate({
+        ctrlKey: true,
+        altKey: false,
+      } as TapEventDetails)
     ).toBe(false);
     expect(
-      flyToPartKeyInteraction.predicate({ metaKey: true } as TapEventDetails)
+      flyToPartKeyInteraction.predicate({
+        metaKey: true,
+        altKey: false,
+      } as TapEventDetails)
     ).toBe(false);
     expect(
       flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails)
