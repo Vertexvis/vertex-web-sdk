@@ -15,7 +15,7 @@ export class FlyToPartKeyInteraction
   ) {}
 
   public predicate(e: TapEventDetails): boolean {
-    return !!e.altKey && !e.shiftKey;
+    return e.altKey && !e.shiftKey;
   }
 
   public async fn(e: TapEventDetails): Promise<void> {
