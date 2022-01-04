@@ -51,6 +51,13 @@ export function buildSceneOperation(
         },
         operationTypes,
       };
+    case 'all-selected':
+      return {
+        override: {
+          selection: {},
+        },
+        operationTypes,
+      };
     default:
       return {};
   }
