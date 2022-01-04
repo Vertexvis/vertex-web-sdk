@@ -36,6 +36,11 @@ interface MetadataQueryExpression {
   keys: string[];
 }
 
+interface AllSelectedQueryExpression {
+  type: 'all-selected';
+  material?: ColorMaterial;
+}
+
 /**
  * Represents the sum of all possible types of expressions.
  */
@@ -45,7 +50,8 @@ export type QueryExpression =
   | AndExpression
   | OrExpression
   | SceneTreeRangeQueryExpression
-  | MetadataQueryExpression;
+  | MetadataQueryExpression
+  | AllSelectedQueryExpression;
 
 /**
  * An interface that represents a query is "complete" and can be turned into an
@@ -94,6 +100,10 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withMetadata(filter: string, keys: string[]): MetadataQuery {
     return new MetadataQuery(filter, keys);
   }
+
+  public withSelected(color?: ColorMaterial): AllSelectedQuery {
+    return new AllSelectedQuery(color);
+  }
 }
 
 export class AllQuery implements TerminalQuery {
@@ -121,6 +131,17 @@ export class MetadataQuery implements TerminalQuery {
       type: 'metadata',
       filter: this.filter,
       keys: this.keys,
+    };
+  }
+}
+
+export class AllSelectedQuery implements TerminalQuery {
+  public constructor(private material?: ColorMaterial) {}
+
+  public build(): AllSelectedQueryExpression {
+    return {
+      type: 'all-selected',
+      material: this.material,
     };
   }
 }

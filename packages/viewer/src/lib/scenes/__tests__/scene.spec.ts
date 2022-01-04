@@ -110,6 +110,64 @@ describe(Scene, () => {
       });
     });
 
+    it('should support passing withSelected queries', () => {
+      scene.items((op) => op.where((q) => q.withSelected()).select()).execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            override: {
+              selection: {},
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: colorMaterial.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('should support passing withSelected and a color, to only show selected items with the specific color queries', () => {
+      scene
+        .items((op) => op.where((q) => q.withSelected(colorMaterial)).select())
+        .execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            override: {
+              selection: {
+                material: expect.objectContaining({
+                  kd: colorMaterial.diffuse,
+                }),
+              },
+            },
+            operationTypes: [
+              {
+                changeSelection: {
+                  material: expect.objectContaining({
+                    kd: colorMaterial.diffuse,
+                  }),
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     it('should support passing scene-tree range queries', () => {
       scene
         .items((op) =>
