@@ -38,7 +38,6 @@ interface MetadataQueryExpression {
 
 interface AllSelectedQueryExpression {
   type: 'all-selected';
-  material?: ColorMaterial;
 }
 
 /**
@@ -101,8 +100,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     return new MetadataQuery(filter, keys);
   }
 
-  public withSelected(material?: ColorMaterial): AllSelectedQuery {
-    return new AllSelectedQuery(material);
+  public withSelected(): AllSelectedQuery {
+    return new AllSelectedQuery();
   }
 }
 
@@ -136,12 +135,9 @@ export class MetadataQuery implements TerminalQuery {
 }
 
 export class AllSelectedQuery implements TerminalQuery {
-  public constructor(private material?: ColorMaterial) {}
-
   public build(): AllSelectedQueryExpression {
     return {
       type: 'all-selected',
-      material: this.material,
     };
   }
 }

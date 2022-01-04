@@ -54,19 +54,7 @@ export function buildSceneOperation(
     case 'all-selected':
       return {
         override: {
-          selection:
-            query.material != null
-              ? {
-                  material: {
-                    d: query.material.opacity,
-                    ns: query.material.glossiness,
-                    ka: query.material.ambient,
-                    kd: query.material.diffuse,
-                    ks: query.material.specular,
-                    ke: query.material.emissive,
-                  },
-                }
-              : {},
+          selection: {},
         },
         operationTypes,
       };
