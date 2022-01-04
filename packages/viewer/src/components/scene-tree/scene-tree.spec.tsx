@@ -943,6 +943,22 @@ describe('<vertex-scene-tree>', () => {
       tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
       expect(filter).toHaveBeenCalledWith('term', expect.anything());
     });
+
+    it('performs search with metadata columns', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const filter = jest.spyOn(controller, 'filter');
+
+      const { stream } = makeViewerStream();
+      const { tree } = await newSceneTreeSpec({ controller, stream });
+      tree.filterOnMetadata = true;
+      tree.metadataKeys = ['foo', 'bar', 'baz'];
+
+      tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
+      expect(filter).toHaveBeenCalledWith('term', {
+        columns: tree.metadataKeys,
+      });
+    });
   });
 });
 

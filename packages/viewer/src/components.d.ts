@@ -139,6 +139,10 @@ export namespace Components {
      */
     filterItems: (term: string, options?: FilterTreeOptions) => Promise<void>;
     /**
+     * Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.
+     */
+    filterOnMetadata: boolean;
+    /**
      * Returns the row data from the given vertical client position.
      * @param clientY The vertical client position.
      * @returns A row or `undefined` if the row hasn't been loaded.
@@ -1419,6 +1423,10 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     controller?: SceneTreeController;
+    /**
+     * Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.
+     */
+    filterOnMetadata?: boolean;
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */

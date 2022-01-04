@@ -185,6 +185,13 @@ export class SceneTree {
   public controller?: SceneTreeController;
 
   /**
+   * Temporary flag to indicate whether metadata should be used when filtering
+   * as opposed to just the name of the item.
+   */
+  @Prop({ mutable: true })
+  public filterOnMetadata = false;
+
+  /**
    * A list of part metadata keys that will be made available to each row. This
    * metadata can be used for data binding inside the scene tree's template.
    */
@@ -779,7 +786,9 @@ export class SceneTree {
 
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
-    this.filterItems(event.detail);
+    this.filterItems(event.detail, {
+      columns: this.filterOnMetadata ? this.metadataKeys : undefined,
+    });
   }
 
   private getScrollToPosition(
