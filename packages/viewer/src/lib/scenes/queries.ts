@@ -101,8 +101,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     return new MetadataQuery(filter, keys);
   }
 
-  public withSelected(color?: ColorMaterial): AllSelectedQuery {
-    return new AllSelectedQuery(color);
+  public withSelected(material?: ColorMaterial): AllSelectedQuery {
+    return new AllSelectedQuery(material);
   }
 }
 

@@ -188,8 +188,6 @@ export class ItemsOperationExecutor {
     const pbOperations = this.queryOperations.map((op) =>
       buildSceneOperation(op.query, op.operations)
     );
-
-    console.log('pbOperations: ', pbOperations);
     const request = {
       sceneViewId: {
         hex: this.sceneViewId,
