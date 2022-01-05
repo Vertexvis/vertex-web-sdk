@@ -25,6 +25,16 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(content?.textContent).toBe(node.name);
   });
 
+  it('includes is-filter-hit attribute if the node is a filter hit', async () => {
+    const node = createNode({ filterHit: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell value="${node.name}"></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.getAttribute('is-filter-hit')).toBe('');
+  });
+
   it('renders expand icon if expand toggle is true and item is expanded', async () => {
     const node = createNode({ expanded: true, isLeaf: false });
     const { cell } = await newComponentSpec({
@@ -492,6 +502,7 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     visible: false,
     partiallyVisible: false,
     columnsList: [],
+    filterHit: false,
     ...values,
   };
 }

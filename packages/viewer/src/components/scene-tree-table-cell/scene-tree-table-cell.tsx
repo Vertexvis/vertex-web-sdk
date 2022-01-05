@@ -124,6 +124,7 @@ export class SceneTreeTableCell {
     this.toggleAttribute('is-selected', !!this.node?.selected);
     this.toggleAttribute('is-partial', !!this.node?.partiallyVisible);
     this.toggleAttribute('is-leaf', !!this.node?.isLeaf);
+    this.toggleAttribute('is-filter-hit', !!this.node?.filterHit);
   }
 
   public render(): h.JSX.IntrinsicElements {
