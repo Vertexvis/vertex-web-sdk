@@ -44,7 +44,7 @@ export async function selectRangeInSceneTree(
   viewer: HTMLVertexViewerElement,
   start: number,
   end: number,
-  { material, append = false }: ViewerSelectItemOptions
+  { material, append = true }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
