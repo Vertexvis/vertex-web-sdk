@@ -1,6 +1,6 @@
+import * as Euler from './euler';
 import * as Matrix4 from './matrix4';
 import * as Vector3 from './vector3';
-import * as Euler from './euler';
 
 /**
  * A type that represents a

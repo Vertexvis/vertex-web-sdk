@@ -1,5 +1,5 @@
-import * as Point from '../point';
 import * as Angle from '../angle';
+import * as Point from '../point';
 
 describe(Angle.fromPoints, () => {
   it('should return 0', () => {

@@ -9,14 +9,15 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+
 import { stampTemplateWithId } from '../../lib/templates';
-import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import {
   ArrowMarkup,
   CircleMarkup,
   FreeformMarkup,
   Markup,
 } from '../../lib/types/markup';
+import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
 

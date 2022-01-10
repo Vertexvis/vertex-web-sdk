@@ -1,9 +1,10 @@
 import { Point } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
-import { FrameImageLike } from './frame';
-import { fromPbStencilBufferOrThrow } from '../mappers';
+
 import { decodePng } from '../../workers/png-decoder-pool';
+import { fromPbStencilBufferOrThrow } from '../mappers';
 import { DepthBuffer } from './depthBuffer';
+import { FrameImageLike } from './frame';
 import { ImageAttributesLike } from './frame';
 
 /**

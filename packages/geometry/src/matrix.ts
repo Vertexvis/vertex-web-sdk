@@ -1,5 +1,5 @@
-import * as Point from './point';
 import { toRadians } from './angle';
+import * as Point from './point';
 
 /**
  * Represents a 2D transformation matrix.

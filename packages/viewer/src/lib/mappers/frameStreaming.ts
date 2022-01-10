@@ -1,27 +1,28 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Mapper as M } from '@vertexvis/utils';
 import { BoundingBox, Dimensions } from '@vertexvis/geometry';
+import { protoToDate } from '@vertexvis/stream-api';
+import { Mapper as M } from '@vertexvis/utils';
+
+import { Token } from '../token';
 import {
   CrossSectioning,
-  FrameCamera,
   Frame,
+  FrameCamera,
   FrameImage,
-  FrameScene,
   FramePerspectiveCamera,
-  Orientation,
+  FrameScene,
   ImageAttributesLike,
+  Orientation,
 } from '../types';
-import { fromPbRGBi } from './material';
+import { fromPbUuid } from './core';
 import {
-  fromPbVector3f,
   fromPbBoundingBox3f,
   fromPbDim,
   fromPbRect,
+  fromPbVector3f,
 } from './geometry';
+import { fromPbRGBi } from './material';
 import { fromPbBytesValue } from './scalar';
-import { fromPbUuid } from './core';
-import { Token } from '../token';
-import { protoToDate } from '@vertexvis/stream-api';
 
 export const fromPbCamera: M.Func<
   vertexvis.protobuf.stream.ICamera,

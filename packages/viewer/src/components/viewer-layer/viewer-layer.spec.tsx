@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+
 import { ViewerLayer } from './viewer-layer';
 
 describe('vertex-viewer-layer', () => {

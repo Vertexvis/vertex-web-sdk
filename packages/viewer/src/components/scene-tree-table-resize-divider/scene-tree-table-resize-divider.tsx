@@ -1,4 +1,4 @@
-import { Component, Host, h, State } from '@stencil/core';
+import { Component, h, Host, State } from '@stencil/core';
 import classNames from 'classnames';
 
 @Component({

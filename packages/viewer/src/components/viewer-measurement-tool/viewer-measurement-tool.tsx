@@ -9,14 +9,15 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+
+import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 import { stampTemplateWithId } from '../../lib/templates';
 import {
   DistanceMeasurement,
-  Measurement,
   DistanceUnitType,
+  Measurement,
 } from '../../lib/types';
 import { isVertexViewerDistanceMeasurement } from '../viewer-measurement-distance/utils';
-import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
 
 /**
  * The types of measurements that can be performed by this tool.

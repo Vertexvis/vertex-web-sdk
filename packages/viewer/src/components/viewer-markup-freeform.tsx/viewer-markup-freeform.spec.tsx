@@ -5,8 +5,9 @@ jest.mock('../viewer-markup/dom');
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point, Rectangle } from '@vertexvis/geometry';
-import { ViewerMarkupFreeform } from './viewer-markup-freeform';
+
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { ViewerMarkupFreeform } from './viewer-markup-freeform';
 
 describe('vertex-viewer-markup-freeform', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

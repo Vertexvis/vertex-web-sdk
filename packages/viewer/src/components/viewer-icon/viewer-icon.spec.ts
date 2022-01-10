@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+
 import { ViewerIcon } from './viewer-icon';
 
 describe('<vertex-viewer-icon>', () => {

@@ -1,8 +1,9 @@
 jest.mock('@vertexvis/stream-api');
 
-import { StreamApi } from '@vertexvis/stream-api';
-import { Raycaster } from '../raycaster';
 import { Point } from '@vertexvis/geometry';
+import { StreamApi } from '@vertexvis/stream-api';
+
+import { Raycaster } from '../raycaster';
 
 describe(Raycaster, () => {
   const api = new StreamApi();

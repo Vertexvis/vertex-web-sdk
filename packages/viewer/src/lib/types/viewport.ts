@@ -5,9 +5,10 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
-import { FramePerspectiveCamera } from './frame';
-import type { FrameImageLike } from './frame';
+
 import { DepthBuffer } from './depthBuffer';
+import type { FrameImageLike } from './frame';
+import { FramePerspectiveCamera } from './frame';
 
 /**
  * A `Viewport` represents the drawing area in the viewer.

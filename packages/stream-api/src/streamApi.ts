@@ -1,29 +1,30 @@
-import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
+
 import { ConnectionDescriptor } from './connection';
+import { decode, encode } from './encoder';
+import { StreamRequestError } from './errors';
+import { appendSettingsToUrl, Settings } from './settings';
+import { currentDateAsProtoTimestamp } from './time';
 import {
+  EventMessage,
   GetStencilBufferPayload,
   HitItemsPayload,
+  LoadSceneViewStatePayload,
   ReconnectPayload,
-  ReplaceCameraPayload,
-  StartStreamPayload,
-  ResponseResult,
-  ResponseError,
-  RequestMessage,
-  ResponseMessage,
-  SyncTimePayload,
   RecordPerformancePayload,
+  ReplaceCameraPayload,
+  RequestMessage,
+  ResponseError,
+  ResponseMessage,
+  ResponseResult,
+  StartStreamPayload,
+  SyncTimePayload,
   UpdateCrossSectioningPayload,
   UpdateDimensionsPayload,
   UpdateStreamPayload,
-  LoadSceneViewStatePayload,
-  EventMessage,
 } from './types';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
-import { currentDateAsProtoTimestamp } from './time';
-import { encode, decode } from './encoder';
-import { StreamRequestError } from './errors';
-import { appendSettingsToUrl, Settings } from './settings';
+import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
 
 export type RequestMessageHandler = (msg: RequestMessage) => void;
 

@@ -1,14 +1,15 @@
-import { acknowledgeFrameRequests } from '../timing';
-import { SynchronizedClock } from '../../types';
 import {
-  WebSocketClientMock,
-  StreamApi,
+  decode,
   encode,
   Fixtures,
+  StreamApi,
   toProtoTimestamp,
-  decode,
+  WebSocketClientMock,
 } from '@vertexvis/stream-api';
 import Long from 'long';
+
+import { SynchronizedClock } from '../../types';
+import { acknowledgeFrameRequests } from '../timing';
 
 describe(acknowledgeFrameRequests, () => {
   const remoteTime = new Date('2020-08-01T17:00:00.000Z');

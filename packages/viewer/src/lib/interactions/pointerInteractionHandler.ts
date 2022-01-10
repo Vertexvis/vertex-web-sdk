@@ -1,14 +1,15 @@
-import { BaseInteractionHandler } from './baseInteractionHandler';
 import { Point } from '@vertexvis/geometry';
+
+import { ConfigProvider } from '../config';
+import { BaseInteractionHandler } from './baseInteractionHandler';
+import { InteractionApi } from './interactionApi';
 import {
-  ZoomInteraction,
   PanInteraction,
   RotateInteraction,
-  TwistInteraction,
   RotatePointInteraction,
+  TwistInteraction,
+  ZoomInteraction,
 } from './mouseInteractions';
-import { InteractionApi } from './interactionApi';
-import { ConfigProvider } from '../config';
 
 export class PointerInteractionHandler extends BaseInteractionHandler {
   private touchPoints: Set<number>;

@@ -1,5 +1,6 @@
 import { MeasurementResult } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
 import { Mapper as M } from '@vertexvis/utils';
+
 import {
   createMeasureResponse,
   createMinimumDistanceResult,

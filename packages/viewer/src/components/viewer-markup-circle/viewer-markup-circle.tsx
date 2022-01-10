@@ -1,27 +1,28 @@
 import {
   Component,
-  Host,
-  h,
   Element,
-  Prop,
-  Watch,
-  EventEmitter,
   Event,
-  State,
+  EventEmitter,
+  h,
+  Host,
   Method,
+  Prop,
+  State,
+  Watch,
 } from '@stencil/core';
 import { Point, Rectangle } from '@vertexvis/geometry';
+
 import { getMouseClientPosition } from '../../lib/dom';
+import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
-  translateRectToScreen,
-  translatePointToRelative,
   transformRectangle,
+  translatePointToRelative,
+  translateRectToScreen,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
-import { BoundingBox2d } from './viewer-markup-circle-components';
 import { parseBounds } from './utils';
-import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { BoundingBox2d } from './viewer-markup-circle-components';
 
 /**
  * The supported markup modes.

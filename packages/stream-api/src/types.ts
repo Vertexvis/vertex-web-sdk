@@ -1,5 +1,5 @@
-import { DeepRequired, RequiredAndNonNullable } from '@vertexvis/utils';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { DeepRequired, RequiredAndNonNullable } from '@vertexvis/utils';
 
 export type RequestMessage = RequiredAndNonNullable<
   Pick<vertexvis.protobuf.stream.IStreamMessage, 'request' | 'sentAtTime'>

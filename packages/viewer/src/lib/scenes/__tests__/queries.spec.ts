@@ -1,5 +1,6 @@
-import { RootQuery } from '../queries';
 import { UUID } from '@vertexvis/utils';
+
+import { RootQuery } from '../queries';
 
 describe(RootQuery, () => {
   const itemId = UUID.create();

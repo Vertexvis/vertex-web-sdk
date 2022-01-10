@@ -1,3 +1,9 @@
+import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+import { StreamApi } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
+
+import { FrameDecoder } from '../mappers';
+import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import {
   Animation,
   ClippingPlanes,
@@ -6,13 +12,8 @@ import {
   FramePerspectiveCamera,
   StandardView,
 } from '../types';
-import { Vector3, BoundingBox } from '@vertexvis/geometry';
-import { StreamApi } from '@vertexvis/stream-api';
-import { UUID } from '@vertexvis/utils';
-import { buildFlyToOperation } from './mapper';
 import { CameraRenderResult } from './cameraRenderResult';
-import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
-import { FrameDecoder } from '../mappers';
+import { buildFlyToOperation } from './mapper';
 
 const PI_OVER_360 = 0.008726646259972;
 

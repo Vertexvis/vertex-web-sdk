@@ -1,7 +1,7 @@
 jest.mock('../viewer');
 
-import { Viewer } from '../viewer';
 import { Scene } from '../../../lib/scenes';
+import { Viewer } from '../viewer';
 
 export * from '../../../lib/scenes/__mocks__/mocks';
 

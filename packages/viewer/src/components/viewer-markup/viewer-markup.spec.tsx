@@ -1,17 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { ViewerMarkup } from './viewer-markup';
-import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
+import { Point, Rectangle } from '@vertexvis/geometry';
+
 import {
   ArrowMarkup,
   CircleMarkup,
   FreeformMarkup,
 } from '../../lib/types/markup';
-import { Point, Rectangle } from '@vertexvis/geometry';
+import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
-import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
 import { ViewerMarkupFreeform } from '../viewer-markup-freeform.tsx/viewer-markup-freeform';
+import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
+import { ViewerMarkup } from './viewer-markup';
 
 describe('vertex-viewer-markup', () => {
   const viewer = {

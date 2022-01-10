@@ -2,6 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
+
 import { DistanceMeasurement } from '../../lib/types';
 import { ViewerMeasurementDistance } from '../viewer-measurement-distance/viewer-measurement-distance';
 import { ViewerMeasurements } from './viewer-measurements';

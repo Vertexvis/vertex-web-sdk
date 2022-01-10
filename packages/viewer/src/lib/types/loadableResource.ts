@@ -1,4 +1,5 @@
 import { Uri } from '@vertexvis/utils';
+
 import { InvalidResourceUrnError } from '../errors';
 
 interface StreamKeyResource {

@@ -1,6 +1,6 @@
-import * as Vector3 from '../vector3';
-import * as Plane from '../plane';
 import * as Line3 from '../line3';
+import * as Plane from '../plane';
+import * as Vector3 from '../vector3';
 
 describe(Plane.create, () => {
   it('returns plane with defaults', () => {

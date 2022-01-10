@@ -1,8 +1,9 @@
 import { Angle, Vector3 } from '@vertexvis/geometry';
+
 import {
+  makeLookAtMatrix,
   makeLookAtViewMatrix,
   makePerspectiveMatrix,
-  makeLookAtMatrix,
 } from '../matrices';
 
 describe(makePerspectiveMatrix, () => {

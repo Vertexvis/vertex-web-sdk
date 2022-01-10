@@ -2,6 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
+
 import { SceneTreeSearch } from './scene-tree-search';
 
 describe('vertex-scene-tree-search', () => {

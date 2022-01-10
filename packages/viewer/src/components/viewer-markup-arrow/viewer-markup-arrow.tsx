@@ -1,29 +1,30 @@
 import {
   Component,
-  Host,
-  h,
   Element,
-  Prop,
-  Watch,
-  EventEmitter,
   Event,
-  State,
+  EventEmitter,
+  h,
+  Host,
   Method,
+  Prop,
+  State,
+  Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
+
 import { getMouseClientPosition } from '../../lib/dom';
-import {
-  createArrowheadPoints,
-  arrowheadPointsToPolygonPoints,
-  parsePoint,
-} from './utils';
-import { SvgShadow } from '../viewer-markup/viewer-markup-components';
-import { BoundingBox1d } from './viewer-markup-arrow-components';
+import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
-import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { SvgShadow } from '../viewer-markup/viewer-markup-components';
+import {
+  arrowheadPointsToPolygonPoints,
+  createArrowheadPoints,
+  parsePoint,
+} from './utils';
+import { BoundingBox1d } from './viewer-markup-arrow-components';
 
 /**
  * The supported arrow markup modes.

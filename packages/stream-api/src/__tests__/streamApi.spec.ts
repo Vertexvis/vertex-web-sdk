@@ -6,12 +6,13 @@ jest.mock('@vertexvis/utils', () => {
   };
 });
 
-import { StreamApi } from '../streamApi';
-import { UUID } from '@vertexvis/utils';
-import { toProtoDuration, currentDateAsProtoTimestamp } from '../time';
-import { WebSocketClientMock } from '../testing';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { UUID } from '@vertexvis/utils';
+
 import { decode } from '../encoder';
+import { StreamApi } from '../streamApi';
+import { WebSocketClientMock } from '../testing';
+import { currentDateAsProtoTimestamp, toProtoDuration } from '../time';
 
 describe(StreamApi, () => {
   const ws = new WebSocketClientMock();

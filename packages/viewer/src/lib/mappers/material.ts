@@ -1,5 +1,6 @@
-import { Color, Mapper as M } from '@vertexvis/utils';
 import type { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Color, Mapper as M } from '@vertexvis/utils';
+
 import { Color3 } from '../../interfaces';
 
 export const fromPbRGBi: M.Func<vertexvis.protobuf.core.IRGBi, Color.Color> =

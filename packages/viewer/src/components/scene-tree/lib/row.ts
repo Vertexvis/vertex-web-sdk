@@ -1,4 +1,5 @@
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+
 import { MetadataKey } from '../interfaces';
 
 export type MetadataMap = Record<MetadataKey, string | undefined>;

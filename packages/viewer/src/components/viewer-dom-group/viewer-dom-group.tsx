@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { Component, Host, h, Watch, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, Watch } from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
 @Component({

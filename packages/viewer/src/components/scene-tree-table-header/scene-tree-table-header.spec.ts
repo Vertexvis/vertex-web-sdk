@@ -1,4 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
+
 import { SceneTreeTableHeader } from './scene-tree-table-header';
 
 describe('<vertex-scene-tree-table-header>', () => {

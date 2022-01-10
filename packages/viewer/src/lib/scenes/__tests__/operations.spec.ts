@@ -1,6 +1,7 @@
-import { SceneOperationBuilder } from '../operations';
-import { ColorMaterial, fromHex } from '../colorMaterial';
 import { Color } from '@vertexvis/utils';
+
+import { ColorMaterial, fromHex } from '../colorMaterial';
+import { SceneOperationBuilder } from '../operations';
 
 describe(SceneOperationBuilder, () => {
   it('creates a hide operation', () => {

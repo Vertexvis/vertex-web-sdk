@@ -1,4 +1,4 @@
-import { rollupConfig, rollupCdnConfig } from '../rollup';
+import { rollupCdnConfig, rollupConfig } from '../rollup';
 
 describe(rollupConfig, () => {
   it('should generate single bundle if not multiplatform', () => {

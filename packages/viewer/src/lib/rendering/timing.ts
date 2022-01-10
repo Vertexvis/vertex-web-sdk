@@ -1,12 +1,13 @@
-import { SynchronizedClock } from '../types';
-import {
-  RequestMessageHandler,
-  toProtoDuration,
-  protoToDate,
-  StreamApi,
-} from '@vertexvis/stream-api';
 import { google } from '@vertexvis/frame-streaming-protos';
-import { ifRequestId, ifDrawFrame } from './utils';
+import {
+  protoToDate,
+  RequestMessageHandler,
+  StreamApi,
+  toProtoDuration,
+} from '@vertexvis/stream-api';
+
+import { SynchronizedClock } from '../types';
+import { ifDrawFrame, ifRequestId } from './utils';
 
 const MUTE_WARNING_SECONDS = 1 * 60; // 1 minute
 

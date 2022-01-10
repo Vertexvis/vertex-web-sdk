@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+
 import { InteractionApi } from './interactionApi';
 import { MultiTouchInteractionHandler } from './multiTouchInteractionHandler';
 

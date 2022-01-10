@@ -1,9 +1,10 @@
-import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
-import { KeyInteraction } from './keyInteraction';
-import { ConfigProvider } from '../config';
-import { TapEventDetails } from './tapEventDetails';
-import { ImageScaleProvider, Scene } from '../scenes';
 import { Point, Vector3 } from '@vertexvis/geometry';
+import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
+
+import { ConfigProvider } from '../config';
+import { ImageScaleProvider, Scene } from '../scenes';
+import { KeyInteraction } from './keyInteraction';
+import { TapEventDetails } from './tapEventDetails';
 
 type SceneProvider = () => Scene;
 

@@ -6,24 +6,25 @@ jest.mock('../../lib/rendering/imageLoaders');
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point, Vector3 } from '@vertexvis/geometry';
+
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import {
   FramePerspectiveCamera,
   STENCIL_BUFFER_EMPTY_VALUE,
   STENCIL_BUFFER_FEATURE_VALUE,
   Viewport,
 } from '../../lib/types';
-import { ViewerMeasurementDistance } from './viewer-measurement-distance';
-import { getMeasurementBoundingClientRect } from './dom';
+import * as Fixtures from '../../testing/fixtures';
 import {
+  key1,
   loadViewerStreamKey,
   makeViewerStream,
-  key1,
 } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
-import * as Fixtures from '../../testing/fixtures';
-import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import { getMeasurementBoundingClientRect } from './dom';
+import { ViewerMeasurementDistance } from './viewer-measurement-distance';
 
 describe('vertex-viewer-measurement-distance', () => {
   const camera = new FramePerspectiveCamera(

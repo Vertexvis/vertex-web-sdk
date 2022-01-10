@@ -1,10 +1,11 @@
 import { Component, h, Host, Prop, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
+
 import { Formatter } from '../../lib/formatter';
 import {
+  MeasurementDetailsSummary,
   MeasurementModel,
   MeasurementResult,
-  MeasurementDetailsSummary,
   summarizeResults,
 } from '../../lib/measurement';
 import {

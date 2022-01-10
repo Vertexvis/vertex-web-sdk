@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+
 import { SceneTreeToolbar } from './scene-tree-toolbar';
 
 describe('scene-tree-toolbar', () => {

@@ -1,9 +1,10 @@
-import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
-import { KeyInteraction } from './keyInteraction';
-import { ConfigProvider } from '../config';
-import { TapEventDetails } from './tapEventDetails';
-import { ImageScaleProvider } from '../scenes';
 import { Point } from '@vertexvis/geometry';
+import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
+
+import { ConfigProvider } from '../config';
+import { ImageScaleProvider } from '../scenes';
+import { KeyInteraction } from './keyInteraction';
+import { TapEventDetails } from './tapEventDetails';
 
 export class FlyToPartKeyInteraction
   implements KeyInteraction<TapEventDetails>

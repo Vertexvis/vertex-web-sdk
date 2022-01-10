@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+
 import { toPbStreamAttributes } from '../streamAttributes';
 
 describe(toPbStreamAttributes, () => {

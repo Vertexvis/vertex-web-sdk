@@ -2,9 +2,10 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
-import { ViewerMeasurementDetails } from './viewer-measurement-details';
-import { MeasurementModel, summarizeResults } from '../../lib/measurement';
 import { Angle } from '@vertexvis/geometry';
+
+import { MeasurementModel, summarizeResults } from '../../lib/measurement';
+import { ViewerMeasurementDetails } from './viewer-measurement-details';
 
 describe('vertex-viewer-measurement-details', () => {
   it('renders a details with measurement details', async () => {

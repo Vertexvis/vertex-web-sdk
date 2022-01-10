@@ -1,21 +1,22 @@
 import {
   Component,
-  Host,
-  h,
   Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Listen,
+  Method,
   Prop,
   Watch,
-  EventEmitter,
-  Event,
-  Method,
-  Listen,
 } from '@stencil/core';
+
 import { stampTemplateWithId } from '../../lib/templates';
 import {
-  Markup,
   ArrowMarkup,
   CircleMarkup,
   FreeformMarkup,
+  Markup,
 } from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';

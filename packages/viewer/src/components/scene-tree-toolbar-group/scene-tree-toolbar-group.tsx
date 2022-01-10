@@ -1,4 +1,4 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, h, Host } from '@stencil/core';
 
 /**
  * @slot The content of the group.

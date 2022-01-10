@@ -8,30 +8,31 @@ jest.mock('../../lib/stencil', () => ({
 }));
 jest.mock('../scene-tree/lib/dom');
 
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { SceneTreeController } from '../scene-tree/lib/controller';
-import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import {
-  getSceneTreeTableOffsetTop,
-  getSceneTreeTableViewportWidth,
-} from './lib/dom';
+import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+
+import { readDOM } from '../../lib/stencil';
 import {
   createGetTreeResponse,
   mockGrpcUnaryResult,
   random,
   ResponseStreamMock,
 } from '../../testing';
-import { SceneTreeTableLayout } from './scene-tree-table-layout';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
-import { readDOM } from '../../lib/stencil';
-import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
-import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
-import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
+import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
+import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
+import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
+import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
+import {
+  getSceneTreeTableOffsetTop,
+  getSceneTreeTableViewportWidth,
+} from './lib/dom';
+import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
 describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {

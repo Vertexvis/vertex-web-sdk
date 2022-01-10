@@ -1,13 +1,13 @@
 import {
   Component,
-  Host,
-  h,
-  Prop,
-  State,
   Element,
-  Method,
   Event,
   EventEmitter,
+  h,
+  Host,
+  Method,
+  Prop,
+  State,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
@@ -16,12 +16,13 @@ import {
   generateInstanceFromTemplate,
   InstancedTemplate,
 } from '@vertexvis/html-templates';
+
 import { readDOM } from '../../lib/stencil';
-import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { LoadedRow, Row } from '../scene-tree/lib/row';
 import { RowDataProvider } from '../scene-tree/scene-tree';
+import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import {
   DomScrollToOptions,
   getSceneTreeTableOffsetTop,

@@ -1,5 +1,5 @@
-import { RequestMessageHandler } from '@vertexvis/stream-api';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { RequestMessageHandler } from '@vertexvis/stream-api';
 
 export function ifRequestId(
   f: (id: string) => RequestMessageHandler

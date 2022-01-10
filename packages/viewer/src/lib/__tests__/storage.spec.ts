@@ -1,4 +1,4 @@
-import { upsertStorageEntry, getStorageEntry } from '../storage';
+import { getStorageEntry, upsertStorageEntry } from '../storage';
 
 class MockLocalStorage {
   private storage: Record<string, string>;

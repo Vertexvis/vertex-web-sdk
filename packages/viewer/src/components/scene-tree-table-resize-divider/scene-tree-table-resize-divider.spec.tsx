@@ -1,4 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
+
 import { SceneTreeTableResizeDivider } from './scene-tree-table-resize-divider';
 
 describe('<vertex-scene-tree-table-resize-divider>', () => {

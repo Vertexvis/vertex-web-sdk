@@ -1,5 +1,6 @@
-import { ColorMaterial } from './colorMaterial';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+
+import { ColorMaterial } from './colorMaterial';
 
 interface ShowItemOperation {
   type: 'show';

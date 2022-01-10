@@ -1,15 +1,16 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
-import { Scene } from '../../scenes';
 import { Point } from '@vertexvis/geometry';
-import { InteractionApi } from '../interactionApi';
-import { frame } from '../../../testing/fixtures';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Interactions, Orientation, Viewport } from '../../types';
-import * as ColorMaterial from '../../scenes/colorMaterial';
+
+import { frame } from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
+import { Scene } from '../../scenes';
+import * as ColorMaterial from '../../scenes/colorMaterial';
+import { Interactions, Orientation, Viewport } from '../../types';
 import { Frame } from '../../types/frame';
+import { InteractionApi } from '../interactionApi';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();

@@ -1,4 +1,5 @@
 import 'requestidlecallback-polyfill';
+
 import {
   Component,
   Element,
@@ -13,31 +14,32 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { ElementPool } from '@vertexvis/html-templates';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
-import { isLoadedRow, Row } from './lib/row';
+
+import { Config, parseConfig } from '../../lib/config';
+import { Environment } from '../../lib/environment';
+import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
+import { SceneTreeError } from './errors';
+import { MetadataKey } from './interfaces';
 import {
   FilterTreeOptions,
   SceneTreeController,
   SceneTreeState,
 } from './lib/controller';
-import { Config, parseConfig } from '../../lib/config';
-import { Environment } from '../../lib/environment';
 import { getSceneTreeContainsElement } from './lib/dom';
+import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
+import { isLoadedRow, Row } from './lib/row';
 import {
   deselectItem,
   hideItem,
   selectItem,
-  ViewerSelectItemOptions,
-  showItem,
   selectRangeInSceneTree,
+  showItem,
+  ViewerSelectItemOptions,
 } from './lib/viewer-ops';
-import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
-import { MetadataKey } from './interfaces';
-import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
-import { SceneTreeError } from './errors';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
 

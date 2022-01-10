@@ -1,11 +1,12 @@
-import {
-  RequestMessage,
-  DrawFramePayload,
-  GracefulReconnectPayload,
-} from '../../types';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Objects, UUID } from '@vertexvis/utils';
+
 import { currentDateAsProtoTimestamp } from '../../time';
+import {
+  DrawFramePayload,
+  GracefulReconnectPayload,
+  RequestMessage,
+} from '../../types';
 
 type Metadata = Partial<Pick<RequestMessage, 'sentAtTime'>>;
 

@@ -1,9 +1,10 @@
 jest.mock('@vertexvis/stream-api');
 
-import { StreamApi } from '@vertexvis/stream-api';
-import { CrossSectioner } from '../crossSectioner';
-import { CrossSectioning } from '../../types';
 import { Vector3 } from '@vertexvis/geometry';
+import { StreamApi } from '@vertexvis/stream-api';
+
+import { CrossSectioning } from '../../types';
+import { CrossSectioner } from '../crossSectioner';
 
 describe(CrossSectioner, () => {
   const api = new StreamApi();

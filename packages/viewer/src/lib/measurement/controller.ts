@@ -1,3 +1,4 @@
+import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 import {
   MeasureRequest,
   MeasureResponse,
@@ -5,16 +6,16 @@ import {
   UpdateModelEntitiesRequest,
 } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
+import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
+
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { mapMeasureResponseOrThrow } from './mapper';
 import {
   MeasurementModel,
   MeasurementOutcome,
   MeasurementResult,
 } from './model';
-import { mapMeasureResponseOrThrow } from './mapper';
 import { MeasurementEntity } from './model';
-import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
-import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 /**
  * The `MeasurementController` is responsible for performing measurements of

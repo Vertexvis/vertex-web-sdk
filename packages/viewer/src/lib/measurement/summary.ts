@@ -1,4 +1,5 @@
 import { Vector3 } from '@vertexvis/geometry';
+
 import {
   MeasurementResult,
   MinimumDistanceMeasurementResult,

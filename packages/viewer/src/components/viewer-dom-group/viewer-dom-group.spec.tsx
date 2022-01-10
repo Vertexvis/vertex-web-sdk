@@ -1,5 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
 import { ViewerDomGroup } from './viewer-dom-group';
 
 describe('vertex-viewer-dom-group', () => {

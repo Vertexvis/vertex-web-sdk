@@ -6,6 +6,7 @@ import {
   WebSocketClientMock,
 } from '@vertexvis/stream-api';
 import { Async, Color } from '@vertexvis/utils';
+
 import { random } from '../../../testing';
 import { parseConfig } from '../../config';
 import {

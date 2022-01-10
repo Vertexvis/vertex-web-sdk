@@ -1,8 +1,9 @@
-import { MeasurementModel, MinimumDistanceMeasurementResult } from '../model';
-import { random } from '../../../testing';
 import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
+
+import { random } from '../../../testing';
 import { MeasurementEntity } from '..';
+import { MeasurementModel, MinimumDistanceMeasurementResult } from '../model';
 
 describe('MeasurementModel', () => {
   const point = Vector3.create();

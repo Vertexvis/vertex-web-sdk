@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { Component, Host, h, State, Prop, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Vector3 } from '@vertexvis/geometry';
+
 import { readDOM } from '../../lib/stencil';
 import {
   FramePerspectiveCamera,

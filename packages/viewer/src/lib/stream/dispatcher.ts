@@ -1,6 +1,6 @@
-import { Listener, Disposable, Async } from '@vertexvis/utils';
-import { StreamApi } from '@vertexvis/stream-api';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { StreamApi } from '@vertexvis/stream-api';
+import { Async, Disposable, Listener } from '@vertexvis/utils';
 
 export const DEFAULT_TIMEOUT_IN_MS = 1000 * 10;
 

@@ -1,4 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
+
 import { SceneTreeTableColumn } from './scene-tree-table-column';
 
 describe('<vertex-scene-tree-table-column>', () => {

@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Fragment, FunctionalComponent, h } from '@stencil/core';
+
 import { SceneTreeErrorDetails } from './lib/errors';
 
 interface SceneTreeErrorProps {

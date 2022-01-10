@@ -5,19 +5,20 @@ jest.mock('../../lib/rendering/imageLoaders');
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
-import { ViewerViewCube } from './viewer-view-cube';
+
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { FramePerspectiveCamera, Orientation } from '../../lib/types';
-import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
-import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
-import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import {
+  key1,
   loadViewerStreamKey,
   makeViewerStream,
-  key1,
 } from '../../testing/viewer';
-import { Viewer } from '../viewer/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
-import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import { Viewer } from '../viewer/viewer';
+import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
+import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
+import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
+import { ViewerViewCube } from './viewer-view-cube';
 
 describe('vertex-viewer-view-cube', () => {
   (loadImageBytes as jest.Mock).mockReturnValue({
@@ -169,11 +170,11 @@ describe('vertex-viewer-view-cube', () => {
 });
 
 import {
-  sceneMock,
-  cameraMock,
-  viewer,
-  resetAwaiter,
   awaitScene,
+  cameraMock,
+  resetAwaiter,
+  sceneMock,
+  viewer,
 } from '../viewer/__mocks__/mocks';
 
 describe('vertex-viewer-view-cube interactions', () => {

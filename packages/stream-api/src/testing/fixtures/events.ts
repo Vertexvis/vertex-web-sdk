@@ -1,10 +1,11 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+
+import { currentDateAsProtoTimestamp } from '../../time';
 import {
-  RequestMessage,
   AnimationCompletedEvent,
   EventMessage,
+  RequestMessage,
 } from '../../types';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { currentDateAsProtoTimestamp } from '../../time';
 
 type Metadata = Partial<Pick<RequestMessage, 'sentAtTime'>>;
 

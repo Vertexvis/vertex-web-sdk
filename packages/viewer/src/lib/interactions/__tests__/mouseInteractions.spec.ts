@@ -1,13 +1,14 @@
 jest.mock('../interactionApi');
 
-import {
-  RotateInteraction,
-  PanInteraction,
-  ZoomInteraction,
-  TwistInteraction,
-} from '../mouseInteractions';
-import { InteractionApi } from '../interactionApi';
 import { Point } from '@vertexvis/geometry';
+
+import { InteractionApi } from '../interactionApi';
+import {
+  PanInteraction,
+  RotateInteraction,
+  TwistInteraction,
+  ZoomInteraction,
+} from '../mouseInteractions';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const element = document.createElement('canvas');

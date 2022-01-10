@@ -1,4 +1,5 @@
 import { Color } from '@vertexvis/utils';
+
 import { toPbRGBi } from '../material';
 
 describe(toPbRGBi, () => {

@@ -1,4 +1,4 @@
-import { Point, Dimensions } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
 /**

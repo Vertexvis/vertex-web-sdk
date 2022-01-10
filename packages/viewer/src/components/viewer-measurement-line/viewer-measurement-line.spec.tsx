@@ -2,6 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
+
 import { ViewerMeasurementLine } from './viewer-measurement-line';
 
 describe('vertex-viewer-measurement-line', () => {

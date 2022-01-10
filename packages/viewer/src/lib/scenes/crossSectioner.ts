@@ -1,5 +1,6 @@
-import { StreamApi } from '@vertexvis/stream-api';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { StreamApi } from '@vertexvis/stream-api';
+
 import { CrossSectioning } from '../types';
 
 /**

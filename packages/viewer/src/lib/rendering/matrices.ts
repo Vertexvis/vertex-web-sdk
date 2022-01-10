@@ -4,6 +4,7 @@
  */
 
 import { Angle, Matrix4, Vector3 } from '@vertexvis/geometry';
+
 import { FrameCamera } from '../types';
 
 /**
