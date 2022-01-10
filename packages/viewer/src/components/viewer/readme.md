@@ -60,7 +60,7 @@ To remove a cursor, call `dispose()` on the returned disposable.
 
 Type: `Promise<Disposable>`
 
-
+A disposable that can be used to remove the cursor.
 
 ### `getBaseInteractionHandler() => Promise<BaseInteractionHandler | undefined>`
 
@@ -129,7 +129,8 @@ the default camera controls provided by the viewer.
 
 Type: `Promise<Disposable>`
 
-
+A promise containing the disposable to use to
+deregister the handler.
 
 ### `registerTapKeyInteraction(keyInteraction: KeyInteraction<TapEventDetails>) => Promise<void>`
 
