@@ -12,6 +12,7 @@ import * as Interactions from './interactions';
 import * as LoadableResource from './loadableResource';
 
 export * from './depthBuffer';
+export * from './entities';
 export * from './featureMap';
 export * from './frame';
 export * from './markup';
