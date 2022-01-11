@@ -1,5 +1,6 @@
+import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder';
+
 import type { DecodePngFn } from './png-decoder';
-import { loadWorker, WorkerModule, Pool } from 'worker:./png-decoder';
 
 type DecodePngModule = WorkerModule<DecodePngFn>;
 type DecodePngPool = Pool<DecodePngFn>;

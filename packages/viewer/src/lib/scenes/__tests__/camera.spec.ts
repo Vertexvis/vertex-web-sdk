@@ -1,11 +1,12 @@
 const realApi = jest.requireActual('@vertexvis/stream-api');
 jest.mock('@vertexvis/stream-api');
 
-import { Camera } from '../camera';
-import { FrameCamera } from '../../types';
-import { UUID } from '@vertexvis/utils';
-import { Vector3, BoundingBox, Angle } from '@vertexvis/geometry';
+import { Angle, BoundingBox, Vector3 } from '@vertexvis/geometry';
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
+
+import { FrameCamera } from '../../types';
+import { Camera } from '../camera';
 
 describe(Camera, () => {
   const stream = new StreamApi();

@@ -1,5 +1,5 @@
-import * as Vector3 from '../vector3';
 import * as BoundingBox from '../boundingBox';
+import * as Vector3 from '../vector3';
 
 describe(BoundingBox.create, () => {
   it('creates a bounding box', () => {

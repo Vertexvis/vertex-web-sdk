@@ -1,11 +1,11 @@
 import {
   config,
-  typescript,
-  output,
-  input,
   external,
-  RollupConfig,
+  input,
+  output,
   resolve,
+  RollupConfig,
+  typescript,
 } from '@vertexvis/build-tools';
 
 interface Config {

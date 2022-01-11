@@ -1,14 +1,15 @@
 import {
   Component,
-  Host,
-  h,
-  Prop,
-  EventEmitter,
   Event,
-  State,
+  EventEmitter,
+  h,
+  Host,
   Method,
+  Prop,
+  State,
 } from '@stencil/core';
 import classNames from 'classnames';
+
 import { debounceEvent } from '../../lib/stencil';
 
 /**

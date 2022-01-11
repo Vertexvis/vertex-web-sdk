@@ -1,14 +1,15 @@
 jest.mock('../viewer/viewer');
 
 import { newSpecPage } from '@stencil/core/testing';
-import { ViewerDefaultToolbar } from './viewer-default-toolbar';
+
 import {
-  sceneMock,
-  cameraMock,
-  viewer,
-  resetAwaiter,
   awaitScene,
+  cameraMock,
+  resetAwaiter,
+  sceneMock,
+  viewer,
 } from '../viewer/__mocks__/mocks';
+import { ViewerDefaultToolbar } from './viewer-default-toolbar';
 
 describe('<vertex-viewer-default-toolbar>', () => {
   beforeEach(() => {

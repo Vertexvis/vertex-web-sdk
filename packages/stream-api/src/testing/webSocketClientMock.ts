@@ -1,11 +1,12 @@
+import { Disposable } from '@vertexvis/utils';
+
+import { ConnectionDescriptor } from '../connection';
 import {
+  CloseHandler,
+  MessageHandler,
   WebSocketClient,
   WebSocketSendData,
-  MessageHandler,
-  CloseHandler,
 } from '../webSocketClient';
-import { ConnectionDescriptor } from '../connection';
-import { Disposable } from '@vertexvis/utils';
 
 export class WebSocketClientMock implements WebSocketClient {
   private closeHandlers = new Set<CloseHandler>();

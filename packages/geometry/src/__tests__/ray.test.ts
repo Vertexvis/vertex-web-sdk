@@ -1,6 +1,6 @@
-import * as Vector3 from '../vector3';
-import * as Ray from '../ray';
 import * as Plane from '../plane';
+import * as Ray from '../ray';
+import * as Vector3 from '../vector3';
 
 describe(Ray.create, () => {
   it('creates a ray with defaults', () => {

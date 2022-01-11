@@ -1,11 +1,11 @@
 import { ConfigProvider } from '../config';
 import { BaseInteractionHandler } from './baseInteractionHandler';
 import {
-  RotateInteraction,
-  ZoomInteraction,
   PanInteraction,
-  TwistInteraction,
+  RotateInteraction,
   RotatePointInteraction,
+  TwistInteraction,
+  ZoomInteraction,
 } from './mouseInteractions';
 
 export class MouseInteractionHandler extends BaseInteractionHandler {

@@ -1,17 +1,18 @@
 jest.mock('../imageLoaders');
 
+import { Dimensions } from '@vertexvis/geometry';
+import { Async } from '@vertexvis/utils';
+
+import * as Fixtures from '../../../testing/fixtures';
+import { TimingMeter } from '../../meters';
+import { Viewport } from '../../types';
 import {
+  CanvasRenderer,
   createCanvasRenderer,
   DrawFrame,
   measureCanvasRenderer,
-  CanvasRenderer,
 } from '../canvas';
-import { Dimensions } from '@vertexvis/geometry';
-import * as Fixtures from '../../../testing/fixtures';
 import { loadImageBytes } from '../imageLoaders';
-import { Async } from '@vertexvis/utils';
-import { TimingMeter } from '../../meters';
-import { Viewport } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = new HTMLCanvasElement().getContext('2d')!;

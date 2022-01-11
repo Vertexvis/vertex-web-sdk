@@ -6,9 +6,10 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
+
+import { makeDepthImageBytes } from '../../../testing/fixtures';
 import { DepthBuffer } from '../depthBuffer';
 import { FramePerspectiveCamera } from '../frame';
-import { makeDepthImageBytes } from '../../../testing/fixtures';
 import { Viewport } from '../viewport';
 
 describe(DepthBuffer, () => {

@@ -1,5 +1,6 @@
-import { toProtoTimestamp, toProtoDuration, protoToDate } from '../time';
 import { google } from '@vertexvis/frame-streaming-protos';
+
+import { protoToDate, toProtoDuration, toProtoTimestamp } from '../time';
 
 describe(toProtoTimestamp, () => {
   const fixedDate = new Date('2020-08-01T18:08:00.100Z');

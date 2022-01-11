@@ -1,5 +1,5 @@
-import * as Matrix4 from './matrix4';
 import { lerp as lerpNumber } from './math';
+import * as Matrix4 from './matrix4';
 
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a

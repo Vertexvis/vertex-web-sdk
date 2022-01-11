@@ -33,11 +33,10 @@ import {
   SceneTreeAPIClient,
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { sign } from 'jsonwebtoken';
 import { Async } from '@vertexvis/utils';
-import { SceneTreeController, SceneTreeState } from '../controller';
-import { fromNodeProto, Row } from '../row';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
+import { sign } from 'jsonwebtoken';
+
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
@@ -45,6 +44,8 @@ import {
   random,
   ResponseStreamMock,
 } from '../../../../testing';
+import { SceneTreeController, SceneTreeState } from '../controller';
+import { fromNodeProto, Row } from '../row';
 
 function signJwt(viewId: string): string {
   return sign(

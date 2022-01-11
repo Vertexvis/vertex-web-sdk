@@ -1,4 +1,5 @@
 import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
+
 import { ConnectionDescriptor } from './connection';
 
 export type WebSocketSendData =

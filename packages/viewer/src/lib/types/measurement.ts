@@ -1,5 +1,6 @@
 import { Vector3 } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
+
 import { DistanceUnits } from './measurementUnits';
 
 export interface DistanceMeasurementInit {

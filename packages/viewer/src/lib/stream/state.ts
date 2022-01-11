@@ -1,4 +1,5 @@
 import { Disposable } from '@vertexvis/utils';
+
 import { Token } from '../token';
 import { Frame, Orientation, SynchronizedClock } from '../types';
 import { Resource } from '../types/loadableResource';

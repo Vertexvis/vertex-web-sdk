@@ -1,8 +1,9 @@
-import { Uri, Objects } from '@vertexvis/utils';
+import { Objects, Uri } from '@vertexvis/utils';
+
 import {
-  defineParams,
   defineBoolean,
   defineNumber,
+  defineParams,
   defineString,
   ParamsBuilder,
 } from './paramsBuilder';

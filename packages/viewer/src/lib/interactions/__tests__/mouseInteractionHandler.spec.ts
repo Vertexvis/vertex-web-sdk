@@ -1,16 +1,16 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
 
-import { MouseInteractionHandler } from '../mouseInteractionHandler';
+import { parseConfig } from '../../config';
 import { InteractionApi } from '../interactionApi';
+import { MouseInteractionHandler } from '../mouseInteractionHandler';
 import {
   PanInteraction,
-  ZoomInteraction,
   RotateInteraction,
-  TwistInteraction,
   RotatePointInteraction,
+  TwistInteraction,
+  ZoomInteraction,
 } from '../mouseInteractions';
-import { parseConfig } from '../../config';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;

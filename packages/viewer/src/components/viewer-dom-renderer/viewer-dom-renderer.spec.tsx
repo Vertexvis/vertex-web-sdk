@@ -1,17 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { ViewerDomRenderer } from './viewer-dom-renderer';
 import {
   BoundingBox,
   Dimensions,
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
-import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
+
 import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
 import { makeDepthImageBytes } from '../../testing/fixtures';
+import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
+import { ViewerDomRenderer } from './viewer-dom-renderer';
 
 describe('<vertex-viewer-dom-renderer>', () => {
   const camera = FramePerspectiveCamera.fromBoundingBox(

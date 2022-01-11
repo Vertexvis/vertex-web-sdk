@@ -1,9 +1,10 @@
-import { FrameRenderer } from './renderer';
 import { Dimensions } from '@vertexvis/geometry';
+
 import { Timing, TimingMeter } from '../meters';
-import { HtmlImage, loadImageBytes } from './imageLoaders';
-import { Frame } from '../types/frame';
 import { StencilBufferManager, Viewport } from '../types';
+import { Frame } from '../types/frame';
+import { HtmlImage, loadImageBytes } from './imageLoaders';
+import { FrameRenderer } from './renderer';
 
 const REPORTING_INTERVAL_MS = 1000;
 

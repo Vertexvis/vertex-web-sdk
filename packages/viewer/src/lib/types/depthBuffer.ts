@@ -1,6 +1,7 @@
 import { Point, Ray } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
+
 import {
   FrameImageLike,
   FramePerspectiveCamera,

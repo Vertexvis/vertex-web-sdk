@@ -1,4 +1,6 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Plane, Vector3 } from '@vertexvis/geometry';
+import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 import { MeasureEntity } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import {
@@ -7,9 +9,8 @@ import {
   Listener,
   Mapper,
 } from '@vertexvis/utils';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
+
 import { fromPbVector3f } from '../mappers';
-import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 
 /**
  * A measurement result that represents the closets point between two entities.

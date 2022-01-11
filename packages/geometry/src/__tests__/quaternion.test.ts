@@ -1,8 +1,8 @@
-import * as Quaternion from '../quaternion';
-import * as Vector3 from '../vector3';
 import * as Angle from '../angle';
 import * as Euler from '../euler';
 import * as Matrix4 from '../matrix4';
+import * as Quaternion from '../quaternion';
+import * as Vector3 from '../vector3';
 
 describe(Quaternion.fromJson, () => {
   it('parses json obj', () => {

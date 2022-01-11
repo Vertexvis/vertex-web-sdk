@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+
 import { ViewerToolbarGroup } from './viewer-toolbar-group';
 
 describe('<vertex-viewer-toolbar>', () => {

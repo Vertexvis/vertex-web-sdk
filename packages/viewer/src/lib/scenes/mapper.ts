@@ -1,9 +1,10 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { toProtoDuration } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
+
+import { Animation, FlyTo } from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
-import { FlyTo, Animation } from '../types';
-import { UUID } from '@vertexvis/utils';
-import { toProtoDuration } from '@vertexvis/stream-api';
 
 export function buildSceneOperation(
   query: QueryExpression,

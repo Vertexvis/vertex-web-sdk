@@ -1,12 +1,13 @@
 import {
-  StreamApi,
-  WebSocketClientMock,
   encode,
   Fixtures,
+  StreamApi,
+  WebSocketClientMock,
 } from '@vertexvis/stream-api';
-import { StreamApiEventDispatcher } from '../dispatcher';
+
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
+import { StreamApiEventDispatcher } from '../dispatcher';
 
 describe(StreamApiEventDispatcher, () => {
   const correlationId = 'corr-id';

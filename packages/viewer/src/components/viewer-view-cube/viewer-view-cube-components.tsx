@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Fragment, FunctionalComponent, h } from '@stencil/core';
+import { Euler, Quaternion, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
-import { Vector3, Quaternion, Euler } from '@vertexvis/geometry';
 
 type FaceEdge = 'top' | 'bottom' | 'left' | 'right';
 

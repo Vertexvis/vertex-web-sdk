@@ -1,6 +1,7 @@
-import { StreamApi } from '@vertexvis/stream-api';
-import { Point } from '@vertexvis/geometry';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Point } from '@vertexvis/geometry';
+import { StreamApi } from '@vertexvis/stream-api';
+
 import { ImageScaleProvider } from './scene';
 
 /**

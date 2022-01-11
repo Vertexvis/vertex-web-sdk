@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+
 import { MeasurementController, MeasurementEntity } from '../..';
 import { getMouseClientPosition } from '../dom';
 import { InteractionApi, InteractionHandler } from '../interactions';

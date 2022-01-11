@@ -1,13 +1,16 @@
-import type { MeasureResponse as PbMeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
+import { Plane } from '@vertexvis/geometry';
 import type {
   MeasurementResult as PbMeasurementResult,
-  PlanarDistanceResult as PbPlanarDistanceResult,
-  PlanarAngleResult as PbPlanarAngleResult,
   MinimumDistanceResult as PbMinimumDistanceResult,
-  SurfaceAreaResult as PbSurfaceAreaResult,
+  PlanarAngleResult as PbPlanarAngleResult,
+  PlanarDistanceResult as PbPlanarDistanceResult,
   PlanePair as PbPlanePair,
+  SurfaceAreaResult as PbSurfaceAreaResult,
 } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
+import type { MeasureResponse as PbMeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M } from '@vertexvis/utils';
+
+import { fromPbPlane, fromPbVector3f } from '../mappers';
 import {
   MeasurementOutcome,
   MeasurementResult,
@@ -16,8 +19,6 @@ import {
   PlanarDistanceMeasurementResult,
   SurfaceAreaMeasurementResult,
 } from '../measurement/model';
-import { fromPbPlane, fromPbVector3f } from '../mappers';
-import { Plane } from '@vertexvis/geometry';
 
 const mapPlanePair: M.Func<
   PbPlanePair.AsObject,

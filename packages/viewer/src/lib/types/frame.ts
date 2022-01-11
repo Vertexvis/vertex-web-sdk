@@ -1,19 +1,20 @@
 import {
-  Dimensions,
-  Vector3,
-  Rectangle,
   BoundingBox,
-  Matrix4,
+  Dimensions,
   Line3,
+  Matrix4,
   Plane,
+  Rectangle,
+  Vector3,
 } from '@vertexvis/geometry';
-import * as FrameCamera from './frameCamera';
-import * as CrossSectioning from './crossSectioning';
+
+import { decodePng } from '../../workers/png-decoder-pool';
 import * as ClippingPlanes from './clippingPlanes';
+import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
 import { FeatureMap } from './featureMap';
+import * as FrameCamera from './frameCamera';
 import { Orientation } from './orientation';
-import { decodePng } from '../../workers/png-decoder-pool';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;

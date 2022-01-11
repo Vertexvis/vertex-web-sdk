@@ -1,47 +1,48 @@
 import {
   Component,
-  Host,
+  Element,
+  Event,
+  EventEmitter,
   h,
+  Host,
+  Method,
   Prop,
   State,
   Watch,
-  Element,
-  Method,
-  Event,
-  EventEmitter,
 } from '@stencil/core';
 import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
-import {
-  DepthBuffer,
-  FramePerspectiveCamera,
-  DistanceUnits,
-  StencilBuffer,
-  DistanceUnitType,
-  Viewport,
-} from '../../lib/types';
-import {
-  Anchor,
-  MeasurementElementPositions,
-  getViewingElementPositions,
-  translateWorldPtToViewport,
-} from './utils';
-import { getMeasurementBoundingClientRect } from './dom';
-import { getMouseClientPosition } from '../../lib/dom';
-import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
+
 import {
   MEASUREMENT_LINE_CAP_LENGTH,
   MEASUREMENT_SNAP_DISTANCE,
 } from '../../lib/constants';
 import { Cursor, measurementCursor } from '../../lib/cursors';
-import { PointToPointHitTester } from './hitTest';
+import { getMouseClientPosition } from '../../lib/dom';
 import { Formatter } from '../../lib/formatter';
 import {
-  PointToPointInteraction,
-  PointToPointInteractionModel,
+  DepthBuffer,
+  DistanceUnits,
+  DistanceUnitType,
+  FramePerspectiveCamera,
+  StencilBuffer,
+  Viewport,
+} from '../../lib/types';
+import { getMeasurementBoundingClientRect } from './dom';
+import { PointToPointHitTester } from './hitTest';
+import {
   PointToPointHitProvider,
+  PointToPointInteraction,
   PointToPointInteractionController,
+  PointToPointInteractionModel,
 } from './interactions';
+import {
+  Anchor,
+  getViewingElementPositions,
+  MeasurementElementPositions,
+  translateWorldPtToViewport,
+} from './utils';
+import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
 
 /**
  * Contains the bounding boxes of child elements of this component. This

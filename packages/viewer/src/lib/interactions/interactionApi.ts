@@ -1,3 +1,5 @@
+import { EventEmitter } from '@stencil/core';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Angle,
   BoundingBox,
@@ -6,18 +8,17 @@ import {
   Ray,
   Vector3,
 } from '@vertexvis/geometry';
-import { EventEmitter } from '@stencil/core';
-import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Scene, Camera } from '../scenes';
+
+import { ReceivedFrame } from '../..';
+import { Camera, Scene } from '../scenes';
 import {
   DepthBuffer,
   FramePerspectiveCamera,
   Interactions,
   Viewport,
 } from '../types';
-import { ReceivedFrame } from '../..';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 
 type SceneProvider = () => Scene;
 

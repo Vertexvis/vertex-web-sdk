@@ -1,19 +1,20 @@
 jest.mock('../hitTest');
 jest.mock('../../../lib/scenes');
 
-import {
-  PointToPointInteractionController,
-  PointToPointInteractionModel,
-} from '../interactions';
-import { randomPoint, randomVector3 } from '../../../testing/random';
-import { Async } from '@vertexvis/utils';
-import { PointToPointMeasurementResult } from '../../../lib/measurement';
 import { Vector3 } from '@vertexvis/geometry';
+import { Async } from '@vertexvis/utils';
+
+import { PointToPointMeasurementResult } from '../../../lib/measurement';
 import {
   makeHitProvider,
   makeHitTester,
   makeRaycaster,
 } from '../../../testing/fixtures';
+import { randomPoint, randomVector3 } from '../../../testing/random';
+import {
+  PointToPointInteractionController,
+  PointToPointInteractionModel,
+} from '../interactions';
 
 describe(PointToPointInteractionController, () => {
   let model!: PointToPointInteractionModel;

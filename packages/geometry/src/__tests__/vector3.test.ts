@@ -1,6 +1,6 @@
-import * as Vector3 from '../vector3';
 import * as Angle from '../angle';
 import * as Matrix4 from '../matrix4';
+import * as Vector3 from '../vector3';
 
 describe(Vector3.create, () => {
   it('creates a vector with x, y, z', () => {

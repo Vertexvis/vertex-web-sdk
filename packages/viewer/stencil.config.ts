@@ -1,11 +1,11 @@
 import { Config } from '@stencil/core';
-import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
 import workers from '@vertexvis/rollup-plugin-web-workers';
-import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import typescript2 from 'rollup-plugin-typescript2';
+import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import typescript2 from 'rollup-plugin-typescript2';
 
 export const config: Config = {
   namespace: 'viewer',

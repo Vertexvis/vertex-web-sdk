@@ -1,11 +1,12 @@
-import { Objects, DeepPartial } from '@vertexvis/utils';
-import { Environment } from './environment';
-import { Animation, Flags, Events, Interactions } from './types';
 import { FrameDeliverySettings } from '@vertexvis/stream-api';
 import {
   AdaptiveRenderingSettings,
   QualityOfServiceSettings,
 } from '@vertexvis/stream-api';
+import { DeepPartial, Objects } from '@vertexvis/utils';
+
+import { Environment } from './environment';
+import { Animation, Events, Flags, Interactions } from './types';
 
 interface NetworkConfig {
   apiHost: string;

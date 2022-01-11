@@ -1,12 +1,13 @@
 import {
-  StreamApi,
-  WebSocketClientMock,
   encode,
   Fixtures,
+  StreamApi,
+  WebSocketClientMock,
 } from '@vertexvis/stream-api';
-import { CameraRenderResult } from '../cameraRenderResult';
+
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
+import { CameraRenderResult } from '../cameraRenderResult';
 
 describe(CameraRenderResult, () => {
   const correlationId = 'corr-id';

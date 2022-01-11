@@ -2,6 +2,7 @@
 import { FunctionalComponent, h } from '@stencil/core';
 import { Angle, Point } from '@vertexvis/geometry';
 import classNames from 'classnames';
+
 import { RelativeAnchor } from '../viewer-markup/viewer-markup-components';
 
 export interface BoundingBox1dProps {

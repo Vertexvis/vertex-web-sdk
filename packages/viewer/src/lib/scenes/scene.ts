@@ -1,21 +1,22 @@
-import { StreamApi } from '@vertexvis/stream-api';
-import { Camera } from './camera';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { BoundingBox, Dimensions, Point } from '@vertexvis/geometry';
-import { Raycaster } from './raycaster';
-import { CrossSectioner } from './crossSectioner';
+import { StreamApi } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
+
+import { InvalidArgumentError } from '../errors';
+import { FrameDecoder } from '../mappers';
+import { Frame } from '../types/frame';
+import { Camera } from './camera';
 import { ColorMaterial, fromHex } from './colorMaterial';
+import { CrossSectioner } from './crossSectioner';
+import { buildSceneOperation } from './mapper';
 import {
+  ItemOperation,
   SceneItemOperations,
   SceneOperationBuilder,
-  ItemOperation,
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
-import { UUID } from '@vertexvis/utils';
-import { buildSceneOperation } from './mapper';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { InvalidArgumentError } from '../errors';
-import { Frame } from '../types/frame';
-import { FrameDecoder } from '../mappers';
+import { Raycaster } from './raycaster';
 
 interface SceneExecutionOptions {
   suppliedCorrelationId?: string;

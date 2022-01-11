@@ -1,13 +1,14 @@
+import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { decode as decodePng } from 'fast-png';
 import fs from 'fs/promises';
 import path from 'path';
-import { decode as decodePng } from 'fast-png';
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+
+import { makeDepthBuffer } from '../../../testing/fixtures';
 import {
-  StencilBuffer,
   STENCIL_BUFFER_EMPTY_VALUE,
   STENCIL_BUFFER_FEATURE_VALUE,
+  StencilBuffer,
 } from '../stencilBuffer';
-import { makeDepthBuffer } from '../../../testing/fixtures';
 
 describe(StencilBuffer, () => {
   const depthBuffer = makeDepthBuffer(200, 100);

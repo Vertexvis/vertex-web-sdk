@@ -2,6 +2,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
+
 import { PointToPointHitTester } from '../components/viewer-measurement-distance/hitTest';
 import { PointToPointHitProvider } from '../components/viewer-measurement-distance/interactions';
 import { fromPbFrame } from '../lib/mappers';
@@ -9,8 +10,8 @@ import { RaycasterLike } from '../lib/scenes/raycaster';
 import {
   DepthBuffer,
   Orientation,
-  StencilBuffer,
   STENCIL_BUFFER_FEATURE_VALUE,
+  StencilBuffer,
   Viewport,
 } from '../lib/types';
 

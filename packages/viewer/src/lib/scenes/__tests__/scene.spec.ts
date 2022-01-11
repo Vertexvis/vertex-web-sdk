@@ -1,13 +1,14 @@
 jest.mock('@vertexvis/stream-api');
 
-import { Scene } from '../scene';
-import { StreamApi } from '@vertexvis/stream-api';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { frame } from '../../../testing/fixtures';
+import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
-import * as ColorMaterial from '../colorMaterial';
+
+import { frame } from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
+import * as ColorMaterial from '../colorMaterial';
+import { Scene } from '../scene';
 
 describe(Scene, () => {
   const sceneViewId: UUID.UUID = UUID.create();

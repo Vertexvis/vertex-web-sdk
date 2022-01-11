@@ -1,3 +1,4 @@
+import { Dimensions } from '@vertexvis/geometry';
 import {
   ConnectionDescriptor,
   currentDateAsProtoTimestamp,
@@ -16,6 +17,8 @@ import {
   Objects,
   Uri,
 } from '@vertexvis/utils';
+
+import { Color3, StreamAttributes } from '../../interfaces';
 import { Config, parseConfig } from '../config';
 import {
   CustomError,
@@ -31,6 +34,8 @@ import {
   toPbRGBi,
   toPbStreamAttributes,
 } from '../mappers';
+import { acknowledgeFrameRequests } from '../rendering';
+import { Token } from '../token';
 import {
   Frame,
   LoadableResource,
@@ -38,16 +43,12 @@ import {
   SynchronizedClock,
 } from '../types';
 import { Resource } from '../types/loadableResource';
-import { Token } from '../token';
-import { Dimensions } from '@vertexvis/geometry';
 import {
   Connected,
   Connecting,
-  ViewerStreamState,
   Reconnecting,
+  ViewerStreamState,
 } from './state';
-import { acknowledgeFrameRequests } from '../rendering';
-import { Color3, StreamAttributes } from '../../interfaces';
 
 type StreamResult = Omit<
   Connected,

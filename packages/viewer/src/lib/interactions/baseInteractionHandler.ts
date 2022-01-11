@@ -1,20 +1,19 @@
-import { InteractionApi } from './interactionApi';
-import { InteractionHandler } from './interactionHandler';
-import { BaseEvent } from './interactionEvent';
-
-import {
-  RotateInteraction,
-  ZoomInteraction,
-  PanInteraction,
-  MouseInteraction,
-  TwistInteraction,
-  RotatePointInteraction,
-} from './mouseInteractions';
-
 import { Point } from '@vertexvis/geometry';
-import { EventDispatcher, Disposable, Listener } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+
 import { ConfigProvider } from '../config';
 import { getMouseClientPosition } from '../dom';
+import { InteractionApi } from './interactionApi';
+import { BaseEvent } from './interactionEvent';
+import { InteractionHandler } from './interactionHandler';
+import {
+  MouseInteraction,
+  PanInteraction,
+  RotateInteraction,
+  RotatePointInteraction,
+  TwistInteraction,
+  ZoomInteraction,
+} from './mouseInteractions';
 
 export type InteractionType =
   | 'rotate'

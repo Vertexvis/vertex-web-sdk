@@ -1,8 +1,9 @@
-import { FlyToPartKeyInteraction } from '../flyToPartKeyInteraction';
-import { StreamApi } from '@vertexvis/stream-api';
-import { Config } from '../../config';
-import { TapEventDetails } from '../tapEventDetails';
 import { Point } from '@vertexvis/geometry';
+import { StreamApi } from '@vertexvis/stream-api';
+
+import { Config } from '../../config';
+import { FlyToPartKeyInteraction } from '../flyToPartKeyInteraction';
+import { TapEventDetails } from '../tapEventDetails';
 
 describe(FlyToPartKeyInteraction, () => {
   const streamApi = new StreamApi();

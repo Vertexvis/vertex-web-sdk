@@ -1,6 +1,6 @@
-import * as Vector3 from './vector3';
-import * as Quaternion from './quaternion';
 import * as Angle from './angle';
+import * as Quaternion from './quaternion';
+import * as Vector3 from './vector3';
 
 /**
  * A type alias representing a 4x4 column-major matrix.

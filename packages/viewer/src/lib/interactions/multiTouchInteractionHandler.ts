@@ -1,6 +1,7 @@
-import { InteractionHandler } from './interactionHandler';
+import { Angle, Matrix2, Point } from '@vertexvis/geometry';
+
 import { InteractionApi } from './interactionApi';
-import { Point, Matrix2, Angle } from '@vertexvis/geometry';
+import { InteractionHandler } from './interactionHandler';
 
 export abstract class MultiTouchInteractionHandler
   implements InteractionHandler

@@ -9,10 +9,11 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
-import { update3d, Renderer3d } from './renderer3d';
-import { Renderer2d, update2d } from './renderer2d';
+
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FramePerspectiveCamera } from '../../lib/types/frame';
+import { Renderer2d, update2d } from './renderer2d';
+import { Renderer3d, update3d } from './renderer3d';
 
 export type ViewerDomRendererDrawMode = '2d' | '3d';
 

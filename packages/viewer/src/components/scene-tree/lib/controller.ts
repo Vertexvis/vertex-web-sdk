@@ -1,8 +1,7 @@
-import {
-  ResponseStream,
-  SceneTreeAPIClient,
-  ServiceError,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+import { grpc } from '@improbable-eng/grpc-web';
+import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
+import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   CollapseAllRequest,
   CollapseNodeRequest,
@@ -20,16 +19,18 @@ import {
   SubscribeRequest,
   SubscribeResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
-import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
-import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
-import { grpc } from '@improbable-eng/grpc-web';
+import {
+  ResponseStream,
+  SceneTreeAPIClient,
+  ServiceError,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable, EventDispatcher } from '@vertexvis/utils';
-import { fromNodeProto, Row } from './row';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+
+import { MetadataKey } from '../interfaces';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
-import { MetadataKey } from '../interfaces';
+import { fromNodeProto, Row } from './row';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;

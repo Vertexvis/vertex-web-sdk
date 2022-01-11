@@ -1,73 +1,67 @@
 import {
   Component,
   Element,
+  Event,
+  EventEmitter,
   h,
   Host,
+  Listen,
+  Method,
   Prop,
   State,
   Watch,
-  Method,
-  Event,
-  EventEmitter,
-  Listen,
 } from '@stencil/core';
-import { Config, parseConfig } from '../../lib/config';
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { toProtoDuration, WebSocketClientImpl } from '@vertexvis/stream-api';
+import { Color, Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import classnames from 'classnames';
-import { Disposable, Color, EventDispatcher, UUID } from '@vertexvis/utils';
-import { Viewport, Orientation, StencilBufferManager } from '../../lib/types';
-import { InteractionHandler } from '../../lib/interactions/interactionHandler';
+
+import {
+  FeatureHighlightOptions,
+  FeatureLineOptions,
+  FrameType,
+  StreamAttributes,
+} from '../../interfaces';
+import { Config, parseConfig } from '../../lib/config';
+import { Cursor, CursorManager } from '../../lib/cursors';
+import { cssCursor } from '../../lib/dom';
+import { Environment } from '../../lib/environment';
+import {
+  ComponentInitializationError,
+  IllegalStateError,
+  InteractionHandlerError,
+  ViewerInitializationError,
+} from '../../lib/errors';
+import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
+import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
+import { FlyToPositionKeyInteraction } from '../../lib/interactions/flyToPositionKeyInteraction';
 import { InteractionApi } from '../../lib/interactions/interactionApi';
-import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
+import { InteractionHandler } from '../../lib/interactions/interactionHandler';
+import { KeyInteraction } from '../../lib/interactions/keyInteraction';
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { MultiPointerInteractionHandler } from '../../lib/interactions/multiPointerInteractionHandler';
 import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
-import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
+import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
-import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
-import { FlyToPositionKeyInteraction } from '../../lib/interactions/flyToPositionKeyInteraction';
-import { Environment } from '../../lib/environment';
-import {
-  ViewerInitializationError,
-  InteractionHandlerError,
-  ComponentInitializationError,
-  IllegalStateError,
-} from '../../lib/errors';
-import { WebSocketClientImpl, toProtoDuration } from '@vertexvis/stream-api';
-import { Scene } from '../../lib/scenes/scene';
-import {
-  getElementBackgroundColor,
-  getElementBoundingClientRect,
-} from './utils';
+import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
+import { fromPbFrameOrThrow } from '../../lib/mappers';
+import { paintTime, Timing } from '../../lib/meters';
 import {
   CanvasRenderer,
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
-import { paintTime, Timing } from '../../lib/meters';
-import {
-  getStorageEntry,
-  StorageKeys,
-  upsertStorageEntry,
-} from '../../lib/storage';
-import { KeyInteraction } from '../../lib/interactions/keyInteraction';
-import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import {
   ColorMaterial,
   defaultSelectionMaterial,
   fromHex,
 } from '../../lib/scenes/colorMaterial';
-import { Frame } from '../../lib/types/frame';
-import { fromPbFrameOrThrow } from '../../lib/mappers';
-import { Cursor, CursorManager } from '../../lib/cursors';
-import { cssCursor } from '../../lib/dom';
+import { Scene } from '../../lib/scenes/scene';
 import {
-  FrameType,
-  FeatureHighlightOptions,
-  FeatureLineOptions,
-  StreamAttributes,
-} from '../../interfaces';
-import { ViewerStream } from '../../lib/stream/stream';
+  getStorageEntry,
+  StorageKeys,
+  upsertStorageEntry,
+} from '../../lib/storage';
 import {
   Connected,
   Connecting,
@@ -75,6 +69,13 @@ import {
   Disconnected,
   ViewerStreamState,
 } from '../../lib/stream/state';
+import { ViewerStream } from '../../lib/stream/stream';
+import { Orientation, StencilBufferManager, Viewport } from '../../lib/types';
+import { Frame } from '../../lib/types/frame';
+import {
+  getElementBackgroundColor,
+  getElementBoundingClientRect,
+} from './utils';
 
 interface ConnectedStatus {
   jwt: string;

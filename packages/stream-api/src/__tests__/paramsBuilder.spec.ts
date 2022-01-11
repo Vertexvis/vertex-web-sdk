@@ -1,8 +1,8 @@
 import {
   defineBoolean,
   defineNumber,
-  defineString,
   defineParams,
+  defineString,
 } from '../paramsBuilder';
 
 interface Foo<T> {

@@ -5,8 +5,9 @@ jest.mock('../viewer-markup/dom');
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
-import { ViewerMarkupArrow } from './viewer-markup-arrow';
+
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { ViewerMarkupArrow } from './viewer-markup-arrow';
 
 describe('vertex-viewer-markup-arrow', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

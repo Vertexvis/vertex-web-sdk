@@ -1,13 +1,14 @@
-import { FlyToPositionKeyInteraction } from '../flyToPositionKeyInteraction';
-import { StreamApi } from '@vertexvis/stream-api';
-import { Config } from '../../config';
-import { TapEventDetails } from '../tapEventDetails';
 import { Point, Vector3 } from '@vertexvis/geometry';
-import { Scene } from '../../scenes';
-import { fromPbFrameOrThrow } from '../../mappers';
-import { Orientation } from '../../types';
-import * as ColorMaterial from '../../scenes/colorMaterial';
+import { StreamApi } from '@vertexvis/stream-api';
+
 import { frame } from '../../../testing/fixtures';
+import { Config } from '../../config';
+import { fromPbFrameOrThrow } from '../../mappers';
+import { Scene } from '../../scenes';
+import * as ColorMaterial from '../../scenes/colorMaterial';
+import { Orientation } from '../../types';
+import { FlyToPositionKeyInteraction } from '../flyToPositionKeyInteraction';
+import { TapEventDetails } from '../tapEventDetails';
 
 describe(FlyToPositionKeyInteraction, () => {
   const streamApi = new StreamApi();

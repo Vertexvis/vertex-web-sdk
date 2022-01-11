@@ -8,15 +8,14 @@ jest.mock('../viewer/utils');
 jest.mock('../../lib/stencil');
 jest.mock('../../lib/rendering/imageLoaders');
 
-import {
-  SceneTreeAPIClient,
-  ServiceError,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { SceneTree } from './scene-tree';
-import { SceneTreeController } from './lib/controller';
+import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import {
+  ColumnKey,
+  Node,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
@@ -26,33 +25,14 @@ import {
   LocateItemResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import {
-  ColumnKey,
-  Node,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { Viewer } from '../viewer/viewer';
-import { getElementBoundingClientRect } from '../viewer/utils';
-import {
-  getSceneTreeContainsElement,
-  getSceneTreeOffsetTop,
-  getSceneTreeViewportHeight,
-} from './lib/dom';
-import { sign } from 'jsonwebtoken';
-import { decodeSceneTreeJwt } from './lib/jwt';
-import { grpc } from '@improbable-eng/grpc-web';
-import {
-  deselectItem,
-  hideItem,
-  selectItem,
-  showItem,
-  selectRangeInSceneTree,
-} from './lib/viewer-ops';
+  SceneTreeAPIClient,
+  ServiceError,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
-import {
-  loadViewerStreamKey,
-  makeViewerStream,
-  key1,
-  key2,
-} from '../../testing/viewer';
+import { sign } from 'jsonwebtoken';
+
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import { ViewerStream } from '../../lib/stream/stream';
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
@@ -60,10 +40,31 @@ import {
   random,
   ResponseStreamMock,
 } from '../../testing';
-import { SceneTreeTableLayout } from '../scene-tree-table-layout/scene-tree-table-layout';
-import { ViewerStream } from '../../lib/stream/stream';
-import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import {
+  key1,
+  key2,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import { scrollToTop } from '../scene-tree-table-layout/lib/dom';
+import { SceneTreeTableLayout } from '../scene-tree-table-layout/scene-tree-table-layout';
+import { getElementBoundingClientRect } from '../viewer/utils';
+import { Viewer } from '../viewer/viewer';
+import { SceneTreeController } from './lib/controller';
+import {
+  getSceneTreeContainsElement,
+  getSceneTreeOffsetTop,
+  getSceneTreeViewportHeight,
+} from './lib/dom';
+import { decodeSceneTreeJwt } from './lib/jwt';
+import {
+  deselectItem,
+  hideItem,
+  selectItem,
+  selectRangeInSceneTree,
+  showItem,
+} from './lib/viewer-ops';
+import { SceneTree } from './scene-tree';
 
 describe('<vertex-scene-tree>', () => {
   const sceneViewId = random.guid();

@@ -1,5 +1,6 @@
-import { ImageLoadError } from '../errors';
 import { Disposable } from '@vertexvis/utils';
+
+import { ImageLoadError } from '../errors';
 
 export interface HtmlImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;

@@ -4,6 +4,7 @@ import {
   WebSocketClientMock,
 } from '@vertexvis/stream-api';
 import { Async } from '@vertexvis/utils';
+
 import { ViewerStream } from '../lib/stream/stream';
 import * as Fixtures from './fixtures';
 import { random } from './random';

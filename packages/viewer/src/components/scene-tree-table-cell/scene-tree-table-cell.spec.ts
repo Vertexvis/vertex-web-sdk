@@ -1,6 +1,7 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import Chance from 'chance';
+
 import { SceneTreeTableCell } from './scene-tree-table-cell';
 
 const random = new Chance();

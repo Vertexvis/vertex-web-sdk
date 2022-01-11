@@ -1,48 +1,37 @@
 /**
  * @module Types
  */
-import * as ClippingPlanes from './clippingPlanes';
-import * as Flags from './flags';
-import * as Events from './events';
-import * as FrameCamera from './frameCamera';
-import * as LoadableResource from './loadableResource';
 import * as Animation from './animation';
-import * as FlyTo from './flyToOptions';
-import * as Interactions from './interactions';
+import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
+import * as Events from './events';
+import * as Flags from './flags';
+import * as FlyTo from './flyToOptions';
+import * as FrameCamera from './frameCamera';
+import * as Interactions from './interactions';
+import * as LoadableResource from './loadableResource';
 
 export * from './depthBuffer';
-
 export * from './featureMap';
-
 export * from './frame';
-
 export * from './markup';
-
 export * from './measurement';
-
 export * from './measurementUnits';
-
+export * from './orientation';
 export * from './standardView';
-
 export * from './stencilBuffer';
-
 export * from './synchronizedClock';
-
 export * from './typeGuards';
-
 export * from './viewport';
 
-export * from './orientation';
-
 export {
+  Animation,
   ClippingPlanes,
+  CrossSectioning,
   Events,
   Flags,
-  FrameCamera,
-  LoadableResource,
-  Animation,
   FlyTo,
+  FrameCamera,
   Interactions,
-  CrossSectioning,
+  LoadableResource,
 };

@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+
 import { Cursor } from './cursors';
 
 export function getMouseClientPosition(

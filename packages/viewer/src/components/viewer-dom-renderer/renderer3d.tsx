@@ -1,10 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
+
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FramePerspectiveCamera } from '../../lib/types/frame';
-import { isVertexViewerDomGroup } from '../viewer-dom-group/utils';
 import { isVertexViewerDomElement } from '../viewer-dom-element/utils';
+import { isVertexViewerDomGroup } from '../viewer-dom-group/utils';
 
 interface Props {
   camera: FramePerspectiveCamera;

@@ -1,11 +1,11 @@
 import {
   Component,
-  Host,
-  h,
-  Prop,
-  EventEmitter,
-  Event,
   Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';

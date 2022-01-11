@@ -5,8 +5,9 @@ jest.mock('../viewer-markup/dom');
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Rectangle } from '@vertexvis/geometry';
-import { ViewerMarkupCircle } from './viewer-markup-circle';
+
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { ViewerMarkupCircle } from './viewer-markup-circle';
 
 describe('vertex-viewer-markup-circle', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

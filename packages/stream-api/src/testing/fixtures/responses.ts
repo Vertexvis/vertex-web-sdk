@@ -1,13 +1,14 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Objects, UUID } from '@vertexvis/utils';
+
 import { RefreshTokenResult } from '../..';
 import { currentDateAsProtoTimestamp } from '../../time';
 import {
-  ResponseMessage,
+  LoadSceneViewStateResult,
   ReconnectResult,
+  ResponseMessage,
   StartStreamResult,
   SyncTimeResult,
-  LoadSceneViewStateResult,
 } from '../../types';
 
 type Metadata = Partial<Pick<ResponseMessage, 'sentAtTime'>>;

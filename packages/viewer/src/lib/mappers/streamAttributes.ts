@@ -1,14 +1,15 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { clamp } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
+
 import {
-  FrameType,
   FeatureHighlightOptions,
   FeatureLineOptions,
+  FrameType,
   StreamAttributes,
 } from '../../interfaces';
-import { toPbFloatValue } from './scalar';
 import { toPbRGBi } from './material';
+import { toPbFloatValue } from './scalar';
 
 const toPbFrameType: M.Func<
   FrameType,

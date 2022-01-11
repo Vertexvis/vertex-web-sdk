@@ -2,6 +2,7 @@
 
 import { Component, h, Host, Prop, Watch } from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
 /**

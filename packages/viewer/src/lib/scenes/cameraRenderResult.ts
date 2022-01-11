@@ -1,7 +1,8 @@
 import { StreamApi } from '@vertexvis/stream-api';
-import { Result } from '../stream/result';
-import { StreamApiEventDispatcher } from '../stream/dispatcher';
+
 import type { FrameDecoder } from '../mappers';
+import { StreamApiEventDispatcher } from '../stream/dispatcher';
+import { Result } from '../stream/result';
 import { Frame } from '../types';
 
 export interface RenderResultIds {

@@ -2,6 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
 import { ViewerDomElement } from './viewer-dom-element';
 
 describe('vertex-viewer-dom-element', () => {

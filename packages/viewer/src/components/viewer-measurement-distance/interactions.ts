@@ -1,11 +1,12 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
-import { PointToPointHitTester } from './hitTest';
-import { fromPbVector3f } from '../../lib/mappers';
 import { Mapper } from '@vertexvis/utils';
+
+import { fromPbVector3f } from '../../lib/mappers';
 import { PointToPointMeasurementResult } from '../../lib/measurement';
-import { Anchor } from './utils';
 import { RaycasterLike } from '../../lib/scenes';
+import { PointToPointHitTester } from './hitTest';
+import { Anchor } from './utils';
 
 /**
  * Provides APIs to perform local or remote hit tests.

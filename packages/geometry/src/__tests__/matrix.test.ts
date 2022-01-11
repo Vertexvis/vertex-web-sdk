@@ -1,5 +1,5 @@
-import * as Point from '../point';
 import * as Matrix from '../matrix';
+import * as Point from '../point';
 
 const matrix = Matrix.identity();
 

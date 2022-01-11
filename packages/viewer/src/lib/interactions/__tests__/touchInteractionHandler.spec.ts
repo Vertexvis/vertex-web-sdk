@@ -1,9 +1,10 @@
 jest.mock('../interactionApi');
 jest.mock('../mouseInteractions');
 
-import { TouchInteractionHandler } from '../touchInteractionHandler';
-import { InteractionApi } from '../interactionApi';
 import { Point } from '@vertexvis/geometry';
+
+import { InteractionApi } from '../interactionApi';
+import { TouchInteractionHandler } from '../touchInteractionHandler';
 
 const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 

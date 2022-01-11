@@ -1,12 +1,13 @@
-import { EventDispatcher } from '@vertexvis/utils';
+import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
+import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
+import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import type {
   ResponseStream,
   Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
-import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
+import { EventDispatcher } from '@vertexvis/utils';
+
 import { random } from './random';
 
 export class ResponseStreamMock<T> implements ResponseStream<T> {

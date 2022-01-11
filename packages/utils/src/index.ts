@@ -13,19 +13,16 @@ import * as Strings from './strings';
 import * as Uri from './uri';
 import * as UUID from './uuid';
 
-export * from './mappedTypes';
-
 export * from './disposable';
-
 export * from './eventDispatcher';
-
+export * from './mappedTypes';
 export * from './predicate';
 
 export {
   Async,
   BinaryReader,
-  EventTargets,
   Color,
+  EventTargets,
   Mapper,
   Objects,
   Range,

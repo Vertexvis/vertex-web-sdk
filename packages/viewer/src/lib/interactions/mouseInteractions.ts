@@ -1,7 +1,8 @@
-import { InteractionApi } from './interactionApi';
 import { Point } from '@vertexvis/geometry';
-import { InteractionType } from './baseInteractionHandler';
+
 import { getMouseClientPosition } from '../dom';
+import { InteractionType } from './baseInteractionHandler';
+import { InteractionApi } from './interactionApi';
 
 export abstract class MouseInteraction {
   protected currentPosition: Point.Point | undefined;

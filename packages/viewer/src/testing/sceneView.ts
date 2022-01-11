@@ -12,6 +12,7 @@ import {
   SurfaceAreaResult,
 } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
 import { MeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
+
 import { random } from './random';
 
 export function createMeasureResponse(

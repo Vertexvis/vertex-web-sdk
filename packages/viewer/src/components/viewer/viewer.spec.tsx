@@ -7,22 +7,23 @@ import { h } from '@stencil/core';
 import { NewSpecPageOptions } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
 import { Async, Color } from '@vertexvis/utils';
+
+import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
+import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
+import { loadImageBytes } from '../../lib/rendering/imageLoaders';
+import * as Storage from '../../lib/storage';
+import { random } from '../../testing';
+import {
+  key1,
+  key2,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
 import { Viewer } from './viewer';
-import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
-import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
-import { random } from '../../testing';
-import { loadImageBytes } from '../../lib/rendering/imageLoaders';
-import {
-  loadViewerStreamKey,
-  makeViewerStream,
-  key1,
-  key2,
-} from '../../testing/viewer';
-import * as Storage from '../../lib/storage';
 
 describe('vertex-viewer', () => {
   (loadImageBytes as jest.Mock).mockReturnValue({

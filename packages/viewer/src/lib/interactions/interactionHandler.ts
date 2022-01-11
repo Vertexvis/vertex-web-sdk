@@ -1,4 +1,5 @@
 import { Disposable } from '@vertexvis/utils';
+
 import { InteractionApi } from './interactionApi';
 
 /**

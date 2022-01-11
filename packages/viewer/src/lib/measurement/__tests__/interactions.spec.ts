@@ -4,15 +4,16 @@ jest.mock(
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../interactions');
 
-import { PreciseMeasurementInteractionHandler } from '../interactions';
-import { MeasurementController } from '../controller';
-import { MeasurementModel } from '../model';
+import { Vector3 } from '@vertexvis/geometry';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
+import { StreamApi } from '@vertexvis/stream-api';
+import { Async } from '@vertexvis/utils';
+
 import { random } from '../../../testing';
 import { InteractionApi } from '../../interactions';
-import { StreamApi } from '@vertexvis/stream-api';
-import { Vector3 } from '@vertexvis/geometry';
-import { Async } from '@vertexvis/utils';
+import { MeasurementController } from '../controller';
+import { PreciseMeasurementInteractionHandler } from '../interactions';
+import { MeasurementModel } from '../model';
 
 describe(PreciseMeasurementInteractionHandler, () => {
   const model = new MeasurementModel();

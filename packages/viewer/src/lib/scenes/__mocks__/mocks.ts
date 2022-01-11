@@ -1,5 +1,5 @@
-import { Scene } from '../scene';
 import { Camera } from '../camera';
+import { Scene } from '../scene';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SceneMocks = jest.createMockFromModule('../../scenes') as any;
