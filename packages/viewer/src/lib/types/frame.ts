@@ -57,9 +57,7 @@ export class Frame {
 
   private async decodeFeatureMap(bytes: Uint8Array): Promise<FeatureMap> {
     const png = await decodePng(bytes);
-    if (png.data instanceof Uint8Array) {
-      return new FeatureMap(png.data);
-    } else throw new Error('Feature map could not be decoded as a Uint8Array');
+    return FeatureMap.fromPng(png, this.image.imageAttr);
   }
 }
 

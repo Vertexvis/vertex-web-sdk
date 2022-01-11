@@ -1,6 +1,6 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
-import { Mapper } from '@vertexvis/utils';
+import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
 
 import { PointToPointHitTester } from '../components/viewer-measurement-distance/hitTest';
@@ -9,6 +9,8 @@ import { fromPbFrame } from '../lib/mappers';
 import { RaycasterLike } from '../lib/scenes/raycaster';
 import {
   DepthBuffer,
+  FeatureMap,
+  ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
   StencilBuffer,
@@ -87,12 +89,11 @@ export function makeDepthBuffer(
   height: number,
   value = 2 ** 16 - 1
 ): DepthBuffer {
-  const png = makeDepthImageBytes(width, height, value);
-  return DepthBuffer.fromPng({ data: png }, frame.scene.camera, {
-    frameDimensions: Dimensions.create(width, height),
-    imageRect: Rectangle.create(0, 0, width, height),
-    imageScale: 1,
-  });
+  return DepthBuffer.fromPng(
+    { data: makeDepthImageBytes(width, height, value) },
+    frame.scene.camera,
+    makeImageAttributes(width, height)
+  );
 }
 
 export function makeStencilImageBytes(
@@ -118,14 +119,52 @@ export function makeStencilBuffer(
   const data = makeStencilImageBytes(width, height, fill);
   return StencilBuffer.fromPng(
     { data, channels: 1 },
-    {
-      frameDimensions: Dimensions.create(width, height),
-      imageRect: Rectangle.create(0, 0, width, height),
-      imageScale: 1,
-    },
+    makeImageAttributes(width, height),
     data,
     depthBuffer ?? makeDepthBuffer(width, height)
   );
+}
+
+export function makeFeatureMap(
+  width: number,
+  height: number,
+  fill: (pixel: Point.Point) => Color.Color
+): FeatureMap {
+  return FeatureMap.fromPng(
+    { data: makeFeatureMapBytes(width, height, fill) },
+    makeImageAttributes(width, height)
+  );
+}
+
+export function makeFeatureMapBytes(
+  width: number,
+  height: number,
+  fill: (pixel: Point.Point) => Color.Color
+): Uint8Array {
+  const data = new Uint8Array(width * height * 4);
+  for (let i = 0; i < width * height; i++) {
+    const x = i % width;
+    const y = Math.floor(i / width);
+    const color = fill(Point.create(x, y));
+
+    const offset = i * 4;
+    data[offset] = color.r;
+    data[offset + 1] = color.g;
+    data[offset + 2] = color.b;
+    data[offset + 3] = color.a;
+  }
+  return data;
+}
+
+export function makeImageAttributes(
+  width: number,
+  height: number
+): ImageAttributesLike {
+  return {
+    frameDimensions: Dimensions.create(width, height),
+    imageRect: Rectangle.create(0, 0, width, height),
+    imageScale: 1,
+  };
 }
 
 export function makeHitTester({
