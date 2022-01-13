@@ -1,4 +1,5 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';

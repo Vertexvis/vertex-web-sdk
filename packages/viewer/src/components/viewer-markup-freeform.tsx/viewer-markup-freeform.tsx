@@ -16,12 +16,12 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isVertexViewerMarkupElement,
   transformRectangle,
   translatePointsToBounds,
   translatePointToRelative,
   translatePointToScreen,
   translateRectToScreen,
-  isVertexViewerMarkupElement,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from '../viewer-markup-circle/utils';
