@@ -17,11 +17,12 @@
 
 ## Events
 
-| Event        | Description                                                                | Type                |
-| ------------ | -------------------------------------------------------------------------- | ------------------- |
-| `editBegin`  | An event that is dispatched anytime the user begins editing the markup.    | `CustomEvent<void>` |
-| `editCancel` | An event that is dispatched when the user cancels editing of the markup.   | `CustomEvent<void>` |
-| `editEnd`    | An event that is dispatched when the user has finished editing the markup. | `CustomEvent<void>` |
+| Event          | Description                                                                                                             | Type                |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `editBegin`    | An event that is dispatched anytime the user begins editing the markup.                                                 | `CustomEvent<void>` |
+| `editCancel`   | An event that is dispatched when the user cancels editing of the markup.                                                | `CustomEvent<void>` |
+| `editEnd`      | An event that is dispatched when the user has finished editing the markup.                                              | `CustomEvent<void>` |
+| `viewRendered` | An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender. | `CustomEvent<void>` |
 
 
 ## Methods

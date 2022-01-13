@@ -309,11 +309,22 @@ export class ViewerMarkup {
   @Listen('markupEnd')
   protected async handleMarkupEnd(event: CustomEvent<Markup>): Promise<void> {
     const e = event as CustomEvent<Markup>;
-    await this.addMarkup(e.detail);
+    const el = await this.addMarkup(e.detail);
+
+    await new Promise<void>((resolve) => {
+      const handleRender = (): void => {
+        el.removeEventListener('viewRendered', handleRender);
+        resolve();
+      };
+
+      el.addEventListener('viewRendered', handleRender);
+    });
 
     if (this.selectNew) {
       this.selectedMarkupId = e.detail.id;
     }
+
+    this.getMarkupTool()?.reset();
   }
 
   /**

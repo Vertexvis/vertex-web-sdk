@@ -5,6 +5,7 @@ import {
   EventEmitter,
   h,
   Host,
+  Method,
   Prop,
   State,
   Watch,
@@ -172,6 +173,27 @@ export class ViewerMarkupTool {
     this.updateMarkupElement();
   }
 
+  @Method()
+  public async reset(): Promise<void> {
+    const { markupElement } = this.stateMap;
+    if (isVertexViewerFreeformMarkup(markupElement)) {
+      window.requestAnimationFrame(() => {
+        markupElement.points = undefined;
+        markupElement.bounds = undefined;
+      });
+    } else if (isVertexViewerCircleMarkup(markupElement)) {
+      window.requestAnimationFrame(() => {
+        markupElement.bounds = undefined;
+      });
+    } else if (isVertexViewerArrowMarkup(markupElement)) {
+      window.requestAnimationFrame(() => {
+        markupElement.start = undefined;
+        markupElement.end = undefined;
+        markupElement.mode = 'create';
+      });
+    }
+  }
+
   /**
    * @ignore
    */
@@ -328,33 +350,18 @@ export class ViewerMarkupTool {
       if (points != null && points.length > 0 && bounds != null) {
         this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
       }
-
-      window.requestAnimationFrame(() => {
-        markupElement.points = undefined;
-        markupElement.bounds = undefined;
-      });
     } else if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
 
       if (bounds != null) {
         this.markupEnd.emit(new CircleMarkup({ bounds }));
       }
-
-      window.requestAnimationFrame(() => {
-        markupElement.bounds = undefined;
-      });
     } else if (isVertexViewerArrowMarkup(markupElement)) {
       const { start, end } = markupElement;
 
       if (start != null && end != null) {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
-
-      window.requestAnimationFrame(() => {
-        markupElement.start = undefined;
-        markupElement.end = undefined;
-        markupElement.mode = 'create';
-      });
     }
   };
 

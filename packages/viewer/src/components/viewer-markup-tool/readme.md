@@ -26,6 +26,19 @@
 | `markupEnd`        | An event that is dispatched when a user has finished their markup.   | `CustomEvent<ArrowMarkup \| CircleMarkup \| FreeformMarkup>` |
 
 
+## Methods
+
+### `reset() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
 ## Dependencies
 
 ### Depends on
