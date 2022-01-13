@@ -5,11 +5,7 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import {
-  MeasurementController,
-  MeasurementEntity,
-  MeasurementModel,
-} from '../../lib/measurement';
+import { MeasurementController, MeasurementModel } from '../../lib/measurement';
 import { PreciseMeasurementInteractionHandler } from '../../lib/measurement/interactions';
 
 @Component({
@@ -33,11 +29,7 @@ export class ViewerMeasurementPrecise {
   @Prop()
   public config?: Config;
 
-  @State()
-  private entities: MeasurementEntity[] = [];
-
   private registeredInteractionHandler?: Promise<Disposable>;
-  private onEntitiesChangedDisposable?: Disposable;
 
   protected connectedCallback(): void {
     this.setupInteractionHandler();
@@ -46,7 +38,6 @@ export class ViewerMeasurementPrecise {
   protected componentWillLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
-    this.setupModelListeners();
   }
 
   protected disconnectedCallback(): void {
@@ -61,7 +52,6 @@ export class ViewerMeasurementPrecise {
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.setupController();
-    this.setupModelListeners();
   }
 
   @Watch('viewer')
@@ -98,26 +88,5 @@ export class ViewerMeasurementPrecise {
           new PreciseMeasurementInteractionHandler(this.measurementController)
         );
     }
-  }
-
-  private clearModelListeners(): void {
-    this.onEntitiesChangedDisposable?.dispose();
-    this.onEntitiesChangedDisposable = undefined;
-  }
-
-  private setupModelListeners(): void {
-    this.clearModelListeners();
-
-    this.onEntitiesChangedDisposable = this.measurementModel?.onEntitiesChanged(
-      this.handleEntitiesChanged
-    );
-  }
-
-  private handleEntitiesChanged = (): void => {
-    this.updateEntities();
-  };
-
-  private updateEntities(): void {
-    this.entities = this.measurementModel?.getEntities() ?? [];
   }
 }

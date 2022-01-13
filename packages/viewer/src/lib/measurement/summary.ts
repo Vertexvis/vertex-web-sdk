@@ -5,16 +5,19 @@ import {
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
+  PointToPointMeasurementResult,
   SurfaceAreaMeasurementResult,
-} from './model';
+} from './results';
+
+type Approximateable<T> = T & { isApproximated: boolean };
 
 export interface MeasurementDetailsSummary {
   parallelDistance?: number;
-  minDistance?: number;
+  minDistance?: Approximateable<{ value: number }>;
   maxDistance?: number;
   area?: number;
   angle?: number;
-  distanceVector?: Vector3.Vector3;
+  distanceVector?: Approximateable<Vector3.Vector3>;
 }
 
 export function summarizeResults(
@@ -22,6 +25,8 @@ export function summarizeResults(
 ): MeasurementDetailsSummary {
   return results.reduce((summary, result) => {
     switch (result.type) {
+      case 'point-to-point':
+        return { ...summary, ...summarizePointToPointResult(result) };
       case 'minimum-distance':
         return { ...summary, ...summarizeMinDistanceResult(result) };
       case 'planar-angle':
@@ -34,6 +39,17 @@ export function summarizeResults(
   }, {});
 }
 
+function summarizePointToPointResult(
+  result: PointToPointMeasurementResult
+): MeasurementDetailsSummary {
+  const v = Vector3.subtract(result.start, result.end);
+  const d = Vector3.distance(result.start, result.end);
+  return {
+    distanceVector: { ...v, isApproximated: true },
+    minDistance: { value: d, isApproximated: true },
+  };
+}
+
 function summarizeMinDistanceResult(
   result: MinimumDistanceMeasurementResult
 ): MeasurementDetailsSummary {
@@ -43,8 +59,8 @@ function summarizeMinDistanceResult(
   );
 
   return {
-    minDistance: result.distance,
-    distanceVector,
+    distanceVector: { ...distanceVector, isApproximated: false },
+    minDistance: { value: result.distance, isApproximated: false },
   };
 }
 

@@ -1,8 +1,9 @@
 import { Point } from '@vertexvis/geometry';
 
-import { MeasurementController, MeasurementEntity } from '../..';
 import { getMouseClientPosition } from '../dom';
 import { InteractionApi, InteractionHandler } from '../interactions';
+import { MeasurementController } from './controller';
+import { PreciseMeasurementEntity } from './entities';
 
 export class PreciseMeasurementInteractionHandler
   implements InteractionHandler
@@ -36,7 +37,7 @@ export class PreciseMeasurementInteractionHandler
         const [hit] = await api.hitItems(pt);
 
         if (hit != null) {
-          this.controller.addEntity(MeasurementEntity.fromHit(hit));
+          this.controller.addEntity(PreciseMeasurementEntity.fromHit(hit));
         } else {
           this.controller.clearEntities();
         }
