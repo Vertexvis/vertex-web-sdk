@@ -19,6 +19,7 @@ import {
   transformRectangle,
   translatePointToRelative,
   translateRectToScreen,
+  isVertexViewerMarkupElement,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from './utils';
@@ -132,6 +133,14 @@ export class ViewerMarkupCircle {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -183,7 +192,7 @@ export class ViewerMarkupCircle {
 
       return (
         <Host>
-          <svg class="svg">
+          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
@@ -235,7 +244,7 @@ export class ViewerMarkupCircle {
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -297,6 +306,13 @@ export class ViewerMarkupCircle {
         this.editAnchor,
         event.shiftKey
       );
+    }
+  };
+
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    const target = event.target as HTMLElement;
+    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+      this.startMarkup(event);
     }
   };
 

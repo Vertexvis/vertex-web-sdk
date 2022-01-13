@@ -5,6 +5,7 @@ import {
   EventEmitter,
   h,
   Host,
+  Listen,
   Prop,
   State,
   Watch,

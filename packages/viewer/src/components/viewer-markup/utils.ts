@@ -1,4 +1,7 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
+import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
 
 export type BoundingBox2dAnchorPosition =
   | 'left'
@@ -232,4 +235,17 @@ export function transformRectangle(
         bounds.height
       );
   }
+}
+
+export function isVertexViewerMarkupElement(
+  el: HTMLElement
+): el is
+  | HTMLVertexViewerMarkupArrowElement
+  | HTMLVertexViewerMarkupCircleElement
+  | HTMLVertexViewerMarkupFreeformElement {
+  return (
+    isVertexViewerArrowMarkup(el) ||
+    isVertexViewerCircleMarkup(el) ||
+    isVertexViewerFreeformMarkup(el)
+  );
 }

@@ -21,6 +21,7 @@ import {
   translatePointToRelative,
   translatePointToScreen,
   translateRectToScreen,
+  isVertexViewerMarkupElement,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from '../viewer-markup-circle/utils';
@@ -149,6 +150,7 @@ export class ViewerMarkupFreeform {
 
   private min?: Point.Point;
   private max?: Point.Point;
+  private pointerId?: number;
 
   /**
    * @ignore
@@ -166,6 +168,14 @@ export class ViewerMarkupFreeform {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -219,7 +229,7 @@ export class ViewerMarkupFreeform {
     if (this.screenPoints.length > 0 && this.elementBounds != null) {
       return (
         <Host>
-          <svg class="svg">
+          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
             <defs>
               <SvgShadow id="freeform-markup-shadow" />
             </defs>
@@ -269,7 +279,7 @@ export class ViewerMarkupFreeform {
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -318,6 +328,13 @@ export class ViewerMarkupFreeform {
     }
   }
 
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    const target = event.target as HTMLElement;
+    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+      this.startMarkup(event);
+    }
+  };
+
   private updateEditAnchor = (
     event: PointerEvent,
     anchor: BoundingBox2dAnchorPosition
@@ -364,7 +381,11 @@ export class ViewerMarkupFreeform {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (this.points != null && this.elementBounds != null) {
+    if (
+      this.pointerId === event.pointerId &&
+      this.points != null &&
+      this.elementBounds != null
+    ) {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
@@ -377,7 +398,12 @@ export class ViewerMarkupFreeform {
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.elementBounds != null) {
+    if (
+      this.pointerId == null &&
+      this.mode !== '' &&
+      this.elementBounds != null
+    ) {
+      this.pointerId = event.pointerId;
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
@@ -393,6 +419,7 @@ export class ViewerMarkupFreeform {
 
   private endMarkup = (event: PointerEvent): void => {
     if (
+      this.pointerId === event.pointerId &&
       this.mode !== '' &&
       this.points != null &&
       this.points.length > 1 &&
@@ -410,13 +437,16 @@ export class ViewerMarkupFreeform {
       this.screenPoints = [...this.screenPoints, screenPosition];
 
       this.editEnd.emit();
-    } else {
+    } else if (this.mode === 'edit') {
       this.points = undefined;
       this.editCancel.emit();
+    } else if (this.mode === 'create') {
+      this.points = undefined;
     }
 
     this.min = undefined;
     this.max = undefined;
+    this.pointerId = undefined;
     this.removeDrawingInteractionListeners();
   };
 

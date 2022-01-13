@@ -15,6 +15,7 @@ import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
+  isVertexViewerMarkupElement,
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
@@ -150,6 +151,14 @@ export class ViewerMarkupArrow {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -208,7 +217,7 @@ export class ViewerMarkupArrow {
 
       return (
         <Host>
-          <svg class="svg">
+          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
             <defs>
               <SvgShadow id="arrow-shadow" />
             </defs>
@@ -254,7 +263,7 @@ export class ViewerMarkupArrow {
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -331,6 +340,13 @@ export class ViewerMarkupArrow {
           this.end.y - yDifference
         );
       }
+    }
+  };
+
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    const target = event.target as HTMLElement;
+    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+      this.startMarkup(event);
     }
   };
 

@@ -9,7 +9,9 @@ import {
   Method,
   Prop,
   Watch,
+  State,
 } from '@stencil/core';
+import { Point } from '@vertexvis/geometry';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -109,6 +111,12 @@ export class ViewerMarkup {
 
   @Element()
   private hostEl!: HTMLElement;
+
+  @State()
+  private toSelectMarkupId?: string;
+
+  @State()
+  private toSelectPointerPosition?: Point.Point;
 
   /**
    * Adds a new markup as a child to this component. A new markup
@@ -320,12 +328,51 @@ export class ViewerMarkup {
    * @ignore
    */
   @Listen('pointerdown')
-  protected async handleMarkupPointerDown(event: Event): Promise<void> {
+  protected async handleMarkupPointerDown(event: PointerEvent): Promise<void> {
     if (!this.disabled) {
       const el = event.target as Element;
       const markups = await this.getMarkupElements();
       const markup = markups.find((m) => m === el);
       if (markup?.id != null && markup?.id !== '') {
+        this.toSelectMarkupId = el.id;
+        this.toSelectPointerPosition = Point.create(
+          event.clientX,
+          event.clientY
+        );
+      }
+    }
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('pointermove')
+  protected async handleMarkupPointerMove(event: PointerEvent): Promise<void> {
+    if (
+      this.toSelectPointerPosition != null &&
+      Point.distance(
+        this.toSelectPointerPosition,
+        Point.create(event.clientX, event.clientY)
+      ) > 2
+    ) {
+      this.toSelectMarkupId = undefined;
+    }
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('pointerup')
+  protected async handleMarkupPointerUp(event: Event): Promise<void> {
+    if (!this.disabled) {
+      const el = event.target as Element;
+      const markups = await this.getMarkupElements();
+      const markup = markups.find((m) => m === el);
+      if (
+        markup?.id != null &&
+        markup?.id !== '' &&
+        markup.id === this.toSelectMarkupId
+      ) {
         this.selectedMarkupId = el.id;
       }
     }
