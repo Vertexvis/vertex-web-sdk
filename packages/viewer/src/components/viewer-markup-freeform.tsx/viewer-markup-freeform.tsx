@@ -164,8 +164,6 @@ export class ViewerMarkupFreeform {
   }
 
   protected componentDidLoad(): void {
-    this.updatePointsFromProps();
-
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
 
@@ -184,6 +182,7 @@ export class ViewerMarkupFreeform {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -211,6 +210,13 @@ export class ViewerMarkupFreeform {
   @Watch('bounds')
   protected handleBoundsJsonChange(): void {
     this.updatePointsFromProps();
+  }
+
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
   }
 
   private updateViewport(): void {

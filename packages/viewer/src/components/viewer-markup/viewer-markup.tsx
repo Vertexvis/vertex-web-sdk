@@ -8,8 +8,8 @@ import {
   Listen,
   Method,
   Prop,
-  Watch,
   State,
+  Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 

@@ -16,10 +16,10 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isVertexViewerMarkupElement,
   transformRectangle,
   translatePointToRelative,
   translateRectToScreen,
-  isVertexViewerMarkupElement,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from './utils';
@@ -149,6 +149,7 @@ export class ViewerMarkupCircle {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -171,6 +172,13 @@ export class ViewerMarkupCircle {
   @Watch('bounds')
   protected handleBoundsJsonChange(): void {
     this.updateBoundsFromProps();
+  }
+
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
   }
 
   private updateViewport(): void {
@@ -340,10 +348,13 @@ export class ViewerMarkupCircle {
     ) {
       this.editAnchor = 'bottom-right';
       this.editEnd.emit();
-    } else {
+    } else if (this.mode === 'edit') {
       this.bounds = undefined;
       this.editCancel.emit();
+    } else {
+      this.bounds = undefined;
     }
+
     this.removeDrawingInteractionListeners();
   };
 }

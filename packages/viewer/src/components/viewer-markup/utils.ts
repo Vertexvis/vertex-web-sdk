@@ -249,3 +249,7 @@ export function isVertexViewerMarkupElement(
     isVertexViewerFreeformMarkup(el)
   );
 }
+
+export function isValidPointData(...points: Point.Point[]): boolean {
+  return points.every((pt) => !isNaN(pt.x) && !isNaN(pt.y));
+}

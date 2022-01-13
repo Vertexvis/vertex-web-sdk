@@ -15,6 +15,7 @@ import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
+  isValidPointData,
   isVertexViewerMarkupElement,
   translatePointToRelative,
   translatePointToScreen,
@@ -167,6 +168,7 @@ export class ViewerMarkupArrow {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -196,6 +198,13 @@ export class ViewerMarkupArrow {
     this.updatePointsFromProps();
   }
 
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -215,49 +224,53 @@ export class ViewerMarkupArrow {
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
       const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
 
-      return (
-        <Host>
-          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
-            <defs>
-              <SvgShadow id="arrow-shadow" />
-            </defs>
-            <g filter="url(#arrow-shadow)">
-              <polygon
-                id="arrow-head"
-                class="head"
-                points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-              />
-              <line
-                id="arrow-line"
-                class="line"
-                x1={screenStart.x}
-                y1={screenStart.y}
-                x2={arrowheadPoints.base.x}
-                y2={arrowheadPoints.base.y}
-              />
-              {this.mode === 'edit' && (
+      if (isValidPointData(screenStart, screenEnd)) {
+        return (
+          <Host>
+            <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
+              <defs>
+                <SvgShadow id="arrow-shadow" />
+              </defs>
+              <g filter="url(#arrow-shadow)">
+                <polygon
+                  id="arrow-head"
+                  class="head"
+                  points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+                />
                 <line
-                  id="bounding-box-1d-line"
-                  class="bounds-line"
+                  id="arrow-line"
+                  class="line"
                   x1={screenStart.x}
                   y1={screenStart.y}
-                  x2={screenEnd.x}
-                  y2={screenEnd.y}
+                  x2={arrowheadPoints.base.x}
+                  y2={arrowheadPoints.base.y}
                 />
-              )}
-            </g>
-          </svg>
-          {this.mode === 'edit' && (
-            <BoundingBox1d
-              start={screenStart}
-              end={screenEnd}
-              onStartAnchorPointerDown={this.editStartPoint}
-              onCenterAnchorPointerDown={this.editCenterPoint}
-              onEndAnchorPointerDown={this.editEndPoint}
-            />
-          )}
-        </Host>
-      );
+                {this.mode === 'edit' && (
+                  <line
+                    id="bounding-box-1d-line"
+                    class="bounds-line"
+                    x1={screenStart.x}
+                    y1={screenStart.y}
+                    x2={screenEnd.x}
+                    y2={screenEnd.y}
+                  />
+                )}
+              </g>
+            </svg>
+            {this.mode === 'edit' && (
+              <BoundingBox1d
+                start={screenStart}
+                end={screenEnd}
+                onStartAnchorPointerDown={this.editStartPoint}
+                onCenterAnchorPointerDown={this.editCenterPoint}
+                onEndAnchorPointerDown={this.editEndPoint}
+              />
+            )}
+          </Host>
+        );
+      } else {
+        return <Host></Host>;
+      }
     } else {
       return (
         <Host>
@@ -366,9 +379,11 @@ export class ViewerMarkupArrow {
   private endMarkup = (): void => {
     if (this.mode !== '' && this.end != null) {
       this.editEnd.emit();
-    } else {
+    } else if (this.mode === 'edit') {
       this.start = undefined;
       this.editCancel.emit();
+    } else {
+      this.start = undefined;
     }
 
     this.removeDrawingInteractionListeners();

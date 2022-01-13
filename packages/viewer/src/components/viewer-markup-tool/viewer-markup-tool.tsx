@@ -6,6 +6,7 @@ import {
   h,
   Host,
   Listen,
+  Method,
   Prop,
   State,
   Watch,
@@ -326,30 +327,36 @@ export class ViewerMarkupTool {
     if (isVertexViewerFreeformMarkup(markupElement)) {
       const { points, bounds } = markupElement;
 
-      markupElement.points = undefined;
-      markupElement.bounds = undefined;
-
       if (points != null && points.length > 0 && bounds != null) {
         this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
       }
+
+      window.requestAnimationFrame(() => {
+        markupElement.points = undefined;
+        markupElement.bounds = undefined;
+      });
     } else if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
-
-      markupElement.bounds = undefined;
 
       if (bounds != null) {
         this.markupEnd.emit(new CircleMarkup({ bounds }));
       }
+
+      window.requestAnimationFrame(() => {
+        markupElement.bounds = undefined;
+      });
     } else if (isVertexViewerArrowMarkup(markupElement)) {
       const { start, end } = markupElement;
-
-      markupElement.start = undefined;
-      markupElement.end = undefined;
-      markupElement.mode = 'create';
 
       if (start != null && end != null) {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
+
+      window.requestAnimationFrame(() => {
+        markupElement.start = undefined;
+        markupElement.end = undefined;
+        markupElement.mode = 'create';
+      });
     }
   };
 
