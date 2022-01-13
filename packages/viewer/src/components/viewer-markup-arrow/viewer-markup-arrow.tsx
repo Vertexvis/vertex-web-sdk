@@ -136,6 +136,8 @@ export class ViewerMarkupArrow {
   @State()
   private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
 
+  private pointerId?: number;
+
   /**
    * @ignore
    */
@@ -327,7 +329,7 @@ export class ViewerMarkupArrow {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (this.elementBounds != null) {
+    if (this.elementBounds != null && this.pointerId === event.pointerId) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
@@ -365,6 +367,7 @@ export class ViewerMarkupArrow {
 
   private startMarkup = (event: PointerEvent): void => {
     if (this.mode !== '' && this.elementBounds != null) {
+      this.pointerId = event.pointerId;
       this.start =
         this.start ??
         translatePointToRelative(

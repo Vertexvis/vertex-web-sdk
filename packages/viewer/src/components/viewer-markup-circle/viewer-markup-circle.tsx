@@ -117,6 +117,8 @@ export class ViewerMarkupCircle {
   @State()
   private resizeBounds?: Rectangle.Rectangle;
 
+  private pointerId?: number;
+
   /**
    * @ignore
    */
@@ -300,7 +302,8 @@ export class ViewerMarkupCircle {
     if (
       this.bounds != null &&
       this.startPosition != null &&
-      this.elementBounds != null
+      this.elementBounds != null &&
+      this.pointerId === event.pointerId
     ) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
@@ -330,6 +333,7 @@ export class ViewerMarkupCircle {
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
       );
+      this.pointerId = event.pointerId;
       this.startPosition = position;
       this.bounds =
         this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
