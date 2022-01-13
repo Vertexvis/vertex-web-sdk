@@ -191,20 +191,10 @@ export function fromPbFrame(
       M.compose(fromPbFrameImageAttributes, M.getProp('frameDimensions')),
       fromPbFrameScene(worldOrientation),
       fromPbFrameImage,
-      M.getProp('depthBuffer'),
-      M.getProp('featureMap')
+      M.mapProp('depthBuffer', fromPbBytesValue),
+      M.mapProp('featureMap', fromPbBytesValue)
     ),
-    ([cIds, seq, fd, s, i, db, fm]) => {
-      return new Frame(
-        cIds,
-        seq,
-        fd,
-        i,
-        s,
-        db?.value || undefined,
-        fm?.value || undefined
-      );
-    }
+    ([cIds, seq, fd, s, i, db, fm]) => new Frame(cIds, seq, fd, i, s, db, fm)
   );
 }
 
