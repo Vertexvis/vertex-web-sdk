@@ -29,7 +29,10 @@
 
 ### `reset() => Promise<void>`
 
-
+Resets the state of the internally managed markup element
+to allow for creating a new markup. This state is automatically
+managed when this element is placed as a child of a
+`<vertex-viewer-markup>` element.
 
 #### Returns
 

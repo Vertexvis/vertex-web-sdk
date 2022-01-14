@@ -167,6 +167,12 @@ export class ViewerMarkupTool {
     this.updateMarkupElement();
   }
 
+  /**
+   * Resets the state of the internally managed markup element
+   * to allow for creating a new markup. This state is automatically
+   * managed when this element is placed as a child of a
+   * `<vertex-viewer-markup>` element.
+   */
   @Method()
   public async reset(): Promise<void> {
     const { markupElement } = this.stateMap;

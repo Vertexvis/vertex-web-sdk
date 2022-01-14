@@ -835,6 +835,9 @@ export namespace Components {
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
+    /**
+     * Resets the state of the internally managed markup element to allow for creating a new markup. This state is automatically managed when this element is placed as a child of a `<vertex-viewer-markup>` element.
+     */
     reset: () => Promise<void>;
     /**
      * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
