@@ -17,7 +17,6 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
   isValidStartEvent,
-  isVertexViewerMarkupElement,
   transformRectangle,
   translatePointsToBounds,
   translatePointToRelative,
