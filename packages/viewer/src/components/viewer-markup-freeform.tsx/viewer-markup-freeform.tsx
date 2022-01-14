@@ -16,6 +16,7 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isValidStartEvent,
   transformRectangle,
   translatePointsToBounds,
   translatePointToRelative,
@@ -120,11 +121,11 @@ export class ViewerMarkupFreeform {
   public editEnd!: EventEmitter<void>;
 
   /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
+   * An event that is dispatched when this markup element is in view
+   * mode (`this.mode === ""`), and it completes a rerender.
    */
   @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
+  public viewRendered!: EventEmitter<void>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -149,6 +150,7 @@ export class ViewerMarkupFreeform {
 
   private min?: Point.Point;
   private max?: Point.Point;
+  private pointerId?: number;
 
   /**
    * @ignore
@@ -162,10 +164,22 @@ export class ViewerMarkupFreeform {
   }
 
   protected componentDidLoad(): void {
-    this.updatePointsFromProps();
-
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected componentDidRender(): void {
+    if (this.mode === '') {
+      this.viewRendered.emit();
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -174,6 +188,7 @@ export class ViewerMarkupFreeform {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -203,6 +218,13 @@ export class ViewerMarkupFreeform {
     this.updatePointsFromProps();
   }
 
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -219,7 +241,7 @@ export class ViewerMarkupFreeform {
     if (this.screenPoints.length > 0 && this.elementBounds != null) {
       return (
         <Host>
-          <svg class="svg">
+          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
             <defs>
               <SvgShadow id="freeform-markup-shadow" />
             </defs>
@@ -269,7 +291,7 @@ export class ViewerMarkupFreeform {
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -318,6 +340,12 @@ export class ViewerMarkupFreeform {
     }
   }
 
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    if (isValidStartEvent(event)) {
+      this.startMarkup(event);
+    }
+  };
+
   private updateEditAnchor = (
     event: PointerEvent,
     anchor: BoundingBox2dAnchorPosition
@@ -364,7 +392,11 @@ export class ViewerMarkupFreeform {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (this.points != null && this.elementBounds != null) {
+    if (
+      this.pointerId === event.pointerId &&
+      this.points != null &&
+      this.elementBounds != null
+    ) {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
@@ -377,7 +409,12 @@ export class ViewerMarkupFreeform {
   };
 
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.elementBounds != null) {
+    if (
+      this.pointerId == null &&
+      this.mode !== '' &&
+      this.elementBounds != null
+    ) {
+      this.pointerId = event.pointerId;
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
@@ -393,9 +430,10 @@ export class ViewerMarkupFreeform {
 
   private endMarkup = (event: PointerEvent): void => {
     if (
+      this.pointerId === event.pointerId &&
       this.mode !== '' &&
       this.points != null &&
-      this.points.length > 1 &&
+      this.points.length > 2 &&
       this.elementBounds != null
     ) {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
@@ -412,11 +450,11 @@ export class ViewerMarkupFreeform {
       this.editEnd.emit();
     } else {
       this.points = undefined;
-      this.editCancel.emit();
     }
 
     this.min = undefined;
     this.max = undefined;
+    this.pointerId = undefined;
     this.removeDrawingInteractionListeners();
   };
 

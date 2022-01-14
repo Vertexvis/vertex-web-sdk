@@ -133,27 +133,6 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(centerEl?.getAttribute('style')).toContain('top: 50px');
   });
 
-  it('should cancel markup editing if no movement occurs', async () => {
-    const onEditCancel = jest.fn();
-    await newSpecPage({
-      components: [ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer-markup-arrow
-          mode="create"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          viewer={viewer as any}
-          onEditCancel={onEditCancel}
-        ></vertex-viewer-markup-arrow>
-      ),
-    });
-
-    interactionTargetListeners.forEach((l) => l(new MouseEvent('pointerdown')));
-
-    window.dispatchEvent(new MouseEvent('pointerup'));
-
-    expect(onEditCancel).toHaveBeenCalled();
-  });
-
   it('removes event listeners when the viewer changes', async () => {
     const newViewer = {
       getInteractionTarget: jest.fn(),

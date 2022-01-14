@@ -5,6 +5,7 @@ import {
   EventEmitter,
   h,
   Host,
+  Method,
   Prop,
   State,
   Watch,
@@ -102,12 +103,6 @@ export class ViewerMarkupTool {
   @Event({ bubbles: true })
   public markupEnd!: EventEmitter<Markup>;
 
-  /**
-   * An event that is dispatched when a user has cancelled a markup edit.
-   */
-  @Event({ bubbles: true })
-  public markupEditCancel!: EventEmitter<void>;
-
   @Element()
   private hostEl!: HTMLElement;
 
@@ -170,6 +165,29 @@ export class ViewerMarkupTool {
    */
   protected componentDidLoad(): void {
     this.updateMarkupElement();
+  }
+
+  /**
+   * Resets the state of the internally managed markup element
+   * to allow for creating a new markup. This state is automatically
+   * managed when this element is placed as a child of a
+   * `<vertex-viewer-markup>` element.
+   */
+  @Method()
+  public async reset(): Promise<void> {
+    const { markupElement } = this.stateMap;
+    if (isVertexViewerFreeformMarkup(markupElement)) {
+      markupElement.points = undefined;
+      markupElement.bounds = undefined;
+      markupElement.mode = 'create';
+    } else if (isVertexViewerCircleMarkup(markupElement)) {
+      markupElement.bounds = undefined;
+      markupElement.mode = 'create';
+    } else if (isVertexViewerArrowMarkup(markupElement)) {
+      markupElement.start = undefined;
+      markupElement.end = undefined;
+      markupElement.mode = 'create';
+    }
   }
 
   /**
@@ -292,10 +310,6 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       markupElement.removeEventListener('editEnd', this.handleMarkupEditEnd);
-      markupElement.removeEventListener(
-        'editCancel',
-        this.handleMarkupEditCancel
-      );
     }
 
     if (!this.disabled) {
@@ -307,10 +321,6 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       newMarkupElement.addEventListener('editEnd', this.handleMarkupEditEnd);
-      newMarkupElement.addEventListener(
-        'editCancel',
-        this.handleMarkupEditCancel
-      );
       this.stateMap.markupElement = newMarkupElement;
       this.hostEl.append(newMarkupElement);
     }
@@ -325,16 +335,11 @@ export class ViewerMarkupTool {
     if (isVertexViewerFreeformMarkup(markupElement)) {
       const { points, bounds } = markupElement;
 
-      markupElement.points = undefined;
-      markupElement.bounds = undefined;
-
       if (points != null && points.length > 0 && bounds != null) {
         this.markupEnd.emit(new FreeformMarkup({ points, bounds }));
       }
     } else if (isVertexViewerCircleMarkup(markupElement)) {
       const { bounds } = markupElement;
-
-      markupElement.bounds = undefined;
 
       if (bounds != null) {
         this.markupEnd.emit(new CircleMarkup({ bounds }));
@@ -342,17 +347,9 @@ export class ViewerMarkupTool {
     } else if (isVertexViewerArrowMarkup(markupElement)) {
       const { start, end } = markupElement;
 
-      markupElement.start = undefined;
-      markupElement.end = undefined;
-      markupElement.mode = 'create';
-
       if (start != null && end != null) {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
     }
-  };
-
-  private handleMarkupEditCancel = (): void => {
-    this.markupEditCancel.emit();
   };
 }

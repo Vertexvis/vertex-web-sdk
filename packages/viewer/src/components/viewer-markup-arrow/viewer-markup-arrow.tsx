@@ -15,6 +15,8 @@ import { Point } from '@vertexvis/geometry';
 import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
+  isValidPointData,
+  isValidStartEvent,
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
@@ -119,11 +121,11 @@ export class ViewerMarkupArrow {
   public editEnd!: EventEmitter<void>;
 
   /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
+   * An event that is dispatched when this markup element is in view
+   * mode (`this.mode === ""`), and it completes a rerender.
    */
   @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
+  public viewRendered!: EventEmitter<void>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -133,6 +135,8 @@ export class ViewerMarkupArrow {
 
   @State()
   private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
+
+  private pointerId?: number;
 
   /**
    * @ignore
@@ -150,6 +154,20 @@ export class ViewerMarkupArrow {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected componentDidRender(): void {
+    if (this.mode === '') {
+      this.viewRendered.emit();
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -158,6 +176,7 @@ export class ViewerMarkupArrow {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -187,6 +206,13 @@ export class ViewerMarkupArrow {
     this.updatePointsFromProps();
   }
 
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -206,55 +232,59 @@ export class ViewerMarkupArrow {
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
       const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
 
-      return (
-        <Host>
-          <svg class="svg">
-            <defs>
-              <SvgShadow id="arrow-shadow" />
-            </defs>
-            <g filter="url(#arrow-shadow)">
-              <polygon
-                id="arrow-head"
-                class="head"
-                points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-              />
-              <line
-                id="arrow-line"
-                class="line"
-                x1={screenStart.x}
-                y1={screenStart.y}
-                x2={arrowheadPoints.base.x}
-                y2={arrowheadPoints.base.y}
-              />
-              {this.mode === 'edit' && (
+      if (isValidPointData(screenStart, screenEnd)) {
+        return (
+          <Host>
+            <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
+              <defs>
+                <SvgShadow id="arrow-shadow" />
+              </defs>
+              <g filter="url(#arrow-shadow)">
+                <polygon
+                  id="arrow-head"
+                  class="head"
+                  points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+                />
                 <line
-                  id="bounding-box-1d-line"
-                  class="bounds-line"
+                  id="arrow-line"
+                  class="line"
                   x1={screenStart.x}
                   y1={screenStart.y}
-                  x2={screenEnd.x}
-                  y2={screenEnd.y}
+                  x2={arrowheadPoints.base.x}
+                  y2={arrowheadPoints.base.y}
                 />
-              )}
-            </g>
-          </svg>
-          {this.mode === 'edit' && (
-            <BoundingBox1d
-              start={screenStart}
-              end={screenEnd}
-              onStartAnchorPointerDown={this.editStartPoint}
-              onCenterAnchorPointerDown={this.editCenterPoint}
-              onEndAnchorPointerDown={this.editEndPoint}
-            />
-          )}
-        </Host>
-      );
+                {this.mode === 'edit' && (
+                  <line
+                    id="bounding-box-1d-line"
+                    class="bounds-line"
+                    x1={screenStart.x}
+                    y1={screenStart.y}
+                    x2={screenEnd.x}
+                    y2={screenEnd.y}
+                  />
+                )}
+              </g>
+            </svg>
+            {this.mode === 'edit' && (
+              <BoundingBox1d
+                start={screenStart}
+                end={screenEnd}
+                onStartAnchorPointerDown={this.editStartPoint}
+                onCenterAnchorPointerDown={this.editCenterPoint}
+                onEndAnchorPointerDown={this.editEndPoint}
+              />
+            )}
+          </Host>
+        );
+      } else {
+        return <Host></Host>;
+      }
     } else {
       return (
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -305,7 +335,7 @@ export class ViewerMarkupArrow {
   };
 
   private updatePoints = (event: PointerEvent): void => {
-    if (this.elementBounds != null) {
+    if (this.elementBounds != null && this.pointerId === event.pointerId) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
@@ -334,8 +364,15 @@ export class ViewerMarkupArrow {
     }
   };
 
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    if (isValidStartEvent(event)) {
+      this.startMarkup(event);
+    }
+  };
+
   private startMarkup = (event: PointerEvent): void => {
     if (this.mode !== '' && this.elementBounds != null) {
+      this.pointerId = event.pointerId;
       this.start =
         this.start ??
         translatePointToRelative(
@@ -348,11 +385,25 @@ export class ViewerMarkupArrow {
   };
 
   private endMarkup = (): void => {
-    if (this.mode !== '' && this.end != null) {
+    const screenStart =
+      this.start != null && this.elementBounds != null
+        ? translatePointToScreen(this.start, this.elementBounds)
+        : undefined;
+    const screenEnd =
+      this.end != null && this.elementBounds != null
+        ? translatePointToScreen(this.end, this.elementBounds)
+        : undefined;
+
+    if (
+      this.mode !== '' &&
+      screenStart != null &&
+      screenEnd != null &&
+      Point.distance(screenStart, screenEnd) >= 2
+    ) {
       this.editEnd.emit();
     } else {
       this.start = undefined;
-      this.editCancel.emit();
+      this.end = undefined;
     }
 
     this.removeDrawingInteractionListeners();

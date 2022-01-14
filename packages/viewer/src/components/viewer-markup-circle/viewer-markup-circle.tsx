@@ -16,6 +16,7 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isValidStartEvent,
   transformRectangle,
   translatePointToRelative,
   translateRectToScreen,
@@ -95,11 +96,11 @@ export class ViewerMarkupCircle {
   public editEnd!: EventEmitter<void>;
 
   /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
+   * An event that is dispatched when this markup element is in view
+   * mode (`this.mode === ""`), and it completes a rerender.
    */
   @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
+  public viewRendered!: EventEmitter<void>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -115,6 +116,8 @@ export class ViewerMarkupCircle {
 
   @State()
   private resizeBounds?: Rectangle.Rectangle;
+
+  private pointerId?: number;
 
   /**
    * @ignore
@@ -132,6 +135,20 @@ export class ViewerMarkupCircle {
 
     const resize = new ResizeObserver(() => this.updateViewport());
     resize.observe(this.hostEl);
+
+    if (this.mode === 'create') {
+      window.addEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
+  protected componentDidRender(): void {
+    if (this.mode === '') {
+      this.viewRendered.emit();
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   @Method()
@@ -140,6 +157,7 @@ export class ViewerMarkupCircle {
       this.removeInteractionListeners(this.viewer);
     }
     this.removeDrawingInteractionListeners();
+    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
   /**
@@ -164,6 +182,13 @@ export class ViewerMarkupCircle {
     this.updateBoundsFromProps();
   }
 
+  @Watch('mode')
+  protected handleModeChange(): void {
+    if (this.mode !== 'create') {
+      window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    }
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -183,7 +208,7 @@ export class ViewerMarkupCircle {
 
       return (
         <Host>
-          <svg class="svg">
+          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
@@ -235,7 +260,7 @@ export class ViewerMarkupCircle {
         <Host>
           <div
             class="create-overlay"
-            onPointerDown={(event) => this.startMarkup(event)}
+            onTouchStart={(event) => event.preventDefault()}
           ></div>
         </Host>
       );
@@ -283,7 +308,8 @@ export class ViewerMarkupCircle {
     if (
       this.bounds != null &&
       this.startPosition != null &&
-      this.elementBounds != null
+      this.elementBounds != null &&
+      this.pointerId === event.pointerId
     ) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
@@ -300,12 +326,19 @@ export class ViewerMarkupCircle {
     }
   };
 
+  private handleWindowPointerDown = (event: PointerEvent): void => {
+    if (isValidStartEvent(event)) {
+      this.startMarkup(event);
+    }
+  };
+
   private startMarkup = (event: PointerEvent): void => {
     if (this.mode !== '' && this.elementBounds != null) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
       );
+      this.pointerId = event.pointerId;
       this.startPosition = position;
       this.bounds =
         this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
@@ -326,8 +359,8 @@ export class ViewerMarkupCircle {
       this.editEnd.emit();
     } else {
       this.bounds = undefined;
-      this.editCancel.emit();
     }
+
     this.removeDrawingInteractionListeners();
   };
 }
