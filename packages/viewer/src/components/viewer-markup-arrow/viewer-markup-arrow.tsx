@@ -403,6 +403,7 @@ export class ViewerMarkupArrow {
       this.editEnd.emit();
     } else {
       this.start = undefined;
+      this.end = undefined;
     }
 
     this.removeDrawingInteractionListeners();
