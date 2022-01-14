@@ -103,12 +103,6 @@ export class ViewerMarkupTool {
   @Event({ bubbles: true })
   public markupEnd!: EventEmitter<Markup>;
 
-  /**
-   * An event that is dispatched when a user has cancelled a markup edit.
-   */
-  @Event({ bubbles: true })
-  public markupEditCancel!: EventEmitter<void>;
-
   @Element()
   private hostEl!: HTMLElement;
 
@@ -177,20 +171,16 @@ export class ViewerMarkupTool {
   public async reset(): Promise<void> {
     const { markupElement } = this.stateMap;
     if (isVertexViewerFreeformMarkup(markupElement)) {
-      window.requestAnimationFrame(() => {
-        markupElement.points = undefined;
-        markupElement.bounds = undefined;
-      });
+      markupElement.points = undefined;
+      markupElement.bounds = undefined;
+      markupElement.mode = 'create';
     } else if (isVertexViewerCircleMarkup(markupElement)) {
-      window.requestAnimationFrame(() => {
-        markupElement.bounds = undefined;
-      });
+      markupElement.bounds = undefined;
+      markupElement.mode = 'create';
     } else if (isVertexViewerArrowMarkup(markupElement)) {
-      window.requestAnimationFrame(() => {
-        markupElement.start = undefined;
-        markupElement.end = undefined;
-        markupElement.mode = 'create';
-      });
+      markupElement.start = undefined;
+      markupElement.end = undefined;
+      markupElement.mode = 'create';
     }
   }
 
@@ -314,10 +304,6 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       markupElement.removeEventListener('editEnd', this.handleMarkupEditEnd);
-      markupElement.removeEventListener(
-        'editCancel',
-        this.handleMarkupEditCancel
-      );
     }
 
     if (!this.disabled) {
@@ -329,10 +315,6 @@ export class ViewerMarkupTool {
         this.handleMarkupEditBegin
       );
       newMarkupElement.addEventListener('editEnd', this.handleMarkupEditEnd);
-      newMarkupElement.addEventListener(
-        'editCancel',
-        this.handleMarkupEditCancel
-      );
       this.stateMap.markupElement = newMarkupElement;
       this.hostEl.append(newMarkupElement);
     }
@@ -363,9 +345,5 @@ export class ViewerMarkupTool {
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
     }
-  };
-
-  private handleMarkupEditCancel = (): void => {
-    this.markupEditCancel.emit();
   };
 }

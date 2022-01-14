@@ -1,3 +1,10 @@
+jest.mock('./dom', () => ({
+  getMarkupBoundingClientRect: jest.fn(() => ({
+    width: 100,
+    height: 100,
+  })),
+}));
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
@@ -15,9 +22,23 @@ import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
 import { ViewerMarkup } from './viewer-markup';
 
 describe('vertex-viewer-markup', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let interactionTargetListeners: any[] = [];
+  const addEventListener = jest.fn((_, listener) => {
+    interactionTargetListeners = [...interactionTargetListeners, listener];
+  });
+  const removeEventListener = jest.fn((_, listener) => {
+    interactionTargetListeners = interactionTargetListeners.filter(
+      (l) => l !== listener
+    );
+  });
   const viewer = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    getInteractionTarget: jest.fn(() => ({
+      addEventListener,
+      removeEventListener,
+    })),
   };
   const arrowMarkup = new ArrowMarkup({
     start: Point.create(0, 0),
@@ -264,6 +285,105 @@ describe('vertex-viewer-markup', () => {
     });
   });
 
+  describe('creating markup', () => {
+    it('resets the internal markup tool when markup renders', async () => {
+      const page = await newSpecPage({
+        components: [
+          ViewerMarkup,
+          ViewerMarkupTool,
+          ViewerMarkupArrow,
+          ViewerMarkupCircle,
+          ViewerMarkupFreeform,
+        ],
+        template: () => (
+          <vertex-viewer-markup
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            viewer={viewer as any}
+          >
+            <vertex-viewer-markup-tool />
+          </vertex-viewer-markup>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const tool = el.querySelector(
+        'vertex-viewer-markup-tool'
+      ) as HTMLVertexViewerMarkupToolElement;
+      const arrow = tool.querySelector(
+        'vertex-viewer-markup-arrow'
+      ) as HTMLVertexViewerMarkupArrowElement;
+      arrow.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: 100,
+          clientY: 0,
+        })
+      );
+      await page.waitForChanges();
+
+      expect(arrow.start).toBeDefined();
+      expect(arrow.end).toBeDefined();
+
+      window.dispatchEvent(new MouseEvent('pointerup'));
+      await page.waitForChanges();
+
+      expect(arrow.start).toBeUndefined();
+      expect(arrow.end).toBeUndefined();
+
+      el.tool = 'circle';
+      await page.waitForChanges();
+
+      const circle = tool.querySelector(
+        'vertex-viewer-markup-circle'
+      ) as HTMLVertexViewerMarkupCircleElement;
+      circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: 100,
+          clientY: 100,
+        })
+      );
+      await page.waitForChanges();
+
+      expect(circle.bounds).toBeDefined();
+
+      window.dispatchEvent(new MouseEvent('pointerup'));
+      await page.waitForChanges();
+
+      expect(circle.bounds).toBeUndefined();
+
+      el.tool = 'freeform';
+      await page.waitForChanges();
+
+      const freeform = tool.querySelector(
+        'vertex-viewer-markup-freeform'
+      ) as HTMLVertexViewerMarkupFreeformElement;
+      freeform.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: 100,
+          clientY: 0,
+        })
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: 100,
+          clientY: 100,
+        })
+      );
+      await page.waitForChanges();
+
+      expect(freeform.bounds).toBeDefined();
+      expect(freeform.points).toBeDefined();
+
+      window.dispatchEvent(new MouseEvent('pointerup'));
+      await page.waitForChanges();
+
+      expect(freeform.bounds).toBeUndefined();
+      expect(freeform.points).toBeUndefined();
+    });
+  });
+
   describe('removing markup', () => {
     it('removes markup containing id', async () => {
       const page = await newSpecPage({
@@ -366,16 +486,19 @@ describe('vertex-viewer-markup', () => {
 
       // Should select, markup has ID
       markupEl1.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      markupEl1.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl1.id);
 
-      // Should not select, markup does not have ID
+      // Should clear selection, markup does not have ID
       markupEl2.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      markupEl2.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
-      expect(el.selectedMarkupId).toEqual(markupEl1.id);
+      expect(el.selectedMarkupId).toBeUndefined();
 
       // Should select, markup has ID
       markupEl3.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      markupEl3.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl3.id);
     });
@@ -390,6 +513,41 @@ describe('vertex-viewer-markup', () => {
       const markupEl = await el.addMarkup(arrowMarkup);
 
       markupEl.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+
+      expect(el.selectedMarkupId).toBeUndefined();
+    });
+
+    it('does not select markup if movement occurs', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMarkup, ViewerMarkupArrow],
+        html: `
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-arrow id="m1" class="provided"></vertex-viewer-markup-arrow>
+          </vertex-viewer-markup>
+        `,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const markup = el.querySelector('vertex-viewer-markup-arrow');
+
+      markup?.dispatchEvent(
+        new MouseEvent('pointerdown', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 50,
+        })
+      );
+      await page.waitForChanges();
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: 100,
+          clientY: 100,
+        })
+      );
+      markup?.dispatchEvent(
+        new MouseEvent('pointerup', { bubbles: true, clientX: 50, clientY: 50 })
+      );
+      await page.waitForChanges();
 
       expect(el.selectedMarkupId).toBeUndefined();
     });

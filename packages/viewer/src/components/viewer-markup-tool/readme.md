@@ -19,11 +19,10 @@
 
 ## Events
 
-| Event              | Description                                                          | Type                                                         |
-| ------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `markupBegin`      | An event that is dispatched when a user begins a new markup.         | `CustomEvent<void>`                                          |
-| `markupEditCancel` | An event that is dispatched when a user has cancelled a markup edit. | `CustomEvent<void>`                                          |
-| `markupEnd`        | An event that is dispatched when a user has finished their markup.   | `CustomEvent<ArrowMarkup \| CircleMarkup \| FreeformMarkup>` |
+| Event         | Description                                                        | Type                                                         |
+| ------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| `markupBegin` | An event that is dispatched when a user begins a new markup.       | `CustomEvent<void>`                                          |
+| `markupEnd`   | An event that is dispatched when a user has finished their markup. | `CustomEvent<ArrowMarkup \| CircleMarkup \| FreeformMarkup>` |
 
 
 ## Methods

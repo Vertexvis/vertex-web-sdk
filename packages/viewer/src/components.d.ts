@@ -1914,10 +1914,6 @@ declare namespace LocalJSX {
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
     /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
-    /**
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
@@ -1956,10 +1952,6 @@ declare namespace LocalJSX {
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
     /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
-    /**
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
@@ -1989,10 +1981,6 @@ declare namespace LocalJSX {
      * An event that is dispatched anytime the user begins editing the markup.
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
     /**
      * An event that is dispatched when the user has finished editing the markup.
      */
@@ -2035,10 +2023,6 @@ declare namespace LocalJSX {
      * An event that is dispatched when a user begins a new markup.
      */
     onMarkupBegin?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is dispatched when a user has cancelled a markup edit.
-     */
-    onMarkupEditCancel?: (event: CustomEvent<void>) => void;
     /**
      * An event that is dispatched when a user has finished their markup.
      */

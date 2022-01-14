@@ -16,6 +16,7 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isValidStartEvent,
   isVertexViewerMarkupElement,
   transformRectangle,
   translatePointToRelative,
@@ -94,13 +95,6 @@ export class ViewerMarkupCircle {
    */
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
-
-  /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
-   */
-  @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
 
   /**
    * An event that is dispatched when this markup element is in view
@@ -334,8 +328,7 @@ export class ViewerMarkupCircle {
   };
 
   private handleWindowPointerDown = (event: PointerEvent): void => {
-    const target = event.target as HTMLElement;
-    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+    if (isValidStartEvent(event)) {
       this.startMarkup(event);
     }
   };
@@ -365,9 +358,6 @@ export class ViewerMarkupCircle {
     ) {
       this.editAnchor = 'bottom-right';
       this.editEnd.emit();
-    } else if (this.mode === 'edit') {
-      this.bounds = undefined;
-      this.editCancel.emit();
     } else {
       this.bounds = undefined;
     }

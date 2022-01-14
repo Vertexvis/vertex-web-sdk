@@ -16,6 +16,7 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
+  isValidStartEvent,
   isVertexViewerMarkupElement,
   transformRectangle,
   translatePointsToBounds,
@@ -119,13 +120,6 @@ export class ViewerMarkupFreeform {
    */
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
-
-  /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
-   */
-  @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
 
   /**
    * An event that is dispatched when this markup element is in view
@@ -348,8 +342,7 @@ export class ViewerMarkupFreeform {
   }
 
   private handleWindowPointerDown = (event: PointerEvent): void => {
-    const target = event.target as HTMLElement;
-    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+    if (isValidStartEvent(event)) {
       this.startMarkup(event);
     }
   };
@@ -441,7 +434,7 @@ export class ViewerMarkupFreeform {
       this.pointerId === event.pointerId &&
       this.mode !== '' &&
       this.points != null &&
-      this.points.length > 1 &&
+      this.points.length > 2 &&
       this.elementBounds != null
     ) {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
@@ -456,10 +449,7 @@ export class ViewerMarkupFreeform {
       this.screenPoints = [...this.screenPoints, screenPosition];
 
       this.editEnd.emit();
-    } else if (this.mode === 'edit') {
-      this.points = undefined;
-      this.editCancel.emit();
-    } else if (this.mode === 'create') {
+    } else {
       this.points = undefined;
     }
 

@@ -116,7 +116,11 @@ export class ViewerMarkup {
   private toSelectMarkupId?: string;
 
   @State()
-  private toSelectPointerPosition?: Point.Point;
+  private pointerDownPosition?: Point.Point;
+
+  protected disconnectedCallback(): void {
+    window.removeEventListener('pointermove', this.handlePointerMove);
+  }
 
   /**
    * Adds a new markup as a child to this component. A new markup
@@ -330,14 +334,6 @@ export class ViewerMarkup {
   /**
    * @ignore
    */
-  @Listen('markupEditCancel')
-  protected async handleMarkupEditCancel(): Promise<void> {
-    this.selectedMarkupId = undefined;
-  }
-
-  /**
-   * @ignore
-   */
   @Listen('pointerdown')
   protected async handleMarkupPointerDown(event: PointerEvent): Promise<void> {
     if (!this.disabled) {
@@ -346,27 +342,10 @@ export class ViewerMarkup {
       const markup = markups.find((m) => m === el);
       if (markup?.id != null && markup?.id !== '') {
         this.toSelectMarkupId = el.id;
-        this.toSelectPointerPosition = Point.create(
-          event.clientX,
-          event.clientY
-        );
       }
-    }
-  }
+      this.pointerDownPosition = Point.create(event.clientX, event.clientY);
 
-  /**
-   * @ignore
-   */
-  @Listen('pointermove')
-  protected async handleMarkupPointerMove(event: PointerEvent): Promise<void> {
-    if (
-      this.toSelectPointerPosition != null &&
-      Point.distance(
-        this.toSelectPointerPosition,
-        Point.create(event.clientX, event.clientY)
-      ) > 2
-    ) {
-      this.toSelectMarkupId = undefined;
+      window.addEventListener('pointermove', this.handlePointerMove);
     }
   }
 
@@ -374,19 +353,31 @@ export class ViewerMarkup {
    * @ignore
    */
   @Listen('pointerup')
-  protected async handleMarkupPointerUp(event: Event): Promise<void> {
+  protected async handleMarkupPointerUp(event: PointerEvent): Promise<void> {
     if (!this.disabled) {
       const el = event.target as Element;
       const markups = await this.getMarkupElements();
       const markup = markups.find((m) => m === el);
       if (
         markup?.id != null &&
-        markup?.id !== '' &&
+        markup.id !== '' &&
         markup.id === this.toSelectMarkupId
       ) {
         this.selectedMarkupId = el.id;
+      } else if (
+        this.pointerDownPosition != null &&
+        Point.distance(
+          this.pointerDownPosition,
+          Point.create(event.clientX, event.clientY)
+        ) <= 2
+      ) {
+        this.selectedMarkupId = undefined;
       }
+      this.toSelectMarkupId = undefined;
+      this.pointerDownPosition = undefined;
     }
+
+    window.removeEventListener('pointermove', this.handlePointerMove);
   }
 
   /**
@@ -406,6 +397,18 @@ export class ViewerMarkup {
       </Host>
     );
   }
+
+  private handlePointerMove = (event: PointerEvent): void => {
+    if (
+      this.pointerDownPosition != null &&
+      Point.distance(
+        this.pointerDownPosition,
+        Point.create(event.clientX, event.clientY)
+      ) > 2
+    ) {
+      this.toSelectMarkupId = undefined;
+    }
+  };
 
   private appendMarkupElement(
     el:

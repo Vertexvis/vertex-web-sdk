@@ -16,7 +16,7 @@ import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidPointData,
-  isVertexViewerMarkupElement,
+  isValidStartEvent,
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
@@ -119,13 +119,6 @@ export class ViewerMarkupArrow {
    */
   @Event({ bubbles: true })
   public editEnd!: EventEmitter<void>;
-
-  /**
-   * An event that is dispatched when the user cancels editing of the
-   * markup.
-   */
-  @Event({ bubbles: true })
-  public editCancel!: EventEmitter<void>;
 
   /**
    * An event that is dispatched when this markup element is in view
@@ -372,8 +365,7 @@ export class ViewerMarkupArrow {
   };
 
   private handleWindowPointerDown = (event: PointerEvent): void => {
-    const target = event.target as HTMLElement;
-    if (isVertexViewerMarkupElement(target) && target.mode !== 'edit') {
+    if (isValidStartEvent(event)) {
       this.startMarkup(event);
     }
   };
@@ -393,11 +385,22 @@ export class ViewerMarkupArrow {
   };
 
   private endMarkup = (): void => {
-    if (this.mode !== '' && this.end != null) {
+    const screenStart =
+      this.start != null && this.elementBounds != null
+        ? translatePointToScreen(this.start, this.elementBounds)
+        : undefined;
+    const screenEnd =
+      this.end != null && this.elementBounds != null
+        ? translatePointToScreen(this.end, this.elementBounds)
+        : undefined;
+
+    if (
+      this.mode !== '' &&
+      screenStart != null &&
+      screenEnd != null &&
+      Point.distance(screenStart, screenEnd) >= 2
+    ) {
       this.editEnd.emit();
-    } else if (this.mode === 'edit') {
-      this.start = undefined;
-      this.editCancel.emit();
     } else {
       this.start = undefined;
     }

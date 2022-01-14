@@ -254,3 +254,9 @@ export function isVertexViewerMarkupElement(
 export function isValidPointData(...points: Point.Point[]): boolean {
   return points.every((pt) => !isNaN(pt.x) && !isNaN(pt.y));
 }
+
+export function isValidStartEvent(event: PointerEvent): boolean {
+  const el = event.target as HTMLElement;
+
+  return isVertexViewerMarkupElement(el) && el.mode !== 'edit';
+}
