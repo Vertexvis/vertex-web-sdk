@@ -119,7 +119,7 @@ export class ViewerMarkup {
   private pointerDownPosition?: Point.Point;
 
   protected disconnectedCallback(): void {
-    window.removeEventListener('pointermove', this.handlePointerUp);
+    window.removeEventListener('pointerup', this.handlePointerUp);
     window.removeEventListener('pointermove', this.handlePointerMove);
   }
 
@@ -405,7 +405,7 @@ export class ViewerMarkup {
       this.pointerDownPosition = undefined;
     }
 
-    window.removeEventListener('pointermove', this.handlePointerUp);
+    window.removeEventListener('pointerup', this.handlePointerUp);
     window.removeEventListener('pointermove', this.handlePointerMove);
   };
 
