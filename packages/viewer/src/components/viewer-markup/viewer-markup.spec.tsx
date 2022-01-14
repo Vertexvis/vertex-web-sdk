@@ -486,18 +486,21 @@ describe('vertex-viewer-markup', () => {
 
       // Should select, markup has ID
       markupEl1.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
       markupEl1.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl1.id);
 
       // Should clear selection, markup does not have ID
       markupEl2.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
       markupEl2.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toBeUndefined();
 
       // Should select, markup has ID
       markupEl3.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      await page.waitForChanges();
       markupEl3.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl3.id);
