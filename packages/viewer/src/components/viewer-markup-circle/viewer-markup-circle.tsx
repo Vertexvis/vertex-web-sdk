@@ -208,7 +208,7 @@ export class ViewerMarkupCircle {
 
       return (
         <Host>
-          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
+          <svg class="svg" onTouchStart={this.handleTouchStart}>
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
@@ -253,6 +253,12 @@ export class ViewerMarkupCircle {
               }
             />
           )}
+          {this.mode === 'create' && (
+            <div
+              class="create-overlay"
+              onTouchStart={this.handleTouchStart}
+            ></div>
+          )}
         </Host>
       );
     } else {
@@ -260,7 +266,7 @@ export class ViewerMarkupCircle {
         <Host>
           <div
             class="create-overlay"
-            onTouchStart={(event) => event.preventDefault()}
+            onTouchStart={this.handleTouchStart}
           ></div>
         </Host>
       );
@@ -332,8 +338,16 @@ export class ViewerMarkupCircle {
     }
   };
 
+  private handleTouchStart = (event: TouchEvent): void => {
+    event.preventDefault();
+  };
+
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.elementBounds != null) {
+    if (
+      this.mode !== '' &&
+      this.elementBounds != null &&
+      this.pointerId == null
+    ) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
         this.elementBounds
@@ -348,19 +362,22 @@ export class ViewerMarkupCircle {
     }
   };
 
-  private endMarkup = (): void => {
-    if (
-      this.mode !== '' &&
-      this.bounds != null &&
-      this.bounds?.width > 0 &&
-      this.bounds?.height > 0
-    ) {
-      this.editAnchor = 'bottom-right';
-      this.editEnd.emit();
-    } else {
-      this.bounds = undefined;
-    }
+  private endMarkup = (event: PointerEvent): void => {
+    if (this.pointerId === event.pointerId) {
+      if (
+        this.mode !== '' &&
+        this.bounds != null &&
+        this.bounds?.width > 0 &&
+        this.bounds?.height > 0
+      ) {
+        this.editAnchor = 'bottom-right';
+        this.editEnd.emit();
+      } else {
+        this.bounds = undefined;
+      }
 
-    this.removeDrawingInteractionListeners();
+      this.pointerId = undefined;
+      this.removeDrawingInteractionListeners();
+    }
   };
 }

@@ -235,7 +235,7 @@ export class ViewerMarkupArrow {
       if (isValidPointData(screenStart, screenEnd)) {
         return (
           <Host>
-            <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
+            <svg class="svg" onTouchStart={this.handleTouchStart}>
               <defs>
                 <SvgShadow id="arrow-shadow" />
               </defs>
@@ -274,6 +274,12 @@ export class ViewerMarkupArrow {
                 onEndAnchorPointerDown={this.editEndPoint}
               />
             )}
+            {this.mode === 'create' && (
+              <div
+                class="create-overlay"
+                onTouchStart={this.handleTouchStart}
+              ></div>
+            )}
           </Host>
         );
       } else {
@@ -284,7 +290,7 @@ export class ViewerMarkupArrow {
         <Host>
           <div
             class="create-overlay"
-            onTouchStart={(event) => event.preventDefault()}
+            onTouchStart={this.handleTouchStart}
           ></div>
         </Host>
       );
@@ -370,8 +376,16 @@ export class ViewerMarkupArrow {
     }
   };
 
+  private handleTouchStart = (event: TouchEvent): void => {
+    event.preventDefault();
+  };
+
   private startMarkup = (event: PointerEvent): void => {
-    if (this.mode !== '' && this.elementBounds != null) {
+    if (
+      this.mode !== '' &&
+      this.elementBounds != null &&
+      this.pointerId == null
+    ) {
       this.pointerId = event.pointerId;
       this.start =
         this.start ??
@@ -384,28 +398,31 @@ export class ViewerMarkupArrow {
     }
   };
 
-  private endMarkup = (): void => {
-    const screenStart =
-      this.start != null && this.elementBounds != null
-        ? translatePointToScreen(this.start, this.elementBounds)
-        : undefined;
-    const screenEnd =
-      this.end != null && this.elementBounds != null
-        ? translatePointToScreen(this.end, this.elementBounds)
-        : undefined;
+  private endMarkup = (event: PointerEvent): void => {
+    if (this.pointerId === event.pointerId) {
+      const screenStart =
+        this.start != null && this.elementBounds != null
+          ? translatePointToScreen(this.start, this.elementBounds)
+          : undefined;
+      const screenEnd =
+        this.end != null && this.elementBounds != null
+          ? translatePointToScreen(this.end, this.elementBounds)
+          : undefined;
 
-    if (
-      this.mode !== '' &&
-      screenStart != null &&
-      screenEnd != null &&
-      Point.distance(screenStart, screenEnd) >= 2
-    ) {
-      this.editEnd.emit();
-    } else {
-      this.start = undefined;
-      this.end = undefined;
+      if (
+        this.mode !== '' &&
+        screenStart != null &&
+        screenEnd != null &&
+        Point.distance(screenStart, screenEnd) >= 2
+      ) {
+        this.editEnd.emit();
+      } else {
+        this.start = undefined;
+        this.end = undefined;
+      }
+
+      this.pointerId = undefined;
+      this.removeDrawingInteractionListeners();
     }
-
-    this.removeDrawingInteractionListeners();
   };
 }

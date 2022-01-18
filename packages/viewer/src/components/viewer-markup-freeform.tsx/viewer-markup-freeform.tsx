@@ -241,7 +241,7 @@ export class ViewerMarkupFreeform {
     if (this.screenPoints.length > 0 && this.elementBounds != null) {
       return (
         <Host>
-          <svg class="svg" onTouchStart={(event) => event.preventDefault()}>
+          <svg class="svg" onTouchStart={this.handleTouchStart}>
             <defs>
               <SvgShadow id="freeform-markup-shadow" />
             </defs>
@@ -284,6 +284,12 @@ export class ViewerMarkupFreeform {
               }
             />
           )}
+          {this.mode === 'create' && (
+            <div
+              class="create-overlay"
+              onTouchStart={this.handleTouchStart}
+            ></div>
+          )}
         </Host>
       );
     } else {
@@ -291,7 +297,7 @@ export class ViewerMarkupFreeform {
         <Host>
           <div
             class="create-overlay"
-            onTouchStart={(event) => event.preventDefault()}
+            onTouchStart={this.handleTouchStart}
           ></div>
         </Host>
       );
@@ -344,6 +350,10 @@ export class ViewerMarkupFreeform {
     if (isValidStartEvent(event)) {
       this.startMarkup(event);
     }
+  };
+
+  private handleTouchStart = (event: TouchEvent): void => {
+    event.preventDefault();
   };
 
   private updateEditAnchor = (
@@ -429,33 +439,37 @@ export class ViewerMarkupFreeform {
   };
 
   private endMarkup = (event: PointerEvent): void => {
-    if (
-      this.pointerId === event.pointerId &&
-      this.mode !== '' &&
-      this.points != null &&
-      this.points.length > 2 &&
-      this.elementBounds != null
-    ) {
-      const screenPosition = getMouseClientPosition(event, this.elementBounds);
-      const position = translatePointToRelative(
-        screenPosition,
-        this.elementBounds
-      );
+    if (this.pointerId === event.pointerId) {
+      if (
+        this.mode !== '' &&
+        this.points != null &&
+        this.points.length > 2 &&
+        this.elementBounds != null
+      ) {
+        const screenPosition = getMouseClientPosition(
+          event,
+          this.elementBounds
+        );
+        const position = translatePointToRelative(
+          screenPosition,
+          this.elementBounds
+        );
 
-      this.updateMinAndMax(position);
+        this.updateMinAndMax(position);
 
-      this.points = [...this.points, position];
-      this.screenPoints = [...this.screenPoints, screenPosition];
+        this.points = [...this.points, position];
+        this.screenPoints = [...this.screenPoints, screenPosition];
 
-      this.editEnd.emit();
-    } else {
-      this.points = undefined;
+        this.editEnd.emit();
+      } else {
+        this.points = undefined;
+      }
+
+      this.min = undefined;
+      this.max = undefined;
+      this.pointerId = undefined;
+      this.removeDrawingInteractionListeners();
     }
-
-    this.min = undefined;
-    this.max = undefined;
-    this.pointerId = undefined;
-    this.removeDrawingInteractionListeners();
   };
 
   private endEdit = (): void => {
