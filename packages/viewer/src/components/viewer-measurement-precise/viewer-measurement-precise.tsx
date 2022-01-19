@@ -6,7 +6,7 @@ import { Disposable } from '@vertexvis/utils';
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { MeasurementController, MeasurementModel } from '../../lib/measurement';
-import { PreciseMeasurementInteractionHandler } from '../../lib/measurement/interactions';
+import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 
 @Component({
   tag: 'vertex-viewer-measurement-precise',
@@ -85,7 +85,7 @@ export class ViewerMeasurementPrecise {
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new PreciseMeasurementInteractionHandler(this.measurementController)
+          new MeasurementInteractionHandler(this.measurementController)
         );
     }
   }

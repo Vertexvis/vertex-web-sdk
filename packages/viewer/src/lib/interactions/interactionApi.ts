@@ -9,11 +9,14 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
+import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
+import { Cursor, CursorManager } from '../cursors';
 import { Camera, Scene } from '../scenes';
 import {
   DepthBuffer,
+  EntityType,
   FramePerspectiveCamera,
   Interactions,
   Viewport,
@@ -58,6 +61,7 @@ export class InteractionApi {
 
   public constructor(
     private stream: StreamApi,
+    private cursors: CursorManager,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private getFrame: () => ReceivedFrame | undefined,
@@ -72,6 +76,24 @@ export class InteractionApi {
     this.doubleTap = this.doubleTap.bind(this);
     this.longPress = this.longPress.bind(this);
     this.emitTapEvent = this.emitTapEvent.bind(this);
+  }
+
+  public addCursor(cursor: Cursor, priority?: number): Disposable {
+    return this.cursors.add(cursor, priority);
+  }
+
+  public async getEntityTypeAtPoint(
+    point: Point.Point
+  ): Promise<EntityType | undefined> {
+    const viewport = this.getViewport();
+    const featureMap = await this.getFrame()?.featureMap();
+
+    if (featureMap != null) {
+      const framePt = viewport.transformPointToFrame(point, featureMap);
+      return featureMap.getEntityType(framePt);
+    } else {
+      return Promise.resolve(undefined);
+    }
   }
 
   /**
@@ -312,8 +334,8 @@ export class InteractionApi {
   }
 
   /**
-   * Performs a view all operation for the scene's bounding box, and requests a new image
-   * for the updated scene.
+   * Performs a view all operation for the scene's bounding box, and requests a
+   * new image for the updated scene.
    */
   public async viewAll(): Promise<void> {
     await this.getScene().camera().viewAll().render();

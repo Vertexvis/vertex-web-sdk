@@ -131,7 +131,12 @@ export function makeFeatureMap(
   fill: (pixel: Point.Point) => Color.Color
 ): FeatureMap {
   return FeatureMap.fromPng(
-    { data: makeFeatureMapBytes(width, height, fill) },
+    {
+      data: makeFeatureMapBytes(width, height, fill),
+      width,
+      height,
+      channels: 4,
+    },
     makeImageAttributes(width, height)
   );
 }

@@ -35,3 +35,12 @@ export enum EntityType {
    */
   GENERIC_GEOMETRY = 0x60, // == 96
 }
+
+/**
+ * Checks if the given entity type contains BREP information.
+ */
+export function isPreciseEntityType(type: EntityType): boolean {
+  return (
+    type === EntityType.PRECISE_EDGE || type === EntityType.PRECISE_SURFACE
+  );
+}

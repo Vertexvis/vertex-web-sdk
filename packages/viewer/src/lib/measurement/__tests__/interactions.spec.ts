@@ -10,20 +10,22 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { Async } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
+import { CursorManager } from '../../cursors';
 import { InteractionApi } from '../../interactions';
 import { MeasurementController } from '../controller';
-import { PreciseMeasurementInteractionHandler } from '../interactions';
+import { MeasurementInteractionHandler } from '../interactions';
 import { MeasurementModel } from '../model';
 
-describe(PreciseMeasurementInteractionHandler, () => {
+describe(MeasurementInteractionHandler, () => {
   const model = new MeasurementModel();
   const client = new SceneViewAPIClient(random.url());
   const controller = new MeasurementController(model, client, () => 'token');
-  const handler = new PreciseMeasurementInteractionHandler(controller);
+  const handler = new MeasurementInteractionHandler(controller);
 
   const element = document.createElement('div');
   const api = new InteractionApi(
     new StreamApi(),
+    new CursorManager(),
     jest.fn(),
     jest.fn(),
     jest.fn(),
