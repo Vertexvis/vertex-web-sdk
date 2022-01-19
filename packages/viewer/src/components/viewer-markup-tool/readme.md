@@ -19,11 +19,26 @@
 
 ## Events
 
-| Event              | Description                                                          | Type                                                         |
-| ------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `markupBegin`      | An event that is dispatched when a user begins a new markup.         | `CustomEvent<void>`                                          |
-| `markupEditCancel` | An event that is dispatched when a user has cancelled a markup edit. | `CustomEvent<void>`                                          |
-| `markupEnd`        | An event that is dispatched when a user has finished their markup.   | `CustomEvent<ArrowMarkup \| CircleMarkup \| FreeformMarkup>` |
+| Event         | Description                                                        | Type                                                         |
+| ------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| `markupBegin` | An event that is dispatched when a user begins a new markup.       | `CustomEvent<void>`                                          |
+| `markupEnd`   | An event that is dispatched when a user has finished their markup. | `CustomEvent<ArrowMarkup \| CircleMarkup \| FreeformMarkup>` |
+
+
+## Methods
+
+### `reset() => Promise<void>`
+
+Resets the state of the internally managed markup element
+to allow for creating a new markup. This state is automatically
+managed when this element is placed as a child of a
+`<vertex-viewer-markup>` element.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 
 ## Dependencies

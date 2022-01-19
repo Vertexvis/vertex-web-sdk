@@ -836,6 +836,10 @@ export namespace Components {
      */
     freeformTemplateId?: string;
     /**
+     * Resets the state of the internally managed markup element to allow for creating a new markup. This state is automatically managed when this element is placed as a child of a `<vertex-viewer-markup>` element.
+     */
+    reset: () => Promise<void>;
+    /**
      * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     tool: ViewerMarkupToolType;
@@ -1913,13 +1917,13 @@ declare namespace LocalJSX {
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
     /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
-    /**
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
+     */
+    onViewRendered?: (event: CustomEvent<void>) => void;
     /**
      * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
@@ -1951,13 +1955,13 @@ declare namespace LocalJSX {
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
     /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
-    /**
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
+     */
+    onViewRendered?: (event: CustomEvent<void>) => void;
     /**
      * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
@@ -1981,13 +1985,13 @@ declare namespace LocalJSX {
      */
     onEditBegin?: (event: CustomEvent<void>) => void;
     /**
-     * An event that is dispatched when the user cancels editing of the markup.
-     */
-    onEditCancel?: (event: CustomEvent<void>) => void;
-    /**
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
+    /**
+     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
+     */
+    onViewRendered?: (event: CustomEvent<void>) => void;
     /**
      * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
@@ -2022,10 +2026,6 @@ declare namespace LocalJSX {
      * An event that is dispatched when a user begins a new markup.
      */
     onMarkupBegin?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is dispatched when a user has cancelled a markup edit.
-     */
-    onMarkupEditCancel?: (event: CustomEvent<void>) => void;
     /**
      * An event that is dispatched when a user has finished their markup.
      */

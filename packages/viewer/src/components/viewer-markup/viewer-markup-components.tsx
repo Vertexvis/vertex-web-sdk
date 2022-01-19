@@ -22,6 +22,7 @@ export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
         top: `${point.y}px`,
         left: `${point.x}px`,
       }}
+      onTouchStart={(event) => event.preventDefault()}
       onPointerDown={onPointerDown}
     >
       <div
