@@ -5,7 +5,11 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import { MeasurementController, MeasurementModel } from '../../lib/measurement';
+import {
+  ImpreciseMeasurementEntity,
+  MeasurementController,
+  MeasurementModel,
+} from '../../lib/measurement';
 import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 
 @Component({
@@ -29,7 +33,11 @@ export class ViewerMeasurementPrecise {
   @Prop()
   public config?: Config;
 
+  @State()
+  private impreciseEntities: ImpreciseMeasurementEntity[] = [];
+
   private registeredInteractionHandler?: Promise<Disposable>;
+  private onEntitiesChangedHandler?: Disposable;
 
   protected connectedCallback(): void {
     this.setupInteractionHandler();
@@ -37,11 +45,13 @@ export class ViewerMeasurementPrecise {
 
   protected componentWillLoad(): void {
     this.setupController();
+    this.setupModelListeners();
     this.setupInteractionHandler();
   }
 
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
+    this.clearModelListeners();
   }
 
   @Watch('measurementController')
@@ -52,6 +62,7 @@ export class ViewerMeasurementPrecise {
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.setupController();
+    this.setupModelListeners();
   }
 
   @Watch('viewer')
@@ -60,7 +71,17 @@ export class ViewerMeasurementPrecise {
   }
 
   public render(): JSX.Element {
-    return <Host></Host>;
+    return (
+      <Host>
+        <vertex-viewer-dom-renderer drawMode="2d" viewer={this.viewer}>
+          {this.impreciseEntities.map((e) => (
+            <vertex-viewer-dom-element position={e.point}>
+              <div class="imprecise-anchor" />
+            </vertex-viewer-dom-element>
+          ))}
+        </vertex-viewer-dom-renderer>
+      </Host>
+    );
   }
 
   private setupController(): void {
@@ -88,5 +109,18 @@ export class ViewerMeasurementPrecise {
           new MeasurementInteractionHandler(this.measurementController)
         );
     }
+  }
+
+  private clearModelListeners(): void {
+    this.onEntitiesChangedHandler?.dispose();
+    this.onEntitiesChangedHandler = undefined;
+  }
+
+  private setupModelListeners(): void {
+    this.onEntitiesChangedHandler = this.measurementModel.onEntitiesChanged(
+      () => {
+        this.impreciseEntities = this.measurementModel.getImpreciseEntities();
+      }
+    );
   }
 }

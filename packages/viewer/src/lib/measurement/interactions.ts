@@ -1,11 +1,12 @@
 import { Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { measurementCursor } from '../cursors';
+import { Cursor, measurementCursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { EntityType, isPreciseEntityType } from '../types';
+import { ImpreciseMeasurementEntity } from '.';
 import { MeasurementController } from './controller';
 import { PreciseMeasurementEntity } from './entities';
 
@@ -72,87 +73,65 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     }
 
     if (isPreciseEntityType(type)) {
-      this.measurementInteraction = new PreciseMeasurementInteractionHandler(
+      this.measurementInteraction = new PreciseMeasurementInteraction(
         this.controller
       );
     } else {
-      this.measurementInteraction =
-        new ImpreciseMeasurementInteractionHandler();
+      this.measurementInteraction = new ImpreciseMeasurementInteraction(
+        this.controller
+      );
     }
 
     this.measurementInteraction.initialize(this.element, this.api);
   }
 }
 
-class PreciseMeasurementInteractionHandler implements InteractionHandler {
-  private element?: HTMLElement;
-  private api?: InteractionApi;
-  private cursor?: Disposable;
+class MeasurementInteraction implements InteractionHandler {
+  protected element?: HTMLElement;
+  protected api?: InteractionApi;
+
+  protected get elementRect(): DOMRect | undefined {
+    return this.rectObserver.rect;
+  }
 
   private rectObserver = new ElementRectObserver();
-
-  public constructor(private readonly controller: MeasurementController) {}
+  private cursor?: Disposable;
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.api = api;
 
-    this.rectObserver.observe(element);
-
-    this.element.addEventListener('pointermove', this.handlePointerMove);
-    this.element.addEventListener('pointerdown', this.handlePointerDown);
+    this.rectObserver.observe(this.element);
   }
 
   public dispose(): void {
-    this.element?.removeEventListener('pointermove', this.handlePointerMove);
-    this.element?.removeEventListener('pointerdown', this.handlePointerDown);
-
-    this.clearCursor();
     this.rectObserver.disconnect();
+    this.clearCursor();
 
     this.element = undefined;
     this.api = undefined;
   }
 
-  private clearCursor(): void {
+  protected addCursor(cursor: Cursor): void {
+    this.cursor = this.ifInitialized(({ api }) => api.addCursor(cursor));
+  }
+
+  protected clearCursor(): void {
     this.cursor?.dispose();
     this.cursor = undefined;
   }
 
-  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
-    if (this.rectObserver.rect != null) {
-      const pt = getMouseClientPosition(event, this.rectObserver.rect);
-      const type = await this.api?.getEntityTypeAtPoint(pt);
-
-      this.clearCursor();
-
-      if (type != null && isPreciseEntityType(type)) {
-        this.cursor = this.api?.addCursor(measurementCursor);
-      }
+  protected ifInitialized<R>(
+    f: (data: { element: HTMLElement; api: InteractionApi }) => R
+  ): R {
+    if (this.element != null && this.api != null) {
+      return f({ element: this.element, api: this.api });
     } else {
-      this.clearCursor();
+      throw new Error('Measurement interaction handler not initialized.');
     }
-  };
+  }
 
-  private handlePointerDown = (event: PointerEvent): void => {
-    this.ifNoInteraction(event, () => {
-      this.ifInitialized(async ({ element, api }) => {
-        const pt = getMouseClientPosition(
-          event,
-          element.getBoundingClientRect()
-        );
-        const [hit] = await api.hitItems(pt);
-
-        if (hit != null) {
-          this.controller.addEntity(PreciseMeasurementEntity.fromHit(hit));
-        } else {
-          this.controller.clearEntities();
-        }
-      });
-    });
-  };
-
-  private ifNoInteraction(event: PointerEvent, f: () => void): void {
+  protected ifNoInteraction(event: PointerEvent, f: () => void): void {
     const startPos = Point.create(event.clientX, event.clientY);
     let didInteract = false;
 
@@ -174,28 +153,103 @@ class PreciseMeasurementInteractionHandler implements InteractionHandler {
     window.addEventListener('pointermove', handleMouseMove);
     window.addEventListener('pointerup', handleMouseUp);
   }
-
-  private ifInitialized<R>(
-    f: (data: { element: HTMLElement; api: InteractionApi }) => R
-  ): R {
-    if (this.element != null && this.api != null) {
-      return f({ element: this.element, api: this.api });
-    } else {
-      throw new Error('Measurement interaction handler not initialized.');
-    }
-  }
 }
 
-class ImpreciseMeasurementInteractionHandler implements InteractionHandler {
-  private element?: HTMLElement;
-  private api?: InteractionApi;
+class PreciseMeasurementInteraction extends MeasurementInteraction {
+  public constructor(private readonly controller: MeasurementController) {
+    super();
+  }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
-    this.element = element;
-    this.api = api;
+    super.initialize(element, api);
+
+    this.element?.addEventListener('pointermove', this.handlePointerMove);
+    this.element?.addEventListener('pointerdown', this.handlePointerDown);
   }
 
   public dispose(): void {
-    // noop yet
+    this.element?.removeEventListener('pointermove', this.handlePointerMove);
+    this.element?.removeEventListener('pointerdown', this.handlePointerDown);
+
+    this.clearCursor();
+
+    super.dispose();
   }
+
+  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
+    const pt = getMouseClientPosition(event, this.elementRect);
+    const type = await this.api?.getEntityTypeAtPoint(pt);
+
+    this.clearCursor();
+
+    if (type != null && isPreciseEntityType(type)) {
+      this.addCursor(measurementCursor);
+    }
+  };
+
+  private handlePointerDown = (event: PointerEvent): void => {
+    this.ifNoInteraction(event, () => {
+      this.ifInitialized(async ({ element, api }) => {
+        const pt = getMouseClientPosition(
+          event,
+          element.getBoundingClientRect()
+        );
+        const [hit] = await api.hitItems(pt);
+
+        if (hit != null) {
+          this.controller.addEntity(PreciseMeasurementEntity.fromHit(hit));
+        } else {
+          this.controller.clearEntities();
+        }
+      });
+    });
+  };
+}
+
+class ImpreciseMeasurementInteraction extends MeasurementInteraction {
+  public constructor(private readonly controller: MeasurementController) {
+    super();
+  }
+
+  public initialize(element: HTMLElement, api: InteractionApi): void {
+    super.initialize(element, api);
+
+    this.element?.addEventListener('pointermove', this.handlePointerMove);
+    this.element?.addEventListener('pointerdown', this.handlePointerDown);
+  }
+
+  public dispose(): void {
+    this.element?.removeEventListener('pointermove', this.handlePointerMove);
+    this.element?.removeEventListener('pointerdown', this.handlePointerDown);
+
+    super.dispose();
+  }
+
+  private handlePointerMove = (event: PointerEvent): void => {
+    this.ifInitialized(async ({ api }) => {
+      const pt = getMouseClientPosition(event, this.elementRect);
+      const type = await api.getEntityTypeAtPoint(pt);
+
+      this.clearCursor();
+
+      if (type != null && !isPreciseEntityType(type)) {
+        this.addCursor('crosshair');
+      }
+    });
+  };
+
+  private handlePointerDown = (event: PointerEvent): void => {
+    this.ifNoInteraction(event, () =>
+      this.ifInitialized(async ({ api }) => {
+        const pt = getMouseClientPosition(event, this.elementRect);
+        const type = await api.getEntityTypeAtPoint(pt);
+        const worldPt = await api.getWorldPointFromViewport(pt);
+
+        if (type != null && worldPt != null) {
+          console.log('add entity', worldPt);
+          this.controller.addEntity(new ImpreciseMeasurementEntity(worldPt));
+        }
+      })
+    );
+  };
 }

@@ -82,6 +82,22 @@ export class InteractionApi {
     return this.cursors.add(cursor, priority);
   }
 
+  public async getWorldPointFromViewport(
+    point: Point.Point
+  ): Promise<Vector3.Vector3 | undefined> {
+    const viewport = this.getViewport();
+    const frame = this.getFrame();
+
+    if (frame == null) {
+      throw new Error('Cannot get world point. Frame is undefined.');
+    }
+
+    const depthBuffer = await frame.depthBuffer();
+    return depthBuffer != null
+      ? viewport.transformPointToWorldSpace(point, depthBuffer, 0.5)
+      : undefined;
+  }
+
   public async getEntityTypeAtPoint(
     point: Point.Point
   ): Promise<EntityType | undefined> {

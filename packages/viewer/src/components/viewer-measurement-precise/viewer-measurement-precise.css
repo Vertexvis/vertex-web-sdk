@@ -7,3 +7,11 @@
   right: 0;
   pointer-events: none;
 }
+
+.imprecise-anchor {
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  height: 8px;
+  width: 8px;
+}

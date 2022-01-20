@@ -39,8 +39,35 @@ export class MeasurementController {
    * entity.
    */
   public addEntity(
+    entity: MeasurementEntity
+  ): Promise<MeasurementOutcome | undefined> {
+    return entity instanceof ImpreciseMeasurementEntity
+      ? this.addImpreciseEntity(entity)
+      : this.addPreciseEntity(entity);
+  }
+
+  private addImpreciseEntity(
+    entity: ImpreciseMeasurementEntity
+  ): Promise<MeasurementOutcome | undefined> {
+    const preciseEntities = this.model.getPreciseEntities();
+    const impreciseEntities = this.model.getImpreciseEntities();
+
+    if (preciseEntities.length > 0 || impreciseEntities.length === 2) {
+      this.clearEntities();
+    }
+
+    return this.performMeasurement(() => this.model.addEntity(entity));
+  }
+
+  private addPreciseEntity(
     entity: PreciseMeasurementEntity
   ): Promise<MeasurementOutcome | undefined> {
+    const impreciseEntities = this.model.getImpreciseEntities();
+
+    if (impreciseEntities.length > 0) {
+      this.clearEntities();
+    }
+
     return this.performMeasurement(() => this.model.addEntity(entity));
   }
 
@@ -65,7 +92,7 @@ export class MeasurementController {
    * entity.
    */
   public removeEntity(
-    entity: PreciseMeasurementEntity
+    entity: MeasurementEntity
   ): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => this.model.removeEntity(entity));
   }
@@ -78,7 +105,7 @@ export class MeasurementController {
    * entities.
    */
   public setEntities(
-    entities: Set<PreciseMeasurementEntity>
+    entities: Set<MeasurementEntity>
   ): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => this.model.setEntities(entities));
   }
@@ -88,10 +115,9 @@ export class MeasurementController {
   ): Promise<MeasurementOutcome | undefined> {
     const previous = this.model.getPreciseEntities();
     const changed = effect();
-    const entities = this.model.getPreciseEntities();
     if (changed) {
-      this.measureAndUpdateModel(entities);
-      this.highlightEntities(previous, entities);
+      this.measureAndUpdateModel(this.model.getEntities());
+      this.highlightEntities(previous, this.model.getPreciseEntities());
     }
     return this.outcome;
   }

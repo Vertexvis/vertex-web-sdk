@@ -40,7 +40,7 @@ export class MeasurementModel {
    * @param entity An entity to measure.
    * @returns `true` if the entity has been added.
    */
-  public addEntity(entity: PreciseMeasurementEntity): boolean {
+  public addEntity(entity: MeasurementEntity): boolean {
     if (!this.entities.has(entity)) {
       this.entities.add(entity);
       this.entitiesChanged.emit(this.getEntities());
@@ -73,6 +73,7 @@ export class MeasurementModel {
    */
   public setOutcome(outcome: MeasurementOutcome | undefined): void {
     if (!Objects.isEqual(this.outcome, outcome)) {
+      console.log('set outcome', outcome);
       this.outcome = outcome;
       this.outcomeChanged.emit(outcome);
     }
@@ -133,7 +134,7 @@ export class MeasurementModel {
    * @param entities A set of entities to measure.
    * @returns `true` if the entity has been added.
    */
-  public setEntities(entities: Set<PreciseMeasurementEntity>): boolean {
+  public setEntities(entities: Set<MeasurementEntity>): boolean {
     this.entities.clear();
     entities.forEach((e) => this.entities.add(e));
     this.entitiesChanged.emit(this.getEntities());

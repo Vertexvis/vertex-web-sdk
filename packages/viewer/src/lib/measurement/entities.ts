@@ -7,15 +7,15 @@ import { Mapper } from '@vertexvis/utils';
 
 import { fromPbVector3f } from '../mappers';
 
-export interface MeasurementEntity {
-  readonly point: Vector3.Vector3;
-}
+export type MeasurementEntity =
+  | ImpreciseMeasurementEntity
+  | PreciseMeasurementEntity;
 
-export class ImpreciseMeasurementEntity implements MeasurementEntity {
+export class ImpreciseMeasurementEntity {
   public constructor(public readonly point: Vector3.Vector3) {}
 }
 
-export class PreciseMeasurementEntity implements MeasurementEntity {
+export class PreciseMeasurementEntity {
   public constructor(
     public readonly point: Vector3.Vector3,
     public readonly modelEntity: Uint8Array
