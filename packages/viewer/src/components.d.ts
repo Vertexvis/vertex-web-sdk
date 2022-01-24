@@ -41,6 +41,7 @@ import { ViewerMarkupCircleMode } from "./components/viewer-markup-circle/viewer
 import { ViewerMarkupFreeformMode } from "./components/viewer-markup-freeform.tsx/viewer-markup-freeform";
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { MeasurementController, MeasurementDetailsSummary, MeasurementModel } from "./lib/measurement";
+import { MeasurementOverlayManager } from "./lib/measurement/overlays";
 import { Formatter } from "./lib/formatter";
 import { MeasurementOutcome } from "./lib/measurement/outcomes";
 import { ViewerMeasurementDistanceElementMetrics, ViewerMeasurementDistanceMode } from "./components/viewer-measurement-distance/viewer-measurement-distance";
@@ -766,6 +767,7 @@ export namespace Components {
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
          */
         "measurementModel": MeasurementModel;
+        "measurementOverlays": MeasurementOverlayManager;
         /**
           * The current `MeasurementOutcome` displayed.
          */
@@ -876,6 +878,7 @@ export namespace Components {
         "configEnv": Environment;
         "measurementController"?: MeasurementController;
         "measurementModel": MeasurementModel;
+        "measurementOverlays": MeasurementOverlayManager;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMeasurementTool {
@@ -1908,6 +1911,7 @@ declare namespace LocalJSX {
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
          */
         "measurementModel"?: MeasurementModel;
+        "measurementOverlays"?: MeasurementOverlayManager;
         /**
           * The current `MeasurementOutcome` displayed.
          */
@@ -2022,6 +2026,7 @@ declare namespace LocalJSX {
         "configEnv"?: Environment;
         "measurementController"?: MeasurementController;
         "measurementModel"?: MeasurementModel;
+        "measurementOverlays"?: MeasurementOverlayManager;
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMeasurementTool {

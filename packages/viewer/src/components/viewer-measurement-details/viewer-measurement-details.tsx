@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { Formatter } from '../../lib/formatter';
@@ -6,9 +6,15 @@ import {
   MeasurementDetailsSummary,
   MeasurementModel,
   MeasurementResult,
+  MinimumDistanceMeasurementResult,
+  PointToPointMeasurementResult,
   summarizeResults,
 } from '../../lib/measurement';
 import { MeasurementOutcome } from '../../lib/measurement/outcomes';
+import {
+  MeasurementOverlay,
+  MeasurementOverlayManager,
+} from '../../lib/measurement/overlays';
 import {
   AngleUnits,
   AngleUnitType,
@@ -31,6 +37,9 @@ export class ViewerMeasurementDetails {
    */
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
+
+  @Prop()
+  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
   /**
    * The unit of distance-based measurement.
@@ -120,6 +129,9 @@ export class ViewerMeasurementDetails {
   })
   public visibleSummary?: MeasurementDetailsSummary;
 
+  @State()
+  private overlay?: MeasurementOverlay;
+
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
   private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
@@ -181,7 +193,11 @@ export class ViewerMeasurementDetails {
           </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.minDistance != null && (
-          <MeasurementDetailsEntry label="Min Dist">
+          <MeasurementDetailsEntry
+            label="Min Dist"
+            onMouseEnter={this.showMinDistOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
             {this.formatDistance(
               this.visibleSummary.minDistance.value,
               this.visibleSummary.minDistance.isApproximated
@@ -194,7 +210,11 @@ export class ViewerMeasurementDetails {
           </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.x != null && (
-          <MeasurementDetailsEntry label="X">
+          <MeasurementDetailsEntry
+            label="X"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
             {this.formatDistance(
               this.visibleSummary.distanceVector.x,
               this.visibleSummary.distanceVector.isApproximated
@@ -202,7 +222,11 @@ export class ViewerMeasurementDetails {
           </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.y != null && (
-          <MeasurementDetailsEntry label="Y">
+          <MeasurementDetailsEntry
+            label="Y"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
             {this.formatDistance(
               this.visibleSummary.distanceVector.y,
               this.visibleSummary.distanceVector.isApproximated
@@ -210,7 +234,11 @@ export class ViewerMeasurementDetails {
           </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.z != null && (
-          <MeasurementDetailsEntry label="Z">
+          <MeasurementDetailsEntry
+            label="Z"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
             {this.formatDistance(
               this.visibleSummary.distanceVector.z,
               this.visibleSummary.distanceVector.isApproximated
@@ -228,6 +256,38 @@ export class ViewerMeasurementDetails {
       this.hiddenDetails = JSON.parse(this.hiddenDetailsJson);
     }
   }
+
+  private showMinDistOverlay = (): void => {
+    const results = this.getMeasurementResults();
+    const result = results.find(
+      (r) => r.type === 'minimum-distance' || r.type === 'point-to-point'
+    ) as
+      | MinimumDistanceMeasurementResult
+      | PointToPointMeasurementResult
+      | undefined;
+
+    if (result != null) {
+      this.overlay = this.measurementOverlays.addLineFromResult(result);
+    }
+  };
+
+  private showDistanceVectorOverlay = (): void => {
+    const results = this.getMeasurementResults();
+    const pp = results.find(
+      (r) => r.type === 'point-to-point' || r.type === 'minimum-distance'
+    ) as
+      | PointToPointMeasurementResult
+      | MinimumDistanceMeasurementResult
+      | undefined;
+
+    if (pp != null) {
+      this.overlay = this.measurementOverlays.addDistanceVectorFromResult(pp);
+    }
+  };
+
+  private hideOverlay = (): void => {
+    this.overlay?.dispose();
+  };
 
   private handleOutcomeChange = (
     outcome: MeasurementOutcome | undefined

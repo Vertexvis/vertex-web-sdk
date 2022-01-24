@@ -5,13 +5,15 @@ import { paramCase } from 'param-case';
 
 interface MeasurementDetailsEntryProps {
   label: string;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const MeasurementDetailsEntry: FunctionalComponent<
   MeasurementDetailsEntryProps
-> = ({ label }, children) => {
+> = ({ label, ...props }, children) => {
   return (
-    <div class="measurement-details-entry">
+    <div {...props} class="measurement-details-entry">
       <div
         class={classNames('measurement-details-entry-label', paramCase(label))}
       >

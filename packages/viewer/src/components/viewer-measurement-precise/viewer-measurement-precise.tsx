@@ -11,6 +11,11 @@ import {
   MeasurementModel,
 } from '../../lib/measurement';
 import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
+import {
+  MeasurementOverlay,
+  MeasurementOverlayManager,
+} from '../../lib/measurement/overlays';
+import { MeasurementOverlayView } from './viewer-measurement-precise-components';
 
 @Component({
   tag: 'vertex-viewer-measurement-precise',
@@ -20,6 +25,9 @@ import { MeasurementInteractionHandler } from '../../lib/measurement/interaction
 export class ViewerMeasurementPrecise {
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
+
+  @Prop()
+  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
   @Prop({ mutable: true })
   public measurementController?: MeasurementController;
@@ -36,8 +44,12 @@ export class ViewerMeasurementPrecise {
   @State()
   private impreciseEntities: ImpreciseMeasurementEntity[] = [];
 
+  @State()
+  private overlays: MeasurementOverlay[] = [];
+
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
+  private onOverlaysChangedHandler?: Disposable;
 
   protected connectedCallback(): void {
     this.setupInteractionHandler();
@@ -71,15 +83,20 @@ export class ViewerMeasurementPrecise {
   }
 
   public render(): JSX.Element {
+    const viewport = this.viewer?.viewport;
+    const camera = this.viewer?.frame?.scene.camera;
+
     return (
       <Host>
-        <vertex-viewer-dom-renderer drawMode="2d" viewer={this.viewer}>
-          {this.impreciseEntities.map((e) => (
-            <vertex-viewer-dom-element position={e.point}>
-              <div class="imprecise-anchor" />
-            </vertex-viewer-dom-element>
+        {viewport != null &&
+          camera != null &&
+          this.overlays.map((o) => (
+            <MeasurementOverlayView
+              overlay={o}
+              camera={camera}
+              viewport={viewport}
+            />
           ))}
-        </vertex-viewer-dom-renderer>
       </Host>
     );
   }
@@ -106,7 +123,10 @@ export class ViewerMeasurementPrecise {
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new MeasurementInteractionHandler(this.measurementController)
+          new MeasurementInteractionHandler(
+            this.measurementController,
+            this.measurementOverlays
+          )
         );
     }
   }
@@ -114,12 +134,21 @@ export class ViewerMeasurementPrecise {
   private clearModelListeners(): void {
     this.onEntitiesChangedHandler?.dispose();
     this.onEntitiesChangedHandler = undefined;
+
+    this.onOverlaysChangedHandler?.dispose();
+    this.onOverlaysChangedHandler = undefined;
   }
 
   private setupModelListeners(): void {
     this.onEntitiesChangedHandler = this.measurementModel.onEntitiesChanged(
       () => {
         this.impreciseEntities = this.measurementModel.getImpreciseEntities();
+      }
+    );
+
+    this.onOverlaysChangedHandler = this.measurementOverlays.onOverlaysChanged(
+      (overlays) => {
+        this.overlays = overlays;
       }
     );
   }

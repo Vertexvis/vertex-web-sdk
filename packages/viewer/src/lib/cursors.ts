@@ -148,8 +148,16 @@ export class CursorManager {
   }
 }
 
+// CSS SVG images need to be URL encoded: https://yoksel.github.io/url-encoder/
+
 export const measurementCursor = {
   url: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' stroke='%23fff' stroke-width='1.25' stroke-opacity='0.5' stroke-miterlimit='10' shape-rendering='crispEdges'/%3E%3Cpath d='M21.5 8h-19a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h19a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5zm-.5 6H3V9h3v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2v2.5a.5.5 0 001 0V9h2z' shape-rendering='crispEdges'/%3E%3C/svg%3E",
   offsetX: -24,
   offsetY: -24,
+};
+
+export const measurementWithArrowCursor = {
+  url: "data:image/svg+xml;utf8,%3Csvg id='icons' xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bstroke:%23fff;stroke-miterlimit:10;stroke-width:2px;%7D.cls-2%7Bfill:%23fff;%7D.cls-2,.cls-3%7Bfill-rule:evenodd;%7D%3C/style%3E%3C/defs%3E%3Cpath class='cls-1' d='M27.46,21h-19a.5.5,0,0,0-.5.5v6a.5.5,0,0,0,.5.5h19a.5.5,0,0,0,.5-.5v-6A.5.5,0,0,0,27.46,21ZM27,27H9V22h3v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2Z'/%3E%3Cpath d='M27.46,21h-19a.5.5,0,0,0-.5.5v6a.5.5,0,0,0,.5.5h19a.5.5,0,0,0,.5-.5v-6A.5.5,0,0,0,27.46,21ZM27,27H9V22h3v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2v2.5a.5.5,0,0,0,1,0V22h2Z'/%3E%3Cpath class='cls-2' d='M1,17V1L12.59,12.62H5.81l-.41.12Z'/%3E%3Cpath class='cls-2' d='M10.08,17.69l-3.6,1.53L1.8,8.14,5.48,6.58Z'/%3E%3Cpath class='cls-3' d='M8.75,17l-1.84.77-3.1-7.37,1.84-.78Z'/%3E%3Cpath class='cls-3' d='M2,3.41V14.6l3-2.87.43-.14h4.76Z'/%3E%3C/svg%3E",
+  offsetX: -30,
+  offsetY: -30,
 };

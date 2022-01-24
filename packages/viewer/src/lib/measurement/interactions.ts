@@ -1,7 +1,11 @@
 import { Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { Cursor, measurementCursor } from '../cursors';
+import {
+  Cursor,
+  measurementCursor,
+  measurementWithArrowCursor,
+} from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
@@ -9,9 +13,11 @@ import { EntityType, isPreciseEntityType } from '../types';
 import { ImpreciseMeasurementEntity } from '.';
 import { MeasurementController } from './controller';
 import { PreciseMeasurementEntity } from './entities';
+import { MeasurementOverlayManager, PointOverlay } from './overlays';
 
 export class MeasurementInteractionHandler implements InteractionHandler {
   private controller: MeasurementController;
+  private overlays: MeasurementOverlayManager;
   private element?: HTMLElement;
   private api?: InteractionApi;
   private rectObserver = new ElementRectObserver();
@@ -19,8 +25,12 @@ export class MeasurementInteractionHandler implements InteractionHandler {
   private entityType?: EntityType;
   private measurementInteraction?: InteractionHandler;
 
-  public constructor(controller: MeasurementController) {
+  public constructor(
+    controller: MeasurementController,
+    overlays: MeasurementOverlayManager
+  ) {
     this.controller = controller;
+    this.overlays = overlays;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -78,7 +88,8 @@ export class MeasurementInteractionHandler implements InteractionHandler {
       );
     } else {
       this.measurementInteraction = new ImpreciseMeasurementInteraction(
-        this.controller
+        this.controller,
+        this.overlays
       );
     }
 
@@ -183,7 +194,7 @@ class PreciseMeasurementInteraction extends MeasurementInteraction {
     this.clearCursor();
 
     if (type != null && isPreciseEntityType(type)) {
-      this.addCursor(measurementCursor);
+      this.addCursor(measurementWithArrowCursor);
     }
   };
 
@@ -207,7 +218,12 @@ class PreciseMeasurementInteraction extends MeasurementInteraction {
 }
 
 class ImpreciseMeasurementInteraction extends MeasurementInteraction {
-  public constructor(private readonly controller: MeasurementController) {
+  private pointOverlay?: PointOverlay;
+
+  public constructor(
+    private readonly controller: MeasurementController,
+    private readonly overlays: MeasurementOverlayManager
+  ) {
     super();
   }
 
@@ -219,6 +235,8 @@ class ImpreciseMeasurementInteraction extends MeasurementInteraction {
   }
 
   public dispose(): void {
+    this.pointOverlay?.dispose();
+
     this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
@@ -229,11 +247,14 @@ class ImpreciseMeasurementInteraction extends MeasurementInteraction {
     this.ifInitialized(async ({ api }) => {
       const pt = getMouseClientPosition(event, this.elementRect);
       const type = await api.getEntityTypeAtPoint(pt);
+      const worldPt = await api.getWorldPointFromViewport(pt);
 
       this.clearCursor();
+      this.pointOverlay?.dispose();
 
-      if (type != null && !isPreciseEntityType(type)) {
-        this.addCursor('crosshair');
+      if (type != null && worldPt != null && !isPreciseEntityType(type)) {
+        this.addCursor(measurementCursor);
+        this.pointOverlay = this.overlays.addPoint({ point: worldPt });
       }
     });
   };
@@ -246,8 +267,8 @@ class ImpreciseMeasurementInteraction extends MeasurementInteraction {
         const worldPt = await api.getWorldPointFromViewport(pt);
 
         if (type != null && worldPt != null) {
-          console.log('add entity', worldPt);
           this.controller.addEntity(new ImpreciseMeasurementEntity(worldPt));
+          this.pointOverlay?.dispose();
         }
       })
     );

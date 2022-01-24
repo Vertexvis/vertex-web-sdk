@@ -28,11 +28,11 @@ export class MeasurementModel {
   private outcome?: MeasurementOutcome;
   private results = new Set<MeasurementResult>();
 
+  private entitiesChanged = new EventDispatcher<MeasurementEntity[]>();
+
   private outcomeChanged = new EventDispatcher<
     MeasurementOutcome | undefined
   >();
-
-  private entitiesChanged = new EventDispatcher<MeasurementEntity[]>();
 
   /**
    * Registers an entity to be measured with the model.

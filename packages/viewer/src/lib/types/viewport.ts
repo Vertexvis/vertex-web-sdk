@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  Matrix4,
   Point,
   Ray,
   Rectangle,
@@ -61,6 +62,21 @@ export class Viewport implements Dimensions.Dimensions {
       ndc.x * this.center.x + this.center.x,
       -ndc.y * this.center.y + this.center.y
     );
+  }
+
+  /**
+   * Transforms a world point to 2D point in viewport space.
+   *
+   * @param worldPt The world point to transform.
+   * @param projectionViewMatrix The projection matrix to transform a 3D point to 2D point.
+   * @returns A point in viewport space.
+   */
+  public transformWorldToViewport(
+    worldPt: Vector3.Vector3,
+    projectionViewMatrix: Matrix4.Matrix4
+  ): Point.Point {
+    const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
+    return this.transformVectorToViewport(ndc);
   }
 
   public transformPointToViewport(
