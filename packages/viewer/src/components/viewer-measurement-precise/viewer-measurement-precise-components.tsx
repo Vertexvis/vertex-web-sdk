@@ -5,7 +5,6 @@ import {
   DistanceVectorOverlay,
   LineOverlay,
   MeasurementOverlay,
-  PointOverlay,
 } from '../../lib/measurement/overlays';
 import { FramePerspectiveCamera, Viewport } from '../../lib/types';
 
@@ -18,11 +17,7 @@ interface MeasurementOverlayViewProps<O extends MeasurementOverlay> {
 export const MeasurementOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<MeasurementOverlay>
 > = ({ overlay, viewport, camera }) => {
-  if (overlay.type === 'point') {
-    return (
-      <PointOverlayView overlay={overlay} viewport={viewport} camera={camera} />
-    );
-  } else if (overlay.type === 'line') {
+  if (overlay.type === 'line') {
     return (
       <LineOverlayView overlay={overlay} viewport={viewport} camera={camera} />
     );
@@ -35,19 +30,6 @@ export const MeasurementOverlayView: FunctionalComponent<
       />
     );
   }
-};
-
-const PointOverlayView: FunctionalComponent<
-  MeasurementOverlayViewProps<PointOverlay>
-> = ({ overlay: { point }, camera, viewport }) => {
-  const { x, y } = viewport.transformWorldToViewport(
-    point,
-    camera.projectionViewMatrix
-  );
-
-  return (
-    <div class="point-overlay" style={{ left: `${x}px`, top: `${y}px` }} />
-  );
 };
 
 const LineOverlayView: FunctionalComponent<

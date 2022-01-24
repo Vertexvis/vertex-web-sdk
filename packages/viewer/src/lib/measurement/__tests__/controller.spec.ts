@@ -12,21 +12,21 @@ import {
   mockGrpcUnaryResult,
   random,
 } from '../../../testing';
-import { PreciseMeasurementEntity } from '..';
 import { MeasurementController } from '../controller';
+import { MeasurementEntity } from '../entities';
 import { MeasurementModel } from '../model';
 
 describe('MeasurementController', () => {
   const model = new MeasurementModel();
-  const entity1 = new PreciseMeasurementEntity(
+  const entity1 = new MeasurementEntity(
     Vector3.create(),
     new ModelEntity().serializeBinary()
   );
-  const entity2 = new PreciseMeasurementEntity(
+  const entity2 = new MeasurementEntity(
     Vector3.create(),
     new ModelEntity().serializeBinary()
   );
-  const entity3 = new PreciseMeasurementEntity(
+  const entity3 = new MeasurementEntity(
     Vector3.create(),
     new ModelEntity().serializeBinary()
   );

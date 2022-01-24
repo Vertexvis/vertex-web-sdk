@@ -2,9 +2,9 @@ import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 
 import { random } from '../../../testing';
-import { PreciseMeasurementEntity } from '../entities';
+import { MeasurementEntity } from '../entities';
 import { MeasurementModel } from '../model';
-import { PreciseMeasurementOutcome } from '../outcomes';
+import { MeasurementOutcome } from '../outcomes';
 import { MinimumDistanceMeasurementResult } from '../results';
 
 describe('MeasurementModel', () => {
@@ -12,9 +12,9 @@ describe('MeasurementModel', () => {
   const point2 = Vector3.create();
   const point3 = Vector3.create();
   const modelEntity = new ModelEntity().serializeBinary();
-  const measureEntity = new PreciseMeasurementEntity(point, modelEntity);
-  const measureEntity2 = new PreciseMeasurementEntity(point2, modelEntity);
-  const measureEntity3 = new PreciseMeasurementEntity(point3, modelEntity);
+  const measureEntity = new MeasurementEntity(point, modelEntity);
+  const measureEntity2 = new MeasurementEntity(point2, modelEntity);
+  const measureEntity3 = new MeasurementEntity(point3, modelEntity);
 
   describe(MeasurementModel.prototype.addEntity, () => {
     it('adds the entity if not registered', () => {
@@ -63,10 +63,7 @@ describe('MeasurementModel', () => {
   describe(MeasurementModel.prototype.clearOutcome, () => {
     it('removes all results', () => {
       const model = new MeasurementModel();
-      const outcome: PreciseMeasurementOutcome = {
-        type: 'precise',
-        results: [],
-      };
+      const outcome: MeasurementOutcome = { results: [] };
 
       const onChange = jest.fn();
       model.setOutcome(outcome);
@@ -84,10 +81,7 @@ describe('MeasurementModel', () => {
       const model = new MeasurementModel();
       const result1 = createMinimumDistanceResult();
       const result2 = createMinimumDistanceResult();
-      const outcome: PreciseMeasurementOutcome = {
-        type: 'precise',
-        results: [result1, result2],
-      };
+      const outcome: MeasurementOutcome = { results: [result1, result2] };
       const onChange = jest.fn();
 
       model.onOutcomeChanged(onChange);

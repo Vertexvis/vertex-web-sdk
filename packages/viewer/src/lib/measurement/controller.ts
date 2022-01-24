@@ -1,4 +1,3 @@
-import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 import {
   MeasureRequest,
@@ -10,8 +9,7 @@ import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/proto
 import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
-import { ImpreciseMeasurementEntity } from '.';
-import { MeasurementEntity, PreciseMeasurementEntity } from './entities';
+import { MeasurementEntity } from './entities';
 import { mapMeasureResponseOrThrow } from './mapper';
 import { MeasurementModel } from './model';
 import { MeasurementOutcome } from './outcomes';
@@ -41,33 +39,6 @@ export class MeasurementController {
   public addEntity(
     entity: MeasurementEntity
   ): Promise<MeasurementOutcome | undefined> {
-    return entity instanceof ImpreciseMeasurementEntity
-      ? this.addImpreciseEntity(entity)
-      : this.addPreciseEntity(entity);
-  }
-
-  private addImpreciseEntity(
-    entity: ImpreciseMeasurementEntity
-  ): Promise<MeasurementOutcome | undefined> {
-    const preciseEntities = this.model.getPreciseEntities();
-    const impreciseEntities = this.model.getImpreciseEntities();
-
-    if (preciseEntities.length > 0 || impreciseEntities.length === 2) {
-      this.clearEntities();
-    }
-
-    return this.performMeasurement(() => this.model.addEntity(entity));
-  }
-
-  private addPreciseEntity(
-    entity: PreciseMeasurementEntity
-  ): Promise<MeasurementOutcome | undefined> {
-    const impreciseEntities = this.model.getImpreciseEntities();
-
-    if (impreciseEntities.length > 0) {
-      this.clearEntities();
-    }
-
     return this.performMeasurement(() => this.model.addEntity(entity));
   }
 
@@ -113,18 +84,19 @@ export class MeasurementController {
   private performMeasurement(
     effect: () => boolean
   ): Promise<MeasurementOutcome | undefined> {
-    const previous = this.model.getPreciseEntities();
+    const previous = this.model.getEntities();
     const changed = effect();
+    const entities = this.model.getEntities();
     if (changed) {
-      this.measureAndUpdateModel(this.model.getEntities());
-      this.highlightEntities(previous, this.model.getPreciseEntities());
+      this.measureAndUpdateModel(entities);
+      this.highlightEntities(previous, entities);
     }
     return this.outcome;
   }
 
   private measureAndUpdateModel(entities: MeasurementEntity[]): void {
     if (entities.length > 0) {
-      this.outcome = this.measureEntities().then((outcome) => {
+      this.outcome = this.measureEntities(entities).then((outcome) => {
         this.model.setOutcome(outcome);
         return this.model.getOutcome();
       });
@@ -133,22 +105,8 @@ export class MeasurementController {
     }
   }
 
-  private async measureEntities(): Promise<MeasurementOutcome | undefined> {
-    const impreciseEntities = this.model.getImpreciseEntities();
-    const preciseEntities = this.model.getPreciseEntities();
-
-    // TODO(dan): prob need to revisit logic here.
-    if (impreciseEntities.length > 0) {
-      return this.measureImpreciseEntities(impreciseEntities);
-    } else if (preciseEntities.length > 0) {
-      return this.measurePreciseEntities(preciseEntities);
-    } else {
-      return undefined;
-    }
-  }
-
-  private async measurePreciseEntities(
-    entities: PreciseMeasurementEntity[]
+  private async measureEntities(
+    entities: MeasurementEntity[]
   ): Promise<MeasurementOutcome | undefined> {
     if (entities.length > 0) {
       const res = await requestUnary<MeasureResponse>(async (handler) => {
@@ -165,30 +123,9 @@ export class MeasurementController {
     }
   }
 
-  private measureImpreciseEntities(
-    entities: ImpreciseMeasurementEntity[]
-  ): MeasurementOutcome | undefined {
-    const [startE, endE] = entities;
-
-    if (startE != null && endE != null) {
-      return {
-        type: 'imprecise',
-        result: {
-          type: 'point-to-point',
-          start: startE.point,
-          end: endE.point,
-          distance: Vector3.distance(startE.point, endE.point),
-          valid: true,
-        },
-      };
-    } else {
-      return undefined;
-    }
-  }
-
   private async highlightEntities(
-    previous: PreciseMeasurementEntity[],
-    entities: PreciseMeasurementEntity[]
+    previous: MeasurementEntity[],
+    entities: MeasurementEntity[]
   ): Promise<void> {
     await requestUnary(async (handler) => {
       const meta = await createMetadata(this.jwtProvider, this.deviceId);

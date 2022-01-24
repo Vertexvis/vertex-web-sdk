@@ -360,10 +360,8 @@ export class ViewerMeasurementDetails {
   private getMeasurementResults(): MeasurementResult[] {
     if (this.outcome == null) {
       return [];
-    } else if (this.outcome.type === 'precise') {
-      return this.outcome.results;
     } else {
-      return [this.outcome.result];
+      return this.outcome.results;
     }
   }
 }

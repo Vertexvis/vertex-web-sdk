@@ -7,15 +7,7 @@ import { Mapper } from '@vertexvis/utils';
 
 import { fromPbVector3f } from '../mappers';
 
-export type MeasurementEntity =
-  | ImpreciseMeasurementEntity
-  | PreciseMeasurementEntity;
-
-export class ImpreciseMeasurementEntity {
-  public constructor(public readonly point: Vector3.Vector3) {}
-}
-
-export class PreciseMeasurementEntity {
+export class MeasurementEntity {
   public constructor(
     public readonly point: Vector3.Vector3,
     public readonly modelEntity: Uint8Array
@@ -23,13 +15,13 @@ export class PreciseMeasurementEntity {
 
   public static fromHit(
     hit: vertexvis.protobuf.stream.IHit
-  ): PreciseMeasurementEntity {
+  ): MeasurementEntity {
     if (hit.hitPoint != null && hit.modelEntity != null) {
       const hitPoint = Mapper.ifInvalidThrow(fromPbVector3f)(hit.hitPoint);
       const modelEntity = vertexvis.protobuf.core.ModelEntity.encode(
         hit.modelEntity
       ).finish();
-      return new PreciseMeasurementEntity(hitPoint, modelEntity);
+      return new MeasurementEntity(hitPoint, modelEntity);
     } else {
       throw new Error(
         'Cannot create MeasurementEntity from Hit. Hit is missing hit point and model entity'

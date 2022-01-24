@@ -21,16 +21,7 @@ export interface DistanceVectorOverlay extends Disposable {
   z: { start: Vector3.Vector3; end: Vector3.Vector3 };
 }
 
-export interface PointOverlay extends Disposable {
-  type: 'point';
-  id: string;
-  point: Vector3.Vector3;
-}
-
-export type MeasurementOverlay =
-  | LineOverlay
-  | DistanceVectorOverlay
-  | PointOverlay;
+export type MeasurementOverlay = LineOverlay | DistanceVectorOverlay;
 
 export class MeasurementOverlayManager {
   private overlays = new Map<string, MeasurementOverlay>();
@@ -91,20 +82,6 @@ export class MeasurementOverlayManager {
       x,
       y,
       z,
-      dispose: () => this.remove(id),
-    };
-    this.addOverlay(overlay);
-    return overlay;
-  }
-
-  public addPoint(
-    values: Omit<PointOverlay, 'type' | 'id' | 'dispose'>
-  ): PointOverlay {
-    const id = UUID.create();
-    const overlay: PointOverlay = {
-      ...values,
-      type: 'point',
-      id: id,
       dispose: () => this.remove(id),
     };
     this.addOverlay(overlay);

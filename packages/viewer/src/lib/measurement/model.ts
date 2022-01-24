@@ -5,11 +5,7 @@ import {
   Objects,
 } from '@vertexvis/utils';
 
-import {
-  ImpreciseMeasurementEntity,
-  MeasurementEntity,
-  PreciseMeasurementEntity,
-} from './entities';
+import { MeasurementEntity } from './entities';
 import { MeasurementOutcome } from './outcomes';
 import { MeasurementResult } from './results';
 
@@ -73,7 +69,6 @@ export class MeasurementModel {
    */
   public setOutcome(outcome: MeasurementOutcome | undefined): void {
     if (!Objects.isEqual(this.outcome, outcome)) {
-      console.log('set outcome', outcome);
       this.outcome = outcome;
       this.outcomeChanged.emit(outcome);
     }
@@ -84,18 +79,6 @@ export class MeasurementModel {
    */
   public getEntities(): MeasurementEntity[] {
     return Array.from(this.entities);
-  }
-
-  public getImpreciseEntities(): ImpreciseMeasurementEntity[] {
-    return this.getEntities().filter(
-      (e) => e instanceof ImpreciseMeasurementEntity
-    ) as ImpreciseMeasurementEntity[];
-  }
-
-  public getPreciseEntities(): PreciseMeasurementEntity[] {
-    return this.getEntities().filter(
-      (e) => e instanceof PreciseMeasurementEntity
-    ) as PreciseMeasurementEntity[];
   }
 
   /**

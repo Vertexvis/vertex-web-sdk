@@ -8,31 +8,10 @@
   pointer-events: none;
 }
 
-.imprecise-anchor {
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid black;
-  height: 8px;
-  width: 8px;
-}
-
-.point-overlay {
-  position: absolute;
-  background-color: black;
-  border-radius: 50%;
-  border: 1px solid white;
-  width: 4px;
-  height: 4px;
-  transform: translate(-50%, -50%);
-}
-
 .measurement-line {
   position: absolute;
   width: 100%;
   height: 100%;
-}
-
-.measurement-line.line-overlay {
 }
 
 .measurement-line.distance-vector-x {

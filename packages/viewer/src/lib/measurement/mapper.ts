@@ -11,7 +11,7 @@ import type { MeasureResponse as PbMeasureResponse } from '@vertexvis/scene-view
 import { Mapper as M } from '@vertexvis/utils';
 
 import { fromPbPlane, fromPbVector3f } from '../mappers';
-import { PreciseMeasurementOutcome } from './outcomes';
+import { MeasurementOutcome } from './outcomes';
 import {
   MeasurementResult,
   MinimumDistanceMeasurementResult,
@@ -131,7 +131,7 @@ const mapMeasurementResult: M.Func<
 
 export const mapMeasureResponse: M.Func<
   PbMeasureResponse.AsObject,
-  PreciseMeasurementOutcome
+  MeasurementOutcome
 > = M.defineMapper(
   M.read(
     M.mapRequiredProp(

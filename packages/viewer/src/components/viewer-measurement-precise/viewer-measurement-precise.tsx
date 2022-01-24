@@ -5,11 +5,7 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import {
-  ImpreciseMeasurementEntity,
-  MeasurementController,
-  MeasurementModel,
-} from '../../lib/measurement';
+import { MeasurementController, MeasurementModel } from '../../lib/measurement';
 import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import {
   MeasurementOverlay,
@@ -40,9 +36,6 @@ export class ViewerMeasurementPrecise {
 
   @Prop()
   public config?: Config;
-
-  @State()
-  private impreciseEntities: ImpreciseMeasurementEntity[] = [];
 
   @State()
   private overlays: MeasurementOverlay[] = [];
@@ -123,10 +116,7 @@ export class ViewerMeasurementPrecise {
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new MeasurementInteractionHandler(
-            this.measurementController,
-            this.measurementOverlays
-          )
+          new MeasurementInteractionHandler(this.measurementController)
         );
     }
   }
@@ -140,12 +130,6 @@ export class ViewerMeasurementPrecise {
   }
 
   private setupModelListeners(): void {
-    this.onEntitiesChangedHandler = this.measurementModel.onEntitiesChanged(
-      () => {
-        this.impreciseEntities = this.measurementModel.getImpreciseEntities();
-      }
-    );
-
     this.onOverlaysChangedHandler = this.measurementOverlays.onOverlaysChanged(
       (overlays) => {
         this.overlays = overlays;
