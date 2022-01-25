@@ -57,7 +57,7 @@ export class FeatureMap implements FrameImageLike {
    * @returns The type of entity at the given location, or `undefined` if no
    * entity exists.
    */
-  public getEntityType(point: Point.Point): EntityType | undefined {
+  public getEntityType(point: Point.Point): EntityType {
     const color = this.getColor(point);
 
     if (color?.a === EntityType.CROSS_SECTION) {
@@ -72,6 +72,8 @@ export class FeatureMap implements FrameImageLike {
       return EntityType.PRECISE_EDGE;
     } else if (color?.a === EntityType.PRECISE_SURFACE) {
       return EntityType.PRECISE_SURFACE;
+    } else {
+      return EntityType.NO_GEOMETRY;
     }
   }
 

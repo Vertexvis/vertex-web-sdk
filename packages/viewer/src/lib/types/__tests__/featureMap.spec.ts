@@ -50,7 +50,9 @@ describe(FeatureMap, () => {
         EntityType.PRECISE_SURFACE
       );
 
-      expect(featureMap.getEntityType(Point.create(1, 6))).toBeUndefined();
+      expect(featureMap.getEntityType(Point.create(1, 6))).toEqual(
+        EntityType.NO_GEOMETRY
+      );
     });
   });
 });

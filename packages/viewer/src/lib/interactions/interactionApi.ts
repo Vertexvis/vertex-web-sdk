@@ -78,10 +78,25 @@ export class InteractionApi {
     this.emitTapEvent = this.emitTapEvent.bind(this);
   }
 
+  /**
+   * Displays a cursor over the viewer with the given priority. Cursors with
+   * higher priority will take precedence over cursors with lower priorities if
+   * there's more than a single cursor added.
+   *
+   * @param cursor The cursor to add.
+   * @param priority The priority of the cursor.
+   * @returns A `Disposable` that can be used to remove the cursor.
+   */
   public addCursor(cursor: Cursor, priority?: number): Disposable {
     return this.cursors.add(cursor, priority);
   }
 
+  /**
+   * Returns a 3D point in world space for the given 2D point in viewport space.
+   *
+   * @param point A point in 2D viewport space to transform.
+   * @returns A 3D point in world space.
+   */
   public async getWorldPointFromViewport(
     point: Point.Point
   ): Promise<Vector3.Vector3 | undefined> {
@@ -98,9 +113,13 @@ export class InteractionApi {
       : undefined;
   }
 
-  public async getEntityTypeAtPoint(
-    point: Point.Point
-  ): Promise<EntityType | undefined> {
+  /**
+   * Returns the entity at the given point in viewport space.
+   *
+   * @param point A point in viewport space.
+   * @returns The entity that was found.
+   */
+  public async getEntityTypeAtPoint(point: Point.Point): Promise<EntityType> {
     const viewport = this.getViewport();
     const featureMap = await this.getFrame()?.featureMap();
 
@@ -108,7 +127,7 @@ export class InteractionApi {
       const framePt = viewport.transformPointToFrame(point, featureMap);
       return featureMap.getEntityType(framePt);
     } else {
-      return Promise.resolve(undefined);
+      return EntityType.NO_GEOMETRY;
     }
   }
 
