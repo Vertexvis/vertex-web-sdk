@@ -76,9 +76,10 @@ import {
   MeasurementController,
   MeasurementDetailsSummary,
   MeasurementModel,
-  MeasurementResult,
 } from './lib/measurement';
+import { MeasurementOverlayManager } from './lib/measurement/overlays';
 import { Formatter } from './lib/formatter';
+import { MeasurementOutcome } from './lib/measurement/outcomes';
 import {
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceMode,
@@ -885,11 +886,11 @@ export namespace Components {
      * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel: MeasurementModel;
+    measurementOverlays: MeasurementOverlayManager;
     /**
-     * The current `MeasurementResult` displayed.
-     * @readonly
+     * The current `MeasurementOutcome` displayed.
      */
-    results: MeasurementResult[];
+    outcome: MeasurementOutcome | undefined;
     /**
      * A summary representing all available measurements based on the current `MeasurementResult` set.
      * @readonly
@@ -998,6 +999,7 @@ export namespace Components {
     configEnv: Environment;
     measurementController?: MeasurementController;
     measurementModel: MeasurementModel;
+    measurementOverlays: MeasurementOverlayManager;
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementTool {
@@ -2076,11 +2078,11 @@ declare namespace LocalJSX {
      * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel?: MeasurementModel;
+    measurementOverlays?: MeasurementOverlayManager;
     /**
-     * The current `MeasurementResult` displayed.
-     * @readonly
+     * The current `MeasurementOutcome` displayed.
      */
-    results?: MeasurementResult[];
+    outcome?: MeasurementOutcome | undefined;
     /**
      * A summary representing all available measurements based on the current `MeasurementResult` set.
      * @readonly
@@ -2191,6 +2193,7 @@ declare namespace LocalJSX {
     configEnv?: Environment;
     measurementController?: MeasurementController;
     measurementModel?: MeasurementModel;
+    measurementOverlays?: MeasurementOverlayManager;
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementTool {

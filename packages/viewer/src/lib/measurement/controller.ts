@@ -9,20 +9,17 @@ import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/proto
 import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { MeasurementEntity } from './entities';
 import { mapMeasureResponseOrThrow } from './mapper';
-import {
-  MeasurementModel,
-  MeasurementOutcome,
-  MeasurementResult,
-} from './model';
-import { MeasurementEntity } from './model';
+import { MeasurementModel } from './model';
+import { MeasurementOutcome } from './outcomes';
 
 /**
  * The `MeasurementController` is responsible for performing measurements of
  * registered entities, and updating the model with their measurement results.
  */
 export class MeasurementController {
-  private results = Promise.resolve<MeasurementResult[]>([]);
+  private outcome = Promise.resolve<MeasurementOutcome | undefined>(undefined);
 
   public constructor(
     private model: MeasurementModel,
@@ -39,7 +36,9 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after registering this
    * entity.
    */
-  public addEntity(entity: MeasurementEntity): Promise<MeasurementResult[]> {
+  public addEntity(
+    entity: MeasurementEntity
+  ): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => this.model.addEntity(entity));
   }
 
@@ -47,10 +46,10 @@ export class MeasurementController {
    * Clears all entities and returns a promise that resolves with an empty list
    * of measurement results.
    */
-  public clearEntities(): Promise<MeasurementResult[]> {
+  public clearEntities(): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => {
       this.model.clearEntities();
-      this.model.clearResults();
+      this.model.clearOutcome();
       return true;
     });
   }
@@ -63,7 +62,9 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after removing this
    * entity.
    */
-  public removeEntity(entity: MeasurementEntity): Promise<MeasurementResult[]> {
+  public removeEntity(
+    entity: MeasurementEntity
+  ): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => this.model.removeEntity(entity));
   }
 
@@ -76,13 +77,13 @@ export class MeasurementController {
    */
   public setEntities(
     entities: Set<MeasurementEntity>
-  ): Promise<MeasurementResult[]> {
+  ): Promise<MeasurementOutcome | undefined> {
     return this.performMeasurement(() => this.model.setEntities(entities));
   }
 
   private performMeasurement(
     effect: () => boolean
-  ): Promise<MeasurementResult[]> {
+  ): Promise<MeasurementOutcome | undefined> {
     const previous = this.model.getEntities();
     const changed = effect();
     const entities = this.model.getEntities();
@@ -90,32 +91,36 @@ export class MeasurementController {
       this.measureAndUpdateModel(entities);
       this.highlightEntities(previous, entities);
     }
-    return this.results;
+    return this.outcome;
   }
 
   private measureAndUpdateModel(entities: MeasurementEntity[]): void {
     if (entities.length > 0) {
-      this.results = this.measureEntities().then((outcome) => {
-        this.model.replaceResultsWithOutcome(outcome);
-        return this.model.getResults();
+      this.outcome = this.measureEntities(entities).then((outcome) => {
+        this.model.setOutcome(outcome);
+        return this.model.getOutcome();
       });
     } else {
-      this.results = Promise.resolve([]);
+      this.outcome = Promise.resolve(undefined);
     }
   }
 
-  private async measureEntities(): Promise<MeasurementOutcome> {
-    const entities = this.model.getEntities().map((e) => e.toProto());
+  private async measureEntities(
+    entities: MeasurementEntity[]
+  ): Promise<MeasurementOutcome | undefined> {
+    if (entities.length > 0) {
+      const res = await requestUnary<MeasureResponse>(async (handler) => {
+        const meta = await createMetadata(this.jwtProvider, this.deviceId);
+        const req = new MeasureRequest();
+        req.setEntitiesList(entities.map((e) => e.toProto()));
 
-    const res = await requestUnary<MeasureResponse>(async (handler) => {
-      const meta = await createMetadata(this.jwtProvider, this.deviceId);
-      const req = new MeasureRequest();
-      req.setEntitiesList(entities);
+        this.client.measure(req, meta, handler);
+      });
 
-      this.client.measure(req, meta, handler);
-    });
-
-    return mapMeasureResponseOrThrow(res.toObject());
+      return mapMeasureResponseOrThrow(res.toObject());
+    } else {
+      return undefined;
+    }
   }
 
   private async highlightEntities(

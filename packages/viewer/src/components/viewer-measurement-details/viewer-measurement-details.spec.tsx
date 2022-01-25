@@ -58,7 +58,7 @@ describe('vertex-viewer-measurement-details', () => {
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     measurementDetails.visibleSummary = {
-      minDistance: 100,
+      minDistance: { value: 100, isApproximated: true },
     };
 
     await page.waitForChanges();
@@ -69,7 +69,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain('10.00 cm');
+    ).toContain('~10.00 cm');
 
     measurementDetails.distanceFormatter = () => 'formatted distance';
     await page.waitForChanges();
@@ -140,9 +140,7 @@ describe('vertex-viewer-measurement-details', () => {
       measurementDetails.shadowRoot?.querySelector(
         'div.measurement-details-entry'
       )?.innerHTML
-    ).toContain(
-      '1.00 cm<span class="measurement-details-entry-label-superscript">2</span>'
-    );
+    ).toContain('1.00 cm²');
 
     measurementDetails.areaFormatter = () => 'formatted area';
     await page.waitForChanges();
@@ -165,7 +163,8 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
-    model.replaceResultsWithOutcome({
+    model.setOutcome({
+      type: 'precise',
       results: [
         {
           type: 'minimum-distance',
@@ -200,7 +199,8 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
-    model.replaceResultsWithOutcome({
+    model.setOutcome({
+      type: 'precise',
       results: [
         {
           type: 'minimum-distance',
@@ -218,7 +218,8 @@ describe('vertex-viewer-measurement-details', () => {
 
     await page.waitForChanges();
 
-    model2.replaceResultsWithOutcome({
+    model2.setOutcome({
+      type: 'precise',
       results: [
         {
           type: 'planar-distance',
@@ -254,7 +255,8 @@ describe('vertex-viewer-measurement-details', () => {
     const measurementDetails =
       page.root as HTMLVertexViewerMeasurementDetailsElement;
 
-    model.replaceResultsWithOutcome({
+    model.setOutcome({
+      type: 'precise',
       results: [
         {
           type: 'minimum-distance',
@@ -292,7 +294,8 @@ describe('vertex-viewer-measurement-details', () => {
 
     await page.waitForChanges();
 
-    model.replaceResultsWithOutcome({
+    model.setOutcome({
+      type: 'precise',
       results: [
         {
           type: 'minimum-distance',

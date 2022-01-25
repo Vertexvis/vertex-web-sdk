@@ -9,11 +9,14 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
+import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
+import { Cursor, CursorManager } from '../cursors';
 import { Camera, Scene } from '../scenes';
 import {
   DepthBuffer,
+  EntityType,
   FramePerspectiveCamera,
   Interactions,
   Viewport,
@@ -58,6 +61,7 @@ export class InteractionApi {
 
   public constructor(
     private stream: StreamApi,
+    private cursors: CursorManager,
     private getConfig: InteractionConfigProvider,
     private getScene: SceneProvider,
     private getFrame: () => ReceivedFrame | undefined,
@@ -72,6 +76,59 @@ export class InteractionApi {
     this.doubleTap = this.doubleTap.bind(this);
     this.longPress = this.longPress.bind(this);
     this.emitTapEvent = this.emitTapEvent.bind(this);
+  }
+
+  /**
+   * Displays a cursor over the viewer with the given priority. Cursors with
+   * higher priority will take precedence over cursors with lower priorities if
+   * there's more than a single cursor added.
+   *
+   * @param cursor The cursor to add.
+   * @param priority The priority of the cursor.
+   * @returns A `Disposable` that can be used to remove the cursor.
+   */
+  public addCursor(cursor: Cursor, priority?: number): Disposable {
+    return this.cursors.add(cursor, priority);
+  }
+
+  /**
+   * Returns a 3D point in world space for the given 2D point in viewport space.
+   *
+   * @param point A point in 2D viewport space to transform.
+   * @returns A 3D point in world space.
+   */
+  public async getWorldPointFromViewport(
+    point: Point.Point
+  ): Promise<Vector3.Vector3 | undefined> {
+    const viewport = this.getViewport();
+    const frame = this.getFrame();
+
+    if (frame == null) {
+      throw new Error('Cannot get world point. Frame is undefined.');
+    }
+
+    const depthBuffer = await frame.depthBuffer();
+    return depthBuffer != null
+      ? viewport.transformPointToWorldSpace(point, depthBuffer, 0.5)
+      : undefined;
+  }
+
+  /**
+   * Returns the entity at the given point in viewport space.
+   *
+   * @param point A point in viewport space.
+   * @returns The entity that was found.
+   */
+  public async getEntityTypeAtPoint(point: Point.Point): Promise<EntityType> {
+    const viewport = this.getViewport();
+    const featureMap = await this.getFrame()?.featureMap();
+
+    if (featureMap != null) {
+      const framePt = viewport.transformPointToFrame(point, featureMap);
+      return featureMap.getEntityType(framePt);
+    } else {
+      return EntityType.NO_GEOMETRY;
+    }
   }
 
   /**
@@ -312,8 +369,8 @@ export class InteractionApi {
   }
 
   /**
-   * Performs a view all operation for the scene's bounding box, and requests a new image
-   * for the updated scene.
+   * Performs a view all operation for the scene's bounding box, and requests a
+   * new image for the updated scene.
    */
   public async viewAll(): Promise<void> {
     await this.getScene().camera().viewAll().render();

@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { Formatter } from '../../lib/formatter';
@@ -6,8 +6,15 @@ import {
   MeasurementDetailsSummary,
   MeasurementModel,
   MeasurementResult,
+  MinimumDistanceMeasurementResult,
+  PointToPointMeasurementResult,
   summarizeResults,
 } from '../../lib/measurement';
+import { MeasurementOutcome } from '../../lib/measurement/outcomes';
+import {
+  MeasurementOverlay,
+  MeasurementOverlayManager,
+} from '../../lib/measurement/overlays';
 import {
   AngleUnits,
   AngleUnitType,
@@ -15,6 +22,7 @@ import {
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
+import { MeasurementDetailsEntry } from './viewer-measurement-details-components';
 
 @Component({
   tag: 'vertex-viewer-measurement-details',
@@ -29,6 +37,9 @@ export class ViewerMeasurementDetails {
    */
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
+
+  @Prop()
+  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
   /**
    * The unit of distance-based measurement.
@@ -91,12 +102,10 @@ export class ViewerMeasurementDetails {
   public hiddenDetailsJson?: string;
 
   /**
-   * The current `MeasurementResult` displayed.
-   *
-   * @readonly
+   * The current `MeasurementOutcome` displayed.
    */
   @Prop({ mutable: true })
-  public results: MeasurementResult[] = [];
+  public outcome: MeasurementOutcome | undefined;
 
   /**
    * A summary representing all available measurements based on
@@ -120,14 +129,17 @@ export class ViewerMeasurementDetails {
   })
   public visibleSummary?: MeasurementDetailsSummary;
 
+  @State()
+  private overlay?: MeasurementOverlay;
+
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
   private angleMeasurementUnits = new AngleUnits(this.angleUnits);
   private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   private resultsChangeListener?: Disposable;
 
   public connectedCallback(): void {
-    this.resultsChangeListener = this.measurementModel.onResultsChanged(
-      this.handleResultsChange
+    this.resultsChangeListener = this.measurementModel.onOutcomeChanged(
+      this.handleOutcomeChange
     );
   }
 
@@ -157,8 +169,8 @@ export class ViewerMeasurementDetails {
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.resultsChangeListener?.dispose();
-    this.resultsChangeListener = this.measurementModel.onResultsChanged(
-      this.handleResultsChange
+    this.resultsChangeListener = this.measurementModel.onOutcomeChanged(
+      this.handleOutcomeChange
     );
   }
 
@@ -171,46 +183,67 @@ export class ViewerMeasurementDetails {
     return this.visibleSummary != null ? (
       <Host>
         {this.visibleSummary?.angle != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label">Angle:</div>
+          <MeasurementDetailsEntry label="Angle">
             {this.formatAngle(this.visibleSummary.angle)}
-          </div>
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.parallelDistance != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label">Parallel Dist:</div>
+          <MeasurementDetailsEntry label="Parallel Dist">
             {this.formatDistance(this.visibleSummary.parallelDistance)}
-          </div>
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.minDistance != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label">Min Dist:</div>
-            {this.formatDistance(this.visibleSummary.minDistance)}
-          </div>
+          <MeasurementDetailsEntry
+            label="Min Dist"
+            onMouseEnter={this.showMinDistOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
+            {this.formatDistance(
+              this.visibleSummary.minDistance.value,
+              this.visibleSummary.minDistance.isApproximated
+            )}
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.area != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label">Area:</div>
-            <div innerHTML={this.formatArea(this.visibleSummary.area)} />
-          </div>
+          <MeasurementDetailsEntry label="Area">
+            {this.formatArea(this.visibleSummary.area)}
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.x != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label x-label">X:</div>
-            {this.formatDistance(this.visibleSummary.distanceVector?.x)}
-          </div>
+          <MeasurementDetailsEntry
+            label="X"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
+            {this.formatDistance(
+              this.visibleSummary.distanceVector.x,
+              this.visibleSummary.distanceVector.isApproximated
+            )}
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.y != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label y-label">Y:</div>
-            {this.formatDistance(this.visibleSummary.distanceVector?.y)}
-          </div>
+          <MeasurementDetailsEntry
+            label="Y"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
+            {this.formatDistance(
+              this.visibleSummary.distanceVector.y,
+              this.visibleSummary.distanceVector.isApproximated
+            )}
+          </MeasurementDetailsEntry>
         )}
         {this.visibleSummary?.distanceVector?.z != null && (
-          <div class="measurement-details-entry">
-            <div class="measurement-details-entry-label z-label">Z:</div>
-            {this.formatDistance(this.visibleSummary.distanceVector?.z)}
-          </div>
+          <MeasurementDetailsEntry
+            label="Z"
+            onMouseEnter={this.showDistanceVectorOverlay}
+            onMouseLeave={this.hideOverlay}
+          >
+            {this.formatDistance(
+              this.visibleSummary.distanceVector.z,
+              this.visibleSummary.distanceVector.isApproximated
+            )}
+          </MeasurementDetailsEntry>
         )}
       </Host>
     ) : (
@@ -224,12 +257,49 @@ export class ViewerMeasurementDetails {
     }
   }
 
-  private handleResultsChange = (results: MeasurementResult[]): void => {
-    this.results = results;
+  private showMinDistOverlay = (): void => {
+    const results = this.getMeasurementResults();
+    const result = results.find(
+      (r) => r.type === 'minimum-distance' || r.type === 'point-to-point'
+    ) as
+      | MinimumDistanceMeasurementResult
+      | PointToPointMeasurementResult
+      | undefined;
+
+    if (result != null) {
+      this.overlay = this.measurementOverlays.addLineFromResult(result);
+    }
+  };
+
+  private showDistanceVectorOverlay = (): void => {
+    const results = this.getMeasurementResults();
+    const pp = results.find(
+      (r) => r.type === 'point-to-point' || r.type === 'minimum-distance'
+    ) as
+      | PointToPointMeasurementResult
+      | MinimumDistanceMeasurementResult
+      | undefined;
+
+    if (pp != null) {
+      this.overlay = this.measurementOverlays.addDistanceVectorFromResult(pp);
+    }
+  };
+
+  private hideOverlay = (): void => {
+    this.overlay?.dispose();
+  };
+
+  private handleOutcomeChange = (
+    outcome: MeasurementOutcome | undefined
+  ): void => {
+    this.outcome = outcome;
     this.createSummary();
   };
 
-  private formatDistance = (distance: number): string => {
+  private formatDistance = (
+    distance: number,
+    isApproximate = false
+  ): string => {
     const realDistance = Math.abs(
       this.distanceMeasurementUnits.convertWorldValueToReal(distance)
     );
@@ -238,9 +308,10 @@ export class ViewerMeasurementDetails {
       return this.distanceFormatter(realDistance);
     } else {
       const abbreviated = this.distanceMeasurementUnits.unit.abbreviatedName;
+      const value = realDistance.toFixed(this.fractionalDigits);
       return realDistance == null
         ? '---'
-        : `${realDistance.toFixed(this.fractionalDigits)} ${abbreviated}`;
+        : `${isApproximate ? '~' + value : value} ${abbreviated}`;
     }
   };
 
@@ -269,7 +340,7 @@ export class ViewerMeasurementDetails {
   };
 
   private createSummary = (): void => {
-    const baseSummary = summarizeResults(this.results);
+    const baseSummary = summarizeResults(this.getMeasurementResults());
     const hidden = this.hiddenDetails ?? [];
 
     this.summary = baseSummary;
@@ -285,4 +356,12 @@ export class ViewerMeasurementDetails {
         {}
       );
   };
+
+  private getMeasurementResults(): MeasurementResult[] {
+    if (this.outcome == null) {
+      return [];
+    } else {
+      return this.outcome.results;
+    }
+  }
 }

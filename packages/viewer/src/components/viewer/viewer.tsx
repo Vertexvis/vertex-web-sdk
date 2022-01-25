@@ -1075,6 +1075,7 @@ export class Viewer {
 
     return new InteractionApi(
       this.stream,
+      this.stateMap.cursorManager,
       () => this.getResolvedConfig().interactions,
       () => this.createScene(),
       () => this.frame,
