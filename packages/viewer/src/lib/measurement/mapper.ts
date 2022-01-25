@@ -11,14 +11,14 @@ import type { MeasureResponse as PbMeasureResponse } from '@vertexvis/scene-view
 import { Mapper as M } from '@vertexvis/utils';
 
 import { fromPbPlane, fromPbVector3f } from '../mappers';
+import { MeasurementOutcome } from './outcomes';
 import {
-  MeasurementOutcome,
   MeasurementResult,
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
   SurfaceAreaMeasurementResult,
-} from '../measurement/model';
+} from './results';
 
 const mapPlanePair: M.Func<
   PbPlanePair.AsObject,
@@ -139,7 +139,7 @@ export const mapMeasureResponse: M.Func<
       M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult))
     )
   ),
-  ([results]) => ({ results })
+  ([results]) => ({ type: 'precise', results })
 );
 
 export const mapMeasureResponseOrThrow = M.ifInvalidThrow(mapMeasureResponse);

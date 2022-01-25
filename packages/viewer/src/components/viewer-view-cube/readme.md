@@ -54,6 +54,9 @@ viewer's scene changes. The cube can be embedded within a
 | `--viewer-view-cube-side-background-hover`         | A CSS background value that defines the background of the hovered side of the cube. Note, the hover background is rendered on-top of the side's background. |
 | `--viewer-view-cube-side-background-hover-opacity` | A CSS number that defines the opacity of the background for a hovered side of the cube.                                                                     |
 | `--viewer-view-cube-side-border`                   | A CSS border value that defines the border of each side of the cube.                                                                                        |
+| `--viewer-view-cube-triad-x-axis-color`            | A CSS color for the X axis of the triad                                                                                                                     |
+| `--viewer-view-cube-triad-y-axis-color`            | A CSS color for the Y axis of the triad                                                                                                                     |
+| `--viewer-view-cube-triad-z-axis-color`            | A CSS color for the Z axis of the triad                                                                                                                     |
 
 
 ## Dependencies

@@ -2,8 +2,10 @@ import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
 
 import { random } from '../../../testing';
-import { MeasurementEntity } from '..';
-import { MeasurementModel, MinimumDistanceMeasurementResult } from '../model';
+import { MeasurementEntity } from '../entities';
+import { MeasurementModel } from '../model';
+import { MeasurementOutcome } from '../outcomes';
+import { MinimumDistanceMeasurementResult } from '../results';
 
 describe('MeasurementModel', () => {
   const point = Vector3.create();
@@ -48,56 +50,6 @@ describe('MeasurementModel', () => {
     });
   });
 
-  describe(MeasurementModel.prototype.addResult, () => {
-    it('adds result if model does not contain result', () => {
-      const model = new MeasurementModel();
-      const result = createMinimumDistanceResult();
-      const onChange = jest.fn();
-      model.onResultsChanged(onChange);
-
-      expect(model.addResult(result)).toBe(true);
-      expect(onChange).toHaveBeenCalledWith([result]);
-      expect(model.getResults()).toEqual([result]);
-    });
-
-    it('wont duplicate results', () => {
-      const model = new MeasurementModel();
-      const result = createMinimumDistanceResult();
-      const onChange = jest.fn();
-      model.addResult(result);
-      model.onResultsChanged(onChange);
-
-      expect(model.addResult(result)).toBe(false);
-      expect(onChange).not.toHaveBeenCalled();
-      expect(model.getResults()).toEqual([result]);
-    });
-  });
-
-  describe(MeasurementModel.prototype.removeResult, () => {
-    it('removes result', () => {
-      const model = new MeasurementModel();
-      const result = createMinimumDistanceResult();
-      const onChange = jest.fn();
-      model.addResult(result);
-      model.onResultsChanged(onChange);
-
-      expect(model.removeResult(result)).toBe(true);
-      expect(onChange).toHaveBeenCalledWith([]);
-      expect(model.getResults()).toEqual([]);
-    });
-
-    it('result must belong to model', () => {
-      const model = new MeasurementModel();
-      const result = createMinimumDistanceResult();
-      const onChange = jest.fn();
-      model.onResultsChanged(onChange);
-
-      expect(model.removeResult(result)).toBe(false);
-      expect(onChange).not.toHaveBeenCalled();
-      expect(model.getResults()).toEqual([]);
-    });
-  });
-
   describe(MeasurementModel.prototype.clearEntities, () => {
     it('removes all results', () => {
       const model = new MeasurementModel();
@@ -108,38 +60,35 @@ describe('MeasurementModel', () => {
     });
   });
 
-  describe(MeasurementModel.prototype.clearResults, () => {
+  describe(MeasurementModel.prototype.clearOutcome, () => {
     it('removes all results', () => {
       const model = new MeasurementModel();
-      const result1 = createMinimumDistanceResult();
-      const result2 = createMinimumDistanceResult();
+      const outcome: MeasurementOutcome = { results: [] };
+
       const onChange = jest.fn();
-      model.addResult(result1);
-      model.addResult(result2);
-      model.onResultsChanged(onChange);
+      model.setOutcome(outcome);
+      model.onOutcomeChanged(onChange);
 
-      model.clearResults();
+      model.clearOutcome();
 
-      expect(onChange).toHaveBeenCalled();
-      expect(model.getResults()).toEqual([]);
+      expect(onChange).toHaveBeenCalledWith(undefined);
+      expect(model.getOutcome()).toEqual(undefined);
     });
   });
 
-  describe(MeasurementModel.prototype.replaceResultsWithOutcome, () => {
-    it('replaces all results with results in outcome', () => {
+  describe(MeasurementModel.prototype.setOutcome, () => {
+    it('replaces outcome', () => {
       const model = new MeasurementModel();
       const result1 = createMinimumDistanceResult();
       const result2 = createMinimumDistanceResult();
-      const result3 = createMinimumDistanceResult();
-      const outcome = { results: [result2, result3] };
+      const outcome: MeasurementOutcome = { results: [result1, result2] };
       const onChange = jest.fn();
 
-      model.addResult(result1);
-      model.onResultsChanged(onChange);
+      model.onOutcomeChanged(onChange);
 
-      model.replaceResultsWithOutcome(outcome);
-      expect(onChange).toHaveBeenCalledWith([result2, result3]);
-      expect(model.getResults()).toEqual([result2, result3]);
+      model.setOutcome(outcome);
+      expect(onChange).toHaveBeenCalledWith(outcome);
+      expect(model.getOutcome()).toEqual(outcome);
     });
   });
 

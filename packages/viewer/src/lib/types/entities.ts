@@ -34,4 +34,9 @@ export enum EntityType {
    * A value that represents the presence of geometry without BREP.
    */
   GENERIC_GEOMETRY = 0x60, // == 96
+
+  /**
+   * A value that represents the absence of geometry.
+   */
+  NO_GEOMETRY = 0x00,
 }

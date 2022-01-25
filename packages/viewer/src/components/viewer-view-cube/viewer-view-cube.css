@@ -36,6 +36,24 @@
    */
   --viewer-view-cube-opacity: 0.8;
 
+  /**
+   * @prop --viewer-view-cube-triad-x-axis-color: A CSS color for the X axis of
+   * the triad
+   */
+  --viewer-view-cube-triad-x-axis-color: var(--x-axis-color);
+
+  /**
+   * @prop --viewer-view-cube-triad-y-axis-color: A CSS color for the Y axis of
+   * the triad
+   */
+  --viewer-view-cube-triad-y-axis-color: var(--y-axis-color);
+
+  /**
+   * @prop --viewer-view-cube-triad-z-axis-color: A CSS color for the Z axis of
+   * the triad
+   */
+  --viewer-view-cube-triad-z-axis-color: var(--z-axis-color);
+
   display: block;
   color: var(--neutral-700);
   width: 80px;
@@ -87,13 +105,13 @@
   font-size: 0.6875rem;
 }
 .triad-label-x {
-  color: #ea3324;
+  color: var(--viewer-view-cube-triad-x-axis-color);
 }
 .triad-label-y {
-  color: #4faf32;
+  color: var(--viewer-view-cube-triad-y-axis-color);
 }
 .triad-label-z {
-  color: #0000ff;
+  color: var(--viewer-view-cube-triad-z-axis-color);
 }
 
 .cube {
