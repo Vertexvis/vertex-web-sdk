@@ -115,7 +115,7 @@ export class ViewerDomRenderer {
   /**
    * @ignore
    */
-  protected componentWillRender(): void {
+  protected componentDidRender(): void {
     this.updateElements();
   }
 

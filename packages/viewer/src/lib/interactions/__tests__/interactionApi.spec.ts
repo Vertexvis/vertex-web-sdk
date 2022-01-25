@@ -4,7 +4,8 @@ jest.mock('../../../workers/png-decoder-pool');
 import { Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
-import { frame } from '../../../testing/fixtures';
+import { makeFrame } from '../../../testing/fixtures';
+import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
 import * as ColorMaterial from '../../scenes/colorMaterial';
@@ -20,6 +21,7 @@ describe(InteractionApi, () => {
   const emitInteractionFinished = jest.fn();
   const streamApi = new StreamApi();
   const sceneViewId = 'scene-view-id';
+  const frame = makeFrame();
   const scene = new Scene(
     streamApi,
     frame,
@@ -42,6 +44,7 @@ describe(InteractionApi, () => {
 
     api = new InteractionApi(
       streamApi,
+      new CursorManager(),
       interactionConfigProvider,
       sceneProvider,
       frameProvider,
@@ -179,6 +182,7 @@ describe(InteractionApi, () => {
     beforeEach(() => {
       api = new InteractionApi(
         streamApi,
+        new CursorManager(),
         interactionConfigProvider,
         sceneProvider,
         frameProvider,

@@ -62,6 +62,7 @@
     "fast-png": "^6.1.0",
     "google-protobuf": "^3.19.2",
     "jwt-decode": "^3.1.2",
+    "param-case": "^3.0.4",
     "protobufjs": "^6.9.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "threads": "^1.7.0",

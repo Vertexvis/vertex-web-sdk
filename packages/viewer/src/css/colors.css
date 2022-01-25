@@ -106,3 +106,9 @@
   --purple-800: #66124b;
   --purple-900: #4d0b39;
 }
+
+:root {
+  --x-axis-color: #ea3324;
+  --y-axis-color: #4faf32;
+  --z-axis-color: #0000ff;
+}

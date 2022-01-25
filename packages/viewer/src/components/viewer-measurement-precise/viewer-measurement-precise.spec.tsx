@@ -2,7 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-import { PreciseMeasurementInteractionHandler } from '../../lib/measurement/interactions';
+import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import { Viewer } from '../viewer/viewer';
 import { ViewerMeasurementPrecise } from './viewer-measurement-precise';
 
@@ -20,7 +20,7 @@ describe('vertex-viewer-measurement-precise', () => {
     const handlers = await viewer?.getInteractionHandlers();
 
     expect(handlers).toEqual(
-      expect.arrayContaining([expect.any(PreciseMeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
     );
   });
 
@@ -41,13 +41,13 @@ describe('vertex-viewer-measurement-precise', () => {
     measurement.remove();
     let handlers = await viewer?.getInteractionHandlers();
     expect(handlers).not.toEqual(
-      expect.arrayContaining([expect.any(PreciseMeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
     );
 
     viewer?.appendChild(measurement);
     handlers = await viewer?.getInteractionHandlers();
     expect(handlers).toEqual(
-      expect.arrayContaining([expect.any(PreciseMeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
     );
   });
 });

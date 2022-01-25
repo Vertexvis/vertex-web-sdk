@@ -4,7 +4,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { frame } from '../../../testing/fixtures';
+import { makeFrame } from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
 import * as ColorMaterial from '../colorMaterial';
@@ -17,7 +17,7 @@ describe(Scene, () => {
   const colorMaterial = ColorMaterial.fromHex('#ff0000');
   const scene = new Scene(
     streamApi,
-    frame,
+    makeFrame(),
     fromPbFrameOrThrow(Orientation.DEFAULT),
     imageScaleProvider,
     sceneViewId,
@@ -407,6 +407,7 @@ describe(Scene, () => {
   describe(Scene.prototype.crossSectioning, () => {
     it('should return crossSectioner', () => {
       const cs = scene.crossSectioning();
+      const frame = makeFrame();
 
       expect(cs.current()).toEqual(frame.scene.crossSection);
     });

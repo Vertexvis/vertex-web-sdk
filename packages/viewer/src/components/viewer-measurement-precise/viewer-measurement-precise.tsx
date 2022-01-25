@@ -5,12 +5,13 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
+import { MeasurementController, MeasurementModel } from '../../lib/measurement';
+import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import {
-  MeasurementController,
-  MeasurementEntity,
-  MeasurementModel,
-} from '../../lib/measurement';
-import { PreciseMeasurementInteractionHandler } from '../../lib/measurement/interactions';
+  MeasurementOverlay,
+  MeasurementOverlayManager,
+} from '../../lib/measurement/overlays';
+import { MeasurementOverlayView } from './viewer-measurement-precise-components';
 
 @Component({
   tag: 'vertex-viewer-measurement-precise',
@@ -20,6 +21,9 @@ import { PreciseMeasurementInteractionHandler } from '../../lib/measurement/inte
 export class ViewerMeasurementPrecise {
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
+
+  @Prop()
+  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
   @Prop({ mutable: true })
   public measurementController?: MeasurementController;
@@ -34,10 +38,11 @@ export class ViewerMeasurementPrecise {
   public config?: Config;
 
   @State()
-  private entities: MeasurementEntity[] = [];
+  private overlays: MeasurementOverlay[] = [];
 
   private registeredInteractionHandler?: Promise<Disposable>;
-  private onEntitiesChangedDisposable?: Disposable;
+  private onEntitiesChangedHandler?: Disposable;
+  private onOverlaysChangedHandler?: Disposable;
 
   protected connectedCallback(): void {
     this.setupInteractionHandler();
@@ -45,12 +50,13 @@ export class ViewerMeasurementPrecise {
 
   protected componentWillLoad(): void {
     this.setupController();
-    this.setupInteractionHandler();
     this.setupModelListeners();
+    this.setupInteractionHandler();
   }
 
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
+    this.clearModelListeners();
   }
 
   @Watch('measurementController')
@@ -70,7 +76,22 @@ export class ViewerMeasurementPrecise {
   }
 
   public render(): JSX.Element {
-    return <Host></Host>;
+    const viewport = this.viewer?.viewport;
+    const camera = this.viewer?.frame?.scene.camera;
+
+    return (
+      <Host>
+        {viewport != null &&
+          camera != null &&
+          this.overlays.map((o) => (
+            <MeasurementOverlayView
+              overlay={o}
+              camera={camera}
+              viewport={viewport}
+            />
+          ))}
+      </Host>
+    );
   }
 
   private setupController(): void {
@@ -95,29 +116,24 @@ export class ViewerMeasurementPrecise {
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new PreciseMeasurementInteractionHandler(this.measurementController)
+          new MeasurementInteractionHandler(this.measurementController)
         );
     }
   }
 
   private clearModelListeners(): void {
-    this.onEntitiesChangedDisposable?.dispose();
-    this.onEntitiesChangedDisposable = undefined;
+    this.onEntitiesChangedHandler?.dispose();
+    this.onEntitiesChangedHandler = undefined;
+
+    this.onOverlaysChangedHandler?.dispose();
+    this.onOverlaysChangedHandler = undefined;
   }
 
   private setupModelListeners(): void {
-    this.clearModelListeners();
-
-    this.onEntitiesChangedDisposable = this.measurementModel?.onEntitiesChanged(
-      this.handleEntitiesChanged
+    this.onOverlaysChangedHandler = this.measurementOverlays.onOverlaysChanged(
+      (overlays) => {
+        this.overlays = overlays;
+      }
     );
-  }
-
-  private handleEntitiesChanged = (): void => {
-    this.updateEntities();
-  };
-
-  private updateEntities(): void {
-    this.entities = this.measurementModel?.getEntities() ?? [];
   }
 }

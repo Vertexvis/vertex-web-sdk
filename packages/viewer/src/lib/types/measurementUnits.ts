@@ -234,38 +234,32 @@ export class AreaUnits {
   private static units: Record<DistanceUnitType, Unit> = {
     millimeters: {
       name: 'Square Millimeters',
-      abbreviatedName:
-        'mm<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'mm²',
       converter: new MillimeterUnitConverter(),
     },
     centimeters: {
       name: 'Square Centimeters',
-      abbreviatedName:
-        'cm<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'cm²',
       converter: new CentimeterUnitConverter(2),
     },
     meters: {
       name: 'Square Meters',
-      abbreviatedName:
-        'm<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'm²',
       converter: new MeterUnitConverter(2),
     },
     inches: {
       name: 'Square Inches',
-      abbreviatedName:
-        'in<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'in²',
       converter: new InchesUnitConverter(2),
     },
     feet: {
       name: 'Square Feet',
-      abbreviatedName:
-        'ft<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'ft²',
       converter: new FeetUnitConverter(2),
     },
     yards: {
       name: 'Square Yards',
-      abbreviatedName:
-        'yd<span class=measurement-details-entry-label-superscript>2</span>',
+      abbreviatedName: 'yd²',
       converter: new YardUnitConverter(2),
     },
   };

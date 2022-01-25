@@ -34,7 +34,7 @@ export class Frame {
     if (this.cachedDepthBuffer == null) {
       this.cachedDepthBuffer =
         this.depthBufferBytes != null
-          ? this.decodeDepthBuffer(this.depthBufferBytes)
+          ? this.decodeDepthBuffer(new Uint8Array(this.depthBufferBytes))
           : Promise.resolve(undefined);
     }
     return this.cachedDepthBuffer;
@@ -49,7 +49,7 @@ export class Frame {
     if (this.cachedFeatureMap == null) {
       this.cachedFeatureMap =
         this.featureMapBytes != null
-          ? this.decodeFeatureMap(this.featureMapBytes)
+          ? this.decodeFeatureMap(new Uint8Array(this.featureMapBytes))
           : Promise.resolve(undefined);
     }
     return this.cachedFeatureMap;

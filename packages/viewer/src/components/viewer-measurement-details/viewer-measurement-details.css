@@ -34,21 +34,14 @@
   padding-right: 0.25rem;
 }
 
-.measurement-details-entry-label.x-label {
+.measurement-details-entry-label.x {
   color: var(--viewer-measurement-details-x-color);
 }
 
-.measurement-details-entry-label.y-label {
+.measurement-details-entry-label.y {
   color: var(--viewer-measurement-details-y-color);
 }
 
-.measurement-details-entry-label.z-label {
+.measurement-details-entry-label.z {
   color: var(--viewer-measurement-details-z-color);
-}
-
-.measurement-details-entry-label-superscript {
-  font-size: 0.6rem;
-  position: relative;
-  bottom: 0.3em;
-  line-height: initial;
 }

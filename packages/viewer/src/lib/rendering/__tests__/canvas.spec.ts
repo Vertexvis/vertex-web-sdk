@@ -24,14 +24,14 @@ const image = {
 const drawFrame1: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
-  frame: Fixtures.frame,
+  frame: Fixtures.makeFrame(),
   viewport: new Viewport(100, 50),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
   dimensions: Dimensions.create(100, 50),
-  frame: Fixtures.frame,
+  frame: Fixtures.makeFrame(),
   viewport: new Viewport(100, 50),
 };
 
@@ -71,9 +71,8 @@ describe(measureCanvasRenderer, () => {
   const renderDelayInMs = 5;
   const reportIntervalInMs = renderDelayInMs + 5;
 
-  const frame = Fixtures.frame;
   const renderer: CanvasRenderer = () =>
-    Async.delay(renderDelayInMs, Promise.resolve(frame));
+    Async.delay(renderDelayInMs, Promise.resolve(Fixtures.makeFrame()));
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
   const callback = jest.fn();

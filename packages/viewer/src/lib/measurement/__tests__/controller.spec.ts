@@ -12,8 +12,8 @@ import {
   mockGrpcUnaryResult,
   random,
 } from '../../../testing';
-import { MeasurementEntity } from '..';
 import { MeasurementController } from '../controller';
+import { MeasurementEntity } from '../entities';
 import { MeasurementModel } from '../model';
 
 describe('MeasurementController', () => {
@@ -42,7 +42,7 @@ describe('MeasurementController', () => {
   );
 
   beforeEach(() => {
-    model.clearResults();
+    model.clearOutcome();
     model.clearEntities();
     jest.resetAllMocks();
   });
@@ -56,11 +56,11 @@ describe('MeasurementController', () => {
       );
 
       await controller.addEntity(entity1);
-      const results = await controller.addEntity(entity2);
+      const outcome = await controller.addEntity(entity2);
 
-      expect(results).toEqual([
-        expect.objectContaining({ type: 'minimum-distance' }),
-      ]);
+      expect(outcome).toMatchObject({
+        results: [expect.objectContaining({ type: 'minimum-distance' })],
+      });
     });
 
     it('returns cached results', async () => {
@@ -72,12 +72,12 @@ describe('MeasurementController', () => {
 
       controller.addEntity(entity1);
       await controller.addEntity(entity2);
-      const results = await controller.addEntity(entity2);
+      const outcome = await controller.addEntity(entity2);
 
       expect(client.measure).toHaveBeenCalledTimes(2);
-      expect(results).toEqual([
-        expect.objectContaining({ type: 'minimum-distance' }),
-      ]);
+      expect(outcome).toMatchObject({
+        results: [expect.objectContaining({ type: 'minimum-distance' })],
+      });
     });
   });
 
@@ -113,8 +113,8 @@ describe('MeasurementController', () => {
         mockGrpcUnaryResult(createMeasureResponse())
       );
 
-      const results = await controller.removeEntity(entity2);
-      expect(results).toEqual([]);
+      const outcome = await controller.removeEntity(entity2);
+      expect(outcome).toMatchObject({ results: [] });
     });
   });
 
@@ -130,9 +130,9 @@ describe('MeasurementController', () => {
       const results = await controller.setEntities(new Set([entity2, entity3]));
 
       expect(model.getEntities()).toEqual([entity2, entity3]);
-      expect(results).toEqual([
-        expect.objectContaining({ type: 'minimum-distance' }),
-      ]);
+      expect(results).toMatchObject({
+        results: [expect.objectContaining({ type: 'minimum-distance' })],
+      });
     });
   });
 });
