@@ -1,7 +1,7 @@
 {
   "name": "root",
   "private": true,
-  "nextVersionBump": "minor",
+  "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^8.6.0",
     "http-server": "^14.0.0",
