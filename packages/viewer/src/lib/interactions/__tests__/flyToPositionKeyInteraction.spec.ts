@@ -1,7 +1,7 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
-import { frame } from '../../../testing/fixtures';
+import { makeFrame } from '../../../testing/fixtures';
 import { Config } from '../../config';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
@@ -21,7 +21,7 @@ describe(FlyToPositionKeyInteraction, () => {
   const sceneViewId = 'scene-view-id';
   const scene = new Scene(
     streamApi,
-    frame,
+    makeFrame(),
     fromPbFrameOrThrow(Orientation.DEFAULT),
     () => Point.create(1, 1),
     sceneViewId,

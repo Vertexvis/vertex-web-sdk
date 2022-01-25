@@ -10,6 +10,7 @@ import { RaycasterLike } from '../lib/scenes/raycaster';
 import {
   DepthBuffer,
   FeatureMap,
+  Frame,
   ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
@@ -48,9 +49,11 @@ export const drawFramePayload: DrawFramePayload = {
   depthBuffer: { value: makeDepthImagePng(100, 50) },
 };
 
-export const frame = Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-  drawFramePayload
-);
+export function makeFrame(): Frame {
+  return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
+    drawFramePayload
+  );
+}
 
 export function makeImagePng(width: number, height: number): Uint8Array {
   const data = new Uint8ClampedArray(width * height * 4);
@@ -91,7 +94,7 @@ export function makeDepthBuffer(
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
-    frame.scene.camera,
+    makeFrame().scene.camera,
     makeImageAttributes(width, height)
   );
 }
