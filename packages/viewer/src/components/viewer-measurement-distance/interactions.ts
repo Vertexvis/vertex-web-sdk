@@ -3,10 +3,36 @@ import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import { Mapper } from '@vertexvis/utils';
 
 import { fromPbVector3f } from '../../lib/mappers';
-import { PointToPointMeasurementResult } from '../../lib/measurement';
 import { RaycasterLike } from '../../lib/scenes';
 import { PointToPointHitTester } from './hitTest';
 import { Anchor } from './utils';
+
+/**
+ * A measurement result that represents the distance between two points.
+ */
+export interface PointToPointMeasurementResult {
+  /**
+   * The distance, in world units, between two points. This value is only
+   * populated if the result is valid.
+   */
+  distance?: number;
+
+  /**
+   * The first point, in world units.
+   */
+  start: Vector3.Vector3;
+
+  /**
+   * The second point, in world units.
+   */
+  end: Vector3.Vector3;
+
+  /**
+   * Indicates if this result is valid. A value of `false` indicates that one of
+   * the points does not touch any geometry.
+   */
+  valid: boolean;
+}
 
 /**
  * Provides APIs to perform local or remote hit tests.
@@ -472,23 +498,12 @@ function validMeasurement(
   start: Vector3.Vector3,
   end: Vector3.Vector3
 ): PointToPointMeasurementResult {
-  return {
-    type: 'point-to-point',
-    start,
-    end,
-    distance: Vector3.distance(start, end),
-    valid: true,
-  };
+  return { start, end, distance: Vector3.distance(start, end), valid: true };
 }
 
 function invalidMeasurement(
   start: Vector3.Vector3,
   end: Vector3.Vector3
 ): PointToPointMeasurementResult {
-  return {
-    type: 'point-to-point',
-    start,
-    end,
-    valid: false,
-  };
+  return { start, end, valid: false };
 }
