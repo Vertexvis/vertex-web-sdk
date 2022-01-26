@@ -75,14 +75,14 @@ describe(MeasurementInteractionHandler, () => {
     mockMeasurableEntityAtPoint(EntityType.PRECISE_EDGE);
     element.dispatchEvent(new MouseEvent('pointermove'));
     await eventually(() => {
-      expect(addCursor).toHaveBeenCalledWith(measurementWithArrowCursor);
+      expect(addCursor).not.toHaveBeenCalled();
     });
     reset();
 
     mockMeasurableEntityAtPoint(EntityType.IMPRECISE_SURFACE);
     element.dispatchEvent(new MouseEvent('pointermove'));
     await eventually(() => {
-      expect(addCursor).not.toHaveBeenCalled();
+      expect(addCursor).toHaveBeenCalledWith(measurementWithArrowCursor);
     });
     reset();
 

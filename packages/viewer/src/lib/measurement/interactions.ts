@@ -10,8 +10,8 @@ import { MeasurementController } from './controller';
 import { MeasurementEntity } from './entities';
 
 const measurableEntityTypes = [
-  EntityType.PRECISE_EDGE,
   EntityType.PRECISE_SURFACE,
+  EntityType.IMPRECISE_SURFACE,
 ];
 
 export class MeasurementInteractionHandler implements InteractionHandler {
