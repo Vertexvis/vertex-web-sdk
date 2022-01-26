@@ -17,12 +17,12 @@ export interface MinimumDistanceMeasurementResult {
   /**
    * The closest point of the first entity, in world coordinates.
    */
-  closestPoint1: Vector3.Vector3;
+  point1: Vector3.Vector3;
 
   /**
    * The closest point of the second entity, in world coordinates.
    */
-  closestPoint2: Vector3.Vector3;
+  point2: Vector3.Vector3;
 }
 
 /**

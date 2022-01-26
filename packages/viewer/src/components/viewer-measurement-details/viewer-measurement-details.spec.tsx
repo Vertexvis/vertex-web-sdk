@@ -1,46 +1,42 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
 import { Angle } from '@vertexvis/geometry';
 
-import { MeasurementModel, summarizeResults } from '../../lib/measurement';
+import { MeasurementModel } from '../../lib/measurement';
 import { ViewerMeasurementDetails } from './viewer-measurement-details';
 
 describe('vertex-viewer-measurement-details', () => {
   it('renders a details with measurement details', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => <vertex-viewer-measurement-details />,
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
+    const { model, page } = await newMeasurementDetailsSpec();
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
     ).toBeNull();
 
-    measurementDetails.visibleSummary = summarizeResults([
-      {
-        type: 'minimum-distance',
-        distance: 2,
-        closestPoint1: Vector3.create(100, 200, 300),
-        closestPoint2: Vector3.create(10, 20, 30),
-      },
-      {
-        type: 'planar-distance',
-        distance: 1,
-        plane1: Plane.create(),
-        plane2: Plane.create(),
-      },
-    ]);
+    model.setOutcome({
+      isApproximate: false,
+      results: [
+        {
+          type: 'minimum-distance',
+          distance: 2,
+          point1: Vector3.create(100, 200, 300),
+          point2: Vector3.create(10, 20, 30),
+        },
+        {
+          type: 'planar-distance',
+          distance: 1,
+          plane1: Plane.create(),
+          plane2: Plane.create(),
+        },
+      ],
+    });
 
     await page.waitForChanges();
 
-    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+    const entries = comp.shadowRoot?.querySelectorAll(
       'div.measurement-details-entry'
     ) as NodeListOf<HTMLDivElement>;
 
@@ -48,165 +44,112 @@ describe('vertex-viewer-measurement-details', () => {
     expect(entries[1].innerText).toContain('Min Dist:2.00 mm');
   });
 
-  it('formats distances', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => <vertex-viewer-measurement-details />,
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
-
-    measurementDetails.visibleSummary = {
-      minDistance: { value: 100, isApproximated: true },
-    };
-
-    await page.waitForChanges();
-
-    measurementDetails.distanceUnits = 'centimeters';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('~10.00 cm');
-
-    measurementDetails.distanceFormatter = () => 'formatted distance';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('formatted distance');
-  });
-
-  it('formats angles', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => <vertex-viewer-measurement-details />,
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
-
-    const radians = Angle.toRadians(90);
-    measurementDetails.visibleSummary = {
-      angle: radians,
-    };
-
-    await page.waitForChanges();
-
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('90.00 deg');
-
-    measurementDetails.angleUnits = 'radians';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain(`${radians.toFixed(2)} rad`);
-
-    measurementDetails.angleFormatter = () => 'formatted angle';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('formatted angle');
-  });
-
-  it('formats areas', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => <vertex-viewer-measurement-details />,
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
-
-    measurementDetails.visibleSummary = {
-      area: 100,
-    };
-
-    await page.waitForChanges();
-
-    measurementDetails.distanceUnits = 'centimeters';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('1.00 cm²');
-
-    measurementDetails.areaFormatter = () => 'formatted area';
-    await page.waitForChanges();
-    expect(
-      measurementDetails.shadowRoot?.querySelector(
-        'div.measurement-details-entry'
-      )?.innerHTML
-    ).toContain('formatted area');
-  });
-
-  it('responds to result changes', async () => {
-    const model = new MeasurementModel();
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => (
-        <vertex-viewer-measurement-details measurementModel={model} />
-      ),
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
+  it('displays minimum distance', async () => {
+    const { model, page } = await newMeasurementDetailsSpec();
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     model.setOutcome({
-      type: 'precise',
+      isApproximate: true,
       results: [
         {
           type: 'minimum-distance',
-          distance: 10,
-          closestPoint1: Vector3.create(1, 5, 3),
-          closestPoint2: Vector3.create(4, 2, 6),
+          point1: Vector3.create(0, 0, 0),
+          point2: Vector3.create(0, 0, 100),
+          distance: 100,
+        },
+      ],
+    });
+
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('~100.00 mm');
+
+    comp.distanceUnits = 'centimeters';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('~10.00 cm');
+
+    comp.distanceFormatter = () => 'formatted distance';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('formatted distance');
+  });
+
+  it('displays planar angle', async () => {
+    const angle = Angle.toRadians(90);
+    const { model, page } = await newMeasurementDetailsSpec();
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    model.setOutcome({
+      isApproximate: false,
+      results: [
+        {
+          type: 'planar-angle',
+          angle: angle,
+          plane1: Plane.create(),
+          plane2: Plane.create(),
         },
       ],
     });
 
     await page.waitForChanges();
 
-    const entries = measurementDetails.shadowRoot?.querySelectorAll(
-      'div.measurement-details-entry'
-    ) as NodeListOf<HTMLDivElement>;
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('90.00 deg');
 
-    expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
-    expect(entries[1].innerText).toContain('X:3.00 mm');
-    expect(entries[2].innerText).toContain('Y:3.00 mm');
-    expect(entries[3].innerText).toContain('Z:3.00 mm');
+    comp.angleUnits = 'radians';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain(`${angle.toFixed(2)} rad`);
+
+    comp.angleFormatter = () => 'formatted angle';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('formatted angle');
+  });
+
+  it('displays area', async () => {
+    const { model, page } = await newMeasurementDetailsSpec();
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
+
+    model.setOutcome({
+      isApproximate: false,
+      results: [{ type: 'surface-area', area: 100 }],
+    });
+
+    await page.waitForChanges();
+
+    comp.distanceUnits = 'centimeters';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('1.00 cm²');
+
+    comp.areaFormatter = () => 'formatted area';
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+    ).toContain('formatted area');
   });
 
   it('responds to model changes', async () => {
-    const model = new MeasurementModel();
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => (
-        <vertex-viewer-measurement-details measurementModel={model} />
-      ),
-    });
-
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
+    const { model, page } = await newMeasurementDetailsSpec();
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     model.setOutcome({
-      type: 'precise',
+      isApproximate: false,
       results: [
         {
           type: 'minimum-distance',
           distance: 10,
-          closestPoint1: Vector3.create(1, 5, 3),
-          closestPoint2: Vector3.create(4, 2, 6),
+          point1: Vector3.create(1, 5, 3),
+          point2: Vector3.create(4, 2, 6),
         },
       ],
     });
@@ -214,12 +157,8 @@ describe('vertex-viewer-measurement-details', () => {
     await page.waitForChanges();
 
     const model2 = new MeasurementModel();
-    measurementDetails.measurementModel = model2;
-
-    await page.waitForChanges();
-
     model2.setOutcome({
-      type: 'precise',
+      isApproximate: false,
       results: [
         {
           type: 'planar-distance',
@@ -230,9 +169,10 @@ describe('vertex-viewer-measurement-details', () => {
       ],
     });
 
+    comp.measurementModel = model2;
     await page.waitForChanges();
 
-    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+    const entries = comp.shadowRoot?.querySelectorAll(
       'div.measurement-details-entry'
     ) as NodeListOf<HTMLDivElement>;
 
@@ -240,81 +180,57 @@ describe('vertex-viewer-measurement-details', () => {
     expect(entries[0].innerText).toContain('Parallel Dist:10.00 mm');
   });
 
-  it('hides details', async () => {
+  it('hides results', async () => {
     const model = new MeasurementModel();
     const page = await newSpecPage({
       components: [ViewerMeasurementDetails],
       template: () => (
         <vertex-viewer-measurement-details
           measurementModel={model}
-          hiddenDetails={['distanceVector']}
+          resultTypes={['minimum-distance']}
         />
       ),
     });
 
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     model.setOutcome({
-      type: 'precise',
+      isApproximate: false,
       results: [
         {
           type: 'minimum-distance',
           distance: 10,
-          closestPoint1: Vector3.create(1, 5, 3),
-          closestPoint2: Vector3.create(4, 2, 6),
+          point1: Vector3.create(1, 5, 3),
+          point2: Vector3.create(4, 2, 6),
         },
       ],
     });
 
     await page.waitForChanges();
-
-    const entries = measurementDetails.shadowRoot?.querySelectorAll(
+    const entries = comp.shadowRoot?.querySelectorAll(
       'div.measurement-details-entry'
     ) as NodeListOf<HTMLDivElement>;
-
-    expect(entries.length).toBe(1);
     expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
+
+    comp.resultTypes = ['planar-angle'];
+    await page.waitForChanges();
+    expect(
+      comp.shadowRoot?.querySelectorAll('div.measurement-details-entry')
+    ).toHaveLength(0);
   });
 
-  it('hides details from json string', async () => {
+  async function newMeasurementDetailsSpec(): Promise<{
+    page: SpecPage;
+    model: MeasurementModel;
+  }> {
     const model = new MeasurementModel();
     const page = await newSpecPage({
       components: [ViewerMeasurementDetails],
-      html: `
-        <vertex-viewer-measurement-details
-          hidden-details='["minDistance"]'
-        />`,
+      template: () => (
+        <vertex-viewer-measurement-details measurementModel={model} />
+      ),
     });
 
-    const measurementDetails =
-      page.root as HTMLVertexViewerMeasurementDetailsElement;
-
-    measurementDetails.measurementModel = model;
-
-    await page.waitForChanges();
-
-    model.setOutcome({
-      type: 'precise',
-      results: [
-        {
-          type: 'minimum-distance',
-          distance: 10,
-          closestPoint1: Vector3.create(1, 5, 3),
-          closestPoint2: Vector3.create(4, 2, 6),
-        },
-      ],
-    });
-
-    await page.waitForChanges();
-
-    const entries = measurementDetails.shadowRoot?.querySelectorAll(
-      'div.measurement-details-entry'
-    ) as NodeListOf<HTMLDivElement>;
-
-    expect(entries.length).toBe(3);
-    expect(entries[0].innerText).toContain('X:3.00 mm');
-    expect(entries[1].innerText).toContain('Y:3.00 mm');
-    expect(entries[2].innerText).toContain('Z:3.00 mm');
-  });
+    return { page, model };
+  }
 });

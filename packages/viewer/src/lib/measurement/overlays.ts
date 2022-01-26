@@ -31,7 +31,7 @@ export class MeasurementOverlayManager {
     result: MinimumDistanceMeasurementResult | PointToPointMeasurementResult
   ): LineOverlay {
     if (result.type === 'minimum-distance') {
-      return this.addLine(result.closestPoint1, result.closestPoint2);
+      return this.addLine(result.point1, result.point2);
     } else {
       return this.addLine(result.start, result.end);
     }
@@ -52,11 +52,11 @@ export class MeasurementOverlayManager {
 
   public addDistanceVectorFromResult(
     result: PointToPointMeasurementResult | MinimumDistanceMeasurementResult
-  ): DistanceVectorOverlay | undefined {
+  ): DistanceVectorOverlay {
     if (result.type === 'point-to-point') {
       return this.addDistanceVector(result.start, result.end);
     } else {
-      return this.addDistanceVector(result.closestPoint1, result.closestPoint2);
+      return this.addDistanceVector(result.point1, result.point2);
     }
   }
 

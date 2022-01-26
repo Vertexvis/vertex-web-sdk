@@ -80,11 +80,11 @@ const mapMinimumDistance: M.Func<
     M.mapRequiredProp('closestPoint1', fromPbVector3f),
     M.mapRequiredProp('closestPoint2', fromPbVector3f)
   ),
-  ([distance, closestPoint1, closestPoint2]) => ({
+  ([distance, point1, point2]) => ({
     type: 'minimum-distance',
     distance,
-    closestPoint1,
-    closestPoint2,
+    point1,
+    point2,
   })
 );
 
@@ -137,9 +137,10 @@ export const mapMeasureResponse: M.Func<
     M.mapRequiredProp(
       'outcome',
       M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult))
-    )
+    ),
+    M.mapRequiredProp('outcome', M.getProp('isApproximate'))
   ),
-  ([results]) => ({ type: 'precise', results })
+  ([results, isApproximate]) => ({ results, isApproximate })
 );
 
 export const mapMeasureResponseOrThrow = M.ifInvalidThrow(mapMeasureResponse);
