@@ -84,7 +84,7 @@ export class MeasurementOverlayManager {
     }
   }
 
-  private getOverlays(): MeasurementOverlay[] {
+  public getOverlays(): MeasurementOverlay[] {
     return Array.from(this.overlays.values());
   }
 

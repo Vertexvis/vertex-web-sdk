@@ -6,46 +6,4 @@
   left: 0;
   right: 0;
   pointer-events: none;
-
-  /**
-   * @prop --viewer-measurement-precise-x-axis-color: A CSS color for overlays
-   * representing the X axis.
-   */
-  --viewer-measurement-precise-x-axis-color: var(--x-axis-color);
-
-  /**
-   * @prop --viewer-measurement-precise-y-axis-color: A CSS color for overlays
-   * representing the Y axis.
-   */
-  --viewer-measurement-precise-y-axis-color: var(--y-axis-color);
-
-  /**
-   * @prop --viewer-measurement-precise-z-axis-color: A CSS color for overlays
-   * representing the Z axis.
-   */
-  --viewer-measurement-precise-z-axis-color: var(--z-axis-color);
-}
-
-.measurement-line {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.measurement-line.distance-vector-x {
-  --viewer-measurement-line-fill: var(
-    --viewer-measurement-precise-x-axis-color
-  );
-}
-
-.measurement-line.distance-vector-y {
-  --viewer-measurement-line-fill: var(
-    --viewer-measurement-precise-y-axis-color
-  );
-}
-
-.measurement-line.distance-vector-z {
-  --viewer-measurement-line-fill: var(
-    --viewer-measurement-precise-z-axis-color
-  );
 }

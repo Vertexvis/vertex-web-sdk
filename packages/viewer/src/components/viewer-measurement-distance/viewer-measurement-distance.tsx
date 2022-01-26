@@ -133,6 +133,13 @@ export class ViewerMeasurementDistance {
   public distance?: number;
 
   /**
+   * Enables the display of axis reference lines between the start and end
+   * point.
+   */
+  @Prop()
+  public showAxisReferenceLines = false;
+
+  /**
    * The distance, in pixels, between the mouse and nearest snappable edge. A
    * value of 0 disables snapping.
    */
