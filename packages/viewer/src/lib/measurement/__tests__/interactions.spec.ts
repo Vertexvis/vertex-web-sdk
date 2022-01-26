@@ -34,7 +34,10 @@ describe(MeasurementInteractionHandler, () => {
     () => 'token',
     deviceId
   );
-  const handler = new MeasurementInteractionHandler(controller);
+  const handler = new MeasurementInteractionHandler(controller, [
+    EntityType.PRECISE_SURFACE,
+    EntityType.IMPRECISE_SURFACE,
+  ]);
 
   const element = document.createElement('div');
   const api = new InteractionApi(
