@@ -1,10 +1,7 @@
 import { Vector3 } from '@vertexvis/geometry';
 import { Disposable, EventDispatcher, Listener, UUID } from '@vertexvis/utils';
 
-import {
-  MinimumDistanceMeasurementResult,
-  PointToPointMeasurementResult,
-} from './results';
+import { MinimumDistanceMeasurementResult } from './results';
 
 export interface LineOverlay extends Disposable {
   type: 'line';
@@ -28,13 +25,9 @@ export class MeasurementOverlayManager {
   private overlaysChanged = new EventDispatcher<MeasurementOverlay[]>();
 
   public addLineFromResult(
-    result: MinimumDistanceMeasurementResult | PointToPointMeasurementResult
+    result: MinimumDistanceMeasurementResult
   ): LineOverlay {
-    if (result.type === 'minimum-distance') {
-      return this.addLine(result.closestPoint1, result.closestPoint2);
-    } else {
-      return this.addLine(result.start, result.end);
-    }
+    return this.addLine(result.point1, result.point2);
   }
 
   public addLine(start: Vector3.Vector3, end: Vector3.Vector3): LineOverlay {
@@ -51,13 +44,9 @@ export class MeasurementOverlayManager {
   }
 
   public addDistanceVectorFromResult(
-    result: PointToPointMeasurementResult | MinimumDistanceMeasurementResult
-  ): DistanceVectorOverlay | undefined {
-    if (result.type === 'point-to-point') {
-      return this.addDistanceVector(result.start, result.end);
-    } else {
-      return this.addDistanceVector(result.closestPoint1, result.closestPoint2);
-    }
+    result: MinimumDistanceMeasurementResult
+  ): DistanceVectorOverlay {
+    return this.addDistanceVector(result.point1, result.point2);
   }
 
   public addDistanceVector(

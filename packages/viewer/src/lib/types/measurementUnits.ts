@@ -16,7 +16,7 @@ export type DistanceUnitType =
 
 export type AngleUnitType = 'degrees' | 'radians';
 
-interface Unit {
+export interface Unit {
   name: string;
   abbreviatedName: string;
   converter: UnitConverter<number>;

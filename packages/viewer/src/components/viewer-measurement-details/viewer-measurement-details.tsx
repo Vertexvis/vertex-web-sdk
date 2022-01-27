@@ -2,15 +2,7 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { Formatter } from '../../lib/formatter';
-import {
-  MeasurementDetailsSummary,
-  MeasurementModel,
-  MeasurementResult,
-  MinimumDistanceMeasurementResult,
-  PointToPointMeasurementResult,
-  summarizeResults,
-} from '../../lib/measurement';
-import { MeasurementOutcome } from '../../lib/measurement/outcomes';
+import { MeasurementModel, MeasurementResult } from '../../lib/measurement';
 import {
   MeasurementOverlay,
   MeasurementOverlayManager,
@@ -21,8 +13,14 @@ import {
   AreaUnits,
   DistanceUnits,
   DistanceUnitType,
+  Unit,
 } from '../../lib/types';
-import { MeasurementDetailsEntry } from './viewer-measurement-details-components';
+import {
+  MinimumDistanceResultEntry,
+  PlanarAngleResultEntry,
+  PlanarDistanceResultEntry,
+  SurfaceAreaResultEntry,
+} from './viewer-measurement-details-results';
 
 @Component({
   tag: 'vertex-viewer-measurement-details',
@@ -38,8 +36,11 @@ export class ViewerMeasurementDetails {
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
 
+  /**
+   * The manager that the component will use to present measurement overlays.
+   */
   @Prop()
-  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
+  public measurementOverlays?: MeasurementOverlayManager;
 
   /**
    * The unit of distance-based measurement.
@@ -84,284 +85,226 @@ export class ViewerMeasurementDetails {
   public areaFormatter?: Formatter<number>;
 
   /**
-   * An optional set of details to hide. This can be used to display
-   * reduced sets of details for more a more focused representation.
-   * Can be provided as an array of keys from the `MeasurementDetailsSummary`
-   * type, or as a JSON array with the format '["angle", "minDistance"]'.
+   * A set of result types to display. If `undefined`, then all results will be
+   * displayed.
    */
-  @Prop({ mutable: true })
-  public hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
+  @Prop()
+  public resultTypes?: MeasurementResult['type'][];
 
-  /**
-   * An optional set of details to hide. This can be used to display
-   * reduced sets of details for more a more focused representation.
-   * Can be provided as an array of keys from the `MeasurementDetailsSummary`
-   * type, or as a JSON array with the format '["angle", "minDistance"]'.
-   */
-  @Prop({ attribute: 'hidden-details' })
-  public hiddenDetailsJson?: string;
+  @State()
+  private results: MeasurementResult[] = [];
 
-  /**
-   * The current `MeasurementOutcome` displayed.
-   */
-  @Prop({ mutable: true })
-  public outcome: MeasurementOutcome | undefined;
-
-  /**
-   * A summary representing all available measurements based on
-   * the current `MeasurementResult` set.
-   *
-   * @readonly
-   */
-  @Prop({
-    mutable: true,
-  })
-  public summary?: MeasurementDetailsSummary;
-
-  /**
-   * The visible measurements based on the current `summary`
-   * and `hiddenDetails`.
-   *
-   * @readonly
-   */
-  @Prop({
-    mutable: true,
-  })
-  public visibleSummary?: MeasurementDetailsSummary;
+  @State()
+  private isApproximate = false;
 
   @State()
   private overlay?: MeasurementOverlay;
 
+  @State()
   private distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
-  private angleMeasurementUnits = new AngleUnits(this.angleUnits);
-  private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
-  private resultsChangeListener?: Disposable;
 
-  public connectedCallback(): void {
-    this.resultsChangeListener = this.measurementModel.onOutcomeChanged(
+  @State()
+  private angleMeasurementUnits = new AngleUnits(this.angleUnits);
+
+  @State()
+  private areaMeasurementUnits = new AreaUnits(this.distanceUnits);
+
+  private onOutcomeChangedHandler?: Disposable;
+
+  /**
+   * @internal
+   */
+  protected connectedCallback(): void {
+    this.onOutcomeChangedHandler = this.measurementModel.onOutcomeChanged(
       this.handleOutcomeChange
     );
+    this.updateStateFromModel();
   }
 
-  public componentWillLoad(): void {
-    this.parseHiddenDetails();
+  /**
+   * @internal
+   */
+  protected disconnectedCallback(): void {
+    this.onOutcomeChangedHandler?.dispose();
   }
 
-  public componentWillUpdate(): void {
-    this.parseHiddenDetails();
-  }
-
-  public disconnectedCallback(): void {
-    this.resultsChangeListener?.dispose();
-  }
-
+  /**
+   * @internal
+   */
   @Watch('distanceUnits')
   protected handleDistanceUnitsChanged(): void {
     this.distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
     this.areaMeasurementUnits = new AreaUnits(this.distanceUnits);
   }
 
+  /**
+   * @internal
+   */
   @Watch('angleUnits')
   protected handleAngleUnitsChanged(): void {
     this.angleMeasurementUnits = new AngleUnits(this.angleUnits);
   }
 
+  /**
+   * @internal
+   */
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
-    this.resultsChangeListener?.dispose();
-    this.resultsChangeListener = this.measurementModel.onOutcomeChanged(
+    this.onOutcomeChangedHandler?.dispose();
+    this.onOutcomeChangedHandler = this.measurementModel.onOutcomeChanged(
       this.handleOutcomeChange
     );
+
+    this.updateStateFromModel();
   }
 
-  @Watch('hiddenDetails')
-  protected handleHiddenDetailsChanged(): void {
-    this.createSummary();
+  /**
+   * @internal
+   */
+  @Watch('resultTypes')
+  protected handleResultTypesChanged(): void {
+    this.updateStateFromModel();
   }
 
-  public render(): h.JSX.IntrinsicElements {
-    return this.visibleSummary != null ? (
+  /**
+   * @internal
+   */
+  protected render(): h.JSX.IntrinsicElements {
+    return (
       <Host>
-        {this.visibleSummary?.angle != null && (
-          <MeasurementDetailsEntry label="Angle">
-            {this.formatAngle(this.visibleSummary.angle)}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.parallelDistance != null && (
-          <MeasurementDetailsEntry label="Parallel Dist">
-            {this.formatDistance(this.visibleSummary.parallelDistance)}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.minDistance != null && (
-          <MeasurementDetailsEntry
-            label="Min Dist"
-            onMouseEnter={this.showMinDistOverlay}
-            onMouseLeave={this.hideOverlay}
-          >
-            {this.formatDistance(
-              this.visibleSummary.minDistance.value,
-              this.visibleSummary.minDistance.isApproximated
-            )}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.area != null && (
-          <MeasurementDetailsEntry label="Area">
-            {this.formatArea(this.visibleSummary.area)}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.distanceVector?.x != null && (
-          <MeasurementDetailsEntry
-            label="X"
-            onMouseEnter={this.showDistanceVectorOverlay}
-            onMouseLeave={this.hideOverlay}
-          >
-            {this.formatDistance(
-              this.visibleSummary.distanceVector.x,
-              this.visibleSummary.distanceVector.isApproximated
-            )}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.distanceVector?.y != null && (
-          <MeasurementDetailsEntry
-            label="Y"
-            onMouseEnter={this.showDistanceVectorOverlay}
-            onMouseLeave={this.hideOverlay}
-          >
-            {this.formatDistance(
-              this.visibleSummary.distanceVector.y,
-              this.visibleSummary.distanceVector.isApproximated
-            )}
-          </MeasurementDetailsEntry>
-        )}
-        {this.visibleSummary?.distanceVector?.z != null && (
-          <MeasurementDetailsEntry
-            label="Z"
-            onMouseEnter={this.showDistanceVectorOverlay}
-            onMouseLeave={this.hideOverlay}
-          >
-            {this.formatDistance(
-              this.visibleSummary.distanceVector.z,
-              this.visibleSummary.distanceVector.isApproximated
-            )}
-          </MeasurementDetailsEntry>
-        )}
+        {this.renderResult('planar-angle', (result) => (
+          <PlanarAngleResultEntry
+            result={result}
+            overlays={this.measurementOverlays}
+            formatter={this.makeAngleFormatter()}
+            onShowOverlay={this.handleShowOverlay}
+            onHideOverlay={this.handleHideOverlay}
+          />
+        ))}
+
+        {this.renderResult('planar-distance', (result) => (
+          <PlanarDistanceResultEntry
+            result={result}
+            overlays={this.measurementOverlays}
+            formatter={this.makeDistanceFormatter()}
+            onShowOverlay={this.handleShowOverlay}
+            onHideOverlay={this.handleHideOverlay}
+          />
+        ))}
+
+        {this.renderResult('surface-area', (result) => (
+          <SurfaceAreaResultEntry
+            result={result}
+            overlays={this.measurementOverlays}
+            formatter={this.makeAreaFormatter()}
+            onShowOverlay={this.handleShowOverlay}
+            onHideOverlay={this.handleHideOverlay}
+          />
+        ))}
+
+        {this.renderResult('minimum-distance', (result) => (
+          <MinimumDistanceResultEntry
+            result={result}
+            overlays={this.measurementOverlays}
+            formatter={this.makeDistanceFormatter()}
+            onShowOverlay={this.handleShowOverlay}
+            onHideOverlay={this.handleHideOverlay}
+          />
+        ))}
       </Host>
-    ) : (
-      <Host />
     );
   }
 
-  private parseHiddenDetails(): void {
-    if (this.hiddenDetailsJson != null) {
-      this.hiddenDetails = JSON.parse(this.hiddenDetailsJson);
-    }
-  }
-
-  private showMinDistOverlay = (): void => {
-    const results = this.getMeasurementResults();
-    const result = results.find(
-      (r) => r.type === 'minimum-distance' || r.type === 'point-to-point'
-    ) as
-      | MinimumDistanceMeasurementResult
-      | PointToPointMeasurementResult
-      | undefined;
-
-    if (result != null) {
-      this.overlay = this.measurementOverlays.addLineFromResult(result);
-    }
+  private handleShowOverlay = (
+    overlay: MeasurementOverlay | undefined
+  ): void => {
+    this.overlay = overlay;
   };
 
-  private showDistanceVectorOverlay = (): void => {
-    const results = this.getMeasurementResults();
-    const pp = results.find(
-      (r) => r.type === 'point-to-point' || r.type === 'minimum-distance'
-    ) as
-      | PointToPointMeasurementResult
-      | MinimumDistanceMeasurementResult
-      | undefined;
-
-    if (pp != null) {
-      this.overlay = this.measurementOverlays.addDistanceVectorFromResult(pp);
-    }
-  };
-
-  private hideOverlay = (): void => {
+  private handleHideOverlay = (): void => {
     this.overlay?.dispose();
   };
 
-  private handleOutcomeChange = (
-    outcome: MeasurementOutcome | undefined
-  ): void => {
-    this.outcome = outcome;
-    this.createSummary();
+  private handleOutcomeChange = (): void => {
+    this.updateStateFromModel();
   };
 
-  private formatDistance = (
-    distance: number,
-    isApproximate = false
-  ): string => {
-    const realDistance = Math.abs(
-      this.distanceMeasurementUnits.convertWorldValueToReal(distance)
+  private updateStateFromModel(): void {
+    const isFilteredResultType = (result: MeasurementResult): boolean => {
+      return this.resultTypes?.includes(result.type) ?? true;
+    };
+
+    const outcome = this.measurementModel.getOutcome();
+    if (outcome != null) {
+      this.results = outcome.results.filter(isFilteredResultType);
+      this.isApproximate = outcome.isApproximate;
+    } else {
+      this.results = [];
+      this.isApproximate = false;
+    }
+  }
+
+  private renderResult<T extends MeasurementResult['type']>(
+    type: T,
+    render: (
+      result: Extract<MeasurementResult, { type: T }>
+    ) => h.JSX.IntrinsicElements | undefined
+  ): h.JSX.IntrinsicElements | undefined {
+    const result = this.getResultForType(type);
+    return result != null ? render(result) : undefined;
+  }
+
+  private getResultForType<T extends MeasurementResult['type']>(
+    type: T
+  ): Extract<MeasurementResult, { type: T }> | undefined {
+    return this.results.find((result) => result.type === type) as Extract<
+      MeasurementResult,
+      { type: T }
+    >;
+  }
+
+  private makeDistanceFormatter(): Formatter<number> {
+    return this.makeFormatter(
+      (value) => this.distanceMeasurementUnits.convertWorldValueToReal(value),
+      this.distanceMeasurementUnits.unit,
+      this.distanceFormatter
     );
+  }
 
-    if (this.distanceFormatter != null) {
-      return this.distanceFormatter(realDistance);
-    } else {
-      const abbreviated = this.distanceMeasurementUnits.unit.abbreviatedName;
-      const value = realDistance.toFixed(this.fractionalDigits);
-      return realDistance == null
-        ? '---'
-        : `${isApproximate ? '~' + value : value} ${abbreviated}`;
-    }
-  };
+  private makeAngleFormatter(): Formatter<number> {
+    return this.makeFormatter(
+      (value) => this.angleMeasurementUnits.convertTo(value),
+      this.angleMeasurementUnits.unit,
+      this.angleFormatter
+    );
+  }
 
-  private formatAngle = (angleInRadians: number): string => {
-    if (this.angleFormatter != null) {
-      return this.angleFormatter(angleInRadians);
-    } else {
-      const value = this.angleMeasurementUnits
-        .convertTo(angleInRadians)
-        .toFixed(this.fractionalDigits);
-      return `${value} ${this.angleMeasurementUnits.unit.abbreviatedName}`;
-    }
-  };
+  private makeAreaFormatter(): Formatter<number> {
+    return this.makeFormatter(
+      (value) => this.areaMeasurementUnits.convertWorldValueToReal(value),
+      this.areaMeasurementUnits.unit,
+      this.areaFormatter
+    );
+  }
 
-  private formatArea = (area: number): string => {
-    const realArea = this.areaMeasurementUnits.convertWorldValueToReal(area);
+  private makeFormatter(
+    convert: (value: number) => number,
+    units: Unit,
+    customFormatter: Formatter<number> | undefined
+  ): Formatter<number> {
+    return (value) => {
+      const v = convert(value);
 
-    if (this.areaFormatter != null) {
-      return this.areaFormatter(area);
-    } else {
-      const abbreviated = this.areaMeasurementUnits.unit.abbreviatedName;
-      return realArea == null
-        ? '---'
-        : `${realArea.toFixed(this.fractionalDigits)} ${abbreviated}`;
-    }
-  };
+      if (customFormatter != null) {
+        return customFormatter(v);
+      } else {
+        return this.formatValue(v, units);
+      }
+    };
+  }
 
-  private createSummary = (): void => {
-    const baseSummary = summarizeResults(this.getMeasurementResults());
-    const hidden = this.hiddenDetails ?? [];
-
-    this.summary = baseSummary;
-    this.visibleSummary = (
-      Object.keys(baseSummary) as Array<keyof MeasurementDetailsSummary>
-    )
-      .filter((k) => !hidden.includes(k))
-      .reduce(
-        (reducedSummary, key) => ({
-          ...reducedSummary,
-          [key]: baseSummary[key],
-        }),
-        {}
-      );
-  };
-
-  private getMeasurementResults(): MeasurementResult[] {
-    if (this.outcome == null) {
-      return [];
-    } else {
-      return this.outcome.results;
-    }
+  private formatValue(value: number, unit: Unit): string {
+    const val = value.toFixed(this.fractionalDigits);
+    return `${this.isApproximate ? '~' + val : val} ${unit.abbreviatedName}`;
   }
 }

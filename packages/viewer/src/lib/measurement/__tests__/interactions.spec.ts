@@ -34,7 +34,10 @@ describe(MeasurementInteractionHandler, () => {
     () => 'token',
     deviceId
   );
-  const handler = new MeasurementInteractionHandler(controller);
+  const handler = new MeasurementInteractionHandler(controller, [
+    EntityType.PRECISE_SURFACE,
+    EntityType.IMPRECISE_SURFACE,
+  ]);
 
   const element = document.createElement('div');
   const api = new InteractionApi(
@@ -75,14 +78,14 @@ describe(MeasurementInteractionHandler, () => {
     mockMeasurableEntityAtPoint(EntityType.PRECISE_EDGE);
     element.dispatchEvent(new MouseEvent('pointermove'));
     await eventually(() => {
-      expect(addCursor).toHaveBeenCalledWith(measurementWithArrowCursor);
+      expect(addCursor).not.toHaveBeenCalled();
     });
     reset();
 
     mockMeasurableEntityAtPoint(EntityType.IMPRECISE_SURFACE);
     element.dispatchEvent(new MouseEvent('pointermove'));
     await eventually(() => {
-      expect(addCursor).not.toHaveBeenCalled();
+      expect(addCursor).toHaveBeenCalledWith(measurementWithArrowCursor);
     });
     reset();
 

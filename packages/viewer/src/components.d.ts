@@ -36,6 +36,7 @@ import {
   AngleUnitType,
   DepthBuffer,
   DistanceUnitType,
+  EntityType,
   FramePerspectiveCamera as FramePerspectiveCamera1,
   Measurement,
   Orientation,
@@ -74,12 +75,11 @@ import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.ts
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
 import {
   MeasurementController,
-  MeasurementDetailsSummary,
   MeasurementModel,
+  MeasurementResult,
 } from './lib/measurement';
 import { MeasurementOverlayManager } from './lib/measurement/overlays';
 import { Formatter } from './lib/formatter';
-import { MeasurementOutcome } from './lib/measurement/outcomes';
 import {
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceMode,
@@ -875,32 +875,17 @@ export namespace Components {
      */
     fractionalDigits: number;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
-     */
-    hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
-    /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
-     */
-    hiddenDetailsJson?: string;
-    /**
      * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel: MeasurementModel;
-    measurementOverlays: MeasurementOverlayManager;
     /**
-     * The current `MeasurementOutcome` displayed.
+     * The manager that the component will use to present measurement overlays.
      */
-    outcome: MeasurementOutcome | undefined;
+    measurementOverlays?: MeasurementOverlayManager;
     /**
-     * A summary representing all available measurements based on the current `MeasurementResult` set.
-     * @readonly
+     * A set of result types to display. If `undefined`, then all results will be displayed.
      */
-    summary?: MeasurementDetailsSummary;
-    /**
-     * The visible measurements based on the current `summary` and `hiddenDetails`.
-     * @readonly
-     */
-    visibleSummary?: MeasurementDetailsSummary;
+    resultTypes?: MeasurementResult['type'][];
   }
   interface VertexViewerMeasurementDistance {
     /**
@@ -995,11 +980,30 @@ export namespace Components {
     start: Point.Point;
   }
   interface VertexViewerMeasurementPrecise {
+    /**
+     * An optional configuration to setup network configuration of measurement endpoints.
+     */
     config?: Config;
+    /**
+     * The environment that will be used to request measurement results.
+     */
     configEnv: Environment;
+    measurableEntityTypes: EntityType[];
+    /**
+     * The controller that is responsible for performing measurements and updating the model.
+     */
     measurementController?: MeasurementController;
+    /**
+     * The model that contains the entities and outcomes from performing precise measurements.
+     */
     measurementModel: MeasurementModel;
+    /**
+     * The manager that is responsible for measurement overlays to present by this component.
+     */
     measurementOverlays: MeasurementOverlayManager;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementTool {
@@ -2067,32 +2071,17 @@ declare namespace LocalJSX {
      */
     fractionalDigits?: number;
     /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
-     */
-    hiddenDetails?: Array<keyof MeasurementDetailsSummary>;
-    /**
-     * An optional set of details to hide. This can be used to display reduced sets of details for more a more focused representation. Can be provided as an array of keys from the `MeasurementDetailsSummary` type, or as a JSON array with the format '["angle", "minDistance"]'.
-     */
-    hiddenDetailsJson?: string;
-    /**
      * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
     measurementModel?: MeasurementModel;
+    /**
+     * The manager that the component will use to present measurement overlays.
+     */
     measurementOverlays?: MeasurementOverlayManager;
     /**
-     * The current `MeasurementOutcome` displayed.
+     * A set of result types to display. If `undefined`, then all results will be displayed.
      */
-    outcome?: MeasurementOutcome | undefined;
-    /**
-     * A summary representing all available measurements based on the current `MeasurementResult` set.
-     * @readonly
-     */
-    summary?: MeasurementDetailsSummary;
-    /**
-     * The visible measurements based on the current `summary` and `hiddenDetails`.
-     * @readonly
-     */
-    visibleSummary?: MeasurementDetailsSummary;
+    resultTypes?: MeasurementResult['type'][];
   }
   interface VertexViewerMeasurementDistance {
     /**
@@ -2189,11 +2178,30 @@ declare namespace LocalJSX {
     start?: Point.Point;
   }
   interface VertexViewerMeasurementPrecise {
+    /**
+     * An optional configuration to setup network configuration of measurement endpoints.
+     */
     config?: Config;
+    /**
+     * The environment that will be used to request measurement results.
+     */
     configEnv?: Environment;
+    measurableEntityTypes?: EntityType[];
+    /**
+     * The controller that is responsible for performing measurements and updating the model.
+     */
     measurementController?: MeasurementController;
+    /**
+     * The model that contains the entities and outcomes from performing precise measurements.
+     */
     measurementModel?: MeasurementModel;
+    /**
+     * The manager that is responsible for measurement overlays to present by this component.
+     */
     measurementOverlays?: MeasurementOverlayManager;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementTool {

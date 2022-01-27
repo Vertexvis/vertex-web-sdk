@@ -4,7 +4,6 @@ jest.mock('../../../lib/scenes');
 import { Vector3 } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
 
-import { PointToPointMeasurementResult } from '../../../lib/measurement';
 import {
   makeHitProvider,
   makeHitTester,
@@ -14,6 +13,7 @@ import { randomPoint, randomVector3 } from '../../../testing/random';
 import {
   PointToPointInteractionController,
   PointToPointInteractionModel,
+  PointToPointMeasurementResult,
 } from '../interactions';
 
 describe(PointToPointInteractionController, () => {
@@ -122,7 +122,6 @@ describe(PointToPointInteractionController, () => {
 
   describe(PointToPointInteractionController.prototype.editMeasurement, () => {
     const measurement: PointToPointMeasurementResult = {
-      type: 'point-to-point',
       start: randomVector3(),
       end: randomVector3(),
       valid: true,
@@ -277,7 +276,6 @@ describe(PointToPointInteractionModel, () => {
   const start = randomVector3();
   const end = randomVector3();
   const measurement: PointToPointMeasurementResult = {
-    type: 'point-to-point',
     start,
     end,
     distance: Vector3.distance(start, end),

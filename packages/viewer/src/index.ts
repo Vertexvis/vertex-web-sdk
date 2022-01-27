@@ -15,6 +15,7 @@ export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export { Scene } from './lib/scenes';
 export {
+  EntityType,
   LoadableResource,
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,

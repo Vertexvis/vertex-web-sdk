@@ -11,6 +11,7 @@ import {
   MeasurementOverlay,
   MeasurementOverlayManager,
 } from '../../lib/measurement/overlays';
+import { EntityType } from '../../lib/types';
 import { MeasurementOverlayView } from './viewer-measurement-precise-components';
 
 @Component({
@@ -19,21 +20,53 @@ import { MeasurementOverlayView } from './viewer-measurement-precise-components'
   shadow: true,
 })
 export class ViewerMeasurementPrecise {
+  /**
+   * The model that contains the entities and outcomes from performing precise
+   * measurements.
+   */
   @Prop()
   public measurementModel: MeasurementModel = new MeasurementModel();
 
+  /**
+   * The manager that is responsible for measurement overlays to present by this
+   * component.
+   */
   @Prop()
   public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
+  /**
+   * The controller that is responsible for performing measurements and updating
+   * the model.
+   */
   @Prop({ mutable: true })
   public measurementController?: MeasurementController;
 
+  /**
+   * @internal
+   *
+   * An internal property that can be used to opt-in to performing measurements
+   * on other types of entities.
+   */
+  @Prop()
+  public measurableEntityTypes: EntityType[] = [EntityType.PRECISE_SURFACE];
+
+  /**
+   * The viewer that this component is bound to. This is automatically assigned
+   * if added to the light-dom of a parent viewer element.
+   */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * The environment that will be used to request measurement results.
+   */
   @Prop()
   public configEnv: Environment = 'platprod';
 
+  /**
+   * An optional configuration to setup network configuration of measurement
+   * endpoints.
+   */
   @Prop()
   public config?: Config;
 
@@ -44,38 +77,67 @@ export class ViewerMeasurementPrecise {
   private onEntitiesChangedHandler?: Disposable;
   private onOverlaysChangedHandler?: Disposable;
 
+  /**
+   * @ignore
+   */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
   }
 
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.setupController();
     this.setupModelListeners();
     this.setupInteractionHandler();
   }
 
+  /**
+   * @ignore
+   */
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
     this.clearModelListeners();
   }
 
+  /**
+   * @ignore
+   */
+  @Watch('measurableEntityTypes')
+  protected handleMeasurableEntityTypesChanged(): void {
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('measurementController')
   protected handleMeasurementControllerChanged(): void {
     this.setupInteractionHandler();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.setupController();
     this.setupModelListeners();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('viewer')
   protected handleViewerChanged(): void {
     this.setupInteractionHandler();
   }
 
-  public render(): JSX.Element {
+  /**
+   * @ignore
+   */
+  protected render(): JSX.Element {
     const viewport = this.viewer?.viewport;
     const camera = this.viewer?.frame?.scene.camera;
 
@@ -116,7 +178,10 @@ export class ViewerMeasurementPrecise {
     if (this.measurementController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new MeasurementInteractionHandler(this.measurementController)
+          new MeasurementInteractionHandler(
+            this.measurementController,
+            this.measurableEntityTypes
+          )
         );
     }
   }

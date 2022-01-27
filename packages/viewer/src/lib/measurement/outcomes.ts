@@ -5,4 +5,5 @@ import { MeasurementResult } from './results';
  */
 export interface MeasurementOutcome {
   results: MeasurementResult[];
+  isApproximate: boolean;
 }

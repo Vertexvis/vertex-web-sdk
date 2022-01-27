@@ -9,13 +9,10 @@ import { EntityType } from '../types';
 import { MeasurementController } from './controller';
 import { MeasurementEntity } from './entities';
 
-const measurableEntityTypes = [
-  EntityType.PRECISE_EDGE,
-  EntityType.PRECISE_SURFACE,
-];
-
 export class MeasurementInteractionHandler implements InteractionHandler {
   private controller: MeasurementController;
+  private measurableEntityTypes: EntityType[];
+
   private element?: HTMLElement;
   private api?: InteractionApi;
 
@@ -27,8 +24,12 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     return this.rectObserver.rect;
   }
 
-  public constructor(controller: MeasurementController) {
+  public constructor(
+    controller: MeasurementController,
+    measurableEntityTypes: EntityType[]
+  ) {
     this.controller = controller;
+    this.measurableEntityTypes = measurableEntityTypes;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -86,7 +87,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
   ): Promise<boolean> {
     const pt = getMouseClientPosition(event, this.elementRect);
     const type = await this.api?.getEntityTypeAtPoint(pt);
-    return type != null && measurableEntityTypes.includes(type);
+    return type != null && this.measurableEntityTypes.includes(type);
   }
 
   private measureEntityUnderPointer(event: PointerEvent): void {

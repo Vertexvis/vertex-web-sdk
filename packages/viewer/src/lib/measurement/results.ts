@@ -17,12 +17,12 @@ export interface MinimumDistanceMeasurementResult {
   /**
    * The closest point of the first entity, in world coordinates.
    */
-  closestPoint1: Vector3.Vector3;
+  point1: Vector3.Vector3;
 
   /**
    * The closest point of the second entity, in world coordinates.
    */
-  closestPoint2: Vector3.Vector3;
+  point2: Vector3.Vector3;
 }
 
 /**
@@ -77,38 +77,6 @@ export interface PlanarDistanceMeasurementResult {
 }
 
 /**
- * A measurement result that represents the distance between two points.
- */
-export interface PointToPointMeasurementResult {
-  /**
-   * The type.
-   */
-  type: 'point-to-point';
-
-  /**
-   * The distance, in world units, between two points. This value is only
-   * populated if the result is valid.
-   */
-  distance?: number;
-
-  /**
-   * The first point, in world units.
-   */
-  start: Vector3.Vector3;
-
-  /**
-   * The second point, in world units.
-   */
-  end: Vector3.Vector3;
-
-  /**
-   * Indicates if this result is valid. A value of `false` indicates that one of
-   * the points does not touch any geometry.
-   */
-  valid: boolean;
-}
-
-/**
  * A measurement result that represents the surface area of one or more faces.
  */
 export interface SurfaceAreaMeasurementResult {
@@ -130,5 +98,4 @@ export type MeasurementResult =
   | MinimumDistanceMeasurementResult
   | PlanarAngleMeasurementResult
   | PlanarDistanceMeasurementResult
-  | SurfaceAreaMeasurementResult
-  | PointToPointMeasurementResult;
+  | SurfaceAreaMeasurementResult;

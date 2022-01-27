@@ -63,7 +63,7 @@ describe('MeasurementModel', () => {
   describe(MeasurementModel.prototype.clearOutcome, () => {
     it('removes all results', () => {
       const model = new MeasurementModel();
-      const outcome: MeasurementOutcome = { results: [] };
+      const outcome: MeasurementOutcome = { isApproximate: false, results: [] };
 
       const onChange = jest.fn();
       model.setOutcome(outcome);
@@ -81,7 +81,10 @@ describe('MeasurementModel', () => {
       const model = new MeasurementModel();
       const result1 = createMinimumDistanceResult();
       const result2 = createMinimumDistanceResult();
-      const outcome: MeasurementOutcome = { results: [result1, result2] };
+      const outcome: MeasurementOutcome = {
+        isApproximate: false,
+        results: [result1, result2],
+      };
       const onChange = jest.fn();
 
       model.onOutcomeChanged(onChange);
@@ -112,12 +115,12 @@ function createMinimumDistanceResult(): MinimumDistanceMeasurementResult {
   return {
     type: 'minimum-distance',
     distance: random.floating(),
-    closestPoint1: Vector3.create(
+    point1: Vector3.create(
       random.floating(),
       random.floating(),
       random.floating()
     ),
-    closestPoint2: Vector3.create(
+    point2: Vector3.create(
       random.floating(),
       random.floating(),
       random.floating()
