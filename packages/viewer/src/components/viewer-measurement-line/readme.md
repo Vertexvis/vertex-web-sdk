@@ -33,13 +33,13 @@
 ### Used by
 
  - [vertex-viewer-measurement-distance](../viewer-measurement-distance)
- - [vertex-viewer-measurement-precise](../viewer-measurement-precise)
+ - [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
-  vertex-viewer-measurement-precise --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-overlays --> vertex-viewer-measurement-line
   style vertex-viewer-measurement-line fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

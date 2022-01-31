@@ -5,14 +5,14 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config, parseConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
-import { MeasurementController, MeasurementModel } from '../../lib/measurement';
-import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import {
+  MeasurementController,
+  MeasurementModel,
   MeasurementOverlay,
   MeasurementOverlayManager,
-} from '../../lib/measurement/overlays';
+} from '../../lib/measurement';
+import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import { EntityType } from '../../lib/types';
-import { MeasurementOverlayView } from './viewer-measurement-precise-components';
 
 @Component({
   tag: 'vertex-viewer-measurement-precise',
@@ -138,20 +138,12 @@ export class ViewerMeasurementPrecise {
    * @ignore
    */
   protected render(): JSX.Element {
-    const viewport = this.viewer?.viewport;
-    const camera = this.viewer?.frame?.scene.camera;
-
     return (
       <Host>
-        {viewport != null &&
-          camera != null &&
-          this.overlays.map((o) => (
-            <MeasurementOverlayView
-              overlay={o}
-              camera={camera}
-              viewport={viewport}
-            />
-          ))}
+        <vertex-viewer-measurement-overlays
+          viewer={this.viewer}
+          measurementOverlays={this.measurementOverlays}
+        />
       </Host>
     );
   }

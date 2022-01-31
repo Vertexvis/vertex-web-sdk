@@ -2,11 +2,12 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { Formatter } from '../../lib/formatter';
-import { MeasurementModel, MeasurementResult } from '../../lib/measurement';
 import {
+  MeasurementModel,
   MeasurementOverlay,
   MeasurementOverlayManager,
-} from '../../lib/measurement/overlays';
+  MeasurementResult,
+} from '../../lib/measurement';
 import {
   AngleUnits,
   AngleUnitType,

@@ -895,4 +895,32 @@ describe('vertex-viewer-measurement-distance', () => {
       expect(onEditEnd).toHaveBeenCalled();
     });
   });
+
+  it('renders axis reference lines if enabled', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDistance],
+      template: () => (
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+          showAxisReferenceLines
+        />
+      ),
+    });
+
+    const comp = page.root as HTMLVertexViewerMeasurementDistanceElement;
+    const overlays = comp.shadowRoot?.querySelector(
+      'vertex-viewer-measurement-overlays'
+    ) as HTMLVertexViewerMeasurementOverlaysElement | undefined;
+
+    expect(overlays).toBeDefined();
+    expect(overlays?.measurementOverlays.getOverlays()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'distance-vector',
+        }),
+      ])
+    );
+  });
 });

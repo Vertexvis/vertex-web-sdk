@@ -12,6 +12,10 @@ import {
 } from '@stencil/core';
 
 import { MEASUREMENT_SNAP_DISTANCE } from '../../lib/constants';
+import {
+  makeMinimumDistanceResult,
+  MeasurementModel,
+} from '../../lib/measurement';
 import { stampTemplateWithId } from '../../lib/templates';
 import {
   DistanceMeasurement,
@@ -79,6 +83,21 @@ export class ViewerMeasurements {
    */
   @Prop()
   public snapDistance: number = MEASUREMENT_SNAP_DISTANCE;
+
+  /**
+   * Enables the display of axis reference lines between the start and end
+   * point of selected measurements.
+   */
+  @Prop()
+  public showAxisReferenceLines = false;
+
+  /**
+   * The measurement model that will be updated with the selected measurement.
+   * You can pass this to a <vertex-viewer-measurement-details> component to
+   * display measurement outcomes.
+   */
+  @Prop()
+  public measurementModel: MeasurementModel = new MeasurementModel();
 
   /**
    * Dispatched when a new measurement is added, either through user interaction
@@ -186,9 +205,24 @@ export class ViewerMeasurements {
    */
   @Watch('selectedMeasurementId')
   protected async handleSelectedMeasurementIdChanged(): Promise<void> {
+    this.measurementModel.clearOutcome();
+
     const measurements = await this.getMeasurementElements();
     measurements.forEach((m) => {
-      m.mode = m.id === this.selectedMeasurementId ? 'edit' : '';
+      if (m.id === this.selectedMeasurementId) {
+        m.mode = 'edit';
+        m.showAxisReferenceLines = this.showAxisReferenceLines;
+
+        if (m.start != null && m.end != null) {
+          this.measurementModel.setOutcome({
+            isApproximate: true,
+            results: [makeMinimumDistanceResult(m.start, m.end)],
+          });
+        }
+      } else {
+        m.mode = '';
+        m.showAxisReferenceLines = false;
+      }
     });
   }
 

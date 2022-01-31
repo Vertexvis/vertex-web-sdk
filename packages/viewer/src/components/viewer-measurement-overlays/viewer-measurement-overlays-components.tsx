@@ -5,7 +5,7 @@ import {
   DistanceVectorOverlay,
   LineOverlay,
   MeasurementOverlay,
-} from '../../lib/measurement/overlays';
+} from '../../lib/measurement';
 import { FramePerspectiveCamera, Viewport } from '../../lib/types';
 
 interface MeasurementOverlayViewProps<O extends MeasurementOverlay> {

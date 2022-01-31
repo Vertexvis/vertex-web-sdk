@@ -21,6 +21,10 @@ import { Cursor, measurementCursor } from '../../lib/cursors';
 import { getMouseClientPosition } from '../../lib/dom';
 import { Formatter } from '../../lib/formatter';
 import {
+  MeasurementOverlay,
+  MeasurementOverlayManager,
+} from '../../lib/measurement';
+import {
   DepthBuffer,
   DistanceUnits,
   DistanceUnitType,
@@ -131,6 +135,13 @@ export class ViewerMeasurementDistance {
    */
   @Prop({ mutable: true })
   public distance?: number;
+
+  /**
+   * Enables the display of axis reference lines between the start and end
+   * point.
+   */
+  @Prop()
+  public showAxisReferenceLines = false;
 
   /**
    * The distance, in pixels, between the mouse and nearest snappable edge. A
@@ -261,6 +272,9 @@ export class ViewerMeasurementDistance {
   private controller = new PointToPointInteractionController(this.model);
   private interaction?: PointToPointInteraction;
 
+  private overlays = new MeasurementOverlayManager();
+  private overlay?: MeasurementOverlay;
+
   private measurementUnits = new DistanceUnits(this.units);
   private isUserInteractingWithModel = false;
 
@@ -336,6 +350,12 @@ export class ViewerMeasurementDistance {
     if (this.mode === 'edit') {
       return (
         <Host>
+          {this.showAxisReferenceLines && (
+            <vertex-viewer-measurement-overlays
+              measurementOverlays={this.overlays}
+              viewer={this.viewer}
+            />
+          )}
           <div class="measurement">
             <DistanceMeasurementRenderer
               startPt={startPt}
@@ -356,6 +376,12 @@ export class ViewerMeasurementDistance {
     } else if (this.mode === 'replace') {
       return (
         <Host>
+          {this.showAxisReferenceLines && (
+            <vertex-viewer-measurement-overlays
+              measurementOverlays={this.overlays}
+              viewer={this.viewer}
+            />
+          )}
           <div class="measurement">
             <DistanceMeasurementRenderer
               startPt={startPt}
@@ -374,6 +400,12 @@ export class ViewerMeasurementDistance {
     } else {
       return (
         <Host>
+          {this.showAxisReferenceLines && (
+            <vertex-viewer-measurement-overlays
+              measurementOverlays={this.overlays}
+              viewer={this.viewer}
+            />
+          )}
           <div class="measurement">
             <DistanceMeasurementRenderer
               startPt={startPt}
@@ -455,6 +487,21 @@ export class ViewerMeasurementDistance {
     this.updateCamera();
     this.updateDepthBuffer();
     this.updateMeasurementPropsFromModel();
+    this.updateOverlays();
+  }
+
+  private updateOverlays(): void {
+    this.overlay?.dispose();
+
+    if (
+      this.showAxisReferenceLines &&
+      this.interactionCount === 0 &&
+      !this.invalid &&
+      this.start != null &&
+      this.end != null
+    ) {
+      this.overlay = this.overlays.addDistanceVector(this.start, this.end);
+    }
   }
 
   private async setCursor(cursor: Cursor): Promise<void> {

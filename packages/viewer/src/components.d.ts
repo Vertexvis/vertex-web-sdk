@@ -76,9 +76,9 @@ import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/view
 import {
   MeasurementController,
   MeasurementModel,
+  MeasurementOverlayManager,
   MeasurementResult,
 } from './lib/measurement';
-import { MeasurementOverlayManager } from './lib/measurement/overlays';
 import { Formatter } from './lib/formatter';
 import {
   ViewerMeasurementDistanceElementMetrics,
@@ -941,6 +941,10 @@ export namespace Components {
      */
     mode: ViewerMeasurementDistanceMode;
     /**
+     * Enables the display of axis reference lines between the start and end point.
+     */
+    showAxisReferenceLines: boolean;
+    /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
     snapDistance: number;
@@ -978,6 +982,17 @@ export namespace Components {
      * A point that specifies the starting point of the line.
      */
     start: Point.Point;
+  }
+  interface VertexViewerMeasurementOverlays {
+    camera?: FramePerspectiveCamera;
+    /**
+     * The model that contains the overlays to present.
+     */
+    measurementOverlays: MeasurementOverlayManager;
+    /**
+     * The viewer that this component is bound to.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementPrecise {
     /**
@@ -1080,6 +1095,10 @@ export namespace Components {
       HTMLVertexViewerMeasurementDistanceElement[]
     >;
     /**
+     * The measurement model that will be updated with the selected measurement. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
+     */
+    measurementModel: MeasurementModel;
+    /**
      * Removes a measurement with the given ID, and returns the HTML element associated to the measurement. Returns `undefined` if no measurement is found.
      * @param id The ID of the measurement to remove.
      * @returns The measurement element, or undefined.
@@ -1091,6 +1110,10 @@ export namespace Components {
      * The ID of the measurement that is selected.
      */
     selectedMeasurementId?: string;
+    /**
+     * Enables the display of axis reference lines between the start and end point of selected measurements.
+     */
+    showAxisReferenceLines: boolean;
     /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
@@ -1339,6 +1362,13 @@ declare global {
     prototype: HTMLVertexViewerMeasurementLineElement;
     new (): HTMLVertexViewerMeasurementLineElement;
   };
+  interface HTMLVertexViewerMeasurementOverlaysElement
+    extends Components.VertexViewerMeasurementOverlays,
+      HTMLStencilElement {}
+  var HTMLVertexViewerMeasurementOverlaysElement: {
+    prototype: HTMLVertexViewerMeasurementOverlaysElement;
+    new (): HTMLVertexViewerMeasurementOverlaysElement;
+  };
   interface HTMLVertexViewerMeasurementPreciseElement
     extends Components.VertexViewerMeasurementPrecise,
       HTMLStencilElement {}
@@ -1407,6 +1437,7 @@ declare global {
     'vertex-viewer-measurement-details': HTMLVertexViewerMeasurementDetailsElement;
     'vertex-viewer-measurement-distance': HTMLVertexViewerMeasurementDistanceElement;
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
+    'vertex-viewer-measurement-overlays': HTMLVertexViewerMeasurementOverlaysElement;
     'vertex-viewer-measurement-precise': HTMLVertexViewerMeasurementPreciseElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
     'vertex-viewer-measurements': HTMLVertexViewerMeasurementsElement;
@@ -2139,6 +2170,10 @@ declare namespace LocalJSX {
      */
     onEditEnd?: (event: CustomEvent<void>) => void;
     /**
+     * Enables the display of axis reference lines between the start and end point.
+     */
+    showAxisReferenceLines?: boolean;
+    /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
     snapDistance?: number;
@@ -2176,6 +2211,17 @@ declare namespace LocalJSX {
      * A point that specifies the starting point of the line.
      */
     start?: Point.Point;
+  }
+  interface VertexViewerMeasurementOverlays {
+    camera?: FramePerspectiveCamera;
+    /**
+     * The model that contains the overlays to present.
+     */
+    measurementOverlays?: MeasurementOverlayManager;
+    /**
+     * The viewer that this component is bound to.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMeasurementPrecise {
     /**
@@ -2260,6 +2306,10 @@ declare namespace LocalJSX {
      */
     fractionalDigits?: number;
     /**
+     * The measurement model that will be updated with the selected measurement. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
+     */
+    measurementModel?: MeasurementModel;
+    /**
      * Dispatched when a new measurement is added, either through user interaction or programmatically.
      */
     onMeasurementAdded?: (
@@ -2275,6 +2325,10 @@ declare namespace LocalJSX {
      * The ID of the measurement that is selected.
      */
     selectedMeasurementId?: string;
+    /**
+     * Enables the display of axis reference lines between the start and end point of selected measurements.
+     */
+    showAxisReferenceLines?: boolean;
     /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
      */
@@ -2372,6 +2426,7 @@ declare namespace LocalJSX {
     'vertex-viewer-measurement-details': VertexViewerMeasurementDetails;
     'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
+    'vertex-viewer-measurement-overlays': VertexViewerMeasurementOverlays;
     'vertex-viewer-measurement-precise': VertexViewerMeasurementPrecise;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
     'vertex-viewer-measurements': VertexViewerMeasurements;
@@ -2434,6 +2489,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
       'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
+      'vertex-viewer-measurement-overlays': LocalJSX.VertexViewerMeasurementOverlays &
+        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementOverlaysElement>;
       'vertex-viewer-measurement-precise': LocalJSX.VertexViewerMeasurementPrecise &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementPreciseElement>;
       'vertex-viewer-measurement-tool': LocalJSX.VertexViewerMeasurementTool &

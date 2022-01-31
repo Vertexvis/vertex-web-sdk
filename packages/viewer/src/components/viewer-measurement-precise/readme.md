@@ -17,25 +17,17 @@
 | `viewer`                | --           | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `HTMLVertexViewerElement \| undefined`     | `undefined`                       |
 
 
-## CSS Custom Properties
-
-| Name                                        | Description                                       |
-| ------------------------------------------- | ------------------------------------------------- |
-| `--viewer-measurement-precise-x-axis-color` | A CSS color for overlays representing the X axis. |
-| `--viewer-measurement-precise-y-axis-color` | A CSS color for overlays representing the Y axis. |
-| `--viewer-measurement-precise-z-axis-color` | A CSS color for overlays representing the Z axis. |
-
-
 ## Dependencies
 
 ### Depends on
 
-- [vertex-viewer-measurement-line](../viewer-measurement-line)
+- [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-measurement-precise --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-precise --> vertex-viewer-measurement-overlays
+  vertex-viewer-measurement-overlays --> vertex-viewer-measurement-line
   style vertex-viewer-measurement-precise fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

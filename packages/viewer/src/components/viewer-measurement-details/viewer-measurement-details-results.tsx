@@ -4,16 +4,14 @@ import { Vector3 } from '@vertexvis/geometry';
 
 import { Formatter } from '../../lib/formatter';
 import {
+  MeasurementOverlay,
+  MeasurementOverlayManager,
   MeasurementResult,
   MinimumDistanceMeasurementResult,
   PlanarAngleMeasurementResult,
   PlanarDistanceMeasurementResult,
   SurfaceAreaMeasurementResult,
 } from '../../lib/measurement';
-import {
-  MeasurementOverlay,
-  MeasurementOverlayManager,
-} from '../../lib/measurement/overlays';
 import { MeasurementDetailsEntry } from './viewer-measurement-details-entry';
 
 interface MeasurementResultEntryProps<R extends MeasurementResult> {

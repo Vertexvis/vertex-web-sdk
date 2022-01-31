@@ -45,7 +45,9 @@ independently for more advanced or custom use-cases.
 graph TD;
   vertex-viewer-measurement-tool --> vertex-viewer-layer
   vertex-viewer-measurement-tool --> vertex-viewer-measurement-distance
+  vertex-viewer-measurement-distance --> vertex-viewer-measurement-overlays
   vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
+  vertex-viewer-measurement-overlays --> vertex-viewer-measurement-line
   style vertex-viewer-measurement-tool fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

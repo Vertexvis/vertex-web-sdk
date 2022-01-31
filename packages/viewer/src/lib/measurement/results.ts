@@ -1,4 +1,4 @@
-import type { Plane, Vector3 } from '@vertexvis/geometry';
+import { Plane, Vector3 } from '@vertexvis/geometry';
 
 /**
  * A measurement result that represents the closets point between two entities.
@@ -99,3 +99,22 @@ export type MeasurementResult =
   | PlanarAngleMeasurementResult
   | PlanarDistanceMeasurementResult
   | SurfaceAreaMeasurementResult;
+
+/**
+ * Constructs a new measurement result from the given points.
+ *
+ * @param point1 A starting point.
+ * @param point2 An ending point.
+ * @returns A new measurement result.
+ */
+export function makeMinimumDistanceResult(
+  point1: Vector3.Vector3,
+  point2: Vector3.Vector3
+): MinimumDistanceMeasurementResult {
+  return {
+    type: 'minimum-distance',
+    point1,
+    point2,
+    distance: Vector3.distance(point1, point2),
+  };
+}
