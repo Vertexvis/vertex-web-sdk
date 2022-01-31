@@ -25,6 +25,10 @@ describe('vertex-viewer-measurements', () => {
     id: `measurement-2`,
   });
 
+  const pt1 = Vector3.create(0, 0, 0);
+  const pt2 = Vector3.create(0, 0, 1);
+  const pt3 = Vector3.create(0, 0, 2);
+
   describe('adding measurements', () => {
     it('adds a measurement element with default distance measurement', async () => {
       const page = await newSpecPage({
@@ -265,6 +269,97 @@ describe('vertex-viewer-measurements', () => {
       measurementEl.dispatchEvent(new Event('pointerdown', { bubbles: true }));
 
       expect(el.selectedMeasurementId).toBeUndefined();
+    });
+
+    it('updates model with minimum distance result', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
+        template: () => (
+          <vertex-viewer-measurements>
+            <vertex-viewer-measurement-distance
+              id="m1"
+              start={pt1}
+              end={pt2}
+            ></vertex-viewer-measurement-distance>
+            <vertex-viewer-measurement-distance
+              id="m2"
+              start={pt2}
+              end={pt3}
+            ></vertex-viewer-measurement-distance>
+          </vertex-viewer-measurements>
+        ),
+      });
+      const el = page.root as HTMLVertexViewerMeasurementsElement;
+
+      el.selectedMeasurementId = 'm1';
+      await page.waitForChanges();
+
+      expect(el.measurementModel.getOutcome()).toEqual(
+        expect.objectContaining({
+          results: [
+            expect.objectContaining({
+              type: 'minimum-distance',
+              point1: pt1,
+              point2: pt2,
+            }),
+          ],
+        })
+      );
+
+      el.selectedMeasurementId = 'm2';
+      await page.waitForChanges();
+
+      expect(el.measurementModel.getOutcome()).toEqual(
+        expect.objectContaining({
+          results: [
+            expect.objectContaining({
+              type: 'minimum-distance',
+              point1: pt2,
+              point2: pt3,
+            }),
+          ],
+        })
+      );
+    });
+
+    it('sets show axis reference lines on selected measurement', async () => {
+      const page = await newSpecPage({
+        components: [ViewerMeasurements, ViewerMeasurementDistance],
+        template: () => (
+          <vertex-viewer-measurements showAxisReferenceLines>
+            <vertex-viewer-measurement-distance
+              id="m1"
+              start={pt1}
+              end={pt2}
+            ></vertex-viewer-measurement-distance>
+            <vertex-viewer-measurement-distance
+              id="m2"
+              start={pt2}
+              end={pt3}
+            ></vertex-viewer-measurement-distance>
+          </vertex-viewer-measurements>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerMeasurementsElement;
+      const m1 = el.querySelector(
+        '#m1'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
+      const m2 = el.querySelector(
+        '#m2'
+      ) as HTMLVertexViewerMeasurementDistanceElement;
+
+      el.selectedMeasurementId = 'm1';
+      await page.waitForChanges();
+
+      expect(m1.showAxisReferenceLines).toBe(true);
+      expect(m2.showAxisReferenceLines).toBe(false);
+
+      el.selectedMeasurementId = 'm2';
+      await page.waitForChanges();
+
+      expect(m1.showAxisReferenceLines).toBe(false);
+      expect(m2.showAxisReferenceLines).toBe(true);
     });
   });
 

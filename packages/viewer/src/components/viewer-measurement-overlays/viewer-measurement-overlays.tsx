@@ -99,7 +99,6 @@ export class ViewerMeasurementOverlays {
 
   private updateOverlays(): void {
     this.overlays = this.measurementOverlays.getOverlays();
-    console.log('update overlays', this.overlays);
   }
 
   /**
