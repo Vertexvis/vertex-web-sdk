@@ -23,7 +23,7 @@ then
 
   npx lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
   git commit -am "Canary release $next_canary_version"
-  npx lerna publish from-package --canary --preid "$preid" --dist-tag "$dist_tag" --yes
+  npx lerna publish from-package --canary --preid "$preid" --exact --dist-tag "$dist_tag" --yes
 else
   echo "No published canary version found for $next_version"
 
@@ -32,6 +32,6 @@ else
 
   npx lerna version --no-push --no-git-tag-version --exact "$next_canary_version" --yes
   git commit -am "Canary release $next_canary_version"
-  npx lerna publish from-package --canary --preid "$preid" --dist-tag "$dist_tag" --yes
+  npx lerna publish from-package --canary --preid "$preid" --exact --dist-tag "$dist_tag" --yes
 fi
 
