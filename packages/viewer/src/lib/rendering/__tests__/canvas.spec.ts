@@ -1,7 +1,6 @@
 jest.mock('../imageLoaders');
 
 import { Dimensions } from '@vertexvis/geometry';
-import { Async } from '@vertexvis/utils';
 
 import * as Fixtures from '../../../testing/fixtures';
 import { TimingMeter } from '../../meters';
@@ -68,20 +67,26 @@ describe(createCanvasRenderer, () => {
 });
 
 describe(measureCanvasRenderer, () => {
-  const renderDelayInMs = 5;
-  const reportIntervalInMs = renderDelayInMs + 5;
+  const reportIntervalInMs = 10;
 
-  const renderer: CanvasRenderer = () =>
-    Async.delay(renderDelayInMs, Promise.resolve(Fixtures.makeFrame()));
+  const renderer: CanvasRenderer = () => Promise.resolve(Fixtures.makeFrame());
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
-  const callback = jest.fn();
 
   jest.spyOn(meter, 'takeMeasurements').mockReturnValue([measurement]);
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  it('reports timings to api', async () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('reports timings to api', () => {
+    jest.useFakeTimers();
+
+    const callback = jest.fn();
     const render = measureCanvasRenderer(
       meter,
       renderer,
@@ -90,8 +95,8 @@ describe(measureCanvasRenderer, () => {
       reportIntervalInMs
     );
 
-    await render(drawFrame1);
-    await Async.delay(reportIntervalInMs);
+    render(drawFrame1);
+    jest.advanceTimersByTime(reportIntervalInMs);
 
     expect(callback).toHaveBeenCalledWith(
       expect.arrayContaining([measurement])
@@ -99,6 +104,9 @@ describe(measureCanvasRenderer, () => {
   });
 
   it('stops reporting timer after last render', async () => {
+    jest.useFakeTimers();
+
+    const callback = jest.fn();
     const render = measureCanvasRenderer(
       meter,
       renderer,
@@ -109,7 +117,7 @@ describe(measureCanvasRenderer, () => {
 
     render(drawFrame1);
     await render(drawFrame2);
-    await Async.delay(reportIntervalInMs * 2);
+    jest.advanceTimersByTime(reportIntervalInMs);
 
     expect(callback).toHaveBeenCalledTimes(1);
   });

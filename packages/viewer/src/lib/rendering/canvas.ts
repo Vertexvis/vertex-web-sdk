@@ -44,7 +44,8 @@ export function measureCanvasRenderer(
   callback: ReportTimingsCallback,
   intervalMs: number = REPORTING_INTERVAL_MS
 ): CanvasRenderer {
-  let timer: number | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let timer: any;
   let renderCount = 0;
   let fpsFrameCount: number | undefined;
   let fpsHistory: number[] = [];
@@ -52,7 +53,7 @@ export function measureCanvasRenderer(
   function start(): void {
     renderCount++;
     if (timer == null) {
-      timer = window.setInterval(() => {
+      timer = setInterval(() => {
         reportTimings(meter, callback);
         if (renderCount === 0) {
           clearTimer();
@@ -67,7 +68,7 @@ export function measureCanvasRenderer(
 
   function clearTimer(): void {
     if (timer != null) {
-      window.clearInterval(timer);
+      clearInterval(timer);
       timer = undefined;
     }
   }
