@@ -56,14 +56,14 @@ export class MeasurementOverlayManager {
     const id = UUID.create();
     const v = Vector3.subtract(start, end);
 
-    const ze = Vector3.add(start, Vector3.create(0, 0, -v.z));
-    const z = { start, end: ze };
+    const ye = Vector3.add(start, Vector3.create(0, -v.y, 0));
+    const y = { start: start, end: ye };
 
-    const ye = Vector3.add(ze, Vector3.create(0, -v.y, 0));
-    const y = { start: ze, end: ye };
+    const ze = Vector3.add(ye, Vector3.create(0, 0, -v.z));
+    const z = { start: ye, end: ze };
 
-    const xe = Vector3.add(ye, Vector3.create(-v.x, 0, 0));
-    const x = { start: ye, end: xe };
+    const xe = Vector3.add(ze, Vector3.create(-v.x, 0, 0));
+    const x = { start: ze, end: xe };
 
     const overlay: DistanceVectorOverlay = {
       type: 'distance-vector',
