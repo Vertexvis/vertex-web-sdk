@@ -59,9 +59,12 @@
   color: var(--viewer-measurement-distance-accent-color);
   font-size: 0.75rem;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 :host([invalid]) {
@@ -72,13 +75,6 @@
   --viewer-measurement-distance-contrast-color: var(
     --viewer-measurement-distance-invalid-contrast-color
   ) !important;
-}
-
-.measurement {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
 }
 
 .line {
@@ -106,11 +102,6 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   display: block;
-}
-
-:host(:not([mode='replace'])) .anchor,
-:host(:not([mode='replace'])) .anchor-label,
-:host(:not([mode='replace'])) .distance-label {
   pointer-events: auto;
 }
 
@@ -139,16 +130,17 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   display: block;
+  pointer-events: auto;
 }
 
-:host([mode='edit']) {
+:host(:not([mode=''])) {
   cursor: inherit;
 }
-:host([mode='edit']) .anchor {
+:host(:not([mode=''])) .anchor {
   cursor: move;
 }
 
-:host(:not([mode='edit'])) .anchor {
+:host([mode='']) .anchor {
   visibility: hidden;
 }
 
@@ -160,7 +152,7 @@
   box-sizing: border-box;
 }
 
-:host([mode='edit']) .anchor-placeholder {
+:host(:not([mode=''])) .anchor-placeholder {
   border: 2px solid var(--viewer-measurement-distance-accent-color);
   background: var(--viewer-measurement-distance-contrast-color);
 }
@@ -176,6 +168,7 @@
   border: var(--viewer-measurement-distance-distance-border);
   border-radius: var(--viewer-measurement-distance-distance-border-radius);
   padding: var(--viewer-measurement-distance-distance-padding);
+  pointer-events: auto;
 }
 
 .indicator {

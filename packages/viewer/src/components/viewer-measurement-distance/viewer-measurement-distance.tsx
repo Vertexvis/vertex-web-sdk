@@ -5,6 +5,7 @@ import {
   EventEmitter,
   h,
   Host,
+  Listen,
   Method,
   Prop,
   State,
@@ -21,6 +22,8 @@ import { Cursor, measurementCursor } from '../../lib/cursors';
 import { getMouseClientPosition } from '../../lib/dom';
 import { Formatter } from '../../lib/formatter';
 import {
+  makeMinimumDistanceResult,
+  MeasurementModel,
   MeasurementOverlay,
   MeasurementOverlayManager,
 } from '../../lib/measurement';
@@ -232,6 +235,14 @@ export class ViewerMeasurementDistance {
   public viewer?: HTMLVertexViewerElement;
 
   /**
+   * The measurement model that will be updated when this measurement changes.
+   * You can pass this to a <vertex-viewer-measurement-details> component to
+   * display measurement outcomes.
+   */
+  @Prop()
+  public measurementModel: MeasurementModel = new MeasurementModel();
+
+  /**
    * An event that is dispatched anytime the user begins editing the
    * measurement.
    */
@@ -265,6 +276,9 @@ export class ViewerMeasurementDistance {
   // a rerender if changed.
   private stateMap: StateMap = {};
 
+  @State()
+  private measurementUnits = new DistanceUnits(this.units);
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -275,7 +289,6 @@ export class ViewerMeasurementDistance {
   private overlays = new MeasurementOverlayManager();
   private overlay?: MeasurementOverlay;
 
-  private measurementUnits = new DistanceUnits(this.units);
   private isUserInteractingWithModel = false;
 
   /**
@@ -342,85 +355,55 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
+    return (
+      <Host>
+        {this.showAxisReferenceLines && (
+          <vertex-viewer-measurement-overlays
+            measurementOverlays={this.overlays}
+            viewer={this.viewer}
+          />
+        )}
+        {this.renderMeasurement()}
+      </Host>
+    );
+  }
+
+  private renderMeasurement(): h.JSX.IntrinsicElements {
     const positions = this.computeElementPositions();
     const { startPt, endPt, labelPt, indicatorPt, hideStart, hideEnd } =
       positions;
     const distance = this.formatDistance(this.distance);
 
-    if (this.mode === 'edit') {
+    if (this.mode === 'edit' || this.mode === 'replace') {
       return (
-        <Host>
-          {this.showAxisReferenceLines && (
-            <vertex-viewer-measurement-overlays
-              measurementOverlays={this.overlays}
-              viewer={this.viewer}
-            />
-          )}
-          <div class="measurement">
-            <DistanceMeasurementRenderer
-              startPt={startPt}
-              endPt={endPt}
-              centerPt={labelPt}
-              indicatorPt={indicatorPt}
-              distance={distance}
-              anchorLabelOffset={this.anchorLabelOffset}
-              lineCapLength={this.lineCapLength}
-              hideStartAnchor={hideStart}
-              hideEndAnchor={hideEnd}
-              onStartAnchorPointerDown={this.handleEditAnchor('start')}
-              onEndAnchorPointerDown={this.handleEditAnchor('end')}
-            />
-          </div>
-        </Host>
-      );
-    } else if (this.mode === 'replace') {
-      return (
-        <Host>
-          {this.showAxisReferenceLines && (
-            <vertex-viewer-measurement-overlays
-              measurementOverlays={this.overlays}
-              viewer={this.viewer}
-            />
-          )}
-          <div class="measurement">
-            <DistanceMeasurementRenderer
-              startPt={startPt}
-              endPt={endPt}
-              centerPt={labelPt}
-              indicatorPt={indicatorPt}
-              distance={distance}
-              hideStartAnchor={hideStart}
-              hideEndAnchor={hideEnd}
-              anchorLabelOffset={this.anchorLabelOffset}
-              lineCapLength={this.lineCapLength}
-            />
-          </div>
-        </Host>
+        <DistanceMeasurementRenderer
+          startPt={startPt}
+          endPt={endPt}
+          centerPt={labelPt}
+          indicatorPt={indicatorPt}
+          distance={distance}
+          anchorLabelOffset={this.anchorLabelOffset}
+          lineCapLength={this.lineCapLength}
+          hideStartAnchor={hideStart}
+          hideEndAnchor={hideEnd}
+          onStartAnchorPointerDown={this.handleEditAnchor('start')}
+          onEndAnchorPointerDown={this.handleEditAnchor('end')}
+        />
       );
     } else {
       return (
-        <Host>
-          {this.showAxisReferenceLines && (
-            <vertex-viewer-measurement-overlays
-              measurementOverlays={this.overlays}
-              viewer={this.viewer}
-            />
-          )}
-          <div class="measurement">
-            <DistanceMeasurementRenderer
-              startPt={startPt}
-              endPt={endPt}
-              centerPt={labelPt}
-              indicatorPt={this.indicatorPt}
-              distance={distance}
-              hideStartAnchor={hideStart}
-              hideEndAnchor={hideEnd}
-              anchorLabelOffset={this.anchorLabelOffset}
-              lineCapLength={this.lineCapLength}
-              linePointerEvents="painted"
-            />
-          </div>
-        </Host>
+        <DistanceMeasurementRenderer
+          startPt={startPt}
+          endPt={endPt}
+          centerPt={labelPt}
+          indicatorPt={this.indicatorPt}
+          distance={distance}
+          hideStartAnchor={hideStart}
+          hideEndAnchor={hideEnd}
+          anchorLabelOffset={this.anchorLabelOffset}
+          lineCapLength={this.lineCapLength}
+          linePointerEvents="painted"
+        />
       );
     }
   }
@@ -468,19 +451,43 @@ export class ViewerMeasurementDistance {
     this.warnIfDepthBuffersDisabled();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('start')
   protected handleStartChanged(): void {
     this.updateInteractionModel();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('end')
   protected handleEndChanged(): void {
     this.updateInteractionModel();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('invalid')
   protected handleInvalidChanged(): void {
     this.updateInteractionModel();
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('editEnd')
+  protected handleEditEnd(): void {
+    this.measurementModel.clearOutcome();
+
+    if (!this.invalid && this.start != null && this.end != null) {
+      this.measurementModel.setOutcome({
+        isApproximate: true,
+        results: [makeMinimumDistanceResult(this.start, this.end)],
+      });
+    }
   }
 
   private computePropsAndState(): void {
@@ -536,25 +543,28 @@ export class ViewerMeasurementDistance {
     if (this.internalCamera != null) {
       const measurement = this.model.getMeasurement();
 
-      if (measurement != null) {
-        return this.computeLineElementPositions(
-          this.internalCamera.projectionViewMatrix,
-          Line3.create({
-            start: measurement.start,
-            end: measurement.end,
-          })
-        );
-      } else if (this.indicatorPt != null) {
-        return {
-          indicatorPt: translateWorldPtToViewport(
-            this.indicatorPt,
-            this.internalCamera.projectionViewMatrix,
-            this.viewport
-          ),
-        };
-      }
+      const line =
+        measurement != null
+          ? this.computeLineElementPositions(
+              this.internalCamera.projectionViewMatrix,
+              Line3.create(measurement)
+            )
+          : {};
+      const indicator =
+        this.indicatorPt != null
+          ? {
+              indicatorPt: translateWorldPtToViewport(
+                this.indicatorPt,
+                this.internalCamera.projectionViewMatrix,
+                this.viewport
+              ),
+            }
+          : {};
+
+      return { ...line, ...indicator };
+    } else {
+      return {};
     }
-    return {};
   }
 
   private computeLineElementPositions(
@@ -731,7 +741,9 @@ export class ViewerMeasurementDistance {
         const snapPt = this.snapPoint(pt, event);
         this.interaction = this.controller.newMeasurement(snapPt, hits);
 
-        startMeasurement(measureInteraction);
+        if (this.interaction != null) {
+          startMeasurement(measureInteraction);
+        }
       }
     }
   };
@@ -739,7 +751,7 @@ export class ViewerMeasurementDistance {
   private handleEditAnchor(
     anchor: Anchor
   ): ((event: PointerEvent) => void) | undefined {
-    if (this.mode === 'edit') {
+    if (this.mode === 'edit' || this.mode === 'replace') {
       const handlePointerMove = this.createInteractionMoveHandler();
       const handlePointerUp = async (event: PointerEvent): Promise<void> => {
         const hits = this.getHitProvider();

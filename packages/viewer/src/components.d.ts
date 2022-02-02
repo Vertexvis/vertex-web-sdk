@@ -937,6 +937,10 @@ export namespace Components {
      */
     lineCapLength: number;
     /**
+     * The measurement model that will be updated when this measurement changes. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
+     */
+    measurementModel: MeasurementModel;
+    /**
      * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
      */
     mode: ViewerMeasurementDistanceMode;
@@ -2157,6 +2161,10 @@ declare namespace LocalJSX {
      * The length of the caps at each end of the distance measurement.
      */
     lineCapLength?: number;
+    /**
+     * The measurement model that will be updated when this measurement changes. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
+     */
+    measurementModel?: MeasurementModel;
     /**
      * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
      */
