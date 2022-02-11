@@ -67,7 +67,7 @@
   pointer-events: none;
 }
 
-:host([invalid]) {
+:host([invalid]:not([invalid='false'])) {
   --viewer-measurement-distance-accent-color: var(
     --viewer-measurement-distance-invalid-accent-color
   ) !important;
