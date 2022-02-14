@@ -76,11 +76,14 @@ import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/view
 import {
   MeasurementController,
   MeasurementModel,
+  MeasurementOutcome,
   MeasurementOverlayManager,
   MeasurementResult,
 } from './lib/measurement';
 import { Formatter } from './lib/formatter';
 import {
+  EditBeginEventDetails,
+  EditEndEventDetails,
   ViewerMeasurementDistanceElementMetrics,
   ViewerMeasurementDistanceMode,
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
@@ -877,7 +880,11 @@ export namespace Components {
     /**
      * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
      */
-    measurementModel: MeasurementModel;
+    measurementModel?: MeasurementModel;
+    /**
+     * The outcome to display. This property is automatically updated if a measurement model is provided.
+     */
+    measurementOutcome?: MeasurementOutcome;
     /**
      * The manager that the component will use to present measurement overlays.
      */
@@ -2110,6 +2117,10 @@ declare namespace LocalJSX {
      */
     measurementModel?: MeasurementModel;
     /**
+     * The outcome to display. This property is automatically updated if a measurement model is provided.
+     */
+    measurementOutcome?: MeasurementOutcome;
+    /**
      * The manager that the component will use to present measurement overlays.
      */
     measurementOverlays?: MeasurementOverlayManager;
@@ -2172,11 +2183,11 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched anytime the user begins editing the measurement.
      */
-    onEditBegin?: (event: CustomEvent<void>) => void;
+    onEditBegin?: (event: CustomEvent<EditBeginEventDetails>) => void;
     /**
      * An event that is dispatched when the user has finished editing the measurement.
      */
-    onEditEnd?: (event: CustomEvent<void>) => void;
+    onEditEnd?: (event: CustomEvent<EditEndEventDetails>) => void;
     /**
      * Enables the display of axis reference lines between the start and end point.
      */

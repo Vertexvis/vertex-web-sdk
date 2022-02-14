@@ -4,6 +4,7 @@ import { Disposable } from '@vertexvis/utils';
 import { Formatter } from '../../lib/formatter';
 import {
   MeasurementModel,
+  MeasurementOutcome,
   MeasurementOverlay,
   MeasurementOverlayManager,
   MeasurementResult,
@@ -35,13 +36,20 @@ export class ViewerMeasurementDetails {
    * which can then be used to update the display.
    */
   @Prop()
-  public measurementModel: MeasurementModel = new MeasurementModel();
+  public measurementModel?: MeasurementModel;
 
   /**
    * The manager that the component will use to present measurement overlays.
    */
   @Prop()
   public measurementOverlays?: MeasurementOverlayManager;
+
+  /**
+   * The outcome to display. This property is automatically updated if a
+   * measurement model is provided.
+   */
+  @Prop({ mutable: true })
+  public measurementOutcome?: MeasurementOutcome;
 
   /**
    * The unit of distance-based measurement.
@@ -93,12 +101,6 @@ export class ViewerMeasurementDetails {
   public resultTypes?: MeasurementResult['type'][];
 
   @State()
-  private results: MeasurementResult[] = [];
-
-  @State()
-  private isApproximate = false;
-
-  @State()
   private overlay?: MeasurementOverlay;
 
   @State()
@@ -116,7 +118,7 @@ export class ViewerMeasurementDetails {
    * @internal
    */
   protected connectedCallback(): void {
-    this.onOutcomeChangedHandler = this.measurementModel.onOutcomeChanged(
+    this.onOutcomeChangedHandler = this.measurementModel?.onOutcomeChanged(
       this.handleOutcomeChange
     );
     this.updateStateFromModel();
@@ -152,7 +154,7 @@ export class ViewerMeasurementDetails {
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.onOutcomeChangedHandler?.dispose();
-    this.onOutcomeChangedHandler = this.measurementModel.onOutcomeChanged(
+    this.onOutcomeChangedHandler = this.measurementModel?.onOutcomeChanged(
       this.handleOutcomeChange
     );
 
@@ -171,9 +173,17 @@ export class ViewerMeasurementDetails {
    * @internal
    */
   protected render(): h.JSX.IntrinsicElements {
+    const isFilteredResultType = (result: MeasurementResult): boolean => {
+      return this.resultTypes?.includes(result.type) ?? true;
+    };
+
+    const results = (this.measurementOutcome?.results ?? []).filter(
+      isFilteredResultType
+    );
+
     return (
       <Host>
-        {this.renderResult('planar-angle', (result) => (
+        {this.renderResult('planar-angle', results, (result) => (
           <PlanarAngleResultEntry
             result={result}
             overlays={this.measurementOverlays}
@@ -183,7 +193,7 @@ export class ViewerMeasurementDetails {
           />
         ))}
 
-        {this.renderResult('planar-distance', (result) => (
+        {this.renderResult('planar-distance', results, (result) => (
           <PlanarDistanceResultEntry
             result={result}
             overlays={this.measurementOverlays}
@@ -193,7 +203,7 @@ export class ViewerMeasurementDetails {
           />
         ))}
 
-        {this.renderResult('surface-area', (result) => (
+        {this.renderResult('surface-area', results, (result) => (
           <SurfaceAreaResultEntry
             result={result}
             overlays={this.measurementOverlays}
@@ -203,7 +213,7 @@ export class ViewerMeasurementDetails {
           />
         ))}
 
-        {this.renderResult('minimum-distance', (result) => (
+        {this.renderResult('minimum-distance', results, (result) => (
           <MinimumDistanceResultEntry
             result={result}
             overlays={this.measurementOverlays}
@@ -231,34 +241,25 @@ export class ViewerMeasurementDetails {
   };
 
   private updateStateFromModel(): void {
-    const isFilteredResultType = (result: MeasurementResult): boolean => {
-      return this.resultTypes?.includes(result.type) ?? true;
-    };
-
-    const outcome = this.measurementModel.getOutcome();
-    if (outcome != null) {
-      this.results = outcome.results.filter(isFilteredResultType);
-      this.isApproximate = outcome.isApproximate;
-    } else {
-      this.results = [];
-      this.isApproximate = false;
-    }
+    this.measurementOutcome = this.measurementModel?.getOutcome();
   }
 
   private renderResult<T extends MeasurementResult['type']>(
     type: T,
+    results: MeasurementResult[],
     render: (
       result: Extract<MeasurementResult, { type: T }>
     ) => h.JSX.IntrinsicElements | undefined
   ): h.JSX.IntrinsicElements | undefined {
-    const result = this.getResultForType(type);
+    const result = this.getResultForType(type, results);
     return result != null ? render(result) : undefined;
   }
 
   private getResultForType<T extends MeasurementResult['type']>(
-    type: T
+    type: T,
+    results: MeasurementResult[]
   ): Extract<MeasurementResult, { type: T }> | undefined {
-    return this.results.find((result) => result.type === type) as Extract<
+    return results.find((result) => result.type === type) as Extract<
       MeasurementResult,
       { type: T }
     >;
@@ -306,6 +307,7 @@ export class ViewerMeasurementDetails {
 
   private formatValue(value: number, unit: Unit): string {
     const val = value.toFixed(this.fractionalDigits);
-    return `${this.isApproximate ? '~' + val : val} ${unit.abbreviatedName}`;
+    const isApprox = this.measurementOutcome?.isApproximate ?? false;
+    return `${isApprox ? '~' + val : val} ${unit.abbreviatedName}`;
   }
 }

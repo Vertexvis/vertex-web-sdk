@@ -4,21 +4,29 @@ import { DepthBuffer, StencilBuffer, Viewport } from '../../lib/types';
 
 export class PointToPointHitTester {
   public constructor(
-    private stencil: StencilBuffer,
+    private stencil: StencilBuffer | undefined,
     private depthBuffer: DepthBuffer,
     private viewport: Viewport
   ) {}
 
   public hitTest(pt: Point.Point): boolean {
-    const stencilPt = this.viewport.transformPointToFrame(pt, this.stencil);
-    const depthPt = this.viewport.transformPointToFrame(pt, this.depthBuffer);
-    return this.stencil.hitTest(stencilPt) || this.depthBuffer.hitTest(depthPt);
+    const dpt = this.viewport.transformPointToFrame(pt, this.depthBuffer);
+    if (this.stencil != null) {
+      const spt = this.viewport.transformPointToFrame(pt, this.stencil);
+      return this.stencil.hitTest(spt) || this.depthBuffer.hitTest(dpt);
+    } else {
+      return this.depthBuffer.hitTest(dpt);
+    }
   }
 
   public snapToNearestPixel(pt: Point.Point, radius: number): Point.Point {
-    const framePt = this.viewport.transformPointToFrame(pt, this.stencil);
-    const snapPt = this.stencil.snapToNearestPixel(framePt, radius);
-    return this.viewport.transformPointToViewport(snapPt, this.stencil);
+    if (this.stencil != null) {
+      const framePt = this.viewport.transformPointToFrame(pt, this.stencil);
+      const snapPt = this.stencil.snapToNearestPixel(framePt, radius);
+      return this.viewport.transformPointToViewport(snapPt, this.stencil);
+    } else {
+      return pt;
+    }
   }
 
   public transformPointToWorld(
@@ -35,9 +43,11 @@ export class PointToPointHitTester {
   }
 
   private pickDepthBuffer(pt: Point.Point): DepthBuffer | undefined {
-    const stencilPt = this.viewport.transformPointToFrame(pt, this.stencil);
-    if (this.stencil.hitTest(stencilPt)) {
-      return this.stencil.depthBuffer;
+    if (this.stencil != null) {
+      const stencilPt = this.viewport.transformPointToFrame(pt, this.stencil);
+      if (this.stencil.hitTest(stencilPt)) {
+        return this.stencil.depthBuffer;
+      }
     }
 
     const depthPt = this.viewport.transformPointToFrame(pt, this.depthBuffer);

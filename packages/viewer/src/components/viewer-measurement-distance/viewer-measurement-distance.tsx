@@ -5,7 +5,6 @@ import {
   EventEmitter,
   h,
   Host,
-  Listen,
   Method,
   Prop,
   State,
@@ -72,6 +71,22 @@ export interface ViewerMeasurementDistanceElementMetrics {
  */
 export type ViewerMeasurementDistanceMode = 'edit' | 'replace' | '';
 
+/**
+ * A details object describing the edit begin event.
+ */
+export interface EditBeginEventDetails {
+  type: Exclude<ViewerMeasurementDistanceMode, ''>;
+  anchor: Anchor;
+}
+/**
+ * A details object describing the edit end event.
+ */
+export interface EditEndEventDetails {
+  start: Vector3.Vector3;
+  end: Vector3.Vector3;
+  valid: boolean;
+}
+
 interface StateMap {
   hoverCursor?: Disposable;
   stencil?: StencilBuffer;
@@ -104,7 +119,7 @@ export class ViewerMeasurementDistance {
    * `Vector3` or a JSON string representation in the format of `[x, y, z]` or
    * `{"x": 0, "y": 0, "z": 0}`.
    */
-  @Prop({ mutable: true, attribute: null })
+  @Prop({ mutable: true })
   public start?: Vector3.Vector3;
 
   /**
@@ -112,7 +127,7 @@ export class ViewerMeasurementDistance {
    * instance of a `Vector3` or a JSON string representation in the format of
    * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
    */
-  @Prop({ attribute: 'start' })
+  @Prop()
   public startJson?: string;
 
   /**
@@ -128,7 +143,7 @@ export class ViewerMeasurementDistance {
    * instance of a `Vector3` or a JSON string representation in the format of
    * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
    */
-  @Prop({ attribute: 'end' })
+  @Prop()
   public endJson?: string;
 
   /**
@@ -247,14 +262,14 @@ export class ViewerMeasurementDistance {
    * measurement.
    */
   @Event()
-  public editBegin!: EventEmitter<void>;
+  public editBegin!: EventEmitter<EditBeginEventDetails>;
 
   /**
    * An event that is dispatched when the user has finished editing the
    * measurement.
    */
   @Event()
-  public editEnd!: EventEmitter<void>;
+  public editEnd!: EventEmitter<EditEndEventDetails>;
 
   @State()
   private viewport: Viewport = new Viewport(0, 0);
@@ -449,6 +464,11 @@ export class ViewerMeasurementDistance {
   @Watch('mode')
   protected handleModeChanged(): void {
     this.warnIfDepthBuffersDisabled();
+
+    if (this.viewer != null) {
+      this.removeInteractionListeners(this.viewer);
+      this.addInteractionListeners(this.viewer);
+    }
   }
 
   /**
@@ -473,21 +493,6 @@ export class ViewerMeasurementDistance {
   @Watch('invalid')
   protected handleInvalidChanged(): void {
     this.updateInteractionModel();
-  }
-
-  /**
-   * @ignore
-   */
-  @Listen('editEnd')
-  protected handleEditEnd(): void {
-    this.measurementModel.clearOutcome();
-
-    if (!this.invalid && this.start != null && this.end != null) {
-      this.measurementModel.setOutcome({
-        isApproximate: true,
-        results: [makeMinimumDistanceResult(this.start, this.end)],
-      });
-    }
   }
 
   private computePropsAndState(): void {
@@ -730,7 +735,7 @@ export class ViewerMeasurementDistance {
           }
         };
 
-        this.beginEditing('end');
+        this.beginEditing('replace', 'end');
         window.addEventListener('pointermove', pointerMove);
         window.addEventListener('pointerup', pointerUp);
       };
@@ -772,7 +777,7 @@ export class ViewerMeasurementDistance {
         this.getStencilBuffer();
 
         if (event.button === 0) {
-          this.beginEditing(anchor);
+          this.beginEditing('edit', anchor);
 
           this.interaction = this.controller.editMeasurement(anchor);
 
@@ -828,20 +833,40 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private beginEditing(anchor: Anchor): void {
+  private beginEditing(
+    type: EditBeginEventDetails['type'],
+    anchor: EditBeginEventDetails['anchor']
+  ): void {
     if (this.interactionCount === 0) {
       this.interactingAnchor = anchor;
-      this.editBegin.emit();
+      this.editBegin.emit({ type, anchor });
     }
     this.interactionCount = this.interactionCount + 1;
   }
 
   private endEditing(): void {
     if (this.interactionCount === 1) {
+      const measurement = this.model.getMeasurement();
+
       this.interactingAnchor = 'none';
-      this.editEnd.emit();
+      this.updateMeasurementModel();
+
+      if (measurement != null) {
+        this.editEnd.emit(measurement);
+      }
     }
     this.interactionCount = this.interactionCount - 1;
+  }
+
+  private updateMeasurementModel(): void {
+    this.measurementModel.clearOutcome();
+
+    if (!this.invalid && this.start != null && this.end != null) {
+      this.measurementModel.setOutcome({
+        isApproximate: true,
+        results: [makeMinimumDistanceResult(this.start, this.end)],
+      });
+    }
   }
 
   private getHitProvider(): PointToPointHitProvider | undefined {
@@ -859,7 +884,7 @@ export class ViewerMeasurementDistance {
 
   private getHitTester(): PointToPointHitTester | undefined {
     const { stencil, depthBuffer } = this.stateMap;
-    if (stencil != null && depthBuffer != null) {
+    if (depthBuffer != null) {
       return new PointToPointHitTester(stencil, depthBuffer, this.viewport);
     }
   }
