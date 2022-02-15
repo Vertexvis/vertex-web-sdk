@@ -48,7 +48,10 @@ export class ViewerMeasurementPrecise {
    * on other types of entities.
    */
   @Prop()
-  public measurableEntityTypes: EntityType[] = [EntityType.PRECISE_SURFACE];
+  public measurableEntityTypes: EntityType[] = [
+    EntityType.PRECISE_SURFACE,
+    EntityType.IMPRECISE_SURFACE,
+  ];
 
   /**
    * The viewer that this component is bound to. This is automatically assigned
