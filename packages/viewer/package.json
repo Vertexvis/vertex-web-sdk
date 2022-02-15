@@ -65,6 +65,7 @@
     "param-case": "^3.0.4",
     "protobufjs": "^6.9.0",
     "requestidlecallback-polyfill": "^1.0.2",
+    "resize-observer": "^1.0.4",
     "threads": "^1.7.0",
     "tslib": "^2.1.0"
   },
@@ -85,7 +86,6 @@
     "eslint-plugin-react": "^7.28.0",
     "jest": "^26.6.3",
     "jsonwebtoken": "^8.5.1",
-    "resize-observer": "^1.0.4",
     "rollup": "^2.63.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",

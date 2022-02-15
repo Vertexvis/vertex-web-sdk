@@ -23,6 +23,7 @@ export const config: Config = {
       ],
     }),
   ],
+  globalScript: 'src/polyfill/resize-observer.ts',
   globalStyle: 'src/css/global.css',
   outputTargets: [
     reactOutputTarget({
