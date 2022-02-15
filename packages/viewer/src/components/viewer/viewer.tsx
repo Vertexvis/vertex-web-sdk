@@ -15,6 +15,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { toProtoDuration, WebSocketClientImpl } from '@vertexvis/stream-api';
 import { Color, Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import classnames from 'classnames';
+import { ResizeObserver } from 'resize-observer';
 
 import {
   FeatureHighlightOptions,
