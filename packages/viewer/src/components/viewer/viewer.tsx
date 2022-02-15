@@ -378,7 +378,6 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
-    this.getDeviceId();
   }
 
   /**

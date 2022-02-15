@@ -322,23 +322,25 @@ describe('vertex-viewer', () => {
   describe('device id', () => {
     it('generates and stores device id', async () => {
       const { stream, ws } = makeViewerStream();
+      const deviceId = 'device-id';
       const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            deviceId={deviceId}
+          />
+        ),
       });
-
-      const storedDeviceId = Storage.getStorageEntry(
-        Storage.StorageKeys.DEVICE_ID,
-        (records) => records['device-id']
-      );
 
       const load = jest.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
-      expect(storedDeviceId).toBe(viewer.deviceId);
+      expect(deviceId).toBe(viewer.deviceId);
       expect(load).toHaveBeenCalledWith(
         expect.anything(),
         expect.anything(),
-        storedDeviceId,
+        deviceId,
         expect.anything()
       );
     });
