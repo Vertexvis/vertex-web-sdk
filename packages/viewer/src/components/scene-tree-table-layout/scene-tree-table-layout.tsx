@@ -358,7 +358,7 @@ export class SceneTreeTableLayout {
     this.computeViewportRows();
 
     if (this.controller?.isConnected) {
-      this.controller.updateActiveRowRange(
+      await this.controller.updateActiveRowRange(
         this.viewportStartIndex,
         this.viewportEndIndex
       );
