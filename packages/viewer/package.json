@@ -34,7 +34,7 @@
     "prebuild": "yarn clean",
     "build": "stencil build --docs",
     "postbuild": "./scripts/postbuild.sh",
-    "start": "stencil build --dev --watch --serve",
+    "start": "stencil build --watch --serve",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
     "test": "stencil test --spec --maxWorkers=50%",
