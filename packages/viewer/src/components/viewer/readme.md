@@ -172,6 +172,14 @@ Type: `Promise<void>`
 
 
 
+## CSS Custom Properties
+
+| Name                  | Description                                                                                                                                                                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--image-background`  | The background color of the rendered image. Defaults to `--viewer-background`.                                                                                              |
+| `--viewer-background` | The background color of the viewer component. This will be visible if the size of the viewer becomes greater than the maximum image size of 1280x1280. Defaults to #FFFFFF. |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*
