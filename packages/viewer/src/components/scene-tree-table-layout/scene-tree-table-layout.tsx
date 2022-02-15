@@ -251,14 +251,7 @@ export class SceneTreeTableLayout {
   }
 
   public async componentWillRender(): Promise<void> {
-    this.computeViewportRows();
-
-    if (this.controller?.isConnected) {
-      await this.controller.updateActiveRowRange(
-        this.viewportStartIndex,
-        this.viewportEndIndex
-      );
-    }
+    await this.computeAndUpdateViewportRows();
   }
 
   public componentDidRender(): void {
@@ -358,6 +351,17 @@ export class SceneTreeTableLayout {
       this.viewportStartIndex = startIndex;
       this.viewportEndIndex = endIndex;
       this.stateMap.viewportRows = rows;
+    }
+  }
+
+  private async computeAndUpdateViewportRows(): Promise<void> {
+    this.computeViewportRows();
+
+    if (this.controller?.isConnected) {
+      this.controller.updateActiveRowRange(
+        this.viewportStartIndex,
+        this.viewportEndIndex
+      );
     }
   }
 
@@ -834,6 +838,7 @@ export class SceneTreeTableLayout {
 
   private handleScrollChanged = (event: Event): void => {
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
+    this.computeAndUpdateViewportRows();
   };
 
   private getViewportRows(startIndex: number, endIndex: number): Row[] {
