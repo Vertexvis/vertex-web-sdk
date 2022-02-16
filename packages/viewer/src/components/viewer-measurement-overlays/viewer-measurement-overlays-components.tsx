@@ -7,6 +7,10 @@ import {
   MeasurementOverlay,
 } from '../../lib/measurement';
 import { FramePerspectiveCamera, Viewport } from '../../lib/types';
+import {
+  RenderParams,
+  translateWorldLineToViewport,
+} from '../viewer-measurement-distance/utils';
 
 interface MeasurementOverlayViewProps<O extends MeasurementOverlay> {
   overlay: O;
@@ -34,17 +38,20 @@ export const MeasurementOverlayView: FunctionalComponent<
 
 const LineOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<LineOverlay>
-> = ({ overlay: { start, end }, camera, viewport }) => {
+> = ({ overlay, camera, viewport }) => {
   const m = camera.projectionViewMatrix;
 
-  const sw = viewport.transformWorldToViewport(start, m);
-  const ew = viewport.transformWorldToViewport(end, m);
+  const { start, end } = translateWorldLineToViewport(overlay, {
+    camera,
+    projectionViewMatrix: m,
+    viewport,
+  });
 
   return (
     <vertex-viewer-measurement-line
       class="measurement-line"
-      start={sw}
-      end={ew}
+      start={start}
+      end={end}
     />
   );
 };
@@ -53,13 +60,11 @@ const DistanceVectorOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<DistanceVectorOverlay>
 > = ({ overlay: { x, y, z }, camera, viewport }) => {
   const m = camera.projectionViewMatrix;
+  const params: RenderParams = { camera, projectionViewMatrix: m, viewport };
 
-  const xs = viewport.transformWorldToViewport(x.start, m);
-  const xe = viewport.transformWorldToViewport(x.end, m);
-  const ys = viewport.transformWorldToViewport(y.start, m);
-  const ye = viewport.transformWorldToViewport(y.end, m);
-  const zs = viewport.transformWorldToViewport(z.start, m);
-  const ze = viewport.transformWorldToViewport(z.end, m);
+  const { start: xs, end: xe } = translateWorldLineToViewport(x, params);
+  const { start: ys, end: ye } = translateWorldLineToViewport(y, params);
+  const { start: zs, end: ze } = translateWorldLineToViewport(z, params);
 
   return (
     <Fragment>
