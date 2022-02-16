@@ -39,11 +39,8 @@ export const MeasurementOverlayView: FunctionalComponent<
 const LineOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<LineOverlay>
 > = ({ overlay, camera, viewport }) => {
-  const m = camera.projectionViewMatrix;
-
   const { start, end } = translateWorldLineToViewport(overlay, {
     camera,
-    projectionViewMatrix: m,
     viewport,
   });
 
@@ -59,8 +56,7 @@ const LineOverlayView: FunctionalComponent<
 const DistanceVectorOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<DistanceVectorOverlay>
 > = ({ overlay: { x, y, z }, camera, viewport }) => {
-  const m = camera.projectionViewMatrix;
-  const params: RenderParams = { camera, projectionViewMatrix: m, viewport };
+  const params: RenderParams = { camera, viewport };
 
   const { start: xs, end: xe } = translateWorldLineToViewport(x, params);
   const { start: ys, end: ye } = translateWorldLineToViewport(y, params);
