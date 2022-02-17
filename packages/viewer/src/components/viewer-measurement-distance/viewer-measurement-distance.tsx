@@ -92,6 +92,8 @@ interface StateMap {
   depthBuffer?: DepthBuffer;
 }
 
+const INTERACTION_THRESHOLD = 3;
+
 /**
  * @slot start-anchor - An HTML element for the starting point anchor.
  *
@@ -328,6 +330,13 @@ export class ViewerMeasurementDistance {
     } else {
       return undefined;
     }
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.stateMap.hoverCursor?.dispose();
   }
 
   /**
@@ -671,7 +680,14 @@ export class ViewerMeasurementDistance {
       // interacting with the model. If so, we temporarily disable measurement
       // updates until the user finishes.
       const pointerDownAndMove = (callback: () => void): Disposable => {
-        const pointerMove = (): void => callback();
+        let downPt: Point.Point = Point.create(0, 0);
+
+        const pointerMove = (event: PointerEvent): void => {
+          const dist = Point.distance(downPt, getMouseClientPosition(event));
+          if (dist >= INTERACTION_THRESHOLD) {
+            callback();
+          }
+        };
 
         const dispose = (): void => {
           window.removeEventListener('pointermove', pointerMove);
@@ -680,7 +696,8 @@ export class ViewerMeasurementDistance {
 
         const pointerUp = (): void => dispose();
 
-        const pointerDown = (): void => {
+        const pointerDown = (event: PointerEvent): void => {
+          downPt = getMouseClientPosition(event);
           window.addEventListener('pointermove', pointerMove);
           window.addEventListener('pointerup', pointerUp);
         };
