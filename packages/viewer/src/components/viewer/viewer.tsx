@@ -372,7 +372,6 @@ export class Viewer {
 
   private canvasRenderer!: CanvasRenderer;
   private resizeRenderer!: CanvasRenderer;
-  private activeRenderer!: CanvasRenderer;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -497,7 +496,6 @@ export class Viewer {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    // const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
         <div
@@ -1009,7 +1007,6 @@ export class Viewer {
         this.getResolvedConfig().flags.logFrameRate,
         (timings) => this.reportPerformance(timings)
       );
-      this.activeRenderer = this.canvasRenderer;
 
       this.emitConnectionChange({
         status: 'connected',
@@ -1191,18 +1188,8 @@ export class Viewer {
 
   private updateCanvasDimensions(dimensions: Dimensions.Dimensions): void {
     if (this.canvasElement != null) {
-      if (
-        !Dimensions.isEqual(
-          Dimensions.create(
-            this.canvasElement.width,
-            this.canvasElement.height
-          ),
-          dimensions
-        )
-      ) {
-        this.canvasElement.width = dimensions.width;
-        this.canvasElement.height = dimensions.height;
-      }
+      this.canvasElement.width = dimensions.width;
+      this.canvasElement.height = dimensions.height;
     }
   }
 
