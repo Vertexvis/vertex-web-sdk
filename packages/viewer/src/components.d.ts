@@ -480,6 +480,10 @@ export namespace Components {
     registerTapKeyInteraction: (
       keyInteraction: KeyInteraction<TapEventDetails>
     ) => Promise<void>;
+    /**
+     * An optional value that will debounce frame updates when resizing this viewer element.
+     */
+    resizeDebounce: number;
     resolvedConfig?: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
@@ -1719,6 +1723,10 @@ declare namespace LocalJSX {
      * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
      */
     onTokenExpired?: (event: CustomEvent<void>) => void;
+    /**
+     * An optional value that will debounce frame updates when resizing this viewer element.
+     */
+    resizeDebounce?: number;
     resolvedConfig?: Config;
     /**
      * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
