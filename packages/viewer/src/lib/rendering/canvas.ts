@@ -13,6 +13,7 @@ export interface DrawFrame {
   dimensions: Dimensions.Dimensions;
   frame: Frame;
   viewport: Viewport;
+  beforeDraw?: VoidFunction;
 }
 
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
@@ -114,6 +115,32 @@ export function createCanvasRenderer(): CanvasRenderer {
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
       drawImage(image, data);
+    }
+
+    image.dispose();
+    return data.frame;
+  };
+}
+
+export function createHiddenCanvasRenderer(): CanvasRenderer {
+  const hiddenCanvas = document.createElement('canvas');
+  let lastFrameNumber: number | undefined;
+
+  return async (data) => {
+    const frameNumber = data.frame.sequenceNumber;
+    const frameIsNewer =
+      lastFrameNumber == null || frameNumber > lastFrameNumber;
+    const image = await loadImageBytes(data.frame.image.imageBytes);
+
+    hiddenCanvas.width = data.dimensions.width;
+    hiddenCanvas.height = data.dimensions.height;
+    const ctx = hiddenCanvas.getContext('2d');
+
+    if (ctx != null && frameIsNewer) {
+      lastFrameNumber = frameNumber;
+      drawImage(image, { ...data, canvas: ctx });
+      data.beforeDraw?.();
+      data.canvas.drawImage(hiddenCanvas, 0, 0);
     }
 
     image.dispose();

@@ -49,6 +49,7 @@ import { paintTime, Timing } from '../../lib/meters';
 import {
   CanvasRenderer,
   createCanvasRenderer,
+  createHiddenCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import {
@@ -370,6 +371,8 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
+  private resizeRenderer!: CanvasRenderer;
+  private activeRenderer!: CanvasRenderer;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -494,7 +497,7 @@ export class Viewer {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const canvasDimensions = this.getCanvasDimensions();
+    // const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
         <div
@@ -514,8 +517,6 @@ export class Viewer {
                 this.stateMap.interactionTarget = ref;
               }}
               class="canvas"
-              width={canvasDimensions != null ? canvasDimensions.width : 0}
-              height={canvasDimensions != null ? canvasDimensions.height : 0}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -940,7 +941,6 @@ export class Viewer {
   private recalculateComponentDimensions(): void {
     if (this.isResizing) {
       this.calculateComponentDimensions();
-      this.isResizing = false;
 
       this.stream?.update({ dimensions: this.dimensions });
       this.dimensionschange.emit(this.dimensions);
@@ -1003,6 +1003,13 @@ export class Viewer {
         this.getResolvedConfig().flags.logFrameRate,
         (timings) => this.reportPerformance(timings)
       );
+      this.resizeRenderer = measureCanvasRenderer(
+        paintTime,
+        createHiddenCanvasRenderer(),
+        this.getResolvedConfig().flags.logFrameRate,
+        (timings) => this.reportPerformance(timings)
+      );
+      this.activeRenderer = this.canvasRenderer;
 
       this.emitConnectionChange({
         status: 'connected',
@@ -1054,6 +1061,12 @@ export class Viewer {
           dimensions,
           frame: this.frame,
           viewport: this.viewport,
+          beforeDraw: () => {
+            if (this.isResizing) {
+              this.updateCanvasDimensions(dimensions);
+              this.isResizing = false;
+            }
+          },
         };
 
         this.frameReceived.emit(this.frame);
@@ -1062,7 +1075,9 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        const drawnFrame = await this.canvasRenderer(data);
+        const drawnFrame = this.isResizing
+          ? await this.resizeRenderer(data)
+          : await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
     }
@@ -1172,6 +1187,23 @@ export class Viewer {
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,
     };
+  }
+
+  private updateCanvasDimensions(dimensions: Dimensions.Dimensions): void {
+    if (this.canvasElement != null) {
+      if (
+        !Dimensions.isEqual(
+          Dimensions.create(
+            this.canvasElement.width,
+            this.canvasElement.height
+          ),
+          dimensions
+        )
+      ) {
+        this.canvasElement.width = dimensions.width;
+        this.canvasElement.height = dimensions.height;
+      }
+    }
   }
 
   private updateStreamAttributes(): void {
