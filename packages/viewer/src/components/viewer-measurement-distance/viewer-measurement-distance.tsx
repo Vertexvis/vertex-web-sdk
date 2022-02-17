@@ -10,7 +10,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Line3, Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import {
@@ -46,7 +46,6 @@ import {
   Anchor,
   getViewingElementPositions,
   MeasurementElementPositions,
-  translateWorldPtToViewport,
 } from './utils';
 import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
 
@@ -535,10 +534,7 @@ export class ViewerMeasurementDistance {
   private computeEditOrViewElementPositions(): MeasurementElementPositions {
     const measurement = this.model.getMeasurement();
     if (this.internalCamera != null && measurement != null) {
-      return this.computeLineElementPositions(
-        this.internalCamera.projectionViewMatrix,
-        Line3.create(measurement)
-      );
+      return this.computeLineElementPositions(Line3.create(measurement));
     } else {
       return {};
     }
@@ -550,18 +546,14 @@ export class ViewerMeasurementDistance {
 
       const line =
         measurement != null
-          ? this.computeLineElementPositions(
-              this.internalCamera.projectionViewMatrix,
-              Line3.create(measurement)
-            )
+          ? this.computeLineElementPositions(Line3.create(measurement))
           : {};
       const indicator =
         this.indicatorPt != null
           ? {
-              indicatorPt: translateWorldPtToViewport(
+              indicatorPt: this.viewport.transformWorldToViewport(
                 this.indicatorPt,
-                this.internalCamera.projectionViewMatrix,
-                this.viewport
+                this.internalCamera.projectionViewMatrix
               ),
             }
           : {};
@@ -573,12 +565,10 @@ export class ViewerMeasurementDistance {
   }
 
   private computeLineElementPositions(
-    matrix: Matrix4.Matrix4,
     line: Line3.Line3
   ): MeasurementElementPositions {
     if (this.internalCamera != null) {
       return getViewingElementPositions(line, this.interactingAnchor, {
-        projectionViewMatrix: matrix,
         viewport: this.viewport,
         camera: this.internalCamera,
       });
