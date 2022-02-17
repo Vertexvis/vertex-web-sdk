@@ -1,4 +1,4 @@
-import { Line3, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Line3, Point } from '@vertexvis/geometry';
 
 import { FramePerspectiveCamera, Viewport } from '../../lib/types';
 
@@ -14,18 +14,8 @@ export interface MeasurementElementPositions {
 }
 
 export interface RenderParams {
-  projectionViewMatrix: Matrix4.Matrix4;
   viewport: Viewport;
   camera: FramePerspectiveCamera;
-}
-
-export function translateWorldPtToViewport(
-  pt: Vector3.Vector3,
-  projectionViewMatrix: Matrix4.Matrix4,
-  viewport: Viewport
-): Point.Point {
-  const ndc = Vector3.transformMatrix(pt, projectionViewMatrix);
-  return viewport.transformVectorToViewport(ndc);
 }
 
 export function translateWorldLineToViewport(
@@ -37,7 +27,7 @@ export function translateWorldLineToViewport(
   hideStart: boolean;
   hideEnd: boolean;
 } {
-  const { camera, projectionViewMatrix, viewport } = params;
+  const { camera, viewport } = params;
 
   const isStartBehindCamera = camera.isPointBehindNear(line.start);
   const isEndBehindCamera = camera.isPointBehindNear(line.end);
@@ -52,7 +42,7 @@ export function translateWorldLineToViewport(
       end: isEndBehindCamera && pt != null ? pt : line.end,
     });
 
-    const ndc = Line3.transformMatrix(newLine, projectionViewMatrix);
+    const ndc = Line3.transformMatrix(newLine, camera.projectionViewMatrix);
     return {
       start: viewport.transformVectorToViewport(ndc.start),
       end: viewport.transformVectorToViewport(ndc.end),
@@ -60,7 +50,7 @@ export function translateWorldLineToViewport(
       hideEnd: isEndBehindCamera,
     };
   } else {
-    const ndc = Line3.transformMatrix(line, projectionViewMatrix);
+    const ndc = Line3.transformMatrix(line, camera.projectionViewMatrix);
     return {
       start: viewport.transformVectorToViewport(ndc.start),
       end: viewport.transformVectorToViewport(ndc.end),
@@ -104,9 +94,8 @@ function getIndicatorPtForAnchor(
   anchor: Anchor,
   params: RenderParams
 ): Point.Point {
-  return translateWorldPtToViewport(
+  return params.viewport.transformWorldToViewport(
     anchor === 'start' ? line.start : line.end,
-    params.projectionViewMatrix,
-    params.viewport
+    params.camera.projectionViewMatrix
   );
 }
