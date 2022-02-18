@@ -1,3 +1,4 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   encode,
   Fixtures as StreamFixtures,
@@ -65,4 +66,19 @@ export async function loadViewerStreamKey(
     )
   );
   await loaded;
+}
+
+export function receiveFrame(
+  ws: WebSocketClientMock,
+  transformPayload?: (
+    payload: vertexvis.protobuf.stream.IDrawFramePayload
+  ) => vertexvis.protobuf.stream.IDrawFramePayload
+): void {
+  ws.receiveMessage(
+    encode(
+      StreamFixtures.Requests.drawFrame({
+        payload: transformPayload?.(Fixtures.drawFramePayload),
+      })
+    )
+  );
 }
