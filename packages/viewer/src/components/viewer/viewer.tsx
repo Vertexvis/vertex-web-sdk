@@ -1072,6 +1072,13 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
+        if (
+          this.canvasElement.getAttribute('width') == null ||
+          this.canvasElement.getAttribute('height') == null
+        ) {
+          this.updateCanvasDimensions(dimensions);
+        }
+
         const drawnFrame = this.isResizing
           ? await this.resizeRenderer(data)
           : await this.canvasRenderer(data);
