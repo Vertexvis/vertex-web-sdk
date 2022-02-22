@@ -246,7 +246,7 @@ export class Viewer {
    * An optional value that will debounce frame updates when resizing
    * this viewer element.
    */
-  @Prop() public resizeDebounce = 0;
+  @Prop() public resizeDebounce = 100;
 
   /**
    * The last frame that was received, which can be used to inspect the scene
@@ -376,6 +376,7 @@ export class Viewer {
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
   private isResizing?: boolean;
+  private isResizeUpdate?: boolean;
 
   private resizeTimer?: NodeJS.Timeout;
 
@@ -867,7 +868,7 @@ export class Viewer {
     const dimensionsHaveChanged =
       entries.length >= 0 &&
       this.dimensions != null &&
-      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
+      !Dimensions.isEqual(entries[0].contentRect, this.viewport);
 
     if (dimensionsHaveChanged) {
       if (this.resizeTimer != null) {
@@ -878,6 +879,7 @@ export class Viewer {
       if (!this.isResizing) {
         this.resizeTimer = setTimeout(() => {
           this.isResizing = true;
+          this.isResizeUpdate = true;
           this.recalculateComponentDimensions();
         }, this.resizeDebounce);
       }
@@ -939,6 +941,7 @@ export class Viewer {
   private recalculateComponentDimensions(): void {
     if (this.isResizing) {
       this.calculateComponentDimensions();
+      this.isResizing = false;
 
       this.stream?.update({ dimensions: this.dimensions });
       this.dimensionschange.emit(this.dimensions);
@@ -1042,11 +1045,11 @@ export class Viewer {
   }
 
   private async updateFrame(frame: Frame): Promise<void> {
-    const dimensions = this.getCanvasDimensions();
+    const canvasDimensions = this.getCanvasDimensions();
 
     if (
       this.canvasElement != null &&
-      dimensions != null &&
+      canvasDimensions != null &&
       this.frame !== frame
     ) {
       const canvas = this.canvasElement.getContext('2d');
@@ -1055,14 +1058,13 @@ export class Viewer {
 
         const data = {
           canvas,
-          dimensions,
+          canvasDimensions,
+          dimensions: this.dimensions,
           frame: this.frame,
           viewport: this.viewport,
           beforeDraw: () => {
-            if (this.isResizing) {
-              this.updateCanvasDimensions(dimensions);
-              this.isResizing = false;
-            }
+            this.updateCanvasDimensions(canvasDimensions);
+            this.isResizeUpdate = false;
           },
         };
 
@@ -1072,14 +1074,7 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        if (
-          this.canvasElement.getAttribute('width') == null ||
-          this.canvasElement.getAttribute('height') == null
-        ) {
-          this.updateCanvasDimensions(dimensions);
-        }
-
-        const drawnFrame = this.isResizing
+        const drawnFrame = this.isResizeUpdate
           ? await this.resizeRenderer(data)
           : await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
