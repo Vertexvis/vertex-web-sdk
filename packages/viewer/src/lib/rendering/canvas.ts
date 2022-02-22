@@ -138,7 +138,7 @@ export function createHiddenCanvasRenderer(): CanvasRenderer {
     const frameIsNewer =
       lastFrameNumber == null || frameNumber > lastFrameNumber;
     const frameDimensionsMatch =
-      data.dimensions != null &&
+      data.dimensions == null ||
       Dimensions.isEqual(
         data.dimensions,
         data.frame.image.imageAttr.frameDimensions

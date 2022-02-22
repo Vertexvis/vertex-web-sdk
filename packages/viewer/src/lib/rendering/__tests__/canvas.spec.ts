@@ -23,21 +23,30 @@ const image = {
 
 const drawFrame1: DrawFrame = {
   canvas,
-  dimensions: Dimensions.create(100, 50),
+  canvasDimensions: Dimensions.create(100, 50),
   frame: Fixtures.makeFrame(),
   viewport: new Viewport(100, 50),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
-  dimensions: Dimensions.create(100, 50),
+  canvasDimensions: Dimensions.create(100, 50),
   frame: Fixtures.makeFrame(),
   viewport: new Viewport(100, 50),
 };
 
 const drawFrame3: DrawFrame = {
   canvas,
-  dimensions: Dimensions.create(100, 50),
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makeFrame(),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+};
+
+const drawFrame4: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  dimensions: Dimensions.create(500, 500),
   frame: Fixtures.makeFrame(),
   viewport: new Viewport(100, 50),
   beforeDraw: jest.fn(),
@@ -106,6 +115,15 @@ describe(createHiddenCanvasRenderer, () => {
     await renderer(drawFrame3);
 
     expect(drawFrame3.beforeDraw).toHaveBeenCalled();
+  });
+
+  it('does not draw if the frame does not match dimensions', async () => {
+    const renderer = createHiddenCanvasRenderer();
+    const drawImage = jest.spyOn(canvas, 'drawImage');
+
+    await renderer(drawFrame4);
+
+    expect(drawImage).not.toHaveBeenCalledTimes(1);
   });
 
   it('disposes loaded image', async () => {
