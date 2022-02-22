@@ -849,7 +849,7 @@ describe('vertex-viewer-measurement-distance', () => {
       ) as HTMLVertexViewerMeasurementDistanceElement;
       const interactionTarget = await viewer.getInteractionTarget();
 
-      // update start
+      // update start anchor
       interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
@@ -863,6 +863,7 @@ describe('vertex-viewer-measurement-distance', () => {
       );
       await page.waitForChanges();
       expect(onEditBegin).toHaveBeenCalled();
+      expect(onEditEnd).not.toHaveBeenCalled();
 
       // move end anchor
       window.dispatchEvent(

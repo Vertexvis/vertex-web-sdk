@@ -67,7 +67,8 @@ describe(PointToPointInteractionController, () => {
       const interaction = controller.newMeasurement(pt, hits);
 
       (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(end);
-      let res = interaction?.update(pt, hits);
+      interaction?.update(pt, hits);
+      let res = model.getMeasurement();
       expect(res).toMatchObject({ start, end, valid: true });
       expect(model.getMeasurement()).toMatchObject({ start, end, valid: true });
       expect(model.getIndicator()).toEqual(end);
@@ -100,7 +101,8 @@ describe(PointToPointInteractionController, () => {
       const interaction = controller.newMeasurement(pt, hits);
 
       (hitTester.hitTest as jest.Mock).mockReturnValue(false);
-      let res = interaction?.update(pt, hits);
+      interaction?.update(pt, hits);
+      let res = model.getMeasurement();
       expect(res).toMatchObject({ start, end, valid: false });
       expect(model.getMeasurement()).toMatchObject({
         start,
@@ -142,7 +144,8 @@ describe(PointToPointInteractionController, () => {
 
         const interaction = controller.editMeasurement('start');
 
-        let res = interaction.update(pt, hits);
+        interaction.update(pt, hits);
+        let res = model.getMeasurement();
         expect(res).toMatchObject({ start, end: measurement.end, valid: true });
         expect(model.getMeasurement()).toMatchObject({
           start,
@@ -175,7 +178,8 @@ describe(PointToPointInteractionController, () => {
 
         const interaction = controller.editMeasurement('start');
 
-        let res = interaction.update(pt, hits);
+        interaction.update(pt, hits);
+        let res = model.getMeasurement();
         expect(res).toMatchObject({
           start,
           end: measurement.end,
@@ -209,7 +213,8 @@ describe(PointToPointInteractionController, () => {
 
         const interaction = controller.editMeasurement('end');
 
-        let res = interaction.update(pt, hits);
+        interaction.update(pt, hits);
+        let res = model.getMeasurement();
         expect(res).toMatchObject({
           start: measurement.start,
           end,
@@ -246,7 +251,8 @@ describe(PointToPointInteractionController, () => {
 
         const interaction = controller.editMeasurement('end');
 
-        let res = interaction.update(pt, hits);
+        interaction.update(pt, hits);
+        let res = model.getMeasurement();
         expect(res).toMatchObject({
           start: measurement.start,
           end,
