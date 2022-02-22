@@ -49,6 +49,7 @@ import { paintTime, Timing } from '../../lib/meters';
 import {
   CanvasRenderer,
   createCanvasRenderer,
+  createHiddenCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import {
@@ -245,7 +246,7 @@ export class Viewer {
    * An optional value that will debounce frame updates when resizing
    * this viewer element.
    */
-  @Prop() public resizeDebounce = 0;
+  @Prop() public resizeDebounce = 100;
 
   /**
    * The last frame that was received, which can be used to inspect the scene
@@ -370,10 +371,12 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
+  private resizeRenderer!: CanvasRenderer;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
   private isResizing?: boolean;
+  private isResizeUpdate?: boolean;
 
   private resizeTimer?: NodeJS.Timeout;
 
@@ -494,7 +497,6 @@ export class Viewer {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const canvasDimensions = this.getCanvasDimensions();
     return (
       <Host>
         <div
@@ -514,8 +516,6 @@ export class Viewer {
                 this.stateMap.interactionTarget = ref;
               }}
               class="canvas"
-              width={canvasDimensions != null ? canvasDimensions.width : 0}
-              height={canvasDimensions != null ? canvasDimensions.height : 0}
             ></canvas>
             {this.errorMessage != null ? (
               <div class="error-message">{this.errorMessage}</div>
@@ -868,7 +868,7 @@ export class Viewer {
     const dimensionsHaveChanged =
       entries.length >= 0 &&
       this.dimensions != null &&
-      !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
+      !Dimensions.isEqual(entries[0].contentRect, this.viewport);
 
     if (dimensionsHaveChanged) {
       if (this.resizeTimer != null) {
@@ -879,6 +879,7 @@ export class Viewer {
       if (!this.isResizing) {
         this.resizeTimer = setTimeout(() => {
           this.isResizing = true;
+          this.isResizeUpdate = true;
           this.recalculateComponentDimensions();
         }, this.resizeDebounce);
       }
@@ -1003,6 +1004,12 @@ export class Viewer {
         this.getResolvedConfig().flags.logFrameRate,
         (timings) => this.reportPerformance(timings)
       );
+      this.resizeRenderer = measureCanvasRenderer(
+        paintTime,
+        createHiddenCanvasRenderer(),
+        this.getResolvedConfig().flags.logFrameRate,
+        (timings) => this.reportPerformance(timings)
+      );
 
       this.emitConnectionChange({
         status: 'connected',
@@ -1038,11 +1045,11 @@ export class Viewer {
   }
 
   private async updateFrame(frame: Frame): Promise<void> {
-    const dimensions = this.getCanvasDimensions();
+    const canvasDimensions = this.getCanvasDimensions();
 
     if (
       this.canvasElement != null &&
-      dimensions != null &&
+      canvasDimensions != null &&
       this.frame !== frame
     ) {
       const canvas = this.canvasElement.getContext('2d');
@@ -1051,9 +1058,14 @@ export class Viewer {
 
         const data = {
           canvas,
-          dimensions,
+          canvasDimensions,
+          dimensions: this.dimensions,
           frame: this.frame,
           viewport: this.viewport,
+          beforeDraw: () => {
+            this.updateCanvasDimensions(canvasDimensions);
+            this.isResizeUpdate = false;
+          },
         };
 
         this.frameReceived.emit(this.frame);
@@ -1062,7 +1074,9 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        const drawnFrame = await this.canvasRenderer(data);
+        const drawnFrame = this.isResizeUpdate
+          ? await this.resizeRenderer(data)
+          : await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
     }
@@ -1172,6 +1186,13 @@ export class Viewer {
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,
     };
+  }
+
+  private updateCanvasDimensions(dimensions: Dimensions.Dimensions): void {
+    if (this.canvasElement != null) {
+      this.canvasElement.width = dimensions.width;
+      this.canvasElement.height = dimensions.height;
+    }
   }
 
   private updateStreamAttributes(): void {

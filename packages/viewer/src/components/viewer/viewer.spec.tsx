@@ -6,6 +6,7 @@ jest.mock('../../workers/png-decoder-pool');
 import { h } from '@stencil/core';
 import { NewSpecPageOptions } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
+import { Dimensions } from '@vertexvis/geometry';
 import { Async, Color } from '@vertexvis/utils';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
@@ -13,11 +14,14 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import * as Storage from '../../lib/storage';
 import { random } from '../../testing';
+import { makeImagePng } from '../../testing/fixtures';
+import { triggerResizeObserver } from '../../testing/resizeObserver';
 import {
   key1,
   key2,
   loadViewerStreamKey,
   makeViewerStream,
+  receiveFrame,
 } from '../../testing/viewer';
 import {
   getElementBackgroundColor,
@@ -475,6 +479,56 @@ describe('vertex-viewer', () => {
       );
 
       expect(onInteractionEnded).toHaveBeenCalled();
+    });
+  });
+
+  describe('resizing', () => {
+    it('handles resizes', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      jest.useFakeTimers();
+      triggerResizeObserver([
+        {
+          contentRect: { width: 500, height: 500 },
+        },
+      ]);
+      jest.advanceTimersByTime(1000);
+      jest.useRealTimers();
+
+      const onFrameDrawn = jest.fn();
+
+      viewer.addEventListener('frameDrawn', onFrameDrawn);
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        imageAttributes: {
+          ...payload.imageAttributes,
+          frameDimensions: Dimensions.create(500, 500),
+        },
+        sequenceNumber: 2,
+        image: makeImagePng(500, 500),
+      }));
+
+      await Async.delay(10);
+
+      expect(onFrameDrawn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            dimensions: Dimensions.create(500, 500),
+          }),
+        })
+      );
     });
   });
 

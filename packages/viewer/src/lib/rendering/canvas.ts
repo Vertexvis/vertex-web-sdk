@@ -10,9 +10,11 @@ const REPORTING_INTERVAL_MS = 1000;
 
 export interface DrawFrame {
   canvas: CanvasRenderingContext2D;
-  dimensions: Dimensions.Dimensions;
+  canvasDimensions: Dimensions.Dimensions;
+  dimensions?: Dimensions.Dimensions;
   frame: Frame;
   viewport: Viewport;
+  beforeDraw?: VoidFunction;
 }
 
 export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
@@ -22,7 +24,12 @@ export type ReportTimingsCallback = (timing: Timing[]) => void;
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const rect = data.viewport.calculateDrawRect(data.frame.image);
 
-  data.canvas.clearRect(0, 0, data.dimensions.width, data.dimensions.height);
+  data.canvas.clearRect(
+    0,
+    0,
+    data.canvasDimensions.width,
+    data.canvasDimensions.height
+  );
   data.canvas.drawImage(image.image, rect.x, rect.y, rect.width, rect.height);
 }
 
@@ -113,7 +120,40 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
       lastFrameNumber = frameNumber;
+      data.beforeDraw?.();
       drawImage(image, data);
+    }
+
+    image.dispose();
+    return data.frame;
+  };
+}
+
+export function createHiddenCanvasRenderer(): CanvasRenderer {
+  const hiddenCanvas = document.createElement('canvas');
+  let lastFrameNumber: number | undefined;
+
+  return async (data) => {
+    const frameNumber = data.frame.sequenceNumber;
+    const frameIsNewer =
+      lastFrameNumber == null || frameNumber > lastFrameNumber;
+    const frameDimensionsMatch =
+      data.dimensions == null ||
+      Dimensions.isEqual(
+        data.dimensions,
+        data.frame.image.imageAttr.frameDimensions
+      );
+    const image = await loadImageBytes(data.frame.image.imageBytes);
+
+    hiddenCanvas.width = data.canvasDimensions.width;
+    hiddenCanvas.height = data.canvasDimensions.height;
+    const ctx = hiddenCanvas.getContext('2d');
+
+    if (ctx != null && frameIsNewer && frameDimensionsMatch) {
+      lastFrameNumber = frameNumber;
+      drawImage(image, { ...data, canvas: ctx });
+      data.beforeDraw?.();
+      data.canvas.drawImage(hiddenCanvas, 0, 0);
     }
 
     image.dispose();
