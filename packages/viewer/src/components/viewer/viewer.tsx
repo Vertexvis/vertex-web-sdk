@@ -242,6 +242,12 @@ export class Viewer {
     defaultSelectionMaterial;
 
   /**
+   * An optional value that will debounce frame updates when resizing
+   * this viewer element.
+   */
+  @Prop() public resizeDebounce = 0;
+
+  /**
    * The last frame that was received, which can be used to inspect the scene
    * and camera information.
    *
@@ -368,6 +374,8 @@ export class Viewer {
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
   private isResizing?: boolean;
+
+  private resizeTimer?: NodeJS.Timeout;
 
   private interactionHandlers: InteractionHandler[] = [];
   private interactionApi!: InteractionApi;
@@ -861,10 +869,19 @@ export class Viewer {
       entries.length >= 0 &&
       this.dimensions != null &&
       !Dimensions.isEqual(entries[0].contentRect, this.dimensions);
-    if (dimensionsHaveChanged && !this.isResizing) {
-      this.isResizing = true;
 
-      window.requestAnimationFrame(() => this.recalculateComponentDimensions());
+    if (dimensionsHaveChanged) {
+      if (this.resizeTimer != null) {
+        clearTimeout(this.resizeTimer);
+        this.resizeTimer = undefined;
+      }
+
+      if (!this.isResizing) {
+        this.resizeTimer = setTimeout(() => {
+          this.isResizing = true;
+          this.recalculateComponentDimensions();
+        }, this.resizeDebounce);
+      }
     }
   }
 
