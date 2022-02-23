@@ -1142,6 +1142,7 @@ export class Viewer {
       frame,
       fromPbFrameOrThrow(worldOrientation),
       () => this.getImageScale(),
+      this.viewport,
       sceneViewId,
       selectionMaterial
     );

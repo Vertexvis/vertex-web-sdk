@@ -1,3 +1,5 @@
+import { Point } from '@vertexvis/geometry';
+
 import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperationsBuilder } from './scene';
 
@@ -40,6 +42,11 @@ interface AllSelectedQueryExpression {
   type: 'all-selected';
 }
 
+interface PointQueryExpression {
+  type: 'point';
+  point: Point.Point;
+}
+
 /**
  * Represents the sum of all possible types of expressions.
  */
@@ -49,6 +56,7 @@ export type QueryExpression =
   | AndExpression
   | OrExpression
   | SceneTreeRangeQueryExpression
+  | PointQueryExpression
   | MetadataQueryExpression
   | AllSelectedQueryExpression;
 
@@ -103,6 +111,10 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withSelected(): AllSelectedQuery {
     return new AllSelectedQuery();
   }
+
+  public withPoint(point: Point.Point): PointQuery {
+    return new PointQuery(point);
+  }
 }
 
 export class AllQuery implements TerminalQuery {
@@ -138,6 +150,17 @@ export class AllSelectedQuery implements TerminalQuery {
   public build(): AllSelectedQueryExpression {
     return {
       type: 'all-selected',
+    };
+  }
+}
+
+export class PointQuery implements TerminalQuery {
+  public constructor(private point: Point.Point) {}
+
+  public build(): PointQueryExpression {
+    return {
+      type: 'point',
+      point: this.point,
     };
   }
 }

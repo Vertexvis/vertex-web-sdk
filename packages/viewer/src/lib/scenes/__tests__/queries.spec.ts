@@ -1,3 +1,4 @@
+import { Point } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
 
 import { RootQuery } from '../queries';
@@ -110,6 +111,16 @@ describe(RootQuery, () => {
           type: 'supplied-id',
         },
       ],
+    });
+  });
+
+  it('should support point queries', () => {
+    const point = Point.create(50, 50);
+    const itemQueryBuilder = new RootQuery().withPoint(point);
+
+    expect(itemQueryBuilder.build()).toEqual({
+      type: 'point',
+      point,
     });
   });
 });
