@@ -180,6 +180,7 @@ export class ItemsOperationExecutor {
   public constructor(
     private sceneViewId: UUID.UUID,
     private stream: StreamApi,
+    private dimensions: Dimensions.Dimensions,
     private queryOperations: QueryOperation[]
   ) {}
 
@@ -187,7 +188,9 @@ export class ItemsOperationExecutor {
     executionOptions?: SceneExecutionOptions
   ): Promise<void> {
     const pbOperations = this.queryOperations.map((op) =>
-      buildSceneOperation(op.query, op.operations)
+      buildSceneOperation(op.query, op.operations, {
+        dimensions: this.dimensions,
+      })
     );
     const request = {
       sceneViewId: {
@@ -224,6 +227,7 @@ export class Scene {
     private frame: Frame,
     private decodeFrame: FrameDecoder,
     private imageScaleProvider: ImageScaleProvider,
+    private dimensions: Dimensions.Dimensions,
     public readonly sceneViewId: UUID.UUID,
     private defaultSelectionMaterial: ColorMaterial
   ) {}
@@ -285,6 +289,7 @@ export class Scene {
     return new ItemsOperationExecutor(
       this.sceneViewId,
       this.stream,
+      this.dimensions,
       operationList
     );
   }

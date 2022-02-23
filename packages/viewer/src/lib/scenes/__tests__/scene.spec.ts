@@ -6,7 +6,7 @@ import { UUID } from '@vertexvis/utils';
 
 import { makeFrame } from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
-import { Orientation } from '../../types';
+import { Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../colorMaterial';
 import { Scene } from '../scene';
 
@@ -14,12 +14,14 @@ describe(Scene, () => {
   const sceneViewId: UUID.UUID = UUID.create();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
+  const viewport = new Viewport(50, 50);
   const colorMaterial = ColorMaterial.fromHex('#ff0000');
   const scene = new Scene(
     streamApi,
     makeFrame(),
     fromPbFrameOrThrow(Orientation.DEFAULT),
     imageScaleProvider,
+    viewport,
     sceneViewId,
     colorMaterial
   );
