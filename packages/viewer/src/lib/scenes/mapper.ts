@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Dimensions } from '@vertexvis/geometry';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -6,9 +7,14 @@ import { Animation, FlyTo } from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
 
+export interface BuildSceneOperationContext {
+  dimensions: Dimensions.Dimensions;
+}
+
 export function buildSceneOperation(
   query: QueryExpression,
-  operations: ItemOperation[]
+  operations: ItemOperation[],
+  context: BuildSceneOperationContext
 ): vertexvis.protobuf.stream.ISceneOperation {
   const operationTypes = buildOperationTypes(operations);
 
@@ -56,6 +62,14 @@ export function buildSceneOperation(
       return {
         override: {
           selection: {},
+        },
+        operationTypes,
+      };
+    case 'point':
+      return {
+        point: {
+          point: query.point,
+          viewport: context.dimensions,
         },
         operationTypes,
       };
