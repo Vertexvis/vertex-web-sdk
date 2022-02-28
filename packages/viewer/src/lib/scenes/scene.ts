@@ -301,7 +301,6 @@ export class Scene {
   public camera(): OrthographicCamera | PerspectiveCamera {
     const { scene } = this.frame;
 
-    console.log(scene.camera);
     if (scene.camera instanceof FrameOrthographicCamera) {
       return new OrthographicCamera(
         this.stream,

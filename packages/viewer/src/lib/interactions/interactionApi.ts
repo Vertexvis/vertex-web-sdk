@@ -390,7 +390,6 @@ export class InteractionApi {
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
-      console.log(camera);
       const upVector = Vector3.normalize(camera.up);
       const lookAt = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
@@ -410,8 +409,6 @@ export class InteractionApi {
       const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
       const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
-
-      console.log(camera.rotateAroundAxis(angle, rotationAxis));
 
       return camera.rotateAroundAxis(angle, rotationAxis);
     });
