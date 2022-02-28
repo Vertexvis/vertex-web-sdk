@@ -1,6 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Vector3 } from '@vertexvis/geometry';
-import { ReplaceCameraPayload } from '@vertexvis/stream-api';
 
 export interface PerspectiveFrameCamera {
   position: Vector3.Vector3;
