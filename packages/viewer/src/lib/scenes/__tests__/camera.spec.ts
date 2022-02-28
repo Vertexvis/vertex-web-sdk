@@ -6,11 +6,14 @@ import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { FrameCamera } from '../../types';
+import { PerspectiveCamera } from '..';
 import { Camera } from '../camera';
 
 describe(Camera, () => {
   const stream = new StreamApi();
-  const data = FrameCamera.create({ position: Vector3.create(1, 2, 3) });
+  const data = FrameCamera.createPerspective({
+    position: Vector3.create(1, 2, 3),
+  });
   const boundingBox = BoundingBox.create(Vector3.create(), Vector3.create());
 
   beforeAll(() => {
@@ -24,9 +27,15 @@ describe(Camera, () => {
     jest.restoreAllMocks();
   });
 
-  describe(Camera.prototype.fitToBoundingBox, () => {
+  describe(PerspectiveCamera.prototype.fitToBoundingBox, () => {
     describe('when aspect ratio < 1', () => {
-      const camera = new Camera(stream, 0.5, data, boundingBox);
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        data,
+        boundingBox,
+        jest.fn()
+      );
 
       it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
         const updatedCamera = camera.fitToBoundingBox(
@@ -39,9 +48,17 @@ describe(Camera, () => {
     });
   });
 
-  describe(Camera.prototype.distanceToBoundingBoxCenter, () => {
-    const forward = FrameCamera.create({ position: { x: 0, y: 0, z: 5 } });
-    const camera = new Camera(stream, 0.5, forward, boundingBox);
+  describe(PerspectiveCamera.prototype.distanceToBoundingBoxCenter, () => {
+    const forward = FrameCamera.createPerspective({
+      position: { x: 0, y: 0, z: 5 },
+    });
+    const camera = new PerspectiveCamera(
+      stream,
+      0.5,
+      forward,
+      boundingBox,
+      jest.fn()
+    );
 
     it('computes the distance to the center of the provided bounding box', () => {
       const distance = camera.distanceToBoundingBoxCenter(boundingBox);
@@ -50,15 +67,16 @@ describe(Camera, () => {
     });
   });
 
-  describe(Camera.prototype.rotateAroundAxis, () => {
-    const camera = new Camera(
+  describe(PerspectiveCamera.prototype.rotateAroundAxis, () => {
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.back(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('returns camera with position rotated around axis', () => {
@@ -72,15 +90,16 @@ describe(Camera, () => {
     });
   });
 
-  describe(Camera.prototype.rotateAroundAxisAtPoint, () => {
-    const camera = new Camera(
+  describe(PerspectiveCamera.prototype.rotateAroundAxisAtPoint, () => {
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.back(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('returns camera with position rotated around axis', () => {
@@ -98,15 +117,16 @@ describe(Camera, () => {
     });
   });
 
-  describe(Camera.prototype.moveBy, () => {
-    const camera = new Camera(
+  describe(PerspectiveCamera.prototype.moveBy, () => {
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.origin(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('shifts the position and lookat by the given delta', () => {
@@ -119,32 +139,34 @@ describe(Camera, () => {
     });
   });
 
-  describe(Camera.prototype.viewVector, () => {
-    const camera = new Camera(
+  describe('viewVector', () => {
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.forward(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('returns the vector between the position and lookat', () => {
-      const viewVector = camera.viewVector();
+      const viewVector = camera.viewVector;
       expect(viewVector).toEqual(Vector3.back());
     });
   });
 
-  describe(Camera.prototype.render, () => {
-    const camera = new Camera(
+  describe(PerspectiveCamera.prototype.render, () => {
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.forward(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('should render using camera', async () => {
@@ -152,7 +174,9 @@ describe(Camera, () => {
       expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
-            position: Vector3.forward(),
+            perspective: expect.objectContaining({
+              position: Vector3.forward(),
+            }),
           }),
         })
       );
@@ -160,14 +184,15 @@ describe(Camera, () => {
   });
 
   describe('render with animations', () => {
-    const camera = new Camera(
+    const camera = new PerspectiveCamera(
       stream,
       1,
       {
         ...data,
         position: Vector3.forward(),
       },
-      boundingBox
+      boundingBox,
+      jest.fn()
     );
 
     it('should render using camera with animations', async () => {
@@ -180,7 +205,9 @@ describe(Camera, () => {
       expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
-            position: Vector3.forward(),
+            perspective: expect.objectContaining({
+              position: Vector3.forward(),
+            }),
           }),
           animation: {
             duration: { nanos: 500000000, seconds: 0 },
@@ -269,12 +296,12 @@ describe(Camera, () => {
     });
 
     it('renders with fly to camera param', async () => {
-      const data = FrameCamera.create();
+      const data = FrameCamera.createPerspective();
       await camera.flyTo({ camera: data }).render();
 
       expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          camera: data,
+          camera: FrameCamera.toProtobuf(data),
         }),
         true
       );
@@ -285,7 +312,7 @@ describe(Camera, () => {
         Vector3.create(1, 1, 1),
         Vector3.create(2, 2, 2)
       );
-      const newCamera = new Camera(
+      const newCamera = new PerspectiveCamera(
         stream,
 
         1,
@@ -293,7 +320,8 @@ describe(Camera, () => {
           ...data,
           position: Vector3.back(),
         },
-        newBoundingBox
+        newBoundingBox,
+        jest.fn()
       );
 
       await newCamera.viewAll().render();
@@ -301,9 +329,11 @@ describe(Camera, () => {
       expect(stream.replaceCamera).toHaveBeenCalledWith(
         expect.objectContaining({
           camera: expect.objectContaining({
-            lookAt: Vector3.create(1.5, 1.5, 1.5),
-            position: Vector3.create(1.5, 1.5, 3.7998473026935273),
-            up: Vector3.create(0, 1, 0),
+            perspective: expect.objectContaining({
+              lookAt: Vector3.create(1.5, 1.5, 1.5),
+              position: Vector3.create(1.5, 1.5, 3.7998473026935273),
+              up: Vector3.create(0, 1, 0),
+            }),
           }),
         })
       );
@@ -314,7 +344,7 @@ describe(Camera, () => {
         Vector3.create(1, 1, 1),
         Vector3.create(2, 2, 2)
       );
-      const newCamera = new Camera(
+      const newCamera = new PerspectiveCamera(
         stream,
 
         1,
@@ -322,7 +352,8 @@ describe(Camera, () => {
           ...data,
           position: Vector3.back(),
         },
-        newBoundingBox
+        newBoundingBox,
+        jest.fn()
       );
 
       await newCamera.viewAll().render({
@@ -337,9 +368,11 @@ describe(Camera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
           camera: expect.objectContaining({
-            lookAt: Vector3.create(1.5, 1.5, 1.5),
-            position: Vector3.create(1.5, 1.5, 3.7998473026935273),
-            up: Vector3.create(0, 1, 0),
+            perspective: expect.objectContaining({
+              lookAt: Vector3.create(1.5, 1.5, 1.5),
+              position: Vector3.create(1.5, 1.5, 3.7998473026935273),
+              up: Vector3.create(0, 1, 0),
+            }),
           }),
         }),
         true
@@ -358,7 +391,7 @@ describe(Camera, () => {
       );
       const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
 
-      const newCamera = new Camera(
+      const newCamera = new PerspectiveCamera(
         stream,
 
         1,
@@ -367,7 +400,8 @@ describe(Camera, () => {
           position: Vector3.create(0, 0, 1),
           lookAt: Vector3.origin(),
         },
-        newBoundingBox
+        newBoundingBox,
+        jest.fn()
       );
 
       expect(newCamera.far).toBe(1 + radius);

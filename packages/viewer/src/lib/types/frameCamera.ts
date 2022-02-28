@@ -1,3 +1,4 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Vector3 } from '@vertexvis/geometry';
 import { ReplaceCameraPayload } from '@vertexvis/stream-api';
 
@@ -17,13 +18,13 @@ export interface OrthographicFrameCamera {
 export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 
 export function isPerspectiveFrameCamera(
-  camera: FrameCamera
+  camera: Partial<FrameCamera>
 ): camera is PerspectiveFrameCamera {
   return (camera as PerspectiveFrameCamera).position != null;
 }
 
 export function isOrthographicFrameCamera(
-  camera: FrameCamera
+  camera: Partial<FrameCamera>
 ): camera is OrthographicFrameCamera {
   const asOrtho = camera as OrthographicFrameCamera;
   return asOrtho.viewVector != null && asOrtho.fovHeight != null;
@@ -39,9 +40,9 @@ export function createPerspective(
   };
 }
 
-export function toReplaceCameraPayload(
-  camera: FrameCamera
-): ReplaceCameraPayload['camera'] {
+export function toProtobuf(
+  camera: Partial<FrameCamera>
+): vertexvis.protobuf.stream.ICamera {
   if (isOrthographicFrameCamera(camera)) {
     return {
       orthographic: { ...camera },

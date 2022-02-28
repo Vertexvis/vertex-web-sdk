@@ -236,7 +236,7 @@ export abstract class Camera<T> {
         );
       } else {
         this.stream.replaceCamera({
-          camera: FrameCamera.toReplaceCameraPayload(this.data),
+          camera: FrameCamera.toProtobuf(this.data),
           frameCorrelationId: { value: corrId },
         });
 
