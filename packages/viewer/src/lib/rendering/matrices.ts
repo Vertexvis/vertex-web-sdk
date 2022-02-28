@@ -106,7 +106,7 @@ export function makeLookAtViewMatrix(
 ): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
-    ? Vector3.add(camera.viewVector, camera.lookAt)
+    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
     : camera.position;
 
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));
@@ -141,7 +141,7 @@ export function makeLookAtMatrix(
 ): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
-    ? Vector3.add(camera.viewVector, camera.lookAt)
+    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
     : camera.position;
 
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));

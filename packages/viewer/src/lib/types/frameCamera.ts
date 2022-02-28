@@ -40,18 +40,40 @@ export function createPerspective(
   };
 }
 
+export function createOrthographic(
+  data: Partial<OrthographicFrameCamera> = {}
+): OrthographicFrameCamera {
+  return {
+    viewVector: data.viewVector || Vector3.back(),
+    lookAt: data.lookAt || Vector3.origin(),
+    up: data.up || Vector3.up(),
+    fovHeight: data.fovHeight ?? 45,
+  };
+}
+
 export function toProtobuf(
   camera: Partial<FrameCamera>
 ): vertexvis.protobuf.stream.ICamera {
   if (isOrthographicFrameCamera(camera)) {
     return {
-      orthographic: { ...camera },
+      orthographic: {
+        viewVector: { ...camera.viewVector },
+        lookAt: { ...camera.lookAt },
+        up: { ...camera.up },
+        fovHeight: camera.fovHeight,
+      },
+    };
+  } else if (isPerspectiveFrameCamera(camera)) {
+    return {
+      perspective: {
+        position: { ...camera.position },
+        lookAt: { ...camera.lookAt },
+        up: { ...camera.up },
+      },
     };
   } else {
     return {
-      perspective: {
-        ...camera,
-      },
+      ...camera,
     };
   }
 }

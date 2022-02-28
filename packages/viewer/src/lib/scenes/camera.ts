@@ -24,11 +24,11 @@ export function cameraToVector(
   vector: Vector3.Vector3,
   camera: FrameCamera.FrameCamera
 ): Vector3.Vector3 {
-  if (isOrthographicFrameCamera(camera)) {
-    return vector;
-  } else {
-    return Vector3.subtract(camera.position, vector);
-  }
+  const position = isOrthographicFrameCamera(camera)
+    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
+    : camera.position;
+
+  return Vector3.subtract(position, vector);
 }
 
 export function distanceToVectorAlongViewVec(
@@ -533,14 +533,27 @@ export class OrthographicCamera
     point: Vector3.Vector3,
     axis: Vector3.Vector3
   ): OrthographicCamera {
+    const newLookAt = Vector3.rotateAboutAxis(
+      angleInRadians,
+      this.lookAt,
+      axis,
+      point
+    );
+    const newUp = Vector3.rotateAboutAxis(
+      angleInRadians,
+      this.up,
+      axis,
+      Vector3.origin()
+    );
+    const newViewVector = Vector3.subtract(
+      Vector3.rotateAboutAxis(angleInRadians, this.position, axis, point),
+      newLookAt
+    );
+
     return this.update({
-      lookAt: Vector3.rotateAboutAxis(angleInRadians, this.lookAt, axis, point),
-      up: Vector3.rotateAboutAxis(
-        angleInRadians,
-        this.up,
-        axis,
-        Vector3.origin()
-      ),
+      viewVector: newViewVector,
+      lookAt: newLookAt,
+      up: newUp,
     });
   }
 
@@ -582,7 +595,7 @@ export class OrthographicCamera
   }
 
   public get position(): Vector3.Vector3 {
-    return Vector3.add(this.viewVector, this.lookAt);
+    return Vector3.add(this.lookAt, Vector3.negate(this.viewVector));
   }
 
   /**
