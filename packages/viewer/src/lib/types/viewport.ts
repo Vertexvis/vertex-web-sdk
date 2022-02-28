@@ -8,8 +8,7 @@ import {
 } from '@vertexvis/geometry';
 
 import { DepthBuffer } from './depthBuffer';
-import type { FrameImageLike } from './frame';
-import { FramePerspectiveCamera } from './frame';
+import type { FrameCameraWithMatrices, FrameImageLike } from './frame';
 
 /**
  * A `Viewport` represents the drawing area in the viewer.
@@ -137,7 +136,7 @@ export class Viewport implements Dimensions.Dimensions {
   public transformPointToRay(
     pt: Point.Point,
     image: FrameImageLike,
-    camera: FramePerspectiveCamera
+    camera: FrameCameraWithMatrices
   ): Ray.Ray {
     const ndc = this.transformScreenPointToNdc(pt, image);
     const origin = Vector3.fromMatrixPosition(camera.worldMatrix);

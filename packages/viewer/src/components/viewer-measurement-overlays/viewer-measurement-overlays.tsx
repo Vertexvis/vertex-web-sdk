@@ -6,7 +6,7 @@ import {
   MeasurementOverlay,
   MeasurementOverlayManager,
 } from '../../lib/measurement';
-import { FramePerspectiveCamera } from '../../lib/types';
+import { FrameCameraBase } from '../../lib/types';
 import { MeasurementOverlayView } from './viewer-measurement-overlays-components';
 
 @Component({
@@ -38,7 +38,7 @@ export class ViewerMeasurementOverlays {
    * @internal
    */
   @Prop({ mutable: true })
-  public camera?: FramePerspectiveCamera;
+  public camera?: FrameCameraBase;
 
   /**
    * The viewer that this component is bound to.

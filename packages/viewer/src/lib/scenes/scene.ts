@@ -5,8 +5,9 @@ import { UUID } from '@vertexvis/utils';
 
 import { InvalidArgumentError } from '../errors';
 import { FrameDecoder } from '../mappers';
+import { FrameOrthographicCamera } from '../types';
 import { Frame } from '../types/frame';
-import { Camera } from './camera';
+import { OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
 import { buildSceneOperation } from './mapper';
@@ -297,20 +298,36 @@ export class Scene {
   /**
    * An instance of the current camera of the scene.
    */
-  public camera(): Camera {
+  public camera(): OrthographicCamera | PerspectiveCamera {
     const { scene } = this.frame;
-    const data = {
-      position: scene.camera.position,
-      lookAt: scene.camera.lookAt,
-      up: scene.camera.up,
-    };
-    return new Camera(
-      this.stream,
-      Dimensions.aspectRatio(this.viewport()),
-      data,
-      this.frame.scene.boundingBox,
-      this.decodeFrame
-    );
+
+    console.log(scene.camera);
+    if (scene.camera instanceof FrameOrthographicCamera) {
+      return new OrthographicCamera(
+        this.stream,
+        Dimensions.aspectRatio(this.viewport()),
+        {
+          viewVector: scene.camera.viewVector,
+          lookAt: scene.camera.lookAt,
+          up: scene.camera.up,
+          fovHeight: scene.camera.fovHeight,
+        },
+        this.frame.scene.boundingBox,
+        this.decodeFrame
+      );
+    } else {
+      return new PerspectiveCamera(
+        this.stream,
+        Dimensions.aspectRatio(this.viewport()),
+        {
+          position: scene.camera.position,
+          lookAt: scene.camera.lookAt,
+          up: scene.camera.up,
+        },
+        this.frame.scene.boundingBox,
+        this.decodeFrame
+      );
+    }
   }
 
   public boundingBox(): BoundingBox.BoundingBox {

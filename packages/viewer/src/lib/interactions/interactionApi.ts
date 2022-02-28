@@ -13,11 +13,16 @@ import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import { Camera, Scene } from '../scenes';
+import {
+  getVerticalFov,
+  OrthographicCamera,
+  PerspectiveCamera,
+  Scene,
+} from '../scenes';
 import {
   DepthBuffer,
   EntityType,
-  FramePerspectiveCamera,
+  FrameCameraBase,
   Interactions,
   Viewport,
 } from '../types';
@@ -27,19 +32,19 @@ type SceneProvider = () => Scene;
 
 type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
-type CameraTransform = (data: {
-  camera: Camera;
+type CameraTransform<T = PerspectiveCamera | OrthographicCamera> = (data: {
+  camera: T;
   viewport: Viewport;
   scale: Point.Point;
   boundingBox: BoundingBox.BoundingBox;
   frame: ReceivedFrame;
   depthBuffer?: DepthBuffer;
-}) => Camera;
+}) => T;
 
 interface PanData {
   hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
-  startingCamera: FramePerspectiveCamera;
+  startingCamera: FrameCameraBase;
 }
 
 interface ZoomData {
@@ -52,7 +57,7 @@ interface ZoomData {
  * the internal state of an interaction.
  */
 export class InteractionApi {
-  private currentCamera?: Camera;
+  private currentCamera?: PerspectiveCamera | OrthographicCamera;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
@@ -347,12 +352,12 @@ export class InteractionApi {
    */
   public async panCameraByDelta(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector();
+      const vv = camera.viewVector;
 
       const u = Vector3.normalize(camera.up);
       const v = Vector3.normalize(vv);
 
-      const d = Vector3.magnitude(vv) * Math.tan(camera.fovY);
+      const d = Vector3.magnitude(vv) * Math.tan(getVerticalFov(camera));
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
@@ -385,6 +390,7 @@ export class InteractionApi {
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
+      console.log(camera);
       const upVector = Vector3.normalize(camera.up);
       const lookAt = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
@@ -404,6 +410,8 @@ export class InteractionApi {
       const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
       const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+      console.log(camera.rotateAroundAxis(angle, rotationAxis));
 
       return camera.rotateAroundAxis(angle, rotationAxis);
     });
@@ -455,8 +463,8 @@ export class InteractionApi {
           lookAt: Vector3.add(
             Vector3.scale(
               camera.distanceToBoundingBoxCenter() /
-                Vector3.magnitude(updated.viewVector()),
-              updated.viewVector()
+                Vector3.magnitude(updated.viewVector),
+              updated.viewVector
             ),
             updated.position
           ),
@@ -474,7 +482,7 @@ export class InteractionApi {
    */
   public async zoomCamera(delta: number): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector();
+      const vv = camera.viewVector;
       const v = Vector3.normalize(vv);
 
       const distance = Vector3.magnitude(vv);

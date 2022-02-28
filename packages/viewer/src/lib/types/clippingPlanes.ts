@@ -1,29 +1,26 @@
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
 
+import { cameraToVector, distanceToVectorAlongViewVec } from '../scenes';
 import { FrameCamera } from './frameCamera';
 
 export interface ClippingPlanes {
   near: number;
   far: number;
 }
-
 export function fromBoundingBoxAndLookAtCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: FrameCamera
 ): ClippingPlanes {
   const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
+  const cameraToCenter = cameraToVector(boundingBoxCenter, camera);
   const centerToBoundingPlane = Vector3.subtract(
     boundingBox.max,
     boundingBoxCenter
   );
-  const distanceToCenterAlongViewVec =
-    Math.abs(
-      Vector3.dot(
-        Vector3.subtract(camera.lookAt, camera.position),
-        cameraToCenter
-      )
-    ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
+  const distanceToCenterAlongViewVec = distanceToVectorAlongViewVec(
+    cameraToCenter,
+    camera
+  );
   const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
   let far = distanceToCenterAlongViewVec + radius;
   let near = far * 0.01;

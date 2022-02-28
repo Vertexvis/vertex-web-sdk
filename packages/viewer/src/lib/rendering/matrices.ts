@@ -103,20 +103,22 @@ export function makePerspectiveMatrix(
 export function makeLookAtViewMatrix(
   camera: FrameCamera.FrameCamera
 ): Matrix4.Matrix4 {
-  const { position, lookAt, up } = camera;
+  // const { position, lookAt, up } = camera;
 
-  const z = Vector3.normalize(Vector3.subtract(position, lookAt));
-  const x = Vector3.normalize(Vector3.cross(up, z));
-  const y = Vector3.cross(z, x);
+  // const z = Vector3.normalize(Vector3.subtract(position, lookAt));
+  // const x = Vector3.normalize(Vector3.cross(up, z));
+  // const y = Vector3.cross(z, x);
 
-  /* eslint-disable prettier/prettier */
-  return [
-    x.x, x.y, x.z, -Vector3.dot(x, position),
-    y.x, y.y, y.z, -Vector3.dot(y, position),
-    z.x, z.y, z.z, -Vector3.dot(z, position),
-    0  , 0  , 0  , 1,
-  ];
-  /* eslint-enable prettier/prettier */
+  // /* eslint-disable prettier/prettier */
+  // return [
+  //   x.x, x.y, x.z, -Vector3.dot(x, position),
+  //   y.x, y.y, y.z, -Vector3.dot(y, position),
+  //   z.x, z.y, z.z, -Vector3.dot(z, position),
+  //   0  , 0  , 0  , 1,
+  // ];
+  // /* eslint-enable prettier/prettier */
+
+  return Matrix4.makeIdentity();
 }
 
 /**
@@ -133,18 +135,20 @@ export function makeLookAtViewMatrix(
 export function makeLookAtMatrix(
   camera: FrameCamera.FrameCamera
 ): Matrix4.Matrix4 {
-  const { position, lookAt, up } = camera;
+  // const { position, lookAt, up } = camera;
 
-  const z = Vector3.normalize(Vector3.subtract(position, lookAt));
-  const x = Vector3.normalize(Vector3.cross(up, z));
-  const y = Vector3.cross(z, x);
+  // const z = Vector3.normalize(Vector3.subtract(position, lookAt));
+  // const x = Vector3.normalize(Vector3.cross(up, z));
+  // const y = Vector3.cross(z, x);
 
-  /* eslint-disable prettier/prettier */
-  return [
-    x.x, y.x, z.x, position.x,
-    x.y, y.y, z.y, position.y,
-    x.z, y.z, z.z, position.z,
-    0  , 0  , 0  , 1
-  ];
-  /* eslint-enable prettier/prettier */
+  // /* eslint-disable prettier/prettier */
+  // return [
+  //   x.x, y.x, z.x, position.x,
+  //   x.y, y.y, z.y, position.y,
+  //   x.z, y.z, z.z, position.z,
+  //   0  , 0  , 0  , 1
+  // ];
+  // /* eslint-enable prettier/prettier */
+
+  return Matrix4.makeIdentity();
 }

@@ -5,6 +5,8 @@ import { Vector3 } from '@vertexvis/geometry';
 
 import { readDOM } from '../../lib/stencil';
 import {
+  FrameCameraBase,
+  FrameOrthographicCamera,
   FramePerspectiveCamera,
   Orientation,
   StandardView,
@@ -96,7 +98,7 @@ export class ViewerViewCube {
    * @internal
    */
   @Prop({ mutable: true })
-  public camera?: FramePerspectiveCamera;
+  public camera?: FrameCameraBase;
 
   /**
    * The viewer element that is connected to the view cube.
@@ -131,15 +133,26 @@ export class ViewerViewCube {
       const scale = this.boxLength * lengthScalar;
       const fovY = 21.5;
 
-      this.camera = new FramePerspectiveCamera(
-        Vector3.scale(scale, Vector3.negate(camera.direction)),
-        Vector3.origin(),
-        camera.up,
-        0.1,
-        100,
-        1,
-        fovY
-      );
+      this.camera =
+        camera instanceof FramePerspectiveCamera
+          ? new FramePerspectiveCamera(
+              Vector3.scale(scale, Vector3.negate(camera.direction)),
+              Vector3.origin(),
+              camera.up,
+              0.1,
+              100,
+              1,
+              fovY
+            )
+          : new FrameOrthographicCamera(
+              camera.viewVector,
+              Vector3.origin(),
+              camera.up,
+              0.1,
+              100,
+              1,
+              fovY
+            );
 
       this.worldOrientation = this.viewer.frame.scene.worldOrientation;
     }

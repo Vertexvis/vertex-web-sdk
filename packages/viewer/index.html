@@ -68,6 +68,19 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+
+        viewer.config = {
+          flags: {
+            logWsMessages: true
+          }
+        }
+
+        viewer.addEventListener('tap', async (e) => {
+          console.log(e);
+          const scene = await viewer.scene();
+
+          await scene.items(op => [op.where(q => q.withPoint(e.detail.position)).hide()]).execute();
+        })
       }
     </script>
   </head>
@@ -85,9 +98,8 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src='urn:vertexvis:stream-key:7aJaf3LqqxhBDgDQ8HUgMrhUY2BnHIp2yMvk'
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"

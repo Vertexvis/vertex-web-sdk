@@ -6,7 +6,7 @@ import {
   LineOverlay,
   MeasurementOverlay,
 } from '../../lib/measurement';
-import { FramePerspectiveCamera, Viewport } from '../../lib/types';
+import { FrameCameraBase, Viewport } from '../../lib/types';
 import {
   RenderParams,
   translateWorldLineToViewport,
@@ -15,7 +15,7 @@ import {
 interface MeasurementOverlayViewProps<O extends MeasurementOverlay> {
   overlay: O;
   viewport: Viewport;
-  camera: FramePerspectiveCamera;
+  camera: FrameCameraBase;
 }
 
 export const MeasurementOverlayView: FunctionalComponent<

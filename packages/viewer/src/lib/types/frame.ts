@@ -80,7 +80,7 @@ export class FrameImage implements FrameImageLike {
 
 export class FrameScene {
   public constructor(
-    public readonly camera: FramePerspectiveCamera,
+    public readonly camera: FrameCameraBase,
     public readonly boundingBox: BoundingBox.BoundingBox,
     public readonly crossSection: CrossSectioning.CrossSectioning,
     public readonly worldOrientation: Orientation,
@@ -89,27 +89,36 @@ export class FrameScene {
 }
 
 interface FrameCameraMatrices {
-  readonly worldMatrix: Matrix4.Matrix4;
-  readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionMatrix: Matrix4.Matrix4;
   readonly projectionMatrixInverse: Matrix4.Matrix4;
+  readonly worldMatrix: Matrix4.Matrix4;
+  readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionViewMatrix: Matrix4.Matrix4;
 }
 
-interface FramePerspectiveCameraLike {
+interface FrameCameraLike {
   readonly position: Vector3.Vector3;
   readonly lookAt: Vector3.Vector3;
   readonly up: Vector3.Vector3;
   readonly near: number;
   readonly far: number;
   readonly aspectRatio: number;
+}
+
+interface FramePerspectiveCameraLike {
   readonly fovY: number;
 }
 
-export class FramePerspectiveCamera
-  implements FrameCameraMatrices, FramePerspectiveCameraLike
-{
-  private cameraMatrices?: FrameCameraMatrices;
+interface FrameOrthographicCameraLike {
+  readonly fovHeight: number;
+  readonly top: number;
+  readonly bottom: number;
+  readonly right: number;
+  readonly left: number;
+}
+
+export class FrameCameraBase implements FrameCameraLike {
+  protected cameraMatrices?: FrameCameraMatrices;
 
   public constructor(
     public readonly position: Vector3.Vector3,
@@ -117,29 +126,8 @@ export class FramePerspectiveCamera
     public readonly up: Vector3.Vector3,
     public readonly near: number,
     public readonly far: number,
-    public readonly aspectRatio: number,
-    public readonly fovY: number
+    public readonly aspectRatio: number
   ) {}
-
-  public static fromBoundingBox(
-    camera: FrameCamera.FrameCamera,
-    boundingBox: BoundingBox.BoundingBox,
-    aspectRatio: number
-  ): FramePerspectiveCamera {
-    const { near, far } = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
-      boundingBox,
-      camera
-    );
-    return new FramePerspectiveCamera(
-      camera.position,
-      camera.lookAt,
-      camera.up,
-      near,
-      far,
-      aspectRatio,
-      45
-    );
-  }
 
   public get direction(): Vector3.Vector3 {
     return Vector3.normalize(this.viewVector);
@@ -169,35 +157,37 @@ export class FramePerspectiveCamera
     return this.computeCameraMatrices().projectionViewMatrix;
   }
 
-  private computeCameraMatrices(): FrameCameraMatrices {
-    if (this.cameraMatrices == null) {
-      const viewMatrix = Matrix4.makeLookAtView(
-        this.position,
-        this.lookAt,
-        this.up
-      );
-      const worldMatrix = Matrix4.invert(viewMatrix);
-      const projectionMatrix = Matrix4.makePerspective(
-        this.near,
-        this.far,
-        this.fovY,
-        this.aspectRatio
-      );
-      const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
-      const projectionViewMatrix = Matrix4.multiply(
-        projectionMatrix,
-        viewMatrix
-      );
+  public static fromBoundingBox(
+    camera: FrameCamera.FrameCamera,
+    boundingBox: BoundingBox.BoundingBox,
+    aspectRatio: number
+  ): FrameCameraBase {
+    const { near, far } = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+      boundingBox,
+      camera
+    );
 
-      this.cameraMatrices = {
-        viewMatrix,
-        worldMatrix,
-        projectionMatrix,
-        projectionMatrixInverse,
-        projectionViewMatrix,
-      };
+    if (FrameCamera.isOrthographicFrameCamera(camera)) {
+      return new FrameOrthographicCamera(
+        camera.viewVector,
+        camera.lookAt,
+        camera.up,
+        near,
+        far,
+        aspectRatio,
+        camera.fovHeight
+      );
+    } else {
+      return new FramePerspectiveCamera(
+        camera.position,
+        camera.lookAt,
+        camera.up,
+        near,
+        far,
+        aspectRatio,
+        45
+      );
     }
-    return this.cameraMatrices;
   }
 
   /**
@@ -232,5 +222,143 @@ export class FramePerspectiveCamera
     const pt = Plane.intersectLine(nearP, vl);
 
     return pt != null ? Vector3.add(pt, position) : undefined;
+  }
+
+  protected computeCameraMatrices(): FrameCameraMatrices {
+    if (this.cameraMatrices == null) {
+      return {
+        viewMatrix: Matrix4.makeIdentity(),
+        worldMatrix: Matrix4.makeIdentity(),
+        projectionMatrix: Matrix4.makeIdentity(),
+        projectionMatrixInverse: Matrix4.makeIdentity(),
+        projectionViewMatrix: Matrix4.makeIdentity(),
+      };
+    }
+    return this.cameraMatrices;
+  }
+
+  protected updateCameraMatrices(
+    cameraMatrices: FrameCameraMatrices
+  ): FrameCameraMatrices {
+    this.cameraMatrices = cameraMatrices;
+
+    return this.cameraMatrices;
+  }
+}
+
+export interface FrameCameraWithMatrices extends FrameCameraBase {
+  readonly direction: Vector3.Vector3;
+  readonly viewVector: Vector3.Vector3;
+  readonly worldMatrix: Matrix4.Matrix4;
+  readonly viewMatrix: Matrix4.Matrix4;
+  readonly projectionMatrix: Matrix4.Matrix4;
+  readonly projectionMatrixInverse: Matrix4.Matrix4;
+  readonly projectionViewMatrix: Matrix4.Matrix4;
+}
+
+export class FramePerspectiveCamera
+  extends FrameCameraBase
+  implements FrameCameraWithMatrices, FramePerspectiveCameraLike
+{
+  public constructor(
+    public readonly position: Vector3.Vector3,
+    public readonly lookAt: Vector3.Vector3,
+    public readonly up: Vector3.Vector3,
+    public readonly near: number,
+    public readonly far: number,
+    public readonly aspectRatio: number,
+    public readonly fovY: number
+  ) {
+    super(position, lookAt, up, near, far, aspectRatio);
+  }
+
+  protected override computeCameraMatrices(): FrameCameraMatrices {
+    if (this.cameraMatrices == null) {
+      const viewMatrix = Matrix4.makeLookAtView(
+        this.position,
+        this.lookAt,
+        this.up
+      );
+      const worldMatrix = Matrix4.invert(viewMatrix);
+      const projectionMatrix = Matrix4.makePerspective(
+        this.near,
+        this.far,
+        this.fovY,
+        this.aspectRatio
+      );
+      const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
+      const projectionViewMatrix = Matrix4.multiply(
+        projectionMatrix,
+        viewMatrix
+      );
+
+      return super.updateCameraMatrices({
+        viewMatrix,
+        worldMatrix,
+        projectionMatrix,
+        projectionMatrixInverse,
+        projectionViewMatrix,
+      });
+    }
+    return this.cameraMatrices;
+  }
+}
+
+export class FrameOrthographicCamera
+  extends FrameCameraBase
+  implements FrameCameraWithMatrices, FrameOrthographicCameraLike
+{
+  public readonly top: number;
+  public readonly bottom: number;
+  public readonly right: number;
+  public readonly left: number;
+
+  public constructor(
+    viewVector: Vector3.Vector3,
+    public readonly lookAt: Vector3.Vector3,
+    public readonly up: Vector3.Vector3,
+    public readonly near: number,
+    public readonly far: number,
+    public readonly aspectRatio: number,
+    public readonly fovHeight: number
+  ) {
+    super(Vector3.add(viewVector, lookAt), lookAt, up, near, far, aspectRatio);
+    this.top = fovHeight * 0.5;
+    this.bottom = -this.top;
+    this.right = this.top * aspectRatio;
+    this.left = -this.right;
+  }
+
+  protected override computeCameraMatrices(): FrameCameraMatrices {
+    if (this.cameraMatrices == null) {
+      const viewMatrix = Matrix4.makeLookAtView(
+        this.position,
+        this.lookAt,
+        this.up
+      );
+      const worldMatrix = Matrix4.invert(viewMatrix);
+      const projectionMatrix = Matrix4.makeOrthographic(
+        this.left,
+        this.right,
+        this.bottom,
+        this.top,
+        this.near,
+        this.far
+      );
+      const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
+      const projectionViewMatrix = Matrix4.multiply(
+        projectionMatrix,
+        viewMatrix
+      );
+
+      return super.updateCameraMatrices({
+        viewMatrix,
+        worldMatrix,
+        projectionMatrix,
+        projectionMatrixInverse,
+        projectionViewMatrix,
+      });
+    }
+    return this.cameraMatrices;
   }
 }

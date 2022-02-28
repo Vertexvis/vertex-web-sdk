@@ -3,12 +3,12 @@ import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { FramePerspectiveCamera } from '../../lib/types/frame';
+import { FrameCameraWithMatrices } from '../../lib/types/frame';
 import { isVertexViewerDomElement } from '../viewer-dom-element/utils';
 import { isVertexViewerDomGroup } from '../viewer-dom-group/utils';
 
 interface Props {
-  camera: FramePerspectiveCamera;
+  camera: FrameCameraWithMatrices;
   viewport: Viewport;
 }
 
@@ -37,7 +37,7 @@ export function update3d(
   element: HTMLElement,
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
-  camera: FramePerspectiveCamera,
+  camera: FrameCameraWithMatrices,
   depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < element.children.length; i++) {
@@ -60,7 +60,7 @@ function updateElement(
   element: HTMLVertexViewerDomElementElement,
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
-  camera: FramePerspectiveCamera,
+  camera: FrameCameraWithMatrices,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
@@ -93,7 +93,7 @@ function updateGroup(
   element: HTMLVertexViewerDomGroupElement,
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
-  camera: FramePerspectiveCamera,
+  camera: FrameCameraWithMatrices,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);

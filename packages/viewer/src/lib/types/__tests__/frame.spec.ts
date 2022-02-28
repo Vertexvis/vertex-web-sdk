@@ -1,9 +1,9 @@
 import { Line3, Vector3 } from '@vertexvis/geometry';
 
-import { FramePerspectiveCamera } from '../frame';
+import { FrameCameraBase } from '../frame';
 
-describe(FramePerspectiveCamera, () => {
-  const camera = new FramePerspectiveCamera(
+describe(FrameCameraBase, () => {
+  const camera = new FrameCameraBase(
     Vector3.scale(2, Vector3.back()),
     Vector3.origin(),
     Vector3.up(),
@@ -13,7 +13,7 @@ describe(FramePerspectiveCamera, () => {
     45
   );
 
-  describe(FramePerspectiveCamera.prototype.isPointBehindNear, () => {
+  describe(FrameCameraBase.prototype.isPointBehindNear, () => {
     it('returns true if world point behind near plane', () => {
       const pt = camera.position;
       expect(camera.isPointBehindNear(pt)).toBe(true);
@@ -25,7 +25,7 @@ describe(FramePerspectiveCamera, () => {
     });
   });
 
-  describe(FramePerspectiveCamera.prototype.intersectLineWithNear, () => {
+  describe(FrameCameraBase.prototype.intersectLineWithNear, () => {
     it('returns point on near plane if line intersects', () => {
       const line = Line3.create({
         start: Vector3.origin(),

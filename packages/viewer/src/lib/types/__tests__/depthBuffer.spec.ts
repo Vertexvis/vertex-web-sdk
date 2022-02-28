@@ -9,11 +9,11 @@ import {
 
 import { makeDepthImageBytes } from '../../../testing/fixtures';
 import { DepthBuffer } from '../depthBuffer';
-import { FramePerspectiveCamera } from '../frame';
+import { FrameCameraBase } from '../frame';
 import { Viewport } from '../viewport';
 
 describe(DepthBuffer, () => {
-  const camera = FramePerspectiveCamera.fromBoundingBox(
+  const camera = FrameCameraBase.fromBoundingBox(
     {
       position: { x: 0, y: 0, z: -100 },
       lookAt: Vector3.origin(),
@@ -92,7 +92,7 @@ describe(DepthBuffer, () => {
   });
 
   describe(DepthBuffer.prototype.getWorldPoint, () => {
-    const camera = FramePerspectiveCamera.fromBoundingBox(
+    const camera = FrameCameraBase.fromBoundingBox(
       {
         position: { x: 0, y: 0, z: 5 },
         lookAt: Vector3.origin(),
