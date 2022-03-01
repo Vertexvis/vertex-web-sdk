@@ -119,7 +119,7 @@ export interface FlyToParams {
  * This class in intended to treated as an immutable type. Any mutations return
  * a new instance of the class with the updated properties.
  */
-export abstract class Camera<T> {
+export abstract class Camera {
   public constructor(
     protected stream: StreamApi,
     protected aspect: number,
@@ -133,7 +133,7 @@ export abstract class Camera<T> {
     boundingBox: BoundingBox.BoundingBox,
     fovVertical: number,
     viewVector: Vector3.Vector3
-  ): T {
+  ): Camera {
     const radius =
       1.1 *
       Vector3.magnitude(
@@ -181,7 +181,7 @@ export abstract class Camera<T> {
    */
   public flyTo(
     paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor)
-  ): T {
+  ): Camera {
     if (typeof paramsOrQuery !== 'function') {
       return this.updateFlyToOptions({
         flyTo: this.buildFlyToType(paramsOrQuery),
@@ -193,7 +193,7 @@ export abstract class Camera<T> {
     }
   }
 
-  public viewAll(): T {
+  public viewAll(): Camera {
     return this.fitToBoundingBox(this.boundingBox);
   }
 
@@ -256,7 +256,10 @@ export abstract class Camera<T> {
    * @param angleInRadians The angle, in radians, to rotate.
    * @param axis A normalized vector to rotate around.
    */
-  public rotateAroundAxis(angleInRadians: number, axis: Vector3.Vector3): T {
+  public rotateAroundAxis(
+    angleInRadians: number,
+    axis: Vector3.Vector3
+  ): Camera {
     return this.rotateAroundAxisAtPoint(angleInRadians, this.data.lookAt, axis);
   }
 
@@ -267,7 +270,7 @@ export abstract class Camera<T> {
    * @param standardView The standard view to apply.
    * @returns A new camera.
    */
-  public standardView(standardView: StandardView): T {
+  public standardView(standardView: StandardView): Camera {
     return this.update({
       position: standardView.position,
       lookAt: Vector3.origin(),
@@ -310,7 +313,7 @@ export abstract class Camera<T> {
     angleInRadians: number,
     point: Vector3.Vector3,
     axis: Vector3.Vector3
-  ): T;
+  ): Camera;
 
   /**
    * Updates the position of the camera such that the given bounding box will
@@ -318,25 +321,45 @@ export abstract class Camera<T> {
    *
    * @param boundingBox The bounding box to position to.
    */
-  public abstract fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): T;
+  public abstract fitToBoundingBox(
+    boundingBox: BoundingBox.BoundingBox
+  ): Camera;
+
+  public abstract get position(): Vector3.Vector3;
+  public abstract get lookAt(): Vector3.Vector3;
+  public abstract get up(): Vector3.Vector3;
+  public abstract get near(): number;
+  public abstract get far(): number;
+  public abstract get aspectRatio(): number;
+  public abstract get viewVector(): Vector3.Vector3;
+
+  /**
+   * Shifts the position of the camera by the given delta.
+   *
+   * @param delta The number of units to shift the camera on the X, Y, and Z
+   * axis.
+   */
+  public abstract moveBy(delta: Vector3.Vector3): Camera;
 
   /**
    * Updates the `position`, `lookAt` and/or `up` vectors of the camera.
    *
    * @param camera The values to update the camera to.
    */
-  public abstract update(camera: Partial<FrameCamera.FrameCamera>): T;
+  public abstract update(camera: Partial<FrameCamera.FrameCamera>): Camera;
 
   /**
    * Returns a `FrameCameraBase` representation.
    */
   public abstract toFrameCamera(): FrameCameraBase;
 
-  protected abstract updateFlyToOptions(flyToOptions?: FlyTo.FlyToOptions): T;
+  protected abstract updateFlyToOptions(
+    flyToOptions?: FlyTo.FlyToOptions
+  ): Camera;
 }
 
 export class PerspectiveCamera
-  extends Camera<PerspectiveCamera>
+  extends Camera
   implements FrameCamera.PerspectiveFrameCamera
 {
   public constructor(
@@ -363,7 +386,7 @@ export class PerspectiveCamera
    * @param delta The number of units to shift the camera on the X, Y, and Z
    * axis.
    */
-  public moveBy(delta: Vector3.Vector3): PerspectiveCamera {
+  public moveBy(delta: Vector3.Vector3): Camera {
     return this.update({
       position: Vector3.add(this.position, delta),
       lookAt: Vector3.add(this.lookAt, delta),
@@ -374,7 +397,7 @@ export class PerspectiveCamera
     angleInRadians: number,
     point: Vector3.Vector3,
     axis: Vector3.Vector3
-  ): PerspectiveCamera {
+  ): Camera {
     return this.update({
       position: Vector3.rotateAboutAxis(
         angleInRadians,
@@ -392,9 +415,7 @@ export class PerspectiveCamera
     });
   }
 
-  public fitToBoundingBox(
-    boundingBox: BoundingBox.BoundingBox
-  ): PerspectiveCamera {
+  public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
     return super.fitCameraToBoundingBox(
       boundingBox,
       this.fovY,
@@ -402,7 +423,7 @@ export class PerspectiveCamera
     );
   }
 
-  public update(camera: Partial<FrameCamera.FrameCamera>): PerspectiveCamera {
+  public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
     return new PerspectiveCamera(
       this.stream,
       this.aspect,
@@ -495,7 +516,7 @@ export class PerspectiveCamera
 }
 
 export class OrthographicCamera
-  extends Camera<OrthographicCamera>
+  extends Camera
   implements FrameCamera.OrthographicFrameCamera
 {
   public constructor(
@@ -522,9 +543,14 @@ export class OrthographicCamera
    * @param delta The number of units to shift the camera on the X, Y, and Z
    * axis.
    */
-  public moveBy(delta: Vector3.Vector3): OrthographicCamera {
+  public moveBy(delta: Vector3.Vector3): Camera {
+    const updatedLookAt = Vector3.add(this.lookAt, delta);
     return this.update({
-      lookAt: Vector3.add(this.lookAt, delta),
+      viewVector: Vector3.subtract(
+        updatedLookAt,
+        Vector3.add(this.position, delta)
+      ),
+      lookAt: updatedLookAt,
     });
   }
 
@@ -532,7 +558,7 @@ export class OrthographicCamera
     angleInRadians: number,
     point: Vector3.Vector3,
     axis: Vector3.Vector3
-  ): OrthographicCamera {
+  ): Camera {
     const newLookAt = Vector3.rotateAboutAxis(
       angleInRadians,
       this.lookAt,
@@ -557,9 +583,7 @@ export class OrthographicCamera
     });
   }
 
-  public fitToBoundingBox(
-    boundingBox: BoundingBox.BoundingBox
-  ): OrthographicCamera {
+  public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
     return super.fitCameraToBoundingBox(
       boundingBox,
       this.fovHeight,
@@ -567,7 +591,7 @@ export class OrthographicCamera
     );
   }
 
-  public update(camera: Partial<FrameCamera.FrameCamera>): OrthographicCamera {
+  public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
     return new OrthographicCamera(
       this.stream,
       this.aspect,
@@ -654,10 +678,4 @@ export class OrthographicCamera
       flyToOptions
     );
   }
-}
-
-export function getVerticalFov(
-  camera: PerspectiveCamera | OrthographicCamera
-): number {
-  return camera instanceof PerspectiveCamera ? camera.fovY : camera.fovHeight;
 }

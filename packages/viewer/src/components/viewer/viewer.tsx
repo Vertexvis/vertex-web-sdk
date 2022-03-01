@@ -32,6 +32,10 @@ import {
   InteractionHandlerError,
   ViewerInitializationError,
 } from '../../lib/errors';
+import {
+  InteractionApiOrthographic,
+  InteractionApiPerspective,
+} from '../../lib/interactions';
 import { BaseInteractionHandler } from '../../lib/interactions/baseInteractionHandler';
 import { FlyToPartKeyInteraction } from '../../lib/interactions/flyToPartKeyInteraction';
 import { FlyToPositionKeyInteraction } from '../../lib/interactions/flyToPositionKeyInteraction';
@@ -164,6 +168,12 @@ export class Viewer {
    * the viewer. Enabled by default.
    */
   @Prop() public cameraControls = true;
+
+  /**
+   * The type of camera model to represent the scene with. Can be either
+   * `perspective` or `orthographic`, and defaults to `perspective`.
+   */
+  @Prop() public cameraType: 'perspective' | 'orthographic' = 'perspective';
 
   /**
    * Enables or disables the default keyboard shortcut interactions provided by
@@ -1103,19 +1113,33 @@ export class Viewer {
       );
     }
 
-    return new InteractionApi(
-      this.stream,
-      this.stateMap.cursorManager,
-      () => this.getResolvedConfig().interactions,
-      () => this.createScene(),
-      () => this.frame,
-      () => this.viewport,
-      this.tap,
-      this.doubletap,
-      this.longpress,
-      this.interactionStarted,
-      this.interactionFinished
-    );
+    return this.cameraType === 'perspective'
+      ? new InteractionApiPerspective(
+          this.stream,
+          this.stateMap.cursorManager,
+          () => this.getResolvedConfig().interactions,
+          () => this.createScene(),
+          () => this.frame,
+          () => this.viewport,
+          this.tap,
+          this.doubletap,
+          this.longpress,
+          this.interactionStarted,
+          this.interactionFinished
+        )
+      : new InteractionApiOrthographic(
+          this.stream,
+          this.stateMap.cursorManager,
+          () => this.getResolvedConfig().interactions,
+          () => this.createScene(),
+          () => this.frame,
+          () => this.viewport,
+          this.tap,
+          this.doubletap,
+          this.longpress,
+          this.interactionStarted,
+          this.interactionFinished
+        );
   }
 
   private handleCursorChanged(): void {

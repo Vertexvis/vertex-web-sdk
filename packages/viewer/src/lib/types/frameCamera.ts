@@ -69,6 +69,9 @@ export function toProtobuf(
         lookAt: { ...camera.lookAt },
         up: { ...camera.up },
       },
+      position: { ...camera.position },
+      lookAt: { ...camera.lookAt },
+      up: { ...camera.up },
     };
   } else {
     return {

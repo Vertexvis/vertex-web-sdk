@@ -7,7 +7,7 @@ import { InvalidArgumentError } from '../errors';
 import { FrameDecoder } from '../mappers';
 import { FrameOrthographicCamera } from '../types';
 import { Frame } from '../types/frame';
-import { OrthographicCamera, PerspectiveCamera } from '.';
+import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
 import { buildSceneOperation } from './mapper';
@@ -298,7 +298,7 @@ export class Scene {
   /**
    * An instance of the current camera of the scene.
    */
-  public camera(): OrthographicCamera | PerspectiveCamera {
+  public camera(): Camera {
     const { scene } = this.frame;
 
     if (scene.camera instanceof FrameOrthographicCamera) {

@@ -358,6 +358,10 @@ export namespace Components {
      */
     cameraControls: boolean;
     /**
+     * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
+     */
+    cameraType: 'perspective' | 'orthographic';
+    /**
      * The Client ID associated with your Vertex Application.
      */
     clientId?: string;
@@ -1626,6 +1630,10 @@ declare namespace LocalJSX {
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
      */
     cameraControls?: boolean;
+    /**
+     * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
+     */
+    cameraType?: 'perspective' | 'orthographic';
     /**
      * The Client ID associated with your Vertex Application.
      */

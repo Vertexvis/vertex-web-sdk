@@ -62,7 +62,9 @@ export async function loadViewerStreamKey(
   await Async.delay(10);
   ws.receiveMessage(
     encode(
-      StreamFixtures.Requests.drawFrame({ payload: Fixtures.drawFramePayload })
+      StreamFixtures.Requests.drawFrame({
+        payload: Fixtures.drawFramePayloadPerspective,
+      })
     )
   );
   await loaded;
@@ -77,7 +79,7 @@ export function receiveFrame(
   ws.receiveMessage(
     encode(
       StreamFixtures.Requests.drawFrame({
-        payload: transformPayload?.(Fixtures.drawFramePayload),
+        payload: transformPayload?.(Fixtures.drawFramePayloadPerspective),
       })
     )
   );

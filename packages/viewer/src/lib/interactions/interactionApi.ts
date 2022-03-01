@@ -13,12 +13,7 @@ import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import {
-  getVerticalFov,
-  OrthographicCamera,
-  PerspectiveCamera,
-  Scene,
-} from '../scenes';
+import { Camera, Scene } from '../scenes';
 import {
   DepthBuffer,
   EntityType,
@@ -28,18 +23,21 @@ import {
 } from '../types';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 
-type SceneProvider = () => Scene;
+export type SceneProvider = () => Scene;
 
-type InteractionConfigProvider = () => Interactions.InteractionConfig;
+export type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
-type CameraTransform<T = PerspectiveCamera | OrthographicCamera> = (data: {
+export type CameraTransform<
+  T extends Camera = Camera,
+  R extends Camera = Camera
+> = (data: {
   camera: T;
   viewport: Viewport;
   scale: Point.Point;
   boundingBox: BoundingBox.BoundingBox;
   frame: ReceivedFrame;
   depthBuffer?: DepthBuffer;
-}) => T;
+}) => R;
 
 interface PanData {
   hitPt: Vector3.Vector3;
@@ -56,8 +54,8 @@ interface ZoomData {
  * The `InteractionApi` provides methods that API developers can use to modify
  * the internal state of an interaction.
  */
-export class InteractionApi {
-  private currentCamera?: PerspectiveCamera | OrthographicCamera;
+export abstract class InteractionApi {
+  protected currentCamera?: Camera;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
@@ -65,12 +63,12 @@ export class InteractionApi {
   private zoomData?: ZoomData;
 
   public constructor(
-    private stream: StreamApi,
+    protected stream: StreamApi,
     private cursors: CursorManager,
-    private getConfig: InteractionConfigProvider,
-    private getScene: SceneProvider,
-    private getFrame: () => ReceivedFrame | undefined,
-    private getViewport: () => Viewport,
+    protected getConfig: InteractionConfigProvider,
+    protected getScene: SceneProvider,
+    protected getFrame: () => ReceivedFrame | undefined,
+    protected getViewport: () => Viewport,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>,
@@ -344,36 +342,6 @@ export class InteractionApi {
   }
 
   /**
-   * Performs a pan operation of the scene's camera, and requests a new image
-   * for the updated scene.
-   *
-   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
-   *  viewer.
-   */
-  public async panCameraByDelta(delta: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector;
-
-      const u = Vector3.normalize(camera.up);
-      const v = Vector3.normalize(vv);
-
-      const d = Vector3.magnitude(vv) * Math.tan(getVerticalFov(camera));
-      const epsilonX = (delta.x * d) / viewport.width;
-      const epsilonY = (delta.y / viewport.width) * d;
-
-      const xvec = Vector3.cross(u, v);
-      const yvec = Vector3.cross(v, xvec);
-
-      const offset = Vector3.add(
-        Vector3.scale(epsilonX, xvec),
-        Vector3.scale(epsilonY, yvec)
-      );
-
-      return camera.moveBy(offset);
-    });
-  }
-
-  /**
    * Performs a view all operation for the scene's bounding box, and requests a
    * new image for the updated scene.
    */
@@ -638,4 +606,13 @@ export class InteractionApi {
       ? viewport.transformPointToWorldSpace(point, depthBuffer)
       : fallbackPoint;
   }
+
+  /**
+   * Performs a pan operation of the scene's camera, and requests a new image
+   * for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public abstract panCameraByDelta(delta: Point.Point): Promise<void>;
 }
