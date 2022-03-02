@@ -75,7 +75,12 @@ import {
   ViewerStreamState,
 } from '../../lib/stream/state';
 import { ViewerStream } from '../../lib/stream/stream';
-import { Orientation, StencilBufferManager, Viewport } from '../../lib/types';
+import {
+  FrameCamera,
+  Orientation,
+  StencilBufferManager,
+  Viewport,
+} from '../../lib/types';
 import { Frame } from '../../lib/types/frame';
 import {
   getElementBackgroundColor,
@@ -722,6 +727,16 @@ export class Viewer {
     }
   }
 
+  @Watch('cameraType')
+  protected handleCameraTypeChanged(
+    updatedCameraType: string,
+    previousCameraType: string
+  ): void {
+    if (updatedCameraType !== previousCameraType) {
+      this.updateCameraType();
+    }
+  }
+
   /**
    * @ignore
    */
@@ -1064,7 +1079,10 @@ export class Viewer {
     ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
+        const previousFrame = this.frame;
         this.frame = frame;
+
+        this.updateInteractionApi(previousFrame);
 
         const data = {
           canvas,
@@ -1113,7 +1131,8 @@ export class Viewer {
       );
     }
 
-    return this.cameraType === 'perspective'
+    return this.frame == null ||
+      FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera)
       ? new InteractionApiPerspective(
           this.stream,
           this.stateMap.cursorManager,
@@ -1222,6 +1241,45 @@ export class Viewer {
 
   private updateStreamAttributes(): void {
     this.stream?.update({ streamAttributes: this.getStreamAttributes() });
+  }
+
+  private updateInteractionApi(previousFrame?: Frame): void {
+    if (previousFrame != null && this.frame != null) {
+      const hasChangedFromPerspective =
+        FrameCamera.isPerspectiveFrameCamera(previousFrame.scene.camera) &&
+        FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera);
+      const hasChangedFromOrthographic =
+        FrameCamera.isOrthographicFrameCamera(previousFrame.scene.camera) &&
+        FrameCamera.isOrthographicFrameCamera(this.frame.scene.camera);
+
+      if (hasChangedFromPerspective || hasChangedFromOrthographic) {
+        this.interactionApi = this.createInteractionApi();
+      }
+    }
+  }
+
+  private updateCameraType(): void {
+    if (this.frame != null) {
+      if (
+        this.cameraType === 'orthographic' &&
+        FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera)
+      ) {
+        this.stream?.replaceCamera({
+          camera: FrameCamera.toProtobuf(
+            FrameCamera.toOrthographic(this.frame.scene.camera)
+          ),
+        });
+      } else if (
+        this.cameraType === 'orthographic' &&
+        FrameCamera.isOrthographicFrameCamera(this.frame.scene.camera)
+      ) {
+        this.stream?.replaceCamera({
+          camera: FrameCamera.toProtobuf(
+            FrameCamera.toPerspective(this.frame.scene.camera)
+          ),
+        });
+      }
+    }
   }
 
   private getDepthBufferStreamAttributesValue(): FrameType {

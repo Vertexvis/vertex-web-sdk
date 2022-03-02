@@ -50,6 +50,27 @@ export function createOrthographic(
   };
 }
 
+export function toOrthographic(
+  data: PerspectiveFrameCamera
+): OrthographicFrameCamera {
+  return {
+    viewVector: Vector3.subtract(data.lookAt, data.position),
+    up: data.up,
+    lookAt: data.lookAt,
+    fovHeight: 45,
+  };
+}
+
+export function toPerspective(
+  data: OrthographicFrameCamera
+): PerspectiveFrameCamera {
+  return {
+    position: Vector3.add(data.lookAt, Vector3.negate(data.viewVector)),
+    up: data.up,
+    lookAt: data.lookAt,
+  };
+}
+
 export function toProtobuf(
   camera: Partial<FrameCamera>
 ): vertexvis.protobuf.stream.ICamera {
