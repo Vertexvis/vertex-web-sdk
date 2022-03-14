@@ -52,17 +52,16 @@ export class InteractionApiOrthographic extends InteractionApi {
    */
   public async panCameraByDelta(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector;
+      const viewVector = camera.viewVector;
+      const normalizedUpVector = Vector3.normalize(camera.up);
+      const normalizedViewVector = Vector3.normalize(viewVector);
 
-      const u = Vector3.normalize(camera.up);
-      const v = Vector3.normalize(vv);
-
-      const d = Vector3.magnitude(vv) * Math.tan(camera.fovHeight);
+      const d = Vector3.magnitude(viewVector) * Math.tan(camera.fovHeight);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
-      const xvec = Vector3.cross(u, v);
-      const yvec = Vector3.cross(v, xvec);
+      const xvec = Vector3.cross(normalizedUpVector, normalizedViewVector);
+      const yvec = Vector3.cross(normalizedViewVector, xvec);
       const offset = Vector3.add(
         Vector3.scale(epsilonX, xvec),
         Vector3.scale(epsilonY, yvec)

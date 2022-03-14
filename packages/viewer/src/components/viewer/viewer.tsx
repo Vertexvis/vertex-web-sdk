@@ -1270,7 +1270,7 @@ export class Viewer {
           ),
         });
       } else if (
-        this.cameraType === 'orthographic' &&
+        this.cameraType === 'perspective' &&
         FrameCamera.isOrthographicFrameCamera(this.frame.scene.camera)
       ) {
         this.stream?.replaceCamera({

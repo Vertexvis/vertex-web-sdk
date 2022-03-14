@@ -1,5 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Vector3 } from '@vertexvis/geometry';
+import { Angle, Vector3 } from '@vertexvis/geometry';
 
 export interface PerspectiveFrameCamera {
   position: Vector3.Vector3;
@@ -53,19 +53,41 @@ export function createOrthographic(
 export function toOrthographic(
   data: PerspectiveFrameCamera
 ): OrthographicFrameCamera {
+  const viewVector = Vector3.subtract(data.lookAt, data.position);
+
+  console.log(data);
+
   return {
-    viewVector: Vector3.subtract(data.lookAt, data.position),
+    viewVector,
     up: data.up,
     lookAt: data.lookAt,
-    fovHeight: 45,
+    fovHeight:
+      2 * Vector3.magnitude(viewVector) * Math.tan(Angle.toRadians(22.5)),
   };
 }
 
 export function toPerspective(
   data: OrthographicFrameCamera
 ): PerspectiveFrameCamera {
+  const expectedMagnitude =
+    data.fovHeight / (2 * Math.tan(Angle.toRadians(22.5)));
+  const receivedMagnitude = Vector3.magnitude(data.viewVector);
+  const magnitudeScale = expectedMagnitude / receivedMagnitude;
+
+  console.log({
+    position: Vector3.add(
+      data.lookAt,
+      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
+    ),
+    up: data.up,
+    lookAt: data.lookAt,
+  });
+
   return {
-    position: Vector3.add(data.lookAt, Vector3.negate(data.viewVector)),
+    position: Vector3.add(
+      data.lookAt,
+      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
+    ),
     up: data.up,
     lookAt: data.lookAt,
   };
