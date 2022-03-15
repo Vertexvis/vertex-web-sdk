@@ -1305,16 +1305,27 @@ export class Viewer {
 
   private getDeviceId(): string | undefined {
     if (this.deviceId == null) {
-      this.deviceId = getStorageEntry(
-        StorageKeys.DEVICE_ID,
-        (entry) => entry['device-id']
-      );
+      try {
+        this.deviceId = getStorageEntry(
+          StorageKeys.DEVICE_ID,
+          (entry) => entry['device-id']
+        );
+      } catch (e) {
+        console.warn('Cannot read device ID. Local storage is not supported.');
+      }
 
       if (this.deviceId == null) {
         this.deviceId = UUID.create();
-        upsertStorageEntry(StorageKeys.DEVICE_ID, {
-          ['device-id']: this.deviceId,
-        });
+
+        try {
+          upsertStorageEntry(StorageKeys.DEVICE_ID, {
+            ['device-id']: this.deviceId,
+          });
+        } catch (e) {
+          console.warn(
+            'Cannot write device ID. Local storage is not supported.'
+          );
+        }
       }
     }
     return this.deviceId;
