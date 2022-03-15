@@ -74,19 +74,10 @@ export function toPerspective(
   const receivedMagnitude = Vector3.magnitude(data.viewVector);
   const magnitudeScale = expectedMagnitude / receivedMagnitude;
 
-  console.log({
-    position: Vector3.add(
-      data.lookAt,
-      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
-    ),
-    up: data.up,
-    lookAt: data.lookAt,
-  });
-
   return {
     position: Vector3.add(
       data.lookAt,
-      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
+      Vector3.scale(magnitudeScale, data.viewVector)
     ),
     up: data.up,
     lookAt: data.lookAt,

@@ -25,7 +25,7 @@ export function cameraToVector(
   camera: FrameCamera.FrameCamera
 ): Vector3.Vector3 {
   const position = isOrthographicFrameCamera(camera)
-    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
+    ? Vector3.add(camera.lookAt, camera.viewVector)
     : camera.position;
 
   return Vector3.subtract(position, vector);
@@ -627,7 +627,7 @@ export class OrthographicCamera
   }
 
   public get position(): Vector3.Vector3 {
-    return Vector3.add(this.lookAt, Vector3.negate(this.viewVector));
+    return Vector3.add(this.lookAt, this.viewVector);
   }
 
   /**
