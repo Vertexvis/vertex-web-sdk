@@ -23,6 +23,10 @@ import {
 } from '../types';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 
+export interface PivotOptions {
+  fixedUp?: boolean;
+}
+
 export type SceneProvider = () => Scene;
 
 export type InteractionConfigProvider = () => Interactions.InteractionConfig;
@@ -503,6 +507,61 @@ export abstract class InteractionApi {
         }
       }
       return camera;
+    });
+  }
+
+  /**
+   * Performs a pivot operation of the scene's camera, updating the lookAt
+   * while maintaining the position, and requests a new image for the
+   * updated scene.
+   *
+   * @param degreesLocalX The angle to rotate the lookAt point around the local x-axis
+   * @param degreesLocalY The angle to rotate the lookAt point around the local y-axis
+   */
+  public async pivotCamera(
+    degreesLocalX: number,
+    degreesLocalY: number
+  ): Promise<void> {
+    return this.transformCamera(({ camera }) => {
+      const { position, up, lookAt } = camera;
+      const normalizedUp = Vector3.normalize(up);
+      const normalizedViewVector = Vector3.normalize(camera.viewVector);
+      const xVector = Vector3.cross(normalizedUp, normalizedViewVector);
+      const yVector = Vector3.cross(normalizedViewVector, xVector);
+
+      const updatedLookAtX = Vector3.rotateAboutAxis(
+        Angle.toRadians(degreesLocalX),
+        lookAt,
+        xVector,
+        position
+      );
+      const updatedLookAtY = Vector3.rotateAboutAxis(
+        Angle.toRadians(-degreesLocalY),
+        updatedLookAtX,
+        yVector,
+        position
+      );
+
+      return camera.update({ ...camera, lookAt: updatedLookAtY });
+    });
+  }
+
+  /**
+   * Translates the position and lookAt of the scene's camera by the
+   * specified `translation` vector, and requests a new image for the
+   * updated scene.
+   *
+   * @param translation The translation vector
+   */
+  public async translateCamera(translation: Vector3.Vector3): Promise<void> {
+    return this.transformCamera(({ camera }) => {
+      const { position, lookAt } = camera;
+
+      return camera.update({
+        ...camera,
+        position: Vector3.add(position, translation),
+        lookAt: Vector3.add(lookAt, translation),
+      });
     });
   }
 
