@@ -132,7 +132,7 @@ export class ViewerViewCube {
       const fovY = 21.5;
 
       this.camera = new FramePerspectiveCamera(
-        Vector3.scale(scale, camera.direction),
+        Vector3.scale(scale, Vector3.negate(camera.direction)),
         Vector3.origin(),
         camera.up,
         0.1,

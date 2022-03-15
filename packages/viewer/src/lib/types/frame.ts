@@ -322,7 +322,14 @@ export class FrameOrthographicCamera
     public readonly aspectRatio: number,
     public readonly fovHeight: number
   ) {
-    super(Vector3.add(viewVector, lookAt), lookAt, up, near, far, aspectRatio);
+    super(
+      Vector3.add(lookAt, Vector3.negate(viewVector)),
+      lookAt,
+      up,
+      near,
+      far,
+      aspectRatio
+    );
     this.top = fovHeight * 0.5;
     this.bottom = -this.top;
     this.right = this.top * aspectRatio;

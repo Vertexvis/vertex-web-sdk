@@ -33,7 +33,7 @@ export function createPerspective(
   data: Partial<PerspectiveFrameCamera> = {}
 ): PerspectiveFrameCamera {
   return {
-    position: data.position || Vector3.origin(),
+    position: data.position || Vector3.forward(),
     lookAt: data.lookAt || Vector3.origin(),
     up: data.up || Vector3.up(),
   };
@@ -55,8 +55,6 @@ export function toOrthographic(
 ): OrthographicFrameCamera {
   const viewVector = Vector3.subtract(data.lookAt, data.position);
 
-  console.log(data);
-
   return {
     viewVector,
     up: data.up,
@@ -77,7 +75,7 @@ export function toPerspective(
   return {
     position: Vector3.add(
       data.lookAt,
-      Vector3.scale(magnitudeScale, data.viewVector)
+      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
     ),
     up: data.up,
     lookAt: data.lookAt,

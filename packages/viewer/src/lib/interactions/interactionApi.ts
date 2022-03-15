@@ -602,7 +602,6 @@ export abstract class InteractionApi {
     const viewport = this.getViewport();
     const framePt = viewport.transformPointToFrame(point, depthBuffer);
     const hasDepth = depthBuffer.hitTest(framePt);
-    console.log(hasDepth);
     return hasDepth
       ? viewport.transformPointToWorldSpace(point, depthBuffer)
       : fallbackPoint;

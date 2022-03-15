@@ -546,13 +546,6 @@ export class OrthographicCamera
   public moveBy(delta: Vector3.Vector3): Camera {
     const updatedLookAt = Vector3.add(this.lookAt, delta);
 
-    console.log('lookAt', this.lookAt, updatedLookAt);
-    console.log(
-      'vv',
-      this.viewVector,
-      Vector3.subtract(updatedLookAt, Vector3.add(this.position, delta))
-    );
-
     return this.update({
       viewVector: Vector3.subtract(
         updatedLookAt,
