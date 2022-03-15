@@ -50,7 +50,7 @@ describe(FramePerspectiveCamera, () => {
 
 describe(FrameOrthographicCamera, () => {
   const camera = new FrameOrthographicCamera(
-    Vector3.scale(2, Vector3.back()),
+    Vector3.scale(2, Vector3.forward()),
     Vector3.origin(),
     Vector3.up(),
     1,
