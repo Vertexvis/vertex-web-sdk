@@ -11,33 +11,59 @@ export function fromBoundingBoxAndLookAtCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: FrameCamera
 ): ClippingPlanes {
+  return fromBoundingBoxAndPerspectiveCamera(boundingBox, camera);
+}
+
+// Logic pulled from https://github.com/Vertexvis/rendering-client-lib-java/blob/master/src/main/java/com/vertexvis/rendering/graphics/PerspectiveCamera.java#L65
+// and needs to remain in sync with that computation.
+// TODO: revisit computation of these values in a single location
+export function fromBoundingBoxAndPerspectiveCamera(
+  boundingBox: BoundingBox.BoundingBox,
+  camera: FrameCamera
+): ClippingPlanes {
   const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
   const centerToBoundingPlane = Vector3.subtract(
     boundingBox.max,
     boundingBoxCenter
   );
-  const distanceToCenterAlongViewVec =
-    Math.abs(
-      Vector3.dot(
-        Vector3.subtract(camera.lookAt, camera.position),
-        cameraToCenter
-      )
-    ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
-  const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
-  let far = distanceToCenterAlongViewVec + radius;
-  let near = far * 0.01;
+  const radius = Vector3.magnitude(centerToBoundingPlane);
+  const length = Math.max(radius, Vector3.magnitude(boundingBoxCenter));
+  const epsilon = length === 0 ? 1.0 : length * 1e-6;
+  const minRange = epsilon * 1e2;
 
-  if (near > distanceToCenterAlongViewVec - radius) {
-    if (near > 1000) {
-      const difference = near - 1000;
-      near = 1000;
-      far -= difference;
-    } else {
-    }
-  } else {
-    near = distanceToCenterAlongViewVec - radius;
+  const signedDistToEye = Vector3.dot(
+    Vector3.subtract(boundingBoxCenter, camera.position),
+    Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
+  );
+
+  const bRadius = Math.max(radius, minRange);
+
+  let newFar =
+    bRadius + signedDistToEye < minRange
+      ? bRadius * 3.0
+      : bRadius + signedDistToEye;
+
+  let newNear =
+    newFar - bRadius * 2.0 < minRange
+      ? Math.min(minRange, newFar)
+      : newFar - bRadius * 2.0;
+
+  if (newFar - newNear < minRange) {
+    newNear = Math.max(newNear, minRange);
+    newFar += newNear + minRange;
+  } else if (newNear / newFar < 0.0001) {
+    newNear = newFar * 0.0001;
   }
 
-  return { far, near };
+  if (newNear > newFar - bRadius * 2.0) {
+    if (newNear > 1000 + minRange) {
+      newFar -= newNear - 1000;
+      newNear = 1000;
+    }
+  }
+
+  return {
+    near: newNear,
+    far: newFar,
+  };
 }

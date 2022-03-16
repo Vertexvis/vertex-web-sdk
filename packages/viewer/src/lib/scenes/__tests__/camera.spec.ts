@@ -6,6 +6,7 @@ import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { FrameCamera } from '../../types';
+import { fromBoundingBoxAndPerspectiveCamera } from '../../types/clippingPlanes';
 import { Camera } from '../camera';
 
 describe(Camera, () => {
@@ -351,12 +352,6 @@ describe(Camera, () => {
         Vector3.create(-1, -1, -1),
         Vector3.create(1, 1, 1)
       );
-      const boundingBoxCenter = BoundingBox.center(newBoundingBox);
-      const centerToBoundingPlane = Vector3.subtract(
-        newBoundingBox.max,
-        boundingBoxCenter
-      );
-      const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
 
       const newCamera = new Camera(
         stream,
@@ -370,8 +365,13 @@ describe(Camera, () => {
         newBoundingBox
       );
 
-      expect(newCamera.far).toBe(1 + radius);
-      expect(newCamera.near).toBe((1 + radius) * 0.01);
+      const { near, far } = fromBoundingBoxAndPerspectiveCamera(
+        newBoundingBox,
+        newCamera
+      );
+
+      expect(newCamera.far).toBe(far);
+      expect(newCamera.near).toBe(near);
     });
   });
 });
