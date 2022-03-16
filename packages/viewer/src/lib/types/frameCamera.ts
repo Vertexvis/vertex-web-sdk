@@ -5,6 +5,7 @@ export interface PerspectiveFrameCamera {
   position: Vector3.Vector3;
   lookAt: Vector3.Vector3;
   up: Vector3.Vector3;
+  fovY: number;
 }
 
 export interface OrthographicFrameCamera {
@@ -29,13 +30,31 @@ export function isOrthographicFrameCamera(
   return asOrtho.viewVector != null && asOrtho.fovHeight != null;
 }
 
+export function withPositionAndViewVector(camera: FrameCamera): FrameCamera & {
+  position: Vector3.Vector3;
+  viewVector: Vector3.Vector3;
+} {
+  if (isOrthographicFrameCamera(camera)) {
+    return {
+      ...camera,
+      position: Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector)),
+    };
+  } else {
+    return {
+      ...camera,
+      viewVector: Vector3.subtract(camera.lookAt, camera.position),
+    };
+  }
+}
+
 export function createPerspective(
   data: Partial<PerspectiveFrameCamera> = {}
 ): PerspectiveFrameCamera {
   return {
-    position: data.position || Vector3.forward(),
-    lookAt: data.lookAt || Vector3.origin(),
-    up: data.up || Vector3.up(),
+    position: data.position ?? Vector3.forward(),
+    lookAt: data.lookAt ?? Vector3.origin(),
+    up: data.up ?? Vector3.up(),
+    fovY: data.fovY ?? 45,
   };
 }
 
@@ -43,10 +62,10 @@ export function createOrthographic(
   data: Partial<OrthographicFrameCamera> = {}
 ): OrthographicFrameCamera {
   return {
-    viewVector: data.viewVector || Vector3.back(),
-    lookAt: data.lookAt || Vector3.origin(),
-    up: data.up || Vector3.up(),
-    fovHeight: data.fovHeight ?? 45,
+    viewVector: data.viewVector ?? Vector3.back(),
+    lookAt: data.lookAt ?? Vector3.origin(),
+    up: data.up ?? Vector3.up(),
+    fovHeight: data.fovHeight ?? 1.0,
   };
 }
 
@@ -60,25 +79,24 @@ export function toOrthographic(
     up: data.up,
     lookAt: data.lookAt,
     fovHeight:
-      2 * Vector3.magnitude(viewVector) * Math.tan(Angle.toRadians(22.5)),
+      2 *
+      Vector3.magnitude(viewVector) *
+      Math.tan(Angle.toRadians(data.fovY / 2.0)),
   };
 }
 
 export function toPerspective(
   data: OrthographicFrameCamera
 ): PerspectiveFrameCamera {
-  const expectedMagnitude =
-    data.fovHeight / (2 * Math.tan(Angle.toRadians(22.5)));
-  const receivedMagnitude = Vector3.magnitude(data.viewVector);
-  const magnitudeScale = expectedMagnitude / receivedMagnitude;
+  const fovY = Angle.toDegrees(
+    Math.atan(data.fovHeight / (2 * Vector3.magnitude(data.viewVector))) * 2
+  );
 
   return {
-    position: Vector3.add(
-      data.lookAt,
-      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
-    ),
+    position: Vector3.add(data.lookAt, Vector3.negate(data.viewVector)),
     up: data.up,
     lookAt: data.lookAt,
+    fovY,
   };
 }
 

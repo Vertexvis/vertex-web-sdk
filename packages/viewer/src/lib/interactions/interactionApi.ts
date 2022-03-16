@@ -427,7 +427,7 @@ export abstract class InteractionApi {
           // center of the bounding box to maintain zoom and pan behavior.
           lookAt: Vector3.add(
             Vector3.scale(
-              camera.distanceToBoundingBoxCenter() /
+              Math.abs(camera.signedDistanceToBoundingBoxCenter()) /
                 Vector3.magnitude(updated.viewVector),
               updated.viewVector
             ),

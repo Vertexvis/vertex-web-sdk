@@ -33,7 +33,13 @@ export const fromPbPerspectiveCamera: M.Func<
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
     M.mapProp('up', M.compose(M.required('up'), fromPbVector3f))
   ),
-  ([position, lookAt, up]) => ({ position, lookAt, up })
+  ([position, lookAt, up]) => ({
+    position,
+    lookAt,
+    up,
+    // TODO: map fovY property when available
+    fovY: 45,
+  })
 );
 
 export const fromPbOrthographicCamera: M.Func<
@@ -74,6 +80,8 @@ export const fromPbCamera: M.Func<
       position: position ?? Vector3.back(),
       lookAt: lookAt ?? Vector3.origin(),
       up: up ?? Vector3.up(),
+      // TODO: map fovY property when available
+      fovY: 45,
     }
 );
 

@@ -3,9 +3,9 @@ import { BoundingBox, Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { InvalidArgumentError } from '../errors';
+import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
-import { FrameOrthographicCamera } from '../types';
+import { FrameOrthographicCamera, FramePerspectiveCamera } from '../types';
 import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
@@ -314,7 +314,7 @@ export class Scene {
         this.frame.scene.boundingBox,
         this.decodeFrame
       );
-    } else {
+    } else if (scene.camera instanceof FramePerspectiveCamera) {
       return new PerspectiveCamera(
         this.stream,
         Dimensions.aspectRatio(this.viewport()),
@@ -322,9 +322,14 @@ export class Scene {
           position: scene.camera.position,
           lookAt: scene.camera.lookAt,
           up: scene.camera.up,
+          fovY: scene.camera.fovY,
         },
         this.frame.scene.boundingBox,
         this.decodeFrame
+      );
+    } else {
+      throw new InvalidCameraError(
+        'Cannot retrieve camera. Scene has an unknown or invalid camera type.'
       );
     }
   }

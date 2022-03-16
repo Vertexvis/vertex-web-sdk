@@ -20,6 +20,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       position: { x: 0, y: 0, z: -100 },
       lookAt: Vector3.origin(),
       up: Vector3.up(),
+      fovY: 45,
     },
     BoundingBox.create({ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: 1 }),
     1

@@ -14,35 +14,11 @@ import {
   FramePerspectiveCamera,
   StandardView,
 } from '../types';
-import { isOrthographicFrameCamera } from '../types/frameCamera';
+import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
 
 const PI_OVER_360 = 0.008726646259972;
-
-export function cameraToVector(
-  vector: Vector3.Vector3,
-  camera: FrameCamera.FrameCamera
-): Vector3.Vector3 {
-  const position = isOrthographicFrameCamera(camera)
-    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
-    : camera.position;
-
-  return Vector3.subtract(position, vector);
-}
-
-export function distanceToVectorAlongViewVec(
-  vector: Vector3.Vector3,
-  camera: FrameCamera.FrameCamera
-): number {
-  const viewVector = isOrthographicFrameCamera(camera)
-    ? camera.viewVector
-    : Vector3.subtract(camera.lookAt, camera.position);
-
-  return (
-    Math.abs(Vector3.dot(viewVector, vector)) / Vector3.magnitude(viewVector)
-  );
-}
 
 interface CameraRenderOptions {
   animation?: Animation.Animation;
@@ -162,14 +138,20 @@ export abstract class Camera {
    *
    * @param boundingBox - The bounding box to determine distance from.
    */
-  public distanceToBoundingBoxCenter(
+  public signedDistanceToBoundingBoxCenter(
     boundingBox?: BoundingBox.BoundingBox
   ): number {
-    const box = boundingBox || this.boundingBox;
-    const boundingBoxCenter = BoundingBox.center(box);
-    const cameraToCenter = cameraToVector(boundingBoxCenter, this.data);
+    const { position, viewVector } = withPositionAndViewVector(this.data);
 
-    return distanceToVectorAlongViewVec(cameraToCenter, this.data);
+    const boundingBoxCenter = BoundingBox.center(
+      boundingBox ?? this.boundingBox
+    );
+    const cameraToCenter = Vector3.subtract(position, boundingBoxCenter);
+
+    return (
+      Math.abs(Vector3.dot(viewVector, cameraToCenter)) /
+      Vector3.magnitude(viewVector)
+    );
   }
 
   /**
@@ -475,7 +457,7 @@ export class PerspectiveCamera
    * The camera's field of view.
    */
   public get fovY(): number {
-    return 45;
+    return this.perspectiveData.fovY;
   }
 
   /**
