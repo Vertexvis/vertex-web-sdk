@@ -149,8 +149,7 @@ export abstract class Camera {
     const cameraToCenter = Vector3.subtract(position, boundingBoxCenter);
 
     return (
-      Math.abs(Vector3.dot(viewVector, cameraToCenter)) /
-      Vector3.magnitude(viewVector)
+      Vector3.dot(viewVector, cameraToCenter) / Vector3.magnitude(viewVector)
     );
   }
 
