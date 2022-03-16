@@ -92,14 +92,14 @@ describe(DepthBuffer, () => {
   });
 
   describe(DepthBuffer.prototype.getWorldPoint, () => {
-    const camera = FramePerspectiveCamera.fromBoundingBox(
-      {
-        position: { x: 0, y: 0, z: 5 },
-        lookAt: Vector3.origin(),
-        up: Vector3.up(),
-      },
-      BoundingBox.create(Vector3.origin(), { x: 0, y: 0, z: 100 }),
-      1
+    const camera = new FramePerspectiveCamera(
+      { x: 0, y: 0, z: 5 },
+      Vector3.origin(),
+      Vector3.up(),
+      1,
+      100,
+      1,
+      45
     );
 
     function createDepthBufferWithDepth(depthValue: number): {
