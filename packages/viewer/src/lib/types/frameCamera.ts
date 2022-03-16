@@ -86,14 +86,19 @@ export function toOrthographic(
 }
 
 export function toPerspective(
-  data: OrthographicFrameCamera
+  data: OrthographicFrameCamera,
+  fovY = 45
 ): PerspectiveFrameCamera {
-  const fovY = Angle.toDegrees(
-    Math.atan(data.fovHeight / (2 * Vector3.magnitude(data.viewVector))) * 2
-  );
+  const expectedMagnitude =
+    data.fovHeight / (2 * Math.tan(Angle.toRadians(fovY / 2)));
+  const receivedMagnitude = Vector3.magnitude(data.viewVector);
+  const magnitudeScale = expectedMagnitude / receivedMagnitude;
 
   return {
-    position: Vector3.add(data.lookAt, Vector3.negate(data.viewVector)),
+    position: Vector3.add(
+      data.lookAt,
+      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
+    ),
     up: data.up,
     lookAt: data.lookAt,
     fovY,

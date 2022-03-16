@@ -69,6 +69,16 @@ describe(PerspectiveCamera, () => {
         const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
 
         expect(distance).toBeCloseTo(5);
+
+        const flipped = camera.update({
+          ...camera,
+          lookAt: { x: 0, y: 0, z: 10 },
+        });
+
+        const flippedDistance =
+          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+
+        expect(flippedDistance).toBeCloseTo(-5);
       });
     }
   );
@@ -473,6 +483,17 @@ describe(OrthographicCamera, () => {
         const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
 
         expect(distance).toBeCloseTo(5);
+
+        const flipped = camera.update({
+          ...camera,
+          viewVector: Vector3.negate(camera.viewVector),
+          lookAt: { x: 0, y: 0, z: 10 },
+        });
+
+        const flippedDistance =
+          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+
+        expect(flippedDistance).toBeCloseTo(-5);
       });
     }
   );
