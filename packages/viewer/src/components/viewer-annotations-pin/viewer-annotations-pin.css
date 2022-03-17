@@ -1,0 +1,56 @@
+:host {
+  /* position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none; */
+
+  font-size: 0.75rem;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pin {
+  cursor: pointer;
+  color: var(--blue-700);
+}
+
+.selected {
+  stroke-width: 1;
+  stroke: var(--white);
+}
+
+.pin-anchor {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  background: var(--white);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid var(--black);
+  background: var(--white);
+  pointer-events: auto;
+}
+
+.anchor-placeholder {
+  background: var(--white);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.anchor-placeholder {
+  border: 2px solid var(--black);
+  background: var(--white);
+}
+

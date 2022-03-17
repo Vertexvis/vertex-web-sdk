@@ -380,12 +380,12 @@ export class ViewerMeasurementDistance {
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        {this.showAxisReferenceLines && (
+        {/* {this.showAxisReferenceLines && (
           <vertex-viewer-measurement-overlays
             measurementOverlays={this.overlays}
             viewer={this.viewer}
           />
-        )}
+        )} */}
         {this.renderMeasurement()}
       </Host>
     );

@@ -12,7 +12,8 @@ export type ViewerIconName =
   | 'chevron-right'
   | 'chevron-down'
   | 'search'
-  | 'close-circle';
+  | 'close-circle'
+  | 'pin-fill';
 
 /**
  * The predefined sizes for icons.
@@ -83,6 +84,10 @@ export class ViewerIcon {
     } else if (this.name === 'close-circle') {
       return this.renderSvgIcon(
         <path d="M8 1a7 7 0 107 7 7 7 0 00-7-7zm2.85 9.15a.49.49 0 01-.7.7L8 8.71l-2.15 2.14a.49.49 0 01-.7-.7L7.29 8 5.15 5.85a.49.49 0 01.7-.7L8 7.29l2.15-2.14a.49.49 0 01.7.7L8.71 8z" />
+      );
+    } else if (this.name === 'pin-fill') {
+      return this.renderSvgIcon(
+        <path d="M8,.55A5.9,5.9,0,0,0,2.1,6.44a9.14,9.14,0,0,0,2.66,6.24,11.44,11.44,0,0,0,1.93,1.65,7.43,7.43,0,0,0,.73.44l.28.12a.78.78,0,0,0,.6,0,6.65,6.65,0,0,0,1.34-.79,11.79,11.79,0,0,0,2.76-2.88,8.59,8.59,0,0,0,1.5-4.78A5.9,5.9,0,0,0,8,.55ZM8,8.44a2,2,0,1,1,2-2A2,2,0,0,1,8,8.44Z" />
       );
     } else {
       return <svg />;

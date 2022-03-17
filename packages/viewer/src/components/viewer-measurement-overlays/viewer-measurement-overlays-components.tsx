@@ -71,13 +71,13 @@ const DistanceVectorOverlayView: FunctionalComponent<
       />
       <vertex-viewer-measurement-line
         class="measurement-line distance-vector-y"
-        start={ys}
-        end={ye}
+        start={xs}
+        end={xe}
       />
       <vertex-viewer-measurement-line
         class="measurement-line distance-vector-z"
-        start={zs}
-        end={ze}
+        start={xs}
+        end={xe}
       />
     </Fragment>
   );

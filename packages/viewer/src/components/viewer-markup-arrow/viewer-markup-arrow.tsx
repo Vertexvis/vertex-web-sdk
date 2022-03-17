@@ -341,6 +341,7 @@ export class ViewerMarkupArrow {
   };
 
   private updatePoints = (event: PointerEvent): void => {
+    console.log('update points', event.clientX);
     if (this.elementBounds != null && this.pointerId === event.pointerId) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),

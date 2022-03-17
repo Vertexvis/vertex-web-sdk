@@ -56,6 +56,11 @@
         width: 100%;
         height: 100%;
       }
+
+      vertex-viewer-measurement-details { 
+        position: absolute;
+        top: 0;
+      }
     </style>
 
     <script type="module">
@@ -68,27 +73,103 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+
+
+        const markup = document.getElementById('markup');
+
+
+        const preciseMeasurement = document.getElementById('vertex-viewer-measurement-precise');
+        const detailsPage = document.getElementById('measurement-details');
+
+        console.log('preciseMeasurement: ', preciseMeasurement.measurementModel);
+        detailsPage.measurementModel = preciseMeasurement.measurementModel;
+        // An event is dispatched whenever a new markup is added.
+        markup.addEventListener('markupAdded', (event) => {
+          console.log(`markup added`, event.detail.id, event.detail.distance);
+        });
+
+         // An event is dispatched whenever a new measurement is added.
+        measurements.addEventListener('measurementAdded', (event) => {
+          console.log(`Measurement added`, event.detail.id, event.detail.distance);
+        })
+        
+
+        viewer.addEventListener('tap', async (event) => {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+          const result = await raycaster.hitItems(position);
+          if (result.hits && result.hits.length > 0) {
+            console.log(result.hits);
+
+            // await scene
+            //   .items((op) => [
+            //     op.where((q) => q.withItemId(result.hits[0])).hide(),
+            //   ])
+            //   .execute();
+
+          } else {
+            // range query
+             await scene
+              .items((op) => [
+                op.where((q) => q.withSelected()).hide(),
+              ])
+              .execute();
+          }
+        });
+
       }
     </script>
   </head>
 
   <body>
     <div class="app">
-      <div class="tree">
+      <!-- <div class="tree">
         <vertex-scene-tree
           id="scene-tree"
           config-env="platdev"
           viewer-selector="#viewer"
         >
         </vertex-scene-tree>
-      </div>
+      </div> -->
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          depth-buffers="final"
+          feature-maps="final"
+          src="urn:vertexvis:stream-key:RgGLfd96RmvLGn8p0_Pbpwg82PBNZM2wH-q5"
         >
+        <!-- DLE0VxacKFrNiqj9cEKjmnrqGpBOYcwuNNgz -->
+         
+        
+          <vertex-viewer-annotations-pin
+            id="vertex-viewer-annotation-pin"
+            config-env="platdev"
+          >
+        
+          </vertex-viewer-annotations-pin>
+
+          <!-- <vertex-viewer-measurement-precise
+            id="vertex-viewer-measurement-precise"
+            config-env="platdev"
+          >
+          </vertex-viewer-measurement-precise>
+
+          <vertex-viewer-measurement-details
+          id="measurement-details"
+          distance-units="inches"
+          style=""
+          fractional-digits="1"
+        >
+        </vertex-viewer-measurement-details> -->
+
+        <!-- <vertex-viewer-measurement-distance
+          id="vertex-viewer-measurement-distance"
+          mode="replace"
+        >
+        </vertex-viewer-measurement-distance> -->
+        
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
@@ -98,6 +179,26 @@
               class="view-cube"
             ></vertex-viewer-view-cube>
           </vertex-viewer-toolbar>
+
+          <!-- <vertex-viewer-measurements id="measurements">
+          </vertex-viewer-measurements> -->
+          <vertex-viewer-markup id="markup">
+            <!-- <vertex-viewer-markup-tool></vertex-viewer-markup-tool> -->
+          </vertex-viewer-markup>
+
+
+          <!-- <vertex-viewer-dom-renderer draw-mode="2d" id="viewer-pin-renderer">
+            <vertex-viewer-dom-element
+              id="something-1"
+              key="something-1"
+              position={{ x: 0, y: 0, z: 0 }}
+              positionJson={JSON.stringify({ x: 0, y: 0, z: 0 })}
+            >
+              <div id="drawn-pin-initial" class="pin">
+                1
+              </div>
+            </vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer> -->
         </vertex-viewer>
       </div>
     </div>
