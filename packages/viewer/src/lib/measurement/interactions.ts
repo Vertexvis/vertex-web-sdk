@@ -87,7 +87,6 @@ export class MeasurementInteractionHandler implements InteractionHandler {
   ): Promise<boolean> {
     const pt = getMouseClientPosition(event, this.elementRect);
     const type = await this.api?.getEntityTypeAtPoint(pt);
-    console.log('type precise-measurement: ', type);
     return type != null && this.measurableEntityTypes.includes(type);
   }
 

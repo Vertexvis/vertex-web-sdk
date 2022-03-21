@@ -348,7 +348,6 @@ export class ViewerMarkupTool {
       const { start, end } = markupElement;
 
       if (start != null && end != null) {
-        console.log('new one,', start, end);
         this.markupEnd.emit(new ArrowMarkup({ start, end }));
       }
     }
