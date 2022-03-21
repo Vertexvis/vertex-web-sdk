@@ -77,6 +77,8 @@ import {
 import { ViewerStream } from '../../lib/stream/stream';
 import {
   FrameCamera,
+  FrameOrthographicCamera,
+  FramePerspectiveCamera,
   Orientation,
   StencilBufferManager,
   Viewport,
@@ -1132,7 +1134,7 @@ export class Viewer {
     }
 
     return this.frame == null ||
-      FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera)
+      this.frame.scene.camera instanceof FramePerspectiveCamera
       ? new InteractionApiPerspective(
           this.stream,
           this.stateMap.cursorManager,
@@ -1246,14 +1248,18 @@ export class Viewer {
   private updateInteractionApi(previousFrame?: Frame): void {
     if (previousFrame != null && this.frame != null) {
       const hasChangedFromPerspective =
-        FrameCamera.isPerspectiveFrameCamera(previousFrame.scene.camera) &&
-        FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera);
+        previousFrame.scene.camera instanceof FramePerspectiveCamera &&
+        this.frame.scene.camera instanceof FrameOrthographicCamera;
       const hasChangedFromOrthographic =
-        FrameCamera.isOrthographicFrameCamera(previousFrame.scene.camera) &&
-        FrameCamera.isOrthographicFrameCamera(this.frame.scene.camera);
+        previousFrame.scene.camera instanceof FrameOrthographicCamera &&
+        this.frame.scene.camera instanceof FramePerspectiveCamera;
 
       if (hasChangedFromPerspective || hasChangedFromOrthographic) {
         this.interactionApi = this.createInteractionApi();
+
+        this.interactionHandlers.forEach((handler) =>
+          this.initializeInteractionHandler(handler)
+        );
       }
     }
   }
@@ -1266,7 +1272,10 @@ export class Viewer {
       ) {
         this.stream?.replaceCamera({
           camera: FrameCamera.toProtobuf(
-            FrameCamera.toOrthographic(this.frame.scene.camera)
+            FrameCamera.toOrthographic(
+              this.frame.scene.camera,
+              this.frame.scene.boundingBox
+            )
           ),
         });
       } else if (

@@ -59,8 +59,8 @@ export abstract class InteractionApi {
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
-  private panData?: PanData;
-  private zoomData?: ZoomData;
+  protected panData?: PanData;
+  protected zoomData?: ZoomData;
 
   public constructor(
     protected stream: StreamApi,
@@ -311,10 +311,10 @@ export abstract class InteractionApi {
         // Create a plane for the hit point that will be used to determine the
         // delta of future mouse movements to the original hit point. Fallback
         // to a plane placed at the look at point, in case there's no hit.
-        const hitPt =
-          depthBuffer != null
-            ? this.getWorldPoint(screenPt, depthBuffer, fallback)
-            : fallback;
+        const hitPt = fallback;
+        // depthBuffer != null
+        //   ? this.getWorldPoint(screenPt, depthBuffer, fallback)
+        //   : fallback;
         const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
@@ -594,7 +594,7 @@ export abstract class InteractionApi {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 
-  private getWorldPoint(
+  protected getWorldPoint(
     point: Point.Point,
     depthBuffer: DepthBuffer,
     fallbackPoint: Vector3.Vector3
