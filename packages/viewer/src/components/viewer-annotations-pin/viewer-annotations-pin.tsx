@@ -81,12 +81,10 @@ export class ViewerAnnotationsPin {
     this.setupInteractionHandler();
 
     this.pinModel.onEntitiesChanged((entities) => {
-      console.log('entitiesChanged in viewer annotations-pin: ', entities);
       this.pins = entities;
     });
 
     this.pinModel.onSelectionChange((selectedId) => {
-      console.log('SELECTION CHANGE: ', selectedId);
       this.selectedPinId = selectedId;
     });
   }
@@ -105,11 +103,6 @@ export class ViewerAnnotationsPin {
   @Watch('viewer')
   protected handleViewerChanged(): void {
     this.setupInteractionHandler();
-  }
-
-  @Watch('pinModel')
-  protected pinModelChanged(): void {
-    console.log('this.pinModel: ', this.pinModel);
   }
 
   /**
@@ -138,8 +131,6 @@ export class ViewerAnnotationsPin {
   }
 
   protected render(): JSX.Element {
-    console.log('rendering: ', this.pins);
-
     const onUpdatePin = (
       currentPin: TextPinEntity,
       updatedPin: TextPinEntity
@@ -165,7 +156,6 @@ export class ViewerAnnotationsPin {
                   pin={pin}
                   selected={this.selectedPinId === pin.id}
                   onSelectPin={(id) => {
-                    console.log('herere: ', this.pinController);
                     this.pinController?.setSelectedPinId(id);
                   }}
                   onUpdatePinLabelPosition={async (point) => {
@@ -174,7 +164,6 @@ export class ViewerAnnotationsPin {
                     const frame = this.viewer?.frame;
                     const depthBuffer = await frame?.depthBuffer();
 
-                    console.log('Trying, ', depthBuffer);
                     if (depthBuffer != null && viewport != null) {
                       const updatedCoordinates =
                         viewport?.transformPointToWorldSpace(
@@ -183,7 +172,6 @@ export class ViewerAnnotationsPin {
                           0.5
                         );
 
-                      console.log('updating pin');
                       onUpdatePin(pin, {
                         ...pin,
                         labelWorldPosition: updatedCoordinates,

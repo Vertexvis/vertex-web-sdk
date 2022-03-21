@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { FunctionalComponent, h, Host } from '@stencil/core';
+import { FunctionalComponent, h } from '@stencil/core';
 import { Angle, Point } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
@@ -51,10 +51,9 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
       ? Point.add(endPt, Point.polar(anchorLabelOffset, angle))
       : undefined;
 
-  console.log('startPt, endPt', startPt, endPt, lineCapLength);
   return (
     <div>
-      {/* {startPt != null && endPt != null && (
+      {startPt != null && endPt != null && (
         <vertex-viewer-measurement-line
           class={classNames('line', {
             'hide-start-line-cap': hideStartAnchor,
@@ -65,7 +64,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
           capLength={lineCapLength}
           pointerEvents={linePointerEvents}
         />
-      )} */}
+      )}
 
       {!hideStartAnchor && startPt != null && (
         <div
@@ -80,16 +79,16 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
         </div>
       )}
 
-      {/* {!hideStartAnchor && startLabelPt && (
+      {!hideStartAnchor && startLabelPt && (
         <div
           class="anchor-label anchor-label-start"
           style={{ transform: cssTransformCenterAt(startLabelPt) }}
         >
           <slot name="start-label" />
         </div>
-      )} */}
+      )}
 
-      {/* {!hideEndAnchor && endPt != null && (
+      {!hideEndAnchor && endPt != null && (
         <div
           id="end-anchor"
           class="anchor anchor-end"
@@ -130,7 +129,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
             <div class="indicator-placeholder" />
           </slot>
         </div>
-      )} */}
+      )}
     </div>
   );
 };

@@ -36,7 +36,6 @@ export class PinsInteractionHandler implements InteractionHandler {
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.api = api;
-    console.log('adding measurement cursor');
     this.addCursor('crosshair');
 
     element.addEventListener('pointermove', this.handlePointerMove);
@@ -67,10 +66,7 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.ifInitialized(async ({ api }) => {
       const pt = getMouseClientPosition(event);
 
-      console.log('point: ', pt);
       const [hit] = await api.hitItems(pt);
-
-      console.log('hit: ', hit);
 
       if (hit?.hitPoint != null) {
         const vector3 = await api.getWorldPointFromViewport(pt);
