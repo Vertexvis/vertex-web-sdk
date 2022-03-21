@@ -5,20 +5,20 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
+  Listen,
   Method,
   Prop,
   Watch,
 } from '@stencil/core';
-import { Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { Config } from '../../lib/config';
-import { cssTransformCenterAt } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
 import { PinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
 import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-distance/viewer-measurement-distance';
+import { DrawablePinRenderer } from './drawable-pin';
 
 @Component({
   tag: 'vertex-viewer-annotations-pin',
@@ -38,7 +38,7 @@ export class ViewerAnnotationsPin {
   @Prop()
   public pinModel: PinModel = new PinModel();
 
-  @Prop()
+  @Prop({ mutable: true })
   public pins: PinEntity[] = [];
 
   /**
@@ -47,6 +47,9 @@ export class ViewerAnnotationsPin {
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
+
+  @Prop({ mutable: true })
+  public selectedPinId?: string;
 
   /**
    * An optional configuration to setup network configuration of measurement
@@ -104,6 +107,15 @@ export class ViewerAnnotationsPin {
   }
 
   /**
+   * @ignore
+   */
+  @Listen('pointerdown')
+  protected async handleMarkupPointerDown(event: PointerEvent): Promise<void> {
+    console.log('pointerdown event: ', event);
+    window.addEventListener('pointerup', this.handlePointerUp);
+  }
+
+  /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
    * this function uses `getBoundingClientRect` internally and will cause a
    * relayout of the DOM.
@@ -134,39 +146,29 @@ export class ViewerAnnotationsPin {
     return (
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
-          {this.pins.map((m, i) => {
+          {this.pins.map((pin, i) => {
             return (
-              // <div
-              //   id="start-anchor"
-              //   class="anchor anchor-start"
-              //   style={{ transform: cssTransformCenterAt(m.point) }}
-              //   onPointerDown={(event) => console.log('pointer: ', event)}
-              // >
-              //   <slot name="start-anchor">
-              //     <div class="anchor-placeholder"></div>
-              //   </slot>
-              // </div>
               <vertex-viewer-dom-element
                 key={`drawn-pin-${i}`}
                 data-testid={`drawn-pin-${i}`}
-                occluded={true}
-                position={m.worldPosition}
+                position={pin.worldPosition}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  this.selectedPinId = pin.id;
+                }}
               >
-                <div
-                  id="start-anchor"
-                  class="pin-anchor"
-                  // style={{ transform: cssTrsansformCenterAt(m.point) }}
-                  onPointerDown={(event) => console.log('pointer: ', event)}
-                >
-                  {/* <slot name="start-anchor">
-                  <div class="anchor-placeholder"></div>
-                </slot> */}
-                </div>
-                {/* <vertex-viewer-icon
-                  name="pin-fill"
-                  class="pin"
-                  size="lg"
-                ></vertex-viewer-icon> */}
+                <DrawablePinRenderer
+                  pin={pin}
+                  selected={this.selectedPinId === pin.id}
+                  onUpdatePin={(updatedPin) => {
+                    this.pinModel.setEntities(
+                      new Set([
+                        ...this.pins.filter((p) => p.id !== pin.id),
+                        updatedPin,
+                      ])
+                    );
+                  }}
+                />
               </vertex-viewer-dom-element>
             );
           })}
@@ -202,4 +204,11 @@ export class ViewerAnnotationsPin {
     this.onOverlaysChangedHandler?.dispose();
     this.onOverlaysChangedHandler = undefined;
   }
+
+  private handlePointerUp = async (event: PointerEvent): Promise<void> => {
+    console.log('testing');
+    this.selectedPinId = undefined;
+
+    window.removeEventListener('pointerup', this.handlePointerUp);
+  };
 }

@@ -443,6 +443,7 @@ export namespace Components {
          */
         "pinModel": PinModel;
         "pins": PinEntity[];
+        "selectedPinId"?: string;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -1633,6 +1634,7 @@ declare namespace LocalJSX {
          */
         "pinModel"?: PinModel;
         "pins"?: PinEntity[];
+        "selectedPinId"?: string;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */

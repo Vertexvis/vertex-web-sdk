@@ -1,4 +1,4 @@
-import { Disposable } from '@vertexvis/utils';
+import { Disposable, UUID } from '@vertexvis/utils';
 
 import { Cursor, pinCursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
@@ -6,7 +6,7 @@ import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { EntityType } from '../types';
 import { PinController } from './controller';
-import { PinEntity } from './entities';
+import { PinEntity, TextPinEntity } from './entities';
 
 export class PinsInteractionHandler implements InteractionHandler {
   private controller: PinController;
@@ -37,7 +37,7 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.element = element;
     this.api = api;
     console.log('adding measurement cursor');
-    this.addCursor(pinCursor);
+    this.addCursor('crosshair');
 
     element.addEventListener('pointermove', this.handlePointerMove);
     element.addEventListener('pointerdown', this.handlePointerDown);
@@ -70,14 +70,20 @@ export class PinsInteractionHandler implements InteractionHandler {
       const [hit] = await api.hitItems(pt);
 
       console.log('hit: ', hit);
-      // const rect = this.elementRect;
 
       if (hit?.hitPoint != null) {
         const vector3 = await api.getWorldPointFromViewport(pt);
+        const labelVector = await api.getWorldPointFromViewport({
+          x: pt.x,
+          y: pt.y - 50,
+        });
 
         console.log('Got vector3: ', vector3);
         if (vector3 != null) {
-          this.controller.addEntity(new PinEntity(vector3, pt));
+          const pinId = UUID.create();
+          this.controller.addEntity(
+            new TextPinEntity(pinId, vector3, pt, labelVector)
+          );
         }
       } else {
         console.warn('No Hit Found');
@@ -87,14 +93,6 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private addCursor(cursor: Cursor): void {
     this.cursor = this.ifInitialized(({ api }) => api.addCursor(cursor));
-  }
-
-  private async isDroppableSurface(event: PointerEvent): Promise<boolean> {
-    const pt = getMouseClientPosition(event, this.elementRect);
-    const type = await this.api?.getEntityTypeAtPoint(pt);
-
-    console.log('type: ', type);
-    return type != null && this.VALID_GEOMETRY_TYPES.includes(type);
   }
 
   protected ifInitialized<R>(

@@ -54,3 +54,17 @@
   background: var(--white);
 }
 
+:host([mode='']) .distance-label {
+  color: var(--white);
+  background: var(--neutral-900);
+}
+
+
+.distance-label {
+  position: absolute;
+  background: var(--white);
+  border: 1px solid var(--neutral-900);
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  pointer-events: auto;
+}
