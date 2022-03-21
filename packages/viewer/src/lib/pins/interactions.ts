@@ -63,6 +63,7 @@ export class PinsInteractionHandler implements InteractionHandler {
   };
 
   private handlePointerDown = async (event: PointerEvent): Promise<void> => {
+    this.controller.setSelectedPinId(undefined);
     this.ifInitialized(async ({ api }) => {
       const pt = getMouseClientPosition(event);
 

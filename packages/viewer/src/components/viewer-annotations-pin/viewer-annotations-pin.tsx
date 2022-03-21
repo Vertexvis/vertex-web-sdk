@@ -8,13 +8,14 @@ import {
   Listen,
   Method,
   Prop,
+  State,
   Watch,
 } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
-import { PinEntity } from '../../lib/pins/entities';
+import { PinEntity, TextPinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
 import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-distance/viewer-measurement-distance';
@@ -39,7 +40,10 @@ export class ViewerAnnotationsPin {
   public pinModel: PinModel = new PinModel();
 
   @Prop({ mutable: true })
-  public pins: PinEntity[] = [];
+  public pins: TextPinEntity[] = [];
+
+  @State()
+  private selectedPinId?: string;
 
   /**
    * The viewer that this component is bound to. This is automatically assigned
@@ -47,9 +51,6 @@ export class ViewerAnnotationsPin {
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
-
-  @Prop({ mutable: true })
-  public selectedPinId?: string;
 
   /**
    * An optional configuration to setup network configuration of measurement
@@ -83,6 +84,11 @@ export class ViewerAnnotationsPin {
       console.log('entitiesChanged in viewer annotations-pin: ', entities);
       this.pins = entities;
     });
+
+    this.pinModel.onSelectionChange((selectedId) => {
+      console.log('SELECTION CHANGE: ', selectedId);
+      this.selectedPinId = selectedId;
+    });
   }
 
   /**
@@ -104,15 +110,6 @@ export class ViewerAnnotationsPin {
   @Watch('pinModel')
   protected pinModelChanged(): void {
     console.log('this.pinModel: ', this.pinModel);
-  }
-
-  /**
-   * @ignore
-   */
-  @Listen('pointerdown')
-  protected async handleMarkupPointerDown(event: PointerEvent): Promise<void> {
-    console.log('pointerdown event: ', event);
-    window.addEventListener('pointerup', this.handlePointerUp);
   }
 
   /**
@@ -143,6 +140,17 @@ export class ViewerAnnotationsPin {
   protected render(): JSX.Element {
     console.log('rendering: ', this.pins);
 
+    const onUpdatePin = (
+      currentPin: TextPinEntity,
+      updatedPin: TextPinEntity
+    ): void => {
+      this.pinModel.setEntities(
+        new Set([
+          ...this.pins.filter((p) => p.id !== currentPin.id),
+          updatedPin,
+        ])
+      );
+    };
     return (
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
@@ -152,21 +160,38 @@ export class ViewerAnnotationsPin {
                 key={`drawn-pin-${i}`}
                 data-testid={`drawn-pin-${i}`}
                 position={pin.worldPosition}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  this.selectedPinId = pin.id;
-                }}
               >
                 <DrawablePinRenderer
                   pin={pin}
                   selected={this.selectedPinId === pin.id}
+                  onSelectPin={(id) => {
+                    console.log('herere: ', this.pinController);
+                    this.pinController?.setSelectedPinId(id);
+                  }}
+                  onUpdatePinLabelPosition={async (point) => {
+                    const viewport = this.viewer?.viewport;
+
+                    const frame = this.viewer?.frame;
+                    const depthBuffer = await frame?.depthBuffer();
+
+                    console.log('Trying, ', depthBuffer);
+                    if (depthBuffer != null && viewport != null) {
+                      const updatedCoordinates =
+                        viewport?.transformPointToWorldSpace(
+                          point,
+                          depthBuffer,
+                          0.5
+                        );
+
+                      console.log('updating pin');
+                      onUpdatePin(pin, {
+                        ...pin,
+                        labelWorldPosition: updatedCoordinates,
+                      });
+                    }
+                  }}
                   onUpdatePin={(updatedPin) => {
-                    this.pinModel.setEntities(
-                      new Set([
-                        ...this.pins.filter((p) => p.id !== pin.id),
-                        updatedPin,
-                      ])
-                    );
+                    onUpdatePin(pin, updatedPin);
                   }}
                 />
               </vertex-viewer-dom-element>
@@ -204,11 +229,4 @@ export class ViewerAnnotationsPin {
     this.onOverlaysChangedHandler?.dispose();
     this.onOverlaysChangedHandler = undefined;
   }
-
-  private handlePointerUp = async (event: PointerEvent): Promise<void> => {
-    console.log('testing');
-    this.selectedPinId = undefined;
-
-    window.removeEventListener('pointerup', this.handlePointerUp);
-  };
 }

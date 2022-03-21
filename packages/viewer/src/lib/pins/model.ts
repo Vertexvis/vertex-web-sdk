@@ -8,8 +8,10 @@ import { PinEntity } from './entities';
  */
 export class PinModel {
   private entities = new Set<PinEntity>();
+  private selectedPinId?: string;
 
   private entitiesChanged = new EventDispatcher<PinEntity[]>();
+  private selectionChanged = new EventDispatcher<string | undefined>();
 
   /**
    * Registers an entity to be drawn in the canvas
@@ -22,6 +24,7 @@ export class PinModel {
       this.entities.add(entity);
 
       console.log('entitiesChanged: ', this.getEntities());
+      this.setSelectedPin(entity.id);
       this.entitiesChanged.emit(this.getEntities());
       return true;
     } else {
@@ -41,6 +44,10 @@ export class PinModel {
    */
   public getEntities(): PinEntity[] {
     return Array.from(this.entities);
+  }
+
+  public getSelectedPinId(): string | undefined {
+    return this.selectedPinId;
   }
 
   /**
@@ -81,5 +88,25 @@ export class PinModel {
    */
   public onEntitiesChanged(listener: Listener<PinEntity[]>): Disposable {
     return this.entitiesChanged.on(listener);
+  }
+
+  /**
+   * Registers an event listener that will be invoked when the model's
+   * pin selection changes
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onSelectionChange(listener: Listener<string | undefined>): Disposable {
+    return this.selectionChanged.on(listener);
+  }
+
+  /**
+   * Sets the selected pin Id
+   * @param pinId
+   */
+  public setSelectedPin(pinId?: string): void {
+    this.selectedPinId = pinId;
+    this.selectionChanged.emit(this.selectedPinId);
   }
 }

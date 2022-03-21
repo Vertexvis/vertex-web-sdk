@@ -47,4 +47,12 @@ export class PinController {
   public setEntities(entities: Set<PinEntity>): void {
     this.model.setEntities(entities);
   }
+
+  /**
+   * Tells the controller which pin is selected in the model
+   * @param pinId
+   */
+  public setSelectedPinId(pinId?: string): void {
+    this.model.setSelectedPin(pinId);
+  }
 }
