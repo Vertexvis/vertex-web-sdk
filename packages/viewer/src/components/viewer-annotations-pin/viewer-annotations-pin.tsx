@@ -11,6 +11,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+import { Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { Config } from '../../lib/config';
@@ -159,22 +160,33 @@ export class ViewerAnnotationsPin {
                     this.pinController?.setSelectedPinId(id);
                   }}
                   onUpdatePinLabelPosition={async (point) => {
-                    const viewport = this.viewer?.viewport;
-
                     const frame = this.viewer?.frame;
-                    const depthBuffer = await frame?.depthBuffer();
+                    if (pin.labelOffset != null && frame != null) {
+                      console.log('Point: ', point);
 
-                    if (depthBuffer != null && viewport != null) {
-                      const updatedCoordinates =
-                        viewport?.transformPointToWorldSpace(
-                          point,
-                          depthBuffer,
-                          0.5
-                        );
+                      console.log('pin.point: ', pin.labelOffset);
 
+                      const x = point.x;
+                      const y = point.y;
+
+                      // console.log('x: ', x);
+                      // const updatedOffset = Point.subtract(
+
+                      // );
+                      // console.log('updatedOffest', updatedOffset);
+
+                      const subtracted = Point.subtract(
+                        {
+                          x: frame.image.imageAttr.frameDimensions.width / 2,
+                          y:
+                            frame.image.imageAttr.frameDimensions.height / 2 +
+                            50,
+                        },
+                        point
+                      );
                       onUpdatePin(pin, {
                         ...pin,
-                        labelWorldPosition: updatedCoordinates,
+                        labelOffset: { ...subtracted },
                       });
                     }
                   }}

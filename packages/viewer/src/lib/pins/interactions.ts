@@ -70,16 +70,19 @@ export class PinsInteractionHandler implements InteractionHandler {
 
       if (hit?.hitPoint != null) {
         const vector3 = await api.getWorldPointFromViewport(pt);
-        const labelVector = await api.getWorldPointFromViewport({
-          x: pt.x,
-          y: pt.y - 50,
-        });
+        // const labelVector = await api.getWorldPointFromViewport({
+        //   x: pt.x,
+        //   y: pt.y,
+        // });
 
         console.log('Got vector3: ', vector3);
         if (vector3 != null) {
           const pinId = UUID.create();
           this.controller.addEntity(
-            new TextPinEntity(pinId, vector3, pt, labelVector)
+            new TextPinEntity(pinId, vector3, pt, {
+              y: 50,
+              x: 0,
+            })
           );
         }
       } else {

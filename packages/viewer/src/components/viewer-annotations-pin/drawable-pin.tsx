@@ -56,7 +56,7 @@ export const DrawablePinRenderer: FunctionalComponent<
         class="pin-anchor"
         onPointerDown={(event) => console.log('pointer: ', event)}
       ></div>
-      {pin.labelWorldPosition != null &&
+      {pin.labelOffset != null &&
         (selected ? (
           <input
             id={`pin-label-${pin.id}`}
@@ -73,7 +73,7 @@ export const DrawablePinRenderer: FunctionalComponent<
               });
             }}
             style={{
-              transform: cssTransformCenterAt(pin.labelWorldPosition),
+              transform: `translate(-50%, -50%) translate(${pin.labelOffset.x}px, ${pin.labelOffset.y}px)`,
             }}
           />
         ) : (
@@ -81,7 +81,7 @@ export const DrawablePinRenderer: FunctionalComponent<
             id={`pin-label-${pin.id}`}
             class="distance-label"
             style={{
-              transform: cssTransformCenterAt(pin.labelWorldPosition),
+              transform: `translate(-50%, -50%) translate(${pin.labelOffset.x}px, ${pin.labelOffset.y}px)`,
             }}
           >
             {pin.labelText || 'Untitled Pin'}

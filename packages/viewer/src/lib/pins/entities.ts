@@ -13,7 +13,7 @@ export class TextPinEntity extends PinEntity {
     public readonly id: string,
     public readonly worldPosition: Vector3.Vector3,
     public readonly point: Point.Point,
-    public readonly labelWorldPosition?: Vector3.Vector3,
+    public readonly labelOffset?: Point.Point,
     public readonly labelText?: string
   ) {
     super(id, worldPosition, point);
