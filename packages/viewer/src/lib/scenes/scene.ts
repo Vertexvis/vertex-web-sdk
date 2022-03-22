@@ -3,10 +3,11 @@ import { BoundingBox, Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { InvalidArgumentError } from '../errors';
+import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
+import { FrameOrthographicCamera, FramePerspectiveCamera } from '../types';
 import { Frame } from '../types/frame';
-import { Camera } from './camera';
+import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
 import { buildSceneOperation } from './mapper';
@@ -299,18 +300,38 @@ export class Scene {
    */
   public camera(): Camera {
     const { scene } = this.frame;
-    const data = {
-      position: scene.camera.position,
-      lookAt: scene.camera.lookAt,
-      up: scene.camera.up,
-    };
-    return new Camera(
-      this.stream,
-      Dimensions.aspectRatio(this.viewport()),
-      data,
-      this.frame.scene.boundingBox,
-      this.decodeFrame
-    );
+
+    if (scene.camera instanceof FrameOrthographicCamera) {
+      return new OrthographicCamera(
+        this.stream,
+        Dimensions.aspectRatio(this.viewport()),
+        {
+          viewVector: scene.camera.viewVector,
+          lookAt: scene.camera.lookAt,
+          up: scene.camera.up,
+          fovHeight: scene.camera.fovHeight,
+        },
+        this.frame.scene.boundingBox,
+        this.decodeFrame
+      );
+    } else if (scene.camera instanceof FramePerspectiveCamera) {
+      return new PerspectiveCamera(
+        this.stream,
+        Dimensions.aspectRatio(this.viewport()),
+        {
+          position: scene.camera.position,
+          lookAt: scene.camera.lookAt,
+          up: scene.camera.up,
+          fovY: scene.camera.fovY,
+        },
+        this.frame.scene.boundingBox,
+        this.decodeFrame
+      );
+    } else {
+      throw new InvalidCameraError(
+        'Cannot retrieve camera. Scene has an unknown or invalid camera type.'
+      );
+    }
   }
 
   public boundingBox(): BoundingBox.BoundingBox {

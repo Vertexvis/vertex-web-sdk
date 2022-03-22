@@ -20,6 +20,7 @@ export {
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,
   FrameScene as ReceivedFrameScene,
+  FrameOrthographicCamera as ReceivedOrthographicCamera,
   FramePerspectiveCamera as ReceivedPerspectiveCamera,
   SynchronizedClock,
   Viewport,

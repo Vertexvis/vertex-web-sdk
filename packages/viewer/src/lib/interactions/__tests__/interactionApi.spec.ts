@@ -1,10 +1,10 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
-import { makeFrame } from '../../../testing/fixtures';
+import { makePerspectiveFrame } from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
@@ -12,6 +12,7 @@ import * as ColorMaterial from '../../scenes/colorMaterial';
 import { Interactions, Orientation, Viewport } from '../../types';
 import { Frame } from '../../types/frame';
 import { InteractionApi } from '../interactionApi';
+import { InteractionApiPerspective } from '../interactionApiPerspective';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
@@ -21,12 +22,13 @@ describe(InteractionApi, () => {
   const emitInteractionFinished = jest.fn();
   const streamApi = new StreamApi();
   const sceneViewId = 'scene-view-id';
-  const frame = makeFrame();
+  const frame = makePerspectiveFrame();
   const scene = new Scene(
     streamApi,
     frame,
     fromPbFrameOrThrow(Orientation.DEFAULT),
     () => Point.create(1, 1),
+    Dimensions.create(50, 50),
     sceneViewId,
     ColorMaterial.fromHex('#ffffff')
   );
@@ -42,7 +44,7 @@ describe(InteractionApi, () => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
 
-    api = new InteractionApi(
+    api = new InteractionApiPerspective(
       streamApi,
       new CursorManager(),
       interactionConfigProvider,
@@ -180,7 +182,7 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
-      api = new InteractionApi(
+      api = new InteractionApiPerspective(
         streamApi,
         new CursorManager(),
         interactionConfigProvider,

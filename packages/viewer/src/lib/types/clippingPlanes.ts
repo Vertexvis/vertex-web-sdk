@@ -1,6 +1,11 @@
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
 
-import { FrameCamera } from './frameCamera';
+import {
+  FrameCamera,
+  isOrthographicFrameCamera,
+  OrthographicFrameCamera,
+  PerspectiveFrameCamera,
+} from './frameCamera';
 
 export interface ClippingPlanes {
   near: number;
@@ -11,7 +16,9 @@ export function fromBoundingBoxAndLookAtCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: FrameCamera
 ): ClippingPlanes {
-  return fromBoundingBoxAndPerspectiveCamera(boundingBox, camera);
+  return isOrthographicFrameCamera(camera)
+    ? fromBoundingBoxAndOrthographicCamera(boundingBox, camera)
+    : fromBoundingBoxAndPerspectiveCamera(boundingBox, camera);
 }
 
 // Logic pulled from https://github.com/Vertexvis/rendering-client-lib-java/blob/master/src/main/java/com/vertexvis/rendering/graphics/PerspectiveCamera.java#L65
@@ -19,7 +26,7 @@ export function fromBoundingBoxAndLookAtCamera(
 // TODO: revisit computation of these values in a single location
 export function fromBoundingBoxAndPerspectiveCamera(
   boundingBox: BoundingBox.BoundingBox,
-  camera: FrameCamera
+  camera: PerspectiveFrameCamera
 ): ClippingPlanes {
   const boundingBoxCenter = BoundingBox.center(boundingBox);
   const centerToBoundingPlane = Vector3.subtract(
@@ -65,5 +72,35 @@ export function fromBoundingBoxAndPerspectiveCamera(
   return {
     near: newNear,
     far: newFar,
+  };
+}
+
+// Logic pulled from https://github.com/Vertexvis/rendering-client-lib-java/blob/master/src/main/java/com/vertexvis/rendering/graphics/OrthographicCamera.java#L35
+// and needs to remain in sync with that computation.
+// TODO: revisit computation of these values in a single location
+export function fromBoundingBoxAndOrthographicCamera(
+  boundingBox: BoundingBox.BoundingBox,
+  camera: OrthographicFrameCamera
+): ClippingPlanes {
+  const boundingBoxCenter = BoundingBox.center(boundingBox);
+  const centerToBoundingPlane = Vector3.subtract(
+    boundingBox.max,
+    boundingBoxCenter
+  );
+  const radius = Vector3.magnitude(centerToBoundingPlane);
+  const length = Math.max(radius, Vector3.magnitude(boundingBoxCenter));
+  const epsilon = length === 0 ? 1.0 : length * 1e-6;
+  const minRange = epsilon * 1e2;
+
+  const projCenter = Vector3.dot(
+    Vector3.subtract(boundingBoxCenter, camera.lookAt),
+    camera.viewVector
+  );
+
+  const bRadius = Math.max(radius, minRange);
+
+  return {
+    near: projCenter - bRadius,
+    far: projCenter + bRadius,
   };
 }
