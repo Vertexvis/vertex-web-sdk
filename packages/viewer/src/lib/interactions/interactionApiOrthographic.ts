@@ -124,6 +124,7 @@ export class InteractionApiOrthographic extends InteractionApi {
         const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
+        console.log(this.panData);
       }
 
       if (this.panData != null) {
@@ -140,14 +141,8 @@ export class InteractionApiOrthographic extends InteractionApi {
 
         if (movePt != null) {
           const delta = Vector3.subtract(hitPt, movePt);
-          const boundingSphere = BoundingSphere.create(frame.scene.boundingBox);
-          const relativeDelta = Vector3.scale(
-            ((boundingSphere.radius * 2) / viewport.width) * camera.aspectRatio,
-            delta
-          );
-
           return camera.update({
-            lookAt: Vector3.add(startingCamera.lookAt, relativeDelta),
+            lookAt: Vector3.add(startingCamera.lookAt, delta),
           });
         }
       }

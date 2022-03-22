@@ -85,6 +85,12 @@ export function fromBoundingBoxAndOrthographicCamera(
 
   const bRadius = Math.max(boundingSphere.radius, minRange);
 
+  console.log(
+    'orthographic clipping',
+    projCenter - bRadius,
+    projCenter + bRadius
+  );
+
   return {
     near: projCenter - bRadius,
     far: projCenter + bRadius,
