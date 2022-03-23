@@ -1,6 +1,5 @@
 import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 
-import { constrainViewVector } from '../rendering/vectors';
 import {
   FrameCamera,
   isOrthographicFrameCamera,

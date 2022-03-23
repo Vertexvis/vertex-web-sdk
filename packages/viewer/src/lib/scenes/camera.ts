@@ -1,9 +1,4 @@
-import {
-  BoundingBox,
-  BoundingSphere,
-  Plane,
-  Vector3,
-} from '@vertexvis/geometry';
+import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -529,14 +524,8 @@ export class OrthographicCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
-    const updatedLookAt = Vector3.add(this.lookAt, delta);
-
     return this.update({
-      viewVector: constrainViewVector(
-        Vector3.subtract(updatedLookAt, Vector3.add(this.position, delta)),
-        BoundingSphere.create(this.boundingBox)
-      ),
-      lookAt: updatedLookAt,
+      lookAt: Vector3.add(this.lookAt, delta),
     });
   }
 
