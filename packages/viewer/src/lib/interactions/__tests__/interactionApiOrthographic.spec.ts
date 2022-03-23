@@ -91,4 +91,69 @@ describe(InteractionApi, () => {
       expect(moveBy.mock.calls[0][0].x).toBeCloseTo(-1);
     });
   });
+
+  describe(InteractionApiOrthographic.prototype.panCameraToScreenPoint, () => {
+    it('changes the lookAt of the orthographic camera', async () => {
+      const data = FrameCamera.createOrthographic();
+      const mockOrthographicCamera = new OrthographicCamera(
+        streamApi,
+        1,
+        data,
+        BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
+        fromPbFrameOrThrow(Orientation.DEFAULT)
+      );
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
+      const update = jest
+        .spyOn(mockOrthographicCamera, 'update')
+        .mockImplementation(() => mockOrthographicCamera);
+
+      await api.beginInteraction();
+      await api.panCameraToScreenPoint(
+        Point.create(frame.image.imageAttr.frameDimensions.width, 0)
+      );
+      await api.panCameraToScreenPoint(Point.create(0, 0));
+      await api.endInteraction();
+
+      expect(update).toHaveBeenCalledTimes(2);
+      expect(update.mock.calls[1][0].lookAt).toMatchObject({
+        x: -2,
+        y: 0,
+        z: 0,
+      });
+    });
+  });
+
+  describe(InteractionApiOrthographic.prototype.zoomCameraToPoint, () => {
+    it('changes the fovHeight and lookAt of the orthographic camera', async () => {
+      const data = FrameCamera.createOrthographic();
+      const mockOrthographicCamera = new OrthographicCamera(
+        streamApi,
+        1,
+        data,
+        BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
+        fromPbFrameOrThrow(Orientation.DEFAULT)
+      );
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
+      const update = jest.spyOn(mockOrthographicCamera, 'update');
+
+      await api.beginInteraction();
+      await api.zoomCameraToPoint(
+        Point.create(frame.image.imageAttr.frameDimensions.width, 0),
+        -100
+      );
+      await api.endInteraction();
+
+      expect(update.mock.calls[0][0].lookAt?.x).toBeCloseTo(1);
+      expect(update.mock.calls[0][0].lookAt?.y).toBeCloseTo(-1);
+      expect(update.mock.calls[0][0].lookAt?.z).toBe(0);
+      expect(
+        (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera)
+          .fovHeight
+      ).toBe(3);
+    });
+  });
 });
