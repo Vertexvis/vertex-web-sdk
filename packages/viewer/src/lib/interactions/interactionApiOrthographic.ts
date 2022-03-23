@@ -186,7 +186,7 @@ export class InteractionApiOrthographic extends InteractionApi {
         camera.aspectRatio,
         asPerspective.fovY
       );
-      const dir = perspectiveCam.direction;
+      const dir = frameCam.direction;
       const ray = viewport.transformPointToRay(
         point,
         frame.image,
@@ -196,7 +196,7 @@ export class InteractionApiOrthographic extends InteractionApi {
       if (this.zoomData == null) {
         const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
           dir,
-          perspectiveCam.lookAt
+          frameCam.lookAt
         );
         const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
         if (fallbackPt == null) {
@@ -215,31 +215,18 @@ export class InteractionApiOrthographic extends InteractionApi {
       }
 
       if (this.zoomData != null) {
-        const { hitPt, hitPlane } = this.zoomData;
-        const distance = Vector3.distance(perspectiveCam.position, hitPt);
-        const epsilon = (6 * distance * delta) / viewport.height;
+        const { hitPt } = this.zoomData;
 
-        const position = Ray.at(ray, epsilon);
-        const lookAt = Plane.projectPoint(hitPlane, position);
-        const newCamera = FrameCamera.createPerspective({
-          ...asPerspective,
-          position,
-          lookAt,
-        });
-        const newOrtho = FrameCamera.toOrthographic(
-          newCamera,
-          frame.scene.boundingBox
+        const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
+        const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
+        const diff = Vector3.scale(
+          (camera.fovHeight - fovHeight) / camera.fovHeight,
+          Vector3.subtract(hitPt, camera.lookAt)
         );
-
-        console.log(
-          camera.lookAt,
-          camera.viewVector,
-          (camera as any).fovHeight
-        );
-        console.log(newOrtho.lookAt, newOrtho.viewVector, newOrtho.fovHeight);
 
         return camera.update({
-          ...newOrtho,
+          lookAt: Vector3.add(camera.lookAt, diff),
+          fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
         });
       }
       return camera;
