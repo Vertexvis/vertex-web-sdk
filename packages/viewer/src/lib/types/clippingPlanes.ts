@@ -80,16 +80,10 @@ export function fromBoundingBoxAndOrthographicCamera(
 
   const projCenter = Vector3.dot(
     Vector3.subtract(boundingSphere.center, camera.lookAt),
-    Vector3.normalize(camera.viewVector)
+    camera.viewVector
   );
 
   const bRadius = Math.max(boundingSphere.radius, minRange);
-
-  console.log(
-    'orthographic clipping',
-    projCenter - bRadius,
-    projCenter + bRadius
-  );
 
   return {
     near: projCenter - bRadius,

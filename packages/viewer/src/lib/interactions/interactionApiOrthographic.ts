@@ -2,6 +2,8 @@ import { EventEmitter } from '@stencil/core';
 import {
   BoundingBox,
   BoundingSphere,
+  Matrix,
+  Matrix4,
   Plane,
   Point,
   Ray,
@@ -11,17 +13,32 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
+import { constrainViewVector } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
-import { DepthBuffer, Viewport } from '../types';
+import {
+  ClippingPlanes,
+  DepthBuffer,
+  FrameCamera,
+  FrameOrthographicCamera,
+  FramePerspectiveCamera,
+  Viewport,
+} from '../types';
 import {
   CameraTransform,
   InteractionApi,
   InteractionConfigProvider,
   SceneProvider,
+  ZoomData,
 } from './interactionApi';
 import { TapEventDetails } from './tapEventDetails';
 
+interface OrthographicZoomData extends ZoomData {
+  startingCamera: FrameOrthographicCamera;
+}
+
 export class InteractionApiOrthographic extends InteractionApi {
+  private orthographicZoomData?: OrthographicZoomData;
+
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -124,7 +141,6 @@ export class InteractionApiOrthographic extends InteractionApi {
         const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
-        console.log(this.panData);
       }
 
       if (this.panData != null) {
@@ -155,84 +171,78 @@ export class InteractionApiOrthographic extends InteractionApi {
     delta: number
   ): Promise<void> {
     return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      // const cam = frame.scene.camera;
-      // const dir = cam.direction;
+      const frameCam = camera.toFrameCamera();
+      const asPerspective = FrameCamera.toPerspective(frameCam);
+      const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+        frame.scene.boundingBox,
+        asPerspective
+      );
+      const perspectiveCam = new FramePerspectiveCamera(
+        asPerspective.position,
+        asPerspective.lookAt,
+        asPerspective.up,
+        planes.near,
+        planes.far,
+        camera.aspectRatio,
+        asPerspective.fovY
+      );
+      const dir = perspectiveCam.direction;
+      const ray = viewport.transformPointToRay(
+        point,
+        frame.image,
+        perspectiveCam
+      );
 
-      // const frameCam = camera.toFrameCamera();
-      // const ray = viewport.transformPointToRay(point, frame.image, frameCam);
+      if (this.zoomData == null) {
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+          dir,
+          perspectiveCam.lookAt
+        );
+        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+        if (fallbackPt == null) {
+          console.warn(
+            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+          );
+          return camera;
+        }
 
-      // console.log('orthographic ray', ray);
+        const hitPt = fallbackPt;
+        // depthBuffer != null
+        //   ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+        //   : fallbackPt;
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+        this.zoomData = { hitPt, hitPlane };
+      }
 
-      // if (this.zoomData == null) {
-      //   const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, cam.lookAt);
-      //   const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
-      //   if (fallbackPt == null) {
-      //     console.warn(
-      //       'Cannot determine fallback point for zoom. Ray does not intersect plane.'
-      //     );
-      //     return camera;
-      //   }
+      if (this.zoomData != null) {
+        const { hitPt, hitPlane } = this.zoomData;
+        const distance = Vector3.distance(perspectiveCam.position, hitPt);
+        const epsilon = (6 * distance * delta) / viewport.height;
 
-      //   // TODO: properly support depth buffer in orthographic
-      //   const hitPt = fallbackPt;
-      //   // depthBuffer != null
-      //   //   ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-      //   //   : fallbackPt;
-      //   const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-      //   this.zoomData = { hitPt, hitPlane };
-      // }
+        const position = Ray.at(ray, epsilon);
+        const lookAt = Plane.projectPoint(hitPlane, position);
+        const newCamera = FrameCamera.createPerspective({
+          ...asPerspective,
+          position,
+          lookAt,
+        });
+        const newOrtho = FrameCamera.toOrthographic(
+          newCamera,
+          frame.scene.boundingBox
+        );
 
-      // if (this.zoomData != null) {
-      //   const { hitPt, hitPlane } = this.zoomData;
-      //   const distance = Vector3.distance(camera.position, hitPt);
-      //   const epsilon = (6 * distance * delta) / viewport.height;
-      //   const boundingBoxCenter = BoundingBox.center(frame.scene.boundingBox);
-      //   const centerToBoundingPlane = Vector3.subtract(
-      //     frame.scene.boundingBox.max,
-      //     boundingBoxCenter
-      //   );
-      //   const radius = Vector3.magnitude(centerToBoundingPlane);
+        console.log(
+          camera.lookAt,
+          camera.viewVector,
+          (camera as any).fovHeight
+        );
+        console.log(newOrtho.lookAt, newOrtho.viewVector, newOrtho.fovHeight);
 
-      //   const position = Ray.at(ray, epsilon);
-      //   const lookAt = Plane.projectPoint(hitPlane, position);
-      //   const scale =
-      //     radius / Vector3.magnitude(Vector3.subtract(lookAt, position));
-      //   const newCamera = camera.update({
-      //     // lookAt: Vector3.add(lookAt, Vector3.scale(epsilon, lookAt)),
-      //     viewVector: Vector3.scale(scale, Vector3.subtract(lookAt, position)),
-      //     fovHeight: Math.max(1, camera.fovHeight - epsilon),
-      //   });
-      //   // const newDistance = Vector3.distance(camera.position, lookAt);
-
-      //   // if (newDistance >= newCamera.near) {
-      //   return newCamera;
-      //   // }
-      // }
-      // return camera;
-
-      // const boundingBoxCenter = BoundingBox.center(frame.scene.boundingBox);
-      // const centerToBoundingPlane = Vector3.subtract(
-      //   frame.scene.boundingBox.max,
-      //   boundingBoxCenter
-      // );
-      // const radius = Vector3.magnitude(centerToBoundingPlane);
-      // const diameter = radius * 2;
-
-      // const deltaPoint = Vector3.create(
-      //   (point.x / viewport.width) * diameter,
-      //   (point.y / viewport.height) * diameter,
-      //   camera.far
-      // );
-
-      // viewport.transformPointToWorldSpace(point, depthBuffer, camera.far);
-
-      // const lookAt = Vector3.add(camera.lookAt, deltaPoint);
-
-      const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
-
-      return camera.update({
-        fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
-      });
+        return camera.update({
+          ...newOrtho,
+        });
+      }
+      return camera;
     });
   }
 

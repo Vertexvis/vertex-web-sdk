@@ -20,7 +20,8 @@ export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 export function isPerspectiveFrameCamera(
   camera: Partial<FrameCamera>
 ): camera is PerspectiveFrameCamera {
-  return (camera as PerspectiveFrameCamera).position != null;
+  const asPerspective = camera as PerspectiveFrameCamera;
+  return asPerspective.position != null && asPerspective.fovY != null;
 }
 
 export function isOrthographicFrameCamera(

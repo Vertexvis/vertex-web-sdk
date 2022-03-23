@@ -39,13 +39,13 @@ export type CameraTransform<
   depthBuffer?: DepthBuffer;
 }) => R;
 
-interface PanData {
+export interface PanData {
   hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
   startingCamera: FrameCameraBase;
 }
 
-interface ZoomData {
+export interface ZoomData {
   hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
 }

@@ -8,6 +8,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { FrameDecoder } from '../mappers';
+import { constrainViewVector } from '../rendering/vectors';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import {
   Animation,
@@ -531,9 +532,9 @@ export class OrthographicCamera
     const updatedLookAt = Vector3.add(this.lookAt, delta);
 
     return this.update({
-      viewVector: Vector3.subtract(
-        updatedLookAt,
-        Vector3.add(this.position, delta)
+      viewVector: constrainViewVector(
+        Vector3.subtract(updatedLookAt, Vector3.add(this.position, delta)),
+        BoundingSphere.create(this.boundingBox)
       ),
       lookAt: updatedLookAt,
     });
@@ -544,14 +545,26 @@ export class OrthographicCamera
     point: Vector3.Vector3,
     axis: Vector3.Vector3
   ): Camera {
+    const updatedLookAt = Vector3.rotateAboutAxis(
+      angleInRadians,
+      this.lookAt,
+      axis,
+      point
+    );
+    const updatedPosition = Vector3.rotateAboutAxis(
+      angleInRadians,
+      this.position,
+      axis,
+      point
+    );
+    const viewVector = constrainViewVector(
+      Vector3.subtract(updatedLookAt, updatedPosition),
+      BoundingSphere.create(this.boundingBox)
+    );
+
     return this.update({
-      viewVector: Vector3.rotateAboutAxis(
-        angleInRadians,
-        this.viewVector,
-        axis,
-        point
-      ),
-      lookAt: Vector3.rotateAboutAxis(angleInRadians, this.lookAt, axis, point),
+      viewVector: viewVector,
+      lookAt: updatedLookAt,
       up: Vector3.rotateAboutAxis(
         angleInRadians,
         this.up,
