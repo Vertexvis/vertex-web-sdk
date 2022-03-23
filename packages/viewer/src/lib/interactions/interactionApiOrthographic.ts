@@ -1,25 +1,13 @@
 import { EventEmitter } from '@stencil/core';
-import {
-  BoundingBox,
-  BoundingSphere,
-  Matrix,
-  Matrix4,
-  Plane,
-  Point,
-  Ray,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
-import { constrainViewVector } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
 import {
   ClippingPlanes,
-  DepthBuffer,
   FrameCamera,
-  FrameOrthographicCamera,
   FramePerspectiveCamera,
   Viewport,
 } from '../types';
@@ -28,17 +16,10 @@ import {
   InteractionApi,
   InteractionConfigProvider,
   SceneProvider,
-  ZoomData,
 } from './interactionApi';
 import { TapEventDetails } from './tapEventDetails';
 
-interface OrthographicZoomData extends ZoomData {
-  startingCamera: FrameOrthographicCamera;
-}
-
 export class InteractionApiOrthographic extends InteractionApi {
-  private orthographicZoomData?: OrthographicZoomData;
-
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -171,29 +152,29 @@ export class InteractionApiOrthographic extends InteractionApi {
     delta: number
   ): Promise<void> {
     return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      const frameCam = camera.toFrameCamera();
-      const asPerspective = FrameCamera.toPerspective(frameCam);
-      const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
-        frame.scene.boundingBox,
-        asPerspective
-      );
-      const perspectiveCam = new FramePerspectiveCamera(
-        asPerspective.position,
-        asPerspective.lookAt,
-        asPerspective.up,
-        planes.near,
-        planes.far,
-        camera.aspectRatio,
-        asPerspective.fovY
-      );
-      const dir = frameCam.direction;
-      const ray = viewport.transformPointToRay(
-        point,
-        frame.image,
-        perspectiveCam
-      );
-
       if (this.zoomData == null) {
+        const frameCam = camera.toFrameCamera();
+        const asPerspective = FrameCamera.toPerspective(frameCam);
+        const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+          frame.scene.boundingBox,
+          asPerspective
+        );
+        const perspectiveCam = new FramePerspectiveCamera(
+          asPerspective.position,
+          asPerspective.lookAt,
+          asPerspective.up,
+          planes.near,
+          planes.far,
+          camera.aspectRatio,
+          asPerspective.fovY
+        );
+        const dir = frameCam.direction;
+        const ray = viewport.transformPointToRay(
+          point,
+          frame.image,
+          perspectiveCam
+        );
+
         const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
           dir,
           frameCam.lookAt
