@@ -311,10 +311,10 @@ export abstract class InteractionApi {
         // Create a plane for the hit point that will be used to determine the
         // delta of future mouse movements to the original hit point. Fallback
         // to a plane placed at the look at point, in case there's no hit.
-        const hitPt = fallback;
-        // depthBuffer != null
-        //   ? this.getWorldPoint(screenPt, depthBuffer, fallback)
-        //   : fallback;
+        const hitPt =
+          depthBuffer != null
+            ? this.getWorldPoint(screenPt, depthBuffer, fallback)
+            : fallback;
         const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
