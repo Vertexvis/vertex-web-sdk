@@ -148,7 +148,7 @@ describe(Matrix4.makeOrthographic, () => {
     expect(m.m22).toBeCloseTo(0.5);
     expect(m.m42).toBeCloseTo(0);
     expect(m.m33).toBeCloseTo(-0.2);
-    expect(m.m43).toBe(-100);
+    expect(m.m43).toBe(-1);
     expect(m.m44).toBe(1);
   });
 
@@ -160,7 +160,7 @@ describe(Matrix4.makeOrthographic, () => {
     expect(m.m22).toBeCloseTo(0.2);
     expect(m.m42).toBeCloseTo(0.6);
     expect(m.m33).toBeCloseTo(-0.2);
-    expect(m.m43).toBe(-100);
+    expect(m.m43).toBe(-1);
     expect(m.m44).toBe(1);
   });
 });
