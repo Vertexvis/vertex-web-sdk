@@ -1,5 +1,6 @@
 import {
   BoundingBox,
+  BoundingSphere,
   Dimensions,
   Line3,
   Matrix4,
@@ -9,6 +10,7 @@ import {
 } from '@vertexvis/geometry';
 
 import { decodePng } from '../../workers/png-decoder-pool';
+import { constrainViewVector } from '../rendering/vectors';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
@@ -169,7 +171,10 @@ export class FrameCameraBase implements FrameCameraLike {
 
     if (FrameCamera.isOrthographicFrameCamera(camera)) {
       return new FrameOrthographicCamera(
-        camera.viewVector,
+        constrainViewVector(
+          camera.viewVector,
+          BoundingSphere.create(boundingBox)
+        ),
         camera.lookAt,
         camera.up,
         near,

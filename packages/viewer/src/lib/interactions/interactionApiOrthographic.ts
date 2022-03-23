@@ -11,6 +11,7 @@ import {
   FramePerspectiveCamera,
   Viewport,
 } from '../types';
+import { ZoomData } from '.';
 import {
   CameraTransform,
   InteractionApi,
@@ -19,7 +20,13 @@ import {
 } from './interactionApi';
 import { TapEventDetails } from './tapEventDetails';
 
+interface OrthographicZoomData extends ZoomData {
+  startingScreenPt: Point.Point;
+}
+
 export class InteractionApiOrthographic extends InteractionApi {
+  private orthographicZoomData?: OrthographicZoomData;
+
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -152,7 +159,10 @@ export class InteractionApiOrthographic extends InteractionApi {
     delta: number
   ): Promise<void> {
     return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      if (this.zoomData == null) {
+      if (
+        this.orthographicZoomData == null ||
+        Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
+      ) {
         const frameCam = camera.toFrameCamera();
         const asPerspective = FrameCamera.toPerspective(frameCam);
         const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
@@ -192,11 +202,15 @@ export class InteractionApiOrthographic extends InteractionApi {
         //   ? this.getWorldPoint(point, depthBuffer, fallbackPt)
         //   : fallbackPt;
         const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-        this.zoomData = { hitPt, hitPlane };
+        this.orthographicZoomData = {
+          hitPt,
+          hitPlane,
+          startingScreenPt: point,
+        };
       }
 
-      if (this.zoomData != null) {
-        const { hitPt } = this.zoomData;
+      if (this.orthographicZoomData != null) {
+        const { hitPt } = this.orthographicZoomData;
 
         const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
         const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);

@@ -603,7 +603,10 @@ export class OrthographicCamera
 
   public toFrameCamera(): FrameOrthographicCamera {
     return new FrameOrthographicCamera(
-      this.viewVector,
+      constrainViewVector(
+        this.viewVector,
+        BoundingSphere.create(this.boundingBox)
+      ),
       this.lookAt,
       this.up,
       this.near,

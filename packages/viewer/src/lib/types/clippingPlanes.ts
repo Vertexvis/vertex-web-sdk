@@ -1,5 +1,6 @@
 import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 
+import { constrainViewVector } from '../rendering/vectors';
 import {
   FrameCamera,
   isOrthographicFrameCamera,
@@ -78,15 +79,10 @@ export function fromBoundingBoxAndOrthographicCamera(
   const boundingSphere = BoundingSphere.create(boundingBox);
   const minRange = boundingSphere.epsilon * 1e2;
 
-  const projCenter = Vector3.dot(
-    Vector3.subtract(boundingSphere.center, camera.lookAt),
-    camera.viewVector
-  );
-
   const bRadius = Math.max(boundingSphere.radius, minRange);
 
   return {
-    near: projCenter - bRadius,
-    far: projCenter + bRadius,
+    near: -bRadius,
+    far: bRadius,
   };
 }
