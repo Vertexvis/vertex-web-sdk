@@ -399,7 +399,7 @@ export class PerspectiveCamera
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
     return super.fitCameraToBoundingBox(
       boundingBox,
-      this.fovY,
+      this.fovY ?? 45,
       this.viewVector
     );
   }
@@ -423,7 +423,7 @@ export class PerspectiveCamera
       this.near,
       this.far,
       this.aspectRatio,
-      this.fovY
+      this.fovY ?? 45
     );
   }
 
@@ -455,7 +455,7 @@ export class PerspectiveCamera
   /**
    * The camera's field of view.
    */
-  public get fovY(): number {
+  public get fovY(): number | undefined {
     return this.perspectiveData.fovY;
   }
 

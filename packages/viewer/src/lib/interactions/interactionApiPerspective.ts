@@ -57,7 +57,7 @@ export class InteractionApiPerspective extends InteractionApi {
       const u = Vector3.normalize(camera.up);
       const v = Vector3.normalize(vv);
 
-      const d = Vector3.magnitude(vv) * Math.tan(camera.fovY);
+      const d = Vector3.magnitude(vv) * Math.tan(camera.fovY ?? 45);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 

@@ -5,7 +5,7 @@ export interface PerspectiveFrameCamera {
   position: Vector3.Vector3;
   lookAt: Vector3.Vector3;
   up: Vector3.Vector3;
-  fovY: number;
+  fovY?: number;
 }
 
 export interface OrthographicFrameCamera {
@@ -20,7 +20,10 @@ export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 export function isPerspectiveFrameCamera(
   camera: Partial<FrameCamera>
 ): camera is PerspectiveFrameCamera {
-  return (camera as PerspectiveFrameCamera).position != null;
+  return (
+    (camera as PerspectiveFrameCamera).position != null &&
+    (camera as OrthographicFrameCamera).fovHeight == null
+  );
 }
 
 export function isOrthographicFrameCamera(
@@ -81,7 +84,7 @@ export function toOrthographic(
     fovHeight:
       2 *
       Vector3.magnitude(viewVector) *
-      Math.tan(Angle.toRadians(data.fovY / 2.0)),
+      Math.tan(Angle.toRadians(data.fovY ?? 45 / 2.0)),
   };
 }
 
