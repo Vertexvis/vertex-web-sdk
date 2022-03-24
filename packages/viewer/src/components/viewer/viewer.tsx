@@ -1133,8 +1133,12 @@ export class Viewer {
       );
     }
 
+<<<<<<< HEAD
     return this.frame == null ||
       this.frame.scene.camera instanceof FramePerspectiveCamera
+=======
+    return this.frame == null || this.frame.scene.camera.isPerspective()
+>>>>>>> 0bac2e2cdbb7f2667d803f04a037c3a292de6203
       ? new InteractionApiPerspective(
           this.stream,
           this.stateMap.cursorManager,
@@ -1248,11 +1252,11 @@ export class Viewer {
   private updateInteractionApi(previousFrame?: Frame): void {
     if (previousFrame != null && this.frame != null) {
       const hasChangedFromPerspective =
-        previousFrame.scene.camera instanceof FramePerspectiveCamera &&
-        this.frame.scene.camera instanceof FrameOrthographicCamera;
+        previousFrame.scene.camera.isPerspective() &&
+        this.frame.scene.camera.isOrthographic();
       const hasChangedFromOrthographic =
-        previousFrame.scene.camera instanceof FrameOrthographicCamera &&
-        this.frame.scene.camera instanceof FramePerspectiveCamera;
+        previousFrame.scene.camera.isOrthographic() &&
+        this.frame.scene.camera.isPerspective();
 
       if (hasChangedFromPerspective || hasChangedFromOrthographic) {
         this.interactionApi = this.createInteractionApi();
@@ -1268,7 +1272,7 @@ export class Viewer {
     if (this.frame != null) {
       if (
         this.cameraType === 'orthographic' &&
-        FrameCamera.isPerspectiveFrameCamera(this.frame.scene.camera)
+        this.frame.scene.camera.isPerspective()
       ) {
         this.stream?.replaceCamera({
           camera: FrameCamera.toProtobuf(
@@ -1280,7 +1284,7 @@ export class Viewer {
         });
       } else if (
         this.cameraType === 'perspective' &&
-        FrameCamera.isOrthographicFrameCamera(this.frame.scene.camera)
+        this.frame.scene.camera.isOrthographic()
       ) {
         this.stream?.replaceCamera({
           camera: FrameCamera.toProtobuf(

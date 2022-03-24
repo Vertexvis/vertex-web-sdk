@@ -92,7 +92,7 @@ export function toOrthographic(
     fovHeight:
       2 *
       Vector3.magnitude(viewVector) *
-      Math.tan(Angle.toRadians(data.fovY ?? 45 / 2.0)),
+      Math.tan(Angle.toRadians((data.fovY ?? 45) / 2.0)),
   };
 }
 
