@@ -275,7 +275,7 @@ export class FramePerspectiveCamera
     public readonly near: number,
     public readonly far: number,
     public readonly aspectRatio: number,
-    public readonly fovY: number
+    public readonly fovY = 45
   ) {
     super(position, lookAt, up, near, far, aspectRatio);
   }
