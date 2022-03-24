@@ -6,6 +6,7 @@
 import { Angle, Matrix4, Vector3 } from '@vertexvis/geometry';
 
 import { FrameCamera } from '../types';
+import { isOrthographicFrameCamera } from '../types/frameCamera';
 
 /**
  * Matrix becomes a perspective projection matrix.
@@ -103,7 +104,10 @@ export function makePerspectiveMatrix(
 export function makeLookAtViewMatrix(
   camera: FrameCamera.FrameCamera
 ): Matrix4.Matrix4 {
-  const { position, lookAt, up } = camera;
+  const { lookAt, up } = camera;
+  const position = isOrthographicFrameCamera(camera)
+    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
+    : camera.position;
 
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));
   const x = Vector3.normalize(Vector3.cross(up, z));
@@ -117,6 +121,8 @@ export function makeLookAtViewMatrix(
     0  , 0  , 0  , 1,
   ];
   /* eslint-enable prettier/prettier */
+
+  return Matrix4.makeIdentity();
 }
 
 /**
@@ -133,7 +139,10 @@ export function makeLookAtViewMatrix(
 export function makeLookAtMatrix(
   camera: FrameCamera.FrameCamera
 ): Matrix4.Matrix4 {
-  const { position, lookAt, up } = camera;
+  const { lookAt, up } = camera;
+  const position = isOrthographicFrameCamera(camera)
+    ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
+    : camera.position;
 
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));
   const x = Vector3.normalize(Vector3.cross(up, z));
@@ -147,4 +156,6 @@ export function makeLookAtMatrix(
     0  , 0  , 0  , 1
   ];
   /* eslint-enable prettier/prettier */
+
+  return Matrix4.makeIdentity();
 }

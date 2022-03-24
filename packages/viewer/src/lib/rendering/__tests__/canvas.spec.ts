@@ -23,21 +23,21 @@ const image = {
 const drawFrame1: DrawFrame = {
   canvas,
   canvasDimensions: Dimensions.create(100, 50),
-  frame: Fixtures.makeFrame(),
+  frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
 };
 
 const drawFrame2: DrawFrame = {
   canvas,
   canvasDimensions: Dimensions.create(100, 50),
-  frame: Fixtures.makeFrame(),
+  frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
 };
 
 const drawFrame3: DrawFrame = {
   canvas,
   canvasDimensions: Dimensions.create(100, 50),
-  frame: Fixtures.makeFrame(),
+  frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
   beforeDraw: jest.fn(),
 };
@@ -45,7 +45,7 @@ const drawFrame3: DrawFrame = {
 const drawFrame4: DrawFrame = {
   canvas,
   canvasDimensions: Dimensions.create(100, 50),
-  frame: Fixtures.makeFrame(),
+  frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
   beforeDraw: jest.fn(),
   predicate: jest.fn(() => false),
@@ -105,7 +105,8 @@ describe(createCanvasRenderer, () => {
 describe(measureCanvasRenderer, () => {
   const reportIntervalInMs = 10;
 
-  const renderer: CanvasRenderer = () => Promise.resolve(Fixtures.makeFrame());
+  const renderer: CanvasRenderer = () =>
+    Promise.resolve(Fixtures.makePerspectiveFrame());
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
 

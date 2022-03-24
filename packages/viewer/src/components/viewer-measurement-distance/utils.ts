@@ -1,6 +1,6 @@
 import { Line3, Point } from '@vertexvis/geometry';
 
-import { FramePerspectiveCamera, Viewport } from '../../lib/types';
+import { FrameCameraBase, Viewport } from '../../lib/types';
 
 export type Anchor = 'start' | 'end';
 
@@ -15,7 +15,7 @@ export interface MeasurementElementPositions {
 
 export interface RenderParams {
   viewport: Viewport;
-  camera: FramePerspectiveCamera;
+  camera: FrameCameraBase;
 }
 
 export function translateWorldLineToViewport(

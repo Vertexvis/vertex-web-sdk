@@ -11,7 +11,7 @@ import {
 import { Matrix4 } from '@vertexvis/geometry';
 
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { FramePerspectiveCamera } from '../../lib/types/frame';
+import { FrameCameraBase } from '../../lib/types/frame';
 import { Renderer2d, update2d } from './renderer2d';
 import { Renderer3d, update3d } from './renderer3d';
 
@@ -52,7 +52,7 @@ export class ViewerDomRenderer {
    * component, or when added as a child to `<vertex-viewer>`.
    */
   @Prop({ mutable: true })
-  public camera?: FramePerspectiveCamera;
+  public camera?: FrameCameraBase;
 
   /**
    * The current depth buffer of the frame.

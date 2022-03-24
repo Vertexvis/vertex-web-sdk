@@ -18,14 +18,9 @@ import {
   Viewport,
 } from '../lib/types';
 
-export const drawFramePayload: DrawFramePayload = {
+const baseDrawFramePayload: Partial<DrawFramePayload> = {
   sequenceNumber: 1,
   sceneAttributes: {
-    camera: {
-      position: { x: 0, y: 0, z: 100 },
-      lookAt: { x: 0, y: 0, z: 0 },
-      up: { x: 0, y: 1, z: 0 },
-    },
     visibleBoundingBox: {
       xmin: -100,
       ymin: -100,
@@ -49,9 +44,44 @@ export const drawFramePayload: DrawFramePayload = {
   depthBuffer: { value: makeDepthImagePng(100, 50) },
 };
 
-export function makeFrame(): Frame {
+export const drawFramePayloadPerspective: DrawFramePayload = {
+  ...baseDrawFramePayload,
+  sceneAttributes: {
+    ...baseDrawFramePayload.sceneAttributes,
+    camera: {
+      perspective: {
+        position: { x: 0, y: 0, z: 100 },
+        lookAt: { x: 0, y: 0, z: 0 },
+        up: { x: 0, y: 1, z: 0 },
+      },
+    },
+  },
+};
+
+export const drawFramePayloadOrthographic: DrawFramePayload = {
+  ...baseDrawFramePayload,
+  sceneAttributes: {
+    ...baseDrawFramePayload.sceneAttributes,
+    camera: {
+      orthographic: {
+        viewVector: { x: 0, y: 0, z: -100 },
+        lookAt: { x: 0, y: 0, z: 0 },
+        up: { x: 0, y: 1, z: 0 },
+        fovHeight: 100,
+      },
+    },
+  },
+};
+
+export function makePerspectiveFrame(): Frame {
   return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-    drawFramePayload
+    drawFramePayloadPerspective
+  );
+}
+
+export function makeOrthographicFrame(): Frame {
+  return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
+    drawFramePayloadOrthographic
   );
 }
 
@@ -94,7 +124,7 @@ export function makeDepthBuffer(
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
-    makeFrame().scene.camera,
+    makePerspectiveFrame().scene.camera,
     makeImageAttributes(width, height)
   );
 }

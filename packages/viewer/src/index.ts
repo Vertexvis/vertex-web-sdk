@@ -16,10 +16,12 @@ export * from './lib/measurement';
 export { Scene } from './lib/scenes';
 export {
   EntityType,
+  FrameCameraBase,
   LoadableResource,
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,
   FrameScene as ReceivedFrameScene,
+  FrameOrthographicCamera as ReceivedOrthographicCamera,
   FramePerspectiveCamera as ReceivedPerspectiveCamera,
   SynchronizedClock,
   Viewport,

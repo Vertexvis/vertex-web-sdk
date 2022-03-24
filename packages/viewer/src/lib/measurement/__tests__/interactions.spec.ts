@@ -17,7 +17,7 @@ import {
   random,
 } from '../../../testing';
 import { CursorManager, measurementWithArrowCursor } from '../../cursors';
-import { InteractionApi } from '../../interactions';
+import { InteractionApiPerspective } from '../../interactions';
 import { EntityType } from '../../types';
 import { MeasurementController } from '../controller';
 import { MeasurementInteractionHandler } from '../interactions';
@@ -40,7 +40,7 @@ describe(MeasurementInteractionHandler, () => {
   ]);
 
   const element = document.createElement('div');
-  const api = new InteractionApi(
+  const api = new InteractionApiPerspective(
     new StreamApi(),
     new CursorManager(),
     jest.fn(),

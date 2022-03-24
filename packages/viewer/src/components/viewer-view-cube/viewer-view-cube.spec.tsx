@@ -7,7 +7,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
-import { FramePerspectiveCamera, Orientation } from '../../lib/types';
+import { FrameCameraBase, Orientation } from '../../lib/types';
 import {
   key1,
   loadViewerStreamKey,
@@ -116,7 +116,7 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('orients cube and triad based on camera', async () => {
-    const camera = new FramePerspectiveCamera(
+    const camera = new FrameCameraBase(
       Vector3.right(),
       Vector3.origin(),
       Vector3.down(),

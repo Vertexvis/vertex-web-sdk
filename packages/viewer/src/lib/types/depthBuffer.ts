@@ -3,8 +3,8 @@ import { Vector3 } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
 
 import {
+  FrameCameraWithMatrices,
   FrameImageLike,
-  FramePerspectiveCamera,
   ImageAttributesLike,
 } from './frame';
 import { Viewport } from './viewport';
@@ -33,7 +33,7 @@ export class DepthBuffer implements FrameImageLike {
    * @param pixels A 16-bit typed array of depth values.
    */
   public constructor(
-    public readonly camera: FramePerspectiveCamera,
+    public readonly camera: FrameCameraWithMatrices,
     public readonly imageAttr: ImageAttributesLike,
     public readonly pixels: Uint16Array
   ) {}
@@ -49,7 +49,7 @@ export class DepthBuffer implements FrameImageLike {
    */
   public static fromPng(
     png: Pick<DecodedPng, 'data'>,
-    camera: FramePerspectiveCamera,
+    camera: FrameCameraWithMatrices,
     imageAttr: ImageAttributesLike
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {

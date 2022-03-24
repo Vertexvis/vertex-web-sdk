@@ -30,14 +30,15 @@ import {
   FrameType,
 } from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
-import { Frame, FramePerspectiveCamera } from './lib/types/frame';
+import { Frame, FrameCameraBase } from './lib/types/frame';
 import { ViewerStream } from './lib/stream/stream';
 import {
   AngleUnitType,
   DepthBuffer,
   DistanceUnitType,
   EntityType,
-  FramePerspectiveCamera as FramePerspectiveCamera1,
+  FrameCameraBase as FrameCameraBase1,
+  FramePerspectiveCamera,
   Measurement,
   Orientation,
   StencilBufferManager,
@@ -358,6 +359,10 @@ export namespace Components {
      */
     cameraControls: boolean;
     /**
+     * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
+     */
+    cameraType: 'perspective' | 'orthographic';
+    /**
      * The Client ID associated with your Vertex Application.
      */
     clientId?: string;
@@ -636,7 +641,7 @@ export namespace Components {
     /**
      * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
@@ -906,7 +911,7 @@ export namespace Components {
     /**
      * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
      */
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
      */
@@ -999,7 +1004,7 @@ export namespace Components {
     start: Point.Point;
   }
   interface VertexViewerMeasurementOverlays {
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * The model that contains the overlays to present.
      */
@@ -1627,6 +1632,10 @@ declare namespace LocalJSX {
      */
     cameraControls?: boolean;
     /**
+     * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
+     */
+    cameraType?: 'perspective' | 'orthographic';
+    /**
      * The Client ID associated with your Vertex Application.
      */
     clientId?: string;
@@ -1871,7 +1880,7 @@ declare namespace LocalJSX {
     /**
      * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
@@ -2145,7 +2154,7 @@ declare namespace LocalJSX {
     /**
      * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
      */
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
      */
@@ -2240,7 +2249,7 @@ declare namespace LocalJSX {
     start?: Point.Point;
   }
   interface VertexViewerMeasurementOverlays {
-    camera?: FramePerspectiveCamera;
+    camera?: FrameCameraBase;
     /**
      * The model that contains the overlays to present.
      */

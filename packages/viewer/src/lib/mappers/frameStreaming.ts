@@ -1,5 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { BoundingBox, Dimensions } from '@vertexvis/geometry';
+import { BoundingBox, Dimensions, Vector3 } from '@vertexvis/geometry';
 import { protoToDate } from '@vertexvis/stream-api';
 import { Mapper as M } from '@vertexvis/utils';
 
@@ -8,8 +8,8 @@ import {
   CrossSectioning,
   Frame,
   FrameCamera,
+  FrameCameraBase,
   FrameImage,
-  FramePerspectiveCamera,
   FrameScene,
   ImageAttributesLike,
   Orientation,
@@ -24,16 +24,65 @@ import {
 import { fromPbRGBi } from './material';
 import { fromPbBytesValue } from './scalar';
 
-export const fromPbCamera: M.Func<
-  vertexvis.protobuf.stream.ICamera,
-  FrameCamera.FrameCamera
+export const fromPbPerspectiveCamera: M.Func<
+  vertexvis.protobuf.stream.IPerspectiveCamera,
+  FrameCamera.PerspectiveFrameCamera
 > = M.defineMapper(
   M.read(
     M.mapProp('position', M.compose(M.required('position'), fromPbVector3f)),
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
     M.mapProp('up', M.compose(M.required('up'), fromPbVector3f))
   ),
-  ([position, lookAt, up]) => ({ position, lookAt, up })
+  ([position, lookAt, up]) => ({
+    position,
+    lookAt,
+    up,
+    // TODO: map fovY property when available
+    fovY: 45,
+  })
+);
+
+export const fromPbOrthographicCamera: M.Func<
+  vertexvis.protobuf.stream.IOrthographicCamera,
+  FrameCamera.OrthographicFrameCamera
+> = M.defineMapper(
+  M.read(
+    M.mapProp(
+      'viewVector',
+      M.compose(M.required('viewVector'), fromPbVector3f)
+    ),
+    M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
+    M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
+    M.mapProp('fovHeight', M.required('fovHeight'))
+  ),
+  ([viewVector, lookAt, up, fovHeight]) => ({
+    viewVector,
+    lookAt,
+    up,
+    fovHeight,
+  })
+);
+
+export const fromPbCamera: M.Func<
+  vertexvis.protobuf.stream.ICamera,
+  FrameCamera.FrameCamera
+> = M.defineMapper(
+  M.read(
+    M.mapProp('position', M.ifDefined(fromPbVector3f)),
+    M.mapProp('lookAt', M.ifDefined(fromPbVector3f)),
+    M.mapProp('up', M.ifDefined(fromPbVector3f)),
+    M.mapProp('perspective', M.ifDefined(fromPbPerspectiveCamera)),
+    M.mapProp('orthographic', M.ifDefined(fromPbOrthographicCamera))
+  ),
+  ([position, lookAt, up, perspective, orthographic]) =>
+    perspective ??
+    orthographic ?? {
+      position: position ?? Vector3.back(),
+      lookAt: lookAt ?? Vector3.origin(),
+      up: up ?? Vector3.up(),
+      // TODO: map fovY property when available
+      fovY: 45,
+    }
 );
 
 export const fromPbSectionPlane: M.Func<
@@ -154,11 +203,11 @@ const fromPbFrameSceneAttributes: M.Func<
 
 const fromPbFrameCamera: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
-  FramePerspectiveCamera
+  FrameCameraBase
 > = M.defineMapper(
   M.read(fromPbFrameSceneAttributes, fromPbFrameImageAttributes),
   ([sceneAttr, imageAttr]) =>
-    FramePerspectiveCamera.fromBoundingBox(
+    FrameCameraBase.fromBoundingBox(
       sceneAttr.camera,
       sceneAttr.boundingBox,
       Dimensions.aspectRatio(imageAttr.frameDimensions)

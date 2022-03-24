@@ -9,7 +9,7 @@ import { Point, Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import {
-  FramePerspectiveCamera,
+  FrameCameraBase,
   STENCIL_BUFFER_EMPTY_VALUE,
   STENCIL_BUFFER_FEATURE_VALUE,
   Viewport,
@@ -27,7 +27,7 @@ import { getMeasurementBoundingClientRect } from './dom';
 import { ViewerMeasurementDistance } from './viewer-measurement-distance';
 
 describe('vertex-viewer-measurement-distance', () => {
-  const camera = new FramePerspectiveCamera(
+  const camera = new FrameCameraBase(
     Vector3.create(0, 0, 100),
     Vector3.origin(),
     Vector3.up(),
