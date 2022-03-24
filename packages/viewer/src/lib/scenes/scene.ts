@@ -301,7 +301,7 @@ export class Scene {
   public camera(): Camera {
     const { scene } = this.frame;
 
-    if (scene.camera instanceof FrameOrthographicCamera) {
+    if (scene.camera.isOrthographic()) {
       return new OrthographicCamera(
         this.stream,
         Dimensions.aspectRatio(this.viewport()),
@@ -314,7 +314,7 @@ export class Scene {
         this.frame.scene.boundingBox,
         this.decodeFrame
       );
-    } else if (scene.camera instanceof FramePerspectiveCamera) {
+    } else if (scene.camera.isPerspective()) {
       return new PerspectiveCamera(
         this.stream,
         Dimensions.aspectRatio(this.viewport()),
