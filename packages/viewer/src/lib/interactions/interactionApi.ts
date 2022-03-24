@@ -39,13 +39,13 @@ export type CameraTransform<
   depthBuffer?: DepthBuffer;
 }) => R;
 
-interface PanData {
+export interface PanData {
   hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
   startingCamera: FrameCameraBase;
 }
 
-interface ZoomData {
+export interface ZoomData {
   hitPt: Vector3.Vector3;
   hitPlane: Plane.Plane;
 }
@@ -59,8 +59,8 @@ export abstract class InteractionApi {
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
-  private panData?: PanData;
-  private zoomData?: ZoomData;
+  protected panData?: PanData;
+  protected zoomData?: ZoomData;
 
   public constructor(
     protected stream: StreamApi,
@@ -594,7 +594,7 @@ export abstract class InteractionApi {
     return isTouch || window.matchMedia('(pointer: coarse)').matches;
   }
 
-  private getWorldPoint(
+  protected getWorldPoint(
     point: Point.Point,
     depthBuffer: DepthBuffer,
     fallbackPoint: Vector3.Vector3

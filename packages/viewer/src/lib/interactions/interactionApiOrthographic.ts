@@ -1,11 +1,17 @@
 import { EventEmitter } from '@stencil/core';
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
 import { OrthographicCamera } from '../scenes';
-import { Viewport } from '../types';
+import {
+  ClippingPlanes,
+  FrameCamera,
+  FramePerspectiveCamera,
+  Viewport,
+} from '../types';
+import { ZoomData } from '.';
 import {
   CameraTransform,
   InteractionApi,
@@ -14,7 +20,13 @@ import {
 } from './interactionApi';
 import { TapEventDetails } from './tapEventDetails';
 
+interface OrthographicZoomData extends ZoomData {
+  startingScreenPt: Point.Point;
+}
+
 export class InteractionApiOrthographic extends InteractionApi {
+  private orthographicZoomData?: OrthographicZoomData;
+
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -68,6 +80,151 @@ export class InteractionApiOrthographic extends InteractionApi {
       );
 
       return camera.moveBy(offset);
+    });
+  }
+
+  /**
+   * Moves the camera's position and look at to the given screen coordinate.
+   *
+   * If the screen coordinate intersects with an object, the camera will track
+   * the hit point so the mouse position is always under the mouse.
+   *
+   * If the screen coordinate doesn't intersect with an object, then ???.
+   *
+   * @param screenPt A point in screen coordinates.
+   */
+  public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
+    return this.transformCamera(({ camera, frame, viewport, depthBuffer }) => {
+      // Capture the starting state of the pan.
+      if (this.panData == null) {
+        const startingCamera = camera.toFrameCamera();
+        const direction = startingCamera.direction;
+
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera
+        );
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+          direction,
+          camera.lookAt
+        );
+        const fallback = Ray.intersectPlane(ray, fallbackPlane);
+        if (fallback == null) {
+          console.warn(
+            'Cannot determine fallback for pan. Ray does not intersect plane.'
+          );
+          return camera;
+        }
+
+        // TODO: properly support depth buffer in orthographic
+        const hitPt = fallback;
+        // Create a plane for the hit point that will be used to determine the
+        // delta of future mouse movements to the original hit point. Fallback
+        // to a plane placed at the look at point, in case there's no hit.
+        // const hitPt =
+        //   depthBuffer != null
+        //     ? this.getWorldPoint(screenPt, depthBuffer, fallback)
+        //     : fallback;
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
+
+        this.panData = { hitPt, hitPlane, startingCamera };
+      }
+
+      if (this.panData != null) {
+        const { hitPt, hitPlane, startingCamera } = this.panData;
+
+        // Use a ray that originates at the screen and intersects with the hit
+        // plane to determine the move distance.
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera
+        );
+        const movePt = Ray.intersectPlane(ray, hitPlane);
+
+        if (movePt != null) {
+          const delta = Vector3.subtract(hitPt, movePt);
+          return camera.update({
+            lookAt: Vector3.add(startingCamera.lookAt, delta),
+          });
+        }
+      }
+      return camera;
+    });
+  }
+
+  public async zoomCameraToPoint(
+    point: Point.Point,
+    delta: number
+  ): Promise<void> {
+    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
+      if (
+        this.orthographicZoomData == null ||
+        Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
+      ) {
+        const frameCam = camera.toFrameCamera();
+        const asPerspective = FrameCamera.toPerspective(frameCam);
+        const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
+          frame.scene.boundingBox,
+          asPerspective
+        );
+        const perspectiveCam = new FramePerspectiveCamera(
+          asPerspective.position,
+          asPerspective.lookAt,
+          asPerspective.up,
+          planes.near,
+          planes.far,
+          camera.aspectRatio,
+          asPerspective.fovY ?? 45
+        );
+        const dir = frameCam.direction;
+        const ray = viewport.transformPointToRay(
+          point,
+          frame.image,
+          perspectiveCam
+        );
+
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+          dir,
+          frameCam.lookAt
+        );
+        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+        if (fallbackPt == null) {
+          console.warn(
+            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+          );
+          return camera;
+        }
+
+        const hitPt = fallbackPt;
+        // depthBuffer != null
+        //   ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+        //   : fallbackPt;
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+        this.orthographicZoomData = {
+          hitPt,
+          hitPlane,
+          startingScreenPt: point,
+        };
+      }
+
+      if (this.orthographicZoomData != null) {
+        const { hitPt } = this.orthographicZoomData;
+
+        const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
+        const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
+        const diff = Vector3.scale(
+          (camera.fovHeight - fovHeight) / camera.fovHeight,
+          Vector3.subtract(hitPt, camera.lookAt)
+        );
+
+        return camera.update({
+          lookAt: Vector3.add(camera.lookAt, diff),
+          fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
+        });
+      }
+      return camera;
     });
   }
 

@@ -1,4 +1,4 @@
-import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 
 import {
   FrameCamera,
@@ -28,22 +28,15 @@ export function fromBoundingBoxAndPerspectiveCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: PerspectiveFrameCamera
 ): ClippingPlanes {
-  const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const centerToBoundingPlane = Vector3.subtract(
-    boundingBox.max,
-    boundingBoxCenter
-  );
-  const radius = Vector3.magnitude(centerToBoundingPlane);
-  const length = Math.max(radius, Vector3.magnitude(boundingBoxCenter));
-  const epsilon = length === 0 ? 1.0 : length * 1e-6;
-  const minRange = epsilon * 1e2;
+  const boundingSphere = BoundingSphere.create(boundingBox);
+  const minRange = boundingSphere.epsilon * 1e2;
 
   const signedDistToEye = Vector3.dot(
-    Vector3.subtract(boundingBoxCenter, camera.position),
+    Vector3.subtract(boundingSphere.center, camera.position),
     Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
   );
 
-  const bRadius = Math.max(radius, minRange);
+  const bRadius = Math.max(boundingSphere.radius, minRange);
 
   let newFar =
     bRadius + signedDistToEye < minRange
@@ -82,25 +75,13 @@ export function fromBoundingBoxAndOrthographicCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: OrthographicFrameCamera
 ): ClippingPlanes {
-  const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const centerToBoundingPlane = Vector3.subtract(
-    boundingBox.max,
-    boundingBoxCenter
-  );
-  const radius = Vector3.magnitude(centerToBoundingPlane);
-  const length = Math.max(radius, Vector3.magnitude(boundingBoxCenter));
-  const epsilon = length === 0 ? 1.0 : length * 1e-6;
-  const minRange = epsilon * 1e2;
+  const boundingSphere = BoundingSphere.create(boundingBox);
+  const minRange = boundingSphere.epsilon * 1e2;
 
-  const projCenter = Vector3.dot(
-    Vector3.subtract(boundingBoxCenter, camera.lookAt),
-    camera.viewVector
-  );
-
-  const bRadius = Math.max(radius, minRange);
+  const bRadius = Math.max(boundingSphere.radius, minRange);
 
   return {
-    near: projCenter - bRadius,
-    far: projCenter + bRadius,
+    near: -bRadius,
+    far: bRadius,
   };
 }

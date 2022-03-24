@@ -1253,6 +1253,10 @@ export class Viewer {
 
       if (hasChangedFromPerspective || hasChangedFromOrthographic) {
         this.interactionApi = this.createInteractionApi();
+
+        this.interactionHandlers.forEach((handler) =>
+          this.initializeInteractionHandler(handler)
+        );
       }
     }
   }
@@ -1265,7 +1269,10 @@ export class Viewer {
       ) {
         this.stream?.replaceCamera({
           camera: FrameCamera.toProtobuf(
-            FrameCamera.toOrthographic(this.frame.scene.camera)
+            FrameCamera.toOrthographic(
+              this.frame.scene.camera,
+              this.frame.scene.boundingBox
+            )
           ),
         });
       } else if (
