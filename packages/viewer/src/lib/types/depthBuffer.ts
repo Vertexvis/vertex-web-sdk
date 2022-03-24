@@ -78,7 +78,21 @@ export class DepthBuffer implements FrameImageLike {
       point,
       fallbackNormalizedDepth
     );
+
     return depth * (far - near) + near;
+  }
+
+  public getOrthographicDepthAtPoint(
+    point: Point.Point,
+    fallbackNormalizedDepth?: number
+  ): number {
+    const { near, far } = this.camera;
+    const depth = this.getNormalizedDepthAtPoint(
+      point,
+      fallbackNormalizedDepth
+    );
+
+    return depth * (far - near) + near / 2;
   }
 
   /**
@@ -155,7 +169,22 @@ export class DepthBuffer implements FrameImageLike {
     const angle =
       Vector3.dot(vv, eyeToWorldPt) /
       (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
-    return Ray.at(ray, distance / angle);
+    console.log(angle);
+    console.log(Ray.at(ray, distance));
+    return Ray.at(ray, distance);
+  }
+
+  public getOrthographicWorldPoint(
+    point: Point.Point,
+    ray: Ray.Ray,
+    fallbackNormalizedDepth?: number
+  ): Vector3.Vector3 {
+    const distance = this.getOrthographicDepthAtPoint(
+      point,
+      fallbackNormalizedDepth
+    );
+
+    return Ray.at(ray, distance);
   }
 
   /**

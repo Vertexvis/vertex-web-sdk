@@ -7,6 +7,7 @@ import { CursorManager } from '../cursors';
 import { OrthographicCamera } from '../scenes';
 import {
   ClippingPlanes,
+  DepthBuffer,
   FrameCamera,
   FramePerspectiveCamera,
   Viewport,
@@ -94,39 +95,28 @@ export class InteractionApiOrthographic extends InteractionApi {
    * @param screenPt A point in screen coordinates.
    */
   public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, frame, viewport, depthBuffer }) => {
+    return this.transformCamera(({ camera, frame, viewport }) => {
       // Capture the starting state of the pan.
       if (this.panData == null) {
         const startingCamera = camera.toFrameCamera();
         const direction = startingCamera.direction;
 
-        const ray = viewport.transformPointToRay(
+        const ray = viewport.transformPointToOrthographicRay(
           screenPt,
           frame.image,
           startingCamera
         );
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(
           direction,
           camera.lookAt
         );
-        const fallback = Ray.intersectPlane(ray, fallbackPlane);
-        if (fallback == null) {
+        const hitPt = Ray.intersectPlane(ray, hitPlane);
+        if (hitPt == null) {
           console.warn(
             'Cannot determine fallback for pan. Ray does not intersect plane.'
           );
           return camera;
         }
-
-        // TODO: properly support depth buffer in orthographic
-        const hitPt = fallback;
-        // Create a plane for the hit point that will be used to determine the
-        // delta of future mouse movements to the original hit point. Fallback
-        // to a plane placed at the look at point, in case there's no hit.
-        // const hitPt =
-        //   depthBuffer != null
-        //     ? this.getWorldPoint(screenPt, depthBuffer, fallback)
-        //     : fallback;
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, hitPt);
 
         this.panData = { hitPt, hitPlane, startingCamera };
       }
@@ -136,7 +126,7 @@ export class InteractionApiOrthographic extends InteractionApi {
 
         // Use a ray that originates at the screen and intersects with the hit
         // plane to determine the move distance.
-        const ray = viewport.transformPointToRay(
+        const ray = viewport.transformPointToOrthographicRay(
           screenPt,
           frame.image,
           startingCamera
@@ -164,25 +154,11 @@ export class InteractionApiOrthographic extends InteractionApi {
         Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
       ) {
         const frameCam = camera.toFrameCamera();
-        const asPerspective = FrameCamera.toPerspective(frameCam);
-        const planes = ClippingPlanes.fromBoundingBoxAndLookAtCamera(
-          frame.scene.boundingBox,
-          asPerspective
-        );
-        const perspectiveCam = new FramePerspectiveCamera(
-          asPerspective.position,
-          asPerspective.lookAt,
-          asPerspective.up,
-          planes.near,
-          planes.far,
-          camera.aspectRatio,
-          asPerspective.fovY ?? 45
-        );
         const dir = frameCam.direction;
-        const ray = viewport.transformPointToRay(
+        const ray = viewport.transformPointToOrthographicRay(
           point,
           frame.image,
-          perspectiveCam
+          frameCam
         );
 
         const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
@@ -197,10 +173,10 @@ export class InteractionApiOrthographic extends InteractionApi {
           return camera;
         }
 
-        const hitPt = fallbackPt;
-        // depthBuffer != null
-        //   ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-        //   : fallbackPt;
+        const hitPt =
+          depthBuffer != null
+            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+            : fallbackPt;
         const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
         this.orthographicZoomData = {
           hitPt,
@@ -226,6 +202,24 @@ export class InteractionApiOrthographic extends InteractionApi {
       }
       return camera;
     });
+  }
+
+  protected getWorldPoint(
+    point: Point.Point,
+    depthBuffer: DepthBuffer,
+    fallbackPoint: Vector3.Vector3
+  ): Vector3.Vector3 {
+    const viewport = this.getViewport();
+    const framePt = viewport.transformPointToFrame(point, depthBuffer);
+    const hasDepth = depthBuffer.hitTest(framePt);
+    console.log(
+      hasDepth
+        ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
+        : fallbackPoint
+    );
+    return hasDepth
+      ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
+      : fallbackPoint;
   }
 
   public async transformCamera(
