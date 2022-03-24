@@ -392,7 +392,7 @@ export class PerspectiveCamera
       );
 
     // ratio of the height of the frustum to the distance along the view vector
-    let hOverD = Math.tan(this.fovY * PI_OVER_360);
+    let hOverD = Math.tan((this.fovY ?? 45) * PI_OVER_360);
 
     if (this.aspect < 1.0) {
       hOverD *= this.aspect;
@@ -422,7 +422,7 @@ export class PerspectiveCamera
       this.near,
       this.far,
       this.aspectRatio,
-      this.fovY
+      this.fovY ?? 45
     );
   }
 
@@ -454,7 +454,7 @@ export class PerspectiveCamera
   /**
    * The camera's field of view.
    */
-  public get fovY(): number {
+  public get fovY(): number | undefined {
     return this.perspectiveData.fovY;
   }
 
