@@ -186,13 +186,14 @@ export class InteractionApiOrthographic extends InteractionApi {
       }
 
       if (this.orthographicZoomData != null) {
-        const { hitPt } = this.orthographicZoomData;
+        const { hitPt, hitPlane } = this.orthographicZoomData;
 
         const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
         const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
+        const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
         const diff = Vector3.scale(
           (camera.fovHeight - fovHeight) / camera.fovHeight,
-          Vector3.subtract(hitPt, camera.lookAt)
+          Vector3.subtract(hitPt, projectedLookAt)
         );
 
         return camera.update({

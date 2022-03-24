@@ -357,6 +357,14 @@ export class FrameOrthographicCamera
     this.left = -this.right;
   }
 
+  public toPerspective(boundingBox: BoundingBox.BoundingBox): FrameCameraBase {
+    return FrameCameraBase.fromBoundingBox(
+      FrameCamera.toPerspective(this),
+      boundingBox,
+      this.aspectRatio
+    );
+  }
+
   public override isOrthographic(): this is FrameOrthographicCamera {
     return true;
   }
