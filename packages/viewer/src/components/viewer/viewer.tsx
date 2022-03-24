@@ -404,7 +404,6 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
-    console.log('WEB_SDK 1');
   }
 
   /**
