@@ -5,7 +5,6 @@ import { UUID } from '@vertexvis/utils';
 
 import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
-import { FrameOrthographicCamera, FramePerspectiveCamera } from '../types';
 import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
