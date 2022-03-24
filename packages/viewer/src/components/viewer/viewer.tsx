@@ -1133,12 +1133,7 @@ export class Viewer {
       );
     }
 
-<<<<<<< HEAD
-    return this.frame == null ||
-      this.frame.scene.camera instanceof FramePerspectiveCamera
-=======
     return this.frame == null || this.frame.scene.camera.isPerspective()
->>>>>>> 0bac2e2cdbb7f2667d803f04a037c3a292de6203
       ? new InteractionApiPerspective(
           this.stream,
           this.stateMap.cursorManager,
