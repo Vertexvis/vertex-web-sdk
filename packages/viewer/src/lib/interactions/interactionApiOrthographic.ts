@@ -176,7 +176,7 @@ export class InteractionApiOrthographic extends InteractionApi {
           planes.near,
           planes.far,
           camera.aspectRatio,
-          asPerspective.fovY
+          asPerspective.fovY ?? 45
         );
         const dir = frameCam.direction;
         const ray = viewport.transformPointToRay(
