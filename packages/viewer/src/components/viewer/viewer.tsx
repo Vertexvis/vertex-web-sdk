@@ -77,8 +77,6 @@ import {
 import { ViewerStream } from '../../lib/stream/stream';
 import {
   FrameCamera,
-  FrameOrthographicCamera,
-  FramePerspectiveCamera,
   Orientation,
   StencilBufferManager,
   Viewport,
