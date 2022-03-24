@@ -212,11 +212,6 @@ export class InteractionApiOrthographic extends InteractionApi {
     const viewport = this.getViewport();
     const framePt = viewport.transformPointToFrame(point, depthBuffer);
     const hasDepth = depthBuffer.hitTest(framePt);
-    console.log(
-      hasDepth
-        ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
-        : fallbackPoint
-    );
     return hasDepth
       ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
       : fallbackPoint;

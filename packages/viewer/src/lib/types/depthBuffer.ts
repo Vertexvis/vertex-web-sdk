@@ -169,9 +169,7 @@ export class DepthBuffer implements FrameImageLike {
     const angle =
       Vector3.dot(vv, eyeToWorldPt) /
       (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
-    console.log(angle);
-    console.log(Ray.at(ray, distance));
-    return Ray.at(ray, distance);
+    return Ray.at(ray, distance / angle);
   }
 
   public getOrthographicWorldPoint(

@@ -1,4 +1,4 @@
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
@@ -11,6 +11,7 @@ import {
   DepthBuffer,
   FeatureMap,
   Frame,
+  FrameCameraBase,
   ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
@@ -218,7 +219,15 @@ export function makeHitTester({
     stencilBuffer ??
       makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
     depthBuffer ?? makeDepthBuffer(200, 100),
-    viewport ?? new Viewport(200, 100)
+    viewport ?? new Viewport(200, 100),
+    new FrameCameraBase(
+      Vector3.forward(),
+      Vector3.origin(),
+      Vector3.up(),
+      0,
+      100,
+      1
+    )
   );
 }
 
