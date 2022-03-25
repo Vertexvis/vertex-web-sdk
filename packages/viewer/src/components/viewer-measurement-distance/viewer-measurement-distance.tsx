@@ -891,7 +891,7 @@ export class ViewerMeasurementDistance {
 
   private getHitTester(): PointToPointHitTester | undefined {
     const { stencil, depthBuffer } = this.stateMap;
-    if (depthBuffer != null && this.internalCamera != null) {
+    if (depthBuffer != null) {
       return new PointToPointHitTester(
         stencil,
         depthBuffer,

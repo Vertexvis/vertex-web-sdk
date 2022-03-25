@@ -12,6 +12,7 @@ import {
   FeatureMap,
   Frame,
   FrameCameraBase,
+  FramePerspectiveCamera,
   ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
@@ -224,13 +225,14 @@ export function makeHitTester({
     depthBuffer ?? makeDepthBuffer(200, 100),
     viewport ?? new Viewport(200, 100),
     camera ??
-      new FrameCameraBase(
+      new FramePerspectiveCamera(
         Vector3.forward(),
         Vector3.origin(),
         Vector3.up(),
         0,
         100,
-        1
+        1,
+        45
       )
   );
 }

@@ -12,7 +12,7 @@ export class PointToPointHitTester {
     private stencil: StencilBuffer | undefined,
     private depthBuffer: DepthBuffer,
     private viewport: Viewport,
-    private camera: FrameCameraBase
+    private camera?: FrameCameraBase
   ) {}
 
   public hitTest(pt: Point.Point): boolean {
@@ -42,11 +42,11 @@ export class PointToPointHitTester {
     const buffer = this.pickDepthBuffer(pt);
 
     if (buffer != null) {
-      return this.camera.isPerspective()
+      return this.camera == null || this.camera.isPerspective()
         ? this.viewport.transformPointToWorldSpace(pt, buffer)
         : this.viewport.transformPointToOrthographicWorldSpace(pt, buffer);
     } else if (ignoreHitTest) {
-      return this.camera.isPerspective()
+      return this.camera == null || this.camera.isPerspective()
         ? this.viewport.transformPointToWorldSpace(pt, this.depthBuffer)
         : this.viewport.transformPointToOrthographicWorldSpace(
             pt,
