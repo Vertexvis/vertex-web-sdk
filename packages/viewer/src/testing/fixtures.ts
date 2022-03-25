@@ -121,11 +121,12 @@ export function makeDepthImageBytes(
 export function makeDepthBuffer(
   width: number,
   height: number,
-  value = 2 ** 16 - 1
+  value = 2 ** 16 - 1,
+  camera?: FrameCameraBase
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
-    makePerspectiveFrame().scene.camera,
+    camera ?? makePerspectiveFrame().scene.camera,
     makeImageAttributes(width, height)
   );
 }
@@ -210,24 +211,27 @@ export function makeHitTester({
   stencilBuffer,
   depthBuffer,
   viewport,
+  camera,
 }: {
   stencilBuffer?: StencilBuffer;
   depthBuffer?: DepthBuffer;
   viewport?: Viewport;
+  camera?: FrameCameraBase;
 } = {}): PointToPointHitTester {
   return new PointToPointHitTester(
     stencilBuffer ??
       makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
     depthBuffer ?? makeDepthBuffer(200, 100),
     viewport ?? new Viewport(200, 100),
-    new FrameCameraBase(
-      Vector3.forward(),
-      Vector3.origin(),
-      Vector3.up(),
-      0,
-      100,
-      1
-    )
+    camera ??
+      new FrameCameraBase(
+        Vector3.forward(),
+        Vector3.origin(),
+        Vector3.up(),
+        0,
+        100,
+        1
+      )
   );
 }
 

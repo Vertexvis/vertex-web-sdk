@@ -199,10 +199,16 @@ export class FrameCameraBase implements FrameCameraLike {
     }
   }
 
+  /**
+   * Returns whether this `FrameCameraBase` is an orthographic camera.
+   */
   public isOrthographic(): this is FrameOrthographicCamera {
     return false;
   }
 
+  /**
+   * Returns whether this `FrameCameraBase` is a perspective camera.
+   */
   public isPerspective(): this is FramePerspectiveCamera {
     return false;
   }
@@ -289,6 +295,20 @@ export class FramePerspectiveCamera
     super(position, lookAt, up, near, far, aspectRatio);
   }
 
+  /**
+   * Converts this `FramePerspectiveCamera` to a `FrameOrthographicCamera` using
+   * the provided `boundingBox` to compute the viewing frustum.
+   *
+   * @param boundingBox The visible bounding box.
+   */
+  public toOrthographic(boundingBox: BoundingBox.BoundingBox): FrameCameraBase {
+    return FrameCameraBase.fromBoundingBox(
+      FrameCamera.toOrthographic(this, boundingBox),
+      boundingBox,
+      this.aspectRatio
+    );
+  }
+
   public override isPerspective(): this is FramePerspectiveCamera {
     return true;
   }
@@ -357,6 +377,12 @@ export class FrameOrthographicCamera
     this.left = -this.right;
   }
 
+  /**
+   * Converts this `FrameOrthographicCamera` to a `FramePerspectiveCamera` using
+   * the provided `boundingBox` to compute the near and far clipping planes.
+   *
+   * @param boundingBox The visible bounding box.
+   */
   public toPerspective(boundingBox: BoundingBox.BoundingBox): FrameCameraBase {
     return FrameCameraBase.fromBoundingBox(
       FrameCamera.toPerspective(this),
