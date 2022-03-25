@@ -3,6 +3,7 @@
  */
 import * as Angle from './angle';
 import * as BoundingBox from './boundingBox';
+import * as BoundingSphere from './boundingSphere';
 import * as Dimensions from './dimensions';
 import * as Euler from './euler';
 import * as Line3 from './line3';
@@ -21,6 +22,7 @@ export * from './math';
 export {
   Angle,
   BoundingBox,
+  BoundingSphere,
   Dimensions,
   Euler,
   Line3,

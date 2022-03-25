@@ -384,7 +384,7 @@ export function makeOrthographic(
 
   const x = (right + left) * w;
   const y = (top + bottom) * h;
-  const z = (far + near) / d;
+  const z = (far + near) * d;
 
   /* eslint-disable prettier/prettier */
   return [

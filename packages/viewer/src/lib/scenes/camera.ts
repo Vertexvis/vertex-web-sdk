@@ -1,8 +1,9 @@
-import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { FrameDecoder } from '../mappers';
+import { constrainViewVector } from '../rendering/vectors';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import {
   Animation,
@@ -107,23 +108,9 @@ export abstract class Camera {
 
   protected fitCameraToBoundingBox(
     boundingBox: BoundingBox.BoundingBox,
-    fovVertical: number,
+    distance: number,
     viewVector: Vector3.Vector3
   ): Camera {
-    const radius =
-      1.1 *
-      Vector3.magnitude(
-        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
-      );
-
-    // ratio of the height of the frustum to the distance along the view vector
-    let hOverD = Math.tan(fovVertical * PI_OVER_360);
-
-    if (this.aspect < 1.0) {
-      hOverD *= this.aspect;
-    }
-
-    const distance = Math.abs(radius / hOverD);
     const vvec = Vector3.scale(distance, Vector3.normalize(viewVector));
 
     const lookAt = BoundingBox.center(boundingBox);
@@ -254,6 +241,7 @@ export abstract class Camera {
   public standardView(standardView: StandardView): Camera {
     return this.update({
       position: standardView.position,
+      viewVector: Vector3.subtract(Vector3.origin(), standardView.position),
       lookAt: Vector3.origin(),
       up: standardView.up,
     });
@@ -397,11 +385,22 @@ export class PerspectiveCamera
   }
 
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    return super.fitCameraToBoundingBox(
-      boundingBox,
-      this.fovY ?? 45,
-      this.viewVector
-    );
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
+      );
+
+    // ratio of the height of the frustum to the distance along the view vector
+    let hOverD = Math.tan((this.fovY ?? 45) * PI_OVER_360);
+
+    if (this.aspect < 1.0) {
+      hOverD *= this.aspect;
+    }
+
+    const distance = Math.abs(radius / hOverD);
+
+    return super.fitCameraToBoundingBox(boundingBox, distance, this.viewVector);
   }
 
   public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
@@ -525,14 +524,8 @@ export class OrthographicCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
-    const updatedLookAt = Vector3.add(this.lookAt, delta);
-
     return this.update({
-      viewVector: Vector3.subtract(
-        updatedLookAt,
-        Vector3.add(this.position, delta)
-      ),
-      lookAt: updatedLookAt,
+      lookAt: Vector3.add(this.lookAt, delta),
     });
   }
 
@@ -541,36 +534,49 @@ export class OrthographicCamera
     point: Vector3.Vector3,
     axis: Vector3.Vector3
   ): Camera {
-    const newLookAt = Vector3.rotateAboutAxis(
+    const updatedLookAt = Vector3.rotateAboutAxis(
       angleInRadians,
       this.lookAt,
       axis,
       point
     );
-    const newUp = Vector3.rotateAboutAxis(
+    const updatedPosition = Vector3.rotateAboutAxis(
       angleInRadians,
-      this.up,
+      this.position,
       axis,
-      Vector3.origin()
+      point
     );
-    const newViewVector = Vector3.subtract(
-      Vector3.rotateAboutAxis(angleInRadians, this.position, axis, point),
-      newLookAt
+    const viewVector = constrainViewVector(
+      Vector3.subtract(updatedLookAt, updatedPosition),
+      BoundingSphere.create(this.boundingBox)
     );
 
     return this.update({
-      viewVector: newViewVector,
-      lookAt: newLookAt,
-      up: newUp,
+      viewVector: viewVector,
+      lookAt: updatedLookAt,
+      up: Vector3.rotateAboutAxis(
+        angleInRadians,
+        this.up,
+        axis,
+        Vector3.origin()
+      ),
     });
   }
 
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    return super.fitCameraToBoundingBox(
+    const boundingSphere = BoundingSphere.create(boundingBox);
+
+    const fitAll = super.fitCameraToBoundingBox(
       boundingBox,
-      this.fovHeight,
+      boundingSphere.radius,
       this.viewVector
     );
+
+    return this.update({
+      lookAt: fitAll.lookAt,
+      viewVector: fitAll.viewVector,
+      fovHeight: boundingSphere.radius * 2,
+    });
   }
 
   public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
@@ -586,7 +592,10 @@ export class OrthographicCamera
 
   public toFrameCamera(): FrameOrthographicCamera {
     return new FrameOrthographicCamera(
-      this.viewVector,
+      constrainViewVector(
+        this.viewVector,
+        BoundingSphere.create(this.boundingBox)
+      ),
       this.lookAt,
       this.up,
       this.near,

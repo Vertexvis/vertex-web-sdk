@@ -1,5 +1,6 @@
 import {
   BoundingBox,
+  BoundingSphere,
   Dimensions,
   Line3,
   Matrix4,
@@ -9,6 +10,7 @@ import {
 } from '@vertexvis/geometry';
 
 import { decodePng } from '../../workers/png-decoder-pool';
+import { constrainViewVector } from '../rendering/vectors';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
@@ -169,7 +171,10 @@ export class FrameCameraBase implements FrameCameraLike {
 
     if (FrameCamera.isOrthographicFrameCamera(camera)) {
       return new FrameOrthographicCamera(
-        camera.viewVector,
+        constrainViewVector(
+          camera.viewVector,
+          BoundingSphere.create(boundingBox)
+        ),
         camera.lookAt,
         camera.up,
         near,
@@ -188,6 +193,14 @@ export class FrameCameraBase implements FrameCameraLike {
         45
       );
     }
+  }
+
+  public isOrthographic(): this is FrameOrthographicCamera {
+    return false;
+  }
+
+  public isPerspective(): this is FramePerspectiveCamera {
+    return false;
   }
 
   /**
@@ -267,9 +280,13 @@ export class FramePerspectiveCamera
     public readonly near: number,
     public readonly far: number,
     public readonly aspectRatio: number,
-    public readonly fovY: number
+    public readonly fovY = 45
   ) {
     super(position, lookAt, up, near, far, aspectRatio);
+  }
+
+  public override isPerspective(): this is FramePerspectiveCamera {
+    return true;
   }
 
   protected override computeCameraMatrices(): FrameCameraMatrices {
@@ -334,6 +351,10 @@ export class FrameOrthographicCamera
     this.bottom = -this.top;
     this.right = this.top * aspectRatio;
     this.left = -this.right;
+  }
+
+  public override isOrthographic(): this is FrameOrthographicCamera {
+    return true;
   }
 
   protected override computeCameraMatrices(): FrameCameraMatrices {
