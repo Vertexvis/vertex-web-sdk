@@ -174,9 +174,6 @@ export class ViewerDomRenderer {
 
     this.depthBuffer =
       depthBuffers === 'all' ? await frame?.depthBuffer() : undefined;
-    this.camera =
-      frame?.scene.camera != null && frame.scene.camera.isOrthographic()
-        ? frame.scene.camera.toPerspective(frame.scene.boundingBox)
-        : frame?.scene?.camera;
+    this.camera = frame?.scene.camera;
   }
 }
