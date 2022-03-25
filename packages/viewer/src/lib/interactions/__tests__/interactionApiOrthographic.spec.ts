@@ -118,7 +118,7 @@ describe(InteractionApi, () => {
 
       expect(update).toHaveBeenCalledTimes(2);
       expect(update.mock.calls[1][0].lookAt).toMatchObject({
-        x: -2,
+        x: -1,
         y: 0,
         z: 0,
       });

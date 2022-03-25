@@ -1,4 +1,4 @@
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
@@ -11,6 +11,8 @@ import {
   DepthBuffer,
   FeatureMap,
   Frame,
+  FrameCameraBase,
+  FramePerspectiveCamera,
   ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
@@ -120,11 +122,12 @@ export function makeDepthImageBytes(
 export function makeDepthBuffer(
   width: number,
   height: number,
-  value = 2 ** 16 - 1
+  value = 2 ** 16 - 1,
+  camera?: FrameCameraBase
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
-    makePerspectiveFrame().scene.camera,
+    camera ?? makePerspectiveFrame().scene.camera,
     makeImageAttributes(width, height)
   );
 }
@@ -209,16 +212,28 @@ export function makeHitTester({
   stencilBuffer,
   depthBuffer,
   viewport,
+  camera,
 }: {
   stencilBuffer?: StencilBuffer;
   depthBuffer?: DepthBuffer;
   viewport?: Viewport;
+  camera?: FrameCameraBase;
 } = {}): PointToPointHitTester {
   return new PointToPointHitTester(
     stencilBuffer ??
       makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
     depthBuffer ?? makeDepthBuffer(200, 100),
-    viewport ?? new Viewport(200, 100)
+    viewport ?? new Viewport(200, 100),
+    camera ??
+      new FramePerspectiveCamera(
+        Vector3.forward(),
+        Vector3.origin(),
+        Vector3.up(),
+        0,
+        100,
+        1,
+        45
+      )
   );
 }
 

@@ -1,5 +1,6 @@
-import { Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 
+import { FrameCamera } from '..';
 import { FrameOrthographicCamera, FramePerspectiveCamera } from '../frame';
 
 describe(FramePerspectiveCamera, () => {
@@ -12,6 +13,22 @@ describe(FramePerspectiveCamera, () => {
     1,
     45
   );
+
+  describe(FramePerspectiveCamera.prototype.toOrthographic, () => {
+    it('converts to an orthographic camera', () => {
+      const bounds = BoundingBox.create(
+        Vector3.create(-1, -1, -1),
+        Vector3.create(1, 1, 1)
+      );
+      const asOrthographic = FrameCamera.toOrthographic(camera, bounds);
+
+      expect(camera.toOrthographic(bounds)).toMatchObject({
+        ...asOrthographic,
+        near: -Math.sqrt(3),
+        far: Math.sqrt(3),
+      });
+    });
+  });
 
   describe(FramePerspectiveCamera.prototype.isPointBehindNear, () => {
     it('returns true if world point behind near plane', () => {
@@ -58,6 +75,21 @@ describe(FrameOrthographicCamera, () => {
     1,
     45
   );
+
+  describe(FrameOrthographicCamera.prototype.toPerspective, () => {
+    it('converts to a perspective camera', () => {
+      const bounds = BoundingBox.create(
+        Vector3.create(-1, -1, -1),
+        Vector3.create(1, 1, 1)
+      );
+      const asPerspective = FrameCamera.toPerspective(camera);
+      const converted = camera.toPerspective(bounds);
+
+      expect(converted).toMatchObject(asPerspective);
+      expect(converted.near).toBeCloseTo(52.5877);
+      expect(converted.far).toBeCloseTo(56.0518);
+    });
+  });
 
   describe(FrameOrthographicCamera.prototype.isPointBehindNear, () => {
     it('returns true if world point behind near plane', () => {

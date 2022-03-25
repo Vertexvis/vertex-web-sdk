@@ -892,7 +892,12 @@ export class ViewerMeasurementDistance {
   private getHitTester(): PointToPointHitTester | undefined {
     const { stencil, depthBuffer } = this.stateMap;
     if (depthBuffer != null) {
-      return new PointToPointHitTester(stencil, depthBuffer, this.viewport);
+      return new PointToPointHitTester(
+        stencil,
+        depthBuffer,
+        this.viewport,
+        this.internalCamera
+      );
     }
   }
 
