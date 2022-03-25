@@ -5,14 +5,8 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
 import { OrthographicCamera } from '../scenes';
-import {
-  ClippingPlanes,
-  DepthBuffer,
-  FrameCamera,
-  FramePerspectiveCamera,
-  Viewport,
-} from '../types';
-import { ZoomData } from '.';
+import { DepthBuffer, Viewport } from '../types';
+import { ZoomData } from './interactionApi';
 import {
   CameraTransform,
   InteractionApi,

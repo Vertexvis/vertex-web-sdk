@@ -1,6 +1,6 @@
 import { BoundingBox, Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
 
-import { ClippingPlanes, FrameCamera } from '..';
+import { FrameCamera } from '..';
 import { FrameOrthographicCamera, FramePerspectiveCamera } from '../frame';
 
 describe(FramePerspectiveCamera, () => {
