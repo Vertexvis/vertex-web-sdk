@@ -17,7 +17,9 @@ export const Renderer3d: FunctionalComponent<Props> = (
   children
 ) => {
   const pMatrix = Matrix4.toObject(camera.projectionMatrix);
-  const fovY = pMatrix.m22 * (viewport.height / 2);
+  const fovY = camera.isOrthographic()
+    ? ((camera.far * 2) / (camera.fovHeight * 2)) * (viewport.height / 2)
+    : pMatrix.m22 * (viewport.height / 2);
   const cameraTransform = [
     `translateZ(${fovY}px)`,
     getCameraCssMatrix(camera.viewMatrix),
