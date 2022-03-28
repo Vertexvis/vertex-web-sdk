@@ -173,30 +173,25 @@ export class SceneTreeTableCell {
               <slot name="placeholder">{this.placeholder}</slot>
             )}
           </div>
-          {this.visibilityToggle && (
-            <button
-              class="visibility-btn no-shrink"
-              data-test-id={'visibility-btn-' + this.node?.name}
-              onPointerDown={(event) => {
-                event?.preventDefault();
-                this.toggleVisibility(event);
-              }}
-              onTouchStart={(event) => {
-                event?.preventDefault();
-                this.toggleVisibility(event);
-              }}
-            >
-              <div
-                class={classNames('icon', {
-                  'icon-visible':
-                    !this.node?.partiallyVisible && this.node?.visible,
-                  'icon-hidden':
-                    !this.node?.partiallyVisible && !this.node?.visible,
-                  'icon-partial': this.node?.partiallyVisible,
-                })}
-              />
-            </button>
-          )}
+          <button
+            class="visibility-btn no-shrink"
+            data-test-id={'visibility-btn-' + this.node?.name}
+            onPointerDown={(event) => {
+              console.log('touching the visibility toggle');
+              event?.preventDefault();
+              this.toggleVisibility(event);
+            }}
+          >
+            <div
+              class={classNames('icon', {
+                'icon-visible':
+                  !this.node?.partiallyVisible && this.node?.visible,
+                'icon-hidden':
+                  !this.node?.partiallyVisible && !this.node?.visible,
+                'icon-partial': this.node?.partiallyVisible,
+              })}
+            />
+          </button>
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
