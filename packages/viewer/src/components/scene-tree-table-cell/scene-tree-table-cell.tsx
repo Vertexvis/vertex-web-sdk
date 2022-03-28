@@ -184,8 +184,10 @@ export class SceneTreeTableCell {
             >
               <div
                 class={classNames('icon', {
+                  'icon-blank':
+                    this.hoveredNodeId !== this.node?.id?.hex && !this.node?.partiallyVisible && this.node?.visible,
                   'icon-visible':
-                    !this.node?.partiallyVisible && this.node?.visible,
+                    this.hoveredNodeId === this.node?.id?.hex && !this.node?.partiallyVisible && this.node?.visible,
                   'icon-hidden':
                     !this.node?.partiallyVisible && !this.node?.visible,
                   'icon-partial': this.node?.partiallyVisible,
