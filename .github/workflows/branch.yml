@@ -36,6 +36,15 @@ jobs:
           path: |
             packages/*/dist
             packages/viewer/loader
+      - name: "Publish Canary to NPM"
+        env:
+          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          ./scripts/publish_canary.sh
   lint:
     runs-on: ubuntu-latest
     steps:
