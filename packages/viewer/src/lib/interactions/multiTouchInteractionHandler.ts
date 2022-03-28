@@ -53,7 +53,8 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.panCameraByDelta(delta);
 
       // Setting a minimum angle to prevent wobbling
-      if (Math.abs(angle) > 0.2) {
+      console.log(Math.abs(angle));
+      if (Math.abs(angle) > 0.4) {
         this.interactionApi?.twistCamera(angle);
       }
     }

@@ -181,6 +181,10 @@ export class SceneTreeTableCell {
                 event?.preventDefault();
                 this.toggleVisibility(event);
               }}
+              onTouchStart={(event) => {
+                event?.preventDefault();
+                this.toggleVisibility(event);
+              }}
             >
               <div
                 class={classNames('icon', {

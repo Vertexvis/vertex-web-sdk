@@ -6,6 +6,7 @@
     "version": {
       "allowBranch": [
         "master",
+        "mobile_scene_tree",
         "release-temp/*"
       ]
     }
