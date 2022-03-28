@@ -173,25 +173,26 @@ export class SceneTreeTableCell {
               <slot name="placeholder">{this.placeholder}</slot>
             )}
           </div>
-          <button
-            class="visibility-btn no-shrink"
-            data-test-id={'visibility-btn-' + this.node?.name}
-            onPointerDown={(event) => {
-              console.log('touching the visibility toggle');
-              event?.preventDefault();
-              this.toggleVisibility(event);
-            }}
-          >
-            <div
-              class={classNames('icon', {
-                'icon-visible':
-                  !this.node?.partiallyVisible && this.node?.visible,
-                'icon-hidden':
-                  !this.node?.partiallyVisible && !this.node?.visible,
-                'icon-partial': this.node?.partiallyVisible,
-              })}
-            />
-          </button>
+          {this.visibilityToggle && (
+            <button
+              class="visibility-btn no-shrink"
+              data-test-id={'visibility-btn-' + this.node?.name}
+              onPointerDown={(event) => {
+                event?.preventDefault();
+                this.toggleVisibility(event);
+              }}
+            >
+              <div
+                class={classNames('icon', {
+                  'icon-visible':
+                    !this.node?.partiallyVisible && this.node?.visible,
+                  'icon-hidden':
+                    !this.node?.partiallyVisible && !this.node?.visible,
+                  'icon-partial': this.node?.partiallyVisible,
+                })}
+              />
+            </button>
+          )}
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
@@ -239,7 +240,7 @@ export class SceneTreeTableCell {
     this.expandToggled.emit({ node: this.node, originalEvent: event });
   };
 
-  private toggleVisibility = (event: PointerEvent | TouchEvent): void => {
+  private toggleVisibility = (event: PointerEvent): void => {
     if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleItemVisibility(this.node);
     }

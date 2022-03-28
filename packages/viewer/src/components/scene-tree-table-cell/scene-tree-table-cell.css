@@ -82,11 +82,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  visibility: hidden;
   width: 24px;
   height: 24px;
 }
 
+:host(:not([is-hovered]):not([is-partial]):not([is-hidden])) .visibility-btn,
 :host([is-hidden]) .visibility-btn,
 :host([is-partial]) .visibility-btn,
 :host([is-hovered]) .visibility-btn {
