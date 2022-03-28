@@ -12,7 +12,7 @@ import classNames from 'classnames';
 
 export interface SceneTreeTableCellEventDetails {
   node?: Node.AsObject;
-  originalEvent: PointerEvent;
+  originalEvent: PointerEvent | TouchEvent;
 }
 
 @Component({
@@ -244,7 +244,7 @@ export class SceneTreeTableCell {
     this.expandToggled.emit({ node: this.node, originalEvent: event });
   };
 
-  private toggleVisibility = (event: PointerEvent): void => {
+  private toggleVisibility = (event: PointerEvent | TouchEvent): void => {
     if (this.tree != null && this.node != null && !this.interactionsDisabled) {
       this.tree.toggleItemVisibility(this.node);
     }
