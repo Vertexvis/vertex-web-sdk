@@ -214,10 +214,14 @@ export class SceneTreeTableCell {
   };
 
   private handleCellPointerDown = (event: PointerEvent): void => {
+    console.log(event);
+    console.log(event.movementY);
+
     if (
       !event.defaultPrevented &&
       event.button === 0 &&
-      !this.interactionsDisabled
+      !this.interactionsDisabled &&
+      event.movementY === 0
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
