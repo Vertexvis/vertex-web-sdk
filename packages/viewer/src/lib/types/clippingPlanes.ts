@@ -1,6 +1,11 @@
-import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 
-import { FrameCamera } from './frameCamera';
+import {
+  FrameCamera,
+  isOrthographicFrameCamera,
+  OrthographicFrameCamera,
+  PerspectiveFrameCamera,
+} from './frameCamera';
 
 export interface ClippingPlanes {
   near: number;
@@ -11,33 +16,72 @@ export function fromBoundingBoxAndLookAtCamera(
   boundingBox: BoundingBox.BoundingBox,
   camera: FrameCamera
 ): ClippingPlanes {
-  const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const cameraToCenter = Vector3.subtract(camera.position, boundingBoxCenter);
-  const centerToBoundingPlane = Vector3.subtract(
-    boundingBox.max,
-    boundingBoxCenter
-  );
-  const distanceToCenterAlongViewVec =
-    Math.abs(
-      Vector3.dot(
-        Vector3.subtract(camera.lookAt, camera.position),
-        cameraToCenter
-      )
-    ) / Vector3.magnitude(Vector3.subtract(camera.lookAt, camera.position));
-  const radius = 1.1 * Vector3.magnitude(centerToBoundingPlane);
-  let far = distanceToCenterAlongViewVec + radius;
-  let near = far * 0.01;
+  return isOrthographicFrameCamera(camera)
+    ? fromBoundingBoxAndOrthographicCamera(boundingBox, camera)
+    : fromBoundingBoxAndPerspectiveCamera(boundingBox, camera);
+}
 
-  if (near > distanceToCenterAlongViewVec - radius) {
-    if (near > 1000) {
-      const difference = near - 1000;
-      near = 1000;
-      far -= difference;
-    } else {
-    }
-  } else {
-    near = distanceToCenterAlongViewVec - radius;
+// Logic pulled from https://github.com/Vertexvis/rendering-client-lib-java/blob/master/src/main/java/com/vertexvis/rendering/graphics/PerspectiveCamera.java#L65
+// and needs to remain in sync with that computation.
+// TODO: revisit computation of these values in a single location
+export function fromBoundingBoxAndPerspectiveCamera(
+  boundingBox: BoundingBox.BoundingBox,
+  camera: PerspectiveFrameCamera
+): ClippingPlanes {
+  const boundingSphere = BoundingSphere.create(boundingBox);
+  const minRange = boundingSphere.epsilon * 1e2;
+
+  const signedDistToEye = Vector3.dot(
+    Vector3.subtract(boundingSphere.center, camera.position),
+    Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
+  );
+
+  const bRadius = Math.max(boundingSphere.radius, minRange);
+
+  let newFar =
+    bRadius + signedDistToEye < minRange
+      ? bRadius * 3.0
+      : bRadius + signedDistToEye;
+
+  let newNear =
+    newFar - bRadius * 2.0 < minRange
+      ? Math.min(minRange, newFar)
+      : newFar - bRadius * 2.0;
+
+  if (newFar - newNear < minRange) {
+    newNear = Math.max(newNear, minRange);
+    newFar += newNear + minRange;
+  } else if (newNear / newFar < 0.0001) {
+    newNear = newFar * 0.0001;
   }
 
-  return { far, near };
+  if (newNear > newFar - bRadius * 2.0) {
+    if (newNear > 1000 + minRange) {
+      newFar -= newNear - 1000;
+      newNear = 1000;
+    }
+  }
+
+  return {
+    near: newNear,
+    far: newFar,
+  };
+}
+
+// Logic pulled from https://github.com/Vertexvis/rendering-client-lib-java/blob/master/src/main/java/com/vertexvis/rendering/graphics/OrthographicCamera.java#L35
+// and needs to remain in sync with that computation.
+// TODO: revisit computation of these values in a single location
+export function fromBoundingBoxAndOrthographicCamera(
+  boundingBox: BoundingBox.BoundingBox,
+  camera: OrthographicFrameCamera
+): ClippingPlanes {
+  const boundingSphere = BoundingSphere.create(boundingBox);
+  const minRange = boundingSphere.epsilon * 1e2;
+
+  const bRadius = Math.max(boundingSphere.radius, minRange);
+
+  return {
+    near: -bRadius,
+    far: bRadius,
+  };
 }

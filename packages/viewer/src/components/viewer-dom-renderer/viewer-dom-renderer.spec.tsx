@@ -8,18 +8,19 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 
-import { DepthBuffer, FramePerspectiveCamera } from '../../lib/types';
+import { DepthBuffer, FrameCameraBase } from '../../lib/types';
 import { makeDepthImageBytes } from '../../testing/fixtures';
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
 import { ViewerDomRenderer } from './viewer-dom-renderer';
 
 describe('<vertex-viewer-dom-renderer>', () => {
-  const camera = FramePerspectiveCamera.fromBoundingBox(
+  const camera = FrameCameraBase.fromBoundingBox(
     {
       position: { x: 0, y: 0, z: -100 },
       lookAt: Vector3.origin(),
       up: Vector3.up(),
+      fovY: 45,
     },
     BoundingBox.create({ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: 1 }),
     1

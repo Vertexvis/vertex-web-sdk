@@ -3,8 +3,8 @@ import { Vector3 } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
 
 import {
+  FrameCameraWithMatrices,
   FrameImageLike,
-  FramePerspectiveCamera,
   ImageAttributesLike,
 } from './frame';
 import { Viewport } from './viewport';
@@ -33,7 +33,7 @@ export class DepthBuffer implements FrameImageLike {
    * @param pixels A 16-bit typed array of depth values.
    */
   public constructor(
-    public readonly camera: FramePerspectiveCamera,
+    public readonly camera: FrameCameraWithMatrices,
     public readonly imageAttr: ImageAttributesLike,
     public readonly pixels: Uint16Array
   ) {}
@@ -49,7 +49,7 @@ export class DepthBuffer implements FrameImageLike {
    */
   public static fromPng(
     png: Pick<DecodedPng, 'data'>,
-    camera: FramePerspectiveCamera,
+    camera: FrameCameraWithMatrices,
     imageAttr: ImageAttributesLike
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
@@ -62,7 +62,7 @@ export class DepthBuffer implements FrameImageLike {
   /**
    * Computes the depth from a 2D point within the coordinate space of the depth
    * buffer. The returned depth is a value that's between the near and far plane
-   * of the camera.
+   * of the perspective camera.
    *
    * @param point A 2D point within the viewport.
    * @param fallbackNormalizedDepth A fallback value if the depth is the max
@@ -78,7 +78,31 @@ export class DepthBuffer implements FrameImageLike {
       point,
       fallbackNormalizedDepth
     );
+
     return depth * (far - near) + near;
+  }
+
+  /**
+   * Computes the depth from a 2D point within the coordinate space of the depth
+   * buffer. The returned depth is a value that's between the near and far plane
+   * of the orthographic camera.
+   *
+   * @param point A 2D point within the viewport.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   * @returns A depth between the near and far plane.
+   */
+  public getOrthographicDepthAtPoint(
+    point: Point.Point,
+    fallbackNormalizedDepth?: number
+  ): number {
+    const { near, far } = this.camera;
+    const depth = this.getNormalizedDepthAtPoint(
+      point,
+      fallbackNormalizedDepth
+    );
+
+    return depth * (far - near) + near / 2;
   }
 
   /**
@@ -130,7 +154,7 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
-   * Computes a 3D point in world space coordinates from the depth value at the
+   * Computes a 3D point in perspective world space coordinates from the depth value at the
    * given pixel and ray.
    *
    * @param point A pixel to use for reading a depth value.
@@ -156,6 +180,29 @@ export class DepthBuffer implements FrameImageLike {
       Vector3.dot(vv, eyeToWorldPt) /
       (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
     return Ray.at(ray, distance / angle);
+  }
+
+  /**
+   * Computes a 3D point in orthographic world space coordinates from the depth value at the
+   * given pixel and ray.
+   *
+   * @param point A pixel to use for reading a depth value.
+   * @param ray A ray that specifies the origin and direction.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   * @returns A point in world space coordinates.
+   */
+  public getOrthographicWorldPoint(
+    point: Point.Point,
+    ray: Ray.Ray,
+    fallbackNormalizedDepth?: number
+  ): Vector3.Vector3 {
+    const distance = this.getOrthographicDepthAtPoint(
+      point,
+      fallbackNormalizedDepth
+    );
+
+    return Ray.at(ray, distance);
   }
 
   /**

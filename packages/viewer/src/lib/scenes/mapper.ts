@@ -3,7 +3,7 @@ import { Dimensions } from '@vertexvis/geometry';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { Animation, FlyTo } from '../types';
+import { Animation, FlyTo, FrameCamera } from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
 
@@ -131,7 +131,7 @@ export function buildFlyToOperation(
     case 'camera': {
       return {
         ...payload,
-        camera: options.flyTo.data,
+        camera: FrameCamera.toProtobuf(options.flyTo.data),
       };
     }
 

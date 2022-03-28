@@ -136,3 +136,12 @@ export class InvalidArgumentError extends CustomError {
     Object.setPrototypeOf(this, InvalidArgumentError.prototype);
   }
 }
+
+export class InvalidCameraError extends CustomError {
+  public constructor(message: string, e?: Error) {
+    super(message, e);
+
+    // Allows for `instanceof` checks.
+    Object.setPrototypeOf(this, InvalidCameraError.prototype);
+  }
+}

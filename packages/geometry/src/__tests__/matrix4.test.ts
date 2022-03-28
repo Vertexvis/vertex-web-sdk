@@ -139,6 +139,32 @@ describe(Matrix4.makePerspective, () => {
   });
 });
 
+describe(Matrix4.makeOrthographic, () => {
+  it('returns projection matrix for uniform horizontal and vertical clipping planes', () => {
+    const m = Matrix4.toObject(Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10));
+
+    expect(m.m11).toBeCloseTo(0.5);
+    expect(m.m41).toBeCloseTo(0);
+    expect(m.m22).toBeCloseTo(0.5);
+    expect(m.m42).toBeCloseTo(0);
+    expect(m.m33).toBeCloseTo(-0.2);
+    expect(m.m43).toBe(-1);
+    expect(m.m44).toBe(1);
+  });
+
+  it('returns projection matrix for non-uniform horizontal and vertical clipping planes', () => {
+    const m = Matrix4.toObject(Matrix4.makeOrthographic(-8, 2, -8, 2, 0, 10));
+
+    expect(m.m11).toBeCloseTo(0.2);
+    expect(m.m41).toBeCloseTo(0.6);
+    expect(m.m22).toBeCloseTo(0.2);
+    expect(m.m42).toBeCloseTo(0.6);
+    expect(m.m33).toBeCloseTo(-0.2);
+    expect(m.m43).toBe(-1);
+    expect(m.m44).toBe(1);
+  });
+});
+
 describe(Matrix4.makeLookAtView, () => {
   it('returns view matrix that looks at target', () => {
     const cosRotation = Math.cos(Angle.toRadians(45));

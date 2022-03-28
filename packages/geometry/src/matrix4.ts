@@ -354,6 +354,49 @@ export function makePerspective(
 }
 
 /**
+ * Creates an orthographic projection matrix.
+ *
+ * Related to: gluOrtho. The viewing volume is cube-shaped and defined by
+ * the six parameters. The left and right values represent the coordinates of
+ * the vertical clipping planes, top and bottom values represent the coordinates
+ * of the horizontal clipping planes, and near and far values represent the
+ * coordinates of the depth clipping planes.
+ *
+ * @param left The coordinate of the left horizontal clipping plane.
+ * @param right The coordinate of the right horizontal clipping plane.
+ * @param bottom The coordinate of the bottom vertical clipping plane.
+ * @param top The coordinate of the top vertical clipping plane.
+ * @param near The coordinate of the near depth clipping plane.
+ * @param far The coordinate of the far depth clipping plane.
+ * @returns A matrix.
+ */
+export function makeOrthographic(
+  left: number,
+  right: number,
+  bottom: number,
+  top: number,
+  near: number,
+  far: number
+): Matrix4 {
+  const w = 1.0 / (right - left);
+  const h = 1.0 / (top - bottom);
+  const d = 1.0 / (far - near);
+
+  const x = (right + left) * w;
+  const y = (top + bottom) * h;
+  const z = (far + near) * d;
+
+  /* eslint-disable prettier/prettier */
+  return [
+    2 * w, 0,     0,      -x,
+    0,     2 * h, 0,      -y,
+    0,     0,     -2 * d, -z,
+    0,     0,     0,      1
+  ];
+  /* eslint-enable prettier/prettier */
+}
+
+/**
  * Matrix becomes a combination of an inverse translation and rotation.
  *
  * Related to: gluLookAt. This creates the inverse of makeLookAtMatrix. The

@@ -1,4 +1,4 @@
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { DrawFramePayload } from '@vertexvis/stream-api';
 import { Color, Mapper } from '@vertexvis/utils';
 import { encode } from 'fast-png';
@@ -11,6 +11,8 @@ import {
   DepthBuffer,
   FeatureMap,
   Frame,
+  FrameCameraBase,
+  FramePerspectiveCamera,
   ImageAttributesLike,
   Orientation,
   STENCIL_BUFFER_FEATURE_VALUE,
@@ -18,14 +20,9 @@ import {
   Viewport,
 } from '../lib/types';
 
-export const drawFramePayload: DrawFramePayload = {
+const baseDrawFramePayload: Partial<DrawFramePayload> = {
   sequenceNumber: 1,
   sceneAttributes: {
-    camera: {
-      position: { x: 0, y: 0, z: 100 },
-      lookAt: { x: 0, y: 0, z: 0 },
-      up: { x: 0, y: 1, z: 0 },
-    },
     visibleBoundingBox: {
       xmin: -100,
       ymin: -100,
@@ -49,9 +46,44 @@ export const drawFramePayload: DrawFramePayload = {
   depthBuffer: { value: makeDepthImagePng(100, 50) },
 };
 
-export function makeFrame(): Frame {
+export const drawFramePayloadPerspective: DrawFramePayload = {
+  ...baseDrawFramePayload,
+  sceneAttributes: {
+    ...baseDrawFramePayload.sceneAttributes,
+    camera: {
+      perspective: {
+        position: { x: 0, y: 0, z: 100 },
+        lookAt: { x: 0, y: 0, z: 0 },
+        up: { x: 0, y: 1, z: 0 },
+      },
+    },
+  },
+};
+
+export const drawFramePayloadOrthographic: DrawFramePayload = {
+  ...baseDrawFramePayload,
+  sceneAttributes: {
+    ...baseDrawFramePayload.sceneAttributes,
+    camera: {
+      orthographic: {
+        viewVector: { x: 0, y: 0, z: -100 },
+        lookAt: { x: 0, y: 0, z: 0 },
+        up: { x: 0, y: 1, z: 0 },
+        fovHeight: 100,
+      },
+    },
+  },
+};
+
+export function makePerspectiveFrame(): Frame {
   return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-    drawFramePayload
+    drawFramePayloadPerspective
+  );
+}
+
+export function makeOrthographicFrame(): Frame {
+  return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
+    drawFramePayloadOrthographic
   );
 }
 
@@ -90,11 +122,12 @@ export function makeDepthImageBytes(
 export function makeDepthBuffer(
   width: number,
   height: number,
-  value = 2 ** 16 - 1
+  value = 2 ** 16 - 1,
+  camera?: FrameCameraBase
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
-    makeFrame().scene.camera,
+    camera ?? makePerspectiveFrame().scene.camera,
     makeImageAttributes(width, height)
   );
 }
@@ -179,16 +212,28 @@ export function makeHitTester({
   stencilBuffer,
   depthBuffer,
   viewport,
+  camera,
 }: {
   stencilBuffer?: StencilBuffer;
   depthBuffer?: DepthBuffer;
   viewport?: Viewport;
+  camera?: FrameCameraBase;
 } = {}): PointToPointHitTester {
   return new PointToPointHitTester(
     stencilBuffer ??
       makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
     depthBuffer ?? makeDepthBuffer(200, 100),
-    viewport ?? new Viewport(200, 100)
+    viewport ?? new Viewport(200, 100),
+    camera ??
+      new FramePerspectiveCamera(
+        Vector3.forward(),
+        Vector3.origin(),
+        Vector3.up(),
+        0,
+        100,
+        1,
+        45
+      )
   );
 }
 

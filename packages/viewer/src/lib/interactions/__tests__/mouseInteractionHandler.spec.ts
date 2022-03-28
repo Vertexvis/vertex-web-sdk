@@ -278,7 +278,7 @@ describe(MouseInteractionHandler, () => {
   }
 
   async function simulateCustomMouseEvent(
-    mouseEvent?: MouseEvent,
+    mouseEvent: MouseEvent,
     interactionDelay?: number
   ): Promise<void> {
     div.dispatchEvent(mouseDown);

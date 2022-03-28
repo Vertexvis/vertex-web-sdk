@@ -30,7 +30,7 @@ import {
   DepthBuffer,
   DistanceUnits,
   DistanceUnitType,
-  FramePerspectiveCamera,
+  FrameCameraBase,
   StencilBuffer,
   Viewport,
 } from '../../lib/types';
@@ -229,7 +229,7 @@ export class ViewerMeasurementDistance {
    * projection view matrix of the viewer will be used.
    */
   @Prop()
-  public camera?: FramePerspectiveCamera;
+  public camera?: FrameCameraBase;
 
   /**
    * @internal
@@ -282,7 +282,7 @@ export class ViewerMeasurementDistance {
   private interactionCount = 0;
 
   @State()
-  private internalCamera?: FramePerspectiveCamera;
+  private internalCamera?: FrameCameraBase;
 
   @State()
   private invalidateStateCounter = 0;
@@ -892,7 +892,12 @@ export class ViewerMeasurementDistance {
   private getHitTester(): PointToPointHitTester | undefined {
     const { stencil, depthBuffer } = this.stateMap;
     if (depthBuffer != null) {
-      return new PointToPointHitTester(stencil, depthBuffer, this.viewport);
+      return new PointToPointHitTester(
+        stencil,
+        depthBuffer,
+        this.viewport,
+        this.internalCamera
+      );
     }
   }
 
