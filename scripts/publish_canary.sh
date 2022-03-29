@@ -6,8 +6,8 @@ set -e
 
 . "$(pwd)"/scripts/utils.sh
 
-preid="canary"
-dist_tag="canary"
+preid="testing"
+dist_tag="testing"
 next_bump=`jq -r '.nextVersionBump' package.json`
 version=`jq -r '.version' lerna.json`
 next_version=`npx semver "$version" --increment "$next_bump"`

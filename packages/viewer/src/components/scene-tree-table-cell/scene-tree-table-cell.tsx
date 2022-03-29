@@ -219,9 +219,16 @@ export class SceneTreeTableCell {
   private handleCellPointerDown = (event: PointerEvent): void => {
     console.log(event);
 
-    this.beginningPointerPosition = event.clientY;
+    if (
+      !event.defaultPrevented &&
+      event.button === 0 &&
+      !this.interactionsDisabled
+    ) {
+       this.beginningPointerPosition = event.clientY;
 
-    window.addEventListener('pointerup', this.handleCellPointerUp);
+       window.addEventListener('pointerup', this.handleCellPointerUp);
+    }
+
   };
 
   private handleCellPointerUp = (event: PointerEvent): void => {
