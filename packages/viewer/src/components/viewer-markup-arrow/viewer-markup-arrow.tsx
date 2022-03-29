@@ -233,6 +233,8 @@ export class ViewerMarkupArrow {
       const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
 
       if (isValidPointData(screenStart, screenEnd)) {
+        console.log('start: ', screenStart, this.start);
+        console.log('end: ', screenEnd, this.end);
         return (
           <Host>
             <svg class="svg" onTouchStart={this.handleTouchStart}>

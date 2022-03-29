@@ -1,5 +1,6 @@
 import { Disposable, UUID } from '@vertexvis/utils';
 
+import { translatePointToRelative } from '../../components/viewer-markup/utils';
 import { Cursor, pinCursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
@@ -70,19 +71,19 @@ export class PinsInteractionHandler implements InteractionHandler {
 
       if (hit?.hitPoint != null) {
         const vector3 = await api.getWorldPointFromViewport(pt);
-        // const labelVector = await api.getWorldPointFromViewport({
-        //   x: pt.x,
-        //   y: pt.y,
-        // });
 
         console.log('Got vector3: ', vector3);
+
+        const relativePoint = translatePointToRelative(
+          {
+            ...pt,
+          },
+          api.getViewport()
+        );
         if (vector3 != null) {
           const pinId = UUID.create();
           this.controller.addEntity(
-            new TextPinEntity(pinId, vector3, pt, {
-              y: 50,
-              x: 0,
-            })
+            new TextPinEntity(pinId, vector3, pt, relativePoint)
           );
         }
       } else {

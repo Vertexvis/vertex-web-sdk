@@ -1,14 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { cssTransformCenterAt } from '../../lib/dom';
 import { TextPinEntity } from '../../lib/pins/entities';
+import {
+  translatePointToRelative,
+  translatePointToScreen,
+} from '../viewer-markup/utils';
 
 export interface DistanceMeasurementRendererProps {
   pin: TextPinEntity;
   selected: boolean;
+  dimensions?: Dimensions.Dimensions;
   onUpdatePin: (pin: TextPinEntity) => void;
   onUpdatePinLabelPosition: (point: Point.Point) => void;
   onSelectPin: (id: string) => void;
@@ -17,11 +21,16 @@ export interface DistanceMeasurementRendererProps {
 }
 export const DrawablePinRenderer: FunctionalComponent<
   DistanceMeasurementRendererProps
-> = ({ pin, selected, onUpdatePin, onSelectPin, onUpdatePinLabelPosition }) => {
+> = ({
+  pin,
+  dimensions,
+  selected,
+  onUpdatePin,
+  onSelectPin,
+  onUpdatePinLabelPosition,
+}) => {
   const pointerDownAndMove = (): Disposable => {
-    console.log('POINTER DOWN');
     const pointerMove = (event: PointerEvent): void => {
-      console.log('DRAGGINGL: ', event.clientX, event.clientY);
       onUpdatePinLabelPosition({
         x: event.clientX,
         y: event.clientY,
@@ -42,11 +51,16 @@ export const DrawablePinRenderer: FunctionalComponent<
       dispose,
     };
   };
+  const screenPosition =
+    pin.labelOffset != null && dimensions != null
+      ? translatePointToScreen(pin.labelOffset, dimensions)
+      : undefined;
+
+  console.log('screenPosition: ', screenPosition);
   return (
     <div
       onPointerDown={(e) => {
         e.stopPropagation();
-        console.log('selecting pin');
         onSelectPin(pin.id);
       }}
       class="pin"
@@ -56,7 +70,7 @@ export const DrawablePinRenderer: FunctionalComponent<
         class="pin-anchor"
         onPointerDown={(event) => console.log('pointer: ', event)}
       ></div>
-      {pin.labelOffset != null &&
+      {/* {screenPosition != null &&
         (selected ? (
           <input
             id={`pin-label-${pin.id}`}
@@ -73,7 +87,8 @@ export const DrawablePinRenderer: FunctionalComponent<
               });
             }}
             style={{
-              transform: `translate(-50%, -50%) translate(${pin.labelOffset.x}px, ${pin.labelOffset.y}px)`,
+              top: `${screenPosition.y.toString()}px`,
+              left: `${screenPosition.x.toString()}px`,
             }}
           />
         ) : (
@@ -81,12 +96,15 @@ export const DrawablePinRenderer: FunctionalComponent<
             id={`pin-label-${pin.id}`}
             class="distance-label"
             style={{
-              transform: `translate(-50%, -50%) translate(${pin.labelOffset.x}px, ${pin.labelOffset.y}px)`,
+              position: 'absolute',
+              top: screenPosition.y.toString(),
+              left: screenPosition.x.toString(),
+              // transform: `translate(-50%, -50%) translate(${pin.labelOffset.x}px, ${pin.labelOffset.y}px)`,
             }}
           >
             {pin.labelText || 'Untitled Pin'}
           </div>
-        ))}
+        ))} */}
     </div>
   );
 };

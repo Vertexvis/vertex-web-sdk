@@ -19,6 +19,11 @@ import { PinController } from '../../lib/pins/controller';
 import { PinEntity, TextPinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
+import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import {
+  translatePointToRelative,
+  translatePointToScreen,
+} from '../viewer-markup/utils';
 import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-distance/viewer-measurement-distance';
 import { DrawablePinRenderer } from './drawable-pin';
 
@@ -63,6 +68,9 @@ export class ViewerAnnotationsPin {
   @Element()
   private hostEl!: HTMLElement;
 
+  @State()
+  private elementBounds?: DOMRect;
+
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
   private onOverlaysChangedHandler?: Disposable;
@@ -78,6 +86,7 @@ export class ViewerAnnotationsPin {
    * @ignore
    */
   protected componentWillLoad(): void {
+    this.updateViewport();
     this.setupController();
     this.setupInteractionHandler();
 
@@ -88,6 +97,11 @@ export class ViewerAnnotationsPin {
     this.pinModel.onSelectionChange((selectedId) => {
       this.selectedPinId = selectedId;
     });
+  }
+
+  protected componentDidLoad(): void {
+    const resize = new ResizeObserver(() => this.updateViewport());
+    resize.observe(this.hostEl);
   }
 
   /**
@@ -143,6 +157,7 @@ export class ViewerAnnotationsPin {
         ])
       );
     };
+
     return (
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
@@ -156,6 +171,7 @@ export class ViewerAnnotationsPin {
                 <DrawablePinRenderer
                   pin={pin}
                   selected={this.selectedPinId === pin.id}
+                  dimensions={this.elementBounds}
                   onSelectPin={(id) => {
                     this.pinController?.setSelectedPinId(id);
                   }}
@@ -164,29 +180,12 @@ export class ViewerAnnotationsPin {
                     if (pin.labelOffset != null && frame != null) {
                       console.log('Point: ', point);
 
-                      console.log('pin.point: ', pin.labelOffset);
-
-                      const x = point.x;
-                      const y = point.y;
-
-                      // console.log('x: ', x);
-                      // const updatedOffset = Point.subtract(
-
-                      // );
-                      // console.log('updatedOffest', updatedOffset);
-
-                      const subtracted = Point.subtract(
-                        {
-                          x: frame.image.imageAttr.frameDimensions.width / 2,
-                          y:
-                            frame.image.imageAttr.frameDimensions.height / 2 +
-                            50,
-                        },
-                        point
-                      );
                       onUpdatePin(pin, {
                         ...pin,
-                        labelOffset: { ...subtracted },
+                        labelOffset: translatePointToRelative(
+                          point,
+                          frame.dimensions
+                        ),
                       });
                     }
                   }}
@@ -198,6 +197,71 @@ export class ViewerAnnotationsPin {
             );
           })}
         </vertex-viewer-dom-renderer>
+
+        {this.pins.map((pin, i) => {
+          const pointerDownAndMove = (): Disposable => {
+            const pointerMove = (event: PointerEvent): void => {
+              const frame = this.viewer?.frame;
+              if (pin.labelOffset != null && frame != null) {
+                const point = {
+                  x: event.clientX,
+                  y: event.clientY,
+                };
+                console.log('Point: ', point);
+
+                onUpdatePin(pin, {
+                  ...pin,
+                  labelOffset: translatePointToRelative(
+                    point,
+                    frame.dimensions
+                  ),
+                });
+              }
+            };
+
+            const dispose = (): void => {
+              window.removeEventListener('pointermove', pointerMove);
+              window.removeEventListener('pointerup', pointerUp);
+            };
+
+            const pointerUp = (): void => dispose();
+
+            window.addEventListener('pointermove', pointerMove);
+            window.addEventListener('pointerup', pointerUp);
+
+            return {
+              dispose,
+            };
+          };
+
+          const frame = this.viewer?.frame;
+          const screenPosition =
+            pin.labelOffset != null && frame?.dimensions != null
+              ? translatePointToScreen(pin.labelOffset, frame.dimensions)
+              : undefined;
+          return (
+            <div>
+              <input
+                id={`pin-label-${pin.id}`}
+                class="distance-label"
+                type="text"
+                placeholder="Untitled Pin"
+                onPointerDown={pointerDownAndMove}
+                value={pin.labelText}
+                onInput={(event) => {
+                  onUpdatePin(pin, {
+                    ...pin,
+                    labelText: (event.target as HTMLInputElement).value,
+                  });
+                }}
+                style={{
+                  top: `${screenPosition?.y.toString() || 0}px`,
+                  left: `${screenPosition?.x.toString() || 0}px`,
+                }}
+              />
+            </div>
+          );
+        })}
       </Host>
     );
   }
@@ -228,5 +292,10 @@ export class ViewerAnnotationsPin {
 
     this.onOverlaysChangedHandler?.dispose();
     this.onOverlaysChangedHandler = undefined;
+  }
+
+  private updateViewport(): void {
+    const rect = getMarkupBoundingClientRect(this.hostEl);
+    this.elementBounds = rect;
   }
 }

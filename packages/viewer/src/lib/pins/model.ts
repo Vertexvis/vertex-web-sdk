@@ -76,6 +76,8 @@ export class PinModel {
     this.entities.clear();
     entities.forEach((e) => this.entities.add(e));
     this.entitiesChanged.emit(this.getEntities());
+    console.log('entitiesChanged: ', this.getEntities());
+
     return true;
   }
 
