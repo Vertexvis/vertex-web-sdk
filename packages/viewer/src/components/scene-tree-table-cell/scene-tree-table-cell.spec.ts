@@ -224,8 +224,14 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', { button: 0 });
-    cell.dispatchEvent(originalEvent);
+    cell.dispatchEvent(
+      new MouseEvent('pointerdown', { button: 0, clientY: 0 })
+    );
+    const originalEvent = new MouseEvent('pointerup', {
+      button: 0,
+      clientY: 0,
+    });
+    window.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalled();
     expect(selected).toHaveBeenCalled();
@@ -254,11 +260,20 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', {
+    cell.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        button: 0,
+        metaKey: true,
+        clientY: 0,
+      })
+    );
+
+    const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       metaKey: true,
+      clientY: 0,
     });
-    cell.dispatchEvent(originalEvent);
+    window.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
@@ -290,7 +305,11 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('selectionToggled', selected);
 
     cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, ctrlKey: true })
+      new MouseEvent('pointerdown', { button: 0, ctrlKey: true, clientY: 0 })
+    );
+
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { button: 0, ctrlKey: true, clientY: 0 })
     );
 
     expect(tree.selectItem).toHaveBeenCalledWith(
@@ -313,7 +332,12 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    cell.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
+    cell.dispatchEvent(
+      new MouseEvent('pointerdown', { button: 0, clientY: 0 })
+    );
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { button: 0, clientY: 0 })
+    );
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       node,
@@ -334,7 +358,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    cell.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
+    cell.dispatchEvent(
+      new MouseEvent('pointerdown', { button: 0, clientY: 0 })
+    );
 
     expect(tree.selectItem).not.toHaveBeenCalled();
     expect(tree.deselectItem).not.toHaveBeenCalled();
@@ -357,7 +383,11 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('selectionToggled', selected);
 
     cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, metaKey: true })
+      new MouseEvent('pointerdown', { button: 0, metaKey: true, clientY: 0 })
+    );
+
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { button: 0, metaKey: true, clientY: 0 })
     );
 
     expect(tree.deselectItem).toHaveBeenCalled();
@@ -380,11 +410,20 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', {
+    cell.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        button: 0,
+        ctrlKey: true,
+        clientY: 5,
+      })
+    );
+
+    const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       ctrlKey: true,
+      clientY: 5,
     });
-    cell.dispatchEvent(originalEvent);
+    window.dispatchEvent(originalEvent);
 
     expect(tree.deselectItem).toHaveBeenCalled();
     expect(selected).toHaveBeenCalledWith(

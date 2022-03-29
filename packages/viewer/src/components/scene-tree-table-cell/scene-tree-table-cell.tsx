@@ -6,6 +6,7 @@ import {
   h,
   Host,
   Prop,
+  State,
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';
