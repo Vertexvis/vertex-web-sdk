@@ -115,6 +115,9 @@ export class SceneTreeTableCell {
   @Element()
   private hostEl!: HTMLElement;
 
+  @State()
+  private beginningPointerPosition = 0;
+
   public componentWillRender(): void {
     this.toggleAttribute(
       'is-hovered',
@@ -184,8 +187,14 @@ export class SceneTreeTableCell {
             >
               <div
                 class={classNames('icon', {
+                  'icon-blank':
+                    this.hoveredNodeId !== this.node?.id?.hex &&
+                    !this.node?.partiallyVisible &&
+                    this.node?.visible,
                   'icon-visible':
-                    !this.node?.partiallyVisible && this.node?.visible,
+                    this.hoveredNodeId === this.node?.id?.hex &&
+                    !this.node?.partiallyVisible &&
+                    this.node?.visible,
                   'icon-hidden':
                     !this.node?.partiallyVisible && !this.node?.visible,
                   'icon-partial': this.node?.partiallyVisible,
@@ -217,6 +226,23 @@ export class SceneTreeTableCell {
       event.button === 0 &&
       !this.interactionsDisabled
     ) {
+      this.beginningPointerPosition = event.clientY;
+      window.addEventListener('pointerup', this.handleCellPointerUp);
+    }
+  };
+
+  private handleCellPointerUp = (event: PointerEvent): void => {
+    // Only select the item if the user isn't scrolling the scene tree
+    const verticalPointerChange = Math.abs(
+      this.beginningPointerPosition - event.clientY
+    );
+
+    if (
+      !event.defaultPrevented &&
+      event.button === 0 &&
+      !this.interactionsDisabled &&
+      verticalPointerChange < 15
+    ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
       } else if (this.node?.selected && !this.recurseParentSelectionDisabled) {
@@ -231,6 +257,8 @@ export class SceneTreeTableCell {
       }
       this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
+
+    window.removeEventListener('pointerup', this.handleCellPointerUp);
   };
 
   private toggleExpansion = (event: PointerEvent): void => {
