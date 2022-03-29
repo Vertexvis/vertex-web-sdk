@@ -115,6 +115,9 @@ export class SceneTreeTableCell {
   @Element()
   private hostEl!: HTMLElement;
 
+  @State()
+  private beginningPointerPosition = 0;
+
   public componentWillRender(): void {
     this.toggleAttribute(
       'is-hovered',
@@ -215,13 +218,24 @@ export class SceneTreeTableCell {
 
   private handleCellPointerDown = (event: PointerEvent): void => {
     console.log(event);
-    console.log(event.movementY);
+
+    this.beginningPointerPosition = event.clientY;
+
+    window.addEventListener('pointerup', this.handleCellPointerUp);
+  };
+
+  private handleCellPointerUp = (event: PointerEvent): void => {
+    console.log(event);
+    console.log(this.beginningPointerPosition - event.clientY);
+
+    // Only select if the user isn't scrolling the scene tree
+    const verticalPointerChange = Math.abs(this.beginningPointerPosition - event.clientY);
 
     if (
       !event.defaultPrevented &&
       event.button === 0 &&
       !this.interactionsDisabled &&
-      event.movementY === 0
+      verticalPointerChange < 15
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
@@ -237,6 +251,8 @@ export class SceneTreeTableCell {
       }
       this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
+
+    window.removeEventListener('pointerup', this.handleCellPointerUp);
   };
 
   private toggleExpansion = (event: PointerEvent): void => {
