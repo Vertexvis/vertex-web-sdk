@@ -92,7 +92,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   }
 
   /**
-   * The local rotation of this element, as a JSON string. JSON
+   * The local quaternion of this element, as a JSON string. JSON
    * representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z":
    * 0, "w": 1}`.
    */

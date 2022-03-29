@@ -511,7 +511,7 @@ export namespace Components {
          */
         "quaternion": Quaternion.Quaternion;
         /**
-          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+          * The local quaternion of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
          */
         "quaternionJson": string;
         /**
@@ -1705,7 +1705,7 @@ declare namespace LocalJSX {
          */
         "quaternion"?: Quaternion.Quaternion;
         /**
-          * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+          * The local quaternion of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
          */
         "quaternionJson"?: string;
         /**

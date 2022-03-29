@@ -38,6 +38,7 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.element = element;
     this.api = api;
     this.addCursor('crosshair');
+    this.rectObserver.observe(element);
 
     element.addEventListener('pointermove', this.handlePointerMove);
     element.addEventListener('pointerdown', this.handlePointerDown);
@@ -69,7 +70,7 @@ export class PinsInteractionHandler implements InteractionHandler {
 
       const [hit] = await api.hitItems(pt);
 
-      if (hit?.hitPoint != null) {
+      if (hit?.hitPoint != null && this.elementRect != null) {
         const vector3 = await api.getWorldPointFromViewport(pt);
 
         console.log('Got vector3: ', vector3);
@@ -78,7 +79,7 @@ export class PinsInteractionHandler implements InteractionHandler {
           {
             ...pt,
           },
-          api.getViewport()
+          this.elementRect
         );
         if (vector3 != null) {
           const pinId = UUID.create();
