@@ -17,15 +17,11 @@ import { Disposable } from '@vertexvis/utils';
 import { Viewport } from '../..';
 import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
-import { PinEntity, TextPinEntity } from '../../lib/pins/entities';
+import { Pin, PinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
-import { DepthBuffer, Frame } from '../../lib/types';
+import { DepthBuffer } from '../../lib/types';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import {
-  translatePointToRelative,
-  translatePointToScreen,
-} from '../viewer-markup/utils';
 import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-distance/viewer-measurement-distance';
 import { DrawablePinRenderer } from './drawable-pin';
 
@@ -48,7 +44,7 @@ export class ViewerAnnotationsTool {
   public pinModel: PinModel = new PinModel();
 
   @Prop({ mutable: true })
-  public pins: TextPinEntity[] = [];
+  public pins: PinEntity[] = [];
 
   @State()
   private selectedPinId?: string;
@@ -172,10 +168,7 @@ export class ViewerAnnotationsTool {
   }
 
   protected render(): JSX.Element {
-    const onUpdatePin = (
-      currentPin: TextPinEntity,
-      updatedPin: TextPinEntity
-    ): void => {
+    const onUpdatePin = (currentPin: Pin, updatedPin: Pin): void => {
       this.pinModel.setEntities(
         new Set([
           ...this.pins.filter((p) => p.id !== currentPin.id),

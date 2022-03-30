@@ -1,22 +1,16 @@
 import {
   Component,
   Element,
-  Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
-  Listen,
-  Method,
   Prop,
-  State,
-  Watch,
 } from '@stencil/core';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { Viewport } from '../..';
-import { Pin, TextPinEntity } from '../../lib/pins/entities';
+import { isTextPinEntity, Pin, TextPinEntity } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import {
   translatePointToRelative,
@@ -87,22 +81,23 @@ export class VertexAnnotationsPinLabel {
     };
     const pointerDownAndMove = (): Disposable => {
       const pointerMove = (event: PointerEvent): void => {
-        const myUpdatedPin: TextPinEntity | undefined =
-          this.pin?.isTextPinEntity()
-            ? new TextPinEntity(
-                this.pin.id,
-                this.pin.worldPosition,
-                this.pin.point,
-                translatePointToRelative(
-                  {
-                    x: event.clientX,
-                    y: event.clientY,
-                  },
-                  this.dimensions
-                ),
-                this.pin.labelText
-              )
-            : undefined;
+        const myUpdatedPin: TextPinEntity | undefined = isTextPinEntity(
+          this.pin
+        )
+          ? new TextPinEntity(
+              this.pin.id,
+              this.pin.worldPosition,
+              this.pin.point,
+              translatePointToRelative(
+                {
+                  x: event.clientX,
+                  y: event.clientY,
+                },
+                this.dimensions
+              ),
+              this.pin.labelText
+            )
+          : undefined;
 
         if (myUpdatedPin) {
           onUpdatePin(myUpdatedPin);
@@ -125,7 +120,7 @@ export class VertexAnnotationsPinLabel {
     };
 
     const screenPosition =
-      this.pin.isTextPinEntity() && this.pin.labelOffset != null
+      isTextPinEntity(this.pin) && this.pin.labelOffset != null
         ? translatePointToScreen(this.pin.labelOffset, this.dimensions)
         : undefined;
 

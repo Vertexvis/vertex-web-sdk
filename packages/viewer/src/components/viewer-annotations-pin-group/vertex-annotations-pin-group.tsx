@@ -8,7 +8,7 @@ import {
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
-import { Pin } from '../../lib/pins/entities';
+import { isTextPinEntity, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 
@@ -62,7 +62,7 @@ export class ViewerAnnotationsPinGroup {
     );
 
     const screenPosition =
-      this.pin.isTextPinEntity() && this.pin.labelOffset != null
+      isTextPinEntity(this.pin) && this.pin.labelOffset != null
         ? translatePointToScreen(this.pin.labelOffset, this.dimensions)
         : undefined;
 
@@ -78,14 +78,12 @@ export class ViewerAnnotationsPinGroup {
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
         >
-          {this.pin?.isTextPinEntity() && (
-            <div class="pin">
-              <div
-                id="start-anchor"
-                class="pin-anchor"
-                onPointerDown={(event) => console.log('pointer: ', event)}
-              ></div>
-            </div>
+          {isTextPinEntity(this.pin) && (
+            <div
+              id="pin-anchor"
+              class="pin-anchor"
+              onPointerDown={(event) => console.log('pointer: ', event)}
+            ></div>
           )}
           {/* todo add regular pin here */}
         </vertex-viewer-dom-element>

@@ -1,18 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
 
 import { Viewport } from '../..';
-import { Pin, TextPinEntity } from '../../lib/pins/entities';
+import { isTextPinEntity, Pin, TextPinEntity } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
-import {
-  translatePointToRelative,
-  translatePointToScreen,
-} from '../viewer-markup/utils';
+import { translatePointToScreen } from '../viewer-markup/utils';
 
 export interface DistanceMeasurementRendererProps {
-  pin: TextPinEntity;
+  pin: Pin;
   selected: boolean;
   dimensions: Dimensions.Dimensions;
   projectionViewMatrix: Matrix4.Matrix4;
@@ -29,10 +25,9 @@ export const DrawablePinRenderer: FunctionalComponent<
 > = ({ pin, dimensions, pinModel, projectionViewMatrix, viewer }) => {
   let pinRef: HTMLVertexViewerAnnotationsPinLabelElement | undefined =
     undefined;
-  const screenPosition =
-    pin.labelOffset != null
-      ? translatePointToScreen(pin.labelOffset, dimensions)
-      : undefined;
+  const screenPosition = isTextPinEntity(pin)
+    ? translatePointToScreen(pin.labelOffset, dimensions)
+    : undefined;
   const pinPoint = getFromWorldPosition(
     pin.worldPosition,
     projectionViewMatrix,
@@ -49,13 +44,11 @@ export const DrawablePinRenderer: FunctionalComponent<
         data-testid={`drawn-pin-${pin.id}`}
         position={pin.worldPosition}
       >
-        <div class="pin">
-          <div
-            id="start-anchor"
-            class="pin-anchor"
-            onPointerDown={(event) => console.log('pointer: ', event)}
-          ></div>
-        </div>
+        <div
+          id="pin-anchor"
+          class="pin-anchor"
+          onPointerDown={(event) => console.log('pointer: ', event)}
+        ></div>
       </vertex-viewer-dom-element>
 
       <vertex-viewer-annotations-pin-label-line

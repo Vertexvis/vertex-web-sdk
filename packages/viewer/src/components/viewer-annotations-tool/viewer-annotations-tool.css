@@ -1,5 +1,4 @@
 :host {
-
   /**
    * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
    * specifies the color of the label line
@@ -20,11 +19,6 @@
   right: 0;
   overflow: hidden;
   pointer-events: none;
-}
-
-.pin {
-  cursor: pointer;
-  color: var(--blue-700);
 }
 
 .selected {

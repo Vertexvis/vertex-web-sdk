@@ -15,12 +15,6 @@
   overflow: hidden;
   pointer-events: none;
 }
-
-.pin {
-  /* cursor: pointer;
-  color: var(--blue-700); */
-}
-
 .selected {
   stroke-width: 1;
   stroke: var(--white);

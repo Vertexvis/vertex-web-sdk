@@ -30,7 +30,7 @@ import { KeyInteraction } from "./lib/interactions/keyInteraction";
 import { Cursor } from "./lib/cursors";
 import { BaseInteractionHandler } from "./lib/interactions/baseInteractionHandler";
 import { Scene } from "./lib/scenes/scene";
-import { Pin, TextPinEntity } from "./lib/pins/entities";
+import { Pin, PinEntity } from "./lib/pins/entities";
 import { PinModel } from "./lib/pins/model";
 import { PinController } from "./lib/pins/controller";
 import { ViewerMeasurementDistanceElementMetrics } from "./components/viewer-measurement-distance/viewer-measurement-distance";
@@ -503,7 +503,7 @@ export namespace Components {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel": PinModel;
-        "pins": TextPinEntity[];
+        "pins": PinEntity[];
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -1775,7 +1775,7 @@ declare namespace LocalJSX {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel"?: PinModel;
-        "pins"?: TextPinEntity[];
+        "pins"?: PinEntity[];
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */

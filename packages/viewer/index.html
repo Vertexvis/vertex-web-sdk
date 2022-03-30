@@ -72,50 +72,30 @@
         await window.customElements.whenDefined('vertex-viewer');
 
         const viewer = document.getElementById('viewer');
-        const tree = document.getElementById('scene-tree');
-
-
-        const markup = document.getElementById('markup');
-
-
-        const preciseMeasurement = document.getElementById('vertex-viewer-measurement-precise');
-        const detailsPage = document.getElementById('measurement-details');
-
-        console.log('preciseMeasurement: ', preciseMeasurement.measurementModel);
-        detailsPage.measurementModel = preciseMeasurement.measurementModel;
-        // An event is dispatched whenever a new markup is added.
-        markup.addEventListener('markupAdded', (event) => {
-          console.log(`markup added`, event.detail.id, event.detail.distance);
-        });
-
-         // An event is dispatched whenever a new measurement is added.
-        measurements.addEventListener('measurementAdded', (event) => {
-          console.log(`Measurement added`, event.detail.id, event.detail.distance);
-        })
-        
 
         viewer.addEventListener('tap', async (event) => {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          const raycaster = await scene.raycaster();
-          const result = await raycaster.hitItems(position);
-          if (result.hits && result.hits.length > 0) {
-            console.log(result.hits);
+          console.log('tapping')
+          const pins = JSON.parse('[{"id":"e79dbc00-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":-176.32194103021436,"y":91.69547942548866,"z":43.755335300637626},"point":{"x":888.4389038085938,"y":417.74578857421875},"labelOffset":{"x":-0.8224178764498511,"y":-0.4240771439731188}},{"id":"ea085360-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":14.249818910313365,"y":65.36610139921402,"z":467.651927437439},"point":{"x":729.2849731445312,"y":639.7041015625},"labelOffset":{"x":-0.6808331344515547,"y":0.3731390480226924}}]');
+          const pinsTool = document.getElementById('vertex-viewer-annotation-tool');
 
-            // await scene
-            //   .items((op) => [
-            //     op.where((q) => q.withItemId(result.hits[0])).hide(),
-            //   ])
-            //   .execute();
+          console.log('setting entities:', pinsTool);
+          pinsTool.pinModel.setEntities(pins);
+          // const { position } = event.detail;
+          // const scene = await viewer.scene();
+          // const raycaster = await scene.raycaster();
+          // const result = await raycaster.hitItems(position);
 
-          } else {
-            // range query
-             await scene
-              .items((op) => [
-                op.where((q) => q.withSelected()).hide(),
-              ])
-              .execute();
-          }
+          // console.log('tapping')
+          // if (result.hits && result.hits.length > 0) {
+          //   console.log(result.hits);
+
+          //   // await scene
+          //   //   .items((op) => [
+          //   //     op.where((q) => q.withItemId(result.hits[0])).hide(),
+          //   //   ])
+          //   //   .execute();
+
+          // }
         });
 
       }

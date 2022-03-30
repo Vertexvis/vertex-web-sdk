@@ -20,6 +20,7 @@ export class PinModel {
    * @returns `true` if the entity has been added.
    */
   public addEntity(entity: PinEntity): boolean {
+    console.log('entity: ', entity);
     if (this.entities[entity.id] == null) {
       this.entities = {
         ...this.entities,
