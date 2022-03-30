@@ -6,6 +6,7 @@ import {
   BoundingBox,
   Dimensions,
   Point,
+  Ray,
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -15,7 +16,13 @@ import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { OrthographicCamera, Scene } from '../../scenes';
 import * as ColorMaterial from '../../scenes/colorMaterial';
-import { FrameCamera, Interactions, Orientation, Viewport } from '../../types';
+import {
+  DepthBuffer,
+  FrameCamera,
+  Interactions,
+  Orientation,
+  Viewport,
+} from '../../types';
 import { Frame } from '../../types/frame';
 import { InteractionApi } from '../interactionApi';
 import { InteractionApiOrthographic } from '../interactionApiOrthographic';
@@ -29,6 +36,7 @@ describe(InteractionApi, () => {
   const streamApi = new StreamApi();
   const sceneViewId = 'scene-view-id';
   const frame = makeOrthographicFrame();
+  const viewport = new Viewport(100, 100);
   const scene = new Scene(
     streamApi,
     frame,
@@ -40,7 +48,7 @@ describe(InteractionApi, () => {
   );
   const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = (): Scene => scene;
-  const viewportProvider = (): Viewport => new Viewport(100, 100);
+  const viewportProvider = (): Viewport => viewport;
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
 
@@ -64,6 +72,28 @@ describe(InteractionApi, () => {
       { emit: emitInteractionFinished }
     );
   });
+
+  describe(
+    InteractionApiOrthographic.prototype.getWorldPointFromViewport,
+    () => {
+      it('uses an orthographic ray to determine a world point', async () => {
+        const depthBuffer = (await frame.depthBuffer()) as DepthBuffer;
+        jest
+          .spyOn(depthBuffer, 'getOrthographicDepthAtPoint')
+          .mockImplementation(() => 0);
+
+        const expectedRay = viewport.transformPointToOrthographicRay(
+          Point.create(1, 1),
+          frame.image,
+          frame.scene.camera
+        );
+
+        expect(
+          await api.getWorldPointFromViewport(Point.create(1, 1))
+        ).toMatchObject(Ray.at(expectedRay, 0));
+      });
+    }
+  );
 
   describe(InteractionApiOrthographic.prototype.panCameraByDelta, () => {
     it('uses the fovHeight value of the orthographic camera', async () => {
