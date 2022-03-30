@@ -79,23 +79,8 @@
           const pinsTool = document.getElementById('vertex-viewer-annotation-tool');
 
           console.log('setting entities:', pinsTool);
-          pinsTool.pinModel.setEntities(pins);
-          // const { position } = event.detail;
-          // const scene = await viewer.scene();
-          // const raycaster = await scene.raycaster();
-          // const result = await raycaster.hitItems(position);
-
-          // console.log('tapping')
-          // if (result.hits && result.hits.length > 0) {
-          //   console.log(result.hits);
-
-          //   // await scene
-          //   //   .items((op) => [
-          //   //     op.where((q) => q.withItemId(result.hits[0])).hide(),
-          //   //   ])
-          //   //   .execute();
-
-          // }
+          // pinsTool.pinModel.setEntities(pins);
+          
         });
 
       }
@@ -130,6 +115,26 @@
         
           </vertex-viewer-annotations-tool>
         
+        <!-- <vertex-viewer-measurement-precise
+            id="vertex-viewer-measurement-precise"
+            config-env="platdev"
+          >
+          </vertex-viewer-measurement-precise>
+
+          <vertex-viewer-measurement-details
+          id="measurement-details"
+          distance-units="inches"
+          style=""
+          fractional-digits="1"
+        >
+        </vertex-viewer-measurement-details> -->
+
+        <!-- <vertex-viewer-measurement-distance
+          id="vertex-viewer-measurement-distance"
+          mode="replace"
+        >
+        </vertex-viewer-measurement-distance> -->
+
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>

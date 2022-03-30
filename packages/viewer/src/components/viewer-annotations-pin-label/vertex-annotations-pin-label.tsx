@@ -20,7 +20,7 @@ import {
 @Component({
   tag: 'vertex-viewer-annotations-pin-label',
   styleUrl: 'vertex-annotations-pin-label.css',
-  shadow: true,
+  shadow: false,
 })
 export class VertexAnnotationsPinLabel {
   /**
@@ -46,13 +46,6 @@ export class VertexAnnotationsPinLabel {
    */
   @Prop()
   public pinModel: PinModel = new PinModel();
-
-  /**
-   * The viewer that this component is bound to. This is automatically assigned
-   * if added to the light-dom of a parent viewer element.
-   */
-  @Prop()
-  public viewer?: HTMLVertexViewerElement;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -120,8 +113,8 @@ export class VertexAnnotationsPinLabel {
     };
 
     const screenPosition =
-      isTextPinEntity(this.pin) && this.pin.labelOffset != null
-        ? translatePointToScreen(this.pin.labelOffset, this.dimensions)
+      isTextPinEntity(this.pin) && this.pin.labelPoint != null
+        ? translatePointToScreen(this.pin.labelPoint, this.dimensions)
         : undefined;
 
     return (

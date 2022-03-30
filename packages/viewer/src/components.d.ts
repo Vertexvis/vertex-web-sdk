@@ -33,7 +33,6 @@ import { Scene } from "./lib/scenes/scene";
 import { Pin, PinEntity } from "./lib/pins/entities";
 import { PinModel } from "./lib/pins/model";
 import { PinController } from "./lib/pins/controller";
-import { ViewerMeasurementDistanceElementMetrics } from "./components/viewer-measurement-distance/viewer-measurement-distance";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
@@ -46,7 +45,7 @@ import { ViewerMarkupFreeformMode } from "./components/viewer-markup-freeform.ts
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { MeasurementController, MeasurementModel, MeasurementOutcome, MeasurementOverlayManager, MeasurementResult } from "./lib/measurement";
 import { Formatter } from "./lib/formatter";
-import { EditBeginEventDetails, EditEndEventDetails, ViewerMeasurementDistanceElementMetrics as ViewerMeasurementDistanceElementMetrics1, ViewerMeasurementDistanceMode } from "./components/viewer-measurement-distance/viewer-measurement-distance";
+import { EditBeginEventDetails, EditEndEventDetails, ViewerMeasurementDistanceElementMetrics, ViewerMeasurementDistanceMode } from "./components/viewer-measurement-distance/viewer-measurement-distance";
 import { Anchor } from "./components/viewer-measurement-distance/utils";
 import { PointToPointHitProvider } from "./components/viewer-measurement-distance/interactions";
 import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/viewer-measurement-tool";
@@ -435,6 +434,10 @@ export namespace Components {
          */
         "dimensions": Dimensions.Dimensions;
         /**
+          * The local matrix of this element.
+         */
+        "matrix": Matrix4.Matrix4;
+        /**
           * The pin to draw for the group
          */
         "pin"?: Pin;
@@ -443,9 +446,9 @@ export namespace Components {
          */
         "pinModel": PinModel;
         /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+          * Projection view matrix used for computing the position of the pin line
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "projectionViewMatrix": Matrix4.Matrix4;
     }
     interface VertexViewerAnnotationsPinLabel {
         /**
@@ -464,10 +467,6 @@ export namespace Components {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel": PinModel;
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerAnnotationsPinLabelLine {
         "labelEl"?: HTMLVertexViewerAnnotationsPinLabelElement;
@@ -481,16 +480,8 @@ export namespace Components {
          */
         "pinLabelDimensions": Dimensions.Dimensions;
         "pinPoint": Point.Point | undefined;
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerAnnotationsTool {
-        /**
-          * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
-         */
-        "computeElementMetrics": () => Promise<ViewerMeasurementDistanceElementMetrics | undefined>;
         /**
           * An optional configuration to setup network configuration of measurement endpoints.
          */
@@ -1711,6 +1702,10 @@ declare namespace LocalJSX {
          */
         "dimensions"?: Dimensions.Dimensions;
         /**
+          * The local matrix of this element.
+         */
+        "matrix"?: Matrix4.Matrix4;
+        /**
           * The pin to draw for the group
          */
         "pin"?: Pin;
@@ -1719,9 +1714,9 @@ declare namespace LocalJSX {
          */
         "pinModel"?: PinModel;
         /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+          * Projection view matrix used for computing the position of the pin line
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "projectionViewMatrix"?: Matrix4.Matrix4;
     }
     interface VertexViewerAnnotationsPinLabel {
         /**
@@ -1740,10 +1735,6 @@ declare namespace LocalJSX {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel"?: PinModel;
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerAnnotationsPinLabelLine {
         "labelEl"?: HTMLVertexViewerAnnotationsPinLabelElement;
@@ -1757,10 +1748,6 @@ declare namespace LocalJSX {
          */
         "pinLabelDimensions"?: Dimensions.Dimensions;
         "pinPoint"?: Point.Point | undefined;
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerAnnotationsTool {
         /**

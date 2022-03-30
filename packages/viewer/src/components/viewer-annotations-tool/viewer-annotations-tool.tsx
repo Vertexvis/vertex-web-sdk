@@ -11,7 +11,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { Viewport } from '../..';
@@ -22,8 +22,6 @@ import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
 import { DepthBuffer } from '../../lib/types';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-distance/viewer-measurement-distance';
-import { DrawablePinRenderer } from './drawable-pin';
 
 @Component({
   tag: 'vertex-viewer-annotations-tool',
@@ -70,7 +68,7 @@ export class ViewerAnnotationsTool {
   private elementBounds?: DOMRect;
 
   @State()
-  private invalidateStateCounter = 0;
+  private projectionViewMatrix?: Matrix4.Matrix4;
 
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
@@ -134,49 +132,11 @@ export class ViewerAnnotationsTool {
   }
 
   private handleFrameDrawn = (): void => {
-    this.invalidateState();
-    this.viewer?.frame?.depthBuffer().then((db) => {
-      if (db != null) {
-        this.depthBuffer = db;
-      }
-    });
+    this.projectionViewMatrix =
+      this.viewer?.frame?.scene.camera.projectionViewMatrix;
   };
 
-  /**
-   * Computes the bounding boxes of the anchors and label. **Note:** invoking
-   * this function uses `getBoundingClientRect` internally and will cause a
-   * relayout of the DOM.
-   */
-  @Method()
-  public async computeElementMetrics(): Promise<
-    ViewerMeasurementDistanceElementMetrics | undefined
-  > {
-    const startAnchorEl =
-      this.hostEl.shadowRoot?.getElementById('start-anchor');
-    const endAnchorEl = this.hostEl.shadowRoot?.getElementById('end-anchor');
-    const labelEl = this.hostEl.shadowRoot?.getElementById('label');
-
-    if (startAnchorEl != null && endAnchorEl != null && labelEl != null) {
-      return {
-        startAnchor: startAnchorEl.getBoundingClientRect(),
-        endAnchor: endAnchorEl.getBoundingClientRect(),
-        label: labelEl.getBoundingClientRect(),
-      };
-    } else {
-      return undefined;
-    }
-  }
-
   protected render(): JSX.Element {
-    const onUpdatePin = (currentPin: Pin, updatedPin: Pin): void => {
-      this.pinModel.setEntities(
-        new Set([
-          ...this.pins.filter((p) => p.id !== currentPin.id),
-          updatedPin,
-        ])
-      );
-    };
-
     return (
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
@@ -184,30 +144,15 @@ export class ViewerAnnotationsTool {
             if (this.elementBounds == null) {
               throw new Error('Dimensions not present for pin renderer');
             }
-            if (this.viewer?.frame?.scene.camera.viewMatrix == null) {
-              throw new Error('View Matrix not present for pin renderer');
-            }
 
             return (
-              // <vertex-viewer-annotations-pin-group
-              //   pin={pin}
-              //   dimensions={this.elementBounds}
-              //   pinModel={this.pinModel}
-              //   viewer={this.viewer}
-              // ></vertex-viewer-annotations-pin-group>
-              <DrawablePinRenderer
+              <vertex-viewer-annotations-pin-group
+                data-is-dom-group-element={true}
                 pin={pin}
-                selected={false}
                 dimensions={this.elementBounds}
-                viewer={this.viewer}
-                projectionViewMatrix={
-                  this.viewer.frame.scene.camera.projectionViewMatrix
-                }
-                onUpdatePin={(updatedPin) => {
-                  onUpdatePin(pin, updatedPin);
-                }}
                 pinModel={this.pinModel}
-              />
+                projectionViewMatrix={this.projectionViewMatrix}
+              ></vertex-viewer-annotations-pin-group>
             );
           })}
         </vertex-viewer-dom-renderer>
@@ -233,10 +178,6 @@ export class ViewerAnnotationsTool {
           new PinsInteractionHandler(this.pinController)
         );
     }
-  }
-
-  private invalidateState(): void {
-    this.invalidateStateCounter = this.invalidateStateCounter + 1;
   }
 
   private clearModelListeners(): void {

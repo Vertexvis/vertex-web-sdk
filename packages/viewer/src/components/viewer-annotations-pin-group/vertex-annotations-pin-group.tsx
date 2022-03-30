@@ -1,10 +1,11 @@
 import {
   Component,
+  Element,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Prop,
+  State,
 } from '@stencil/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
@@ -12,17 +13,36 @@ import { isTextPinEntity, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 
+interface ComputedPoints {
+  pinPoint: Point.Point;
+  labelPoint: Point.Point;
+}
 @Component({
   tag: 'vertex-viewer-annotations-pin-group',
   styleUrl: 'vertex-annotations-pin-group.css',
-  shadow: true,
+  shadow: false,
 })
 export class ViewerAnnotationsPinGroup {
+  @Element()
+  private hostEl!: HTMLElement;
+
   /**
    * The pin to draw for the group
    */
   @Prop({ mutable: true })
   public pin?: Pin;
+
+  /**
+   * The local matrix of this element.
+   */
+  @Prop({ mutable: true, attribute: null })
+  public matrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
+
+  /**
+   * Projection view matrix used for computing the position of the pin line
+   */
+  @Prop()
+  public projectionViewMatrix: Matrix4.Matrix4 = Matrix4.makeIdentity();
 
   /**
    * The dimensions of the canvas for the pins
@@ -36,42 +56,28 @@ export class ViewerAnnotationsPinGroup {
   @Prop()
   public pinModel: PinModel = new PinModel();
 
-  /**
-   * The viewer that this component is bound to. This is automatically assigned
-   * if added to the light-dom of a parent viewer element.
-   */
-  @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  @State()
+  private invalidateStateCounter = 0;
+
+  private labelEl: HTMLVertexViewerAnnotationsPinLabelElement | undefined;
+
+  protected componentDidLoad(): void {
+    this.setLabelObserver();
+  }
 
   protected render(): JSX.Element {
-    if (
-      this.viewer?.frame?.scene.camera.projectionViewMatrix == null ||
-      this.pin == null
-    ) {
-      throw new Error('Unable to render pin without projection matrix');
+    const computed = this.computeLabelLinePoint();
+
+    if (computed == null || this.pin == null) {
+      throw new Error('Unable to draw pin');
     }
 
-    console.log('got a pin: ', this.pin);
-
-    const projectionViewMatrix =
-      this.viewer?.frame?.scene.camera.projectionViewMatrix;
-    const pinPoint = this.getFromWorldPosition(
-      this.pin.worldPosition,
-      projectionViewMatrix,
-      this.dimensions
-    );
-
-    const screenPosition =
-      isTextPinEntity(this.pin) && this.pin.labelOffset != null
-        ? translatePointToScreen(this.pin.labelOffset, this.dimensions)
-        : undefined;
+    const { pinPoint, labelPoint } = computed;
 
     return (
       <vertex-viewer-dom-group
-        key={`pin-group-${this.pin?.id}`}
+        id={`pin-group-${this.pin?.id}`}
         data-testid={`pin-group-${this.pin.id}`}
-        position={this.pin.worldPosition}
-        class="dom-group"
       >
         <vertex-viewer-dom-element
           key={`drawn-pin-${this.pin.id}`}
@@ -90,26 +96,91 @@ export class ViewerAnnotationsPinGroup {
 
         <vertex-viewer-annotations-pin-label-line
           pin={this.pin}
-          viewer={this.viewer}
           pinPoint={pinPoint}
-          labelPoint={screenPosition}
+          labelPoint={labelPoint}
         ></vertex-viewer-annotations-pin-label-line>
 
         <vertex-viewer-annotations-pin-label
           pin={this.pin}
+          ref={(el) => {
+            console.log('setting label: ', el);
+            this.labelEl = el;
+          }}
           dimensions={this.dimensions}
           pinModel={this.pinModel}
-          viewer={this.viewer}
         ></vertex-viewer-annotations-pin-label>
       </vertex-viewer-dom-group>
     );
+  }
+
+  private invalidateState(): void {
+    this.invalidateStateCounter = this.invalidateStateCounter + 1;
+  }
+
+  private setLabelObserver(): void {
+    if (this.labelEl != null) {
+      const resize = new ResizeObserver(() => this.invalidateState());
+
+      resize.observe(this.labelEl);
+    }
+  }
+
+  private computeLabelLinePoint(): ComputedPoints | undefined {
+    const screenPosition =
+      isTextPinEntity(this.pin) && this.pin.labelPoint != null
+        ? translatePointToScreen(this.pin.labelPoint, this.dimensions)
+        : undefined;
+
+    if (screenPosition && this.pin != null) {
+      const pinPoint = this.getFromWorldPosition(
+        this.pin.worldPosition,
+        this.projectionViewMatrix,
+        this.dimensions
+      ); // todo return this as well so I dont have to compute it again.
+
+      const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
+      const labelWidth = label?.clientWidth || 0;
+      const labelHeight = label?.clientHeight || 0;
+      const topPoint = {
+        x: screenPosition.x + labelWidth / 2,
+        y: screenPosition.y,
+      };
+
+      const bottomPoint = {
+        x: screenPosition.x + labelWidth / 2,
+        y: screenPosition.y + labelHeight,
+      };
+
+      const rightPoint = {
+        x: screenPosition.x + labelWidth,
+        y: screenPosition.y + labelHeight / 2,
+      };
+
+      const leftPoint = {
+        x: screenPosition.x,
+        y: screenPosition.y + labelHeight / 2,
+      };
+
+      const candidates = [topPoint, bottomPoint, leftPoint, rightPoint];
+
+      const distances = candidates.map((candidate) =>
+        Point.distance(candidate, pinPoint)
+      );
+
+      const candidateIndex = distances.indexOf(Math.min(...distances));
+
+      return {
+        pinPoint,
+        labelPoint: candidates[candidateIndex],
+      };
+    }
   }
 
   private getFromWorldPosition(
     pt: Vector3.Vector3,
     projectionViewMatrix: Matrix4.Matrix4,
     dimensions: Dimensions.Dimensions
-  ): Point.Point | undefined {
+  ): Point.Point {
     const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);
   }
