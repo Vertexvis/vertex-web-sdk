@@ -428,6 +428,29 @@ describe(PerspectiveCamera, () => {
       expect(newCamera.far).toBe(far);
       expect(newCamera.near).toBe(near);
     });
+
+    it('should align to a plane', () => {
+      const position = Vector3.create(5, 5, 5);
+      const normal = Vector3.left();
+
+      const newCamera = new PerspectiveCamera(
+        stream,
+        1,
+        {
+          ...data,
+          position: Vector3.create(0, 0, 1),
+          lookAt: Vector3.origin(),
+        },
+        boundingBox,
+        jest.fn()
+      );
+
+      const aligned = newCamera.alignTo(position, normal);
+
+      expect(aligned.position).toMatchObject(position);
+      expect(aligned.up).toMatchObject(normal);
+      expect(Vector3.dot(aligned.viewVector, normal)).toBe(0);
+    });
   });
 });
 

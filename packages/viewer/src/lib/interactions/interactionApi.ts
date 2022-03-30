@@ -23,10 +23,6 @@ import {
 } from '../types';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 
-export interface PivotOptions {
-  fixedUp?: boolean;
-}
-
 export type SceneProvider = () => Scene;
 
 export type InteractionConfigProvider = () => Interactions.InteractionConfig;
@@ -543,42 +539,6 @@ export abstract class InteractionApi {
       );
 
       return camera.update({ ...camera, lookAt: updatedLookAtY });
-    });
-  }
-
-  /**
-   * Translates the position and lookAt of the scene's camera by the
-   * specified `translation` vector, and requests a new image for the
-   * updated scene.
-   *
-   * @param translation The translation vector
-   */
-  public async translateCamera(translation: Vector3.Vector3): Promise<void> {
-    return this.transformCamera(({ camera }) => {
-      const { position, lookAt } = camera;
-
-      return camera.update({
-        ...camera,
-        position: Vector3.add(position, translation),
-        lookAt: Vector3.add(lookAt, translation),
-      });
-    });
-  }
-
-  public async alignTo(
-    position: Vector3.Vector3,
-    normal: Vector3.Vector3
-  ): Promise<void> {
-    return this.transformCamera(({ camera }) => {
-      const plane = Plane.fromNormalAndCoplanarPoint(normal, position);
-      const lookAt = Plane.projectPoint(plane, camera.lookAt);
-
-      return camera.update({
-        ...camera,
-        position,
-        lookAt,
-        up: normal,
-      });
     });
   }
 
