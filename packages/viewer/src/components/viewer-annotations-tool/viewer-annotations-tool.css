@@ -6,6 +6,12 @@
    */
    --viewer-annotations-pin-dot-color: var(--blue-600);
 
+     /**
+   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
+   * specifies the color of the label line
+   */
+   --viewer-annotations-pin-dot-border-color: var(--white);
+
   font-size: 0.75rem;
   position: absolute;
   top: 0;
@@ -17,8 +23,8 @@
 }
 
 .pin {
-  /* cursor: pointer;
-  color: var(--blue-700); */
+  cursor: pointer;
+  color: var(--blue-700);
 }
 
 .selected {
@@ -31,12 +37,11 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   display: block;
-  background: var(--white);
   width: 12px;
   height: 12px;
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid var(--black);
+  border: 2px solid var(--viewer-annotations-pin-dot-border-color);
   background: var(--viewer-annotations-pin-dot-color);
   pointer-events: auto;
 }

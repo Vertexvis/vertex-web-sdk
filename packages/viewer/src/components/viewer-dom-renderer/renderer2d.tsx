@@ -59,12 +59,20 @@ function getElementDepths(
 
     if (isVertexViewerDomGroup(child)) {
       console.log('pushing child element: ', child);
-      const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
 
-      console.log('isIdentity: ', Matrix4.makeIdentity() === worldMatrix);
-
-      console.log('pushing child element.worldMatrix: ', worldMatrix);
-      results.push(...getElementDepths(child, worldMatrix, camera));
+      if (child.matrix != null) {
+        const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
+        console.log('pushing child element.worldMatrix: ', worldMatrix);
+        results.push(...getElementDepths(child, worldMatrix, camera));
+      } else if (child?.shadowRoot?.parentElement != null) {
+        results.push(
+          ...getElementDepths(
+            child.shadowRoot.parentElement,
+            parentWorldMatrix,
+            camera
+          )
+        );
+      }
     } else if (isVertexViewerDomElement(child)) {
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
       const worldPosition = Vector3.fromMatrixPosition(worldMatrix);

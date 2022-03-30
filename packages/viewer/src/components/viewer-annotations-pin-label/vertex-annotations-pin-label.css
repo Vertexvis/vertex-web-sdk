@@ -1,23 +1,29 @@
 :host {
-  /* font-size: 0.75rem;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0; */
+  /**
+   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
+   * specifies the color of the label background
+   */
+   --viewer-annotations-pin-label-background-color: var(--blue-200);
+
+  /**
+   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
+   * specifies the color of the label background
+   */
+   --viewer-annotations-pin-label-border-color: var(--blue-600);
+
   overflow: hidden;
   pointer-events: none;
 }
-:host([mode='']) .distance-label {
+:host([mode='']) .pin-label {
   color: var(--white);
   background: var(--neutral-900);
 }
 
 
-.distance-label {
+.pin-label {
   position: absolute;
-  background: var(--white);
-  border: 1px solid var(--neutral-900);
+  background: var(--viewer-annotations-pin-label-background-color);
+  border: 2px solid var(--viewer-annotations-pin-label-border-color);
   border-radius: 0.25rem;
   padding: 0.375rem 0.5rem;
   pointer-events: auto;

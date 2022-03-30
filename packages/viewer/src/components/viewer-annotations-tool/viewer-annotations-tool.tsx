@@ -30,11 +30,11 @@ import { ViewerMeasurementDistanceElementMetrics } from '../viewer-measurement-d
 import { DrawablePinRenderer } from './drawable-pin';
 
 @Component({
-  tag: 'vertex-viewer-annotations-pin',
-  styleUrl: 'viewer-annotations-pin.css',
+  tag: 'vertex-viewer-annotations-tool',
+  styleUrl: 'viewer-annotations-tool.css',
   shadow: true,
 })
-export class ViewerAnnotationsPin {
+export class ViewerAnnotationsTool {
   /**
    * The controller that is responsible for drawing pins and updating the model
    */
@@ -194,6 +194,7 @@ export class ViewerAnnotationsPin {
             if (this.viewer?.frame?.scene.camera.viewMatrix == null) {
               throw new Error('View Matrix not present for pin renderer');
             }
+
             return (
               // <vertex-viewer-annotations-pin-group
               //   pin={pin}

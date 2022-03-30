@@ -30,9 +30,9 @@ import { KeyInteraction } from "./lib/interactions/keyInteraction";
 import { Cursor } from "./lib/cursors";
 import { BaseInteractionHandler } from "./lib/interactions/baseInteractionHandler";
 import { Scene } from "./lib/scenes/scene";
-import { PinController } from "./lib/pins/controller";
-import { PinModel } from "./lib/pins/model";
 import { Pin, TextPinEntity } from "./lib/pins/entities";
+import { PinModel } from "./lib/pins/model";
+import { PinController } from "./lib/pins/controller";
 import { ViewerMeasurementDistanceElementMetrics } from "./components/viewer-measurement-distance/viewer-measurement-distance";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -429,29 +429,6 @@ export namespace Components {
          */
         "viewport": Viewport;
     }
-    interface VertexViewerAnnotationsPin {
-        /**
-          * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
-         */
-        "computeElementMetrics": () => Promise<ViewerMeasurementDistanceElementMetrics | undefined>;
-        /**
-          * An optional configuration to setup network configuration of measurement endpoints.
-         */
-        "config"?: Config;
-        /**
-          * The controller that is responsible for drawing pins and updating the model
-         */
-        "pinController"?: PinController;
-        /**
-          * The model that contains the entities and outcomes from performing pin annotations
-         */
-        "pinModel": PinModel;
-        "pins": TextPinEntity[];
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
-    }
     interface VertexViewerAnnotationsPinGroup {
         /**
           * The dimensions of the canvas for the pins
@@ -504,6 +481,29 @@ export namespace Components {
          */
         "pinLabelDimensions": Dimensions.Dimensions;
         "pinPoint": Point.Point | undefined;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsTool {
+        /**
+          * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
+         */
+        "computeElementMetrics": () => Promise<ViewerMeasurementDistanceElementMetrics | undefined>;
+        /**
+          * An optional configuration to setup network configuration of measurement endpoints.
+         */
+        "config"?: Config;
+        /**
+          * The controller that is responsible for drawing pins and updating the model
+         */
+        "pinController"?: PinController;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel": PinModel;
+        "pins": TextPinEntity[];
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -1220,12 +1220,6 @@ declare global {
         prototype: HTMLVertexViewerElement;
         new (): HTMLVertexViewerElement;
     };
-    interface HTMLVertexViewerAnnotationsPinElement extends Components.VertexViewerAnnotationsPin, HTMLStencilElement {
-    }
-    var HTMLVertexViewerAnnotationsPinElement: {
-        prototype: HTMLVertexViewerAnnotationsPinElement;
-        new (): HTMLVertexViewerAnnotationsPinElement;
-    };
     interface HTMLVertexViewerAnnotationsPinGroupElement extends Components.VertexViewerAnnotationsPinGroup, HTMLStencilElement {
     }
     var HTMLVertexViewerAnnotationsPinGroupElement: {
@@ -1243,6 +1237,12 @@ declare global {
     var HTMLVertexViewerAnnotationsPinLabelLineElement: {
         prototype: HTMLVertexViewerAnnotationsPinLabelLineElement;
         new (): HTMLVertexViewerAnnotationsPinLabelLineElement;
+    };
+    interface HTMLVertexViewerAnnotationsToolElement extends Components.VertexViewerAnnotationsTool, HTMLStencilElement {
+    }
+    var HTMLVertexViewerAnnotationsToolElement: {
+        prototype: HTMLVertexViewerAnnotationsToolElement;
+        new (): HTMLVertexViewerAnnotationsToolElement;
     };
     interface HTMLVertexViewerButtonElement extends Components.VertexViewerButton, HTMLStencilElement {
     }
@@ -1387,10 +1387,10 @@ declare global {
         "vertex-scene-tree-toolbar": HTMLVertexSceneTreeToolbarElement;
         "vertex-scene-tree-toolbar-group": HTMLVertexSceneTreeToolbarGroupElement;
         "vertex-viewer": HTMLVertexViewerElement;
-        "vertex-viewer-annotations-pin": HTMLVertexViewerAnnotationsPinElement;
         "vertex-viewer-annotations-pin-group": HTMLVertexViewerAnnotationsPinGroupElement;
         "vertex-viewer-annotations-pin-label": HTMLVertexViewerAnnotationsPinLabelElement;
         "vertex-viewer-annotations-pin-label-line": HTMLVertexViewerAnnotationsPinLabelLineElement;
+        "vertex-viewer-annotations-tool": HTMLVertexViewerAnnotationsToolElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
         "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
@@ -1705,25 +1705,6 @@ declare namespace LocalJSX {
          */
         "viewport"?: Viewport;
     }
-    interface VertexViewerAnnotationsPin {
-        /**
-          * An optional configuration to setup network configuration of measurement endpoints.
-         */
-        "config"?: Config;
-        /**
-          * The controller that is responsible for drawing pins and updating the model
-         */
-        "pinController"?: PinController;
-        /**
-          * The model that contains the entities and outcomes from performing pin annotations
-         */
-        "pinModel"?: PinModel;
-        "pins"?: TextPinEntity[];
-        /**
-          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
-         */
-        "viewer"?: HTMLVertexViewerElement;
-    }
     interface VertexViewerAnnotationsPinGroup {
         /**
           * The dimensions of the canvas for the pins
@@ -1776,6 +1757,25 @@ declare namespace LocalJSX {
          */
         "pinLabelDimensions"?: Dimensions.Dimensions;
         "pinPoint"?: Point.Point | undefined;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsTool {
+        /**
+          * An optional configuration to setup network configuration of measurement endpoints.
+         */
+        "config"?: Config;
+        /**
+          * The controller that is responsible for drawing pins and updating the model
+         */
+        "pinController"?: PinController;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel"?: PinModel;
+        "pins"?: TextPinEntity[];
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -2457,10 +2457,10 @@ declare namespace LocalJSX {
         "vertex-scene-tree-toolbar": VertexSceneTreeToolbar;
         "vertex-scene-tree-toolbar-group": VertexSceneTreeToolbarGroup;
         "vertex-viewer": VertexViewer;
-        "vertex-viewer-annotations-pin": VertexViewerAnnotationsPin;
         "vertex-viewer-annotations-pin-group": VertexViewerAnnotationsPinGroup;
         "vertex-viewer-annotations-pin-label": VertexViewerAnnotationsPinLabel;
         "vertex-viewer-annotations-pin-label-line": VertexViewerAnnotationsPinLabelLine;
+        "vertex-viewer-annotations-tool": VertexViewerAnnotationsTool;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
         "vertex-viewer-dom-element": VertexViewerDomElement;
@@ -2499,10 +2499,10 @@ declare module "@stencil/core" {
             "vertex-scene-tree-toolbar": LocalJSX.VertexSceneTreeToolbar & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
             "vertex-scene-tree-toolbar-group": LocalJSX.VertexSceneTreeToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
-            "vertex-viewer-annotations-pin": LocalJSX.VertexViewerAnnotationsPin & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinElement>;
             "vertex-viewer-annotations-pin-group": LocalJSX.VertexViewerAnnotationsPinGroup & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinGroupElement>;
             "vertex-viewer-annotations-pin-label": LocalJSX.VertexViewerAnnotationsPinLabel & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinLabelElement>;
             "vertex-viewer-annotations-pin-label-line": LocalJSX.VertexViewerAnnotationsPinLabelLine & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinLabelLineElement>;
+            "vertex-viewer-annotations-tool": LocalJSX.VertexViewerAnnotationsTool & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsToolElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
             "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;

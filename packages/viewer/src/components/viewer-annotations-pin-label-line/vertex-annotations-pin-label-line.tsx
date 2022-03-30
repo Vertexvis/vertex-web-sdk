@@ -1,26 +1,16 @@
 import {
   Component,
   Element,
-  Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
-  Listen,
-  Method,
   Prop,
-  State,
   Watch,
 } from '@stencil/core';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
 
-import { Pin, TextPinEntity } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
-import {
-  translatePointToRelative,
-  translatePointToScreen,
-} from '../viewer-markup/utils';
+import { Pin } from '../../lib/pins/entities';
 
 @Component({
   tag: 'vertex-viewer-annotations-pin-label-line',
@@ -97,15 +87,15 @@ export class VertexAnnotationsPinLabelLine {
           <g>
             <line
               id={`pin-label-line-${this.pin.id}`}
-              class="line"
+              class="label-line"
               x1={this.labelPoint.x}
               y1={this.labelPoint.y}
               x2={this.pinPoint.x}
               y2={this.pinPoint.y}
-              style={{
-                stroke: `rgb(255,0,0)`,
-                'stroke-width': '2',
-              }}
+              // style={{
+              //   stroke: `rgb(255,0,0)`,
+              //   'stroke-width': '2',
+              // }}
             />
           </g>
         </svg>

@@ -133,7 +133,7 @@ export class VertexAnnotationsPinLabel {
       <Host>
         <div
           id={`pin-label-${this.pin.id}`}
-          class="distance-label"
+          class="pin-label"
           onPointerDown={pointerDownAndMove}
           style={{
             top: `${screenPosition?.y.toString() || 0}px`,
