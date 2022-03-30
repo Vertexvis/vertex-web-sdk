@@ -565,6 +565,23 @@ export abstract class InteractionApi {
     });
   }
 
+  public async alignTo(
+    position: Vector3.Vector3,
+    normal: Vector3.Vector3
+  ): Promise<void> {
+    return this.transformCamera(({ camera }) => {
+      const plane = Plane.fromNormalAndCoplanarPoint(normal, position);
+      const lookAt = Plane.projectPoint(plane, camera.lookAt);
+
+      return camera.update({
+        ...camera,
+        position,
+        lookAt,
+        up: normal,
+      });
+    });
+  }
+
   /**
    * Marks the end of an interaction.
    */

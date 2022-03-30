@@ -1,4 +1,12 @@
-import { BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
+import {
+  BoundingBox,
+  BoundingSphere,
+  Matrix4,
+  Plane,
+  Quaternion,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -229,6 +237,52 @@ export abstract class Camera {
     axis: Vector3.Vector3
   ): Camera {
     return this.rotateAroundAxisAtPoint(angleInRadians, this.data.lookAt, axis);
+  }
+
+  /**
+   * Aligns the camera to the plane defined by the provided position and normal.
+   * This will place the camera at the provided position, set the up vector to
+   * the provided normal, and place the lookAt on the defined plane. The point
+   * chosen for the lookAt will be determined using the current view vector.
+   *
+   * @param position The position to place the camera at.
+   * @param normal The normal of the plane to align to.
+   */
+  public alignTo(position: Vector3.Vector3, normal: Vector3.Vector3): Camera {
+    const worldX = Vector3.normalize(
+      Vector3.cross(this.up, Vector3.normalize(this.viewVector))
+    );
+    const positiveWorldY = Vector3.normalize(
+      Vector3.cross(Vector3.normalize(this.viewVector), worldX)
+    );
+
+    // Invert the world y axis if the provided normal is more than 90 degrees from it
+    // to compute a proper angle to rotate the view vector by
+    const worldY =
+      Vector3.angleTo(normal, positiveWorldY) > Math.PI / 2
+        ? Vector3.negate(positiveWorldY)
+        : positiveWorldY;
+    const localX = Vector3.isEqual(worldY, normal)
+      ? worldX
+      : Vector3.normalize(Vector3.cross(worldY, normal));
+
+    const transformedViewVector = Vector3.transformMatrix(
+      this.viewVector,
+      Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(localX, Vector3.angleTo(normal, worldY))
+      )
+    );
+    const lookAtRay = Ray.create({
+      origin: position,
+      direction: Vector3.normalize(transformedViewVector),
+    });
+    const lookAt = Ray.at(lookAtRay, Vector3.magnitude(this.viewVector));
+
+    return this.update({
+      position,
+      lookAt,
+      up: normal,
+    });
   }
 
   /**

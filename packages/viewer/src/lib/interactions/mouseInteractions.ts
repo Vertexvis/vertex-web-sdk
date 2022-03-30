@@ -257,3 +257,32 @@ export class TwistInteraction extends MouseInteraction {
     super.endDrag(event, api);
   }
 }
+
+export class PivotInteraction extends MouseInteraction {
+  public type: InteractionType = 'rotate';
+
+  public beginDrag(
+    event: MouseEvent,
+    canvasPosition: Point.Point,
+    api: InteractionApi
+  ): void {
+    if (this.currentPosition == null) {
+      this.currentPosition = Point.create(event.screenX, event.screenY);
+      api.beginInteraction();
+    }
+  }
+
+  public drag(event: MouseEvent, api: InteractionApi): void {
+    if (this.currentPosition != null) {
+      const position = Point.create(event.screenX, event.screenY);
+      const delta = Point.subtract(position, this.currentPosition);
+
+      api.pivotCamera(-0.25 * delta.y, -0.25 * delta.x);
+      this.currentPosition = position;
+    }
+  }
+
+  public endDrag(event: MouseEvent, api: InteractionApi): void {
+    super.endDrag(event, api);
+  }
+}
