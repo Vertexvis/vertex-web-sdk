@@ -32,7 +32,7 @@ import { BaseInteractionHandler } from "./lib/interactions/baseInteractionHandle
 import { Scene } from "./lib/scenes/scene";
 import { PinController } from "./lib/pins/controller";
 import { PinModel } from "./lib/pins/model";
-import { TextPinEntity } from "./lib/pins/entities";
+import { Pin, TextPinEntity } from "./lib/pins/entities";
 import { ViewerMeasurementDistanceElementMetrics } from "./components/viewer-measurement-distance/viewer-measurement-distance";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
@@ -447,6 +447,63 @@ export namespace Components {
          */
         "pinModel": PinModel;
         "pins": TextPinEntity[];
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinGroup {
+        /**
+          * The dimensions of the canvas for the pins
+         */
+        "dimensions": Dimensions.Dimensions;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel": PinModel;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinLabel {
+        /**
+          * The dimensions of the canvas for the pins
+         */
+        "dimensions": Dimensions.Dimensions;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The dimensions of the the pin label
+         */
+        "pinLabelDimensions": Dimensions.Dimensions;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel": PinModel;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinLabelLine {
+        "labelEl"?: HTMLVertexViewerAnnotationsPinLabelElement;
+        "labelPoint": Point.Point | undefined;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The dimensions of the the pin label
+         */
+        "pinLabelDimensions": Dimensions.Dimensions;
+        "pinPoint": Point.Point | undefined;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -1169,6 +1226,24 @@ declare global {
         prototype: HTMLVertexViewerAnnotationsPinElement;
         new (): HTMLVertexViewerAnnotationsPinElement;
     };
+    interface HTMLVertexViewerAnnotationsPinGroupElement extends Components.VertexViewerAnnotationsPinGroup, HTMLStencilElement {
+    }
+    var HTMLVertexViewerAnnotationsPinGroupElement: {
+        prototype: HTMLVertexViewerAnnotationsPinGroupElement;
+        new (): HTMLVertexViewerAnnotationsPinGroupElement;
+    };
+    interface HTMLVertexViewerAnnotationsPinLabelElement extends Components.VertexViewerAnnotationsPinLabel, HTMLStencilElement {
+    }
+    var HTMLVertexViewerAnnotationsPinLabelElement: {
+        prototype: HTMLVertexViewerAnnotationsPinLabelElement;
+        new (): HTMLVertexViewerAnnotationsPinLabelElement;
+    };
+    interface HTMLVertexViewerAnnotationsPinLabelLineElement extends Components.VertexViewerAnnotationsPinLabelLine, HTMLStencilElement {
+    }
+    var HTMLVertexViewerAnnotationsPinLabelLineElement: {
+        prototype: HTMLVertexViewerAnnotationsPinLabelLineElement;
+        new (): HTMLVertexViewerAnnotationsPinLabelLineElement;
+    };
     interface HTMLVertexViewerButtonElement extends Components.VertexViewerButton, HTMLStencilElement {
     }
     var HTMLVertexViewerButtonElement: {
@@ -1313,6 +1388,9 @@ declare global {
         "vertex-scene-tree-toolbar-group": HTMLVertexSceneTreeToolbarGroupElement;
         "vertex-viewer": HTMLVertexViewerElement;
         "vertex-viewer-annotations-pin": HTMLVertexViewerAnnotationsPinElement;
+        "vertex-viewer-annotations-pin-group": HTMLVertexViewerAnnotationsPinGroupElement;
+        "vertex-viewer-annotations-pin-label": HTMLVertexViewerAnnotationsPinLabelElement;
+        "vertex-viewer-annotations-pin-label-line": HTMLVertexViewerAnnotationsPinLabelLineElement;
         "vertex-viewer-button": HTMLVertexViewerButtonElement;
         "vertex-viewer-default-toolbar": HTMLVertexViewerDefaultToolbarElement;
         "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
@@ -1641,6 +1719,63 @@ declare namespace LocalJSX {
          */
         "pinModel"?: PinModel;
         "pins"?: TextPinEntity[];
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinGroup {
+        /**
+          * The dimensions of the canvas for the pins
+         */
+        "dimensions"?: Dimensions.Dimensions;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel"?: PinModel;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinLabel {
+        /**
+          * The dimensions of the canvas for the pins
+         */
+        "dimensions"?: Dimensions.Dimensions;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The dimensions of the the pin label
+         */
+        "pinLabelDimensions"?: Dimensions.Dimensions;
+        /**
+          * The model that contains the entities and outcomes from performing pin annotations
+         */
+        "pinModel"?: PinModel;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerAnnotationsPinLabelLine {
+        "labelEl"?: HTMLVertexViewerAnnotationsPinLabelElement;
+        "labelPoint"?: Point.Point | undefined;
+        /**
+          * The pin to draw for the group
+         */
+        "pin"?: Pin;
+        /**
+          * The dimensions of the the pin label
+         */
+        "pinLabelDimensions"?: Dimensions.Dimensions;
+        "pinPoint"?: Point.Point | undefined;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -2323,6 +2458,9 @@ declare namespace LocalJSX {
         "vertex-scene-tree-toolbar-group": VertexSceneTreeToolbarGroup;
         "vertex-viewer": VertexViewer;
         "vertex-viewer-annotations-pin": VertexViewerAnnotationsPin;
+        "vertex-viewer-annotations-pin-group": VertexViewerAnnotationsPinGroup;
+        "vertex-viewer-annotations-pin-label": VertexViewerAnnotationsPinLabel;
+        "vertex-viewer-annotations-pin-label-line": VertexViewerAnnotationsPinLabelLine;
         "vertex-viewer-button": VertexViewerButton;
         "vertex-viewer-default-toolbar": VertexViewerDefaultToolbar;
         "vertex-viewer-dom-element": VertexViewerDomElement;
@@ -2362,6 +2500,9 @@ declare module "@stencil/core" {
             "vertex-scene-tree-toolbar-group": LocalJSX.VertexSceneTreeToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
             "vertex-viewer": LocalJSX.VertexViewer & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-annotations-pin": LocalJSX.VertexViewerAnnotationsPin & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinElement>;
+            "vertex-viewer-annotations-pin-group": LocalJSX.VertexViewerAnnotationsPinGroup & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinGroupElement>;
+            "vertex-viewer-annotations-pin-label": LocalJSX.VertexViewerAnnotationsPinLabel & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinLabelElement>;
+            "vertex-viewer-annotations-pin-label-line": LocalJSX.VertexViewerAnnotationsPinLabelLine & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationsPinLabelLineElement>;
             "vertex-viewer-button": LocalJSX.VertexViewerButton & JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
             "vertex-viewer-default-toolbar": LocalJSX.VertexViewerDefaultToolbar & JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
             "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;

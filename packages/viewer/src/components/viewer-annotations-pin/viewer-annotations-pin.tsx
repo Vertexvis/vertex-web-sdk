@@ -139,9 +139,7 @@ export class ViewerAnnotationsPin {
 
   private handleFrameDrawn = (): void => {
     this.invalidateState();
-    console.log('frame.camera: ', this.viewer?.frame);
     this.viewer?.frame?.depthBuffer().then((db) => {
-      console.log('setting db: ', db);
       if (db != null) {
         this.depthBuffer = db;
       }
@@ -190,99 +188,32 @@ export class ViewerAnnotationsPin {
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
           {this.pins.map((pin, i) => {
-            const pointerDownAndMove = (): Disposable => {
-              const pointerMove = (event: PointerEvent): void => {
-                if (pin.labelOffset != null && this.elementBounds != null) {
-                  const point = {
-                    x: event.clientX,
-                    y: event.clientY,
-                  };
-
-                  onUpdatePin(pin, {
-                    ...pin,
-                    labelOffset: translatePointToRelative(
-                      point,
-                      this.elementBounds
-                    ),
-                  });
-                }
-              };
-
-              const dispose = (): void => {
-                window.removeEventListener('pointermove', pointerMove);
-                window.removeEventListener('pointerup', pointerUp);
-              };
-
-              const pointerUp = (): void => dispose();
-
-              window.addEventListener('pointermove', pointerMove);
-              window.addEventListener('pointerup', pointerUp);
-
-              return {
-                dispose,
-              };
-            };
-
-            const screenPosition =
-              pin.labelOffset != null && this.elementBounds != null
-                ? translatePointToScreen(pin.labelOffset, this.elementBounds)
-                : undefined;
-
-            console.log('screenPosistion: ', screenPosition);
-            const pinPoint = this.getFromWorldPosition(pin.worldPosition);
-            // console.log('pinPoint: ', pinPoint);
+            if (this.elementBounds == null) {
+              throw new Error('Dimensions not present for pin renderer');
+            }
+            if (this.viewer?.frame?.scene.camera.viewMatrix == null) {
+              throw new Error('View Matrix not present for pin renderer');
+            }
             return (
-              <vertex-viewer-dom-group
-                key={`drawn-pin-${i}`}
-                data-testid={`drawn-pin-${i}`}
-                // position={pin.worldPosition}
-              >
-                <vertex-viewer-dom-element
-                  key={`drawn-pin-${i}`}
-                  data-testid={`drawn-pin-${i}`}
-                  position={pin.worldPosition}
-                >
-                  <div class="pin">
-                    <div
-                      id="start-anchor"
-                      class="pin-anchor"
-                      onPointerDown={(event) => console.log('pointer: ', event)}
-                    ></div>
-                  </div>
-                </vertex-viewer-dom-element>
-
-                {screenPosition != null && pinPoint != null && (
-                  <svg class="svg">
-                    <g>
-                      <line
-                        id="arrow-line"
-                        class="line"
-                        x1={screenPosition.x}
-                        y1={screenPosition.y}
-                        x2={pinPoint.x}
-                        y2={pinPoint.y}
-                        style={{
-                          stroke: `rgb(255,0,0)`,
-                          'stroke-width': '2',
-                        }}
-                      />
-                    </g>
-                  </svg>
-                )}
-                {screenPosition != null && (
-                  <div
-                    id={`pin-label-${pin.id}`}
-                    class="distance-label"
-                    onPointerDown={pointerDownAndMove}
-                    style={{
-                      top: `${screenPosition?.y.toString() || 0}px`,
-                      left: `${screenPosition?.x.toString() || 0}px`,
-                    }}
-                  >
-                    Untitled Pin
-                  </div>
-                )}
-              </vertex-viewer-dom-group>
+              // <vertex-viewer-annotations-pin-group
+              //   pin={pin}
+              //   dimensions={this.elementBounds}
+              //   pinModel={this.pinModel}
+              //   viewer={this.viewer}
+              // ></vertex-viewer-annotations-pin-group>
+              <DrawablePinRenderer
+                pin={pin}
+                selected={false}
+                dimensions={this.elementBounds}
+                viewer={this.viewer}
+                projectionViewMatrix={
+                  this.viewer.frame.scene.camera.projectionViewMatrix
+                }
+                onUpdatePin={(updatedPin) => {
+                  onUpdatePin(pin, updatedPin);
+                }}
+                pinModel={this.pinModel}
+              />
             );
           })}
         </vertex-viewer-dom-renderer>

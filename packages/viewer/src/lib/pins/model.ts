@@ -7,7 +7,7 @@ import { PinEntity } from './entities';
  *
  */
 export class PinModel {
-  private entities = new Set<PinEntity>();
+  private entities: Record<string, PinEntity> = {};
   private selectedPinId?: string;
 
   private entitiesChanged = new EventDispatcher<PinEntity[]>();
@@ -20,10 +20,12 @@ export class PinModel {
    * @returns `true` if the entity has been added.
    */
   public addEntity(entity: PinEntity): boolean {
-    if (!this.entities.has(entity)) {
-      this.entities.add(entity);
+    if (this.entities[entity.id] == null) {
+      this.entities = {
+        ...this.entities,
+        [entity.id]: entity,
+      };
 
-      console.log('entitiesChanged: ', this.getEntities());
       this.setSelectedPin(entity.id);
       this.entitiesChanged.emit(this.getEntities());
       return true;
@@ -36,14 +38,14 @@ export class PinModel {
    * Clears all registered entities from the model.
    */
   public clearEntities(): void {
-    this.entities.forEach((e) => this.removeEntity(e));
+    this.getEntities().forEach((e) => this.removeEntity(e));
   }
 
   /**
    * Returns all the entities registered with the model.
    */
   public getEntities(): PinEntity[] {
-    return Array.from(this.entities);
+    return Object.keys(this.entities).map((key) => this.entities[key]);
   }
 
   public getSelectedPinId(): string | undefined {
@@ -57,8 +59,8 @@ export class PinModel {
    * @returns `true` if the entity was removed.
    */
   public removeEntity(entity: PinEntity): boolean {
-    if (this.entities.has(entity)) {
-      this.entities.delete(entity);
+    if (this.entities[entity.id] != null) {
+      delete this.entities[entity.id];
       this.entitiesChanged.emit(this.getEntities());
       return true;
     } else {
@@ -73,11 +75,26 @@ export class PinModel {
    * @returns `true` if the entity has been added.
    */
   public setEntities(entities: Set<PinEntity>): boolean {
-    this.entities.clear();
-    entities.forEach((e) => this.entities.add(e));
+    this.clearEntities();
+    entities.forEach((e) => this.addEntity(e));
     this.entitiesChanged.emit(this.getEntities());
     console.log('entitiesChanged: ', this.getEntities());
 
+    return true;
+  }
+
+  /**
+   * Sets the set of entities to be placed with the model.
+   *
+   * @param entities A set of entities to draw.
+   * @returns `true` if the entity has been added.
+   */
+  public setEntity(entity: PinEntity): boolean {
+    this.entities = {
+      ...this.entities,
+      [entity.id]: entity,
+    };
+    this.entitiesChanged.emit(this.getEntities());
     return true;
   }
 

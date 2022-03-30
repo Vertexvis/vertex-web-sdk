@@ -1,13 +1,12 @@
 import { Disposable, UUID } from '@vertexvis/utils';
 
 import { translatePointToRelative } from '../../components/viewer-markup/utils';
-import { Cursor, pinCursor } from '../cursors';
+import { Cursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
-import { EntityType } from '../types';
 import { PinController } from './controller';
-import { PinEntity, TextPinEntity } from './entities';
+import { TextPinEntity } from './entities';
 
 export class PinsInteractionHandler implements InteractionHandler {
   private controller: PinController;
@@ -15,14 +14,6 @@ export class PinsInteractionHandler implements InteractionHandler {
   private api?: InteractionApi;
 
   private cursor?: Disposable;
-  private VALID_GEOMETRY_TYPES: EntityType[] = [
-    EntityType.CROSS_SECTION,
-    EntityType.PRECISE_EDGE,
-    EntityType.PRECISE_SURFACE,
-    EntityType.IMPRECISE_EDGE,
-    EntityType.IMPRECISE_SURFACE,
-    EntityType.GENERIC_GEOMETRY,
-  ];
 
   private rectObserver = new ElementRectObserver();
 

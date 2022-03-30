@@ -1,0 +1,24 @@
+:host {
+  /* font-size: 0.75rem;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; */
+  overflow: hidden;
+  pointer-events: none;
+}
+:host([mode='']) .distance-label {
+  color: var(--white);
+  background: var(--neutral-900);
+}
+
+
+.distance-label {
+  position: absolute;
+  background: var(--white);
+  border: 1px solid var(--neutral-900);
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  pointer-events: auto;
+}

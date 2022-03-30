@@ -58,7 +58,12 @@ function getElementDepths(
     const child = element.children[i];
 
     if (isVertexViewerDomGroup(child)) {
+      console.log('pushing child element: ', child);
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
+
+      console.log('isIdentity: ', Matrix4.makeIdentity() === worldMatrix);
+
+      console.log('pushing child element.worldMatrix: ', worldMatrix);
       results.push(...getElementDepths(child, worldMatrix, camera));
     } else if (isVertexViewerDomElement(child)) {
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
