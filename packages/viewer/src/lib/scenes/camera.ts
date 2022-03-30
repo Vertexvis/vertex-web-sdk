@@ -2,7 +2,6 @@ import {
   BoundingBox,
   BoundingSphere,
   Matrix4,
-  Plane,
   Quaternion,
   Ray,
   Vector3,
