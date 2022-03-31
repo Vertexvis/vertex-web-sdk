@@ -11,9 +11,9 @@ const REPORTING_INTERVAL_MS = 1000;
 export interface DrawFrame {
   canvas: CanvasRenderingContext2D;
   canvasDimensions: Dimensions.Dimensions;
-  dimensions?: Dimensions.Dimensions;
   frame: Frame;
   viewport: Viewport;
+  predicate?: () => boolean;
   beforeDraw?: VoidFunction;
 }
 
@@ -116,44 +116,15 @@ export function createCanvasRenderer(): CanvasRenderer {
 
   return async (data) => {
     const frameNumber = data.frame.sequenceNumber;
+    const frameIsNewer =
+      lastFrameNumber == null || frameNumber > lastFrameNumber;
     const image = await loadImageBytes(data.frame.image.imageBytes);
+    const predicatePassing = data.predicate?.() ?? true;
 
-    if (lastFrameNumber == null || frameNumber > lastFrameNumber) {
+    if (frameIsNewer && predicatePassing) {
       lastFrameNumber = frameNumber;
       data.beforeDraw?.();
       drawImage(image, data);
-    }
-
-    image.dispose();
-    return data.frame;
-  };
-}
-
-export function createHiddenCanvasRenderer(): CanvasRenderer {
-  const hiddenCanvas = document.createElement('canvas');
-  let lastFrameNumber: number | undefined;
-
-  return async (data) => {
-    const frameNumber = data.frame.sequenceNumber;
-    const frameIsNewer =
-      lastFrameNumber == null || frameNumber > lastFrameNumber;
-    const frameDimensionsMatch =
-      data.dimensions == null ||
-      Dimensions.isEqual(
-        data.dimensions,
-        data.frame.image.imageAttr.frameDimensions
-      );
-    const image = await loadImageBytes(data.frame.image.imageBytes);
-
-    hiddenCanvas.width = data.canvasDimensions.width;
-    hiddenCanvas.height = data.canvasDimensions.height;
-    const ctx = hiddenCanvas.getContext('2d');
-
-    if (ctx != null && frameIsNewer && frameDimensionsMatch) {
-      lastFrameNumber = frameNumber;
-      drawImage(image, { ...data, canvas: ctx });
-      data.beforeDraw?.();
-      data.canvas.drawImage(hiddenCanvas, 0, 0);
     }
 
     image.dispose();
