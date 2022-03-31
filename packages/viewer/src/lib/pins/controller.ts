@@ -2,7 +2,7 @@ import {
   ViewerPinToolMode,
   ViewerPinToolType,
 } from '../../components/viewer-pin-tool/viewer-pin-tool';
-import { PinEntity } from './entities';
+import { Pin } from './entities';
 import { PinModel } from './model';
 
 /**
@@ -22,7 +22,7 @@ export class PinController {
    * @param entity The pin entity
    * @returns A void promise
    */
-  public addEntity(entity: PinEntity): void {
+  public addEntity(entity: Pin): void {
     this.model.addEntity(entity);
   }
 
@@ -42,7 +42,7 @@ export class PinController {
    * @returns A promise that resolves with the results after removing this
    * entity.
    */
-  public removeEntity(entity: PinEntity): void {
+  public removeEntity(entity: Pin): void {
     this.model.removeEntity(entity);
   }
 
@@ -53,7 +53,7 @@ export class PinController {
    * @returns A promise that resolves with the results after registering these
    * entities.
    */
-  public setEntities(entities: Set<PinEntity>): void {
+  public setEntities(entities: Set<Pin>): void {
     this.model.setEntities(entities);
   }
 

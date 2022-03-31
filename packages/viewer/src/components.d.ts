@@ -47,7 +47,7 @@ import { Anchor } from "./components/viewer-measurement-distance/utils";
 import { PointToPointHitProvider } from "./components/viewer-measurement-distance/interactions";
 import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/viewer-measurement-tool";
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from "./components/viewer-measurement-tool/viewer-measurement-tool";
-import { Pin, PinEntity, TextPinEntity } from "./lib/pins/entities";
+import { Pin, TextPin } from "./lib/pins/entities";
 import { PinModel } from "./lib/pins/model";
 import { PinController } from "./lib/pins/controller";
 import { ViewerPinToolMode, ViewerPinToolType } from "./components/viewer-pin-tool/viewer-pin-tool";
@@ -1058,7 +1058,7 @@ export namespace Components {
         /**
           * The pin to draw for the group
          */
-        "pin"?: TextPinEntity;
+        "pin"?: TextPin;
         /**
           * The model that contains the entities and outcomes from performing pin operations
          */
@@ -1110,7 +1110,7 @@ export namespace Components {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel": PinModel;
-        "pins": PinEntity[];
+        "pins": Pin[];
         /**
           * The type of pin.  This property will automatically be set.
          */
@@ -2367,7 +2367,7 @@ declare namespace LocalJSX {
         /**
           * The pin to draw for the group
          */
-        "pin"?: TextPinEntity;
+        "pin"?: TextPin;
         /**
           * The model that contains the entities and outcomes from performing pin operations
          */
@@ -2415,7 +2415,7 @@ declare namespace LocalJSX {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel"?: PinModel;
-        "pins"?: PinEntity[];
+        "pins"?: Pin[];
         /**
           * The type of pin.  This property will automatically be set.
          */

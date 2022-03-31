@@ -1,16 +1,16 @@
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-import { Pin, PinEntity } from './entities';
+import { Pin } from './entities';
 
 /**
  * A model representing the state of pins.
  *
  */
 export class PinModel {
-  private entities: Record<string, PinEntity> = {};
+  private entities: Record<string, Pin> = {};
   private selectedPinId?: string;
 
-  private entitiesChanged = new EventDispatcher<PinEntity[]>();
+  private entitiesChanged = new EventDispatcher<Pin[]>();
   private selectionChanged = new EventDispatcher<string | undefined>();
 
   /**
@@ -19,7 +19,7 @@ export class PinModel {
    * @param entity A pin entity to draw.
    * @returns `true` if the entity has been added.
    */
-  public addEntity(entity: PinEntity): boolean {
+  public addEntity(entity: Pin): boolean {
     if (this.entities[entity.id] == null) {
       this.entities = {
         ...this.entities,
@@ -44,7 +44,7 @@ export class PinModel {
   /**
    * Returns all the entities registered with the model.
    */
-  public getEntities(): PinEntity[] {
+  public getEntities(): Pin[] {
     return Object.keys(this.entities).map((key) => this.entities[key]);
   }
 
@@ -58,7 +58,7 @@ export class PinModel {
    * @param entity The entity to remove.
    * @returns `true` if the entity was removed.
    */
-  public removeEntity(entity: PinEntity): boolean {
+  public removeEntity(entity: Pin): boolean {
     if (this.entities[entity.id] != null) {
       delete this.entities[entity.id];
       this.entitiesChanged.emit(this.getEntities());
@@ -74,7 +74,7 @@ export class PinModel {
    * @param entities A set of entities to draw.
    * @returns `true` if the entity has been added.
    */
-  public setEntities(entities: Set<PinEntity>): boolean {
+  public setEntities(entities: Set<Pin>): boolean {
     this.clearEntities();
     entities.forEach((e) => this.addEntity(e));
     this.entitiesChanged.emit(this.getEntities());
@@ -104,7 +104,7 @@ export class PinModel {
    * @param listener The listener to add.
    * @returns A disposable that can be used to remove the listener.
    */
-  public onEntitiesChanged(listener: Listener<PinEntity[]>): Disposable {
+  public onEntitiesChanged(listener: Listener<Pin[]>): Disposable {
     return this.entitiesChanged.on(listener);
   }
 

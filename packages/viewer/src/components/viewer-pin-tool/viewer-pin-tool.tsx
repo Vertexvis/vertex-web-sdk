@@ -13,7 +13,7 @@ import { Disposable } from '@vertexvis/utils';
 
 import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
-import { PinEntity } from '../../lib/pins/entities';
+import { Pin } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -46,7 +46,7 @@ export class ViewerAnnotationsTool {
   public pinModel: PinModel = new PinModel();
 
   @Prop({ mutable: true })
-  public pins: PinEntity[] = [];
+  public pins: Pin[] = [];
 
   @State()
   private selectedPinId?: string;

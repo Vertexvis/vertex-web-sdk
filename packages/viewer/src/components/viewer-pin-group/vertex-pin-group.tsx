@@ -11,7 +11,7 @@ import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
 import { Viewport } from '../..';
-import { isPinEntity, isTextPinEntity, Pin } from '../../lib/pins/entities';
+import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 
@@ -96,14 +96,14 @@ export class ViewerPinGroup {
             this.pinModel.setSelectedPin(this.pin?.id);
           }}
         >
-          {isTextPinEntity(this.pin) && (
+          {isTextPin(this.pin) && (
             <div
               id="pin-anchor"
               class={classNames('pin-anchor', { selected: this.selected })}
             ></div>
           )}
 
-          {isPinEntity(this.pin) && (
+          {isDefaultPin(this.pin) && (
             <vertex-viewer-icon
               name="pin-fill"
               size="lg"
@@ -114,7 +114,7 @@ export class ViewerPinGroup {
           )}
         </vertex-viewer-dom-element>
 
-        {isTextPinEntity(this.pin) && (
+        {isTextPin(this.pin) && (
           <Fragment>
             <vertex-viewer-pin-label-line
               pin={this.pin}
@@ -159,8 +159,11 @@ export class ViewerPinGroup {
       this.dimensions
     );
     const screenPosition =
-      isTextPinEntity(this.pin) && this.pin.labelPoint != null
-        ? translatePointToScreen(this.pin.labelPoint, this.dimensions)
+      isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+        ? translatePointToScreen(
+            this.pin.attributes.labelPoint,
+            this.dimensions
+          )
         : undefined;
 
     if (screenPosition && pinPoint != null) {

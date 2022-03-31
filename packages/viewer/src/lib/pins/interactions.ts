@@ -6,7 +6,7 @@ import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { PinController } from './controller';
-import { PinEntity, TextPinEntity } from './entities';
+import { DefaultPin, TextPin } from './entities';
 
 export class PinsInteractionHandler implements InteractionHandler {
   private controller: PinController;
@@ -31,13 +31,11 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.rectObserver.observe(element);
 
     this.setupEditMode();
-    element.addEventListener('pointermove', this.handlePointerMove);
     element.addEventListener('pointerdown', this.handlePointerDown);
   }
 
   public dispose(): void {
     this.rectObserver.disconnect();
-    this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
     this.element = undefined;
@@ -56,16 +54,6 @@ export class PinsInteractionHandler implements InteractionHandler {
       }
     }
   }
-
-  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
-    // if (await this.isDroppableSurface(event)) {
-    //   this.addCursor(pinCursor);
-    // } else {
-    //   this.clearCursor();
-    //   console.log('clearing cursor ');
-    //   // console.log('not-droppable');
-    // }
-  };
 
   private handlePointerDown = async (event: PointerEvent): Promise<void> => {
     if (this.controller.getToolMode() === 'edit') {
@@ -88,17 +76,14 @@ export class PinsInteractionHandler implements InteractionHandler {
 
             switch (this.controller.getToolType()) {
               case 'pin':
-                this.controller.addEntity(new PinEntity(pinId, vector3, pt));
+                this.controller.addEntity(new DefaultPin(pinId, vector3, pt));
                 break;
               case 'pin-label':
                 this.controller.addEntity(
-                  new TextPinEntity(
-                    pinId,
-                    vector3,
-                    pt,
-                    relativePoint,
-                    'Untitled Pin'
-                  )
+                  new TextPin(pinId, vector3, pt, {
+                    labelPoint: relativePoint,
+                    labelText: 'Untitled Pin',
+                  })
                 );
                 break;
             }

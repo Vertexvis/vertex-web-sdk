@@ -1,6 +1,12 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 
-export class PinEntity {
+interface PinInterface<T> {
+  id: string;
+  worldPosition: Vector3.Vector3;
+  point: Point.Point;
+  attributes?: T;
+}
+export class DefaultPin implements PinInterface<void> {
   public constructor(
     public readonly id: string,
     public readonly worldPosition: Vector3.Vector3,
@@ -8,24 +14,26 @@ export class PinEntity {
   ) {}
 }
 
-export type Pin = PinEntity | TextPinEntity;
+interface PinLabel {
+  labelPoint: Point.Point;
+  labelText?: string;
+}
 
-export class TextPinEntity extends PinEntity {
+export type Pin = DefaultPin | TextPin;
+
+export class TextPin implements PinInterface<PinLabel> {
   public constructor(
     public readonly id: string,
     public readonly worldPosition: Vector3.Vector3,
     public readonly point: Point.Point,
-    public readonly labelPoint: Point.Point,
-    public readonly labelText?: string
-  ) {
-    super(id, worldPosition, point);
-  }
+    public readonly attributes: PinLabel
+  ) {}
 }
 
-export function isTextPinEntity(pin?: Pin): pin is TextPinEntity {
-  return pin != null && (pin as TextPinEntity).labelPoint != null;
+export function isTextPin(pin?: Pin): pin is TextPin {
+  return pin != null && (pin as TextPin).attributes?.labelPoint != null;
 }
 
-export function isPinEntity(pin?: Pin): pin is PinEntity {
-  return pin != null && (pin as TextPinEntity).labelPoint == null;
+export function isDefaultPin(pin?: Pin): pin is DefaultPin {
+  return pin != null && (pin as TextPin).attributes == null;
 }

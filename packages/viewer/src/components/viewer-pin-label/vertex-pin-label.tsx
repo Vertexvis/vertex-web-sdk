@@ -17,7 +17,7 @@ import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { PinController } from '../../lib/pins/controller';
-import { isTextPinEntity, TextPinEntity } from '../../lib/pins/entities';
+import { isTextPin, TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import {
   translatePointToRelative,
@@ -34,7 +34,7 @@ export class VertexPinLabel {
    * The pin to draw for the group
    */
   @Prop({ mutable: true })
-  public pin?: TextPinEntity;
+  public pin?: TextPin;
 
   /**
    * The dimensions of the canvas for the pins
@@ -118,29 +118,24 @@ export class VertexPinLabel {
       throw new Error('Unable to render pin');
     }
 
-    const onUpdatePin = (updatedPin: TextPinEntity): void => {
+    const onUpdatePin = (updatedPin: TextPin): void => {
       this.pinModel.setEntity(updatedPin);
     };
     const pointerDownAndMove = (pointerDown: PointerEvent): Disposable => {
       this.pinModel.setSelectedPin(this.pin?.id);
 
       const pointerMove = (event: PointerEvent): void => {
-        const myUpdatedPin: TextPinEntity | undefined = isTextPinEntity(
-          this.pin
-        )
-          ? new TextPinEntity(
-              this.pin.id,
-              this.pin.worldPosition,
-              this.pin.point,
-              translatePointToRelative(
+        const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
+          ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
+              labelPoint: translatePointToRelative(
                 {
                   x: event.clientX,
                   y: event.clientY,
                 },
                 this.dimensions
               ),
-              this.pin.labelText
-            )
+              labelText: this.pin.attributes.labelText,
+            })
           : undefined;
 
         if (myUpdatedPin) {
@@ -174,8 +169,11 @@ export class VertexPinLabel {
     };
 
     const screenPosition =
-      isTextPinEntity(this.pin) && this.pin.labelPoint != null
-        ? translatePointToScreen(this.pin.labelPoint, this.dimensions)
+      isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+        ? translatePointToScreen(
+            this.pin.attributes.labelPoint,
+            this.dimensions
+          )
         : undefined;
 
     return (
@@ -212,7 +210,7 @@ export class VertexPinLabel {
             }}
             onPointerDown={pointerDownAndMove}
           >
-            {this.pin.labelText}
+            {this.pin.attributes.labelText}
           </div>
         )}
       </Host>
@@ -232,7 +230,10 @@ export class VertexPinLabel {
     if (this.pin != null) {
       this.pinModel.setEntity({
         ...this.pin,
-        labelText: this.value,
+        attributes: {
+          labelPoint: this.pin.attributes.labelPoint,
+          labelText: this.value,
+        },
       });
     }
   }
