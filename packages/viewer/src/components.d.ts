@@ -33,6 +33,7 @@ import { Scene } from "./lib/scenes/scene";
 import { Pin, PinEntity } from "./lib/pins/entities";
 import { PinModel } from "./lib/pins/model";
 import { PinController } from "./lib/pins/controller";
+import { ViewerPinToolMode, ViewerPinToolType } from "./components/viewer-annotations-tool/viewer-annotations-tool";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
@@ -449,6 +450,10 @@ export namespace Components {
           * Projection view matrix used for computing the position of the pin line
          */
         "projectionViewMatrix": Matrix4.Matrix4;
+        /**
+          * Whether or not the pin is "selected"
+         */
+        "selected": boolean;
     }
     interface VertexViewerAnnotationsPinLabel {
         /**
@@ -487,6 +492,10 @@ export namespace Components {
          */
         "config"?: Config;
         /**
+          * The mode of the pin tool
+         */
+        "mode": ViewerPinToolMode;
+        /**
           * The controller that is responsible for drawing pins and updating the model
          */
         "pinController"?: PinController;
@@ -495,6 +504,10 @@ export namespace Components {
          */
         "pinModel": PinModel;
         "pins": PinEntity[];
+        /**
+          * The type of pin.  This property will automatically be set.
+         */
+        "tool": ViewerPinToolType;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -1717,6 +1730,10 @@ declare namespace LocalJSX {
           * Projection view matrix used for computing the position of the pin line
          */
         "projectionViewMatrix"?: Matrix4.Matrix4;
+        /**
+          * Whether or not the pin is "selected"
+         */
+        "selected"?: boolean;
     }
     interface VertexViewerAnnotationsPinLabel {
         /**
@@ -1755,6 +1772,10 @@ declare namespace LocalJSX {
          */
         "config"?: Config;
         /**
+          * The mode of the pin tool
+         */
+        "mode"?: ViewerPinToolMode;
+        /**
           * The controller that is responsible for drawing pins and updating the model
          */
         "pinController"?: PinController;
@@ -1763,6 +1784,10 @@ declare namespace LocalJSX {
          */
         "pinModel"?: PinModel;
         "pins"?: PinEntity[];
+        /**
+          * The type of pin.  This property will automatically be set.
+         */
+        "tool"?: ViewerPinToolType;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */

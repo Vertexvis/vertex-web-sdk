@@ -1,21 +1,24 @@
 import {
   Component,
   Element,
+  Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Prop,
   State,
 } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import classNames from 'classnames';
 
 import { Viewport } from '../..';
-import { isTextPinEntity, Pin } from '../../lib/pins/entities';
+import { PinController } from '../../lib/pins/controller';
+import { isPinEntity, isTextPinEntity, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 
 interface ComputedPoints {
   pinPoint: Point.Point;
-  labelPoint: Point.Point;
+  labelPoint?: Point.Point;
 }
 @Component({
   tag: 'vertex-viewer-annotations-pin-group',
@@ -56,6 +59,12 @@ export class ViewerAnnotationsPinGroup {
   @Prop()
   public pinModel: PinModel = new PinModel();
 
+  /**
+   * Whether or not the pin is "selected"
+   */
+  @Prop()
+  public selected = false;
+
   @State()
   private invalidateStateCounter = 0;
 
@@ -66,11 +75,10 @@ export class ViewerAnnotationsPinGroup {
   }
 
   protected render(): JSX.Element {
-    const computed = this.computeLabelLinePoint();
-
-    if (computed == null || this.pin == null) {
+    if (this.pin == null) {
       throw new Error('Unable to draw pin');
     }
+    const computed = this.computeLabelLinePoint(this.pin);
 
     const { pinPoint, labelPoint } = computed;
 
@@ -83,32 +91,46 @@ export class ViewerAnnotationsPinGroup {
           key={`drawn-pin-${this.pin.id}`}
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+
+            this.pinModel.setSelectedPin(this.pin?.id);
+          }}
+          class="pin-group"
         >
           {isTextPinEntity(this.pin) && (
-            <div
-              id="pin-anchor"
-              class="pin-anchor"
-              onPointerDown={(event) => console.log('pointer: ', event)}
-            ></div>
+            <div id="pin-anchor" class="pin-anchor"></div>
           )}
-          {/* todo add regular pin here */}
+
+          {isPinEntity(this.pin) && (
+            <vertex-viewer-icon
+              name="pin-fill"
+              size="lg"
+              class={classNames('pin', {
+                'pin-selected': this.selected,
+              })}
+            />
+          )}
         </vertex-viewer-dom-element>
 
-        <vertex-viewer-annotations-pin-label-line
-          pin={this.pin}
-          pinPoint={pinPoint}
-          labelPoint={labelPoint}
-        ></vertex-viewer-annotations-pin-label-line>
+        {isTextPinEntity(this.pin) && (
+          <Fragment>
+            <vertex-viewer-annotations-pin-label-line
+              pin={this.pin}
+              pinPoint={pinPoint}
+              labelPoint={labelPoint}
+            ></vertex-viewer-annotations-pin-label-line>
 
-        <vertex-viewer-annotations-pin-label
-          pin={this.pin}
-          ref={(el) => {
-            console.log('setting label: ', el);
-            this.labelEl = el;
-          }}
-          dimensions={this.dimensions}
-          pinModel={this.pinModel}
-        ></vertex-viewer-annotations-pin-label>
+            <vertex-viewer-annotations-pin-label
+              pin={this.pin}
+              ref={(el) => {
+                this.labelEl = el;
+              }}
+              dimensions={this.dimensions}
+              pinModel={this.pinModel}
+            ></vertex-viewer-annotations-pin-label>
+          </Fragment>
+        )}
       </vertex-viewer-dom-group>
     );
   }
@@ -125,19 +147,18 @@ export class ViewerAnnotationsPinGroup {
     }
   }
 
-  private computeLabelLinePoint(): ComputedPoints | undefined {
+  private computeLabelLinePoint(pin: Pin): ComputedPoints {
+    const pinPoint = this.getFromWorldPosition(
+      pin.worldPosition,
+      this.projectionViewMatrix,
+      this.dimensions
+    );
     const screenPosition =
       isTextPinEntity(this.pin) && this.pin.labelPoint != null
         ? translatePointToScreen(this.pin.labelPoint, this.dimensions)
         : undefined;
 
-    if (screenPosition && this.pin != null) {
-      const pinPoint = this.getFromWorldPosition(
-        this.pin.worldPosition,
-        this.projectionViewMatrix,
-        this.dimensions
-      ); // todo return this as well so I dont have to compute it again.
-
+    if (screenPosition && pinPoint != null) {
       const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
       const labelWidth = label?.clientWidth || 0;
       const labelHeight = label?.clientHeight || 0;
@@ -174,6 +195,10 @@ export class ViewerAnnotationsPinGroup {
         labelPoint: candidates[candidateIndex],
       };
     }
+
+    return {
+      pinPoint,
+    };
   }
 
   private getFromWorldPosition(

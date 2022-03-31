@@ -1,12 +1,9 @@
 import {
   Component,
   Element,
-  Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
-  Listen,
-  Method,
   Prop,
   State,
   Watch,
@@ -17,12 +14,21 @@ import { Disposable } from '@vertexvis/utils';
 import { Viewport } from '../..';
 import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
-import { Pin, PinEntity } from '../../lib/pins/entities';
+import { PinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
 import { DepthBuffer } from '../../lib/types';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
+/**
+ * The types of pins that can be performed by this tool.
+ */
+export type ViewerPinToolType = 'pin' | 'pin-label';
+
+/**
+ * The mode of the pin tool
+ */
+export type ViewerPinToolMode = 'edit' | 'view';
 @Component({
   tag: 'vertex-viewer-annotations-tool',
   styleUrl: 'viewer-annotations-tool.css',
@@ -61,6 +67,20 @@ export class ViewerAnnotationsTool {
   @Prop()
   public config?: Config;
 
+  /**
+   * The type of pin.
+   *
+   * This property will automatically be set.
+   */
+  @Prop({ mutable: true })
+  public tool: ViewerPinToolType = 'pin';
+
+  /**
+   * The mode of the pin tool
+   */
+  @Prop({ mutable: true })
+  public mode: ViewerPinToolMode = 'view';
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -75,6 +95,26 @@ export class ViewerAnnotationsTool {
   private onOverlaysChangedHandler?: Disposable;
 
   private depthBuffer: DepthBuffer | undefined;
+
+  /**
+   * @ignore
+   */
+  @Watch('mode')
+  protected watchModeChange(): void {
+    console.log('new interaction handler');
+    this.pinController?.setToolMode(this.mode);
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('tool')
+  protected watchTypeChange(): void {
+    console.log('new interaction handler');
+    this.pinController?.setToolType(this.tool);
+    this.setupInteractionHandler();
+  }
 
   /**
    * @ignore
@@ -152,6 +192,7 @@ export class ViewerAnnotationsTool {
                 dimensions={this.elementBounds}
                 pinModel={this.pinModel}
                 projectionViewMatrix={this.projectionViewMatrix}
+                selected={this.selectedPinId === pin.id}
               ></vertex-viewer-annotations-pin-group>
             );
           })}
@@ -161,7 +202,7 @@ export class ViewerAnnotationsTool {
   }
 
   private setupController(): void {
-    this.pinController = new PinController(this.pinModel);
+    this.pinController = new PinController(this.pinModel, this.mode, this.tool);
   }
 
   private clearInteractionHandler(): void {
@@ -191,16 +232,5 @@ export class ViewerAnnotationsTool {
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
-  }
-
-  private getFromWorldPosition(pt: Vector3.Vector3): Point.Point | undefined {
-    const projectionViewMatrix = this.depthBuffer?.camera.projectionViewMatrix;
-
-    if (this.elementBounds != null && projectionViewMatrix != null) {
-      const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
-      return Viewport.fromDimensions(
-        this.elementBounds
-      ).transformVectorToViewport(ndcPt);
-    }
   }
 }

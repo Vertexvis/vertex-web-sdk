@@ -1,3 +1,7 @@
+import {
+  ViewerPinToolMode,
+  ViewerPinToolType,
+} from '../../components/viewer-annotations-tool/viewer-annotations-tool';
 import { PinEntity } from './entities';
 import { PinModel } from './model';
 
@@ -5,7 +9,11 @@ import { PinModel } from './model';
  * The `PinController` is responsible for adding pin entities to the viewer canvis
  */
 export class PinController {
-  public constructor(private model: PinModel) {}
+  public constructor(
+    private model: PinModel,
+    private mode: ViewerPinToolMode,
+    private type: ViewerPinToolType
+  ) {}
 
   /**
    * Registers an entity to place on the canvis and places the pin on the associated part.
@@ -54,5 +62,21 @@ export class PinController {
    */
   public setSelectedPinId(pinId?: string): void {
     this.model.setSelectedPin(pinId);
+  }
+
+  public getToolMode(): ViewerPinToolMode {
+    return this.mode;
+  }
+
+  public getToolType(): ViewerPinToolType {
+    return this.type;
+  }
+
+  public setToolMode(mode: ViewerPinToolMode): void {
+    this.mode = mode;
+  }
+
+  public setToolType(type: ViewerPinToolType): void {
+    this.type = type;
   }
 }
