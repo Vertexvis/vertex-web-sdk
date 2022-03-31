@@ -159,6 +159,10 @@ export class FrameCameraBase implements FrameCameraLike {
     return this.computeCameraMatrices().projectionViewMatrix;
   }
 
+  public get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
+    return this.computeCameraMatrices().projectionViewMatrix;
+  }
+
   public static fromBoundingBox(
     camera: FrameCamera.FrameCamera,
     boundingBox: BoundingBox.BoundingBox,
@@ -195,10 +199,16 @@ export class FrameCameraBase implements FrameCameraLike {
     }
   }
 
+  /**
+   * Returns whether this `FrameCameraBase` is an orthographic camera.
+   */
   public isOrthographic(): this is FrameOrthographicCamera {
     return false;
   }
 
+  /**
+   * Returns whether this `FrameCameraBase` is a perspective camera.
+   */
   public isPerspective(): this is FramePerspectiveCamera {
     return false;
   }
@@ -285,6 +295,20 @@ export class FramePerspectiveCamera
     super(position, lookAt, up, near, far, aspectRatio);
   }
 
+  /**
+   * Converts this `FramePerspectiveCamera` to a `FrameOrthographicCamera` using
+   * the provided `boundingBox` to compute the viewing frustum.
+   *
+   * @param boundingBox The visible bounding box.
+   */
+  public toOrthographic(boundingBox: BoundingBox.BoundingBox): FrameCameraBase {
+    return FrameCameraBase.fromBoundingBox(
+      FrameCamera.toOrthographic(this, boundingBox),
+      boundingBox,
+      this.aspectRatio
+    );
+  }
+
   public override isPerspective(): this is FramePerspectiveCamera {
     return true;
   }
@@ -353,8 +377,37 @@ export class FrameOrthographicCamera
     this.left = -this.right;
   }
 
+  /**
+   * Converts this `FrameOrthographicCamera` to a `FramePerspectiveCamera` using
+   * the provided `boundingBox` to compute the near and far clipping planes.
+   *
+   * @param boundingBox The visible bounding box.
+   */
+  public toPerspective(boundingBox: BoundingBox.BoundingBox): FrameCameraBase {
+    return FrameCameraBase.fromBoundingBox(
+      FrameCamera.toPerspective(this),
+      boundingBox,
+      this.aspectRatio
+    );
+  }
+
   public override isOrthographic(): this is FrameOrthographicCamera {
     return true;
+  }
+
+  public override get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
+    const frustumProjectionMatrix = Matrix4.makeFrustum(
+      this.left,
+      this.right,
+      this.top,
+      this.bottom,
+      this.near,
+      this.far
+    );
+    return Matrix4.multiply(
+      frustumProjectionMatrix,
+      this.computeCameraMatrices().viewMatrix
+    );
   }
 
   protected override computeCameraMatrices(): FrameCameraMatrices {

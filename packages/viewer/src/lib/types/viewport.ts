@@ -103,7 +103,7 @@ export class Viewport implements Dimensions.Dimensions {
   }
 
   /**
-   * Transforms a point in viewport coordinates to a point in world space
+   * Transforms a point in viewport coordinates to a point in perspective world space
    * coordinates. This method expects a depth buffer in order to compute a value
    * for the Z axis.
    *
@@ -121,6 +121,34 @@ export class Viewport implements Dimensions.Dimensions {
     const depthPt = this.transformPointToFrame(pt, depthBuffer);
     const ray = this.transformPointToRay(pt, depthBuffer, depthBuffer.camera);
     return depthBuffer.getWorldPoint(depthPt, ray, fallbackNormalizedDepth);
+  }
+
+  /**
+   * Transforms a point in viewport coordinates to a point in orthographic world space
+   * coordinates. This method expects a depth buffer in order to compute a value
+   * for the Z axis.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param depthBuffer A depth buffer for computing the Z axis.
+   * @param fallbackNormalizedDepth A fallback value if the depth is the max
+   *   depth value, or cannot be determined.
+   */
+  public transformPointToOrthographicWorldSpace(
+    pt: Point.Point,
+    depthBuffer: DepthBuffer,
+    fallbackNormalizedDepth?: number
+  ): Vector3.Vector3 {
+    const depthPt = this.transformPointToFrame(pt, depthBuffer);
+    const ray = this.transformPointToOrthographicRay(
+      pt,
+      depthBuffer,
+      depthBuffer.camera
+    );
+    return depthBuffer.getOrthographicWorldPoint(
+      depthPt,
+      ray,
+      fallbackNormalizedDepth
+    );
   }
 
   /**
@@ -147,6 +175,32 @@ export class Viewport implements Dimensions.Dimensions {
     );
     const direction = Vector3.normalize(Vector3.subtract(world, origin));
     return Ray.create({ origin, direction });
+  }
+
+  /**
+   * Transforms a point in viewport coordinates to a ray. The returned ray will
+   * have an origin that is at the world point of viewport coordinate with a direction that
+   * is pointing into world space away from the camera.
+   *
+   * @param pt A point in viewport coordinates.
+   * @param image An image of a frame.
+   * @param camera A camera used to determine orientation of the scene.
+   */
+  public transformPointToOrthographicRay(
+    pt: Point.Point,
+    image: FrameImageLike,
+    camera: FrameCameraWithMatrices
+  ): Ray.Ray {
+    const ndc = this.transformScreenPointToNdc(pt, image);
+    const world = Vector3.transformNdcToWorldSpace(
+      Vector3.create(ndc.x, ndc.y, 0.5),
+      camera.worldMatrix,
+      camera.projectionMatrixInverse
+    );
+    return Ray.create({
+      origin: world,
+      direction: Vector3.normalize(camera.viewVector),
+    });
   }
 
   /**

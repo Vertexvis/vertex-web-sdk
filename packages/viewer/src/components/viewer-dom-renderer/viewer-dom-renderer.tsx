@@ -174,6 +174,6 @@ export class ViewerDomRenderer {
 
     this.depthBuffer =
       depthBuffers === 'all' ? await frame?.depthBuffer() : undefined;
-    this.camera = frame?.scene?.camera;
+    this.camera = frame?.scene.camera;
   }
 }
