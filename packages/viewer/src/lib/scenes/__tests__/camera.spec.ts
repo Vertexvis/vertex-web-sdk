@@ -488,10 +488,10 @@ describe(OrthographicCamera, () => {
         jest.fn()
       );
 
-      it('always provides the radius of the bounding sphere', () => {
+      it('computes the distance to the center of the provided bounding box', () => {
         const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
 
-        expect(distance).toBeCloseTo(Math.sqrt(3));
+        expect(distance).toBeCloseTo(5);
 
         const flipped = camera.update({
           ...camera,
@@ -502,7 +502,7 @@ describe(OrthographicCamera, () => {
         const flippedDistance =
           flipped.signedDistanceToBoundingBoxCenter(boundingBox);
 
-        expect(flippedDistance).toBeCloseTo(Math.sqrt(3));
+        expect(flippedDistance).toBeCloseTo(-5);
       });
     }
   );
