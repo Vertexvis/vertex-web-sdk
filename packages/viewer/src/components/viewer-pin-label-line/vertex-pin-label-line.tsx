@@ -4,20 +4,21 @@ import {
   h,
   Host,
   Prop,
+  Watch,
 } from '@stencil/core';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { Pin } from '../../lib/pins/entities';
 
 @Component({
-  tag: 'vertex-viewer-annotations-pin-label-line',
-  styleUrl: 'vertex-annotations-pin-label-line.css',
+  tag: 'vertex-viewer-pin-label-line',
+  styleUrl: 'vertex-pin-label-line.css',
   shadow: false,
 })
-export class VertexAnnotationsPinLabelLine {
+export class VertexPinLabelLine {
   @Prop()
-  public labelEl?: HTMLVertexViewerAnnotationsPinLabelElement;
+  public labelEl?: HTMLVertexViewerPinLabelElement;
 
   /**
    * The pin to draw for the group
@@ -72,7 +73,7 @@ export class VertexAnnotationsPinLabelLine {
         width: pinLabel.offsetWidth,
       };
 
-      this.labelEl = pinLabel as HTMLVertexViewerAnnotationsPinLabelElement;
+      this.labelEl = pinLabel as HTMLVertexViewerPinLabelElement;
     }
   }
 }

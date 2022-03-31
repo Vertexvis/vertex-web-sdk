@@ -11,7 +11,6 @@ import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
 import { Viewport } from '../..';
-import { PinController } from '../../lib/pins/controller';
 import { isPinEntity, isTextPinEntity, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
@@ -21,11 +20,11 @@ interface ComputedPoints {
   labelPoint?: Point.Point;
 }
 @Component({
-  tag: 'vertex-viewer-annotations-pin-group',
-  styleUrl: 'vertex-annotations-pin-group.css',
+  tag: 'vertex-viewer-pin-group',
+  styleUrl: 'vertex-pin-group.css',
   shadow: false,
 })
-export class ViewerAnnotationsPinGroup {
+export class ViewerPinGroup {
   @Element()
   private hostEl!: HTMLElement;
 
@@ -54,7 +53,7 @@ export class ViewerAnnotationsPinGroup {
   public dimensions: Dimensions.Dimensions = { height: 0, width: 0 };
 
   /**
-   * The model that contains the entities and outcomes from performing pin annotations
+   * The model that contains the entities and outcomes from performing pin operations
    */
   @Prop()
   public pinModel: PinModel = new PinModel();
@@ -68,7 +67,7 @@ export class ViewerAnnotationsPinGroup {
   @State()
   private invalidateStateCounter = 0;
 
-  private labelEl: HTMLVertexViewerAnnotationsPinLabelElement | undefined;
+  private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
   protected componentDidLoad(): void {
     this.setLabelObserver();
@@ -96,10 +95,12 @@ export class ViewerAnnotationsPinGroup {
 
             this.pinModel.setSelectedPin(this.pin?.id);
           }}
-          class="pin-group"
         >
           {isTextPinEntity(this.pin) && (
-            <div id="pin-anchor" class="pin-anchor"></div>
+            <div
+              id="pin-anchor"
+              class={classNames('pin-anchor', { selected: this.selected })}
+            ></div>
           )}
 
           {isPinEntity(this.pin) && (
@@ -115,20 +116,20 @@ export class ViewerAnnotationsPinGroup {
 
         {isTextPinEntity(this.pin) && (
           <Fragment>
-            <vertex-viewer-annotations-pin-label-line
+            <vertex-viewer-pin-label-line
               pin={this.pin}
               pinPoint={pinPoint}
               labelPoint={labelPoint}
-            ></vertex-viewer-annotations-pin-label-line>
+            ></vertex-viewer-pin-label-line>
 
-            <vertex-viewer-annotations-pin-label
+            <vertex-viewer-pin-label
               pin={this.pin}
               ref={(el) => {
                 this.labelEl = el;
               }}
               dimensions={this.dimensions}
               pinModel={this.pinModel}
-            ></vertex-viewer-annotations-pin-label>
+            ></vertex-viewer-pin-label>
           </Fragment>
         )}
       </vertex-viewer-dom-group>
@@ -140,10 +141,14 @@ export class ViewerAnnotationsPinGroup {
   }
 
   private setLabelObserver(): void {
-    if (this.labelEl != null) {
+    const label = this.labelEl?.addEventListener('labelChanged', () => {
+      this.invalidateState();
+    });
+
+    if (label != null) {
       const resize = new ResizeObserver(() => this.invalidateState());
 
-      resize.observe(this.labelEl);
+      resize.observe(label);
     }
   }
 
@@ -160,6 +165,7 @@ export class ViewerAnnotationsPinGroup {
 
     if (screenPosition && pinPoint != null) {
       const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
+
       const labelWidth = label?.clientWidth || 0;
       const labelHeight = label?.clientHeight || 0;
       const topPoint = {

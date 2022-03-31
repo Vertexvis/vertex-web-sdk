@@ -74,11 +74,12 @@
         const viewer = document.getElementById('viewer');
 
         viewer.addEventListener('tap', async (event) => {
-          console.log('tapping')
-          const pins = JSON.parse('[{"id":"e79dbc00-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":-176.32194103021436,"y":91.69547942548866,"z":43.755335300637626},"point":{"x":888.4389038085938,"y":417.74578857421875},"labelOffset":{"x":-0.8224178764498511,"y":-0.4240771439731188}},{"id":"ea085360-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":14.249818910313365,"y":65.36610139921402,"z":467.651927437439},"point":{"x":729.2849731445312,"y":639.7041015625},"labelOffset":{"x":-0.6808331344515547,"y":0.3731390480226924}}]');
+
+          const pinLabels = JSON.parse('[{"id":"e79dbc00-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":-176.32194103021436,"y":91.69547942548866,"z":43.755335300637626},"point":{"x":888.4389038085938,"y":417.74578857421875},"labelOffset":{"x":-0.8224178764498511,"y":-0.4240771439731188}},{"id":"ea085360-b04c-11ec-862d-17aeb1a94fac","worldPosition":{"x":14.249818910313365,"y":65.36610139921402,"z":467.651927437439},"point":{"x":729.2849731445312,"y":639.7041015625},"labelOffset":{"x":-0.6808331344515547,"y":0.3731390480226924}}]');
+          const pins = JSON.parse('[{"id":"df22fe70-b108-11ec-94a9-617191598d43","worldPosition":{"x":-125.9060455107907,"y":93.82305579624563,"z":47.20877822291584},"point":{"x":1393.288818359375,"y":581.3681640625}},{"id":"e0063280-b108-11ec-94a9-617191598d43","worldPosition":{"x":74.4138535079386,"y":94.51938028711606,"z":-60.167634827026404},"point":{"x":1614.5118408203125,"y":616.0751342773438}},{"id":"e4264210-b108-11ec-94a9-617191598d43","worldPosition":{"x":465.6719896945431,"y":85.26907791151507,"z":13.639119366177624},"point":{"x":1688.0672607421875,"y":631.1895751953125}}]');
           const pinsTool = document.getElementById('vertex-viewer-annotation-tool');
 
-          console.log('setting entities:', pinsTool);
+    
           // pinsTool.pinModel.setEntities(pins);
           
         });
@@ -101,19 +102,20 @@
         <vertex-viewer
           id="viewer"
           config-env="platdev"
-          depth-buffers="all"
+          camera-type="orthographic"
+          depth-buffers="final"
           feature-maps="final"
-          src="urn:vertexvis:stream-key:X7EfnwF0dYjgtt44m79T8nleoNjrZjnAanWM"
+          src="urn:vertexvis:stream-key:7UyseXYzS1MSsnbMLMnDlsjt1hoNfHZ2vZd_"
         >
         <!-- DLE0VxacKFrNiqj9cEKjmnrqGpBOYcwuNNgz -->
          
         
-          <vertex-viewer-annotations-tool
+          <vertex-viewer-pin-tool
             id="vertex-viewer-annotation-tool"
             config-env="platdev"
+            mode="edit"
           >
-        
-          </vertex-viewer-annotations-tool>
+          </vertex-viewer-pin-tool>
         
         <!-- <vertex-viewer-measurement-precise
             id="vertex-viewer-measurement-precise"

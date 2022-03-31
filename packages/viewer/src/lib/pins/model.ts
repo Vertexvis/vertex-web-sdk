@@ -1,6 +1,6 @@
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-import { PinEntity } from './entities';
+import { Pin, PinEntity } from './entities';
 
 /**
  * A model representing the state of pins.
@@ -78,7 +78,6 @@ export class PinModel {
     this.clearEntities();
     entities.forEach((e) => this.addEntity(e));
     this.entitiesChanged.emit(this.getEntities());
-    console.log('entitiesChanged: ', this.getEntities());
 
     return true;
   }
@@ -89,7 +88,7 @@ export class PinModel {
    * @param entities A set of entities to draw.
    * @returns `true` if the entity has been added.
    */
-  public setEntity(entity: PinEntity): boolean {
+  public setEntity(entity: Pin): boolean {
     this.entities = {
       ...this.entities,
       [entity.id]: entity,

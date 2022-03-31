@@ -1,7 +1,7 @@
 import {
   ViewerPinToolMode,
   ViewerPinToolType,
-} from '../../components/viewer-annotations-tool/viewer-annotations-tool';
+} from '../../components/viewer-pin-tool/viewer-pin-tool';
 import { PinEntity } from './entities';
 import { PinModel } from './model';
 
@@ -9,6 +9,7 @@ import { PinModel } from './model';
  * The `PinController` is responsible for adding pin entities to the viewer canvis
  */
 export class PinController {
+  private dragging?: boolean = false;
   public constructor(
     private model: PinModel,
     private mode: ViewerPinToolMode,
@@ -78,5 +79,13 @@ export class PinController {
 
   public setToolType(type: ViewerPinToolType): void {
     this.type = type;
+  }
+
+  public getDragging(): boolean {
+    return this.dragging || false;
+  }
+
+  public setDragging(dragging: boolean): void {
+    this.dragging = dragging;
   }
 }

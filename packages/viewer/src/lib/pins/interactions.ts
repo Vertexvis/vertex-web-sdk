@@ -92,7 +92,13 @@ export class PinsInteractionHandler implements InteractionHandler {
                 break;
               case 'pin-label':
                 this.controller.addEntity(
-                  new TextPinEntity(pinId, vector3, pt, relativePoint)
+                  new TextPinEntity(
+                    pinId,
+                    vector3,
+                    pt,
+                    relativePoint,
+                    'Untitled Pin'
+                  )
                 );
                 break;
             }

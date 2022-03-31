@@ -32,13 +32,20 @@
   transform: translate(-50%, -50%);
   display: block;
   background: var(--white);
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   box-sizing: border-box;
   border: 2px solid var(--black);
   background: var(--viewer-annotations-pin-dot-color);
   pointer-events: auto;
+  cursor: pointer;
+}
+
+.selected {
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--white);
 }
 
 .anchor-placeholder {
@@ -62,8 +69,4 @@
 .pin-selected {
   stroke-width: 1;
   stroke: var(--white);
-}
-
-.pin-group {
-  cursor: pointer
 }

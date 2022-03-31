@@ -8,16 +8,14 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { Viewport } from '../..';
 import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
 import { PinEntity } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
 import { PinModel } from '../../lib/pins/model';
-import { DepthBuffer } from '../../lib/types';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 /**
@@ -30,8 +28,8 @@ export type ViewerPinToolType = 'pin' | 'pin-label';
  */
 export type ViewerPinToolMode = 'edit' | 'view';
 @Component({
-  tag: 'vertex-viewer-annotations-tool',
-  styleUrl: 'viewer-annotations-tool.css',
+  tag: 'vertex-viewer-pin-tool',
+  styleUrl: 'viewer-pin-tool.css',
   shadow: true,
 })
 export class ViewerAnnotationsTool {
@@ -92,16 +90,12 @@ export class ViewerAnnotationsTool {
 
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
-  private onOverlaysChangedHandler?: Disposable;
-
-  private depthBuffer: DepthBuffer | undefined;
 
   /**
    * @ignore
    */
   @Watch('mode')
   protected watchModeChange(): void {
-    console.log('new interaction handler');
     this.pinController?.setToolMode(this.mode);
     this.setupInteractionHandler();
   }
@@ -111,7 +105,6 @@ export class ViewerAnnotationsTool {
    */
   @Watch('tool')
   protected watchTypeChange(): void {
-    console.log('new interaction handler');
     this.pinController?.setToolType(this.tool);
     this.setupInteractionHandler();
   }
@@ -186,14 +179,14 @@ export class ViewerAnnotationsTool {
             }
 
             return (
-              <vertex-viewer-annotations-pin-group
+              <vertex-viewer-pin-group
                 data-is-dom-group-element={true}
                 pin={pin}
                 dimensions={this.elementBounds}
                 pinModel={this.pinModel}
                 projectionViewMatrix={this.projectionViewMatrix}
                 selected={this.selectedPinId === pin.id}
-              ></vertex-viewer-annotations-pin-group>
+              ></vertex-viewer-pin-group>
             );
           })}
         </vertex-viewer-dom-renderer>
@@ -224,9 +217,6 @@ export class ViewerAnnotationsTool {
   private clearModelListeners(): void {
     this.onEntitiesChangedHandler?.dispose();
     this.onEntitiesChangedHandler = undefined;
-
-    this.onOverlaysChangedHandler?.dispose();
-    this.onOverlaysChangedHandler = undefined;
   }
 
   private updateViewport(): void {
