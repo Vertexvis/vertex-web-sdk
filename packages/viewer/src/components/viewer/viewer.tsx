@@ -53,7 +53,6 @@ import { paintTime, Timing } from '../../lib/meters';
 import {
   CanvasRenderer,
   createCanvasRenderer,
-  createHiddenCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import {
@@ -1029,13 +1028,6 @@ export class Viewer {
         this.getResolvedConfig().flags.logFrameRate,
         (timings) => this.reportPerformance(timings)
       );
-      this.resizeRenderer = measureCanvasRenderer(
-        paintTime,
-        createHiddenCanvasRenderer(),
-        this.getResolvedConfig().flags.logFrameRate,
-        (timings) => this.reportPerformance(timings)
-      );
-
       this.emitConnectionChange({
         status: 'connected',
         jwt: state.token.token,
@@ -1094,6 +1086,18 @@ export class Viewer {
             this.updateCanvasDimensions(canvasDimensions);
             this.isResizeUpdate = false;
           },
+          predicate: () => {
+            if (this.isResizeUpdate) {
+              return (
+                this.dimensions == null ||
+                Dimensions.isEqual(
+                  this.dimensions,
+                  data.frame.image.imageAttr.frameDimensions
+                )
+              );
+            }
+            return true;
+          },
         };
 
         this.frameReceived.emit(this.frame);
@@ -1102,9 +1106,7 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        const drawnFrame = this.isResizeUpdate
-          ? await this.resizeRenderer(data)
-          : await this.canvasRenderer(data);
+        const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
     }
