@@ -563,6 +563,12 @@ export class OrthographicCamera
     });
   }
 
+  public override signedDistanceToBoundingBoxCenter(
+    boundingBox?: BoundingBox.BoundingBox
+  ): number {
+    return BoundingSphere.create(boundingBox ?? this.boundingBox).radius;
+  }
+
   public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
     const boundingSphere = BoundingSphere.create(boundingBox);
 
