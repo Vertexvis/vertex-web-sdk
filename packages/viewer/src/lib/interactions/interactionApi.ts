@@ -532,7 +532,7 @@ export abstract class InteractionApi {
         position
       );
       const updatedLookAtY = Vector3.rotateAboutAxis(
-        Angle.toRadians(-degreesLocalY),
+        Angle.toRadians(degreesLocalY),
         updatedLookAtX,
         yVector,
         position

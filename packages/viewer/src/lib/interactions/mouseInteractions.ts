@@ -259,7 +259,7 @@ export class TwistInteraction extends MouseInteraction {
 }
 
 export class PivotInteraction extends MouseInteraction {
-  public type: InteractionType = 'rotate';
+  public type: InteractionType = 'pivot';
 
   public beginDrag(
     event: MouseEvent,
@@ -277,7 +277,7 @@ export class PivotInteraction extends MouseInteraction {
       const position = Point.create(event.screenX, event.screenY);
       const delta = Point.subtract(position, this.currentPosition);
 
-      api.pivotCamera(-0.25 * delta.y, -0.25 * delta.x);
+      api.pivotCamera(-0.25 * delta.y, 0.25 * delta.x);
       this.currentPosition = position;
     }
   }
