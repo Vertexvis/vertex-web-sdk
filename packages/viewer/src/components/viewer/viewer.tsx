@@ -81,6 +81,7 @@ import {
   Viewport,
 } from '../../lib/types';
 import { Frame } from '../../lib/types/frame';
+import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
   getElementBackgroundColor,
   getElementBoundingClientRect,
@@ -177,7 +178,8 @@ export class Viewer {
    * The type of camera model to represent the scene with. Can be either
    * `perspective` or `orthographic`, and defaults to `perspective`.
    */
-  @Prop() public cameraType: 'perspective' | 'orthographic' = 'perspective';
+  @Prop({ mutable: true, reflect: true }) public cameraType: FrameCameraType =
+    'perspective';
 
   /**
    * Enables or disables the default keyboard shortcut interactions provided by
@@ -355,6 +357,11 @@ export class Viewer {
    * Emits an event when the user hs finished an interaction.
    */
   @Event() public interactionFinished!: EventEmitter<void>;
+
+  /**
+   * Emits an event when the camera type changes.
+   */
+  @Event() public cameraTypeChanged!: EventEmitter<FrameCameraType>;
 
   /**
    * Used for internals or testing.
@@ -1245,16 +1252,21 @@ export class Viewer {
   }
 
   private updateInteractionApi(previousFrame?: Frame): void {
-    if (previousFrame != null && this.frame != null) {
+    if (this.frame != null) {
       const hasChangedFromPerspective =
-        previousFrame.scene.camera.isPerspective() &&
+        (previousFrame == null || previousFrame.scene.camera.isPerspective()) &&
         this.frame.scene.camera.isOrthographic();
       const hasChangedFromOrthographic =
-        previousFrame.scene.camera.isOrthographic() &&
+        (previousFrame == null ||
+          previousFrame.scene.camera.isOrthographic()) &&
         this.frame.scene.camera.isPerspective();
 
       if (hasChangedFromPerspective || hasChangedFromOrthographic) {
         this.interactionApi = this.createInteractionApi();
+        this.cameraType = this.frame.scene.camera.isPerspective()
+          ? 'perspective'
+          : 'orthographic';
+        this.cameraTypeChanged.emit(this.cameraType);
 
         this.interactionHandlers.forEach((handler) =>
           this.initializeInteractionHandler(handler)

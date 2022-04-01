@@ -24,6 +24,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
 import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
+import { FrameCameraType } from './lib/types/frameCamera';
 import {
   FeatureHighlightOptions,
   FeatureLineOptions,
@@ -361,7 +362,7 @@ export namespace Components {
     /**
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
      */
-    cameraType: 'perspective' | 'orthographic';
+    cameraType: FrameCameraType;
     /**
      * The Client ID associated with your Vertex Application.
      */
@@ -1634,7 +1635,7 @@ declare namespace LocalJSX {
     /**
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
      */
-    cameraType?: 'perspective' | 'orthographic';
+    cameraType?: FrameCameraType;
     /**
      * The Client ID associated with your Vertex Application.
      */
@@ -1682,6 +1683,10 @@ declare namespace LocalJSX {
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
     keyboardControls?: boolean;
+    /**
+     * Emits an event when the camera type changes.
+     */
+    onCameraTypeChanged?: (event: CustomEvent<FrameCameraType>) => void;
     /**
      * Emits an event when the connection status changes for the viewer
      */
