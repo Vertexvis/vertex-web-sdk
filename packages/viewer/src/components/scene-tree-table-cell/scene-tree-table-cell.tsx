@@ -6,7 +6,6 @@ import {
   h,
   Host,
   Prop,
-  State,
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import classNames from 'classnames';
@@ -121,9 +120,6 @@ export class SceneTreeTableCell {
 
   @Element()
   private hostEl!: HTMLElement;
-
-  @State()
-  private beginningPointerPosition = 0;
 
   public componentWillRender(): void {
     this.toggleAttribute(
