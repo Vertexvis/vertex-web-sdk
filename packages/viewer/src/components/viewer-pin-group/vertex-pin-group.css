@@ -31,10 +31,8 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   display: block;
-  background: var(--white);
   width: 9px;
   height: 9px;
-  border-radius: 50%;
   box-sizing: border-box;
   border: 2px solid var(--black);
   background: var(--viewer-annotations-pin-dot-color);
