@@ -1,3 +1,4 @@
+import { Point } from '@vertexvis/geometry';
 import { Disposable, UUID } from '@vertexvis/utils';
 
 import { translatePointToRelative } from '../../components/viewer-markup/utils';
@@ -5,6 +6,7 @@ import { Cursor, labelPinCursor, pinCursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
+import { EntityType } from '../types/entities';
 import { PinController } from './controller';
 import { DefaultPin, TextPin } from './entities';
 
@@ -16,6 +18,12 @@ export class PinsInteractionHandler implements InteractionHandler {
   private cursor?: Disposable;
 
   private rectObserver = new ElementRectObserver();
+
+  private droppableSurfaces: EntityType[] = [
+    EntityType.PRECISE_SURFACE,
+    EntityType.IMPRECISE_SURFACE,
+    EntityType.GENERIC_GEOMETRY,
+  ];
 
   private get elementRect(): DOMRect | undefined {
     return this.rectObserver.rect;
@@ -30,72 +38,110 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.api = api;
     this.rectObserver.observe(element);
 
-    this.setupEditMode();
+    // this.setupEditMode();
+    element.addEventListener('pointermove', this.handlePointerMove);
     element.addEventListener('pointerdown', this.handlePointerDown);
   }
 
   public dispose(): void {
     this.rectObserver.disconnect();
+    this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
     this.element = undefined;
     this.api = undefined;
   }
 
-  public setupEditMode(): void {
-    if (this.controller.getToolMode() === 'edit') {
-      switch (this.controller.getToolType()) {
-        case 'pin':
-          this.addCursor(pinCursor);
-          break;
-        case 'pin-label':
-          this.addCursor(labelPinCursor);
-          break;
-      }
+  private getCusorType(): Cursor {
+    switch (this.controller.getToolType()) {
+      case 'pin':
+        return pinCursor;
+      case 'pin-label':
+        return labelPinCursor;
     }
   }
 
-  private handlePointerDown = async (event: PointerEvent): Promise<void> => {
-    if (this.controller.getToolMode() === 'edit') {
-      this.ifInitialized(async ({ api }) => {
-        const pt = getMouseClientPosition(event);
-
-        const [hit] = await api.hitItems(pt);
-
-        if (hit?.hitPoint != null && this.elementRect != null) {
-          const vector3 = await api.getWorldPointFromViewport(pt);
-
-          const relativePoint = translatePointToRelative(
-            {
-              ...pt,
-            },
-            this.elementRect
-          );
-          if (vector3 != null) {
-            const pinId = UUID.create();
-
-            switch (this.controller.getToolType()) {
-              case 'pin':
-                this.controller.addEntity(new DefaultPin(pinId, vector3, pt));
-                break;
-              case 'pin-label':
-                this.controller.addEntity(
-                  new TextPin(pinId, vector3, pt, {
-                    labelPoint: relativePoint,
-                  })
-                );
-                break;
-            }
-          }
-        } else {
-          this.controller.setSelectedPinId();
-        }
-      });
+  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
+    if (await this.isDroppableSurface(event)) {
+      this.addCursor(this.getCusorType());
+    } else {
+      this.clearCursor();
     }
   };
 
+  private handlePointerDown = async (
+    pointerDown: PointerEvent
+  ): Promise<Disposable> => {
+    const pointerUp = (pointerUp: PointerEvent): void => {
+      const distnaceBetweenStartAndEndPoint = Point.distance(
+        Point.create(pointerDown.clientX, pointerUp.clientY),
+        Point.create(pointerUp.clientX, pointerUp.clientY)
+      );
+
+      if (distnaceBetweenStartAndEndPoint <= 2) {
+        if (this.controller.getToolMode() === 'edit') {
+          this.ifInitialized(async ({ api }) => {
+            const pt = getMouseClientPosition(pointerDown);
+
+            const [hit] = await api.hitItems(pt);
+
+            if (hit?.hitPoint != null && this.elementRect != null) {
+              const vector3 = await api.getWorldPointFromViewport(pt);
+
+              const relativePoint = translatePointToRelative(
+                {
+                  ...pt,
+                },
+                this.elementRect
+              );
+              if (vector3 != null) {
+                const pinId = UUID.create();
+
+                switch (this.controller.getToolType()) {
+                  case 'pin':
+                    this.controller.addEntity(
+                      new DefaultPin(pinId, vector3, pt)
+                    );
+                    break;
+                  case 'pin-label':
+                    this.controller.addEntity(
+                      new TextPin(pinId, vector3, pt, {
+                        labelPoint: relativePoint,
+                      })
+                    );
+                    break;
+                }
+              }
+            } else {
+              this.controller.setSelectedPinId();
+            }
+          });
+        }
+      }
+      dispose();
+    };
+
+    const dispose = (): void => {
+      window.removeEventListener('pointerup', pointerUp);
+    };
+
+    window.addEventListener('pointerup', pointerUp);
+
+    return {
+      dispose,
+    };
+  };
+
   private addCursor(cursor: Cursor): void {
+    this.clearCursor();
     this.cursor = this.ifInitialized(({ api }) => api.addCursor(cursor));
+  }
+
+  private async isDroppableSurface(event: PointerEvent): Promise<boolean> {
+    const pt = getMouseClientPosition(event, this.elementRect);
+    const type = await this.api?.getEntityTypeAtPoint(pt);
+
+    return type != null && this.droppableSurfaces.includes(type);
   }
 
   protected ifInitialized<R>(

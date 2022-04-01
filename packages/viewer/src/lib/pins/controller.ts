@@ -6,7 +6,7 @@ import { Pin } from './entities';
 import { PinModel } from './model';
 
 /**
- * The `PinController` is responsible for adding pin entities to the viewer canvis
+ * The `PinController` is responsible for adding pin entities to the viewer canvas
  */
 export class PinController {
   private dragging?: boolean = false;
@@ -17,7 +17,7 @@ export class PinController {
   ) {}
 
   /**
-   * Registers an entity to place on the canvis and places the pin on the associated part.
+   * Registers an entity to place on the canvas and places the pin on the associated part.
    *
    * @param entity The pin entity
    * @returns A void promise
