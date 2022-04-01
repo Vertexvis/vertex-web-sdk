@@ -18,7 +18,6 @@ import classNames from 'classnames';
 
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, TextPin } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
 import {
   translatePointToRelative,
   translatePointToScreen,
@@ -53,25 +52,19 @@ export class VertexPinLabel {
    * interaction.
    */
   @Prop({ mutable: true })
-  public value = '';
+  public value: string;
 
   /**
-   * The model that contains the entities and outcomes from performing pin operations
+   * The controller that drives behavior for pin operations
    */
   @Prop()
-  public pinModel: PinModel = new PinModel();
+  public pinController?: PinController;
 
   /**
    * @internal
    */
   @Event({ bubbles: true })
   public labelChanged!: EventEmitter<void>;
-
-  /**
-   * The model that contains the entities and outcomes from performing pin operations
-   */
-  @Prop()
-  public pinController?: PinController;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -80,6 +73,14 @@ export class VertexPinLabel {
   private focused = false;
 
   private inputEl?: HTMLInputElement;
+
+  public constructor() {
+    if (this.pin?.attributes?.labelText != null) {
+      this.value = this.pin.attributes.labelText;
+    } else {
+      this.value = '';
+    }
+  }
 
   /**
    * Gives focus to the the component's internal text input.
@@ -109,20 +110,16 @@ export class VertexPinLabel {
 
   protected componentDidRender(): void {
     if (this.focused && this.inputEl != null) {
-      this.inputEl.focus();
+      this.setFocus();
     }
   }
 
   protected render(): JSX.Element {
-    if (this.pin == null) {
-      throw new Error('Unable to render pin');
-    }
-
     const onUpdatePin = (updatedPin: TextPin): void => {
-      this.pinModel.setEntity(updatedPin);
+      this.pinController?.setEntity(updatedPin);
     };
     const pointerDownAndMove = (pointerDown: PointerEvent): Disposable => {
-      this.pinModel.setSelectedPin(this.pin?.id);
+      this.pinController?.setSelectedPinId(this.pin?.id);
 
       const pointerMove = (event: PointerEvent): void => {
         const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
@@ -149,12 +146,12 @@ export class VertexPinLabel {
       };
 
       const pointerUp = (pointerUp: PointerEvent): void => {
-        if (
-          Point.distance(
-            pointerDown,
-            Point.create(pointerUp.clientX, pointerUp.clientY)
-          ) <= 2
-        ) {
+        const distnaceBetweenStartAndEndPoint = Point.distance(
+          Point.create(pointerDown.clientX, pointerUp.clientY),
+          Point.create(pointerUp.clientX, pointerUp.clientY)
+        );
+
+        if (distnaceBetweenStartAndEndPoint <= 2) {
           this.focused = true;
         }
         dispose();
@@ -180,7 +177,7 @@ export class VertexPinLabel {
       <Host>
         {this.focused ? (
           <input
-            id={`pin-label-${this.pin.id}`}
+            id={`pin-label-${this.pin?.id}`}
             type="text"
             class={classNames('pin-label')}
             ref={(ref) => (this.inputEl = ref)}
@@ -202,7 +199,7 @@ export class VertexPinLabel {
           />
         ) : (
           <div
-            id={`pin-label-${this.pin.id}`}
+            id={`pin-label-${this.pin?.id}`}
             class={classNames('pin-label')}
             style={{
               top: `${screenPosition?.y.toString() || 0}px`,
@@ -210,7 +207,7 @@ export class VertexPinLabel {
             }}
             onPointerDown={pointerDownAndMove}
           >
-            {this.pin.attributes.labelText}
+            {this.pin?.attributes.labelText}
           </div>
         )}
       </Host>
@@ -228,7 +225,7 @@ export class VertexPinLabel {
   private submit(): void {
     this.focused = false;
     if (this.pin != null) {
-      this.pinModel.setEntity({
+      this.pinController?.setEntity({
         ...this.pin,
         attributes: {
           labelPoint: this.pin.attributes.labelPoint,

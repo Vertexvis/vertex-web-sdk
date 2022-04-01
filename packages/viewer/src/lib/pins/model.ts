@@ -48,6 +48,13 @@ export class PinModel {
     return Object.keys(this.entities).map((key) => this.entities[key]);
   }
 
+  /**
+   * Returns single entity by id if present in the model.
+   */
+  public getEntityById(id: string): Pin | undefined {
+    return this.entities[id];
+  }
+
   public getSelectedPinId(): string | undefined {
     return this.selectedPinId;
   }

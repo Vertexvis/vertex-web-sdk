@@ -1038,6 +1038,10 @@ export namespace Components {
          */
         "pin"?: Pin;
         /**
+          * The controller that drives behavior for pin operations
+         */
+        "pinController"?: PinController;
+        /**
           * The model that contains the entities and outcomes from performing pin operations
          */
         "pinModel": PinModel;
@@ -1060,17 +1064,13 @@ export namespace Components {
          */
         "pin"?: TextPin;
         /**
-          * The model that contains the entities and outcomes from performing pin operations
+          * The controller that drives behavior for pin operations
          */
         "pinController"?: PinController;
         /**
           * The dimensions of the the pin label
          */
         "pinLabelDimensions": Dimensions.Dimensions;
-        /**
-          * The model that contains the entities and outcomes from performing pin operations
-         */
-        "pinModel": PinModel;
         /**
           * Gives focus to the the component's internal text input.
          */
@@ -1083,21 +1083,9 @@ export namespace Components {
     interface VertexViewerPinLabelLine {
         "labelEl"?: HTMLVertexViewerPinLabelElement;
         "labelPoint": Point.Point | undefined;
-        /**
-          * The pin to draw for the group
-         */
-        "pin"?: Pin;
-        /**
-          * The dimensions of the the pin label
-         */
-        "pinLabelDimensions": Dimensions.Dimensions;
         "pinPoint": Point.Point | undefined;
     }
     interface VertexViewerPinTool {
-        /**
-          * An optional configuration to setup network configuration of measurement endpoints.
-         */
-        "config"?: Config;
         /**
           * The mode of the pin tool
          */
@@ -2346,6 +2334,10 @@ declare namespace LocalJSX {
          */
         "pin"?: Pin;
         /**
+          * The controller that drives behavior for pin operations
+         */
+        "pinController"?: PinController;
+        /**
           * The model that contains the entities and outcomes from performing pin operations
          */
         "pinModel"?: PinModel;
@@ -2369,17 +2361,13 @@ declare namespace LocalJSX {
          */
         "pin"?: TextPin;
         /**
-          * The model that contains the entities and outcomes from performing pin operations
+          * The controller that drives behavior for pin operations
          */
         "pinController"?: PinController;
         /**
           * The dimensions of the the pin label
          */
         "pinLabelDimensions"?: Dimensions.Dimensions;
-        /**
-          * The model that contains the entities and outcomes from performing pin operations
-         */
-        "pinModel"?: PinModel;
         /**
           * The current text value of the component. Value is updated on user interaction.
          */
@@ -2388,21 +2376,9 @@ declare namespace LocalJSX {
     interface VertexViewerPinLabelLine {
         "labelEl"?: HTMLVertexViewerPinLabelElement;
         "labelPoint"?: Point.Point | undefined;
-        /**
-          * The pin to draw for the group
-         */
-        "pin"?: Pin;
-        /**
-          * The dimensions of the the pin label
-         */
-        "pinLabelDimensions"?: Dimensions.Dimensions;
         "pinPoint"?: Point.Point | undefined;
     }
     interface VertexViewerPinTool {
-        /**
-          * An optional configuration to setup network configuration of measurement endpoints.
-         */
-        "config"?: Config;
         /**
           * The mode of the pin tool
          */

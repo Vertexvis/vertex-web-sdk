@@ -11,7 +11,6 @@ import {
 import { Matrix4 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { Config } from '../../lib/config';
 import { PinController } from '../../lib/pins/controller';
 import { Pin } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
@@ -32,7 +31,7 @@ export type ViewerPinToolMode = 'edit' | 'view';
   styleUrl: 'viewer-pin-tool.css',
   shadow: true,
 })
-export class ViewerAnnotationsTool {
+export class ViewerPinTool {
   /**
    * The controller that is responsible for drawing pins and updating the model
    */
@@ -57,13 +56,6 @@ export class ViewerAnnotationsTool {
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
-
-  /**
-   * An optional configuration to setup network configuration of measurement
-   * endpoints.
-   */
-  @Prop()
-  public config?: Config;
 
   /**
    * The type of pin.
@@ -155,16 +147,22 @@ export class ViewerAnnotationsTool {
     oldViewer?: HTMLVertexViewerElement
   ): void {
     this.setupInteractionHandler();
+
     if (oldViewer != null) {
-      oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
+      oldViewer.removeEventListener(
+        'frameDrawn',
+        this.handleSetProjectionMatrix
+      );
     }
 
     if (newViewer != null) {
-      newViewer.addEventListener('frameDrawn', this.handleFrameDrawn);
+      newViewer.addEventListener('frameDrawn', this.handleSetProjectionMatrix);
     }
+
+    this.handleSetProjectionMatrix();
   }
 
-  private handleFrameDrawn = (): void => {
+  private handleSetProjectionMatrix = (): void => {
     this.projectionViewMatrix =
       this.viewer?.frame?.scene.camera.projectionViewMatrix;
   };
@@ -173,17 +171,14 @@ export class ViewerAnnotationsTool {
     return (
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
-          {this.pins.map((pin, i) => {
-            if (this.elementBounds == null) {
-              throw new Error('Dimensions not present for pin renderer');
-            }
-
+          {this.pins.map((pin) => {
             return (
               <vertex-viewer-pin-group
                 data-is-dom-group-element={true}
                 pin={pin}
                 dimensions={this.elementBounds}
                 pinModel={this.pinModel}
+                pinController={this.pinController}
                 projectionViewMatrix={this.projectionViewMatrix}
                 selected={this.selectedPinId === pin.id}
               ></vertex-viewer-pin-group>

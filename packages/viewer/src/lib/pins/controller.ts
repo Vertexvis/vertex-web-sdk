@@ -28,14 +28,14 @@ export class PinController {
 
   /**
    * Clears all entities and returns a promise that resolves with an empty list
-   * of measurement results.
+   * of pin results.
    */
   public clearEntities(): void {
     this.model.clearEntities();
   }
 
   /**
-   * Deregisters an entity and performs a measurement if this entity was
+   * Deregisters an entity and performs a pin if this entity was
    * removed.
    *
    * @param entity The entity to remove.
@@ -47,14 +47,24 @@ export class PinController {
   }
 
   /**
-   * Registers a set of entities and performs a measurement
+   * Registers a set of entities and adds a pin
    *
-   * @param entities The entities to measure.
+   * @param entities The pin entities to draw.
    * @returns A promise that resolves with the results after registering these
    * entities.
    */
   public setEntities(entities: Set<Pin>): void {
     this.model.setEntities(entities);
+  }
+
+  /**
+   * Sets the set of entities to be placed with the model.
+   *
+   * @param entities A set of entities to draw.
+   * @returns `true` if the entity has been added.
+   */
+  public setEntity(entity: Pin): void {
+    this.model.setEntity(entity);
   }
 
   /**

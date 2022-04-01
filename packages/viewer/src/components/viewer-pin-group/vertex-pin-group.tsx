@@ -1,6 +1,5 @@
 import {
   Component,
-  Element,
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
@@ -11,9 +10,11 @@ import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
 import { Viewport } from '../..';
+import { PinController } from '../../lib/pins/controller';
 import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
+import { getClosestCenterToPoint } from './utils';
 
 interface ComputedPoints {
   pinPoint: Point.Point;
@@ -25,9 +26,6 @@ interface ComputedPoints {
   shadow: false,
 })
 export class ViewerPinGroup {
-  @Element()
-  private hostEl!: HTMLElement;
-
   /**
    * The pin to draw for the group
    */
@@ -57,6 +55,12 @@ export class ViewerPinGroup {
    */
   @Prop()
   public pinModel: PinModel = new PinModel();
+
+  /**
+   * The controller that drives behavior for pin operations
+   */
+  @Prop()
+  public pinController?: PinController;
 
   /**
    * Whether or not the pin is "selected"
@@ -93,7 +97,7 @@ export class ViewerPinGroup {
           onPointerDown={(e) => {
             e.stopPropagation();
 
-            this.pinModel.setSelectedPin(this.pin?.id);
+            this.pinController?.setSelectedPinId(this.pin?.id);
           }}
         >
           {isTextPin(this.pin) && (
@@ -117,7 +121,7 @@ export class ViewerPinGroup {
         {isTextPin(this.pin) && (
           <Fragment>
             <vertex-viewer-pin-label-line
-              pin={this.pin}
+              id={`pin-label-line-${this.pin?.id}`}
               pinPoint={pinPoint}
               labelPoint={labelPoint}
             ></vertex-viewer-pin-label-line>
@@ -128,7 +132,7 @@ export class ViewerPinGroup {
                 this.labelEl = el;
               }}
               dimensions={this.dimensions}
-              pinModel={this.pinModel}
+              pinController={this.pinController}
             ></vertex-viewer-pin-label>
           </Fragment>
         )}
@@ -171,37 +175,13 @@ export class ViewerPinGroup {
 
       const labelWidth = label?.clientWidth || 0;
       const labelHeight = label?.clientHeight || 0;
-      const topPoint = {
-        x: screenPosition.x + labelWidth / 2,
-        y: screenPosition.y,
-      };
-
-      const bottomPoint = {
-        x: screenPosition.x + labelWidth / 2,
-        y: screenPosition.y + labelHeight,
-      };
-
-      const rightPoint = {
-        x: screenPosition.x + labelWidth,
-        y: screenPosition.y + labelHeight / 2,
-      };
-
-      const leftPoint = {
-        x: screenPosition.x,
-        y: screenPosition.y + labelHeight / 2,
-      };
-
-      const candidates = [topPoint, bottomPoint, leftPoint, rightPoint];
-
-      const distances = candidates.map((candidate) =>
-        Point.distance(candidate, pinPoint)
-      );
-
-      const candidateIndex = distances.indexOf(Math.min(...distances));
 
       return {
         pinPoint,
-        labelPoint: candidates[candidateIndex],
+        labelPoint: getClosestCenterToPoint(screenPosition, pinPoint, {
+          width: labelWidth,
+          height: labelHeight,
+        }),
       };
     }
 
