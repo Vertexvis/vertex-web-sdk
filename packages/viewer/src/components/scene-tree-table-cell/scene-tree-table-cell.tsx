@@ -56,6 +56,12 @@ export class SceneTreeTableCell {
   public hoveredNodeId?: string;
 
   /**
+   * @internal
+   */
+  @Prop()
+  public isScrolling?: boolean;
+
+  /**
    * Indicates whether to display a button for toggling the expanded state of
    * the node associated with this cell.
    */
@@ -143,7 +149,7 @@ export class SceneTreeTableCell {
         onPointerLeave={() => {
           this.hovered.emit(undefined);
         }}
-        onPointerDown={this.handleCellPointerDown}
+        onPointerUp={this.handleCellPointerUp}
       >
         <div class="wrapper">
           <div class="no-shrink">
@@ -153,7 +159,7 @@ export class SceneTreeTableCell {
             <button
               class="expand-btn no-shrink"
               data-test-id={'expand-' + this.node?.name}
-              onPointerDown={(event) => {
+              onPointerUp={(event) => {
                 event.preventDefault();
                 this.toggleExpansion(event);
               }}
@@ -181,17 +187,13 @@ export class SceneTreeTableCell {
             <button
               class="visibility-btn no-shrink"
               data-test-id={'visibility-btn-' + this.node?.name}
-              onPointerDown={(event) => {
+              onPointerUp={(event) => {
                 event?.preventDefault();
                 this.toggleVisibility(event);
               }}
             >
               <div
                 class={classNames('icon', {
-                  'icon-blank':
-                    this.hoveredNodeId !== this.node?.id?.hex &&
-                    !this.node?.partiallyVisible &&
-                    this.node?.visible,
                   'icon-visible':
                     this.hoveredNodeId === this.node?.id?.hex &&
                     !this.node?.partiallyVisible &&
@@ -221,28 +223,12 @@ export class SceneTreeTableCell {
     return resp;
   };
 
-  private handleCellPointerDown = (event: PointerEvent): void => {
-    if (
-      !event.defaultPrevented &&
-      event.button === 0 &&
-      !this.interactionsDisabled
-    ) {
-      this.beginningPointerPosition = event.clientY;
-      window.addEventListener('pointerup', this.handleCellPointerUp);
-    }
-  };
-
   private handleCellPointerUp = (event: PointerEvent): void => {
-    // Only select the item if the user isn't scrolling the scene tree
-    const verticalPointerChange = Math.abs(
-      this.beginningPointerPosition - event.clientY
-    );
-
     if (
       !event.defaultPrevented &&
       event.button === 0 &&
       !this.interactionsDisabled &&
-      verticalPointerChange < 15
+      !this.isScrolling
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
@@ -258,8 +244,6 @@ export class SceneTreeTableCell {
       }
       this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
-
-    window.removeEventListener('pointerup', this.handleCellPointerUp);
   };
 
   private toggleExpansion = (event: PointerEvent): void => {

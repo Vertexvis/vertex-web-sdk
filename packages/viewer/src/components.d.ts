@@ -265,6 +265,7 @@ export namespace Components {
      * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
      */
     interactionsDisabled: boolean;
+    isScrolling?: boolean;
     /**
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
@@ -1536,6 +1537,7 @@ declare namespace LocalJSX {
      * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
      */
     interactionsDisabled?: boolean;
+    isScrolling?: boolean;
     /**
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
