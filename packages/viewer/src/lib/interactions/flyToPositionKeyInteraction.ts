@@ -3,6 +3,7 @@ import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 
 import { ConfigProvider } from '../config';
 import { ImageScaleProvider, Scene } from '../scenes';
+import { FrameCamera } from '../types';
 import { KeyInteraction } from './keyInteraction';
 import { TapEventDetails } from './tapEventDetails';
 
@@ -46,15 +47,17 @@ export class FlyToPositionKeyInteraction
         hit.hitPoint.z != null
       ) {
         await this.stream.flyTo({
-          camera: camera
-            .update({
-              lookAt: Vector3.create(
-                hit.hitPoint.x,
-                hit.hitPoint.y,
-                hit.hitPoint.z
-              ),
-            })
-            .toFrameCamera(),
+          camera: FrameCamera.toProtobuf(
+            camera
+              .update({
+                lookAt: Vector3.create(
+                  hit.hitPoint.x,
+                  hit.hitPoint.y,
+                  hit.hitPoint.z
+                ),
+              })
+              .toFrameCamera()
+          ),
           animation: {
             duration: toProtoDuration(
               this.configProvider().animation.durationMs
