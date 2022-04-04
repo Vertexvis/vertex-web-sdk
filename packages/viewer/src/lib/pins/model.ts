@@ -19,7 +19,7 @@ export class PinModel {
    * @param entity A pin entity to draw.
    * @returns `true` if the entity has been added.
    */
-  public addEntity(entity: Pin): boolean {
+  public addEntity(entity: Pin, surpressEvent = false): boolean {
     if (this.entities[entity.id] == null) {
       this.entities = {
         ...this.entities,
@@ -27,7 +27,10 @@ export class PinModel {
       };
 
       this.setSelectedPin(entity.id);
-      this.entitiesChanged.emit(this.getEntities());
+
+      if (!surpressEvent) {
+        this.entitiesChanged.emit(this.getEntities());
+      }
       return true;
     } else {
       return false;
@@ -83,7 +86,7 @@ export class PinModel {
    */
   public setEntities(entities: Set<Pin>): boolean {
     this.clearEntities();
-    entities.forEach((e) => this.addEntity(e));
+    entities.forEach((e) => this.addEntity(e, true));
     this.entitiesChanged.emit(this.getEntities());
 
     return true;
