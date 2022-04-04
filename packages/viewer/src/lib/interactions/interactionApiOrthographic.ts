@@ -51,6 +51,28 @@ export class InteractionApiOrthographic extends InteractionApi {
   }
 
   /**
+   * Returns a 3D point in world space for the given 2D point in viewport space.
+   *
+   * @param point A point in 2D viewport space to transform.
+   * @returns A 3D point in world space.
+   */
+  public async getWorldPointFromViewport(
+    point: Point.Point
+  ): Promise<Vector3.Vector3 | undefined> {
+    const viewport = this.getViewport();
+    const frame = this.getFrame();
+
+    if (frame == null) {
+      throw new Error('Cannot get world point. Frame is undefined.');
+    }
+
+    const depthBuffer = await frame.depthBuffer();
+    return depthBuffer != null
+      ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer, 0.5)
+      : undefined;
+  }
+
+  /**
    * Performs a pan operation of the scene's camera, and requests a new image
    * for the updated scene.
    *
