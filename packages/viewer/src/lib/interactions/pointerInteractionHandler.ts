@@ -5,6 +5,7 @@ import { BaseInteractionHandler } from './baseInteractionHandler';
 import { InteractionApi } from './interactionApi';
 import {
   PanInteraction,
+  PivotInteraction,
   RotateInteraction,
   RotatePointInteraction,
   TwistInteraction,
@@ -24,6 +25,7 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
       new ZoomInteraction(),
       new PanInteraction(),
       new TwistInteraction(),
+      new PivotInteraction(),
       getConfig
     );
     this.touchPoints = new Set();

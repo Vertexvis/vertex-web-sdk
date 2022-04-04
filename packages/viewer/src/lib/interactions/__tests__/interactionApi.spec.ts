@@ -1,7 +1,7 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { makePerspectiveFrame } from '../../../testing/fixtures';
@@ -175,7 +175,37 @@ describe(InteractionApi, () => {
     });
 
     it('does nothing if not interacting', async () => {
-      await api.zoomCamera(1);
+      await api.twistCamera(1);
+      expect(streamApi.replaceCamera).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(InteractionApi.prototype.pivotCamera, () => {
+    it('replaces the camera if interacting', async () => {
+      await api.beginInteraction();
+      await api.pivotCamera(1, 0);
+      await api.endInteraction();
+
+      const expectedLookAt = Vector3.rotateAboutAxis(
+        Angle.toRadians(1),
+        frame.scene.camera.lookAt,
+        Vector3.left(),
+        frame.scene.camera.position
+      );
+
+      expect(streamApi.replaceCamera).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            perspective: expect.objectContaining({
+              lookAt: expect.objectContaining(expectedLookAt),
+            }),
+          }),
+        })
+      );
+    });
+
+    it('does nothing if not interacting', async () => {
+      await api.pivotCamera(10, 10);
       expect(streamApi.replaceCamera).not.toHaveBeenCalled();
     });
   });

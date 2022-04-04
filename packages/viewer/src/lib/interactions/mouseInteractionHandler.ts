@@ -2,6 +2,7 @@ import { ConfigProvider } from '../config';
 import { BaseInteractionHandler } from './baseInteractionHandler';
 import {
   PanInteraction,
+  PivotInteraction,
   RotateInteraction,
   RotatePointInteraction,
   TwistInteraction,
@@ -15,7 +16,8 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
     rotatePointInteraction = new RotatePointInteraction(),
     zoomInteraction = new ZoomInteraction(),
     panInteraction = new PanInteraction(),
-    twistInteraction = new TwistInteraction()
+    twistInteraction = new TwistInteraction(),
+    pivotInteraction = new PivotInteraction()
   ) {
     super(
       'mousedown',
@@ -26,6 +28,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       zoomInteraction,
       panInteraction,
       twistInteraction,
+      pivotInteraction,
       getConfig
     );
   }
