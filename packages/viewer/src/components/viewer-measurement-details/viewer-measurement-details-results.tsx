@@ -30,7 +30,7 @@ export const MinimumDistanceResultEntry: FunctionalComponent<
   return (
     <Fragment>
       <MeasurementDetailsEntry
-        label="Min Dist"
+        label="Dist"
         onMouseEnter={() => onShowOverlay(overlays?.addLineFromResult(result))}
         onMouseLeave={onHideOverlay}
       >

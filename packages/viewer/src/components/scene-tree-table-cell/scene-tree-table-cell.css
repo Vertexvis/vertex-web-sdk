@@ -82,15 +82,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  visibility: hidden;
   width: 24px;
   height: 24px;
-}
-
-:host([is-hidden]) .visibility-btn,
-:host([is-partial]) .visibility-btn,
-:host([is-hovered]) .visibility-btn {
-  visibility: inherit;
 }
 
 .icon {

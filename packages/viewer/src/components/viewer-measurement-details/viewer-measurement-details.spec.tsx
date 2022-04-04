@@ -41,7 +41,7 @@ describe('vertex-viewer-measurement-details', () => {
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries[0].innerText).toMatch('Parallel Dist:1.00 mm');
-    expect(entries[1].innerText).toContain('Min Dist:2.00 mm');
+    expect(entries[1].innerText).toContain('Dist:2.00 mm');
   });
 
   it('displays minimum distance', async () => {
@@ -210,7 +210,7 @@ describe('vertex-viewer-measurement-details', () => {
     const entries = comp.shadowRoot?.querySelectorAll(
       'div.measurement-details-entry'
     ) as NodeListOf<HTMLDivElement>;
-    expect(entries[0].innerText).toContain('Min Dist:10.00 mm');
+    expect(entries[0].innerText).toContain('Dist:10.00 mm');
 
     comp.resultTypes = ['planar-angle'];
     await page.waitForChanges();

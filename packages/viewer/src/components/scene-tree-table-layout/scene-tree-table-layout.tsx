@@ -189,6 +189,12 @@ export class SceneTreeTableLayout {
   @State()
   private resizingColumnIndex?: number;
 
+  @State()
+  private isScrolling = false;
+
+  @State()
+  private scrollTimer: number | undefined;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -414,6 +420,7 @@ export class SceneTreeTableLayout {
     (cell as any).tree = this.tree;
     (cell as any).node = row.node;
     (cell as any).hoveredNodeId = this.hoveredNodeId;
+    (cell as any).isScrolling = this.isScrolling;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);
@@ -837,6 +844,13 @@ export class SceneTreeTableLayout {
   };
 
   private handleScrollChanged = (event: Event): void => {
+    this.isScrolling = true;
+
+    window.clearTimeout(this.scrollTimer);
+    window.setTimeout(() => {
+      this.isScrolling = false;
+    }, 200);
+
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
     this.computeAndUpdateViewportRows();
   };
