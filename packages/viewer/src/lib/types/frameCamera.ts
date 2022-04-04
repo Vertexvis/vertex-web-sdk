@@ -1,5 +1,12 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Angle, BoundingBox, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  BoundingBox,
+  BoundingSphere,
+  Vector3,
+} from '@vertexvis/geometry';
+
+export type FrameCameraType = 'perspective' | 'orthographic';
 
 export interface PerspectiveFrameCamera {
   position: Vector3.Vector3;
@@ -77,13 +84,8 @@ export function toOrthographic(
   boundingBox: BoundingBox.BoundingBox
 ): OrthographicFrameCamera {
   const viewVector = Vector3.subtract(data.lookAt, data.position);
-  const boundingBoxCenter = BoundingBox.center(boundingBox);
-  const centerToBoundingPlane = Vector3.subtract(
-    boundingBox.max,
-    boundingBoxCenter
-  );
-  const radius = Vector3.magnitude(centerToBoundingPlane);
-  const scale = radius / Vector3.magnitude(viewVector);
+  const boundingSphere = BoundingSphere.create(boundingBox);
+  const scale = boundingSphere.radius / Vector3.magnitude(viewVector);
 
   return {
     viewVector: Vector3.scale(scale, viewVector),
