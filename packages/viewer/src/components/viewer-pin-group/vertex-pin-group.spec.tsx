@@ -32,7 +32,7 @@ describe('vertex-view-pin-group', () => {
         <vertex-viewer-pin-group
           data-is-dom-group-element={true}
           pin={pin}
-          dimensions={dimensions}
+          elementBounds={dimensions as DOMRect}
           pinModel={pinModel}
           projectionViewMatrix={viewMatrix}
           selected={false}
@@ -83,7 +83,7 @@ describe('vertex-view-pin-group', () => {
         <vertex-viewer-pin-group
           data-is-dom-group-element={true}
           pin={pin}
-          dimensions={dimensions}
+          elementBounds={dimensions as DOMRect}
           pinModel={pinModel}
           projectionViewMatrix={viewMatrix}
           selected={false}

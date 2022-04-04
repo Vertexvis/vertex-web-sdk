@@ -8,7 +8,7 @@ import { TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { VertexPinLabel } from './vertex-pin-label';
 describe('vertex-viewer-pin-label', () => {
-  it('should render a label for a pin and support draging the label', async () => {
+  it('should render a label for a pin and support dragging the label', async () => {
     const hitPoint = Point.create(100, 0);
 
     const worldPosition = Vector3.create();
@@ -28,7 +28,7 @@ describe('vertex-viewer-pin-label', () => {
       components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
-          dimensions={dimensions}
+          elementBounds={dimensions as DOMRect}
           pin={pin}
           pinController={pinController}
         />
@@ -90,7 +90,7 @@ describe('vertex-viewer-pin-label', () => {
       components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
-          dimensions={dimensions}
+          elementBounds={dimensions as DOMRect}
           pin={pin}
           pinController={pinController}
         />
@@ -174,7 +174,7 @@ describe('vertex-viewer-pin-label', () => {
       components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
-          dimensions={dimensions}
+          elementBounds={dimensions as DOMRect}
           pin={pin}
           pinController={pinController}
         />
