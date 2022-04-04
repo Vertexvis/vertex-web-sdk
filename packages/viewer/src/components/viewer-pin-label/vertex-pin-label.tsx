@@ -73,6 +73,9 @@ export class VertexPinLabel {
   @State()
   private focused = false;
 
+  @State()
+  private computedScreenPosition?: Point.Point;
+
   private inputEl?: HTMLInputElement;
 
   private resizeObserver?: ResizeObserver;
@@ -101,6 +104,16 @@ export class VertexPinLabel {
     this.labelChanged.emit();
   }
 
+  @Watch('pin')
+  protected watchPinChange(): void {
+    this.computeScreenPosition();
+  }
+
+  @Watch('elementBounds')
+  protected watchElementBoundsChange(): void {
+    this.computeScreenPosition();
+  }
+
   protected componentDidLoad(): void {
     this.resizeObserver = new ResizeObserver(() => {
       this.labelChanged.emit();
@@ -127,15 +140,7 @@ export class VertexPinLabel {
 
   protected render(): JSX.Element {
     const screenPosition =
-      isTextPin(this.pin) &&
-      this.elementBounds != null &&
-      this.pin.attributes.labelPoint != null
-        ? translatePointToScreen(
-            this.pin.attributes.labelPoint,
-            this.elementBounds
-          )
-        : undefined;
-
+      this.computedScreenPosition || this.computeScreenPosition();
     return (
       <Host>
         {this.focused ? (
@@ -175,6 +180,19 @@ export class VertexPinLabel {
         )}
       </Host>
     );
+  }
+
+  private computeScreenPosition(): Point.Point | undefined {
+    this.computedScreenPosition =
+      isTextPin(this.pin) &&
+      this.elementBounds != null &&
+      this.pin.attributes.labelPoint != null
+        ? translatePointToScreen(
+            this.pin.attributes.labelPoint,
+            this.elementBounds
+          )
+        : undefined;
+    return this.computedScreenPosition;
   }
 
   private pointerDownAndMove(pointerDown: PointerEvent): Disposable {
