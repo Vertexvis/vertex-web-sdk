@@ -11,7 +11,6 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
@@ -19,6 +18,7 @@ import classNames from 'classnames';
 import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, TextPin } from '../../lib/pins/entities';
+import { PinModel } from '../../lib/pins/model';
 import {
   translatePointToRelative,
   translatePointToScreen,
@@ -75,6 +75,8 @@ export class VertexPinLabel {
 
   private inputEl?: HTMLInputElement;
 
+  private resizeObserver?: ResizeObserver;
+
   public constructor() {
     if (this.pin?.attributes?.labelText != null) {
       this.value = this.pin.attributes.labelText;
@@ -100,13 +102,21 @@ export class VertexPinLabel {
   }
 
   protected componentDidLoad(): void {
-    const resize = new ResizeObserver(() => {
+    this.resizeObserver = new ResizeObserver(() => {
       this.labelChanged.emit();
     });
 
     if (this.hostEl != null) {
-      resize.observe(this.hostEl);
+      this.resizeObserver.observe(this.hostEl);
     }
+
+    if (this.pinController == null) {
+      this.pinController = new PinController(new PinModel());
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    this.resizeObserver?.disconnect();
   }
 
   protected componentDidRender(): void {
@@ -116,53 +126,6 @@ export class VertexPinLabel {
   }
 
   protected render(): JSX.Element {
-    const onUpdatePin = (updatedPin: TextPin): void => {
-      this.pinController?.setEntity(updatedPin);
-    };
-    const pointerDownAndMove = (pointerDown: PointerEvent): Disposable => {
-      this.pinController?.setSelectedPinId(this.pin?.id);
-
-      const pointerMove = (event: PointerEvent): void => {
-        if (this.elementBounds != null) {
-          const point = getMouseClientPosition(event, this.elementBounds);
-          const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
-            ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
-                labelPoint: translatePointToRelative(point, this.elementBounds),
-                labelText: this.pin.attributes.labelText,
-              })
-            : undefined;
-
-          if (myUpdatedPin) {
-            onUpdatePin(myUpdatedPin);
-          }
-        }
-      };
-
-      const dispose = (): void => {
-        window.removeEventListener('pointermove', pointerMove);
-        window.removeEventListener('pointerup', pointerUp);
-      };
-
-      const pointerUp = (pointerUp: PointerEvent): void => {
-        const distnaceBetweenStartAndEndPoint = Point.distance(
-          Point.create(pointerDown.clientX, pointerUp.clientY),
-          Point.create(pointerUp.clientX, pointerUp.clientY)
-        );
-
-        if (distnaceBetweenStartAndEndPoint <= 2) {
-          this.focused = true;
-        }
-        dispose();
-      };
-
-      window.addEventListener('pointermove', pointerMove);
-      window.addEventListener('pointerup', pointerUp);
-
-      return {
-        dispose,
-      };
-    };
-
     const screenPosition =
       isTextPin(this.pin) &&
       this.elementBounds != null &&
@@ -205,13 +168,57 @@ export class VertexPinLabel {
               top: `${screenPosition?.y.toString() || 0}px`,
               left: `${screenPosition?.x.toString() || 0}px`,
             }}
-            onPointerDown={pointerDownAndMove}
+            onPointerDown={(e) => this.pointerDownAndMove(e)}
           >
             {this.pin?.attributes.labelText}
           </div>
         )}
       </Host>
     );
+  }
+
+  private pointerDownAndMove(pointerDown: PointerEvent): Disposable {
+    this.pinController?.setSelectedPinId(this.pin?.id);
+
+    const pointerMove = (event: PointerEvent): void => {
+      if (this.elementBounds != null) {
+        const point = getMouseClientPosition(event, this.elementBounds);
+        const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
+          ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
+              labelPoint: translatePointToRelative(point, this.elementBounds),
+              labelText: this.pin.attributes.labelText,
+            })
+          : undefined;
+
+        if (myUpdatedPin) {
+          this.pinController?.setEntity(myUpdatedPin);
+        }
+      }
+    };
+
+    const dispose = (): void => {
+      window.removeEventListener('pointermove', pointerMove);
+      window.removeEventListener('pointerup', pointerUp);
+    };
+
+    const pointerUp = (pointerUp: PointerEvent): void => {
+      const distnaceBetweenStartAndEndPoint = Point.distance(
+        Point.create(pointerDown.clientX, pointerUp.clientY),
+        Point.create(pointerUp.clientX, pointerUp.clientY)
+      );
+
+      if (distnaceBetweenStartAndEndPoint <= 2) {
+        this.focused = true;
+      }
+      dispose();
+    };
+
+    window.addEventListener('pointermove', pointerMove);
+    window.addEventListener('pointerup', pointerUp);
+
+    return {
+      dispose,
+    };
   }
 
   private handleTextFocus = (): void => {

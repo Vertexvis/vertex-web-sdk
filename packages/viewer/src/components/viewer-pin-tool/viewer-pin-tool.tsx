@@ -83,6 +83,8 @@ export class ViewerPinTool {
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
 
+  private resizeObserver?: ResizeObserver;
+
   /**
    * @ignore
    */
@@ -126,8 +128,8 @@ export class ViewerPinTool {
   }
 
   protected componentDidLoad(): void {
-    const resize = new ResizeObserver(() => this.updateViewport());
-    resize.observe(this.hostEl);
+    this.resizeObserver = new ResizeObserver(() => this.updateViewport());
+    this.resizeObserver.observe(this.hostEl);
   }
 
   /**
@@ -212,6 +214,7 @@ export class ViewerPinTool {
   private clearModelListeners(): void {
     this.onEntitiesChangedHandler?.dispose();
     this.onEntitiesChangedHandler = undefined;
+    this.resizeObserver?.disconnect();
   }
 
   private updateViewport(): void {

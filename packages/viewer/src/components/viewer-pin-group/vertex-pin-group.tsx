@@ -11,7 +11,7 @@ import classNames from 'classnames';
 
 import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
-import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/entities';
+import { isDefaultPin, isTextPin, Pin, TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 import { getClosestCenterToPoint } from './utils';
@@ -73,15 +73,26 @@ export class ViewerPinGroup {
 
   private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
+  private resizeObserver?: ResizeObserver;
+
   protected componentDidLoad(): void {
     this.setLabelObserver();
+
+    if (this.pinController == null) {
+      this.pinController = new PinController(this.pinModel);
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    this.labelEl?.removeEventListener('labelChanged', this.invalidateState);
+    this.resizeObserver?.disconnect();
   }
 
   protected render(): JSX.Element {
     if (this.pin == null) {
       throw new Error('Unable to draw pin');
     }
-    const computed = this.computeLabelLinePoint(this.pin);
+    const computed = this.computePinPoints(this.pin);
 
     const { pinPoint, labelPoint } = computed;
 
@@ -91,7 +102,6 @@ export class ViewerPinGroup {
         data-testid={`pin-group-${this.pin.id}`}
       >
         <vertex-viewer-dom-element
-          key={`drawn-pin-${this.pin.id}`}
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
           onPointerDown={(e) => {
@@ -145,54 +155,64 @@ export class ViewerPinGroup {
   }
 
   private setLabelObserver(): void {
-    const label = this.labelEl?.addEventListener('labelChanged', () => {
-      this.invalidateState();
-    });
+    const label = this.labelEl?.addEventListener(
+      'labelChanged',
+      this.invalidateState
+    );
 
     if (label != null) {
-      const resize = new ResizeObserver(() => this.invalidateState());
+      this.resizeObserver = new ResizeObserver(() => this.invalidateState());
 
-      resize.observe(label);
+      this.resizeObserver.observe(label);
     }
   }
 
-  private computeLabelLinePoint(pin: Pin): ComputedPoints {
-    if (this.elementBounds != null) {
-      const pinPoint = this.getFromWorldPosition(
-        pin.worldPosition,
-        this.projectionViewMatrix,
-        this.elementBounds
-      );
-      const screenPosition =
-        isTextPin(this.pin) && this.pin.attributes.labelPoint != null
-          ? translatePointToScreen(
-              this.pin.attributes.labelPoint,
-              this.elementBounds
-            )
-          : undefined;
-
-      if (screenPosition && pinPoint != null) {
-        const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
-
-        const labelWidth = label?.clientWidth || 0;
-        const labelHeight = label?.clientHeight || 0;
-
-        return {
-          pinPoint,
-          labelPoint: getClosestCenterToPoint(screenPosition, pinPoint, {
-            width: labelWidth,
-            height: labelHeight,
-          }),
-        };
-      }
-
-      return {
-        pinPoint,
-      };
+  private computePinPoints(pin: Pin): ComputedPoints {
+    if (this.elementBounds != null && this.pin != null) {
+      return isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+        ? this.computeTextPinPoints(this.pin, this.elementBounds)
+        : this.computeDefaultPinPoints(this.pin, this.elementBounds);
     }
-
     return {
       pinPoint: pin.worldPosition,
+    };
+  }
+
+  private computeDefaultPinPoints(
+    pin: Pin,
+    elementBounds: DOMRect
+  ): ComputedPoints {
+    return {
+      pinPoint: this.getFromWorldPosition(
+        pin.worldPosition,
+        this.projectionViewMatrix,
+        elementBounds
+      ),
+    };
+  }
+
+  private computeTextPinPoints(
+    pin: TextPin,
+    elementBounds: DOMRect
+  ): ComputedPoints {
+    const { pinPoint } = this.computeDefaultPinPoints(pin, elementBounds);
+
+    const screenPosition = translatePointToScreen(
+      pin.attributes.labelPoint,
+      elementBounds
+    );
+
+    const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
+
+    const labelWidth = label?.clientWidth || 0;
+    const labelHeight = label?.clientHeight || 0;
+
+    return {
+      pinPoint,
+      labelPoint: getClosestCenterToPoint(screenPosition, pinPoint, {
+        width: labelWidth,
+        height: labelHeight,
+      }),
     };
   }
 

@@ -1,17 +1,4 @@
 :host {
-  /**
-   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
-   * specifies the color of the label line
-   */
-   --viewer-annotations-pin-dot-color: var(--blue-600);
-
-     /**
-   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
-   * specifies the color of the label line
-   */
-   --viewer-annotations-pin-dot-border-color: var(--white);
-
-  font-size: 0.75rem;
   position: absolute;
   top: 0;
   bottom: 0;

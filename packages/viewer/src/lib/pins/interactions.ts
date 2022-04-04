@@ -144,12 +144,12 @@ export class PinsInteractionHandler implements InteractionHandler {
     pointerDown: PointerEvent
   ): Promise<Disposable> => {
     const pointerUp = (pointerUp: PointerEvent): void => {
-      const distnaceBetweenStartAndEndPoint = Point.distance(
+      const distanceBetweenStartAndEndPoint = Point.distance(
         Point.create(pointerDown.clientX, pointerUp.clientY),
         Point.create(pointerUp.clientX, pointerUp.clientY)
       );
 
-      if (distnaceBetweenStartAndEndPoint <= 2) {
+      if (distanceBetweenStartAndEndPoint <= 2) {
         if (this.controller.getToolMode() === 'edit') {
           const pt = getMouseClientPosition(pointerDown, this.elementRect);
 

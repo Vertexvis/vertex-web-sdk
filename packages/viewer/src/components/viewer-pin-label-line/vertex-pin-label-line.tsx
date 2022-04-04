@@ -5,7 +5,6 @@ import {
   Host,
   Prop,
 } from '@stencil/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Point } from '@vertexvis/geometry';
 
 @Component({

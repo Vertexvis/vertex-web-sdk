@@ -12,8 +12,8 @@ export class PinController {
   private dragging?: boolean = false;
   public constructor(
     private model: PinModel,
-    private mode: ViewerPinToolMode,
-    private type: ViewerPinToolType
+    private mode: ViewerPinToolMode = 'view',
+    private type: ViewerPinToolType = 'pin'
   ) {}
 
   /**
