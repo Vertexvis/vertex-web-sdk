@@ -4,13 +4,15 @@ interface PinInterface<T> {
   id: string;
   worldPosition: Vector3.Vector3;
   point: Point.Point;
+  partId?: string;
   attributes?: T;
 }
 export class DefaultPin implements PinInterface<void> {
   public constructor(
     public readonly id: string,
     public readonly worldPosition: Vector3.Vector3,
-    public readonly point: Point.Point
+    public readonly point: Point.Point,
+    public readonly partId?: string
   ) {}
 }
 
@@ -26,7 +28,8 @@ export class TextPin implements PinInterface<PinLabel> {
     public readonly id: string,
     public readonly worldPosition: Vector3.Vector3,
     public readonly point: Point.Point,
-    public readonly attributes: PinLabel
+    public readonly attributes: PinLabel,
+    public readonly partId?: string
   ) {}
 }
 

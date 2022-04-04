@@ -16,6 +16,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, TextPin } from '../../lib/pins/entities';
 import {
@@ -39,7 +40,7 @@ export class VertexPinLabel {
    * The dimensions of the canvas for the pins
    */
   @Prop({ mutable: true })
-  public dimensions: Dimensions.Dimensions = { height: 0, width: 0 };
+  public elementBounds?: DOMRect;
 
   /**
    * The dimensions of the the pin label
@@ -122,21 +123,18 @@ export class VertexPinLabel {
       this.pinController?.setSelectedPinId(this.pin?.id);
 
       const pointerMove = (event: PointerEvent): void => {
-        const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
-          ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
-              labelPoint: translatePointToRelative(
-                {
-                  x: event.clientX,
-                  y: event.clientY,
-                },
-                this.dimensions
-              ),
-              labelText: this.pin.attributes.labelText,
-            })
-          : undefined;
+        if (this.elementBounds != null) {
+          const point = getMouseClientPosition(event, this.elementBounds);
+          const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
+            ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
+                labelPoint: translatePointToRelative(point, this.elementBounds),
+                labelText: this.pin.attributes.labelText,
+              })
+            : undefined;
 
-        if (myUpdatedPin) {
-          onUpdatePin(myUpdatedPin);
+          if (myUpdatedPin) {
+            onUpdatePin(myUpdatedPin);
+          }
         }
       };
 
@@ -166,10 +164,12 @@ export class VertexPinLabel {
     };
 
     const screenPosition =
-      isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+      isTextPin(this.pin) &&
+      this.elementBounds != null &&
+      this.pin.attributes.labelPoint != null
         ? translatePointToScreen(
             this.pin.attributes.labelPoint,
-            this.dimensions
+            this.elementBounds
           )
         : undefined;
 

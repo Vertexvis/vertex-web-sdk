@@ -48,7 +48,7 @@ export class ViewerPinGroup {
    * The dimensions of the canvas for the pins
    */
   @Prop({ mutable: true })
-  public dimensions: Dimensions.Dimensions = { height: 0, width: 0 };
+  public elementBounds?: DOMRect;
 
   /**
    * The model that contains the entities and outcomes from performing pin operations
@@ -131,7 +131,7 @@ export class ViewerPinGroup {
               ref={(el) => {
                 this.labelEl = el;
               }}
-              dimensions={this.dimensions}
+              elementBounds={this.elementBounds}
               pinController={this.pinController}
             ></vertex-viewer-pin-label>
           </Fragment>
@@ -157,36 +157,42 @@ export class ViewerPinGroup {
   }
 
   private computeLabelLinePoint(pin: Pin): ComputedPoints {
-    const pinPoint = this.getFromWorldPosition(
-      pin.worldPosition,
-      this.projectionViewMatrix,
-      this.dimensions
-    );
-    const screenPosition =
-      isTextPin(this.pin) && this.pin.attributes.labelPoint != null
-        ? translatePointToScreen(
-            this.pin.attributes.labelPoint,
-            this.dimensions
-          )
-        : undefined;
+    if (this.elementBounds != null) {
+      const pinPoint = this.getFromWorldPosition(
+        pin.worldPosition,
+        this.projectionViewMatrix,
+        this.elementBounds
+      );
+      const screenPosition =
+        isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+          ? translatePointToScreen(
+              this.pin.attributes.labelPoint,
+              this.elementBounds
+            )
+          : undefined;
 
-    if (screenPosition && pinPoint != null) {
-      const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
+      if (screenPosition && pinPoint != null) {
+        const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
 
-      const labelWidth = label?.clientWidth || 0;
-      const labelHeight = label?.clientHeight || 0;
+        const labelWidth = label?.clientWidth || 0;
+        const labelHeight = label?.clientHeight || 0;
+
+        return {
+          pinPoint,
+          labelPoint: getClosestCenterToPoint(screenPosition, pinPoint, {
+            width: labelWidth,
+            height: labelHeight,
+          }),
+        };
+      }
 
       return {
         pinPoint,
-        labelPoint: getClosestCenterToPoint(screenPosition, pinPoint, {
-          width: labelWidth,
-          height: labelHeight,
-        }),
       };
     }
 
     return {
-      pinPoint,
+      pinPoint: pin.worldPosition,
     };
   }
 

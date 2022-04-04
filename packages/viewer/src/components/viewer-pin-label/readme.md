@@ -7,14 +7,13 @@
 
 ## Properties
 
-| Property             | Attribute | Description                                                                      | Type                         | Default                   |
-| -------------------- | --------- | -------------------------------------------------------------------------------- | ---------------------------- | ------------------------- |
-| `dimensions`         | --        | The dimensions of the canvas for the pins                                        | `Dimensions`                 | `{ height: 0, width: 0 }` |
-| `pin`                | --        | The pin to draw for the group                                                    | `TextPinEntity \| undefined` | `undefined`               |
-| `pinController`      | --        | The model that contains the entities and outcomes from performing pin operations | `PinController \| undefined` | `undefined`               |
-| `pinLabelDimensions` | --        | The dimensions of the the pin label                                              | `Dimensions`                 | `{ height: 0, width: 0 }` |
-| `pinModel`           | --        | The model that contains the entities and outcomes from performing pin operations | `PinModel`                   | `new PinModel()`          |
-| `value`              | `value`   | The current text value of the component. Value is updated on user interaction.   | `string`                     | `''`                      |
+| Property             | Attribute | Description                                                                    | Type                         | Default                   |
+| -------------------- | --------- | ------------------------------------------------------------------------------ | ---------------------------- | ------------------------- |
+| `elementBounds`      | --        | The dimensions of the canvas for the pins                                      | `DOMRect \| undefined`       | `undefined`               |
+| `pin`                | --        | The pin to draw for the group                                                  | `TextPin \| undefined`       | `undefined`               |
+| `pinController`      | --        | The controller that drives behavior for pin operations                         | `PinController \| undefined` | `undefined`               |
+| `pinLabelDimensions` | --        | The dimensions of the the pin label                                            | `Dimensions`                 | `{ height: 0, width: 0 }` |
+| `value`              | `value`   | The current text value of the component. Value is updated on user interaction. | `string`                     | `undefined`               |
 
 
 ## Methods

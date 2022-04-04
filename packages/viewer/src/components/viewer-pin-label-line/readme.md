@@ -7,13 +7,11 @@
 
 ## Properties
 
-| Property             | Attribute | Description                         | Type                                           | Default                   |
-| -------------------- | --------- | ----------------------------------- | ---------------------------------------------- | ------------------------- |
-| `labelEl`            | --        |                                     | `HTMLVertexViewerPinLabelElement \| undefined` | `undefined`               |
-| `labelPoint`         | --        |                                     | `Point \| undefined`                           | `undefined`               |
-| `pin`                | --        | The pin to draw for the group       | `PinEntity \| TextPinEntity \| undefined`      | `undefined`               |
-| `pinLabelDimensions` | --        | The dimensions of the the pin label | `Dimensions`                                   | `{ height: 0, width: 0 }` |
-| `pinPoint`           | --        |                                     | `Point \| undefined`                           | `undefined`               |
+| Property     | Attribute | Description | Type                                           | Default     |
+| ------------ | --------- | ----------- | ---------------------------------------------- | ----------- |
+| `labelEl`    | --        |             | `HTMLVertexViewerPinLabelElement \| undefined` | `undefined` |
+| `labelPoint` | --        |             | `Point \| undefined`                           | `undefined` |
+| `pinPoint`   | --        |             | `Point \| undefined`                           | `undefined` |
 
 
 ## CSS Custom Properties

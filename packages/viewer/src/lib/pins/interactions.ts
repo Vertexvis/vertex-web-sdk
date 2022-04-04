@@ -1,4 +1,4 @@
-import { Point } from '@vertexvis/geometry';
+import { Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable, UUID } from '@vertexvis/utils';
 
 import { translatePointToRelative } from '../../components/viewer-markup/utils';
@@ -8,7 +8,7 @@ import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { EntityType } from '../types/entities';
 import { PinController } from './controller';
-import { DefaultPin, TextPin } from './entities';
+import { DefaultPin, isTextPin, Pin, TextPin } from './entities';
 
 export class PinsInteractionHandler implements InteractionHandler {
   private controller: PinController;
@@ -38,19 +38,90 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.api = api;
     this.rectObserver.observe(element);
 
-    // this.setupEditMode();
-    element.addEventListener('pointermove', this.handlePointerMove);
+    element.addEventListener('pointermove', this.handlePointerMoveCursorCheck);
     element.addEventListener('pointerdown', this.handlePointerDown);
   }
 
   public dispose(): void {
     this.rectObserver.disconnect();
-    this.element?.removeEventListener('pointermove', this.handlePointerMove);
+
+    this.element?.removeEventListener(
+      'pointermove',
+      this.handlePointerMoveCursorCheck
+    );
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
     this.element = undefined;
     this.api = undefined;
   }
+
+  public async getWorldPositionForPoint(
+    pt: Point.Point
+  ): Promise<Vector3.Vector3 | undefined> {
+    return this.ifInitialized(async ({ api }) => {
+      const vector3 = await api.getWorldPointFromViewport(pt);
+
+      return vector3;
+    });
+  }
+
+  public async handlePlacePin(
+    pt: Point.Point,
+    existingPin?: Pin
+  ): Promise<void> {
+    this.ifInitialized(async ({ api }) => {
+      const [hit] = await api.hitItems(pt);
+
+      if (hit?.hitPoint != null && this.elementRect != null) {
+        const vector3 = await this.getWorldPositionForPoint(pt);
+
+        const relativePoint = translatePointToRelative(
+          {
+            ...pt,
+          },
+          this.elementRect
+        );
+        if (vector3 != null) {
+          const pinId = existingPin != null ? existingPin.id : UUID.create();
+
+          switch (this.controller.getToolType()) {
+            case 'pin':
+              this.controller.setEntity(new DefaultPin(pinId, vector3, pt));
+              break;
+            case 'pin-label':
+              this.controller.setEntity(
+                new TextPin(
+                  pinId,
+                  vector3,
+                  pt,
+                  isTextPin(existingPin)
+                    ? {
+                        ...existingPin.attributes,
+                      }
+                    : {
+                        labelPoint: relativePoint,
+                      },
+                  hit?.itemId?.hex ?? undefined
+                )
+              );
+              break;
+          }
+        }
+      } else {
+        this.controller.setSelectedPinId();
+      }
+    });
+  }
+
+  private handlePointerMoveCursorCheck = async (
+    event: PointerEvent
+  ): Promise<void> => {
+    if (await this.isDroppableSurface(event)) {
+      this.addCursor(this.getCusorType());
+    } else {
+      this.clearCursor();
+    }
+  };
 
   private getCusorType(): Cursor {
     switch (this.controller.getToolType()) {
@@ -80,52 +151,21 @@ export class PinsInteractionHandler implements InteractionHandler {
 
       if (distnaceBetweenStartAndEndPoint <= 2) {
         if (this.controller.getToolMode() === 'edit') {
-          this.ifInitialized(async ({ api }) => {
-            const pt = getMouseClientPosition(pointerDown);
+          const pt = getMouseClientPosition(pointerDown, this.elementRect);
 
-            const [hit] = await api.hitItems(pt);
-
-            if (hit?.hitPoint != null && this.elementRect != null) {
-              const vector3 = await api.getWorldPointFromViewport(pt);
-
-              const relativePoint = translatePointToRelative(
-                {
-                  ...pt,
-                },
-                this.elementRect
-              );
-              if (vector3 != null) {
-                const pinId = UUID.create();
-
-                switch (this.controller.getToolType()) {
-                  case 'pin':
-                    this.controller.addEntity(
-                      new DefaultPin(pinId, vector3, pt)
-                    );
-                    break;
-                  case 'pin-label':
-                    this.controller.addEntity(
-                      new TextPin(pinId, vector3, pt, {
-                        labelPoint: relativePoint,
-                      })
-                    );
-                    break;
-                }
-              }
-            } else {
-              this.controller.setSelectedPinId();
-            }
-          });
+          this.handlePlacePin(pt);
         }
       }
       dispose();
     };
 
     const dispose = (): void => {
+      window.removeEventListener('pointermove', this.handlePointerMove);
       window.removeEventListener('pointerup', pointerUp);
     };
 
     window.addEventListener('pointerup', pointerUp);
+    window.addEventListener('pointermove', this.handlePointerMove);
 
     return {
       dispose,

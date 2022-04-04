@@ -1163,7 +1163,7 @@ export namespace Components {
     /**
      * The dimensions of the canvas for the pins
      */
-    dimensions: Dimensions.Dimensions;
+    elementBounds?: DOMRect;
     /**
      * The local matrix of this element.
      */
@@ -1193,7 +1193,7 @@ export namespace Components {
     /**
      * The dimensions of the canvas for the pins
      */
-    dimensions: Dimensions.Dimensions;
+    elementBounds?: DOMRect;
     /**
      * The pin to draw for the group
      */
@@ -2514,7 +2514,7 @@ declare namespace LocalJSX {
     /**
      * The dimensions of the canvas for the pins
      */
-    dimensions?: Dimensions.Dimensions;
+    elementBounds?: DOMRect;
     /**
      * The local matrix of this element.
      */
@@ -2544,7 +2544,7 @@ declare namespace LocalJSX {
     /**
      * The dimensions of the canvas for the pins
      */
-    dimensions?: Dimensions.Dimensions;
+    elementBounds?: DOMRect;
     onLabelChanged?: (event: CustomEvent<void>) => void;
     /**
      * The pin to draw for the group

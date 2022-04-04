@@ -176,7 +176,7 @@ export class ViewerPinTool {
               <vertex-viewer-pin-group
                 data-is-dom-group-element={true}
                 pin={pin}
-                dimensions={this.elementBounds}
+                elementBounds={this.elementBounds}
                 pinModel={this.pinModel}
                 pinController={this.pinController}
                 projectionViewMatrix={this.projectionViewMatrix}

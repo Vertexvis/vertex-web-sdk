@@ -409,6 +409,7 @@ export class Viewer {
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame>();
 
   public constructor() {
+    console.log('Local Web Sdk');
     this.handleElementResize = this.handleElementResize.bind(this);
   }
 
