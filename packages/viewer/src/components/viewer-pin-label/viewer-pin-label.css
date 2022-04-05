@@ -1,0 +1,58 @@
+:host {
+  /**
+   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
+   * specifies the color of the label background
+   */
+   --viewer-annotations-pin-label-background-color: var(--blue-200);
+
+  /**
+   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
+   * specifies the color of the label background
+   */
+   --viewer-annotations-pin-label-border-color: var(--blue-600);
+
+  /**
+   * @prop --viewer-annotations-pin-label-color: A CSS color that
+   * specifies the color of the label 
+   */
+   --viewer-annotations-pin-label-color: var(--white);
+
+  /**
+   * @prop --viewer-annotations-pin-label-padding: A var that
+   * specifies the padding of the label 
+   */
+   --viewer-annotations-pin-label-padding: 0.375em 0.5em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-border: A var that
+   * specifies the border of the label
+   */
+   --viewer-annotations-pin-label-border: 2px solid var(--viewer-annotations-pin-label-border-color);
+
+     /**
+   * @prop --viewer-annotations-pin-label-border-radius: A var that
+   * specifies the border radius of the label
+   */
+   --viewer-annotations-pin-label-border-radius: 0.25em;
+   
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:host([mode='']) .pin-label {
+  color: var(--viewer-annotations-pin-label-color);
+  background: var(--viewer-annotations-pin-label-background-color);
+}
+
+.pin-label {
+  position: absolute;
+  background: var(--viewer-annotations-pin-label-background-color);
+  border: var(--viewer-annotations-pin-label-border);
+  border-radius: var(--viewer-annotations-pin-label-border-radius);
+  padding: var(--viewer-annotations-pin-label-padding);
+  pointer-events: auto;
+  cursor: pointer;
+  min-width: 16px;
+  min-height: 14px;
+  width: auto;
+}

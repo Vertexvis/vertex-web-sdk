@@ -225,11 +225,13 @@ attribute.
 
 ### Used by
 
+ - [vertex-viewer-pin-tool](../viewer-pin-tool)
  - [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-pin-tool --> vertex-viewer-dom-renderer
   vertex-viewer-view-cube --> vertex-viewer-dom-renderer
   style vertex-viewer-dom-renderer fill:#f9f,stroke:#333,stroke-width:4px
 ```

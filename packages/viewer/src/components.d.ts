@@ -94,6 +94,14 @@ import { PointToPointHitProvider } from './components/viewer-measurement-distanc
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
+  Pin,
+  PinModel,
+  TextPin,
+  ViewerPinToolMode,
+  ViewerPinToolType,
+} from './lib/pins/model';
+import { PinController } from './lib/pins/controller';
+import {
   ViewerToolbarDirection,
   ViewerToolbarPlacement as ViewerToolbarPlacement1,
 } from './components/viewer-toolbar/viewer-toolbar';
@@ -581,7 +589,7 @@ export namespace Components {
      */
     quaternion: Quaternion.Quaternion;
     /**
-     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     * The local quaternion rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
      */
     quaternionJson: string;
     /**
@@ -1153,6 +1161,85 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerPinGroup {
+    /**
+     * The dimensions of the canvas for the pins
+     */
+    elementBounds?: DOMRect;
+    /**
+     * The local matrix of this element.
+     */
+    matrix: Matrix4.Matrix4;
+    /**
+     * The pin to draw for the group
+     */
+    pin?: Pin;
+    /**
+     * The controller that drives behavior for pin operations
+     */
+    pinController?: PinController;
+    /**
+     * The model that contains the entities and outcomes from performing pin operations
+     */
+    pinModel: PinModel;
+    /**
+     * Projection view matrix used for computing the position of the pin line
+     */
+    projectionViewMatrix: Matrix4.Matrix4;
+    /**
+     * Whether or not the pin is "selected"
+     */
+    selected: boolean;
+  }
+  interface VertexViewerPinLabel {
+    /**
+     * The dimensions of the canvas for the pins
+     */
+    elementBounds?: DOMRect;
+    /**
+     * The pin to draw for the group
+     */
+    pin?: TextPin;
+    /**
+     * The controller that drives behavior for pin operations
+     */
+    pinController?: PinController;
+    /**
+     * Gives focus to the the component's internal text input.
+     */
+    setFocus: () => Promise<void>;
+    /**
+     * The current text value of the component. Value is updated on user interaction.
+     */
+    value: string;
+  }
+  interface VertexViewerPinLabelLine {
+    labelPoint: Point.Point | undefined;
+    pinPoint: Point.Point | undefined;
+  }
+  interface VertexViewerPinTool {
+    /**
+     * The mode of the pin tool
+     */
+    mode: ViewerPinToolMode;
+    /**
+     * The controller that is responsible for drawing pins and updating the model
+     */
+    pinController?: PinController;
+    /**
+     * The model that contains the entities and outcomes from performing pin annotations
+     */
+    pinModel: PinModel;
+    pins: Pin[];
+    /**
+     * The type of pin.  This property will automatically be set.
+     */
+    tool: ViewerPinToolType;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerToolbar {
     direction: ViewerToolbarDirection;
     /**
@@ -1412,6 +1499,34 @@ declare global {
     prototype: HTMLVertexViewerMeasurementsElement;
     new (): HTMLVertexViewerMeasurementsElement;
   };
+  interface HTMLVertexViewerPinGroupElement
+    extends Components.VertexViewerPinGroup,
+      HTMLStencilElement {}
+  var HTMLVertexViewerPinGroupElement: {
+    prototype: HTMLVertexViewerPinGroupElement;
+    new (): HTMLVertexViewerPinGroupElement;
+  };
+  interface HTMLVertexViewerPinLabelElement
+    extends Components.VertexViewerPinLabel,
+      HTMLStencilElement {}
+  var HTMLVertexViewerPinLabelElement: {
+    prototype: HTMLVertexViewerPinLabelElement;
+    new (): HTMLVertexViewerPinLabelElement;
+  };
+  interface HTMLVertexViewerPinLabelLineElement
+    extends Components.VertexViewerPinLabelLine,
+      HTMLStencilElement {}
+  var HTMLVertexViewerPinLabelLineElement: {
+    prototype: HTMLVertexViewerPinLabelLineElement;
+    new (): HTMLVertexViewerPinLabelLineElement;
+  };
+  interface HTMLVertexViewerPinToolElement
+    extends Components.VertexViewerPinTool,
+      HTMLStencilElement {}
+  var HTMLVertexViewerPinToolElement: {
+    prototype: HTMLVertexViewerPinToolElement;
+    new (): HTMLVertexViewerPinToolElement;
+  };
   interface HTMLVertexViewerToolbarElement
     extends Components.VertexViewerToolbar,
       HTMLStencilElement {}
@@ -1463,6 +1578,10 @@ declare global {
     'vertex-viewer-measurement-precise': HTMLVertexViewerMeasurementPreciseElement;
     'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
     'vertex-viewer-measurements': HTMLVertexViewerMeasurementsElement;
+    'vertex-viewer-pin-group': HTMLVertexViewerPinGroupElement;
+    'vertex-viewer-pin-label': HTMLVertexViewerPinLabelElement;
+    'vertex-viewer-pin-label-line': HTMLVertexViewerPinLabelLineElement;
+    'vertex-viewer-pin-tool': HTMLVertexViewerPinToolElement;
     'vertex-viewer-toolbar': HTMLVertexViewerToolbarElement;
     'vertex-viewer-toolbar-group': HTMLVertexViewerToolbarGroupElement;
     'vertex-viewer-view-cube': HTMLVertexViewerViewCubeElement;
@@ -1825,7 +1944,7 @@ declare namespace LocalJSX {
      */
     quaternion?: Quaternion.Quaternion;
     /**
-     * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
+     * The local quaternion rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
      */
     quaternionJson?: string;
     /**
@@ -2389,6 +2508,82 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerPinGroup {
+    /**
+     * The dimensions of the canvas for the pins
+     */
+    elementBounds?: DOMRect;
+    /**
+     * The local matrix of this element.
+     */
+    matrix?: Matrix4.Matrix4;
+    /**
+     * The pin to draw for the group
+     */
+    pin?: Pin;
+    /**
+     * The controller that drives behavior for pin operations
+     */
+    pinController?: PinController;
+    /**
+     * The model that contains the entities and outcomes from performing pin operations
+     */
+    pinModel?: PinModel;
+    /**
+     * Projection view matrix used for computing the position of the pin line
+     */
+    projectionViewMatrix?: Matrix4.Matrix4;
+    /**
+     * Whether or not the pin is "selected"
+     */
+    selected?: boolean;
+  }
+  interface VertexViewerPinLabel {
+    /**
+     * The dimensions of the canvas for the pins
+     */
+    elementBounds?: DOMRect;
+    onLabelChanged?: (event: CustomEvent<void>) => void;
+    /**
+     * The pin to draw for the group
+     */
+    pin?: TextPin;
+    /**
+     * The controller that drives behavior for pin operations
+     */
+    pinController?: PinController;
+    /**
+     * The current text value of the component. Value is updated on user interaction.
+     */
+    value?: string;
+  }
+  interface VertexViewerPinLabelLine {
+    labelPoint?: Point.Point | undefined;
+    pinPoint?: Point.Point | undefined;
+  }
+  interface VertexViewerPinTool {
+    /**
+     * The mode of the pin tool
+     */
+    mode?: ViewerPinToolMode;
+    /**
+     * The controller that is responsible for drawing pins and updating the model
+     */
+    pinController?: PinController;
+    /**
+     * The model that contains the entities and outcomes from performing pin annotations
+     */
+    pinModel?: PinModel;
+    pins?: Pin[];
+    /**
+     * The type of pin.  This property will automatically be set.
+     */
+    tool?: ViewerPinToolType;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerToolbar {
     direction?: ViewerToolbarDirection;
     /**
@@ -2473,6 +2668,10 @@ declare namespace LocalJSX {
     'vertex-viewer-measurement-precise': VertexViewerMeasurementPrecise;
     'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
     'vertex-viewer-measurements': VertexViewerMeasurements;
+    'vertex-viewer-pin-group': VertexViewerPinGroup;
+    'vertex-viewer-pin-label': VertexViewerPinLabel;
+    'vertex-viewer-pin-label-line': VertexViewerPinLabelLine;
+    'vertex-viewer-pin-tool': VertexViewerPinTool;
     'vertex-viewer-toolbar': VertexViewerToolbar;
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
     'vertex-viewer-view-cube': VertexViewerViewCube;
@@ -2540,6 +2739,14 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementToolElement>;
       'vertex-viewer-measurements': LocalJSX.VertexViewerMeasurements &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementsElement>;
+      'vertex-viewer-pin-group': LocalJSX.VertexViewerPinGroup &
+        JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement>;
+      'vertex-viewer-pin-label': LocalJSX.VertexViewerPinLabel &
+        JSXBase.HTMLAttributes<HTMLVertexViewerPinLabelElement>;
+      'vertex-viewer-pin-label-line': LocalJSX.VertexViewerPinLabelLine &
+        JSXBase.HTMLAttributes<HTMLVertexViewerPinLabelLineElement>;
+      'vertex-viewer-pin-tool': LocalJSX.VertexViewerPinTool &
+        JSXBase.HTMLAttributes<HTMLVertexViewerPinToolElement>;
       'vertex-viewer-toolbar': LocalJSX.VertexViewerToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
       'vertex-viewer-toolbar-group': LocalJSX.VertexViewerToolbarGroup &

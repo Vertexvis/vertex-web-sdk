@@ -1,0 +1,82 @@
+:host {
+
+  /**
+   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
+   * specifies the color of the label line
+   */
+   --viewer-annotations-pin-dot-color: var(--blue-600);
+
+  /**
+   * @prop  --viewer-annotations-pin-color: A CSS color that
+   * specifies the color of the pin
+   */
+   --viewer-annotations-pin-color: var(--blue-700);
+
+  /**
+   * @prop  --viewer-annotations-pin-font-size: A CSS property to specify
+   the font size of the pin
+   */
+   --viewer-annotations-pin-font-size: 0.75rem;
+
+  /**
+   * @prop  --viewer-annotations-pin-selected-stroke: A CSS color that
+   * specifies the stroke color of a selected pin
+   */
+   --viewer-annotations-pin-selected-stroke: var(--white);
+
+  /**
+   * @prop   --viewer-annotations-pin-selected-border: A CSS color that
+   * specifies the border of a selected pin
+   */
+   --viewer-annotations-pin-selected-border:  2px solid var(--white);
+
+  /**
+   * @prop --viewer-annotations-pin-label-border: A CSS color that
+   * specifies the border of a text pin anchor
+   */
+   --viewer-annotations-pin-label-border:  2px solid var(--black);
+
+  /**
+   * @prop   --viewer-annotations-pin-selected-border: A CSS color that
+   * specifies the stroke of a selected default pin
+   */
+   --viewer-annotations-pin-selected-stroke: var(--white);
+
+  font-size: var(--viewer-annotations-pin-font-size);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pin-anchor {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  border: var(--viewer-annotations-pin-label-border);
+  background: var(--viewer-annotations-pin-dot-color);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.selected {
+  width: 13px;
+  height: 13px;
+  border: var(--viewer-annotations-pin-selected-border)
+}
+
+.pin {
+  color: var(--viewer-annotations-pin-color);
+}
+
+.pin-selected {
+  stroke-width: 1;
+  stroke: var(--viewer-annotations-pin-selected-stroke);
+}

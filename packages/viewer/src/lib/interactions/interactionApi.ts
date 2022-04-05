@@ -68,7 +68,7 @@ export abstract class InteractionApi {
     protected getConfig: InteractionConfigProvider,
     protected getScene: SceneProvider,
     protected getFrame: () => ReceivedFrame | undefined,
-    protected getViewport: () => Viewport,
+    public getViewport: () => Viewport,
     private tapEmitter: EventEmitter<TapEventDetails>,
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>,
