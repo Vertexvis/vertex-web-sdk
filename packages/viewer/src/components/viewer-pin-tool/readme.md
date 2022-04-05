@@ -2,6 +2,37 @@
 
 
 
+The `<vertex-viewer-pin-tool>` is a component for displaying & adding/editing pin objects on the scene on 3D points. The component
+supports adding a "simple" pin, as well as a text pin that has an anchor dot on the model with a relative 2d label that the consumer can drag
+to any relative position on the canvas. 
+
+
+**Example:** Using the tool and adding/drawing pins
+
+```html
+<html>
+<body>
+  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer-pin-tool
+      id="vertex-viewer-pin-tool"
+      mode="edit"
+      tool="pin-label"
+    >
+    </vertex-viewer-pin-tool>
+  </vertex-viewer>
+</body>
+</html>
+```
+
+To draw pins you can do so by setting the pins on the controller exposed via the SDK
+
+```js
+  const pinsTool = document.getElementById('vertex-viewer-pin-tool');
+
+  pinsTool.pinController.setPins(pins); // where 'pins' is a set of pins.
+```
+
+
 <!-- Auto Generated Below -->
 
 
