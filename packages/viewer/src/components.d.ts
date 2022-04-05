@@ -93,13 +93,14 @@ import { Anchor } from './components/viewer-measurement-distance/utils';
 import { PointToPointHitProvider } from './components/viewer-measurement-distance/interactions';
 import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
-import { Pin, TextPin } from './lib/pins/entities';
-import { PinModel } from './lib/pins/model';
-import { PinController } from './lib/pins/controller';
 import {
+  Pin,
+  PinModel,
+  TextPin,
   ViewerPinToolMode,
   ViewerPinToolType,
-} from './components/viewer-pin-tool/viewer-pin-tool';
+} from './lib/pins/model';
+import { PinController } from './lib/pins/controller';
 import {
   ViewerToolbarDirection,
   ViewerToolbarPlacement as ViewerToolbarPlacement1,
