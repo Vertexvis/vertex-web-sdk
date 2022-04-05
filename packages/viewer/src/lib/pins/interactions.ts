@@ -8,7 +8,7 @@ import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { EntityType } from '../types/entities';
 import { PinController } from './controller';
-import { DefaultPin, isTextPin, Pin, TextPin } from './entities';
+import { Pin } from './model';
 
 export class PinsInteractionHandler implements InteractionHandler {
   private controller: PinController;
@@ -86,24 +86,21 @@ export class PinsInteractionHandler implements InteractionHandler {
 
           switch (this.controller.getToolType()) {
             case 'pin':
-              this.controller.setEntity(new DefaultPin(pinId, vector3, pt));
+              this.controller.setPin({
+                id: pinId,
+                worldPosition: vector3,
+                partId: hit?.itemId?.hex ?? undefined,
+              });
               break;
             case 'pin-label':
-              this.controller.setEntity(
-                new TextPin(
-                  pinId,
-                  vector3,
-                  pt,
-                  isTextPin(existingPin)
-                    ? {
-                        ...existingPin.attributes,
-                      }
-                    : {
-                        labelPoint: relativePoint,
-                      },
-                  hit?.itemId?.hex ?? undefined
-                )
-              );
+              this.controller.setPin({
+                id: pinId,
+                worldPosition: vector3,
+                partId: hit?.itemId?.hex ?? undefined,
+                label: {
+                  point: relativePoint,
+                },
+              });
               break;
           }
         }

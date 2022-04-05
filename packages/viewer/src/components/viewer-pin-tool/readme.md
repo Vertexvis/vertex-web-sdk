@@ -1,4 +1,4 @@
-# vertex-viewer-annotation-pin
+# vertex-viewer-pin-tool
 
 
 

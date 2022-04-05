@@ -10,7 +10,7 @@ import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
-import { isTextPin, Pin, TextPin } from '../../lib/pins/entities';
+import { isTextPin, Pin, TextPin } from '../../lib/pins/model';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
 import { PinRenderer } from './pin-renderer';
@@ -155,7 +155,7 @@ export class ViewerPinGroup {
 
   private computePinPoints(pin: Pin): ComputedPoints {
     if (this.elementBounds != null && this.pin != null) {
-      return isTextPin(this.pin) && this.pin.attributes.labelPoint != null
+      return isTextPin(this.pin) && this.pin.label.point != null
         ? this.computeTextPinPoints(this.pin, this.elementBounds)
         : this.computeDefaultPinPoints(this.pin, this.elementBounds);
     }
@@ -184,7 +184,7 @@ export class ViewerPinGroup {
     const { pinPoint } = this.computeDefaultPinPoints(pin, elementBounds);
 
     const screenPosition = translatePointToScreen(
-      pin.attributes.labelPoint,
+      pin.label.point,
       elementBounds
     );
 

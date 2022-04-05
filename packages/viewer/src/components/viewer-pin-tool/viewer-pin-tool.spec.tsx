@@ -4,26 +4,27 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { PinController } from '../../lib/pins/controller';
-import { TextPin } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
+import { PinModel, TextPin } from '../../lib/pins/model';
 import { viewer } from '../viewer/__mocks__/mocks';
 import { ViewerPinGroup } from '../viewer-pin-group/viewer-pin-group';
 import { ViewerPinTool } from './viewer-pin-tool';
 
 describe('vertex-viewer-pin-tool', () => {
   it('should render a label for a pin and support draging the label', async () => {
-    const hitPoint = Point.create(100, 0);
-
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
     const pinController = new PinController(pinModel, 'edit', 'pin-label');
 
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = new TextPin('my-pin-id', worldPosition, hitPoint, {
-      labelPoint: relativePointCenterScreen,
-      labelText: 'My New Pin',
-    });
+    const pin: TextPin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
     const page = await newSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
@@ -49,7 +50,7 @@ describe('vertex-viewer-pin-tool', () => {
       },
     } as unknown as HTMLVertexViewerElement;
 
-    pinController.addEntity(pin);
+    pinController.addPin(pin);
 
     await page.waitForChanges();
 

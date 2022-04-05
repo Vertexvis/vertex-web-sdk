@@ -17,8 +17,7 @@ import classNames from 'classnames';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
-import { isTextPin, TextPin } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
+import { isTextPin, PinModel, TextPin } from '../../lib/pins/model';
 import {
   translatePointToRelative,
   translatePointToScreen,
@@ -75,8 +74,8 @@ export class VertexPinLabel {
   private resizeObserver?: ResizeObserver;
 
   public constructor() {
-    if (this.pin?.attributes?.labelText != null) {
-      this.value = this.pin.attributes.labelText;
+    if (this.pin?.label.text != null) {
+      this.value = this.pin.label.text;
     } else {
       this.value = '';
     }
@@ -167,7 +166,7 @@ export class VertexPinLabel {
             }}
             onPointerDown={(e) => this.pointerDownAndMove(e)}
           >
-            {this.pin?.attributes.labelText}
+            {this.pin?.label.text}
           </div>
         )}
       </Host>
@@ -178,11 +177,8 @@ export class VertexPinLabel {
     this.computedScreenPosition =
       isTextPin(this.pin) &&
       this.elementBounds != null &&
-      this.pin.attributes.labelPoint != null
-        ? translatePointToScreen(
-            this.pin.attributes.labelPoint,
-            this.elementBounds
-          )
+      this.pin.label.point != null
+        ? translatePointToScreen(this.pin.label.point, this.elementBounds)
         : undefined;
     return this.computedScreenPosition;
   }
@@ -195,14 +191,18 @@ export class VertexPinLabel {
         const point = getMouseClientPosition(event, this.elementBounds);
         const myUpdatedPin =
           this.pin != null
-            ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
-                labelPoint: translatePointToRelative(point, this.elementBounds),
-                labelText: this.pin.attributes.labelText,
-              })
+            ? {
+                id: this.pin.id,
+                worldPosition: this.pin.worldPosition,
+                label: {
+                  point: translatePointToRelative(point, this.elementBounds),
+                  text: this.pin.label.text,
+                },
+              }
             : undefined;
 
         if (myUpdatedPin) {
-          this.pinController?.setEntity(myUpdatedPin);
+          this.pinController?.setPin(myUpdatedPin);
         }
       }
     };
@@ -243,11 +243,11 @@ export class VertexPinLabel {
   private submit(): void {
     this.focused = false;
     if (this.pin != null) {
-      this.pinController?.setEntity({
+      this.pinController?.setPin({
         ...this.pin,
-        attributes: {
-          labelPoint: this.pin.attributes.labelPoint,
-          labelText: this.value,
+        label: {
+          point: this.pin.label.point,
+          text: this.value,
         },
       });
     }

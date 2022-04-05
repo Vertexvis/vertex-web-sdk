@@ -12,20 +12,15 @@ import { Matrix4 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { PinController } from '../../lib/pins/controller';
-import { Pin } from '../../lib/pins/entities';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
-import { PinModel } from '../../lib/pins/model';
+import {
+  Pin,
+  PinModel,
+  ViewerPinToolMode,
+  ViewerPinToolType,
+} from '../../lib/pins/model';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
-/**
- * The types of pins that can be performed by this tool.
- */
-export type ViewerPinToolType = 'pin' | 'pin-label';
-
-/**
- * The mode of the pin tool
- */
-export type ViewerPinToolMode = 'edit' | 'view';
 @Component({
   tag: 'vertex-viewer-pin-tool',
   styleUrl: 'viewer-pin-tool.css',

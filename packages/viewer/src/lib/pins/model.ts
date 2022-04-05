@@ -1,11 +1,45 @@
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-import { Pin } from './entities';
+/**
+ * The types of pins that can be performed by this tool.
+ */
+export type ViewerPinToolType = 'pin' | 'pin-label';
+
+/**
+ * The mode of the pin tool
+ */
+export type ViewerPinToolMode = 'edit' | 'view';
 
 /**
  * A model representing the state of pins.
  *
  */
+
+import { Point, Vector3 } from '@vertexvis/geometry';
+
+export interface SimplePin {
+  id: string;
+  worldPosition: Vector3.Vector3;
+  partId?: string;
+}
+export interface PinLabel {
+  point: Point.Point;
+  text?: string;
+}
+export interface TextPin extends SimplePin {
+  label: PinLabel;
+}
+
+export type Pin = TextPin | SimplePin;
+
+export function isTextPin(pin?: Pin): pin is TextPin {
+  return pin != null && (pin as TextPin).label != null;
+}
+
+export function isDefaultPin(pin?: Pin): pin is Pin {
+  return pin != null && (pin as TextPin).label == null;
+}
+
 export class PinModel {
   private entities: Record<string, Pin> = {};
   private selectedPinId?: string;
@@ -16,20 +50,20 @@ export class PinModel {
   /**
    * Registers an entity to be drawn in the canvas
    *
-   * @param entity A pin entity to draw.
+   * @param pin A pin entity to draw.
    * @returns `true` if the entity has been added.
    */
-  public addEntity(entity: Pin, surpressEvent = false): boolean {
-    if (this.entities[entity.id] == null) {
+  public addPin(pin: Pin, surpressEvent = false): boolean {
+    if (this.entities[pin.id] == null) {
       this.entities = {
         ...this.entities,
-        [entity.id]: entity,
+        [pin.id]: pin,
       };
 
-      this.setSelectedPin(entity.id);
+      this.setSelectedPin(pin.id);
 
       if (!surpressEvent) {
-        this.entitiesChanged.emit(this.getEntities());
+        this.entitiesChanged.emit(this.getPins());
       }
       return true;
     } else {
@@ -40,21 +74,21 @@ export class PinModel {
   /**
    * Clears all registered entities from the model.
    */
-  public clearEntities(): void {
-    this.getEntities().forEach((e) => this.removeEntity(e));
+  public clearPins(): void {
+    this.getPins().forEach((e) => this.removePin(e));
   }
 
   /**
    * Returns all the entities registered with the model.
    */
-  public getEntities(): Pin[] {
+  public getPins(): Pin[] {
     return Object.keys(this.entities).map((key) => this.entities[key]);
   }
 
   /**
    * Returns single entity by id if present in the model.
    */
-  public getEntityById(id: string): Pin | undefined {
+  public getPinById(id: string): Pin | undefined {
     return this.entities[id];
   }
 
@@ -68,10 +102,10 @@ export class PinModel {
    * @param entity The entity to remove.
    * @returns `true` if the entity was removed.
    */
-  public removeEntity(entity: Pin): boolean {
+  public removePin(entity: Pin): boolean {
     if (this.entities[entity.id] != null) {
       delete this.entities[entity.id];
-      this.entitiesChanged.emit(this.getEntities());
+      this.entitiesChanged.emit(this.getPins());
       return true;
     } else {
       return false;
@@ -84,10 +118,10 @@ export class PinModel {
    * @param entities A set of entities to draw.
    * @returns `true` if the entity has been added.
    */
-  public setEntities(entities: Set<Pin>): boolean {
-    this.clearEntities();
-    entities.forEach((e) => this.addEntity(e, true));
-    this.entitiesChanged.emit(this.getEntities());
+  public setPins(pins: Set<Pin>): boolean {
+    this.clearPins();
+    pins.forEach((e) => this.addPin(e, true));
+    this.entitiesChanged.emit(this.getPins());
 
     return true;
   }
@@ -95,15 +129,15 @@ export class PinModel {
   /**
    * Sets the set of entities to be placed with the model.
    *
-   * @param entities A set of entities to draw.
-   * @returns `true` if the entity has been added.
+   * @param pin A pin to set
+   * @returns `true` if the entity has been set
    */
-  public setEntity(entity: Pin): boolean {
+  public setPin(pin: Pin): boolean {
     this.entities = {
       ...this.entities,
-      [entity.id]: entity,
+      [pin.id]: pin,
     };
-    this.entitiesChanged.emit(this.getEntities());
+    this.entitiesChanged.emit(this.getPins());
     return true;
   }
 

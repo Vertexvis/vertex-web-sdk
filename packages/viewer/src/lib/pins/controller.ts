@@ -1,9 +1,4 @@
-import {
-  ViewerPinToolMode,
-  ViewerPinToolType,
-} from '../../components/viewer-pin-tool/viewer-pin-tool';
-import { Pin } from './entities';
-import { PinModel } from './model';
+import { Pin, PinModel, ViewerPinToolMode, ViewerPinToolType } from './model';
 
 /**
  * The `PinController` is responsible for adding pin entities to the viewer canvas
@@ -19,19 +14,19 @@ export class PinController {
   /**
    * Registers an entity to place on the canvas and places the pin on the associated part.
    *
-   * @param entity The pin entity
+   * @param pin The pin entity
    * @returns A void promise
    */
-  public addEntity(entity: Pin): void {
-    this.model.addEntity(entity);
+  public addPin(pin: Pin): void {
+    this.model.addPin(pin);
   }
 
   /**
    * Clears all entities and returns a promise that resolves with an empty list
    * of pin results.
    */
-  public clearEntities(): void {
-    this.model.clearEntities();
+  public clearPins(): void {
+    this.model.clearPins();
   }
 
   /**
@@ -42,8 +37,8 @@ export class PinController {
    * @returns A promise that resolves with the results after removing this
    * entity.
    */
-  public removeEntity(entity: Pin): void {
-    this.model.removeEntity(entity);
+  public removePin(pin: Pin): void {
+    this.model.removePin(pin);
   }
 
   /**
@@ -53,18 +48,18 @@ export class PinController {
    * @returns A promise that resolves with the results after registering these
    * entities.
    */
-  public setEntities(entities: Set<Pin>): void {
-    this.model.setEntities(entities);
+  public setPins(pins: Set<Pin>): void {
+    this.model.setPins(pins);
   }
 
   /**
    * Sets the set of entities to be placed with the model.
    *
-   * @param entities A set of entities to draw.
+   * @param pin A pin to set
    * @returns `true` if the entity has been added.
    */
-  public setEntity(entity: Pin): void {
-    this.model.setEntity(entity);
+  public setPin(pin: Pin): void {
+    this.model.setPin(pin);
   }
 
   /**

@@ -3,17 +3,14 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
-import { DefaultPin, TextPin } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
+import { PinModel, SimplePin } from '../../lib/pins/model';
 import { VertexPinLabel } from '../viewer-pin-label/viewer-pin-label';
-import { VertexPinLabelLine } from '../viewer-pin-label-line/vertex-pin-label-line';
+import { VertexPinLabelLine } from '../viewer-pin-label-line/viewer-pin-label-line';
 import { getClosestCenterToPoint } from './utils';
 import { ViewerPinGroup } from './viewer-pin-group';
 
 describe('vertex-view-pin-group', () => {
   it('should render a text pin', async () => {
-    const hitPoint = Point.create(75, 10);
-
     const worldPosition = Vector3.create();
 
     const viewMatrix = Matrix4.makeIdentity();
@@ -21,10 +18,14 @@ describe('vertex-view-pin-group', () => {
 
     const relativePointCenterScreen = Point.create(0, 0);
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin = new TextPin('my-pin-id', worldPosition, hitPoint, {
-      labelPoint: relativePointCenterScreen,
-      labelText: 'My New Pin',
-    });
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
 
     const page = await newSpecPage({
       components: [ViewerPinGroup, VertexPinLabel, VertexPinLabelLine],
@@ -50,9 +51,7 @@ describe('vertex-view-pin-group', () => {
         </vertex-viewer-dom-element>
         <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id">
           <svg class="svg">
-            <g>
-              <line class="label-line" x1="50" x2="50" y1="50" y2="50"></line>
-            </g>
+            <line class="label-line" x1="50" x2="50" y1="50" y2="50"></line>
           </svg>
         </vertex-viewer-pin-label-line>
         <vertex-viewer-pin-label>
@@ -66,16 +65,17 @@ describe('vertex-view-pin-group', () => {
     await page.waitForChanges();
   });
 
-  it('should render a default pin', async () => {
-    const hitPoint = Point.create(75, 10);
-
+  it('should render a simple pin', async () => {
     const worldPosition = Vector3.create();
 
     const viewMatrix = Matrix4.makeIdentity();
     const pinModel = new PinModel();
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin = new DefaultPin('my-pin-id', worldPosition, hitPoint);
+    const pin: SimplePin = {
+      id: 'my-pin-id',
+      worldPosition,
+    };
 
     const page = await newSpecPage({
       components: [ViewerPinGroup],

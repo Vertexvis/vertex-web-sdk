@@ -4,14 +4,11 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 
 import { PinController } from '../../lib/pins/controller';
-import { TextPin } from '../../lib/pins/entities';
-import { PinModel } from '../../lib/pins/model';
+import { PinModel, TextPin } from '../../lib/pins/model';
 import { VertexPinLabel } from './viewer-pin-label';
 
 describe('vertex-viewer-pin-label', () => {
   it('should render a label for a pin and support dragging the label', async () => {
-    const hitPoint = Point.create(100, 0);
-
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
@@ -19,11 +16,15 @@ describe('vertex-viewer-pin-label', () => {
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = new TextPin('my-pin-id', worldPosition, hitPoint, {
-      labelPoint: relativePointCenterScreen,
-      labelText: 'My New Pin',
-    });
-    pinModel.addEntity(pin);
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
+    pinModel.addPin(pin);
 
     const page = await newSpecPage({
       components: [VertexPinLabel],
@@ -46,8 +47,8 @@ describe('vertex-viewer-pin-label', () => {
       </div>
     `);
 
-    const originalPin = pinModel.getEntityById(pin.id) as TextPin;
-    expect(originalPin.attributes.labelPoint).toEqual({ x: 0, y: 0 });
+    const originalPin = pinModel.getPinById(pin.id) as TextPin;
+    expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
     labelLine?.dispatchEvent(new MouseEvent('pointerdown'));
 
     const draggingPoint = Point.create(40, 90);
@@ -66,14 +67,12 @@ describe('vertex-viewer-pin-label', () => {
       </div>
     `);
 
-    const updatedPin = pinModel.getEntityById(pin.id) as TextPin;
+    const updatedPin = pinModel.getPinById(pin.id) as TextPin;
 
-    expect(updatedPin.attributes.labelPoint).toEqual({ x: -0.1, y: 0.4 });
+    expect(updatedPin.label.point).toEqual({ x: -0.1, y: 0.4 });
   });
 
   it('should support changing the label', async () => {
-    const hitPoint = Point.create(100, 0);
-
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
@@ -81,11 +80,15 @@ describe('vertex-viewer-pin-label', () => {
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = new TextPin('my-pin-id', worldPosition, hitPoint, {
-      labelPoint: relativePointCenterScreen,
-      labelText: 'My New Pin',
-    });
-    pinController.addEntity(pin);
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
+    pinController.addPin(pin);
 
     const page = await newSpecPage({
       components: [VertexPinLabel],
@@ -108,8 +111,8 @@ describe('vertex-viewer-pin-label', () => {
       </div>
     `);
 
-    const originalPin = pinModel.getEntityById(pin.id) as TextPin;
-    expect(originalPin.attributes.labelPoint).toEqual({ x: 0, y: 0 });
+    const originalPin = pinModel.getPinById(pin.id) as TextPin;
+    expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
     labelLine?.dispatchEvent(
       new MouseEvent('pointerdown', {
         clientX: 50,
@@ -134,7 +137,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(el.querySelector(`#pin-label-${pin.id}`)).toEqualHtml(`
-      <input autofocus="" class="pin-label" id="pin-label-my-pin-id" type="text" value="My New Pin" style="top: 50px; left: 50px;">
+      <input class="pin-label" id="pin-label-my-pin-id" type="text" value="My New Pin" style="top: 50px; left: 50px;">
     `);
 
     const input = page.root?.querySelector(
@@ -147,17 +150,15 @@ describe('vertex-viewer-pin-label', () => {
 
     await page.waitForChanges();
 
-    const updatedPin = pinModel.getEntityById(pin.id) as TextPin;
+    const updatedPin = pinModel.getPinById(pin.id) as TextPin;
 
-    expect(updatedPin.attributes).toEqual({
-      labelPoint: { x: 0, y: 0 },
-      labelText: 'Updated Text',
+    expect(updatedPin.label).toEqual({
+      point: { x: 0, y: 0 },
+      text: 'Updated Text',
     });
   });
 
   it('should support changing the label and pressing enter to submit', async () => {
-    const hitPoint = Point.create(100, 0);
-
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
@@ -165,11 +166,15 @@ describe('vertex-viewer-pin-label', () => {
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = new TextPin('my-pin-id', worldPosition, hitPoint, {
-      labelPoint: relativePointCenterScreen,
-      labelText: 'My New Pin',
-    });
-    pinController.addEntity(pin);
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
+    pinController.addPin(pin);
 
     const page = await newSpecPage({
       components: [VertexPinLabel],
@@ -192,8 +197,8 @@ describe('vertex-viewer-pin-label', () => {
       </div>
     `);
 
-    const originalPin = pinModel.getEntityById(pin.id) as TextPin;
-    expect(originalPin.attributes.labelPoint).toEqual({ x: 0, y: 0 });
+    const originalPin = pinModel.getPinById(pin.id) as TextPin;
+    expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
     labelLine?.dispatchEvent(
       new MouseEvent('pointerdown', {
         clientX: 50,
@@ -218,7 +223,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(el.querySelector(`#pin-label-${pin.id}`)).toEqualHtml(`
-      <input autofocus="" class="pin-label" id="pin-label-my-pin-id" type="text" value="My New Pin" style="top: 50px; left: 50px;">
+      <input class="pin-label" id="pin-label-my-pin-id" type="text" value="My New Pin" style="top: 50px; left: 50px;">
     `);
 
     const input = page.root?.querySelector(
@@ -236,11 +241,11 @@ describe('vertex-viewer-pin-label', () => {
 
     await page.waitForChanges();
 
-    const updatedPin = pinModel.getEntityById(pin.id) as TextPin;
+    const updatedPin = pinModel.getPinById(pin.id) as TextPin;
 
-    expect(updatedPin.attributes).toEqual({
-      labelPoint: { x: 0, y: 0 },
-      labelText: 'Updated Text With Enter',
+    expect(updatedPin.label).toEqual({
+      point: { x: 0, y: 0 },
+      text: 'Updated Text With Enter',
     });
   });
 });

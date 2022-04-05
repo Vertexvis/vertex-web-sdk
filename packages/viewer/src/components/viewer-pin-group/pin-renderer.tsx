@@ -2,7 +2,7 @@
 import { Fragment, FunctionalComponent, h } from '@stencil/core';
 import classNames from 'classnames';
 
-import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/entities';
+import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/model';
 
 interface PinRendererProps {
   pin?: Pin;
