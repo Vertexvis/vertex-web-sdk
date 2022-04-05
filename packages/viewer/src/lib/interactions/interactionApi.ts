@@ -507,6 +507,42 @@ export abstract class InteractionApi {
   }
 
   /**
+   * Performs a pivot operation of the scene's camera, updating the lookAt
+   * while maintaining the position, and requests a new image for the
+   * updated scene.
+   *
+   * @param degreesLocalX The angle to rotate the lookAt point around the local x-axis
+   * @param degreesLocalY The angle to rotate the lookAt point around the local y-axis
+   */
+  public async pivotCamera(
+    degreesLocalX: number,
+    degreesLocalY: number
+  ): Promise<void> {
+    return this.transformCamera(({ camera }) => {
+      const { position, up, lookAt } = camera;
+      const normalizedUp = Vector3.normalize(up);
+      const normalizedViewVector = Vector3.normalize(camera.viewVector);
+      const xVector = Vector3.cross(normalizedUp, normalizedViewVector);
+      const yVector = Vector3.cross(normalizedViewVector, xVector);
+
+      const updatedLookAtX = Vector3.rotateAboutAxis(
+        Angle.toRadians(degreesLocalX),
+        lookAt,
+        xVector,
+        position
+      );
+      const updatedLookAtY = Vector3.rotateAboutAxis(
+        Angle.toRadians(degreesLocalY),
+        updatedLookAtX,
+        yVector,
+        position
+      );
+
+      return camera.update({ ...camera, lookAt: updatedLookAtY });
+    });
+  }
+
+  /**
    * Marks the end of an interaction.
    */
   public async endInteraction(): Promise<void> {

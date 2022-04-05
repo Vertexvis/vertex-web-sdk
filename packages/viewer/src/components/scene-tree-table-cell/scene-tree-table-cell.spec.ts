@@ -117,7 +117,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('expandToggled', expandToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
-    const originalEvent = new MouseEvent('pointerdown');
+    const originalEvent = new MouseEvent('pointerup');
     expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleExpandItem).toHaveBeenCalled();
@@ -148,7 +148,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('expandToggled', expandToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
-    expandBtn?.dispatchEvent(new MouseEvent('pointerdown'));
+    expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.toggleExpandItem).not.toHaveBeenCalled();
     expect(expandToggled).toHaveBeenCalled();
@@ -171,7 +171,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('visibilityToggled', visibilityToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.visibility-btn');
-    const originalEvent = new MouseEvent('pointerdown');
+    const originalEvent = new MouseEvent('pointerup');
     expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleItemVisibility).toHaveBeenCalled();
@@ -202,7 +202,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('visibilityToggled', visibilityToggled);
 
     const expandBtn = cell.shadowRoot?.querySelector('.visibility-btn');
-    expandBtn?.dispatchEvent(new MouseEvent('pointerdown'));
+    expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.toggleItemVisibility).not.toHaveBeenCalled();
     expect(visibilityToggled).toHaveBeenCalled();
@@ -224,7 +224,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', { button: 0 });
+    const originalEvent = new MouseEvent('pointerup', { button: 0 });
     cell.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalled();
@@ -254,9 +254,10 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', {
+    const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       metaKey: true,
+      clientY: 0,
     });
     cell.dispatchEvent(originalEvent);
 
@@ -290,7 +291,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('selectionToggled', selected);
 
     cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, ctrlKey: true })
+      new MouseEvent('pointerup', { button: 0, ctrlKey: true })
     );
 
     expect(tree.selectItem).toHaveBeenCalledWith(
@@ -313,7 +314,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    cell.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
+    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       node,
@@ -334,7 +335,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    cell.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
+    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
 
     expect(tree.selectItem).not.toHaveBeenCalled();
     expect(tree.deselectItem).not.toHaveBeenCalled();
@@ -357,7 +358,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.addEventListener('selectionToggled', selected);
 
     cell.dispatchEvent(
-      new MouseEvent('pointerdown', { button: 0, metaKey: true })
+      new MouseEvent('pointerup', { button: 0, metaKey: true })
     );
 
     expect(tree.deselectItem).toHaveBeenCalled();
@@ -380,7 +381,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selectionToggled', selected);
 
-    const originalEvent = new MouseEvent('pointerdown', {
+    const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       ctrlKey: true,
     });
@@ -411,7 +412,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const selected = jest.fn();
     cell.addEventListener('selected', selected);
 
-    const event = new MouseEvent('pointerdown', { button: 0, metaKey: true });
+    const event = new MouseEvent('pointerup', { button: 0, metaKey: true });
     event.preventDefault();
     cell.dispatchEvent(event);
 

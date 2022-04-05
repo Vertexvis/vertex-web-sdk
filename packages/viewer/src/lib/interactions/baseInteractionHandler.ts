@@ -9,6 +9,7 @@ import { InteractionHandler } from './interactionHandler';
 import {
   MouseInteraction,
   PanInteraction,
+  PivotInteraction,
   RotateInteraction,
   RotatePointInteraction,
   TwistInteraction,
@@ -20,7 +21,8 @@ export type InteractionType =
   | 'zoom'
   | 'pan'
   | 'twist'
-  | 'rotate-point';
+  | 'rotate-point'
+  | 'pivot';
 
 const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
@@ -54,6 +56,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private zoomInteraction: ZoomInteraction,
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
+    private pivotInteraction: PivotInteraction,
     private getConfig: ConfigProvider
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);
@@ -99,6 +102,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       case 'rotate-point':
         this.currentInteraction = this.rotatePointInteraction;
         break;
+      case 'pivot':
+        this.currentInteraction = this.pivotInteraction;
+        break;
       default:
         this.currentInteraction = undefined;
     }
@@ -133,6 +139,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         break;
       case 'pan':
         this.primaryInteraction = this.panInteraction;
+        break;
+      case 'pivot':
+        this.primaryInteraction = this.pivotInteraction;
         break;
     }
     this.primaryInteractionTypeChange.emit();
