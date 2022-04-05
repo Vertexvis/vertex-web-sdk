@@ -44,6 +44,21 @@ viewer's scene changes. The cube can be embedded within a
 | `zPositiveLabel`    | `z-positive-label`   | The label for the side of the cube on the positive z-axis.                                                                        | `string`                               | `'Front'`   |
 
 
+## CSS Custom Properties
+
+| Name                                               | Description                                                                                                                                                 |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--viewer-view-cube-edge-length`                   | A CSS length value that defines the size of an edge when hovered.                                                                                           |
+| `--viewer-view-cube-opacity`                       | A CSS opacity for when the cube is not hovered.                                                                                                             |
+| `--viewer-view-cube-side-background`               | A CSS background value that defines the background of a side of the cube.                                                                                   |
+| `--viewer-view-cube-side-background-hover`         | A CSS background value that defines the background of the hovered side of the cube. Note, the hover background is rendered on-top of the side's background. |
+| `--viewer-view-cube-side-background-hover-opacity` | A CSS number that defines the opacity of the background for a hovered side of the cube.                                                                     |
+| `--viewer-view-cube-side-border`                   | A CSS border value that defines the border of each side of the cube.                                                                                        |
+| `--viewer-view-cube-triad-x-axis-color`            | A CSS color for the X axis of the triad                                                                                                                     |
+| `--viewer-view-cube-triad-y-axis-color`            | A CSS color for the Y axis of the triad                                                                                                                     |
+| `--viewer-view-cube-triad-z-axis-color`            | A CSS color for the Z axis of the triad                                                                                                                     |
+
+
 ## Dependencies
 
 ### Depends on

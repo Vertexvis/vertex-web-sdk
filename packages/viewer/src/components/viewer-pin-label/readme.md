@@ -28,6 +28,17 @@ Type: `Promise<void>`
 
 
 
+## CSS Custom Properties
+
+| Name                                              | Description                                                  |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| `--viewer-annotations-pin-label-background-color` | A CSS color that specifies the color of the label background |
+| `--viewer-annotations-pin-label-border`           | A var that specifies the border of the label                 |
+| `--viewer-annotations-pin-label-border-radius`    | A var that specifies the border radius of the label          |
+| `--viewer-annotations-pin-label-color`            | A CSS color that specifies the color of the label            |
+| `--viewer-annotations-pin-label-padding`          | A var that specifies the padding of the label                |
+
+
 ## Dependencies
 
 ### Used by

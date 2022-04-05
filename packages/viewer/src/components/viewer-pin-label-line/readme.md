@@ -13,6 +13,14 @@
 | `pinPoint`   | --        |             | `Point \| undefined` | `undefined` |
 
 
+## CSS Custom Properties
+
+| Name                                        | Description                                            |
+| ------------------------------------------- | ------------------------------------------------------ |
+| `--viewer-annotations-pin-label-line-color` | A CSS color that specifies the color of the label line |
+| `--viewer-annotations-pin-label-line-width` | A CSS color that specifies the width of the label line |
+
+
 ## Dependencies
 
 ### Used by
