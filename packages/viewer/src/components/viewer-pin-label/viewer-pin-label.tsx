@@ -11,7 +11,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Dimensions, Point } from '@vertexvis/geometry';
+import { Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -26,27 +26,21 @@ import {
 
 @Component({
   tag: 'vertex-viewer-pin-label',
-  styleUrl: 'vertex-pin-label.css',
+  styleUrl: 'viewer-pin-label.css',
   shadow: false,
 })
 export class VertexPinLabel {
   /**
    * The pin to draw for the group
    */
-  @Prop({ mutable: true })
+  @Prop()
   public pin?: TextPin;
 
   /**
    * The dimensions of the canvas for the pins
    */
-  @Prop({ mutable: true })
+  @Prop()
   public elementBounds?: DOMRect;
-
-  /**
-   * The dimensions of the the pin label
-   */
-  @Prop({ mutable: true })
-  public pinLabelDimensions: Dimensions.Dimensions = { height: 0, width: 0 };
 
   /**
    * The current text value of the component. Value is updated on user
@@ -157,8 +151,6 @@ export class VertexPinLabel {
             }}
             onInput={this.handleTextInput}
             onFocus={this.handleTextFocus}
-            autofocus={true}
-            autoFocus={true}
             onBlur={this.handleTextBlur}
             style={{
               top: `${screenPosition?.y.toString() || 0}px`,
@@ -201,12 +193,13 @@ export class VertexPinLabel {
     const pointerMove = (event: PointerEvent): void => {
       if (this.elementBounds != null) {
         const point = getMouseClientPosition(event, this.elementBounds);
-        const myUpdatedPin: TextPin | undefined = isTextPin(this.pin)
-          ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
-              labelPoint: translatePointToRelative(point, this.elementBounds),
-              labelText: this.pin.attributes.labelText,
-            })
-          : undefined;
+        const myUpdatedPin =
+          this.pin != null
+            ? new TextPin(this.pin.id, this.pin.worldPosition, this.pin.point, {
+                labelPoint: translatePointToRelative(point, this.elementBounds),
+                labelText: this.pin.attributes.labelText,
+              })
+            : undefined;
 
         if (myUpdatedPin) {
           this.pinController?.setEntity(myUpdatedPin);

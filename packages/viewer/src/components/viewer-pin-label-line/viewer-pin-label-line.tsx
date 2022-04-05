@@ -9,32 +9,27 @@ import { Point } from '@vertexvis/geometry';
 
 @Component({
   tag: 'vertex-viewer-pin-label-line',
-  styleUrl: 'vertex-pin-label-line.css',
+  styleUrl: 'viewer-pin-label-line.css',
   shadow: false,
 })
 export class VertexPinLabelLine {
   @Prop()
-  public labelEl?: HTMLVertexViewerPinLabelElement;
-
-  @Prop({ mutable: true })
   public pinPoint: Point.Point | undefined;
 
-  @Prop({ mutable: true })
+  @Prop()
   public labelPoint: Point.Point | undefined;
 
   protected render(): JSX.Element {
     return (
       <Host>
         <svg class="svg">
-          <g>
-            <line
-              class="label-line"
-              x1={this.labelPoint?.x}
-              y1={this.labelPoint?.y}
-              x2={this.pinPoint?.x}
-              y2={this.pinPoint?.y}
-            />
-          </g>
+          <line
+            class="label-line"
+            x1={this.labelPoint?.x}
+            y1={this.labelPoint?.y}
+            x2={this.pinPoint?.x}
+            y2={this.pinPoint?.y}
+          />
         </svg>
       </Host>
     );

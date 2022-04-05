@@ -5,10 +5,10 @@ import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { DefaultPin, TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
-import { VertexPinLabel } from '../viewer-pin-label/vertex-pin-label';
+import { VertexPinLabel } from '../viewer-pin-label/viewer-pin-label';
 import { VertexPinLabelLine } from '../viewer-pin-label-line/vertex-pin-label-line';
 import { getClosestCenterToPoint } from './utils';
-import { ViewerPinGroup } from './vertex-pin-group';
+import { ViewerPinGroup } from './viewer-pin-group';
 
 describe('vertex-view-pin-group', () => {
   it('should render a text pin', async () => {
@@ -97,7 +97,7 @@ describe('vertex-view-pin-group', () => {
     expect(pinGroup).toEqualHtml(`
       <vertex-viewer-dom-group data-testid="pin-group-my-pin-id" id="pin-group-my-pin-id">
         <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-        <vertex-viewer-icon class="pin" name="pin-fill" size="lg"></vertex-viewer-icon>
+          <vertex-viewer-icon class="pin" name="pin-fill" size="lg"></vertex-viewer-icon>
         </vertex-viewer-dom-element>
       </vertex-viewer-dom-group>
     `);

@@ -7,8 +7,9 @@ import { PinController } from '../../lib/pins/controller';
 import { TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { viewer } from '../viewer/__mocks__/mocks';
-import { ViewerPinGroup } from '../viewer-pin-group/vertex-pin-group';
+import { ViewerPinGroup } from '../viewer-pin-group/viewer-pin-group';
 import { ViewerPinTool } from './viewer-pin-tool';
+
 describe('vertex-viewer-pin-tool', () => {
   it('should render a label for a pin and support draging the label', async () => {
     const hitPoint = Point.create(100, 0);

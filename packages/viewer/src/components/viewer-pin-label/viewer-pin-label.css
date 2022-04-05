@@ -21,7 +21,7 @@
    * @prop --viewer-annotations-pin-label-padding: A var that
    * specifies the padding of the label 
    */
-   --viewer-annotations-pin-label-padding: 0.375rem 0.5rem;
+   --viewer-annotations-pin-label-padding: 0.375em 0.5em;
 
   /**
    * @prop --viewer-annotations-pin-label-border: A var that
@@ -33,16 +33,16 @@
    * @prop --viewer-annotations-pin-label-border-radius: A var that
    * specifies the border radius of the label
    */
-   --viewer-annotations-pin-label-border-radius: 0.25rem;
+   --viewer-annotations-pin-label-border-radius: 0.25em;
    
   overflow: hidden;
   pointer-events: none;
 }
+
 :host([mode='']) .pin-label {
   color: var(--viewer-annotations-pin-label-color);
   background: var(--viewer-annotations-pin-label-background-color);
 }
-
 
 .pin-label {
   position: absolute;

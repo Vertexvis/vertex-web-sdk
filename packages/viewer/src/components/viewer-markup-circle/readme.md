@@ -37,26 +37,6 @@ Type: `Promise<void>`
 
 
 
-## CSS Custom Properties
-
-| Name                                                           | Description                                                                            |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `--viewer-markup-circle-bounds-anchor-height`                  | A CSS length that specifies the height of the resize and reposition anchors.           |
-| `--viewer-markup-circle-bounds-anchor-width`                   | A CSS length that specifies the width of the resize and reposition anchors.            |
-| `--viewer-markup-circle-bounds-center-anchor-background-color` | A CSS color that specifies the background color of the center reposition anchor.       |
-| `--viewer-markup-circle-bounds-center-anchor-border-color`     | A CSS color that specifies the color of the center reposition anchor's border.         |
-| `--viewer-markup-circle-bounds-center-anchor-border-width`     | A CSS length that specifies the width of the center reposition anchor's border.        |
-| `--viewer-markup-circle-bounds-edge-anchor-background-color`   | A CSS color that specifies the background color of the edge and corner resize anchors. |
-| `--viewer-markup-circle-bounds-edge-anchor-border-color`       | A CSS color that specifies the color of the edge and corner resize anchors' borders.   |
-| `--viewer-markup-circle-bounds-edge-anchor-border-width`       | A CSS length that specifies the width of the edge and corner resize anchors' borders.  |
-| `--viewer-markup-circle-bounds-outline-border-color`           | A CSS color that specifies the color of the circle's selected bounding box border.     |
-| `--viewer-markup-circle-bounds-outline-border-width`           | A CSS length that specifies the width of the circle's selected bounding box border.    |
-| `--viewer-markup-circle-ellipse-fill-color`                    | A CSS color that specifies the color of the circle's fill.                             |
-| `--viewer-markup-circle-ellipse-fill-opacity`                  | A number between 0 and 1 that specifies the opacity of the circle's fill.              |
-| `--viewer-markup-circle-ellipse-stroke-color`                  | A CSS color that specifies the color of the circle's outline.                          |
-| `--viewer-markup-circle-ellipse-stroke-width`                  | A CSS length that specifies the width of the circle's outline.                         |
-
-
 ## Dependencies
 
 ### Used by

@@ -17,13 +17,6 @@
 | `viewer`        | --        | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `HTMLVertexViewerElement \| undefined` | `undefined`      |
 
 
-## CSS Custom Properties
-
-| Name                                        | Description                                            |
-| ------------------------------------------- | ------------------------------------------------------ |
-| `--viewer-annotations-pin-label-line-color` | A CSS color that specifies the color of the label line |
-
-
 ## Dependencies
 
 ### Depends on
@@ -38,9 +31,9 @@ graph TD;
   vertex-viewer-pin-tool --> vertex-viewer-pin-group
   vertex-viewer-pin-group --> vertex-viewer-dom-group
   vertex-viewer-pin-group --> vertex-viewer-dom-element
-  vertex-viewer-pin-group --> vertex-viewer-icon
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label
+  vertex-viewer-pin-group --> vertex-viewer-icon
   style vertex-viewer-pin-tool fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

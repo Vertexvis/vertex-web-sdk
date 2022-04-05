@@ -4,6 +4,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
 
 import { VertexPinLabelLine } from './vertex-pin-label-line';
+
 describe('vertex-ViewerPinLabelLine-pin', () => {
   it('should render a line between the given points', async () => {
     const start = Point.create(0, 0);

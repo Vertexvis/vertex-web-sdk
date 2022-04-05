@@ -32,11 +32,13 @@ information.
 
 ### Used by
 
+ - [vertex-viewer-pin-group](../viewer-pin-group)
  - [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-pin-group --> vertex-viewer-dom-group
   vertex-viewer-view-cube --> vertex-viewer-dom-group
   style vertex-viewer-dom-group fill:#f9f,stroke:#333,stroke-width:4px
 ```

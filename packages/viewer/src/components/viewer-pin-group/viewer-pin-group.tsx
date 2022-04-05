@@ -7,29 +7,30 @@ import {
   State,
 } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-import classNames from 'classnames';
 
 import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
-import { isDefaultPin, isTextPin, Pin, TextPin } from '../../lib/pins/entities';
+import { isTextPin, Pin, TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
 import { translatePointToScreen } from '../viewer-markup/utils';
+import { PinRenderer } from './pin-renderer';
 import { getClosestCenterToPoint } from './utils';
 
 interface ComputedPoints {
   pinPoint: Point.Point;
   labelPoint?: Point.Point;
 }
+
 @Component({
   tag: 'vertex-viewer-pin-group',
-  styleUrl: 'vertex-pin-group.css',
+  styleUrl: 'viewer-pin-group.css',
   shadow: false,
 })
 export class ViewerPinGroup {
   /**
    * The pin to draw for the group
    */
-  @Prop({ mutable: true })
+  @Prop()
   public pin?: Pin;
 
   /**
@@ -110,22 +111,7 @@ export class ViewerPinGroup {
             this.pinController?.setSelectedPinId(this.pin?.id);
           }}
         >
-          {isTextPin(this.pin) && (
-            <div
-              id="pin-anchor"
-              class={classNames('pin-anchor', { selected: this.selected })}
-            ></div>
-          )}
-
-          {isDefaultPin(this.pin) && (
-            <vertex-viewer-icon
-              name="pin-fill"
-              size="lg"
-              class={classNames('pin', {
-                'pin-selected': this.selected,
-              })}
-            />
-          )}
+          <PinRenderer pin={this.pin} selected={this.selected} />
         </vertex-viewer-dom-element>
 
         {isTextPin(this.pin) && (

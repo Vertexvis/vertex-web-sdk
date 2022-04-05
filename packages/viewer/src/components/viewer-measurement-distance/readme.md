@@ -213,21 +213,6 @@ Type: `Promise<ViewerMeasurementDistanceElementMetrics | undefined>`
 | `"start-label"`  | An HTML or text element that displays next to the start anchor.                                                                        |
 
 
-## CSS Custom Properties
-
-| Name                                                   | Description                                                                                         |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `--viewer-measurement-distance-accent-color`           | A CSS color that specifies the color of lines, anchors and borders.                                 |
-| `--viewer-measurement-distance-contrast-color`         | A CSS color that specifies a color opposite of the accent color.                                    |
-| `--viewer-measurement-distance-distance-border`        | A CSS border that specifies the border color or image for the measurement's label.                  |
-| `--viewer-measurement-distance-distance-border-radius` | A CSS length that specifies the border radius for the measurement's label.                          |
-| `--viewer-measurement-distance-distance-padding`       | A CSS length that specifies the padding of the measurement's label.                                 |
-| `--viewer-measurement-distance-invalid-accent-color`   | A CSS color that specifies the color of lines, anchors and borders when the measurement is invalid. |
-| `--viewer-measurement-distance-invalid-contrast-color` | A CSS color that specifies a color opposite of the accent color when the measurement is invalid.    |
-| `--viewer-measurement-distance-line-fill-width`        | A CSS length that width of the measurement line's fill.                                             |
-| `--viewer-measurement-distance-line-stroke-width`      | A CSS length that width of the measurement line's stroke.                                           |
-
-
 ## Dependencies
 
 ### Used by

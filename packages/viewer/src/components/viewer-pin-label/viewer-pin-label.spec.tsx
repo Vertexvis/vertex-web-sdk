@@ -6,7 +6,8 @@ import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { PinController } from '../../lib/pins/controller';
 import { TextPin } from '../../lib/pins/entities';
 import { PinModel } from '../../lib/pins/model';
-import { VertexPinLabel } from './vertex-pin-label';
+import { VertexPinLabel } from './viewer-pin-label';
+
 describe('vertex-viewer-pin-label', () => {
   it('should render a label for a pin and support dragging the label', async () => {
     const hitPoint = Point.create(100, 0);

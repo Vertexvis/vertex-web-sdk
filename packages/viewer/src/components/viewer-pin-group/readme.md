@@ -18,14 +18,6 @@
 | `selected`             | `selected` | Whether or not the pin is "selected"                                             | `boolean`                                                                                                                          | `false`                  |
 
 
-## CSS Custom Properties
-
-| Name                                        | Description                                            |
-| ------------------------------------------- | ------------------------------------------------------ |
-| `--viewer-annotations-pin-color`            | A CSS color that specifies the color of the pin        |
-| `--viewer-annotations-pin-label-line-color` | A CSS color that specifies the color of the label line |
-
-
 ## Dependencies
 
 ### Used by
@@ -36,18 +28,18 @@
 
 - [vertex-viewer-dom-group](../viewer-dom-group)
 - [vertex-viewer-dom-element](../viewer-dom-element)
-- [vertex-viewer-icon](../viewer-icon)
 - [vertex-viewer-pin-label-line](../viewer-pin-label-line)
 - [vertex-viewer-pin-label](../viewer-pin-label)
+- [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-viewer-pin-group --> vertex-viewer-dom-group
   vertex-viewer-pin-group --> vertex-viewer-dom-element
-  vertex-viewer-pin-group --> vertex-viewer-icon
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label
+  vertex-viewer-pin-group --> vertex-viewer-icon
   vertex-viewer-pin-tool --> vertex-viewer-pin-group
   style vertex-viewer-pin-group fill:#f9f,stroke:#333,stroke-width:4px
 ```
