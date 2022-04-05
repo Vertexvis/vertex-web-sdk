@@ -60,7 +60,6 @@ To draw pins you can do so by setting the pins on the controller exposed via the
 graph TD;
   vertex-viewer-pin-tool --> vertex-viewer-dom-renderer
   vertex-viewer-pin-tool --> vertex-viewer-pin-group
-  vertex-viewer-pin-group --> vertex-viewer-dom-group
   vertex-viewer-pin-group --> vertex-viewer-dom-element
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label

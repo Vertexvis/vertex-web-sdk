@@ -72,6 +72,9 @@ export class ViewerPinGroup {
   @State()
   private invalidateStateCounter = 0;
 
+  @State()
+  private leafNodesRendered = false;
+
   private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
   private resizeObserver?: ResizeObserver;
@@ -82,6 +85,7 @@ export class ViewerPinGroup {
     if (this.pinController == null) {
       this.pinController = new PinController(this.pinModel);
     }
+    this.leafNodesRendered = true;
   }
 
   protected disconnectedCallback(): void {
@@ -98,10 +102,7 @@ export class ViewerPinGroup {
     const { pinPoint, labelPoint } = computed;
 
     return (
-      <vertex-viewer-dom-group
-        id={`pin-group-${this.pin?.id}`}
-        data-testid={`pin-group-${this.pin.id}`}
-      >
+      <Fragment>
         <vertex-viewer-dom-element
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
@@ -111,7 +112,9 @@ export class ViewerPinGroup {
             this.pinController?.setSelectedPinId(this.pin?.id);
           }}
         >
-          <PinRenderer pin={this.pin} selected={this.selected} />
+          {this.leafNodesRendered && (
+            <PinRenderer pin={this.pin} selected={this.selected} />
+          )}
         </vertex-viewer-dom-element>
 
         {isTextPin(this.pin) && (
@@ -132,7 +135,7 @@ export class ViewerPinGroup {
             ></vertex-viewer-pin-label>
           </Fragment>
         )}
-      </vertex-viewer-dom-group>
+      </Fragment>
     );
   }
 

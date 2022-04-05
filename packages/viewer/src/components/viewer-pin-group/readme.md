@@ -26,7 +26,6 @@
 
 ### Depends on
 
-- [vertex-viewer-dom-group](../viewer-dom-group)
 - [vertex-viewer-dom-element](../viewer-dom-element)
 - [vertex-viewer-pin-label-line](../viewer-pin-label-line)
 - [vertex-viewer-pin-label](../viewer-pin-label)
@@ -35,7 +34,6 @@
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-pin-group --> vertex-viewer-dom-group
   vertex-viewer-pin-group --> vertex-viewer-dom-element
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label

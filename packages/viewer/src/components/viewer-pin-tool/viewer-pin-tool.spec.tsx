@@ -64,13 +64,11 @@ describe('vertex-viewer-pin-tool', () => {
     expect(pinTool.shadowRoot).toEqualHtml(`
       <vertex-viewer-dom-renderer drawmode="2d">
         <vertex-viewer-pin-group data-is-dom-group-element>
-          <vertex-viewer-dom-group data-testid="pin-group-my-pin-id" id="pin-group-my-pin-id">
-            <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-              <div class="pin-anchor" id="pin-anchor"></div>
-            </vertex-viewer-dom-element>
-            <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id"></vertex-viewer-pin-label-line>
-            <vertex-viewer-pin-label></vertex-viewer-pin-label>
-          </vertex-viewer-dom-group>
+          <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
+            <div class="pin-anchor" id="pin-anchor"></div>
+          </vertex-viewer-dom-element>
+          <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id"></vertex-viewer-pin-label-line>
+          <vertex-viewer-pin-label></vertex-viewer-pin-label>
         </vertex-viewer-pin-group>
       </vertex-viewer-dom-renderer>
     `);

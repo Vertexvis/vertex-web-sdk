@@ -41,11 +41,10 @@ describe('vertex-view-pin-group', () => {
       ),
     });
 
-    const el = page.root as HTMLVertexViewerPinLabelLineElement;
+    const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    const pinGroup = el.querySelector(`#pin-group-${pin.id}`);
-    expect(pinGroup).toEqualHtml(`
-      <vertex-viewer-dom-group data-testid="pin-group-my-pin-id" id="pin-group-my-pin-id">
+    expect(el).toEqualHtml(`
+      <vertex-viewer-pin-group data-is-dom-group-element>
         <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
           <div class="pin-anchor" id="pin-anchor"></div>
         </vertex-viewer-dom-element>
@@ -59,7 +58,7 @@ describe('vertex-view-pin-group', () => {
             My New Pin
           </div>
         </vertex-viewer-pin-label>
-      </vertex-viewer-dom-group>
+      </vertex-viewer-pin-group>
     `);
 
     await page.waitForChanges();
@@ -91,15 +90,14 @@ describe('vertex-view-pin-group', () => {
       ),
     });
 
-    const el = page.root as HTMLVertexViewerPinLabelLineElement;
+    const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    const pinGroup = el.querySelector(`#pin-group-${pin.id}`);
-    expect(pinGroup).toEqualHtml(`
-      <vertex-viewer-dom-group data-testid="pin-group-my-pin-id" id="pin-group-my-pin-id">
+    expect(el).toEqualHtml(`
+      <vertex-viewer-pin-group data-is-dom-group-element>
         <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
           <vertex-viewer-icon class="pin" name="pin-fill" size="lg"></vertex-viewer-icon>
         </vertex-viewer-dom-element>
-      </vertex-viewer-dom-group>
+      </vertex-viewer-pin-group>
     `);
   });
 });
