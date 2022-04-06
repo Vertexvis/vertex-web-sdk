@@ -64,6 +64,7 @@
     "jwt-decode": "^3.1.2",
     "param-case": "^3.0.4",
     "protobufjs": "^6.9.0",
+    "regl": "^2.1.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "resize-observer": "^1.0.4",
     "threads": "^1.7.0",
