@@ -107,7 +107,9 @@ export class ViewerPinGroup {
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
           onPointerDown={(e) => {
-            e.stopPropagation();
+            if (e.buttons !== 2) {
+              e.stopPropagation();
+            }
 
             this.pinController?.setSelectedPinId(this.pin?.id);
           }}
