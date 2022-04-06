@@ -1,7 +1,4 @@
 :host {
   display: block;
   transform-style: preserve-3d;
-  position: absolute;
-  height: 100%;
-  width: 100%;
 }
