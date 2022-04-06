@@ -146,7 +146,7 @@ export class PinsInteractionHandler implements InteractionHandler {
         Point.create(pointerUp.clientX, pointerUp.clientY)
       );
 
-      if (distanceBetweenStartAndEndPoint <= 2) {
+      if (distanceBetweenStartAndEndPoint <= 2 && pointerDown.buttons !== 2) {
         if (this.controller.getToolMode() === 'edit') {
           const pt = getMouseClientPosition(pointerDown, this.elementRect);
 
