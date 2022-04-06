@@ -60,8 +60,6 @@ export class PinModel {
         [pin.id]: pin,
       };
 
-      this.setSelectedPin(pin.id);
-
       if (!surpressEvent) {
         this.entitiesChanged.emit(this.getPins());
       }
