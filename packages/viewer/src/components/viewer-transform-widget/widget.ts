@@ -1,12 +1,17 @@
-import './glMat4';
-
-import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import {
+  Dimensions,
+  Matrix4,
+  Point,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
 import regl from 'regl';
 
 import { Frame, FrameCameraBase, Viewport } from '../../lib/types';
 import { draw } from './draw';
 import { Mesh, TriangleMesh } from './mesh';
 import {
+  compute2dBounds,
   drawDirection,
   hitTest,
   triangleElements,
@@ -28,27 +33,34 @@ export class TransformGlWidget {
 
   private hoveredMesh?: Mesh;
 
+  private frame?: Frame;
   private position?: Vector3.Vector3;
 
-  public constructor(canvasElement: HTMLCanvasElement, private frame?: Frame) {
+  public constructor(canvasElement: HTMLCanvasElement) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
     this.reglCommand = regl(canvasElement);
 
     this.createTriangleMeshes();
   }
 
+  public getViewportBounds(): Rectangle.Rectangle | undefined {
+    if (this.frame != null) {
+      return compute2dBounds(
+        this.viewport,
+        this.frame,
+        this.xArrow,
+        this.yArrow,
+        this.zArrow
+      );
+    }
+  }
+
   public updateFrame(frame: Frame): void {
     this.frame = frame;
-
-    this.createTriangleMeshes();
-
     this.drawStandard = draw(this.reglCommand, frame);
 
-    this.redraw(() =>
-      [this.xArrow, this.yArrow, this.zArrow].forEach((m) =>
-        this.drawStandard?.(() => m.draw({ color: Vector3.toArray(m.color) }))
-      )
-    );
+    this.createTriangleMeshes();
+    this.redraw();
   }
 
   public updateCursor(cursor: Point.Point): void {
@@ -68,9 +80,15 @@ export class TransformGlWidget {
     return this.hoveredMesh;
   }
 
-  private redraw(additionalDraw?: VoidFunction): void {
+  private redraw(): void {
     this.drawStandard?.(() => {
-      additionalDraw?.();
+      [this.xArrow, this.yArrow, this.zArrow].forEach((m) =>
+        this.drawStandard?.(() =>
+          this.hoveredMesh?.identifier === m.identifier
+            ? m.draw({ color: [1, 1, 0] })
+            : m.draw({ color: Vector3.toArray(m.color) })
+        )
+      );
 
       drawDirection(this.reglCommand, Vector3.up(), 3, this.position);
       drawDirection(this.reglCommand, Vector3.right(), 3, this.position);
@@ -79,31 +97,27 @@ export class TransformGlWidget {
   }
 
   private hitTestAndRedraw(): void {
+    const previousHovered = this.hoveredMesh;
     this.hoveredMesh = undefined;
 
-    this.redraw(() => {
-      const currentFrame = this.frame;
+    const currentFrame = this.frame;
 
-      if (currentFrame != null) {
-        [this.xArrow, this.yArrow, this.zArrow].forEach((m) => {
-          const isHovered =
-            this.cursor != null
-              ? hitTest(this.viewport, this.cursor, currentFrame, m)
-              : false;
+    if (currentFrame != null) {
+      [this.xArrow, this.yArrow, this.zArrow].forEach((m) => {
+        const isHovered =
+          this.cursor != null
+            ? hitTest(this.viewport, this.cursor, currentFrame, m)
+            : false;
 
-          if (isHovered) {
-            this.hoveredMesh = m;
-            this.drawStandard?.(() => {
-              m.draw({ color: [1, 1, 0] });
-            });
-          } else {
-            this.drawStandard?.(() => {
-              m.draw({ color: Vector3.toArray(m.color) });
-            });
-          }
-        });
-      }
-    });
+        if (isHovered) {
+          this.hoveredMesh = m;
+        }
+      });
+    }
+
+    if (this.hoveredMesh !== previousHovered) {
+      this.redraw();
+    }
   }
 
   private createTriangleMeshes(): void {

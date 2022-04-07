@@ -1,10 +1,15 @@
-import './glMat4';
-
-import { Matrix4, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import {
+  BoundingBox,
+  Matrix4,
+  Point,
+  Ray,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
 import regl from 'regl';
 
 import { Frame, FrameCameraBase, Viewport } from '../../lib/types';
-import { TriangleMesh } from './mesh';
+import { Mesh, TriangleMesh } from './mesh';
 
 export function drawDirection(
   reglContext: regl.Regl,
@@ -137,29 +142,27 @@ export function triangleElements(): Vector3.Vector3[] {
   ];
 }
 
-export function computeRay(
+export function compute2dBounds(
   viewport: Viewport,
-  point: Point.Point,
-  view: Matrix4.Matrix4,
-  projection: Matrix4.Matrix4
-): Ray.Ray {
-  const ndc = Point.create(
-    (point.x / viewport.width) * 2 - 1,
-    -(point.y / viewport.height) * 2 + 1
-  );
+  frame: Frame,
+  ...meshes: TriangleMesh[]
+): Rectangle.Rectangle {
+  let min = Point.create();
+  let max = Point.create();
 
-  const origin = Vector3.fromMatrixPosition(Matrix4.invert(view));
-  const world = Vector3.transformNdcToWorldSpace(
-    Vector3.create(ndc.x, ndc.y, 0.5),
-    Matrix4.invert(view),
-    Matrix4.invert(projection)
-  );
-  const direction = Vector3.normalize(Vector3.subtract(world, origin));
+  meshes.map((m) => {
+    m.positions.forEach((p) => {
+      const pt = viewport.transformWorldToViewport(
+        p,
+        frame.scene.camera.projectionViewMatrix
+      );
 
-  return Ray.create({
-    origin,
-    direction,
+      min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
+      max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+    });
   });
+
+  return Rectangle.fromPoints(min, max);
 }
 
 export function hitTest(

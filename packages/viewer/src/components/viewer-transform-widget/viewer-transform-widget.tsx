@@ -1,5 +1,12 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
-import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import {
+  BoundingBox,
+  Plane,
+  Point,
+  Ray,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
 import classNames from 'classnames';
 
 import { Viewport } from '../..';
@@ -26,6 +33,9 @@ export class ViewerTransformWidget {
   @Prop({ mutable: true })
   public position: Vector3.Vector3 = Vector3.create();
 
+  @Prop()
+  public boundingBox?: BoundingBox.BoundingBox;
+
   @State()
   private draggingMesh?: Mesh;
 
@@ -35,22 +45,15 @@ export class ViewerTransformWidget {
   @State()
   private hoveredMeshIdentifier?: string;
 
+  @State()
+  private widgetScreenBounds?: Rectangle.Rectangle;
+
   private canvasBounds?: DOMRect;
   private canvasRef?: HTMLCanvasElement;
   private transformGlWidget?: TransformGlWidget;
 
   protected componentDidLoad(): void {
     window.addEventListener('pointermove', this.handleWindowPointerMove);
-  }
-
-  protected componentDidRender(): void {
-    this.canvasBounds = this.canvasRef?.getBoundingClientRect();
-
-    if (this.canvasRef != null) {
-      this.transformGlWidget = new TransformGlWidget(this.canvasRef);
-      this.transformGlWidget?.updatePosition(this.position);
-      this.updatePropsFromViewer();
-    }
   }
 
   protected disconnectedCallback(): void {
@@ -73,29 +76,32 @@ export class ViewerTransformWidget {
 
   @Watch('position')
   protected handlePositionChanged(): void {
-    // if (this.viewer?.frame != null) {
-    //   const viewport = Viewport.fromDimensions(this.viewer.frame.dimensions);
-    //   this.viewportPosition = viewport.transformWorldToViewport(
-    //     this.position,
-    //     this.viewer.frame.scene.camera.projectionViewMatrix
-    //   );
-    // }
-
-    this.transformGlWidget?.updatePosition(this.position);
+    console.log(this.position);
+    this.getTransformWidget()?.updatePosition(this.position);
   }
 
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <canvas
-          ref={(el) => {
-            this.canvasRef = el;
-          }}
-          class={classNames('widget', {
-            hovered: this.transformGlWidget?.hovered() != null,
-          })}
-          onPointerDown={this.handlePointerDown}
-        />
+        {this.position != null && (
+          <canvas
+            ref={(el) => {
+              this.canvasRef = el;
+            }}
+            class={classNames('widget', {
+              hovered: this.getTransformWidget()?.hovered() != null,
+            })}
+            onPointerDown={this.handlePointerDown}
+          />
+        )}
+
+        {/* {this.widgetScreenBounds && <div style={{
+          opacity: '0.5',
+          backgroundColor: 'blue',
+          top: this.widgetScreenBounds.x,
+          left: this.widgetScreenBounds.y,
+
+        }} />} */}
       </Host>
     );
   }
@@ -110,14 +116,14 @@ export class ViewerTransformWidget {
     );
 
     if (canvasPoint != null) {
-      this.transformGlWidget?.updateCursor(canvasPoint);
+      this.getTransformWidget()?.updateCursor(canvasPoint);
       this.hoveredMeshIdentifier =
-        this.transformGlWidget?.hovered()?.identifier;
+        this.getTransformWidget()?.hovered()?.identifier;
     }
   };
 
   private handlePointerDown = async (event: PointerEvent): Promise<void> => {
-    const hoveredMesh = this.transformGlWidget?.hovered();
+    const hoveredMesh = this.getTransformWidget()?.hovered();
 
     if (hoveredMesh != null) {
       this.draggingMesh = hoveredMesh;
@@ -164,13 +170,13 @@ export class ViewerTransformWidget {
     window.removeEventListener('pointerup', this.handlePointerUp);
   };
 
-  private async updatePropsFromViewer(): Promise<void> {
+  private updatePropsFromViewer = (): void => {
     const { frame } = this.viewer || {};
 
     if (frame != null) {
-      this.transformGlWidget?.updateFrame(frame);
+      this.getTransformWidget()?.updateFrame(frame);
     }
-  }
+  };
 
   private async pointToWorld(
     point: Point.Point
@@ -196,17 +202,19 @@ export class ViewerTransformWidget {
   }
 
   private pointToCanvas(point: Point.Point): Point.Point | undefined {
+    const canvasBounds = this.getCanvasBounds();
+
     if (
-      this.canvasBounds != null &&
+      canvasBounds != null &&
       this.canvasRef != null &&
-      point.x > this.canvasBounds.left &&
-      point.x < this.canvasBounds.right &&
-      point.y > this.canvasBounds.top &&
-      point.y < this.canvasBounds.bottom
+      point.x > canvasBounds.left &&
+      point.x < canvasBounds.right &&
+      point.y > canvasBounds.top &&
+      point.y < canvasBounds.bottom
     ) {
       return Point.create(
-        point.x - this.canvasBounds.left,
-        point.y - this.canvasBounds.top
+        point.x - canvasBounds.left,
+        point.y - canvasBounds.top
       );
     }
 
@@ -223,22 +231,41 @@ export class ViewerTransformWidget {
           x: Vector3.subtract(next, previous).x + this.position.x,
         };
 
-        this.transformGlWidget?.updatePosition(this.position);
+        this.getTransformWidget()?.updatePosition(this.position);
       } else if (this.draggingMesh?.identifier === 'y-translate') {
         this.position = {
           ...this.position,
           y: Vector3.subtract(next, previous).y + this.position.y,
         };
 
-        this.transformGlWidget?.updatePosition(this.position);
+        this.getTransformWidget()?.updatePosition(this.position);
       } else if (this.draggingMesh?.identifier === 'z-translate') {
         this.position = {
           ...this.position,
           z: Vector3.subtract(next, previous).z + this.position.z,
         };
 
-        this.transformGlWidget?.updatePosition(this.position);
+        this.getTransformWidget()?.updatePosition(this.position);
       }
     }
+
+    this.widgetScreenBounds = this.getTransformWidget()?.getViewportBounds();
   }
+
+  private getCanvasBounds = (): DOMRect | undefined => {
+    if (this.canvasBounds != null) {
+      return this.canvasBounds;
+    } else if (this.canvasRef != null) {
+      this.canvasBounds = this.canvasRef?.getBoundingClientRect();
+      return this.canvasBounds;
+    }
+  };
+
+  private getTransformWidget = (): TransformGlWidget | undefined => {
+    if (this.canvasRef != null) {
+      this.transformGlWidget =
+        this.transformGlWidget ?? new TransformGlWidget(this.canvasRef);
+      return this.transformGlWidget;
+    }
+  };
 }

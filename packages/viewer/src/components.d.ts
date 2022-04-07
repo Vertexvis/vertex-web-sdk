@@ -24,7 +24,7 @@ import { ViewerStream } from "./lib/stream/stream";
 import { AngleUnitType, DepthBuffer, DistanceUnitType, EntityType, FrameCameraBase as FrameCameraBase1, FramePerspectiveCamera, Measurement, Orientation, StencilBufferManager, Viewport } from "./lib/types";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
+import { BoundingBox, Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
 import { KeyInteraction } from "./lib/interactions/keyInteraction";
@@ -1032,6 +1032,7 @@ export namespace Components {
         "direction": ViewerToolbarGroupDirection;
     }
     interface VertexViewerTransformWidget {
+        "boundingBox"?: BoundingBox.BoundingBox;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */
@@ -2237,6 +2238,7 @@ declare namespace LocalJSX {
         "direction"?: ViewerToolbarGroupDirection;
     }
     interface VertexViewerTransformWidget {
+        "boundingBox"?: BoundingBox.BoundingBox;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */

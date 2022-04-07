@@ -46,6 +46,18 @@ export class FlyToPositionKeyInteraction
         hit.hitPoint.y != null &&
         hit.hitPoint.z != null
       ) {
+        const newLookAt = Vector3.create(
+          hit.hitPoint.x,
+          hit.hitPoint.y,
+          hit.hitPoint.z
+        );
+        const currentViewVectorMagnitude = Vector3.magnitude(camera.viewVector);
+        const newViewVector = Vector3.scale(
+          currentViewVectorMagnitude,
+          Vector3.normalize(Vector3.subtract(newLookAt, camera.position))
+        );
+        const newPosition = Vector3.subtract(newLookAt, newViewVector);
+
         await this.stream.flyTo({
           camera: FrameCamera.toProtobuf(
             camera
