@@ -2,7 +2,7 @@ import regl from 'regl';
 
 import { Frame } from '../../lib/types';
 
-export function draw(
+export function drawStandard(
   reglCommand: regl.Regl,
   frame: Frame
 ): regl.DrawCommand<regl.DefaultContext> {

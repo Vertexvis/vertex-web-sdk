@@ -207,6 +207,26 @@ export function pad(rect: Rectangle, padding: number): Rectangle {
 }
 
 /**
+ * Returns `true` if the given rectangle contains all the given `points`.
+ *
+ * @param rect The rectangle to check against.
+ * @param points The points to check.
+ */
+export function containsPoints(
+  rect: Rectangle,
+  ...points: Point.Point[]
+): boolean {
+  return points.every((point) => {
+    return (
+      rect.x < point.x &&
+      rect.x + rect.width > point.x &&
+      rect.y < point.y &&
+      rect.y + rect.height > point.y
+    );
+  });
+}
+
+/**
  * Parses a JSON string representation of a Rectangle and returns an object.
  *
  * @param json A JSON string, either in the form `[x,y,width,height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`

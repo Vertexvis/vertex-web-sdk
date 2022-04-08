@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import {
-  BoundingBox,
+  Matrix4,
   Plane,
   Point,
   Ray,
@@ -9,8 +9,8 @@ import {
 } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
-import { Viewport } from '../..';
-import { Mesh } from './mesh';
+import { TransformController } from '../../lib/transforms/controller';
+import { Mesh } from '../../lib/transforms/mesh';
 import { TransformGlWidget } from './widget';
 
 @Component({
@@ -31,19 +31,22 @@ export class ViewerTransformWidget {
    * as translation occurs.
    */
   @Prop({ mutable: true })
-  public position: Vector3.Vector3 = Vector3.create();
+  public position?: Vector3.Vector3;
 
-  @Prop()
-  public boundingBox?: BoundingBox.BoundingBox;
+  @Prop({ mutable: true })
+  public currentPosition?: Vector3.Vector3;
+
+  @Prop({ mutable: true })
+  public controller?: TransformController;
+
+  @Prop({ reflect: true, mutable: true })
+  public hovered?: string;
 
   @State()
   private draggingMesh?: Mesh;
 
   @State()
   private lastWorldPosition?: Vector3.Vector3;
-
-  @State()
-  private hoveredMeshIdentifier?: string;
 
   @State()
   private widgetScreenBounds?: Rectangle.Rectangle;
@@ -66,7 +69,20 @@ export class ViewerTransformWidget {
     oldViewer?: HTMLVertexViewerElement
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
+    oldViewer?.removeEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChanged
+    );
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
+    newViewer?.addEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChanged
+    );
+
+    if (newViewer?.stream != null) {
+      this.controller?.dispose();
+      this.controller = new TransformController(newViewer.stream);
+    }
 
     if (this.canvasRef != null && newViewer != null) {
       this.canvasRef.width = newViewer.clientWidth;
@@ -76,14 +92,28 @@ export class ViewerTransformWidget {
 
   @Watch('position')
   protected handlePositionChanged(): void {
-    console.log(this.position);
-    this.getTransformWidget()?.updatePosition(this.position);
+    this.currentPosition = this.position;
+    this.getTransformWidget()?.updatePosition(this.currentPosition);
+
+    if (this.position == null) {
+      this.controller?.clearTransform();
+    }
+  }
+
+  @Watch('currentPosition')
+  protected handleCurrentPositionChanged(): void {
+    if (this.currentPosition != null) {
+      const widget = this.getTransformWidget();
+
+      widget?.updatePosition(this.currentPosition);
+      this.widgetScreenBounds = widget?.getWidgetBounds();
+    }
   }
 
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        {this.position != null && (
+        {
           <canvas
             ref={(el) => {
               this.canvasRef = el;
@@ -93,32 +123,41 @@ export class ViewerTransformWidget {
             })}
             onPointerDown={this.handlePointerDown}
           />
-        )}
-
-        {/* {this.widgetScreenBounds && <div style={{
-          opacity: '0.5',
-          backgroundColor: 'blue',
-          top: this.widgetScreenBounds.x,
-          left: this.widgetScreenBounds.y,
-
-        }} />} */}
+        }
       </Host>
     );
   }
 
-  private handleViewerFrameDrawn = async (): Promise<void> => {
+  private handleViewerFrameDrawn = (): void => {
     this.updatePropsFromViewer();
+  };
+
+  private handleViewerDimensionsChanged = (): void => {
+    if (
+      this.canvasRef != null &&
+      this.viewer != null &&
+      this.viewer.frame != null
+    ) {
+      this.canvasRef.width = this.viewer.viewport.width;
+      this.canvasRef.height = this.viewer.viewport.height;
+      this.canvasBounds = this.canvasRef?.getBoundingClientRect();
+
+      this.getTransformWidget()?.updateDimensions(this.canvasRef);
+    }
   };
 
   private handleWindowPointerMove = (event: PointerEvent): void => {
     const canvasPoint = this.pointToCanvas(
       Point.create(event.clientX, event.clientY)
     );
+    const widget = this.getTransformWidget();
 
-    if (canvasPoint != null) {
-      this.getTransformWidget()?.updateCursor(canvasPoint);
-      this.hoveredMeshIdentifier =
-        this.getTransformWidget()?.hovered()?.identifier;
+    if (canvasPoint != null && this.isPointWithinWidgetBounds(canvasPoint)) {
+      widget?.updateCursor(canvasPoint);
+      this.hovered = widget?.hovered()?.identifier;
+    } else {
+      widget?.updateCursor(undefined);
+      this.hovered = undefined;
     }
   };
 
@@ -134,6 +173,8 @@ export class ViewerTransformWidget {
         canvasPosition != null
           ? await this.pointToWorld(canvasPosition)
           : undefined;
+
+      this.controller?.beginTransform();
 
       window.removeEventListener('pointermove', this.handleWindowPointerMove);
       window.addEventListener('pointermove', this.handlePointerMove);
@@ -164,6 +205,9 @@ export class ViewerTransformWidget {
 
   private handlePointerUp = (): void => {
     this.draggingMesh = undefined;
+    this.lastWorldPosition = undefined;
+
+    this.controller?.endTransform();
 
     window.addEventListener('pointermove', this.handleWindowPointerMove);
     window.removeEventListener('pointermove', this.handlePointerMove);
@@ -174,7 +218,10 @@ export class ViewerTransformWidget {
     const { frame } = this.viewer || {};
 
     if (frame != null) {
-      this.getTransformWidget()?.updateFrame(frame);
+      const widget = this.getTransformWidget();
+
+      widget?.updateFrame(frame);
+      this.widgetScreenBounds = widget?.getWidgetBounds();
     }
   };
 
@@ -182,10 +229,9 @@ export class ViewerTransformWidget {
     point: Point.Point
   ): Promise<Vector3.Vector3 | undefined> {
     const { frame } = this.viewer || {};
-    const depthBuffer = await frame?.depthBuffer();
 
-    if (frame != null && depthBuffer != null) {
-      const viewport = Viewport.fromDimensions(frame.dimensions);
+    if (frame != null && this.currentPosition != null && this.viewer != null) {
+      const viewport = this.viewer?.viewport;
 
       const ray = viewport.transformPointToRay(
         point,
@@ -194,7 +240,7 @@ export class ViewerTransformWidget {
       );
       const positionPlane = Plane.fromNormalAndCoplanarPoint(
         frame.scene.camera.direction,
-        this.position
+        this.currentPosition
       );
       return Ray.intersectPlane(ray, positionPlane);
     }
@@ -207,10 +253,7 @@ export class ViewerTransformWidget {
     if (
       canvasBounds != null &&
       this.canvasRef != null &&
-      point.x > canvasBounds.left &&
-      point.x < canvasBounds.right &&
-      point.y > canvasBounds.top &&
-      point.y < canvasBounds.bottom
+      Rectangle.containsPoints(canvasBounds, point)
     ) {
       return Point.create(
         point.x - canvasBounds.left,
@@ -221,35 +264,59 @@ export class ViewerTransformWidget {
     return undefined;
   }
 
+  private isPointWithinWidgetBounds(point: Point.Point): boolean {
+    if (
+      this.widgetScreenBounds != null &&
+      Rectangle.containsPoints(this.widgetScreenBounds, point)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   private transform(previous: Vector3.Vector3, next: Vector3.Vector3): void {
     const { frame } = this.viewer || {};
 
-    if (frame != null) {
+    if (
+      frame != null &&
+      this.position != null &&
+      this.currentPosition != null
+    ) {
       if (this.draggingMesh?.identifier === 'x-translate') {
-        this.position = {
-          ...this.position,
-          x: Vector3.subtract(next, previous).x + this.position.x,
+        this.currentPosition = {
+          ...this.currentPosition,
+          x: Vector3.subtract(next, previous).x + this.currentPosition.x,
         };
 
-        this.getTransformWidget()?.updatePosition(this.position);
+        this.controller?.updateTransform(
+          Matrix4.makeTranslation(
+            Vector3.subtract(this.position, this.currentPosition)
+          )
+        );
       } else if (this.draggingMesh?.identifier === 'y-translate') {
-        this.position = {
-          ...this.position,
-          y: Vector3.subtract(next, previous).y + this.position.y,
+        this.currentPosition = {
+          ...this.currentPosition,
+          y: Vector3.subtract(next, previous).y + this.currentPosition.y,
         };
 
-        this.getTransformWidget()?.updatePosition(this.position);
+        this.controller?.updateTransform(
+          Matrix4.makeTranslation(
+            Vector3.subtract(this.position, this.currentPosition)
+          )
+        );
       } else if (this.draggingMesh?.identifier === 'z-translate') {
-        this.position = {
-          ...this.position,
-          z: Vector3.subtract(next, previous).z + this.position.z,
+        this.currentPosition = {
+          ...this.currentPosition,
+          z: Vector3.subtract(next, previous).z + this.currentPosition.z,
         };
 
-        this.getTransformWidget()?.updatePosition(this.position);
+        this.controller?.updateTransform(
+          Matrix4.makeTranslation(
+            Vector3.subtract(this.position, this.currentPosition)
+          )
+        );
       }
     }
-
-    this.widgetScreenBounds = this.getTransformWidget()?.getViewportBounds();
   }
 
   private getCanvasBounds = (): DOMRect | undefined => {

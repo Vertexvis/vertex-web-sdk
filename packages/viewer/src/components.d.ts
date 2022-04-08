@@ -24,7 +24,7 @@ import { ViewerStream } from "./lib/stream/stream";
 import { AngleUnitType, DepthBuffer, DistanceUnitType, EntityType, FrameCameraBase as FrameCameraBase1, FramePerspectiveCamera, Measurement, Orientation, StencilBufferManager, Viewport } from "./lib/types";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
-import { BoundingBox, Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
+import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
 import { Disposable } from "@vertexvis/utils";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
 import { KeyInteraction } from "./lib/interactions/keyInteraction";
@@ -50,6 +50,7 @@ import { ViewerMeasurementToolType } from "./components/viewer-measurement-tool/
 import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from "./components/viewer-measurement-tool/viewer-measurement-tool";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
+import { TransformController } from "./lib/transforms/controller";
 export namespace Components {
     interface VertexSceneTree {
         /**
@@ -1032,11 +1033,13 @@ export namespace Components {
         "direction": ViewerToolbarGroupDirection;
     }
     interface VertexViewerTransformWidget {
-        "boundingBox"?: BoundingBox.BoundingBox;
+        "controller"?: TransformController;
+        "currentPosition"?: Vector3.Vector3;
+        "hovered"?: string;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */
-        "position": Vector3.Vector3;
+        "position"?: Vector3.Vector3;
         /**
           * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
@@ -2238,7 +2241,9 @@ declare namespace LocalJSX {
         "direction"?: ViewerToolbarGroupDirection;
     }
     interface VertexViewerTransformWidget {
-        "boundingBox"?: BoundingBox.BoundingBox;
+        "controller"?: TransformController;
+        "currentPosition"?: Vector3.Vector3;
+        "hovered"?: string;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */
