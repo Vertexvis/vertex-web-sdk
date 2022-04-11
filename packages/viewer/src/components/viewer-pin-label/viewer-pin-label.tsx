@@ -198,6 +198,7 @@ export class VertexPinLabel {
                   point: translatePointToRelative(point, this.elementBounds),
                   text: this.pin.label.text,
                 },
+                partId: this.pin?.partId,
               }
             : undefined;
 
