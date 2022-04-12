@@ -185,6 +185,8 @@ export class VertexPinLabel {
             maxHeight: this.computeMaxHeight(),
           }}
         >
+          {/* This corrects for a behavior in Firefox where setting the `disabled` attribute to true */}
+          {/* prevents any events from propagating. */}
           {!this.focused && (
             <div
               class="pin-input-drag-target"
@@ -220,6 +222,9 @@ export class VertexPinLabel {
   }
 
   private hiddenContent(): Array<string | HTMLBRElement> {
+    // This corrects some inconsistencies in how a newline character
+    // is represented in a div. Leveraging `<br>`s results in a more
+    // consistent representation of the newlines in a textarea.
     return this.value.includes('\n')
       ? this.value
           .split('\n')
