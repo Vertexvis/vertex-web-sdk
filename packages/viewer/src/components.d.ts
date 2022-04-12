@@ -2543,7 +2543,15 @@ declare namespace LocalJSX {
      * The dimensions of the canvas for the pins
      */
     elementBounds?: DOMRect;
+    /**
+     * Emitted whenever the label is blurred, with the ID of the associated pin (or undefined if no pin is provided).
+     */
+    onLabelBlurred?: (event: CustomEvent<string | undefined>) => void;
     onLabelChanged?: (event: CustomEvent<void>) => void;
+    /**
+     * Emitted whenever the label is focused, with the ID of the associated pin (or undefined if no pin is provided).
+     */
+    onLabelFocused?: (event: CustomEvent<string | undefined>) => void;
     /**
      * The pin to draw for the group
      */
