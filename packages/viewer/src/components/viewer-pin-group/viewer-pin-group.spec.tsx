@@ -54,9 +54,12 @@ describe('vertex-view-pin-group', () => {
           </svg>
         </vertex-viewer-pin-label-line>
         <vertex-viewer-pin-label>
-          <div class="pin-label" id="pin-label-my-pin-id" style="top: 50px; left: 50px;">
-            My New Pin
-          </div>
+        <div class="pin-label-input-wrapper" id="pin-label-my-pin-id" style="top: 50px; left: 50px; min-width: var(--viewer-annotations-pin-label-min-width); max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
+          <textarea class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
+        </div>
+        <div class="pin-label-hidden pin-label-text" style="max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
+          My New Pin
+        </div>
         </vertex-viewer-pin-label>
       </vertex-viewer-pin-group>
     `);

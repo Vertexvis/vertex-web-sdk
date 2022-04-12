@@ -22,6 +22,7 @@ import {
   translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
+import { getComputedStyle } from './utils';
 
 @Component({
   tag: 'vertex-viewer-pin-label',
@@ -184,6 +185,12 @@ export class VertexPinLabel {
             maxHeight: this.computeMaxHeight(),
           }}
         >
+          {!this.focused && (
+            <div
+              class="pin-input-drag-target"
+              onPointerDown={this.handlePointerDown}
+            />
+          )}
           <textarea
             id={`pin-label-input-${this.pin?.id}`}
             class={classNames('pin-label-input', 'pin-label-text', {
@@ -206,22 +213,30 @@ export class VertexPinLabel {
             maxHeight: this.computeMaxHeight(),
           }}
         >
-          {this.value
-            .split('\n')
-            .reduce(
-              (res, str) => [...res, str, <br />],
-              [] as Array<string | HTMLBRElement>
-            )}
+          {this.hiddenContent()}
         </div>
       </Host>
     );
   }
 
-  private computeMinWidth(): string | undefined {
+  private hiddenContent(): Array<string | HTMLBRElement> {
+    return this.value.includes('\n')
+      ? this.value
+          .split('\n')
+          .reduce(
+            (res, str) => [...res, str, <br />],
+            [] as Array<string | HTMLBRElement>
+          )
+      : [this.value];
+  }
+
+  private computeMinWidth(): string {
     if (this.contentElBounds != null) {
       const expected = `${this.contentElBounds.width + 16}px`;
 
       return `min(${expected}, ${this.computeMaxWidth()})`;
+    } else {
+      return `var(--viewer-annotations-pin-label-min-width)`;
     }
   }
 
@@ -262,7 +277,7 @@ export class VertexPinLabel {
     readDOM(() => {
       if (this.contentEl != null) {
         this.contentElBounds = this.contentEl.getBoundingClientRect();
-        const computedStyles = window.getComputedStyle(this.contentEl);
+        const computedStyles = getComputedStyle(this.contentEl);
         this.textareaRows = Math.max(
           1,
           Math.ceil(
