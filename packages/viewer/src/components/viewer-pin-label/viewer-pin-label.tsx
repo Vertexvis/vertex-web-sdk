@@ -60,6 +60,20 @@ export class VertexPinLabel {
   @Event({ bubbles: true })
   public labelChanged!: EventEmitter<void>;
 
+  /**
+   * Emitted whenever the label is focused, with the ID of the
+   * associated pin (or undefined if no pin is provided).
+   */
+  @Event({ bubbles: true })
+  public labelFocused!: EventEmitter<string | undefined>;
+
+  /**
+   * Emitted whenever the label is blurred, with the ID of the
+   * associated pin (or undefined if no pin is provided).
+   */
+  @Event({ bubbles: true })
+  public labelBlurred!: EventEmitter<string | undefined>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -337,6 +351,7 @@ export class VertexPinLabel {
 
       if (distanceBetweenStartAndEndPoint <= 2) {
         this.focused = true;
+        this.labelFocused.emit(this.pin?.id);
       }
     }
 
@@ -353,6 +368,7 @@ export class VertexPinLabel {
 
   private submit(): void {
     this.focused = false;
+    this.labelBlurred.emit(this.pin?.id);
     if (this.pin != null) {
       this.pinController?.setPin({
         ...this.pin,
