@@ -12,12 +12,12 @@ import {
   Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, PinModel, TextPin } from '../../lib/pins/model';
+import { readDOM } from '../../lib/stencil';
 import {
   translatePointToRelative,
   translatePointToScreen,
@@ -69,9 +69,19 @@ export class VertexPinLabel {
   @State()
   private computedScreenPosition?: Point.Point;
 
-  private inputEl?: HTMLInputElement;
+  @State()
+  private textareaRows = 1;
+
+  private contentElBounds?: DOMRect;
+
+  private relativePointerDownPosition?: Point.Point;
+  private pinPointerDownPosition?: Point.Point;
+
+  private inputEl?: HTMLTextAreaElement;
+  private contentEl?: HTMLDivElement;
 
   private resizeObserver?: ResizeObserver;
+  private contentResizeObserver?: ResizeObserver;
 
   public constructor() {
     if (this.pin?.label.text != null) {
@@ -107,13 +117,23 @@ export class VertexPinLabel {
     this.computeScreenPosition();
   }
 
+  protected componentWillLoad(): void {
+    this.computeScreenPosition();
+  }
+
   protected componentDidLoad(): void {
     this.resizeObserver = new ResizeObserver(() => {
       this.labelChanged.emit();
     });
 
+    this.contentResizeObserver = new ResizeObserver(this.computeContentSize);
+
     if (this.hostEl != null) {
       this.resizeObserver.observe(this.hostEl);
+    }
+
+    if (this.contentEl != null) {
+      this.contentResizeObserver.observe(this.contentEl);
     }
 
     if (this.pinController == null) {
@@ -123,6 +143,7 @@ export class VertexPinLabel {
 
   protected disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
+    this.contentResizeObserver?.disconnect();
   }
 
   protected componentDidRender(): void {
@@ -132,108 +153,163 @@ export class VertexPinLabel {
   }
 
   protected render(): JSX.Element {
-    const screenPosition =
-      this.computedScreenPosition || this.computeScreenPosition();
     return (
       <Host>
-        {this.focused ? (
-          <input
-            id={`pin-label-${this.pin?.id}`}
-            type="text"
-            class={classNames('pin-label')}
+        <div
+          id={`pin-label-${this.pin?.id}`}
+          class={classNames('pin-label-input-wrapper', {
+            focused: this.focused,
+          })}
+          onPointerDown={this.handlePointerDown}
+          style={{
+            top: `${this.computedScreenPosition?.y.toString() || 0}px`,
+            left: `${this.computedScreenPosition?.x.toString() || 0}px`,
+            minWidth:
+              this.contentElBounds != null && !this.focused
+                ? `calc(${
+                    this.contentElBounds.width + 2
+                  }px + calc(2 * var(--viewer-annotations-pin-label-padding-x)))`
+                : undefined,
+          }}
+        >
+          <textarea
+            id={`pin-label-input-${this.pin?.id}`}
+            class={classNames('pin-label-input', 'pin-label-text', {
+              ['readonly']: !this.focused,
+            })}
+            disabled={!this.focused}
             ref={(ref) => (this.inputEl = ref)}
             value={this.value}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                this.submit();
-              }
-            }}
+            rows={this.textareaRows}
+            onKeyDown={this.handleInputKeyDown}
             onInput={this.handleTextInput}
-            onFocus={this.handleTextFocus}
             onBlur={this.handleTextBlur}
-            style={{
-              top: `${screenPosition?.y.toString() || 0}px`,
-              left: `${screenPosition?.x.toString() || 0}px`,
-            }}
           />
-        ) : (
-          <div
-            id={`pin-label-${this.pin?.id}`}
-            class={classNames('pin-label')}
-            style={{
-              top: `${screenPosition?.y.toString() || 0}px`,
-              left: `${screenPosition?.x.toString() || 0}px`,
-            }}
-            onPointerDown={(e) => this.pointerDownAndMove(e)}
-          >
-            {this.pin?.label.text}
-          </div>
-        )}
+        </div>
+        <div
+          ref={(el) => (this.contentEl = el)}
+          class={classNames('pin-label-text', 'pin-label-hidden')}
+        >
+          {this.value
+            .split('\n')
+            .reduce(
+              (res, str) => [...res, str, <br />],
+              [] as Array<string | HTMLBRElement>
+            )}
+        </div>
       </Host>
     );
   }
 
-  private computeScreenPosition(): Point.Point | undefined {
+  private computeScreenPosition(): void {
     this.computedScreenPosition =
       isTextPin(this.pin) &&
       this.elementBounds != null &&
       this.pin.label.point != null
         ? translatePointToScreen(this.pin.label.point, this.elementBounds)
         : undefined;
-    return this.computedScreenPosition;
   }
 
-  private pointerDownAndMove(pointerDown: PointerEvent): Disposable {
-    this.pinController?.setSelectedPinId(this.pin?.id);
-
-    const pointerMove = (event: PointerEvent): void => {
-      if (this.elementBounds != null) {
-        const point = getMouseClientPosition(event, this.elementBounds);
-        const myUpdatedPin =
-          this.pin != null
-            ? {
-                id: this.pin.id,
-                worldPosition: this.pin.worldPosition,
-                label: {
-                  point: translatePointToRelative(point, this.elementBounds),
-                  text: this.pin.label.text,
-                },
-              }
-            : undefined;
-
-        if (myUpdatedPin) {
-          this.pinController?.setPin(myUpdatedPin);
-        }
+  private computeContentSize = (): void => {
+    readDOM(() => {
+      if (this.contentEl != null) {
+        this.contentElBounds = this.contentEl.getBoundingClientRect();
+        const computedStyles = window.getComputedStyle(this.contentEl);
+        this.textareaRows = Math.max(
+          1,
+          Math.ceil(
+            parseFloat(computedStyles.height) /
+              parseFloat(computedStyles.lineHeight)
+          )
+        );
       }
-    };
+    });
+  };
 
-    const dispose = (): void => {
-      window.removeEventListener('pointermove', pointerMove);
-      window.removeEventListener('pointerup', pointerUp);
-    };
+  private handleInputKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      this.submit();
+    } else if (event.key === 'Enter') {
+      this.textareaRows += 1;
+    }
+  };
 
-    const pointerUp = (pointerUp: PointerEvent): void => {
-      const distnaceBetweenStartAndEndPoint = Point.distance(
-        Point.create(pointerDown.clientX, pointerUp.clientY),
-        Point.create(pointerUp.clientX, pointerUp.clientY)
+  private handlePointerDown = (event: PointerEvent): void => {
+    if (!this.focused) {
+      this.pinController?.setSelectedPinId(this.pin?.id);
+
+      if (this.elementBounds != null) {
+        this.relativePointerDownPosition = translatePointToRelative(
+          getMouseClientPosition(event, this.elementBounds),
+          this.elementBounds
+        );
+        this.pinPointerDownPosition = this.pin?.label.point;
+
+        window.addEventListener('pointermove', this.handlePointerMove);
+        window.addEventListener('pointerup', this.handlePointerUp);
+      }
+    }
+  };
+
+  private handlePointerMove = (event: PointerEvent): void => {
+    if (
+      this.elementBounds != null &&
+      this.relativePointerDownPosition &&
+      this.pinPointerDownPosition != null
+    ) {
+      const point = getMouseClientPosition(event, this.elementBounds);
+      const relative = translatePointToRelative(point, this.elementBounds);
+
+      const relativeDelta = Point.subtract(
+        relative,
+        this.relativePointerDownPosition
       );
 
-      if (distnaceBetweenStartAndEndPoint <= 2) {
+      const myUpdatedPin =
+        this.pin != null
+          ? {
+              id: this.pin.id,
+              worldPosition: this.pin.worldPosition,
+              label: {
+                point: Point.add(this.pinPointerDownPosition, relativeDelta),
+                text: this.pin.label.text,
+              },
+            }
+          : undefined;
+
+      if (myUpdatedPin) {
+        this.pinController?.setPin(myUpdatedPin);
+        this.computeScreenPosition();
+      }
+    }
+  };
+
+  private handlePointerUp = (event: PointerEvent): void => {
+    if (
+      this.pinController?.getToolMode() === 'edit' &&
+      this.relativePointerDownPosition != null &&
+      this.elementBounds != null
+    ) {
+      const pointerDownScreen = translatePointToScreen(
+        this.relativePointerDownPosition,
+        this.elementBounds
+      );
+      const distanceBetweenStartAndEndPoint = Point.distance(
+        pointerDownScreen,
+        getMouseClientPosition(event, this.elementBounds)
+      );
+
+      if (distanceBetweenStartAndEndPoint <= 2) {
         this.focused = true;
       }
-      dispose();
-    };
+    }
 
-    window.addEventListener('pointermove', pointerMove);
-    window.addEventListener('pointerup', pointerUp);
+    this.relativePointerDownPosition = undefined;
+    this.pinPointerDownPosition = undefined;
 
-    return {
-      dispose,
-    };
-  }
-
-  private handleTextFocus = (): void => {
-    this.focused = true;
+    window.removeEventListener('pointermove', this.handlePointerMove);
+    window.removeEventListener('pointerup', this.handlePointerUp);
   };
 
   private handleTextBlur = (): void => {

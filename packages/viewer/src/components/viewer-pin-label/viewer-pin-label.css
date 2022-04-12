@@ -3,38 +3,56 @@
    * @prop --viewer-annotations-pin-label-background-color: A CSS color that
    * specifies the color of the label background
    */
-   --viewer-annotations-pin-label-background-color: var(--blue-200);
+  --viewer-annotations-pin-label-background-color: var(--blue-200);
 
   /**
-   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
-   * specifies the color of the label background
+   * @prop --viewer-annotations-pin-label-border-color: A CSS color that
+   * specifies the color of the label's border
    */
-   --viewer-annotations-pin-label-border-color: var(--blue-600);
+  --viewer-annotations-pin-label-border-color: var(--blue-600);
 
   /**
    * @prop --viewer-annotations-pin-label-color: A CSS color that
    * specifies the color of the label 
    */
-   --viewer-annotations-pin-label-color: var(--white);
+  --viewer-annotations-pin-label-color: var(--white);
 
   /**
-   * @prop --viewer-annotations-pin-label-padding: A var that
-   * specifies the padding of the label 
+   * @prop --viewer-annotations-pin-label-padding-y: A var that
+   * specifies the vertical padding of the label
    */
-   --viewer-annotations-pin-label-padding: 0.375em 0.5em;
+  --viewer-annotations-pin-label-padding-y: 0.375em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-padding-x: A var that
+   * specifies the horizontal padding of the label
+   */
+  --viewer-annotations-pin-label-padding-x:  0.5em;
 
   /**
    * @prop --viewer-annotations-pin-label-border: A var that
    * specifies the border of the label
    */
-   --viewer-annotations-pin-label-border: 2px solid var(--viewer-annotations-pin-label-border-color);
+  --viewer-annotations-pin-label-border: 2px solid var(--viewer-annotations-pin-label-border-color);
 
-     /**
+  /**
    * @prop --viewer-annotations-pin-label-border-radius: A var that
    * specifies the border radius of the label
    */
-   --viewer-annotations-pin-label-border-radius: 0.25em;
-   
+  --viewer-annotations-pin-label-border-radius: 0.25em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-min-width: A CSS length that
+   * specifies the minimum width of the label. Defaults to `1rem`.
+   */
+  --viewer-annotations-pin-label-min-width: 2rem;
+
+  /**
+   * @prop --viewer-annotations-pin-label-max-width: A CSS length that
+   * specifies the maximum width of the label. Defaults to `25rem`.
+   */
+  --viewer-annotations-pin-label-max-width: 25rem;
+
   overflow: hidden;
   pointer-events: none;
 }
@@ -44,15 +62,53 @@
   background: var(--viewer-annotations-pin-label-background-color);
 }
 
-.pin-label {
+.pin-label-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.pin-label-input-wrapper {
+  display: flex;
   position: absolute;
+  pointer-events: auto;
+  min-width: var(--viewer-annotations-pin-label-min-width);
+  max-width: var(--viewer-annotations-pin-label-max-width);
   background: var(--viewer-annotations-pin-label-background-color);
   border: var(--viewer-annotations-pin-label-border);
   border-radius: var(--viewer-annotations-pin-label-border-radius);
-  padding: var(--viewer-annotations-pin-label-padding);
-  pointer-events: auto;
+}
+
+.pin-label-input-wrapper.focused {
+  min-width: var(--viewer-annotations-pin-label-max-width);
+}
+
+.pin-label-input {
+  resize: none;
+  position: relative;
+  outline: none;
+  border: none;
+  padding: 0 0 0 0;
+  background-color: transparent;
+  overflow: hidden;
+  margin: var(--viewer-annotations-pin-label-padding-y) var(--viewer-annotations-pin-label-padding-x);
+  width: 100%;
+  max-width: calc(var(--viewer-annotations-pin-label-max-width) - calc(2 * var(--viewer-annotations-pin-label-padding-x)));
+}
+
+.pin-label-input.readonly {
+  color: black;
   cursor: pointer;
-  min-width: 16px;
-  min-height: 14px;
+}
+
+.pin-label-hidden {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
   width: auto;
+  height: auto;
+  margin: var(--viewer-annotations-pin-label-padding-y) var(--viewer-annotations-pin-label-padding-x);
+  max-width: calc(var(--viewer-annotations-pin-label-max-width) - calc(2 * var(--viewer-annotations-pin-label-padding-x)));
 }
