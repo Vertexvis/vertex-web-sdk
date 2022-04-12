@@ -344,6 +344,7 @@ export class VertexPinLabel {
                 point: Point.add(this.pinPointerDownPosition, relativeDelta),
                 text: this.pin.label.text,
               },
+              partId: this.pin?.partId,
             }
           : undefined;
 
