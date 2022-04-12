@@ -72,6 +72,7 @@ export class VertexPinLabel {
   @State()
   private textareaRows = 1;
 
+  @State()
   private contentElBounds?: DOMRect;
 
   private relativePointerDownPosition?: Point.Point;
@@ -164,12 +165,9 @@ export class VertexPinLabel {
           style={{
             top: `${this.computedScreenPosition?.y.toString() || 0}px`,
             left: `${this.computedScreenPosition?.x.toString() || 0}px`,
-            minWidth:
-              this.contentElBounds != null && !this.focused
-                ? `calc(${
-                    this.contentElBounds.width + 2
-                  }px + calc(2 * var(--viewer-annotations-pin-label-padding-x)))`
-                : undefined,
+            minWidth: this.computeMinWidth(),
+            maxWidth: this.computeMaxWidth(),
+            maxHeight: this.computeMaxHeight(),
           }}
         >
           <textarea
@@ -189,6 +187,10 @@ export class VertexPinLabel {
         <div
           ref={(el) => (this.contentEl = el)}
           class={classNames('pin-label-text', 'pin-label-hidden')}
+          style={{
+            maxWidth: this.computeMaxWidth(),
+            maxHeight: this.computeMaxHeight(),
+          }}
         >
           {this.value
             .split('\n')
@@ -199,6 +201,38 @@ export class VertexPinLabel {
         </div>
       </Host>
     );
+  }
+
+  private computeMinWidth(): string | undefined {
+    if (this.contentElBounds != null) {
+      const expected = `${this.contentElBounds.width + 16}px`;
+
+      return `min(${expected}, ${this.computeMaxWidth()})`;
+    }
+  }
+
+  private computeMaxWidth(): string {
+    const expected = `var(--viewer-annotations-pin-label-max-width)`;
+
+    return `min(${expected}, ${this.computeRemainingWidth()})`;
+  }
+
+  private computeMaxHeight(): string {
+    const expected = `var(--viewer-annotations-pin-label-max-height)`;
+
+    return `min(${expected}, ${this.computeRemainingHeight()})`;
+  }
+
+  private computeRemainingWidth(): string {
+    return `calc(${this.elementBounds?.width.toString() || 0}px - ${
+      this.computedScreenPosition?.x.toString() || 0
+    }px)`;
+  }
+
+  private computeRemainingHeight(): string {
+    return `calc(${this.elementBounds?.height.toString() || 0}px - ${
+      this.computedScreenPosition?.y.toString() || 0
+    }px)`;
   }
 
   private computeScreenPosition(): void {
@@ -218,7 +252,8 @@ export class VertexPinLabel {
         this.textareaRows = Math.max(
           1,
           Math.ceil(
-            parseFloat(computedStyles.height) /
+            (parseFloat(computedStyles.height) -
+              parseFloat(computedStyles.borderWidth) * 2) /
               parseFloat(computedStyles.lineHeight)
           )
         );
