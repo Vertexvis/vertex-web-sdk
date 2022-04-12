@@ -185,14 +185,6 @@ export class VertexPinLabel {
             maxHeight: this.computeMaxHeight(),
           }}
         >
-          {/* This corrects for a behavior in Firefox where setting the `disabled` attribute to true */}
-          {/* prevents any events from propagating. */}
-          {!this.focused && (
-            <div
-              class="pin-input-drag-target"
-              onPointerDown={this.handlePointerDown}
-            />
-          )}
           <textarea
             id={`pin-label-input-${this.pin?.id}`}
             class={classNames('pin-label-input', 'pin-label-text', {
@@ -206,6 +198,14 @@ export class VertexPinLabel {
             onInput={this.handleTextInput}
             onBlur={this.handleTextBlur}
           />
+          {/* This corrects for a behavior in Firefox where setting the `disabled` attribute to true */}
+          {/* prevents any events from propagating. */}
+          {!this.focused && (
+            <div
+              class="pin-input-drag-target"
+              onPointerDown={this.handlePointerDown}
+            />
+          )}
         </div>
         <div
           ref={(el) => (this.contentEl = el)}
