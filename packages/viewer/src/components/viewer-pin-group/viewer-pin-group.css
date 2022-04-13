@@ -74,6 +74,7 @@
 
 .pin {
   color: var(--viewer-annotations-pin-color);
+  cursor: pointer;
 }
 
 .pin-selected {
