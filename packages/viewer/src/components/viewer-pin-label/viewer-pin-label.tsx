@@ -100,11 +100,7 @@ export class VertexPinLabel {
   private contentResizeObserver?: ResizeObserver;
 
   public constructor() {
-    if (this.pin?.label.text != null) {
-      this.value = this.pin.label.text;
-    } else {
-      this.value = '';
-    }
+    this.value = this.getPinText();
   }
 
   /**
@@ -125,6 +121,8 @@ export class VertexPinLabel {
 
   @Watch('pin')
   protected watchPinChange(): void {
+    console.log('Pin Change');
+    this.value = this.getPinText();
     this.computeScreenPosition();
   }
 
@@ -269,6 +267,16 @@ export class VertexPinLabel {
     }px)`;
   }
 
+  private getPinText(): string {
+    if (this.pin?.label.text != null) {
+      this.value = this.pin.label.text;
+    } else {
+      this.value = '';
+    }
+
+    return this.value;
+  }
+
   private computeScreenPosition(): void {
     this.computedScreenPosition =
       isTextPin(this.pin) &&
@@ -383,7 +391,7 @@ export class VertexPinLabel {
     window.removeEventListener('pointerup', this.handlePointerUp);
   };
 
-  private handleTextBlur = (): void => {
+  private handleTextBlur = async (): Promise<void> => {
     this.submit();
   };
 
