@@ -1,10 +1,18 @@
+import { Point, Vector3 } from '@vertexvis/geometry';
+
 import { Pin, PinModel, ViewerPinToolMode, ViewerPinToolType } from './model';
+
+export interface Draggable {
+  id: string;
+  lastPoint?: Point.Point;
+}
 
 /**
  * The `PinController` is responsible for adding pin entities to the viewer canvas
  */
 export class PinController {
-  private dragging?: boolean = false;
+  private draggable?: Draggable;
+
   public constructor(
     private model: PinModel,
     private mode: ViewerPinToolMode = 'view',
@@ -95,11 +103,29 @@ export class PinController {
     this.type = type;
   }
 
-  public getDragging(): boolean {
-    return this.dragging || false;
+  public getDraggable(): Draggable | undefined {
+    return this.draggable;
   }
 
-  public setDragging(dragging: boolean): void {
-    this.dragging = dragging;
+  public setDraggable(draggable: Draggable | undefined): void {
+    this.draggable = draggable;
+  }
+
+  public updateDraggable(
+    draggable: Draggable,
+    worldPosition: Vector3.Vector3,
+    partId?: string
+  ): void {
+    if (this.draggable != null) {
+      this.draggable = draggable;
+    }
+    const pin = this.model.getPinById(draggable.id);
+    if (pin != null) {
+      this.updatePin({
+        ...pin,
+        worldPosition,
+        partId,
+      });
+    }
   }
 }

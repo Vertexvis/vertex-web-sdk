@@ -1,7 +1,22 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
-import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+import {
+  Component,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  Watch,
+} from '@stencil/core';
+import {
+  Euler,
+  Matrix,
+  Matrix4,
+  Quaternion,
+  Vector3,
+} from '@vertexvis/geometry';
+import { Objects } from '@vertexvis/utils';
 
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
@@ -137,6 +152,16 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
     this.syncScale();
   }
 
+  @Watch('matrix')
+  protected handleMatrixChanged(
+    newMatrix: Matrix4.Matrix4,
+    oldMatrix: Matrix4.Matrix4
+  ): void {
+    if (!Objects.isEqual(newMatrix, oldMatrix)) {
+      this.propertyChange.emit();
+    }
+  }
+
   /**
    * The local matrix of this element.
    */
@@ -182,6 +207,12 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
    */
   @Prop({ reflect: true })
   public interactionsOff = false;
+
+  /**
+   * An event that is emitted any property on the dom group changes
+   */
+  @Event({ bubbles: true })
+  public propertyChange!: EventEmitter<void>;
 
   /**
    * @ignore

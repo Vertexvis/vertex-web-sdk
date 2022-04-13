@@ -1,18 +1,25 @@
 import {
   Component,
+  Event,
+  EventEmitter,
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
+import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, Pin, TextPin } from '../../lib/pins/model';
 import { PinModel } from '../../lib/pins/model';
-import { translatePointToScreen } from '../viewer-markup/utils';
+import {
+  translatePointToRelative,
+  translatePointToScreen,
+} from '../viewer-markup/utils';
 import { PinRenderer } from './pin-renderer';
 import { getClosestCenterToPoint } from './utils';
 
@@ -110,8 +117,9 @@ export class ViewerPinGroup {
             if (e.buttons !== 2) {
               e.stopPropagation();
             }
-
             this.pinController?.setSelectedPinId(this.pin?.id);
+
+            this.handleAnchorPointerDown(e);
           }}
         >
           {this.leafNodesRendered && (
@@ -206,6 +214,18 @@ export class ViewerPinGroup {
       }),
     };
   }
+
+  private handleAnchorPointerDown = (event: PointerEvent): void => {
+    if (
+      this.elementBounds != null &&
+      this.pinController?.getToolMode() === 'edit' &&
+      this.pin != null
+    ) {
+      this.pinController?.setDraggable({
+        id: this.pin.id,
+      });
+    }
+  };
 
   private getFromWorldPosition(
     pt: Vector3.Vector3,
