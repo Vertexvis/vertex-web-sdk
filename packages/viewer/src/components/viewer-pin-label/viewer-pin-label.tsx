@@ -121,7 +121,6 @@ export class VertexPinLabel {
 
   @Watch('pin')
   protected watchPinChange(): void {
-    console.log('Pin Change');
     this.value = this.getPinText();
     this.computeScreenPosition();
   }
