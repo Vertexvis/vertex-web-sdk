@@ -1932,7 +1932,7 @@ declare namespace LocalJSX {
      */
     occlusionOff?: boolean;
     /**
-     * An event that is emitted any property on the dom group changes
+     * An event that is emitted when any property on the dom group changes
      */
     onPropertyChange?: (event: CustomEvent<void>) => void;
     /**
@@ -1974,7 +1974,7 @@ declare namespace LocalJSX {
      */
     matrix?: Matrix4.Matrix4;
     /**
-     * An event that is emitted any property on the dom group changes
+     * An event that is emitted when any property on the dom group changes
      */
     onPropertyChange?: (event: CustomEvent<void>) => void;
     /**

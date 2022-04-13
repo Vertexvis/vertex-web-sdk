@@ -51,7 +51,7 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   }
 
   /**
-   * An event that is emitted any property on the dom group changes
+   * An event that is emitted when any property on the dom group changes
    */
   @Event({ bubbles: true })
   public propertyChange!: EventEmitter<void>;

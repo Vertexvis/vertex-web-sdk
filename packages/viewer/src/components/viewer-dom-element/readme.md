@@ -35,9 +35,9 @@ information.
 
 ## Events
 
-| Event            | Description                                                    | Type                |
-| ---------------- | -------------------------------------------------------------- | ------------------- |
-| `propertyChange` | An event that is emitted any property on the dom group changes | `CustomEvent<void>` |
+| Event            | Description                                                         | Type                |
+| ---------------- | ------------------------------------------------------------------- | ------------------- |
+| `propertyChange` | An event that is emitted when any property on the dom group changes | `CustomEvent<void>` |
 
 
 ## Dependencies
