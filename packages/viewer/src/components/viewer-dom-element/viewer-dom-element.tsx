@@ -9,13 +9,7 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import {
-  Euler,
-  Matrix,
-  Matrix4,
-  Quaternion,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { Objects } from '@vertexvis/utils';
 
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
