@@ -198,7 +198,6 @@ export class VertexPinLabel {
             disabled={!this.focused}
             ref={(ref) => (this.inputEl = ref)}
             value={this.value}
-            autoFocus={false}
             rows={this.textareaRows}
             onKeyDown={this.handleInputKeyDown}
             onInput={this.handleTextInput}
@@ -397,7 +396,7 @@ export class VertexPinLabel {
     window.removeEventListener('pointerup', this.handlePointerUp);
   };
 
-  private handleTextBlur = async (): Promise<void> => {
+  private handleTextBlur = (): void => {
     this.submit();
   };
 
