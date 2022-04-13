@@ -63,7 +63,7 @@ describe('vertex-viewer-pin-tool', () => {
 
     expect(pinTool.shadowRoot).toEqualHtml(`
       <vertex-viewer-dom-renderer drawmode="2d">
-        <vertex-viewer-pin-group data-is-dom-group-element>
+        <vertex-viewer-pin-group data-is-dom-group-element id="pin-group-my-pin-id">
           <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
             <div class="pin-anchor" id="pin-anchor"></div>
           </vertex-viewer-dom-element>
