@@ -146,6 +146,9 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
     this.syncScale();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('matrix')
   protected handleMatrixChanged(
     newMatrix: Matrix4.Matrix4,
