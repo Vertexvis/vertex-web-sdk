@@ -63,6 +63,15 @@ export class PinController {
   }
 
   /**
+   * Updates an existing pin
+   * @param pin A pin to set
+   * @returns `true` if the entity has been updated, false otherwise
+   */
+  public updatePin(pin: Pin): void {
+    this.model.updatePin(pin);
+  }
+
+  /**
    * Tells the controller which pin is selected in the model
    * @param pinId
    */
