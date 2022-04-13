@@ -171,6 +171,7 @@ export class ViewerPinTool {
           {this.pins.map((pin) => {
             return (
               <vertex-viewer-pin-group
+                id={`pin-group-${pin.id}`}
                 data-is-dom-group-element={true}
                 pin={pin}
                 elementBounds={this.elementBounds}

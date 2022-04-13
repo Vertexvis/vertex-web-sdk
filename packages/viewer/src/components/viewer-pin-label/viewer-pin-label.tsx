@@ -110,13 +110,21 @@ export class VertexPinLabel {
   public async setFocus(): Promise<void> {
     // HTMLInputElement.focus() doesn't exist in tests.
     if (typeof this.inputEl?.focus === 'function') {
-      this.inputEl?.focus();
+      if (this.focused) {
+        this.inputEl?.focus();
+      } else {
+        this.inputEl?.blur();
+      }
     }
   }
 
   @Watch('focused')
   protected watchFocusChange(): void {
     this.labelChanged.emit();
+
+    if (this.focused) {
+      this.pinController?.setSelectedPinId(this.pin?.id);
+    }
   }
 
   @Watch('pin')
@@ -190,6 +198,7 @@ export class VertexPinLabel {
             disabled={!this.focused}
             ref={(ref) => (this.inputEl = ref)}
             value={this.value}
+            autoFocus={false}
             rows={this.textareaRows}
             onKeyDown={this.handleInputKeyDown}
             onInput={this.handleTextInput}
@@ -313,8 +322,6 @@ export class VertexPinLabel {
 
   private handlePointerDown = (event: PointerEvent): void => {
     if (!this.focused) {
-      this.pinController?.setSelectedPinId(this.pin?.id);
-
       if (this.elementBounds != null) {
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
@@ -356,7 +363,7 @@ export class VertexPinLabel {
           : undefined;
 
       if (myUpdatedPin) {
-        this.pinController?.setPin(myUpdatedPin);
+        this.pinController?.updatePin(myUpdatedPin);
         this.computeScreenPosition();
       }
     }
@@ -398,7 +405,7 @@ export class VertexPinLabel {
     this.focused = false;
     this.labelBlurred.emit(this.pin?.id);
     if (this.pin != null) {
-      this.pinController?.setPin({
+      this.pinController?.updatePin({
         ...this.pin,
         label: {
           point: this.pin.label.point,

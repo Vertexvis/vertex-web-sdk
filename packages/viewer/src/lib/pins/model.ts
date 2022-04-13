@@ -136,7 +136,28 @@ export class PinModel {
       [pin.id]: pin,
     };
     this.entitiesChanged.emit(this.getPins());
+
     return true;
+  }
+
+  /**
+   * Sets the set of entities to be placed with the model.
+   *
+   * @param pin A pin to set
+   * @returns `true` if the entity has been set
+   */
+  public updatePin(pin: Pin): boolean {
+    const pinById = this.getPinById(pin.id);
+    if (pinById != null) {
+      this.entities = {
+        ...this.entities,
+        [pin.id]: pin,
+      };
+      this.entitiesChanged.emit(this.getPins());
+
+      return true;
+    }
+    return false;
   }
 
   /**
