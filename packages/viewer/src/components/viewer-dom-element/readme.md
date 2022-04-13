@@ -33,6 +33,13 @@ information.
 | `scaleJson`       | `scale`            | The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                                                                        | `string`                                                                                                                           | `''`                      |
 
 
+## Events
+
+| Event            | Description                                                         | Type                |
+| ---------------- | ------------------------------------------------------------------- | ------------------- |
+| `propertyChange` | An event that is emitted when any property on the dom group changes | `CustomEvent<void>` |
+
+
 ## Dependencies
 
 ### Used by

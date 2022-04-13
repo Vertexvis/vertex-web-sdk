@@ -110,8 +110,9 @@ export class ViewerPinGroup {
             if (e.buttons !== 2) {
               e.stopPropagation();
             }
-
             this.pinController?.setSelectedPinId(this.pin?.id);
+
+            this.handleAnchorPointerDown(e);
           }}
         >
           {this.leafNodesRendered && (
@@ -206,6 +207,18 @@ export class ViewerPinGroup {
       }),
     };
   }
+
+  private handleAnchorPointerDown = (event: PointerEvent): void => {
+    if (
+      this.elementBounds != null &&
+      this.pinController?.getToolMode() === 'edit' &&
+      this.pin != null
+    ) {
+      this.pinController?.setDraggable({
+        id: this.pin.id,
+      });
+    }
+  };
 
   private getFromWorldPosition(
     pt: Vector3.Vector3,

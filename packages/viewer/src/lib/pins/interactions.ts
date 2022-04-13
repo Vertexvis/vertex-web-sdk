@@ -7,7 +7,7 @@ import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { EntityType } from '../types/entities';
-import { PinController } from './controller';
+import { Draggable, PinController } from './controller';
 import { Pin } from './model';
 
 export class PinsInteractionHandler implements InteractionHandler {
@@ -38,18 +38,17 @@ export class PinsInteractionHandler implements InteractionHandler {
     this.api = api;
     this.rectObserver.observe(element);
 
-    element.addEventListener('pointermove', this.handlePointerMoveCursorCheck);
+    element.addEventListener('pointermove', this.handlePointerMove);
     element.addEventListener('pointerdown', this.handlePointerDown);
+    window.addEventListener('pointerup', this.handlePointerUp);
   }
 
   public dispose(): void {
     this.rectObserver.disconnect();
 
-    this.element?.removeEventListener(
-      'pointermove',
-      this.handlePointerMoveCursorCheck
-    );
+    this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
+    window.removeEventListener('pointerup', this.handlePointerUp);
 
     this.element = undefined;
     this.api = undefined;
@@ -110,10 +109,18 @@ export class PinsInteractionHandler implements InteractionHandler {
     });
   }
 
-  private handlePointerMoveCursorCheck = async (
-    event: PointerEvent
-  ): Promise<void> => {
-    if (await this.isDroppableSurface(event)) {
+  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
+    const isDroppableSurface = await this.isDroppableSurface(event);
+    const draggable = this.controller.getDraggable();
+    if (draggable != null && isDroppableSurface) {
+      this.handleDrag(draggable, event);
+    }
+
+    if (
+      this.controller.getDraggable() == null &&
+      this.controller.getToolMode() === 'edit' &&
+      isDroppableSurface
+    ) {
       this.addCursor(this.getCusorType());
     } else {
       this.clearCursor();
@@ -129,11 +136,21 @@ export class PinsInteractionHandler implements InteractionHandler {
     }
   }
 
-  private handlePointerMove = async (event: PointerEvent): Promise<void> => {
-    if (await this.isDroppableSurface(event)) {
-      this.addCursor(this.getCusorType());
-    } else {
-      this.clearCursor();
+  private handleDrag = async (
+    draggable: Draggable,
+    event: PointerEvent
+  ): Promise<void> => {
+    const pt = getMouseClientPosition(event, this.elementRect);
+    const worldPosition = await this.getWorldPositionForPoint(pt);
+
+    if (worldPosition != null) {
+      this.controller.updateDraggable(
+        {
+          ...draggable,
+          lastPoint: pt,
+        },
+        worldPosition
+      );
     }
   };
 
@@ -153,20 +170,43 @@ export class PinsInteractionHandler implements InteractionHandler {
           this.handlePlacePin(pt);
         }
       }
+
       dispose();
     };
 
     const dispose = (): void => {
-      window.removeEventListener('pointermove', this.handlePointerMove);
       window.removeEventListener('pointerup', pointerUp);
     };
 
     window.addEventListener('pointerup', pointerUp);
-    window.addEventListener('pointermove', this.handlePointerMove);
 
     return {
       dispose,
     };
+  };
+
+  private handlePointerUp = async (): Promise<void> => {
+    const draggable = this.controller.getDraggable();
+    const lastPoint = draggable?.lastPoint;
+
+    this.controller.setDraggable(undefined);
+    if (lastPoint != null && draggable != null) {
+      this.ifInitialized(async ({ api }) => {
+        const [hit] = await api.hitItems(lastPoint);
+        const worldPosition = await this.getWorldPositionForPoint(lastPoint);
+
+        if (hit?.hitPoint != null && worldPosition != null) {
+          this.controller.updateDraggable(
+            {
+              ...draggable,
+              lastPoint,
+            },
+            worldPosition,
+            hit?.partId?.hex ?? undefined
+          );
+        }
+      });
+    }
   };
 
   private addCursor(cursor: Cursor): void {

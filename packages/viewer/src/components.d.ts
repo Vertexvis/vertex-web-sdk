@@ -1932,6 +1932,10 @@ declare namespace LocalJSX {
      */
     occlusionOff?: boolean;
     /**
+     * An event that is emitted when any property on the dom group changes
+     */
+    onPropertyChange?: (event: CustomEvent<void>) => void;
+    /**
      * The local 3D position of where this element is located.
      */
     position?: Vector3.Vector3;
@@ -1969,6 +1973,10 @@ declare namespace LocalJSX {
      * The local matrix of this element.
      */
     matrix?: Matrix4.Matrix4;
+    /**
+     * An event that is emitted when any property on the dom group changes
+     */
+    onPropertyChange?: (event: CustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
      */
