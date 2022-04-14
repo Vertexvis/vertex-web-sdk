@@ -72,29 +72,40 @@ export class PinsInteractionHandler implements InteractionHandler {
       const [hit] = await api.hitItems(pt);
 
       if (hit?.hitPoint != null && this.elementRect != null) {
-        const vector3 = await this.getWorldPositionForPoint(pt);
-
         const relativePoint = translatePointToRelative(
           {
             ...pt,
           },
           this.elementRect
         );
-        if (vector3 != null) {
+        if (
+          hit?.hitPoint != null &&
+          hit?.hitPoint.x != null &&
+          hit?.hitPoint.y != null &&
+          hit?.hitPoint.z != null
+        ) {
           const pinId = existingPin != null ? existingPin.id : UUID.create();
 
           switch (this.controller.getToolType()) {
             case 'pin':
               this.controller.setPin({
                 id: pinId,
-                worldPosition: vector3,
+                worldPosition: {
+                  x: hit?.hitPoint?.x,
+                  y: hit?.hitPoint.y,
+                  z: hit?.hitPoint.z,
+                },
                 partId: hit?.itemId?.hex ?? undefined,
               });
               break;
             case 'pin-label':
               this.controller.setPin({
                 id: pinId,
-                worldPosition: vector3,
+                worldPosition: {
+                  x: hit?.hitPoint?.x,
+                  y: hit?.hitPoint.y,
+                  z: hit?.hitPoint.z,
+                },
                 partId: hit?.itemId?.hex ?? undefined,
                 label: {
                   point: relativePoint,
@@ -190,18 +201,27 @@ export class PinsInteractionHandler implements InteractionHandler {
     const lastPoint = draggable?.lastPoint;
 
     this.controller.setDraggable(undefined);
+
     if (lastPoint != null && draggable != null) {
       this.ifInitialized(async ({ api }) => {
         const [hit] = await api.hitItems(lastPoint);
-        const worldPosition = await this.getWorldPositionForPoint(lastPoint);
 
-        if (hit?.hitPoint != null && worldPosition != null) {
+        if (
+          hit?.hitPoint != null &&
+          hit?.hitPoint?.x != null &&
+          hit?.hitPoint?.y != null &&
+          hit?.hitPoint?.z != null
+        ) {
           this.controller.updateDraggable(
             {
               ...draggable,
               lastPoint,
             },
-            worldPosition,
+            {
+              x: hit?.hitPoint?.x,
+              y: hit?.hitPoint.y,
+              z: hit?.hitPoint.z,
+            },
             hit?.partId?.hex ?? undefined
           );
         }
