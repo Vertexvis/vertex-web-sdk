@@ -1,0 +1,154 @@
+:host {
+  /**
+   * @prop --viewer-annotations-pin-label-background-color: A CSS color that
+   * specifies the color of the label background
+   */
+  --viewer-annotations-pin-label-background-color: var(--blue-200);
+
+  /**
+   * @prop --viewer-annotations-pin-label-border-color: A CSS color that
+   * specifies the color of the label's border
+   */
+  --viewer-annotations-pin-label-border-color: var(--blue-600);
+
+  /**
+   * @prop --viewer-annotations-pin-label-focused-border-color: A CSS color that
+   * specifies the color of the label's border when focused. 
+   */
+   --viewer-annotations-pin-label-focused-border-color: var(--blue-700);
+
+  /**
+   * @prop --viewer-annotations-pin-label-color: A CSS color that
+   * specifies the color of the label 
+   */
+  --viewer-annotations-pin-label-color: var(--white);
+
+  /**
+   * @prop --viewer-annotations-pin-label-padding-y: A var that
+   * specifies the vertical padding of the label
+   */
+  --viewer-annotations-pin-label-padding-y: 0.375em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-padding-x: A var that
+   * specifies the horizontal padding of the label
+   */
+  --viewer-annotations-pin-label-padding-x:  0.5em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-border-width: A CSS length that
+   * specifies the width of the border on this label. Defaults to `2px`.
+   */
+  --viewer-annotations-pin-label-border-width: 2px;
+
+  /**
+   * @prop --viewer-annotations-pin-label-border-style: A CSS variable that
+   * specifies the style of border on this label. Defaults to `solid`.
+   */
+  --viewer-annotations-pin-label-border-style: solid;
+
+  /**
+   * @prop --viewer-annotations-pin-label-border-radius: A var that
+   * specifies the border radius of the label
+   */
+  --viewer-annotations-pin-label-border-radius: 0.25em;
+
+  /**
+   * @prop --viewer-annotations-pin-label-min-width: A CSS length that
+   * specifies the minimum width of the label. Defaults to `1rem`.
+   */
+  --viewer-annotations-pin-label-min-width: 2rem;
+
+  /**
+   * @prop --viewer-annotations-pin-label-max-width: A CSS length that
+   * specifies the maximum width of the label. Defaults to `25rem`.
+   */
+  --viewer-annotations-pin-label-max-width: 25rem;
+
+  /**
+   * @prop --viewer-annotations-pin-label-max-height: A CSS length that
+   * specifies the maximum height of the label. Defaults to `50rem`.
+   */
+   --viewer-annotations-pin-label-max-height: 50rem;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:host([mode='']) .pin-label {
+  color: var(--viewer-annotations-pin-label-color);
+  background: var(--viewer-annotations-pin-label-background-color);
+}
+
+.pin-label-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.pin-label-input-wrapper {
+  display: flex;
+  position: absolute;
+  pointer-events: auto;
+  box-sizing: border-box;
+  min-width: var(--viewer-annotations-pin-label-min-width);
+  max-width: var(--viewer-annotations-pin-label-max-width);
+  max-height: var(--viewer-annotations-pin-label-max-height);
+  background: var(--viewer-annotations-pin-label-background-color);
+  border-width: var(--viewer-annotations-pin-label-border-width);
+  border-style: var(--viewer-annotations-pin-label-border-style);
+  border-color: var(--viewer-annotations-pin-label-border-color);
+  border-radius: var(--viewer-annotations-pin-label-border-radius);
+}
+
+.pin-label-input-wrapper.focused {
+  min-width: var(--viewer-annotations-pin-label-max-width);
+  border-color: var(--viewer-annotations-pin-label-focused-border-color);
+}
+
+.pin-input-drag-target {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.pin-label-input {
+  resize: none;
+  position: relative;
+  outline: none;
+  border: none;
+  word-break: break-word;
+  padding: 0 0 0 0;
+  background-color: transparent;
+  margin: var(--viewer-annotations-pin-label-padding-y) var(--viewer-annotations-pin-label-padding-x);
+  width: var(--viewer-annotations-pin-label-min-width);
+  flex-grow: 1;
+  overflow: hidden;
+  max-width: calc(var(--viewer-annotations-pin-label-max-width) - calc(2 * var(--viewer-annotations-pin-label-padding-x)));
+}
+
+.pin-label-input.readonly {
+  pointer-events: auto;
+  color: black;
+  cursor: pointer;
+}
+
+.pin-label-hidden {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  width: auto;
+  height: auto;
+  box-sizing: border-box;
+  border-width: var(--viewer-annotations-pin-label-border-width);
+  border-style: var(--viewer-annotations-pin-label-border-style);
+  border-color: var(--viewer-annotations-pin-label-border-color);
+  margin: var(--viewer-annotations-pin-label-padding-y) 0;
+  padding: 0 var(--viewer-annotations-pin-label-padding-x);
+  max-width: calc(var(--viewer-annotations-pin-label-max-width) - calc(2 * var(--viewer-annotations-pin-label-padding-x)));
+}

@@ -26,22 +26,31 @@ information.
 | `position`        | --                 | The local 3D position of where this element is located.                                                                                                                                                                        | `Vector3`                                                                                                                          | `Vector3.origin()`        |
 | `positionJson`    | `position`         | The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                                                        | `string`                                                                                                                           | `''`                      |
 | `quaternion`      | --                 | The local rotation of this element.                                                                                                                                                                                            | `Quaternion`                                                                                                                       | `Quaternion.create()`     |
-| `quaternionJson`  | `quaternion`       | The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.                                                                                  | `string`                                                                                                                           | `''`                      |
+| `quaternionJson`  | `quaternion`       | The local quaternion rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.                                                                       | `string`                                                                                                                           | `''`                      |
 | `rotation`        | --                 | The local rotation of this element in Euler angles.                                                                                                                                                                            | `Euler \| undefined`                                                                                                               | `undefined`               |
 | `rotationJson`    | `rotation`         | The local rotation of this element in Euler angles, as a JSON string. JSON representation can either be `[x, y, z, order]` or `{"x": 0, "y": 0, "z": 0, "order": "xyz"}`.                                                      | `string \| undefined`                                                                                                              | `undefined`               |
 | `scale`           | --                 | The local scale of this element.                                                                                                                                                                                               | `Vector3`                                                                                                                          | `Vector3.create(1, 1, 1)` |
 | `scaleJson`       | `scale`            | The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                                                                        | `string`                                                                                                                           | `''`                      |
 
 
+## Events
+
+| Event            | Description                                                         | Type                |
+| ---------------- | ------------------------------------------------------------------- | ------------------- |
+| `propertyChange` | An event that is emitted when any property on the dom group changes | `CustomEvent<void>` |
+
+
 ## Dependencies
 
 ### Used by
 
+ - [vertex-viewer-pin-group](../viewer-pin-group)
  - [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
 ```mermaid
 graph TD;
+  vertex-viewer-pin-group --> vertex-viewer-dom-element
   vertex-viewer-view-cube --> vertex-viewer-dom-element
   style vertex-viewer-dom-element fill:#f9f,stroke:#333,stroke-width:4px
 ```

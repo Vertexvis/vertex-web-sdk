@@ -120,11 +120,13 @@ export function translatePointToRelative(
   canvasDimensions: Dimensions.Dimensions
 ): Point.Point {
   const scaleFactor = toRelativeScaleFactor(canvasDimensions);
-  return Point.scale(
+  const point = Point.scale(
     Point.subtract(pt, Dimensions.center(canvasDimensions)),
     scaleFactor,
     scaleFactor
   );
+
+  return point;
 }
 
 /**

@@ -1,7 +1,16 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
+import {
+  Component,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  Watch,
+} from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+import { Objects } from '@vertexvis/utils';
 
 import { HTMLDomRendererPositionableElement } from '../../interfaces';
 
@@ -92,7 +101,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   }
 
   /**
-   * The local rotation of this element, as a JSON string. JSON
+   * The local quaternion rotation of this element, as a JSON string. JSON
    * representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z":
    * 0, "w": 1}`.
    */
@@ -135,6 +144,19 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('scaleJson')
   protected handleScaleJsonChanged(): void {
     this.syncScale();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('matrix')
+  protected handleMatrixChanged(
+    newMatrix: Matrix4.Matrix4,
+    oldMatrix: Matrix4.Matrix4
+  ): void {
+    if (!Objects.isEqual(newMatrix, oldMatrix)) {
+      this.propertyChange.emit();
+    }
   }
 
   /**
@@ -182,6 +204,12 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
    */
   @Prop({ reflect: true })
   public interactionsOff = false;
+
+  /**
+   * An event that is emitted when any property on the dom group changes
+   */
+  @Event({ bubbles: true })
+  public propertyChange!: EventEmitter<void>;
 
   /**
    * @ignore

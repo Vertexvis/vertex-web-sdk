@@ -33,12 +33,15 @@ describe('vertex-viewer-dom-element', () => {
   });
 
   it('syncs properties when json attributes change', async () => {
+    const onPropertyChanged = jest.fn();
+
     const page = await newSpecPage({
       components: [ViewerDomElement],
       html: `<vertex-viewer-dom-element></vertex-viewer-dom-element>`,
     });
 
     const el = page.root as HTMLVertexViewerDomElementElement;
+    el.addEventListener('propertyChange', onPropertyChanged);
 
     const position = Vector3.create(1, 2, 3);
     const rotation = Euler.create({ x: 2, y: 3, z: 4 });
@@ -63,6 +66,7 @@ describe('vertex-viewer-dom-element', () => {
     expect(el.scale).toEqual(scale);
 
     expect(el.matrix).toEqual(matrix);
+    expect(onPropertyChanged).toHaveBeenCalledTimes(4);
   });
 
   it('updates quaternion when rotation changes', async () => {

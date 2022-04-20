@@ -1,0 +1,36 @@
+
+:host {
+  /**
+   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
+   * specifies the color of the label line
+   */
+   --viewer-annotations-pin-label-line-color: var(--blue-600);
+
+  /**
+   * @prop --viewer-annotations-pin-label-line-width: A CSS color that
+   * specifies the width of the label line
+   */
+   --viewer-annotations-pin-label-line-width: 1
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.label-line {
+  pointer-events: auto;
+  stroke: var(--viewer-annotations-pin-label-line-color);
+  stroke-width: var( --viewer-annotations-pin-label-line-width);
+  cursor: default;
+}
+
+.svg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+}
