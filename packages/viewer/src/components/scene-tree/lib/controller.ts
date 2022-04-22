@@ -41,6 +41,7 @@ export type JwtProvider = () => string | undefined;
 
 export interface SceneTreeState {
   totalRows: number;
+  totalFilterHitRows: number;
   rows: Row[];
   connection: ConnectionState;
 }
@@ -123,6 +124,8 @@ export class SceneTreeController {
 
   private state: SceneTreeState = {
     totalRows: 0,
+    totalFilterHitRows: 0,
+
     rows: [],
     connection: { type: 'disconnected' },
   };
@@ -140,6 +143,14 @@ export class SceneTreeController {
    */
   public get isConnected(): boolean {
     return this.state.connection.type === 'connected';
+  }
+
+  /**
+   * Indicates if the controller is connected to the tree backend, and can make
+   * requests.
+   */
+  public get numberTotalFilterHitRows(): number {
+    return this.state.totalFilterHitRows;
   }
 
   public constructor(
@@ -290,6 +301,7 @@ export class SceneTreeController {
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
+      totalFilterHitRows: reset ? 0 : this.state.totalFilterHitRows,
       rows: reset ? [] : this.state.rows,
     });
   }
@@ -735,6 +747,7 @@ export class SceneTreeController {
         const cursor = res.getCursor();
         const itemsList = res.getItemsList();
 
+        console.log("handling page result");
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
         const fetchedRows = fromNodeProto(
@@ -756,7 +769,10 @@ export class SceneTreeController {
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-        this.updateState({ ...this.state, totalRows, rows });
+        const filterHitRows = rows.filter((row) => row?.node?.filterHit);
+        console.log("Filter hit rows in sdk: " + filterHitRows.length);
+
+        this.updateState({ ...this.state, totalRows: totalRows, rows: rows, totalFilterHitRows: filterHitRows?.length || 0 });
       }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.toString() : 'Unknown';

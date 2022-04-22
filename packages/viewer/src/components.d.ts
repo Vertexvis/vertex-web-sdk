@@ -175,6 +175,10 @@ export namespace Components {
      */
     getRowForEvent: (event: MouseEvent | PointerEvent) => Promise<Row>;
     /**
+     * Performs an API call to get the number of filter results.
+     */
+    getTotalFilterHitRows: () => Promise<number>;
+    /**
      * Performs an API call that will hide the item associated to the given row or row index.
      * @param row The row, row index, or node to hide.
      */
@@ -233,6 +237,7 @@ export namespace Components {
      * @param row The row, row index, or node to toggle visibility.
      */
     toggleItemVisibility: (row: RowArg) => Promise<void>;
+    totalFilterHitRows: number;
     /**
      * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
      */
@@ -1616,6 +1621,7 @@ declare namespace LocalJSX {
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
     rowData?: RowDataProvider;
+    totalFilterHitRows?: number;
     /**
      * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
      */

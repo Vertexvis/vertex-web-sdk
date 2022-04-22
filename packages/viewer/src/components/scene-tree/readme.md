@@ -232,17 +232,18 @@ stack toolbars.
 
 ## Properties
 
-| Property           | Attribute            | Description                                                                                                                                                         | Type                                                   | Default      |
-| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
-| `config`           | --                   | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
-| `configEnv`        | `config-env`         | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
-| `controller`       | --                   |                                                                                                                                                                     | `SceneTreeController \| undefined`                     | `undefined`  |
-| `filterOnMetadata` | `filter-on-metadata` | Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.                                                  | `boolean`                                              | `false`      |
-| `metadataKeys`     | --                   | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.                  | `string[]`                                             | `[]`         |
-| `overScanCount`    | `over-scan-count`    | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `25`         |
-| `rowData`          | --                   | A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
-| `viewer`           | --                   | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                   | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
-| `viewerSelector`   | `viewer-selector`    | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                            | `string \| undefined`                                  | `undefined`  |
+| Property             | Attribute               | Description                                                                                                                                                         | Type                                                   | Default      |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `config`             | --                      | An object to configure the scene tree.                                                                                                                              | `Config \| undefined`                                  | `undefined`  |
+| `configEnv`          | `config-env`            | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.        | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
+| `controller`         | --                      |                                                                                                                                                                     | `SceneTreeController \| undefined`                     | `undefined`  |
+| `filterOnMetadata`   | `filter-on-metadata`    | Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.                                                  | `boolean`                                              | `false`      |
+| `metadataKeys`       | --                      | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.                  | `string[]`                                             | `[]`         |
+| `overScanCount`      | `over-scan-count`       | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling. | `number`                                               | `25`         |
+| `rowData`            | --                      | A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
+| `totalFilterHitRows` | `total-filter-hit-rows` |                                                                                                                                                                     | `number`                                               | `0`          |
+| `viewer`             | --                      | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                   | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
+| `viewerSelector`     | `viewer-selector`       | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                            | `string \| undefined`                                  | `undefined`  |
 
 
 ## Events
@@ -365,6 +366,16 @@ otherwise `undefined` is returned.
 Type: `Promise<Row>`
 
 A row, or `undefined` if the row hasn't been loaded.
+
+### `getTotalFilterHitRows() => Promise<number>`
+
+Performs an API call to get the number of filter results.
+
+#### Returns
+
+Type: `Promise<number>`
+
+
 
 ### `hideItem(row: RowArg) => Promise<void>`
 
