@@ -209,9 +209,6 @@ export class SceneTree {
   @State()
   private totalRows = 0;
 
-  @Prop()
-  public totalFilterHitRows = 0;
-
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -746,7 +743,6 @@ export class SceneTree {
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
-    this.totalFilterHitRows = state.totalFilterHitRows;
     this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {

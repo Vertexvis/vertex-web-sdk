@@ -24,7 +24,7 @@ import {
   SceneTreeAPIClient,
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { MetadataKey } from '../interfaces';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
@@ -41,7 +41,7 @@ export type JwtProvider = () => string | undefined;
 
 export interface SceneTreeState {
   totalRows: number;
-  totalFilterHitRows: number;
+  numberOfRowsWithFilterHit: number;
   rows: Row[];
   connection: ConnectionState;
 }
@@ -122,9 +122,25 @@ export class SceneTreeController {
    */
   public onStateChange = new EventDispatcher<SceneTreeState>();
 
+  /**
+   * Registers an event listener that will be invoked when the number of results
+   * of a search in the scene tree changes
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onNumberOfRowsWithFilterHitChanged(listener: Listener<number | undefined>): Disposable {
+    return this.numberOfRowsWithFilterHitChanged.on(listener);
+  }
+
+  /**
+   * A dispatcher that emits an event whenever the number of search results has changed.
+   */
+  public numberOfRowsWithFilterHitChanged = new EventDispatcher<number>();
+
   private state: SceneTreeState = {
     totalRows: 0,
-    totalFilterHitRows: 0,
+    numberOfRowsWithFilterHit: 0,
 
     rows: [],
     connection: { type: 'disconnected' },
@@ -143,14 +159,6 @@ export class SceneTreeController {
    */
   public get isConnected(): boolean {
     return this.state.connection.type === 'connected';
-  }
-
-  /**
-   * Indicates if the controller is connected to the tree backend, and can make
-   * requests.
-   */
-  public get numberTotalFilterHitRows(): number {
-    return this.state.totalFilterHitRows;
   }
 
   public constructor(
@@ -301,7 +309,7 @@ export class SceneTreeController {
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
-      totalFilterHitRows: reset ? 0 : this.state.totalFilterHitRows,
+      numberOfRowsWithFilterHit: reset ? 0 : this.state.numberOfRowsWithFilterHit,
       rows: reset ? [] : this.state.rows,
     });
   }
@@ -747,7 +755,6 @@ export class SceneTreeController {
         const cursor = res.getCursor();
         const itemsList = res.getItemsList();
 
-        console.log("handling page result");
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
         const fetchedRows = fromNodeProto(
@@ -769,10 +776,14 @@ export class SceneTreeController {
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-        const filterHitRows = rows.filter((row) => row?.node?.filterHit);
-        console.log("Filter hit rows in sdk: " + filterHitRows.length);
+        const rowsWithFilterHit = rows.filter((row) => row?.node?.filterHit);
+        const numberOfRowsWithFilterHit = rowsWithFilterHit ? rowsWithFilterHit.length : 0;
 
-        this.updateState({ ...this.state, totalRows: totalRows, rows: rows, totalFilterHitRows: filterHitRows?.length || 0 });
+        if (numberOfRowsWithFilterHit != this.state.numberOfRowsWithFilterHit) {
+            this.numberOfRowsWithFilterHitChanged.emit(numberOfRowsWithFilterHit);
+        };
+
+        this.updateState({ ...this.state, totalRows: totalRows, rows: rows, numberOfRowsWithFilterHit: numberOfRowsWithFilterHit});
       }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
