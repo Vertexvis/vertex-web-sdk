@@ -123,17 +123,6 @@ export class SceneTreeController {
   public onStateChange = new EventDispatcher<SceneTreeState>();
 
   /**
-   * Registers an event listener that will be invoked when the number of results
-   * of a search in the scene tree changes
-   *
-   * @param listener The listener to add.
-   * @returns A disposable that can be used to remove the listener.
-   */
-  public onNumberOfRowsWithFilterHitChanged(listener: Listener<number | undefined>): Disposable {
-    return this.numberOfRowsWithFilterHitChanged.on(listener);
-  }
-
-  /**
    * A dispatcher that emits an event whenever the number of search results has changed.
    */
   public numberOfRowsWithFilterHitChanged = new EventDispatcher<number>();
@@ -166,6 +155,19 @@ export class SceneTreeController {
     private rowLimit: number,
     private connectOptions: ConnectOptions = {}
   ) {}
+
+  /**
+   * Registers an event listener that will be invoked when the number of results
+   * of a search in the scene tree changes
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onNumberOfRowsWithFilterHitChanged(
+    listener: Listener<number | undefined>
+  ): Disposable {
+    return this.numberOfRowsWithFilterHitChanged.on(listener);
+  }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
     const { connection } = this.state;
@@ -309,7 +311,9 @@ export class SceneTreeController {
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
-      numberOfRowsWithFilterHit: reset ? 0 : this.state.numberOfRowsWithFilterHit,
+      numberOfRowsWithFilterHit: reset
+        ? 0
+        : this.state.numberOfRowsWithFilterHit,
       rows: reset ? [] : this.state.rows,
     });
   }
@@ -777,13 +781,22 @@ export class SceneTreeController {
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
         const rowsWithFilterHit = rows.filter((row) => row?.node?.filterHit);
-        const numberOfRowsWithFilterHit = rowsWithFilterHit ? rowsWithFilterHit.length : 0;
+        const numberOfRowsWithFilterHit = rowsWithFilterHit
+          ? rowsWithFilterHit.length
+          : 0;
 
-        if (numberOfRowsWithFilterHit != this.state.numberOfRowsWithFilterHit) {
-            this.numberOfRowsWithFilterHitChanged.emit(numberOfRowsWithFilterHit);
-        };
+        if (
+          numberOfRowsWithFilterHit !== this.state.numberOfRowsWithFilterHit
+        ) {
+          this.numberOfRowsWithFilterHitChanged.emit(numberOfRowsWithFilterHit);
+        }
 
-        this.updateState({ ...this.state, totalRows: totalRows, rows: rows, numberOfRowsWithFilterHit: numberOfRowsWithFilterHit});
+        this.updateState({
+          ...this.state,
+          totalRows: totalRows,
+          rows: rows,
+          numberOfRowsWithFilterHit: numberOfRowsWithFilterHit,
+        });
       }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
