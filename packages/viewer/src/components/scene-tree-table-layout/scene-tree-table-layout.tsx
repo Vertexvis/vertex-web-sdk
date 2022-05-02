@@ -668,6 +668,7 @@ export class SceneTreeTableLayout {
     this.columnGridLayout = `${this.stateMap.columnWidths
       .slice(0, -1)
       .reduce((res, w) => `${res} ${w}px`, '')} 1fr`;
+
     this.columnGridFixedLayout = `${this.stateMap.columnWidths.reduce(
       (res, w) => `${res} ${w}px`,
       ''
@@ -878,7 +879,10 @@ export class SceneTreeTableLayout {
 
   private getLayoutWidth(): number | undefined {
     if (this.layoutWidth == null) {
-      this.layoutWidth = getSceneTreeTableViewportWidth(this.hostEl);
+      const computedWidth = getSceneTreeTableViewportWidth(this.hostEl);
+      if (computedWidth > 0) {
+        this.layoutWidth = computedWidth;
+      }
     }
     return this.layoutWidth;
   }
