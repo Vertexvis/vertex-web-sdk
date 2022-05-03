@@ -534,8 +534,6 @@ export class SceneTreeController {
         ...this.state,
         numberOfRowsWithFilterHit: numberOfResults,
       });
-
-      return numberOfResults;
     });
   }
 
