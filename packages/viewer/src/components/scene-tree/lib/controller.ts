@@ -760,7 +760,6 @@ export class SceneTreeController {
     try {
       const res = await page.res;
 
-      console.log(page);
       const currentPage = this.getPage(page.index);
       // Only handle the result if the page has not been invalidated.
       if (currentPage?.id === page.id) {
