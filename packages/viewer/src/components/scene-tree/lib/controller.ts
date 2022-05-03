@@ -8,6 +8,7 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   FilterRequest,
+  FilterResponse,
   GetAvailableColumnsRequest,
   GetAvailableColumnsResponse,
   GetNodeAncestorsRequest,
@@ -120,12 +121,7 @@ export class SceneTreeController {
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
    */
-  public onStateChange = new EventDispatcher<SceneTreeState>();
-
-  /**
-   * A dispatcher that emits an event whenever the number of search results has changed.
-   */
-  public numberOfRowsWithFilterHitChanged = new EventDispatcher<number>();
+  public stateChanged = new EventDispatcher<SceneTreeState>();
 
   private state: SceneTreeState = {
     totalRows: 0,
@@ -157,16 +153,15 @@ export class SceneTreeController {
   ) {}
 
   /**
-   * Registers an event listener that will be invoked when the number of results
-   * of a search in the scene tree changes
+   * Registers an event listener that will be invoked when the state changes
    *
    * @param listener The listener to add.
    * @returns A disposable that can be used to remove the listener.
    */
-  public onNumberOfRowsWithFilterHitChanged(
-    listener: Listener<number | undefined>
+  public onStateChanged(
+    listener: Listener<SceneTreeState | undefined>
   ): Disposable {
-    return this.numberOfRowsWithFilterHitChanged.on(listener);
+    return this.stateChanged.on(listener);
   }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
@@ -432,7 +427,7 @@ export class SceneTreeController {
 
   /**
    * Fetches a page at the given index. Once the data has been fetched, the
-   * controller will emit an `onStateChange` event that contains rows with the
+   * controller will emit an `stateChanged` event that contains rows with the
    * fetched page. If a page is invalidated before the request completes, the
    * response is ignored.
    *
@@ -520,15 +515,27 @@ export class SceneTreeController {
     term: string,
     options: FilterTreeOptions = {}
   ): Promise<void> {
-    await this.ifConnectionHasJwt((jwt) => {
-      return this.requestUnary(jwt, (metadata, handler) => {
-        const req = new FilterRequest();
-        req.setFilter(term);
-        req.setFullTree((options.includeCollapsed ?? true) === true);
-        if (options.columns) req.setColumnsKeysList(options.columns);
+    return this.ifConnectionHasJwt(async (jwt) => {
+      const res = await this.requestUnary<FilterResponse>(
+        jwt,
+        (metadata, handler) => {
+          const req = new FilterRequest();
+          req.setFilter(term);
+          req.setFullTree((options.includeCollapsed ?? true) === true);
+          if (options.columns) req.setColumnsKeysList(options.columns);
 
-        this.client.filter(req, metadata, handler);
+          this.client.filter(req, metadata, handler);
+        }
+      );
+
+      const { numberOfResults } = res.toObject();
+
+      this.updateState({
+        ...this.state,
+        numberOfRowsWithFilterHit: numberOfResults,
       });
+
+      return numberOfResults;
     });
   }
 
@@ -753,6 +760,7 @@ export class SceneTreeController {
     try {
       const res = await page.res;
 
+      console.log(page);
       const currentPage = this.getPage(page.index);
       // Only handle the result if the page has not been invalidated.
       if (currentPage?.id === page.id) {
@@ -780,22 +788,10 @@ export class SceneTreeController {
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-        const rowsWithFilterHit = rows.filter((row) => row?.node?.filterHit);
-        const numberOfRowsWithFilterHit = rowsWithFilterHit
-          ? rowsWithFilterHit.length
-          : 0;
-
-        if (
-          numberOfRowsWithFilterHit !== this.state.numberOfRowsWithFilterHit
-        ) {
-          this.numberOfRowsWithFilterHitChanged.emit(numberOfRowsWithFilterHit);
-        }
-
         this.updateState({
           ...this.state,
           totalRows: totalRows,
           rows: rows,
-          numberOfRowsWithFilterHit: numberOfRowsWithFilterHit,
         });
       }
     } catch (e) {
@@ -829,7 +825,7 @@ export class SceneTreeController {
 
   private updateState(newState: SceneTreeState): void {
     this.state = newState;
-    this.onStateChange.emit(this.state);
+    this.stateChanged.emit(this.state);
   }
 
   public getPageForOffset(offset: number): number {
