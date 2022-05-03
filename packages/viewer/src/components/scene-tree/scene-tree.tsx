@@ -579,7 +579,7 @@ export class SceneTree {
       this.controller = new SceneTreeController(client, 100);
     }
 
-    this.stateMap.onStateChangeDisposable = this.controller.stateChanged.on(
+    this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
       (state) => this.handleControllerStateChange(state)
     );
 
@@ -686,7 +686,7 @@ export class SceneTree {
 
     this.stateMap.onStateChangeDisposable?.dispose();
 
-    this.stateMap.onStateChangeDisposable = newController.stateChanged.on(
+    this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
       (state) => this.handleControllerStateChange(state)
     );
 

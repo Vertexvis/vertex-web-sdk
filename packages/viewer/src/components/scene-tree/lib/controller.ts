@@ -121,7 +121,7 @@ export class SceneTreeController {
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
    */
-  public stateChanged = new EventDispatcher<SceneTreeState>();
+  public onStateChange = new EventDispatcher<SceneTreeState>();
 
   private state: SceneTreeState = {
     totalRows: 0,
@@ -158,10 +158,10 @@ export class SceneTreeController {
    * @param listener The listener to add.
    * @returns A disposable that can be used to remove the listener.
    */
-  public onStateChanged(
+  public stateChanged(
     listener: Listener<SceneTreeState | undefined>
   ): Disposable {
-    return this.stateChanged.on(listener);
+    return this.onStateChange.on(listener);
   }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
@@ -427,7 +427,7 @@ export class SceneTreeController {
 
   /**
    * Fetches a page at the given index. Once the data has been fetched, the
-   * controller will emit an `stateChanged` event that contains rows with the
+   * controller will emit an `onStateChange` event that contains rows with the
    * fetched page. If a page is invalidated before the request completes, the
    * response is ignored.
    *
@@ -824,7 +824,7 @@ export class SceneTreeController {
 
   private updateState(newState: SceneTreeState): void {
     this.state = newState;
-    this.stateChanged.emit(this.state);
+    this.onStateChange.emit(this.state);
   }
 
   public getPageForOffset(offset: number): number {
