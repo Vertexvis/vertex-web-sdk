@@ -225,8 +225,6 @@ describe('<vertex-scene-tree>', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      tree.viewerSelector = '#invalid';
-
       await page.waitForChanges();
 
       const errorEl = tree.shadowRoot?.querySelector('.error');

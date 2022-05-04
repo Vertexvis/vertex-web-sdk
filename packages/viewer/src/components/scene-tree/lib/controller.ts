@@ -142,13 +142,6 @@ export class SceneTreeController {
     return this.state.connection.type === 'connected';
   }
 
-  /**
-   * Returns the connection state of the controller
-   */
-  public get connectionState(): ConnectionState {
-    return this.state.connection;
-  }
-
   public constructor(
     private client: SceneTreeAPIClient,
     private rowLimit: number,

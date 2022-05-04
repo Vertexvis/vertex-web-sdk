@@ -220,7 +220,7 @@ export class SceneTree {
   };
 
   @State()
-  private connectionErrorDetails: SceneTreeErrorDetails | undefined;
+  private errorDetails: SceneTreeErrorDetails | undefined;
 
   @State()
   private attemptingRetry = false;
@@ -499,7 +499,7 @@ export class SceneTree {
 
     if (
       target != null &&
-      this.connectionErrorDetails == null &&
+      this.errorDetails == null &&
       getSceneTreeContainsElement(this.el, target as HTMLElement) &&
       isSceneTreeTableCellElement(target)
     ) {
@@ -596,14 +596,18 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
+
+    if (this.viewer == null) {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.MISSING_VIEWER
+      );
+    }
   }
 
   /**
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    const sceneTreeErrorDetails = this.renderError();
-
     return (
       <Host>
         <div class="header">
@@ -614,10 +618,9 @@ export class SceneTree {
           </slot>
         </div>
 
-        {sceneTreeErrorDetails != null &&
-          this.renderErrorMessage(sceneTreeErrorDetails)}
+        {this.errorDetails != null && this.renderError(this.errorDetails)}
 
-        {this.connectionErrorDetails == null && (
+        {this.errorDetails == null && (
           <div class="rows-scroll">
             <slot />
           </div>
@@ -630,24 +633,7 @@ export class SceneTree {
     );
   }
 
-  private renderError(): SceneTreeErrorDetails | undefined {
-    if (this.connectionErrorDetails != null) {
-      return this.connectionErrorDetails;
-    } else if (this.stateMap.componentLoaded && this.viewer == null) {
-      return new SceneTreeErrorDetails(SceneTreeErrorCode.MISSING_VIEWER);
-    } else if (
-      this.stateMap.componentLoaded &&
-      this.controller?.connectionState.type === 'disconnected'
-    ) {
-      return new SceneTreeErrorDetails(SceneTreeErrorCode.DISCONNECTED);
-    }
-
-    return undefined;
-  }
-
-  private renderErrorMessage(
-    details: SceneTreeErrorDetails
-  ): h.JSX.IntrinsicElements {
+  private renderError(details: SceneTreeErrorDetails): h.JSX.IntrinsicElements {
     if (details.code !== SceneTreeErrorCode.SCENE_TREE_DISABLED) {
       return (
         <SceneTreeError details={details}>
@@ -767,10 +753,14 @@ export class SceneTree {
     this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
-      this.connectionErrorDetails = state.connection.details;
+      this.errorDetails = state.connection.details;
       this.connectionError.emit(state.connection.details);
+    } else if (state.connection.type === 'disconnected') {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.DISCONNECTED
+      );
     } else {
-      this.connectionErrorDetails = undefined;
+      this.errorDetails = undefined;
     }
 
     if (
