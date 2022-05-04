@@ -702,6 +702,7 @@ export class SceneTree {
 
   private retryConnectToViewer(): void {
     this.attemptingRetry = true;
+    this.errorDetails = undefined;
     this.connectToViewer();
   }
 
