@@ -567,12 +567,6 @@ export class SceneTree {
    * @ignore
    */
   protected componentWillLoad(): void {
-    if (this.viewerSelector != null) {
-      this.viewer = document.querySelector(this.viewerSelector) as
-        | HTMLVertexViewerElement
-        | undefined;
-    }
-
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
@@ -608,6 +602,8 @@ export class SceneTree {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
+    const sceneTreeErrorDetails = this.renderError();
+
     return (
       <Host>
         <div class="header">
@@ -618,8 +614,8 @@ export class SceneTree {
           </slot>
         </div>
 
-        {this.connectionErrorDetails != null &&
-          this.renderError(this.connectionErrorDetails)}
+        {sceneTreeErrorDetails != null &&
+          this.renderErrorMessage(sceneTreeErrorDetails)}
 
         {this.connectionErrorDetails == null && (
           <div class="rows-scroll">
@@ -634,8 +630,25 @@ export class SceneTree {
     );
   }
 
-  private renderError(details: SceneTreeErrorDetails): h.JSX.IntrinsicElements {
-    if (details.code === SceneTreeErrorCode.UNKNOWN) {
+  private renderError(): SceneTreeErrorDetails | undefined {
+    if (this.connectionErrorDetails != null) {
+      return this.connectionErrorDetails;
+    } else if (this.stateMap.componentLoaded && this.viewer == null) {
+      return new SceneTreeErrorDetails(SceneTreeErrorCode.UNINITIALIZED_VIEWER);
+    } else if (
+      this.stateMap.componentLoaded &&
+      this.controller?.connectionState.type === 'disconnected'
+    ) {
+      return new SceneTreeErrorDetails(SceneTreeErrorCode.UNKNOWN);
+    }
+
+    return undefined;
+  }
+
+  private renderErrorMessage(
+    details: SceneTreeErrorDetails
+  ): h.JSX.IntrinsicElements {
+    if (details.code !== SceneTreeErrorCode.SCENE_TREE_DISABLED) {
       return (
         <SceneTreeError details={details}>
           <button
@@ -709,10 +722,20 @@ export class SceneTree {
   private connectToViewer(): void {
     this.stateMap.viewerDisposable?.dispose();
 
+    if (this.viewer == null && this.viewerSelector != null) {
+      if (this.viewerSelector != null) {
+        this.viewer = document.querySelector(this.viewerSelector) as
+          | HTMLVertexViewerElement
+          | undefined;
+      }
+    }
+
     if (this.viewer != null) {
       this.stateMap.viewerDisposable = this.controller?.connectToViewer(
         this.viewer
       );
+    } else {
+      this.attemptingRetry = false;
     }
   }
 

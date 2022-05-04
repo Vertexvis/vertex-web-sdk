@@ -210,6 +210,37 @@ describe('<vertex-scene-tree>', () => {
       const errorEl = tree.shadowRoot?.querySelector('.error');
       expect(errorEl).toBeDefined();
     });
+
+    it('renders message if viewer not found', async () => {
+      const client = mockSceneTreeClient();
+      mockGetTree({ client });
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page } = await newSceneTreeSpec({
+        controller,
+        stream,
+        viewerSelector: '#invalid-viewer',
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      tree.viewerSelector = '#invalid';
+
+      await page.waitForChanges();
+
+      const errorEl = tree.shadowRoot?.querySelector('.error');
+
+      expect(errorEl).not.toBeNull();
+
+      const errorMessage = tree.shadowRoot?.querySelector('.error-message');
+
+      expect(errorMessage).not.toBeNull();
+
+      expect(errorMessage?.firstChild?.firstChild?.nodeValue).toEqual(
+        'Could not find reference to the viewer'
+      );
+    });
   });
 
   describe('disconnecting', () => {
@@ -966,6 +997,7 @@ describe('<vertex-scene-tree>', () => {
 async function newSceneTreeSpec(data: {
   controller: SceneTreeController;
   stream: ViewerStream;
+  viewerSelector?: string;
   template?: () => unknown;
   setup?: (data: { client: SceneTreeAPIClient }) => void;
 }): Promise<{
@@ -982,7 +1014,7 @@ async function newSceneTreeSpec(data: {
           <div>
             <vertex-scene-tree
               controller={data.controller}
-              viewerSelector="#viewer"
+              viewerSelector={data.viewerSelector || '#viewer'}
             />
             <vertex-viewer
               id="viewer"
