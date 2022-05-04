@@ -723,11 +723,9 @@ export class SceneTree {
     this.stateMap.viewerDisposable?.dispose();
 
     if (this.viewer == null && this.viewerSelector != null) {
-      if (this.viewerSelector != null) {
-        this.viewer = document.querySelector(this.viewerSelector) as
-          | HTMLVertexViewerElement
-          | undefined;
-      }
+      this.viewer = document.querySelector(this.viewerSelector) as
+        | HTMLVertexViewerElement
+        | undefined;
     }
 
     if (this.viewer != null) {
