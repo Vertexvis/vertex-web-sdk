@@ -634,12 +634,12 @@ export class SceneTree {
     if (this.connectionErrorDetails != null) {
       return this.connectionErrorDetails;
     } else if (this.stateMap.componentLoaded && this.viewer == null) {
-      return new SceneTreeErrorDetails(SceneTreeErrorCode.UNINITIALIZED_VIEWER);
+      return new SceneTreeErrorDetails(SceneTreeErrorCode.MISSING_VIEWER);
     } else if (
       this.stateMap.componentLoaded &&
       this.controller?.connectionState.type === 'disconnected'
     ) {
-      return new SceneTreeErrorDetails(SceneTreeErrorCode.UNKNOWN);
+      return new SceneTreeErrorDetails(SceneTreeErrorCode.DISCONNECTED);
     }
 
     return undefined;
