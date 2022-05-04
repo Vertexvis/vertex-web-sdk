@@ -220,7 +220,7 @@ export class SceneTree {
   };
 
   @State()
-  private connectionErrorDetails: SceneTreeErrorDetails | undefined;
+  private errorDetails: SceneTreeErrorDetails | undefined;
 
   @State()
   private attemptingRetry = false;
@@ -499,7 +499,7 @@ export class SceneTree {
 
     if (
       target != null &&
-      this.connectionErrorDetails == null &&
+      this.errorDetails == null &&
       getSceneTreeContainsElement(this.el, target as HTMLElement) &&
       isSceneTreeTableCellElement(target)
     ) {
@@ -567,12 +567,6 @@ export class SceneTree {
    * @ignore
    */
   protected componentWillLoad(): void {
-    if (this.viewerSelector != null) {
-      this.viewer = document.querySelector(this.viewerSelector) as
-        | HTMLVertexViewerElement
-        | undefined;
-    }
-
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
@@ -602,6 +596,12 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
+
+    if (this.viewer == null) {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.MISSING_VIEWER
+      );
+    }
   }
 
   /**
@@ -618,10 +618,9 @@ export class SceneTree {
           </slot>
         </div>
 
-        {this.connectionErrorDetails != null &&
-          this.renderError(this.connectionErrorDetails)}
+        {this.errorDetails != null && this.renderError(this.errorDetails)}
 
-        {this.connectionErrorDetails == null && (
+        {this.errorDetails == null && (
           <div class="rows-scroll">
             <slot />
           </div>
@@ -635,7 +634,7 @@ export class SceneTree {
   }
 
   private renderError(details: SceneTreeErrorDetails): h.JSX.IntrinsicElements {
-    if (details.code === SceneTreeErrorCode.UNKNOWN) {
+    if (details.code !== SceneTreeErrorCode.SCENE_TREE_DISABLED) {
       return (
         <SceneTreeError details={details}>
           <button
@@ -709,10 +708,18 @@ export class SceneTree {
   private connectToViewer(): void {
     this.stateMap.viewerDisposable?.dispose();
 
+    if (this.viewer == null && this.viewerSelector != null) {
+      this.viewer = document.querySelector(this.viewerSelector) as
+        | HTMLVertexViewerElement
+        | undefined;
+    }
+
     if (this.viewer != null) {
       this.stateMap.viewerDisposable = this.controller?.connectToViewer(
         this.viewer
       );
+    } else {
+      this.attemptingRetry = false;
     }
   }
 
@@ -746,10 +753,14 @@ export class SceneTree {
     this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
-      this.connectionErrorDetails = state.connection.details;
+      this.errorDetails = state.connection.details;
       this.connectionError.emit(state.connection.details);
+    } else if (state.connection.type === 'disconnected') {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.DISCONNECTED
+      );
     } else {
-      this.connectionErrorDetails = undefined;
+      this.errorDetails = undefined;
     }
 
     if (
