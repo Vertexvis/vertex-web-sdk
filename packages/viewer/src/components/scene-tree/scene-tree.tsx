@@ -602,9 +602,11 @@ export class SceneTree {
         SceneTreeErrorCode.MISSING_VIEWER
       );
     }
+  }
 
+  public componentWillRender(): void {
     // The controller can load data prior to the first render
-    // ensure that this renders the row.
+    // ensure that this renders any time the state changes.
     this.updateLayoutElement();
   }
 
@@ -755,7 +757,6 @@ export class SceneTree {
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
-    this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
       this.errorDetails = state.connection.details;
