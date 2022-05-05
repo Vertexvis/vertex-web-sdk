@@ -602,6 +602,10 @@ export class SceneTree {
         SceneTreeErrorCode.MISSING_VIEWER
       );
     }
+
+    // The controller can load data prior to the first render
+    // ensure that this renders the row.
+    this.updateLayoutElement();
   }
 
   /**
@@ -854,6 +858,10 @@ export class SceneTree {
       layout.totalRows = this.totalRows;
       layout.controller = this.controller;
       layout.rowData = this.rowData;
+    } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
+      console.debug(
+        'Scene tree has rows, but the component has not yet rendered'
+      );
     }
   }
 
