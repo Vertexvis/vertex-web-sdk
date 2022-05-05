@@ -17,16 +17,17 @@ export function testMesh(
 
   return mesh.elements.reduce((result: boolean, el) => {
     if (
-      testPosition(ray, [
-        mesh.positions[el.x],
-        mesh.positions[el.y],
-        mesh.positions[el.z],
+      el.length === 3 &&
+      (testPosition(ray, [
+        Vector3.fromArray(mesh.positions[el[0]]),
+        Vector3.fromArray(mesh.positions[el[1]]),
+        Vector3.fromArray(mesh.positions[el[2]]),
       ]) ||
-      testPosition(ray, [
-        mesh.positions[el.y],
-        mesh.positions[el.x],
-        mesh.positions[el.z],
-      ])
+        testPosition(ray, [
+          Vector3.fromArray(mesh.positions[el[1]]),
+          Vector3.fromArray(mesh.positions[el[0]]),
+          Vector3.fromArray(mesh.positions[el[2]]),
+        ]))
     ) {
       return true;
     }

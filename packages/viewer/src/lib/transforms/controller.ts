@@ -1,5 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Matrix4 } from '@vertexvis/geometry';
+import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 export class TransformController {
@@ -28,12 +28,12 @@ export class TransformController {
     }
   }
 
-  public async updateTransform(delta: Matrix4.Matrix4): Promise<void> {
-    this.currentDelta = delta;
+  public async updateTranslation(delta: Vector3.Vector3): Promise<void> {
+    this.currentDelta = Matrix4.makeTranslation(delta);
 
-    await this.stream.performInteraction({
+    await this.stream.updateInteraction({
       transform: {
-        delta: this.toDeltaTransform(delta),
+        delta: this.toDeltaTransform(this.currentDelta),
       },
     });
   }
@@ -46,6 +46,7 @@ export class TransformController {
           delta: this.toDeltaTransform(this.currentDelta),
         },
       });
+      this.currentDelta = Matrix4.makeIdentity();
     }
   }
 
@@ -60,11 +61,27 @@ export class TransformController {
     const asObject = Matrix4.toObject(delta);
 
     return {
+      basisX: {
+        x: asObject.m11,
+        y: asObject.m12,
+        z: asObject.m13,
+      },
+      basisY: {
+        x: asObject.m21,
+        y: asObject.m22,
+        z: asObject.m23,
+      },
+      basisZ: {
+        x: asObject.m31,
+        y: asObject.m32,
+        z: asObject.m33,
+      },
       xlate: {
         x: asObject.m14,
         y: asObject.m24,
         z: asObject.m34,
       },
+      scale: 1,
     };
   }
 }

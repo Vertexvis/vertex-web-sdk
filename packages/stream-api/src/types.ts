@@ -83,8 +83,8 @@ export type BeginInteractionPayload = DeepRequired<
   ['transform']
 >;
 
-export type InteractionPayload = DeepRequired<
-  vertexvis.protobuf.stream.IInteractionPayload,
+export type UpdateInteractionPayload = DeepRequired<
+  vertexvis.protobuf.stream.IUpdateInteractionPayload,
   ['transform']
 >;
 

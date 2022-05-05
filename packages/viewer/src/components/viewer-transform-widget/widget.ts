@@ -1,12 +1,15 @@
-import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
+import { BoundingSphere, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import regl from 'regl';
+import shapeBuilder, { JoinStyle } from 'regl-shape';
 
 import { drawAxis } from '../../lib/transforms/axes';
-import { drawStandard } from '../../lib/transforms/draw';
+import { xAxisOutlineMesh } from '../../lib/transforms/axis-arrows';
+import { drawLines, drawStandard } from '../../lib/transforms/draw';
 import { testMesh } from '../../lib/transforms/hits';
 import {
   computeMesh2dBounds,
   Mesh,
+  OutlineMesh,
   TriangleMesh,
 } from '../../lib/transforms/mesh';
 import {
@@ -24,6 +27,7 @@ export class TransformGlWidget {
   private viewport: Viewport;
   private cursor?: Point.Point;
   private xArrow!: TriangleMesh;
+  private xOutline!: OutlineMesh;
   private yArrow!: TriangleMesh;
   private zArrow!: TriangleMesh;
 
@@ -34,11 +38,14 @@ export class TransformGlWidget {
 
   public constructor(canvasElement: HTMLCanvasElement) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
-    this.reglCommand = regl(canvasElement);
+    this.reglCommand = regl({
+      canvas: canvasElement,
+      extensions: ['ANGLE_instanced_arrays'],
+    });
   }
 
   public getWidgetBounds(): Rectangle.Rectangle | undefined {
-    if (this.frame != null) {
+    if (this.position != null && this.frame != null) {
       return computeMesh2dBounds(
         this.viewport,
         this.frame,
@@ -96,16 +103,34 @@ export class TransformGlWidget {
     if (currentPosition != null) {
       this.draw?.(() => {
         [this.xArrow, this.yArrow, this.zArrow].forEach((m) =>
-          this.draw?.(() =>
+          this.draw?.(() => {
             this.hoveredMesh?.identifier === m.identifier
               ? m.draw({ color: [1, 1, 0] })
-              : m.draw({ color: Vector3.toArray(m.color) })
-          )
-        );
+              : m.draw({ color: Vector3.toArray(m.color) });
 
-        drawAxis(this.reglCommand, Vector3.up(), currentPosition);
-        drawAxis(this.reglCommand, Vector3.right(), currentPosition);
-        drawAxis(this.reglCommand, Vector3.back(), currentPosition);
+            drawAxis(
+              this.reglCommand,
+              currentPosition,
+              Vector3.fromArray(m.positions[m.positions.length - 1]),
+              m.color
+            );
+            // this.xOutline.draw({ color: Vector3.toArray(this.xOutline.color) });
+            // this.drawLines?.(this.lineData)
+
+            const { createShape } = shapeBuilder(this.reglCommand);
+            const res = 32;
+            const points = new Float64Array(2 * res).fill(0);
+            const shape = createShape(points, {
+              join: 'round' as JoinStyle,
+              thickness: 12,
+              color: Array(res)
+                .fill(undefined)
+                .map(() => [Math.random(), Math.random(), Math.random()]),
+            });
+
+            shape();
+          })
+        );
       });
     }
   }
@@ -141,10 +166,40 @@ export class TransformGlWidget {
   }
 
   private createTriangleMeshes(): void {
-    if (this.position != null) {
-      this.xArrow = xAxisMesh(this.reglCommand, this.position);
-      this.yArrow = yAxisMesh(this.reglCommand, this.position);
-      this.zArrow = zAxisMesh(this.reglCommand, this.position);
+    if (this.position != null && this.frame != null) {
+      const triangleSize =
+        Vector3.magnitude(
+          Vector3.subtract(this.position, this.frame.scene.camera.position)
+        ) * 0.005;
+
+      this.xArrow = xAxisMesh(
+        this.reglCommand,
+        this.position,
+        this.viewport,
+        this.frame.scene.camera,
+        triangleSize
+      );
+      this.xOutline = xAxisOutlineMesh(
+        this.reglCommand,
+        this.position,
+        this.viewport,
+        this.frame.scene.camera,
+        triangleSize
+      );
+      this.yArrow = yAxisMesh(
+        this.reglCommand,
+        this.position,
+        this.viewport,
+        this.frame.scene.camera,
+        triangleSize
+      );
+      this.zArrow = zAxisMesh(
+        this.reglCommand,
+        this.position,
+        this.viewport,
+        this.frame.scene.camera,
+        triangleSize
+      );
     }
   }
 }

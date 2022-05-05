@@ -10,6 +10,6 @@
     "jsxFactory": "h",
     "target": "es2017"
   },
-  "include": ["src", "types/*.d.ts", "src/components.d.ts"],
+  "include": ["src", "types/*.d.ts", "src/components.d.ts", "src/regl-gpu-lines.d.ts"],
   "exclude": ["dist", "node_modules"]
 }

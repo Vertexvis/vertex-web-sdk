@@ -55,12 +55,24 @@ export class ViewerTransformWidget {
   private canvasRef?: HTMLCanvasElement;
   private transformGlWidget?: TransformGlWidget;
 
+  private previousPosition?: Vector3.Vector3;
+
+  private canvasResizeObserver!: ResizeObserver;
+
   protected componentDidLoad(): void {
     window.addEventListener('pointermove', this.handleWindowPointerMove);
+
+    this.canvasResizeObserver = new ResizeObserver(this.handleCanvasResize);
+
+    if (this.canvasRef != null) {
+      this.canvasResizeObserver.observe(this.canvasRef);
+    }
   }
 
   protected disconnectedCallback(): void {
     window.removeEventListener('pointermove', this.handleWindowPointerMove);
+
+    this.canvasResizeObserver.disconnect();
   }
 
   @Watch('viewer')
@@ -146,6 +158,14 @@ export class ViewerTransformWidget {
     }
   };
 
+  private handleCanvasResize = (): void => {
+    if (this.canvasRef != null) {
+      this.canvasBounds = this.canvasRef?.getBoundingClientRect();
+
+      this.getTransformWidget()?.updateDimensions(this.canvasRef);
+    }
+  };
+
   private handleWindowPointerMove = (event: PointerEvent): void => {
     const canvasPoint = this.pointToCanvas(
       Point.create(event.clientX, event.clientY)
@@ -206,6 +226,7 @@ export class ViewerTransformWidget {
   private handlePointerUp = (): void => {
     this.draggingMesh = undefined;
     this.lastWorldPosition = undefined;
+    this.position = this.currentPosition;
 
     this.controller?.endTransform();
 
@@ -282,16 +303,16 @@ export class ViewerTransformWidget {
       this.position != null &&
       this.currentPosition != null
     ) {
+      this.previousPosition = this.currentPosition;
+
       if (this.draggingMesh?.identifier === 'x-translate') {
         this.currentPosition = {
           ...this.currentPosition,
           x: Vector3.subtract(next, previous).x + this.currentPosition.x,
         };
 
-        this.controller?.updateTransform(
-          Matrix4.makeTranslation(
-            Vector3.subtract(this.position, this.currentPosition)
-          )
+        this.controller?.updateTranslation(
+          Vector3.subtract(this.currentPosition, this.position)
         );
       } else if (this.draggingMesh?.identifier === 'y-translate') {
         this.currentPosition = {
@@ -299,10 +320,8 @@ export class ViewerTransformWidget {
           y: Vector3.subtract(next, previous).y + this.currentPosition.y,
         };
 
-        this.controller?.updateTransform(
-          Matrix4.makeTranslation(
-            Vector3.subtract(this.position, this.currentPosition)
-          )
+        this.controller?.updateTranslation(
+          Vector3.subtract(this.currentPosition, this.position)
         );
       } else if (this.draggingMesh?.identifier === 'z-translate') {
         this.currentPosition = {
@@ -310,10 +329,8 @@ export class ViewerTransformWidget {
           z: Vector3.subtract(next, previous).z + this.currentPosition.z,
         };
 
-        this.controller?.updateTransform(
-          Matrix4.makeTranslation(
-            Vector3.subtract(this.position, this.currentPosition)
-          )
+        this.controller?.updateTranslation(
+          Vector3.subtract(this.currentPosition, this.position)
         );
       }
     }

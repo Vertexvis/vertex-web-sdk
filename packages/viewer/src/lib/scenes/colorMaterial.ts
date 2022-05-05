@@ -13,7 +13,7 @@ export interface ColorMaterial {
 }
 
 const defaultColor: ColorMaterial = {
-  opacity: 100,
+  opacity: 255,
   glossiness: 10,
   diffuse: {
     r: 0,
@@ -55,7 +55,7 @@ export const create = (
 ): ColorMaterial => {
   return {
     ...defaultColor,
-    opacity: opacity || 100,
+    opacity: opacity || 255,
     glossiness: opacity || 10,
     diffuse: {
       r,
@@ -76,7 +76,7 @@ export const fromHex = (hex: string, opacity?: number): ColorMaterial => {
 
   return {
     ...defaultColor,
-    opacity: opacity || 100,
+    opacity: opacity || 255,
     glossiness: opacity || 10,
     diffuse: color != null ? { ...color } : { ...defaultColor.diffuse },
   };
@@ -86,7 +86,7 @@ export const fromHex = (hex: string, opacity?: number): ColorMaterial => {
  * The default material that is used for selected items.
  */
 export const defaultSelectionMaterial: ColorMaterial = {
-  opacity: 100,
+  opacity: 255,
   glossiness: 4,
   diffuse: {
     r: 255,

@@ -473,13 +473,6 @@ Type: `Promise<void>`
 | `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
 
 
-## CSS Custom Properties
-
-| Name                             | Description                                                               |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| `--scene-tree-toolbar-separator` | A CSS border value that specifies the border between scene tree toolbars. |
-
-
 ## Dependencies
 
 ### Depends on

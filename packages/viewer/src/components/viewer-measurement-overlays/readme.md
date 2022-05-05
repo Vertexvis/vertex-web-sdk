@@ -13,15 +13,6 @@
 | `viewer`              | --        | The viewer that this component is bound to.      | `HTMLVertexViewerElement \| undefined` | `undefined`                       |
 
 
-## CSS Custom Properties
-
-| Name                                         | Description                                       |
-| -------------------------------------------- | ------------------------------------------------- |
-| `--viewer-measurement-overlays-x-axis-color` | A CSS color for overlays representing the X axis. |
-| `--viewer-measurement-overlays-y-axis-color` | A CSS color for overlays representing the Y axis. |
-| `--viewer-measurement-overlays-z-axis-color` | A CSS color for overlays representing the Z axis. |
-
-
 ## Dependencies
 
 ### Used by

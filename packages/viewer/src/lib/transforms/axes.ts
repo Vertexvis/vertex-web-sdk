@@ -3,25 +3,20 @@ import regl from 'regl';
 
 export function drawAxis(
   reglCommand: regl.Regl,
-  direction: Vector3.Vector3,
-  position: Vector3.Vector3,
-  length = 18
+  start: Vector3.Vector3,
+  end: Vector3.Vector3,
+  color: Vector3.Vector3
 ): void {
   reglCommand({
     primitive: 'lines',
     count: 2,
 
     attributes: {
-      position: [
-        Vector3.toArray(position),
-        Vector3.toArray(
-          Vector3.add(position, Vector3.scale(length, direction))
-        ),
-      ],
+      position: [Vector3.toArray(start), Vector3.toArray(end)],
     },
 
     uniforms: {
-      color: Vector3.toArray(direction),
+      color: Vector3.toArray(color),
     },
   })();
 }

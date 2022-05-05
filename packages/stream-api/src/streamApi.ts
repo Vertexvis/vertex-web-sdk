@@ -12,7 +12,6 @@ import {
   EventMessage,
   GetStencilBufferPayload,
   HitItemsPayload,
-  InteractionPayload,
   LoadSceneViewStatePayload,
   ReconnectPayload,
   RecordPerformancePayload,
@@ -25,6 +24,7 @@ import {
   SyncTimePayload,
   UpdateCrossSectioningPayload,
   UpdateDimensionsPayload,
+  UpdateInteractionPayload,
   UpdateStreamPayload,
 } from './types';
 import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
@@ -244,7 +244,7 @@ export class StreamApi {
   }
 
   /**
-   * Sends a request to perform the specified interaction.
+   * Sends a request to update the specified interaction.
    *
    * Use `withResponse` to indicate if the server should reply with a response.
    * If `false`, the returned promise will complete immediately. Otherwise,
@@ -254,11 +254,11 @@ export class StreamApi {
    * @param withResponse Indicates if the server should reply with a response.
    * Defaults to `true`.
    */
-  public performInteraction(
-    payload: InteractionPayload,
+  public updateInteraction(
+    payload: UpdateInteractionPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
-    return this.sendRequest({ interaction: payload }, withResponse);
+    return this.sendRequest({ updateInteraction: payload }, withResponse);
   }
 
   /**

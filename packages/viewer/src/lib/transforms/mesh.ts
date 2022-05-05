@@ -4,8 +4,8 @@ import regl from 'regl';
 import { Frame, Viewport } from '../types';
 
 export abstract class Mesh {
-  public abstract elements: Vector3.Vector3[];
-  public abstract positions: Vector3.Vector3[];
+  public abstract elements: Array<number[]>;
+  public abstract positions: Array<number[]>;
   public abstract identifier: string;
 
   public abstract draw(): void;
@@ -14,10 +14,10 @@ export abstract class Mesh {
 export class TriangleMesh implements Mesh {
   public draw = this.reglCommand({
     attributes: {
-      position: [this.positions.map((v) => Vector3.toArray(v))],
+      position: this.positions,
     },
 
-    elements: this.elements.map((v) => Vector3.toArray(v)),
+    elements: this.elements,
 
     uniforms: {
       color: this.isHovered
@@ -29,8 +29,46 @@ export class TriangleMesh implements Mesh {
   public constructor(
     public reglCommand: regl.Regl,
     public identifier: string,
-    public positions: Vector3.Vector3[],
-    public elements: Vector3.Vector3[],
+    public positions: Array<number[]>,
+    public elements: Array<number[]>,
+    public color: Vector3.Vector3,
+    public isHovered: boolean = false
+  ) {}
+
+  public static hovered(mesh: TriangleMesh): TriangleMesh {
+    return new TriangleMesh(
+      mesh.reglCommand,
+      mesh.identifier,
+      mesh.positions,
+      mesh.elements,
+      mesh.color,
+      true
+    );
+  }
+}
+
+export class OutlineMesh implements Mesh {
+  public draw = this.reglCommand({
+    primitive: 'lines',
+
+    attributes: {
+      position: this.positions,
+    },
+
+    elements: this.elements,
+
+    uniforms: {
+      color: this.isHovered
+        ? [0, 1, 1]
+        : this.reglCommand.prop<{ color: number[] }, 'color'>('color'),
+    },
+  });
+
+  public constructor(
+    public reglCommand: regl.Regl,
+    public identifier: string,
+    public positions: Array<number[]>,
+    public elements: Array<number[]>,
     public color: Vector3.Vector3,
     public isHovered: boolean = false
   ) {}
@@ -57,13 +95,15 @@ export function computeMesh2dBounds(
 
   meshes.map((m) => {
     m.positions.forEach((p) => {
-      const pt = viewport.transformWorldToViewport(
-        p,
-        frame.scene.camera.projectionViewMatrix
-      );
+      if (p.length === 3) {
+        const pt = viewport.transformWorldToViewport(
+          Vector3.create(p[0], p[1], p[2]),
+          frame.scene.camera.projectionViewMatrix
+        );
 
-      min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
-      max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+        min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
+        max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+      }
     });
   });
 
