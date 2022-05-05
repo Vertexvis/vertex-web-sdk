@@ -557,7 +557,7 @@ export class SceneTree {
       await selectFilterResults(
         this.viewer,
         term,
-        this.filterOnMetadata ? this.metadataKeys : undefined,
+        this.metadataKeys,
         { append: false }
       );
       return this.rows.filter((row) => row?.node.filterHit);
