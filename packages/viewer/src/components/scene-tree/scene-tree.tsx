@@ -554,12 +554,9 @@ export class SceneTree {
   @Method()
   public async selectFilteredItems(term: string): Promise<Row[] | void> {
     if (this.viewer != null) {
-      await selectFilterResults(
-        this.viewer,
-        term,
-        this.metadataKeys,
-        { append: false }
-      );
+      await selectFilterResults(this.viewer, term, this.metadataKeys, {
+        append: false,
+      });
       return this.rows.filter((row) => row?.node.filterHit);
     } else {
       return;
