@@ -325,6 +325,48 @@ describe('<vertex-scene-tree>', () => {
       )[0] as HTMLVertexSceneTreeTableCellElement;
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
+
+    it('renders the scene tree data, even if the network requests completed before the scene tree render', async () => {
+      const client = mockSceneTreeClient();
+      const res = mockGetTree({ client });
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const page = await newSpecPage({
+        components: [Viewer, SceneTree, SceneTreeTableLayout],
+        template: () => {
+          return (
+            <div>
+              <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
+            </div>
+          );
+        },
+      });
+
+      const viewer = page.body.querySelector(
+        'vertex-viewer'
+      ) as HTMLVertexViewerElement;
+      loadViewerStreamKey(key2, { viewer, stream, ws }, { token });
+      controller?.connectToViewer(viewer);
+
+      const tree = page.doc.createElement('vertex-scene-tree');
+      tree.controller = controller;
+      page?.body.appendChild(tree);
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.connection.type === 'connected') {
+            resolve();
+          }
+        });
+      });
+      await page.waitForChanges();
+
+      const row = tree.querySelectorAll(
+        'vertex-scene-tree-table-cell'
+      )[0] as HTMLVertexSceneTreeTableCellElement;
+      expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
+    });
   });
 
   describe(SceneTree.prototype.invalidateRows, async () => {
