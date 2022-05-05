@@ -35,6 +35,7 @@ import { isLoadedRow, Row } from './lib/row';
 import {
   deselectItem,
   hideItem,
+  selectFilterResults,
   selectItem,
   selectRangeInSceneTree,
   showItem,
@@ -541,6 +542,24 @@ export class SceneTree {
     options: FilterTreeOptions = {}
   ): Promise<void> {
     return this.controller?.filter(term, options);
+  }
+
+  /**
+   * Performs an async request that will select the filtered items in the tree
+   * that match the given term.
+   *
+   * @param term The filter term.
+   * @returns A promise that resolves with the selected rows.
+   */
+  @Method()
+  public async selectFilteredItems(term: string): Promise<Row[]> {
+    await selectFilterResults(
+      this.viewer,
+      term,
+      this.filterOnMetadata ? this.metadataKeys : undefined,
+      { append: false }
+    );
+    return this.rows.filter((row) => row?.node.filterHit);
   }
 
   /**
