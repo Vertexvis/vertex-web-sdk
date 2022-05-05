@@ -552,14 +552,18 @@ export class SceneTree {
    * @returns A promise that resolves with the selected rows.
    */
   @Method()
-  public async selectFilteredItems(term: string): Promise<Row[]> {
-    await selectFilterResults(
-      this.viewer,
-      term,
-      this.filterOnMetadata ? this.metadataKeys : undefined,
-      { append: false }
-    );
-    return this.rows.filter((row) => row?.node.filterHit);
+  public async selectFilteredItems(term: string): Promise<Row[] | void> {
+    if (this.viewer != null) {
+      await selectFilterResults(
+        this.viewer,
+        term,
+        this.filterOnMetadata ? this.metadataKeys : undefined,
+        { append: false }
+      );
+      return this.rows.filter((row) => row?.node.filterHit);
+    } else {
+      return;
+    }
   }
 
   /**

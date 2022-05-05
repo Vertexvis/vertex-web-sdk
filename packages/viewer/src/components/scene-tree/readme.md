@@ -413,14 +413,14 @@ Type: `Promise<void>`
 
 A promise that resolves when the operation is finished.
 
-### `selectFilteredItems(term: string) => Promise<Row[]>`
+### `selectFilteredItems(term: string) => Promise<Row[] | void>`
 
 Performs an async request that will select the filtered items in the tree
 that match the given term.
 
 #### Returns
 
-Type: `Promise<Row[]>`
+Type: `Promise<void | Row[]>`
 
 A promise that resolves with the selected rows.
 

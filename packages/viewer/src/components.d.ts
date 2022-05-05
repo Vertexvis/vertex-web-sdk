@@ -214,7 +214,7 @@ export namespace Components {
      * @param term The filter term.
      * @returns A promise that resolves with the selected rows.
      */
-    selectFilteredItems: (term: string) => Promise<Row[]>;
+    selectFilteredItems: (term: string) => Promise<Row[] | void>;
     /**
      * Performs an API call that will select the item associated to the given row or row index.  This method supports a `recurseParent` option that allows for recursively selecting the next unselected parent node. This behavior is considered stateful. Each call to `selectItem` will track the ancestry of the passed in `rowArg`. If calling `selectItem` with a row not belonging to the ancestry of a previous selection, then this method will perform a standard selection.
      * @param row The row, row index or node to select.
