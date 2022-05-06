@@ -413,6 +413,17 @@ Type: `Promise<void>`
 
 A promise that resolves when the operation is finished.
 
+### `selectFilteredItems(term: string) => Promise<void>`
+
+Performs an async request that will select the filtered items in the tree
+that match the given term.
+
+#### Returns
+
+Type: `Promise<void>`
+
+A promise that completes when the request has completed.
+
 ### `selectItem(row: RowArg, { recurseParent, ...options }?: SelectItemOptions) => Promise<void>`
 
 Performs an API call that will select the item associated to the given row
