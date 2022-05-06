@@ -549,17 +549,14 @@ export class SceneTree {
    * that match the given term.
    *
    * @param term The filter term.
-   * @returns A promise that resolves with the selected rows.
+   * @returns A promise that completes when the request has completed.
    */
   @Method()
-  public async selectFilteredItems(term: string): Promise<Row[] | void> {
+  public async selectFilteredItems(term: string): Promise<void> {
     if (this.viewer != null) {
       await selectFilterResults(this.viewer, term, this.metadataKeys, {
         append: false,
       });
-      return this.rows.filter((row) => row?.node.filterHit);
-    } else {
-      return;
     }
   }
 
