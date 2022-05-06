@@ -861,10 +861,15 @@ describe(SceneTreeController, () => {
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
+
+      const filterRes = new FilterResponse();
+      filterRes.setNumberOfResults(5);
       (client.filter as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new FilterResponse())
+        mockGrpcUnaryResult(filterRes)
       );
 
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
       await controller.connect(jwtProvider);
 
       const req = new FilterRequest();
@@ -878,6 +883,11 @@ describe(SceneTreeController, () => {
         metadata,
         expect.anything()
       );
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          numberOfRowsWithFilterHit: 5,
+        })
+      );
     });
 
     it('does not filter whole tree when include collapsed is false', async () => {
@@ -885,8 +895,10 @@ describe(SceneTreeController, () => {
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
+      const filterRes = new FilterResponse();
+      filterRes.setNumberOfResults(5);
       (client.filter as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new FilterResponse())
+        mockGrpcUnaryResult(filterRes)
       );
 
       await controller.connect(jwtProvider);
@@ -895,12 +907,19 @@ describe(SceneTreeController, () => {
       req.setFilter(term);
       req.setFullTree(false);
 
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
       await controller.filter(term, { includeCollapsed: false });
 
       expect(client.filter).toHaveBeenCalledWith(
         req,
         metadata,
         expect.anything()
+      );
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          numberOfRowsWithFilterHit: 5,
+        })
       );
     });
   });
