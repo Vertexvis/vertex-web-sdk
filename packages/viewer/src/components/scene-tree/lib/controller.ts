@@ -8,6 +8,7 @@ import {
   ExpandAllRequest,
   ExpandNodeRequest,
   FilterRequest,
+  FilterResponse,
   GetAvailableColumnsRequest,
   GetAvailableColumnsResponse,
   GetNodeAncestorsRequest,
@@ -24,7 +25,7 @@ import {
   SceneTreeAPIClient,
   ServiceError,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { MetadataKey } from '../interfaces';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
@@ -41,6 +42,7 @@ export type JwtProvider = () => string | undefined;
 
 export interface SceneTreeState {
   totalRows: number;
+  totalFilteredRows: number;
   rows: Row[];
   connection: ConnectionState;
 }
@@ -123,6 +125,8 @@ export class SceneTreeController {
 
   private state: SceneTreeState = {
     totalRows: 0,
+    totalFilteredRows: 0,
+
     rows: [],
     connection: { type: 'disconnected' },
   };
@@ -147,6 +151,18 @@ export class SceneTreeController {
     private rowLimit: number,
     private connectOptions: ConnectOptions = {}
   ) {}
+
+  /**
+   * Registers an event listener that will be invoked when the state changes
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public stateChanged(
+    listener: Listener<SceneTreeState | undefined>
+  ): Disposable {
+    return this.onStateChange.on(listener);
+  }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
     const { connection } = this.state;
@@ -290,6 +306,7 @@ export class SceneTreeController {
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
+      totalFilteredRows: reset ? 0 : this.state.totalFilteredRows,
       rows: reset ? [] : this.state.rows,
     });
   }
@@ -496,14 +513,24 @@ export class SceneTreeController {
     term: string,
     options: FilterTreeOptions = {}
   ): Promise<void> {
-    await this.ifConnectionHasJwt((jwt) => {
-      return this.requestUnary(jwt, (metadata, handler) => {
-        const req = new FilterRequest();
-        req.setFilter(term);
-        req.setFullTree((options.includeCollapsed ?? true) === true);
-        if (options.columns) req.setColumnsKeysList(options.columns);
+    return this.ifConnectionHasJwt(async (jwt) => {
+      const res = await this.requestUnary<FilterResponse>(
+        jwt,
+        (metadata, handler) => {
+          const req = new FilterRequest();
+          req.setFilter(term);
+          req.setFullTree((options.includeCollapsed ?? true) === true);
+          if (options.columns) req.setColumnsKeysList(options.columns);
 
-        this.client.filter(req, metadata, handler);
+          this.client.filter(req, metadata, handler);
+        }
+      );
+
+      const { numberOfResults } = res.toObject();
+
+      this.updateState({
+        ...this.state,
+        totalFilteredRows: numberOfResults,
       });
     });
   }
@@ -756,7 +783,11 @@ export class SceneTreeController {
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-        this.updateState({ ...this.state, totalRows, rows });
+        this.updateState({
+          ...this.state,
+          totalRows: totalRows,
+          rows: rows,
+        });
       }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
