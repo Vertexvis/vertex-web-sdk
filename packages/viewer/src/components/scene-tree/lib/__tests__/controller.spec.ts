@@ -885,7 +885,7 @@ describe(SceneTreeController, () => {
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          numberOfRowsWithFilterHit: 5,
+          totalFilteredRows: 5,
         })
       );
     });
@@ -918,7 +918,7 @@ describe(SceneTreeController, () => {
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          numberOfRowsWithFilterHit: 5,
+          totalFilteredRows: 5,
         })
       );
     });
