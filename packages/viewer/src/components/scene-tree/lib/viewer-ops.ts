@@ -55,6 +55,21 @@ export async function selectRangeInSceneTree(
     .execute();
 }
 
+export async function selectFilterResults(
+  viewer: HTMLVertexViewerElement,
+  filter: string,
+  keys: string[],
+  { material = undefined, append = false }: ViewerSelectItemOptions
+): Promise<void> {
+  const scene = await viewer.scene();
+  return scene
+    .items((op) => [
+      ...(append ? [] : [op.where((q) => q.all()).deselect()]),
+      op.where((q) => q.withMetadata(filter, keys)).select(material),
+    ])
+    .execute();
+}
+
 export async function deselectItem(
   viewer: HTMLVertexViewerElement,
   id: string
