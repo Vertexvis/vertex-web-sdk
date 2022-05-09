@@ -1117,7 +1117,6 @@ export namespace Components {
     interface VertexViewerTransformWidget {
         "controller"?: TransformController;
         "currentPosition"?: Vector3.Vector3;
-        "hovered"?: string;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */
@@ -2446,7 +2445,6 @@ declare namespace LocalJSX {
     interface VertexViewerTransformWidget {
         "controller"?: TransformController;
         "currentPosition"?: Vector3.Vector3;
-        "hovered"?: string;
         /**
           * The starting position of this transform widget. This position will be updated as translation occurs.
          */

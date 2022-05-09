@@ -54,6 +54,20 @@ Type: `Promise<void>`
 | `"search-icon"` | A slot that replaces the component's default search icon. |
 
 
+## CSS Custom Properties
+
+| Name                                           | Description                                                                                    |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `--scene-tree-search-clear-button-offset`      | A CSS length that specifies the horizontal offset of the clear button.                         |
+| `--scene-tree-search-focused-input-background` | A CSS background value that specifies the background of the internal text input when focused.  |
+| `--scene-tree-search-focused-input-outline`    | A CSS outline value that specifies the outline of the internal text input when focused.        |
+| `--scene-tree-search-input-background`         | A CSS background that specifies the background color or image of the internal text input.      |
+| `--scene-tree-search-input-border`             | A CSS border value that specifies the border of the internal text input.                       |
+| `--scene-tree-search-input-border-radius`      | A CSS length that specifies the radius of the internal text input.                             |
+| `--scene-tree-search-input-padding`            | A CSS padding value that specifies horizontal and vertical lengths of the internal text input. |
+| `--scene-tree-search-search-icon-offset`       | A CSS length that specifies the horizontal offset of the search icon                           |
+
+
 ## Dependencies
 
 ### Used by

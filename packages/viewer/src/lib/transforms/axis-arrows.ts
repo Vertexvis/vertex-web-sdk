@@ -1,101 +1,107 @@
-import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
-import regl from 'regl';
+import { Ray, Vector3 } from '@vertexvis/geometry';
 
-import { Frame, FrameCamera, Viewport } from '../types';
-import { OutlineMesh, TriangleMesh } from './mesh';
+import { FrameCameraBase } from '../types';
+import {
+  AxisMeshPoints,
+  OutlinedTriangleMesh,
+  TriangleMeshPoints,
+} from './mesh';
 
-export function xAxisMesh(
-  reglCommand: regl.Regl,
-  position: Vector3.Vector3,
-  viewport: Viewport,
-  camera: FrameCamera.PerspectiveFrameCamera,
-  triangleSize = 3
-): TriangleMesh {
-  return new TriangleMesh(
-    reglCommand,
-    'x-translate',
-    xAxisPositions(position, viewport, camera, triangleSize).map((p) =>
-      Vector3.toArray(p)
-    ),
-    triangleElements().map((p) => Vector3.toArray(p)),
-    Vector3.right()
+export function axisPositions(
+  widgetPosition: Vector3.Vector3,
+  camera: FrameCameraBase,
+  arrowMesh: OutlinedTriangleMesh
+): AxisMeshPoints {
+  return new AxisMeshPoints(
+    widgetPosition,
+    arrowMesh.meshPoints.worldBase,
+    Vector3.transformMatrix(widgetPosition, camera.projectionViewMatrix),
+    Vector3.transformMatrix(
+      arrowMesh.meshPoints.worldBase,
+      camera.projectionViewMatrix
+    )
   );
 }
 
-export function xAxisOutlineMesh(
-  reglCommand: regl.Regl,
-  position: Vector3.Vector3,
-  viewport: Viewport,
-  camera: FrameCamera.PerspectiveFrameCamera,
+export function xAxisArrowPositions(
+  widgetPosition: Vector3.Vector3,
+  camera: FrameCameraBase,
   triangleSize = 3
-): OutlineMesh {
-  return new OutlineMesh(
-    reglCommand,
-    'x-translate-outline',
-    xAxisPositions(position, viewport, camera, triangleSize).map((p) =>
-      Vector3.toArray(p)
-    ),
-    triangleOutlineElements(),
-    Vector3.create()
+): TriangleMeshPoints {
+  return computeArrowNdcValues(
+    widgetPosition,
+    camera,
+    Vector3.right(),
+    triangleSize
   );
 }
 
-function xAxisPositions(
-  position: Vector3.Vector3,
-  viewport: Viewport,
-  camera: FrameCamera.PerspectiveFrameCamera,
-  triangleSize = 3,
-  axisOffset = 3
-): Vector3.Vector3[] {
-  const baseOffset = (axisOffset - 1) * (triangleSize * 3);
-  const pointOffset = axisOffset * (triangleSize * 3);
+export function yAxisArrowPositions(
+  widgetPosition: Vector3.Vector3,
+  camera: FrameCameraBase,
+  triangleSize = 3
+): TriangleMeshPoints {
+  return computeArrowNdcValues(
+    widgetPosition,
+    camera,
+    Vector3.up(),
+    triangleSize
+  );
+}
+
+export function zAxisArrowPositions(
+  widgetPosition: Vector3.Vector3,
+  camera: FrameCameraBase,
+  triangleSize = 3
+): TriangleMeshPoints {
+  return computeArrowNdcValues(
+    widgetPosition,
+    camera,
+    Vector3.back(),
+    triangleSize
+  );
+}
+
+function computeArrowNdcValues(
+  widgetPosition: Vector3.Vector3,
+  camera: FrameCameraBase,
+  direction: Vector3.Vector3,
+  triangleSize = 3
+): TriangleMeshPoints {
+  const pointOffset = triangleSize * 9;
+
+  const position = Vector3.add(
+    widgetPosition,
+    Vector3.scale(pointOffset, direction)
+  );
 
   const worldX = Vector3.normalize(
     Vector3.cross(
-      Vector3.right(),
+      direction,
       Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
     )
   );
   const xRay = Ray.create({
-    origin: Vector3.add(position, Vector3.create(pointOffset, 0, 0)),
+    origin: position,
     direction: worldX,
   });
   const yRay = Ray.create({
-    origin: Vector3.add(position, Vector3.create(pointOffset, 0, 0)),
-    direction: Vector3.right(),
+    origin: position,
+    direction,
   });
 
   const left = Ray.at(xRay, -(triangleSize * 1.25));
   const right = Ray.at(xRay, triangleSize * 1.25);
   const up = Ray.at(yRay, triangleSize * 3);
 
-  return [
+  return new TriangleMeshPoints(
+    position,
     left,
     right,
     up,
-    Vector3.add(position, Vector3.create(pointOffset, 0, 0)),
-  ];
-}
-
-function triangleElements(): Vector3.Vector3[] {
-  return [
-    Vector3.create(3, 0, 2),
-    Vector3.create(3, 1, 2),
-    // Vector3.create(1, 4, 2),
-    // Vector3.create(3, 4, 0),
-    // Vector3.create(3, 4, 1),
-    // Vector3.create(0, 4, 2),
-  ];
-}
-
-function triangleOutlineElements(): Array<number[]> {
-  return [
-    [0, 1],
-    [1, 2],
-    [2, 0],
-    // Vector3.create(1, 4, 2),
-    // Vector3.create(3, 4, 0),
-    // Vector3.create(3, 4, 1),
-    // Vector3.create(0, 4, 2),
-  ];
+    Vector3.transformMatrix(position, camera.projectionViewMatrix),
+    Vector3.transformMatrix(left, camera.projectionViewMatrix),
+    Vector3.transformMatrix(right, camera.projectionViewMatrix),
+    Vector3.transformMatrix(up, camera.projectionViewMatrix)
+  );
 }

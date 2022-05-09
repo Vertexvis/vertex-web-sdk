@@ -1,5 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 export class TransformController {

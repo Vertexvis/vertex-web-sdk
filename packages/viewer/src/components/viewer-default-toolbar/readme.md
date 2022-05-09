@@ -67,6 +67,18 @@ then the viewer will need to be manually connected.
 | `viewer`             | --                    | An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired. | `HTMLVertexViewerElement \| undefined`                                                                                               | `undefined`       |
 
 
+## CSS Custom Properties
+
+| Name                                   | Description                                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `--viewer-toolbar-group-background`    | The background to apply to each group in the toolbar. Defaults to `rgba(245, 245, 245, 0.95)`                                  |
+| `--viewer-toolbar-group-border-radius` | The corner radius to apply to each group in the toolbar. Defaults to `0.25rem`.                                                |
+| `--viewer-toolbar-group-box-shadow`    | The shadow to apply to each group in the toolbar. Defaults to `-1px 0 2px rgba(0, 0, 0, 0.12), 1px 0 2px rgba(0, 0, 0, 0.13)`. |
+| `--viewer-toolbar-group-gap`           | The spacing between each toolbar group. Defaults to `0.5rem`.                                                                  |
+| `--viewer-toolbar-group-item-gap`      | The spacing between each item within a toolbar group. Defaults to `0.25rem`.                                                   |
+| `--viewer-toolbar-group-padding`       | The padding to apply to each group in the toolbar. Defaults to `0.25rem`.                                                      |
+
+
 ## Dependencies
 
 ### Depends on
