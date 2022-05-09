@@ -1,4 +1,5 @@
-import { Matrix4, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
+import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
@@ -36,6 +37,8 @@ export class TransformWidget {
   private position?: Vector3.Vector3;
   private bounds?: Rectangle.Rectangle;
 
+  private hoveredChanged = new EventDispatcher<Mesh | undefined>();
+
   public constructor(private canvasElement: HTMLCanvasElement) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
   }
@@ -72,7 +75,6 @@ export class TransformWidget {
 
     if (position != null && this.frame != null) {
       this.createOrUpdateMeshes(position, this.frame);
-      this.clear();
       this.redraw();
     } else {
       this.clear();
@@ -86,13 +88,11 @@ export class TransformWidget {
     this.redraw();
   }
 
-  public hovered(): Mesh | undefined {
-    return this.hoveredMesh;
+  public onHoveredChanged(listener: Listener<Mesh | undefined>): Disposable {
+    return this.hoveredChanged.on(listener);
   }
 
   private redraw(): void {
-    console.log('redraw');
-
     const disposable = this.reglCommand?.frame(() => {
       this.getTriangleMeshes().forEach((m) => {
         m.draw({
@@ -135,6 +135,7 @@ export class TransformWidget {
     }
 
     if (this.hoveredMesh !== previousHovered) {
+      this.hoveredChanged.emit(this.hoveredMesh);
       this.redraw();
     }
   }
