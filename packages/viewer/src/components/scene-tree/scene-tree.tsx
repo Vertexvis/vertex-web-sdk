@@ -195,6 +195,12 @@ export class SceneTree {
   public filterOnMetadata = false;
 
   /**
+   * A list of the metadata keys that a scene tree search should be performed on.
+   */
+  @Prop({ mutable: true })
+  public metadataKeysToSearch: MetadataKey[] = [];
+
+  /**
    * A list of part metadata keys that will be made available to each row. This
    * metadata can be used for data binding inside the scene tree's template.
    */
@@ -822,8 +828,13 @@ export class SceneTree {
 
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
+    const columnsToSearch = this.filterOnMetadata
+      ? this.metadataKeysToSearch.length > 0
+        ? this.metadataKeysToSearch
+        : this.metadataKeys
+      : undefined;
     this.filterItems(event.detail, {
-      columns: this.filterOnMetadata ? this.metadataKeys : undefined,
+      columns: columnsToSearch,
     });
   }
 
