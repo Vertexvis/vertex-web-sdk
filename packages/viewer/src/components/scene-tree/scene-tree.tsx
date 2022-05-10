@@ -864,6 +864,8 @@ export class SceneTree {
       `;
 
       this.el.appendChild(layout);
+
+      this.updateLayoutElement();
     }
     this.stateMap.layoutEl = layout;
   }
