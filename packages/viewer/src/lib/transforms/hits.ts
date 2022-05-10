@@ -1,13 +1,16 @@
-import { Point, Ray, Vector3 } from '@vertexvis/geometry';
+import { Point, Vector3 } from '@vertexvis/geometry';
 
 import { Frame, Viewport } from '../../lib/types';
-import { OutlinedTriangleMesh } from './mesh';
+import { TriangleMesh } from './mesh';
 
+/**
+ * Adapted from https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm.
+ */
 export function testTriangleMesh(
   viewport: Viewport,
   point: Point.Point,
   frame: Frame,
-  mesh: OutlinedTriangleMesh
+  mesh: TriangleMesh
 ): boolean {
   const ray = viewport.transformPointToRay(
     point,
@@ -15,41 +18,31 @@ export function testTriangleMesh(
     frame.scene.camera
   );
 
-  return testPosition(ray, [
-    mesh.meshPoints.worldLeft,
-    mesh.meshPoints.worldRight,
-    mesh.meshPoints.worldTip,
-  ]);
-}
-
-function testPosition(ray: Ray.Ray, position: Vector3.Vector3[]): boolean {
   const epsilon = 0.00000001;
-  const edge1 = Vector3.subtract(position[1], position[0]);
-  const edge2 = Vector3.subtract(position[2], position[0]);
+  const edge1 = Vector3.subtract(mesh.points.worldRight, mesh.points.worldLeft);
+  const edge2 = Vector3.subtract(mesh.points.worldTip, mesh.points.worldLeft);
 
-  const pvec = Vector3.cross(ray.direction, edge2);
-  const det = Vector3.dot(edge1, pvec);
+  const p = Vector3.cross(ray.direction, edge2);
+  const det = Vector3.dot(edge1, p);
 
   if (det > -epsilon && det < epsilon) {
     return false;
   }
 
   const f = 1.0 / det;
-  const tvec = Vector3.subtract(ray.origin, position[0]);
-  const u = f * Vector3.dot(tvec, pvec);
+  const t = Vector3.subtract(ray.origin, mesh.points.worldLeft);
+  const u = f * Vector3.dot(t, p);
 
   if (u < 0 || u > 1) {
     return false;
   }
 
-  const qvec = Vector3.cross(tvec, edge1);
-  const v = f * Vector3.dot(ray.direction, qvec);
+  const q = Vector3.cross(t, edge1);
+  const v = f * Vector3.dot(ray.direction, q);
 
   if (v < 0 || u + v > 1) {
     return false;
   }
 
-  const t = Vector3.dot(edge2, qvec) / det;
-
-  return !isNaN(t);
+  return !isNaN(Vector3.dot(edge2, q) / det);
 }

@@ -1,27 +1,7 @@
 import { Ray, Vector3 } from '@vertexvis/geometry';
 
 import { FrameCameraBase } from '../types';
-import {
-  AxisMeshPoints,
-  OutlinedTriangleMesh,
-  TriangleMeshPoints,
-} from './mesh';
-
-export function axisPositions(
-  widgetPosition: Vector3.Vector3,
-  camera: FrameCameraBase,
-  arrowMesh: OutlinedTriangleMesh
-): AxisMeshPoints {
-  return new AxisMeshPoints(
-    widgetPosition,
-    arrowMesh.meshPoints.worldBase,
-    Vector3.transformMatrix(widgetPosition, camera.projectionViewMatrix),
-    Vector3.transformMatrix(
-      arrowMesh.meshPoints.worldBase,
-      camera.projectionViewMatrix
-    )
-  );
-}
+import { TriangleMeshPoints } from './mesh';
 
 export function xAxisArrowPositions(
   widgetPosition: Vector3.Vector3,
@@ -66,20 +46,15 @@ function computeArrowNdcValues(
   widgetPosition: Vector3.Vector3,
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
-  triangleSize = 3
+  triangleSize: number
 ): TriangleMeshPoints {
-  const pointOffset = triangleSize * 9;
-
   const position = Vector3.add(
     widgetPosition,
-    Vector3.scale(pointOffset, direction)
+    Vector3.scale(triangleSize * 9, direction)
   );
 
   const worldX = Vector3.normalize(
-    Vector3.cross(
-      direction,
-      Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
-    )
+    Vector3.cross(direction, Vector3.normalize(camera.viewVector))
   );
   const xRay = Ray.create({
     origin: position,
@@ -95,6 +70,7 @@ function computeArrowNdcValues(
   const up = Ray.at(yRay, triangleSize * 3);
 
   return new TriangleMeshPoints(
+    !isNaN(worldX.x),
     position,
     left,
     right,

@@ -1,32 +1,61 @@
 import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
-import { ShapeProps } from 'regl-shape';
+import { Color } from '@vertexvis/utils';
+import { JoinStyle } from 'regl-shape';
 
-export abstract class Mesh {
+import { CreateShape, DrawShape } from '../../lib/transforms/shape';
+
+export interface MeshPoints {
+  valid: boolean;
+
+  shortestDistanceFrom(vector: Vector3.Vector3): number;
+
+  toWorldArray(): Vector3.Vector3[];
+  toArray(): Point.Point[];
+}
+
+export abstract class Mesh<T extends MeshPoints = MeshPoints> {
   protected pointsArray: Float64Array;
 
-  public abstract draw: (
-    partialProps?: Partial<ShapeProps> | undefined
-  ) => void;
+  public initialFillColor: string;
+
+  public draw: DrawShape;
 
   public constructor(
-    protected createShape: (
-      points: Float64Array,
-      initialPartialProps?: Partial<ShapeProps> | undefined
-    ) => (partialProps?: Partial<ShapeProps> | undefined) => void,
-    public points: Point.Point[],
-    public identifier?: string
+    protected createShape: CreateShape,
+    public identifier: string,
+    public points: T,
+    public outlineColor: string,
+    public fillColor: string
   ) {
-    this.pointsArray = new Float64Array(this.points.length * 2);
-    this.points.forEach((pt, i) => {
+    const pointsAsArray = points.toArray();
+
+    this.pointsArray = new Float64Array(pointsAsArray.length * 2);
+    pointsAsArray.forEach((pt, i) => {
       const arrIndex = i * 2;
       this.pointsArray[arrIndex] = pt.x;
       this.pointsArray[arrIndex + 1] = pt.y;
     });
+
+    this.initialFillColor = fillColor;
+
+    this.draw = createShape(this.pointsArray, {
+      thickness: 2,
+      join: 'rect' as JoinStyle,
+      fill: this.fillColor,
+      color: this.outlineColor,
+    });
   }
 
-  protected updatePointsFromArray(points: Point.Point[]): void {
+  public updateFillColor(color?: Color.Color | string): void {
+    if (color != null) {
+      this.fillColor =
+        typeof color === 'string' ? color : Color.toHexString(color);
+    }
+  }
+
+  public updatePoints(points: T): void {
     this.points = points;
-    points.forEach((pt, i) => {
+    points.toArray().forEach((pt, i) => {
       const arrIndex = i * 2;
       this.pointsArray[arrIndex] = pt.x;
       this.pointsArray[arrIndex + 1] = pt.y;
@@ -34,50 +63,51 @@ export abstract class Mesh {
   }
 }
 
-export class AxisMeshPoints {
+export class AxisMeshPoints implements MeshPoints {
   public constructor(
+    public valid: boolean,
     public worldOrigin: Vector3.Vector3,
     public worldEnd: Vector3.Vector3,
     public origin: Point.Point,
     public end: Point.Point
   ) {}
 
+  public shortestDistanceFrom(vector: Vector3.Vector3): number {
+    return this.toWorldArray()
+      .map((v) => Vector3.distance(v, vector))
+      .sort((a, b) => a - b)[0];
+  }
+
+  public toWorldArray(): Vector3.Vector3[] {
+    return [this.worldOrigin, this.worldEnd];
+  }
+
   public toArray(): Point.Point[] {
     return [this.origin, this.end];
   }
 }
 
-export class AxisMesh extends Mesh {
-  public draw: (partialProps?: Partial<ShapeProps> | undefined) => void;
-
+export class AxisMesh extends Mesh<AxisMeshPoints> {
   public constructor(
-    createShape: (
-      points: Float64Array,
-      initialPartialProps?: Partial<ShapeProps> | undefined
-    ) => (partialProps?: Partial<ShapeProps> | undefined) => void,
+    createShape: CreateShape,
     identifier: string,
-    public meshPoints: AxisMeshPoints,
-    public outlineColor: Vector3.Vector3,
-    public fillColor: Vector3.Vector3,
-    public isHovered: boolean = false
+    points: AxisMeshPoints,
+    outlineColor: Color.Color = Color.create(0, 0, 0, 1),
+    fillColor: Color.Color = Color.create(0, 0, 0, 1)
   ) {
-    super(createShape, meshPoints.toArray(), identifier);
-
-    this.draw = createShape(this.pointsArray, {
-      thickness: 2,
-      fill: Vector3.toArray(this.fillColor),
-      color: Vector3.toArray(this.outlineColor),
-    });
-  }
-
-  public updatePoints(points: AxisMeshPoints): void {
-    super.updatePointsFromArray(points.toArray());
-    this.meshPoints = points;
+    super(
+      createShape,
+      identifier,
+      points,
+      Color.toHexString(outlineColor),
+      Color.toHexString(fillColor)
+    );
   }
 }
 
-export class TriangleMeshPoints {
+export class TriangleMeshPoints implements MeshPoints {
   public constructor(
+    public valid: boolean,
     public worldBase: Vector3.Vector3,
     public worldLeft: Vector3.Vector3,
     public worldRight: Vector3.Vector3,
@@ -88,36 +118,36 @@ export class TriangleMeshPoints {
     public tip: Point.Point
   ) {}
 
+  public shortestDistanceFrom(vector: Vector3.Vector3): number {
+    return this.toWorldArray()
+      .map((v) => Vector3.distance(v, vector))
+      .sort((a, b) => a - b)[0];
+  }
+
+  public toWorldArray(): Vector3.Vector3[] {
+    return [this.worldBase, this.worldLeft, this.worldRight, this.worldTip];
+  }
+
   public toArray(): Point.Point[] {
-    return [this.left, this.right, this.tip, this.left];
+    return [this.base, this.left, this.tip, this.right, this.base];
   }
 }
 
-export class OutlinedTriangleMesh extends Mesh {
-  public draw: (partialProps?: Partial<ShapeProps> | undefined) => void;
-
+export class TriangleMesh extends Mesh<TriangleMeshPoints> {
   public constructor(
-    createShape: (
-      points: Float64Array,
-      initialPartialProps?: Partial<ShapeProps> | undefined
-    ) => (partialProps?: Partial<ShapeProps> | undefined) => void,
+    createShape: CreateShape,
     identifier: string,
-    public meshPoints: TriangleMeshPoints,
-    public outlineColor: Vector3.Vector3,
-    public fillColor: Vector3.Vector3
+    points: TriangleMeshPoints,
+    outlineColor: Color.Color = Color.create(0, 0, 0, 1),
+    fillColor: Color.Color = Color.create(0, 0, 0, 1)
   ) {
-    super(createShape, meshPoints.toArray(), identifier);
-
-    this.draw = createShape(this.pointsArray, {
-      thickness: 2,
-      fill: Vector3.toArray(this.fillColor),
-      color: Vector3.toArray(this.outlineColor),
-    });
-  }
-
-  public updatePoints(points: TriangleMeshPoints): void {
-    super.updatePointsFromArray(points.toArray());
-    this.meshPoints = points;
+    super(
+      createShape,
+      identifier,
+      points,
+      Color.toHexString(outlineColor),
+      Color.toHexString(fillColor)
+    );
   }
 }
 
@@ -125,12 +155,14 @@ export function computeMesh2dBounds(...meshes: Mesh[]): Rectangle.Rectangle {
   let min = Point.create(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
   let max = Point.create();
 
-  meshes.map((m) => {
-    m.points.forEach((pt) => {
-      min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
-      max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+  meshes
+    .filter((m) => m.points.valid)
+    .map((m) => {
+      m.points.toArray().forEach((pt) => {
+        min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
+        max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+      });
     });
-  });
 
   return Rectangle.fromPoints(min, max);
 }

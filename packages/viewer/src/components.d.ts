@@ -1120,10 +1120,6 @@ export namespace Components {
          */
         "controller"?: TransformController;
         /**
-          * @private
-         */
-        "currentPosition"?: Vector3.Vector3;
-        /**
           * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
          */
         "position"?: Vector3.Vector3;
@@ -2453,10 +2449,6 @@ declare namespace LocalJSX {
           * The controller that is responsible for performing transforms.
          */
         "controller"?: TransformController;
-        /**
-          * @private
-         */
-        "currentPosition"?: Vector3.Vector3;
         /**
           * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
          */

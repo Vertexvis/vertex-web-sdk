@@ -35,14 +35,6 @@ export class ViewerTransformWidget {
   public position?: Vector3.Vector3;
 
   /**
-   *
-   * @internal
-   * @private
-   */
-  @Prop({ mutable: true })
-  public currentPosition?: Vector3.Vector3;
-
-  /**
    * The controller that is responsible for performing transforms.
    */
   @Prop({ mutable: true })
@@ -50,6 +42,8 @@ export class ViewerTransformWidget {
 
   @State()
   private hovered?: Mesh;
+
+  private currentPosition?: Vector3.Vector3;
 
   private widget?: TransformWidget;
   private dragging?: Mesh;
@@ -79,6 +73,7 @@ export class ViewerTransformWidget {
     this.canvasResizeObserver.disconnect();
 
     this.hoveredChangeDisposable?.dispose();
+    this.widget?.dispose();
   }
 
   @Watch('viewer')
@@ -112,16 +107,11 @@ export class ViewerTransformWidget {
   protected handlePositionChanged(): void {
     this.currentPosition = this.position;
 
+    this.widget?.updatePosition(this.currentPosition);
+
     if (this.position == null) {
       this.controller?.clearTransform();
     }
-  }
-
-  @Watch('currentPosition')
-  protected handleCurrentPositionChanged(): void {
-    const widget = this.getTransformWidget();
-
-    widget?.updatePosition(this.currentPosition);
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -244,6 +234,7 @@ export class ViewerTransformWidget {
     this.position = this.currentPosition;
 
     this.widget?.updateCursor(canvasPoint);
+    this.widget?.updatePosition(this.currentPosition);
     this.controller?.endTransform();
 
     window.addEventListener('pointermove', this.handleWindowPointerMove);
@@ -274,6 +265,7 @@ export class ViewerTransformWidget {
         this.dragging
       );
 
+      this.widget?.updatePosition(this.currentPosition);
       this.controller?.updateTranslation(
         Vector3.subtract(this.currentPosition, this.position)
       );

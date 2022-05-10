@@ -1,10 +1,10 @@
 import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
+import { axisPositions } from '../../lib/transforms/axis';
 import {
-  axisPositions,
   xAxisArrowPositions,
   yAxisArrowPositions,
   zAxisArrowPositions,
@@ -14,11 +14,11 @@ import {
   AxisMesh,
   computeMesh2dBounds,
   Mesh,
-  OutlinedTriangleMesh,
+  TriangleMesh,
 } from '../../lib/transforms/mesh';
 import { Frame, Viewport } from '../../lib/types';
 
-export class TransformWidget {
+export class TransformWidget implements Disposable {
   private reglCommand?: regl.Regl;
 
   private viewport: Viewport;
@@ -27,20 +27,29 @@ export class TransformWidget {
   private xAxis?: AxisMesh;
   private yAxis?: AxisMesh;
   private zAxis?: AxisMesh;
-  private xArrow?: OutlinedTriangleMesh;
-  private yArrow?: OutlinedTriangleMesh;
-  private zArrow?: OutlinedTriangleMesh;
+  private xArrow?: TriangleMesh;
+  private yArrow?: TriangleMesh;
+  private zArrow?: TriangleMesh;
 
+  private axisMeshes: AxisMesh[] = [];
+  private triangleMeshes: TriangleMesh[] = [];
+  private drawableMeshes: Mesh[] = [];
   private hoveredMesh?: Mesh;
 
   private frame?: Frame;
   private position?: Vector3.Vector3;
   private bounds?: Rectangle.Rectangle;
 
+  private reglFrameDisposable?: regl.Cancellable;
+
   private hoveredChanged = new EventDispatcher<Mesh | undefined>();
 
   public constructor(private canvasElement: HTMLCanvasElement) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
+  }
+
+  public dispose(): void {
+    this.reglFrameDisposable?.cancel();
   }
 
   public boundsContainsPoint(point: Point.Point): boolean {
@@ -54,11 +63,12 @@ export class TransformWidget {
     );
   }
 
-  public updateFrame(frame: Frame, redraw = true): void {
+  public updateFrame(frame: Frame, updateMeshes = true): void {
     this.frame = frame;
-    if (redraw && frame != null && this.position != null) {
+
+    if (updateMeshes && frame != null && this.position != null) {
       this.createOrUpdateMeshes(this.position, frame);
-      this.redraw();
+      this.sortMeshes(frame, ...this.axisMeshes, ...this.triangleMeshes);
     }
   }
 
@@ -66,7 +76,7 @@ export class TransformWidget {
     this.cursor = cursor;
 
     if (cursor != null && this.frame != null) {
-      this.hitTestAndRedraw();
+      this.updateHovered();
     }
   }
 
@@ -75,38 +85,30 @@ export class TransformWidget {
 
     if (position != null && this.frame != null) {
       this.createOrUpdateMeshes(position, this.frame);
-      this.redraw();
+      this.sortMeshes(this.frame, ...this.axisMeshes, ...this.triangleMeshes);
+      this.draw();
     } else {
       this.clear();
+      this.reglFrameDisposable?.cancel();
+      this.reglFrameDisposable = undefined;
     }
   }
 
   public updateDimensions(canvasElement: HTMLCanvasElement): void {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
     this.reglCommand = regl(canvasElement);
-
-    this.redraw();
   }
 
   public onHoveredChanged(listener: Listener<Mesh | undefined>): Disposable {
     return this.hoveredChanged.on(listener);
   }
 
-  private redraw(): void {
-    const disposable = this.reglCommand?.frame(() => {
-      this.getTriangleMeshes().forEach((m) => {
-        m.draw({
-          fill:
-            m.identifier === this.hoveredMesh?.identifier
-              ? [255, 255, 0]
-              : Vector3.toArray(m.fillColor),
-        });
+  private draw(): void {
+    if (this.reglFrameDisposable == null) {
+      this.reglFrameDisposable = this.reglCommand?.frame(() => {
+        this.drawableMeshes.forEach((m) => m.draw({ fill: m.fillColor }));
       });
-
-      this.getAxisMeshes().forEach((m) => m.draw());
-
-      disposable?.cancel();
-    });
+    }
   }
 
   private clear(): void {
@@ -115,43 +117,42 @@ export class TransformWidget {
     });
   }
 
-  private hitTestAndRedraw(): void {
+  private updateHovered(): void {
     const previousHovered = this.hoveredMesh;
-    this.hoveredMesh = undefined;
-
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.getTriangleMeshes().forEach((m) => {
+      this.hoveredMesh = this.triangleMeshes.find((m) => {
         const isHovered =
-          this.cursor != null && m != null
+          this.cursor != null
             ? testTriangleMesh(this.viewport, this.cursor, currentFrame, m)
             : false;
 
-        if (isHovered) {
-          this.hoveredMesh = m;
-        }
+        return isHovered;
       });
-    }
 
-    if (this.hoveredMesh !== previousHovered) {
-      this.hoveredChanged.emit(this.hoveredMesh);
-      this.redraw();
+      if (this.hoveredMesh !== previousHovered) {
+        this.hoveredChanged.emit(this.hoveredMesh);
+        this.hoveredMesh?.updateFillColor('#ffff00');
+        previousHovered?.updateFillColor(previousHovered?.initialFillColor);
+      }
     }
   }
 
-  private getAxisMeshes(): AxisMesh[] {
-    if (this.xAxis != null && this.yAxis != null && this.zAxis != null) {
-      return [this.xAxis, this.yAxis, this.zAxis];
-    }
-    return [];
-  }
+  private sortMeshes(frame: Frame, ...meshes: Mesh[]): void {
+    const compare = (m1: Mesh, m2: Mesh): number =>
+      m1.points.shortestDistanceFrom(frame.scene.camera.position) -
+      m2.points.shortestDistanceFrom(frame.scene.camera.position);
 
-  private getTriangleMeshes(): OutlinedTriangleMesh[] {
-    if (this.xArrow != null && this.yArrow != null && this.zArrow != null) {
-      return [this.xArrow, this.yArrow, this.zArrow];
-    }
-    return [];
+    this.axisMeshes = this.axisMeshes.sort(compare);
+    this.triangleMeshes = this.triangleMeshes.sort(compare);
+
+    // Reverse sorted meshes to draw the closest mesh last.
+    // This causes it to appear above any other mesh.
+    this.drawableMeshes = meshes
+      .filter((m) => m.points.valid)
+      .sort(compare)
+      .reverse();
   }
 
   private createOrUpdateMeshes(position: Vector3.Vector3, frame: Frame): void {
@@ -161,7 +162,7 @@ export class TransformWidget {
       this.updateMeshes(position, frame);
     }
 
-    this.bounds = computeMesh2dBounds(...this.getTriangleMeshes());
+    this.bounds = computeMesh2dBounds(...this.triangleMeshes);
   }
 
   private createMeshes(position: Vector3.Vector3, frame: Frame): void {
@@ -171,60 +172,57 @@ export class TransformWidget {
     });
     const { createShape } = shapeBuilder(this.reglCommand);
 
-    const triangleSize =
-      Vector3.magnitude(
-        Vector3.subtract(position, frame.scene.camera.position)
-      ) * 0.005;
+    const triangleSize = this.computeTriangleSize(position, frame);
 
-    this.xArrow = new OutlinedTriangleMesh(
+    this.xArrow = new TriangleMesh(
       createShape,
       'x-translate',
       xAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Vector3.create(),
-      Vector3.create(255, 0, 0)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#ff0000')
     );
     this.xAxis = new AxisMesh(
       createShape,
       'x-axis',
       axisPositions(position, frame.scene.camera, this.xArrow),
-      Vector3.create(),
-      Vector3.create(255, 0, 0)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#ff0000')
     );
-    this.yArrow = new OutlinedTriangleMesh(
+    this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
       yAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Vector3.create(),
-      Vector3.create(0, 255, 0)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#00ff00')
     );
     this.yAxis = new AxisMesh(
       createShape,
       'y-axis',
       axisPositions(position, frame.scene.camera, this.yArrow),
-      Vector3.create(),
-      Vector3.create(0, 255, 0)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#00ff00')
     );
-    this.zArrow = new OutlinedTriangleMesh(
+    this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
       zAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Vector3.create(),
-      Vector3.create(0, 0, 255)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#0000ff')
     );
     this.zAxis = new AxisMesh(
       createShape,
       'z-axis',
       axisPositions(position, frame.scene.camera, this.zArrow),
-      Vector3.create(),
-      Vector3.create(0, 0, 255)
+      Color.fromHexString('#000000'),
+      Color.fromHexString('#0000ff')
     );
+
+    this.axisMeshes = [this.xAxis, this.yAxis, this.zAxis];
+    this.triangleMeshes = [this.xArrow, this.yArrow, this.zArrow];
   }
 
   private updateMeshes(position: Vector3.Vector3, frame: Frame): void {
-    const triangleSize =
-      Vector3.magnitude(
-        Vector3.subtract(position, frame.scene.camera.position)
-      ) * 0.005;
+    const triangleSize = this.computeTriangleSize(position, frame);
 
     if (this.xArrow != null) {
       this.xArrow.updatePoints(
@@ -252,5 +250,13 @@ export class TransformWidget {
         axisPositions(position, frame.scene.camera, this.zArrow)
       );
     }
+  }
+
+  private computeTriangleSize(position: Vector3.Vector3, frame: Frame): number {
+    return (
+      Vector3.magnitude(
+        Vector3.subtract(position, frame.scene.camera.position)
+      ) * 0.005
+    );
   }
 }
