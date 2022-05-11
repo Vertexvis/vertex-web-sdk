@@ -35,6 +35,7 @@ import { isLoadedRow, Row } from './lib/row';
 import {
   deselectItem,
   hideItem,
+  selectFilterResults,
   selectItem,
   selectRangeInSceneTree,
   showItem,
@@ -220,7 +221,7 @@ export class SceneTree {
   };
 
   @State()
-  private connectionErrorDetails: SceneTreeErrorDetails | undefined;
+  private errorDetails: SceneTreeErrorDetails | undefined;
 
   @State()
   private attemptingRetry = false;
@@ -499,7 +500,7 @@ export class SceneTree {
 
     if (
       target != null &&
-      this.connectionErrorDetails == null &&
+      this.errorDetails == null &&
       getSceneTreeContainsElement(this.el, target as HTMLElement) &&
       isSceneTreeTableCellElement(target)
     ) {
@@ -544,6 +545,22 @@ export class SceneTree {
   }
 
   /**
+   * Performs an async request that will select the filtered items in the tree
+   * that match the given term.
+   *
+   * @param term The filter term.
+   * @returns A promise that completes when the request has completed.
+   */
+  @Method()
+  public async selectFilteredItems(term: string): Promise<void> {
+    if (this.viewer != null) {
+      await selectFilterResults(this.viewer, term, this.metadataKeys, {
+        append: false,
+      });
+    }
+  }
+
+  /**
    * Fetches the metadata keys that are available to the scene tree. Metadata
    * keys can be assigned to the scene tree using the `metadataKeys` property.
    * The scene tree will fetch this metadata and make these values available
@@ -567,12 +584,6 @@ export class SceneTree {
    * @ignore
    */
   protected componentWillLoad(): void {
-    if (this.viewerSelector != null) {
-      this.viewer = document.querySelector(this.viewerSelector) as
-        | HTMLVertexViewerElement
-        | undefined;
-    }
-
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
@@ -602,6 +613,18 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
+
+    if (this.viewer == null) {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.MISSING_VIEWER
+      );
+    }
+  }
+
+  public componentWillRender(): void {
+    // The controller can load data prior to the first render
+    // ensure that this renders any time the state changes.
+    this.updateLayoutElement();
   }
 
   /**
@@ -618,10 +641,9 @@ export class SceneTree {
           </slot>
         </div>
 
-        {this.connectionErrorDetails != null &&
-          this.renderError(this.connectionErrorDetails)}
+        {this.errorDetails != null && this.renderError(this.errorDetails)}
 
-        {this.connectionErrorDetails == null && (
+        {this.errorDetails == null && (
           <div class="rows-scroll">
             <slot />
           </div>
@@ -635,7 +657,7 @@ export class SceneTree {
   }
 
   private renderError(details: SceneTreeErrorDetails): h.JSX.IntrinsicElements {
-    if (details.code === SceneTreeErrorCode.UNKNOWN) {
+    if (details.code !== SceneTreeErrorCode.SCENE_TREE_DISABLED) {
       return (
         <SceneTreeError details={details}>
           <button
@@ -703,16 +725,25 @@ export class SceneTree {
 
   private retryConnectToViewer(): void {
     this.attemptingRetry = true;
+    this.errorDetails = undefined;
     this.connectToViewer();
   }
 
   private connectToViewer(): void {
     this.stateMap.viewerDisposable?.dispose();
 
+    if (this.viewer == null && this.viewerSelector != null) {
+      this.viewer = document.querySelector(this.viewerSelector) as
+        | HTMLVertexViewerElement
+        | undefined;
+    }
+
     if (this.viewer != null) {
       this.stateMap.viewerDisposable = this.controller?.connectToViewer(
         this.viewer
       );
+    } else {
+      this.attemptingRetry = false;
     }
   }
 
@@ -743,13 +774,16 @@ export class SceneTree {
   private handleControllerStateChange(state: SceneTreeState): void {
     this.rows = state.rows;
     this.totalRows = state.totalRows;
-    this.updateLayoutElement();
 
     if (state.connection.type === 'failure') {
-      this.connectionErrorDetails = state.connection.details;
+      this.errorDetails = state.connection.details;
       this.connectionError.emit(state.connection.details);
+    } else if (state.connection.type === 'disconnected') {
+      this.errorDetails = new SceneTreeErrorDetails(
+        SceneTreeErrorCode.DISCONNECTED
+      );
     } else {
-      this.connectionErrorDetails = undefined;
+      this.errorDetails = undefined;
     }
 
     if (
@@ -830,6 +864,8 @@ export class SceneTree {
       `;
 
       this.el.appendChild(layout);
+
+      this.updateLayoutElement();
     }
     this.stateMap.layoutEl = layout;
   }
@@ -842,6 +878,10 @@ export class SceneTree {
       layout.totalRows = this.totalRows;
       layout.controller = this.controller;
       layout.rowData = this.rowData;
+    } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
+      console.debug(
+        'Scene tree has rows, but the component has not yet rendered'
+      );
     }
   }
 
