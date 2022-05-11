@@ -47,13 +47,13 @@ describe(StreamApi, () => {
     });
 
     it('resolves immediately when no requestId is provided', async () => {
-      await streamApi.beginInteraction(false);
+      await streamApi.beginInteraction(undefined, false);
       expect(send).toHaveBeenCalled();
     });
 
     it('includes sent at time for requests with responses', async () => {
       const requestId = mockRequestId();
-      const request = streamApi.endInteraction(true);
+      const request = streamApi.endInteraction(undefined, true);
       ws.receiveMessage(
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
