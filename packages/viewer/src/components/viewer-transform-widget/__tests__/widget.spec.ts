@@ -49,43 +49,43 @@ function createMeshes(
     mockShapeBuilder().createShape,
     'x-translate',
     xAxisArrowPositions(position, frame.scene.camera, triangleSize),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#ff0000')
+    '#000000',
+    '#000000'
   );
   const xAxis = new AxisMesh(
     mockShapeBuilder().createShape,
     'x-axis',
     axisPositions(position, frame.scene.camera, xArrow),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#ff0000')
+    '#000000',
+    '#000000'
   );
   const yArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'y-translate',
     yAxisArrowPositions(position, frame.scene.camera, triangleSize),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#00ff00')
+    '#000000',
+    '#000000'
   );
   const yAxis = new AxisMesh(
     mockShapeBuilder().createShape,
     'y-axis',
     axisPositions(position, frame.scene.camera, yArrow),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#00ff00')
+    '#000000',
+    '#000000'
   );
   const zArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'z-translate',
     zAxisArrowPositions(position, frame.scene.camera, triangleSize),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#0000ff')
+    '#000000',
+    '#000000'
   );
   const zAxis = new AxisMesh(
     mockShapeBuilder().createShape,
     'z-axis',
     axisPositions(position, frame.scene.camera, zArrow),
-    Color.fromHexString('#000000'),
-    Color.fromHexString('#0000ff')
+    '#000000',
+    '#000000'
   );
 
   return {
@@ -244,7 +244,9 @@ describe(TransformWidget, () => {
   });
 
   it('updates the hovered mesh', async () => {
-    const widget = new TransformWidget(canvas);
+    const widget = new TransformWidget(canvas, {
+      hovered: '#ffff00',
+    });
     const frame = makePerspectiveFrame();
     const position = Vector3.create(1, 1, 1);
     const meshes = createMeshes(position, frame);
@@ -262,5 +264,50 @@ describe(TransformWidget, () => {
     meshes.xArrow.updateFillColor('#ffff00');
 
     expect(hoveredListener).toHaveBeenCalledWith(meshes.xArrow);
+  });
+
+  it('updates with the colors provided, and retains existing if undefined', async () => {
+    const widget = new TransformWidget(canvas, {
+      zArrow: '#555555',
+    });
+    const frame = makePerspectiveFrame();
+    const position = Vector3.create(1, 1, 1);
+
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+    );
+    widget.updatePosition(position);
+
+    widget.updateColors({
+      xArrow: '#333333',
+      yArrow: '#444444',
+      zArrow: undefined,
+    });
+
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#333333')
+    ).toBe(true);
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#444444')
+    ).toBe(true);
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#555555')
+    ).toBe(true);
+
+    widget.updateColors({
+      xArrow: undefined,
+      yArrow: undefined,
+      zArrow: '#111111',
+    });
+
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#333333')
+    ).toBe(true);
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#444444')
+    ).toBe(true);
+    expect(
+      widget.getDrawableMeshes().some((m) => m.fillColor === '#111111')
+    ).toBe(true);
   });
 });

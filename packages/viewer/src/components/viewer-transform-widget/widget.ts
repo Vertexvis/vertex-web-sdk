@@ -18,6 +18,14 @@ import {
 } from '../../lib/transforms/mesh';
 import { Frame, Viewport } from '../../lib/types';
 
+export interface MeshColors {
+  xArrow?: Color.Color | string;
+  yArrow?: Color.Color | string;
+  zArrow?: Color.Color | string;
+  hovered?: Color.Color | string;
+  outline?: Color.Color | string;
+}
+
 export class TransformWidget implements Disposable {
   private reglCommand?: regl.Regl;
 
@@ -44,8 +52,23 @@ export class TransformWidget implements Disposable {
 
   private hoveredChanged = new EventDispatcher<Mesh | undefined>();
 
-  public constructor(private canvasElement: HTMLCanvasElement) {
+  private xArrowFillColor?: Color.Color | string;
+  private yArrowFillColor?: Color.Color | string;
+  private zArrowFillColor?: Color.Color | string;
+  private hoveredArrowFillColor?: Color.Color | string;
+  private outlineColor?: Color.Color | string;
+
+  public constructor(
+    private canvasElement: HTMLCanvasElement,
+    colors: MeshColors = {}
+  ) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
+
+    this.xArrowFillColor = colors.xArrow;
+    this.yArrowFillColor = colors.yArrow;
+    this.zArrowFillColor = colors.zArrow;
+    this.hoveredArrowFillColor = colors.hovered;
+    this.outlineColor = colors.outline;
   }
 
   public dispose(): void {
@@ -101,6 +124,19 @@ export class TransformWidget implements Disposable {
     }
   }
 
+  public updateColors(colors: MeshColors): void {
+    this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
+    this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
+    this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
+    this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
+    this.outlineColor = colors.outline ?? this.outlineColor;
+
+    this.xArrow?.updateFillColor(this.xArrowFillColor);
+    this.yArrow?.updateFillColor(this.yArrowFillColor);
+    this.zArrow?.updateFillColor(this.zArrowFillColor);
+    this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
+  }
+
   public updateDimensions(canvasElement: HTMLCanvasElement): void {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
   }
@@ -136,7 +172,7 @@ export class TransformWidget implements Disposable {
 
       if (this.hoveredMesh !== previousHovered) {
         this.hoveredChanged.emit(this.hoveredMesh);
-        this.hoveredMesh?.updateFillColor('#ffff00');
+        this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
         previousHovered?.updateFillColor(previousHovered?.initialFillColor);
       }
     }
@@ -181,43 +217,46 @@ export class TransformWidget implements Disposable {
       createShape,
       'x-translate',
       xAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#ff0000')
+      this.outlineColor,
+      this.xArrowFillColor
     );
     this.xAxis = new AxisMesh(
       createShape,
       'x-axis',
       axisPositions(position, frame.scene.camera, this.xArrow),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#ff0000')
+      this.outlineColor,
+      this.xArrowFillColor,
+      { thickness: 3 }
     );
     this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
       yAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#00ff00')
+      this.outlineColor,
+      this.yArrowFillColor
     );
     this.yAxis = new AxisMesh(
       createShape,
       'y-axis',
       axisPositions(position, frame.scene.camera, this.yArrow),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#00ff00')
+      this.outlineColor,
+      this.yArrowFillColor,
+      { thickness: 3 }
     );
     this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
       zAxisArrowPositions(position, frame.scene.camera, triangleSize),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#0000ff')
+      this.outlineColor,
+      this.zArrowFillColor
     );
     this.zAxis = new AxisMesh(
       createShape,
       'z-axis',
       axisPositions(position, frame.scene.camera, this.zArrow),
-      Color.fromHexString('#000000'),
-      Color.fromHexString('#0000ff')
+      this.outlineColor,
+      this.zArrowFillColor,
+      { thickness: 3 }
     );
 
     this.axisMeshes = [this.xAxis, this.yAxis, this.zAxis];

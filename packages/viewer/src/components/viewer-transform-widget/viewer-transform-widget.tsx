@@ -1,10 +1,9 @@
-import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Host, Prop, Watch } from '@stencil/core';
 import { Point, Vector3 } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
-import { readDOM } from '../../lib/__mocks__/stencil';
-import { writeDOM } from '../../lib/stencil';
+import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Mesh } from '../../lib/transforms/mesh';
 import {
@@ -40,8 +39,44 @@ export class ViewerTransformWidget {
   @Prop({ mutable: true })
   public controller?: TransformController;
 
-  @State()
-  private hovered?: Mesh;
+  /**
+   * The color of the translation arrow on the x-axis. Defaults to `#ea3324`.
+   */
+  @Prop()
+  public xArrowColor: Color.Color | string = '#ea3324';
+
+  /**
+   * The color of the translation arrow on the y-axis. Defaults to `#4faf32`.
+   */
+  @Prop()
+  public yArrowColor: Color.Color | string = '#4faf32';
+
+  /**
+   * The color of the translation arrow on the z-axis. Defaults to `#0000ff`.
+   */
+  @Prop()
+  public zArrowColor: Color.Color | string = '#0000ff';
+
+  /**
+   * The color override of the hovered component. Defaults to `#ffff00`.
+   */
+  @Prop()
+  public hoveredColor: Color.Color | string = '#ffff00';
+
+  /**
+   * The color to display when persistence of a transform is pending. Defaults to `#cccccc`.
+   */
+  @Prop()
+  public disabledColor: Color.Color | string = '#cccccc';
+
+  /**
+   * @internal
+   * @private
+   *
+   * Visible for testing.
+   */
+  @Prop({ mutable: true })
+  public hovered?: Mesh;
 
   private currentPosition?: Vector3.Vector3;
 
@@ -223,7 +258,7 @@ export class ViewerTransformWidget {
     }
   };
 
-  private handlePointerUp = (event: PointerEvent): void => {
+  private handlePointerUp = async (event: PointerEvent): Promise<void> => {
     const canvasPoint = convertPointToCanvas(
       Point.create(event.clientX, event.clientY),
       this.canvasBounds
@@ -235,11 +270,26 @@ export class ViewerTransformWidget {
 
     this.widget?.updateCursor(canvasPoint);
     this.widget?.updatePosition(this.currentPosition);
-    this.controller?.endTransform();
+    this.widget?.updateColors({
+      xArrow: this.disabledColor,
+      yArrow: this.disabledColor,
+      zArrow: this.disabledColor,
+      hovered: this.disabledColor,
+    });
 
-    window.addEventListener('pointermove', this.handleWindowPointerMove);
     window.removeEventListener('pointermove', this.handlePointerMove);
     window.removeEventListener('pointerup', this.handlePointerUp);
+
+    await this.controller?.endTransform();
+
+    window.addEventListener('pointermove', this.handleWindowPointerMove);
+
+    this.widget?.updateColors({
+      xArrow: this.xArrowColor,
+      yArrow: this.yArrowColor,
+      zArrow: this.zArrowColor,
+      hovered: this.hoveredColor,
+    });
   };
 
   private updatePropsFromViewer = (): void => {
@@ -262,7 +312,7 @@ export class ViewerTransformWidget {
         this.currentPosition,
         previous,
         next,
-        this.dragging
+        this.dragging.identifier
       );
 
       this.widget?.updatePosition(this.currentPosition);
@@ -274,7 +324,12 @@ export class ViewerTransformWidget {
 
   private setupTransformWidget = (): void => {
     if (this.canvasRef != null) {
-      this.widget = new TransformWidget(this.canvasRef);
+      this.widget = new TransformWidget(this.canvasRef, {
+        xArrow: this.xArrowColor,
+        yArrow: this.yArrowColor,
+        zArrow: this.zArrowColor,
+        hovered: this.hoveredColor,
+      });
 
       this.hoveredChangeDisposable = this.widget.onHoveredChanged(
         this.handleHoveredMeshChanged

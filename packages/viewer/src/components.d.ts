@@ -25,7 +25,7 @@ import { AngleUnitType, DepthBuffer, DistanceUnitType, EntityType, FrameCameraBa
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
 import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
-import { Disposable } from "@vertexvis/utils";
+import { Color, Disposable } from "@vertexvis/utils";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
 import { KeyInteraction } from "./lib/interactions/keyInteraction";
 import { Cursor } from "./lib/cursors";
@@ -53,6 +53,7 @@ import { PinController } from "./lib/pins/controller";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { TransformController } from "./lib/transforms/controller";
+import { Mesh } from "./lib/transforms/mesh";
 export namespace Components {
     interface VertexSceneTree {
         /**
@@ -1126,6 +1127,18 @@ export namespace Components {
          */
         "controller"?: TransformController;
         /**
+          * The color to display when persistence of a transform is pending. Defaults to `#cccccc`.
+         */
+        "disabledColor": Color.Color | string;
+        /**
+          * @private Visible for testing.
+         */
+        "hovered"?: Mesh;
+        /**
+          * The color override of the hovered component. Defaults to `#ffff00`.
+         */
+        "hoveredColor": Color.Color | string;
+        /**
           * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
          */
         "position"?: Vector3.Vector3;
@@ -1133,6 +1146,18 @@ export namespace Components {
           * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
         "viewer"?: HTMLVertexViewerElement;
+        /**
+          * The color of the translation arrow on the x-axis. Defaults to `#ea3324`.
+         */
+        "xArrowColor": Color.Color | string;
+        /**
+          * The color of the translation arrow on the y-axis. Defaults to `#4faf32`.
+         */
+        "yArrowColor": Color.Color | string;
+        /**
+          * The color of the translation arrow on the z-axis. Defaults to `#0000ff`.
+         */
+        "zArrowColor": Color.Color | string;
     }
     interface VertexViewerViewCube {
         /**
@@ -2456,6 +2481,18 @@ declare namespace LocalJSX {
          */
         "controller"?: TransformController;
         /**
+          * The color to display when persistence of a transform is pending. Defaults to `#cccccc`.
+         */
+        "disabledColor"?: Color.Color | string;
+        /**
+          * @private Visible for testing.
+         */
+        "hovered"?: Mesh;
+        /**
+          * The color override of the hovered component. Defaults to `#ffff00`.
+         */
+        "hoveredColor"?: Color.Color | string;
+        /**
           * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
          */
         "position"?: Vector3.Vector3;
@@ -2463,6 +2500,18 @@ declare namespace LocalJSX {
           * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
         "viewer"?: HTMLVertexViewerElement;
+        /**
+          * The color of the translation arrow on the x-axis. Defaults to `#ea3324`.
+         */
+        "xArrowColor"?: Color.Color | string;
+        /**
+          * The color of the translation arrow on the y-axis. Defaults to `#4faf32`.
+         */
+        "yArrowColor"?: Color.Color | string;
+        /**
+          * The color of the translation arrow on the z-axis. Defaults to `#0000ff`.
+         */
+        "zArrowColor"?: Color.Color | string;
     }
     interface VertexViewerViewCube {
         /**

@@ -7401,11 +7401,6 @@ regexpp@^3.2.0:
   resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-3.2.0.tgz#0425a2768d8f23bad70ca4b90461fa2f1213e1b2"
   integrity sha512-pq2bWo9mVD43nbts2wGv17XLiNLya+GklZ8kaDLV2Z08gDCsGpnKn9BFMepvWuHCbyVvY7J5o5+BVvoQbmlJLg==
 
-regl-gpu-lines@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/regl-gpu-lines/-/regl-gpu-lines-2.2.1.tgz#e31504020d3442abe81dcada253c889ff6df2c9b"
-  integrity sha512-L/DQuwoNiE2NQ5/S8TVh1rpy5xX5E9Eo+hfHGojVkQh5Tc1IiH5rVaXoda4YPdFNU6RWWi6H1oCgTbmV8yE9fA==
-
 regl-shape@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/regl-shape/-/regl-shape-1.1.0.tgz#35281d71200d02fe39b9d760ea48ec10ebcb0608"

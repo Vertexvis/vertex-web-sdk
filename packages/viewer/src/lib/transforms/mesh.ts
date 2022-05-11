@@ -1,6 +1,6 @@
 import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
-import { JoinStyle } from 'regl-shape';
+import { JoinStyle, ShapeProps } from 'regl-shape';
 
 import { CreateShape, DrawShape } from '../../lib/transforms/shape';
 import { flattenPointArray } from './util';
@@ -26,7 +26,8 @@ export abstract class Mesh<T extends MeshPoints = MeshPoints> {
     public identifier: string,
     public points: T,
     public outlineColor: string,
-    public fillColor: string
+    public fillColor: string,
+    public shapeProps: Partial<ShapeProps> = {}
   ) {
     const pointsAsArray = points.toArray();
 
@@ -38,10 +39,12 @@ export abstract class Mesh<T extends MeshPoints = MeshPoints> {
     this.initialFillColor = fillColor;
 
     this.draw = createShape(this.pointsArray, {
+      count: pointsAsArray.length,
       thickness: 2,
       join: 'rect' as JoinStyle,
       fill: this.fillColor,
       color: this.outlineColor,
+      ...shapeProps,
     });
   }
 
@@ -89,15 +92,19 @@ export class AxisMesh extends Mesh<AxisMeshPoints> {
     createShape: CreateShape,
     identifier: string,
     points: AxisMeshPoints,
-    outlineColor: Color.Color = Color.create(0, 0, 0, 1),
-    fillColor: Color.Color = Color.create(0, 0, 0, 1)
+    outlineColor: Color.Color | string = '#000000',
+    fillColor: Color.Color | string = '#000000',
+    shapeProps: Partial<ShapeProps> = {}
   ) {
     super(
       createShape,
       identifier,
       points,
-      Color.toHexString(outlineColor),
-      Color.toHexString(fillColor)
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
+      typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
+      shapeProps
     );
   }
 }
@@ -135,15 +142,19 @@ export class TriangleMesh extends Mesh<TriangleMeshPoints> {
     createShape: CreateShape,
     identifier: string,
     points: TriangleMeshPoints,
-    outlineColor: Color.Color = Color.create(0, 0, 0, 1),
-    fillColor: Color.Color = Color.create(0, 0, 0, 1)
+    outlineColor: Color.Color | string = '#000000',
+    fillColor: Color.Color | string = '#000000',
+    shapeProps: Partial<ShapeProps> = {}
   ) {
     super(
       createShape,
       identifier,
       points,
-      Color.toHexString(outlineColor),
-      Color.toHexString(fillColor)
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
+      typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
+      shapeProps
     );
   }
 }

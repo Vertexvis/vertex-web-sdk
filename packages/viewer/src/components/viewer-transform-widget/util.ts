@@ -1,6 +1,5 @@
 import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 
-import { Mesh } from '../../lib/transforms/mesh';
 import { Frame, Viewport } from '../../lib/types';
 
 export function convertPointToCanvas(
@@ -38,9 +37,9 @@ export function computeUpdatedPosition(
   current: Vector3.Vector3,
   previous: Vector3.Vector3,
   next: Vector3.Vector3,
-  dragging: Mesh
+  identifier: string
 ): Vector3.Vector3 {
-  switch (dragging.identifier) {
+  switch (identifier) {
     case 'x-translate':
       return {
         ...current,
@@ -57,6 +56,6 @@ export function computeUpdatedPosition(
         z: Vector3.subtract(next, previous).z + current.z,
       };
     default:
-      return next;
+      return current;
   }
 }
