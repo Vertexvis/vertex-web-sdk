@@ -68,29 +68,6 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
-        const widget = document.getElementById('widget');
-
-        viewer.addEventListener('tap', async (e) => {
-          const scene = await viewer.scene();
-          const raycaster = scene.raycaster();
-
-          const results = await raycaster.hitItems(e.detail.position);
-
-          console.log(results);
-          if (results.hits.length > 0) {
-            console.log(results.hits[0]);
-
-            widget.position = results.hits[0].hitPoint;
-          } else {
-            widget.position = undefined;
-          }
-        })
-
-        viewer.config = {
-          flags: {
-            logWsMessages: true
-          }
-        }
       }
     </script>
   </head>
@@ -108,16 +85,13 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
+          client-id="client-id"
           config-env="platdev"
-          src='urn:vertexvis:stream-key:v5j4bSB_6OBi4aiWxgkmBXSG4JPc1GLJdwpx'
+          src="urn:vertexvis:stream-key:key"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
-
-          <vertex-viewer-transform-widget id="widget">
-
-          </vertex-viewer-transform-widget>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube
