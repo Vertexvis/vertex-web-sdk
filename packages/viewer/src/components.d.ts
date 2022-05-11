@@ -190,6 +190,10 @@ export namespace Components {
      */
     metadataKeys: MetadataKey[];
     /**
+     * A list of the metadata keys that a scene tree search should be performed on.
+     */
+    metadataSearchKeys: MetadataKey[];
+    /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
     overScanCount: number;
@@ -1660,6 +1664,10 @@ declare namespace LocalJSX {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
+    /**
+     * A list of the metadata keys that a scene tree search should be performed on.
+     */
+    metadataSearchKeys?: MetadataKey[];
     onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
