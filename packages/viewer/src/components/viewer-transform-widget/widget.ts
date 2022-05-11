@@ -52,6 +52,13 @@ export class TransformWidget implements Disposable {
     this.reglFrameDisposable?.cancel();
   }
 
+  /**
+   * @internal - visible for testing
+   */
+  public getDrawableMeshes(): Mesh[] {
+    return this.drawableMeshes;
+  }
+
   public boundsContainsPoint(point: Point.Point): boolean {
     return (
       this.bounds != null &&
@@ -96,7 +103,6 @@ export class TransformWidget implements Disposable {
 
   public updateDimensions(canvasElement: HTMLCanvasElement): void {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
-    this.reglCommand = regl(canvasElement);
   }
 
   public onHoveredChanged(listener: Listener<Mesh | undefined>): Disposable {
@@ -122,14 +128,11 @@ export class TransformWidget implements Disposable {
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredMesh = this.triangleMeshes.find((m) => {
-        const isHovered =
-          this.cursor != null
-            ? testTriangleMesh(this.viewport, this.cursor, currentFrame, m)
-            : false;
-
-        return isHovered;
-      });
+      this.hoveredMesh = this.triangleMeshes.find((m) =>
+        this.cursor != null
+          ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
+          : false
+      );
 
       if (this.hoveredMesh !== previousHovered) {
         this.hoveredChanged.emit(this.hoveredMesh);

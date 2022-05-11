@@ -3,6 +3,7 @@ import { Color } from '@vertexvis/utils';
 import { JoinStyle } from 'regl-shape';
 
 import { CreateShape, DrawShape } from '../../lib/transforms/shape';
+import { flattenPointArray } from './util';
 
 export interface MeshPoints {
   valid: boolean;
@@ -30,11 +31,9 @@ export abstract class Mesh<T extends MeshPoints = MeshPoints> {
     const pointsAsArray = points.toArray();
 
     this.pointsArray = new Float64Array(pointsAsArray.length * 2);
-    pointsAsArray.forEach((pt, i) => {
-      const arrIndex = i * 2;
-      this.pointsArray[arrIndex] = pt.x;
-      this.pointsArray[arrIndex + 1] = pt.y;
-    });
+    flattenPointArray(pointsAsArray).forEach(
+      (v, i) => (this.pointsArray[i] = v)
+    );
 
     this.initialFillColor = fillColor;
 
@@ -55,11 +54,9 @@ export abstract class Mesh<T extends MeshPoints = MeshPoints> {
 
   public updatePoints(points: T): void {
     this.points = points;
-    points.toArray().forEach((pt, i) => {
-      const arrIndex = i * 2;
-      this.pointsArray[arrIndex] = pt.x;
-      this.pointsArray[arrIndex + 1] = pt.y;
-    });
+    flattenPointArray(points.toArray()).forEach(
+      (v, i) => (this.pointsArray[i] = v)
+    );
   }
 }
 

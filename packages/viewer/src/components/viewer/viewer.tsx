@@ -145,7 +145,7 @@ export class Viewer {
    * @private
    * @internal
    */
-  @Prop() public deviceId?: string;
+  @Prop({ mutable: true }) public deviceId?: string;
 
   /**
    * An object or JSON encoded string that defines configuration settings for

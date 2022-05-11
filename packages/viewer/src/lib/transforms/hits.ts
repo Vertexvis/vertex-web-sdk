@@ -7,10 +7,10 @@ import { TriangleMesh } from './mesh';
  * Adapted from https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm.
  */
 export function testTriangleMesh(
-  viewport: Viewport,
-  point: Point.Point,
+  mesh: TriangleMesh,
   frame: Frame,
-  mesh: TriangleMesh
+  viewport: Viewport,
+  point: Point.Point
 ): boolean {
   const ray = viewport.transformPointToRay(
     point,
