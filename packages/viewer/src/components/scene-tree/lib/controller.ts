@@ -42,7 +42,7 @@ export type JwtProvider = () => string | undefined;
 
 export interface SceneTreeState {
   totalRows: number;
-  totalFilteredRows: number;
+  totalFilteredRows?: number;
   rows: Row[];
   connection: ConnectionState;
 }
@@ -125,7 +125,6 @@ export class SceneTreeController {
 
   private state: SceneTreeState = {
     totalRows: 0,
-    totalFilteredRows: 0,
 
     rows: [],
     connection: { type: 'disconnected' },
@@ -306,7 +305,6 @@ export class SceneTreeController {
         sceneViewId: connection.sceneViewId,
       },
       totalRows: reset ? 0 : this.state.totalRows,
-      totalFilteredRows: reset ? 0 : this.state.totalFilteredRows,
       rows: reset ? [] : this.state.rows,
     });
   }

@@ -560,7 +560,12 @@ export class SceneTree {
   @Method()
   public async selectFilteredItems(term: string): Promise<void> {
     if (this.viewer != null) {
-      await selectFilterResults(this.viewer, term, this.metadataKeys, {
+      const columnsToSearch =
+        this.metadataSearchKeys.length > 0
+          ? this.metadataSearchKeys
+          : this.metadataKeys;
+
+      await selectFilterResults(this.viewer, term, columnsToSearch, {
         append: false,
       });
     }
