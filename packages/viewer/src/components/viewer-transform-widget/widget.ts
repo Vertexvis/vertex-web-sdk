@@ -99,6 +99,7 @@ export class TransformWidget implements Disposable {
     if (updateMeshes && frame != null && this.position != null) {
       this.createOrUpdateMeshes(this.position, frame);
       this.sortMeshes(frame, ...this.axisMeshes, ...this.triangleMeshes);
+      this.draw();
     }
   }
 

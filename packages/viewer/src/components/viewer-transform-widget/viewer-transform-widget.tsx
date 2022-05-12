@@ -71,7 +71,7 @@ export class ViewerTransformWidget {
 
   /**
    * @internal
-   * @private
+   * @ignore
    *
    * Visible for testing.
    */
@@ -98,8 +98,10 @@ export class ViewerTransformWidget {
     if (this.canvasRef != null) {
       this.canvasResizeObserver.observe(this.canvasRef);
 
-      this.setupTransformWidget();
+      this.setupTransformWidget(this.canvasRef);
     }
+
+    this.handleViewerChanged(this.viewer, undefined);
   }
 
   protected disconnectedCallback(): void {
@@ -111,6 +113,9 @@ export class ViewerTransformWidget {
     this.widget?.dispose();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
@@ -131,18 +136,16 @@ export class ViewerTransformWidget {
       this.controller?.dispose();
       this.controller = new TransformController(newViewer.stream);
     }
-
-    if (this.canvasRef != null && newViewer != null) {
-      this.canvasRef.width = newViewer.clientWidth;
-      this.canvasRef.height = newViewer.clientHeight;
-    }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('position')
   protected handlePositionChanged(): void {
     this.currentPosition = this.position;
 
-    this.widget?.updatePosition(this.currentPosition);
+    this.getTransformWidget()?.updatePosition(this.currentPosition);
 
     if (this.position == null) {
       this.controller?.clearTransform();
@@ -159,6 +162,8 @@ export class ViewerTransformWidget {
           class={classNames('widget', {
             hovered: this.hovered != null,
           })}
+          width={this.viewer?.viewport.width}
+          height={this.viewer?.viewport.height}
           onPointerDown={this.handlePointerDown}
         />
       </Host>
@@ -261,16 +266,17 @@ export class ViewerTransformWidget {
   private handlePointerUp = async (event: PointerEvent): Promise<void> => {
     const canvasPoint = convertPointToCanvas(
       Point.create(event.clientX, event.clientY),
-      this.canvasBounds
+      this.getCanvasBounds()
     );
+    const widget = this.getTransformWidget();
 
     this.dragging = undefined;
     this.lastWorldPosition = undefined;
     this.position = this.currentPosition;
 
-    this.widget?.updateCursor(canvasPoint);
-    this.widget?.updatePosition(this.currentPosition);
-    this.widget?.updateColors({
+    widget?.updateCursor(canvasPoint);
+    widget?.updatePosition(this.currentPosition);
+    widget?.updateColors({
       xArrow: this.disabledColor,
       yArrow: this.disabledColor,
       zArrow: this.disabledColor,
@@ -284,7 +290,7 @@ export class ViewerTransformWidget {
 
     window.addEventListener('pointermove', this.handleWindowPointerMove);
 
-    this.widget?.updateColors({
+    this.getTransformWidget()?.updateColors({
       xArrow: this.xArrowColor,
       yArrow: this.yArrowColor,
       zArrow: this.zArrowColor,
@@ -315,26 +321,31 @@ export class ViewerTransformWidget {
         this.dragging.identifier
       );
 
-      this.widget?.updatePosition(this.currentPosition);
+      this.getTransformWidget()?.updatePosition(this.currentPosition);
       this.controller?.updateTranslation(
         Vector3.subtract(this.currentPosition, this.position)
       );
     }
   }
 
-  private setupTransformWidget = (): void => {
-    if (this.canvasRef != null) {
-      this.widget = new TransformWidget(this.canvasRef, {
-        xArrow: this.xArrowColor,
-        yArrow: this.yArrowColor,
-        zArrow: this.zArrowColor,
-        hovered: this.hoveredColor,
-      });
+  private setupTransformWidget = (canvasRef: HTMLCanvasElement): void => {
+    this.widget = new TransformWidget(canvasRef, {
+      xArrow: this.xArrowColor,
+      yArrow: this.yArrowColor,
+      zArrow: this.zArrowColor,
+      hovered: this.hoveredColor,
+    });
 
-      this.hoveredChangeDisposable = this.widget.onHoveredChanged(
-        this.handleHoveredMeshChanged
-      );
+    if (this.position != null) {
+      this.widget.updatePosition(this.position);
     }
+    if (this.viewer?.frame != null) {
+      this.widget.updateFrame(this.viewer.frame, true);
+    }
+
+    this.hoveredChangeDisposable = this.widget.onHoveredChanged(
+      this.handleHoveredMeshChanged
+    );
   };
 
   private getCanvasBounds = (): DOMRect | undefined => {
@@ -348,7 +359,7 @@ export class ViewerTransformWidget {
 
   private getTransformWidget = (): TransformWidget | undefined => {
     if (this.widget == null && this.canvasRef != null) {
-      this.setupTransformWidget();
+      this.setupTransformWidget(this.canvasRef);
     }
 
     return this.widget;
