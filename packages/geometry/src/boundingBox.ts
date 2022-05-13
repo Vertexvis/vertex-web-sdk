@@ -35,6 +35,29 @@ export const center = (boundingBox: BoundingBox): Vector3.Vector3 => {
   return Vector3.scale(0.5, Vector3.add(boundingBox.min, boundingBox.max));
 };
 
+/**
+ * Returns the diagonal vector between the `min` and `max` vectors of the
+ * given `BoundingBox`.
+ */
+export const diagonal = (boundingBox: BoundingBox): Vector3.Vector3 => {
+  return Vector3.subtract(boundingBox.max, boundingBox.min);
+};
+
+/**
+ * Returns a floating-point spatial error tolerance based on the extents of the box.
+ */
+export const epsilon = (boundingBox: BoundingBox): number => {
+  return (
+    Math.max(
+      Math.max(
+        Vector3.magnitude(boundingBox.max),
+        Vector3.magnitude(boundingBox.min)
+      ),
+      Vector3.magnitude(diagonal(boundingBox))
+    ) * 1e-6
+  );
+};
+
 /* eslint-disable padding-line-between-statements */
 /**
  * Combine two or more bounding boxes into a new minimal bounding box that

@@ -3,7 +3,6 @@ jest.mock('../../lib/rendering/imageLoaders');
 jest.mock('./widget');
 jest.mock('../../lib/stencil', () => ({
   readDOM: jest.fn((callback) => callback()),
-  writeDOM: jest.fn((callback) => callback()),
 }));
 jest.mock('./util', () => ({
   convertPointToCanvas: jest.fn(),
@@ -18,7 +17,6 @@ import { Point, Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
-import { Viewport } from '../../lib/types';
 import { makePerspectiveFrame } from '../../testing/fixtures';
 import {
   key1,
@@ -265,6 +263,9 @@ describe('vertex-viewer-transform-widget', () => {
     const widget = page.body.querySelector(
       'vertex-viewer-transform-widget'
     ) as HTMLVertexViewerTransformWidgetElement;
+    const canvas = widget.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await page.waitForChanges();
@@ -277,9 +278,12 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
 
-    viewer.viewport = new Viewport(5000, 5000);
+    canvas.width = 5000;
+    canvas.height = 5000;
 
     viewer.dispatchEvent(new CustomEvent('dimensionschange'));
+
+    await page.waitForChanges();
 
     expect(mockTransformWidget.updateDimensions).toHaveBeenCalledWith(
       expect.objectContaining({

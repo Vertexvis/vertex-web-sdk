@@ -20,6 +20,9 @@ export class TransformController {
     if (!this.isTransforming) {
       this.currentDelta = delta;
       this.isTransforming = true;
+
+      console.debug('Beginning transform interaction');
+
       await this.stream.beginInteraction({
         transform: {
           delta: this.toDeltaTransform(delta),
@@ -40,12 +43,24 @@ export class TransformController {
 
   public async endTransform(): Promise<void> {
     if (this.isTransforming) {
-      this.isTransforming = false;
+      console.debug(
+        `Ending transform interaction [delta=${this.currentDelta}]`
+      );
+
       await this.stream.endInteraction({
         transform: {
           delta: this.toDeltaTransform(this.currentDelta),
         },
       });
+      this.isTransforming = false;
+      this.currentDelta = Matrix4.makeIdentity();
+    }
+  }
+
+  public async endInteraction(): Promise<void> {
+    if (this.isTransforming) {
+      await this.stream.endInteraction();
+      this.isTransforming = false;
       this.currentDelta = Matrix4.makeIdentity();
     }
   }
@@ -81,7 +96,7 @@ export class TransformController {
         y: asObject.m24,
         z: asObject.m34,
       },
-      scale: 1,
+      scale: asObject.m44,
     };
   }
 }

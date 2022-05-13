@@ -171,6 +171,13 @@ describe(Rectangle.containsPoints, () => {
       )
     ).toBe(false);
   });
+
+  it('returns true if points lie on the bounds of the rectangle', () => {
+    const rect = Rectangle.create(1, 1, 10, 10);
+    expect(
+      Rectangle.containsPoints(rect, Point.create(1, 1), Point.create(11, 11))
+    ).toBe(true);
+  });
 });
 
 describe(Rectangle.fromJson, () => {

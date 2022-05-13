@@ -1,4 +1,4 @@
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Frame, Viewport } from '../../lib/types';
 import { TriangleMesh } from './mesh';
@@ -18,31 +18,36 @@ export function testTriangleMesh(
     frame.scene.camera
   );
 
-  const epsilon = 0.00000001;
   const edge1 = Vector3.subtract(mesh.points.worldRight, mesh.points.worldLeft);
   const edge2 = Vector3.subtract(mesh.points.worldTip, mesh.points.worldLeft);
+
+  const epsilon = BoundingBox.epsilon(
+    BoundingBox.fromVectors([ray.direction, ray.origin, edge1, edge2]) ??
+      BoundingBox.create(edge1, edge2)
+  );
 
   const p = Vector3.cross(ray.direction, edge2);
   const det = Vector3.dot(edge1, p);
 
-  if (det > -epsilon && det < epsilon) {
+  if (Math.abs(det) < epsilon) {
     return false;
   }
 
-  const f = 1.0 / det;
   const t = Vector3.subtract(ray.origin, mesh.points.worldLeft);
-  const u = f * Vector3.dot(t, p);
+  const u = Vector3.dot(t, p) / det;
 
   if (u < 0 || u > 1) {
     return false;
   }
 
   const q = Vector3.cross(t, edge1);
-  const v = f * Vector3.dot(ray.direction, q);
+  const v = Vector3.dot(ray.direction, q) / det;
 
   if (v < 0 || u + v > 1) {
     return false;
   }
 
-  return !isNaN(Vector3.dot(edge2, q) / det);
+  const r = Vector3.dot(edge2, q) / det;
+
+  return !isNaN(r) && r > epsilon;
 }

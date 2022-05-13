@@ -269,7 +269,7 @@ describe(Scene, () => {
               {
                 changeMaterial: {
                   material: {
-                    d: 255,
+                    d: 100,
                     ka: {
                       a: 0,
                       b: 0,
