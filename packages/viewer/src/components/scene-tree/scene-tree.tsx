@@ -613,6 +613,7 @@ export class SceneTree {
    */
   protected async componentDidLoad(): Promise<void> {
     this.ensureLayoutDefined();
+    this.updateLayoutElement();
 
     const layoutEl = this.getLayoutElement();
     const resizeObserver = new ResizeObserver(() => {
@@ -880,8 +881,6 @@ export class SceneTree {
       `;
 
       this.el.appendChild(layout);
-
-      this.updateLayoutElement();
     }
     this.stateMap.layoutEl = layout;
   }
