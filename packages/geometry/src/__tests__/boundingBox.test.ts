@@ -24,7 +24,7 @@ describe(BoundingBox.diagonal, () => {
     const min = Vector3.create(-1, -1, 0);
     const max = Vector3.create(1, 1, 0);
     expect(BoundingBox.diagonal(BoundingBox.create(min, max))).toEqual(
-      Vector3.create(2, 2, 2)
+      Vector3.create(2, 2, 0)
     );
   });
 });
