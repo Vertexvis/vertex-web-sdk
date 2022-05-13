@@ -147,6 +147,39 @@ describe(Rectangle.pad, () => {
   });
 });
 
+describe(Rectangle.containsPoints, () => {
+  it('returns true if all the points are contained by the rectangle', () => {
+    const rect = Rectangle.create(1, 1, 10, 10);
+    expect(
+      Rectangle.containsPoints(
+        rect,
+        Point.create(2, 2),
+        Point.create(3, 3),
+        Point.create(4, 4)
+      )
+    ).toBe(true);
+  });
+
+  it('returns false if any of the points are not contained by the rectangle', () => {
+    const rect = Rectangle.create(1, 1, 10, 10);
+    expect(
+      Rectangle.containsPoints(
+        rect,
+        Point.create(2, 2),
+        Point.create(3, 3),
+        Point.create(15, 15)
+      )
+    ).toBe(false);
+  });
+
+  it('returns true if points lie on the bounds of the rectangle', () => {
+    const rect = Rectangle.create(1, 1, 10, 10);
+    expect(
+      Rectangle.containsPoints(rect, Point.create(1, 1), Point.create(11, 11))
+    ).toBe(true);
+  });
+});
+
 describe(Rectangle.fromJson, () => {
   it('parses json obj', () => {
     const v = Rectangle.fromJson(

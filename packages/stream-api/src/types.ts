@@ -78,6 +78,21 @@ export type GetStencilBufferPayload = DeepRequired<
   []
 >;
 
+export type BeginInteractionPayload = DeepRequired<
+  vertexvis.protobuf.stream.IBeginInteractionPayload,
+  ['transform']
+>;
+
+export type UpdateInteractionPayload = DeepRequired<
+  vertexvis.protobuf.stream.IUpdateInteractionPayload,
+  ['transform']
+>;
+
+export type EndInteractionPayload = DeepRequired<
+  vertexvis.protobuf.stream.IEndInteractionPayload,
+  ['transform']
+>;
+
 export type DrawFrameResult = DeepRequired<
   Pick<vertexvis.protobuf.stream.IStreamResponse, 'drawFrame'>,
   | ['drawFrame', 'timing', 'receiveToPaintDuration']

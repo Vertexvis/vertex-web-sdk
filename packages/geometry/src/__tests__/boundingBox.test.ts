@@ -19,6 +19,42 @@ describe(BoundingBox.center, () => {
   });
 });
 
+describe(BoundingBox.diagonal, () => {
+  it('returns the diagonal of the bounding box', () => {
+    const min = Vector3.create(-1, -1, 0);
+    const max = Vector3.create(1, 1, 0);
+    expect(BoundingBox.diagonal(BoundingBox.create(min, max))).toEqual(
+      Vector3.create(2, 2, 0)
+    );
+  });
+});
+
+describe(BoundingBox.epsilon, () => {
+  it('computes with the magnitude of the max vector if it has the largest magnitude', () => {
+    const min = Vector3.create(1, 1, 1);
+    const max = Vector3.create(5, 5, 5);
+    expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
+      Vector3.magnitude(max) * 1e-6
+    );
+  });
+
+  it('computes with the magnitude of the min vector if it has the largest magnitude', () => {
+    const min = Vector3.create(-5, -5, -5);
+    const max = Vector3.create(-1, -1, -1);
+    expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
+      Vector3.magnitude(min) * 1e-6
+    );
+  });
+
+  it('computes with the magnitude of the diagonal vector if it has the largest magnitude', () => {
+    const min = Vector3.create(-5, -5, -5);
+    const max = Vector3.create(5, 5, 5);
+    expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
+      Vector3.magnitude(Vector3.create(10, 10, 10)) * 1e-6
+    );
+  });
+});
+
 const bbox = BoundingBox.create(
   Vector3.create(10, 30, 30),
   Vector3.create(100, 300, 300)

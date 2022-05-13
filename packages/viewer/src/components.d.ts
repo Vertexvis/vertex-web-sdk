@@ -106,6 +106,8 @@ import {
   ViewerToolbarPlacement as ViewerToolbarPlacement1,
 } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from './components/viewer-toolbar-group/viewer-toolbar-group';
+import { TransformController } from './lib/transforms/controller';
+import { Mesh } from './lib/transforms/mesh';
 export namespace Components {
   interface VertexSceneTree {
     /**
@@ -1260,6 +1262,24 @@ export namespace Components {
   interface VertexViewerToolbarGroup {
     direction: ViewerToolbarGroupDirection;
   }
+  interface VertexViewerTransformWidget {
+    /**
+     * The controller that is responsible for performing transforms.
+     */
+    controller?: TransformController;
+    /**
+     * @ignore Visible for testing.
+     */
+    hovered?: Mesh;
+    /**
+     * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
+     */
+    position?: Vector3.Vector3;
+    /**
+     * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerViewCube {
     /**
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
@@ -1551,6 +1571,13 @@ declare global {
     prototype: HTMLVertexViewerToolbarGroupElement;
     new (): HTMLVertexViewerToolbarGroupElement;
   };
+  interface HTMLVertexViewerTransformWidgetElement
+    extends Components.VertexViewerTransformWidget,
+      HTMLStencilElement {}
+  var HTMLVertexViewerTransformWidgetElement: {
+    prototype: HTMLVertexViewerTransformWidgetElement;
+    new (): HTMLVertexViewerTransformWidgetElement;
+  };
   interface HTMLVertexViewerViewCubeElement
     extends Components.VertexViewerViewCube,
       HTMLStencilElement {}
@@ -1594,6 +1621,7 @@ declare global {
     'vertex-viewer-pin-tool': HTMLVertexViewerPinToolElement;
     'vertex-viewer-toolbar': HTMLVertexViewerToolbarElement;
     'vertex-viewer-toolbar-group': HTMLVertexViewerToolbarGroupElement;
+    'vertex-viewer-transform-widget': HTMLVertexViewerTransformWidgetElement;
     'vertex-viewer-view-cube': HTMLVertexViewerViewCubeElement;
   }
 }
@@ -2624,6 +2652,24 @@ declare namespace LocalJSX {
   interface VertexViewerToolbarGroup {
     direction?: ViewerToolbarGroupDirection;
   }
+  interface VertexViewerTransformWidget {
+    /**
+     * The controller that is responsible for performing transforms.
+     */
+    controller?: TransformController;
+    /**
+     * @ignore Visible for testing.
+     */
+    hovered?: Mesh;
+    /**
+     * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
+     */
+    position?: Vector3.Vector3;
+    /**
+     * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerViewCube {
     /**
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
@@ -2704,6 +2750,7 @@ declare namespace LocalJSX {
     'vertex-viewer-pin-tool': VertexViewerPinTool;
     'vertex-viewer-toolbar': VertexViewerToolbar;
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
+    'vertex-viewer-transform-widget': VertexViewerTransformWidget;
     'vertex-viewer-view-cube': VertexViewerViewCube;
   }
 }
@@ -2781,6 +2828,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
       'vertex-viewer-toolbar-group': LocalJSX.VertexViewerToolbarGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
+      'vertex-viewer-transform-widget': LocalJSX.VertexViewerTransformWidget &
+        JSXBase.HTMLAttributes<HTMLVertexViewerTransformWidgetElement>;
       'vertex-viewer-view-cube': LocalJSX.VertexViewerViewCube &
         JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
     }
