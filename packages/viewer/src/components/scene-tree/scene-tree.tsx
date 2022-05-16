@@ -571,9 +571,15 @@ export class SceneTree {
           ? this.metadataSearchKeys
           : this.metadataKeys;
 
-      await selectFilterResults(this.viewer, term, columnsToSearch, {
-        append: false,
-      });
+      await selectFilterResults(
+        this.viewer,
+        term,
+        columnsToSearch,
+        this.metadataSearchExactMatch,
+        {
+          append: false,
+        }
+      );
     }
   }
 
