@@ -856,7 +856,7 @@ describe(SceneTreeController, () => {
   describe(SceneTreeController.prototype.filter, () => {
     const term = 'filter';
 
-    it('defaults to including full tree', async () => {
+    it('defaults to including full tree and non-exact match', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
@@ -875,6 +875,7 @@ describe(SceneTreeController, () => {
       const req = new FilterRequest();
       req.setFilter(term);
       req.setFullTree(true);
+      req.setExactMatch(false);
 
       await controller.filter(term);
 
@@ -906,10 +907,14 @@ describe(SceneTreeController, () => {
       const req = new FilterRequest();
       req.setFilter(term);
       req.setFullTree(false);
+      req.setExactMatch(true);
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
-      await controller.filter(term, { includeCollapsed: false });
+      await controller.filter(term, {
+        includeCollapsed: false,
+        exactMatch: true,
+      });
 
       expect(client.filter).toHaveBeenCalledWith(
         req,
