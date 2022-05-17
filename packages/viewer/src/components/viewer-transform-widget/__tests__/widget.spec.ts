@@ -18,10 +18,16 @@ import {
 import { testTriangleMesh } from '../../../lib/transforms/hits';
 import { AxisMesh, TriangleMesh } from '../../../lib/transforms/mesh';
 import { flattenPointArray } from '../../../lib/transforms/util';
-import { Frame, FrameCameraBase, FrameScene } from '../../../lib/types';
+import {
+  Frame,
+  FrameCameraBase,
+  FrameOrthographicCamera,
+  FrameScene,
+} from '../../../lib/types';
 import {
   makeDepthImagePng,
   makeFeatureMapBytes,
+  makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
 import { TransformWidget } from '../widget';
@@ -32,7 +38,8 @@ const mockShapeBuilder = shapeBuilder as MockShapeBuilder;
 
 function createMeshes(
   position: Vector3.Vector3,
-  frame: Frame
+  frame: Frame,
+  triangleSize?: number
 ): {
   xArrow: TriangleMesh;
   yArrow: TriangleMesh;
@@ -41,14 +48,15 @@ function createMeshes(
   yAxis: AxisMesh;
   zAxis: AxisMesh;
 } {
-  const triangleSize =
+  const expectedTriangleSize =
+    triangleSize ??
     Vector3.magnitude(Vector3.subtract(position, frame.scene.camera.position)) *
-    0.005;
+      0.005;
 
   const xArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'x-translate',
-    xAxisArrowPositions(position, frame.scene.camera, triangleSize),
+    xAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
@@ -62,7 +70,7 @@ function createMeshes(
   const yArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'y-translate',
-    yAxisArrowPositions(position, frame.scene.camera, triangleSize),
+    yAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
@@ -76,7 +84,7 @@ function createMeshes(
   const zArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'z-translate',
-    zAxisArrowPositions(position, frame.scene.camera, triangleSize),
+    zAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
@@ -184,6 +192,45 @@ describe(TransformWidget, () => {
     );
   });
 
+  it('creates axis and arrow meshes for orthographic cameras', async () => {
+    const widget = new TransformWidget(canvas);
+    const frame = makeOrthographicFrame();
+    const position = Vector3.create(1, 1, 1);
+    const meshes = createMeshes(
+      position,
+      frame,
+      (frame.scene.camera as FrameOrthographicCamera).fovHeight
+    );
+
+    widget.updateFrame(frame);
+    widget.updatePosition(position);
+
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.xArrow.points.toArray())),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.yArrow.points.toArray())),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.zArrow.points.toArray())),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.xAxis.points.toArray())),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.yAxis.points.toArray())),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      new Float64Array(flattenPointArray(meshes.zAxis.points.toArray())),
+      expect.anything()
+    );
+  });
+
   it('sorts the meshes', async () => {
     const widget = new TransformWidget(canvas);
     const baseFrame = makePerspectiveFrame();
@@ -243,7 +290,7 @@ describe(TransformWidget, () => {
     );
   });
 
-  it('updates the hovered mesh', async () => {
+  it('updates and clears the hovered mesh', async () => {
     const widget = new TransformWidget(canvas, {
       hovered: '#ffff00',
     });
@@ -264,6 +311,10 @@ describe(TransformWidget, () => {
     meshes.xArrow.updateFillColor('#ffff00');
 
     expect(hoveredListener).toHaveBeenCalledWith(meshes.xArrow);
+
+    widget.updateCursor(undefined);
+
+    expect(hoveredListener).toHaveBeenCalledWith(undefined);
   });
 
   it('updates with the colors provided, and retains existing if undefined', async () => {
