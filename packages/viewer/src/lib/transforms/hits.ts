@@ -12,11 +12,13 @@ export function testTriangleMesh(
   viewport: Viewport,
   point: Point.Point
 ): boolean {
-  const ray = viewport.transformPointToRay(
-    point,
-    frame.image,
-    frame.scene.camera
-  );
+  const ray = frame.scene.camera.isOrthographic()
+    ? viewport.transformPointToOrthographicRay(
+        point,
+        frame.image,
+        frame.scene.camera
+      )
+    : viewport.transformPointToRay(point, frame.image, frame.scene.camera);
 
   const edge1 = Vector3.subtract(mesh.points.worldRight, mesh.points.worldLeft);
   const edge2 = Vector3.subtract(mesh.points.worldTip, mesh.points.worldLeft);
@@ -29,7 +31,7 @@ export function testTriangleMesh(
   const p = Vector3.cross(ray.direction, edge2);
   const det = Vector3.dot(edge1, p);
 
-  if (Math.abs(det) < epsilon) {
+  if (!(Math.abs(det) >= epsilon)) {
     return false;
   }
 
@@ -49,5 +51,5 @@ export function testTriangleMesh(
 
   const r = Vector3.dot(edge2, q) / det;
 
-  return !isNaN(r) && r > epsilon;
+  return !isNaN(r) && r > 0;
 }

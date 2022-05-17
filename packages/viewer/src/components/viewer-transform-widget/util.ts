@@ -18,11 +18,13 @@ export function convertCanvasPointToWorld(
   position?: Vector3.Vector3
 ): Vector3.Vector3 | undefined {
   if (point != null && frame != null && viewport != null && position != null) {
-    const ray = viewport.transformPointToRay(
-      point,
-      frame.image,
-      frame.scene.camera
-    );
+    const ray = frame.scene.camera.isPerspective()
+      ? viewport.transformPointToRay(point, frame.image, frame.scene.camera)
+      : viewport.transformPointToOrthographicRay(
+          point,
+          frame.image,
+          frame.scene.camera
+        );
     const positionPlane = Plane.fromNormalAndCoplanarPoint(
       frame.scene.camera.direction,
       position

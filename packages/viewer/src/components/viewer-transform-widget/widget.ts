@@ -46,7 +46,7 @@ export class TransformWidget implements Disposable {
 
   private frame?: Frame;
   private position?: Vector3.Vector3;
-  private bounds?: Rectangle.Rectangle;
+  public bounds?: Rectangle.Rectangle;
 
   private reglFrameDisposable?: regl.Cancellable;
 
@@ -108,6 +108,8 @@ export class TransformWidget implements Disposable {
 
     if (cursor != null && this.frame != null) {
       this.updateHovered();
+    } else {
+      this.clearHovered();
     }
   }
 
@@ -176,6 +178,16 @@ export class TransformWidget implements Disposable {
         this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
         previousHovered?.updateFillColor(previousHovered?.initialFillColor);
       }
+    }
+  }
+
+  private clearHovered(): void {
+    const previousHovered = this.hoveredMesh;
+    this.hoveredMesh = undefined;
+
+    if (this.hoveredMesh !== previousHovered) {
+      this.hoveredChanged.emit(this.hoveredMesh);
+      previousHovered.updateFillColor(previousHovered.initialFillColor);
     }
   }
 
@@ -297,9 +309,11 @@ export class TransformWidget implements Disposable {
 
   private computeTriangleSize(position: Vector3.Vector3, frame: Frame): number {
     return (
-      Vector3.magnitude(
-        Vector3.subtract(position, frame.scene.camera.position)
-      ) * 0.005
+      (frame.scene.camera.isOrthographic()
+        ? frame.scene.camera.fovHeight
+        : Vector3.magnitude(
+            Vector3.subtract(position, frame.scene.camera.position)
+          )) * 0.005
     );
   }
 }

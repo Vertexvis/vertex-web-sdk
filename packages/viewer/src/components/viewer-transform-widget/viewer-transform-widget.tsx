@@ -64,7 +64,7 @@ export class ViewerTransformWidget {
   private lastWorldPosition?: Vector3.Vector3;
 
   private canvasBounds?: DOMRect;
-  private canvasResizeObserver?: ResizeObserver;
+  private canvasResizeObserver!: ResizeObserver;
   private canvasRef?: HTMLCanvasElement;
 
   private hoveredChangeDisposable?: Disposable;
@@ -106,7 +106,7 @@ export class ViewerTransformWidget {
   protected disconnectedCallback(): void {
     window.removeEventListener('pointermove', this.handlePointerMove);
 
-    this.canvasResizeObserver?.disconnect();
+    this.canvasResizeObserver.disconnect();
 
     this.hoveredChangeDisposable?.dispose();
     this.widget?.dispose();
@@ -146,7 +146,7 @@ export class ViewerTransformWidget {
         newPosition
       )}, current=${JSON.stringify(oldPosition)}]`
     );
-    this.widget?.updatePosition(this.currentPosition);
+    this.getTransformWidget().updatePosition(this.currentPosition);
 
     if (newPosition == null) {
       this.controller?.clearTransform();
@@ -330,7 +330,6 @@ export class ViewerTransformWidget {
     });
 
     if (this.position != null) {
-      this.currentPosition = this.position;
       this.widget.updatePosition(this.position);
     }
     if (this.viewer?.frame != null) {

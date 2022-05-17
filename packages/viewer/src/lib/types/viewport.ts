@@ -192,13 +192,13 @@ export class Viewport implements Dimensions.Dimensions {
     camera: FrameCameraWithMatrices
   ): Ray.Ray {
     const ndc = this.transformScreenPointToNdc(pt, image);
-    const world = Vector3.transformNdcToWorldSpace(
-      Vector3.create(ndc.x, ndc.y, 0.5),
+    const origin = Vector3.transformNdcToWorldSpace(
+      Vector3.create(ndc.x, ndc.y, 0),
       camera.worldMatrix,
       camera.projectionMatrixInverse
     );
     return Ray.create({
-      origin: world,
+      origin,
       direction: Vector3.normalize(camera.viewVector),
     });
   }
