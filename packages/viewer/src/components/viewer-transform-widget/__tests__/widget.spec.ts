@@ -30,7 +30,7 @@ import {
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
-import { TransformWidget } from '../widget';
+import { DEFAULT_MESH_SCALAR, TransformWidget } from '../widget';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 
@@ -51,7 +51,7 @@ function createMeshes(
   const expectedTriangleSize =
     triangleSize ??
     Vector3.magnitude(Vector3.subtract(position, frame.scene.camera.position)) *
-      0.005;
+      DEFAULT_MESH_SCALAR;
 
   const xArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
@@ -163,6 +163,7 @@ describe(TransformWidget, () => {
     const position = Vector3.create(1, 1, 1);
     const meshes = createMeshes(position, frame);
 
+    mockShapeBuilder().createShape.mockClear();
     widget.updateFrame(frame);
     widget.updatePosition(position);
 
@@ -199,9 +200,11 @@ describe(TransformWidget, () => {
     const meshes = createMeshes(
       position,
       frame,
-      (frame.scene.camera as FrameOrthographicCamera).fovHeight
+      (frame.scene.camera as FrameOrthographicCamera).fovHeight *
+        DEFAULT_MESH_SCALAR
     );
 
+    mockShapeBuilder().createShape.mockClear();
     widget.updateFrame(frame);
     widget.updatePosition(position);
 

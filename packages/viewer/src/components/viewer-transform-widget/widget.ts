@@ -26,6 +26,12 @@ export interface MeshColors {
   outline?: Color.Color | string;
 }
 
+// Scalar that is used in combination with the camera
+// components to determine the relative size of the meshes.
+// This attempts to keep the widget approximately the same
+// size as zooming occurs.
+export const DEFAULT_MESH_SCALAR = 0.005;
+
 export class TransformWidget implements Disposable {
   private reglCommand?: regl.Regl;
 
@@ -313,7 +319,7 @@ export class TransformWidget implements Disposable {
         ? frame.scene.camera.fovHeight
         : Vector3.magnitude(
             Vector3.subtract(position, frame.scene.camera.position)
-          )) * 0.005
+          )) * DEFAULT_MESH_SCALAR
     );
   }
 }
