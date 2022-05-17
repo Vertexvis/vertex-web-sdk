@@ -55,6 +55,7 @@ export function buildSceneOperation(
         metadata: {
           valueFilter: query.filter,
           keys: query.keys,
+          exactMatch: query.exactMatch,
         },
         operationTypes,
       };

@@ -190,6 +190,10 @@ export namespace Components {
      */
     metadataKeys: MetadataKey[];
     /**
+     * Indicates whether the metadata search should use an exact match.
+     */
+    metadataSearchExactMatch: boolean;
+    /**
      * A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys: MetadataKey[];
@@ -1644,6 +1648,10 @@ declare namespace LocalJSX {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
+    /**
+     * Indicates whether the metadata search should use an exact match.
+     */
+    metadataSearchExactMatch?: boolean;
     /**
      * A list of the metadata keys that a scene tree search should be performed on.
      */

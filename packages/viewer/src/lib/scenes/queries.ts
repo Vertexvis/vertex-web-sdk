@@ -36,6 +36,7 @@ interface MetadataQueryExpression {
   type: 'metadata';
   filter: string;
   keys: string[];
+  exactMatch: boolean;
 }
 
 interface AllSelectedQueryExpression {
@@ -104,8 +105,12 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     return new SceneTreeRangeQuery(range);
   }
 
-  public withMetadata(filter: string, keys: string[]): MetadataQuery {
-    return new MetadataQuery(filter, keys);
+  public withMetadata(
+    filter: string,
+    keys: string[],
+    exactMatch: boolean
+  ): MetadataQuery {
+    return new MetadataQuery(filter, keys, exactMatch);
   }
 
   public withSelected(): AllSelectedQuery {
@@ -135,13 +140,18 @@ export class SceneTreeRangeQuery implements TerminalQuery {
 }
 
 export class MetadataQuery implements TerminalQuery {
-  public constructor(private filter: string, private keys: string[]) {}
+  public constructor(
+    private filter: string,
+    private keys: string[],
+    private exactMatch: boolean
+  ) {}
 
   public build(): MetadataQueryExpression {
     return {
       type: 'metadata',
       filter: this.filter,
       keys: this.keys,
+      exactMatch: this.exactMatch,
     };
   }
 }

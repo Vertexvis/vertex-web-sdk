@@ -91,6 +91,11 @@ export interface FilterTreeOptions {
   includeCollapsed?: boolean;
 
   /**
+   * Indicates if the filter should be an exact match with the results.
+   */
+  exactMatch?: boolean;
+
+  /**
    * The metadata keys to filter the tree on.
    */
   columns?: MetadataKey[];
@@ -517,7 +522,8 @@ export class SceneTreeController {
         (metadata, handler) => {
           const req = new FilterRequest();
           req.setFilter(term);
-          req.setFullTree((options.includeCollapsed ?? true) === true);
+          req.setFullTree(options.includeCollapsed ?? true);
+          req.setExactMatch(!!options.exactMatch);
           if (options.columns) req.setColumnsKeysList(options.columns);
 
           this.client.filter(req, metadata, handler);
