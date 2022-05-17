@@ -1920,10 +1920,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-web-workers/-/rollup-plugin-web-workers-0.1.0.tgz#53c0981df8127125e3fd3c67ddc0169693efec58"
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
-"@vertexvis/scene-tree-protos@^0.1.13":
-  version "0.1.13"
-  resolved "https://registry.npmjs.org/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.13.tgz#e977496bfdc1476d8ea14bac34b8f25295ecff25"
-  integrity sha512-razQrMpAvnL4X90gvVceITR+M5oHLOb0VSuEs0SKm55I4r+fC5F5VHSKpCD+ManB3lABTIrP7O9CMKjN7d0vaQ==
+"@vertexvis/scene-tree-protos@^0.1.14":
+  version "0.1.14"
+  resolved "https://registry.npmjs.org/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.14.tgz#78f02708cf4ab46c4a08c3022143598dcfdba2bb"
+  integrity sha512-/VeS2PaM2EgbwTBV0fS1ILuEB684uUPEaHlRcuTw3fRKZaJ8SM0DFgpQ3QD+QqYT6TqQ9OM6C5rHItbtQggIDQ==
 
 "@vertexvis/scene-view-protos@^0.1.8":
   version "0.1.8"

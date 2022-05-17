@@ -1025,10 +1025,12 @@ describe('<vertex-scene-tree>', () => {
       const { tree } = await newSceneTreeSpec({ controller, stream });
       tree.filterOnMetadata = true;
       tree.metadataKeys = ['foo', 'bar', 'baz'];
+      tree.metadataSearchExactMatch = false;
 
       tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
       expect(filter).toHaveBeenCalledWith('term', {
         columns: tree.metadataKeys,
+        exactMatch: false,
       });
     });
   });

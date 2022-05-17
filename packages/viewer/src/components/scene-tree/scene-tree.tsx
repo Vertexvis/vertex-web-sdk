@@ -195,6 +195,12 @@ export class SceneTree {
   public filterOnMetadata = false;
 
   /**
+   * Indicates whether the metadata search should use an exact match.
+   */
+  @Prop({ mutable: true })
+  public metadataSearchExactMatch = false;
+
+  /**
    * A list of the metadata keys that a scene tree search should be performed on.
    */
   @Prop({ mutable: true })
@@ -565,9 +571,15 @@ export class SceneTree {
           ? this.metadataSearchKeys
           : this.metadataKeys;
 
-      await selectFilterResults(this.viewer, term, columnsToSearch, {
-        append: false,
-      });
+      await selectFilterResults(
+        this.viewer,
+        term,
+        columnsToSearch,
+        this.metadataSearchExactMatch,
+        {
+          append: false,
+        }
+      );
     }
   }
 
@@ -841,6 +853,7 @@ export class SceneTree {
       : undefined;
     this.filterItems(event.detail, {
       columns: columnsToSearch,
+      exactMatch: this.metadataSearchExactMatch,
     });
   }
 
