@@ -522,7 +522,7 @@ export class SceneTreeController {
         (metadata, handler) => {
           const req = new FilterRequest();
           req.setFilter(term);
-          req.setFullTree(!options.includeCollapsed);
+          req.setFullTree(options.includeCollapsed ?? true);
           req.setExactMatch(!!options.exactMatch);
           if (options.columns) req.setColumnsKeysList(options.columns);
 
