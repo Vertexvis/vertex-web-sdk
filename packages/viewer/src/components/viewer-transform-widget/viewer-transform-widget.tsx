@@ -35,7 +35,7 @@ export class ViewerTransformWidget {
   public positionChanged!: EventEmitter<Vector3.Vector3 | undefined>;
 
   /**
-   * An event that is emitted when the delta changed
+   * An event that is emitted when the interaction has ended
    */
   @Event({ bubbles: true })
   public interactionEnded!: EventEmitter<Matrix4.Matrix4 | undefined>;

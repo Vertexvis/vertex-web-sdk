@@ -2670,7 +2670,7 @@ declare namespace LocalJSX {
      */
     hovered?: Mesh;
     /**
-     * An event that is emitted when the delta changed
+     * An event that is emitted when the interaction has ended
      */
     onInteractionEnded?: (
       event: CustomEvent<Matrix4.Matrix4 | undefined>
