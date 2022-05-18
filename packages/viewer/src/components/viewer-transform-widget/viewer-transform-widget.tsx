@@ -235,12 +235,11 @@ export class ViewerTransformWidget {
         this.currentPosition
       );
 
-      this.transform(
-        this.lastWorldPosition,
-        currentWorld ?? this.lastWorldPosition
-      );
+      if (currentWorld != null) {
+        this.transform(this.lastWorldPosition, currentWorld);
 
-      this.lastWorldPosition = currentWorld;
+        this.lastWorldPosition = currentWorld;
+      }
     }
   };
 

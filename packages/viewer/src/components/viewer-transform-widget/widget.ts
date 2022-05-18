@@ -52,7 +52,7 @@ export class TransformWidget implements Disposable {
 
   private frame?: Frame;
   private position?: Vector3.Vector3;
-  public bounds?: Rectangle.Rectangle;
+  private bounds?: Rectangle.Rectangle;
 
   private reglFrameDisposable?: regl.Cancellable;
 
@@ -92,10 +92,7 @@ export class TransformWidget implements Disposable {
     return (
       this.bounds != null &&
       this.frame != null &&
-      Rectangle.containsPoints(
-        this.bounds,
-        this.viewport.transformScreenPointToNdc(point, this.frame.image)
-      )
+      Rectangle.containsPoints(this.bounds, point)
     );
   }
 
@@ -173,11 +170,13 @@ export class TransformWidget implements Disposable {
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredMesh = this.triangleMeshes.find((m) =>
-        this.cursor != null
-          ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
-          : false
-      );
+      this.hoveredMesh = this.triangleMeshes
+        .filter((m) => m.points.valid)
+        .find((m) =>
+          this.cursor != null
+            ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
+            : false
+        );
 
       if (this.hoveredMesh !== previousHovered) {
         this.hoveredChanged.emit(this.hoveredMesh);
@@ -220,7 +219,7 @@ export class TransformWidget implements Disposable {
       this.updateMeshes(position, frame);
     }
 
-    this.bounds = computeMesh2dBounds(...this.triangleMeshes);
+    this.bounds = computeMesh2dBounds(this.viewport, ...this.triangleMeshes);
   }
 
   private createMeshes(position: Vector3.Vector3, frame: Frame): void {

@@ -31,6 +31,8 @@ export function testTriangleMesh(
   const p = Vector3.cross(ray.direction, edge2);
   const det = Vector3.dot(edge1, p);
 
+  // This check causes a `det` of NaN or 0 to return false
+  // without needing to perform the subsequent calculations.
   if (!(Math.abs(det) >= epsilon)) {
     return false;
   }
@@ -51,5 +53,7 @@ export function testTriangleMesh(
 
   const r = Vector3.dot(edge2, q) / det;
 
-  return !isNaN(r) && r > 0;
+  // Ignore the case where the computed hit position is negative
+  // if in orthographic, as the near plane can be a negative value.
+  return !isNaN(r) && (r > 0 || frame.scene.camera.isOrthographic());
 }
