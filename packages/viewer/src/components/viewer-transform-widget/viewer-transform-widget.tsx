@@ -8,7 +8,7 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -33,6 +33,18 @@ export class ViewerTransformWidget {
    */
   @Event({ bubbles: true })
   public positionChanged!: EventEmitter<Vector3.Vector3 | undefined>;
+
+  /**
+   * An event that is emitted when the interaction has ended
+   */
+  @Event({ bubbles: true })
+  public interactionEnded!: EventEmitter<Matrix4.Matrix4 | undefined>;
+
+  /**
+   * An event that is emitted an interaction with the widget has started
+   */
+  @Event({ bubbles: true })
+  public interactionStarted!: EventEmitter<void>;
 
   /**
    * The viewer to connect to transforms. If nested within a <vertex-viewer>,
@@ -233,6 +245,7 @@ export class ViewerTransformWidget {
       );
 
       this.controller?.beginTransform();
+      this.interactionStarted.emit();
 
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.addEventListener('pointermove', this.handleDrag);
@@ -284,7 +297,11 @@ export class ViewerTransformWidget {
     window.removeEventListener('pointerup', this.handleEndTransform);
 
     try {
+      const delta = this.controller?.getCurrentDelta();
+
       await this.controller?.endTransform();
+
+      this.interactionEnded.emit(delta);
     } catch (e) {
       console.error('Failed to end transform interaction', e);
     }
