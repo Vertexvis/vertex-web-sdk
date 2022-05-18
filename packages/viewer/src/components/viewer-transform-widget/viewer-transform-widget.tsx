@@ -38,7 +38,7 @@ export class ViewerTransformWidget {
    * An event that is emitted when the delta changed
    */
   @Event({ bubbles: true })
-  public deltaChanged!: EventEmitter<Matrix4.Matrix4 | undefined>;
+  public interactionEnded!: EventEmitter<Matrix4.Matrix4 | undefined>;
 
   /**
    * An event that is emitted an interaction with the widget has started
@@ -301,7 +301,7 @@ export class ViewerTransformWidget {
 
       await this.controller?.endTransform();
 
-      this.deltaChanged.emit(delta);
+      this.interactionEnded.emit(delta);
     } catch (e) {
       console.error('Failed to end transform interaction', e);
     }

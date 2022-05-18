@@ -172,14 +172,14 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onDeltaChange = jest.fn();
+    const onInteractionEnded = jest.fn();
     const onInteractionStarted = jest.fn();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
-    widget.addEventListener('deltaChanged', onDeltaChange);
+    widget.addEventListener('interactionEnded', onInteractionEnded);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -252,7 +252,7 @@ describe('vertex-viewer-transform-widget', () => {
     );
 
     await page.waitForChanges();
-    expect(onDeltaChange).toHaveBeenCalled();
+    expect(onInteractionEnded).toHaveBeenCalled();
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
