@@ -172,10 +172,15 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
+    const onDeltaChange = jest.fn();
+    const onInteractionStarted = jest.fn();
+
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
+    widget.addEventListener('deltaChanged', onDeltaChange);
+    widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
 
@@ -196,10 +201,11 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000'
     );
-
     const beginSpy = jest.spyOn(stream, 'beginInteraction');
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest.spyOn(stream, 'endInteraction');
+    const endSpy = jest
+      .spyOn(stream, 'endInteraction')
+      .mockReturnValue(Promise.resolve({}));
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
@@ -244,6 +250,10 @@ describe('vertex-viewer-transform-widget', () => {
         },
       })
     );
+
+    await page.waitForChanges();
+    expect(onDeltaChange).toHaveBeenCalled();
+    expect(onInteractionStarted).toHaveBeenCalled();
   });
 
   it('updates widget bounds when the viewer dimensions change', async () => {

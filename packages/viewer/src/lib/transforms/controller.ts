@@ -41,6 +41,10 @@ export class TransformController {
     });
   }
 
+  public getCurrentDelta(): Matrix4.Matrix4 | undefined {
+    return this.currentDelta;
+  }
+
   public async endTransform(): Promise<void> {
     if (this.isTransforming) {
       console.debug(

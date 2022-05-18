@@ -2670,6 +2670,14 @@ declare namespace LocalJSX {
      */
     hovered?: Mesh;
     /**
+     * An event that is emitted when the delta changed
+     */
+    onDeltaChanged?: (event: CustomEvent<Matrix4.Matrix4 | undefined>) => void;
+    /**
+     * An event that is emitted when the delta changed
+     */
+    onInteractionStarted?: (event: CustomEvent<void>) => void;
+    /**
      * An event that is emitted when the position of the widget changes.
      */
     onPositionChanged?: (
