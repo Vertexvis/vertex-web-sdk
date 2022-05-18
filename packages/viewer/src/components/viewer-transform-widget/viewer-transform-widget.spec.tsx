@@ -14,7 +14,6 @@ jest.mock('./util', () => ({
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point, Vector3 } from '@vertexvis/geometry';
-import { position } from '@vertexvis/geometry/dist/matrix4';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
