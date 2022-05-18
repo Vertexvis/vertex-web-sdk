@@ -2674,7 +2674,7 @@ declare namespace LocalJSX {
      */
     onDeltaChanged?: (event: CustomEvent<Matrix4.Matrix4 | undefined>) => void;
     /**
-     * An event that is emitted when the delta changed
+     * An event that is emitted an interaction with the widget has started
      */
     onInteractionStarted?: (event: CustomEvent<void>) => void;
     /**

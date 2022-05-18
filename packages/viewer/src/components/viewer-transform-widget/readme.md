@@ -16,11 +16,11 @@
 
 ## Events
 
-| Event                | Description                                                       | Type                                                                                                                                                         |
-| -------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `deltaChanged`       | An event that is emitted when the delta changed                   | `CustomEvent<[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined>` |
-| `interactionStarted` | An event that is emitted when the delta changed                   | `CustomEvent<void>`                                                                                                                                          |
-| `positionChanged`    | An event that is emitted when the position of the widget changes. | `CustomEvent<Vector3 \| undefined>`                                                                                                                          |
+| Event                | Description                                                         | Type                                                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `deltaChanged`       | An event that is emitted when the delta changed                     | `CustomEvent<[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined>` |
+| `interactionStarted` | An event that is emitted an interaction with the widget has started | `CustomEvent<void>`                                                                                                                                          |
+| `positionChanged`    | An event that is emitted when the position of the widget changes.   | `CustomEvent<Vector3 \| undefined>`                                                                                                                          |
 
 
 ## CSS Custom Properties

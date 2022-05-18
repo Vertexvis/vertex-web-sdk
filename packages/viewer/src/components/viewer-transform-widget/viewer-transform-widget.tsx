@@ -41,7 +41,7 @@ export class ViewerTransformWidget {
   public deltaChanged!: EventEmitter<Matrix4.Matrix4 | undefined>;
 
   /**
-   * An event that is emitted when the delta changed
+   * An event that is emitted an interaction with the widget has started
    */
   @Event({ bubbles: true })
   public interactionStarted!: EventEmitter<void>;
