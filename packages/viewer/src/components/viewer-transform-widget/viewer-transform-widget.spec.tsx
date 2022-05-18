@@ -391,7 +391,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
 
-    const position2 = Vector3.create(1, 1, 1);
+    const position2 = Vector3.create(2, 2, 2);
     widget.position = position2;
 
     await page.waitForChanges();
