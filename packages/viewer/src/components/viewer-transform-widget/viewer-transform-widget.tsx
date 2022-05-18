@@ -32,7 +32,7 @@ export class ViewerTransformWidget {
    * An event that is emitted when the position of the widget changes.
    */
   @Event({ bubbles: true })
-  public positionChanged!: EventEmitter<Vector3.Vector3>;
+  public positionChanged!: EventEmitter<Vector3.Vector3 | undefined>;
 
   /**
    * The viewer to connect to transforms. If nested within a <vertex-viewer>,

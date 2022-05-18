@@ -16,9 +16,9 @@
 
 ## Events
 
-| Event             | Description                                                       | Type                   |
-| ----------------- | ----------------------------------------------------------------- | ---------------------- |
-| `positionChanged` | An event that is emitted when the position of the widget changes. | `CustomEvent<Vector3>` |
+| Event             | Description                                                       | Type                                |
+| ----------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| `positionChanged` | An event that is emitted when the position of the widget changes. | `CustomEvent<Vector3 \| undefined>` |
 
 
 ## CSS Custom Properties

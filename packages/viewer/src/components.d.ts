@@ -2672,7 +2672,9 @@ declare namespace LocalJSX {
     /**
      * An event that is emitted when the position of the widget changes.
      */
-    onPositionChanged?: (event: CustomEvent<Vector3.Vector3>) => void;
+    onPositionChanged?: (
+      event: CustomEvent<Vector3.Vector3 | undefined>
+    ) => void;
     /**
      * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
      */
