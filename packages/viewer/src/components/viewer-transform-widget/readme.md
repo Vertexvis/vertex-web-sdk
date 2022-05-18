@@ -14,6 +14,13 @@
 | `viewer`     | --        | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
+## Events
+
+| Event             | Description                                                       | Type                                |
+| ----------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| `positionChanged` | An event that is emitted when the position of the widget changes. | `CustomEvent<Vector3 \| undefined>` |
+
+
 ## CSS Custom Properties
 
 | Name                                             | Description                                                                               |

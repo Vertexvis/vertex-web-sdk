@@ -361,4 +361,51 @@ describe('vertex-viewer-transform-widget', () => {
     expect(endSpy).toHaveBeenCalled();
     expect(mockTransformWidget.updatePosition).toHaveBeenCalledWith(undefined);
   });
+
+  it('should dispatch an event when the position of the widget changes', async () => {
+    const { stream, ws } = makeViewerStream();
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+    const onPositionChanged = jest.fn();
+    widget.addEventListener('positionChanged', onPositionChanged);
+
+    const position1 = Vector3.create(1, 1, 1);
+    widget.position = position1;
+
+    await page.waitForChanges();
+
+    const position2 = Vector3.create(2, 2, 2);
+    widget.position = position2;
+
+    await page.waitForChanges();
+
+    expect(onPositionChanged).toHaveBeenCalledTimes(2);
+    expect(onPositionChanged).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: position1,
+      })
+    );
+    expect(onPositionChanged).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: position2,
+      })
+    );
+  });
 });
