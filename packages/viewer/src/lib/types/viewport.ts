@@ -53,14 +53,25 @@ export class Viewport implements Dimensions.Dimensions {
    * Transforms a normalized device coordinate to a 2D point within the
    * viewport.
    *
-   * @param ndc A 3D point in NDC.
+   * @param ndc A 2D point in NDC.
    * @returns A 2D point in the coordinate space of the viewport.
    */
-  public transformVectorToViewport(ndc: Vector3.Vector3): Point.Point {
+  public transformNdcPointToViewport(ndc: Point.Point): Point.Point {
     return Point.create(
       ndc.x * this.center.x + this.center.x,
       -ndc.y * this.center.y + this.center.y
     );
+  }
+
+  /**
+   * Transforms a normalized device coordinate to a 2D point within the
+   * viewport.
+   *
+   * @param ndc A 3D point in NDC.
+   * @returns A 2D point in the coordinate space of the viewport.
+   */
+  public transformVectorToViewport(ndc: Vector3.Vector3): Point.Point {
+    return this.transformNdcPointToViewport(ndc);
   }
 
   /**
@@ -192,13 +203,13 @@ export class Viewport implements Dimensions.Dimensions {
     camera: FrameCameraWithMatrices
   ): Ray.Ray {
     const ndc = this.transformScreenPointToNdc(pt, image);
-    const world = Vector3.transformNdcToWorldSpace(
-      Vector3.create(ndc.x, ndc.y, 0.5),
+    const origin = Vector3.transformNdcToWorldSpace(
+      Vector3.create(ndc.x, ndc.y, 0),
       camera.worldMatrix,
       camera.projectionMatrixInverse
     );
     return Ray.create({
-      origin: world,
+      origin,
       direction: Vector3.normalize(camera.viewVector),
     });
   }
