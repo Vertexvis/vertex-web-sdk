@@ -1,4 +1,13 @@
-import { Component, Element, h, Host, Prop, Watch } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  Watch,
+} from '@stencil/core';
 import { Point, Vector3 } from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
@@ -19,6 +28,12 @@ import { TransformWidget } from './widget';
   shadow: true,
 })
 export class ViewerTransformWidget {
+  /**
+   * An event that is emitted when the position of the widget changes.
+   */
+  @Event({ bubbles: true })
+  public positionChanged!: EventEmitter<Vector3.Vector3>;
+
   /**
    * The viewer to connect to transforms. If nested within a <vertex-viewer>,
    * this property will be populated automatically.
@@ -151,6 +166,8 @@ export class ViewerTransformWidget {
     if (newPosition == null) {
       this.controller?.clearTransform();
     }
+
+    this.positionChanged.emit(newPosition);
   }
 
   public render(): h.JSX.IntrinsicElements {
