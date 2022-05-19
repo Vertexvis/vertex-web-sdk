@@ -3,6 +3,7 @@ import { Color } from '@vertexvis/utils';
 import { JoinStyle, ShapeProps } from 'regl-shape';
 
 import { CreateShape, DrawShape } from '../../lib/transforms/shape';
+import { Viewport } from '../types';
 import { flattenPointArray } from './util';
 
 export interface MeshPoints {
@@ -159,17 +160,23 @@ export class TriangleMesh extends Mesh<TriangleMeshPoints> {
   }
 }
 
-export function computeMesh2dBounds(...meshes: Mesh[]): Rectangle.Rectangle {
+export function computeMesh2dBounds(
+  viewport: Viewport,
+  ...meshes: Mesh[]
+): Rectangle.Rectangle {
   let min = Point.create(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
   let max = Point.create();
 
   meshes
     .filter((m) => m.points.valid)
     .map((m) => {
-      m.points.toArray().forEach((pt) => {
-        min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
-        max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
-      });
+      m.points
+        .toArray()
+        .map((pt) => viewport.transformNdcPointToViewport(pt))
+        .forEach((pt) => {
+          min = Point.create(Math.min(pt.x, min.x), Math.min(pt.y, min.y));
+          max = Point.create(Math.max(pt.x, max.x), Math.max(pt.y, max.y));
+        });
     });
 
   return Rectangle.fromPoints(min, max);

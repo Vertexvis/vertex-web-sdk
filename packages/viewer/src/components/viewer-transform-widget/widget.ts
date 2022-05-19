@@ -26,6 +26,12 @@ export interface MeshColors {
   outline?: Color.Color | string;
 }
 
+// Scalar that is used in combination with the camera
+// components to determine the relative size of the meshes.
+// This attempts to keep the widget approximately the same
+// size as zooming occurs.
+export const DEFAULT_MESH_SCALAR = 0.005;
+
 export class TransformWidget implements Disposable {
   private reglCommand?: regl.Regl;
 
@@ -86,10 +92,7 @@ export class TransformWidget implements Disposable {
     return (
       this.bounds != null &&
       this.frame != null &&
-      Rectangle.containsPoints(
-        this.bounds,
-        this.viewport.transformScreenPointToNdc(point, this.frame.image)
-      )
+      Rectangle.containsPoints(this.bounds, point)
     );
   }
 
@@ -108,6 +111,8 @@ export class TransformWidget implements Disposable {
 
     if (cursor != null && this.frame != null) {
       this.updateHovered();
+    } else {
+      this.clearHovered();
     }
   }
 
@@ -165,17 +170,29 @@ export class TransformWidget implements Disposable {
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredMesh = this.triangleMeshes.find((m) =>
-        this.cursor != null
-          ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
-          : false
-      );
+      this.hoveredMesh = this.triangleMeshes
+        .filter((m) => m.points.valid)
+        .find((m) =>
+          this.cursor != null
+            ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
+            : false
+        );
 
       if (this.hoveredMesh !== previousHovered) {
         this.hoveredChanged.emit(this.hoveredMesh);
         this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
         previousHovered?.updateFillColor(previousHovered?.initialFillColor);
       }
+    }
+  }
+
+  private clearHovered(): void {
+    const previousHovered = this.hoveredMesh;
+    this.hoveredMesh = undefined;
+
+    if (this.hoveredMesh !== previousHovered) {
+      this.hoveredChanged.emit(this.hoveredMesh);
+      previousHovered.updateFillColor(previousHovered.initialFillColor);
     }
   }
 
@@ -202,7 +219,7 @@ export class TransformWidget implements Disposable {
       this.updateMeshes(position, frame);
     }
 
-    this.bounds = computeMesh2dBounds(...this.triangleMeshes);
+    this.bounds = computeMesh2dBounds(this.viewport, ...this.triangleMeshes);
   }
 
   private createMeshes(position: Vector3.Vector3, frame: Frame): void {
@@ -297,9 +314,11 @@ export class TransformWidget implements Disposable {
 
   private computeTriangleSize(position: Vector3.Vector3, frame: Frame): number {
     return (
-      Vector3.magnitude(
-        Vector3.subtract(position, frame.scene.camera.position)
-      ) * 0.005
+      (frame.scene.camera.isOrthographic()
+        ? frame.scene.camera.fovHeight
+        : Vector3.magnitude(
+            Vector3.subtract(position, frame.scene.camera.position)
+          )) * DEFAULT_MESH_SCALAR
     );
   }
 }

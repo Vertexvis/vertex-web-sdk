@@ -19,7 +19,7 @@ describe('viewport utilities', () => {
 
       const expectedOrigin = Vector3.transformMatrix(
         Vector3.transformMatrix(
-          Vector3.create(-0.8, 0.8, 0.5),
+          Vector3.create(-0.8, 0.8, 0),
           orthographic.projectionMatrixInverse
         ),
         orthographic.worldMatrix

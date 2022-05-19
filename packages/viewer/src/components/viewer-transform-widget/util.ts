@@ -18,17 +18,41 @@ export function convertCanvasPointToWorld(
   position?: Vector3.Vector3
 ): Vector3.Vector3 | undefined {
   if (point != null && frame != null && viewport != null && position != null) {
-    const ray = viewport.transformPointToRay(
-      point,
-      frame.image,
-      frame.scene.camera
-    );
-    const positionPlane = Plane.fromNormalAndCoplanarPoint(
-      frame.scene.camera.direction,
-      position
-    );
+    if (frame.scene.camera.isOrthographic()) {
+      const ray = viewport.transformPointToOrthographicRay(
+        point,
+        frame.image,
+        frame.scene.camera
+      );
+      // Offset the point to past the bounding sphere of the model to
+      // adjust the position plane location.
+      const offsetPoint = Ray.at(
+        Ray.create({
+          origin: position,
+          direction: frame.scene.camera.direction,
+        }),
+        Vector3.magnitude(frame.scene.camera.viewVector) * 2
+      );
 
-    return Ray.intersectPlane(ray, positionPlane);
+      return Ray.intersectPlane(
+        ray,
+        Plane.fromNormalAndCoplanarPoint(
+          frame.scene.camera.direction,
+          offsetPoint
+        )
+      );
+    } else {
+      const ray = viewport.transformPointToRay(
+        point,
+        frame.image,
+        frame.scene.camera
+      );
+
+      return Ray.intersectPlane(
+        ray,
+        Plane.fromNormalAndCoplanarPoint(frame.scene.camera.direction, position)
+      );
+    }
   }
   return undefined;
 }

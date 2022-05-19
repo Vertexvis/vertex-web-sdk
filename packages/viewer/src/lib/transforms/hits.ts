@@ -12,11 +12,13 @@ export function testTriangleMesh(
   viewport: Viewport,
   point: Point.Point
 ): boolean {
-  const ray = viewport.transformPointToRay(
-    point,
-    frame.image,
-    frame.scene.camera
-  );
+  const ray = frame.scene.camera.isOrthographic()
+    ? viewport.transformPointToOrthographicRay(
+        point,
+        frame.image,
+        frame.scene.camera
+      )
+    : viewport.transformPointToRay(point, frame.image, frame.scene.camera);
 
   const edge1 = Vector3.subtract(mesh.points.worldRight, mesh.points.worldLeft);
   const edge2 = Vector3.subtract(mesh.points.worldTip, mesh.points.worldLeft);
@@ -29,7 +31,9 @@ export function testTriangleMesh(
   const p = Vector3.cross(ray.direction, edge2);
   const det = Vector3.dot(edge1, p);
 
-  if (Math.abs(det) < epsilon) {
+  // This check causes a `det` of NaN or 0 to return false
+  // without needing to perform the subsequent calculations.
+  if (!(Math.abs(det) >= epsilon)) {
     return false;
   }
 
@@ -49,5 +53,9 @@ export function testTriangleMesh(
 
   const r = Vector3.dot(edge2, q) / det;
 
-  return !isNaN(r) && r > epsilon;
+  // Ignore the case where the computed hit position is negative
+  // if in orthographic to correctly return hit results when close
+  // to the camera.
+  // TODO: revisit with https://vertexvis.atlassian.net/browse/PLAT-1549
+  return !isNaN(r) && (r > 0 || frame.scene.camera.isOrthographic());
 }
