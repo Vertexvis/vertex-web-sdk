@@ -1023,7 +1023,6 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream } = makeViewerStream();
       const { tree } = await newSceneTreeSpec({ controller, stream });
-      tree.filterOnMetadata = true;
       tree.metadataKeys = ['foo', 'bar', 'baz'];
       tree.metadataSearchExactMatch = false;
 
