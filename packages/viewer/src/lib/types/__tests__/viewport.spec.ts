@@ -41,10 +41,7 @@ describe('viewport utilities', () => {
       const viewport = new Viewport(100, 100);
 
       const buffer = makeDepthBuffer(100, 100, undefined, orthographic);
-      const depth =
-        (0.5 / DepthBuffer.MAX_DEPTH_VALUE) *
-          (orthographic.far - orthographic.near) +
-        orthographic.near / 2;
+      const depth = 0.5 * (orthographic.far - orthographic.near);
       const ray = viewport.transformPointToOrthographicRay(
         Point.create(10, 10),
         buffer,
@@ -55,7 +52,7 @@ describe('viewport utilities', () => {
         viewport.transformPointToOrthographicWorldSpace(
           Point.create(10, 10),
           buffer,
-          0.5
+          0.5 * DepthBuffer.MAX_DEPTH_VALUE
         )
       ).toMatchObject(Ray.at(ray, depth));
     });
