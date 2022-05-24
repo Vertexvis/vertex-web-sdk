@@ -48,7 +48,7 @@
     "@improbable-eng/grpc-web": "^0.15.0",
     "@stencil/core": "^2.12.1",
     "@types/classnames": "^2.3.1",
-    "@vertexvis/frame-streaming-protos": "^0.6.21",
+    "@vertexvis/frame-streaming-protos": "^0.6.22",
     "@vertexvis/geometry": "0.13.1",
     "@vertexvis/html-templates": "0.13.1",
     "@vertexvis/scene-tree-protos": "^0.1.14",
