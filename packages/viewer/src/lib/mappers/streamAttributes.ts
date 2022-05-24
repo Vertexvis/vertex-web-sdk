@@ -81,9 +81,7 @@ const toPbFeatureHighlight: M.Func<
 
 const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> =
   M.defineMapper(
-    (noDefaultLights) => {
-      return noDefaultLights ? noDefaultLights : false;
-    },
+    (noDefaultLights) => !!noDefaultLights,
     (attr) => attr
   );
 
