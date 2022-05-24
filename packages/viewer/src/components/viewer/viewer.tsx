@@ -225,6 +225,13 @@ export class Viewer {
   @Prop() public experimentalGhostingOpacity = 0;
 
   /**
+   * Specifies whether to use the default lights for the scene. When false, default
+   * lights are used. When true, no default lights are used, and the lights must
+   * be specified separately.
+   */
+  @Prop() public noDefaultLights = false;
+
+  /**
    * Specifies if and how to render feature lines.
    */
   @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
@@ -759,6 +766,11 @@ export class Viewer {
     this.updateStreamAttributes();
   }
 
+  @Watch('noDefaultLights')
+  protected handleNoDefaultLightsChanged(): void {
+    this.updateStreamAttributes();
+  }
+
   /**
    * @ignore
    */
@@ -1234,6 +1246,7 @@ export class Viewer {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalGhosting: this.experimentalGhostingOpacity,
+      noDefaultLights: this.noDefaultLights,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,

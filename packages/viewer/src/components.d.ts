@@ -454,6 +454,10 @@ export namespace Components {
      */
     load: (urn: string) => Promise<void>;
     /**
+     * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
+     */
+    noDefaultLights: boolean;
+    /**
      * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
      * @example
      * ```
@@ -1846,6 +1850,10 @@ declare namespace LocalJSX {
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
     keyboardControls?: boolean;
+    /**
+     * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
+     */
+    noDefaultLights?: boolean;
     /**
      * Emits an event when the camera type changes.
      */
