@@ -102,7 +102,7 @@ export class DepthBuffer implements FrameImageLike {
       fallbackNormalizedDepth
     );
 
-    return depth * (far - near) + near / 2;
+    return depth * (far - near);
   }
 
   /**
