@@ -5,17 +5,13 @@ import { ShapeProps } from 'regl-shape';
 import { CreateShape } from '../../lib/transforms/shape';
 import { Drawable, DrawablePoints } from './drawable';
 
-export class TriangleMeshPoints implements DrawablePoints {
+export class AxisLinePoints implements DrawablePoints {
   public constructor(
     public valid: boolean,
-    public worldBase: Vector3.Vector3,
-    public worldLeft: Vector3.Vector3,
-    public worldRight: Vector3.Vector3,
-    public worldTip: Vector3.Vector3,
-    public base: Point.Point,
-    public left: Point.Point,
-    public right: Point.Point,
-    public tip: Point.Point
+    public worldOrigin: Vector3.Vector3,
+    public worldEnd: Vector3.Vector3,
+    public origin: Point.Point,
+    public end: Point.Point
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -25,19 +21,19 @@ export class TriangleMeshPoints implements DrawablePoints {
   }
 
   public toWorldArray(): Vector3.Vector3[] {
-    return [this.worldBase, this.worldLeft, this.worldRight, this.worldTip];
+    return [this.worldOrigin, this.worldEnd];
   }
 
   public toArray(): Point.Point[] {
-    return [this.base, this.left, this.tip, this.right, this.base];
+    return [this.origin, this.end];
   }
 }
 
-export class TriangleMesh extends Drawable<TriangleMeshPoints> {
+export class AxisLine extends Drawable<AxisLinePoints> {
   public constructor(
     createShape: CreateShape,
     identifier: string,
-    points: TriangleMeshPoints,
+    points: AxisLinePoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {}
@@ -55,17 +51,15 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
   }
 }
 
-export class DiamondMeshPoints implements DrawablePoints {
+export class RotationLinePoints implements DrawablePoints {
   public constructor(
     public valid: boolean,
-    public worldBase: Vector3.Vector3,
-    public worldLeft: Vector3.Vector3,
-    public worldRight: Vector3.Vector3,
-    public worldTip: Vector3.Vector3,
-    public base: Point.Point,
-    public left: Point.Point,
-    public right: Point.Point,
-    public tip: Point.Point
+    public worldStart: Vector3.Vector3,
+    public worldCenter: Vector3.Vector3,
+    public worldEnd: Vector3.Vector3,
+    public start: Point.Point,
+    public center: Point.Point,
+    public end: Point.Point
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -75,19 +69,19 @@ export class DiamondMeshPoints implements DrawablePoints {
   }
 
   public toWorldArray(): Vector3.Vector3[] {
-    return [this.worldBase, this.worldLeft, this.worldRight, this.worldTip];
+    return [this.worldStart, this.worldCenter, this.worldEnd];
   }
 
   public toArray(): Point.Point[] {
-    return [this.base, this.left, this.tip, this.right, this.base];
+    return [this.start, this.center, this.end];
   }
 }
 
-export class DiamondMesh extends Drawable<DiamondMeshPoints> {
+export class RotationLine extends Drawable<RotationLinePoints> {
   public constructor(
     createShape: CreateShape,
     identifier: string,
-    points: DiamondMeshPoints,
+    points: RotationLinePoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {}

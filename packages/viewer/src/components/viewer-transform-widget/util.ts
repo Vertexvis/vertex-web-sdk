@@ -111,11 +111,21 @@ export function computeUpdatedTransform(
         )
       );
     case 'x-rotate': {
+      const rotation = Quaternion.fromMatrixRotation(current);
+      const rotatedRight = Vector3.transformMatrix(
+        Vector3.right(),
+        Matrix4.makeRotation(rotation)
+      );
+      const rotatedLeft = Vector3.transformMatrix(
+        Vector3.left(),
+        Matrix4.makeRotation(rotation)
+      );
+
       const rotationAxis =
-        Vector3.dot(viewVector, Vector3.right()) >
-        Vector3.dot(viewVector, Vector3.left())
-          ? Vector3.right()
-          : Vector3.left();
+        Vector3.dot(viewVector, rotatedRight) >
+        Vector3.dot(viewVector, rotatedLeft)
+          ? rotatedRight
+          : rotatedLeft;
 
       return computeRotation(
         Quaternion.fromAxisAngle(rotationAxis, angle),
@@ -123,11 +133,21 @@ export function computeUpdatedTransform(
       );
     }
     case 'y-rotate': {
+      const rotation = Quaternion.fromMatrixRotation(current);
+      const rotatedUp = Vector3.transformMatrix(
+        Vector3.up(),
+        Matrix4.makeRotation(rotation)
+      );
+      const rotatedDown = Vector3.transformMatrix(
+        Vector3.down(),
+        Matrix4.makeRotation(rotation)
+      );
+
       const rotationAxis =
-        Vector3.dot(viewVector, Vector3.up()) >
-        Vector3.dot(viewVector, Vector3.down())
-          ? Vector3.up()
-          : Vector3.down();
+        Vector3.dot(viewVector, rotatedUp) >
+        Vector3.dot(viewVector, rotatedDown)
+          ? rotatedUp
+          : rotatedDown;
 
       return computeRotation(
         Quaternion.fromAxisAngle(rotationAxis, angle),
@@ -135,11 +155,21 @@ export function computeUpdatedTransform(
       );
     }
     case 'z-rotate': {
+      const rotation = Quaternion.fromMatrixRotation(current);
+      const rotatedForward = Vector3.transformMatrix(
+        Vector3.forward(),
+        Matrix4.makeRotation(rotation)
+      );
+      const rotatedBack = Vector3.transformMatrix(
+        Vector3.back(),
+        Matrix4.makeRotation(rotation)
+      );
+
       const rotationAxis =
-        Vector3.dot(viewVector, Vector3.forward()) >
-        Vector3.dot(viewVector, Vector3.back())
-          ? Vector3.forward()
-          : Vector3.back();
+        Vector3.dot(viewVector, rotatedForward) >
+        Vector3.dot(viewVector, rotatedBack)
+          ? rotatedForward
+          : rotatedBack;
 
       return computeRotation(
         Quaternion.fromAxisAngle(rotationAxis, angle),

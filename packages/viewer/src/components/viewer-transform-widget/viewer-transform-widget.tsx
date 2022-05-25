@@ -14,7 +14,7 @@ import classNames from 'classnames';
 
 import { readDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
-import { Mesh } from '../../lib/transforms/mesh';
+import { Drawable } from '../../lib/transforms/drawable';
 import {
   computeUpdatedTransform,
   convertCanvasPointToWorld,
@@ -73,7 +73,7 @@ export class ViewerTransformWidget {
    * Visible for testing.
    */
   @Prop({ mutable: true })
-  public hovered?: Mesh;
+  public hovered?: Drawable;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -88,7 +88,7 @@ export class ViewerTransformWidget {
   private disabledColor: Color.Color | string = '#cccccc';
 
   private widget?: TransformWidget;
-  private dragging?: Mesh;
+  private dragging?: Drawable;
   private lastAngle = 0;
   private lastWorldPosition?: Vector3.Vector3;
 
@@ -203,8 +203,8 @@ export class ViewerTransformWidget {
     );
   }
 
-  private handleHoveredMeshChanged = (mesh: Mesh | undefined): void => {
-    this.hovered = mesh;
+  private handleHoveredDrawableChanged = (drawable?: Drawable): void => {
+    this.hovered = drawable;
   };
 
   private handleViewerFrameDrawn = (): void => {
@@ -436,7 +436,7 @@ export class ViewerTransformWidget {
     }
 
     this.hoveredChangeDisposable = this.widget.onHoveredChanged(
-      this.handleHoveredMeshChanged
+      this.handleHoveredDrawableChanged
     );
 
     return this.widget;

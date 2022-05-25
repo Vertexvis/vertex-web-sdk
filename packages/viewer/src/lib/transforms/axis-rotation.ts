@@ -56,6 +56,15 @@ function computeRotationNdcValues(
     Vector3.add(xDirection, yDirection),
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
+  const transformedX = Vector3.transformMatrix(
+    xDirection,
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+  );
+  const transformedY = Vector3.transformMatrix(
+    yDirection,
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+  );
+  console.log(xDirection, yDirection, transformedX, transformedY)
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
@@ -64,13 +73,13 @@ function computeRotationNdcValues(
 
   const xRay = Ray.create({
     origin: position,
-    direction: xDirection,
+    direction: transformedX,
   });
   const yRay = Ray.create({
     origin: position,
-    direction: yDirection
+    direction: transformedY
   });
-  const rotationAxis = Vector3.cross(xDirection, yDirection);
+  const rotationAxis = Vector3.cross(transformedX, transformedY);
 
   const base = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(yRay, -(triangleSize * 1.25)), rotationAxis, position)
   const right = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(xRay, triangleSize * 1.25), rotationAxis, position)

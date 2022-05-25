@@ -1,18 +1,19 @@
 import { BoundingBox, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Frame, Viewport } from '../../lib/types';
-import { DiamondMesh, Mesh, TriangleMesh } from './mesh';
+import { Drawable } from './drawable';
+import { DiamondMesh, TriangleMesh } from './mesh';
 
-export function testMesh(
-  mesh: Mesh,
+export function testDrawable(
+  drawable: Drawable,
   frame: Frame,
   viewport: Viewport,
   point: Point.Point
 ): boolean {
-  if (mesh instanceof TriangleMesh) {
-    return testTriangleMesh(mesh, frame, viewport, point);
-  } else if (mesh instanceof DiamondMesh) {
-    return testDiamondMesh(mesh, frame, viewport, point);
+  if (drawable instanceof TriangleMesh) {
+    return testTriangleMesh(drawable, frame, viewport, point);
+  } else if (drawable instanceof DiamondMesh) {
+    return testDiamondMesh(drawable, frame, viewport, point);
   }
   return false;
 }

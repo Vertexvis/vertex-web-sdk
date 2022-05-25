@@ -53,7 +53,7 @@ import { PinController } from "./lib/pins/controller";
 import { ViewerToolbarDirection, ViewerToolbarPlacement as ViewerToolbarPlacement1 } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { TransformController } from "./lib/transforms/controller";
-import { Mesh } from "./lib/transforms/mesh";
+import { Drawable } from "./lib/transforms/drawable";
 export namespace Components {
     interface VertexSceneTree {
         /**
@@ -1137,7 +1137,7 @@ export namespace Components {
         /**
           * @ignore Visible for testing.
          */
-        "hovered"?: Mesh;
+        "hovered"?: Drawable;
         /**
           * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
          */
@@ -2479,7 +2479,7 @@ declare namespace LocalJSX {
         /**
           * @ignore Visible for testing.
          */
-        "hovered"?: Mesh;
+        "hovered"?: Drawable;
         /**
           * An event that is emitted when the interaction has ended
          */

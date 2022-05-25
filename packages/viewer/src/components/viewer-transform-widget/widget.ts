@@ -15,14 +15,13 @@ import {
   yAxisArrowPositions,
   zAxisArrowPositions,
 } from '../../lib/transforms/axis-translation';
-import { testMesh } from '../../lib/transforms/hits';
 import {
-  AxisMesh,
-  computeMesh2dBounds,
-  DiamondMesh,
-  Mesh,
-  TriangleMesh,
-} from '../../lib/transforms/mesh';
+  computeDrawable2dBounds,
+  Drawable,
+} from '../../lib/transforms/drawable';
+import { testDrawable } from '../../lib/transforms/hits';
+import { AxisLine } from '../../lib/transforms/line';
+import { DiamondMesh, TriangleMesh } from '../../lib/transforms/mesh';
 import { Frame, Viewport } from '../../lib/types';
 
 export interface MeshColors {
@@ -45,9 +44,9 @@ export class TransformWidget implements Disposable {
   private viewport: Viewport;
   private cursor?: Point.Point;
 
-  private xAxis?: AxisMesh;
-  private yAxis?: AxisMesh;
-  private zAxis?: AxisMesh;
+  private xAxis?: AxisLine;
+  private yAxis?: AxisLine;
+  private zAxis?: AxisLine;
   private xArrow?: TriangleMesh;
   private yArrow?: TriangleMesh;
   private zArrow?: TriangleMesh;
@@ -55,11 +54,11 @@ export class TransformWidget implements Disposable {
   private yRotation?: DiamondMesh;
   private zRotation?: DiamondMesh;
 
-  private axisMeshes: AxisMesh[] = [];
+  private axisLines: AxisLine[] = [];
   private triangleMeshes: TriangleMesh[] = [];
   private diamondMeshes: DiamondMesh[] = [];
-  private drawableMeshes: Mesh[] = [];
-  private hoveredMesh?: Mesh;
+  private drawableElements: Drawable[] = [];
+  private hoveredElement?: Drawable;
 
   private frame?: Frame;
   private transform?: Matrix4.Matrix4;
@@ -67,7 +66,7 @@ export class TransformWidget implements Disposable {
 
   private reglFrameDisposable?: regl.Cancellable;
 
-  private hoveredChanged = new EventDispatcher<Mesh | undefined>();
+  private hoveredChanged = new EventDispatcher<Drawable | undefined>();
 
   private xArrowFillColor?: Color.Color | string;
   private yArrowFillColor?: Color.Color | string;
@@ -95,8 +94,8 @@ export class TransformWidget implements Disposable {
   /**
    * @internal - visible for testing
    */
-  public getDrawableMeshes(): Mesh[] {
-    return this.drawableMeshes;
+  public getDrawableElements(): Drawable[] {
+    return this.drawableElements;
   }
 
   public boundsContainsPoint(point: Point.Point): boolean {
@@ -114,7 +113,7 @@ export class TransformWidget implements Disposable {
       this.createOrUpdateMeshes(this.transform, frame);
       this.sortMeshes(
         frame,
-        ...this.axisMeshes,
+        ...this.axisLines,
         ...this.triangleMeshes,
         ...this.diamondMeshes
       );
@@ -139,7 +138,7 @@ export class TransformWidget implements Disposable {
       this.createOrUpdateMeshes(transform, this.frame);
       this.sortMeshes(
         this.frame,
-        ...this.axisMeshes,
+        ...this.axisLines,
         ...this.triangleMeshes,
         ...this.diamondMeshes
       );
@@ -161,21 +160,26 @@ export class TransformWidget implements Disposable {
     this.xArrow?.updateFillColor(this.xArrowFillColor);
     this.yArrow?.updateFillColor(this.yArrowFillColor);
     this.zArrow?.updateFillColor(this.zArrowFillColor);
-    this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
+    this.xRotation?.updateFillColor(this.xArrowFillColor);
+    this.yRotation?.updateFillColor(this.yArrowFillColor);
+    this.zRotation?.updateFillColor(this.zArrowFillColor);
+    this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
 
   public updateDimensions(canvasElement: HTMLCanvasElement): void {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
   }
 
-  public onHoveredChanged(listener: Listener<Mesh | undefined>): Disposable {
+  public onHoveredChanged(
+    listener: Listener<Drawable | undefined>
+  ): Disposable {
     return this.hoveredChanged.on(listener);
   }
 
   private draw(): void {
     if (this.reglFrameDisposable == null) {
       this.reglFrameDisposable = this.reglCommand?.frame(() => {
-        this.drawableMeshes.forEach((m) => m.draw({ fill: m.fillColor }));
+        this.drawableElements.forEach((el) => el.draw({ fill: el.fillColor }));
       });
     }
   }
@@ -187,49 +191,49 @@ export class TransformWidget implements Disposable {
   }
 
   private updateHovered(): void {
-    const previousHovered = this.hoveredMesh;
+    const previousHovered = this.hoveredElement;
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredMesh = [...this.triangleMeshes, ...this.diamondMeshes]
-        .filter((m) => m.points.valid)
+      this.hoveredElement = [...this.triangleMeshes, ...this.diamondMeshes]
+        .filter((el) => el.points.valid)
         .find((m) =>
           this.cursor != null
-            ? testMesh(m, currentFrame, this.viewport, this.cursor)
+            ? testDrawable(m, currentFrame, this.viewport, this.cursor)
             : false
         );
 
-      if (this.hoveredMesh !== previousHovered) {
-        this.hoveredChanged.emit(this.hoveredMesh);
-        this.hoveredMesh?.updateFillColor(this.hoveredArrowFillColor);
+      if (this.hoveredElement !== previousHovered) {
+        this.hoveredChanged.emit(this.hoveredElement);
+        this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
         previousHovered?.updateFillColor(previousHovered?.initialFillColor);
       }
     }
   }
 
   private clearHovered(): void {
-    const previousHovered = this.hoveredMesh;
-    this.hoveredMesh = undefined;
+    const previousHovered = this.hoveredElement;
+    this.hoveredElement = undefined;
 
-    if (this.hoveredMesh !== previousHovered) {
-      this.hoveredChanged.emit(this.hoveredMesh);
+    if (this.hoveredElement !== previousHovered) {
+      this.hoveredChanged.emit(this.hoveredElement);
       previousHovered.updateFillColor(previousHovered.initialFillColor);
     }
   }
 
-  private sortMeshes(frame: Frame, ...meshes: Mesh[]): void {
-    const compare = (m1: Mesh, m2: Mesh): number =>
-      m1.points.shortestDistanceFrom(frame.scene.camera.position) -
-      m2.points.shortestDistanceFrom(frame.scene.camera.position);
+  private sortMeshes(frame: Frame, ...meshes: Drawable[]): void {
+    const compare = (d1: Drawable, d2: Drawable): number =>
+      d1.points.shortestDistanceFrom(frame.scene.camera.position) -
+      d2.points.shortestDistanceFrom(frame.scene.camera.position);
 
-    this.axisMeshes = this.axisMeshes.sort(compare);
+    this.axisLines = this.axisLines.sort(compare);
     this.triangleMeshes = this.triangleMeshes.sort(compare);
     this.diamondMeshes = this.diamondMeshes.sort(compare);
 
     // Reverse sorted meshes to draw the closest mesh last.
     // This causes it to appear above any other mesh.
-    this.drawableMeshes = meshes
-      .filter((m) => m.points.valid)
+    this.drawableElements = meshes
+      .filter((el) => el.points.valid)
       .sort(compare)
       .reverse();
   }
@@ -241,7 +245,10 @@ export class TransformWidget implements Disposable {
       this.updateMeshes(transform, frame);
     }
 
-    this.bounds = computeMesh2dBounds(this.viewport, ...this.triangleMeshes);
+    this.bounds = computeDrawable2dBounds(
+      this.viewport,
+      ...this.triangleMeshes
+    );
   }
 
   private createMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
@@ -267,7 +274,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.xArrowFillColor
     );
-    this.xAxis = new AxisMesh(
+    this.xAxis = new AxisLine(
       createShape,
       'x-axis',
       axisPositions(transform, frame.scene.camera, this.xArrow),
@@ -289,7 +296,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.yArrowFillColor
     );
-    this.yAxis = new AxisMesh(
+    this.yAxis = new AxisLine(
       createShape,
       'y-axis',
       axisPositions(transform, frame.scene.camera, this.yArrow),
@@ -304,7 +311,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.zArrowFillColor
     );
-    this.zAxis = new AxisMesh(
+    this.zAxis = new AxisLine(
       createShape,
       'z-axis',
       axisPositions(transform, frame.scene.camera, this.zArrow),
@@ -320,7 +327,7 @@ export class TransformWidget implements Disposable {
       this.zArrowFillColor
     );
 
-    this.axisMeshes = [this.xAxis, this.yAxis, this.zAxis];
+    this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
     this.triangleMeshes = [this.xArrow, this.yArrow, this.zArrow];
     this.diamondMeshes = [this.xRotation, this.yRotation, this.zRotation];
   }
