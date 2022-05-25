@@ -9,12 +9,12 @@ import { Color } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
-import { axisPositions } from '../../../lib/transforms/axis';
+import { axisPositions } from '../../../lib/transforms/axis-lines';
 import {
   xAxisArrowPositions,
   yAxisArrowPositions,
   zAxisArrowPositions,
-} from '../../../lib/transforms/axis-arrows';
+} from '../../../lib/transforms/axis-translation';
 import { testTriangleMesh } from '../../../lib/transforms/hits';
 import { AxisMesh, TriangleMesh } from '../../../lib/transforms/mesh';
 import { flattenPointArray } from '../../../lib/transforms/util';

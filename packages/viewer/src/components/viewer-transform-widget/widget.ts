@@ -1,18 +1,25 @@
+import { Matrix4 } from '@vertexvis/geometry';
 import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
-import { axisPositions } from '../../lib/transforms/axis';
+import { axisPositions } from '../../lib/transforms/axis-lines';
+import {
+  xAxisRotationPositions,
+  yAxisRotationPositions,
+  zAxisRotationPositions,
+} from '../../lib/transforms/axis-rotation';
 import {
   xAxisArrowPositions,
   yAxisArrowPositions,
   zAxisArrowPositions,
-} from '../../lib/transforms/axis-arrows';
-import { testTriangleMesh } from '../../lib/transforms/hits';
+} from '../../lib/transforms/axis-translation';
+import { testMesh } from '../../lib/transforms/hits';
 import {
   AxisMesh,
   computeMesh2dBounds,
+  DiamondMesh,
   Mesh,
   TriangleMesh,
 } from '../../lib/transforms/mesh';
@@ -44,14 +51,18 @@ export class TransformWidget implements Disposable {
   private xArrow?: TriangleMesh;
   private yArrow?: TriangleMesh;
   private zArrow?: TriangleMesh;
+  private xRotation?: DiamondMesh;
+  private yRotation?: DiamondMesh;
+  private zRotation?: DiamondMesh;
 
   private axisMeshes: AxisMesh[] = [];
   private triangleMeshes: TriangleMesh[] = [];
+  private diamondMeshes: DiamondMesh[] = [];
   private drawableMeshes: Mesh[] = [];
   private hoveredMesh?: Mesh;
 
   private frame?: Frame;
-  private position?: Vector3.Vector3;
+  private transform?: Matrix4.Matrix4;
   private bounds?: Rectangle.Rectangle;
 
   private reglFrameDisposable?: regl.Cancellable;
@@ -99,9 +110,14 @@ export class TransformWidget implements Disposable {
   public updateFrame(frame: Frame, updateMeshes = true): void {
     this.frame = frame;
 
-    if (updateMeshes && frame != null && this.position != null) {
-      this.createOrUpdateMeshes(this.position, frame);
-      this.sortMeshes(frame, ...this.axisMeshes, ...this.triangleMeshes);
+    if (updateMeshes && frame != null && this.transform != null) {
+      this.createOrUpdateMeshes(this.transform, frame);
+      this.sortMeshes(
+        frame,
+        ...this.axisMeshes,
+        ...this.triangleMeshes,
+        ...this.diamondMeshes
+      );
       this.draw();
     }
   }
@@ -116,12 +132,17 @@ export class TransformWidget implements Disposable {
     }
   }
 
-  public updatePosition(position?: Vector3.Vector3): void {
-    this.position = position;
+  public updateTransform(transform?: Matrix4.Matrix4): void {
+    this.transform = transform;
 
-    if (position != null && this.frame != null) {
-      this.createOrUpdateMeshes(position, this.frame);
-      this.sortMeshes(this.frame, ...this.axisMeshes, ...this.triangleMeshes);
+    if (transform != null && this.frame != null) {
+      this.createOrUpdateMeshes(transform, this.frame);
+      this.sortMeshes(
+        this.frame,
+        ...this.axisMeshes,
+        ...this.triangleMeshes,
+        ...this.diamondMeshes
+      );
       this.draw();
     } else {
       this.clear();
@@ -170,11 +191,11 @@ export class TransformWidget implements Disposable {
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredMesh = this.triangleMeshes
+      this.hoveredMesh = [...this.triangleMeshes, ...this.diamondMeshes]
         .filter((m) => m.points.valid)
         .find((m) =>
           this.cursor != null
-            ? testTriangleMesh(m, currentFrame, this.viewport, this.cursor)
+            ? testMesh(m, currentFrame, this.viewport, this.cursor)
             : false
         );
 
@@ -203,6 +224,7 @@ export class TransformWidget implements Disposable {
 
     this.axisMeshes = this.axisMeshes.sort(compare);
     this.triangleMeshes = this.triangleMeshes.sort(compare);
+    this.diamondMeshes = this.diamondMeshes.sort(compare);
 
     // Reverse sorted meshes to draw the closest mesh last.
     // This causes it to appear above any other mesh.
@@ -212,36 +234,43 @@ export class TransformWidget implements Disposable {
       .reverse();
   }
 
-  private createOrUpdateMeshes(position: Vector3.Vector3, frame: Frame): void {
+  private createOrUpdateMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
     if (this.xArrow == null || this.yArrow == null || this.zArrow == null) {
-      this.createMeshes(position, frame);
+      this.createMeshes(transform, frame);
     } else {
-      this.updateMeshes(position, frame);
+      this.updateMeshes(transform, frame);
     }
 
     this.bounds = computeMesh2dBounds(this.viewport, ...this.triangleMeshes);
   }
 
-  private createMeshes(position: Vector3.Vector3, frame: Frame): void {
+  private createMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
     this.reglCommand = regl({
       canvas: this.canvasElement,
       extensions: ['ANGLE_instanced_arrays'],
     });
     const { createShape } = shapeBuilder(this.reglCommand);
 
-    const triangleSize = this.computeTriangleSize(position, frame);
+    const triangleSize = this.computeTriangleSize(transform, frame);
 
     this.xArrow = new TriangleMesh(
       createShape,
       'x-translate',
-      xAxisArrowPositions(position, frame.scene.camera, triangleSize),
+      xAxisArrowPositions(transform, frame.scene.camera, triangleSize),
+      this.outlineColor,
+      this.xArrowFillColor
+    );
+    this.xRotation = new DiamondMesh(
+      createShape,
+      'x-rotate',
+      xAxisRotationPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
       this.xArrowFillColor
     );
     this.xAxis = new AxisMesh(
       createShape,
       'x-axis',
-      axisPositions(position, frame.scene.camera, this.xArrow),
+      axisPositions(transform, frame.scene.camera, this.xArrow),
       this.outlineColor,
       this.xArrowFillColor,
       { thickness: 3 }
@@ -249,14 +278,21 @@ export class TransformWidget implements Disposable {
     this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
-      yAxisArrowPositions(position, frame.scene.camera, triangleSize),
+      yAxisArrowPositions(transform, frame.scene.camera, triangleSize),
+      this.outlineColor,
+      this.yArrowFillColor
+    );
+    this.yRotation = new DiamondMesh(
+      createShape,
+      'y-rotate',
+      yAxisRotationPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
       this.yArrowFillColor
     );
     this.yAxis = new AxisMesh(
       createShape,
       'y-axis',
-      axisPositions(position, frame.scene.camera, this.yArrow),
+      axisPositions(transform, frame.scene.camera, this.yArrow),
       this.outlineColor,
       this.yArrowFillColor,
       { thickness: 3 }
@@ -264,55 +300,77 @@ export class TransformWidget implements Disposable {
     this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
-      zAxisArrowPositions(position, frame.scene.camera, triangleSize),
+      zAxisArrowPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
       this.zArrowFillColor
     );
     this.zAxis = new AxisMesh(
       createShape,
       'z-axis',
-      axisPositions(position, frame.scene.camera, this.zArrow),
+      axisPositions(transform, frame.scene.camera, this.zArrow),
       this.outlineColor,
       this.zArrowFillColor,
       { thickness: 3 }
     );
+    this.zRotation = new DiamondMesh(
+      createShape,
+      'z-rotate',
+      zAxisRotationPositions(transform, frame.scene.camera, triangleSize),
+      this.outlineColor,
+      this.zArrowFillColor
+    );
 
     this.axisMeshes = [this.xAxis, this.yAxis, this.zAxis];
     this.triangleMeshes = [this.xArrow, this.yArrow, this.zArrow];
+    this.diamondMeshes = [this.xRotation, this.yRotation, this.zRotation];
   }
 
-  private updateMeshes(position: Vector3.Vector3, frame: Frame): void {
-    const triangleSize = this.computeTriangleSize(position, frame);
+  private updateMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
+    const triangleSize = this.computeTriangleSize(transform, frame);
 
     if (this.xArrow != null) {
       this.xArrow.updatePoints(
-        xAxisArrowPositions(position, frame.scene.camera, triangleSize)
+        xAxisArrowPositions(transform, frame.scene.camera, triangleSize)
       );
       this.xAxis?.updatePoints(
-        axisPositions(position, frame.scene.camera, this.xArrow)
+        axisPositions(transform, frame.scene.camera, this.xArrow)
       );
     }
+    this.xRotation?.updatePoints(
+      xAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+    );
 
     if (this.yArrow != null) {
       this.yArrow.updatePoints(
-        yAxisArrowPositions(position, frame.scene.camera, triangleSize)
+        yAxisArrowPositions(transform, frame.scene.camera, triangleSize)
       );
       this.yAxis?.updatePoints(
-        axisPositions(position, frame.scene.camera, this.yArrow)
+        axisPositions(transform, frame.scene.camera, this.yArrow)
       );
     }
+    this.yRotation?.updatePoints(
+      yAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+    );
 
     if (this.zArrow != null) {
       this.zArrow.updatePoints(
-        zAxisArrowPositions(position, frame.scene.camera, triangleSize)
+        zAxisArrowPositions(transform, frame.scene.camera, triangleSize)
       );
       this.zAxis?.updatePoints(
-        axisPositions(position, frame.scene.camera, this.zArrow)
+        axisPositions(transform, frame.scene.camera, this.zArrow)
       );
     }
+    this.zRotation?.updatePoints(
+      zAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+    );
   }
 
-  private computeTriangleSize(position: Vector3.Vector3, frame: Frame): number {
+  private computeTriangleSize(
+    transform: Matrix4.Matrix4,
+    frame: Frame
+  ): number {
+    const position = Vector3.fromMatrixPosition(transform);
+
     return (
       (frame.scene.camera.isOrthographic()
         ? frame.scene.camera.fovHeight

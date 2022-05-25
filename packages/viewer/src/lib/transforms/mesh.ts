@@ -18,7 +18,7 @@ export interface MeshPoints {
 export abstract class Mesh<T extends MeshPoints = MeshPoints> {
   protected pointsArray: Float64Array;
 
-  public initialFillColor: string;
+  public initialFillColor?: string;
 
   public draw: DrawShape;
 
@@ -27,7 +27,7 @@ export abstract class Mesh<T extends MeshPoints = MeshPoints> {
     public identifier: string,
     public points: T,
     public outlineColor: string,
-    public fillColor: string,
+    public fillColor?: string,
     public shapeProps: Partial<ShapeProps> = {}
   ) {
     const pointsAsArray = points.toArray();
@@ -143,6 +143,56 @@ export class TriangleMesh extends Mesh<TriangleMeshPoints> {
     createShape: CreateShape,
     identifier: string,
     points: TriangleMeshPoints,
+    outlineColor: Color.Color | string = '#000000',
+    fillColor: Color.Color | string = '#000000',
+    shapeProps: Partial<ShapeProps> = {}
+  ) {
+    super(
+      createShape,
+      identifier,
+      points,
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
+      typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
+      shapeProps
+    );
+  }
+}
+
+export class DiamondMeshPoints implements MeshPoints {
+  public constructor(
+    public valid: boolean,
+    public worldBase: Vector3.Vector3,
+    public worldLeft: Vector3.Vector3,
+    public worldRight: Vector3.Vector3,
+    public worldTip: Vector3.Vector3,
+    public base: Point.Point,
+    public left: Point.Point,
+    public right: Point.Point,
+    public tip: Point.Point
+  ) {}
+
+  public shortestDistanceFrom(vector: Vector3.Vector3): number {
+    return this.toWorldArray()
+      .map((v) => Vector3.distance(v, vector))
+      .sort((a, b) => a - b)[0];
+  }
+
+  public toWorldArray(): Vector3.Vector3[] {
+    return [this.worldBase, this.worldLeft, this.worldRight, this.worldTip];
+  }
+
+  public toArray(): Point.Point[] {
+    return [this.base, this.left, this.tip, this.right, this.base];
+  }
+}
+
+export class DiamondMesh extends Mesh<DiamondMeshPoints> {
+  public constructor(
+    createShape: CreateShape,
+    identifier: string,
+    points: DiamondMeshPoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {}

@@ -8,7 +8,7 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Angle, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -16,7 +16,7 @@ import { readDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Mesh } from '../../lib/transforms/mesh';
 import {
-  computeUpdatedPosition,
+  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
@@ -78,7 +78,8 @@ export class ViewerTransformWidget {
   @Element()
   private hostEl!: HTMLElement;
 
-  private currentPosition?: Vector3.Vector3;
+  private startingTransform?: Matrix4.Matrix4;
+  private currentTransform?: Matrix4.Matrix4;
 
   private xArrowColor: Color.Color | string = '#ea3324';
   private yArrowColor: Color.Color | string = '#4faf32';
@@ -88,6 +89,7 @@ export class ViewerTransformWidget {
 
   private widget?: TransformWidget;
   private dragging?: Mesh;
+  private lastAngle = 0;
   private lastWorldPosition?: Vector3.Vector3;
 
   private canvasBounds?: DOMRect;
@@ -166,14 +168,15 @@ export class ViewerTransformWidget {
     newPosition?: Vector3.Vector3,
     oldPosition?: Vector3.Vector3
   ): void {
-    this.currentPosition = newPosition;
+    this.currentTransform = this.getTransform(oldPosition, newPosition);
+    this.startingTransform = this.currentTransform;
 
     console.debug(
       `Updating widget position [previous=${JSON.stringify(
         newPosition
       )}, current=${JSON.stringify(oldPosition)}]`
     );
-    this.widget?.updatePosition(this.currentPosition);
+    this.widget?.updateTransform(this.currentTransform);
 
     if (newPosition == null) {
       this.controller?.clearTransform();
@@ -232,16 +235,36 @@ export class ViewerTransformWidget {
   };
 
   private handleBeginDrag = async (event: PointerEvent): Promise<void> => {
-    if (this.hovered != null) {
+    const canvasBounds = this.getCanvasBounds();
+
+    if (
+      this.hovered != null &&
+      canvasBounds != null &&
+      this.viewer != null &&
+      this.position != null &&
+      this.viewer.frame != null
+    ) {
       this.dragging = this.hovered;
+
+      const currentCanvas = convertPointToCanvas(
+        Point.create(event.clientX, event.clientY),
+        canvasBounds
+      );
+      const widgetCenter = this.viewer.viewport.transformWorldToViewport(
+        this.position,
+        this.viewer.frame.scene.camera.projectionViewMatrix
+      );
+
+      this.lastAngle =
+        currentCanvas != null
+          ? Angle.fromPoints(widgetCenter, currentCanvas)
+          : 0;
+
       this.lastWorldPosition = convertCanvasPointToWorld(
-        convertPointToCanvas(
-          Point.create(event.clientX, event.clientY),
-          this.getCanvasBounds()
-        ),
+        currentCanvas,
         this.viewer?.frame,
         this.viewer?.viewport,
-        this.currentPosition
+        this.currentTransform
       );
 
       this.controller?.beginTransform();
@@ -254,21 +277,47 @@ export class ViewerTransformWidget {
   };
 
   private handleDrag = async (event: PointerEvent): Promise<void> => {
-    if (this.dragging != null && this.lastWorldPosition != null) {
-      const currentWorld = convertCanvasPointToWorld(
-        convertPointToCanvas(
-          Point.create(event.clientX, event.clientY),
-          this.getCanvasBounds()
-        ),
-        this.viewer?.frame,
-        this.viewer?.viewport,
-        this.currentPosition
+    const canvasBounds = this.getCanvasBounds();
+
+    if (
+      this.dragging != null &&
+      this.lastWorldPosition != null &&
+      canvasBounds != null &&
+      this.viewer != null &&
+      this.viewer.frame != null &&
+      this.position != null
+    ) {
+      const currentCanvas = convertPointToCanvas(
+        Point.create(event.clientX, event.clientY),
+        canvasBounds
+      );
+      const widgetCenter = this.viewer.viewport.transformWorldToViewport(
+        this.position,
+        this.viewer.frame.scene.camera.projectionViewMatrix
       );
 
-      if (currentWorld != null) {
-        this.transform(this.lastWorldPosition, currentWorld);
+      const currentWorld = convertCanvasPointToWorld(
+        currentCanvas,
+        this.viewer?.frame,
+        this.viewer?.viewport,
+        this.currentTransform
+      );
+
+      if (
+        currentWorld != null &&
+        currentCanvas != null &&
+        widgetCenter != null
+      ) {
+        const angle = Angle.fromPoints(widgetCenter, currentCanvas);
+
+        this.transform(
+          this.lastWorldPosition,
+          currentWorld,
+          angle - this.lastAngle
+        );
 
         this.lastWorldPosition = currentWorld;
+        this.lastAngle = angle;
       }
     }
   };
@@ -282,10 +331,14 @@ export class ViewerTransformWidget {
 
     this.dragging = undefined;
     this.lastWorldPosition = undefined;
-    this.position = this.currentPosition;
+    this.position =
+      this.currentTransform != null
+        ? Vector3.fromMatrixPosition(this.currentTransform)
+        : this.position;
+    this.lastAngle = 0;
 
     widget.updateCursor(canvasPoint);
-    widget.updatePosition(this.currentPosition);
+    widget.updateTransform(this.currentTransform);
     widget.updateColors({
       xArrow: this.disabledColor,
       yArrow: this.disabledColor,
@@ -326,22 +379,34 @@ export class ViewerTransformWidget {
     }
   };
 
-  private transform(previous: Vector3.Vector3, next: Vector3.Vector3): void {
+  private transform(
+    previous: Vector3.Vector3,
+    next: Vector3.Vector3,
+    angle: number
+  ): void {
     if (
       this.position != null &&
-      this.currentPosition != null &&
-      this.dragging != null
+      this.startingTransform != null &&
+      this.currentTransform != null &&
+      this.dragging != null &&
+      this.viewer != null &&
+      this.viewer.frame != null
     ) {
-      this.currentPosition = computeUpdatedPosition(
-        this.currentPosition,
+      this.currentTransform = computeUpdatedTransform(
+        this.currentTransform,
         previous,
         next,
+        this.viewer?.frame.scene.camera.viewVector,
+        angle,
         this.dragging.identifier
       );
 
-      this.getTransformWidget().updatePosition(this.currentPosition);
-      this.controller?.updateTranslation(
-        Vector3.subtract(this.currentPosition, this.position)
+      this.getTransformWidget().updateTransform(this.currentTransform);
+      this.controller?.updateTransform(
+        Matrix4.multiply(
+          this.currentTransform,
+          Matrix4.invert(this.startingTransform)
+        )
       );
     }
   }
@@ -363,8 +428,8 @@ export class ViewerTransformWidget {
     });
 
     if (this.position != null) {
-      this.currentPosition = this.position;
-      this.widget.updatePosition(this.position);
+      this.currentTransform = Matrix4.makeTranslation(this.position);
+      this.widget.updateTransform(this.currentTransform);
     }
     if (this.viewer?.frame != null) {
       this.widget.updateFrame(this.viewer.frame, true);
@@ -383,6 +448,30 @@ export class ViewerTransformWidget {
 
       this.getTransformWidget().updateDimensions(canvasElement);
     });
+  };
+
+  private getTransform = (
+    oldPosition?: Vector3.Vector3,
+    newPosition?: Vector3.Vector3
+  ): Matrix4.Matrix4 | undefined => {
+    if (oldPosition != null && newPosition != null) {
+      const currentTransformAsObject =
+        this.currentTransform != null
+          ? Matrix4.toObject(this.currentTransform)
+          : Matrix4.toObject(Matrix4.makeIdentity());
+
+      // Maintain existing rotation, but update the position
+      // treating it as a global position, rather than applying
+      // the existing rotation to the new position.
+      return Matrix4.fromObject({
+        ...currentTransformAsObject,
+        m14: newPosition.x,
+        m24: newPosition.y,
+        m34: newPosition.z,
+      });
+    } else if (newPosition != null) {
+      return Matrix4.makeTranslation(newPosition);
+    }
   };
 
   private getCanvasBounds = (): DOMRect | undefined => {
