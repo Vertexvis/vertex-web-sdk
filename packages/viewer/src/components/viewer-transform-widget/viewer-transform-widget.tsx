@@ -12,7 +12,7 @@ import { Angle, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
-import { readDOM } from '../../lib/stencil';
+import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Drawable } from '../../lib/transforms/drawable';
 import {
@@ -150,9 +150,15 @@ export class ViewerTransformWidget {
     oldViewer?: HTMLVertexViewerElement
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    oldViewer?.removeEventListener('dimensionschange', this.handleResize);
+    oldViewer?.removeEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange
+    );
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener('dimensionschange', this.handleResize);
+    newViewer?.addEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange
+    );
 
     if (newViewer?.stream != null) {
       this.controller?.dispose();
@@ -209,6 +215,17 @@ export class ViewerTransformWidget {
 
   private handleViewerFrameDrawn = (): void => {
     this.updatePropsFromViewer();
+  };
+
+  private handleViewerDimensionsChange = (): void => {
+    writeDOM(() => {
+      if (this.viewer != null && this.canvasRef != null) {
+        this.canvasRef.width = this.viewer.viewport.width;
+        this.canvasRef.height = this.viewer.viewport.height;
+
+        this.updateCanvasBounds(this.canvasRef);
+      }
+    });
   };
 
   private handleResize = (): void => {

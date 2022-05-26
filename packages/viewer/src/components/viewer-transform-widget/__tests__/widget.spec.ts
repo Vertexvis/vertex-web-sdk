@@ -159,7 +159,7 @@ describe(TransformWidget, () => {
     expect(regl).toHaveBeenCalledWith(
       expect.objectContaining({
         canvas,
-        extensions: ['ANGLE_instanced_arrays'],
+        extensions: 'angle_instanced_arrays',
       })
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalled();

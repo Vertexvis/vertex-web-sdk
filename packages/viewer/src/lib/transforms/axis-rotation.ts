@@ -1,13 +1,13 @@
 import { Angle, Matrix4, Quaternion, Ray, Vector3 } from '@vertexvis/geometry';
 
 import { FrameCameraBase } from '../types';
-import { DiamondMeshPoints } from './mesh';
+import { TriangleMeshPoints } from './mesh';
 
 export function xAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3
-): DiamondMeshPoints {
+): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
@@ -21,7 +21,7 @@ export function yAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3
-): DiamondMeshPoints {
+): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
@@ -35,7 +35,7 @@ export function zAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3
-): DiamondMeshPoints {
+): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
@@ -51,7 +51,7 @@ function computeRotationNdcValues(
   xDirection: Vector3.Vector3,
   yDirection: Vector3.Vector3,
   triangleSize: number
-): DiamondMeshPoints {
+): TriangleMeshPoints {
   const transformedDirection = Vector3.transformMatrix(
     Vector3.add(xDirection, yDirection),
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
@@ -105,7 +105,7 @@ function computeRotationNdcValues(
     position
   );
 
-  return new DiamondMeshPoints(
+  return new TriangleMeshPoints(
     Vector3.dot(transformedX, camera.direction) !== -1 &&
       Vector3.dot(transformedY, camera.direction) !== -1,
     base,

@@ -24,7 +24,7 @@ import {
 } from '../../lib/transforms/drawable';
 import { testDrawable } from '../../lib/transforms/hits';
 import { AxisLine, RotationLine } from '../../lib/transforms/line';
-import { DiamondMesh, TriangleMesh } from '../../lib/transforms/mesh';
+import { TriangleMesh } from '../../lib/transforms/mesh';
 import { CreateShape } from '../../lib/transforms/shape';
 import { Frame, Viewport } from '../../lib/types';
 
@@ -60,20 +60,20 @@ export class TransformWidget implements Disposable {
   private xArrow?: TriangleMesh;
   private yArrow?: TriangleMesh;
   private zArrow?: TriangleMesh;
-  private xRotation?: DiamondMesh;
+  private xRotation?: TriangleMesh;
   private xyRotationLine?: RotationLine;
   private xzRotationLine?: RotationLine;
-  private yRotation?: DiamondMesh;
+  private yRotation?: TriangleMesh;
   private yxRotationLine?: RotationLine;
   private yzRotationLine?: RotationLine;
-  private zRotation?: DiamondMesh;
+  private zRotation?: TriangleMesh;
   private zxRotationLine?: RotationLine;
   private zyRotationLine?: RotationLine;
 
   private axisLines: AxisLine[] = [];
   private rotationLines: RotationLine[] = [];
-  private triangleMeshes: TriangleMesh[] = [];
-  private diamondMeshes: DiamondMesh[] = [];
+  private translationMeshes: TriangleMesh[] = [];
+  private rotationMeshes: TriangleMesh[] = [];
   private drawableElements: Drawable[] = [];
   private hoveredElement?: Drawable;
 
@@ -132,8 +132,8 @@ export class TransformWidget implements Disposable {
         frame,
         ...this.axisLines,
         ...this.rotationLines,
-        ...this.triangleMeshes,
-        ...this.diamondMeshes
+        ...this.translationMeshes,
+        ...this.rotationMeshes
       );
       this.draw();
     }
@@ -158,8 +158,8 @@ export class TransformWidget implements Disposable {
         this.frame,
         ...this.axisLines,
         ...this.rotationLines,
-        ...this.triangleMeshes,
-        ...this.diamondMeshes
+        ...this.translationMeshes,
+        ...this.rotationMeshes
       );
       this.draw();
     } else {
@@ -187,6 +187,10 @@ export class TransformWidget implements Disposable {
 
   public updateDimensions(canvasElement: HTMLCanvasElement): void {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
+
+    if (this.transform != null && this.frame != null) {
+      this.createOrUpdateMeshes(this.transform, this.frame);
+    }
   }
 
   public onHoveredChanged(
@@ -214,7 +218,7 @@ export class TransformWidget implements Disposable {
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
-      this.hoveredElement = [...this.triangleMeshes, ...this.diamondMeshes]
+      this.hoveredElement = [...this.translationMeshes, ...this.rotationMeshes]
         .filter((el) => el.points.valid)
         .find((m) =>
           this.cursor != null
@@ -246,8 +250,8 @@ export class TransformWidget implements Disposable {
       d2.points.shortestDistanceFrom(frame.scene.camera.position);
 
     this.axisLines = this.axisLines.sort(compare);
-    this.triangleMeshes = this.triangleMeshes.sort(compare);
-    this.diamondMeshes = this.diamondMeshes.sort(compare);
+    this.translationMeshes = this.translationMeshes.sort(compare);
+    this.rotationMeshes = this.rotationMeshes.sort(compare);
 
     // Reverse sorted meshes to draw the closest mesh last.
     // This causes it to appear above any other mesh.
@@ -266,15 +270,15 @@ export class TransformWidget implements Disposable {
 
     this.bounds = computeDrawable2dBounds(
       this.viewport,
-      ...this.diamondMeshes,
-      ...this.triangleMeshes
+      ...this.rotationMeshes,
+      ...this.translationMeshes
     );
   }
 
   private createMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
     this.reglCommand = regl({
       canvas: this.canvasElement,
-      extensions: ['ANGLE_instanced_arrays'],
+      extensions: 'angle_instanced_arrays',
     });
     const { createShape } = shapeBuilder(this.reglCommand);
 
@@ -287,7 +291,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.xArrowFillColor
     );
-    this.xRotation = new DiamondMesh(
+    this.xRotation = new TriangleMesh(
       createShape,
       'x-rotate',
       xAxisRotationPositions(transform, frame.scene.camera, triangleSize),
@@ -308,7 +312,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.yArrowFillColor
     );
-    this.yRotation = new DiamondMesh(
+    this.yRotation = new TriangleMesh(
       createShape,
       'y-rotate',
       yAxisRotationPositions(transform, frame.scene.camera, triangleSize),
@@ -336,7 +340,7 @@ export class TransformWidget implements Disposable {
       this.outlineColor,
       this.zArrowFillColor
     );
-    this.zRotation = new DiamondMesh(
+    this.zRotation = new TriangleMesh(
       createShape,
       'z-rotate',
       zAxisRotationPositions(transform, frame.scene.camera, triangleSize),
@@ -347,8 +351,8 @@ export class TransformWidget implements Disposable {
     this.createRotationLines(createShape, transform, frame);
 
     this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
-    this.triangleMeshes = [this.xArrow, this.yArrow, this.zArrow];
-    this.diamondMeshes = [this.xRotation, this.yRotation, this.zRotation];
+    this.translationMeshes = [this.xArrow, this.yArrow, this.zArrow];
+    this.rotationMeshes = [this.xRotation, this.yRotation, this.zRotation];
   }
 
   private createRotationLines(

@@ -2,7 +2,7 @@ import { BoundingBox, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Frame, Viewport } from '../../lib/types';
 import { Drawable } from './drawable';
-import { DiamondMesh, TriangleMesh } from './mesh';
+import { TriangleMesh } from './mesh';
 
 export function testDrawable(
   drawable: Drawable,
@@ -12,31 +12,12 @@ export function testDrawable(
 ): boolean {
   if (drawable instanceof TriangleMesh) {
     return testTriangleMesh(drawable, frame, viewport, point);
-  } else if (drawable instanceof DiamondMesh) {
-    return testDiamondMesh(drawable, frame, viewport, point);
   }
   return false;
 }
 
-/**
- * Adapted from https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm.
- */
 export function testTriangleMesh(
   mesh: TriangleMesh,
-  frame: Frame,
-  viewport: Viewport,
-  point: Point.Point
-): boolean {
-  return testTriangle(
-    [mesh.points.worldLeft, mesh.points.worldRight, mesh.points.worldTip],
-    frame,
-    viewport,
-    point
-  );
-}
-
-export function testDiamondMesh(
-  mesh: DiamondMesh,
   frame: Frame,
   viewport: Viewport,
   point: Point.Point

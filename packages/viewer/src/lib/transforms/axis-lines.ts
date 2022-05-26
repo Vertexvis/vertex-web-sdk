@@ -2,7 +2,7 @@ import { Matrix4, Ray, Vector3 } from '@vertexvis/geometry';
 
 import { FrameCameraBase } from '../types';
 import { AxisLinePoints, RotationLinePoints } from './line';
-import { DiamondMesh, TriangleMesh } from './mesh';
+import { TriangleMesh } from './mesh';
 
 export function axisPositions(
   widgetTransform: Matrix4.Matrix4,
@@ -21,7 +21,7 @@ export function axisPositions(
 
 export function rotationAxisPositions(
   camera: FrameCameraBase,
-  rotationMesh?: DiamondMesh,
+  rotationMesh?: TriangleMesh,
   towardPoint?: Vector3.Vector3,
   triangleSize = 3
 ): RotationLinePoints | undefined {
