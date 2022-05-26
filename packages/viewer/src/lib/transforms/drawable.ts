@@ -56,11 +56,13 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     }
   }
 
-  public updatePoints(points: T): void {
-    this.points = points;
-    flattenPointArray(points.toArray()).forEach(
-      (v, i) => (this.pointsArray[i] = v)
-    );
+  public updatePoints(points?: T): void {
+    if (points != null) {
+      this.points = points;
+      flattenPointArray(points.toArray()).forEach(
+        (v, i) => (this.pointsArray[i] = v)
+      );
+    }
   }
 }
 

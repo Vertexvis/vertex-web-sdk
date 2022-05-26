@@ -21,44 +21,70 @@ export function axisPositions(
 
 export function rotationAxisPositions(
   camera: FrameCameraBase,
-  rotationMesh: DiamondMesh,
-  side: 'left' | 'right',
+  rotationMesh?: DiamondMesh,
+  towardPoint?: Vector3.Vector3,
   triangleSize = 3
-): RotationLinePoints {
-  const origin =
-    side === 'left'
-      ? rotationMesh.points.worldTip
-      : rotationMesh.points.worldLeft;
-  const opposite =
-    side === 'left'
-      ? rotationMesh.points.worldLeft
-      : rotationMesh.points.worldTip;
+): RotationLinePoints | undefined {
+  if (rotationMesh != null && towardPoint != null) {
+    const baseDistance = Vector3.distance(
+      rotationMesh.points.worldBase,
+      towardPoint
+    );
+    const tipDistance = Vector3.distance(
+      rotationMesh.points.worldTip,
+      towardPoint
+    );
 
-  const directionRay = Ray.create({
-    origin,
-    direction: Vector3.normalize(Vector3.subtract(opposite, origin)),
-  });
+    const origin =
+      baseDistance < tipDistance
+        ? rotationMesh.points.worldBase
+        : rotationMesh.points.worldTip;
+    const middle = Vector3.scale(0.5, Vector3.add(origin, towardPoint));
 
-  const middle = Ray.at(directionRay, triangleSize);
+    const centerPointRay = Ray.create({
+      origin: middle,
+      direction: Vector3.normalize(
+        Vector3.subtract(
+          rotationMesh.points.worldRight,
+          rotationMesh.points.worldLeft
+        )
+      ),
+    });
 
-  const curveRay = Ray.create({
-    origin: middle,
-    direction: Vector3.normalize(
-      Vector3.subtract(rotationMesh.points.worldRight, origin)
-    ),
-  });
+    const worldPoints = [0, 0.05, 0.1, 0.15].map((v) =>
+      computeQuadraticBezierCurvePoint(
+        origin,
+        Ray.at(centerPointRay, triangleSize * 2),
+        towardPoint,
+        v
+      )
+    );
 
-  const end = Ray.at(curveRay, triangleSize);
+    return new RotationLinePoints(
+      rotationMesh.points.valid,
+      worldPoints,
+      worldPoints.map((p) =>
+        Vector3.transformMatrix(p, camera.projectionViewMatrix)
+      )
+    );
+  }
+  return undefined;
+}
 
-  console.log(rotationMesh.points, origin, middle, end);
+function computeQuadraticBezierCurvePoint(
+  start: Vector3.Vector3,
+  control: Vector3.Vector3,
+  end: Vector3.Vector3,
+  distance: number
+): Vector3.Vector3 {
+  const distanceInverse = 1 - distance;
+  const startScalar = distanceInverse * distanceInverse;
+  const controlScalar = 2 * distanceInverse * distance;
+  const endScalar = distance * distance;
 
-  return new RotationLinePoints(
-    true,
-    origin,
-    middle,
-    end,
-    Vector3.transformMatrix(origin, camera.projectionViewMatrix),
-    Vector3.transformMatrix(middle, camera.projectionViewMatrix),
-    Vector3.transformMatrix(end, camera.projectionViewMatrix)
+  return Vector3.create(
+    startScalar * start.x + controlScalar * control.x + endScalar * end.x,
+    startScalar * start.y + controlScalar * control.y + endScalar * end.y,
+    startScalar * start.z + controlScalar * control.z + endScalar * end.z
   );
 }

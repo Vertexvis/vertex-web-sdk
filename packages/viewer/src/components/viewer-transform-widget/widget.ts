@@ -4,7 +4,10 @@ import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
-import { axisPositions } from '../../lib/transforms/axis-lines';
+import {
+  axisPositions,
+  rotationAxisPositions,
+} from '../../lib/transforms/axis-lines';
 import {
   xAxisRotationPositions,
   yAxisRotationPositions,
@@ -20,8 +23,9 @@ import {
   Drawable,
 } from '../../lib/transforms/drawable';
 import { testDrawable } from '../../lib/transforms/hits';
-import { AxisLine } from '../../lib/transforms/line';
+import { AxisLine, RotationLine } from '../../lib/transforms/line';
 import { DiamondMesh, TriangleMesh } from '../../lib/transforms/mesh';
+import { CreateShape } from '../../lib/transforms/shape';
 import { Frame, Viewport } from '../../lib/types';
 
 export interface MeshColors {
@@ -32,11 +36,17 @@ export interface MeshColors {
   outline?: Color.Color | string;
 }
 
-// Scalar that is used in combination with the camera
+// Scalar that is used in combination with a perspective camera's
 // components to determine the relative size of the meshes.
 // This attempts to keep the widget approximately the same
 // size as zooming occurs.
-export const DEFAULT_MESH_SCALAR = 0.005;
+export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
+
+// Scalar that is used in combination with an orthographic camera's
+// components to determine the relative size of the meshes.
+// This attempts to keep the widget approximately the same
+// size as zooming occurs.
+export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
 
 export class TransformWidget implements Disposable {
   private reglCommand?: regl.Regl;
@@ -51,10 +61,17 @@ export class TransformWidget implements Disposable {
   private yArrow?: TriangleMesh;
   private zArrow?: TriangleMesh;
   private xRotation?: DiamondMesh;
+  private xyRotationLine?: RotationLine;
+  private xzRotationLine?: RotationLine;
   private yRotation?: DiamondMesh;
+  private yxRotationLine?: RotationLine;
+  private yzRotationLine?: RotationLine;
   private zRotation?: DiamondMesh;
+  private zxRotationLine?: RotationLine;
+  private zyRotationLine?: RotationLine;
 
   private axisLines: AxisLine[] = [];
+  private rotationLines: RotationLine[] = [];
   private triangleMeshes: TriangleMesh[] = [];
   private diamondMeshes: DiamondMesh[] = [];
   private drawableElements: Drawable[] = [];
@@ -114,6 +131,7 @@ export class TransformWidget implements Disposable {
       this.sortMeshes(
         frame,
         ...this.axisLines,
+        ...this.rotationLines,
         ...this.triangleMeshes,
         ...this.diamondMeshes
       );
@@ -139,6 +157,7 @@ export class TransformWidget implements Disposable {
       this.sortMeshes(
         this.frame,
         ...this.axisLines,
+        ...this.rotationLines,
         ...this.triangleMeshes,
         ...this.diamondMeshes
       );
@@ -247,6 +266,7 @@ export class TransformWidget implements Disposable {
 
     this.bounds = computeDrawable2dBounds(
       this.viewport,
+      ...this.diamondMeshes,
       ...this.triangleMeshes
     );
   }
@@ -279,8 +299,7 @@ export class TransformWidget implements Disposable {
       'x-axis',
       axisPositions(transform, frame.scene.camera, this.xArrow),
       this.outlineColor,
-      this.xArrowFillColor,
-      { thickness: 3 }
+      this.xArrowFillColor
     );
     this.yArrow = new TriangleMesh(
       createShape,
@@ -301,8 +320,7 @@ export class TransformWidget implements Disposable {
       'y-axis',
       axisPositions(transform, frame.scene.camera, this.yArrow),
       this.outlineColor,
-      this.yArrowFillColor,
-      { thickness: 3 }
+      this.yArrowFillColor
     );
     this.zArrow = new TriangleMesh(
       createShape,
@@ -316,8 +334,7 @@ export class TransformWidget implements Disposable {
       'z-axis',
       axisPositions(transform, frame.scene.camera, this.zArrow),
       this.outlineColor,
-      this.zArrowFillColor,
-      { thickness: 3 }
+      this.zArrowFillColor
     );
     this.zRotation = new DiamondMesh(
       createShape,
@@ -327,9 +344,114 @@ export class TransformWidget implements Disposable {
       this.zArrowFillColor
     );
 
+    this.createRotationLines(createShape, transform, frame);
+
     this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
     this.triangleMeshes = [this.xArrow, this.yArrow, this.zArrow];
     this.diamondMeshes = [this.xRotation, this.yRotation, this.zRotation];
+  }
+
+  private createRotationLines(
+    createShape: CreateShape,
+    transform: Matrix4.Matrix4,
+    frame: Frame
+  ): void {
+    const triangleSize = this.computeTriangleSize(transform, frame);
+
+    const xyRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.xRotation,
+      this.yArrow?.points.worldTip,
+      triangleSize
+    );
+    const xzRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.xRotation,
+      this.zArrow?.points.worldTip,
+      triangleSize
+    );
+    const yxRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.yRotation,
+      this.xArrow?.points.worldTip,
+      triangleSize
+    );
+    const yzRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.yRotation,
+      this.zArrow?.points.worldTip,
+      triangleSize
+    );
+    const zxRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.zRotation,
+      this.xArrow?.points.worldTip,
+      triangleSize
+    );
+    const zyRotationLinePoints = rotationAxisPositions(
+      frame.scene.camera,
+      this.zRotation,
+      this.yArrow?.points.worldTip,
+      triangleSize
+    );
+
+    if (xyRotationLinePoints != null) {
+      this.xyRotationLine = new RotationLine(
+        createShape,
+        'xy-rotation-line',
+        xyRotationLinePoints,
+        this.outlineColor
+      );
+    }
+    if (xzRotationLinePoints != null) {
+      this.xzRotationLine = new RotationLine(
+        createShape,
+        'xz-rotation-line',
+        xzRotationLinePoints,
+        this.outlineColor
+      );
+    }
+    if (yxRotationLinePoints != null) {
+      this.yxRotationLine = new RotationLine(
+        createShape,
+        'yx-rotation-line',
+        yxRotationLinePoints,
+        this.outlineColor
+      );
+    }
+    if (yzRotationLinePoints != null) {
+      this.yzRotationLine = new RotationLine(
+        createShape,
+        'yz-rotation-line',
+        yzRotationLinePoints,
+        this.outlineColor
+      );
+    }
+    if (zxRotationLinePoints != null) {
+      this.zxRotationLine = new RotationLine(
+        createShape,
+        'zx-rotation-line',
+        zxRotationLinePoints,
+        this.outlineColor
+      );
+    }
+    if (zyRotationLinePoints != null) {
+      this.zyRotationLine = new RotationLine(
+        createShape,
+        'zy-rotation-line',
+        zyRotationLinePoints,
+        this.outlineColor
+      );
+    }
+
+    this.rotationLines = [
+      this.xyRotationLine,
+      this.xzRotationLine,
+      this.yxRotationLine,
+      this.yzRotationLine,
+      this.zxRotationLine,
+      this.zyRotationLine,
+    ].filter((l) => l != null) as RotationLine[];
   }
 
   private updateMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
@@ -370,6 +492,55 @@ export class TransformWidget implements Disposable {
     this.zRotation?.updatePoints(
       zAxisRotationPositions(transform, frame.scene.camera, triangleSize)
     );
+
+    this.xyRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.xRotation,
+        this.yArrow?.points.worldTip,
+        triangleSize
+      )
+    );
+    this.xzRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.xRotation,
+        this.zArrow?.points.worldTip,
+        triangleSize
+      )
+    );
+    this.yxRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.yRotation,
+        this.xArrow?.points.worldTip,
+        triangleSize
+      )
+    );
+    this.yzRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.yRotation,
+        this.zArrow?.points.worldTip,
+        triangleSize
+      )
+    );
+    this.zxRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.zRotation,
+        this.xArrow?.points.worldTip,
+        triangleSize
+      )
+    );
+    this.zyRotationLine?.updatePoints(
+      rotationAxisPositions(
+        frame.scene.camera,
+        this.zRotation,
+        this.yArrow?.points.worldTip,
+        triangleSize
+      )
+    );
   }
 
   private computeTriangleSize(
@@ -378,12 +549,10 @@ export class TransformWidget implements Disposable {
   ): number {
     const position = Vector3.fromMatrixPosition(transform);
 
-    return (
-      (frame.scene.camera.isOrthographic()
-        ? frame.scene.camera.fovHeight
-        : Vector3.magnitude(
-            Vector3.subtract(position, frame.scene.camera.position)
-          )) * DEFAULT_MESH_SCALAR
-    );
+    return frame.scene.camera.isOrthographic()
+      ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
+      : Vector3.magnitude(
+          Vector3.subtract(position, frame.scene.camera.position)
+        ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
   }
 }

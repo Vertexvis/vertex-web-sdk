@@ -64,11 +64,10 @@ function computeRotationNdcValues(
     yDirection,
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
-  console.log(xDirection, yDirection, transformedX, transformedY)
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
-    Vector3.scale(triangleSize * 8, transformedDirection)
+    Vector3.scale(triangleSize * 10, transformedDirection)
   );
 
   const xRay = Ray.create({
@@ -77,17 +76,38 @@ function computeRotationNdcValues(
   });
   const yRay = Ray.create({
     origin: position,
-    direction: transformedY
+    direction: transformedY,
   });
   const rotationAxis = Vector3.cross(transformedX, transformedY);
 
-  const base = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(yRay, -(triangleSize * 1.25)), rotationAxis, position)
-  const right = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(xRay, triangleSize * 1.25), rotationAxis, position)
-  const up = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(yRay, triangleSize * 1.25), rotationAxis, position)
-  const left = Vector3.rotateAboutAxis(Angle.toRadians(45), Ray.at(xRay, -(triangleSize * 1.25)), rotationAxis, position)
+  const base = Vector3.rotateAboutAxis(
+    Angle.toRadians(45),
+    Ray.at(yRay, -triangleSize),
+    rotationAxis,
+    position
+  );
+  const right = Vector3.rotateAboutAxis(
+    Angle.toRadians(45),
+    Ray.at(xRay, triangleSize),
+    rotationAxis,
+    position
+  );
+  const up = Vector3.rotateAboutAxis(
+    Angle.toRadians(45),
+    Ray.at(yRay, triangleSize),
+    rotationAxis,
+    position
+  );
+  const left = Vector3.rotateAboutAxis(
+    Angle.toRadians(45),
+    Ray.at(xRay, -triangleSize),
+    rotationAxis,
+    position
+  );
 
   return new DiamondMeshPoints(
-    true,
+    Vector3.dot(transformedX, camera.direction) !== -1 &&
+      Vector3.dot(transformedY, camera.direction) !== -1,
     base,
     left,
     right,
