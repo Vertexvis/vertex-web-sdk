@@ -294,7 +294,7 @@ describe(Scene, () => {
                       g: 0,
                       r: 0,
                     },
-                    ns: 50,
+                    ns: ColorMaterial.defaultColor.glossiness,
                   },
                 },
               },
