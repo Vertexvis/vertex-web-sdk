@@ -7,13 +7,13 @@ jest.mock('../../lib/stencil', () => ({
 jest.mock('./util', () => ({
   convertPointToCanvas: jest.fn(),
   convertCanvasPointToWorld: jest.fn(),
-  computeUpdatedPosition: jest.fn(),
+  computeUpdatedTransform: jest.fn(),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
@@ -26,7 +26,7 @@ import {
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import {
-  computeUpdatedPosition,
+  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
@@ -94,8 +94,8 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
 
-    expect(mockTransformWidget.updatePosition).toHaveBeenCalledWith(
-      widget.position
+    expect(mockTransformWidget.updateTransform).toHaveBeenCalledWith(
+      Matrix4.makeTranslation(widget.position)
     );
     expect(mockTransformWidget.updateFrame).toHaveBeenCalledWith(frame, true);
   });
@@ -210,8 +210,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedPosition as jest.Mock).mockImplementation(() =>
-      Vector3.create(2, 2, 2)
+    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
     );
 
     widget.shadowRoot
@@ -355,7 +355,7 @@ describe('vertex-viewer-transform-widget', () => {
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedPosition as jest.Mock).mockImplementation(() =>
+    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
       Vector3.create(2, 2, 2)
     );
 
@@ -363,13 +363,13 @@ describe('vertex-viewer-transform-widget', () => {
       ?.querySelector('canvas')
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
-    (mockTransformWidget.updatePosition as jest.Mock).mockClear();
+    (mockTransformWidget.updateTransform as jest.Mock).mockClear();
     widget.position = undefined;
 
     await page.waitForChanges();
 
     expect(endSpy).toHaveBeenCalled();
-    expect(mockTransformWidget.updatePosition).toHaveBeenCalledWith(undefined);
+    expect(mockTransformWidget.updateTransform).toHaveBeenCalledWith(undefined);
   });
 
   it('should dispatch an event when the position of the widget changes', async () => {

@@ -1,10 +1,10 @@
 jest.mock('regl-shape');
 jest.mock('regl');
 jest.mock('../../../lib/transforms/hits', () => ({
-  testTriangleMesh: jest.fn(),
+  testDrawable: jest.fn(),
 }));
 
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
@@ -15,8 +15,9 @@ import {
   yAxisArrowPositions,
   zAxisArrowPositions,
 } from '../../../lib/transforms/axis-translation';
-import { testTriangleMesh } from '../../../lib/transforms/hits';
-import { AxisMesh, TriangleMesh } from '../../../lib/transforms/mesh';
+import { testDrawable } from '../../../lib/transforms/hits';
+import { AxisLine } from '../../../lib/transforms/line';
+import { TriangleMesh } from '../../../lib/transforms/mesh';
 import { flattenPointArray } from '../../../lib/transforms/util';
 import {
   Frame,
@@ -30,68 +31,76 @@ import {
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
-import { DEFAULT_MESH_SCALAR, TransformWidget } from '../widget';
+import {
+  DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
+  DEFAULT_PERSPECTIVE_MESH_SCALAR,
+  TransformWidget,
+} from '../widget';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 
 const mockShapeBuilder = shapeBuilder as MockShapeBuilder;
 
 function createMeshes(
-  position: Vector3.Vector3,
+  transform: Matrix4.Matrix4,
   frame: Frame,
   triangleSize?: number
 ): {
   xArrow: TriangleMesh;
   yArrow: TriangleMesh;
   zArrow: TriangleMesh;
-  xAxis: AxisMesh;
-  yAxis: AxisMesh;
-  zAxis: AxisMesh;
+  xAxis: AxisLine;
+  yAxis: AxisLine;
+  zAxis: AxisLine;
 } {
   const expectedTriangleSize =
     triangleSize ??
-    Vector3.magnitude(Vector3.subtract(position, frame.scene.camera.position)) *
-      DEFAULT_MESH_SCALAR;
+    Vector3.magnitude(
+      Vector3.subtract(
+        Vector3.fromMatrixPosition(transform),
+        frame.scene.camera.position
+      )
+    ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
   const xArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'x-translate',
-    xAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
+    xAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
-  const xAxis = new AxisMesh(
+  const xAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'x-axis',
-    axisPositions(position, frame.scene.camera, xArrow),
+    axisPositions(transform, frame.scene.camera, xArrow),
     '#000000',
     '#000000'
   );
   const yArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'y-translate',
-    yAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
+    yAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
-  const yAxis = new AxisMesh(
+  const yAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'y-axis',
-    axisPositions(position, frame.scene.camera, yArrow),
+    axisPositions(transform, frame.scene.camera, yArrow),
     '#000000',
     '#000000'
   );
   const zArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'z-translate',
-    zAxisArrowPositions(position, frame.scene.camera, expectedTriangleSize),
+    zAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
     '#000000'
   );
-  const zAxis = new AxisMesh(
+  const zAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'z-axis',
-    axisPositions(position, frame.scene.camera, zArrow),
+    axisPositions(transform, frame.scene.camera, zArrow),
     '#000000',
     '#000000'
   );
@@ -145,7 +154,7 @@ describe(TransformWidget, () => {
     const widget = new TransformWidget(canvas);
 
     widget.updateFrame(makePerspectiveFrame());
-    widget.updatePosition(Vector3.create(1, 1, 1));
+    widget.updateTransform(Matrix4.makeTranslation(Vector3.create(1, 1, 1)));
 
     expect(regl).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -160,12 +169,12 @@ describe(TransformWidget, () => {
   it('creates axis and arrow meshes', async () => {
     const widget = new TransformWidget(canvas);
     const frame = makePerspectiveFrame();
-    const position = Vector3.create(1, 1, 1);
-    const meshes = createMeshes(position, frame);
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const meshes = createMeshes(positionTransform, frame);
 
     mockShapeBuilder().createShape.mockClear();
     widget.updateFrame(frame);
-    widget.updatePosition(position);
+    widget.updateTransform(positionTransform);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       new Float64Array(flattenPointArray(meshes.xArrow.points.toArray())),
@@ -196,17 +205,17 @@ describe(TransformWidget, () => {
   it('creates axis and arrow meshes for orthographic cameras', async () => {
     const widget = new TransformWidget(canvas);
     const frame = makeOrthographicFrame();
-    const position = Vector3.create(1, 1, 1);
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
     const meshes = createMeshes(
-      position,
+      positionTransform,
       frame,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
-        DEFAULT_MESH_SCALAR
+        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
     );
 
     mockShapeBuilder().createShape.mockClear();
     widget.updateFrame(frame);
-    widget.updatePosition(position);
+    widget.updateTransform(positionTransform);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       new Float64Array(flattenPointArray(meshes.xArrow.points.toArray())),
@@ -250,17 +259,26 @@ describe(TransformWidget, () => {
       Vector3.create(10, 0, 100)
     );
 
-    const position = Vector3.create(1, 1, 1);
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
     widget.updateFrame(xFrame);
-    widget.updatePosition(position);
+    widget.updateTransform(positionTransform);
 
-    expect(widget.getDrawableMeshes().map((m) => m.identifier)).toMatchObject(
+    expect(widget.getDrawableElements().map((e) => e.identifier)).toMatchObject(
       [
         'x-translate',
+        'zx-rotation-line',
+        'z-rotate',
+        'yx-rotation-line',
+        'y-rotate',
+        'zy-rotation-line',
         'x-axis',
+        'yz-rotation-line',
         'y-translate',
         'y-axis',
+        'xy-rotation-line',
+        'x-rotate',
+        'xz-rotation-line',
         'z-axis',
         'z-translate',
       ].reverse()
@@ -268,12 +286,21 @@ describe(TransformWidget, () => {
 
     widget.updateFrame(yFrame);
 
-    expect(widget.getDrawableMeshes().map((m) => m.identifier)).toMatchObject(
+    expect(widget.getDrawableElements().map((e) => e.identifier)).toMatchObject(
       [
         'y-translate',
+        'xy-rotation-line',
+        'x-rotate',
+        'zy-rotation-line',
+        'z-rotate',
+        'xz-rotation-line',
         'y-axis',
+        'zx-rotation-line',
         'z-translate',
         'z-axis',
+        'yz-rotation-line',
+        'y-rotate',
+        'yx-rotation-line',
         'x-axis',
         'x-translate',
       ].reverse()
@@ -281,12 +308,21 @@ describe(TransformWidget, () => {
 
     widget.updateFrame(zFrame);
 
-    expect(widget.getDrawableMeshes().map((m) => m.identifier)).toMatchObject(
+    expect(widget.getDrawableElements().map((e) => e.identifier)).toMatchObject(
       [
         'z-translate',
+        'yz-rotation-line',
+        'y-rotate',
+        'xz-rotation-line',
+        'x-rotate',
+        'yx-rotation-line',
         'z-axis',
+        'xy-rotation-line',
         'x-translate',
         'x-axis',
+        'zx-rotation-line',
+        'z-rotate',
+        'zy-rotation-line',
         'y-axis',
         'y-translate',
       ].reverse()
@@ -298,17 +334,17 @@ describe(TransformWidget, () => {
       hovered: '#ffff00',
     });
     const frame = makePerspectiveFrame();
-    const position = Vector3.create(1, 1, 1);
-    const meshes = createMeshes(position, frame);
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const meshes = createMeshes(positionTransform, frame);
     const hoveredListener = jest.fn();
 
-    (testTriangleMesh as jest.Mock).mockImplementation(
+    (testDrawable as jest.Mock).mockImplementation(
       (m) => m.identifier === 'x-translate'
     );
 
     widget.onHoveredChanged(hoveredListener);
     widget.updateFrame(frame);
-    widget.updatePosition(position);
+    widget.updateTransform(positionTransform);
     widget.updateCursor(Point.create(100, 100));
 
     meshes.xArrow.updateFillColor('#ffff00');
@@ -325,12 +361,12 @@ describe(TransformWidget, () => {
       zArrow: '#555555',
     });
     const frame = makePerspectiveFrame();
-    const position = Vector3.create(1, 1, 1);
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
     widget.updateFrame(
       updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
     );
-    widget.updatePosition(position);
+    widget.updateTransform(positionTransform);
 
     widget.updateColors({
       xArrow: '#333333',
@@ -339,13 +375,13 @@ describe(TransformWidget, () => {
     });
 
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#333333')
+      widget.getDrawableElements().some((e) => e.fillColor === '#333333')
     ).toBe(true);
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#444444')
+      widget.getDrawableElements().some((e) => e.fillColor === '#444444')
     ).toBe(true);
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#555555')
+      widget.getDrawableElements().some((e) => e.fillColor === '#555555')
     ).toBe(true);
 
     widget.updateColors({
@@ -355,13 +391,13 @@ describe(TransformWidget, () => {
     });
 
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#333333')
+      widget.getDrawableElements().some((e) => e.fillColor === '#333333')
     ).toBe(true);
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#444444')
+      widget.getDrawableElements().some((e) => e.fillColor === '#444444')
     ).toBe(true);
     expect(
-      widget.getDrawableMeshes().some((m) => m.fillColor === '#111111')
+      widget.getDrawableElements().some((e) => e.fillColor === '#111111')
     ).toBe(true);
   });
 });

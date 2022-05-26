@@ -1,9 +1,9 @@
-import { Point, Vector3 } from '@vertexvis/geometry';
+import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../../../lib/types';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import {
-  computeUpdatedPosition,
+  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from '../util';
@@ -30,12 +30,12 @@ describe('vertex-viewer-transform-widget utils', () => {
         Point.create(0, 0),
         makePerspectiveFrame(),
         new Viewport(100, 50),
-        Vector3.create(0, 0, 0)
+        Matrix4.makeTranslation(Vector3.create(0, 0, 0))
       );
 
-      expect(worldPt.x).toBeCloseTo(-82.84271247462402);
-      expect(worldPt.y).toBeCloseTo(41.42135623731201);
-      expect(worldPt.z).toBe(0);
+      expect(worldPt?.x).toBeCloseTo(-82.84271247462402);
+      expect(worldPt?.y).toBeCloseTo(41.42135623731201);
+      expect(worldPt?.z).toBe(0);
     });
 
     it('returns undefined if values are not provided', () => {
@@ -54,49 +54,57 @@ describe('vertex-viewer-transform-widget utils', () => {
     });
   });
 
-  describe(computeUpdatedPosition, () => {
+  describe(computeUpdatedTransform, () => {
     it('computes updated x translation', () => {
       expect(
-        computeUpdatedPosition(
-          Vector3.back(),
+        computeUpdatedTransform(
+          Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.right(),
+          Vector3.back(),
+          0,
           'x-translate'
         )
-      ).toMatchObject(Vector3.create(1, 0, 1));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(1, 0, 1)));
     });
 
     it('computes updated y translation', () => {
       expect(
-        computeUpdatedPosition(
-          Vector3.back(),
+        computeUpdatedTransform(
+          Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.up(),
+          Vector3.back(),
+          0,
           'y-translate'
         )
-      ).toMatchObject(Vector3.create(0, 1, 1));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 1, 1)));
     });
 
     it('computes updated z translation', () => {
       expect(
-        computeUpdatedPosition(
-          Vector3.back(),
+        computeUpdatedTransform(
+          Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.forward(),
+          Vector3.back(),
+          0,
           'z-translate'
         )
-      ).toMatchObject(Vector3.create(0, 0, 0));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0, 0)));
     });
 
     it('returns the current position if no matching identifier is provided', () => {
       expect(
-        computeUpdatedPosition(
-          Vector3.back(),
+        computeUpdatedTransform(
+          Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.forward(),
+          Vector3.back(),
+          0,
           'non-matching-identifier'
         )
-      ).toMatchObject(Vector3.back());
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.back()));
     });
   });
 });
