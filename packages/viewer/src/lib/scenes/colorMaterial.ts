@@ -55,7 +55,7 @@ export const create = (
 ): ColorMaterial => {
   return {
     ...defaultColor,
-    opacity: opacity || defaultColor.opacity,
+    opacity: opacity ?? defaultColor.opacity,
     diffuse: {
       r,
       g,
