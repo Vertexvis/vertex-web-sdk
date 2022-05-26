@@ -86,11 +86,13 @@ export class TransformController {
 
   private toDeltaTransform(
     delta: Matrix4.Matrix4,
-    adjust = false
+    columnMajor = false
   ): vertexvis.protobuf.core.IAffineMatrix4f {
     const asObject = Matrix4.toObject(delta);
 
-    const basisX = adjust
+    // TODO: update this to pass a single order for the
+    // transform matrix after work in https://vertexvis.atlassian.net/browse/PLAT-1582
+    const basisX = columnMajor
       ? {
           x: asObject.m11,
           y: asObject.m21,
@@ -101,7 +103,7 @@ export class TransformController {
           y: asObject.m12,
           z: asObject.m13,
         };
-    const basisY = adjust
+    const basisY = columnMajor
       ? {
           x: asObject.m12,
           y: asObject.m22,
@@ -112,7 +114,7 @@ export class TransformController {
           y: asObject.m22,
           z: asObject.m23,
         };
-    const basisZ = adjust
+    const basisZ = columnMajor
       ? {
           x: asObject.m13,
           y: asObject.m23,

@@ -28,7 +28,7 @@ import { TriangleMesh } from '../../lib/transforms/mesh';
 import { CreateShape } from '../../lib/transforms/shape';
 import { Frame, Viewport } from '../../lib/types';
 
-export interface MeshColors {
+export interface DrawableElementColors {
   xArrow?: Color.Color | string;
   yArrow?: Color.Color | string;
   zArrow?: Color.Color | string;
@@ -93,7 +93,7 @@ export class TransformWidget implements Disposable {
 
   public constructor(
     private canvasElement: HTMLCanvasElement,
-    colors: MeshColors = {}
+    colors: DrawableElementColors = {}
   ) {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
 
@@ -123,11 +123,11 @@ export class TransformWidget implements Disposable {
     );
   }
 
-  public updateFrame(frame: Frame, updateMeshes = true): void {
+  public updateFrame(frame: Frame, updateElements = true): void {
     this.frame = frame;
 
-    if (updateMeshes && frame != null && this.transform != null) {
-      this.createOrUpdateMeshes(this.transform, frame);
+    if (updateElements && frame != null && this.transform != null) {
+      this.createOrUpdateElements(this.transform, frame);
       this.sortMeshes(
         frame,
         ...this.axisLines,
@@ -153,7 +153,7 @@ export class TransformWidget implements Disposable {
     this.transform = transform;
 
     if (transform != null && this.frame != null) {
-      this.createOrUpdateMeshes(transform, this.frame);
+      this.createOrUpdateElements(transform, this.frame);
       this.sortMeshes(
         this.frame,
         ...this.axisLines,
@@ -169,7 +169,7 @@ export class TransformWidget implements Disposable {
     }
   }
 
-  public updateColors(colors: MeshColors): void {
+  public updateColors(colors: DrawableElementColors): void {
     this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
     this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
     this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
@@ -189,7 +189,7 @@ export class TransformWidget implements Disposable {
     this.viewport = new Viewport(canvasElement.width, canvasElement.height);
 
     if (this.transform != null && this.frame != null) {
-      this.createOrUpdateMeshes(this.transform, this.frame);
+      this.createOrUpdateElements(this.transform, this.frame);
     }
   }
 
@@ -244,7 +244,7 @@ export class TransformWidget implements Disposable {
     }
   }
 
-  private sortMeshes(frame: Frame, ...meshes: Drawable[]): void {
+  private sortMeshes(frame: Frame, ...drawableElements: Drawable[]): void {
     const compare = (d1: Drawable, d2: Drawable): number =>
       d1.points.shortestDistanceFrom(frame.scene.camera.position) -
       d2.points.shortestDistanceFrom(frame.scene.camera.position);
@@ -253,19 +253,22 @@ export class TransformWidget implements Disposable {
     this.translationMeshes = this.translationMeshes.sort(compare);
     this.rotationMeshes = this.rotationMeshes.sort(compare);
 
-    // Reverse sorted meshes to draw the closest mesh last.
-    // This causes it to appear above any other mesh.
-    this.drawableElements = meshes
+    // Reverse sorted elements to draw the closest element last.
+    // This causes it to appear above any other element.
+    this.drawableElements = drawableElements
       .filter((el) => el.points.valid)
       .sort(compare)
       .reverse();
   }
 
-  private createOrUpdateMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
+  private createOrUpdateElements(
+    transform: Matrix4.Matrix4,
+    frame: Frame
+  ): void {
     if (this.xArrow == null || this.yArrow == null || this.zArrow == null) {
-      this.createMeshes(transform, frame);
+      this.createElements(transform, frame);
     } else {
-      this.updateMeshes(transform, frame);
+      this.updateElements(transform, frame);
     }
 
     this.bounds = computeDrawable2dBounds(
@@ -275,7 +278,7 @@ export class TransformWidget implements Disposable {
     );
   }
 
-  private createMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
+  private createElements(transform: Matrix4.Matrix4, frame: Frame): void {
     this.reglCommand = regl({
       canvas: this.canvasElement,
       extensions: 'angle_instanced_arrays',
@@ -458,7 +461,7 @@ export class TransformWidget implements Disposable {
     ].filter((l) => l != null) as RotationLine[];
   }
 
-  private updateMeshes(transform: Matrix4.Matrix4, frame: Frame): void {
+  private updateElements(transform: Matrix4.Matrix4, frame: Frame): void {
     const triangleSize = this.computeTriangleSize(transform, frame);
 
     if (this.xArrow != null) {
