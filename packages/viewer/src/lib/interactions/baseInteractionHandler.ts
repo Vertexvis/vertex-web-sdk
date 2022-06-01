@@ -152,6 +152,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected handleDownEvent(event: BaseEvent): void {
+    // Prevent selection of any text while interacting with the model.
+    event.preventDefault();
+
     this.interactionTimer = window.setTimeout(() => {
       this.downPosition = Point.create(event.screenX, event.screenY);
       this.downPositionCanvas = this.getCanvasPosition(event);
