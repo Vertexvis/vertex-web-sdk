@@ -307,6 +307,8 @@ export class ViewerMeasurementDistance {
 
   private isUserInteractingWithModel = false;
 
+  private newInteractionHandler?: Disposable;
+
   /**
    * Computes the bounding boxes of the anchors and label. **Note:** invoking
    * this function uses `getBoundingClientRect` internally and will cause a
@@ -337,6 +339,7 @@ export class ViewerMeasurementDistance {
    */
   protected disconnectedCallback(): void {
     this.stateMap.hoverCursor?.dispose();
+    this.newInteractionHandler?.dispose();
   }
 
   /**
@@ -743,6 +746,8 @@ export class ViewerMeasurementDistance {
         };
 
         this.beginEditing('replace', 'end');
+        this.newInteractionHandler = { dispose };
+
         window.addEventListener('pointermove', pointerMove);
         window.addEventListener('pointerup', pointerUp);
       };
