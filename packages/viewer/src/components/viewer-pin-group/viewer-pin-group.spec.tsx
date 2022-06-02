@@ -103,6 +103,98 @@ describe('vertex-view-pin-group', () => {
       </vertex-viewer-pin-group>
     `);
   });
+
+  it('should select the pin when selecting the line', async () => {
+    const worldPosition = Vector3.create();
+
+    const viewMatrix = Matrix4.makeIdentity();
+    const pinModel = new PinModel();
+
+    const mockFn = jest.fn();
+    pinModel.onSelectionChange(mockFn);
+
+    const relativePointCenterScreen = Point.create(0, 0);
+    const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
+
+    const page = await newSpecPage({
+      components: [ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-group
+          data-is-dom-group-element={true}
+          pin={pin}
+          elementBounds={dimensions as DOMRect}
+          pinModel={pinModel}
+          projectionViewMatrix={viewMatrix}
+          selected={false}
+        ></vertex-viewer-pin-group>
+      ),
+    });
+
+    const el = page.root as HTMLVertexViewerPinGroupElement;
+
+    const line = el.querySelector(
+      'vertex-viewer-pin-label-line'
+    ) as HTMLVertexViewerPinLabelLineElement;
+
+    line.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    await page.waitForChanges();
+
+    expect(mockFn).toHaveBeenCalled();
+  });
+
+  it('should select the pin when selecting the label', async () => {
+    const worldPosition = Vector3.create();
+
+    const viewMatrix = Matrix4.makeIdentity();
+    const pinModel = new PinModel();
+
+    const mockFn = jest.fn();
+    pinModel.onSelectionChange(mockFn);
+
+    const relativePointCenterScreen = Point.create(0, 0);
+    const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
+    const pin = {
+      id: 'my-pin-id',
+      worldPosition,
+      label: {
+        point: relativePointCenterScreen,
+        text: 'My New Pin',
+      },
+    };
+
+    const page = await newSpecPage({
+      components: [ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-group
+          data-is-dom-group-element={true}
+          pin={pin}
+          elementBounds={dimensions as DOMRect}
+          pinModel={pinModel}
+          projectionViewMatrix={viewMatrix}
+          selected={false}
+        ></vertex-viewer-pin-group>
+      ),
+    });
+
+    const el = page.root as HTMLVertexViewerPinGroupElement;
+
+    const label = el.querySelector(
+      'vertex-viewer-pin-label'
+    ) as HTMLVertexViewerPinLabelElement;
+
+    label.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    await page.waitForChanges();
+
+    expect(mockFn).toHaveBeenCalled();
+  });
 });
 
 describe(getClosestCenterToPoint, () => {

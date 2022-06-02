@@ -101,6 +101,10 @@ export class ViewerPinGroup {
 
     const { pinPoint, labelPoint } = computed;
 
+    const handleSelectPin = (): void => {
+      this.pinController?.setSelectedPinId(this.pin?.id);
+    };
+
     return (
       <Fragment>
         <vertex-viewer-dom-element
@@ -110,7 +114,7 @@ export class ViewerPinGroup {
             if (e.buttons !== 2) {
               e.stopPropagation();
             }
-            this.pinController?.setSelectedPinId(this.pin?.id);
+            handleSelectPin();
 
             this.handleAnchorPointerDown(e);
           }}
@@ -126,6 +130,7 @@ export class ViewerPinGroup {
               id={`pin-label-line-${this.pin?.id}`}
               pinPoint={pinPoint}
               labelPoint={labelPoint}
+              onPointerDown={handleSelectPin}
             ></vertex-viewer-pin-label-line>
 
             <vertex-viewer-pin-label
@@ -135,6 +140,7 @@ export class ViewerPinGroup {
               }}
               elementBounds={this.elementBounds}
               pinController={this.pinController}
+              onPointerDown={handleSelectPin}
             ></vertex-viewer-pin-label>
           </Fragment>
         )}
