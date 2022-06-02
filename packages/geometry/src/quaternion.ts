@@ -102,7 +102,7 @@ export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
       x: 0.25 * s,
       y: (sm12 + sm21) / s,
       z: (sm31 + sm13) / s,
-      w: s,
+      w: (sm23 - sm32) / s,
     };
   } else if (sm22 > sm33) {
     const s = Math.sqrt(1.0 + sm22 - sm11 - sm33) * 2;

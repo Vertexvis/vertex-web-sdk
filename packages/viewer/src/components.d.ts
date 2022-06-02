@@ -107,7 +107,7 @@ import {
 } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { TransformController } from './lib/transforms/controller';
-import { Mesh } from './lib/transforms/mesh';
+import { Drawable } from './lib/transforms/drawable';
 export namespace Components {
   interface VertexSceneTree {
     /**
@@ -154,10 +154,6 @@ export namespace Components {
      * @returns A promise that completes when the request has completed. Note, items are displayed asynchronously. So the displayed items may not reflect the result of this filter when the promise completes.
      */
     filterItems: (term: string, options?: FilterTreeOptions) => Promise<void>;
-    /**
-     * Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.
-     */
-    filterOnMetadata: boolean;
     /**
      * Returns the row data from the given vertical client position.
      * @param clientY The vertical client position.
@@ -457,6 +453,10 @@ export namespace Components {
      * @param urn The URN of the resource to load.
      */
     load: (urn: string) => Promise<void>;
+    /**
+     * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
+     */
+    noDefaultLights: boolean;
     /**
      * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
      * @example
@@ -1274,7 +1274,7 @@ export namespace Components {
     /**
      * @ignore Visible for testing.
      */
-    hovered?: Mesh;
+    hovered?: Drawable;
     /**
      * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
      */
@@ -1641,10 +1641,6 @@ declare namespace LocalJSX {
     configEnv?: Environment;
     controller?: SceneTreeController;
     /**
-     * Temporary flag to indicate whether metadata should be used when filtering as opposed to just the name of the item.
-     */
-    filterOnMetadata?: boolean;
-    /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
@@ -1854,6 +1850,10 @@ declare namespace LocalJSX {
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
     keyboardControls?: boolean;
+    /**
+     * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
+     */
+    noDefaultLights?: boolean;
     /**
      * Emits an event when the camera type changes.
      */
@@ -2668,7 +2668,17 @@ declare namespace LocalJSX {
     /**
      * @ignore Visible for testing.
      */
-    hovered?: Mesh;
+    hovered?: Drawable;
+    /**
+     * An event that is emitted when the interaction has ended
+     */
+    onInteractionEnded?: (
+      event: CustomEvent<Matrix4.Matrix4 | undefined>
+    ) => void;
+    /**
+     * An event that is emitted an interaction with the widget has started
+     */
+    onInteractionStarted?: (event: CustomEvent<void>) => void;
     /**
      * An event that is emitted when the position of the widget changes.
      */

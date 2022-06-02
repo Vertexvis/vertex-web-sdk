@@ -188,13 +188,6 @@ export class SceneTree {
   public controller?: SceneTreeController;
 
   /**
-   * Temporary flag to indicate whether metadata should be used when filtering
-   * as opposed to just the name of the item.
-   */
-  @Prop({ mutable: true })
-  public filterOnMetadata = false;
-
-  /**
    * Indicates whether the metadata search should use an exact match.
    */
   @Prop({ mutable: true })
@@ -846,11 +839,11 @@ export class SceneTree {
 
   @Listen('search')
   protected handleSearch(event: CustomEvent<string>): void {
-    const columnsToSearch = this.filterOnMetadata
-      ? this.metadataSearchKeys.length > 0
+    const columnsToSearch =
+      this.metadataSearchKeys.length > 0
         ? this.metadataSearchKeys
-        : this.metadataKeys
-      : undefined;
+        : this.metadataKeys;
+
     this.filterItems(event.detail, {
       columns: columnsToSearch,
       exactMatch: this.metadataSearchExactMatch,

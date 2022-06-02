@@ -27,11 +27,64 @@ describe(Quaternion.fromAxisAngle, () => {
 });
 
 describe(Quaternion.fromMatrixRotation, () => {
-  it('rotates quaternion around axis', () => {
-    const m = Matrix4.makeIdentity();
+  it('creates a quaternion from a x-rotation matrix of less than 90 degrees', () => {
+    const angle = Angle.toRadians(45);
+    const m = Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(Vector3.right(), angle)
+    );
     const q = Quaternion.fromMatrixRotation(m);
+    const expected = Quaternion.create({
+      x: Math.sin(angle / 2),
+      w: Math.cos(angle / 2),
+    });
 
-    expect(q).toEqual(Quaternion.create());
+    expect(q.x).toBeCloseTo(expected.x);
+    expect(q.w).toBeCloseTo(expected.w);
+  });
+
+  it('creates a quaternion from a x-rotation matrix of over 90 degrees', () => {
+    const angle = Angle.toRadians(170);
+    const m = Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(Vector3.right(), angle)
+    );
+    const q = Quaternion.fromMatrixRotation(m);
+    const expected = Quaternion.create({
+      x: Math.sin(angle / 2),
+      w: Math.cos(angle / 2),
+    });
+
+    expect(q.x).toBeCloseTo(expected.x);
+    expect(q.w).toBeCloseTo(expected.w);
+  });
+
+  it('creates a quaternion from a y-rotation matrix of over 90 degrees', () => {
+    const angle = Angle.toRadians(190);
+    const m = Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(Vector3.up(), angle)
+    );
+    const q = Quaternion.fromMatrixRotation(m);
+    const expected = Quaternion.create({
+      y: Math.sin(angle / 2),
+      w: Math.cos(angle / 2),
+    });
+
+    expect(q.y).toBeCloseTo(expected.y);
+    expect(q.w).toBeCloseTo(expected.w);
+  });
+
+  it('creates a quaternion from a z-rotation matrix of over 90 degrees', () => {
+    const angle = Angle.toRadians(200);
+    const m = Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(Vector3.back(), angle)
+    );
+    const q = Quaternion.fromMatrixRotation(m);
+    const expected = Quaternion.create({
+      z: Math.sin(angle / 2),
+      w: Math.cos(angle / 2),
+    });
+
+    expect(q.z).toBeCloseTo(expected.z);
+    expect(q.w).toBeCloseTo(expected.w);
   });
 });
 
