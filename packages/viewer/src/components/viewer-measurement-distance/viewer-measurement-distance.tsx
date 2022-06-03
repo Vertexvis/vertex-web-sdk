@@ -623,7 +623,7 @@ export class ViewerMeasurementDistance {
   private async addInteractionListeners(
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
+    const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
     if (this.mode === 'replace') {
       interactionTarget.addEventListener('pointermove', this.updateStartAnchor);
       interactionTarget.addEventListener('pointerdown', this.newMeasurement);
@@ -634,7 +634,7 @@ export class ViewerMeasurementDistance {
   private async removeInteractionListeners(
     viewer: HTMLVertexViewerElement
   ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
+    const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
     interactionTarget.removeEventListener(
       'pointermove',
       this.updateStartAnchor

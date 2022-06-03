@@ -667,9 +667,10 @@ export class Viewer {
    * our interaction handling.
    *
    * @internal
+   * @deprecated Use `InteractionHandler`.
    */
   @Method()
-  public async getInteractionTarget(): Promise<HTMLElement> {
+  public async getInteractionTarget_DEPRECATED(): Promise<HTMLElement> {
     if (this.stateMap.interactionTarget != null) {
       return this.stateMap.interactionTarget;
     } else throw new Error('Interaction target is undefined.');

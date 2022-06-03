@@ -35,7 +35,7 @@ describe('vertex-viewer-markup', () => {
   const viewer = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getInteractionTarget: jest.fn(() => ({
+    getInteractionTarget_DEPRECATED: jest.fn(() => ({
       addEventListener,
       removeEventListener,
     })),
