@@ -23,9 +23,12 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
     super();
   }
 
-  public editAnchor(anchor: ViewerMarkupArrowEditAnchor): void {
+  public editAnchor(
+    anchor: ViewerMarkupArrowEditAnchor,
+    event: PointerEvent
+  ): void {
     this.anchor = anchor;
-    this.acceptInteraction();
+    this.startInteraction(event);
   }
 
   public startInteraction(event: PointerEvent): void {

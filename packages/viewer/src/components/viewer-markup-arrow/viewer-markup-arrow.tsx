@@ -267,14 +267,14 @@ export class ViewerMarkupArrow {
               <BoundingBox1d
                 start={screenStart}
                 end={screenEnd}
-                onStartAnchorPointerDown={() =>
-                  this.interactionHandler.editAnchor('start')
+                onStartAnchorPointerDown={(event) =>
+                  this.interactionHandler.editAnchor('start', event)
                 }
-                onCenterAnchorPointerDown={() =>
-                  this.interactionHandler.editAnchor('center')
+                onCenterAnchorPointerDown={(event) =>
+                  this.interactionHandler.editAnchor('center', event)
                 }
-                onEndAnchorPointerDown={() =>
-                  this.interactionHandler.editAnchor('end')
+                onEndAnchorPointerDown={(event) =>
+                  this.interactionHandler.editAnchor('end', event)
                 }
               />
             )}

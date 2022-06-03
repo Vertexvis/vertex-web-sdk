@@ -10,18 +10,16 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Point, Rectangle } from '@vertexvis/geometry';
+import { Rectangle } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
-import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
-  BoundingBox2dAnchorPosition,
   isValidStartEvent,
-  transformRectangle,
-  translatePointToRelative,
   translateRectToScreen,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
+import { CircleMarkupInteractionHandler } from './interactions';
 import { parseBounds } from './utils';
 import { BoundingBox2d } from './viewer-markup-circle-components';
 
@@ -103,30 +101,25 @@ export class ViewerMarkupCircle {
   public viewRendered!: EventEmitter<void>;
 
   @Element()
-  private hostEl!: HTMLElement;
+  private hostEl!: HTMLVertexViewerMarkupCircleElement;
 
   @State()
   private elementBounds?: DOMRect;
 
-  @State()
-  private startPosition?: Point.Point;
+  private interactionHandler = new CircleMarkupInteractionHandler(
+    this.hostEl,
+    this.editBegin,
+    this.editEnd
+  );
 
-  @State()
-  private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
-
-  @State()
-  private resizeBounds?: Rectangle.Rectangle;
-
-  private pointerId?: number;
+  private registeredHandler?: Disposable;
 
   /**
    * @ignore
    */
   protected componentWillLoad(): void {
     this.updateViewport();
-
     this.handleViewerChanged(this.viewer);
-
     this.updateBoundsFromProps();
   }
 
@@ -148,15 +141,14 @@ export class ViewerMarkupCircle {
   }
 
   protected disconnectedCallback(): void {
-    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    this.dispose();
   }
 
   @Method()
   public async dispose(): Promise<void> {
-    if (this.viewer != null) {
-      this.removeInteractionListeners(this.viewer);
-    }
-    this.removeDrawingInteractionListeners();
+    this.registeredHandler?.dispose();
+    this.registeredHandler = undefined;
+
     window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
@@ -164,16 +156,16 @@ export class ViewerMarkupCircle {
    * @ignore
    */
   @Watch('viewer')
-  protected handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
-  ): void {
-    if (oldViewer != null) {
-      this.removeInteractionListeners(oldViewer);
-    }
+  protected async handleViewerChanged(
+    newViewer?: HTMLVertexViewerElement
+  ): Promise<void> {
+    this.registeredHandler?.dispose();
+    this.registeredHandler = undefined;
 
     if (newViewer != null) {
-      this.addInteractionListeners(newViewer);
+      this.registeredHandler = await newViewer.registerInteractionHandler(
+        this.interactionHandler
+      );
     }
   }
 
@@ -229,27 +221,31 @@ export class ViewerMarkupCircle {
             <BoundingBox2d
               bounds={relativeBounds}
               onTopLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-left')
+                this.interactionHandler.editAnchor('top-left', e)
               }
               onTopRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-right')
+                this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+              onTopAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('top', e)
+              }
               onBottomLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-left')
+                this.interactionHandler.editAnchor('bottom-left', e)
               }
               onBottomRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-right')
+                this.interactionHandler.editAnchor('bottom-right', e)
               }
               onBottomAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom')
+                this.interactionHandler.editAnchor('bottom', e)
               }
-              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
+              onLeftAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('left', e)
+              }
               onRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'right')
+                this.interactionHandler.editAnchor('right', e)
               }
               onCenterAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'center')
+                this.interactionHandler.editAnchor('center', e)
               }
             />
           )}
@@ -273,111 +269,13 @@ export class ViewerMarkupCircle {
     }
   }
 
-  private async addInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode === 'create') {
-      interactionTarget.addEventListener('pointerdown', this.startMarkup);
-    }
-  }
-
-  private async addDrawingInteractionListeners(): Promise<void> {
-    if (this.mode !== '') {
-      window.addEventListener('pointermove', this.updatePoints);
-      window.addEventListener('pointerup', this.endMarkup);
-    }
-  }
-
-  private async removeInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    interactionTarget.removeEventListener('pointerdown', this.startMarkup);
-  }
-
-  private async removeDrawingInteractionListeners(): Promise<void> {
-    window.removeEventListener('pointermove', this.updatePoints);
-    window.removeEventListener('pointerup', this.endMarkup);
-  }
-
-  private updateEditAnchor = (
-    event: PointerEvent,
-    anchor: BoundingBox2dAnchorPosition
-  ): void => {
-    this.resizeBounds = this.bounds;
-    this.editAnchor = anchor;
-    this.startMarkup(event);
-  };
-
-  private updatePoints = (event: PointerEvent): void => {
-    if (
-      this.bounds != null &&
-      this.startPosition != null &&
-      this.elementBounds != null &&
-      this.pointerId === event.pointerId
-    ) {
-      const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
-      );
-
-      this.bounds = transformRectangle(
-        this.resizeBounds ?? this.bounds,
-        this.startPosition,
-        position,
-        this.editAnchor,
-        event.shiftKey
-      );
-    }
-  };
-
   private handleWindowPointerDown = (event: PointerEvent): void => {
     if (isValidStartEvent(event)) {
-      this.startMarkup(event);
+      this.interactionHandler.startInteraction(event);
     }
   };
 
   private handleTouchStart = (event: TouchEvent): void => {
     event.preventDefault();
-  };
-
-  private startMarkup = (event: PointerEvent): void => {
-    if (
-      this.mode !== '' &&
-      this.elementBounds != null &&
-      this.pointerId == null
-    ) {
-      const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
-      );
-      this.pointerId = event.pointerId;
-      this.startPosition = position;
-      this.bounds =
-        this.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
-      this.resizeBounds = this.bounds;
-      this.editBegin.emit();
-      this.addDrawingInteractionListeners();
-    }
-  };
-
-  private endMarkup = (event: PointerEvent): void => {
-    if (this.pointerId === event.pointerId) {
-      if (
-        this.mode !== '' &&
-        this.bounds != null &&
-        this.bounds?.width > 0 &&
-        this.bounds?.height > 0
-      ) {
-        this.editAnchor = 'bottom-right';
-        this.editEnd.emit();
-      } else {
-        this.bounds = undefined;
-      }
-
-      this.pointerId = undefined;
-      this.removeDrawingInteractionListeners();
-    }
   };
 }
