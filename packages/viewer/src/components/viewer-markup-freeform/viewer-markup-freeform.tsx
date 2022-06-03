@@ -11,21 +11,18 @@ import {
   Watch,
 } from '@stencil/core';
 import { Point, Rectangle } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
-import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
-  BoundingBox2dAnchorPosition,
   isValidStartEvent,
-  transformRectangle,
-  translatePointsToBounds,
-  translatePointToRelative,
   translatePointToScreen,
   translateRectToScreen,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from '../viewer-markup-circle/utils';
 import { BoundingBox2d } from '../viewer-markup-circle/viewer-markup-circle-components';
+import { FreeformMarkupInteractionHandler } from './interactions';
 import { parsePoints } from './utils';
 
 /**
@@ -128,38 +125,28 @@ export class ViewerMarkupFreeform {
   public viewRendered!: EventEmitter<void>;
 
   @Element()
-  private hostEl!: HTMLElement;
+  private hostEl!: HTMLVertexViewerMarkupFreeformElement;
 
   @State()
   private elementBounds?: DOMRect;
 
   @State()
-  private resizeStartPosition?: Point.Point;
-
-  @State()
-  private editAnchor: BoundingBox2dAnchorPosition = 'bottom-right';
-
-  @State()
-  private resizeBounds?: Rectangle.Rectangle;
-
-  @State()
-  private resizePoints?: Point.Point[];
-
-  @State()
   private screenPoints: Point.Point[] = [];
 
-  private min?: Point.Point;
-  private max?: Point.Point;
-  private pointerId?: number;
+  private interactionHandler = new FreeformMarkupInteractionHandler(
+    this.hostEl,
+    this.editBegin,
+    this.editEnd
+  );
+
+  private registeredInteraction?: Disposable;
 
   /**
    * @ignore
    */
   protected componentWillLoad(): void {
     this.updateViewport();
-
     this.handleViewerChanged(this.viewer);
-
     this.updatePointsFromProps();
   }
 
@@ -179,15 +166,14 @@ export class ViewerMarkupFreeform {
   }
 
   protected disconnectedCallback(): void {
-    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    this.dispose();
   }
 
   @Method()
   public async dispose(): Promise<void> {
-    if (this.viewer != null) {
-      this.removeInteractionListeners(this.viewer);
-    }
-    this.removeDrawingInteractionListeners();
+    this.registeredInteraction?.dispose();
+    this.registeredInteraction = undefined;
+
     window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
@@ -195,26 +181,26 @@ export class ViewerMarkupFreeform {
    * @ignore
    */
   @Watch('viewer')
-  protected handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
-  ): void {
-    if (oldViewer != null) {
-      this.removeInteractionListeners(oldViewer);
-    }
+  protected async handleViewerChanged(
+    newViewer?: HTMLVertexViewerElement
+  ): Promise<void> {
+    this.registeredInteraction?.dispose();
+    this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.addInteractionListeners(newViewer);
+      this.registeredInteraction = await newViewer.registerInteractionHandler(
+        this.interactionHandler
+      );
     }
   }
 
   @Watch('points')
-  protected handlePointsJsonChange(): void {
+  protected handlePointsChange(): void {
     this.updatePointsFromProps();
   }
 
   @Watch('bounds')
-  protected handleBoundsJsonChange(): void {
+  protected handleBoundsChange(): void {
     this.updatePointsFromProps();
   }
 
@@ -260,27 +246,31 @@ export class ViewerMarkupFreeform {
             <BoundingBox2d
               bounds={translateRectToScreen(this.bounds, this.elementBounds)}
               onTopLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-left')
+                this.interactionHandler.editAnchor('top-left', e)
               }
               onTopRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'top-right')
+                this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) => this.updateEditAnchor(e, 'top')}
+              onTopAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('top', e)
+              }
               onBottomLeftAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-left')
+                this.interactionHandler.editAnchor('bottom-left', e)
               }
               onBottomRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom-right')
+                this.interactionHandler.editAnchor('bottom-right', e)
               }
               onBottomAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'bottom')
+                this.interactionHandler.editAnchor('bottom', e)
               }
-              onLeftAnchorPointerDown={(e) => this.updateEditAnchor(e, 'left')}
+              onLeftAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('left', e)
+              }
               onRightAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'right')
+                this.interactionHandler.editAnchor('right', e)
               }
               onCenterAnchorPointerDown={(e) =>
-                this.updateEditAnchor(e, 'center')
+                this.interactionHandler.editAnchor('center', e)
               }
             />
           )}
@@ -304,202 +294,15 @@ export class ViewerMarkupFreeform {
     }
   }
 
-  private async addInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode === 'create') {
-      interactionTarget.addEventListener('pointerdown', this.startMarkup);
-    }
-  }
-
-  private async addDrawingInteractionListeners(): Promise<void> {
-    if (this.mode !== '') {
-      window.addEventListener('pointermove', this.updatePoints);
-      window.addEventListener('pointerup', this.endMarkup);
-    }
-  }
-
-  private async addEditingInteractionListeners(): Promise<void> {
-    if (this.mode === 'edit') {
-      window.addEventListener('pointermove', this.updateBounds);
-      window.addEventListener('pointerup', this.endEdit);
-    }
-  }
-
-  private async removeInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    interactionTarget.removeEventListener('pointerdown', this.startMarkup);
-  }
-
-  private async removeDrawingInteractionListeners(): Promise<void> {
-    window.removeEventListener('pointermove', this.updatePoints);
-    window.removeEventListener('pointerup', this.endMarkup);
-  }
-
-  private async removeEditingInteractionListeners(): Promise<void> {
-    if (this.mode === 'edit') {
-      window.removeEventListener('pointermove', this.updateBounds);
-      window.removeEventListener('pointerup', this.endEdit);
-    }
-  }
-
   private handleWindowPointerDown = (event: PointerEvent): void => {
     if (isValidStartEvent(event)) {
-      this.startMarkup(event);
+      this.interactionHandler.startInteraction(event);
     }
   };
 
   private handleTouchStart = (event: TouchEvent): void => {
     event.preventDefault();
   };
-
-  private updateEditAnchor = (
-    event: PointerEvent,
-    anchor: BoundingBox2dAnchorPosition
-  ): void => {
-    if (this.elementBounds != null) {
-      this.resizeBounds = this.bounds;
-      this.resizePoints = this.points;
-      this.editAnchor = anchor;
-      this.resizeStartPosition = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
-      );
-      this.addEditingInteractionListeners();
-    }
-  };
-
-  private updateBounds = (event: PointerEvent): void => {
-    if (
-      this.resizeStartPosition != null &&
-      this.elementBounds != null &&
-      this.resizeBounds != null &&
-      this.resizePoints != null
-    ) {
-      const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
-      );
-
-      const updatedBounds = transformRectangle(
-        this.resizeBounds,
-        this.resizeStartPosition,
-        position,
-        this.editAnchor,
-        event.shiftKey
-      );
-      this.points = translatePointsToBounds(
-        this.resizePoints,
-        this.resizeBounds,
-        updatedBounds
-      );
-      this.screenPoints = this.convertPointsToScreen() ?? this.screenPoints;
-      this.bounds = updatedBounds;
-    }
-  };
-
-  private updatePoints = (event: PointerEvent): void => {
-    if (
-      this.pointerId === event.pointerId &&
-      this.points != null &&
-      this.elementBounds != null
-    ) {
-      const screenPosition = getMouseClientPosition(event, this.elementBounds);
-      const position = translatePointToRelative(
-        screenPosition,
-        this.elementBounds
-      );
-      this.updateMinAndMax(position);
-      this.points = [...this.points, position];
-      this.screenPoints = [...this.screenPoints, screenPosition];
-    }
-  };
-
-  private startMarkup = (event: PointerEvent): void => {
-    if (
-      this.pointerId == null &&
-      this.mode !== '' &&
-      this.elementBounds != null
-    ) {
-      this.pointerId = event.pointerId;
-      const screenPosition = getMouseClientPosition(event, this.elementBounds);
-      const position = translatePointToRelative(
-        screenPosition,
-        this.elementBounds
-      );
-      this.updateMinAndMax(position);
-      this.points = this.points ?? [position];
-      this.screenPoints = this.screenPoints ?? [screenPosition];
-      this.editBegin.emit();
-      this.addDrawingInteractionListeners();
-    }
-  };
-
-  private endMarkup = (event: PointerEvent): void => {
-    if (this.pointerId === event.pointerId) {
-      if (
-        this.mode !== '' &&
-        this.points != null &&
-        this.points.length > 2 &&
-        this.elementBounds != null
-      ) {
-        const screenPosition = getMouseClientPosition(
-          event,
-          this.elementBounds
-        );
-        const position = translatePointToRelative(
-          screenPosition,
-          this.elementBounds
-        );
-
-        this.updateMinAndMax(position);
-
-        this.points = [...this.points, position];
-        this.screenPoints = [...this.screenPoints, screenPosition];
-
-        this.editEnd.emit();
-      } else {
-        this.points = undefined;
-      }
-
-      this.min = undefined;
-      this.max = undefined;
-      this.pointerId = undefined;
-      this.removeDrawingInteractionListeners();
-    }
-  };
-
-  private endEdit = (): void => {
-    this.resizeBounds = undefined;
-    this.removeEditingInteractionListeners();
-    this.editEnd.emit();
-  };
-
-  private updateMinAndMax(position: Point.Point): void {
-    this.min =
-      this.min != null
-        ? Point.create(
-            Math.min(this.min.x, position.x),
-            Math.min(this.min.y, position.y)
-          )
-        : position;
-    this.max =
-      this.max != null
-        ? Point.create(
-            Math.max(this.max.x, position.x),
-            Math.max(this.max.y, position.y)
-          )
-        : position;
-    this.bounds = Rectangle.create(
-      this.min.x,
-      this.min.y,
-      this.max.x - this.min.x,
-      this.max.y - this.min.y
-    );
-  }
 
   private convertPointsToScreen(): Point.Point[] | undefined {
     const elementBounds = this.elementBounds;

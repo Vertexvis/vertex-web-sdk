@@ -47,7 +47,7 @@ Type: `Promise<void>`
 
 - [vertex-viewer-markup-arrow](../viewer-markup-arrow)
 - [vertex-viewer-markup-circle](../viewer-markup-circle)
-- [vertex-viewer-markup-freeform](../viewer-markup-freeform.tsx)
+- [vertex-viewer-markup-freeform](../viewer-markup-freeform)
 
 ### Graph
 ```mermaid

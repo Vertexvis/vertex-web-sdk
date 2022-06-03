@@ -2,7 +2,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
-import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
 export type BoundingBox2dAnchorPosition =
   | 'left'

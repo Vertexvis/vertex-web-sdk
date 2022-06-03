@@ -20,7 +20,7 @@ import {
 } from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
-import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
 /**
  * The types of markup that can be performed by this tool.

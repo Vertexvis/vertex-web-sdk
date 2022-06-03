@@ -17,7 +17,7 @@ import {
 } from '../../lib/types/markup';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
-import { ViewerMarkupFreeform } from '../viewer-markup-freeform.tsx/viewer-markup-freeform';
+import { ViewerMarkupFreeform } from '../viewer-markup-freeform/viewer-markup-freeform';
 import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
 import { ViewerMarkup } from './viewer-markup';
 
