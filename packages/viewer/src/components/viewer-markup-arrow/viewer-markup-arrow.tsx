@@ -11,16 +11,16 @@ import {
   Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
-import { getMouseClientPosition } from '../../lib/dom';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidPointData,
   isValidStartEvent,
-  translatePointToRelative,
   translatePointToScreen,
 } from '../viewer-markup/utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
+import { ArrowMarkupInteractionHandler } from './interactions';
 import {
   arrowheadPointsToPolygonPoints,
   createArrowheadPoints,
@@ -34,8 +34,6 @@ import { BoundingBox1d } from './viewer-markup-arrow-components';
  * @see {@link ViewerMarkupArrowMode.mode} - For more details about modes.
  */
 export type ViewerMarkupArrowMode = 'edit' | 'create' | '';
-
-type ViewerMarkupArrowEditAnchor = 'start' | 'end' | 'center';
 
 @Component({
   tag: 'vertex-viewer-markup-arrow',
@@ -128,24 +126,25 @@ export class ViewerMarkupArrow {
   public viewRendered!: EventEmitter<void>;
 
   @Element()
-  private hostEl!: HTMLElement;
+  private hostEl!: HTMLVertexViewerMarkupArrowElement;
 
   @State()
   private elementBounds?: DOMRect;
 
-  @State()
-  private editAnchor: ViewerMarkupArrowEditAnchor = 'end';
+  private interactionHandler = new ArrowMarkupInteractionHandler(
+    this.hostEl,
+    this.editBegin,
+    this.editEnd
+  );
 
-  private pointerId?: number;
+  private registeredInteraction?: Disposable;
 
   /**
    * @ignore
    */
   protected componentWillLoad(): void {
     this.updateViewport();
-
     this.handleViewerChanged(this.viewer);
-
     this.updatePointsFromProps();
   }
 
@@ -167,15 +166,14 @@ export class ViewerMarkupArrow {
   }
 
   protected disconnectedCallback(): void {
-    window.removeEventListener('pointerdown', this.handleWindowPointerDown);
+    this.dispose();
   }
 
   @Method()
   public async dispose(): Promise<void> {
-    if (this.viewer != null) {
-      this.removeInteractionListeners(this.viewer);
-    }
-    this.removeDrawingInteractionListeners();
+    this.registeredInteraction?.dispose();
+    this.registeredInteraction = undefined;
+
     window.removeEventListener('pointerdown', this.handleWindowPointerDown);
   }
 
@@ -183,16 +181,16 @@ export class ViewerMarkupArrow {
    * @ignore
    */
   @Watch('viewer')
-  protected handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
-  ): void {
-    if (oldViewer != null) {
-      this.removeInteractionListeners(oldViewer);
-    }
+  protected async handleViewerChanged(
+    newViewer?: HTMLVertexViewerElement
+  ): Promise<void> {
+    this.registeredInteraction?.dispose();
+    this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.addInteractionListeners(newViewer);
+      this.registeredInteraction = await newViewer.registerInteractionHandler(
+        this.interactionHandler
+      );
     }
   }
 
@@ -269,9 +267,15 @@ export class ViewerMarkupArrow {
               <BoundingBox1d
                 start={screenStart}
                 end={screenEnd}
-                onStartAnchorPointerDown={this.editStartPoint}
-                onCenterAnchorPointerDown={this.editCenterPoint}
-                onEndAnchorPointerDown={this.editEndPoint}
+                onStartAnchorPointerDown={() =>
+                  this.interactionHandler.editAnchor('start')
+                }
+                onCenterAnchorPointerDown={() =>
+                  this.interactionHandler.editAnchor('center')
+                }
+                onEndAnchorPointerDown={() =>
+                  this.interactionHandler.editAnchor('end')
+                }
               />
             )}
             {this.mode === 'create' && (
@@ -297,132 +301,13 @@ export class ViewerMarkupArrow {
     }
   }
 
-  private async addInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    if (this.mode === 'create') {
-      interactionTarget.addEventListener('pointerdown', this.startMarkup);
-    }
-  }
-
-  private async addDrawingInteractionListeners(): Promise<void> {
-    if (this.mode !== '') {
-      window.addEventListener('pointermove', this.updatePoints);
-      window.addEventListener('pointerup', this.endMarkup);
-    }
-  }
-
-  private async removeInteractionListeners(
-    viewer: HTMLVertexViewerElement
-  ): Promise<void> {
-    const interactionTarget = await viewer.getInteractionTarget();
-    interactionTarget.removeEventListener('pointerdown', this.startMarkup);
-  }
-
-  private async removeDrawingInteractionListeners(): Promise<void> {
-    window.removeEventListener('pointermove', this.updatePoints);
-    window.removeEventListener('pointerup', this.endMarkup);
-  }
-
-  private editStartPoint = (event: PointerEvent): void => {
-    this.editAnchor = 'start';
-    this.startMarkup(event);
-  };
-
-  private editCenterPoint = (event: PointerEvent): void => {
-    this.editAnchor = 'center';
-    this.startMarkup(event);
-  };
-
-  private editEndPoint = (event: PointerEvent): void => {
-    this.editAnchor = 'end';
-    this.startMarkup(event);
-  };
-
-  private updatePoints = (event: PointerEvent): void => {
-    if (this.elementBounds != null && this.pointerId === event.pointerId) {
-      const position = translatePointToRelative(
-        getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
-      );
-      if (this.editAnchor === 'start') {
-        this.start = position;
-      } else if (this.editAnchor === 'end') {
-        this.end = position;
-      } else if (this.start != null && this.end != null) {
-        const center = Point.create(
-          (this.start.x + this.end.x) / 2,
-          (this.start.y + this.end.y) / 2
-        );
-        const xDifference = center.x - position.x;
-        const yDifference = center.y - position.y;
-
-        this.start = Point.create(
-          this.start.x - xDifference,
-          this.start.y - yDifference
-        );
-        this.end = Point.create(
-          this.end.x - xDifference,
-          this.end.y - yDifference
-        );
-      }
-    }
-  };
-
   private handleWindowPointerDown = (event: PointerEvent): void => {
     if (isValidStartEvent(event)) {
-      this.startMarkup(event);
+      this.interactionHandler.startInteraction(event);
     }
   };
 
   private handleTouchStart = (event: TouchEvent): void => {
     event.preventDefault();
-  };
-
-  private startMarkup = (event: PointerEvent): void => {
-    if (
-      this.mode !== '' &&
-      this.elementBounds != null &&
-      this.pointerId == null
-    ) {
-      this.pointerId = event.pointerId;
-      this.start =
-        this.start ??
-        translatePointToRelative(
-          getMouseClientPosition(event, this.elementBounds),
-          this.elementBounds
-        );
-      this.editBegin.emit();
-      this.addDrawingInteractionListeners();
-    }
-  };
-
-  private endMarkup = (event: PointerEvent): void => {
-    if (this.pointerId === event.pointerId) {
-      const screenStart =
-        this.start != null && this.elementBounds != null
-          ? translatePointToScreen(this.start, this.elementBounds)
-          : undefined;
-      const screenEnd =
-        this.end != null && this.elementBounds != null
-          ? translatePointToScreen(this.end, this.elementBounds)
-          : undefined;
-
-      if (
-        this.mode !== '' &&
-        screenStart != null &&
-        screenEnd != null &&
-        Point.distance(screenStart, screenEnd) >= 2
-      ) {
-        this.editEnd.emit();
-      } else {
-        this.start = undefined;
-        this.end = undefined;
-      }
-
-      this.pointerId = undefined;
-      this.removeDrawingInteractionListeners();
-    }
   };
 }
