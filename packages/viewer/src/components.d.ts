@@ -73,7 +73,7 @@ import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-mar
 import { Markup } from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
-import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform.tsx/viewer-markup-freeform';
+import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
 import { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
 import {
   MeasurementController,
@@ -434,8 +434,9 @@ export namespace Components {
     getInteractionHandlers: () => Promise<InteractionHandler[]>;
     /**
      * The HTML element that will handle interaction events from the user. Used by components to listen for interaction events from the same element as the viewer. Note, this property maybe removed in the future when refactoring our interaction handling.
+     * @deprecated Use `InteractionHandler`.
      */
-    getInteractionTarget: () => Promise<HTMLElement>;
+    getInteractionTarget_DEPRECATED: () => Promise<HTMLElement>;
     /**
      * @deprecated Use `token`.
      */
