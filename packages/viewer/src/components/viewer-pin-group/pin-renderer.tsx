@@ -26,9 +26,7 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
         <vertex-viewer-icon
           name="pin-fill"
           size="lg"
-          class={classNames('pin', {
-            'pin-selected': selected,
-          })}
+          class={classNames('pin', { 'pin-selected': selected })}
         />
       )}
     </Fragment>
