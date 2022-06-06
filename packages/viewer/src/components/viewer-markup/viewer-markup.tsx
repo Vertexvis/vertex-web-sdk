@@ -22,7 +22,7 @@ import {
 } from '../../lib/types/markup';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
-import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform.tsx/utils';
+import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
 
 @Component({

@@ -6,27 +6,14 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Rectangle } from '@vertexvis/geometry';
 
+import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { ViewerMarkup } from '../viewer-markup/viewer-markup';
 import { ViewerMarkupCircle } from './viewer-markup-circle';
 
 describe('vertex-viewer-markup-circle', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let interactionTargetListeners: any[] = [];
-  const addEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = [...interactionTargetListeners, listener];
-  });
-  const removeEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = interactionTargetListeners.filter(
-      (l) => l !== listener
-    );
-  });
-  const viewer = {
-    getInteractionTarget: jest.fn(() => ({
-      addEventListener,
-      removeEventListener,
-    })),
-  };
   const bounds = Rectangle.create(-0.5, -0.5, 0.5, 0.5);
+
   (getMarkupBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -37,7 +24,6 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   beforeEach(() => {
-    interactionTargetListeners = [];
     jest.clearAllMocks();
   });
 
@@ -45,10 +31,7 @@ describe('vertex-viewer-markup-circle', () => {
     const page = await newSpecPage({
       components: [ViewerMarkupCircle],
       template: () => (
-        <vertex-viewer-markup-circle
-          bounds={bounds}
-          mode="edit"
-        ></vertex-viewer-markup-circle>
+        <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
       ),
     });
 
@@ -107,16 +90,20 @@ describe('vertex-viewer-markup-circle', () => {
 
   it('handles resizes', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupCircle],
+      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
-        <vertex-viewer-markup-circle
-          bounds={bounds}
-          mode="edit"
-        ></vertex-viewer-markup-circle>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupCircleElement;
+    const root = page.root as HTMLVertexViewerElement;
+    const el = root.querySelector(
+      'vertex-viewer-markup-circle'
+    ) as HTMLVertexViewerMarkupCircleElement;
     const leftEl = el?.shadowRoot?.getElementById(
       'bounding-box-2d-left-anchor'
     );
@@ -150,10 +137,7 @@ describe('vertex-viewer-markup-circle', () => {
      */
     rightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 75,
-        clientY: 0,
-      })
+      new MouseEvent('pointermove', { clientX: 75, clientY: 0 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -162,10 +146,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 100,
-        clientY: 100,
-      })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -174,10 +155,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 90,
-        clientY: 10,
-      })
+      new MouseEvent('pointermove', { clientX: 90, clientY: 10 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -186,10 +164,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     leftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 50,
-        clientY: 50,
-      })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -198,10 +173,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 60,
-        clientY: 20,
-      })
+      new MouseEvent('pointermove', { clientX: 60, clientY: 20 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -210,10 +182,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 40,
-        clientY: 90,
-      })
+      new MouseEvent('pointermove', { clientX: 40, clientY: 90 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -222,10 +191,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 50,
-        clientY: 30,
-      })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 30 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -234,10 +200,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 50,
-        clientY: 80,
-      })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 80 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -250,16 +213,10 @@ describe('vertex-viewer-markup-circle', () => {
      */
 
     centerEl?.dispatchEvent(
-      new MouseEvent('pointerdown', {
-        clientX: 65,
-        clientY: 55,
-      })
+      new MouseEvent('pointerdown', { clientX: 65, clientY: 55 })
     );
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 50,
-        clientY: 50,
-      })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -291,16 +248,20 @@ describe('vertex-viewer-markup-circle', () => {
 
   it('should support maintaining aspect ratio', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupCircle],
+      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
-        <vertex-viewer-markup-circle
-          bounds={bounds}
-          mode="edit"
-        ></vertex-viewer-markup-circle>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupCircleElement;
+    const root = page.root as HTMLVertexViewerElement;
+    const el = root.querySelector(
+      'vertex-viewer-markup-circle'
+    ) as HTMLVertexViewerMarkupCircleElement;
     const bottomRightEl = el?.shadowRoot?.getElementById(
       'bounding-box-2d-bottom-right-anchor'
     );
@@ -315,28 +276,34 @@ describe('vertex-viewer-markup-circle', () => {
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
+
     expect(bottomRightEl?.getAttribute('style')).toContain('left: 106px');
     expect(bottomRightEl?.getAttribute('style')).toContain('top: 106px');
   });
 
   it('removes event listeners when the viewer changes', async () => {
-    const newViewer = {
-      getInteractionTarget: jest.fn(),
-    };
     const page = await newSpecPage({
-      components: [ViewerMarkupCircle],
+      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
-        <vertex-viewer-markup-circle
-          mode="create"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          viewer={viewer as any}
-        ></vertex-viewer-markup-circle>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-circle mode="create" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupCircleElement;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    el.viewer = newViewer as any;
+    const root = page.root as HTMLVertexViewerElement;
+    const canvas = root.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+
+    const newViewer = page.doc.createElement('vertex-viewer');
+    const el = root.querySelector(
+      'vertex-viewer-markup-circle'
+    ) as HTMLVertexViewerMarkupCircleElement;
+    el.viewer = newViewer;
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
@@ -347,17 +314,25 @@ describe('vertex-viewer-markup-circle', () => {
 
   it('removes event listeners when disposed', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupCircle],
+      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
-        <vertex-viewer-markup-circle
-          mode="create"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          viewer={viewer as any}
-        ></vertex-viewer-markup-circle>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-circle mode="create" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupCircleElement;
+    const root = page.root as HTMLVertexViewerElement;
+    const canvas = root.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+
+    const el = root.querySelector(
+      'vertex-viewer-markup-circle'
+    ) as HTMLVertexViewerMarkupCircleElement;
     el.dispose();
     await page.waitForChanges();
 

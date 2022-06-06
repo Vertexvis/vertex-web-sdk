@@ -624,7 +624,7 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget();
+      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
 
       interactionTarget.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
@@ -668,7 +668,7 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget();
+      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
 
       // update start
       interactionTarget.dispatchEvent(
@@ -727,7 +727,7 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget();
+      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
 
       // update start
       interactionTarget.dispatchEvent(
@@ -792,7 +792,7 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget();
+      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
 
       // update start
       interactionTarget.dispatchEvent(
@@ -847,7 +847,7 @@ describe('vertex-viewer-measurement-distance', () => {
       const measurement = viewer.querySelector(
         'vertex-viewer-measurement-distance'
       ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget();
+      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
 
       // update start anchor
       interactionTarget.dispatchEvent(

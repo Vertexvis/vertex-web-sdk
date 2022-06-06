@@ -6,28 +6,15 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
 
+import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
+import { ViewerMarkup } from '../viewer-markup/viewer-markup';
 import { ViewerMarkupArrow } from './viewer-markup-arrow';
 
 describe('vertex-viewer-markup-arrow', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let interactionTargetListeners: any[] = [];
-  const addEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = [...interactionTargetListeners, listener];
-  });
-  const removeEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = interactionTargetListeners.filter(
-      (l) => l !== listener
-    );
-  });
-  const viewer = {
-    getInteractionTarget: jest.fn(() => ({
-      addEventListener,
-      removeEventListener,
-    })),
-  };
   const start = Point.create(0, -0.5);
   const end = Point.create(0, 0);
+
   (getMarkupBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -38,7 +25,6 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   beforeEach(() => {
-    interactionTargetListeners = [];
     jest.clearAllMocks();
   });
 
@@ -46,11 +32,7 @@ describe('vertex-viewer-markup-arrow', () => {
     const page = await newSpecPage({
       components: [ViewerMarkupArrow],
       template: () => (
-        <vertex-viewer-markup-arrow
-          start={start}
-          end={end}
-          mode="edit"
-        ></vertex-viewer-markup-arrow>
+        <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
       ),
     });
 
@@ -73,17 +55,19 @@ describe('vertex-viewer-markup-arrow', () => {
 
   it('handles resizes', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupArrow],
+      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
-        <vertex-viewer-markup-arrow
-          start={start}
-          end={end}
-          mode="edit"
-        ></vertex-viewer-markup-arrow>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupArrowElement;
+    const el = page.root?.querySelector(
+      'vertex-viewer-markup-arrow'
+    ) as HTMLVertexViewerMarkupArrowElement;
     const startEl = el?.shadowRoot?.getElementById(
       'bounding-box-1d-start-anchor'
     );
@@ -94,10 +78,7 @@ describe('vertex-viewer-markup-arrow', () => {
 
     startEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 100,
-        clientY: 0,
-      })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -106,10 +87,7 @@ describe('vertex-viewer-markup-arrow', () => {
 
     endEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 100,
-        clientY: 50,
-      })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 50 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -118,10 +96,7 @@ describe('vertex-viewer-markup-arrow', () => {
 
     centerEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', {
-        clientX: 50,
-        clientY: 50,
-      })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -134,23 +109,29 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('removes event listeners when the viewer changes', async () => {
-    const newViewer = {
-      getInteractionTarget: jest.fn(),
-    };
     const page = await newSpecPage({
-      components: [ViewerMarkupArrow],
+      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
-        <vertex-viewer-markup-arrow
-          mode="create"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          viewer={viewer as any}
-        ></vertex-viewer-markup-arrow>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-arrow mode="create" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupArrowElement;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    el.viewer = newViewer as any;
+    const root = page.root as HTMLVertexViewerElement;
+    const newViewer = page.doc.createElement('vertex-viewer');
+
+    const canvas = root.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+
+    const markup = root.querySelector(
+      'vertex-viewer-markup-arrow'
+    ) as HTMLVertexViewerMarkupArrowElement;
+    markup.viewer = newViewer;
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
@@ -161,17 +142,26 @@ describe('vertex-viewer-markup-arrow', () => {
 
   it('removes event listeners when disposed', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupArrow],
+      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
-        <vertex-viewer-markup-arrow
-          mode="create"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          viewer={viewer as any}
-        ></vertex-viewer-markup-arrow>
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-arrow mode="create" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
       ),
     });
 
-    const el = page.root as HTMLVertexViewerMarkupArrowElement;
+    const root = page.root as HTMLVertexViewerElement;
+
+    const canvas = root.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+
+    const el = root.querySelector(
+      'vertex-viewer-markup-arrow'
+    ) as HTMLVertexViewerMarkupArrowElement;
     el.dispose();
     await page.waitForChanges();
 

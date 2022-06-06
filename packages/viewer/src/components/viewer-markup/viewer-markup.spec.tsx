@@ -15,9 +15,10 @@ import {
   CircleMarkup,
   FreeformMarkup,
 } from '../../lib/types/markup';
+import { Viewer } from '../viewer/viewer';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
-import { ViewerMarkupFreeform } from '../viewer-markup-freeform.tsx/viewer-markup-freeform';
+import { ViewerMarkupFreeform } from '../viewer-markup-freeform/viewer-markup-freeform';
 import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
 import { ViewerMarkup } from './viewer-markup';
 
@@ -35,7 +36,7 @@ describe('vertex-viewer-markup', () => {
   const viewer = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getInteractionTarget: jest.fn(() => ({
+    getInteractionTarget_DEPRECATED: jest.fn(() => ({
       addEventListener,
       removeEventListener,
     })),
@@ -289,6 +290,7 @@ describe('vertex-viewer-markup', () => {
     it('resets the internal markup tool when markup renders', async () => {
       const page = await newSpecPage({
         components: [
+          Viewer,
           ViewerMarkup,
           ViewerMarkupTool,
           ViewerMarkupArrow,
@@ -296,16 +298,22 @@ describe('vertex-viewer-markup', () => {
           ViewerMarkupFreeform,
         ],
         template: () => (
-          <vertex-viewer-markup
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            viewer={viewer as any}
-          >
-            <vertex-viewer-markup-tool />
-          </vertex-viewer-markup>
+          <vertex-viewer>
+            <vertex-viewer-markup
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              viewer={viewer as any}
+            >
+              <vertex-viewer-markup-tool />
+            </vertex-viewer-markup>
+          </vertex-viewer>
         ),
       });
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const root = page.root as HTMLVertexViewerElement;
+
+      const el = root.querySelector(
+        'vertex-viewer-markup'
+      ) as HTMLVertexViewerMarkupElement;
       const tool = el.querySelector(
         'vertex-viewer-markup-tool'
       ) as HTMLVertexViewerMarkupToolElement;
@@ -314,10 +322,7 @@ describe('vertex-viewer-markup', () => {
       ) as HTMLVertexViewerMarkupArrowElement;
       arrow.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', {
-          clientX: 100,
-          clientY: 0,
-        })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
       );
       await page.waitForChanges();
 
@@ -338,10 +343,7 @@ describe('vertex-viewer-markup', () => {
       ) as HTMLVertexViewerMarkupCircleElement;
       circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', {
-          clientX: 100,
-          clientY: 100,
-        })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
       );
       await page.waitForChanges();
 
@@ -360,16 +362,10 @@ describe('vertex-viewer-markup', () => {
       ) as HTMLVertexViewerMarkupFreeformElement;
       freeform.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', {
-          clientX: 100,
-          clientY: 0,
-        })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
       );
       window.dispatchEvent(
-        new MouseEvent('pointermove', {
-          clientX: 100,
-          clientY: 100,
-        })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
       );
       await page.waitForChanges();
 
