@@ -16,7 +16,6 @@ export * from './entities';
 export * from './featureMap';
 export * from './frame';
 export * from './markup';
-export * from './measurement';
 export * from './measurementUnits';
 export * from './orientation';
 export * from './standardView';

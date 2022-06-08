@@ -40,7 +40,6 @@ import {
   EntityType,
   FrameCameraBase as FrameCameraBase1,
   FramePerspectiveCamera,
-  Measurement,
   Orientation,
   StencilBufferManager,
   Viewport,
@@ -91,8 +90,6 @@ import {
 } from './components/viewer-measurement-distance/viewer-measurement-distance';
 import { Anchor } from './components/viewer-measurement-distance/utils';
 import { PointToPointHitProvider } from './components/viewer-measurement-distance/interactions';
-import { ViewerMeasurementToolType } from './components/viewer-measurement-tool/viewer-measurement-tool';
-import { ViewerMeasurementToolType as ViewerMeasurementToolType1 } from './components/viewer-measurement-tool/viewer-measurement-tool';
 import {
   Pin,
   PinModel,
@@ -1068,116 +1065,6 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerMeasurementTool {
-    /**
-     * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    disabled: boolean;
-    /**
-     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    distanceTemplateId?: string;
-    /**
-     * The number of fractional digits to display measurements in.
-     */
-    fractionalDigits: number;
-    /**
-     * A property that indicates if the user is performing a measurement.
-     */
-    isMeasuring: boolean;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance: number;
-    /**
-     * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    tool: ViewerMeasurementToolType;
-    /**
-     * The unit type to display measurements in.
-     */
-    units: DistanceUnitType;
-    /**
-     * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
-  interface VertexViewerMeasurements {
-    /**
-     * Adds a new measurement as a child to this component. A new measurement component will be created from the template specified by `distance-template-id` or if undefined a default element will be created.
-     * @param measurement The measurement to add.
-     * @returns The measurement element that was created.
-     * @see {@link ViewerMeasurements.distanceTemplateId}
-     */
-    addMeasurement: (
-      measurement: Measurement
-    ) => Promise<HTMLVertexViewerMeasurementDistanceElement>;
-    /**
-     * If `true`, disables adding or editing of measurements through user interaction.
-     */
-    disabled: boolean;
-    /**
-     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.
-     */
-    distanceTemplateId?: string;
-    /**
-     * The number of fractional digits to display measurements in.
-     */
-    fractionalDigits: number;
-    /**
-     * Returns the measurement element associated to the given ID.
-     * @param id The ID of the measurement element to return.
-     * @returns A measurement element, or `undefined`.
-     * @see {@link ViewerMeasurements.getMeasurementElements}
-     */
-    getMeasurementElement: (
-      id: string
-    ) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>;
-    /**
-     * Returns a list of measurement elements that are children of this component.
-     * @returns A list of all measurements.
-     * @see {@link ViewerMeasurements.getMeasurementElement}
-     */
-    getMeasurementElements: () => Promise<
-      HTMLVertexViewerMeasurementDistanceElement[]
-    >;
-    /**
-     * The measurement model that will be updated with the selected measurement. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
-     */
-    measurementModel: MeasurementModel;
-    /**
-     * Removes a measurement with the given ID, and returns the HTML element associated to the measurement. Returns `undefined` if no measurement is found.
-     * @param id The ID of the measurement to remove.
-     * @returns The measurement element, or undefined.
-     */
-    removeMeasurement: (
-      id: string
-    ) => Promise<HTMLVertexViewerMeasurementDistanceElement | undefined>;
-    /**
-     * The ID of the measurement that is selected.
-     */
-    selectedMeasurementId?: string;
-    /**
-     * Enables the display of axis reference lines between the start and end point of selected measurements.
-     */
-    showAxisReferenceLines: boolean;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance: number;
-    /**
-     * The type of measurement to perform.
-     */
-    tool: ViewerMeasurementToolType;
-    /**
-     * The unit type to display measurements in.
-     */
-    units: DistanceUnitType;
-    /**
-     * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
   interface VertexViewerPinGroup {
     /**
      * The dimensions of the canvas for the pins
@@ -1519,20 +1406,6 @@ declare global {
     prototype: HTMLVertexViewerMeasurementPreciseElement;
     new (): HTMLVertexViewerMeasurementPreciseElement;
   };
-  interface HTMLVertexViewerMeasurementToolElement
-    extends Components.VertexViewerMeasurementTool,
-      HTMLStencilElement {}
-  var HTMLVertexViewerMeasurementToolElement: {
-    prototype: HTMLVertexViewerMeasurementToolElement;
-    new (): HTMLVertexViewerMeasurementToolElement;
-  };
-  interface HTMLVertexViewerMeasurementsElement
-    extends Components.VertexViewerMeasurements,
-      HTMLStencilElement {}
-  var HTMLVertexViewerMeasurementsElement: {
-    prototype: HTMLVertexViewerMeasurementsElement;
-    new (): HTMLVertexViewerMeasurementsElement;
-  };
   interface HTMLVertexViewerPinGroupElement
     extends Components.VertexViewerPinGroup,
       HTMLStencilElement {}
@@ -1617,8 +1490,6 @@ declare global {
     'vertex-viewer-measurement-line': HTMLVertexViewerMeasurementLineElement;
     'vertex-viewer-measurement-overlays': HTMLVertexViewerMeasurementOverlaysElement;
     'vertex-viewer-measurement-precise': HTMLVertexViewerMeasurementPreciseElement;
-    'vertex-viewer-measurement-tool': HTMLVertexViewerMeasurementToolElement;
-    'vertex-viewer-measurements': HTMLVertexViewerMeasurementsElement;
     'vertex-viewer-pin-group': HTMLVertexViewerPinGroupElement;
     'vertex-viewer-pin-label': HTMLVertexViewerPinLabelElement;
     'vertex-viewer-pin-label-line': HTMLVertexViewerPinLabelLineElement;
@@ -2470,102 +2341,6 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerMeasurementTool {
-    /**
-     * Disables measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    disabled?: boolean;
-    /**
-     * An ID to an HTML template that describes the HTML content to use for distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    distanceTemplateId?: string;
-    /**
-     * The number of fractional digits to display measurements in.
-     */
-    fractionalDigits?: number;
-    /**
-     * A property that indicates if the user is performing a measurement.
-     */
-    isMeasuring?: boolean;
-    /**
-     * An event that is dispatched when a user begins a new measurement.
-     */
-    onMeasureBegin?: (event: CustomEvent<void>) => void;
-    /**
-     * An event that is dispatched when a user has finished their measurement.
-     */
-    onMeasureEnd?: (event: CustomEvent<Measurement>) => void;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance?: number;
-    /**
-     * The type of measurement.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` element.
-     */
-    tool?: ViewerMeasurementToolType;
-    /**
-     * The unit type to display measurements in.
-     */
-    units?: DistanceUnitType;
-    /**
-     * The viewer to connect to measurements.  This property will automatically be set when a child of a `<vertex-viewer-measurements>` or `<vertex-viewer>` element.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
-  interface VertexViewerMeasurements {
-    /**
-     * If `true`, disables adding or editing of measurements through user interaction.
-     */
-    disabled?: boolean;
-    /**
-     * An HTML template that describes the HTML to use for new distance measurements. It's expected that the template contains a `<vertex-viewer-measurement-distance>`.
-     */
-    distanceTemplateId?: string;
-    /**
-     * The number of fractional digits to display measurements in.
-     */
-    fractionalDigits?: number;
-    /**
-     * The measurement model that will be updated with the selected measurement. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
-     */
-    measurementModel?: MeasurementModel;
-    /**
-     * Dispatched when a new measurement is added, either through user interaction or programmatically.
-     */
-    onMeasurementAdded?: (
-      event: CustomEvent<HTMLVertexViewerMeasurementDistanceElement>
-    ) => void;
-    /**
-     * Dispatched when a new measurement is removed, either through user interaction or programmatically.
-     */
-    onMeasurementRemoved?: (
-      event: CustomEvent<HTMLVertexViewerMeasurementDistanceElement>
-    ) => void;
-    /**
-     * The ID of the measurement that is selected.
-     */
-    selectedMeasurementId?: string;
-    /**
-     * Enables the display of axis reference lines between the start and end point of selected measurements.
-     */
-    showAxisReferenceLines?: boolean;
-    /**
-     * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     */
-    snapDistance?: number;
-    /**
-     * The type of measurement to perform.
-     */
-    tool?: ViewerMeasurementToolType;
-    /**
-     * The unit type to display measurements in.
-     */
-    units?: DistanceUnitType;
-    /**
-     * The viewer to connect to measurements. If nested within a <vertex-viewer>, this property will be populated automatically.
-     */
-    viewer?: HTMLVertexViewerElement;
-  }
   interface VertexViewerPinGroup {
     /**
      * The dimensions of the canvas for the pins
@@ -2765,8 +2540,6 @@ declare namespace LocalJSX {
     'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
     'vertex-viewer-measurement-overlays': VertexViewerMeasurementOverlays;
     'vertex-viewer-measurement-precise': VertexViewerMeasurementPrecise;
-    'vertex-viewer-measurement-tool': VertexViewerMeasurementTool;
-    'vertex-viewer-measurements': VertexViewerMeasurements;
     'vertex-viewer-pin-group': VertexViewerPinGroup;
     'vertex-viewer-pin-label': VertexViewerPinLabel;
     'vertex-viewer-pin-label-line': VertexViewerPinLabelLine;
@@ -2835,10 +2608,6 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementOverlaysElement>;
       'vertex-viewer-measurement-precise': LocalJSX.VertexViewerMeasurementPrecise &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementPreciseElement>;
-      'vertex-viewer-measurement-tool': LocalJSX.VertexViewerMeasurementTool &
-        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementToolElement>;
-      'vertex-viewer-measurements': LocalJSX.VertexViewerMeasurements &
-        JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementsElement>;
       'vertex-viewer-pin-group': LocalJSX.VertexViewerPinGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement>;
       'vertex-viewer-pin-label': LocalJSX.VertexViewerPinLabel &
