@@ -8,7 +8,6 @@ import { Environment } from '../../lib/environment';
 import {
   MeasurementController,
   MeasurementModel,
-  MeasurementOverlay,
   MeasurementOverlayManager,
 } from '../../lib/measurement';
 import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
@@ -73,12 +72,7 @@ export class ViewerMeasurementPrecise {
   @Prop()
   public config?: Config;
 
-  @State()
-  private overlays: MeasurementOverlay[] = [];
-
   private registeredInteractionHandler?: Promise<Disposable>;
-  private onEntitiesChangedHandler?: Disposable;
-  private onOverlaysChangedHandler?: Disposable;
 
   /**
    * @ignore
@@ -92,7 +86,6 @@ export class ViewerMeasurementPrecise {
    */
   protected componentWillLoad(): void {
     this.setupController();
-    this.setupModelListeners();
     this.setupInteractionHandler();
   }
 
@@ -101,7 +94,6 @@ export class ViewerMeasurementPrecise {
    */
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
-    this.clearModelListeners();
   }
 
   /**
@@ -126,7 +118,6 @@ export class ViewerMeasurementPrecise {
   @Watch('measurementModel')
   protected handleMeasurementModelChanged(): void {
     this.setupController();
-    this.setupModelListeners();
   }
 
   /**
@@ -179,21 +170,5 @@ export class ViewerMeasurementPrecise {
           )
         );
     }
-  }
-
-  private clearModelListeners(): void {
-    this.onEntitiesChangedHandler?.dispose();
-    this.onEntitiesChangedHandler = undefined;
-
-    this.onOverlaysChangedHandler?.dispose();
-    this.onOverlaysChangedHandler = undefined;
-  }
-
-  private setupModelListeners(): void {
-    this.onOverlaysChangedHandler = this.measurementOverlays.onOverlaysChanged(
-      (overlays) => {
-        this.overlays = overlays;
-      }
-    );
   }
 }
