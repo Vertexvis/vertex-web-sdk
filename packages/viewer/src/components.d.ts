@@ -950,11 +950,11 @@ export namespace Components {
      */
     distance?: number;
     /**
-     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the ending anchor.
      */
     end?: Vector3.Vector3;
     /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the ending anchor, as a JSON string. The JSON string can be an array or object representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
     endJson?: string;
     /**
@@ -996,11 +996,11 @@ export namespace Components {
      */
     snapDistance: number;
     /**
-     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the starting anchor.
      */
     start?: Vector3.Vector3;
     /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the starting anchor, as a JSON string. The JSON string can be an array or object representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
     startJson?: string;
     /**
@@ -2344,11 +2344,11 @@ declare namespace LocalJSX {
      */
     distance?: number;
     /**
-     * The position of the ending anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the ending anchor.
      */
     end?: Vector3.Vector3;
     /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the ending anchor, as a JSON string. The JSON string can be an array or object representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
     endJson?: string;
     /**
@@ -2398,11 +2398,11 @@ declare namespace LocalJSX {
      */
     snapDistance?: number;
     /**
-     * The position of the starting anchor. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the starting anchor.
      */
     start?: Vector3.Vector3;
     /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Vector3` or a JSON string representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+     * The world position of the starting anchor, as a JSON string. The JSON string can be an array or object representation in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
      */
     startJson?: string;
     /**

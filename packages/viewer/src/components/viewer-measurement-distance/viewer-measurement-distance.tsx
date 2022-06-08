@@ -116,33 +116,29 @@ const INTERACTION_THRESHOLD = 3;
 })
 export class ViewerMeasurementDistance {
   /**
-   * The position of the starting anchor. Can either be an instance of a
-   * `Vector3` or a JSON string representation in the format of `[x, y, z]` or
-   * `{"x": 0, "y": 0, "z": 0}`.
+   * The world position of the starting anchor.
    */
   @Prop({ mutable: true })
   public start?: Vector3.Vector3;
 
   /**
-   * The position of the starting anchor, as a JSON string. Can either be an
-   * instance of a `Vector3` or a JSON string representation in the format of
-   * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+   * The world position of the starting anchor, as a JSON string. The JSON
+   * string can be an array or object representation in the format of `[x, y,
+   * z]` or `{"x": 0, "y": 0, "z": 0}`.
    */
   @Prop()
   public startJson?: string;
 
   /**
-   * The position of the ending anchor. Can either be an instance of a `Vector3`
-   * or a JSON string representation in the format of `[x, y, z]` or `{"x": 0,
-   * "y": 0, "z": 0}`.
+   * The world position of the ending anchor.
    */
   @Prop({ mutable: true })
   public end?: Vector3.Vector3;
 
   /**
-   * The position of the ending anchor, as a JSON string. Can either be an
-   * instance of a `Vector3` or a JSON string representation in the format of
-   * `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
+   * The world position of the ending anchor, as a JSON string. The JSON string
+   * can be an array or object representation in the format of `[x, y, z]` or
+   * `{"x": 0, "y": 0, "z": 0}`.
    */
   @Prop()
   public endJson?: string;
