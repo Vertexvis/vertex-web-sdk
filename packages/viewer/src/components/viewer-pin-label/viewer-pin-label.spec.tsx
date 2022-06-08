@@ -49,7 +49,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
@@ -109,7 +109,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
@@ -176,7 +176,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
@@ -250,7 +250,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0.4, 0);
@@ -316,7 +316,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0, 0.4);
@@ -375,7 +375,7 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0, 0.4);

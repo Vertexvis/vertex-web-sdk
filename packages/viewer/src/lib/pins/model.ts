@@ -3,7 +3,7 @@ import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 /**
  * The types of pins that can be performed by this tool.
  */
-export type ViewerPinToolType = 'pin' | 'pin-label';
+export type ViewerPinToolType = 'pin-icon' | 'pin-text';
 
 /**
  * The mode of the pin tool

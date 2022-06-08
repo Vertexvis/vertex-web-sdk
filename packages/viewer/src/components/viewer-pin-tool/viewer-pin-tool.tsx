@@ -52,7 +52,7 @@ export class ViewerPinTool {
    * This property will automatically be set.
    */
   @Prop({ mutable: true })
-  public tool: ViewerPinToolType = 'pin';
+  public tool: ViewerPinToolType = 'pin-icon';
 
   /**
    * The mode of the pin tool

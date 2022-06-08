@@ -82,7 +82,7 @@ export class PinsInteractionHandler implements InteractionHandler {
           const pinId = existingPin != null ? existingPin.id : UUID.create();
 
           switch (this.controller.getToolType()) {
-            case 'pin':
+            case 'pin-icon':
               this.controller.setPin({
                 type: 'icon',
                 id: pinId,
@@ -94,7 +94,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 partId: hit?.itemId?.hex ?? undefined,
               });
               break;
-            case 'pin-label':
+            case 'pin-text':
               this.controller.setPin({
                 type: 'text',
                 id: pinId,
@@ -137,9 +137,9 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private getCusorType(): Cursor {
     switch (this.controller.getToolType()) {
-      case 'pin':
+      case 'pin-icon':
         return pinCursor;
-      case 'pin-label':
+      case 'pin-text':
         return labelPinCursor;
     }
   }
