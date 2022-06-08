@@ -3,7 +3,7 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
-import { PinModel, SimplePin } from '../../lib/pins/model';
+import { IconPin, PinModel, TextPin } from '../../lib/pins/model';
 import { VertexPinLabel } from '../viewer-pin-label/viewer-pin-label';
 import { VertexPinLabelLine } from '../viewer-pin-label-line/viewer-pin-label-line';
 import { getClosestCenterToPoint } from './utils';
@@ -16,8 +16,9 @@ describe('vertex-view-pin-group', () => {
 
     const relativePointCenterScreen = Point.create(0, 0);
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin = {
+    const pin: TextPin = {
       id: 'my-pin-id',
+      type: 'text',
       worldPosition,
       label: {
         point: relativePointCenterScreen,
@@ -39,7 +40,6 @@ describe('vertex-view-pin-group', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
-    el.pinController?.addPin(pin);
 
     expect(el).toEqualHtml(`
       <vertex-viewer-pin-group data-is-dom-group-element>
@@ -70,7 +70,8 @@ describe('vertex-view-pin-group', () => {
     const pinModel = new PinModel();
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin: SimplePin = {
+    const pin: IconPin = {
+      type: 'icon',
       id: 'my-pin-id',
       worldPosition,
     };
@@ -111,7 +112,8 @@ describe('vertex-view-pin-group', () => {
 
     const relativePointCenterScreen = Point.create(0, 0);
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -157,7 +159,8 @@ describe('vertex-view-pin-group', () => {
 
     const relativePointCenterScreen = Point.create(0, 0);
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {

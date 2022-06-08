@@ -11,6 +11,7 @@ import { ViewerPinTool } from './viewer-pin-tool';
 describe('vertex-viewer-pin-tool', () => {
   it('should render a label for a pin and support dragging the label', async () => {
     const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition: Vector3.create(),
       label: {

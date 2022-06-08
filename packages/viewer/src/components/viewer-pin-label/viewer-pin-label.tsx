@@ -350,13 +350,11 @@ export class VertexPinLabel {
       const myUpdatedPin =
         this.pin != null
           ? {
-              id: this.pin.id,
-              worldPosition: this.pin.worldPosition,
+              ...this.pin,
               label: {
+                ...this.pin.label,
                 point: Point.add(this.pinPointerDownPosition, relativeDelta),
-                text: this.pin.label.text,
               },
-              partId: this.pin?.partId,
             }
           : undefined;
 
