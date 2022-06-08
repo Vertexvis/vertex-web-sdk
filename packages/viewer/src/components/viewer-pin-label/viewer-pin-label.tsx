@@ -177,7 +177,6 @@ export class VertexPinLabel {
     return (
       <Host>
         <div
-          id={`pin-label-${this.pin?.id}`}
           class={classNames('pin-label-input-wrapper', {
             focused: this.focused,
           })}

@@ -76,7 +76,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
 
     expect(label.style.top).toBe('50px');
     expect(label.style.left).toBe('50px');
@@ -133,7 +135,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -197,7 +201,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -267,7 +273,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -330,7 +338,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -390,7 +400,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;

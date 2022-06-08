@@ -186,14 +186,8 @@ export class ViewerPinGroup {
       elementBounds
     );
 
-    // TODO(dan): Make this component own the ID, so we don't break component
-    // encapsulation.
-    const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
-
-    // TODO(dan): Refactor this so the browser doesn't do a relayout before each
-    // render.
-    const labelWidth = label?.clientWidth || 0;
-    const labelHeight = label?.clientHeight || 0;
+    const labelWidth = this.labelEl?.clientWidth || 0;
+    const labelHeight = this.labelEl?.clientHeight || 0;
 
     return {
       pinPoint,
