@@ -12,9 +12,7 @@ import { ViewerPinGroup } from './viewer-pin-group';
 describe('vertex-view-pin-group', () => {
   it('should render a text pin', async () => {
     const worldPosition = Vector3.create();
-
     const viewMatrix = Matrix4.makeIdentity();
-    const pinModel = new PinModel();
 
     const relativePointCenterScreen = Point.create(0, 0);
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
@@ -34,7 +32,6 @@ describe('vertex-view-pin-group', () => {
           data-is-dom-group-element={true}
           pin={pin}
           elementBounds={dimensions as DOMRect}
-          pinModel={pinModel}
           projectionViewMatrix={viewMatrix}
           selected={false}
         ></vertex-viewer-pin-group>
@@ -42,6 +39,7 @@ describe('vertex-view-pin-group', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
+    el.pinController?.addPin(pin);
 
     expect(el).toEqualHtml(`
       <vertex-viewer-pin-group data-is-dom-group-element>
@@ -54,7 +52,7 @@ describe('vertex-view-pin-group', () => {
           </svg>
         </vertex-viewer-pin-label-line>
         <vertex-viewer-pin-label>
-        <div class="pin-label-input-wrapper" id="pin-label-my-pin-id" style="top: 50px; left: 50px; min-width: var(--viewer-annotations-pin-label-min-width); max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
+        <div class="pin-label-input-wrapper" style="top: 50px; left: 50px; min-width: var(--viewer-annotations-pin-label-min-width); max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
           <textarea class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea><div class="pin-input-drag-target"></div>
         </div>
         <div class="pin-label-hidden pin-label-text" style="max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
@@ -63,8 +61,6 @@ describe('vertex-view-pin-group', () => {
         </vertex-viewer-pin-label>
       </vertex-viewer-pin-group>
     `);
-
-    await page.waitForChanges();
   });
 
   it('should render a simple pin', async () => {

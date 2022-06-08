@@ -3,42 +3,35 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
-import { PinController } from '../../lib/pins/controller';
-import { PinModel, TextPin } from '../../lib/pins/model';
+import { TextPin } from '../../lib/pins/model';
 import { viewer } from '../viewer/__mocks__/mocks';
 import { ViewerPinGroup } from '../viewer-pin-group/viewer-pin-group';
 import { ViewerPinTool } from './viewer-pin-tool';
 
 describe('vertex-viewer-pin-tool', () => {
-  it('should render a label for a pin and support draging the label', async () => {
-    const worldPosition = Vector3.create();
-
-    const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
-
-    const relativePointCenterScreen = Point.create(0, 0);
+  it('should render a label for a pin and support dragging the label', async () => {
     const pin: TextPin = {
       id: 'my-pin-id',
-      worldPosition,
+      worldPosition: Vector3.create(),
       label: {
-        point: relativePointCenterScreen,
+        point: Point.create(0, 0),
         text: 'My New Pin',
       },
     };
+    const addEventListener = jest.fn();
+
     const page = await newSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool
           id="vertex-viewer-pin-tool"
           mode="edit"
-          tool="pin-label"
-          pins={[pin]}
+          tool="pin-text"
         ></vertex-viewer-pin-tool>
       ),
     });
-
-    const addEventListener = jest.fn();
-    page.rootInstance.viewer = {
+    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    toolEl.viewer = {
       ...viewer,
       addEventListener,
       frame: {
@@ -49,8 +42,7 @@ describe('vertex-viewer-pin-tool', () => {
         },
       },
     } as unknown as HTMLVertexViewerElement;
-
-    pinController.addPin(pin);
+    toolEl.pinController?.addPin(pin);
 
     await page.waitForChanges();
 
@@ -59,9 +51,7 @@ describe('vertex-viewer-pin-tool', () => {
       expect.any(Function)
     );
 
-    const pinTool = page.root as HTMLVertexViewerPinToolElement;
-
-    expect(pinTool.shadowRoot).toEqualHtml(`
+    expect(toolEl.shadowRoot).toEqualHtml(`
       <vertex-viewer-dom-renderer drawmode="2d">
         <vertex-viewer-pin-group data-is-dom-group-element id="pin-group-my-pin-id">
           <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
