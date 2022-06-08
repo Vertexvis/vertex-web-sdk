@@ -230,11 +230,6 @@ Type: `Promise<ViewerMeasurementDistanceElementMetrics | undefined>`
 
 ## Dependencies
 
-### Used by
-
- - [vertex-viewer-measurement-tool](../viewer-measurement-tool)
- - [vertex-viewer-measurements](../viewer-measurements)
-
 ### Depends on
 
 - [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
@@ -246,8 +241,6 @@ graph TD;
   vertex-viewer-measurement-distance --> vertex-viewer-measurement-overlays
   vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
   vertex-viewer-measurement-overlays --> vertex-viewer-measurement-line
-  vertex-viewer-measurement-tool --> vertex-viewer-measurement-distance
-  vertex-viewer-measurements --> vertex-viewer-measurement-distance
   style vertex-viewer-measurement-distance fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
