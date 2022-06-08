@@ -16,7 +16,7 @@ export class PinController {
   public constructor(
     private model: PinModel,
     private mode: ViewerPinToolMode = 'view',
-    private type: ViewerPinToolType = 'pin'
+    private type: ViewerPinToolType = 'pin-icon'
   ) {}
 
   /**

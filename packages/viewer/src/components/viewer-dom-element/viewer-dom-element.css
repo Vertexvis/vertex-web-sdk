@@ -1,6 +1,19 @@
 :host {
   position: absolute;
   pointer-events: none;
+  visibility: hidden;
+}
+
+/* Ignore Stencil's hydrated prop in favor of a custom `ready` selector. This
+ * prevents flashing of elements before Stencil has a time to position the
+ * element in 3D space.
+ */
+:host(.hydrated) {
+  visibility: hidden;
+}
+
+:host(.ready) {
+  visibility: inherit;
 }
 
 :host(:not([interactions-off])) > * {

@@ -39,12 +39,6 @@ export class ViewerPinTool {
   @Prop()
   public pinModel: PinModel = new PinModel();
 
-  @Prop({ mutable: true })
-  public pins: Pin[] = [];
-
-  @State()
-  private selectedPinId?: string;
-
   /**
    * The viewer that this component is bound to. This is automatically assigned
    * if added to the light-dom of a parent viewer element.
@@ -58,7 +52,7 @@ export class ViewerPinTool {
    * This property will automatically be set.
    */
   @Prop({ mutable: true })
-  public tool: ViewerPinToolType = 'pin';
+  public tool: ViewerPinToolType = 'pin-icon';
 
   /**
    * The mode of the pin tool
@@ -68,6 +62,12 @@ export class ViewerPinTool {
 
   @Element()
   private hostEl!: HTMLElement;
+
+  @State()
+  private pins: Pin[] = [];
+
+  @State()
+  private selectedPinId?: string;
 
   @State()
   private elementBounds?: DOMRect;

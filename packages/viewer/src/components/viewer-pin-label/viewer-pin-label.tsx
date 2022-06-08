@@ -177,7 +177,6 @@ export class VertexPinLabel {
     return (
       <Host>
         <div
-          id={`pin-label-${this.pin?.id}`}
           class={classNames('pin-label-input-wrapper', {
             focused: this.focused,
           })}
@@ -351,13 +350,11 @@ export class VertexPinLabel {
       const myUpdatedPin =
         this.pin != null
           ? {
-              id: this.pin.id,
-              worldPosition: this.pin.worldPosition,
+              ...this.pin,
               label: {
+                ...this.pin.label,
                 point: Point.add(this.pinPointerDownPosition, relativeDelta),
-                text: this.pin.label.text,
               },
-              partId: this.pin?.partId,
             }
           : undefined;
 

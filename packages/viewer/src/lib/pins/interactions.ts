@@ -72,12 +72,7 @@ export class PinsInteractionHandler implements InteractionHandler {
       const [hit] = await api.hitItems(pt);
 
       if (hit?.hitPoint != null && this.elementRect != null) {
-        const relativePoint = translatePointToRelative(
-          {
-            ...pt,
-          },
-          this.elementRect
-        );
+        const relativePoint = translatePointToRelative(pt, this.elementRect);
         if (
           hit?.hitPoint != null &&
           hit?.hitPoint.x != null &&
@@ -87,8 +82,9 @@ export class PinsInteractionHandler implements InteractionHandler {
           const pinId = existingPin != null ? existingPin.id : UUID.create();
 
           switch (this.controller.getToolType()) {
-            case 'pin':
+            case 'pin-icon':
               this.controller.setPin({
+                type: 'icon',
                 id: pinId,
                 worldPosition: {
                   x: hit?.hitPoint?.x,
@@ -98,8 +94,9 @@ export class PinsInteractionHandler implements InteractionHandler {
                 partId: hit?.itemId?.hex ?? undefined,
               });
               break;
-            case 'pin-label':
+            case 'pin-text':
               this.controller.setPin({
+                type: 'text',
                 id: pinId,
                 worldPosition: {
                   x: hit?.hitPoint?.x,
@@ -140,9 +137,9 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private getCusorType(): Cursor {
     switch (this.controller.getToolType()) {
-      case 'pin':
+      case 'pin-icon':
         return pinCursor;
-      case 'pin-label':
+      case 'pin-text':
         return labelPinCursor;
     }
   }

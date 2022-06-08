@@ -2,7 +2,7 @@
 import { Fragment, FunctionalComponent, h } from '@stencil/core';
 import classNames from 'classnames';
 
-import { isDefaultPin, isTextPin, Pin } from '../../lib/pins/model';
+import { isIconPin, isTextPin, Pin } from '../../lib/pins/model';
 
 interface PinRendererProps {
   pin?: Pin;
@@ -22,13 +22,11 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
         ></div>
       )}
 
-      {isDefaultPin(pin) && (
+      {isIconPin(pin) && (
         <vertex-viewer-icon
           name="pin-fill"
           size="lg"
-          class={classNames('pin', {
-            'pin-selected': selected,
-          })}
+          class={classNames('pin', { 'pin-selected': selected })}
         />
       )}
     </Fragment>

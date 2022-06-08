@@ -7,7 +7,7 @@ import { InteractionApiPerspective } from '../../interactions';
 import { EntityType } from '../../types';
 import { PinController } from '../controller';
 import { PinsInteractionHandler } from '../interactions';
-import { PinModel } from '../model';
+import { PinModel, TextPin } from '../model';
 
 describe('PinsInteractionHandler', () => {
   const model = new PinModel();
@@ -27,7 +27,8 @@ describe('PinsInteractionHandler', () => {
     { emit: jest.fn() }
   );
 
-  const pin = {
+  const pin: TextPin = {
+    type: 'text',
     id: 'my-pin-id',
     worldPosition: Vector3.create(),
     label: {
@@ -60,7 +61,7 @@ describe('PinsInteractionHandler', () => {
 
     await eventually(() => {
       const updatedPoint = model.getPinById(pin.id);
-      expect(updatedPoint.worldPosition).toEqual({
+      expect(updatedPoint?.worldPosition).toEqual({
         x: 1,
         y: 2,
         z: 3,
@@ -84,7 +85,7 @@ describe('PinsInteractionHandler', () => {
     });
     reset();
 
-    controller.setToolType('pin-label');
+    controller.setToolType('pin-text');
 
     element.dispatchEvent(new MouseEvent('pointermove'));
 

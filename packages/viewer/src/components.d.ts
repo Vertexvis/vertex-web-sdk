@@ -1247,7 +1247,6 @@ export namespace Components {
      * The model that contains the entities and outcomes from performing pin annotations
      */
     pinModel: PinModel;
-    pins: Pin[];
     /**
      * The type of pin.  This property will automatically be set.
      */
@@ -2641,7 +2640,6 @@ declare namespace LocalJSX {
      * The model that contains the entities and outcomes from performing pin annotations
      */
     pinModel?: PinModel;
-    pins?: Pin[];
     /**
      * The type of pin.  This property will automatically be set.
      */

@@ -3,7 +3,7 @@ import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 /**
  * The types of pins that can be performed by this tool.
  */
-export type ViewerPinToolType = 'pin' | 'pin-label';
+export type ViewerPinToolType = 'pin-icon' | 'pin-text';
 
 /**
  * The mode of the pin tool
@@ -17,27 +17,35 @@ export type ViewerPinToolMode = 'edit' | 'view';
 
 import { Point, Vector3 } from '@vertexvis/geometry';
 
-export interface SimplePin {
+interface BasePin {
   id: string;
   worldPosition: Vector3.Vector3;
   partId?: string;
 }
+
+export interface TextPin extends BasePin {
+  type: 'text';
+  label: PinLabel;
+}
+
+// Future: Support custom icons.
+export interface IconPin extends BasePin {
+  type: 'icon';
+}
+
+export type Pin = IconPin | TextPin;
+
 export interface PinLabel {
   point: Point.Point;
   text?: string;
 }
-export interface TextPin extends SimplePin {
-  label: PinLabel;
-}
-
-export type Pin = TextPin | SimplePin;
 
 export function isTextPin(pin?: Pin): pin is TextPin {
-  return pin != null && (pin as TextPin).label != null;
+  return pin?.type === 'text';
 }
 
-export function isDefaultPin(pin?: Pin): pin is Pin {
-  return pin != null && (pin as TextPin).label == null;
+export function isIconPin(pin?: Pin): pin is Pin {
+  return pin?.type === 'icon';
 }
 
 export class PinModel {

@@ -97,13 +97,8 @@ export class ViewerPinGroup {
     if (this.pin == null) {
       throw new Error('Unable to draw pin');
     }
-    const computed = this.computePinPoints(this.pin);
 
-    const { pinPoint, labelPoint } = computed;
-
-    const handleSelectPin = (): void => {
-      this.pinController?.setSelectedPinId(this.pin?.id);
-    };
+    const { pinPoint, labelPoint } = this.computePinPoints(this.pin);
 
     return (
       <Fragment>
@@ -114,14 +109,12 @@ export class ViewerPinGroup {
             if (e.buttons !== 2) {
               e.stopPropagation();
             }
-            handleSelectPin();
 
-            this.handleAnchorPointerDown(e);
+            this.selectPin();
+            this.handleAnchorPointerDown();
           }}
         >
-          {this.leafNodesRendered && (
-            <PinRenderer pin={this.pin} selected={this.selected} />
-          )}
+          <PinRenderer pin={this.pin} selected={this.selected} />
         </vertex-viewer-dom-element>
 
         {isTextPin(this.pin) && (
@@ -130,17 +123,15 @@ export class ViewerPinGroup {
               id={`pin-label-line-${this.pin?.id}`}
               pinPoint={pinPoint}
               labelPoint={labelPoint}
-              onPointerDown={handleSelectPin}
+              onPointerDown={() => this.selectPin()}
             ></vertex-viewer-pin-label-line>
 
             <vertex-viewer-pin-label
               pin={this.pin}
-              ref={(el) => {
-                this.labelEl = el;
-              }}
+              ref={(el) => (this.labelEl = el)}
               elementBounds={this.elementBounds}
               pinController={this.pinController}
-              onPointerDown={handleSelectPin}
+              onPointerDown={() => this.selectPin()}
             ></vertex-viewer-pin-label>
           </Fragment>
         )}
@@ -148,20 +139,16 @@ export class ViewerPinGroup {
     );
   }
 
-  private invalidateState(): void {
+  private invalidateState = (): void => {
     this.invalidateStateCounter = this.invalidateStateCounter + 1;
-  }
+  };
 
   private setLabelObserver(): void {
-    const label = this.labelEl?.addEventListener(
-      'labelChanged',
-      this.invalidateState
-    );
+    if (this.labelEl != null) {
+      this.labelEl.addEventListener('labelChanged', this.invalidateState);
 
-    if (label != null) {
       this.resizeObserver = new ResizeObserver(() => this.invalidateState());
-
-      this.resizeObserver.observe(label);
+      this.resizeObserver.observe(this.labelEl);
     }
   }
 
@@ -171,9 +158,8 @@ export class ViewerPinGroup {
         ? this.computeTextPinPoints(this.pin, this.elementBounds)
         : this.computeDefaultPinPoints(this.pin, this.elementBounds);
     }
-    return {
-      pinPoint: pin.worldPosition,
-    };
+
+    return { pinPoint: pin.worldPosition };
   }
 
   private computeDefaultPinPoints(
@@ -200,10 +186,8 @@ export class ViewerPinGroup {
       elementBounds
     );
 
-    const label = this.labelEl?.querySelector(`#pin-label-${this.pin?.id}`);
-
-    const labelWidth = label?.clientWidth || 0;
-    const labelHeight = label?.clientHeight || 0;
+    const labelWidth = this.labelEl?.clientWidth || 0;
+    const labelHeight = this.labelEl?.clientHeight || 0;
 
     return {
       pinPoint,
@@ -214,17 +198,19 @@ export class ViewerPinGroup {
     };
   }
 
-  private handleAnchorPointerDown = (event: PointerEvent): void => {
+  private handleAnchorPointerDown(): void {
     if (
       this.elementBounds != null &&
       this.pinController?.getToolMode() === 'edit' &&
       this.pin != null
     ) {
-      this.pinController?.setDraggable({
-        id: this.pin.id,
-      });
+      this.pinController?.setDraggable({ id: this.pin.id });
     }
-  };
+  }
+
+  private selectPin(): void {
+    this.pinController?.setSelectedPinId(this.pin?.id);
+  }
 
   private getFromWorldPosition(
     pt: Vector3.Vector3,

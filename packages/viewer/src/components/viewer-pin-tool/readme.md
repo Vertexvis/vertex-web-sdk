@@ -43,8 +43,7 @@ To draw pins you can do so by setting the pins on the controller exposed via the
 | `mode`          | `mode`    | The mode of the pin tool                                                                                                         | `"edit" \| "view"`                     | `'view'`         |
 | `pinController` | --        | The controller that is responsible for drawing pins and updating the model                                                       | `PinController \| undefined`           | `undefined`      |
 | `pinModel`      | --        | The model that contains the entities and outcomes from performing pin annotations                                                | `PinModel`                             | `new PinModel()` |
-| `pins`          | --        |                                                                                                                                  | `Pin[]`                                | `[]`             |
-| `tool`          | `tool`    | The type of pin.  This property will automatically be set.                                                                       | `"pin" \| "pin-label"`                 | `'pin'`          |
+| `tool`          | `tool`    | The type of pin.  This property will automatically be set.                                                                       | `"pin-icon" \| "pin-text"`             | `'pin-icon'`     |
 | `viewer`        | --        | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `HTMLVertexViewerElement \| undefined` | `undefined`      |
 
 

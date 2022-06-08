@@ -49,11 +49,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -76,7 +77,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
 
     expect(label.style.top).toBe('50px');
     expect(label.style.left).toBe('50px');
@@ -106,11 +109,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -133,7 +137,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -170,11 +176,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointCenterScreen = Point.create(0, 0);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -197,7 +204,9 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -241,11 +250,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0.4, 0);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -267,7 +277,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -304,11 +316,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0, 0.4);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -330,7 +343,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
@@ -347,11 +362,7 @@ describe('vertex-viewer-pin-label', () => {
 
     await page.waitForChanges();
 
-    triggerResizeObserver([
-      {
-        contentRect: { width: 10, height: 10 },
-      },
-    ]);
+    triggerResizeObserver([{ contentRect: { width: 10, height: 10 } }]);
 
     await page.waitForChanges();
 
@@ -364,11 +375,12 @@ describe('vertex-viewer-pin-label', () => {
     const worldPosition = Vector3.create();
 
     const pinModel = new PinModel();
-    const pinController = new PinController(pinModel, 'edit', 'pin-label');
+    const pinController = new PinController(pinModel, 'edit', 'pin-text');
 
     const dimensions: Dimensions.Dimensions = { height: 100, width: 100 };
     const relativePointRightScreen = Point.create(0, 0.4);
-    const pin = {
+    const pin: TextPin = {
+      type: 'text',
       id: 'my-pin-id',
       worldPosition,
       label: {
@@ -390,7 +402,9 @@ describe('vertex-viewer-pin-label', () => {
     });
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
-    const label = el.querySelector(`#pin-label-${pin.id}`) as HTMLDivElement;
+    const label = el.querySelector(
+      '.pin-label-input-wrapper'
+    ) as HTMLDivElement;
     const input = el.querySelector(
       `#pin-label-input-${pin.id}`
     ) as HTMLTextAreaElement;
