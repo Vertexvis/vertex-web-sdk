@@ -71,6 +71,7 @@ function updateElement(
   const occluded =
     !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
   element.occluded = occluded ?? false;
+  element.classList.add('ready');
 
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(worldMatrix);

@@ -34,16 +34,18 @@ export function update2d(
 
     const occluded =
       !element.occlusionOff && depthBuffer?.isOccluded(worldPosition, viewport);
-    element.occluded = occluded ?? false;
-
     const screenPt = getScreenPosition(
       worldPosition,
       camera.projectionViewMatrix,
       viewport
     );
+
     updateTransform(element, screenPt);
     updateDepth(element, i, elements.length);
     update2d(element, worldMatrix, viewport, camera, depthBuffer);
+
+    element.occluded = occluded ?? false;
+    element.classList.add('ready');
   }
 }
 

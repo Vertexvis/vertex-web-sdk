@@ -114,9 +114,7 @@ export class ViewerPinGroup {
             this.handleAnchorPointerDown();
           }}
         >
-          {this.leafNodesRendered && (
-            <PinRenderer pin={this.pin} selected={this.selected} />
-          )}
+          <PinRenderer pin={this.pin} selected={this.selected} />
         </vertex-viewer-dom-element>
 
         {isTextPin(this.pin) && (
