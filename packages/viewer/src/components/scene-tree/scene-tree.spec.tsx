@@ -369,7 +369,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.invalidateRows, async () => {
+  describe(SceneTree.prototype.invalidateRows, () => {
     it('rerenders each row', async () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });

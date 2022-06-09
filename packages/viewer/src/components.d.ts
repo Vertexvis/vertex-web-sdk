@@ -337,7 +337,7 @@ export namespace Components {
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
-    rowData?: RowDataProvider;
+    rowData?: RowDataProvider1;
     rowHeight: number;
     rows: Row[];
     scrollOffset: number;
@@ -700,8 +700,8 @@ export namespace Components {
      * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
      * @param markup The markup to add.
      * @returns The markup element that was created.
-     * @see {@link ViewerMarkups.arrowTemplateId}
-     * @see {@link ViewerMarkups.circleTemplateId}
+     * @see {@link ViewerMarkups.arrowTemplateId }
+     * @see {@link ViewerMarkups.circleTemplateId }
      */
     addMarkup: (
       markup: Markup
@@ -935,7 +935,7 @@ export namespace Components {
     /**
      * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
      */
-    camera?: FrameCameraBase;
+    camera?: FrameCameraBase1;
     /**
      * Computes the bounding boxes of the anchors and label. **Note:** invoking this function uses `getBoundingClientRect` internally and will cause a relayout of the DOM.
      */
@@ -1028,7 +1028,7 @@ export namespace Components {
     start: Point.Point;
   }
   interface VertexViewerMeasurementOverlays {
-    camera?: FrameCameraBase;
+    camera?: FrameCameraBase1;
     /**
      * The model that contains the overlays to present.
      */
@@ -1215,6 +1215,70 @@ export namespace Components {
      */
     zPositiveLabel: string;
   }
+}
+export interface VertexSceneTreeCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeElement;
+}
+export interface VertexSceneTreeSearchCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeSearchElement;
+}
+export interface VertexSceneTreeTableCellCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeTableCellElement;
+}
+export interface VertexSceneTreeTableLayoutCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeTableLayoutElement;
+}
+export interface VertexViewerCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerElement;
+}
+export interface VertexViewerDomElementCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerDomElementElement;
+}
+export interface VertexViewerDomGroupCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerDomGroupElement;
+}
+export interface VertexViewerMarkupCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMarkupElement;
+}
+export interface VertexViewerMarkupArrowCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMarkupArrowElement;
+}
+export interface VertexViewerMarkupCircleCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMarkupCircleElement;
+}
+export interface VertexViewerMarkupFreeformCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMarkupFreeformElement;
+}
+export interface VertexViewerMarkupToolCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMarkupToolElement;
+}
+export interface VertexViewerMeasurementDistanceCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerMeasurementDistanceElement;
+}
+export interface VertexViewerPinLabelCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerPinLabelElement;
+}
+export interface VertexViewerTransformWidgetCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerTransformWidgetElement;
 }
 declare global {
   interface HTMLVertexSceneTreeElement
@@ -1523,7 +1587,9 @@ declare namespace LocalJSX {
      * A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys?: MetadataKey[];
-    onConnectionError?: (event: CustomEvent<SceneTreeErrorDetails>) => void;
+    onConnectionError?: (
+      event: VertexSceneTreeCustomEvent<SceneTreeErrorDetails>
+    ) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
@@ -1554,7 +1620,7 @@ declare namespace LocalJSX {
     /**
      * An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value.
      */
-    onSearch?: (event: CustomEvent<string>) => void;
+    onSearch?: (event: VertexSceneTreeSearchCustomEvent<string>) => void;
     /**
      * Placeholder text if `value` is empty.
      */
@@ -1583,22 +1649,24 @@ declare namespace LocalJSX {
      * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
      */
     onExpandToggled?: (
-      event: CustomEvent<SceneTreeTableCellEventDetails>
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
     ) => void;
     onHovered?: (
-      event: CustomEvent<SceneTreeTableCellEventDetails | undefined>
+      event: VertexSceneTreeTableCellCustomEvent<
+        SceneTreeTableCellEventDetails | undefined
+      >
     ) => void;
     /**
      * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
      */
     onSelectionToggled?: (
-      event: CustomEvent<SceneTreeTableCellEventDetails>
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
     ) => void;
     /**
      * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
      */
     onVisibilityToggled?: (
-      event: CustomEvent<SceneTreeTableCellEventDetails>
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
     ) => void;
     /**
      * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
@@ -1641,7 +1709,9 @@ declare namespace LocalJSX {
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;
-    onLayoutRendered?: (event: CustomEvent<void>) => void;
+    onLayoutRendered?: (
+      event: VertexSceneTreeTableLayoutCustomEvent<void>
+    ) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
@@ -1650,7 +1720,7 @@ declare namespace LocalJSX {
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
-    rowData?: RowDataProvider;
+    rowData?: RowDataProvider1;
     rowHeight?: number;
     rows?: Row[];
     scrollOffset?: number;
@@ -1728,57 +1798,63 @@ declare namespace LocalJSX {
     /**
      * Emits an event when the camera type changes.
      */
-    onCameraTypeChanged?: (event: CustomEvent<FrameCameraType>) => void;
+    onCameraTypeChanged?: (
+      event: VertexViewerCustomEvent<FrameCameraType>
+    ) => void;
     /**
      * Emits an event when the connection status changes for the viewer
      */
-    onConnectionChange?: (event: CustomEvent<ConnectionStatus>) => void;
+    onConnectionChange?: (
+      event: VertexViewerCustomEvent<ConnectionStatus>
+    ) => void;
     /**
      * Used for internals or testing.
      * @private
      */
-    onDeviceIdChange?: (event: CustomEvent<string>) => void;
-    onDimensionschange?: (event: CustomEvent<Dimensions.Dimensions>) => void;
+    onDeviceIdChange?: (event: VertexViewerCustomEvent<string>) => void;
+    onDimensionschange?: (
+      event: VertexViewerCustomEvent<Dimensions.Dimensions>
+    ) => void;
     /**
      * Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.
      */
-    onDoubletap?: (event: CustomEvent<TapEventDetails>) => void;
+    onDoubletap?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
     /**
      * Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameDrawn?: (event: CustomEvent<Frame>) => void;
+    onFrameDrawn?: (event: VertexViewerCustomEvent<Frame>) => void;
     /**
      * Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.
      */
-    onFrameReceived?: (event: CustomEvent<Frame>) => void;
+    onFrameReceived?: (event: VertexViewerCustomEvent<Frame>) => void;
     /**
      * Emits an event when the user hs finished an interaction.
      */
-    onInteractionFinished?: (event: CustomEvent<void>) => void;
+    onInteractionFinished?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Emits an event when the user has started an interaction.
      */
-    onInteractionStarted?: (event: CustomEvent<void>) => void;
+    onInteractionStarted?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.
      */
-    onLongpress?: (event: CustomEvent<TapEventDetails>) => void;
+    onLongpress?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
     /**
      * Emits an event when a frame is received with a different scene attribute.
      */
-    onSceneChanged?: (event: CustomEvent<void>) => void;
+    onSceneChanged?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Emits an event when the scene is ready to be interacted with.
      */
-    onSceneReady?: (event: CustomEvent<void>) => void;
+    onSceneReady?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
      */
-    onTap?: (event: CustomEvent<TapEventDetails>) => void;
+    onTap?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
     /**
      * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
      */
-    onTokenExpired?: (event: CustomEvent<void>) => void;
+    onTokenExpired?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * An optional value that will debounce frame updates when resizing this viewer element.
      */
@@ -1855,7 +1931,7 @@ declare namespace LocalJSX {
     /**
      * An event that is emitted when any property on the dom group changes
      */
-    onPropertyChange?: (event: CustomEvent<void>) => void;
+    onPropertyChange?: (event: VertexViewerDomElementCustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
      */
@@ -1897,7 +1973,7 @@ declare namespace LocalJSX {
     /**
      * An event that is emitted when any property on the dom group changes
      */
-    onPropertyChange?: (event: CustomEvent<void>) => void;
+    onPropertyChange?: (event: VertexViewerDomGroupCustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
      */
@@ -1986,7 +2062,7 @@ declare namespace LocalJSX {
      * Dispatched when a new markup is added, either through user interaction or programmatically.
      */
     onMarkupAdded?: (
-      event: CustomEvent<
+      event: VertexViewerMarkupCustomEvent<
         | HTMLVertexViewerMarkupArrowElement
         | HTMLVertexViewerMarkupCircleElement
         | HTMLVertexViewerMarkupFreeformElement
@@ -1996,7 +2072,7 @@ declare namespace LocalJSX {
      * Dispatched when a markup is removed, either through user interaction or programmatically.
      */
     onMarkupRemoved?: (
-      event: CustomEvent<
+      event: VertexViewerMarkupCustomEvent<
         | HTMLVertexViewerMarkupArrowElement
         | HTMLVertexViewerMarkupCircleElement
         | HTMLVertexViewerMarkupFreeformElement
@@ -2035,15 +2111,15 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched anytime the user begins editing the markup.
      */
-    onEditBegin?: (event: CustomEvent<void>) => void;
+    onEditBegin?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
     /**
      * An event that is dispatched when the user has finished editing the markup.
      */
-    onEditEnd?: (event: CustomEvent<void>) => void;
+    onEditEnd?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
-    onViewRendered?: (event: CustomEvent<void>) => void;
+    onViewRendered?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
     /**
      * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
@@ -2073,15 +2149,15 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched anytime the user begins editing the markup.
      */
-    onEditBegin?: (event: CustomEvent<void>) => void;
+    onEditBegin?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
     /**
      * An event that is dispatched when the user has finished editing the markup.
      */
-    onEditEnd?: (event: CustomEvent<void>) => void;
+    onEditEnd?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
-    onViewRendered?: (event: CustomEvent<void>) => void;
+    onViewRendered?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
     /**
      * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
@@ -2103,15 +2179,17 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched anytime the user begins editing the markup.
      */
-    onEditBegin?: (event: CustomEvent<void>) => void;
+    onEditBegin?: (event: VertexViewerMarkupFreeformCustomEvent<void>) => void;
     /**
      * An event that is dispatched when the user has finished editing the markup.
      */
-    onEditEnd?: (event: CustomEvent<void>) => void;
+    onEditEnd?: (event: VertexViewerMarkupFreeformCustomEvent<void>) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
-    onViewRendered?: (event: CustomEvent<void>) => void;
+    onViewRendered?: (
+      event: VertexViewerMarkupFreeformCustomEvent<void>
+    ) => void;
     /**
      * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
@@ -2145,11 +2223,11 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched when a user begins a new markup.
      */
-    onMarkupBegin?: (event: CustomEvent<void>) => void;
+    onMarkupBegin?: (event: VertexViewerMarkupToolCustomEvent<void>) => void;
     /**
      * An event that is dispatched when a user has finished their markup.
      */
-    onMarkupEnd?: (event: CustomEvent<Markup>) => void;
+    onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
     /**
      * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
@@ -2209,7 +2287,7 @@ declare namespace LocalJSX {
     /**
      * The camera used to position the anchors. If `viewer` is defined, then the projection view matrix of the viewer will be used.
      */
-    camera?: FrameCameraBase;
+    camera?: FrameCameraBase1;
     /**
      * The distance between `start` and `end` in real world units. Value will be undefined if the start and end positions are undefined, or if the measurement is invalid.
      */
@@ -2255,11 +2333,15 @@ declare namespace LocalJSX {
     /**
      * An event that is dispatched anytime the user begins editing the measurement.
      */
-    onEditBegin?: (event: CustomEvent<EditBeginEventDetails>) => void;
+    onEditBegin?: (
+      event: VertexViewerMeasurementDistanceCustomEvent<EditBeginEventDetails>
+    ) => void;
     /**
      * An event that is dispatched when the user has finished editing the measurement.
      */
-    onEditEnd?: (event: CustomEvent<EditEndEventDetails>) => void;
+    onEditEnd?: (
+      event: VertexViewerMeasurementDistanceCustomEvent<EditEndEventDetails>
+    ) => void;
     /**
      * Enables the display of axis reference lines between the start and end point.
      */
@@ -2304,7 +2386,7 @@ declare namespace LocalJSX {
     start?: Point.Point;
   }
   interface VertexViewerMeasurementOverlays {
-    camera?: FrameCameraBase;
+    camera?: FrameCameraBase1;
     /**
      * The model that contains the overlays to present.
      */
@@ -2379,12 +2461,16 @@ declare namespace LocalJSX {
     /**
      * Emitted whenever the label is blurred, with the ID of the associated pin (or undefined if no pin is provided).
      */
-    onLabelBlurred?: (event: CustomEvent<string | undefined>) => void;
-    onLabelChanged?: (event: CustomEvent<void>) => void;
+    onLabelBlurred?: (
+      event: VertexViewerPinLabelCustomEvent<string | undefined>
+    ) => void;
+    onLabelChanged?: (event: VertexViewerPinLabelCustomEvent<void>) => void;
     /**
      * Emitted whenever the label is focused, with the ID of the associated pin (or undefined if no pin is provided).
      */
-    onLabelFocused?: (event: CustomEvent<string | undefined>) => void;
+    onLabelFocused?: (
+      event: VertexViewerPinLabelCustomEvent<string | undefined>
+    ) => void;
     /**
      * The pin to draw for the group
      */
@@ -2447,17 +2533,19 @@ declare namespace LocalJSX {
      * An event that is emitted when the interaction has ended
      */
     onInteractionEnded?: (
-      event: CustomEvent<Matrix4.Matrix4 | undefined>
+      event: VertexViewerTransformWidgetCustomEvent<Matrix4.Matrix4 | undefined>
     ) => void;
     /**
      * An event that is emitted an interaction with the widget has started
      */
-    onInteractionStarted?: (event: CustomEvent<void>) => void;
+    onInteractionStarted?: (
+      event: VertexViewerTransformWidgetCustomEvent<void>
+    ) => void;
     /**
      * An event that is emitted when the position of the widget changes.
      */
     onPositionChanged?: (
-      event: CustomEvent<Vector3.Vector3 | undefined>
+      event: VertexViewerTransformWidgetCustomEvent<Vector3.Vector3 | undefined>
     ) => void;
     /**
      * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
