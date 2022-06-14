@@ -74,9 +74,9 @@
   "devDependencies": {
     "@stencil/react-output-target": "^0.3.1",
     "@types/chance": "^1.1.1",
-    "@types/google-protobuf": "^3.7.4",
+    "@types/google-protobuf": "^3.15.6",
     "@types/jest": "^27.5.1",
-    "@types/jsonwebtoken": "^8.5.6",
+    "@types/jsonwebtoken": "^8.5.8",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/rollup-plugin-vertexvis-copyright": "^0.4.1",
     "@vertexvis/rollup-plugin-web-workers": "^0.1.0",
