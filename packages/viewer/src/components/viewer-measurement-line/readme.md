@@ -1,6 +1,6 @@
 # vertex-viewer-measurement-line
 
-
+Intended for internal use.
 
 <!-- Auto Generated Below -->
 

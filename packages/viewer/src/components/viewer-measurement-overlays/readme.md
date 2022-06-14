@@ -1,6 +1,6 @@
 # vertex-viewer-measurement-overlays
 
-
+Intended for internal use.
 
 <!-- Auto Generated Below -->
 

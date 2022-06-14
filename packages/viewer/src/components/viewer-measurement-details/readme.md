@@ -1,16 +1,56 @@
 # vertex-viewer-measurement-details
 
-The `<vertex-viewer-measurement-details>` component displays the results
-of a measurement that has been performed. A `MeasurementModel` can be provided,
-and this component will listen for any changes to the model and update to display
+The `<vertex-viewer-measurement-details>` component displays the results of a
+measurement that has been performed. A `MeasurementModel` can be provided, and
+this component will listen for any changes to the model and update to display
 new results. Alternatively, if no `MeasurementModel` is passed, one will be
 created, and can then be used to control the display of this component.
 
+## Displaying Measurement Results
+
+The `MeasurementModel` of a `vertex-viewer-measurement-distance` or
+`vertex-viewer-measurement-precise` can be passed to the component to
+automatically display results when a measurement is performed by these
+components.
+
+**Example:** Passing a `MeasurementModel`.
+
+```html
+<html>
+<body>
+  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" feature-maps="final">
+    <vertex-viewer-measurement-precise
+      id="measurement"
+    ></vertex-viewer-measurement-precise>
+
+    <vertex-viewer-toolbar placement="bottom-right">
+      <vertex-viewer-measurement-details
+        id="details"
+      ></vertex-viewer-measurement-details>
+    </vertex-viewer-toolbar>
+  </vertex-viewer>
+
+  <script type="module">
+    window.addEventListener('load', () => main());
+
+    async function main() {
+      const measurement = document.getElementById('measurement');
+      const details = document.getElementById('details');
+
+      // Set the detail's measurement model to display measurement results.
+      details.measurementModel = measurement.measurementModel;
+    }
+  </script>
+</body>
+</html>
+```
+
 ## Units of Distance-Based Measurement and Formatting
 
-The displayed units of distance-based measurement and precision can be configured by setting
-the `distance-units` and `fractional-digits` attributes. Currently supported units
-include: `millimeters`, `centimeters`, `meters`, `inches`, `feet`, `yards`.
+The displayed units of distance-based measurement and precision can be
+configured by setting the `distance-units` and `fractional-digits` attributes.
+Currently supported units include: `millimeters`, `centimeters`, `meters`,
+`inches`, `feet`, `yards`.
 
 **Example:** Settings units and fractional digits.
 
@@ -18,19 +58,19 @@ include: `millimeters`, `centimeters`, `meters`, `inches`, `feet`, `yards`.
 <html>
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
-    <vertex-viewer-measurements>
+    <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         distance-units="inches"
         fractional-digits="1"
       ></vertex-viewer-measurement-details>
-    </vertex-viewer-measurements>
+    </vertex-viewer-toolbar>
   </vertex-viewer>
 </body>
 </html>
 ```
 
-Default formatting for distance-based measurements can be overridden by setting 
-the `distanceFormatter` property. This is a function that is passed the distance 
+Default formatting for distance-based measurements can be overridden by setting
+the `distanceFormatter` property. This is a function that is passed the distance
 in real space and should return a string.
 
 **Example:** Replacing the default distance formatter.
@@ -39,11 +79,11 @@ in real space and should return a string.
 <html>
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
-    <vertex-viewer-measurements>
+    <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         id="measurement-details"
       ></vertex-viewer-measurement-details>
-    </vertex-viewer-measurements>
+    </vertex-viewer-toolbar>
   </vertex-viewer>
 
   <script type="module">
@@ -66,18 +106,18 @@ include: `degrees` and `radians`.
 <html>
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
-    <vertex-viewer-measurements>
+    <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         angle-units="radians"
         fractional-digits="1"
       ></vertex-viewer-measurement-details>
-    </vertex-viewer-measurements>
+    </vertex-viewer-toolbar>
   </vertex-viewer>
 </body>
 </html>
 ```
 
-Default formatting for angle-based measurements can be overridden by setting 
+Default formatting for angle-based measurements can be overridden by setting
 the `angleFormatter` property. This is a function that is passed the angle
 in degrees, and should return a string.
 
@@ -87,11 +127,11 @@ in degrees, and should return a string.
 <html>
 <body>
   <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
-    <vertex-viewer-measurements>
+    <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         id="measurement-details"
       ></vertex-viewer-measurement-details>
-    </vertex-viewer-measurements>
+    </vertex-viewer-toolbar>
   </vertex-viewer>
 
   <script type="module">
