@@ -47,7 +47,7 @@
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
     "@vertexwebsdk/build": "0.14.0",
-    "eslint": "^8.6.0",
+    "eslint": "^8.17.0",
     "jest": "^27.5.1",
     "rollup": "^2.63.0",
     "ts-jest": "^27.1.4",
