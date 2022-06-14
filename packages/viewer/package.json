@@ -72,7 +72,7 @@
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@stencil/react-output-target": "^0.2.1",
+    "@stencil/react-output-target": "^0.3.1",
     "@types/chance": "^1.1.1",
     "@types/google-protobuf": "^3.7.4",
     "@types/jest": "^27.5.1",
