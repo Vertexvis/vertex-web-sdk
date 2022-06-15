@@ -3,17 +3,13 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
 
+import { Viewer } from '../viewer/viewer';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupFreeform } from '../viewer-markup-freeform/viewer-markup-freeform';
 import { ViewerMarkupTool } from './viewer-markup-tool';
 
 describe('vertex-viewer-markup-tool', () => {
-  const viewer = {
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-  };
-
   const start = Vector3.create(0, 0, 0);
   const end = Vector3.create(1, 1, 1);
 
@@ -288,14 +284,14 @@ describe('vertex-viewer-markup-tool', () => {
 
   it('updates markup when props change', async () => {
     const page = await newSpecPage({
-      components: [ViewerMarkupTool, ViewerMarkupArrow],
+      components: [Viewer, ViewerMarkupTool, ViewerMarkupArrow],
       html: `<vertex-viewer-markup-tool></vertex-viewer-markup-tool>`,
     });
 
     const toolEl = page.root as HTMLVertexViewerMarkupToolElement;
+    const viewer = page.doc.createElement('vertex-viewer');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    toolEl.viewer = viewer as any;
+    toolEl.viewer = viewer;
     await page.waitForChanges();
     const markupEl = page.root
       ?.firstElementChild as HTMLVertexViewerMarkupArrowElement;

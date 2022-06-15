@@ -23,24 +23,6 @@ import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
 import { ViewerMarkup } from './viewer-markup';
 
 describe('vertex-viewer-markup', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let interactionTargetListeners: any[] = [];
-  const addEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = [...interactionTargetListeners, listener];
-  });
-  const removeEventListener = jest.fn((_, listener) => {
-    interactionTargetListeners = interactionTargetListeners.filter(
-      (l) => l !== listener
-    );
-  });
-  const viewer = {
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    getInteractionTarget_DEPRECATED: jest.fn(() => ({
-      addEventListener,
-      removeEventListener,
-    })),
-  };
   const arrowMarkup = new ArrowMarkup({
     start: Point.create(0, 0),
     end: Point.create(0.5, 0.5),
@@ -299,10 +281,7 @@ describe('vertex-viewer-markup', () => {
         ],
         template: () => (
           <vertex-viewer>
-            <vertex-viewer-markup
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              viewer={viewer as any}
-            >
+            <vertex-viewer-markup>
               <vertex-viewer-markup-tool />
             </vertex-viewer-markup>
           </vertex-viewer>
@@ -556,24 +535,26 @@ describe('vertex-viewer-markup', () => {
     it('sets markup tool with correct props', async () => {
       const page = await newSpecPage({
         components: [
+          Viewer,
           ViewerMarkup,
           ViewerMarkupTool,
           ViewerMarkupArrow,
           ViewerMarkupCircle,
         ],
         template: () => (
-          <vertex-viewer-markup
-            arrowTemplateId="my-arrow-template"
-            circleTemplateId="my-circle-template"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            viewer={viewer as any}
-          >
-            <vertex-viewer-markup-tool />
-          </vertex-viewer-markup>
+          <vertex-viewer>
+            <vertex-viewer-markup
+              arrowTemplateId="my-arrow-template"
+              circleTemplateId="my-circle-template"
+            >
+              <vertex-viewer-markup-tool />
+            </vertex-viewer-markup>
+          </vertex-viewer>
         ),
       });
 
-      const toolEl = page.root?.querySelector(
+      const viewer = page.root as HTMLVertexViewerElement;
+      const toolEl = viewer.querySelector(
         'vertex-viewer-markup-tool'
       ) as HTMLVertexViewerMarkupToolElement;
 
@@ -587,19 +568,24 @@ describe('vertex-viewer-markup', () => {
     it('updates tool props when props change', async () => {
       const page = await newSpecPage({
         components: [
+          Viewer,
           ViewerMarkup,
           ViewerMarkupTool,
           ViewerMarkupArrow,
           ViewerMarkupCircle,
         ],
         template: () => (
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-tool />
-          </vertex-viewer-markup>
+          <vertex-viewer>
+            <vertex-viewer-markup>
+              <vertex-viewer-markup-tool />
+            </vertex-viewer-markup>
+          </vertex-viewer>
         ),
       });
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root?.querySelector(
+        'vertex-viewer-markup'
+      ) as HTMLVertexViewerMarkupElement;
       const toolEl = el.querySelector(
         'vertex-viewer-markup-tool'
       ) as HTMLVertexViewerMarkupToolElement;
@@ -616,8 +602,8 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(toolEl.disabled).toBe(true);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      el.viewer = viewer as any;
+      const viewer = page.doc.createElement('vertex-viewer');
+      el.viewer = viewer;
       await page.waitForChanges();
       expect(toolEl.viewer).toBe(viewer);
     });
@@ -625,23 +611,28 @@ describe('vertex-viewer-markup', () => {
     it('updates markup props when props change', async () => {
       const page = await newSpecPage({
         components: [
+          Viewer,
           ViewerMarkup,
           ViewerMarkupTool,
           ViewerMarkupArrow,
           ViewerMarkupCircle,
         ],
         template: () => (
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-tool />
-          </vertex-viewer-markup>
+          <vertex-viewer>
+            <vertex-viewer-markup>
+              <vertex-viewer-markup-tool />
+            </vertex-viewer-markup>
+          </vertex-viewer>
         ),
       });
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root?.querySelector(
+        'vertex-viewer-markup'
+      ) as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      el.viewer = viewer as any;
+      const viewer = page.doc.createElement('vertex-viewer');
+      el.viewer = viewer;
       await page.waitForChanges();
       expect(markupEl.viewer).toBe(viewer);
     });
