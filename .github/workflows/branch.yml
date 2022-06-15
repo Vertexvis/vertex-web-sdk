@@ -87,7 +87,7 @@ jobs:
       - name: "Install"
         run: "yarn install"
       - name: "Test"
-        run: "yarn test:coverage"
+        run: "yarn test:ci"
   docs:
     runs-on: ubuntu-latest
     needs: [build]

@@ -20,6 +20,7 @@
     "release": "./scripts/release.sh",
     "release:ask": "ASK_VERSION=true ./scripts/release.sh",
     "test": "lerna run test",
+    "test:ci": "lerna run test:ci",
     "test:coverage": "lerna run test:coverage",
     "lint": "lerna run lint",
     "format": "lerna run format",
