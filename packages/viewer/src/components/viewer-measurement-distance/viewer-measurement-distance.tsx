@@ -198,11 +198,17 @@ export class ViewerMeasurementDistance {
   public lineCapLength = MEASUREMENT_LINE_CAP_LENGTH;
 
   /**
-   * A mode that specifies how the measurement component should behave. When
-   * unset, the component will not respond to interactions with the handles.
+   * A mode that specifies how the measurement component should behave.
+   *
+   * When unset, the component will not respond to interactions with the
+   * handles.
+   *
    * When `edit`, the measurement anchors are interactive and the user is able
-   * to reposition them. When `replace`, anytime the user clicks on the canvas,
-   * a new measurement will be performed.
+   * to reposition them.
+   *
+   * When `replace`, anytime the user clicks on the canvas, a new measurement
+   * will be created and replace any existing measurement. After a measurement
+   * is created, the measurement will be editable.
    */
   @Prop({ reflect: true })
   public mode: ViewerMeasurementDistanceMode = '';
