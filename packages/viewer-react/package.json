@@ -29,6 +29,7 @@
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "test": "echo 'No unit tests defined'",
+    "test:ci": "yarn test:coverage",
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
