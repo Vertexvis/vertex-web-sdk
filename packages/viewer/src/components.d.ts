@@ -409,6 +409,10 @@ export namespace Components {
      */
     experimentalGhostingOpacity: number;
     /**
+     * Specifies experimental rendering options. For Vertex use only.
+     */
+    experimentalRenderingOptions: string;
+    /**
      * Specifies how selected features should be highlighted.
      */
     featureHighlighting?: FeatureHighlightOptions;
@@ -1700,6 +1704,10 @@ declare namespace LocalJSX {
      * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
      */
     experimentalGhostingOpacity?: number;
+    /**
+     * Specifies experimental rendering options. For Vertex use only.
+     */
+    experimentalRenderingOptions?: string;
     /**
      * Specifies how selected features should be highlighted.
      */

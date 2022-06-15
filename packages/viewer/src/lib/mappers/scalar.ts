@@ -4,6 +4,8 @@ export const toPbBoolValue = toPbScalarWrapper<boolean>();
 
 export const toPbFloatValue = toPbScalarWrapper<number>();
 
+export const toPbStringValue = toPbScalarWrapper<string>();
+
 export const fromPbBytesValue = fromPbScalarWrapper<Uint8Array>();
 
 function toPbScalarWrapper<T>(): M.Func<

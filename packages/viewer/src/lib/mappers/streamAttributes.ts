@@ -85,6 +85,12 @@ const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> =
     (attr) => attr
   );
 
+const toPbExperimentalRenderingOptions: M.Func<string | undefined, string> =
+  M.defineMapper(
+    (experimentalRenderingOptions) => experimentalRenderingOptions ?? '',
+    (attr) => attr
+  );
+
 export const toPbStreamAttributes: M.Func<
   StreamAttributes,
   vertexvis.protobuf.stream.IStreamAttributes
@@ -95,14 +101,16 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('noDefaultLights', toPbNoDefaultLights),
     M.mapProp('featureLines', toPbFeatureLines),
     M.mapProp('featureHighlighting', toPbFeatureHighlight),
-    M.mapProp('featureMaps', toPbFrameType)
+    M.mapProp('featureMaps', toPbFrameType),
+    M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions)
   ),
-  ([db, eg, ndl, fl, fh, fm]) => ({
+  ([db, eg, ndl, fl, fh, fm, ero]) => ({
     depthBuffers: db,
     experimentalGhosting: eg,
     noDefaultLights: ndl,
     featureLines: fl,
     featureHighlighting: fh,
     featureMaps: fm,
+    experimentalRenderingOptions: ero,
   })
 );
