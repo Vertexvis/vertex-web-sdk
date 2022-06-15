@@ -1891,15 +1891,10 @@
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.1"
 
-"@vertexvis/frame-streaming-protos@0.7.0":
+"@vertexvis/frame-streaming-protos@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.7.0.tgz#7a070c86e6e45d9d0e9932f2682b4f1887c0e28c"
   integrity sha512-H60m169UreO/D5k9y8B7kYNz6pZvfDa3SH6NNj308zCUXACpCATlMmb9zLj8+JwpHZLQyx304N+RoQIfzU2O9w==
-
-"@vertexvis/frame-streaming-protos@^0.6.22":
-  version "0.6.22"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.6.22.tgz#a2a3b773cc9350ec67f86a91469fea01dd6814f0"
-  integrity sha512-rkr9MbySNBcb2BONd4uVTwD2bnq7U8F7Toh/O5T+iBUCrIGV0F9LOrgc27dG9Jw8X8D3iSzNQSPq6Nl2xT0Mrg==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
