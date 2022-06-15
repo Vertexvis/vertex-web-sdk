@@ -232,6 +232,13 @@ export class Viewer {
   @Prop() public noDefaultLights = false;
 
   /**
+   * @private
+   * @internal
+   * Specifies experimental rendering options. For Vertex use only.
+   */
+  @Prop() public experimentalRenderingOptions = '';
+
+  /**
    * Specifies if and how to render feature lines.
    */
   @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
@@ -775,6 +782,14 @@ export class Viewer {
   /**
    * @ignore
    */
+  @Watch('experimentalRenderingOptions')
+  protected handleExperimentalRenderingOptionsChanged(): void {
+    this.updateStreamAttributes();
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('featureLines')
   protected handleFeatureLinesChanged(): void {
     this.updateStreamAttributes();
@@ -1251,6 +1266,7 @@ export class Viewer {
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,
+      experimentalRenderingOptions: this.experimentalRenderingOptions,
     };
   }
 
