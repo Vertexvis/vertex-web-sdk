@@ -232,6 +232,8 @@ export class Viewer {
   @Prop() public noDefaultLights = false;
 
   /**
+   * @private
+   * @internal
    * Specifies experimental rendering options. For Vertex use only.
    */
   @Prop() public experimentalRenderingOptions = '';
@@ -777,6 +779,9 @@ export class Viewer {
     this.updateStreamAttributes();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('experimentalRenderingOptions')
   protected handleExperimentalRenderingOptionsChanged(): void {
     this.updateStreamAttributes();
