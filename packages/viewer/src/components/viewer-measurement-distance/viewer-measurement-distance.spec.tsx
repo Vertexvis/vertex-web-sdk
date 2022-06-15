@@ -1,6 +1,7 @@
 jest.mock('../viewer/utils');
 jest.mock('./dom');
 jest.mock('../../lib/rendering/imageLoaders');
+jest.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';

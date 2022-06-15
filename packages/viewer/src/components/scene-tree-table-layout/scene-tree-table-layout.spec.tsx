@@ -106,7 +106,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
                 </vertex-scene-tree-table-cell>
               </template>
             </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table-layout> 
+          </vertex-scene-tree-table-layout>
       `,
     });
 
@@ -130,24 +130,6 @@ describe('<vertex-scene-tree-table-layout>', () => {
     expect(
       table.querySelector('vertex-scene-tree-table-cell')?.hoveredNodeId
     ).toBe(mockRow.node.id?.hex);
-  });
-
-  it('throws an exception if no cell template is specified for a column', async () => {
-    const client = mockSceneTreeClient();
-    mockGetTree({ client });
-
-    const controller = new SceneTreeController(client, 100);
-    await expect(
-      newSceneTreeTableSpec({
-        controller,
-        html: `
-          <vertex-scene-tree-table-layout>
-            <vertex-scene-tree-table-column>
-            </vertex-scene-tree-table-column>
-          </vertex-scene-tree-table-layout>
-      `,
-      })
-    ).rejects.toThrow(new Error('Column is missing cell template element'));
   });
 
   it('creates headers from header template', async () => {
@@ -494,6 +476,7 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     visible: false,
     partiallyVisible: false,
     columnsList: [],
+    filterHit: false,
     ...values,
   };
 }

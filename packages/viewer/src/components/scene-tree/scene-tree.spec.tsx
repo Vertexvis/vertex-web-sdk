@@ -175,27 +175,31 @@ describe('<vertex-scene-tree>', () => {
       expect(rowData).toHaveBeenCalled();
     });
 
-    it('emits error if tree is not enabled', async (done) => {
-      const client = mockSceneTreeClient();
-      mockGetTreeError(client, grpc.Code.FailedPrecondition);
+    it('emits error if tree is not enabled', (done) => {
+      async function test(): Promise<void> {
+        const client = mockSceneTreeClient();
+        mockGetTreeError(client, grpc.Code.FailedPrecondition);
 
-      const { stream, ws } = makeViewerStream();
-      const controller = new SceneTreeController(client, 100);
-      const { viewer } = await newSceneTreeSpec({
-        controller,
-        stream,
-        template: () => (
-          <div>
-            <vertex-scene-tree
-              controller={controller}
-              onConnectionError={() => done()}
-              viewerSelector="#viewer"
-            ></vertex-scene-tree>
-            <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
-          </div>
-        ),
-      });
-      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+        const { stream, ws } = makeViewerStream();
+        const controller = new SceneTreeController(client, 100);
+        const { viewer } = await newSceneTreeSpec({
+          controller,
+          stream,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                onConnectionError={() => done()}
+                viewerSelector="#viewer"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
+            </div>
+          ),
+        });
+        await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      }
+
+      test();
     });
 
     it('renders message if load failed', async () => {
@@ -369,7 +373,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.invalidateRows, async () => {
+  describe(SceneTree.prototype.invalidateRows, () => {
     it('rerenders each row', async () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });
@@ -1009,8 +1013,8 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
       const filter = jest.spyOn(controller, 'filter');
 
-      const { stream } = makeViewerStream();
-      const { tree } = await newSceneTreeSpec({ controller, stream });
+      mockGetTree({ client });
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
 
       tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
       expect(filter).toHaveBeenCalledWith('term', expect.anything());
@@ -1021,8 +1025,8 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
       const filter = jest.spyOn(controller, 'filter');
 
-      const { stream } = makeViewerStream();
-      const { tree } = await newSceneTreeSpec({ controller, stream });
+      mockGetTree({ client });
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       tree.metadataKeys = ['foo', 'bar', 'baz'];
       tree.metadataSearchExactMatch = false;
 
