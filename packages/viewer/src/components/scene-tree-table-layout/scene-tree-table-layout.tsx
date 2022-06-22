@@ -220,7 +220,7 @@ export class SceneTreeTableLayout {
   private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
-  private loadingTimer?: NodeJS.Timeout;
+  private loadingTimer?: number;
 
   public componentWillLoad(): void {
     this.updateColumnElements();
@@ -271,7 +271,10 @@ export class SceneTreeTableLayout {
       this.rows[this.viewportEndIndex] != null;
 
     if (!isViewportDataPresent && this.loadingTimer == null) {
-      this.loadingTimer = setTimeout(this.setIsLoading, DISPLAY_LOADER_TIMEOUT);
+      this.loadingTimer = window.setTimeout(
+        this.setIsLoading,
+        DISPLAY_LOADER_TIMEOUT
+      );
     } else if (isViewportDataPresent) {
       this.isStillLoading = false;
       if (this.loadingTimer) {
