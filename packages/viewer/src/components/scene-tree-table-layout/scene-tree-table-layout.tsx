@@ -271,9 +271,7 @@ export class SceneTreeTableLayout {
       this.rows[this.viewportEndIndex] != null;
 
     if (!isViewportDataPresent && this.loadingTimer == null) {
-      this.loadingTimer = setTimeout(() => {
-        this.isStillLoading = true;
-      }, DISPLAY_LOADER_TIMEOUT);
+      this.loadingTimer = setTimeout(this.setIsLoading, DISPLAY_LOADER_TIMEOUT);
     } else if (isViewportDataPresent) {
       this.isStillLoading = false;
       if (this.loadingTimer) {
@@ -357,15 +355,19 @@ export class SceneTreeTableLayout {
           <slot name="divider" />
         </div>
         {this.resizingColumnIndex != null && <div class="resize-overlay" />}
-        {this.isStillLoading && (
+        {/* {this.isStillLoading && (
           <slot name="loading">
             <div class="loading">
               <vertex-viewer-spinner size="md" />
             </div>
           </slot>
-        )}
+        )} */}
       </Host>
     );
+  }
+
+  private setIsLoading(): void {
+    this.isStillLoading = true;
   }
 
   private computeViewportRows(): void {
