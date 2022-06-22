@@ -204,10 +204,7 @@ export class SceneTree {
    * metadata can be used for data binding inside the scene tree's template.
    */
   @Prop()
-  public metadataKeys: MetadataKey[] = [
-    'VERTEX_SCENE_ITEM_NAME',
-    'child_0_OBID',
-  ];
+  public metadataKeys: MetadataKey[] = [];
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
