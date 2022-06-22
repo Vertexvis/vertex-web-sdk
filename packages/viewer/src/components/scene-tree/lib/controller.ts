@@ -31,7 +31,7 @@ import { MetadataKey } from '../interfaces';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
-import { fromNodeProto, Row } from './row';
+import { fromNodeProto, isLoadedRow, Row } from './row';
 
 export interface ConnectOptions {
   idleReconnectInSeconds?: number;
@@ -744,7 +744,7 @@ export class SceneTreeController {
     const updatedRows = this.state.rows
       .slice(start, end + 1)
       .map((row) =>
-        row != null
+        isLoadedRow(row)
           ? { ...row, node: { ...row.node, ...transform(row.node) } }
           : row
       );

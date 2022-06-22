@@ -98,6 +98,7 @@ import {
   ViewerPinToolType,
 } from './lib/pins/model';
 import { PinController } from './lib/pins/controller';
+import { SpinnerSize } from './components/viewer-spinner/viewer-spinner';
 import {
   ViewerToolbarDirection,
   ViewerToolbarPlacement as ViewerToolbarPlacement1,
@@ -260,6 +261,10 @@ export namespace Components {
      * If `true`, disables user interaction of the component.
      */
     disabled: boolean;
+    /**
+     * An indicator to show if the filter results are loading.
+     */
+    isSearching?: boolean;
     /**
      * Placeholder text if `value` is empty.
      */
@@ -1143,6 +1148,12 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerSpinner {
+    /**
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 23px  * `md`: 32px  * `lg`: 64px
+     */
+    size?: SpinnerSize;
+  }
   interface VertexViewerToolbar {
     direction: ViewerToolbarDirection;
     /**
@@ -1434,6 +1445,13 @@ declare global {
     prototype: HTMLVertexViewerPinToolElement;
     new (): HTMLVertexViewerPinToolElement;
   };
+  interface HTMLVertexViewerSpinnerElement
+    extends Components.VertexViewerSpinner,
+      HTMLStencilElement {}
+  var HTMLVertexViewerSpinnerElement: {
+    prototype: HTMLVertexViewerSpinnerElement;
+    new (): HTMLVertexViewerSpinnerElement;
+  };
   interface HTMLVertexViewerToolbarElement
     extends Components.VertexViewerToolbar,
       HTMLStencilElement {}
@@ -1494,6 +1512,7 @@ declare global {
     'vertex-viewer-pin-label': HTMLVertexViewerPinLabelElement;
     'vertex-viewer-pin-label-line': HTMLVertexViewerPinLabelLineElement;
     'vertex-viewer-pin-tool': HTMLVertexViewerPinToolElement;
+    'vertex-viewer-spinner': HTMLVertexViewerSpinnerElement;
     'vertex-viewer-toolbar': HTMLVertexViewerToolbarElement;
     'vertex-viewer-toolbar-group': HTMLVertexViewerToolbarGroupElement;
     'vertex-viewer-transform-widget': HTMLVertexViewerTransformWidgetElement;
@@ -1551,6 +1570,10 @@ declare namespace LocalJSX {
      * If `true`, disables user interaction of the component.
      */
     disabled?: boolean;
+    /**
+     * An indicator to show if the filter results are loading.
+     */
+    isSearching?: boolean;
     /**
      * An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value.
      */
@@ -2424,6 +2447,12 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerSpinner {
+    /**
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 23px  * `md`: 32px  * `lg`: 64px
+     */
+    size?: SpinnerSize;
+  }
   interface VertexViewerToolbar {
     direction?: ViewerToolbarDirection;
     /**
@@ -2544,6 +2573,7 @@ declare namespace LocalJSX {
     'vertex-viewer-pin-label': VertexViewerPinLabel;
     'vertex-viewer-pin-label-line': VertexViewerPinLabelLine;
     'vertex-viewer-pin-tool': VertexViewerPinTool;
+    'vertex-viewer-spinner': VertexViewerSpinner;
     'vertex-viewer-toolbar': VertexViewerToolbar;
     'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
     'vertex-viewer-transform-widget': VertexViewerTransformWidget;
@@ -2616,6 +2646,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerPinLabelLineElement>;
       'vertex-viewer-pin-tool': LocalJSX.VertexViewerPinTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinToolElement>;
+      'vertex-viewer-spinner': LocalJSX.VertexViewerSpinner &
+        JSXBase.HTMLAttributes<HTMLVertexViewerSpinnerElement>;
       'vertex-viewer-toolbar': LocalJSX.VertexViewerToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
       'vertex-viewer-toolbar-group': LocalJSX.VertexViewerToolbarGroup &

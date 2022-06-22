@@ -798,7 +798,6 @@ describe('<vertex-scene-tree>', () => {
       const row2 = await tree.getRowAtIndex(2);
       await tree.selectItem(row2, { range: true });
 
-      expect(true).toBeTruthy();
       expect(selectRangeInSceneTree).toHaveBeenCalledWith(
         expect.anything(),
         2,

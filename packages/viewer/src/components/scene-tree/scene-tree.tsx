@@ -215,6 +215,9 @@ export class SceneTree {
   @State()
   private totalRows = 0;
 
+  @State()
+  private isSearching = false;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -653,7 +656,7 @@ export class SceneTree {
         <div class="header">
           <slot name="header">
             <vertex-scene-tree-toolbar class="search-toolbar">
-              <vertex-scene-tree-search />
+              <vertex-scene-tree-search isSearching={this.isSearching} />
             </vertex-scene-tree-toolbar>
           </slot>
         </div>
@@ -838,16 +841,18 @@ export class SceneTree {
   }
 
   @Listen('search')
-  protected handleSearch(event: CustomEvent<string>): void {
+  protected async handleSearch(event: CustomEvent<string>): Promise<void> {
     const columnsToSearch =
       this.metadataSearchKeys.length > 0
         ? this.metadataSearchKeys
         : this.metadataKeys;
 
-    this.filterItems(event.detail, {
+    this.isSearching = true;
+    await this.filterItems(event.detail, {
       columns: columnsToSearch,
       exactMatch: this.metadataSearchExactMatch,
     });
+    this.isSearching = false;
   }
 
   private getScrollToPosition(

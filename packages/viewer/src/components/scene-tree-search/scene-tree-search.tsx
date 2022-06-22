@@ -27,7 +27,7 @@ export class SceneTreeSearch {
    * input.
    */
   @Prop()
-  public debounce = 250;
+  public debounce = 350;
 
   /**
    * If `true`, disables user interaction of the component.
@@ -47,6 +47,12 @@ export class SceneTreeSearch {
    */
   @Prop({ mutable: true })
   public value = '';
+
+  /**
+   * An indicator to show if the filter results are loading.
+   */
+  @Prop({ mutable: true })
+  public isSearching?: boolean = false;
 
   /**
    * An event that is emitted when a user has inputted or cleared the search
@@ -82,12 +88,17 @@ export class SceneTreeSearch {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
+    console.log('isSearching scene-tree: ', this.isSearching);
     return (
       <Host>
         <div class="root">
           <div class="overlay icon icon-search">
             <slot name="search-icon">
-              <vertex-viewer-icon name="search" size="sm" />
+              {this.isSearching ? (
+                <vertex-viewer-spinner size="xs" />
+              ) : (
+                <vertex-viewer-icon name="search" size="sm" />
+              )}
             </slot>
           </div>
 
