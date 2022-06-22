@@ -366,9 +366,9 @@ export class SceneTreeTableLayout {
     );
   }
 
-  private setIsLoading(): void {
+  private setIsLoading = (): void => {
     this.isStillLoading = true;
-  }
+  };
 
   private computeViewportRows(): void {
     const viewportHeight = this.getLayoutHeight();
