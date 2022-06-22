@@ -40,13 +40,6 @@
   background: var(--scene-tree-cell-background-selected);
 }
 
-@keyframes moving-gradient {
-
-  0% { background-position: -250px 0; }
-  100% { background-position: 250px 0; }
-}
-
-
 .wrapper {
   display: flex;
   align-items: center;

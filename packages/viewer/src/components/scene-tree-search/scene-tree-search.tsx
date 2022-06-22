@@ -88,7 +88,6 @@ export class SceneTreeSearch {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
-    console.log('isSearching scene-tree: ', this.isSearching);
     return (
       <Host>
         <div class="root">
