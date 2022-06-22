@@ -355,13 +355,13 @@ export class SceneTreeTableLayout {
           <slot name="divider" />
         </div>
         {this.resizingColumnIndex != null && <div class="resize-overlay" />}
-        {/* {this.isStillLoading && (
+        {this.isStillLoading && (
           <slot name="loading">
             <div class="loading">
               <vertex-viewer-spinner size="md" />
             </div>
           </slot>
-        )} */}
+        )}
       </Host>
     );
   }
