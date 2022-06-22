@@ -7,6 +7,8 @@ import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import typescript2 from 'rollup-plugin-typescript2';
 
+import jestConfig from './jest-shared.config';
+
 export const config: Config = {
   namespace: 'viewer',
   nodeResolve: {
@@ -46,23 +48,7 @@ export const config: Config = {
       type: 'docs-readme',
     },
   ],
-  testing: {
-    collectCoverageFrom: ['**/src/**/*.{ts,tsx}'],
-    coveragePathIgnorePatterns: ['src/testing'],
-    coverageThreshold: {
-      global: {
-        branches: 68,
-        functions: 80,
-        lines: 86,
-        statements: 85,
-      },
-    },
-    roots: ['<rootDir>/src/'],
-    moduleNameMapper: {
-      '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
-    },
-    setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts'],
-  },
+  testing: { ...jestConfig },
   extras: {
     dynamicImportShim: true,
     shadowDomShim: true,

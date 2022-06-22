@@ -2,6 +2,7 @@ const jestConfig = require('@vertexvis/jest-config-vertexvis/jest.config');
 
 module.exports = {
   ...jestConfig,
+  testEnvironment: 'jsdom',
   coverageThreshold: {
     global: {
       branches: 65,

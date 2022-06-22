@@ -414,6 +414,10 @@ export namespace Components {
      */
     experimentalGhostingOpacity: number;
     /**
+     * @private
+     */
+    experimentalRenderingOptions: string;
+    /**
      * Specifies how selected features should be highlighted.
      */
     featureHighlighting?: FeatureHighlightOptions;
@@ -986,7 +990,7 @@ export namespace Components {
      */
     measurementModel: MeasurementModel;
     /**
-     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+     * A mode that specifies how the measurement component should behave.  When unset, the component will not respond to interactions with the handles.  When `edit`, the measurement anchors are interactive and the user is able to reposition them.  When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
      */
     mode: ViewerMeasurementDistanceMode;
     /**
@@ -1724,6 +1728,10 @@ declare namespace LocalJSX {
      */
     experimentalGhostingOpacity?: number;
     /**
+     * @private
+     */
+    experimentalRenderingOptions?: string;
+    /**
      * Specifies how selected features should be highlighted.
      */
     featureHighlighting?: FeatureHighlightOptions;
@@ -2272,7 +2280,7 @@ declare namespace LocalJSX {
      */
     measurementModel?: MeasurementModel;
     /**
-     * A mode that specifies how the measurement component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the measurement anchors are interactive and the user is able to reposition them. When `replace`, anytime the user clicks on the canvas, a new measurement will be performed.
+     * A mode that specifies how the measurement component should behave.  When unset, the component will not respond to interactions with the handles.  When `edit`, the measurement anchors are interactive and the user is able to reposition them.  When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
      */
     mode?: ViewerMeasurementDistanceMode;
     /**

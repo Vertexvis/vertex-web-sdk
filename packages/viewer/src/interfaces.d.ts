@@ -35,4 +35,5 @@ export interface StreamAttributes {
   featureLines?: FeatureLineOptions;
   featureHighlighting?: FeatureHighlightOptions;
   featureMaps?: FrameType;
+  experimentalRenderingOptions?: string;
 }

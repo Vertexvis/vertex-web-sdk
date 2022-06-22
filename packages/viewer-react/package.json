@@ -29,6 +29,7 @@
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "test": "echo 'No unit tests defined'",
+    "test:ci": "yarn test:coverage",
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
@@ -38,7 +39,7 @@
     "@types/react": "^17.0.22",
     "@types/react-dom": "^17.0.11",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
-    "eslint": "^8.6.0",
+    "eslint": "^8.17.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "tslib": "^2.1.0"

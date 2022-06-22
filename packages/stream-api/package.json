@@ -32,22 +32,23 @@
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
     "test": "jest",
+    "test:ci": "yarn test:coverage",
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.6.22"
+    "@vertexvis/frame-streaming-protos": "^0.7.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^27.5.1",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
     "@vertexvis/utils": "0.14.0",
     "@vertexwebsdk/build": "0.14.0",
-    "eslint": "^8.6.0",
-    "jest": "^26.6.3",
+    "eslint": "^8.17.0",
+    "jest": "^27.5.1",
     "protobufjs": "^6.9.0",
-    "rollup": "^2.63.0",
-    "ts-jest": "^26.5.2",
+    "rollup": "^2.75.6",
+    "ts-jest": "^27.1.4",
     "tslib": "^2.1.0",
     "typescript": "^4.5.4"
   },

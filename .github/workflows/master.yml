@@ -30,7 +30,7 @@ jobs:
       - name: "Build"
         run: "yarn build"
       - name: "Test"
-        run: "yarn test"
+        run: "yarn test:ci"
       - name: "Upload build artifacts"
         uses: actions/upload-artifact@v2
         with:
