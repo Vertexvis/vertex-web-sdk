@@ -218,6 +218,9 @@ export class SceneTree {
   @State()
   private isSearching = false;
 
+  @State()
+  private showLoader = false;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -656,7 +659,15 @@ export class SceneTree {
         <div class="header">
           <slot name="header">
             <vertex-scene-tree-toolbar class="search-toolbar">
-              <vertex-scene-tree-search isSearching={this.isSearching} />
+              <vertex-scene-tree-search>
+                <div slot="search-icon">
+                  {this.isSearching ? (
+                    <vertex-viewer-spinner slot="search-icon" size="xs" />
+                  ) : (
+                    <vertex-viewer-icon name="search" size="sm" />
+                  )}
+                </div>
+              </vertex-scene-tree-search>
             </vertex-scene-tree-toolbar>
           </slot>
         </div>
@@ -665,6 +676,11 @@ export class SceneTree {
 
         {this.errorDetails == null && (
           <div class="rows-scroll">
+            {this.showLoader && (
+              <slot name="loading">
+                <vertex-viewer-spinner class="loading" size="md" />
+              </slot>
+            )}
             <slot />
           </div>
         )}
@@ -792,6 +808,8 @@ export class SceneTree {
   }
 
   private handleControllerStateChange(state: SceneTreeState): void {
+    this.showLoader = !!state.shouldShowLoading;
+    this.isSearching = state.isSearching;
     this.rows = state.rows;
     this.totalRows = state.totalRows;
 
@@ -847,12 +865,14 @@ export class SceneTree {
         ? this.metadataSearchKeys
         : this.metadataKeys;
 
-    this.isSearching = true;
-    await this.filterItems(event.detail, {
-      columns: columnsToSearch,
-      exactMatch: this.metadataSearchExactMatch,
-    });
-    this.isSearching = false;
+    try {
+      await this.filterItems(event.detail, {
+        columns: columnsToSearch,
+        exactMatch: this.metadataSearchExactMatch,
+      });
+    } catch (e) {
+      console.error('Failed to filter tree with exception: ', e);
+    }
   }
 
   private getScrollToPosition(

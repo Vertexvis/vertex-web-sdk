@@ -17,7 +17,7 @@ export class ViewerSpinner {
    * sizes are set to:
    *
    *  * `xm`: 16px
-   *  * `sm`: 23px
+   *  * `sm`: 24px
    *  * `md`: 32px
    *  * `lg`: 64px
    */
@@ -27,7 +27,7 @@ export class ViewerSpinner {
   public render(): h.JSX.IntrinsicElements {
     return (
       <div
-        class={classNames('spinner grey', {
+        class={classNames('spinner', {
           ['xs']: this.size === 'xs',
           ['sm']: this.size === 'sm',
           ['md']: this.size === 'md',

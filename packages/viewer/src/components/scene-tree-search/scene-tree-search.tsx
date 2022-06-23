@@ -49,12 +49,6 @@ export class SceneTreeSearch {
   public value = '';
 
   /**
-   * An indicator to show if the filter results are loading.
-   */
-  @Prop({ mutable: true })
-  public isSearching?: boolean = false;
-
-  /**
    * An event that is emitted when a user has inputted or cleared the search
    * term. The event may be delayed according to the current `debounce` value.
    */
@@ -93,11 +87,7 @@ export class SceneTreeSearch {
         <div class="root">
           <div class="overlay icon icon-search">
             <slot name="search-icon">
-              {this.isSearching ? (
-                <vertex-viewer-spinner size="xs" />
-              ) : (
-                <vertex-viewer-icon name="search" size="sm" />
-              )}
+              <vertex-viewer-icon name="search" size="sm" />
             </slot>
           </div>
 

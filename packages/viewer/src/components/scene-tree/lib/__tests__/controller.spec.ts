@@ -1070,13 +1070,18 @@ describe(SceneTreeController, () => {
       await controller.connect(jwtProvider);
 
       const pendingRows = new Promise<Row[]>((resolve) => {
-        controller.onStateChange.on((state) => resolve(state.rows));
+        controller.onStateChange.on((state) => {
+          if (state.rows.slice(0, 20).every((row) => row != null)) {
+            resolve(state.rows);
+          }
+        });
       });
 
       controller.updateActiveRowRange(0, 9);
       controller.updateActiveRowRange(10, 19);
 
       const rows = await pendingRows;
+
       expect(rows.slice(0, 20).every((row) => row != null)).toBe(true);
     });
   });

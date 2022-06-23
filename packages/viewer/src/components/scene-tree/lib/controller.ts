@@ -34,6 +34,7 @@ import { decodeSceneTreeJwt } from './jwt';
 import { fromNodeProto, isLoadedRow, Row } from './row';
 
 export interface ConnectOptions {
+  spinnerDelay: number;
   idleReconnectInSeconds?: number;
   lostConnectionReconnectInSeconds?: number;
 }
@@ -45,6 +46,8 @@ export interface SceneTreeState {
   totalFilteredRows?: number;
   rows: Row[];
   connection: ConnectionState;
+  isSearching: boolean;
+  shouldShowLoading?: boolean;
 }
 
 interface Page {
@@ -120,8 +123,10 @@ export class SceneTreeController {
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
   private metadataKeys: MetadataKey[] = [];
+  private debugLogs = false;
 
   private reconnectTimer?: number;
+  private loadingTimer?: number;
 
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
@@ -130,7 +135,7 @@ export class SceneTreeController {
 
   private state: SceneTreeState = {
     totalRows: 0,
-
+    isSearching: false,
     rows: [],
     connection: { type: 'disconnected' },
   };
@@ -153,7 +158,7 @@ export class SceneTreeController {
   public constructor(
     private client: SceneTreeAPIClient,
     private rowLimit: number,
-    private connectOptions: ConnectOptions = {}
+    private connectOptions: ConnectOptions = { spinnerDelay: 2000 }
   ) {}
 
   /**
@@ -166,6 +171,10 @@ export class SceneTreeController {
     listener: Listener<SceneTreeState | undefined>
   ): Disposable {
     return this.onStateChange.on(listener);
+  }
+
+  public setDebugLogs(debugLogs: boolean): void {
+    this.debugLogs = debugLogs;
   }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
@@ -192,7 +201,7 @@ export class SceneTreeController {
     this.updateState({ ...this.state, connection: connecting });
 
     try {
-      console.debug('Scene tree controller connecting.');
+      this.log('Scene tree controller connecting.');
 
       await this.fetchPage(0);
 
@@ -260,7 +269,7 @@ export class SceneTreeController {
   public connectToViewer(viewer: HTMLVertexViewerElement): Disposable {
     const connectWithViewerJwt = async (): Promise<void> => {
       if (viewer.token != null) {
-        console.debug(
+        this.log(
           'Scene tree controller found viewer JWT. Attempting connection.'
         );
 
@@ -273,7 +282,7 @@ export class SceneTreeController {
     };
 
     const handleSceneReady = (): void => {
-      console.debug('Scene tree controller received scene ready');
+      this.log('Scene tree controller received scene ready');
       connectWithViewerJwt();
     };
 
@@ -289,7 +298,7 @@ export class SceneTreeController {
   }
 
   public disconnect(reset = false): void {
-    console.debug(`Scene tree controller disconnecting [reset=${reset}]`);
+    this.log(`Scene tree controller disconnecting [reset=${reset}]`);
 
     this.clearReconnectTimer();
 
@@ -309,6 +318,7 @@ export class SceneTreeController {
         jwtProvider: connection.jwtProvider,
         sceneViewId: connection.sceneViewId,
       },
+      isSearching: false,
       totalRows: reset ? 0 : this.state.totalRows,
       rows: reset ? [] : this.state.rows,
     });
@@ -444,7 +454,7 @@ export class SceneTreeController {
 
       if (!this.pages.has(index)) {
         const offset = index * this.rowLimit;
-        console.debug('Scene tree fetching page', index, offset);
+        this.log('Scene tree fetching page', index, offset);
         const res = this.fetchTree(offset, this.rowLimit, jwt);
         const id = this.nextPageId++;
         const page = { id, res, index, metadataKeys: this.metadataKeys };
@@ -517,25 +527,38 @@ export class SceneTreeController {
     options: FilterTreeOptions = {}
   ): Promise<void> {
     return this.ifConnectionHasJwt(async (jwt) => {
-      const res = await this.requestUnary<FilterResponse>(
-        jwt,
-        (metadata, handler) => {
-          const req = new FilterRequest();
-          req.setFilter(term);
-          req.setFullTree(options.includeCollapsed ?? true);
-          req.setExactMatch(!!options.exactMatch);
-          if (options.columns) req.setColumnsKeysList(options.columns);
-
-          this.client.filter(req, metadata, handler);
-        }
-      );
-
-      const { numberOfResults } = res.toObject();
-
       this.updateState({
         ...this.state,
-        totalFilteredRows: numberOfResults,
+        isSearching: true,
       });
+      try {
+        const res = await this.requestUnary<FilterResponse>(
+          jwt,
+          (metadata, handler) => {
+            const req = new FilterRequest();
+            req.setFilter(term);
+            req.setFullTree(options.includeCollapsed ?? true);
+            req.setExactMatch(!!options.exactMatch);
+            if (options.columns) req.setColumnsKeysList(options.columns);
+
+            this.client.filter(req, metadata, handler);
+          }
+        );
+
+        const { numberOfResults } = res.toObject();
+
+        this.updateState({
+          ...this.state,
+          totalFilteredRows: numberOfResults,
+          isSearching: false,
+        });
+      } catch (e) {
+        console.error('Failed to filter search ', e);
+        this.updateState({
+          ...this.state,
+          isSearching: false,
+        });
+      }
     });
   }
 
@@ -607,7 +630,7 @@ export class SceneTreeController {
         .slice(0, pages.length - threshold)
         .forEach(({ index }) => this.invalidatePage(index));
 
-      console.debug(
+      this.log(
         `Scene tree dropped ${pages.length - this.fetchedPageCount} pages`,
         this.pages
       );
@@ -637,6 +660,7 @@ export class SceneTreeController {
    */
   public async updateActiveRowRange(start: number, end: number): Promise<void> {
     this.activeRowRange = this.constrainRowOffsets(start, end);
+
     await this.fetchUnloadedPagesInActiveRows();
   }
 
@@ -657,7 +681,7 @@ export class SceneTreeController {
         const { change } = msg.toObject();
 
         if (change?.listChange != null) {
-          console.debug('Received list change', change.listChange.start);
+          this.log('Received list change', change.listChange.start);
           this.invalidateAfterOffset(change.listChange.start);
           this.fetchUnloadedPagesInActiveRows();
         }
@@ -671,7 +695,7 @@ export class SceneTreeController {
         } = change?.ranges || {};
 
         if (partiallyVisibleList.length > 0) {
-          console.debug(
+          this.log(
             'Received partial visibility list change',
             partiallyVisibleList
           );
@@ -684,7 +708,7 @@ export class SceneTreeController {
         }
 
         if (hiddenList.length > 0) {
-          console.debug('Received hidden list change', hiddenList);
+          this.log('Received hidden list change', hiddenList);
 
           hiddenList.forEach(({ start, end }) =>
             this.patchNodesInRange(start, end, () => ({
@@ -695,7 +719,7 @@ export class SceneTreeController {
         }
 
         if (shownList.length > 0) {
-          console.debug('Received shown list change', shownList);
+          this.log('Received shown list change', shownList);
 
           shownList.forEach(({ start, end }) =>
             this.patchNodesInRange(start, end, () => ({
@@ -706,7 +730,7 @@ export class SceneTreeController {
         }
 
         if (deselectedList.length > 0) {
-          console.debug('Received deselected list change', deselectedList);
+          this.log('Received deselected list change', deselectedList);
 
           deselectedList.forEach(({ start, end }) =>
             this.patchNodesInRange(start, end, () => ({ selected: false }))
@@ -714,7 +738,7 @@ export class SceneTreeController {
         }
 
         if (selectedList.length > 0) {
-          console.debug('Received selected list change', selectedList);
+          this.log('Received selected list change', selectedList);
 
           selectedList.forEach(({ start, end }) =>
             this.patchNodesInRange(start, end, () => ({ selected: true }))
@@ -787,11 +811,26 @@ export class SceneTreeController {
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
-        this.updateState({
-          ...this.state,
-          totalRows: totalRows,
-          rows: rows,
-        });
+        if (this.isViewLoading(rows) && this.loadingTimer == null) {
+          this.loadingTimer = window.setTimeout(() => {
+            this.updateState({
+              ...this.getState(),
+              shouldShowLoading: true,
+            });
+          }, this.connectOptions.spinnerDelay);
+
+          this.updateState({
+            ...this.state,
+            totalRows: totalRows,
+            rows: rows,
+          });
+        } else {
+          this.updateState({
+            ...this.state,
+            totalRows: totalRows,
+            rows: rows,
+          });
+        }
       }
     } catch (e) {
       const errorMessage = e instanceof Error ? e.toString() : 'Unknown';
@@ -822,8 +861,31 @@ export class SceneTreeController {
     }
   }
 
+  private getState(): SceneTreeState {
+    return this.state;
+  }
+
+  private isViewLoading(rows: Row[]): boolean {
+    return (
+      rows[this.activeRowRange[0]] == null &&
+      rows[this.activeRowRange[1]] == null
+    );
+  }
+
   private updateState(newState: SceneTreeState): void {
-    this.state = newState;
+    if (this.loadingTimer && !this.isViewLoading(newState.rows)) {
+      clearTimeout(this.loadingTimer);
+      this.loadingTimer = undefined;
+      this.state = {
+        ...newState,
+        shouldShowLoading: false,
+      };
+    } else {
+      this.state = {
+        ...newState,
+      };
+    }
+
     this.onStateChange.emit(this.state);
   }
 
@@ -938,5 +1000,11 @@ export class SceneTreeController {
 
   private get maxPages(): number {
     return Math.max(1, Math.ceil(this.state.totalRows / this.rowLimit));
+  }
+
+  private log(message?: string, ...optionalParams: unknown[]): void {
+    if (this.debugLogs) {
+      console.debug(message, optionalParams);
+    }
   }
 }
