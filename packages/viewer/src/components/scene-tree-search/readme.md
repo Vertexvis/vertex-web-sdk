@@ -18,13 +18,12 @@ functionality will need to be wired programmatically to
 
 ## Properties
 
-| Property      | Attribute      | Description                                                                     | Type                   | Default     |
-| ------------- | -------------- | ------------------------------------------------------------------------------- | ---------------------- | ----------- |
-| `debounce`    | `debounce`     | Specifies the delay, in milliseconds, to emit `search` events after user input. | `number`               | `350`       |
-| `disabled`    | `disabled`     | If `true`, disables user interaction of the component.                          | `boolean`              | `false`     |
-| `isSearching` | `is-searching` | An indicator to show if the filter results are loading.                         | `boolean \| undefined` | `false`     |
-| `placeholder` | `placeholder`  | Placeholder text if `value` is empty.                                           | `string \| undefined`  | `undefined` |
-| `value`       | `value`        | The current text value of the component. Value is updated on user interaction.  | `string`               | `''`        |
+| Property      | Attribute     | Description                                                                     | Type                  | Default     |
+| ------------- | ------------- | ------------------------------------------------------------------------------- | --------------------- | ----------- |
+| `debounce`    | `debounce`    | Specifies the delay, in milliseconds, to emit `search` events after user input. | `number`              | `350`       |
+| `disabled`    | `disabled`    | If `true`, disables user interaction of the component.                          | `boolean`             | `false`     |
+| `placeholder` | `placeholder` | Placeholder text if `value` is empty.                                           | `string \| undefined` | `undefined` |
+| `value`       | `value`       | The current text value of the component. Value is updated on user interaction.  | `string`              | `''`        |
 
 
 ## Events
@@ -77,13 +76,11 @@ Type: `Promise<void>`
 
 ### Depends on
 
-- [vertex-viewer-spinner](../viewer-spinner)
 - [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-scene-tree-search --> vertex-viewer-spinner
   vertex-scene-tree-search --> vertex-viewer-icon
   vertex-scene-tree --> vertex-scene-tree-search
   style vertex-scene-tree-search fill:#f9f,stroke:#333,stroke-width:4px

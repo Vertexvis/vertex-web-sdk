@@ -56,6 +56,7 @@ component.
 
 ### Used by
 
+ - [vertex-scene-tree](../scene-tree)
  - [vertex-scene-tree-search](../scene-tree-search)
  - [vertex-viewer-default-toolbar](../viewer-default-toolbar)
  - [vertex-viewer-pin-group](../viewer-pin-group)
@@ -63,6 +64,7 @@ component.
 ### Graph
 ```mermaid
 graph TD;
+  vertex-scene-tree --> vertex-viewer-icon
   vertex-scene-tree-search --> vertex-viewer-icon
   vertex-viewer-default-toolbar --> vertex-viewer-icon
   vertex-viewer-pin-group --> vertex-viewer-icon
