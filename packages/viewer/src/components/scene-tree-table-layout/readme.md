@@ -42,9 +42,14 @@ Type: `Promise<void>`
 
  - [vertex-scene-tree](../scene-tree)
 
+### Depends on
+
+- [vertex-viewer-spinner](../viewer-spinner)
+
 ### Graph
 ```mermaid
 graph TD;
+  vertex-scene-tree-table-layout --> vertex-viewer-spinner
   vertex-scene-tree --> vertex-scene-tree-table-layout
   style vertex-scene-tree-table-layout fill:#f9f,stroke:#333,stroke-width:4px
 ```

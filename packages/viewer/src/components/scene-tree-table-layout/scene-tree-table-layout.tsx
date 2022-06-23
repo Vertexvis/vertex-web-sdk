@@ -20,7 +20,7 @@ import {
 import { readDOM } from '../../lib/stencil';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
-import { LoadedRow, Row } from '../scene-tree/lib/row';
+import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';
 import { RowDataProvider } from '../scene-tree/scene-tree';
 import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import {
@@ -29,6 +29,8 @@ import {
   getSceneTreeTableViewportWidth,
   scrollToTop,
 } from './lib/dom';
+
+const DISPLAY_LOADER_TIMEOUT = 2000;
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -190,6 +192,9 @@ export class SceneTreeTableLayout {
   private resizingColumnIndex?: number;
 
   @State()
+  private isStillLoading = false;
+
+  @State()
   private isScrolling = false;
 
   @State()
@@ -214,6 +219,8 @@ export class SceneTreeTableLayout {
   private tableElement?: HTMLDivElement;
   private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
+
+  private loadingTimer?: number;
 
   public componentWillLoad(): void {
     this.updateColumnElements();
@@ -258,6 +265,23 @@ export class SceneTreeTableLayout {
 
   public async componentWillRender(): Promise<void> {
     await this.computeAndUpdateViewportRows();
+
+    const isViewportDataPresent =
+      this.rows[this.viewportStartIndex] != null ||
+      this.rows[this.viewportEndIndex] != null;
+
+    if (!isViewportDataPresent && this.loadingTimer == null) {
+      this.loadingTimer = window.setTimeout(
+        this.setIsLoading,
+        DISPLAY_LOADER_TIMEOUT
+      );
+    } else if (isViewportDataPresent) {
+      this.isStillLoading = false;
+      if (this.loadingTimer) {
+        clearTimeout(this.loadingTimer);
+      }
+      this.loadingTimer = undefined;
+    }
   }
 
   public componentDidRender(): void {
@@ -334,9 +358,20 @@ export class SceneTreeTableLayout {
           <slot name="divider" />
         </div>
         {this.resizingColumnIndex != null && <div class="resize-overlay" />}
+        {this.isStillLoading && (
+          <slot name="loading">
+            <div class="loading">
+              <vertex-viewer-spinner size="md" />
+            </div>
+          </slot>
+        )}
       </Host>
     );
   }
+
+  private setIsLoading = (): void => {
+    this.isStillLoading = true;
+  };
 
   private computeViewportRows(): void {
     const viewportHeight = this.getLayoutHeight();
@@ -393,7 +428,8 @@ export class SceneTreeTableLayout {
           : () => `0`;
       pool.iterateElements((el, binding, rowIndex) => {
         const row = this.stateMap.viewportRows[rowIndex];
-        if (row != null) {
+
+        if (isLoadedRow(row)) {
           this.updateCell(row, el, binding, rowIndex, cellPaddingLeft);
         }
       });

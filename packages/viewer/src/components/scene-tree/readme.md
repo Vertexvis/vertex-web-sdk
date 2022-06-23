@@ -506,7 +506,9 @@ graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   vertex-scene-tree --> vertex-scene-tree-search
   vertex-scene-tree --> vertex-scene-tree-table-layout
+  vertex-scene-tree-search --> vertex-viewer-spinner
   vertex-scene-tree-search --> vertex-viewer-icon
+  vertex-scene-tree-table-layout --> vertex-viewer-spinner
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
