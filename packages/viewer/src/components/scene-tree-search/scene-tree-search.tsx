@@ -7,10 +7,13 @@ import {
   Method,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
+import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { debounceEvent } from '../../lib/stencil';
+import { SceneTreeController } from '../scene-tree/lib/controller';
 
 /**
  * @slot search-icon - A slot that replaces the component's default search icon.
@@ -42,6 +45,12 @@ export class SceneTreeSearch {
   public placeholder?: string = undefined;
 
   /**
+   * The scene tree controller
+   */
+  @Prop()
+  public controller?: SceneTreeController;
+
+  /**
    * The current text value of the component. Value is updated on user
    * interaction.
    */
@@ -58,7 +67,11 @@ export class SceneTreeSearch {
   @State()
   private focused = false;
 
+  @State()
+  private isSearching = false;
+
   private inputEl?: HTMLInputElement;
+  private onStateChangeDisposable?: Disposable;
 
   /**
    * Gives focus to the the component's internal text input.
@@ -74,8 +87,27 @@ export class SceneTreeSearch {
   /**
    * @ignore
    */
+  @Watch('controller')
+  public controllerChanged(controller: SceneTreeController): void {
+    this.onStateChangeDisposable?.dispose();
+
+    this.onStateChangeDisposable = controller.onStateChange.on((state) => {
+      this.isSearching = state.isSearching;
+    });
+  }
+
+  /**
+   * @ignore
+   */
   protected componentDidLoad(): void {
     this.handleDebounceChanged();
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.onStateChangeDisposable?.dispose();
   }
 
   /**
@@ -87,7 +119,11 @@ export class SceneTreeSearch {
         <div class="root">
           <div class="overlay icon icon-search">
             <slot name="search-icon">
-              <vertex-viewer-icon name="search" size="sm" />
+              {this.isSearching ? (
+                <vertex-viewer-spinner slot="search-icon" size="xs" />
+              ) : (
+                <vertex-viewer-icon name="search" size="sm" />
+              )}
             </slot>
           </div>
 

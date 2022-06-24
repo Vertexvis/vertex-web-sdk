@@ -659,15 +659,7 @@ export class SceneTree {
         <div class="header">
           <slot name="header">
             <vertex-scene-tree-toolbar class="search-toolbar">
-              <vertex-scene-tree-search>
-                <div slot="search-icon">
-                  {this.isSearching ? (
-                    <vertex-viewer-spinner slot="search-icon" size="xs" />
-                  ) : (
-                    <vertex-viewer-icon name="search" size="sm" />
-                  )}
-                </div>
-              </vertex-scene-tree-search>
+              <vertex-scene-tree-search controller={this.controller} />
             </vertex-scene-tree-toolbar>
           </slot>
         </div>

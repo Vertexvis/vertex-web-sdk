@@ -254,6 +254,10 @@ export namespace Components {
   }
   interface VertexSceneTreeSearch {
     /**
+     * The scene tree controller
+     */
+    controller?: SceneTreeController;
+    /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
      */
     debounce: number;
@@ -1628,6 +1632,10 @@ declare namespace LocalJSX {
     viewerSelector?: string;
   }
   interface VertexSceneTreeSearch {
+    /**
+     * The scene tree controller
+     */
+    controller?: SceneTreeController;
     /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
      */

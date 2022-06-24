@@ -17,11 +17,13 @@
 ### Used by
 
  - [vertex-scene-tree](../scene-tree)
+ - [vertex-scene-tree-search](../scene-tree-search)
 
 ### Graph
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-viewer-spinner
+  vertex-scene-tree-search --> vertex-viewer-spinner
   style vertex-viewer-spinner fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

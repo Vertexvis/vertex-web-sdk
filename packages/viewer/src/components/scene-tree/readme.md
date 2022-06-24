@@ -499,7 +499,6 @@ Type: `Promise<void>`
 - [vertex-scene-tree-toolbar](../scene-tree-toolbar)
 - [vertex-scene-tree-search](../scene-tree-search)
 - [vertex-viewer-spinner](../viewer-spinner)
-- [vertex-viewer-icon](../viewer-icon)
 - [vertex-scene-tree-table-layout](../scene-tree-table-layout)
 
 ### Graph
@@ -508,8 +507,8 @@ graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   vertex-scene-tree --> vertex-scene-tree-search
   vertex-scene-tree --> vertex-viewer-spinner
-  vertex-scene-tree --> vertex-viewer-icon
   vertex-scene-tree --> vertex-scene-tree-table-layout
+  vertex-scene-tree-search --> vertex-viewer-spinner
   vertex-scene-tree-search --> vertex-viewer-icon
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
