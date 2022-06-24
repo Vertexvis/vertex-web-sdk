@@ -254,6 +254,10 @@ export namespace Components {
   }
   interface VertexSceneTreeSearch {
     /**
+     * The scene tree controller
+     */
+    controller?: SceneTreeController;
+    /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
      */
     debounce: number;
@@ -261,10 +265,6 @@ export namespace Components {
      * If `true`, disables user interaction of the component.
      */
     disabled: boolean;
-    /**
-     * An indicator to show if the filter results are loading.
-     */
-    isSearching?: boolean;
     /**
      * Placeholder text if `value` is empty.
      */
@@ -1154,7 +1154,7 @@ export namespace Components {
   }
   interface VertexViewerSpinner {
     /**
-     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 23px  * `md`: 32px  * `lg`: 64px
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 24px  * `md`: 32px  * `lg`: 64px
      */
     size?: SpinnerSize;
   }
@@ -1633,6 +1633,10 @@ declare namespace LocalJSX {
   }
   interface VertexSceneTreeSearch {
     /**
+     * The scene tree controller
+     */
+    controller?: SceneTreeController;
+    /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
      */
     debounce?: number;
@@ -1640,10 +1644,6 @@ declare namespace LocalJSX {
      * If `true`, disables user interaction of the component.
      */
     disabled?: boolean;
-    /**
-     * An indicator to show if the filter results are loading.
-     */
-    isSearching?: boolean;
     /**
      * An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value.
      */
@@ -2543,7 +2543,7 @@ declare namespace LocalJSX {
   }
   interface VertexViewerSpinner {
     /**
-     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 23px  * `md`: 32px  * `lg`: 64px
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 24px  * `md`: 32px  * `lg`: 64px
      */
     size?: SpinnerSize;
   }

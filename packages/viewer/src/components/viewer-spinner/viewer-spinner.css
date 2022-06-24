@@ -1,8 +1,5 @@
-
-
 .spinner {
   position: relative;
-  display: flex;
   height: 16px;
   width: 16px;
 }
@@ -15,7 +12,7 @@
   border-style: solid;
   box-sizing: border-box;
   border-color: var(--neutral-800) transparent transparent transparent;
-  border-width: var(--border-width, 1px);
+  border-width: 1px;
 
   margin: 0;
 }
@@ -39,7 +36,7 @@
 }
 
 .spinner.xs div {
-  border-width: var(--border-width, 1px);
+  border-width: 1px;
   height: 16px;
   width: 16px;
   margin: 0;
@@ -47,12 +44,12 @@
 
 /* sm */
 .spinner.sm {
-  height: 23px;
-  width: 23px;
+  height: 24px;
+  width: 24px;
 }
 
 .spinner.sm div {
-  border-width: var(--border-width, 3px);
+  border-width: 3px;
   height: 18px;
   width: 18px;
   margin: 2px;
@@ -65,7 +62,7 @@
 }
 
 .spinner.md div {
-  border-width: var(--border-width, 3px);
+  border-width:  3px;
   height: 32px;
   width: 32px;
   margin: 2px;
@@ -78,9 +75,9 @@
 }
 
 .spinner.lg div {
-  border-width: var(--border-width, 6px);
-  height: 51px;
-  width: 51px;
+  border-width:  6px;
+  height: 52px;
+  width: 52px;
   margin: 6px;
 }
 

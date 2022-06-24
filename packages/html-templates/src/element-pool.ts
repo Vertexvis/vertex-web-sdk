@@ -60,10 +60,9 @@ export class ElementPool {
   ): void {
     this.elements.forEach((el, i) => {
       const instance = this.instanceMap.get(el);
-      if (instance == null) {
-        throw new Error('Binding not found for element.');
-      }
-      f(el, instance.bindings, i);
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      f(el, instance!.bindings, i);
     });
   }
 

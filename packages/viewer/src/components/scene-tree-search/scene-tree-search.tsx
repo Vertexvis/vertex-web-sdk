@@ -7,10 +7,13 @@ import {
   Method,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
+import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { debounceEvent } from '../../lib/stencil';
+import { SceneTreeController } from '../scene-tree/lib/controller';
 
 /**
  * @slot search-icon - A slot that replaces the component's default search icon.
@@ -42,17 +45,17 @@ export class SceneTreeSearch {
   public placeholder?: string = undefined;
 
   /**
+   * The scene tree controller
+   */
+  @Prop()
+  public controller?: SceneTreeController;
+
+  /**
    * The current text value of the component. Value is updated on user
    * interaction.
    */
   @Prop({ mutable: true })
   public value = '';
-
-  /**
-   * An indicator to show if the filter results are loading.
-   */
-  @Prop({ mutable: true })
-  public isSearching?: boolean = false;
 
   /**
    * An event that is emitted when a user has inputted or cleared the search
@@ -64,7 +67,11 @@ export class SceneTreeSearch {
   @State()
   private focused = false;
 
+  @State()
+  private isSearching = false;
+
   private inputEl?: HTMLInputElement;
+  private onStateChangeDisposable?: Disposable;
 
   /**
    * Gives focus to the the component's internal text input.
@@ -80,8 +87,25 @@ export class SceneTreeSearch {
   /**
    * @ignore
    */
+  @Watch('controller')
+  public controllerChanged(controller: SceneTreeController): void {
+    this.setupController();
+  }
+
+  /**
+   * @ignore
+   */
   protected componentDidLoad(): void {
     this.handleDebounceChanged();
+
+    this.setupController();
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.onStateChangeDisposable?.dispose();
   }
 
   /**
@@ -94,7 +118,7 @@ export class SceneTreeSearch {
           <div class="overlay icon icon-search">
             <slot name="search-icon">
               {this.isSearching ? (
-                <vertex-viewer-spinner size="xs" />
+                <vertex-viewer-spinner slot="search-icon" size="xs" />
               ) : (
                 <vertex-viewer-icon name="search" size="sm" />
               )}
@@ -160,5 +184,15 @@ export class SceneTreeSearch {
 
   private handleDebounceChanged(): void {
     this.search = debounceEvent(this.search, this.debounce);
+  }
+
+  private setupController(): void {
+    this.onStateChangeDisposable?.dispose();
+
+    this.onStateChangeDisposable = this.controller?.onStateChange.on(
+      (state) => {
+        this.isSearching = state.isSearching;
+      }
+    );
   }
 }

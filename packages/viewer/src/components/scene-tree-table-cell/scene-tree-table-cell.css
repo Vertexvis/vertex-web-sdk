@@ -28,8 +28,6 @@
      * padding between the cell's border and content.
      */
    --scene-tree-cell-padding: 0.25rem 0;
-
-   
 }
 
 :host([is-hovered]) {
