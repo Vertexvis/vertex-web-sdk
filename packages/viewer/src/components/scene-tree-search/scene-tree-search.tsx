@@ -89,11 +89,7 @@ export class SceneTreeSearch {
    */
   @Watch('controller')
   public controllerChanged(controller: SceneTreeController): void {
-    this.onStateChangeDisposable?.dispose();
-
-    this.onStateChangeDisposable = controller.onStateChange.on((state) => {
-      this.isSearching = state.isSearching;
-    });
+    this.setupController();
   }
 
   /**
@@ -101,6 +97,8 @@ export class SceneTreeSearch {
    */
   protected componentDidLoad(): void {
     this.handleDebounceChanged();
+
+    this.setupController();
   }
 
   /**
@@ -186,5 +184,15 @@ export class SceneTreeSearch {
 
   private handleDebounceChanged(): void {
     this.search = debounceEvent(this.search, this.debounce);
+  }
+
+  private setupController(): void {
+    this.onStateChangeDisposable?.dispose();
+
+    this.onStateChangeDisposable = this.controller?.onStateChange.on(
+      (state) => {
+        this.isSearching = state.isSearching;
+      }
+    );
   }
 }
