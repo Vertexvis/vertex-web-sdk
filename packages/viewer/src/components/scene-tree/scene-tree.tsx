@@ -95,7 +95,7 @@ export interface ScrollToOptions {
   position?: 'start' | 'middle' | 'end';
 }
 
-interface SceneTreeOperationOptions {
+export interface SceneTreeOperationOptions {
   suppliedCorrelationId?: string;
 }
 

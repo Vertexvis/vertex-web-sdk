@@ -8,6 +8,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   RowArg,
   RowDataProvider,
+  SceneTreeOperationOptions,
   ScrollToOptions,
   SelectItemOptions,
 } from './components/scene-tree/scene-tree';
