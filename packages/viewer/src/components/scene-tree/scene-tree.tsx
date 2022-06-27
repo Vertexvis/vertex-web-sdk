@@ -39,7 +39,7 @@ import {
   selectItem,
   selectRangeInSceneTree,
   showItem,
-  ViewerItemOptions,
+  ViewerSelectItemOptions,
 } from './lib/viewer-ops';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
@@ -102,7 +102,7 @@ export interface SceneTreeOperationOptions {
 /**
  * A set of options to configure selection behavior.
  */
-export interface SelectItemOptions extends ViewerItemOptions {
+export interface SelectItemOptions extends ViewerSelectItemOptions {
   /**
    * Specifies that the next deselected ancestor node should be selected.
    */
