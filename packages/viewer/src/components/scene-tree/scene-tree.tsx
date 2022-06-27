@@ -95,6 +95,10 @@ export interface ScrollToOptions {
   position?: 'start' | 'middle' | 'end';
 }
 
+export interface SceneTreeOperationOptions {
+  suppliedCorrelationId?: string;
+}
+
 /**
  * A set of options to configure selection behavior.
  */
@@ -563,7 +567,10 @@ export class SceneTree {
    * @returns A promise that completes when the request has completed.
    */
   @Method()
-  public async selectFilteredItems(term: string): Promise<void> {
+  public async selectFilteredItems(
+    term: string,
+    options?: SceneTreeOperationOptions
+  ): Promise<void> {
     if (this.viewer != null) {
       const columnsToSearch =
         this.metadataSearchKeys.length > 0
@@ -577,6 +584,7 @@ export class SceneTree {
         this.metadataSearchExactMatch,
         {
           append: false,
+          ...options,
         }
       );
     }
