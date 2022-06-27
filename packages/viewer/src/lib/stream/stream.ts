@@ -321,6 +321,10 @@ export class ViewerStream extends StreamApi {
 
         if (this.state.type === 'connected') {
           this.updateState({ ...this.state, frame });
+
+          if (!Dimensions.isEqual(this.dimensions, frame.dimensions)) {
+            this.updateDimensions({ dimensions: this.dimensions });
+          }
         }
       }
     });
