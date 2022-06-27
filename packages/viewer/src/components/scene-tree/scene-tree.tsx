@@ -39,7 +39,7 @@ import {
   selectItem,
   selectRangeInSceneTree,
   showItem,
-  ViewerSelectItemOptions,
+  ViewerItemOptions,
 } from './lib/viewer-ops';
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
@@ -95,10 +95,14 @@ export interface ScrollToOptions {
   position?: 'start' | 'middle' | 'end';
 }
 
+interface SceneTreeOperationOptions {
+  suppliedCorrelationId?: string;
+}
+
 /**
  * A set of options to configure selection behavior.
  */
-export interface SelectItemOptions extends ViewerSelectItemOptions {
+export interface SelectItemOptions extends ViewerItemOptions {
   /**
    * Specifies that the next deselected ancestor node should be selected.
    */
@@ -563,7 +567,10 @@ export class SceneTree {
    * @returns A promise that completes when the request has completed.
    */
   @Method()
-  public async selectFilteredItems(term: string): Promise<void> {
+  public async selectFilteredItems(
+    term: string,
+    options?: SceneTreeOperationOptions
+  ): Promise<void> {
     if (this.viewer != null) {
       const columnsToSearch =
         this.metadataSearchKeys.length > 0
@@ -577,6 +584,7 @@ export class SceneTree {
         this.metadataSearchExactMatch,
         {
           append: false,
+          ...options,
         }
       );
     }

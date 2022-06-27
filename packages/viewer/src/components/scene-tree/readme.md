@@ -414,7 +414,7 @@ Type: `Promise<void>`
 
 A promise that resolves when the operation is finished.
 
-### `selectFilteredItems(term: string) => Promise<void>`
+### `selectFilteredItems(term: string, options?: SceneTreeOperationOptions | undefined) => Promise<void>`
 
 Performs an async request that will select the filtered items in the tree
 that match the given term.
