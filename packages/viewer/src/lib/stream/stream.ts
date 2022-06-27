@@ -163,9 +163,9 @@ export class ViewerStream extends StreamApi {
 
     if (fields.dimensions != null && fields.dimensions !== this.dimensions) {
       this.dimensions = fields.dimensions;
-      this.ifState('connected', () => {
-        this.updateDimensions({ dimensions: this.dimensions });
-      });
+      this.ifState('connected', () =>
+        this.updateDimensions({ dimensions: this.dimensions })
+      );
     }
 
     if (
@@ -322,10 +322,7 @@ export class ViewerStream extends StreamApi {
         if (this.state.type === 'connected') {
           this.updateState({ ...this.state, frame });
 
-          if (
-            this.dimensions &&
-            !Dimensions.isEqual(this.dimensions, frame.dimensions)
-          ) {
+          if (!Dimensions.isEqual(this.dimensions, frame.dimensions)) {
             this.updateDimensions({ dimensions: this.dimensions });
           }
         }
