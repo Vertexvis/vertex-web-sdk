@@ -1,10 +1,12 @@
 import { ColorMaterial } from '../../..';
 
 export interface ViewerItemOptions {
+  suppliedCorrelationId?: string;
+}
+export interface ViewerSelectItemOptions extends ViewerItemOptions {
   material?: string | ColorMaterial.ColorMaterial;
   append?: boolean;
   range?: boolean;
-  suppliedCorrelationId?: string;
 }
 
 export async function showItem(
@@ -34,7 +36,7 @@ export async function hideItem(
 export async function selectItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { material, append = false, suppliedCorrelationId }: ViewerItemOptions
+  { material, append = false, suppliedCorrelationId }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -49,7 +51,7 @@ export async function selectRangeInSceneTree(
   viewer: HTMLVertexViewerElement,
   start: number,
   end: number,
-  { material, append = true, suppliedCorrelationId }: ViewerItemOptions
+  { material, append = true, suppliedCorrelationId }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -71,7 +73,7 @@ export async function selectFilterResults(
     material = undefined,
     append = false,
     suppliedCorrelationId,
-  }: ViewerItemOptions
+  }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
