@@ -32,6 +32,7 @@ import {
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
 } from './lib/dom';
+import { SceneTreeTableHoverController } from './lib/hover-controller';
 import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
 describe('<vertex-scene-tree-table-layout>', () => {
@@ -121,15 +122,21 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     await page.waitForChanges();
 
-    const cell = table.querySelector('vertex-scene-tree-table-cell');
+    const hovered = jest.fn();
+    const hoverController = new SceneTreeTableHoverController();
+    const disposable = hoverController.stateChanged(hovered);
+    const cell = table.querySelector(
+      'vertex-scene-tree-table-cell'
+    ) as HTMLVertexSceneTreeTableCellElement;
+    cell.hoverController = hoverController;
 
     cell?.dispatchEvent(new MouseEvent('pointerenter'));
 
     await page.waitForChanges();
 
-    expect(
-      table.querySelector('vertex-scene-tree-table-cell')?.hoveredNodeId
-    ).toBe(mockRow.node.id?.hex);
+    disposable.dispose();
+
+    expect(hovered).toHaveBeenCalledWith(mockRow.node.id?.hex);
   });
 
   it('creates headers from header template', async () => {

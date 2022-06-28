@@ -2,6 +2,7 @@ import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import Chance from 'chance';
 
+import { SceneTreeTableHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCell } from './scene-tree-table-cell';
 
 const random = new Chance();
@@ -419,7 +420,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(selected).not.toHaveBeenCalled();
   });
 
-  it('dispatches hover events when a pointer enters the cell', async () => {
+  it('updates the hover controller when a pointer enters the cell', async () => {
     const node = createNode({ selected: true });
     const { cell } = await newComponentSpec({
       html: `
@@ -428,23 +429,19 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
+    const hoverController = new SceneTreeTableHoverController();
     const hovered = jest.fn();
-    cell.addEventListener('hovered', hovered);
+    const disposable = hoverController.stateChanged(hovered);
+    cell.hoverController = hoverController;
 
-    const originalEvent = new MouseEvent('pointerenter');
-    cell.dispatchEvent(originalEvent);
+    cell.dispatchEvent(new MouseEvent('pointerenter'));
 
-    expect(hovered).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: {
-          node,
-          originalEvent,
-        },
-      })
-    );
+    disposable.dispose();
+
+    expect(hovered).toHaveBeenCalledWith(node.id?.hex);
   });
 
-  it('dispatches hover events when a pointer leaves the cell', async () => {
+  it('updates the hover controller when a pointer leaves the cell', async () => {
     const node = createNode({ selected: true });
     const { cell } = await newComponentSpec({
       html: `
@@ -453,25 +450,16 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
+    const hoverController = new SceneTreeTableHoverController();
     const hovered = jest.fn();
-    cell.addEventListener('hovered', hovered);
+    const disposable = hoverController.stateChanged(hovered);
+    cell.hoverController = hoverController;
 
-    const originalEvent = new MouseEvent('pointerenter');
-    cell.dispatchEvent(originalEvent);
     cell.dispatchEvent(new MouseEvent('pointerleave'));
 
-    expect(hovered).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: {
-          node,
-          originalEvent,
-        },
-      })
-    );
+    disposable.dispose();
 
-    expect(hovered).toHaveBeenCalledWith(
-      expect.objectContaining({ detail: undefined })
-    );
+    expect(hovered).toHaveBeenCalledWith(undefined);
   });
 });
 
