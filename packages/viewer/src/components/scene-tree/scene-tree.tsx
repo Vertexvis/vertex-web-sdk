@@ -177,7 +177,7 @@ export class SceneTree {
    * An object to configure the scene tree.
    */
   @Prop()
-  public config?: Config;
+  public config?: Config | string;
 
   /**
    * Sets the default environment for the viewer. This setting is used for

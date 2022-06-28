@@ -121,7 +121,7 @@ export namespace Components {
     /**
      * An object to configure the scene tree.
      */
-    config?: Config;
+    config?: Config | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
@@ -1596,7 +1596,7 @@ declare namespace LocalJSX {
     /**
      * An object to configure the scene tree.
      */
-    config?: Config;
+    config?: Config | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
