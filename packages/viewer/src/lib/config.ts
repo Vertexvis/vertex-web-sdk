@@ -29,7 +29,7 @@ export interface Config {
   EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
 }
 
-type PartialConfig = DeepPartial<Config>;
+export type PartialConfig = DeepPartial<Config>;
 
 export type ConfigProvider = () => Config;
 

@@ -32,6 +32,7 @@ import {
 import {
   SceneTreeAPIClient,
   ServiceError,
+  Status,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Async } from '@vertexvis/utils';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
@@ -253,6 +254,58 @@ describe(SceneTreeController, () => {
 
       const req = new SubscribeRequest();
       expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+    });
+
+    it('should invalidate the tree on subscription failures', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      await controller.connect(jwtProvider);
+
+      stream.invokeOnStatus({
+        code: 1,
+        details: 'Testing',
+      } as unknown as Status);
+
+      const req = new SubscribeRequest();
+      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+
+      const pages = Array.from({ length: 10 })
+        .map((_, page) => page)
+        .filter((page) => controller.isPageLoaded(page));
+
+      expect(pages).toEqual([]);
+    });
+
+    it('should invalidate the tree when the subscription call ends', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+      const stream = new ResponseStreamMock<SubscribeResponse>();
+
+      (client.subscribe as jest.Mock).mockReturnValue(stream);
+
+      await controller.connect(jwtProvider);
+
+      stream.invokeOnEnd({
+        code: 0,
+        details: 'Testing',
+      } as unknown as Status);
+
+      const req = new SubscribeRequest();
+      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+
+      const pages = Array.from({ length: 10 })
+        .map((_, page) => page)
+        .filter((page) => controller.isPageLoaded(page));
+
+      expect(pages).toEqual([]);
     });
 
     it('cancels subscription when disconnected', async () => {

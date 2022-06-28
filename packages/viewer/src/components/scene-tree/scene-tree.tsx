@@ -19,7 +19,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
-import { Config, parseConfig } from '../../lib/config';
+import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
@@ -177,7 +177,7 @@ export class SceneTree {
    * An object to configure the scene tree.
    */
   @Prop()
-  public config?: Config;
+  public config?: PartialConfig | string;
 
   /**
    * Sets the default environment for the viewer. This setting is used for

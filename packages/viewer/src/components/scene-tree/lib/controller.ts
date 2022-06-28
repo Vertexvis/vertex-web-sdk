@@ -746,6 +746,19 @@ export class SceneTreeController {
         }
       });
 
+      stream.on('status', (s) => {
+        if (s.code !== 0) {
+          console.error(
+            `Failed to subscribe to scene tree with code=${s.code}, details=${s.details}`
+          );
+          this.invalidateAfterOffset(0);
+        }
+      });
+
+      stream.on('end', () => {
+        this.invalidateAfterOffset(0);
+      });
+
       return stream;
     });
   }
