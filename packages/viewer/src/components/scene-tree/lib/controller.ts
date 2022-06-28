@@ -749,7 +749,7 @@ export class SceneTreeController {
       stream.on('status', (s) => {
         if (s.code !== 0) {
           console.error(
-            `Failed to load scene tree with code=${s.code}, details=${s.details}`
+            `Failed to subscribe to scene tree with code=${s.code}, details=${s.details}`
           );
           this.invalidateAfterOffset(0);
         }
