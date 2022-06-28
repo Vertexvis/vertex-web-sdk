@@ -29,6 +29,7 @@ import {
   getSceneTreeTableViewportWidth,
   scrollToTop,
 } from './lib/dom';
+import { SceneTreeTableHoverController } from './lib/hover-controller';
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -215,6 +216,8 @@ export class SceneTreeTableLayout {
   private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
+  private cellHoverController = new SceneTreeTableHoverController();
+
   public componentWillLoad(): void {
     this.updateColumnElements();
     this.createPools();
@@ -392,15 +395,13 @@ export class SceneTreeTableLayout {
           ? (depth: number) => `calc(${depth} * 0.5rem)`
           : () => `0`;
 
-      if (!this.isScrolling) {
-        pool.iterateElements((el, binding, rowIndex) => {
-          const row = this.stateMap.viewportRows[rowIndex];
+      pool.iterateElements((el, binding, rowIndex) => {
+        const row = this.stateMap.viewportRows[rowIndex];
 
-          if (isLoadedRow(row)) {
-            this.updateCell(row, el, binding, rowIndex, cellPaddingLeft);
-          }
-        });
-      }
+        if (isLoadedRow(row)) {
+          this.updateCell(row, el, binding, rowIndex, cellPaddingLeft);
+        }
+      });
     });
   };
 
@@ -423,7 +424,7 @@ export class SceneTreeTableLayout {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (cell as any).tree = this.tree;
     (cell as any).node = row.node;
-    (cell as any).hoveredNodeId = this.hoveredNodeId;
+    (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -852,7 +853,7 @@ export class SceneTreeTableLayout {
     this.isScrolling = true;
 
     window.clearTimeout(this.scrollTimer);
-    window.setTimeout(() => {
+    this.scrollTimer = window.setTimeout(() => {
       this.isScrolling = false;
     }, 200);
 

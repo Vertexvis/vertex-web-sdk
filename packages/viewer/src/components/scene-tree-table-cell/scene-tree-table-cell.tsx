@@ -8,7 +8,10 @@ import {
   Prop,
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
+
+import { SceneTreeTableHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
 export interface SceneTreeTableCellEventDetails {
   node?: Node.AsObject;
@@ -51,8 +54,8 @@ export class SceneTreeTableCell {
   /**
    * @internal
    */
-  @Prop()
-  public hoveredNodeId?: string;
+  @Prop({ mutable: true })
+  public hovered = false;
 
   /**
    * @internal
@@ -94,8 +97,8 @@ export class SceneTreeTableCell {
   /**
    * @internal
    */
-  @Event({ bubbles: true })
-  public hovered!: EventEmitter<SceneTreeTableCellEventDetails | undefined>;
+  @Prop()
+  public hoverController?: SceneTreeTableHoverController;
 
   /**
    * An event that is emitted when a user requests to expand the node. This is
@@ -121,11 +124,20 @@ export class SceneTreeTableCell {
   @Element()
   private hostEl!: HTMLElement;
 
+  private hoverListener?: Disposable;
+
+  public componentDidLoad(): void {
+    this.hoverListener = this.hoverController?.stateChanged((id) => {
+      this.hovered = id === this.node?.id?.hex;
+    });
+  }
+
+  public disconnectedCallback(): void {
+    this.hoverListener?.dispose();
+  }
+
   public componentWillRender(): void {
-    this.toggleAttribute(
-      'is-hovered',
-      this.hoveredNodeId === this.node?.id?.hex
-    );
+    this.toggleAttribute('is-hovered', this.hovered);
     this.toggleAttribute('is-hidden', !this.node?.visible);
     this.toggleAttribute('is-selected', !!this.node?.selected);
     this.toggleAttribute('is-partial', !!this.node?.partiallyVisible);
@@ -136,15 +148,8 @@ export class SceneTreeTableCell {
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host
-        onPointerEnter={(e: PointerEvent) => {
-          this.hovered.emit({
-            node: this.node,
-            originalEvent: e,
-          });
-        }}
-        onPointerLeave={() => {
-          this.hovered.emit(undefined);
-        }}
+        onPointerEnter={this.handleCellPointerEnter}
+        onPointerLeave={this.handleCellPointerLeave}
         onPointerUp={this.handleCellPointerUp}
       >
         <div class="wrapper">
@@ -191,7 +196,7 @@ export class SceneTreeTableCell {
               <div
                 class={classNames('icon', {
                   'icon-visible':
-                    this.hoveredNodeId === this.node?.id?.hex &&
+                    this.hovered &&
                     !this.node?.partiallyVisible &&
                     this.node?.visible,
                   'icon-hidden':
@@ -217,6 +222,14 @@ export class SceneTreeTableCell {
         : this.value;
 
     return resp;
+  };
+
+  private handleCellPointerEnter = (): void => {
+    this.hoverController?.setHovered(this.node?.id?.hex);
+  };
+
+  private handleCellPointerLeave = (): void => {
+    this.hoverController?.setHovered(undefined);
   };
 
   private handleCellPointerUp = (event: PointerEvent): void => {

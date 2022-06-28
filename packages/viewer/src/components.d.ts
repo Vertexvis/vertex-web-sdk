@@ -22,6 +22,7 @@ import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { SceneTreeTableHoverController } from './components/scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
 import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
@@ -287,7 +288,8 @@ export namespace Components {
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
-    hoveredNodeId?: string;
+    hoverController?: SceneTreeTableHoverController;
+    hovered: boolean;
     /**
      * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
      */
@@ -1666,7 +1668,8 @@ declare namespace LocalJSX {
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
-    hoveredNodeId?: string;
+    hoverController?: SceneTreeTableHoverController;
+    hovered?: boolean;
     /**
      * A flag that disables the default interactions of this component. If disabled, you can use the event handlers to be notified when certain operations are performed by the user.
      */
@@ -1681,11 +1684,6 @@ declare namespace LocalJSX {
      */
     onExpandToggled?: (
       event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
-    ) => void;
-    onHovered?: (
-      event: VertexSceneTreeTableCellCustomEvent<
-        SceneTreeTableCellEventDetails | undefined
-      >
     ) => void;
     /**
      * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
