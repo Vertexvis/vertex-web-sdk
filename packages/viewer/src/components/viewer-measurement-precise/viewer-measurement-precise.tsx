@@ -70,7 +70,7 @@ export class ViewerMeasurementPrecise {
    * endpoints.
    */
   @Prop()
-  public config?: Config;
+  public config?: Config | string;
 
   private registeredInteractionHandler?: Promise<Disposable>;
 
