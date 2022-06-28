@@ -755,7 +755,7 @@ export class SceneTreeController {
         }
       });
 
-      stream.on('end', (s) => {
+      stream.on('end', () => {
         this.invalidateAfterOffset(0);
       });
 
