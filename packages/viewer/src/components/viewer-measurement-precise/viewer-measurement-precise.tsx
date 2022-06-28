@@ -3,7 +3,7 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
-import { Config, parseConfig, PartialConfig } from '../../lib/config';
+import { parseConfig, PartialConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import {
   MeasurementController,
