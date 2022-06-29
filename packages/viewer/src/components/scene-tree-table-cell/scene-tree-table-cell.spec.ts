@@ -2,7 +2,7 @@ import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import Chance from 'chance';
 
-import { SceneTreeTableHoverController } from '../scene-tree-table-layout/lib/hover-controller';
+import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCell } from './scene-tree-table-cell';
 
 const random = new Chance();
@@ -429,7 +429,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const hoverController = new SceneTreeTableHoverController();
+    const hoverController = new SceneTreeCellHoverController();
     const hovered = jest.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;
@@ -450,7 +450,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const hoverController = new SceneTreeTableHoverController();
+    const hoverController = new SceneTreeCellHoverController();
     const hovered = jest.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;

@@ -34,7 +34,7 @@ import {
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
 } from './lib/dom';
-import { SceneTreeTableHoverController } from './lib/hover-controller';
+import { SceneTreeCellHoverController } from './lib/hover-controller';
 import { restartTimeout } from './lib/window';
 import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
@@ -126,7 +126,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     const hovered = jest.fn();
-    const hoverController = new SceneTreeTableHoverController();
+    const hoverController = new SceneTreeCellHoverController();
     const disposable = hoverController.stateChanged(hovered);
     const cell = table.querySelector(
       'vertex-scene-tree-table-cell'

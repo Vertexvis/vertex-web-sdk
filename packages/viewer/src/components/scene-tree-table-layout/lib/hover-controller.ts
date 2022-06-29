@@ -1,6 +1,6 @@
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-export class SceneTreeTableHoverController {
+export class SceneTreeCellHoverController {
   public onStateChange = new EventDispatcher<string | undefined>();
 
   public setHovered(id?: string): void {

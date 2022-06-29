@@ -29,7 +29,7 @@ import {
   getSceneTreeTableViewportWidth,
   scrollToTop,
 } from './lib/dom';
-import { SceneTreeTableHoverController } from './lib/hover-controller';
+import { SceneTreeCellHoverController } from './lib/hover-controller';
 import { restartTimeout } from './lib/window';
 
 interface StateMap {
@@ -217,7 +217,7 @@ export class SceneTreeTableLayout {
   private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
-  private cellHoverController = new SceneTreeTableHoverController();
+  private cellHoverController = new SceneTreeCellHoverController();
 
   public componentWillLoad(): void {
     this.updateColumnElements();
