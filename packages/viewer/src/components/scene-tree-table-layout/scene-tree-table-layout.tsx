@@ -22,13 +22,14 @@ import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';
 import { RowDataProvider } from '../scene-tree/scene-tree';
-import { SceneTreeTableCellEventDetails } from '../scene-tree-table-cell/scene-tree-table-cell';
 import {
   DomScrollToOptions,
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
   scrollToTop,
 } from './lib/dom';
+import { SceneTreeCellHoverController } from './lib/hover-controller';
+import { restartTimeout } from './lib/window';
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -178,9 +179,6 @@ export class SceneTreeTableLayout {
   private columnGridFixedLayout = '';
 
   @State()
-  private hoveredNodeId?: string;
-
-  @State()
   private isComputingCellHeight = true;
 
   @State()
@@ -215,13 +213,11 @@ export class SceneTreeTableLayout {
   private headerElement?: HTMLDivElement;
   private columnElements: HTMLVertexSceneTreeTableColumnElement[] = [];
 
+  private cellHoverController = new SceneTreeCellHoverController();
+
   public componentWillLoad(): void {
     this.updateColumnElements();
     this.createPools();
-
-    this.columnElements.forEach((c) => {
-      c.addEventListener('hovered', this.handleCellHover as EventListener);
-    });
 
     this.headerResizeObserver = new ResizeObserver(() => {
       this.stateMap.headerHeight = undefined;
@@ -267,9 +263,6 @@ export class SceneTreeTableLayout {
   }
 
   public disconnectedCallback(): void {
-    this.columnElements.forEach((c) => {
-      c.removeEventListener('hovered', this.handleCellHover as EventListener);
-    });
     this.tableElement?.removeEventListener('scroll', this.handleScrollChanged);
     this.removeDividerDragListeners();
     this.headerResizeObserver?.disconnect();
@@ -392,15 +385,13 @@ export class SceneTreeTableLayout {
           ? (depth: number) => `calc(${depth} * 0.5rem)`
           : () => `0`;
 
-      if (!this.isScrolling) {
-        pool.iterateElements((el, binding, rowIndex) => {
-          const row = this.stateMap.viewportRows[rowIndex];
+      pool.iterateElements((el, binding, rowIndex) => {
+        const row = this.stateMap.viewportRows[rowIndex];
 
-          if (isLoadedRow(row)) {
-            this.updateCell(row, el, binding, rowIndex, cellPaddingLeft);
-          }
-        });
-      }
+        if (isLoadedRow(row)) {
+          this.updateCell(row, el, binding, rowIndex, cellPaddingLeft);
+        }
+      });
     });
   };
 
@@ -423,7 +414,7 @@ export class SceneTreeTableLayout {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (cell as any).tree = this.tree;
     (cell as any).node = row.node;
-    (cell as any).hoveredNodeId = this.hoveredNodeId;
+    (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -478,17 +469,9 @@ export class SceneTreeTableLayout {
   };
 
   private updateColumnElements = (): void => {
-    this.columnElements.forEach((c) => {
-      c.removeEventListener('hovered', this.handleCellHover as EventListener);
-    });
-
     this.columnElements = Array.from(
       this.hostEl.querySelectorAll('vertex-scene-tree-table-column')
     ) as Array<HTMLVertexSceneTreeTableColumnElement>;
-
-    this.columnElements.forEach((c) => {
-      c.addEventListener('hovered', this.handleCellHover as EventListener);
-    });
   };
 
   private createPools(): void {
@@ -679,12 +662,6 @@ export class SceneTreeTableLayout {
     )}`;
   };
 
-  private handleCellHover = (
-    event: CustomEvent<SceneTreeTableCellEventDetails | undefined>
-  ): void => {
-    this.hoveredNodeId = event.detail?.node?.id?.hex;
-  };
-
   private bindHeaderData = (): void => {
     if (this.stateMap.headerInstances == null) {
       this.stateMap.headerInstances = this.columnElements
@@ -851,10 +828,9 @@ export class SceneTreeTableLayout {
   private handleScrollChanged = (event: Event): void => {
     this.isScrolling = true;
 
-    window.clearTimeout(this.scrollTimer);
-    window.setTimeout(() => {
+    this.scrollTimer = restartTimeout(() => {
       this.isScrolling = false;
-    }, 200);
+    }, this.scrollTimer);
 
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
     this.computeAndUpdateViewportRows();
