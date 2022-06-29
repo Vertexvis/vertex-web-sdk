@@ -11,7 +11,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
-import { SceneTreeTableHoverController } from '../scene-tree-table-layout/lib/hover-controller';
+import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
 export interface SceneTreeTableCellEventDetails {
   node?: Node.AsObject;
@@ -98,7 +98,7 @@ export class SceneTreeTableCell {
    * @internal
    */
   @Prop()
-  public hoverController?: SceneTreeTableHoverController;
+  public hoverController?: SceneTreeCellHoverController;
 
   /**
    * An event that is emitted when a user requests to expand the node. This is
@@ -127,7 +127,7 @@ export class SceneTreeTableCell {
   private hoverListener?: Disposable;
 
   public componentDidLoad(): void {
-    this.hoverListener = this.hoverController?.stateChanged((id) => {
+    this.hoverListener = this.hoverController?.stateChanged((id?: string) => {
       this.hovered = id === this.node?.id?.hex;
     });
   }
