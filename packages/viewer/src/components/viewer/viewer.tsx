@@ -22,7 +22,7 @@ import {
   FrameType,
   StreamAttributes,
 } from '../../interfaces';
-import { Config, parseConfig } from '../../lib/config';
+import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
 import { Environment } from '../../lib/environment';
@@ -151,7 +151,7 @@ export class Viewer {
    * An object or JSON encoded string that defines configuration settings for
    * the viewer.
    */
-  @Prop() public config?: Config | string;
+  @Prop() public config?: PartialConfig | string;
 
   /**
    * Sets the default environment for the viewer. This setting is used for

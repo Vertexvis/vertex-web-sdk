@@ -12,7 +12,7 @@ import {
   ScrollToOptions,
   SelectItemOptions,
 } from './components/scene-tree/scene-tree';
-import { Config } from './lib/config';
+import { Config, PartialConfig } from './lib/config';
 import { Environment } from './lib/environment';
 import {
   FilterTreeOptions,
@@ -122,7 +122,7 @@ export namespace Components {
     /**
      * An object to configure the scene tree.
      */
-    config?: Config;
+    config?: PartialConfig | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
@@ -399,7 +399,7 @@ export namespace Components {
     /**
      * An object or JSON encoded string that defines configuration settings for the viewer.
      */
-    config?: Config | string;
+    config?: PartialConfig | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      * @see Viewer.config
@@ -1057,7 +1057,7 @@ export namespace Components {
     /**
      * An optional configuration to setup network configuration of measurement endpoints.
      */
-    config?: Config;
+    config?: PartialConfig | string;
     /**
      * The environment that will be used to request measurement results.
      */
@@ -1598,7 +1598,7 @@ declare namespace LocalJSX {
     /**
      * An object to configure the scene tree.
      */
-    config?: Config;
+    config?: PartialConfig | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      */
@@ -1780,7 +1780,7 @@ declare namespace LocalJSX {
     /**
      * An object or JSON encoded string that defines configuration settings for the viewer.
      */
-    config?: Config | string;
+    config?: PartialConfig | string;
     /**
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
      * @see Viewer.config
@@ -2433,7 +2433,7 @@ declare namespace LocalJSX {
     /**
      * An optional configuration to setup network configuration of measurement endpoints.
      */
-    config?: Config;
+    config?: PartialConfig | string;
     /**
      * The environment that will be used to request measurement results.
      */
