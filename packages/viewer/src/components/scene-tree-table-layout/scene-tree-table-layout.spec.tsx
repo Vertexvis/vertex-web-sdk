@@ -3,6 +3,7 @@ jest.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
 );
 jest.mock('./lib/dom');
+jest.mock('./lib/window');
 jest.mock('../../lib/stencil', () => ({
   readDOM: jest.fn((fn) => fn()),
 }));
@@ -25,6 +26,7 @@ import {
 import { triggerResizeObserver } from '../../testing/resizeObserver';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
+import { Row } from '../scene-tree/lib/row';
 import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
 import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
 import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
@@ -33,6 +35,7 @@ import {
   getSceneTreeTableViewportWidth,
 } from './lib/dom';
 import { SceneTreeTableHoverController } from './lib/hover-controller';
+import { restartTimeout } from './lib/window';
 import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
 describe('<vertex-scene-tree-table-layout>', () => {
@@ -92,7 +95,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     ).not.toBeNull();
   });
 
-  it('responds to hover events', async () => {
+  it('provides scene tree cells with the created hover controller', async () => {
     const client = mockSceneTreeClient();
     mockGetTree({ client });
 
@@ -392,6 +395,92 @@ describe('<vertex-scene-tree-table-layout>', () => {
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
     ).toContain('grid-template-columns:  100px 1fr');
+  });
+
+  it('debounces isScrolling updates for the cells', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="100" max-width="100">
+          <template>
+            <vertex-scene-tree-table-cell class="templated-cell" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100" max-width="100">
+          <template>
+            <vertex-scene-tree-table-cell class="templated-cell" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    let restartTimeoutFn: VoidFunction | undefined;
+    (restartTimeout as jest.Mock).mockImplementation((fn: VoidFunction) => {
+      restartTimeoutFn = fn;
+
+      return 1;
+    });
+
+    const createMockRow = (index: number): Row => ({
+      index,
+      node: createNode(),
+      metadata: {},
+      data: {},
+    });
+    table.rows = new Array(100).fill(undefined).map((_, i) => createMockRow(i));
+    table.totalRows = table.rows.length;
+
+    await page.waitForChanges();
+
+    const tableContainer = table.shadowRoot?.querySelector(
+      'div.table'
+    ) as HTMLDivElement;
+
+    tableContainer.scrollTop = 5;
+    tableContainer.dispatchEvent(new Event('scroll'));
+
+    await page.waitForChanges();
+
+    expect(restartTimeout).toHaveBeenCalledWith(
+      expect.any(Function),
+      undefined
+    );
+
+    expect(
+      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+    ).toBe(true);
+
+    tableContainer.scrollTop = 10;
+    tableContainer.dispatchEvent(new Event('scroll'));
+
+    await page.waitForChanges();
+
+    expect(restartTimeout).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Number)
+    );
+
+    expect(
+      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+    ).toBe(true);
+
+    restartTimeoutFn?.();
+
+    await page.waitForChanges();
+
+    expect(
+      tableContainer.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+    ).toBeFalsy();
   });
 });
 

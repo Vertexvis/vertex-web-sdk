@@ -30,6 +30,7 @@ import {
   scrollToTop,
 } from './lib/dom';
 import { SceneTreeTableHoverController } from './lib/hover-controller';
+import { restartTimeout } from './lib/window';
 
 interface StateMap {
   columnElementPools?: WeakMap<
@@ -852,10 +853,9 @@ export class SceneTreeTableLayout {
   private handleScrollChanged = (event: Event): void => {
     this.isScrolling = true;
 
-    window.clearTimeout(this.scrollTimer);
-    this.scrollTimer = window.setTimeout(() => {
+    this.scrollTimer = restartTimeout(() => {
       this.isScrolling = false;
-    }, 200);
+    }, this.scrollTimer);
 
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
     this.computeAndUpdateViewportRows();
