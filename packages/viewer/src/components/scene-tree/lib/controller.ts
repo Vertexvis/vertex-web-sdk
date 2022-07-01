@@ -47,6 +47,7 @@ export interface SceneTreeState {
   totalFilteredRows?: number;
   rows: Row[];
   connection: ConnectionState;
+  serverSideConnection: 'disconnected' | 'connected';
   isSearching: boolean;
   shouldShowLoading?: boolean;
 }
@@ -139,6 +140,7 @@ export class SceneTreeController {
     isSearching: false,
     rows: [],
     connection: { type: 'disconnected' },
+    serverSideConnection: 'disconnected',
   };
 
   /**
@@ -176,6 +178,13 @@ export class SceneTreeController {
 
   public setDebugLogs(debugLogs: boolean): void {
     this.debugLogs = debugLogs;
+  }
+
+  public invalidateCurrentView(): void {
+    if (this.state.serverSideConnection === 'disconnected') {
+      this.invalidateAfterOffset(0);
+      this.fetchUnloadedPagesInActiveRows();
+    }
   }
 
   public async connect(jwtProvider: JwtProvider): Promise<void> {
@@ -319,6 +328,7 @@ export class SceneTreeController {
         jwtProvider: connection.jwtProvider,
         sceneViewId: connection.sceneViewId,
       },
+      serverSideConnection: 'disconnected',
       isSearching: false,
       totalRows: reset ? 0 : this.state.totalRows,
       rows: reset ? [] : this.state.rows,
@@ -338,7 +348,7 @@ export class SceneTreeController {
       const req = new CollapseNodeRequest();
       req.setNodeId(nodeId);
 
-      await this.requestUnary(jwt, (metadata, handler) =>
+      await this.requestUnaryWithFallback(jwt, (metadata, handler) =>
         this.client.collapseNode(req, metadata, handler)
       );
     });
@@ -357,7 +367,7 @@ export class SceneTreeController {
       const req = new ExpandNodeRequest();
       req.setNodeId(nodeId);
 
-      await this.requestUnary(jwt, (metadata, handler) =>
+      await this.requestUnaryWithFallback(jwt, (metadata, handler) =>
         this.client.expandNode(req, metadata, handler)
       );
     });
@@ -368,7 +378,7 @@ export class SceneTreeController {
    */
   public async collapseAll(): Promise<void> {
     return this.ifConnectionHasJwt(async (jwt) => {
-      await this.requestUnary(jwt, (metadata, handler) =>
+      await this.requestUnaryWithFallback(jwt, (metadata, handler) =>
         this.client.collapseAll(new CollapseAllRequest(), metadata, handler)
       );
     });
@@ -379,7 +389,7 @@ export class SceneTreeController {
    */
   public async expandAll(): Promise<void> {
     return this.ifConnectionHasJwt(async (jwt) => {
-      await this.requestUnary(jwt, (metadata, handler) =>
+      await this.requestUnaryWithFallback(jwt, (metadata, handler) =>
         this.client.expandAll(new ExpandAllRequest(), metadata, handler)
       );
     });
@@ -401,7 +411,7 @@ export class SceneTreeController {
       const req = new LocateItemRequest();
       req.setNodeId(nodeId);
 
-      const res = await this.requestUnary<LocateItemResponse>(
+      const res = await this.requestUnaryWithFallback<LocateItemResponse>(
         jwt,
         (metadata, handler) => this.client.locateItem(req, metadata, handler)
       );
@@ -427,7 +437,7 @@ export class SceneTreeController {
       const req = new GetNodeAncestorsRequest();
       req.setNodeId(nodeUuid);
 
-      const res = await this.requestUnary<GetNodeAncestorsResponse>(
+      const res = await this.requestUnaryWithFallback<GetNodeAncestorsResponse>(
         jwt,
         (metadata, handler) =>
           this.client.getNodeAncestors(req, metadata, handler)
@@ -504,13 +514,14 @@ export class SceneTreeController {
    */
   public async fetchMetadataKeys(): Promise<MetadataKey[]> {
     return this.ifConnectionHasJwt(async (jwt) => {
-      const res = await this.requestUnary<GetAvailableColumnsResponse>(
-        jwt,
-        (meta, handler) => {
-          const req = new GetAvailableColumnsRequest();
-          this.client.getAvailableColumns(req, meta, handler);
-        }
-      );
+      const res =
+        await this.requestUnaryWithFallback<GetAvailableColumnsResponse>(
+          jwt,
+          (meta, handler) => {
+            const req = new GetAvailableColumnsRequest();
+            this.client.getAvailableColumns(req, meta, handler);
+          }
+        );
 
       return res.getKeysList().map((value) => value.getValue());
     });
@@ -533,7 +544,7 @@ export class SceneTreeController {
         isSearching: true,
       });
       try {
-        const res = await this.requestUnary<FilterResponse>(
+        const res = await this.requestUnaryWithFallback<FilterResponse>(
           jwt,
           (metadata, handler) => {
             const req = new FilterRequest();
@@ -754,6 +765,11 @@ export class SceneTreeController {
               `Failed to subscribe to scene tree with code=${s.code}, details=${s.details}`
             );
             this.invalidateAfterOffset(0);
+          } else {
+            this.updateState({
+              ...this.state,
+              serverSideConnection: 'connected',
+            });
           }
         });
 
@@ -953,6 +969,20 @@ export class SceneTreeController {
           reject(new Error('Invalid response. Both error and result are null'));
         }
       });
+    });
+  }
+
+  private requestUnaryWithFallback<R>(
+    jwt: string,
+    req: (
+      metadata: grpc.Metadata,
+      handler: (err: ServiceError | null, res: R | null) => void
+    ) => void
+  ): Promise<R> {
+    return this.requestUnary(jwt, req).then((r) => {
+      this.invalidateCurrentView();
+
+      return r;
     });
   }
 

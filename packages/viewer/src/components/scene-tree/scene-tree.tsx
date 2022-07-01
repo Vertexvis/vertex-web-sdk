@@ -386,8 +386,10 @@ export class SceneTree {
     await this.performRowOperation(row, async ({ viewer, id, node }) => {
       if (node.visible) {
         await hideItem(viewer, id);
+        this.controller?.invalidateCurrentView();
       } else {
         await showItem(viewer, id);
+        this.controller?.invalidateCurrentView();
       }
     });
   }
@@ -618,7 +620,7 @@ export class SceneTree {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
       this.controller = new SceneTreeController(client, 100, {
-        disableServerSideStreaming: true,
+        disableServerSideStreaming: this.disableServerSideStreaming,
         spinnerDelay: 2000,
       });
     }
@@ -812,7 +814,6 @@ export class SceneTree {
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.showLoader = !!state.shouldShowLoading;
-    this.isSearching = state.isSearching;
     this.rows = state.rows;
     this.totalRows = state.totalRows;
 
