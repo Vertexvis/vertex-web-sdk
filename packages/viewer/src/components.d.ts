@@ -133,6 +133,7 @@ export namespace Components {
      * @param row The row, row index, or node to deselect.
      */
     deselectItem: (row: RowArg) => Promise<void>;
+    disableServerSideStreaming: boolean;
     /**
      * Performs an API call to expand all nodes in the tree.
      */
@@ -1604,6 +1605,7 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     controller?: SceneTreeController;
+    disableServerSideStreaming?: boolean;
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */

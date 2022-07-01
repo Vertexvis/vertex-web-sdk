@@ -203,6 +203,9 @@ export class SceneTree {
   @Prop({ mutable: true })
   public metadataSearchKeys: MetadataKey[] = [];
 
+  @Prop()
+  public disableServerSideStreaming = false;
+
   /**
    * A list of part metadata keys that will be made available to each row. This
    * metadata can be used for data binding inside the scene tree's template.
@@ -218,9 +221,6 @@ export class SceneTree {
 
   @State()
   private totalRows = 0;
-
-  @State()
-  private isSearching = false;
 
   @State()
   private showLoader = false;
@@ -617,7 +617,10 @@ export class SceneTree {
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(sceneTreeHost);
-      this.controller = new SceneTreeController(client, 100);
+      this.controller = new SceneTreeController(client, 100, {
+        disableServerSideStreaming: true,
+        spinnerDelay: 2000,
+      });
     }
 
     this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(

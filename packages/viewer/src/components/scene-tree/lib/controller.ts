@@ -35,6 +35,7 @@ import { fromNodeProto, isLoadedRow, Row } from './row';
 
 export interface ConnectOptions {
   spinnerDelay: number;
+  disableServerSideStreaming?: boolean;
   idleReconnectInSeconds?: number;
   lostConnectionReconnectInSeconds?: number;
 }
@@ -675,89 +676,91 @@ export class SceneTreeController {
         return sub;
       });
 
-      stream.on('data', (msg) => {
-        this.startIdleReconnectTimer();
+      if (!this.connectOptions.disableServerSideStreaming) {
+        stream.on('data', (msg) => {
+          this.startIdleReconnectTimer();
 
-        const { change } = msg.toObject();
+          const { change } = msg.toObject();
 
-        if (change?.listChange != null) {
-          this.log('Received list change', change.listChange.start);
-          this.invalidateAfterOffset(change.listChange.start);
-          this.fetchUnloadedPagesInActiveRows();
-        }
+          if (change?.listChange != null) {
+            this.log('Received list change', change.listChange.start);
+            this.invalidateAfterOffset(change.listChange.start);
+            this.fetchUnloadedPagesInActiveRows();
+          }
 
-        const {
-          hiddenList = [],
-          shownList = [],
-          partiallyVisibleList = [],
-          deselectedList = [],
-          selectedList = [],
-        } = change?.ranges || {};
+          const {
+            hiddenList = [],
+            shownList = [],
+            partiallyVisibleList = [],
+            deselectedList = [],
+            selectedList = [],
+          } = change?.ranges || {};
 
-        if (partiallyVisibleList.length > 0) {
-          this.log(
-            'Received partial visibility list change',
-            partiallyVisibleList
-          );
+          if (partiallyVisibleList.length > 0) {
+            this.log(
+              'Received partial visibility list change',
+              partiallyVisibleList
+            );
 
-          partiallyVisibleList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({
-              partiallyVisible: true,
-            }))
-          );
-        }
+            partiallyVisibleList.forEach(({ start, end }) =>
+              this.patchNodesInRange(start, end, () => ({
+                partiallyVisible: true,
+              }))
+            );
+          }
 
-        if (hiddenList.length > 0) {
-          this.log('Received hidden list change', hiddenList);
+          if (hiddenList.length > 0) {
+            this.log('Received hidden list change', hiddenList);
 
-          hiddenList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({
-              visible: false,
-              partiallyVisible: false,
-            }))
-          );
-        }
+            hiddenList.forEach(({ start, end }) =>
+              this.patchNodesInRange(start, end, () => ({
+                visible: false,
+                partiallyVisible: false,
+              }))
+            );
+          }
 
-        if (shownList.length > 0) {
-          this.log('Received shown list change', shownList);
+          if (shownList.length > 0) {
+            this.log('Received shown list change', shownList);
 
-          shownList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({
-              visible: true,
-              partiallyVisible: false,
-            }))
-          );
-        }
+            shownList.forEach(({ start, end }) =>
+              this.patchNodesInRange(start, end, () => ({
+                visible: true,
+                partiallyVisible: false,
+              }))
+            );
+          }
 
-        if (deselectedList.length > 0) {
-          this.log('Received deselected list change', deselectedList);
+          if (deselectedList.length > 0) {
+            this.log('Received deselected list change', deselectedList);
 
-          deselectedList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({ selected: false }))
-          );
-        }
+            deselectedList.forEach(({ start, end }) =>
+              this.patchNodesInRange(start, end, () => ({ selected: false }))
+            );
+          }
 
-        if (selectedList.length > 0) {
-          this.log('Received selected list change', selectedList);
+          if (selectedList.length > 0) {
+            this.log('Received selected list change', selectedList);
 
-          selectedList.forEach(({ start, end }) =>
-            this.patchNodesInRange(start, end, () => ({ selected: true }))
-          );
-        }
-      });
+            selectedList.forEach(({ start, end }) =>
+              this.patchNodesInRange(start, end, () => ({ selected: true }))
+            );
+          }
+        });
 
-      stream.on('status', (s) => {
-        if (s.code !== 0) {
-          console.error(
-            `Failed to subscribe to scene tree with code=${s.code}, details=${s.details}`
-          );
+        stream.on('status', (s) => {
+          if (s.code !== 0) {
+            console.error(
+              `Failed to subscribe to scene tree with code=${s.code}, details=${s.details}`
+            );
+            this.invalidateAfterOffset(0);
+          }
+        });
+
+        stream.on('end', () => {
           this.invalidateAfterOffset(0);
-        }
-      });
-
-      stream.on('end', () => {
-        this.invalidateAfterOffset(0);
-      });
+        });
+      }
 
       return stream;
     });
