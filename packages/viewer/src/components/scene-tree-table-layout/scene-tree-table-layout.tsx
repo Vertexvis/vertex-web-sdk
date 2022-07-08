@@ -222,6 +222,7 @@ export class SceneTreeTableLayout {
     this.headerResizeObserver = new ResizeObserver(() => {
       this.stateMap.headerHeight = undefined;
       this.computeHeaderHeight();
+      this.updateLayoutPosition();
     });
 
     this.resizeObserver = new ResizeObserver(() => {
