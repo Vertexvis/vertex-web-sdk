@@ -384,7 +384,7 @@ export class SceneTree {
   @Method()
   public async toggleItemVisibility(row: RowArg): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id, node }) => {
-      if (node.visible) {
+      if (node.visible || node.partiallyVisible) {
         await hideItem(viewer, id);
       } else {
         await showItem(viewer, id);

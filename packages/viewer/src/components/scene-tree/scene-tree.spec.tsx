@@ -588,6 +588,20 @@ describe('<vertex-scene-tree>', () => {
       expect(hideItem).toHaveBeenCalled();
     });
 
+    it('hides item if index partially hidden', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      mockGetTree({
+        client,
+        transform: (node) => node.setPartiallyVisible(true),
+      });
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      await tree.toggleItemVisibility(0);
+      expect(hideItem).toHaveBeenCalled();
+    });
+
     it('shows item if row hidden', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
