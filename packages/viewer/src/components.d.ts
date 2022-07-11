@@ -285,6 +285,10 @@ export namespace Components {
   }
   interface VertexSceneTreeTableCell {
     /**
+     * A flag that disables selection if the Alt (or Option on Mac) key is held down. When enabled, selection will occur as though no modifier keys are pressed.
+     */
+    disableAltKeySelection: boolean;
+    /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
@@ -1664,6 +1668,10 @@ declare namespace LocalJSX {
     value?: string;
   }
   interface VertexSceneTreeTableCell {
+    /**
+     * A flag that disables selection if the Alt (or Option on Mac) key is held down. When enabled, selection will occur as though no modifier keys are pressed.
+     */
+    disableAltKeySelection?: boolean;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */

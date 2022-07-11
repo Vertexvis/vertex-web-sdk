@@ -239,6 +239,32 @@ describe('<vertex-scene-tree-table-cell>', () => {
     );
   });
 
+  it('ignores selection if alt key pressed and disable alt key selection is true', async () => {
+    const node = createNode({ selected: false });
+    const { cell } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-table-cell disable-alt-key-selection></vertex-scene-tree-table-cell>
+      `,
+      node,
+    });
+
+    const tree = { selectItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cell as any).tree = tree;
+
+    const selected = jest.fn();
+    cell.addEventListener('selectionToggled', selected);
+
+    const originalEvent = new MouseEvent('pointerup', {
+      button: 0,
+      altKey: true,
+    });
+    cell.dispatchEvent(originalEvent);
+
+    expect(tree.selectItem).not.toHaveBeenCalled();
+    expect(selected).not.toHaveBeenCalled();
+  });
+
   it('appends selection if unselected and meta key', async () => {
     const node = createNode({ selected: false });
     const { cell } = await newComponentSpec({

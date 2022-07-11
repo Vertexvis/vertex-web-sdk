@@ -95,6 +95,14 @@ export class SceneTreeTableCell {
   public recurseParentSelectionDisabled = false;
 
   /**
+   * A flag that disables selection if the Alt (or Option on Mac) key is held
+   * down. When enabled, selection will occur as though no modifier keys are
+   * pressed.
+   */
+  @Prop()
+  public disableAltKeySelection = false;
+
+  /**
    * @internal
    */
   @Prop()
@@ -237,7 +245,8 @@ export class SceneTreeTableCell {
       !event.defaultPrevented &&
       event.button === 0 &&
       !this.interactionsDisabled &&
-      !this.isScrolling
+      !this.isScrolling &&
+      !this.isDisabledSelection(event)
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
@@ -275,5 +284,9 @@ export class SceneTreeTableCell {
     } else {
       this.hostEl.removeAttribute(attr);
     }
+  }
+
+  private isDisabledSelection(event: PointerEvent): boolean {
+    return this.disableAltKeySelection && event.altKey;
   }
 }
