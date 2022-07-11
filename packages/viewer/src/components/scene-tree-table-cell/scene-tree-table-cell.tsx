@@ -11,6 +11,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
 export interface SceneTreeTableCellEventDetails {
@@ -95,12 +96,17 @@ export class SceneTreeTableCell {
   public recurseParentSelectionDisabled = false;
 
   /**
-   * A flag that disables selection if the Alt (or Option on Mac) key is held
-   * down. When enabled, selection will occur as though no modifier keys are
-   * pressed.
+   * A set of supported modifier keys when performing selection. Setting any
+   * value to `false` will cause a click with that modifier key to be ignored
+   * and no selection to be performed.
    */
   @Prop()
-  public disableAltKeySelection = false;
+  public enabledModifierKeys: SelectionModifierKeys = {
+    shiftKey: true,
+    ctrlKey: true,
+    metaKey: true,
+    altKey: true,
+  };
 
   /**
    * @internal
@@ -246,7 +252,7 @@ export class SceneTreeTableCell {
       event.button === 0 &&
       !this.interactionsDisabled &&
       !this.isScrolling &&
-      !this.isDisabledSelection(event)
+      this.hasValidModifiers(event)
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
@@ -286,7 +292,23 @@ export class SceneTreeTableCell {
     }
   }
 
-  private isDisabledSelection(event: PointerEvent): boolean {
-    return this.disableAltKeySelection && event.altKey;
+  private hasValidModifiers(event: PointerEvent): boolean {
+    const shiftKeySelectionEnabled = this.enabledModifierKeys.shiftKey ?? true;
+    const altKeySelectionEnabled = this.enabledModifierKeys.altKey ?? true;
+    const ctrlKeySelectionEnabled = this.enabledModifierKeys.ctrlKey ?? true;
+    const metaKeySelectionEnabled = this.enabledModifierKeys.metaKey ?? true;
+
+    const shiftKeyValidOrNotPressed =
+      !event.shiftKey || shiftKeySelectionEnabled;
+    const altKeyValidOrNotPressed = !event.altKey || altKeySelectionEnabled;
+    const ctrlKeyValidOrNotPressed = !event.ctrlKey || ctrlKeySelectionEnabled;
+    const metaKeyValidOrNotPressed = !event.metaKey || metaKeySelectionEnabled;
+
+    return (
+      shiftKeyValidOrNotPressed &&
+      altKeyValidOrNotPressed &&
+      ctrlKeyValidOrNotPressed &&
+      metaKeyValidOrNotPressed
+    );
   }
 }

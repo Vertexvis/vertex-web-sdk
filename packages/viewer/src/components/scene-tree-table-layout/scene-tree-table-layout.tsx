@@ -18,6 +18,7 @@ import {
 } from '@vertexvis/html-templates';
 
 import { readDOM } from '../../lib/stencil';
+import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';
@@ -162,6 +163,19 @@ export class SceneTreeTableLayout {
    */
   @Prop({ mutable: true })
   public viewportEndIndex = 0;
+
+  /**
+   * A set of supported modifier keys when performing selection. Setting any
+   * value to `false` will cause a click with that modifier key to be ignored
+   * and no selection to be performed.
+   */
+  @Prop()
+  public enabledModifierKeys: SelectionModifierKeys = {
+    shiftKey: true,
+    ctrlKey: true,
+    metaKey: true,
+    altKey: true,
+  };
 
   /**
    * @internal
@@ -417,6 +431,7 @@ export class SceneTreeTableLayout {
     (cell as any).node = row.node;
     (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
+    (cell as any).enabledModifierKeys = this.enabledModifierKeys;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);

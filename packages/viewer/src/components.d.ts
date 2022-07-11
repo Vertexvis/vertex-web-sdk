@@ -18,7 +18,10 @@ import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
-import { MetadataKey } from './components/scene-tree/interfaces';
+import {
+  MetadataKey,
+  SelectionModifierKeys,
+} from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
@@ -133,6 +136,10 @@ export namespace Components {
      * @param row The row, row index, or node to deselect.
      */
     deselectItem: (row: RowArg) => Promise<void>;
+    /**
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
+     */
+    enabledModifierKeys: SelectionModifierKeys;
     /**
      * Performs an API call to expand all nodes in the tree.
      */
@@ -285,9 +292,9 @@ export namespace Components {
   }
   interface VertexSceneTreeTableCell {
     /**
-     * A flag that disables selection if the Alt (or Option on Mac) key is held down. When enabled, selection will occur as though no modifier keys are pressed.
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    disableAltKeySelection: boolean;
+    enabledModifierKeys: SelectionModifierKeys;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -341,6 +348,10 @@ export namespace Components {
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
+    /**
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
+     */
+    enabledModifierKeys: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset: number;
     layoutWidth?: number;
@@ -1609,6 +1620,10 @@ declare namespace LocalJSX {
     configEnv?: Environment;
     controller?: SceneTreeController;
     /**
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
+     */
+    enabledModifierKeys?: SelectionModifierKeys;
+    /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
@@ -1669,9 +1684,9 @@ declare namespace LocalJSX {
   }
   interface VertexSceneTreeTableCell {
     /**
-     * A flag that disables selection if the Alt (or Option on Mac) key is held down. When enabled, selection will occur as though no modifier keys are pressed.
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    disableAltKeySelection?: boolean;
+    enabledModifierKeys?: SelectionModifierKeys;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -1743,6 +1758,10 @@ declare namespace LocalJSX {
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
+    /**
+     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
+     */
+    enabledModifierKeys?: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;

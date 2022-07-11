@@ -23,7 +23,7 @@ import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
-import { MetadataKey } from './interfaces';
+import { MetadataKey, SelectionModifierKeys } from './interfaces';
 import {
   FilterTreeOptions,
   SceneTreeController,
@@ -209,6 +209,19 @@ export class SceneTree {
    */
   @Prop()
   public metadataKeys: MetadataKey[] = [];
+
+  /**
+   * A set of supported modifier keys when performing selection. Setting any
+   * value to `false` will cause a click with that modifier key to be ignored
+   * and no selection to be performed.
+   */
+  @Prop()
+  public enabledModifierKeys: SelectionModifierKeys = {
+    shiftKey: true,
+    ctrlKey: true,
+    metaKey: true,
+    altKey: true,
+  };
 
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
@@ -924,6 +937,7 @@ export class SceneTree {
       layout.totalRows = this.totalRows;
       layout.controller = this.controller;
       layout.rowData = this.rowData;
+      layout.enabledModifierKeys = this.enabledModifierKeys;
     } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
       console.debug(
         'Scene tree has rows, but the component has not yet rendered'
