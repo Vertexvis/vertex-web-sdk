@@ -170,7 +170,7 @@ export class SceneTreeTableLayout {
    * and no selection to be performed.
    */
   @Prop()
-  public enabledModifierKeys: SelectionModifierKeys = {
+  public enabledSelectionModifierKeys: SelectionModifierKeys = {
     shiftKey: true,
     ctrlKey: true,
     metaKey: true,
@@ -431,7 +431,8 @@ export class SceneTreeTableLayout {
     (cell as any).node = row.node;
     (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
-    (cell as any).enabledModifierKeys = this.enabledModifierKeys;
+    (cell as any).enabledSelectionModifierKeys =
+      this.enabledSelectionModifierKeys;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);

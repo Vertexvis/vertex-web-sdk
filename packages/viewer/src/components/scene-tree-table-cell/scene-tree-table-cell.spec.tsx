@@ -246,7 +246,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const { cell } = await newComponentSpec({
       template: () => (
         <vertex-scene-tree-table-cell
-          enabledModifierKeys={{
+          enabledSelectionModifierKeys={{
             altKey: false,
           }}
         ></vertex-scene-tree-table-cell>
@@ -276,7 +276,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const { cell } = await newComponentSpec({
       template: () => (
         <vertex-scene-tree-table-cell
-          enabledModifierKeys={{
+          enabledSelectionModifierKeys={{
             shiftKey: false,
           }}
         ></vertex-scene-tree-table-cell>
@@ -306,7 +306,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const { cell } = await newComponentSpec({
       template: () => (
         <vertex-scene-tree-table-cell
-          enabledModifierKeys={{
+          enabledSelectionModifierKeys={{
             ctrlKey: false,
           }}
         ></vertex-scene-tree-table-cell>
@@ -336,7 +336,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const { cell } = await newComponentSpec({
       template: () => (
         <vertex-scene-tree-table-cell
-          enabledModifierKeys={{
+          enabledSelectionModifierKeys={{
             metaKey: false,
           }}
         ></vertex-scene-tree-table-cell>

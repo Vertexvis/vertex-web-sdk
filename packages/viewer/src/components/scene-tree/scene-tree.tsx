@@ -216,7 +216,7 @@ export class SceneTree {
    * and no selection to be performed.
    */
   @Prop()
-  public enabledModifierKeys: SelectionModifierKeys = {
+  public enabledSelectionModifierKeys: SelectionModifierKeys = {
     shiftKey: true,
     ctrlKey: true,
     metaKey: true,
@@ -937,7 +937,7 @@ export class SceneTree {
       layout.totalRows = this.totalRows;
       layout.controller = this.controller;
       layout.rowData = this.rowData;
-      layout.enabledModifierKeys = this.enabledModifierKeys;
+      layout.enabledSelectionModifierKeys = this.enabledSelectionModifierKeys;
     } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
       console.debug(
         'Scene tree has rows, but the component has not yet rendered'

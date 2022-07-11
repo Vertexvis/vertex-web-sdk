@@ -139,7 +139,7 @@ export namespace Components {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys: SelectionModifierKeys;
+    enabledSelectionModifierKeys: SelectionModifierKeys;
     /**
      * Performs an API call to expand all nodes in the tree.
      */
@@ -294,7 +294,7 @@ export namespace Components {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys: SelectionModifierKeys;
+    enabledSelectionModifierKeys: SelectionModifierKeys;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -351,7 +351,7 @@ export namespace Components {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys: SelectionModifierKeys;
+    enabledSelectionModifierKeys: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset: number;
     layoutWidth?: number;
@@ -1622,7 +1622,7 @@ declare namespace LocalJSX {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys?: SelectionModifierKeys;
+    enabledSelectionModifierKeys?: SelectionModifierKeys;
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
@@ -1686,7 +1686,7 @@ declare namespace LocalJSX {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys?: SelectionModifierKeys;
+    enabledSelectionModifierKeys?: SelectionModifierKeys;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -1761,7 +1761,7 @@ declare namespace LocalJSX {
     /**
      * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
      */
-    enabledModifierKeys?: SelectionModifierKeys;
+    enabledSelectionModifierKeys?: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;

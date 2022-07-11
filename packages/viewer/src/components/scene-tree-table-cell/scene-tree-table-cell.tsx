@@ -101,7 +101,7 @@ export class SceneTreeTableCell {
    * and no selection to be performed.
    */
   @Prop()
-  public enabledModifierKeys: SelectionModifierKeys = {
+  public enabledSelectionModifierKeys: SelectionModifierKeys = {
     shiftKey: true,
     ctrlKey: true,
     metaKey: true,
@@ -293,10 +293,14 @@ export class SceneTreeTableCell {
   }
 
   private hasValidModifiers(event: PointerEvent): boolean {
-    const shiftKeySelectionEnabled = this.enabledModifierKeys.shiftKey ?? true;
-    const altKeySelectionEnabled = this.enabledModifierKeys.altKey ?? true;
-    const ctrlKeySelectionEnabled = this.enabledModifierKeys.ctrlKey ?? true;
-    const metaKeySelectionEnabled = this.enabledModifierKeys.metaKey ?? true;
+    const shiftKeySelectionEnabled =
+      this.enabledSelectionModifierKeys.shiftKey ?? true;
+    const altKeySelectionEnabled =
+      this.enabledSelectionModifierKeys.altKey ?? true;
+    const ctrlKeySelectionEnabled =
+      this.enabledSelectionModifierKeys.ctrlKey ?? true;
+    const metaKeySelectionEnabled =
+      this.enabledSelectionModifierKeys.metaKey ?? true;
 
     const shiftKeyValidOrNotPressed =
       !event.shiftKey || shiftKeySelectionEnabled;
