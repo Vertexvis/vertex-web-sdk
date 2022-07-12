@@ -220,9 +220,6 @@ export class SceneTree {
   private totalRows = 0;
 
   @State()
-  private isSearching = false;
-
-  @State()
   private showLoader = false;
 
   /**
@@ -809,7 +806,6 @@ export class SceneTree {
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.showLoader = !!state.shouldShowLoading;
-    this.isSearching = state.isSearching;
     this.rows = state.rows;
     this.totalRows = state.totalRows;
 
