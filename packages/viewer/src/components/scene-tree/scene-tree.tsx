@@ -24,7 +24,7 @@ import { Environment } from '../../lib/environment';
 import { ValidEventPredicate } from '../../lib/types/events';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
-import { MetadataKey, SelectionModifierKeys } from './interfaces';
+import { MetadataKey } from './interfaces';
 import {
   FilterTreeOptions,
   SceneTreeController,

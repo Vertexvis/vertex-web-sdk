@@ -19,7 +19,6 @@ import {
 
 import { readDOM } from '../../lib/stencil';
 import { ValidEventPredicate } from '../../lib/types/events';
-import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';

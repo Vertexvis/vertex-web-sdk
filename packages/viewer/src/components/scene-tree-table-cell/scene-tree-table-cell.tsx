@@ -12,7 +12,6 @@ import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { ValidEventPredicate } from '../../lib/types/events';
-import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
 export interface SceneTreeTableCellEventDetails {
