@@ -33,6 +33,10 @@ export interface TransformOperation {
   transform: vertexvis.protobuf.core.IMatrix4x4f;
 }
 
+export interface ClearTransformOperation {
+  type: 'clear-transform';
+}
+
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
@@ -40,7 +44,8 @@ export type ItemOperation =
   | DeselectItemOperation
   | ChangeMaterialOperation
   | ClearItemOperation
-  | TransformOperation;
+  | TransformOperation
+  | ClearTransformOperation;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
@@ -49,6 +54,7 @@ export interface SceneItemOperations<T> {
   select(color: ColorMaterial): T;
   deselect(): T;
   clearMaterialOverrides(): T;
+  clearTransforms(): T;
 }
 
 /**
@@ -108,6 +114,12 @@ export class SceneOperationBuilder
   ): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'change-transform', transform: matrix }])
+    );
+  }
+
+  public clearTransforms(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'clear-transform' }])
     );
   }
 }

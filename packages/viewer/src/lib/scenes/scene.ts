@@ -163,6 +163,14 @@ export class SceneItemOperationsBuilder
     }
   }
 
+  public clearTransforms(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.defaultSelectionMaterial,
+      this.builder.clearTransforms()
+    );
+  }
+
   public build(): QueryOperation {
     return {
       query: this.query,
