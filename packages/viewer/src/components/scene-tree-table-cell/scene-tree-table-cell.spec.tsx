@@ -241,14 +241,12 @@ describe('<vertex-scene-tree-table-cell>', () => {
     );
   });
 
-  it('ignores selection if alt key pressed and the modifier key is not enabled', async () => {
+  it('ignores selection if the selection predicate is false', async () => {
     const node = createNode({ selected: false });
     const { cell } = await newComponentSpec({
       template: () => (
         <vertex-scene-tree-table-cell
-          enabledSelectionModifierKeys={{
-            altKey: false,
-          }}
+          selectionValidPredicate={(event) => !event.altKey}
         ></vertex-scene-tree-table-cell>
       ),
       node,
@@ -264,96 +262,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       altKey: true,
-    });
-    cell.dispatchEvent(originalEvent);
-
-    expect(tree.selectItem).not.toHaveBeenCalled();
-    expect(selected).not.toHaveBeenCalled();
-  });
-
-  it('ignores selection if shift key pressed and the modifier key is not enabled', async () => {
-    const node = createNode({ selected: false });
-    const { cell } = await newComponentSpec({
-      template: () => (
-        <vertex-scene-tree-table-cell
-          enabledSelectionModifierKeys={{
-            shiftKey: false,
-          }}
-        ></vertex-scene-tree-table-cell>
-      ),
-      node,
-    });
-
-    const tree = { selectItem: jest.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (cell as any).tree = tree;
-
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
-    const originalEvent = new MouseEvent('pointerup', {
-      button: 0,
-      shiftKey: true,
-    });
-    cell.dispatchEvent(originalEvent);
-
-    expect(tree.selectItem).not.toHaveBeenCalled();
-    expect(selected).not.toHaveBeenCalled();
-  });
-
-  it('ignores selection if ctrl key pressed and the modifier key is not enabled', async () => {
-    const node = createNode({ selected: false });
-    const { cell } = await newComponentSpec({
-      template: () => (
-        <vertex-scene-tree-table-cell
-          enabledSelectionModifierKeys={{
-            ctrlKey: false,
-          }}
-        ></vertex-scene-tree-table-cell>
-      ),
-      node,
-    });
-
-    const tree = { selectItem: jest.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (cell as any).tree = tree;
-
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
-    const originalEvent = new MouseEvent('pointerup', {
-      button: 0,
-      ctrlKey: true,
-    });
-    cell.dispatchEvent(originalEvent);
-
-    expect(tree.selectItem).not.toHaveBeenCalled();
-    expect(selected).not.toHaveBeenCalled();
-  });
-
-  it('ignores selection if meta key pressed and the modifier key is not enabled', async () => {
-    const node = createNode({ selected: false });
-    const { cell } = await newComponentSpec({
-      template: () => (
-        <vertex-scene-tree-table-cell
-          enabledSelectionModifierKeys={{
-            metaKey: false,
-          }}
-        ></vertex-scene-tree-table-cell>
-      ),
-      node,
-    });
-
-    const tree = { selectItem: jest.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (cell as any).tree = tree;
-
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
-    const originalEvent = new MouseEvent('pointerup', {
-      button: 0,
-      metaKey: true,
     });
     cell.dispatchEvent(originalEvent);
 

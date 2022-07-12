@@ -18,6 +18,7 @@ import {
 } from '@vertexvis/html-templates';
 
 import { readDOM } from '../../lib/stencil';
+import { ValidEventPredicate } from '../../lib/types/events';
 import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
@@ -165,17 +166,16 @@ export class SceneTreeTableLayout {
   public viewportEndIndex = 0;
 
   /**
-   * A set of supported modifier keys when performing selection. Setting any
-   * value to `false` will cause a click with that modifier key to be ignored
-   * and no selection to be performed.
+   * An optional predicate that will be checked prior to performing a selection.
+   * If no predicate is specified, all `pointerup` events will be considered for
+   * selection.
+   *
+   * Any predicate specified on this `vertex-scene-tree` element will override
+   * the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-cell`
+   * elements.
    */
   @Prop()
-  public enabledSelectionModifierKeys: SelectionModifierKeys = {
-    shiftKey: true,
-    ctrlKey: true,
-    metaKey: true,
-    altKey: true,
-  };
+  public selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
 
   /**
    * @internal
@@ -431,8 +431,7 @@ export class SceneTreeTableLayout {
     (cell as any).node = row.node;
     (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
-    (cell as any).enabledSelectionModifierKeys =
-      this.enabledSelectionModifierKeys;
+    (cell as any).selectionValidPredicate = this.selectionValidPredicate;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);

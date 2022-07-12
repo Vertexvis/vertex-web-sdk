@@ -18,10 +18,8 @@ import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
-import {
-  MetadataKey,
-  SelectionModifierKeys,
-} from './components/scene-tree/interfaces';
+import { MetadataKey } from './components/scene-tree/interfaces';
+import { ValidEventPredicate } from './lib/types/events';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
@@ -137,10 +135,6 @@ export namespace Components {
      */
     deselectItem: (row: RowArg) => Promise<void>;
     /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys: SelectionModifierKeys;
-    /**
      * Performs an API call to expand all nodes in the tree.
      */
     expandAll: () => Promise<void>;
@@ -241,6 +235,10 @@ export namespace Components {
       { recurseParent, ...options }?: SelectItemOptions
     ) => Promise<void>;
     /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.  Any predicate specified on this `vertex-scene-tree` element will override the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-layout` or `vertex-scene-tree-table-cell` elements.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
+    /**
      * Performs an API call that will show the item associated to the given row or row index.
      * @param row The row, row index, or node to show.
      */
@@ -292,10 +290,6 @@ export namespace Components {
   }
   interface VertexSceneTreeTableCell {
     /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys: SelectionModifierKeys;
-    /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
@@ -318,6 +312,10 @@ export namespace Components {
      * A flag that disables selection of the node's parent if the user selects the row multiple times. When enabled, selection of the same row multiple times will recursively select the next unselected parent until the root node is selected.
      */
     recurseParentSelectionDisabled: boolean;
+    /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
     /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
      */
@@ -348,10 +346,6 @@ export namespace Components {
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
-    /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset: number;
     layoutWidth?: number;
@@ -376,6 +370,10 @@ export namespace Components {
       top: number,
       options: Pick<DomScrollToOptions, 'behavior'>
     ) => Promise<void>;
+    /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.  Any predicate specified on this `vertex-scene-tree` element will override the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-cell` elements.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
     totalRows: number;
     /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
@@ -1620,10 +1618,6 @@ declare namespace LocalJSX {
     configEnv?: Environment;
     controller?: SceneTreeController;
     /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys?: SelectionModifierKeys;
-    /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      */
     metadataKeys?: MetadataKey[];
@@ -1647,6 +1641,10 @@ declare namespace LocalJSX {
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
     rowData?: RowDataProvider;
+    /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.  Any predicate specified on this `vertex-scene-tree` element will override the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-layout` or `vertex-scene-tree-table-cell` elements.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
     /**
      * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
      */
@@ -1683,10 +1681,6 @@ declare namespace LocalJSX {
     value?: string;
   }
   interface VertexSceneTreeTableCell {
-    /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys?: SelectionModifierKeys;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -1729,6 +1723,10 @@ declare namespace LocalJSX {
      */
     recurseParentSelectionDisabled?: boolean;
     /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
+    /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
      */
     tree?: HTMLVertexSceneTreeElement;
@@ -1758,10 +1756,6 @@ declare namespace LocalJSX {
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
-    /**
-     * A set of supported modifier keys when performing selection. Setting any value to `false` will cause a click with that modifier key to be ignored and no selection to be performed.
-     */
-    enabledSelectionModifierKeys?: SelectionModifierKeys;
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;
@@ -1780,6 +1774,10 @@ declare namespace LocalJSX {
     rowHeight?: number;
     rows?: Row[];
     scrollOffset?: number;
+    /**
+     * An optional predicate that will be checked prior to performing a selection. If no predicate is specified, all `pointerup` events will be considered for selection.  Any predicate specified on this `vertex-scene-tree` element will override the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-cell` elements.
+     */
+    selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
     totalRows?: number;
     /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.

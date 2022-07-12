@@ -11,6 +11,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { ValidEventPredicate } from '../../lib/types/events';
 import { SelectionModifierKeys } from '../scene-tree/interfaces';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
@@ -96,17 +97,12 @@ export class SceneTreeTableCell {
   public recurseParentSelectionDisabled = false;
 
   /**
-   * A set of supported modifier keys when performing selection. Setting any
-   * value to `false` will cause a click with that modifier key to be ignored
-   * and no selection to be performed.
+   * An optional predicate that will be checked prior to performing a selection.
+   * If no predicate is specified, all `pointerup` events will be considered for
+   * selection.
    */
   @Prop()
-  public enabledSelectionModifierKeys: SelectionModifierKeys = {
-    shiftKey: true,
-    ctrlKey: true,
-    metaKey: true,
-    altKey: true,
-  };
+  public selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
 
   /**
    * @internal
@@ -252,7 +248,7 @@ export class SceneTreeTableCell {
       event.button === 0 &&
       !this.interactionsDisabled &&
       !this.isScrolling &&
-      this.hasValidModifiers(event)
+      this.isValidSelection(event)
     ) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
         this.tree?.deselectItem(this.node);
@@ -292,27 +288,10 @@ export class SceneTreeTableCell {
     }
   }
 
-  private hasValidModifiers(event: PointerEvent): boolean {
-    const shiftKeySelectionEnabled =
-      this.enabledSelectionModifierKeys.shiftKey ?? true;
-    const altKeySelectionEnabled =
-      this.enabledSelectionModifierKeys.altKey ?? true;
-    const ctrlKeySelectionEnabled =
-      this.enabledSelectionModifierKeys.ctrlKey ?? true;
-    const metaKeySelectionEnabled =
-      this.enabledSelectionModifierKeys.metaKey ?? true;
-
-    const shiftKeyValidOrNotPressed =
-      !event.shiftKey || shiftKeySelectionEnabled;
-    const altKeyValidOrNotPressed = !event.altKey || altKeySelectionEnabled;
-    const ctrlKeyValidOrNotPressed = !event.ctrlKey || ctrlKeySelectionEnabled;
-    const metaKeyValidOrNotPressed = !event.metaKey || metaKeySelectionEnabled;
-
+  private isValidSelection(event: PointerEvent): boolean {
     return (
-      shiftKeyValidOrNotPressed &&
-      altKeyValidOrNotPressed &&
-      ctrlKeyValidOrNotPressed &&
-      metaKeyValidOrNotPressed
+      this.selectionValidPredicate == null ||
+      this.selectionValidPredicate(event)
     );
   }
 }
