@@ -56,4 +56,11 @@ describe(SceneOperationBuilder, () => {
 
     expect(definitions).toEqual([{ type: 'deselect' }]);
   });
+
+  it('creates a clear transform operation', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.clearTransforms().build();
+
+    expect(definitions).toEqual([{ type: 'clear-transform' }]);
+  });
 });
