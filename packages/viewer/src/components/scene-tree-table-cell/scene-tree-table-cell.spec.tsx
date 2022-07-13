@@ -221,7 +221,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
         <vertex-scene-tree-table-cell
           selectionHandler={(event, node, tree) => {
             if (!event.altKey) {
-              tree.selectItem();
+              tree.selectItem(node);
             }
           }}
         ></vertex-scene-tree-table-cell>
@@ -229,6 +229,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
     const originalEvent = new MouseEvent('pointerup', {
