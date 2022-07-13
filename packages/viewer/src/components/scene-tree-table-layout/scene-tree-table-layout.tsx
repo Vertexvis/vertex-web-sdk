@@ -18,7 +18,6 @@ import {
 } from '@vertexvis/html-templates';
 
 import { readDOM } from '../../lib/stencil';
-import { ValidEventPredicate } from '../../lib/types/events';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';
@@ -163,18 +162,6 @@ export class SceneTreeTableLayout {
    */
   @Prop({ mutable: true })
   public viewportEndIndex = 0;
-
-  /**
-   * An optional predicate that will be checked prior to performing a selection.
-   * If no predicate is specified, all `pointerup` events will be considered for
-   * selection.
-   *
-   * Any predicate specified on this `vertex-scene-tree` element will override
-   * the `selectionValidPredicate` specified on any nested `vertex-scene-tree-table-cell`
-   * elements.
-   */
-  @Prop()
-  public selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
 
   /**
    * @internal
@@ -430,7 +417,6 @@ export class SceneTreeTableLayout {
     (cell as any).node = row.node;
     (cell as any).hoverController = this.cellHoverController;
     (cell as any).isScrolling = this.isScrolling;
-    (cell as any).selectionValidPredicate = this.selectionValidPredicate;
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
     binding.bind(row);

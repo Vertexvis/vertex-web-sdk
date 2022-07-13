@@ -16,5 +16,3 @@ export const defaultEventConfig: EventConfig = {
   doubleTapThreshold: 500,
   longPressThreshold: 500,
 };
-
-export type ValidEventPredicate<T extends Event> = (event: T) => boolean;

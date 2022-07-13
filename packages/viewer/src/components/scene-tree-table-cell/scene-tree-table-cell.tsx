@@ -1,17 +1,9 @@
-import {
-  Component,
-  Element,
-  Event,
-  EventEmitter,
-  h,
-  Host,
-  Prop,
-} from '@stencil/core';
+import { Component, Element, h, Host, Prop } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
-import { ValidEventPredicate } from '../../lib/types/events';
+import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
 export interface SceneTreeTableCellEventDetails {
@@ -79,56 +71,37 @@ export class SceneTreeTableCell {
   public visibilityToggle?: boolean;
 
   /**
-   * A flag that disables the default interactions of this component. If
-   * disabled, you can use the event handlers to be notified when certain
-   * operations are performed by the user.
+   * An optional handler that will override this cell's default selection
+   * behavior. The registered handler will receive the `pointerup` event,
+   * the node data for the row this cell is associated with, and a reference
+   * to the parent `<vertex-scene-tree>` element for performing operations.
    */
   @Prop()
-  public interactionsDisabled = false;
+  public selectionHandler?: SceneTreeOperationHandler;
 
   /**
-   * A flag that disables selection of the node's parent if the user selects
-   * the row multiple times. When enabled, selection of the same row multiple
-   * times will recursively select the next unselected parent until the root
-   * node is selected.
+   * An optional handler that will override this cell's default visibility
+   * behavior. The registered handler will receive the `pointerup` event,
+   * the node data for the row this cell is associated with, and a reference
+   * to the parent `<vertex-scene-tree>` element for performing operations.
    */
   @Prop()
-  public recurseParentSelectionDisabled = false;
+  public visibilityHandler?: SceneTreeOperationHandler;
 
   /**
-   * An optional predicate that will be checked prior to performing a selection.
-   * If no predicate is specified, all `pointerup` events will be considered for
-   * selection.
+   * An optional handler that will override this cell's default expansion
+   * behavior. The registered handler will receive the `pointerup` event,
+   * the node data for the row this cell is associated with, and a reference
+   * to the parent `<vertex-scene-tree>` element for performing operations.
    */
   @Prop()
-  public selectionValidPredicate?: ValidEventPredicate<PointerEvent>;
+  public expansionHandler?: SceneTreeOperationHandler;
 
   /**
    * @internal
    */
   @Prop()
   public hoverController?: SceneTreeCellHoverController;
-
-  /**
-   * An event that is emitted when a user requests to expand the node. This is
-   * emitted even if interactions are disabled.
-   */
-  @Event({ bubbles: true })
-  public expandToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
-
-  /**
-   * An event that is emitted when a user requests to change the node's
-   * visibility. This event is emitted even if interactions are disabled.
-   */
-  @Event({ bubbles: true })
-  public visibilityToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
-
-  /**
-   * An event that is emitted when a user requests to change the node's selection
-   * state. This event is emitted even if interactions are disabled.
-   */
-  @Event({ bubbles: true })
-  public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -242,41 +215,33 @@ export class SceneTreeTableCell {
   };
 
   private handleCellPointerUp = (event: PointerEvent): void => {
-    if (
-      !event.defaultPrevented &&
-      event.button === 0 &&
-      !this.interactionsDisabled &&
-      !this.isScrolling &&
-      this.isValidSelection(event)
-    ) {
-      if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
-        this.tree?.deselectItem(this.node);
-      } else if (this.node?.selected && !this.recurseParentSelectionDisabled) {
-        this.tree?.selectItem(this.node, {
-          recurseParent: true,
-        });
-      } else if (!this.node?.selected) {
-        this.tree?.selectItem(this.node, {
-          append: event.ctrlKey || event.metaKey,
-          range: event.shiftKey,
-        });
+    if (!this.isScrolling && this.node != null && this.tree != null) {
+      if (this.selectionHandler != null) {
+        this.selectionHandler(event, this.node, this.tree);
+      } else {
+        this.performDefaultSelectionOperation(event);
       }
-      this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
   private toggleExpansion = (event: PointerEvent): void => {
-    if (this.tree != null && this.node != null && !this.interactionsDisabled) {
-      this.tree.toggleExpandItem(this.node);
+    if (this.tree != null && this.node != null) {
+      if (this.expansionHandler != null) {
+        this.expansionHandler(event, this.node, this.tree);
+      } else {
+        this.performDefaultExpansionOperation(this.node, this.tree);
+      }
     }
-    this.expandToggled.emit({ node: this.node, originalEvent: event });
   };
 
   private toggleVisibility = (event: PointerEvent): void => {
-    if (this.tree != null && this.node != null && !this.interactionsDisabled) {
-      this.tree.toggleItemVisibility(this.node);
+    if (this.tree != null && this.node != null) {
+      if (this.visibilityHandler != null) {
+        this.visibilityHandler(event, this.node, this.tree);
+      } else {
+        this.performDefaultVisibilityOperation(this.node, this.tree);
+      }
     }
-    this.visibilityToggled.emit({ node: this.node, originalEvent: event });
   };
 
   private toggleAttribute(attr: string, value: boolean): void {
@@ -287,10 +252,34 @@ export class SceneTreeTableCell {
     }
   }
 
-  private isValidSelection(event: PointerEvent): boolean {
-    return (
-      this.selectionValidPredicate == null ||
-      this.selectionValidPredicate(event)
-    );
-  }
+  private performDefaultSelectionOperation = (event: PointerEvent): void => {
+    if (!event.defaultPrevented && event.button === 0) {
+      if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
+        this.tree?.deselectItem(this.node);
+      } else if (this.node?.selected) {
+        this.tree?.selectItem(this.node, {
+          recurseParent: true,
+        });
+      } else if (!this.node?.selected) {
+        this.tree?.selectItem(this.node, {
+          append: event.ctrlKey || event.metaKey,
+          range: event.shiftKey,
+        });
+      }
+    }
+  };
+
+  private performDefaultVisibilityOperation = (
+    node: Node.AsObject,
+    tree: HTMLVertexSceneTreeElement
+  ): void => {
+    tree.toggleItemVisibility(node);
+  };
+
+  private performDefaultExpansionOperation = (
+    node: Node.AsObject,
+    tree: HTMLVertexSceneTreeElement
+  ): void => {
+    tree.toggleExpandItem(node);
+  };
 }
