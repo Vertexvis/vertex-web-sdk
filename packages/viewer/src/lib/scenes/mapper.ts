@@ -184,7 +184,9 @@ function buildOperationTypes(
         };
       case 'clear-transform':
         return {
-          changeTransform: {},
+          clearTransform: {
+            cascade: op.cascade,
+          },
         };
       case 'hide':
         return {

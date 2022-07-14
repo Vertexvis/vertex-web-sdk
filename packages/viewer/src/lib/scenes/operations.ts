@@ -35,6 +35,7 @@ export interface TransformOperation {
 
 export interface ClearTransformOperation {
   type: 'clear-transform';
+  cascade?: boolean;
 }
 
 export type ItemOperation =
@@ -117,9 +118,9 @@ export class SceneOperationBuilder
     );
   }
 
-  public clearTransforms(): SceneOperationBuilder {
+  public clearTransforms(cascade = true): SceneOperationBuilder {
     return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'clear-transform' }])
+      this.operations.concat([{ type: 'clear-transform', cascade }])
     );
   }
 }

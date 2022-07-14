@@ -163,11 +163,11 @@ export class SceneItemOperationsBuilder
     }
   }
 
-  public clearTransforms(): SceneItemOperationsBuilder {
+  public clearTransforms(cascade = true): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
       this.defaultSelectionMaterial,
-      this.builder.clearTransforms()
+      this.builder.clearTransforms(cascade)
     );
   }
 
