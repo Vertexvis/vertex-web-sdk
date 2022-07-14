@@ -37,6 +37,7 @@ export interface ConnectOptions {
   spinnerDelay: number;
   idleReconnectInSeconds?: number;
   lostConnectionReconnectInSeconds?: number;
+  subscriptionHandshakeGracePeriodInMs?: number;
 }
 
 export type JwtProvider = () => string | undefined;
@@ -127,6 +128,7 @@ export class SceneTreeController {
 
   private reconnectTimer?: number;
   private loadingTimer?: number;
+  private subscriptionHandshakeTimer?: number;
 
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
@@ -158,7 +160,10 @@ export class SceneTreeController {
   public constructor(
     private client: SceneTreeAPIClient,
     private rowLimit: number,
-    private connectOptions: ConnectOptions = { spinnerDelay: 2000 }
+    private connectOptions: ConnectOptions = {
+      spinnerDelay: 2000,
+      subscriptionHandshakeGracePeriodInMs: 5000,
+    }
   ) {}
 
   /**
@@ -204,6 +209,20 @@ export class SceneTreeController {
       this.log('Scene tree controller connecting.');
 
       await this.fetchPage(0);
+
+      this.subscriptionHandshakeTimer = window.setTimeout(() => {
+        this.updateState({
+          ...this.state,
+          connection: {
+            type: 'failure',
+            jwtProvider,
+            sceneViewId,
+            details: new SceneTreeErrorDetails(
+              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+            ),
+          },
+        });
+      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
 
       const stream = await this.subscribe();
       stream.on('end', () => this.startConnectionLostReconnectTimer());
@@ -675,7 +694,11 @@ export class SceneTreeController {
         return sub;
       });
 
-      stream.on('data', (msg) => {
+      stream.on('data', (msg: SubscribeResponse) => {
+        if (msg.hasHandshake() && this.subscriptionHandshakeTimer != null) {
+          clearTimeout(this.subscriptionHandshakeTimer);
+        }
+
         this.startIdleReconnectTimer();
 
         const { change } = msg.toObject();

@@ -25,6 +25,7 @@ import {
   FilterResponse,
   GetAvailableColumnsResponse,
   GetTreeRequest,
+  Handshake,
   LocateItemResponse,
   SubscribeRequest,
   SubscribeResponse,
@@ -46,6 +47,7 @@ import {
   ResponseStreamMock,
 } from '../../../../testing';
 import { SceneTreeController, SceneTreeState } from '../controller';
+import { SceneTreeErrorCode, SceneTreeErrorDetails } from '../errors';
 import { fromNodeProto, Row } from '../row';
 
 function signJwt(viewId: string): string {
@@ -63,7 +65,10 @@ function signJwt(viewId: string): string {
   );
 }
 
-function createController(rowLimit: number): {
+function createController(
+  rowLimit: number,
+  subscriptionHandshakeGracePeriodInMs?: number
+): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
   stream: ResponseStreamMock<unknown>;
@@ -71,6 +76,9 @@ function createController(rowLimit: number): {
   const client = new SceneTreeAPIClient('https://example.com');
   const controller = new SceneTreeController(client, rowLimit, {
     lostConnectionReconnectInSeconds: 0.025,
+    spinnerDelay: 2000,
+    subscriptionHandshakeGracePeriodInMs:
+      subscriptionHandshakeGracePeriodInMs || 1000,
   });
 
   const stream = new ResponseStreamMock<SubscribeResponse>();
@@ -97,7 +105,6 @@ describe(SceneTreeController, () => {
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(getTree)
       );
-
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
       await controller.connect(jwtProvider);
@@ -237,6 +244,79 @@ describe(SceneTreeController, () => {
         expect.objectContaining({
           connection: expect.objectContaining({
             type: 'failure',
+          }),
+        })
+      );
+    });
+
+    it('emits subscription failure if no handshake is received within the timeout', async () => {
+      const subscriptionHandshakeTimeout = 50;
+      const { controller, client } = createController(
+        10,
+        subscriptionHandshakeTimeout
+      );
+      const getTree = createGetTreeResponse(10, 100, (node) =>
+        node.setVisible(false)
+      );
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+
+      await controller.connect(jwtProvider);
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, subscriptionHandshakeTimeout + 50);
+      });
+
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'failure',
+            details: new SceneTreeErrorDetails(
+              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+            ),
+          }),
+        })
+      );
+    });
+
+    it('handles the subscription handshake', async () => {
+      const subscriptionHandshakeTimeout = 50;
+      const { controller, client, stream } = createController(
+        10,
+        subscriptionHandshakeTimeout
+      );
+      const getTree = createGetTreeResponse(10, 100, (node) =>
+        node.setVisible(false)
+      );
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(getTree)
+      );
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+
+      await controller.connect(jwtProvider);
+
+      const resp = new SubscribeResponse();
+      resp.setHandshake(new Handshake());
+
+      stream.invokeOnData(resp);
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, subscriptionHandshakeTimeout + 50);
+      });
+
+      expect(onStateChange).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'failure',
+            details: new SceneTreeErrorDetails(
+              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+            ),
           }),
         })
       );

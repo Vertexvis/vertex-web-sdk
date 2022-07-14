@@ -3,6 +3,7 @@ export enum SceneTreeErrorCode {
   SCENE_TREE_DISABLED = 1,
   MISSING_VIEWER = 2,
   DISCONNECTED = 3,
+  SUBSCRIPTION_FAILURE = 4,
 }
 
 export class SceneTreeErrorDetails {
@@ -26,5 +27,7 @@ function getSceneTreeErrorMessage(code: SceneTreeErrorCode): string {
       return 'Could not find reference to the viewer';
     case SceneTreeErrorCode.DISCONNECTED:
       return 'Disconnected from server.';
+    case SceneTreeErrorCode.SUBSCRIPTION_FAILURE:
+      return 'The tree was not able to receive subscription events';
   }
 }
