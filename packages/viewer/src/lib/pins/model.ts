@@ -15,7 +15,6 @@ export type ViewerPinToolMode = 'edit' | 'view';
  *
  */
 
-import { JSXBase } from '@stencil/core/internal';
 import { Point, Vector3 } from '@vertexvis/geometry';
 
 interface BasePinAttributes {
