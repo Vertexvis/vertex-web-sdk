@@ -33,7 +33,7 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
           size="lg"
           class={classNames('pin', { 'pin-selected': selected })}
           style={{
-            color: 'red',
+            background: primaryColor,
           }}
         />
       )}

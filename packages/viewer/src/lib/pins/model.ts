@@ -228,16 +228,4 @@ export class PinModel {
     this.selectedPinId = pinId;
     this.selectionChanged.emit(this.selectedPinId);
   }
-
-  /**
-   * PinDrawDidRender
-   */
-  public onDrawWrapper(
-    pin: Pin,
-    element: JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement>,
-    index: number
-  ): JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement> {
-    element.class = `pin-group-${index}`;
-    return element;
-  }
 }

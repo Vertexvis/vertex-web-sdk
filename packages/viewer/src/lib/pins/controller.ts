@@ -119,10 +119,6 @@ export class PinController {
     this.draggable = draggable;
   }
 
-  public getPinsSize(): number {
-    return this.model.getPins().length;
-  }
-
   public setPrimaryColor(color?: Color.Color | string): void {
     this.styleAttributes = {
       ...this.styleAttributes,

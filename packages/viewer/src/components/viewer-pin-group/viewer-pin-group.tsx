@@ -1,10 +1,8 @@
 import {
   Component,
-  Element,
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
-  Host,
   Prop,
   State,
 } from '@stencil/core';
