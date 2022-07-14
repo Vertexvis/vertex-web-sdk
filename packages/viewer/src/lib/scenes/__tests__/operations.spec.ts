@@ -61,6 +61,6 @@ describe(SceneOperationBuilder, () => {
     const builder = new SceneOperationBuilder();
     const definitions = builder.clearTransforms().build();
 
-    expect(definitions).toEqual([{ type: 'clear-transform' }]);
+    expect(definitions).toEqual([{ type: 'clear-transform', cascade: true }]);
   });
 });
