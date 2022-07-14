@@ -26,7 +26,7 @@ import { AngleUnitType, DepthBuffer, DistanceUnitType, EntityType, FrameCameraBa
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus } from "./components/viewer/viewer";
 import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
-import { Disposable } from "@vertexvis/utils";
+import { Color, Disposable } from "@vertexvis/utils";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
 import { KeyInteraction } from "./lib/interactions/keyInteraction";
 import { Cursor } from "./lib/cursors";
@@ -1007,6 +1007,10 @@ export namespace Components {
     }
     interface VertexViewerPinTool {
         /**
+          * The accent color for new pins.
+         */
+        "accentColor": Color.Color | string | undefined;
+        /**
           * The mode of the pin tool
          */
         "mode": ViewerPinToolMode;
@@ -1018,6 +1022,10 @@ export namespace Components {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel": PinModel;
+        /**
+          * The primary color for new pins.
+         */
+        "primaryColor": Color.Color | string | undefined;
         /**
           * The type of pin.  This property will automatically be set.
          */
@@ -2324,6 +2332,10 @@ declare namespace LocalJSX {
     }
     interface VertexViewerPinTool {
         /**
+          * The accent color for new pins.
+         */
+        "accentColor"?: Color.Color | string | undefined;
+        /**
           * The mode of the pin tool
          */
         "mode"?: ViewerPinToolMode;
@@ -2335,6 +2347,10 @@ declare namespace LocalJSX {
           * The model that contains the entities and outcomes from performing pin annotations
          */
         "pinModel"?: PinModel;
+        /**
+          * The primary color for new pins.
+         */
+        "primaryColor"?: Color.Color | string | undefined;
         /**
           * The type of pin.  This property will automatically be set.
          */

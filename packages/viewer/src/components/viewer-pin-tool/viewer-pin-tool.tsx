@@ -9,8 +9,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
-import { generateInstanceFromTemplate } from '@vertexvis/html-templates';
-import { Disposable } from '@vertexvis/utils';
+import { Color, Disposable } from '@vertexvis/utils';
 
 import { PinController } from '../../lib/pins/controller';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
@@ -61,6 +60,18 @@ export class ViewerPinTool {
   @Prop({ mutable: true })
   public mode: ViewerPinToolMode = 'view';
 
+  /**
+   * The primary color for new pins.
+   */
+  @Prop({ mutable: true })
+  public primaryColor: Color.Color | string | undefined;
+
+  /**
+   * The accent color for new pins.
+   */
+  @Prop({ mutable: true })
+  public accentColor: Color.Color | string | undefined;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -102,6 +113,24 @@ export class ViewerPinTool {
   /**
    * @ignore
    */
+  @Watch('accentColor')
+  protected watchAccentColorChange(): void {
+    this.pinController?.setAccentColor(this.accentColor);
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('primaryColor')
+  protected watchPrimaryColorChange(): void {
+    this.pinController?.setPrimaryColor(this.primaryColor);
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
   }
@@ -126,11 +155,6 @@ export class ViewerPinTool {
   protected componentDidLoad(): void {
     this.resizeObserver = new ResizeObserver(() => this.updateViewport());
     this.resizeObserver.observe(this.hostEl);
-  }
-
-  protected componentDidRender(): void {
-    console.log('Rendering');
-    // this.drawPins();
   }
 
   /**
@@ -194,71 +218,20 @@ export class ViewerPinTool {
     );
   }
 
-  private drawPins(): void {
-    this.pins.map((pin, index) => {
-      const template = document.getElementById(
-        `pin-template-${pin.id}`
-      ) as HTMLTemplateElement;
-
-      const alreadyLoaded =
-        this.hostEl.shadowRoot?.getElementById(`pin-group-${pin.id}`) != null;
-
-      if (template != null) {
-        const { element: pinGroup, bindings } =
-          generateInstanceFromTemplate(template);
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        (pinGroup as any).id = `pin-group-${pin.id}`;
-        (pinGroup as any)['data-is-dom-group-element'] = true;
-        (pinGroup as any).pin = pin;
-        (pinGroup as any).elementBounds = this.elementBounds;
-
-        (pinGroup as any).pinModel = this.pinModel;
-        (pinGroup as any).pinController = this.pinController;
-        (pinGroup as any).projectionViewMatrix = this.projectionViewMatrix;
-        (pinGroup as any).selected = this.selectedPinId === pin.id;
-        (pinGroup as any).dataset.isDomGroupElement = true;
-        /* eslint-enable @typescript-eslint/no-explicit-any */
-        if (!alreadyLoaded) {
-          this.hostEl.shadowRoot?.getRootNode()?.appendChild(pinGroup);
-        } else {
-          bindings.bind({ projectionViewMatrix: this.projectionViewMatrix });
-        }
-      } else {
-        const defaultPinGroupTemplate = document.createElement('template');
-        defaultPinGroupTemplate.innerHTML = `
-          <vertex-viewer-pin-group prop:value="{{x.projectionViewMatrix}}">
-          </vertex-viewer-pin-group>
-        `;
-
-        const { element: pinGroup, bindings } = generateInstanceFromTemplate(
-          defaultPinGroupTemplate
-        );
-
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        (pinGroup as any).id = `pin-group-${pin.id}`;
-        (pinGroup as any)['data-is-dom-group-element'] = true;
-        (pinGroup as any).pin = pin;
-        (pinGroup as any).elementBounds = this.elementBounds;
-
-        (pinGroup as any).pinModel = this.pinModel;
-        (pinGroup as any).pinController = this.pinController;
-        (pinGroup as any).projectionViewMatrix = this.projectionViewMatrix;
-        (pinGroup as any).selected = this.selectedPinId === pin.id;
-        (pinGroup as any).dataset.isDomGroupElement = true;
-        /* eslint-enable @typescript-eslint/no-explicit-any */
-
-        if (!alreadyLoaded) {
-          this.hostEl.shadowRoot?.getRootNode()?.appendChild(pinGroup);
-        } else {
-          bindings.bind({ projectionViewMatrix: this.projectionViewMatrix });
-        }
-        // this.hostEl.appendChild(pinGroup);
-      }
-    });
-  }
-
   private setupController(): void {
-    this.pinController = new PinController(this.pinModel, this.mode, this.tool);
+    const attributes =
+      this.accentColor || this.primaryColor
+        ? {
+            accentColor: this.accentColor,
+            primaryColor: this.primaryColor,
+          }
+        : undefined;
+    this.pinController = new PinController(
+      this.pinModel,
+      this.mode,
+      this.tool,
+      attributes
+    );
   }
 
   private clearInteractionHandler(): void {

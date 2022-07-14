@@ -26,8 +26,6 @@ export class VertexPinLabelLine {
 
   protected render(): JSX.Element {
     const { primaryColor } = getPinColors(this.pin);
-
-    console.log('primaryColor label-line: ', primaryColor);
     return (
       <Host>
         <svg class="svg">

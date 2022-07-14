@@ -81,23 +81,12 @@ export class PinsInteractionHandler implements InteractionHandler {
         ) {
           const pinId = existingPin != null ? existingPin.id : UUID.create();
 
-          const getAttributes = (): any => {
-            const mod = this.controller?.getPinsSize() % 3;
-
-            if (mod === 0) {
-              return {};
-            } else if (mod === 1) {
-              return {
-                primaryColor: '#367C2B',
-                accentColor: '#b3f0b3',
-              };
-            } else if (mod === 2) {
-              return {
-                primaryColor: '#ff2',
-                accentColor: '#fab',
-              };
-            }
-          };
+          const attributes =
+            this.controller.getStyleAttributes() != null
+              ? {
+                  style: this.controller.getStyleAttributes(),
+                }
+              : undefined;
 
           switch (this.controller.getToolType()) {
             case 'pin-icon':
@@ -110,9 +99,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                   z: hit?.hitPoint.z,
                 },
                 partId: hit?.itemId?.hex ?? undefined,
-                attributes: {
-                  style: getAttributes(),
-                },
+                attributes,
               });
               break;
             case 'pin-text':
@@ -128,9 +115,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 label: {
                   point: relativePoint,
                 },
-                attributes: {
-                  style: getAttributes(),
-                },
+                attributes,
               });
               break;
           }

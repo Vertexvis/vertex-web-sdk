@@ -96,8 +96,6 @@ export class ViewerPinGroup {
       throw new Error('Unable to draw pin');
     }
 
-    console.log('pin.id: ', this.pin.id);
-
     const { pinPoint, labelPoint } = this.computePinPoints(this.pin);
 
     return (

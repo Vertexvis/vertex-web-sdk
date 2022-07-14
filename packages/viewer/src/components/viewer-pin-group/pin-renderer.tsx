@@ -15,8 +15,6 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
 }) => {
   const { primaryColor } = getPinColors(pin);
 
-  console.log('primaryColor: ', primaryColor);
-
   return (
     <Fragment>
       {isTextPin(pin) && (

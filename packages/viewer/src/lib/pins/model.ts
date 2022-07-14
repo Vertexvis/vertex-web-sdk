@@ -21,6 +21,7 @@ import { Point, Vector3 } from '@vertexvis/geometry';
 interface BasePinAttributes {
   style?: PinStyleAttributes;
 }
+
 interface BasePin {
   id: string;
   worldPosition: Vector3.Vector3;
@@ -49,28 +50,31 @@ export function isTextPin(pin?: Pin): pin is TextPin {
   return pin?.type === 'text';
 }
 
-interface PinStyleAttributes {
-  primaryColor?: string;
-  accentColor?: string;
+export interface PinStyleAttributes {
+  primaryColor?: Color.Color | string;
+  accentColor?: Color.Color | string;
 }
 
 export function isIconPin(pin?: Pin): pin is Pin {
   return pin?.type === 'icon';
 }
 
-export function getPinColors(pin?: Pin): PinStyleAttributes {
-  const primaryColor = pin?.attributes?.style?.primaryColor;
-  const accentColor = pin?.attributes?.style?.accentColor;
-
+function convertColorToString(color: Color.Color | string): string {
+  return typeof color === 'string' ? color : Color.toHexString(color);
+}
+export function getPinColors(pin?: Pin): {
+  primaryColor?: string;
+  accentColor?: string;
+} {
   return {
     primaryColor:
-      typeof primaryColor === 'string' || primaryColor == null
-        ? primaryColor
-        : Color.toHexString(primaryColor) || '',
+      pin?.attributes?.style?.primaryColor == null
+        ? undefined
+        : convertColorToString(pin?.attributes?.style?.primaryColor),
     accentColor:
-      typeof accentColor === 'string' || accentColor == null
-        ? accentColor
-        : Color.toHexString(accentColor) || '',
+      pin?.attributes?.style?.accentColor == null
+        ? undefined
+        : convertColorToString(pin?.attributes?.style?.accentColor),
   };
 }
 

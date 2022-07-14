@@ -1,6 +1,13 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
+import { Color } from '@vertexvis/utils';
 
-import { Pin, PinModel, ViewerPinToolMode, ViewerPinToolType } from './model';
+import {
+  Pin,
+  PinModel,
+  PinStyleAttributes,
+  ViewerPinToolMode,
+  ViewerPinToolType,
+} from './model';
 
 export interface Draggable {
   id: string;
@@ -16,7 +23,8 @@ export class PinController {
   public constructor(
     private model: PinModel,
     private mode: ViewerPinToolMode = 'view',
-    private type: ViewerPinToolType = 'pin-icon'
+    private type: ViewerPinToolType = 'pin-icon',
+    private styleAttributes: PinStyleAttributes | undefined = undefined
   ) {}
 
   /**
@@ -113,6 +121,24 @@ export class PinController {
 
   public getPinsSize(): number {
     return this.model.getPins().length;
+  }
+
+  public setPrimaryColor(color?: Color.Color | string): void {
+    this.styleAttributes = {
+      ...this.styleAttributes,
+      primaryColor: color,
+    };
+  }
+
+  public setAccentColor(color?: Color.Color | string): void {
+    this.styleAttributes = {
+      ...this.styleAttributes,
+      accentColor: color,
+    };
+  }
+
+  public getStyleAttributes(): PinStyleAttributes | undefined {
+    return this.styleAttributes;
   }
 
   public updateDraggable(
