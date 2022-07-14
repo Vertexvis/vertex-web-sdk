@@ -42,6 +42,23 @@
         border-right: 1px solid lightgray;
       }
 
+      .pin-group-1 {
+        --viewer-annotations-pin-dot-color: #367C2B;
+        --viewer-annotations-pin-label-line-color: #000000;
+        --viewer-annotations-pin-label-border-color: #000000;
+        --viewer-annotations-pin-label-background-color: #b3f0b3;
+        --viewer-annotations-pin-label-focused-border-color: #2d6d23;
+      }
+
+      .pin-group-2 {
+        --viewer-annotations-pin-dot-color: #ff2;
+        --viewer-annotations-pin-label-line-color: #000000;
+        --viewer-annotations-pin-label-border-color: #000000;
+        --viewer-annotations-pin-label-background-color: #fab;
+        --viewer-annotations-pin-label-focused-border-color: #f30;
+      }
+
+
       .workarea {
         width: 100%;
         height: 100%;
@@ -85,13 +102,27 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:jHc-TwcfQCBks8jmDTdqPf8ePE40eMfZn5XB"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-pin-tool
+            id="vertex-viewer-pin-tool"
+            mode="edit"
+            tool="pin-text"
+          >
+           <template id="pin-template-69bbdd26-7293-411d-be0f-f997459b806b">
+            <vertex-viewer-pin-group class="pin-group-1" prop:value="projectionViewMatrix">
+            </vertex-viewer-pin-group>
+           </template>
+           <template id="pin-template-e754b937-45c3-404b-8edd-29d35537432b">
+            <vertex-viewer-pin-group class="pin-group-2" prop:value="projectionViewMatrix">
+            </vertex-viewer-pin-group>
+           </template>
+          </vertex-viewer-pin-tool>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube

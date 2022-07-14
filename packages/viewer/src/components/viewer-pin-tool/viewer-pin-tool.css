@@ -7,3 +7,20 @@
   overflow: hidden;
   pointer-events: none;
 }
+
+
+.pin-group-1 {
+  --viewer-annotations-pin-dot-color: #367C2B;
+  --viewer-annotations-pin-label-line-color: #367C2B;
+  --viewer-annotations-pin-label-border-color: #367C2B;
+  --viewer-annotations-pin-label-background-color: #b3f0b3;
+  --viewer-annotations-pin-label-focused-border-color: #367C2B;
+}
+
+.pin-group-2 {
+  --viewer-annotations-pin-dot-color: #ff2;
+  --viewer-annotations-pin-label-line-color: #ff2;
+  --viewer-annotations-pin-label-border-color: #ff2;
+  --viewer-annotations-pin-label-background-color: #fab;
+  --viewer-annotations-pin-label-focused-border-color: #ff2;
+}

@@ -7,6 +7,8 @@ import {
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 
+import { getPinColors, Pin } from '../../lib/pins/model';
+
 @Component({
   tag: 'vertex-viewer-pin-label-line',
   styleUrl: 'viewer-pin-label-line.css',
@@ -19,12 +21,21 @@ export class VertexPinLabelLine {
   @Prop()
   public labelPoint: Point.Point | undefined;
 
+  @Prop()
+  public pin: Pin | undefined;
+
   protected render(): JSX.Element {
+    const { primaryColor } = getPinColors(this.pin);
+
+    console.log('primaryColor label-line: ', primaryColor);
     return (
       <Host>
         <svg class="svg">
           <line
             class="label-line"
+            style={{
+              stroke: primaryColor,
+            }}
             x1={this.labelPoint?.x}
             y1={this.labelPoint?.y}
             x2={this.pinPoint?.x}

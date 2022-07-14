@@ -1,4 +1,4 @@
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 /**
  * The types of pins that can be performed by this tool.
@@ -15,12 +15,17 @@ export type ViewerPinToolMode = 'edit' | 'view';
  *
  */
 
+import { JSXBase } from '@stencil/core/internal';
 import { Point, Vector3 } from '@vertexvis/geometry';
 
+interface BasePinAttributes {
+  style?: PinStyleAttributes;
+}
 interface BasePin {
   id: string;
   worldPosition: Vector3.Vector3;
   partId?: string;
+  attributes?: BasePinAttributes;
 }
 
 export interface TextPin extends BasePin {
@@ -44,8 +49,29 @@ export function isTextPin(pin?: Pin): pin is TextPin {
   return pin?.type === 'text';
 }
 
+interface PinStyleAttributes {
+  primaryColor?: string;
+  accentColor?: string;
+}
+
 export function isIconPin(pin?: Pin): pin is Pin {
   return pin?.type === 'icon';
+}
+
+export function getPinColors(pin?: Pin): PinStyleAttributes {
+  const primaryColor = pin?.attributes?.style?.primaryColor;
+  const accentColor = pin?.attributes?.style?.accentColor;
+
+  return {
+    primaryColor:
+      typeof primaryColor === 'string' || primaryColor == null
+        ? primaryColor
+        : Color.toHexString(primaryColor) || '',
+    accentColor:
+      typeof accentColor === 'string' || accentColor == null
+        ? accentColor
+        : Color.toHexString(accentColor) || '',
+  };
 }
 
 export class PinModel {
@@ -197,5 +223,17 @@ export class PinModel {
   public setSelectedPin(pinId?: string): void {
     this.selectedPinId = pinId;
     this.selectionChanged.emit(this.selectedPinId);
+  }
+
+  /**
+   * PinDrawDidRender
+   */
+  public onDrawWrapper(
+    pin: Pin,
+    element: JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement>,
+    index: number
+  ): JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement> {
+    element.class = `pin-group-${index}`;
+    return element;
   }
 }

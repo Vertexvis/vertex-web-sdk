@@ -16,7 +16,7 @@ to any relative position on the canvas.
     <vertex-viewer-pin-tool
       id="vertex-viewer-pin-tool"
       mode="edit"
-      tool="pin-label"
+      tool="pin-text"
     >
     </vertex-viewer-pin-tool>
   </vertex-viewer>

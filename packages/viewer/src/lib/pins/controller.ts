@@ -111,6 +111,10 @@ export class PinController {
     this.draggable = draggable;
   }
 
+  public getPinsSize(): number {
+    return this.model.getPins().length;
+  }
+
   public updateDraggable(
     draggable: Draggable,
     worldPosition: Vector3.Vector3,

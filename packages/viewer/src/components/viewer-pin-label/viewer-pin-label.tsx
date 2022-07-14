@@ -16,7 +16,12 @@ import classNames from 'classnames';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
-import { isTextPin, PinModel, TextPin } from '../../lib/pins/model';
+import {
+  getPinColors,
+  isTextPin,
+  PinModel,
+  TextPin,
+} from '../../lib/pins/model';
 import { readDOM } from '../../lib/stencil';
 import {
   translatePointToRelative,
@@ -174,6 +179,7 @@ export class VertexPinLabel {
   }
 
   protected render(): JSX.Element {
+    const { primaryColor, accentColor } = getPinColors(this.pin);
     return (
       <Host>
         <div
@@ -187,6 +193,8 @@ export class VertexPinLabel {
             minWidth: this.computeMinWidth(),
             maxWidth: this.computeMaxWidth(),
             maxHeight: this.computeMaxHeight(),
+            'border-color': primaryColor,
+            background: accentColor,
           }}
         >
           <textarea

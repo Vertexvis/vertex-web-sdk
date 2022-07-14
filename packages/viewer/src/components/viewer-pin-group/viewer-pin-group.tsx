@@ -1,8 +1,10 @@
 import {
   Component,
+  Element,
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
+  Host,
   Prop,
   State,
 } from '@stencil/core';
@@ -72,9 +74,6 @@ export class ViewerPinGroup {
   @State()
   private invalidateStateCounter = 0;
 
-  @State()
-  private leafNodesRendered = false;
-
   private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
   private resizeObserver?: ResizeObserver;
@@ -85,7 +84,6 @@ export class ViewerPinGroup {
     if (this.pinController == null) {
       this.pinController = new PinController(this.pinModel);
     }
-    this.leafNodesRendered = true;
   }
 
   protected disconnectedCallback(): void {
@@ -97,6 +95,8 @@ export class ViewerPinGroup {
     if (this.pin == null) {
       throw new Error('Unable to draw pin');
     }
+
+    console.log('pin.id: ', this.pin.id);
 
     const { pinPoint, labelPoint } = this.computePinPoints(this.pin);
 
@@ -122,6 +122,7 @@ export class ViewerPinGroup {
             <vertex-viewer-pin-label-line
               id={`pin-label-line-${this.pin?.id}`}
               pinPoint={pinPoint}
+              pin={this.pin}
               labelPoint={labelPoint}
               onPointerDown={() => this.selectPin()}
             ></vertex-viewer-pin-label-line>
@@ -186,8 +187,8 @@ export class ViewerPinGroup {
       elementBounds
     );
 
-    const labelWidth = this.labelEl?.clientWidth || 0;
-    const labelHeight = this.labelEl?.clientHeight || 0;
+    const labelWidth = this.labelEl?.firstElementChild?.clientWidth || 0;
+    const labelHeight = this.labelEl?.firstElementChild?.clientHeight || 0;
 
     return {
       pinPoint,

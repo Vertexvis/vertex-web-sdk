@@ -9,6 +9,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
+import { generateInstanceFromTemplate } from '@vertexvis/html-templates';
 import { Disposable } from '@vertexvis/utils';
 
 import { PinController } from '../../lib/pins/controller';
@@ -127,6 +128,11 @@ export class ViewerPinTool {
     this.resizeObserver.observe(this.hostEl);
   }
 
+  protected componentDidRender(): void {
+    console.log('Rendering');
+    // this.drawPins();
+  }
+
   /**
    * @ignore
    */
@@ -172,6 +178,7 @@ export class ViewerPinTool {
             return (
               <vertex-viewer-pin-group
                 id={`pin-group-${pin.id}`}
+                class="pin-group"
                 data-is-dom-group-element={true}
                 pin={pin}
                 elementBounds={this.elementBounds}
@@ -185,6 +192,69 @@ export class ViewerPinTool {
         </vertex-viewer-dom-renderer>
       </Host>
     );
+  }
+
+  private drawPins(): void {
+    this.pins.map((pin, index) => {
+      const template = document.getElementById(
+        `pin-template-${pin.id}`
+      ) as HTMLTemplateElement;
+
+      const alreadyLoaded =
+        this.hostEl.shadowRoot?.getElementById(`pin-group-${pin.id}`) != null;
+
+      if (template != null) {
+        const { element: pinGroup, bindings } =
+          generateInstanceFromTemplate(template);
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        (pinGroup as any).id = `pin-group-${pin.id}`;
+        (pinGroup as any)['data-is-dom-group-element'] = true;
+        (pinGroup as any).pin = pin;
+        (pinGroup as any).elementBounds = this.elementBounds;
+
+        (pinGroup as any).pinModel = this.pinModel;
+        (pinGroup as any).pinController = this.pinController;
+        (pinGroup as any).projectionViewMatrix = this.projectionViewMatrix;
+        (pinGroup as any).selected = this.selectedPinId === pin.id;
+        (pinGroup as any).dataset.isDomGroupElement = true;
+        /* eslint-enable @typescript-eslint/no-explicit-any */
+        if (!alreadyLoaded) {
+          this.hostEl.shadowRoot?.getRootNode()?.appendChild(pinGroup);
+        } else {
+          bindings.bind({ projectionViewMatrix: this.projectionViewMatrix });
+        }
+      } else {
+        const defaultPinGroupTemplate = document.createElement('template');
+        defaultPinGroupTemplate.innerHTML = `
+          <vertex-viewer-pin-group prop:value="{{x.projectionViewMatrix}}">
+          </vertex-viewer-pin-group>
+        `;
+
+        const { element: pinGroup, bindings } = generateInstanceFromTemplate(
+          defaultPinGroupTemplate
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        (pinGroup as any).id = `pin-group-${pin.id}`;
+        (pinGroup as any)['data-is-dom-group-element'] = true;
+        (pinGroup as any).pin = pin;
+        (pinGroup as any).elementBounds = this.elementBounds;
+
+        (pinGroup as any).pinModel = this.pinModel;
+        (pinGroup as any).pinController = this.pinController;
+        (pinGroup as any).projectionViewMatrix = this.projectionViewMatrix;
+        (pinGroup as any).selected = this.selectedPinId === pin.id;
+        (pinGroup as any).dataset.isDomGroupElement = true;
+        /* eslint-enable @typescript-eslint/no-explicit-any */
+
+        if (!alreadyLoaded) {
+          this.hostEl.shadowRoot?.getRootNode()?.appendChild(pinGroup);
+        } else {
+          bindings.bind({ projectionViewMatrix: this.projectionViewMatrix });
+        }
+        // this.hostEl.appendChild(pinGroup);
+      }
+    });
   }
 
   private setupController(): void {
