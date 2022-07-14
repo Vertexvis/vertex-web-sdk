@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import Chance from 'chance';
@@ -114,30 +116,25 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const expandToggled = jest.fn();
-    cell.addEventListener('expandToggled', expandToggled);
-
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
     const originalEvent = new MouseEvent('pointerup');
     expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleExpandItem).toHaveBeenCalled();
-    expect(expandToggled).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: expect.objectContaining({
-          originalEvent,
-        }),
-      })
-    );
   });
 
-  it('does not expands cell if interaction disabled', async () => {
+  it('supports overriding expansion behavior', async () => {
     const node = createNode({ expanded: false });
     const { cell } = await newComponentSpec({
-      html: `
-        <vertex-scene-tree-table-cell interactions-disabled expand-toggle>
-        </vertex-scene-tree-table-cell>
-      `,
+      template: () => (
+        <vertex-scene-tree-table-cell
+          expansionHandler={(event, node, tree) => {
+            // do nothing
+          }}
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
+      ),
+
       node,
     });
 
@@ -145,14 +142,10 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const expandToggled = jest.fn();
-    cell.addEventListener('expandToggled', expandToggled);
-
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
     expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.toggleExpandItem).not.toHaveBeenCalled();
-    expect(expandToggled).toHaveBeenCalled();
   });
 
   it('toggles visibility', async () => {
@@ -168,30 +161,24 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const visibilityToggled = jest.fn();
-    cell.addEventListener('visibilityToggled', visibilityToggled);
-
     const expandBtn = cell.shadowRoot?.querySelector('.visibility-btn');
     const originalEvent = new MouseEvent('pointerup');
     expandBtn?.dispatchEvent(originalEvent);
 
     expect(tree.toggleItemVisibility).toHaveBeenCalled();
-    expect(visibilityToggled).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: expect.objectContaining({
-          originalEvent,
-        }),
-      })
-    );
   });
 
-  it('does not toggle visibility cell if interaction disabled', async () => {
+  it('supports overriding visibility behavior', async () => {
     const node = createNode({ visible: false });
     const { cell } = await newComponentSpec({
-      html: `
-        <vertex-scene-tree-table-cell interactions-disabled visibility-toggle>
-        </vertex-scene-tree-table-cell>
-      `,
+      template: () => (
+        <vertex-scene-tree-table-cell
+          visibilityHandler={(event, node, tree) => {
+            // do nothing
+          }}
+          visibility-toggle
+        ></vertex-scene-tree-table-cell>
+      ),
       node,
     });
 
@@ -199,14 +186,10 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const visibilityToggled = jest.fn();
-    cell.addEventListener('visibilityToggled', visibilityToggled);
-
     const expandBtn = cell.shadowRoot?.querySelector('.visibility-btn');
     expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.toggleItemVisibility).not.toHaveBeenCalled();
-    expect(visibilityToggled).toHaveBeenCalled();
   });
 
   it('selects cell if unselected', async () => {
@@ -222,21 +205,40 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
     const originalEvent = new MouseEvent('pointerup', { button: 0 });
     cell.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalled();
-    expect(selected).toHaveBeenCalled();
-    expect(selected).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: expect.objectContaining({
-          originalEvent,
-        }),
-      })
-    );
+  });
+
+  it('supports custom selection handling', async () => {
+    const node = createNode({ selected: false });
+    const tree = { selectItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+    const { cell } = await newComponentSpec({
+      template: () => (
+        <vertex-scene-tree-table-cell
+          selectionHandler={(event, node, tree) => {
+            if (!event.altKey) {
+              tree.selectItem(node);
+            }
+          }}
+        ></vertex-scene-tree-table-cell>
+      ),
+      node,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cell as any).tree = tree;
+
+    const originalEvent = new MouseEvent('pointerup', {
+      button: 0,
+      altKey: true,
+    });
+    cell.dispatchEvent(originalEvent);
+
+    expect(tree.selectItem).not.toHaveBeenCalled();
   });
 
   it('appends selection if unselected and meta key', async () => {
@@ -252,9 +254,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
     const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       metaKey: true,
@@ -265,13 +264,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ append: true })
-    );
-    expect(selected).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: expect.objectContaining({
-          originalEvent,
-        }),
-      })
     );
   });
 
@@ -288,9 +280,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
     cell.dispatchEvent(
       new MouseEvent('pointerup', { button: 0, ctrlKey: true })
     );
@@ -299,7 +288,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
       expect.anything(),
       expect.objectContaining({ append: true })
     );
-    expect(selected).toHaveBeenCalled();
   });
 
   it('recursively selects parents if selected', async () => {
@@ -323,25 +311,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     );
   });
 
-  it('does nothing if selected and recursive selection disabled', async () => {
-    const node = createNode({ selected: true });
-    const { cell } = await newComponentSpec({
-      html: `
-        <vertex-scene-tree-table-cell recurse-parent-selection-disabled></vertex-scene-tree-table-cell>
-      `,
-      node,
-    });
-
-    const tree = { selectItem: jest.fn(), deselectItem: jest.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (cell as any).tree = tree;
-
-    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
-
-    expect(tree.selectItem).not.toHaveBeenCalled();
-    expect(tree.deselectItem).not.toHaveBeenCalled();
-  });
-
   it('deselects if selected and meta key', async () => {
     const node = createNode({ selected: true });
     const { cell } = await newComponentSpec({
@@ -355,15 +324,11 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
     cell.dispatchEvent(
       new MouseEvent('pointerup', { button: 0, metaKey: true })
     );
 
     expect(tree.deselectItem).toHaveBeenCalled();
-    expect(selected).toHaveBeenCalled();
   });
 
   it('deselects if selected and ctrl key', async () => {
@@ -379,9 +344,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const selected = jest.fn();
-    cell.addEventListener('selectionToggled', selected);
-
     const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       ctrlKey: true,
@@ -389,13 +351,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     cell.dispatchEvent(originalEvent);
 
     expect(tree.deselectItem).toHaveBeenCalled();
-    expect(selected).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: expect.objectContaining({
-          originalEvent,
-        }),
-      })
-    );
   });
 
   it('does not select if event default behavior prevented', async () => {
@@ -407,17 +362,15 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
+    const tree = { selectItem: jest.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (cell as any).tree = {};
-
-    const selected = jest.fn();
-    cell.addEventListener('selected', selected);
+    (cell as any).tree = tree;
 
     const event = new MouseEvent('pointerup', { button: 0, metaKey: true });
     event.preventDefault();
     cell.dispatchEvent(event);
 
-    expect(selected).not.toHaveBeenCalled();
+    expect(tree.selectItem).not.toHaveBeenCalled();
   });
 
   it('updates the hover controller when a pointer enters the cell', async () => {
@@ -464,11 +417,14 @@ describe('<vertex-scene-tree-table-cell>', () => {
 });
 
 async function newComponentSpec(data: {
-  html: string;
+  html?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  template?: () => any;
   node?: Node.AsObject;
 }): Promise<{ page: SpecPage; cell: HTMLVertexSceneTreeTableCellElement }> {
   const page = await newSpecPage({
     components: [SceneTreeTableCell],
+    template: data.template,
     html: data.html,
   });
   const cell = page.root as HTMLVertexSceneTreeTableCellElement;
