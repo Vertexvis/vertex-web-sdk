@@ -182,6 +182,12 @@ function buildOperationTypes(
             transform: { ...op.transform },
           },
         };
+      case 'clear-transform':
+        return {
+          clearTransform: {
+            cascade: op.cascade,
+          },
+        };
       case 'hide':
         return {
           changeVisibility: {
