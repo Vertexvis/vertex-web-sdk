@@ -1143,7 +1143,7 @@ export namespace Components {
   }
   interface VertexViewerPinTool {
     /**
-     * The accent color for new pins. Setting this will override the template color to set pins created with this color to this specified color. This is used as a complimentary color to the primary color.
+     * The accent color for new pins. Setting this will override the accent template color, and will be used for any new  pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
      */
     accentColor: Color.Color | string | undefined;
     /**
@@ -1159,7 +1159,7 @@ export namespace Components {
      */
     pinModel: PinModel;
     /**
-     * The primary color for new pins. Setting this will override the template color to set pins created with this color to this specified color. This styling applies to pin anchors, and borders, etc.
+     * The primary color for new pins. Setting this will override the primary template color, and will be used for any new  pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
      */
     primaryColor: Color.Color | string | undefined;
     /**
@@ -2519,7 +2519,7 @@ declare namespace LocalJSX {
   }
   interface VertexViewerPinTool {
     /**
-     * The accent color for new pins. Setting this will override the template color to set pins created with this color to this specified color. This is used as a complimentary color to the primary color.
+     * The accent color for new pins. Setting this will override the accent template color, and will be used for any new  pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
      */
     accentColor?: Color.Color | string | undefined;
     /**
@@ -2535,7 +2535,7 @@ declare namespace LocalJSX {
      */
     pinModel?: PinModel;
     /**
-     * The primary color for new pins. Setting this will override the template color to set pins created with this color to this specified color. This styling applies to pin anchors, and borders, etc.
+     * The primary color for new pins. Setting this will override the primary template color, and will be used for any new  pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
      */
     primaryColor?: Color.Color | string | undefined;
     /**
