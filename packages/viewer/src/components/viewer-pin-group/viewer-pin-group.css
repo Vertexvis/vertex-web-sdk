@@ -1,10 +1,22 @@
 :host {
 
+  /**
+   * @prop  --viewer-annotations-pin-primary-color: A CSS color that
+   * specifies the primary color for the pins. This value gets used for the dot color 
+   * and borders
+   */
   --viewer-annotations-pin-primary-color: var(--blue-700);
+
+  /**
+   * @prop  --viewer-annotations-pin-accent-color: A CSS color that
+   * specifies the accent color for the pins. This value gets used for background colors
+   * 
+   */
+
   --viewer-annotations-pin-accent-color: var(--blue-200);
   /**
-   * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
-   * specifies the color of the label line
+   * @prop  viewer-annotations-pin-dot-color: A CSS color that
+   * specifies the color of the anchor dot
    */
    --viewer-annotations-pin-dot-color: var(--viewer-annotations-pin-primary-color);
 

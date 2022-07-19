@@ -20,14 +20,15 @@
 
 ## CSS Custom Properties
 
-| Name                                        | Description                                                   |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| `--viewer-annotations-pin-color`            | A CSS color that specifies the color of the pin               |
-| `--viewer-annotations-pin-font-size`        | A CSS property to specify the font size of the pin            |
-| `--viewer-annotations-pin-label-border`     | A CSS color that specifies the border of a text pin anchor    |
-| `--viewer-annotations-pin-label-line-color` | A CSS color that specifies the color of the label line        |
-| `--viewer-annotations-pin-selected-border`  | A CSS color that specifies the border of a selected pin       |
-| `--viewer-annotations-pin-selected-stroke`  | A CSS color that specifies the stroke color of a selected pin |
+| Name                                       | Description                                                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `--viewer-annotations-pin-accent-color`    | A CSS color that specifies the accent color for the pins. This value gets used for background colors          |
+| `--viewer-annotations-pin-color`           | A CSS color that specifies the color of the pin                                                               |
+| `--viewer-annotations-pin-font-size`       | A CSS property to specify the font size of the pin                                                            |
+| `--viewer-annotations-pin-label-border`    | A CSS color that specifies the border of a text pin anchor                                                    |
+| `--viewer-annotations-pin-primary-color`   | A CSS color that specifies the primary color for the pins. This value gets used for the dot color and borders |
+| `--viewer-annotations-pin-selected-border` | A CSS color that specifies the border of a selected pin                                                       |
+| `--viewer-annotations-pin-selected-stroke` | A CSS color that specifies the stroke color of a selected pin                                                 |
 
 
 ## Dependencies

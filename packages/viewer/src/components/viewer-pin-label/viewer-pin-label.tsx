@@ -193,7 +193,7 @@ export class VertexPinLabel {
             minWidth: this.computeMinWidth(),
             maxWidth: this.computeMaxWidth(),
             maxHeight: this.computeMaxHeight(),
-            'border-color': primaryColor,
+            borderColor: primaryColor,
             background: accentColor,
           }}
         >
