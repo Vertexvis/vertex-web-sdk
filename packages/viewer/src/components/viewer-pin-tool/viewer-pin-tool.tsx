@@ -61,14 +61,14 @@ export class ViewerPinTool {
   public mode: ViewerPinToolMode = 'view';
 
   /**
-   * The primary color for new pins. Setting this will override the primary template color, and will be used for any new 
+   * The primary color for new pins. Setting this will override the primary template color, and will be used for any new
    * pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
    */
   @Prop({ mutable: true })
   public primaryColor: Color.Color | string | undefined;
 
   /**
-   * The accent color for new pins. Setting this will override the accent template color, and will be used for any new 
+   * The accent color for new pins. Setting this will override the accent template color, and will be used for any new
    * pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
    */
   @Prop({ mutable: true })
