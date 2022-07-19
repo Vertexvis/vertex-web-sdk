@@ -45,7 +45,7 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   public dispose(): void {
     this.rectObserver.disconnect();
-
+    this.clearCursor();
     this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
     window.removeEventListener('pointerup', this.handlePointerUp);
