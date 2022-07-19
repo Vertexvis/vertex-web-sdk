@@ -57,7 +57,7 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { Color, Disposable } from '@vertexvis/utils';
 import { InteractionHandler } from './lib/interactions/interactionHandler';
 import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
@@ -1138,9 +1138,14 @@ export namespace Components {
   }
   interface VertexViewerPinLabelLine {
     labelPoint: Point.Point | undefined;
+    pin: Pin | undefined;
     pinPoint: Point.Point | undefined;
   }
   interface VertexViewerPinTool {
+    /**
+     * The accent color for new pins. Setting this will override the accent template color, and will be used for any new pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
+     */
+    accentColor: Color.Color | string | undefined;
     /**
      * The mode of the pin tool
      */
@@ -1153,6 +1158,10 @@ export namespace Components {
      * The model that contains the entities and outcomes from performing pin annotations
      */
     pinModel: PinModel;
+    /**
+     * The primary color for new pins. Setting this will override the primary template color, and will be used for any new pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
+     */
+    primaryColor: Color.Color | string | undefined;
     /**
      * The type of pin.  This property will automatically be set.
      */
@@ -2505,9 +2514,14 @@ declare namespace LocalJSX {
   }
   interface VertexViewerPinLabelLine {
     labelPoint?: Point.Point | undefined;
+    pin?: Pin | undefined;
     pinPoint?: Point.Point | undefined;
   }
   interface VertexViewerPinTool {
+    /**
+     * The accent color for new pins. Setting this will override the accent template color, and will be used for any new pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
+     */
+    accentColor?: Color.Color | string | undefined;
     /**
      * The mode of the pin tool
      */
@@ -2520,6 +2534,10 @@ declare namespace LocalJSX {
      * The model that contains the entities and outcomes from performing pin annotations
      */
     pinModel?: PinModel;
+    /**
+     * The primary color for new pins. Setting this will override the primary template color, and will be used for any new pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
+     */
+    primaryColor?: Color.Color | string | undefined;
     /**
      * The type of pin.  This property will automatically be set.
      */

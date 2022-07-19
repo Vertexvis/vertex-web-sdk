@@ -1,4 +1,4 @@
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 /**
  * The types of pins that can be performed by this tool.
@@ -17,10 +17,15 @@ export type ViewerPinToolMode = 'edit' | 'view';
 
 import { Point, Vector3 } from '@vertexvis/geometry';
 
+interface BasePinAttributes {
+  style?: PinStyleAttributes;
+}
+
 interface BasePin {
   id: string;
   worldPosition: Vector3.Vector3;
   partId?: string;
+  attributes?: BasePinAttributes;
 }
 
 export interface TextPin extends BasePin {
@@ -44,8 +49,32 @@ export function isTextPin(pin?: Pin): pin is TextPin {
   return pin?.type === 'text';
 }
 
+export interface PinStyleAttributes {
+  primaryColor?: Color.Color | string;
+  accentColor?: Color.Color | string;
+}
+
 export function isIconPin(pin?: Pin): pin is Pin {
   return pin?.type === 'icon';
+}
+
+function convertColorToString(color: Color.Color | string): string {
+  return typeof color === 'string' ? color : Color.toHexString(color);
+}
+export function getPinColors(pin?: Pin): {
+  primaryColor?: string;
+  accentColor?: string;
+} {
+  return {
+    primaryColor:
+      pin?.attributes?.style?.primaryColor == null
+        ? undefined
+        : convertColorToString(pin?.attributes?.style?.primaryColor),
+    accentColor:
+      pin?.attributes?.style?.accentColor == null
+        ? undefined
+        : convertColorToString(pin?.attributes?.style?.accentColor),
+  };
 }
 
 export class PinModel {

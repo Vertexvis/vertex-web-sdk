@@ -2,7 +2,7 @@
 import { Fragment, FunctionalComponent, h } from '@stencil/core';
 import classNames from 'classnames';
 
-import { isIconPin, isTextPin, Pin } from '../../lib/pins/model';
+import { getPinColors, isIconPin, isTextPin, Pin } from '../../lib/pins/model';
 
 interface PinRendererProps {
   pin?: Pin;
@@ -13,12 +13,17 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
   pin,
   selected,
 }) => {
+  const { primaryColor } = getPinColors(pin);
+
   return (
     <Fragment>
       {isTextPin(pin) && (
         <div
           id="pin-anchor"
           class={classNames('pin-anchor', { selected: selected })}
+          style={{
+            background: primaryColor,
+          }}
         ></div>
       )}
 
@@ -27,6 +32,9 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
           name="pin-fill"
           size="lg"
           class={classNames('pin', { 'pin-selected': selected })}
+          style={{
+            color: primaryColor,
+          }}
         />
       )}
     </Fragment>

@@ -3,19 +3,19 @@
    * @prop --viewer-annotations-pin-label-background-color: A CSS color that
    * specifies the color of the label background
    */
-  --viewer-annotations-pin-label-background-color: var(--blue-200);
+  --viewer-annotations-pin-label-background-color: var(--viewer-annotations-pin-accent-color);
 
   /**
    * @prop --viewer-annotations-pin-label-border-color: A CSS color that
    * specifies the color of the label's border
    */
-  --viewer-annotations-pin-label-border-color: var(--blue-600);
+  --viewer-annotations-pin-label-border-color: var(--viewer-annotations-pin-primary-color);
 
   /**
    * @prop --viewer-annotations-pin-label-focused-border-color: A CSS color that
    * specifies the color of the label's border when focused. 
    */
-   --viewer-annotations-pin-label-focused-border-color: var(--blue-700);
+   --viewer-annotations-pin-label-focused-border-color: var(--viewer-annotations-pin-primary-color);
 
   /**
    * @prop --viewer-annotations-pin-label-color: A CSS color that

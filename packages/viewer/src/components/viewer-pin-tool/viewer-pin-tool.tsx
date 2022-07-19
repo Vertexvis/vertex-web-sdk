@@ -9,7 +9,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { Color, Disposable } from '@vertexvis/utils';
 
 import { PinController } from '../../lib/pins/controller';
 import { PinsInteractionHandler } from '../../lib/pins/interactions';
@@ -60,6 +60,20 @@ export class ViewerPinTool {
   @Prop({ mutable: true })
   public mode: ViewerPinToolMode = 'view';
 
+  /**
+   * The primary color for new pins. Setting this will override the primary template color, and will be used for any new
+   * pins created with this `vertex-viewer-pin-tool`. This styling applies to pin anchors, and borders, etc.
+   */
+  @Prop({ mutable: true })
+  public primaryColor: Color.Color | string | undefined;
+
+  /**
+   * The accent color for new pins. Setting this will override the accent template color, and will be used for any new
+   * pins created with this `vertex-viewer-pin-tool`. This styling applies to some background colors, etc
+   */
+  @Prop({ mutable: true })
+  public accentColor: Color.Color | string | undefined;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -95,6 +109,24 @@ export class ViewerPinTool {
   @Watch('tool')
   protected watchTypeChange(): void {
     this.pinController?.setToolType(this.tool);
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('accentColor')
+  protected watchAccentColorChange(): void {
+    this.pinController?.setAccentColor(this.accentColor);
+    this.setupInteractionHandler();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('primaryColor')
+  protected watchPrimaryColorChange(): void {
+    this.pinController?.setPrimaryColor(this.primaryColor);
     this.setupInteractionHandler();
   }
 
@@ -188,7 +220,19 @@ export class ViewerPinTool {
   }
 
   private setupController(): void {
-    this.pinController = new PinController(this.pinModel, this.mode, this.tool);
+    const attributes =
+      this.accentColor || this.primaryColor
+        ? {
+            accentColor: this.accentColor,
+            primaryColor: this.primaryColor,
+          }
+        : undefined;
+    this.pinController = new PinController(
+      this.pinModel,
+      this.mode,
+      this.tool,
+      attributes
+    );
   }
 
   private clearInteractionHandler(): void {

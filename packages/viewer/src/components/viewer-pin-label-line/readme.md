@@ -7,10 +7,11 @@
 
 ## Properties
 
-| Property     | Attribute | Description | Type                 | Default     |
-| ------------ | --------- | ----------- | -------------------- | ----------- |
-| `labelPoint` | --        |             | `Point \| undefined` | `undefined` |
-| `pinPoint`   | --        |             | `Point \| undefined` | `undefined` |
+| Property     | Attribute | Description | Type                              | Default     |
+| ------------ | --------- | ----------- | --------------------------------- | ----------- |
+| `labelPoint` | --        |             | `Point \| undefined`              | `undefined` |
+| `pin`        | --        |             | `IconPin \| TextPin \| undefined` | `undefined` |
+| `pinPoint`   | --        |             | `Point \| undefined`              | `undefined` |
 
 
 ## CSS Custom Properties
