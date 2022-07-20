@@ -1156,9 +1156,9 @@ export class Viewer {
           'pointermove',
           () => this.getResolvedConfig()
         );
-        this.baseInteractionHandler = new PointerInteractionHandler(() =>
-          this.getResolvedConfig()
-        );
+        this.baseInteractionHandler =
+          this.baseInteractionHandler ??
+          new PointerInteractionHandler(() => this.getResolvedConfig());
         const baseDisposable = await this.registerInteractionHandler(
           this.baseInteractionHandler
         );
@@ -1183,9 +1183,9 @@ export class Viewer {
         );
 
         // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(() =>
-          this.getResolvedConfig()
-        );
+        this.baseInteractionHandler =
+          this.baseInteractionHandler ??
+          new MouseInteractionHandler(() => this.getResolvedConfig());
         const baseDisposable = await this.registerInteractionHandler(
           this.baseInteractionHandler
         );
