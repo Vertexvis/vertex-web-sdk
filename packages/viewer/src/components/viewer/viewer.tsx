@@ -655,6 +655,17 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
+  /**
+   * @internal
+   * @ignore
+   */
+  @Method()
+  public async getKeyInteractions(): Promise<
+    KeyInteraction<TapEventDetails>[]
+  > {
+    return this.tapKeyInteractions;
+  }
+
   @Method()
   public async getBaseInteractionHandler(): Promise<
     BaseInteractionHandler | undefined
