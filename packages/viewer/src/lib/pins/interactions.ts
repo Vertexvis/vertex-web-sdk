@@ -45,7 +45,7 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   public dispose(): void {
     this.rectObserver.disconnect();
-
+    this.clearCursor();
     this.element?.removeEventListener('pointermove', this.handlePointerMove);
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
     window.removeEventListener('pointerup', this.handlePointerUp);
@@ -81,6 +81,13 @@ export class PinsInteractionHandler implements InteractionHandler {
         ) {
           const pinId = existingPin != null ? existingPin.id : UUID.create();
 
+          const attributes =
+            this.controller.getStyleAttributes() != null
+              ? {
+                  style: this.controller.getStyleAttributes(),
+                }
+              : undefined;
+
           switch (this.controller.getToolType()) {
             case 'pin-icon':
               this.controller.setPin({
@@ -92,6 +99,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                   z: hit?.hitPoint.z,
                 },
                 partId: hit?.itemId?.hex ?? undefined,
+                attributes,
               });
               break;
             case 'pin-text':
@@ -107,6 +115,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 label: {
                   point: relativePoint,
                 },
+                attributes,
               });
               break;
           }
