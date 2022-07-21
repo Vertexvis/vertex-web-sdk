@@ -245,6 +245,7 @@ export class SceneTreeController {
           details: this.getConnectionError(e),
         },
       });
+      this.clearHandshakeTimer();
       throw e;
     }
 
@@ -258,6 +259,12 @@ export class SceneTreeController {
   private clearReconnectTimer(): void {
     if (this.reconnectTimer != null) {
       window.clearTimeout(this.reconnectTimer);
+    }
+  }
+
+  private clearHandshakeTimer(): void {
+    if (this.subscriptionHandshakeTimer != null) {
+      window.clearTimeout(this.subscriptionHandshakeTimer);
     }
   }
 
@@ -319,6 +326,7 @@ export class SceneTreeController {
   public disconnect(reset = false): void {
     this.log(`Scene tree controller disconnecting [reset=${reset}]`);
 
+    this.clearHandshakeTimer();
     this.clearReconnectTimer();
 
     if (reset) {
@@ -695,8 +703,8 @@ export class SceneTreeController {
       });
 
       stream.on('data', (msg: SubscribeResponse) => {
-        if (msg.hasHandshake() && this.subscriptionHandshakeTimer != null) {
-          clearTimeout(this.subscriptionHandshakeTimer);
+        if (msg.hasHandshake()) {
+          this.clearHandshakeTimer();
         }
 
         this.startIdleReconnectTimer();
