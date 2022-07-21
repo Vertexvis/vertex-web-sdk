@@ -4,7 +4,7 @@ jest.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { NewSpecPageOptions } from '@stencil/core/internal';
+import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions } from '@vertexvis/geometry';
 import { Async, Color } from '@vertexvis/utils';
@@ -482,6 +482,62 @@ describe('vertex-viewer', () => {
     });
   });
 
+  describe('interaction handlers', () => {
+    it('handles toggling cameraControls off', async () => {
+      const { stream, ws } = makeViewerStream();
+      const { page, viewer } = await newViewerSpecWithPage({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      expect(await viewer.getInteractionHandlers()).toHaveLength(3);
+
+      viewer.cameraControls = false;
+      await page.waitForChanges();
+
+      expect(await viewer.getInteractionHandlers()).toHaveLength(0);
+
+      viewer.cameraControls = true;
+      await page.waitForChanges();
+
+      expect(await viewer.getInteractionHandlers()).toHaveLength(3);
+    });
+
+    it('handles toggling keyboardControls off', async () => {
+      const { stream, ws } = makeViewerStream();
+      const { page, viewer } = await newViewerSpecWithPage({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      expect(await viewer.getKeyInteractions()).toHaveLength(2);
+
+      viewer.keyboardControls = false;
+      await page.waitForChanges();
+
+      expect(await viewer.getKeyInteractions()).toHaveLength(0);
+
+      viewer.keyboardControls = true;
+      await page.waitForChanges();
+
+      expect(await viewer.getKeyInteractions()).toHaveLength(2);
+    });
+  });
+
   describe('resizing', () => {
     it('handles resizes', async () => {
       const { stream, ws } = makeViewerStream();
@@ -537,5 +593,12 @@ describe('vertex-viewer', () => {
   ): Promise<HTMLVertexViewerElement> {
     const page = await newSpecPage({ components: [Viewer], ...opts });
     return page.root as HTMLVertexViewerElement;
+  }
+
+  async function newViewerSpecWithPage(
+    opts: Pick<NewSpecPageOptions, 'template' | 'html'>
+  ): Promise<{ page: SpecPage; viewer: HTMLVertexViewerElement }> {
+    const page = await newSpecPage({ components: [Viewer], ...opts });
+    return { page, viewer: page.root as HTMLVertexViewerElement };
   }
 });

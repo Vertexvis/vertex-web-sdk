@@ -458,6 +458,10 @@ export namespace Components {
      */
     getJwt: () => Promise<string | undefined>;
     /**
+     * @ignore
+     */
+    getKeyInteractions: () => Promise<KeyInteraction<TapEventDetails>[]>;
+    /**
      * Returns `true` indicating that the scene is ready to be interacted with.
      */
     isSceneReady: () => Promise<boolean>;

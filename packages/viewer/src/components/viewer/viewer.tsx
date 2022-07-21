@@ -416,8 +416,10 @@ export class Viewer {
   private resizeTimer?: NodeJS.Timeout;
 
   private interactionHandlers: InteractionHandler[] = [];
+  private defaultInteractionHandlerDisposables: Array<Disposable> = [];
   private interactionApi!: InteractionApi;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
+  private defaultTapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
 
   private internalFrameDrawnDispatcher = new EventDispatcher<Frame>();
@@ -466,65 +468,7 @@ export class Viewer {
       }
     }
 
-    if (this.cameraControls) {
-      // default to pointer events if allowed by browser.
-      if (window.PointerEvent != null) {
-        const tapInteractionHandler = new TapInteractionHandler(
-          'pointerdown',
-          'pointerup',
-          'pointermove',
-          () => this.getResolvedConfig()
-        );
-        this.baseInteractionHandler = new PointerInteractionHandler(() =>
-          this.getResolvedConfig()
-        );
-        this.registerInteractionHandler(this.baseInteractionHandler);
-        this.registerInteractionHandler(new MultiPointerInteractionHandler());
-        this.registerInteractionHandler(tapInteractionHandler);
-      } else {
-        const tapInteractionHandler = new TapInteractionHandler(
-          'mousedown',
-          'mouseup',
-          'mousemove',
-          () => this.getResolvedConfig()
-        );
-
-        // fallback to touch events and mouse events as a default
-        this.baseInteractionHandler = new MouseInteractionHandler(() =>
-          this.getResolvedConfig()
-        );
-        this.registerInteractionHandler(this.baseInteractionHandler);
-        this.registerInteractionHandler(new TouchInteractionHandler());
-        this.registerInteractionHandler(tapInteractionHandler);
-      }
-    }
-
-    if (this.keyboardControls && this.stream != null) {
-      this.baseInteractionHandler?.setDefaultKeyboardControls(
-        this.keyboardControls
-      );
-
-      this.registerTapKeyInteraction(
-        new FlyToPartKeyInteraction(
-          this.stream,
-          () => this.getResolvedConfig(),
-          () => this.getImageScale()
-        )
-      );
-      this.registerTapKeyInteraction(
-        new FlyToPositionKeyInteraction(
-          this.stream,
-          () => this.getResolvedConfig(),
-          () => this.getImageScale(),
-          () => this.createScene()
-        )
-      );
-    }
-
-    if (this.rotateAroundTapPoint) {
-      this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
-    }
-
+    this.initializeDefaultInteractionHandlers();
     this.injectViewerApi();
   }
 
@@ -711,6 +655,17 @@ export class Viewer {
     return this.interactionHandlers;
   }
 
+  /**
+   * @internal
+   * @ignore
+   */
+  @Method()
+  public async getKeyInteractions(): Promise<
+    KeyInteraction<TapEventDetails>[]
+  > {
+    return this.tapKeyInteractions;
+  }
+
   @Method()
   public async getBaseInteractionHandler(): Promise<
     BaseInteractionHandler | undefined
@@ -733,6 +688,22 @@ export class Viewer {
     } else {
       this.unload();
     }
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('cameraControls')
+  protected handleCameraControlsChanged(): void {
+    this.initializeDefaultCameraInteractionHandlers();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('keyboardControls')
+  protected handleKeyboardControlsChanged(): void {
+    this.initializeDefaultKeyboardInteractionHandlers();
   }
 
   /**
@@ -1144,6 +1115,120 @@ export class Viewer {
         const drawnFrame = await this.canvasRenderer(data);
         this.dispatchFrameDrawn(drawnFrame);
       }
+    }
+  }
+
+  private async initializeDefaultInteractionHandlers(): Promise<void> {
+    await this.initializeDefaultCameraInteractionHandlers();
+    this.initializeDefaultKeyboardInteractionHandlers();
+
+    if (this.rotateAroundTapPoint) {
+      this.baseInteractionHandler?.setPrimaryInteractionType('rotate-point');
+    }
+  }
+
+  private clearDefaultCameraInteractionHandlers(): void {
+    this.defaultInteractionHandlerDisposables.forEach((disposable) =>
+      disposable.dispose()
+    );
+    this.defaultInteractionHandlerDisposables = [];
+  }
+
+  private clearDefaultKeyboardInteractions(): void {
+    this.defaultTapKeyInteractions.forEach((interaction) => {
+      const index = this.tapKeyInteractions.indexOf(interaction);
+      if (index !== -1) {
+        this.tapKeyInteractions.splice(index, 1);
+      }
+    });
+    this.tapKeyInteractions = [];
+  }
+
+  private async initializeDefaultCameraInteractionHandlers(): Promise<void> {
+    this.clearDefaultCameraInteractionHandlers();
+
+    if (this.cameraControls) {
+      // default to pointer events if allowed by browser.
+      if (window.PointerEvent != null) {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'pointerdown',
+          'pointerup',
+          'pointermove',
+          () => this.getResolvedConfig()
+        );
+        this.baseInteractionHandler =
+          this.baseInteractionHandler ??
+          new PointerInteractionHandler(() => this.getResolvedConfig());
+        const baseDisposable = await this.registerInteractionHandler(
+          this.baseInteractionHandler
+        );
+        const multiPointerDisposable = await this.registerInteractionHandler(
+          new MultiPointerInteractionHandler()
+        );
+        const tapDisposable = await this.registerInteractionHandler(
+          tapInteractionHandler
+        );
+
+        this.defaultInteractionHandlerDisposables = [
+          baseDisposable,
+          multiPointerDisposable,
+          tapDisposable,
+        ];
+      } else {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'mousedown',
+          'mouseup',
+          'mousemove',
+          () => this.getResolvedConfig()
+        );
+
+        // fallback to touch events and mouse events as a default
+        this.baseInteractionHandler =
+          this.baseInteractionHandler ??
+          new MouseInteractionHandler(() => this.getResolvedConfig());
+        const baseDisposable = await this.registerInteractionHandler(
+          this.baseInteractionHandler
+        );
+        const touchDisposable = await this.registerInteractionHandler(
+          new TouchInteractionHandler()
+        );
+        const tapDisposable = await this.registerInteractionHandler(
+          tapInteractionHandler
+        );
+
+        this.defaultInteractionHandlerDisposables = [
+          baseDisposable,
+          touchDisposable,
+          tapDisposable,
+        ];
+      }
+    }
+  }
+
+  private initializeDefaultKeyboardInteractionHandlers(): void {
+    this.clearDefaultKeyboardInteractions();
+
+    if (this.keyboardControls && this.stream != null) {
+      this.baseInteractionHandler?.setDefaultKeyboardControls(
+        this.keyboardControls
+      );
+
+      const flyToPart = new FlyToPartKeyInteraction(
+        this.stream,
+        () => this.getResolvedConfig(),
+        () => this.getImageScale()
+      );
+      const flyToPosition = new FlyToPositionKeyInteraction(
+        this.stream,
+        () => this.getResolvedConfig(),
+        () => this.getImageScale(),
+        () => this.createScene()
+      );
+
+      this.registerTapKeyInteraction(flyToPart);
+      this.registerTapKeyInteraction(flyToPosition);
+
+      this.defaultTapKeyInteractions = [flyToPart, flyToPosition];
     }
   }
 
