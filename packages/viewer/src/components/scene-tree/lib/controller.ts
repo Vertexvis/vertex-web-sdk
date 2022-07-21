@@ -264,7 +264,7 @@ export class SceneTreeController {
 
   private clearHandshakeTimer(): void {
     if (this.subscriptionHandshakeTimer != null) {
-      window.clearTimeout(this.subscriptionHandshakeTimer)
+      window.clearTimeout(this.subscriptionHandshakeTimer);
     }
   }
 
