@@ -24,6 +24,7 @@ import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeOperationHandler } from './components/scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from './components/scene-tree-table-layout/lib/hover-controller';
+import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
 import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
 import { FrameCameraType } from './lib/types/frameCamera';
@@ -1262,6 +1263,10 @@ export interface VertexSceneTreeSearchCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeSearchElement;
 }
+export interface VertexSceneTreeTableCellCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeTableCellElement;
+}
 export interface VertexSceneTreeTableLayoutCustomEvent<T>
   extends CustomEvent<T> {
   detail: T;
@@ -1692,6 +1697,24 @@ declare namespace LocalJSX {
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
     node?: Node.AsObject;
+    /**
+     * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
+     */
+    onExpandToggled?: (
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
+    /**
+     * An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled.
+     */
+    onSelectionToggled?: (
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
+    /**
+     * An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.
+     */
+    onVisibilityToggled?: (
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
     /**
      * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
      */
