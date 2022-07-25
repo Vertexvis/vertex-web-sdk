@@ -1,4 +1,12 @@
-import { Component, Element, h, Host, Prop } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+} from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
@@ -102,6 +110,27 @@ export class SceneTreeTableCell {
    */
   @Prop()
   public hoverController?: SceneTreeCellHoverController;
+
+  /**
+   * An event that is emitted when a user requests to expand the node. This is
+   * emitted even if interactions are disabled.
+   */
+  @Event({ bubbles: true })
+  public expandToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
+
+  /**
+   * An event that is emitted when a user requests to change the node's
+   * visibility. This event is emitted even if interactions are disabled.
+   */
+  @Event({ bubbles: true })
+  public visibilityToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
+
+  /**
+   * An event that is emitted when a user requests to change the node's selection
+   * state. This event is emitted even if interactions are disabled.
+   */
+  @Event({ bubbles: true })
+  public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -221,6 +250,7 @@ export class SceneTreeTableCell {
       } else {
         this.performDefaultSelectionOperation(event);
       }
+      this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
@@ -231,6 +261,7 @@ export class SceneTreeTableCell {
       } else {
         this.performDefaultExpansionOperation(this.node, this.tree);
       }
+      this.expandToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
@@ -241,6 +272,7 @@ export class SceneTreeTableCell {
       } else {
         this.performDefaultVisibilityOperation(this.node, this.tree);
       }
+      this.visibilityToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
