@@ -20,6 +20,15 @@
 | `visibilityToggle`  | `visibility-toggle` | Indicates whether to display a button for toggling the visibility state of the node associated with this cell.                                                                                                                                                                            | `boolean \| undefined`                                                                                                                                                                                                                                         | `undefined` |
 
 
+## Events
+
+| Event               | Description                                                                                                                                  | Type                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `expandToggled`     | An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.                         | `CustomEvent<SceneTreeTableCellEventDetails>` |
+| `selectionToggled`  | An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled. | `CustomEvent<SceneTreeTableCellEventDetails>` |
+| `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<SceneTreeTableCellEventDetails>` |
+
+
 ## CSS Custom Properties
 
 | Name                                    | Description                                                                             |
