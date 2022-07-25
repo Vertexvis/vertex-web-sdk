@@ -1,4 +1,12 @@
-import { Component, Event, EventEmitter, Element, h, Host, Prop } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+} from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
@@ -103,11 +111,6 @@ export class SceneTreeTableCell {
   @Prop()
   public hoverController?: SceneTreeCellHoverController;
 
-  @Element()
-  private hostEl!: HTMLElement;
-
-  private hoverListener?: Disposable;
-
   /**
    * An event that is emitted when a user requests to expand the node. This is
    * emitted even if interactions are disabled.
@@ -128,6 +131,11 @@ export class SceneTreeTableCell {
    */
   @Event({ bubbles: true })
   public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
+
+  @Element()
+  private hostEl!: HTMLElement;
+
+  private hoverListener?: Disposable;
 
   public componentDidLoad(): void {
     this.hoverListener = this.hoverController?.stateChanged((id?: string) => {
