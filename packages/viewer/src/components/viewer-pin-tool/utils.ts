@@ -1,4 +1,15 @@
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { Range } from '@vertexvis/utils';
+
+export function constrainRelativePoint(
+  pt: Point.Point,
+  range: Range.Range
+): Point.Point {
+  const constrainedX = Math.max(range.start, Math.min(range.end, pt.x));
+  const constrainedY = Math.max(range.start, Math.min(range.end, pt.y));
+
+  return Point.create(constrainedX, constrainedY);
+}
 
 /**
  * Translates a point in relative units to a point in screen units.
@@ -26,5 +37,5 @@ export function translatePointToRelative(
     1 / canvasDimensions.height
   );
 
-  return point;
+  return constrainRelativePoint(point, Range.create(-0.5, 0.5));
 }
