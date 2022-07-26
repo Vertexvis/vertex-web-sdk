@@ -26,7 +26,7 @@ import { readDOM } from '../../lib/stencil';
 import {
   translatePointToRelative,
   translatePointToScreen,
-} from '../viewer-markup/utils';
+} from '../viewer-pin-tool/utils';
 import { getComputedStyle } from './utils';
 
 @Component({

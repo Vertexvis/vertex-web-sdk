@@ -1,7 +1,7 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 import { Disposable, UUID } from '@vertexvis/utils';
 
-import { translatePointToRelative } from '../../components/viewer-markup/utils';
+import { translatePointToRelative } from '../../components/viewer-pin-tool/utils';
 import { Cursor, labelPinCursor, pinCursor } from '../cursors';
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';

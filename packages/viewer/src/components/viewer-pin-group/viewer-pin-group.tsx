@@ -12,7 +12,7 @@ import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, Pin, TextPin } from '../../lib/pins/model';
 import { PinModel } from '../../lib/pins/model';
-import { translatePointToScreen } from '../viewer-markup/utils';
+import { translatePointToScreen } from '../viewer-pin-tool/utils';
 import { PinRenderer } from './pin-renderer';
 import { getClosestCenterToPoint } from './utils';
 
