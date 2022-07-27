@@ -406,7 +406,6 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
-  private canvasRenderPromise?: Promise<Frame>;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -1092,7 +1091,7 @@ export class Viewer {
             this.updateCanvasDimensions(canvasDimensions);
             this.isResizeUpdate = false;
           },
-          predicate: () => {
+          loadPredicate: () => {
             if (this.isResizeUpdate) {
               return (
                 this.dimensions == null ||
@@ -1104,6 +1103,9 @@ export class Viewer {
             }
             return true;
           },
+          drawPredicate: () =>
+            this.frame == null ||
+            this.frame?.sequenceNumber <= frame.sequenceNumber,
         };
 
         this.frameReceived.emit(this.frame);
@@ -1112,14 +1114,11 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        // Wait for any frame being actively drawn
-        await this.canvasRenderPromise;
+        const drawnFrame = await this.canvasRenderer(data);
 
-        this.canvasRenderPromise = this.canvasRenderer(data);
-        const drawnFrame = await this.canvasRenderPromise;
-        this.canvasRenderPromise = undefined;
-
-        this.dispatchFrameDrawn(drawnFrame);
+        if (drawnFrame != null) {
+          this.dispatchFrameDrawn(drawnFrame);
+        }
       }
     }
   }

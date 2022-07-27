@@ -553,6 +553,15 @@ describe('vertex-viewer', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
+      (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+        left: 0,
+        top: 0,
+        bottom: 150,
+        right: 200,
+        width: 500,
+        height: 500,
+      });
+
       jest.useFakeTimers();
       triggerResizeObserver([
         {
@@ -647,17 +656,8 @@ describe('vertex-viewer', () => {
 
       await Async.delay(10);
 
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        1,
-        expect.objectContaining({
-          detail: expect.objectContaining({
-            dimensions: Dimensions.create(500, 500),
-          }),
-        })
-      );
-
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        2,
+      expect(onFrameDrawn).toHaveBeenCalledTimes(1);
+      expect(onFrameDrawn).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: expect.objectContaining({
             dimensions: Dimensions.create(1, 1),

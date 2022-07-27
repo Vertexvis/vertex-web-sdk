@@ -48,7 +48,16 @@ const drawFrame4: DrawFrame = {
   frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
   beforeDraw: jest.fn(),
-  predicate: jest.fn(() => false),
+  loadPredicate: jest.fn(() => false),
+};
+
+const drawFrame5: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makePerspectiveFrame(),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+  drawPredicate: jest.fn(() => false),
 };
 
 describe(createCanvasRenderer, () => {
@@ -86,11 +95,21 @@ describe(createCanvasRenderer, () => {
     expect(drawFrame3.beforeDraw).toHaveBeenCalledTimes(1);
   });
 
-  it('skips drawing if predicate fails', async () => {
+  it('skips loading and drawing if the load predicate fails', async () => {
     const renderer = createCanvasRenderer();
     const drawImage = jest.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame4);
+
+    expect(loadImageBytes).not.toHaveBeenCalled();
+    expect(drawImage).not.toHaveBeenCalled();
+  });
+
+  it('skips drawing if the draw predicate fails', async () => {
+    const renderer = createCanvasRenderer();
+    const drawImage = jest.spyOn(canvas, 'drawImage');
+
+    await renderer(drawFrame5);
 
     expect(drawImage).not.toHaveBeenCalled();
   });
@@ -98,6 +117,12 @@ describe(createCanvasRenderer, () => {
   it('disposes loaded image', async () => {
     const renderer = createCanvasRenderer();
     await renderer(drawFrame1);
+    expect(image.dispose).toHaveBeenCalled();
+  });
+
+  it('disposes of the loaded image if draw predicate fails', async () => {
+    const renderer = createCanvasRenderer();
+    await renderer(drawFrame5);
     expect(image.dispose).toHaveBeenCalled();
   });
 });
