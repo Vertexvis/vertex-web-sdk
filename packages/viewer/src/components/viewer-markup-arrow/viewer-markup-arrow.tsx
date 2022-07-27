@@ -18,7 +18,7 @@ import {
   isValidPointData,
   isValidStartEvent,
   translatePointToScreen,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { ArrowMarkupInteractionHandler } from './interactions';
 import {

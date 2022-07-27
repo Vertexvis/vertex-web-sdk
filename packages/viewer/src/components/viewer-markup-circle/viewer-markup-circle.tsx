@@ -17,7 +17,7 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
   translateRectToScreen,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { CircleMarkupInteractionHandler } from './interactions';
 import { parseBounds } from './utils';

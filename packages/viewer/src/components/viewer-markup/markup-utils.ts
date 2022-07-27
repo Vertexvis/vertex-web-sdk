@@ -41,39 +41,11 @@ export function getBoundingBox2dAnchorPosition(
   }
 }
 
-/**
- * Returns the scale factor to convert screen coordinates to canvas coordinates.
- *
- * Scale factor is determined by taking the shortest side of the given
- * dimension. This behavior ensures that relative units are consistent in
- * non-square aspect ratios.
- *
- * @see toRelativeScaleFactor
- */
-export function toScreenScaleFactor(dimensions: Dimensions.Dimensions): number {
-  return Math.min(dimensions.width, dimensions.height);
-}
-
-/**
- * Returns the scale factor to convert canvas coordinates to screen coordinates.
- *
- * Scale factor is determined by taking the shortest side of the given
- * dimension. This behavior ensures that relative units are consistent in
- * non-square aspect ratios.
- *
- * @see toScreenScaleFactor
- */
-export function toRelativeScaleFactor(
-  dimensions: Dimensions.Dimensions
-): number {
-  return 1 / toScreenScaleFactor(dimensions);
-}
-
 export function translatePointToScreen(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
 ): Point.Point {
-  const scaleFactor = toScreenScaleFactor(canvasDimensions);
+  const scaleFactor = canvasDimensions.height;
   return Point.add(
     Point.scale(pt, scaleFactor, scaleFactor),
     Dimensions.center(canvasDimensions)
@@ -93,7 +65,7 @@ export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
   canvasDimensions: Dimensions.Dimensions
 ): Dimensions.Dimensions {
-  const scaleFactor = toScreenScaleFactor(canvasDimensions);
+  const scaleFactor = canvasDimensions.height;
   return Dimensions.scale(scaleFactor, scaleFactor, dimensions);
 }
 
@@ -119,7 +91,7 @@ export function translatePointToRelative(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
 ): Point.Point {
-  const scaleFactor = toRelativeScaleFactor(canvasDimensions);
+  const scaleFactor = 1 / canvasDimensions.height;
   const point = Point.scale(
     Point.subtract(pt, Dimensions.center(canvasDimensions)),
     scaleFactor,

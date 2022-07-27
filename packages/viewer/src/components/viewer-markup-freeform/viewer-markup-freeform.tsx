@@ -18,7 +18,7 @@ import {
   isValidStartEvent,
   translatePointToScreen,
   translateRectToScreen,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { parseBounds } from '../viewer-markup-circle/utils';
 import { BoundingBox2d } from '../viewer-markup-circle/viewer-markup-circle-components';

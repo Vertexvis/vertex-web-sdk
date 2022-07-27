@@ -3,7 +3,7 @@ import { FunctionalComponent, h } from '@stencil/core';
 import { Rectangle } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
-import { getBoundingBox2dAnchorPosition } from '../viewer-markup/utils';
+import { getBoundingBox2dAnchorPosition } from '../viewer-markup/markup-utils';
 import { RelativeAnchor } from '../viewer-markup/viewer-markup-components';
 
 export interface BoundingBox2dProps {

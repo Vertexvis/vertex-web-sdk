@@ -8,7 +8,7 @@ import {
   BoundingBox2dAnchorPosition,
   transformRectangle,
   translatePointToRelative,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 
 export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
   private pointerId?: number;
