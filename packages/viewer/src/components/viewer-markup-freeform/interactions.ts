@@ -9,7 +9,7 @@ import {
   transformRectangle,
   translatePointsToBounds,
   translatePointToRelative,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 
 export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
   private pointerId?: number;

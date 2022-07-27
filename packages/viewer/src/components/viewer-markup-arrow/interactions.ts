@@ -7,7 +7,7 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   translatePointToRelative,
   translatePointToScreen,
-} from '../viewer-markup/utils';
+} from '../viewer-markup/markup-utils';
 
 type ViewerMarkupArrowEditAnchor = 'start' | 'end' | 'center';
 
