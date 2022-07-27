@@ -406,7 +406,7 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
-  private resizeRenderer!: CanvasRenderer;
+  private canvasRenderPromise?: Promise<Frame>;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -1112,7 +1112,13 @@ export class Viewer {
           this.sceneChanged.emit();
         }
 
-        const drawnFrame = await this.canvasRenderer(data);
+        // Wait for any frame being actively drawn
+        await this.canvasRenderPromise;
+
+        this.canvasRenderPromise = this.canvasRenderer(data);
+        const drawnFrame = await this.canvasRenderPromise;
+        this.canvasRenderPromise = undefined;
+
         this.dispatchFrameDrawn(drawnFrame);
       }
     }

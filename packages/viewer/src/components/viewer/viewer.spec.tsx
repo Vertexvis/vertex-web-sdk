@@ -588,6 +588,85 @@ describe('vertex-viewer', () => {
     });
   });
 
+  describe('frame timing', () => {
+    it('handles small and large frames received nearly simultaneously', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      const onFrameDrawn = jest.fn();
+
+      viewer.addEventListener('frameDrawn', onFrameDrawn);
+
+      (loadImageBytes as jest.Mock).mockImplementation(async () => {
+        await Async.delay(5);
+
+        return {
+          width: 200,
+          height: 150,
+          dispose: () => undefined,
+        };
+      });
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        imageAttributes: {
+          ...payload.imageAttributes,
+          frameDimensions: Dimensions.create(500, 500),
+        },
+        sequenceNumber: 2,
+        image: makeImagePng(500, 500),
+      }));
+
+      await Async.delay(1);
+
+      (loadImageBytes as jest.Mock).mockReturnValue({
+        width: 200,
+        height: 150,
+        dispose: () => undefined,
+      });
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        imageAttributes: {
+          ...payload.imageAttributes,
+          frameDimensions: Dimensions.create(1, 1),
+        },
+        sequenceNumber: 3,
+        image: makeImagePng(1, 1),
+      }));
+
+      await Async.delay(10);
+
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            dimensions: Dimensions.create(500, 500),
+          }),
+        })
+      );
+
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            dimensions: Dimensions.create(1, 1),
+          }),
+        })
+      );
+    });
+  });
+
   async function newViewerSpec(
     opts: Pick<NewSpecPageOptions, 'template' | 'html'>
   ): Promise<HTMLVertexViewerElement> {

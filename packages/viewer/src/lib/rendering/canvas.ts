@@ -118,16 +118,18 @@ export function createCanvasRenderer(): CanvasRenderer {
     const frameNumber = data.frame.sequenceNumber;
     const frameIsNewer =
       lastFrameNumber == null || frameNumber > lastFrameNumber;
-    const image = await loadImageBytes(data.frame.image.imageBytes);
     const predicatePassing = data.predicate?.() ?? true;
 
     if (frameIsNewer && predicatePassing) {
+      const image = await loadImageBytes(data.frame.image.imageBytes);
+
       lastFrameNumber = frameNumber;
       data.beforeDraw?.();
       drawImage(image, data);
+
+      image.dispose();
     }
 
-    image.dispose();
     return data.frame;
   };
 }
