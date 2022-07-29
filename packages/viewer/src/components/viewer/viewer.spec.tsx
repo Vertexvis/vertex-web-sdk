@@ -30,11 +30,11 @@ import {
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockImplementation(async () => ({
     width: 200,
     height: 150,
     dispose: () => undefined,
-  });
+  }));
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -638,11 +638,11 @@ describe('vertex-viewer', () => {
 
       await Async.delay(1);
 
-      (loadImageBytes as jest.Mock).mockReturnValue({
+      (loadImageBytes as jest.Mock).mockImplementation(async () => ({
         width: 200,
         height: 150,
         dispose: () => undefined,
-      });
+      }));
 
       receiveFrame(ws, (payload) => ({
         ...payload,

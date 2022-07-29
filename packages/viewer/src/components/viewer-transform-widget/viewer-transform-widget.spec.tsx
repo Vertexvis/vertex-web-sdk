@@ -40,7 +40,7 @@ describe('vertex-viewer-transform-widget', () => {
     document.createElement('canvas')
   );
 
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,

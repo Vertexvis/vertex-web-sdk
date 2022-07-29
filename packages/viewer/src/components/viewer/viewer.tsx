@@ -1091,7 +1091,7 @@ export class Viewer {
             this.updateCanvasDimensions(canvasDimensions);
             this.isResizeUpdate = false;
           },
-          loadPredicate: () => {
+          predicate: () => {
             if (this.isResizeUpdate) {
               return (
                 this.dimensions == null ||
@@ -1103,9 +1103,6 @@ export class Viewer {
             }
             return true;
           },
-          drawPredicate: () =>
-            this.frame == null ||
-            this.frame?.sequenceNumber <= frame.sequenceNumber,
         };
 
         this.frameReceived.emit(this.frame);

@@ -74,7 +74,7 @@ describe('vertex-viewer-measurement-distance', () => {
     height: 100,
   });
 
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 100,
     height: 100,
     dispose: () => undefined,

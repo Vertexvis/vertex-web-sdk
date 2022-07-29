@@ -13,8 +13,7 @@ export interface DrawFrame {
   canvasDimensions: Dimensions.Dimensions;
   frame: Frame;
   viewport: Viewport;
-  loadPredicate?: () => boolean;
-  drawPredicate?: () => boolean;
+  predicate?: () => boolean;
   beforeDraw?: VoidFunction;
 }
 
@@ -119,22 +118,22 @@ export function createCanvasRenderer(): CanvasRenderer {
     const frameNumber = data.frame.sequenceNumber;
     const frameIsNewer =
       lastFrameNumber == null || frameNumber > lastFrameNumber;
-    const loadPredicatePassing = data.loadPredicate?.() ?? true;
+    const predicatePassing = data.predicate?.() ?? true;
 
-    if (frameIsNewer && loadPredicatePassing) {
-      const image = await loadImageBytes(data.frame.image.imageBytes);
-      const drawPredicatePassing = data.drawPredicate?.() ?? true;
-
+    if (frameIsNewer && predicatePassing) {
       lastFrameNumber = frameNumber;
+      return loadImageBytes(data.frame.image.imageBytes).then((image) => {
+        if (
+          lastFrameNumber == null ||
+          data.frame.sequenceNumber >= lastFrameNumber
+        ) {
+          data.beforeDraw?.();
+          drawImage(image, data);
+          image.dispose();
 
-      if (drawPredicatePassing) {
-        data.beforeDraw?.();
-        drawImage(image, data);
-        image.dispose();
-        return data.frame;
-      } else {
-        image.dispose();
-      }
+          return data.frame;
+        }
+      });
     }
   };
 }
