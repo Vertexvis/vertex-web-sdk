@@ -30,11 +30,11 @@ import {
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
-  (loadImageBytes as jest.Mock).mockImplementation(async () => ({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
-  }));
+  });
   (getElementBoundingClientRect as jest.Mock).mockReturnValue({
     left: 0,
     top: 0,
@@ -157,6 +157,8 @@ describe('vertex-viewer', () => {
       viewer.addEventListener('frameReceived', onFrameReceived);
       viewer.addEventListener('frameDrawn', onFrameDrawn);
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
 
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -611,6 +613,8 @@ describe('vertex-viewer', () => {
       });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
 
       const onFrameDrawn = jest.fn();
 
