@@ -8,3 +8,14 @@ describe(UUID.create, () => {
     );
   });
 });
+
+describe(UUID.toMsbLsb, () => {
+  it('should converts UUID string to MSB, LSB', () => {
+    const uuid = 'b728aa62-76c0-4b25-9196-8e5445dc1309';
+    const res = UUID.toMsbLsb(uuid);
+    expect(res).toEqual({
+      msb: '-5248758025824482523',
+      lsb: '-7956015199102954743',
+    });
+  });
+});
