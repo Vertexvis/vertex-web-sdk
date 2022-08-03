@@ -30,7 +30,7 @@ import {
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
@@ -157,6 +157,8 @@ describe('vertex-viewer', () => {
       viewer.addEventListener('frameReceived', onFrameReceived);
       viewer.addEventListener('frameDrawn', onFrameDrawn);
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
 
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -553,6 +555,15 @@ describe('vertex-viewer', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
+      (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+        left: 0,
+        top: 0,
+        bottom: 150,
+        right: 200,
+        width: 500,
+        height: 500,
+      });
+
       jest.useFakeTimers();
       triggerResizeObserver([
         {
@@ -582,6 +593,78 @@ describe('vertex-viewer', () => {
         expect.objectContaining({
           detail: expect.objectContaining({
             dimensions: Dimensions.create(500, 500),
+          }),
+        })
+      );
+    });
+  });
+
+  describe('frame timing', () => {
+    it('handles small and large frames received nearly simultaneously', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
+
+      const onFrameDrawn = jest.fn();
+
+      viewer.addEventListener('frameDrawn', onFrameDrawn);
+
+      (loadImageBytes as jest.Mock).mockImplementation(async () => {
+        await Async.delay(5);
+
+        return {
+          width: 200,
+          height: 150,
+          dispose: () => undefined,
+        };
+      });
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        imageAttributes: {
+          ...payload.imageAttributes,
+          frameDimensions: Dimensions.create(500, 500),
+        },
+        sequenceNumber: 2,
+        image: makeImagePng(500, 500),
+      }));
+
+      await Async.delay(1);
+
+      (loadImageBytes as jest.Mock).mockImplementation(async () => ({
+        width: 200,
+        height: 150,
+        dispose: () => undefined,
+      }));
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        imageAttributes: {
+          ...payload.imageAttributes,
+          frameDimensions: Dimensions.create(1, 1),
+        },
+        sequenceNumber: 3,
+        image: makeImagePng(1, 1),
+      }));
+
+      await Async.delay(10);
+
+      expect(onFrameDrawn).toHaveBeenCalledTimes(1);
+      expect(onFrameDrawn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            dimensions: Dimensions.create(1, 1),
           }),
         })
       );

@@ -17,7 +17,7 @@ export interface DrawFrame {
   beforeDraw?: VoidFunction;
 }
 
-export type CanvasRenderer = FrameRenderer<DrawFrame, Frame>;
+export type CanvasRenderer = FrameRenderer<DrawFrame, Frame | undefined>;
 
 export type ReportTimingsCallback = (timing: Timing[]) => void;
 
@@ -112,23 +112,52 @@ export function measureCanvasRenderer(
 }
 
 export function createCanvasRenderer(): CanvasRenderer {
-  let lastFrameNumber: number | undefined;
+  function loadFrame(): (data: DrawFrame) => Promise<HtmlImage | undefined> {
+    let lastLoadedFrameNumber = -1;
+
+    return async (data: DrawFrame): Promise<HtmlImage | undefined> => {
+      if (data.frame.sequenceNumber > lastLoadedFrameNumber) {
+        const image = await loadImageBytes(data.frame.image.imageBytes);
+
+        lastLoadedFrameNumber = data.frame.sequenceNumber;
+
+        return image;
+      }
+    };
+  }
+
+  function drawFrame(): (
+    data: DrawFrame,
+    image?: HtmlImage
+  ) => Promise<Frame | undefined> {
+    let lastDrawnFrameNumber = -1;
+
+    return async (
+      data: DrawFrame,
+      image?: HtmlImage
+    ): Promise<Frame | undefined> => {
+      if (image != null && data.frame.sequenceNumber > lastDrawnFrameNumber) {
+        lastDrawnFrameNumber = data.frame.sequenceNumber;
+
+        data.beforeDraw?.();
+        drawImage(image, data);
+
+        image.dispose();
+        return data.frame;
+      }
+      image?.dispose();
+    };
+  }
+
+  const load = loadFrame();
+  const draw = drawFrame();
 
   return async (data) => {
-    const frameNumber = data.frame.sequenceNumber;
-    const frameIsNewer =
-      lastFrameNumber == null || frameNumber > lastFrameNumber;
-    const image = await loadImageBytes(data.frame.image.imageBytes);
     const predicatePassing = data.predicate?.() ?? true;
 
-    if (frameIsNewer && predicatePassing) {
-      lastFrameNumber = frameNumber;
-      data.beforeDraw?.();
-      drawImage(image, data);
+    if (predicatePassing) {
+      return load(data).then((image) => draw(data, image));
     }
-
-    image.dispose();
-    return data.frame;
   };
 }
 

@@ -406,7 +406,6 @@ export class Viewer {
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
-  private resizeRenderer!: CanvasRenderer;
 
   private mutationObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
@@ -1113,7 +1112,10 @@ export class Viewer {
         }
 
         const drawnFrame = await this.canvasRenderer(data);
-        this.dispatchFrameDrawn(drawnFrame);
+
+        if (drawnFrame != null) {
+          this.dispatchFrameDrawn(drawnFrame);
+        }
       }
     }
   }

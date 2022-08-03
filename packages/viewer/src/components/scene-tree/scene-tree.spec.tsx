@@ -84,7 +84,7 @@ describe('<vertex-scene-tree>', () => {
   // Scene tree mocks
   (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
   (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 100,
     height: 100,
     dispose: () => undefined,

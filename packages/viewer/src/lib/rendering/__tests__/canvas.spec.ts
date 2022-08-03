@@ -1,6 +1,7 @@
 jest.mock('../imageLoaders');
 
 import { Dimensions } from '@vertexvis/geometry';
+import { Async } from '@vertexvis/utils';
 
 import * as Fixtures from '../../../testing/fixtures';
 import { TimingMeter } from '../../meters';
@@ -16,6 +17,10 @@ import { loadImageBytes } from '../imageLoaders';
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = new HTMLCanvasElement().getContext('2d')!;
 const image = {
+  image: { width: 100, height: 50, close: jest.fn() },
+  dispose: jest.fn(),
+};
+const image2 = {
   image: { width: 100, height: 50, close: jest.fn() },
   dispose: jest.fn(),
 };
@@ -51,11 +56,29 @@ const drawFrame4: DrawFrame = {
   predicate: jest.fn(() => false),
 };
 
-describe(createCanvasRenderer, () => {
-  (loadImageBytes as jest.Mock).mockResolvedValue(image);
+const drawFrame5: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makePerspectiveFrame(),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+};
 
+const drawFrame6: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makePerspectiveFrame({
+    ...Fixtures.drawFramePayloadPerspective,
+    sequenceNumber: 2,
+  }),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+};
+
+describe(createCanvasRenderer, () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (loadImageBytes as jest.Mock).mockResolvedValue(image);
   });
 
   it('draws the next frame', async () => {
@@ -86,13 +109,41 @@ describe(createCanvasRenderer, () => {
     expect(drawFrame3.beforeDraw).toHaveBeenCalledTimes(1);
   });
 
-  it('skips drawing if predicate fails', async () => {
+  it('skips loading and drawing if the predicate fails', async () => {
     const renderer = createCanvasRenderer();
     const drawImage = jest.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame4);
 
+    expect(loadImageBytes).not.toHaveBeenCalled();
     expect(drawImage).not.toHaveBeenCalled();
+  });
+
+  it('skips drawing if the frame to be drawn is older', async () => {
+    const renderer = createCanvasRenderer();
+    const drawImage = jest.spyOn(canvas, 'drawImage');
+
+    (loadImageBytes as jest.Mock)
+      .mockImplementationOnce(async () => {
+        await Async.delay(5);
+
+        return image;
+      })
+      .mockResolvedValue(image2);
+
+    const firstDraw = renderer(drawFrame5);
+    const secondDraw = renderer(drawFrame6);
+    await firstDraw;
+    await secondDraw;
+
+    expect(drawImage).toBeCalledTimes(1);
+    expect(drawImage).toHaveBeenCalledWith(
+      image2.image,
+      0,
+      0,
+      image2.image.width,
+      image2.image.height
+    );
   });
 
   it('disposes loaded image', async () => {

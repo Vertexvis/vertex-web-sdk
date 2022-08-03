@@ -75,10 +75,10 @@ export const drawFramePayloadOrthographic: DrawFramePayload = {
   },
 };
 
-export function makePerspectiveFrame(): Frame {
-  return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-    drawFramePayloadPerspective
-  );
+export function makePerspectiveFrame(
+  payload: DrawFramePayload = drawFramePayloadPerspective
+): Frame {
+  return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(payload);
 }
 
 export function makeOrthographicFrame(): Frame {

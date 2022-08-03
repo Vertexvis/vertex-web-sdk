@@ -21,7 +21,7 @@ import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
 import { ViewerViewCube } from './viewer-view-cube';
 
 describe('vertex-viewer-view-cube', () => {
-  (loadImageBytes as jest.Mock).mockReturnValue({
+  (loadImageBytes as jest.Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
