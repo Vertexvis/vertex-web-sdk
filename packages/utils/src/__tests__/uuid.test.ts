@@ -9,6 +9,14 @@ describe(UUID.create, () => {
   });
 });
 
+describe(UUID.fromMsbLsb, () => {
+  it('should convert MSB, LSB to string', () => {
+    const uuid = 'b728aa62-76c0-4b25-9196-8e5445dc1309';
+    const { msb, lsb } = UUID.toMsbLsb(uuid);
+    expect(UUID.fromMsbLsb(msb, lsb)).toEqual(uuid);
+  });
+});
+
 describe(UUID.toMsbLsb, () => {
   it('should converts UUID string to MSB, LSB', () => {
     const uuid = 'b728aa62-76c0-4b25-9196-8e5445dc1309';
