@@ -1,5 +1,4 @@
 import { google } from '@vertexvis/frame-streaming-protos';
-import Long from 'long';
 
 type MaybeTimestampOrDuration = Pick<
   google.protobuf.ITimestamp,
@@ -74,9 +73,8 @@ export function protoToDate(
   time: MaybeTimestampOrDuration | DefinedTimestampOrDuration
 ): Date | undefined {
   if (time.seconds != null && time.nanos != null) {
-    const seconds = Long.isLong(time.seconds)
-      ? time.seconds.toNumber()
-      : time.seconds;
+    const seconds =
+      typeof time.seconds === 'number' ? time.seconds : time.seconds.toNumber();
     return new Date(seconds * 1000 + time.nanos / 1000000);
   }
 }
