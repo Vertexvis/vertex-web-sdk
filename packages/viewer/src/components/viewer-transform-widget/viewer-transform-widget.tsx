@@ -294,6 +294,9 @@ export class ViewerTransformWidget {
   };
 
   private handleDrag = async (event: PointerEvent): Promise<void> => {
+    // Prevent selection of text and interaction with view cube while dragging the widget
+    event.preventDefault();
+
     const canvasBounds = this.getCanvasBounds();
 
     if (
