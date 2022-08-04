@@ -1,5 +1,4 @@
-import Long from 'long';
-import { parse, v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 export type UUID = string;
 
@@ -31,18 +30,14 @@ export function fromMsbLsb(msb: bigint | string, lsb: bigint | string): UUID {
 }
 
 export function toMsbLsb(id: UUID): UUIDMsbLsb {
-  const bytes = parse(id);
+  const [c1, c2, c3, c4, c5] = id.split('-');
 
-  // I don't know why, but BigInt bitwise ops are produce incorrect values, so
-  // using Long.
-  let msb = Long.fromInt(0);
-  let lsb = Long.fromInt(0);
-  for (let i = 0; i < 8; i++) {
-    msb = msb.shiftLeft(8).or(bytes[i] & 0xff);
+  if (c1 == null || c2 == null || c3 == null || c4 == null || c5 == null) {
+    throw new Error(`Invalid UUID string ${id}`);
   }
-  for (let i = 8; i < 16; i++) {
-    lsb = lsb.shiftLeft(8).or(bytes[i] & 0xff);
-  }
+
+  const msb = BigInt.asIntN(64, BigInt(`0x${c1 + c2 + c3}`));
+  const lsb = BigInt.asIntN(64, BigInt(`0x${c4 + c5}`));
 
   return { msb: msb.toString(), lsb: lsb.toString() };
 }
