@@ -11,6 +11,7 @@ import {
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
+import { random } from '../../../testing';
 import { makeOrthographicFrame } from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
@@ -34,7 +35,8 @@ describe(InteractionApi, () => {
   const emitInteractionStarted = jest.fn();
   const emitInteractionFinished = jest.fn();
   const streamApi = new StreamApi();
-  const sceneViewId = 'scene-view-id';
+  const sceneId = random.guid();
+  const sceneViewId = random.guid();
   const frame = makeOrthographicFrame();
   const viewport = new Viewport(100, 100);
   const scene = new Scene(
@@ -43,6 +45,7 @@ describe(InteractionApi, () => {
     fromPbFrameOrThrow(Orientation.DEFAULT),
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
+    sceneId,
     sceneViewId,
     ColorMaterial.fromHex('#ffffff')
   );

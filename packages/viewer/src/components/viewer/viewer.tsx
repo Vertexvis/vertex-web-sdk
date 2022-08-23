@@ -1297,7 +1297,8 @@ export class Viewer {
       );
     }
 
-    const { frame, sceneViewId, worldOrientation } = this.stateMap.streamState;
+    const { frame, sceneId, sceneViewId, worldOrientation } =
+      this.stateMap.streamState;
 
     const selectionMaterial =
       typeof this.selectionMaterial === 'string'
@@ -1309,6 +1310,7 @@ export class Viewer {
       fromPbFrameOrThrow(worldOrientation),
       () => this.getImageScale(),
       this.viewport,
+      sceneId,
       sceneViewId,
       selectionMaterial
     );

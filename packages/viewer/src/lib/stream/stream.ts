@@ -358,6 +358,7 @@ export class ViewerStream extends StreamApi {
       resource,
       streamId: stream.streamId,
       deviceId: stream.deviceId,
+      sceneId: stream.sceneId,
       sceneViewId: stream.sceneViewId,
       worldOrientation: stream.worldOrientation,
       token: stream.token,
@@ -383,6 +384,7 @@ export class ViewerStream extends StreamApi {
     return {
       resource: resource,
       streamId: res.streamId,
+      sceneId: res.sceneId,
       sceneViewId: res.sceneViewId,
       deviceId: res.sessionId,
       token: res.token,

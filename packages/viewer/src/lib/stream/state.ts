@@ -19,6 +19,7 @@ export interface Connected {
   readonly resource: Resource;
   readonly connection: Disposable;
   readonly streamId: string;
+  readonly sceneId: string;
   readonly sceneViewId: string;
   readonly deviceId: string;
   readonly worldOrientation: Orientation;

@@ -2,8 +2,8 @@ jest.mock('@vertexvis/stream-api');
 
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
-import { UUID } from '@vertexvis/utils';
 
+import { random } from '../../../testing';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation, Viewport } from '../../types';
@@ -11,7 +11,8 @@ import * as ColorMaterial from '../colorMaterial';
 import { Scene } from '../scene';
 
 describe(Scene, () => {
-  const sceneViewId: UUID.UUID = UUID.create();
+  const sceneId = random.guid();
+  const sceneViewId = random.guid();
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
   const viewport = new Viewport(50, 50);
@@ -22,6 +23,7 @@ describe(Scene, () => {
     fromPbFrameOrThrow(Orientation.DEFAULT),
     imageScaleProvider,
     viewport,
+    sceneId,
     sceneViewId,
     colorMaterial
   );
@@ -48,7 +50,7 @@ describe(Scene, () => {
 
   describe(Scene.prototype.items, () => {
     it('should execute commands and query by itemId', () => {
-      const itemId = UUID.create();
+      const itemId = random.guid();
 
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).hide())
@@ -79,8 +81,8 @@ describe(Scene, () => {
     });
 
     it('should support passing a supplied correlationId', () => {
-      const itemId = UUID.create();
-      const suppliedId = `SuppliedId-${UUID.create()}`;
+      const itemId = random.guid();
+      const suppliedId = `SuppliedId-${random.guid()}`;
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).hide())
         .execute({ suppliedCorrelationId: suppliedId });
@@ -209,8 +211,8 @@ describe(Scene, () => {
     });
 
     it('should support passing multiple operations in one request', () => {
-      const itemId = UUID.create();
-      const suppliedId = UUID.create();
+      const itemId = random.guid();
+      const suppliedId = random.guid();
       scene
         .items((op) => [
           op.where((q) => q.all()).hide(),
@@ -305,7 +307,7 @@ describe(Scene, () => {
     });
 
     it('uses default selection material if color is not specified', () => {
-      const itemId = UUID.create();
+      const itemId = random.guid();
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select())
         .execute();
@@ -336,7 +338,7 @@ describe(Scene, () => {
     });
 
     it('selection uses specified material', () => {
-      const itemId = UUID.create();
+      const itemId = random.guid();
       const material = ColorMaterial.fromHex('#0000ff');
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select(material))
@@ -368,7 +370,7 @@ describe(Scene, () => {
     });
 
     it('selection uses hex color', () => {
-      const itemId = UUID.create();
+      const itemId = random.guid();
       const material = ColorMaterial.fromHex('#0000ff');
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select('#0000ff'))

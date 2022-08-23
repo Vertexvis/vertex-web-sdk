@@ -56,6 +56,7 @@ export function startStream(
 ): ResponseMessage {
   const def: StartStreamResult = {
     streamId: { hex: UUID.create() },
+    sceneId: { hex: UUID.create() },
     sceneViewId: { hex: UUID.create() },
     sessionId: { hex: UUID.create() },
     jwt: 'jwt',
