@@ -4,6 +4,7 @@ jest.mock('../../../workers/png-decoder-pool');
 import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
+import { random } from '../../../testing';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
@@ -21,7 +22,8 @@ describe(InteractionApi, () => {
   const emitInteractionStarted = jest.fn();
   const emitInteractionFinished = jest.fn();
   const streamApi = new StreamApi();
-  const sceneViewId = 'scene-view-id';
+  const sceneId = random.guid();
+  const sceneViewId = random.guid();
   const frame = makePerspectiveFrame();
   const scene = new Scene(
     streamApi,
@@ -29,6 +31,7 @@ describe(InteractionApi, () => {
     fromPbFrameOrThrow(Orientation.DEFAULT),
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
+    sceneId,
     sceneViewId,
     ColorMaterial.fromHex('#ffffff')
   );
