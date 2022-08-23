@@ -236,6 +236,7 @@ export class Scene {
     private decodeFrame: FrameDecoder,
     private imageScaleProvider: ImageScaleProvider,
     private dimensions: Dimensions.Dimensions,
+    public readonly sceneId: UUID.UUID,
     public readonly sceneViewId: UUID.UUID,
     private defaultSelectionMaterial: ColorMaterial
   ) {}

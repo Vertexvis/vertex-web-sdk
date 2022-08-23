@@ -1,6 +1,7 @@
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
+import { random } from '../../../testing';
 import {
   makeOrthographicFrame,
   makePerspectiveFrame,
@@ -21,7 +22,9 @@ describe(FlyToPositionKeyInteraction, () => {
     },
   }));
   streamApi.flyTo = jest.fn(async () => ({ flyTo: {} }));
-  const sceneViewId = 'scene-view-id';
+
+  const sceneId = random.guid();
+  const sceneViewId = random.guid();
 
   function createScene(frame: Frame): Scene {
     return new Scene(
@@ -30,6 +33,7 @@ describe(FlyToPositionKeyInteraction, () => {
       fromPbFrameOrThrow(Orientation.DEFAULT),
       () => Point.create(1, 1),
       Dimensions.create(50, 50),
+      sceneId,
       sceneViewId,
       ColorMaterial.fromHex('#ffffff')
     );

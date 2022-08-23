@@ -327,6 +327,7 @@ export const fromPbStartStreamResponse: M.Func<
   vertexvis.protobuf.stream.IStreamResponse,
   {
     streamId: string;
+    sceneId: string;
     sceneViewId: string;
     sessionId: string;
     worldOrientation: Orientation;
@@ -337,6 +338,10 @@ export const fromPbStartStreamResponse: M.Func<
     M.compose(
       M.requiredProp('startStream'),
       M.mapRequiredProp('streamId', fromPbUuid)
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('sceneId', fromPbUuid)
     ),
     M.compose(
       M.requiredProp('startStream'),
@@ -355,8 +360,9 @@ export const fromPbStartStreamResponse: M.Func<
       M.mapRequiredProp('token', fromPbToken)
     )
   ),
-  ([streamId, sceneViewId, sessionId, worldOrientation, token]) => ({
+  ([streamId, sceneId, sceneViewId, sessionId, worldOrientation, token]) => ({
     streamId,
+    sceneId,
     sceneViewId,
     sessionId: sessionId,
     worldOrientation,

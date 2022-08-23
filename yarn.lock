@@ -2139,9 +2139,9 @@
     prettier "^2.5.1"
 
 "@vertexvis/frame-streaming-protos@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.8.0.tgz#7f7028b4e4269ae66012b56c4594f71542e4e847"
-  integrity sha512-jQssMEKZ/Ji4TCt/QnPX1xi1Fdyu38qeTi8/7ywAQuAZ7gfCZy6vbSJeRlNQ8ITRiHFanKdrehaHaQefJ5+E+w==
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.8.1.tgz#6057e6c637492d63adccb08c0741d6ed3c05b64c"
+  integrity sha512-99C0cn4qzmLw4OlhF+tG6SoioSnpvHdp59xEisXQ8twSwy940BY3/VGOI1Ahn2+RntPxrQftv9j8bhIsFrSo3A==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -2163,14 +2163,14 @@
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
 "@vertexvis/scene-tree-protos@^0.1.15":
-  version "0.1.15"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.15.tgz#343639af315c8f835d3840b9649fc8d6f64761c7"
-  integrity sha512-+j8/WdWSNwQcEVS2OcgWvmt85oWO3S/brdMXr+gSC3wt514JbCCqfCvn0cAozWEsmxby05qge5XggdQH5O2VVA==
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.16.tgz#d1dcefbe503efac98d49cbf2f452af185242b534"
+  integrity sha512-wgdn+unrh87M8+U2rLlODjzeiGG7MlWRlOAt7S+fJz0ZXyC3HlB42ZgxGKl2nhb69a+z5K1s+LArc8vFQn1hsA==
 
 "@vertexvis/scene-view-protos@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.1.8.tgz#eb676022c3323b8bbb1198a27cc7ad6849d1ac28"
-  integrity sha512-R3HOVRYWTthiwxrndrbSlvqfmqobSvTsmMvohjihqv9toXWAdjRw/uFcL6ei2zQAq18NPenKqxU3hI1sa0MrjQ==
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.1.9.tgz#130be1e7fe013c03be8638253b8b18ed926fa2b8"
+  integrity sha512-HtvQFLj7DdlHIjnAOT9qIP0XFy1V87L5Jz0Ca8s+A/porB91Xy1y6kHl2bF4K/ZFc6q9H0coLLFH0gqybWlqzA==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"
