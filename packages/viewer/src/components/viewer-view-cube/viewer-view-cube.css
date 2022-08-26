@@ -54,7 +54,6 @@
    */
   --viewer-view-cube-triad-z-axis-color: var(--z-axis-color);
 
-  display: block;
   color: var(--neutral-700);
   width: 80px;
   height: 80px;
