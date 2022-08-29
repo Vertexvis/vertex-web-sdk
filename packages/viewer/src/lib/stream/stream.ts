@@ -311,7 +311,7 @@ export class ViewerStream extends StreamApi {
 
     const stream = await requestStream();
     console.debug(
-      `Stream connected [stream-id=${stream.streamId}, scene-view-id=${stream.sceneViewId}]`
+      `Stream connected [stream-id=${stream.streamId}, scene-id=${stream.sceneId}, scene-view-id=${stream.sceneViewId}]`
     );
 
     const onRequest = this.onRequest((msg) => {
