@@ -444,37 +444,6 @@ describe(ViewerStream, () => {
       stream.update({ dimensions: Dimensions.create(100, 100) });
       expect(updateDimensions).toHaveBeenCalled();
     });
-
-    it('updates dimensions once the stream is connected', async () => {
-      const { stream, ws } = makeStream();
-
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-
-      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
-      const connecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
-      );
-      stream.load(urn123, clientId, deviceId, config);
-      await simulateFrame(ws);
-      await connecting;
-
-      stream.update({ dimensions: Dimensions.create(100, 100) });
-      expect(updateDimensions).not.toHaveBeenCalled();
-
-      const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
-      );
-
-      await connected;
-
-      await simulateFrame(ws);
-      expect(updateDimensions).toHaveBeenCalled();
-    });
   });
 
   function makeStream(): { stream: ViewerStream; ws: WebSocketClientMock } {

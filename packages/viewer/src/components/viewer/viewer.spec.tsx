@@ -597,6 +597,54 @@ describe('vertex-viewer', () => {
         })
       );
     });
+
+    it('updates stream dimensions when connected', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      const updateDimensionsSpy = jest.spyOn(stream, 'update');
+
+      await loadViewerStreamKey(
+        key1,
+        { viewer, stream, ws },
+        {
+          token,
+          beforeConnected: () => {
+            (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+              left: 0,
+              top: 0,
+              bottom: 150,
+              right: 200,
+              width: 500,
+              height: 500,
+            });
+
+            jest.useFakeTimers();
+            triggerResizeObserver([
+              {
+                contentRect: { width: 500, height: 500 },
+              },
+            ]);
+            jest.advanceTimersByTime(1000);
+            jest.useRealTimers();
+          },
+        }
+      );
+
+      expect(updateDimensionsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimensions: Dimensions.create(500, 500),
+        })
+      );
+    });
   });
 
   describe('frame timing', () => {

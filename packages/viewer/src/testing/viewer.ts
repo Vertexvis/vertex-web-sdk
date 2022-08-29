@@ -18,6 +18,7 @@ interface LoadViewerStreamKeyCtx {
 
 interface LoadViewerStreamKeyOptions {
   token?: string;
+  beforeConnected?: VoidFunction;
 }
 
 export const key1 = 'urn:vertexvis:stream-key:123';
@@ -36,7 +37,10 @@ export function makeViewerStream(): {
 export async function loadViewerStreamKey(
   urn: string,
   { viewer, stream, ws }: LoadViewerStreamKeyCtx,
-  { token = random.string({ alpha: true }) }: LoadViewerStreamKeyOptions = {}
+  {
+    token = random.string({ alpha: true }),
+    beforeConnected,
+  }: LoadViewerStreamKeyOptions = {}
 ): Promise<void> {
   jest.spyOn(stream, 'startStream').mockResolvedValue(
     StreamFixtures.Responses.startStream({
@@ -60,6 +64,7 @@ export async function loadViewerStreamKey(
   // Emit frame drawn on next event loop
   await connecting;
   await Async.delay(10);
+  beforeConnected?.();
   ws.receiveMessage(
     encode(
       StreamFixtures.Requests.drawFrame({
