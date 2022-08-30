@@ -972,8 +972,9 @@ export class Viewer {
       this.calculateComponentDimensions();
       this.isResizing = false;
 
-      this.stream?.update({ dimensions: this.dimensions });
-      this.dimensionschange.emit(this.dimensions);
+      if (this.stream?.getState().type === 'connected') {
+        this.updateDimensions(this.dimensions);
+      }
     }
   }
 
@@ -1043,6 +1044,8 @@ export class Viewer {
     if (this.frame !== state.frame) {
       this.updateFrame(state.frame);
     }
+
+    this.updateDimensions(this.dimensions);
   }
 
   private handleConnectionFailed(
@@ -1064,6 +1067,11 @@ export class Viewer {
       this.errorMessage = undefined;
       this.emitConnectionChange({ status: 'disconnected' });
     }
+  }
+
+  private updateDimensions(dimensions?: Dimensions.Dimensions): void {
+    this.stream?.update({ dimensions });
+    this.dimensionschange.emit(dimensions);
   }
 
   private async updateFrame(frame: Frame): Promise<void> {
