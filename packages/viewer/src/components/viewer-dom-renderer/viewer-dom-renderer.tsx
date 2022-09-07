@@ -83,6 +83,10 @@ export class ViewerDomRenderer {
     mutation.observe(this.hostEl, { childList: true });
 
     this.handleViewerChange(this.viewer, undefined);
+
+    if (this.viewer?.frame != null) {
+      this.handleViewerFrameDrawn();
+    }
   }
 
   /**
