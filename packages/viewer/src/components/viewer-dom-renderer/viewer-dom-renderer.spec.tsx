@@ -234,4 +234,53 @@ describe('<vertex-viewer-dom-renderer>', () => {
       expect(el.getAttribute('occluded')).toBeNull();
     });
   });
+
+  describe('initialization', () => {
+    it('initializes the current camera when loaded with a populated viewer.frame', async () => {
+      const addEventListener = jest.fn();
+      /* eslint-disable prettier/prettier */
+      const matrix = [
+        0, 0.5, 0.5, 0,
+        0, 1, 0, 0,
+        0.5, 0.5, 0, 0,
+        0, 0, 0, 1
+      ];
+      /* eslint-enable prettier/prettier */
+
+      const camera = {
+        viewMatrix: matrix,
+        projectionMatrix: matrix,
+        far: 100,
+        near: 1,
+
+        isOrthographic: jest.fn().mockReturnValue(false),
+      };
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            viewer={
+              {
+                addEventListener,
+                frame: {
+                  scene: {
+                    camera,
+                  },
+                },
+              } as unknown as HTMLVertexViewerElement
+            }
+          ></vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerDomRendererElement;
+
+      expect(addEventListener).toHaveBeenCalledWith(
+        'frameDrawn',
+        expect.any(Function)
+      );
+      expect(el.camera).toMatchObject(camera);
+    });
+  });
 });

@@ -64,4 +64,64 @@ describe('vertex-viewer-pin-tool', () => {
       </vertex-viewer-dom-renderer>
     `);
   });
+
+  it('should setup the projectionViewMatrix when loading with an initialized viewer', async () => {
+    const pin: TextPin = {
+      type: 'text',
+      id: 'my-pin-id',
+      worldPosition: Vector3.create(),
+      label: {
+        point: Point.create(0, 0),
+        text: 'My New Pin',
+      },
+    };
+    const addEventListener = jest.fn();
+    /* eslint-disable prettier/prettier */
+    const matrix = [
+      0, 0.5, 0.5, 0,
+      0, 1, 0, 0,
+      0.5, 0.5, 0, 0,
+      0, 0, 0, 1
+    ];
+    /* eslint-enable prettier/prettier */
+
+    const page = await newSpecPage({
+      components: [ViewerPinTool, ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-tool
+          id="vertex-viewer-pin-tool"
+          mode="edit"
+          tool="pin-text"
+          viewer={
+            {
+              ...viewer,
+              addEventListener,
+              frame: {
+                scene: {
+                  camera: {
+                    projectionViewMatrix: matrix,
+                  },
+                },
+              },
+            } as unknown as HTMLVertexViewerElement
+          }
+        ></vertex-viewer-pin-tool>
+      ),
+    });
+    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+
+    toolEl.pinController?.addPin(pin);
+
+    await page.waitForChanges();
+
+    expect(addEventListener).toHaveBeenCalledWith(
+      'frameDrawn',
+      expect.any(Function)
+    );
+
+    expect(
+      toolEl.shadowRoot?.querySelector('vertex-viewer-pin-group')
+        ?.projectionViewMatrix
+    ).toMatchObject(matrix);
+  });
 });

@@ -152,6 +152,8 @@ export class ViewerPinTool {
     this.pinModel.onSelectionChange((selectedId) => {
       this.selectedPinId = selectedId;
     });
+
+    this.handleViewerChanged(this.viewer, undefined);
   }
 
   protected componentDidLoad(): void {
