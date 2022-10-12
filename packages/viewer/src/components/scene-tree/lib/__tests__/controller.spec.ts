@@ -67,7 +67,8 @@ function signJwt(viewId: string): string {
 
 function createController(
   rowLimit: number,
-  subscriptionHandshakeGracePeriodInMs?: number
+  subscriptionHandshakeGracePeriodInMs?: number,
+  subscriptionUseWebSocketTransport = true
 ): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
@@ -79,6 +80,7 @@ function createController(
     spinnerDelay: 2000,
     subscriptionHandshakeGracePeriodInMs:
       subscriptionHandshakeGracePeriodInMs || 1000,
+    subscriptionUseWebSocketTransport,
   });
 
   const stream = new ResponseStreamMock<SubscribeResponse>();
@@ -324,6 +326,10 @@ describe(SceneTreeController, () => {
   });
 
   describe('subscription', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('subscribes to remote changes', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
@@ -334,6 +340,52 @@ describe(SceneTreeController, () => {
 
       const req = new SubscribeRequest();
       expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+    });
+
+    it('subscribes using a websocket transport', async () => {
+      const { controller, client } = createController(10, undefined, true);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const webSocketTransportSpy = jest.spyOn(grpc, 'WebsocketTransport');
+      const crossBrowserHttpTransportSpy = jest.spyOn(
+        grpc,
+        'CrossBrowserHttpTransport'
+      );
+      await controller.connect(jwtProvider);
+
+      const req = new SubscribeRequest();
+      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+      expect(webSocketTransportSpy).toHaveBeenCalled();
+      expect(crossBrowserHttpTransportSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          withCredentials: false,
+        })
+      );
+    });
+
+    it('subscribes without a websocket transport', async () => {
+      const { controller, client } = createController(10, undefined, false);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const webSocketTransportSpy = jest.spyOn(grpc, 'WebsocketTransport');
+      const crossBrowserHttpTransportSpy = jest.spyOn(
+        grpc,
+        'CrossBrowserHttpTransport'
+      );
+      await controller.connect(jwtProvider);
+
+      const req = new SubscribeRequest();
+      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+      expect(webSocketTransportSpy).not.toHaveBeenCalled();
+      expect(crossBrowserHttpTransportSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          withCredentials: false,
+        })
+      );
     });
 
     it('should invalidate the tree on subscription failures', async () => {
