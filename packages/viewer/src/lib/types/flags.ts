@@ -28,8 +28,14 @@ type Flag =
    * are larger than the supported maximum image size (1080p). By default
    * this option is disabled, and images will be scaled up to match the host.
    */
-  | 'letterboxFrames';
+  | 'letterboxFrames'
 
+  /**
+   * Enables or disables the use of the `grpc.WebsocketTransport` for streaming
+   * RPCs. By default this transport will be used, and streaming messages will
+   * be sent over WebSocket.
+   */
+  | 'grpcUseStreamingWebSocketTransport';
 /**
  * A set of experimental features that can be enabled through the viewer's
  * config.
@@ -42,6 +48,7 @@ export const defaultFlags: Flags = {
   logWsMessages: false,
   logFrameRate: false,
   letterboxFrames: false,
+  grpcUseStreamingWebSocketTransport: true,
 };
 
 export function createFlags(

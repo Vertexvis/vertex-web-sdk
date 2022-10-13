@@ -31,8 +31,10 @@ import {
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import { sign } from 'jsonwebtoken';
 
+import { Config } from '../../lib/config';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { ViewerStream } from '../../lib/stream/stream';
+import { defaultFlags } from '../../lib/types/flags';
 import {
   createGetTreeResponse,
   mockGrpcUnaryError,
@@ -56,6 +58,7 @@ import {
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
 } from './lib/dom';
+import { webSocketSubscriptionTransportFactory } from './lib/grpc';
 import { decodeSceneTreeJwt } from './lib/jwt';
 import {
   deselectItem,
@@ -242,6 +245,50 @@ describe('<vertex-scene-tree>', () => {
       expect(errorMessage?.firstChild?.firstChild?.nodeValue).toEqual(
         'Could not find reference to the viewer'
       );
+    });
+
+    it('initializes the default controller with a custom transport for subscriptions by default', async () => {
+      await newSpecPage({
+        components: [SceneTree],
+        template: () => <vertex-scene-tree></vertex-scene-tree>,
+      });
+
+      expect(SceneTreeAPIClient).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          transport: webSocketSubscriptionTransportFactory,
+        })
+      );
+    });
+
+    it('initializes the default controller with a default transport if the flag is disabled', async () => {
+      await newSpecPage({
+        components: [SceneTree],
+        template: () => (
+          <vertex-scene-tree
+            config={
+              {
+                flags: {
+                  ...defaultFlags,
+                  grpcUseStreamingWebSocketTransport: false,
+                },
+              } as unknown as Config
+            }
+          ></vertex-scene-tree>
+        ),
+      });
+
+      expect(SceneTreeAPIClient).toHaveBeenCalledWith(
+        expect.any(String),
+        undefined
+      );
+    });
+  });
+
+  describe('controller initialization', () => {
+    it('subscribes using a websocket transport by default', async () => {
+      const client = mockSceneTreeClient();
+      mockGetTree({ client });
     });
   });
 
