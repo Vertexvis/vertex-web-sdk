@@ -616,7 +616,7 @@ export class SceneTree {
       const { sceneTreeHost } = this.getConfig().network;
       const client = new SceneTreeAPIClient(
         sceneTreeHost,
-        this.getConfig().flags.useSubscriptionWebSocketTransport
+        this.getConfig().flags.grpcUseStreamingWebSocketTransport
           ? {
               transport: webSocketSubscriptionTransportFactory,
             }

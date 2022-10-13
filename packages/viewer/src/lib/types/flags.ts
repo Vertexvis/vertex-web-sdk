@@ -31,11 +31,11 @@ type Flag =
   | 'letterboxFrames'
 
   /**
-   * Enables or disables the use of the `grpc.WebsocketTransport` for scene
-   * tree subscriptions. By default, this transport will be used, and
-   * subscription messages will be sent over WebSocket.
+   * Enables or disables the use of the `grpc.WebsocketTransport` for streaming
+   * RPCs. By default this transport will be used, and streaming messages will
+   * be sent over WebSocket.
    */
-  | 'useSubscriptionWebSocketTransport';
+  | 'grpcUseStreamingWebSocketTransport';
 /**
  * A set of experimental features that can be enabled through the viewer's
  * config.
@@ -48,7 +48,7 @@ export const defaultFlags: Flags = {
   logWsMessages: false,
   logFrameRate: false,
   letterboxFrames: false,
-  useSubscriptionWebSocketTransport: true,
+  grpcUseStreamingWebSocketTransport: true,
 };
 
 export function createFlags(

@@ -270,7 +270,7 @@ describe('<vertex-scene-tree>', () => {
               {
                 flags: {
                   ...defaultFlags,
-                  useSubscriptionWebSocketTransport: false,
+                  grpcUseStreamingWebSocketTransport: false,
                 },
               } as unknown as Config
             }
