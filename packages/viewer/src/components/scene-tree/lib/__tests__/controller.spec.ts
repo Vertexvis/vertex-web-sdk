@@ -67,8 +67,7 @@ function signJwt(viewId: string): string {
 
 function createController(
   rowLimit: number,
-  subscriptionHandshakeGracePeriodInMs?: number,
-  subscriptionUseWebSocketTransport = true
+  subscriptionHandshakeGracePeriodInMs?: number
 ): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
@@ -325,10 +324,6 @@ describe(SceneTreeController, () => {
   });
 
   describe('subscription', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
     it('subscribes to remote changes', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
