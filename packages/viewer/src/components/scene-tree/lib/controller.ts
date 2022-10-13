@@ -38,7 +38,6 @@ export interface ConnectOptions {
   idleReconnectInSeconds?: number;
   lostConnectionReconnectInSeconds?: number;
   subscriptionHandshakeGracePeriodInMs?: number;
-  subscriptionUseWebSocketTransport?: boolean;
 }
 
 export type JwtProvider = () => string | undefined;
@@ -164,7 +163,6 @@ export class SceneTreeController {
     private connectOptions: ConnectOptions = {
       spinnerDelay: 2000,
       subscriptionHandshakeGracePeriodInMs: 5000,
-      subscriptionUseWebSocketTransport: true,
     }
   ) {}
 
@@ -991,20 +989,7 @@ export class SceneTreeController {
     req: (metadata: grpc.Metadata) => ResponseStream<R>
   ): ResponseStream<R> {
     const metadata = this.createJwtMetadata(jwt);
-    return this.connectOptions.subscriptionUseWebSocketTransport
-      ? this.serverStreamWithWebSocket(() => req(metadata))
-      : req(metadata);
-  }
-
-  private serverStreamWithWebSocket<R>(
-    req: () => ResponseStream<R>
-  ): ResponseStream<R> {
-    grpc.setDefaultTransport(grpc.WebsocketTransport());
-    const stream = req();
-    grpc.setDefaultTransport(
-      grpc.CrossBrowserHttpTransport({ withCredentials: false })
-    );
-    return stream;
+    return req(metadata);
   }
 
   private createJwtMetadata(jwt: string): grpc.Metadata {

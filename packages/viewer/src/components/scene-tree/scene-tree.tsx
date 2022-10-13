@@ -31,6 +31,7 @@ import {
 } from './lib/controller';
 import { getSceneTreeContainsElement } from './lib/dom';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
+import { webSocketSubscriptionTransportFactory } from './lib/grpc';
 import { isLoadedRow, Row } from './lib/row';
 import {
   deselectItem,
@@ -613,7 +614,14 @@ export class SceneTree {
   protected componentWillLoad(): void {
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
-      const client = new SceneTreeAPIClient(sceneTreeHost);
+      const client = new SceneTreeAPIClient(
+        sceneTreeHost,
+        this.getConfig().flags.useSubscriptionWebSocketTransport
+          ? {
+              transport: webSocketSubscriptionTransportFactory,
+            }
+          : undefined
+      );
       this.controller = new SceneTreeController(client, 100);
     }
 
