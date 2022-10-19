@@ -74,6 +74,16 @@ export function buildSceneOperation(
         },
         operationTypes,
       };
+    case 'volume-intersection':
+      return {
+        volume: {
+          frustumByRectangle: {
+            rectangle: query.rectangle,
+          },
+          exclusive: true,
+          viewport: context.dimensions,
+        },
+      };
     default:
       return {};
   }

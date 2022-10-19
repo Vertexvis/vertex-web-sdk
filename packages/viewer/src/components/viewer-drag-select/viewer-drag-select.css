@@ -1,0 +1,18 @@
+:host {
+  --viewer-drag-select-outline-border-color: blue;
+  --viewer-drag-select-outline-fill-color: blue;
+  --viewer-drag-select-outline-fill-opacity: 0.1;
+}
+
+.outline {
+  position: absolute;
+  border: 1px solid var(--viewer-drag-select-outline-border-color);
+}
+
+.fill {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--viewer-drag-select-outline-fill-color);
+  opacity: var(--viewer-drag-select-outline-fill-opacity);
+}

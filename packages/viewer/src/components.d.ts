@@ -36,6 +36,7 @@ import { Scene } from "./lib/scenes/scene";
 import { ViewerToolbarPlacement } from "./components/viewer-toolbar/viewer-toolbar";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/viewer-toolbar-group";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
+import { ViewerDragSelectController } from "./components/viewer-drag-select/controller";
 import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { ViewerMarkupToolType } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { Markup } from "./lib/types/markup";
@@ -596,6 +597,13 @@ export namespace Components {
         "drawMode": ViewerDomRendererDrawMode;
         /**
           * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerDragSelect {
+        "controller"?: ViewerDragSelectController;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -1274,6 +1282,12 @@ declare global {
         prototype: HTMLVertexViewerDomRendererElement;
         new (): HTMLVertexViewerDomRendererElement;
     };
+    interface HTMLVertexViewerDragSelectElement extends Components.VertexViewerDragSelect, HTMLStencilElement {
+    }
+    var HTMLVertexViewerDragSelectElement: {
+        prototype: HTMLVertexViewerDragSelectElement;
+        new (): HTMLVertexViewerDragSelectElement;
+    };
     interface HTMLVertexViewerIconElement extends Components.VertexViewerIcon, HTMLStencilElement {
     }
     var HTMLVertexViewerIconElement: {
@@ -1416,6 +1430,7 @@ declare global {
         "vertex-viewer-dom-element": HTMLVertexViewerDomElementElement;
         "vertex-viewer-dom-group": HTMLVertexViewerDomGroupElement;
         "vertex-viewer-dom-renderer": HTMLVertexViewerDomRendererElement;
+        "vertex-viewer-drag-select": HTMLVertexViewerDragSelectElement;
         "vertex-viewer-icon": HTMLVertexViewerIconElement;
         "vertex-viewer-layer": HTMLVertexViewerLayerElement;
         "vertex-viewer-markup": HTMLVertexViewerMarkupElement;
@@ -1894,6 +1909,13 @@ declare namespace LocalJSX {
         "drawMode"?: ViewerDomRendererDrawMode;
         /**
           * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
+    interface VertexViewerDragSelect {
+        "controller"?: ViewerDragSelectController;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -2479,6 +2501,7 @@ declare namespace LocalJSX {
         "vertex-viewer-dom-element": VertexViewerDomElement;
         "vertex-viewer-dom-group": VertexViewerDomGroup;
         "vertex-viewer-dom-renderer": VertexViewerDomRenderer;
+        "vertex-viewer-drag-select": VertexViewerDragSelect;
         "vertex-viewer-icon": VertexViewerIcon;
         "vertex-viewer-layer": VertexViewerLayer;
         "vertex-viewer-markup": VertexViewerMarkup;
@@ -2521,6 +2544,7 @@ declare module "@stencil/core" {
             "vertex-viewer-dom-element": LocalJSX.VertexViewerDomElement & JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
             "vertex-viewer-dom-group": LocalJSX.VertexViewerDomGroup & JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
             "vertex-viewer-dom-renderer": LocalJSX.VertexViewerDomRenderer & JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
+            "vertex-viewer-drag-select": LocalJSX.VertexViewerDragSelect & JSXBase.HTMLAttributes<HTMLVertexViewerDragSelectElement>;
             "vertex-viewer-icon": LocalJSX.VertexViewerIcon & JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
             "vertex-viewer-layer": LocalJSX.VertexViewerLayer & JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
             "vertex-viewer-markup": LocalJSX.VertexViewerMarkup & JSXBase.HTMLAttributes<HTMLVertexViewerMarkupElement>;
