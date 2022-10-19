@@ -82,6 +82,7 @@ export class PinModel {
   private selectedPinId?: string;
 
   private entitiesChanged = new EventDispatcher<Pin[]>();
+  private pinAdded = new EventDispatcher<Pin[]>();
   private selectionChanged = new EventDispatcher<string | undefined>();
 
   /**
@@ -99,6 +100,7 @@ export class PinModel {
 
       if (!surpressEvent) {
         this.entitiesChanged.emit(this.getPins());
+        this.pinAdded.emit(this.getPins());
       }
       return true;
     } else {
@@ -173,6 +175,7 @@ export class PinModel {
       [pin.id]: pin,
     };
     this.entitiesChanged.emit(this.getPins());
+    this.pinAdded.emit(this.getPins());
 
     return true;
   }
@@ -206,6 +209,16 @@ export class PinModel {
    */
   public onEntitiesChanged(listener: Listener<Pin[]>): Disposable {
     return this.entitiesChanged.on(listener);
+  }
+
+  /**
+   * Registers an event listener that will be invoked when a pin is added to the model.
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onPinAdded(listener: Listener<Pin[]>): Disposable {
+    return this.pinAdded.on(listener);
   }
 
   /**
