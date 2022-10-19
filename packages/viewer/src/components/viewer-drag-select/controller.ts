@@ -1,7 +1,6 @@
-import { Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { ViewerDragSelectModel } from './model';
+import { DragFinishedEvent, ViewerDragSelectModel } from './model';
 
 export class ViewerDragSelectController {
   private dragEndDisposable?: Disposable;
@@ -17,11 +16,13 @@ export class ViewerDragSelectController {
     this.dragEndDisposable?.dispose();
   }
 
-  public async selectFromBounds(bounds: Rectangle.Rectangle): Promise<void> {
+  public async selectFromBounds(event: DragFinishedEvent): Promise<void> {
     const scene = await this.viewer.scene();
 
     await scene
-      .items((op) => op.where((q) => q.withVolumeIntersection(bounds)).select())
+      .items((op) =>
+        op.where((q) => q.withVolumeIntersection(event.rectangle)).select()
+      )
       .execute();
   }
 }

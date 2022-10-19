@@ -1,9 +1,14 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Rectangle } from '@vertexvis/geometry';
+import classNames from 'classnames';
 
 import { ViewerDragSelectController } from './controller';
 import { ViewerDragSelectInteractionHandler } from './interaction-handler';
-import { ViewerDragSelectModel } from './model';
+import {
+  BoundsChangedEvent,
+  ViewerDragSelectDirection,
+  ViewerDragSelectModel,
+} from './model';
 
 @Component({
   tag: 'vertex-viewer-drag-select',
@@ -23,6 +28,9 @@ export class ViewerDragSelect {
 
   @State()
   private dragRect?: Rectangle.Rectangle;
+
+  @State()
+  private dragDirection?: ViewerDragSelectDirection;
 
   private interactionModel!: ViewerDragSelectModel;
   private interactionHandler?: ViewerDragSelectInteractionHandler;
@@ -64,7 +72,10 @@ export class ViewerDragSelect {
         <vertex-viewer-layer>
           {this.dragRect != null && (
             <div
-              class="outline"
+              class={classNames('outline', {
+                exclusive: this.dragDirection === 'right',
+                inclusive: this.dragDirection === 'left',
+              })}
               style={{
                 left: `${this.dragRect.x}px`,
                 top: `${this.dragRect.y}px`,
@@ -72,7 +83,12 @@ export class ViewerDragSelect {
                 height: `${this.dragRect.height}px`,
               }}
             >
-              <div class="fill" />
+              <div
+                class={classNames('fill', {
+                  exclusive: this.dragDirection === 'right',
+                  inclusive: this.dragDirection === 'left',
+                })}
+              />
             </div>
           )}
         </vertex-viewer-layer>
@@ -80,8 +96,9 @@ export class ViewerDragSelect {
     );
   }
 
-  private handleBoundsChanged(bounds: Rectangle.Rectangle | undefined): void {
-    this.dragRect = bounds;
+  private handleBoundsChanged(event: BoundsChangedEvent): void {
+    this.dragRect = event.rectangle;
+    this.dragDirection = event.direction;
   }
 
   private registerInteractionHandler(viewer: HTMLVertexViewerElement): void {

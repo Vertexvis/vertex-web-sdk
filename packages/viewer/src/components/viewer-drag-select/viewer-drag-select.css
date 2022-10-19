@@ -1,18 +1,36 @@
 :host {
-  --viewer-drag-select-outline-border-color: blue;
-  --viewer-drag-select-outline-fill-color: blue;
+  --viewer-drag-select-outline-exclusive-border-color: #5555ff;
+  --viewer-drag-select-outline-exclusive-border-style: solid;
+  --viewer-drag-select-outline-exclusive-fill-color: blue;
+  --viewer-drag-select-outline-inclusive-border-color: #ff5555;
+  --viewer-drag-select-outline-inclusive-border-style: dashed;
+  --viewer-drag-select-outline-inclusive-fill-color: red;
   --viewer-drag-select-outline-fill-opacity: 0.1;
 }
 
 .outline {
   position: absolute;
-  border: 1px solid var(--viewer-drag-select-outline-border-color);
+}
+
+.outline.exclusive {
+  border: 3px var(--viewer-drag-select-outline-exclusive-border-style) var(--viewer-drag-select-outline-exclusive-border-color);
+}
+
+.outline.inclusive {
+  border: 3px var(--viewer-drag-select-outline-inclusive-border-style) var(--viewer-drag-select-outline-inclusive-border-color);
 }
 
 .fill {
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: var(--viewer-drag-select-outline-fill-color);
   opacity: var(--viewer-drag-select-outline-fill-opacity);
+}
+
+.fill.exclusive {
+  background-color: var(--viewer-drag-select-outline-exclusive-fill-color);
+}
+
+.fill.inclusive {
+  background-color: var(--viewer-drag-select-outline-inclusive-fill-color);
 }
