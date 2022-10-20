@@ -6,8 +6,7 @@
     "version": {
       "allowBranch": [
         "master",
-        "release-temp/*",
-        "PLAT-2146/poc-drag-select"
+        "release-temp/*"
       ]
     }
   }
