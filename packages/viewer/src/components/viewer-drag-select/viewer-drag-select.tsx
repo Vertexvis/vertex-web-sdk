@@ -47,6 +47,11 @@ export class ViewerDragSelect {
     this.handleViewerChanged(this.viewer);
   }
 
+  public disconnectedCallback(): void {
+    this.controller?.dispose();
+    this.interactionHandler?.dispose();
+  }
+
   /**
    * @ignore
    */

@@ -9,6 +9,7 @@ export class ViewerDragSelectController {
     private viewer: HTMLVertexViewerElement,
     private model: ViewerDragSelectModel
   ) {
+    this.selectFromBounds = this.selectFromBounds.bind(this);
     this.dragEndDisposable = this.model.onDragFinished(this.selectFromBounds);
   }
 
