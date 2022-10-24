@@ -443,6 +443,8 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('selects markup when pressed and not disabled', async () => {
+      const selectionChangedListener = jest.fn();
+
       const page = await newSpecPage({
         components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
         html: `
@@ -458,6 +460,7 @@ describe('vertex-viewer-markup', () => {
       const markupEl1 = provided[0];
       const markupEl2 = provided[1];
       const markupEl3 = await el.addMarkup(arrowMarkup);
+      el.addEventListener('markupSelectionChanged', selectionChangedListener);
 
       // Should select, markup has ID
       markupEl1.dispatchEvent(new Event('pointerdown', { bubbles: true }));
@@ -465,20 +468,31 @@ describe('vertex-viewer-markup', () => {
       markupEl1.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl1.id);
+      expect(selectionChangedListener).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: markupEl1 })
+      );
 
       // Should clear selection, markup does not have ID
+      selectionChangedListener.mockClear();
       markupEl2.dispatchEvent(new Event('pointerdown', { bubbles: true }));
       await page.waitForChanges();
       markupEl2.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toBeUndefined();
+      expect(selectionChangedListener).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: undefined })
+      );
 
       // Should select, markup has ID
+      selectionChangedListener.mockClear();
       markupEl3.dispatchEvent(new Event('pointerdown', { bubbles: true }));
       await page.waitForChanges();
       markupEl3.dispatchEvent(new Event('pointerup', { bubbles: true }));
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl3.id);
+      expect(selectionChangedListener).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: markupEl3 })
+      );
     });
 
     it('does not select markup when pressed and disabled', async () => {
