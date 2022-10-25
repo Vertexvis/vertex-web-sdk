@@ -167,10 +167,11 @@ be cloned and added to the component.
 
 ## Events
 
-| Event           | Description                                                                                 | Type                                                                                                                              |
-| --------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `markupAdded`   | Dispatched when a new markup is added, either through user interaction or programmatically. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>` |
-| `markupRemoved` | Dispatched when a markup is removed, either through user interaction or programmatically.   | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>` |
+| Event                    | Description                                                                                                                         | Type                                                                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `markupAdded`            | Dispatched when a new markup is added, either through user interaction or programmatically.                                         | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
+| `markupRemoved`          | Dispatched when a markup is removed, either through user interaction or programmatically.                                           | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
+| `markupSelectionChanged` | Dispatched when markup selection changes. Will either be the selected element or `undefined` indicating that selection was cleared. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement \| undefined>` |
 
 
 ## Methods

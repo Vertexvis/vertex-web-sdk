@@ -109,6 +109,19 @@ export class ViewerMarkup {
     | HTMLVertexViewerMarkupFreeformElement
   >;
 
+  /**
+   * Dispatched when markup selection changes. Will either be the
+   * selected element or `undefined` indicating that selection
+   * was cleared.
+   */
+  @Event()
+  public markupSelectionChanged!: EventEmitter<
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
+    | undefined
+  >;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -253,8 +266,17 @@ export class ViewerMarkup {
   protected async handleSelectedMarkupIdChanged(): Promise<void> {
     const markup = await this.getMarkupElements();
     markup.forEach((m) => {
-      m.mode = m.id === this.selectedMarkupId ? 'edit' : '';
+      if (m.id === this.selectedMarkupId) {
+        m.mode = 'edit';
+        this.markupSelectionChanged.emit(m);
+      } else {
+        m.mode = '';
+      }
     });
+
+    if (this.selectedMarkupId == null) {
+      this.markupSelectionChanged.emit(undefined);
+    }
   }
 
   /**
