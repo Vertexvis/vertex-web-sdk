@@ -11,7 +11,7 @@ dist_tag="canary"
 next_bump=`jq -r '.nextVersionBump' package.json`
 version=`jq -r '.version' lerna.json`
 next_version=`npx semver "$version" --increment "$next_bump"`
-published_canary_versions=`npm view @vertexvis/viewer --json versions | jq --arg version "$next_version-" -r '.[] | select(contains($version))'`
+published_canary_versions=`npm view @vertexvis/viewer --json versions | jq --arg version "$next_version-" -r '.[] | select(contains($version) and contains("canary"))'`
 
 if test -n "$published_canary_versions"
 then
