@@ -1,0 +1,43 @@
+:host {
+  --viewer-intersection-query-outline-exclusive-color: #0099cc;
+  --viewer-intersection-query-outline-exclusive-border-style: solid;
+  --viewer-intersection-query-outline-inclusive-color: #00cc00;
+  --viewer-intersection-query-outline-inclusive-border-style: dashed;
+  --viewer-intersection-query-outline-border-radius: 0.25rem;
+  --viewer-intersection-query-outline-fill-opacity: 0.25;
+}
+
+.bounds {
+  position: absolute;
+}
+
+.outline {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: var(--viewer-intersection-query-outline-border-radius);
+}
+
+:host([exclusive="true"]) .outline {
+  border: 3px var(--viewer-intersection-query-outline-exclusive-border-style) var(--viewer-intersection-query-outline-exclusive-color);
+}
+
+:host([inclusive="true"]) .outline {
+  border: 3px var(--viewer-intersection-query-outline-inclusive-border-style) var(--viewer-intersection-query-outline-inclusive-color);
+}
+
+.fill {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  opacity: var(--viewer-intersection-query-outline-fill-opacity);
+}
+
+:host([exclusive="true"]) .fill {
+  background-color: var(--viewer-intersection-query-outline-exclusive-color);
+}
+
+:host([inclusive="true"]) .fill {
+  background-color: var(--viewer-intersection-query-outline-inclusive-color);
+}
