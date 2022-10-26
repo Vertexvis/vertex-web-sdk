@@ -5,12 +5,10 @@ jest.mock('../../workers/png-decoder-pool');
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 
-import { Scene } from '../..';
 import {
   key1,
   loadViewerStreamKey,
   makeViewerStream,
-  receiveFrame,
 } from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
