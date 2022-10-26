@@ -80,9 +80,10 @@ export function buildSceneOperation(
           frustumByRectangle: {
             rectangle: query.rectangle,
           },
-          exclusive: true,
+          exclusive: query.exclusive,
           viewport: context.dimensions,
         },
+        operationTypes,
       };
     default:
       return {};

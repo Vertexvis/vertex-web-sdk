@@ -51,6 +51,7 @@ interface PointQueryExpression {
 interface VolumeIntersectionQueryExpression {
   type: 'volume-intersection';
   rectangle: Rectangle.Rectangle;
+  exclusive: boolean;
 }
 
 /**
@@ -128,9 +129,10 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   }
 
   public withVolumeIntersection(
-    rectangle: Rectangle.Rectangle
+    rectangle: Rectangle.Rectangle,
+    exclusive?: boolean
   ): VolumeIntersectionQuery {
-    return new VolumeIntersectionQuery(rectangle);
+    return new VolumeIntersectionQuery(rectangle, exclusive);
   }
 }
 
@@ -188,12 +190,16 @@ export class PointQuery implements TerminalQuery {
 }
 
 export class VolumeIntersectionQuery implements TerminalQuery {
-  public constructor(private rectangle: Rectangle.Rectangle) {}
+  public constructor(
+    private rectangle: Rectangle.Rectangle,
+    private exclusive?: boolean
+  ) {}
 
   public build(): VolumeIntersectionQueryExpression {
     return {
       type: 'volume-intersection',
       rectangle: this.rectangle,
+      exclusive: !!this.exclusive,
     };
   }
 }

@@ -34,11 +34,14 @@ export class VolumeIntersectionQueryController {
       builder: SceneItemOperationsBuilder
     ) => SceneItemOperationsBuilder
   ): void {
+    console.log('update operation transform');
     this.operationTransform = operationTransform;
   }
 
   public async execute(): Promise<void> {
+    console.log('execute');
     const screenBounds = this.model.getScreenBounds();
+    const type = this.model.getType();
     this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
     this.model.complete();
 
@@ -47,7 +50,9 @@ export class VolumeIntersectionQueryController {
       scene
         .items((op) =>
           this.operationTransform(
-            op.where((q) => q.withVolumeIntersection(screenBounds))
+            op.where((q) =>
+              q.withVolumeIntersection(screenBounds, type === 'exclusive')
+            )
           )
         )
         .execute();

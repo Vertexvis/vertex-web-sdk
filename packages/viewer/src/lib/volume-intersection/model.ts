@@ -34,15 +34,27 @@ export class VolumeIntersectionQueryModel {
   }
 
   public complete(): void {
-    this.screenBoundsChanged.emit(undefined);
-    this.dragComplete.emit(this.getQueryDetails());
-    this.reset();
+    if (this.startPoint != null && this.endPoint != null) {
+      this.screenBoundsChanged.emit(undefined);
+      this.dragComplete.emit(this.getQueryDetails());
+      this.reset();
+    }
+  }
+
+  public reset(): void {
+    this.startPoint = undefined;
+    this.endPoint = undefined;
+    this.type = undefined;
   }
 
   public getScreenBounds(): Rectangle.Rectangle | undefined {
     return this.startPoint != null && this.endPoint != null
       ? Rectangle.fromPoints(this.startPoint, this.endPoint)
       : undefined;
+  }
+
+  public getType(): QueryType | undefined {
+    return this.type;
   }
 
   public onScreenBoundsChanged(
@@ -81,11 +93,5 @@ export class VolumeIntersectionQueryModel {
           ? 'exclusive'
           : 'inclusive';
     }
-  }
-
-  private reset(): void {
-    this.startPoint = undefined;
-    this.endPoint = undefined;
-    this.type = undefined;
   }
 }

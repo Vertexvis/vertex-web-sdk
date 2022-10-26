@@ -7,6 +7,7 @@ export class VolumeIntersectionQueryInteractionHandler
   implements InteractionHandler
 {
   private element?: HTMLElement;
+  private isInteracting?: boolean;
 
   public constructor(private controller: VolumeIntersectionQueryController) {
     this.handleDragBegin = this.handleDragBegin.bind(this);
@@ -22,16 +23,17 @@ export class VolumeIntersectionQueryInteractionHandler
 
   public dispose(): void {
     this.element?.removeEventListener('pointerdown', this.handleDragBegin);
-    this.element?.removeEventListener('pointermove', this.handleDrag);
-    this.element?.removeEventListener('pointerup', this.handleDragEnd);
+    window.removeEventListener('pointermove', this.handleDrag);
+    window.removeEventListener('pointerup', this.handleDragEnd);
   }
 
   private handleDragBegin(event: PointerEvent): void {
-    if (event.buttons === 1) {
+    if (event.buttons === 1 && !this.isInteracting) {
+      this.isInteracting = true;
       this.controller.setStartPoint(Point.create(event.offsetX, event.offsetY));
 
-      this.element?.addEventListener('pointermove', this.handleDrag);
-      this.element?.addEventListener('pointerup', this.handleDragEnd);
+      window.addEventListener('pointermove', this.handleDrag);
+      window.addEventListener('pointerup', this.handleDragEnd);
     }
   }
 
@@ -41,8 +43,9 @@ export class VolumeIntersectionQueryInteractionHandler
 
   private handleDragEnd(): void {
     this.controller.execute();
+    this.isInteracting = false;
 
-    this.element?.removeEventListener('pointermove', this.handleDrag);
-    this.element?.removeEventListener('pointerup', this.handleDragEnd);
+    window.removeEventListener('pointermove', this.handleDrag);
+    window.removeEventListener('pointerup', this.handleDragEnd);
   }
 }

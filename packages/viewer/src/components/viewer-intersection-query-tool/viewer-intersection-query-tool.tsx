@@ -1,4 +1,5 @@
 import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Disposable } from '@vertexvis/utils';
 
 import { VolumeIntersectionQueryController } from '../../lib/volume-intersection/controller';
 import { VolumeIntersectionQueryInteractionHandler } from '../../lib/volume-intersection/interactions';
@@ -57,19 +58,25 @@ export class ViewerIntersectionQueryTool {
 
   private interactionHandler?: VolumeIntersectionQueryInteractionHandler;
 
+  private screenBoundsChangedDisposable?: Disposable;
+
   public constructor() {
     this.handleScreenBoundsChanged = this.handleScreenBoundsChanged.bind(this);
   }
 
   public componentWillLoad(): void {
-    this.model = new VolumeIntersectionQueryModel();
+    this.model = this.model ?? new VolumeIntersectionQueryModel();
 
-    this.model.onScreenBoundsChanged(this.handleScreenBoundsChanged);
+    this.screenBoundsChangedDisposable = this.model.onScreenBoundsChanged(
+      this.handleScreenBoundsChanged
+    );
 
     this.handleViewerChanged(this.viewer);
   }
 
   public disconnectedCallback(): void {
+    this.model?.reset();
+    this.screenBoundsChangedDisposable?.dispose();
     this.interactionHandler?.dispose();
   }
 
@@ -85,6 +92,7 @@ export class ViewerIntersectionQueryTool {
         this.model,
         newViewer
       );
+      this.handleDefaultOperationChange(this.defaultOperation);
       this.registerInteractionHandler(this.controller, newViewer);
     }
   }
@@ -96,10 +104,10 @@ export class ViewerIntersectionQueryTool {
   protected handleDefaultOperationChange(
     updatedDefaultOperation: DefaultOperationType
   ): void {
-    this.controller?.setOperationTransform((builder) =>
+    this.controller?.setOperationTransform(
       updatedDefaultOperation === 'select'
-        ? builder.select()
-        : builder.deselect()
+        ? (builder) => builder.select()
+        : (builder) => builder.deselect()
     );
   }
 
