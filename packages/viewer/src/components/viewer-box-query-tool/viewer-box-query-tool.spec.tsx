@@ -178,7 +178,7 @@ describe('vertex-viewer-box-query-tool', () => {
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-box-query-tool defaultOperation="deselect"></vertex-viewer-box-query-tool>
+          <vertex-viewer-box-query-tool operationType="deselect"></vertex-viewer-box-query-tool>
         </vertex-viewer>
       ),
     });
