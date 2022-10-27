@@ -23,11 +23,11 @@ type of query to be performed on pointer up is populated on the `<vertex-viewer-
         height: 100%;
       }
 
-      vertex-viewer-intersection-query-tool[inclusive="true"] .my-box {
+      vertex-viewer-box-query-tool[inclusive="true"] .my-box {
         border: 3px solid green;
       }
 
-      vertex-viewer-intersection-query-tool[exclusive="true"] .my-box {
+      vertex-viewer-box-query-tool[exclusive="true"] .my-box {
         border: 3px dotted blue;
       }
     </style>
