@@ -9,14 +9,20 @@ import {
   VolumeIntersectionQueryModel,
 } from '../../lib/volume-intersection/model';
 
-export type DefaultOperationType = 'select' | 'deselect';
+export type VolumeIntersectionQueryType = 'select' | 'deselect';
 
+/**
+ * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
+ * a query for items in a specific area of the viewer. This tool then allows for an
+ * operation to be performed on the items contained (exclusive) by the box or both
+ * contained by and intersecting with (inclusive) the box.
+ */
 @Component({
-  tag: 'vertex-viewer-intersection-query-tool',
-  styleUrl: 'viewer-intersection-query-tool.css',
+  tag: 'vertex-viewer-box-query-tool',
+  styleUrl: 'viewer-box-query-tool.css',
   shadow: true,
 })
-export class ViewerIntersectionQueryTool {
+export class ViewerBoxQueryTool {
   /**
    * The viewer that this component is bound to. This is automatically assigned
    * if added to the light-dom of a parent viewer element.
@@ -26,7 +32,7 @@ export class ViewerIntersectionQueryTool {
 
   /**
    * The controller that is responsible for performing operations using the
-   * intersection query and updating the model.
+   * volume intersection query defined by the drawn box and updating the model.
    */
   @Prop({ mutable: true })
   public controller?: VolumeIntersectionQueryController;
@@ -48,13 +54,13 @@ export class ViewerIntersectionQueryTool {
    * by using the `setOperationTransform` method of the default controller.
    */
   @Prop()
-  public defaultOperation: DefaultOperationType = 'select';
+  public operationType: VolumeIntersectionQueryType = 'select';
 
   @State()
   private details?: VolumeIntersectionQueryDetails;
 
   @Element()
-  private hostEl!: HTMLVertexViewerIntersectionQueryToolElement;
+  private hostEl!: HTMLVertexViewerBoxQueryToolElement;
 
   private interactionHandler?: VolumeIntersectionQueryInteractionHandler;
 
@@ -92,7 +98,7 @@ export class ViewerIntersectionQueryTool {
         this.model,
         newViewer
       );
-      this.handleDefaultOperationChange(this.defaultOperation);
+      this.handleDefaultOperationChange(this.operationType);
       this.registerInteractionHandler(this.controller, newViewer);
     }
   }
@@ -100,12 +106,12 @@ export class ViewerIntersectionQueryTool {
   /**
    * @ignore
    */
-  @Watch('defaultOperation')
+  @Watch('operationType')
   protected handleDefaultOperationChange(
-    updatedDefaultOperation: DefaultOperationType
+    updatedOperationType: VolumeIntersectionQueryType
   ): void {
     this.controller?.setOperationTransform(
-      updatedDefaultOperation === 'select'
+      updatedOperationType === 'select'
         ? (builder) => builder.select()
         : (builder) => builder.deselect()
     );

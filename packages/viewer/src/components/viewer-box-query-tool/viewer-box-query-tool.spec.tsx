@@ -12,20 +12,20 @@ import {
 } from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
-import { ViewerIntersectionQueryTool } from './viewer-intersection-query-tool';
+import { ViewerBoxQueryTool } from './viewer-box-query-tool';
 
-describe('vertex-viewer-intersection-query-tool', () => {
+describe('vertex-viewer-box-query-tool', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders a vertex-viewer-layer', async () => {
     const page = await newSpecPage({
-      components: [ViewerIntersectionQueryTool, ViewerLayer],
-      html: `<vertex-viewer-intersection-query-tool></vertex-viewer-intersection-query-tool>`,
+      components: [ViewerBoxQueryTool, ViewerLayer],
+      html: `<vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>`,
     });
     expect(page.root).toEqualHtml(`
-      <vertex-viewer-intersection-query-tool>
+      <vertex-viewer-box-query-tool>
         <mock:shadow-root>
           <vertex-viewer-layer>
             <mock:shadow-root>
@@ -33,7 +33,7 @@ describe('vertex-viewer-intersection-query-tool', () => {
             </mock:shadow-root>
           </vertex-viewer-layer>
         </mock:shadow-root>
-      </vertex-viewer-intersection-query-tool>
+      </vertex-viewer-box-query-tool>
     `);
   });
 
@@ -41,10 +41,10 @@ describe('vertex-viewer-intersection-query-tool', () => {
     const { stream, ws } = makeViewerStream();
 
     const page = await newSpecPage({
-      components: [Viewer, ViewerIntersectionQueryTool, ViewerLayer],
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-intersection-query-tool></vertex-viewer-intersection-query-tool>
+          <vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>
         </vertex-viewer>
       ),
     });
@@ -56,7 +56,7 @@ describe('vertex-viewer-intersection-query-tool', () => {
 
     const pointerUpEvent = new MouseEvent('pointerup');
 
-    const tool = viewer.querySelector('vertex-viewer-intersection-query-tool');
+    const tool = viewer.querySelector('vertex-viewer-box-query-tool');
     const layer = tool?.shadowRoot?.querySelector('vertex-viewer-layer');
 
     let bounds = layer?.querySelector('div.bounds');
@@ -79,10 +79,10 @@ describe('vertex-viewer-intersection-query-tool', () => {
     const { stream, ws } = makeViewerStream();
 
     const page = await newSpecPage({
-      components: [Viewer, ViewerIntersectionQueryTool, ViewerLayer],
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-intersection-query-tool></vertex-viewer-intersection-query-tool>
+          <vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>
         </vertex-viewer>
       ),
     });
@@ -127,10 +127,10 @@ describe('vertex-viewer-intersection-query-tool', () => {
     const { stream, ws } = makeViewerStream();
 
     const page = await newSpecPage({
-      components: [Viewer, ViewerIntersectionQueryTool, ViewerLayer],
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-intersection-query-tool></vertex-viewer-intersection-query-tool>
+          <vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>
         </vertex-viewer>
       ),
     });
@@ -175,10 +175,10 @@ describe('vertex-viewer-intersection-query-tool', () => {
     const { stream, ws } = makeViewerStream();
 
     const page = await newSpecPage({
-      components: [Viewer, ViewerIntersectionQueryTool, ViewerLayer],
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-intersection-query-tool defaultOperation="deselect"></vertex-viewer-intersection-query-tool>
+          <vertex-viewer-box-query-tool defaultOperation="deselect"></vertex-viewer-box-query-tool>
         </vertex-viewer>
       ),
     });
