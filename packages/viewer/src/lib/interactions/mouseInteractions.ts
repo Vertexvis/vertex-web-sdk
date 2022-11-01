@@ -242,12 +242,12 @@ export class TwistInteraction extends MouseInteraction {
     canvasPosition: Point.Point,
     api: InteractionApi
   ): void {
-    this.currentPosition = Point.create(event.clientX, event.clientY);
+    this.currentPosition = Point.create(event.offsetX, event.offsetY);
     api.beginInteraction();
   }
 
   public drag(event: MouseEvent, api: InteractionApi): void {
-    const position = Point.create(event.clientX, event.clientY);
+    const position = Point.create(event.offsetX, event.offsetY);
     this.currentPosition = position;
 
     api.twistCamera(position);
