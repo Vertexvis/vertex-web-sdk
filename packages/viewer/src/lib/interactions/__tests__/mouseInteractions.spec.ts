@@ -241,9 +241,19 @@ describe(ZoomInteraction, () => {
 describe(TwistInteraction, () => {
   const api = new InteractionApiMock();
 
-  const event1 = new MouseEvent('mousemove', { screenX: 10, screenY: 5 });
-  const event2 = new MouseEvent('mousemove', { screenX: 15, screenY: 10 });
-  const event3 = new MouseEvent('mousemove', { screenX: 25, screenY: 20 });
+  function createMouseEventWithOffset(
+    type: string,
+    offset: Point.Point
+  ): MouseEvent {
+    const event = new MouseEvent(type);
+    Object.defineProperty(event, 'offsetX', { value: offset.x });
+    Object.defineProperty(event, 'offsetY', { value: offset.y });
+    return event;
+  }
+
+  const event1 = createMouseEventWithOffset('mousemove', Point.create(10, 5));
+  const event2 = createMouseEventWithOffset('mousemove', Point.create(15, 10));
+  const event3 = createMouseEventWithOffset('mousemove', Point.create(25, 20));
 
   const canvasPoint = Point.create(0, 0);
 
@@ -257,20 +267,15 @@ describe(TwistInteraction, () => {
   });
 
   describe(TwistInteraction.prototype.drag, () => {
-    it('should transform the camera for each drag event', () => {
+    it('should transform the camera for each drag event using offset values', () => {
       const interaction = new TwistInteraction();
       interaction.beginDrag(event1, canvasPoint, api);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
       expect(api.twistCamera).toHaveBeenCalledTimes(2);
-    });
-
-    it('does nothing if begin drag has not been called', () => {
-      const interaction = new ZoomInteraction();
-      interaction.drag(event1, api);
-
-      expect(api.zoomCamera).not.toHaveBeenCalled();
+      expect(api.twistCamera).toHaveBeenCalledWith(Point.create(15, 10));
+      expect(api.twistCamera).toHaveBeenCalledWith(Point.create(25, 20));
     });
   });
 
