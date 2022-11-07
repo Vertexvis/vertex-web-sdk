@@ -87,7 +87,7 @@ export class VolumeIntersectionQueryModel {
   }
 
   private updateQueryType(): void {
-    if (this.startPoint != null && this.endPoint) {
+    if (this.startPoint != null && this.endPoint != null) {
       this.type =
         Point.subtract(this.endPoint, this.startPoint).x > 0
           ? 'exclusive'

@@ -16,7 +16,8 @@ export class VolumeIntersectionQueryController {
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
-    private viewer: HTMLVertexViewerElement
+    private viewer: HTMLVertexViewerElement,
+    private maxInFlightOperations = DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT
   ) {
     this.operationTransform = (builder) => builder.select();
   }
@@ -48,7 +49,7 @@ export class VolumeIntersectionQueryController {
 
     if (
       screenBounds != null &&
-      this.inFlightOperations < DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT
+      this.inFlightOperations < this.maxInFlightOperations
     ) {
       this.inFlightOperations = this.inFlightOperations + 1;
       try {
@@ -68,11 +69,9 @@ export class VolumeIntersectionQueryController {
       } finally {
         this.inFlightOperations = this.inFlightOperations - 1;
       }
-    } else if (
-      this.inFlightOperations >= DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT
-    ) {
+    } else if (this.inFlightOperations >= this.maxInFlightOperations) {
       throw new Error(
-        `Unable to perform volume intersection query due to the limit of ${DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT}.`
+        `Unable to perform volume intersection query due to the limit of ${this.maxInFlightOperations}.`
       );
     }
   }
