@@ -237,17 +237,21 @@ export class PanInteraction extends MouseInteraction {
 export class TwistInteraction extends MouseInteraction {
   public type: InteractionType = 'twist';
 
+  private canvasRect?: DOMRect;
+
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
+    element: HTMLElement
   ): void {
     this.currentPosition = Point.create(event.offsetX, event.offsetY);
+    this.canvasRect = element.getBoundingClientRect();
     api.beginInteraction();
   }
 
   public drag(event: MouseEvent, api: InteractionApi): void {
-    const position = Point.create(event.offsetX, event.offsetY);
+    const position = getMouseClientPosition(event, this.canvasRect);
     this.currentPosition = position;
 
     api.twistCamera(position);
