@@ -241,48 +241,49 @@ describe(ZoomInteraction, () => {
 describe(TwistInteraction, () => {
   const api = new InteractionApiMock();
 
-  function createMouseEventWithOffset(
-    type: string,
-    offset: Point.Point
-  ): MouseEvent {
-    const event = new MouseEvent(type);
-    Object.defineProperty(event, 'offsetX', { value: offset.x });
-    Object.defineProperty(event, 'offsetY', { value: offset.y });
-    return event;
-  }
-
-  const event1 = createMouseEventWithOffset('mousemove', Point.create(10, 5));
-  const event2 = createMouseEventWithOffset('mousemove', Point.create(15, 10));
-  const event3 = createMouseEventWithOffset('mousemove', Point.create(25, 20));
+  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
+  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
+  const event3 = new MouseEvent('mousemove', { clientX: 25, clientY: 20 });
 
   const canvasPoint = Point.create(0, 0);
+
+  const mockElement = {
+    getBoundingClientRect() {
+      return {
+        left: 10,
+        top: 10,
+        width: 100,
+        height: 100,
+      };
+    },
+  } as unknown as HTMLElement;
 
   describe(TwistInteraction.prototype.beginDrag, () => {
     it('should start an interaction', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api, mockElement);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
     });
   });
 
   describe(TwistInteraction.prototype.drag, () => {
-    it('should transform the camera for each drag event using offset values', () => {
+    it('should transform the camera for each drag event using bounding rect values', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api, mockElement);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
       expect(api.twistCamera).toHaveBeenCalledTimes(2);
+      expect(api.twistCamera).toHaveBeenCalledWith(Point.create(5, 0));
       expect(api.twistCamera).toHaveBeenCalledWith(Point.create(15, 10));
-      expect(api.twistCamera).toHaveBeenCalledWith(Point.create(25, 20));
     });
   });
 
   describe(TwistInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new TwistInteraction();
-      interaction.beginDrag(event1, canvasPoint, api);
+      interaction.beginDrag(event1, canvasPoint, api, mockElement);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
