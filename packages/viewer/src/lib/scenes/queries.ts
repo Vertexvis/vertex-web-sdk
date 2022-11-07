@@ -1,4 +1,4 @@
-import { Point } from '@vertexvis/geometry';
+import { Point, Rectangle } from '@vertexvis/geometry';
 
 import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperationsBuilder } from './scene';
@@ -48,6 +48,12 @@ interface PointQueryExpression {
   point: Point.Point;
 }
 
+interface VolumeIntersectionQueryExpression {
+  type: 'volume-intersection';
+  rectangle: Rectangle.Rectangle;
+  exclusive: boolean;
+}
+
 /**
  * Represents the sum of all possible types of expressions.
  */
@@ -58,6 +64,7 @@ export type QueryExpression =
   | OrExpression
   | SceneTreeRangeQueryExpression
   | PointQueryExpression
+  | VolumeIntersectionQueryExpression
   | MetadataQueryExpression
   | AllSelectedQueryExpression;
 
@@ -120,6 +127,13 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withPoint(point: Point.Point): PointQuery {
     return new PointQuery(point);
   }
+
+  public withVolumeIntersection(
+    rectangle: Rectangle.Rectangle,
+    exclusive?: boolean
+  ): VolumeIntersectionQuery {
+    return new VolumeIntersectionQuery(rectangle, exclusive);
+  }
 }
 
 export class AllQuery implements TerminalQuery {
@@ -171,6 +185,21 @@ export class PointQuery implements TerminalQuery {
     return {
       type: 'point',
       point: this.point,
+    };
+  }
+}
+
+export class VolumeIntersectionQuery implements TerminalQuery {
+  public constructor(
+    private rectangle: Rectangle.Rectangle,
+    private exclusive?: boolean
+  ) {}
+
+  public build(): VolumeIntersectionQueryExpression {
+    return {
+      type: 'volume-intersection',
+      rectangle: this.rectangle,
+      exclusive: !!this.exclusive,
     };
   }
 }
