@@ -64,6 +64,9 @@ import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
 import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
 import { Scene } from './lib/scenes/scene';
+import { VolumeIntersectionQueryController } from './lib/volume-intersection/controller';
+import { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
+import { VolumeIntersectionQueryType } from './components/viewer-box-query-tool/viewer-box-query-tool';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
@@ -568,6 +571,24 @@ export namespace Components {
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
      */
     viewport: Viewport;
+  }
+  interface VertexViewerBoxQueryTool {
+    /**
+     * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
+     */
+    controller?: VolumeIntersectionQueryController;
+    /**
+     * The model that contains the points representing the corners of the box displayed on screen, the type of the query to be performed, and methods for setting these values.
+     */
+    model?: VolumeIntersectionQueryModel;
+    /**
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `select`, and can be changed to `deselect`.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     */
+    operationType: VolumeIntersectionQueryType;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
@@ -1390,6 +1411,13 @@ declare global {
     prototype: HTMLVertexViewerElement;
     new (): HTMLVertexViewerElement;
   };
+  interface HTMLVertexViewerBoxQueryToolElement
+    extends Components.VertexViewerBoxQueryTool,
+      HTMLStencilElement {}
+  var HTMLVertexViewerBoxQueryToolElement: {
+    prototype: HTMLVertexViewerBoxQueryToolElement;
+    new (): HTMLVertexViewerBoxQueryToolElement;
+  };
   interface HTMLVertexViewerButtonElement
     extends Components.VertexViewerButton,
       HTMLStencilElement {}
@@ -1583,6 +1611,7 @@ declare global {
     'vertex-scene-tree-toolbar': HTMLVertexSceneTreeToolbarElement;
     'vertex-scene-tree-toolbar-group': HTMLVertexSceneTreeToolbarGroupElement;
     'vertex-viewer': HTMLVertexViewerElement;
+    'vertex-viewer-box-query-tool': HTMLVertexViewerBoxQueryToolElement;
     'vertex-viewer-button': HTMLVertexViewerButtonElement;
     'vertex-viewer-default-toolbar': HTMLVertexViewerDefaultToolbarElement;
     'vertex-viewer-dom-element': HTMLVertexViewerDomElementElement;
@@ -1937,6 +1966,24 @@ declare namespace LocalJSX {
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
      */
     viewport?: Viewport;
+  }
+  interface VertexViewerBoxQueryTool {
+    /**
+     * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
+     */
+    controller?: VolumeIntersectionQueryController;
+    /**
+     * The model that contains the points representing the corners of the box displayed on screen, the type of the query to be performed, and methods for setting these values.
+     */
+    model?: VolumeIntersectionQueryModel;
+    /**
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `select`, and can be changed to `deselect`.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     */
+    operationType?: VolumeIntersectionQueryType;
+    /**
+     * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerButton {}
   interface VertexViewerDefaultToolbar {
@@ -2692,6 +2739,7 @@ declare namespace LocalJSX {
     'vertex-scene-tree-toolbar': VertexSceneTreeToolbar;
     'vertex-scene-tree-toolbar-group': VertexSceneTreeToolbarGroup;
     'vertex-viewer': VertexViewer;
+    'vertex-viewer-box-query-tool': VertexViewerBoxQueryTool;
     'vertex-viewer-button': VertexViewerButton;
     'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
     'vertex-viewer-dom-element': VertexViewerDomElement;
@@ -2744,6 +2792,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
       'vertex-viewer': LocalJSX.VertexViewer &
         JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
+      'vertex-viewer-box-query-tool': LocalJSX.VertexViewerBoxQueryTool &
+        JSXBase.HTMLAttributes<HTMLVertexViewerBoxQueryToolElement>;
       'vertex-viewer-button': LocalJSX.VertexViewerButton &
         JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
       'vertex-viewer-default-toolbar': LocalJSX.VertexViewerDefaultToolbar &
