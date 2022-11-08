@@ -325,10 +325,6 @@ export class SceneTreeController {
             console.error('Scene tree controller erred connecting.', e);
           });
         }
-      } else {
-        throw new SceneTreeUnauthorizedError(
-          'Cannot connect scene tree to viewer, JWT is undefined.'
-        );
       }
     };
 

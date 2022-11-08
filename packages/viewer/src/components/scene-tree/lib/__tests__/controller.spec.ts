@@ -276,6 +276,7 @@ describe(SceneTreeController, () => {
           connection: expect.objectContaining({
             type: 'failure',
             details: new SceneTreeErrorDetails(
+              'SUBSCRIPTION_FAILURE',
               SceneTreeErrorCode.SUBSCRIPTION_FAILURE
             ),
           }),
@@ -315,6 +316,7 @@ describe(SceneTreeController, () => {
           connection: expect.objectContaining({
             type: 'failure',
             details: new SceneTreeErrorDetails(
+              'SUBSCRIPTION_FAILURE',
               SceneTreeErrorCode.SUBSCRIPTION_FAILURE
             ),
           }),
