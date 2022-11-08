@@ -1,7 +1,7 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 
-import { buildSceneOperation, toPbSceneViewStateFacets } from '../mapper';
+import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
 
 describe(buildSceneOperation, () => {
   it('maps a clear transform operation', () => {
@@ -29,12 +29,34 @@ describe(buildSceneOperation, () => {
 describe(toPbSceneViewStateFeatures, () => {
   it('maps to SceneViewStateFeature', () => {
     expect(
-      toPbSceneViewStateFacets(['camera', 'material_override'])
+      toPbSceneViewStateFeatures([
+        'Camera',
+        'Material Overrides',
+        'Selection',
+        'Visibility',
+        'Transforms',
+        'Cross Section',
+      ])
     ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_CAMERA,
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_MATERIAL_OVERRIDE,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_SELECTION,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_VISIBILITY,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_TRANSFORM,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION,
+    ]);
+  });
+
+  it('maps to invalid when unknown feature given', () => {
+    expect(toPbSceneViewStateFeatures(['Not a feature'])).toMatchObject([
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_INVALID,
     ]);
   });
 });
