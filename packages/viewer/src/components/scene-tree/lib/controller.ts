@@ -28,7 +28,14 @@ import {
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { MetadataKey } from '../interfaces';
-import { SceneTreeErrorCode, SceneTreeErrorDetails } from './errors';
+import {
+  SceneTreeConnectionCancelledError,
+  SceneTreeError,
+  SceneTreeErrorCode,
+  SceneTreeErrorDetails,
+  SceneTreeOperationFailedError,
+  SceneTreeUnauthorizedError,
+} from './errors';
 import { isGrpcServiceError } from './grpc';
 import { decodeSceneTreeJwt } from './jwt';
 import { fromNodeProto, isLoadedRow, Row } from './row';
@@ -84,6 +91,12 @@ export interface ConnectionFailedState {
   sceneViewId: string;
 }
 
+export interface ConnectionCancelledState {
+  type: 'cancelled';
+  jwtProvider?: JwtProvider;
+  sceneViewId?: string;
+}
+
 /**
  * A set of options to configure tree filtering behavior.
  */
@@ -109,7 +122,8 @@ type ConnectionState =
   | DisconnectedState
   | ConnectingState
   | ConnectedState
-  | ConnectionFailedState;
+  | ConnectionFailedState
+  | ConnectionCancelledState;
 
 /**
  * The `SceneTreeController` is responsible for coordinating interactions of the
@@ -187,7 +201,9 @@ export class SceneTreeController {
     const jwt = jwtProvider();
 
     if (jwt == null) {
-      throw new Error('Cannot connect scene tree. JWT is undefined');
+      throw new SceneTreeUnauthorizedError(
+        'Cannot connect scene tree. JWT is undefined'
+      );
     }
 
     const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
@@ -218,6 +234,7 @@ export class SceneTreeController {
             jwtProvider,
             sceneViewId,
             details: new SceneTreeErrorDetails(
+              'SUBSCRIPTION_FAILURE',
               SceneTreeErrorCode.SUBSCRIPTION_FAILURE
             ),
           },
@@ -236,17 +253,19 @@ export class SceneTreeController {
         },
       });
     } catch (e) {
-      this.updateState({
-        ...this.state,
-        connection: {
-          type: 'failure',
-          jwtProvider,
-          sceneViewId,
-          details: this.getConnectionError(e),
-        },
+      this.ifErrorIsFatal(e, () => {
+        this.updateState({
+          ...this.state,
+          connection: {
+            type: 'failure',
+            jwtProvider,
+            sceneViewId,
+            details: this.getConnectionError(e),
+          },
+        });
+        this.clearHandshakeTimer();
+        throw e;
       });
-      this.clearHandshakeTimer();
-      throw e;
     }
 
     this.startIdleReconnectTimer();
@@ -300,10 +319,16 @@ export class SceneTreeController {
         );
 
         try {
-          await this.connect(() => viewer.token);
+          await this.connect(() => `${viewer.token}a`);
         } catch (e) {
-          console.error('Scene tree controller erred connecting.', e);
+          this.ifErrorIsFatal(e, () => {
+            console.error('Scene tree controller erred connecting.', e);
+          });
         }
+      } else {
+        throw new SceneTreeUnauthorizedError(
+          'Cannot connect scene tree to viewer, JWT is undefined.'
+        );
       }
     };
 
@@ -348,6 +373,32 @@ export class SceneTreeController {
       isSearching: false,
       totalRows: reset ? 0 : this.state.totalRows,
       rows: reset ? [] : this.state.rows,
+    });
+  }
+
+  public cancel(): void {
+    this.log(`Scene tree controller cancelled`);
+
+    this.clearHandshakeTimer();
+    this.clearReconnectTimer();
+
+    this.pages.clear();
+    this.activeRowRange = [];
+
+    const { connection } = this.state;
+    if (connection.type === 'connected') {
+      connection.subscription.dispose();
+    }
+
+    this.updateState({
+      connection: {
+        type: 'cancelled',
+        jwtProvider: connection.jwtProvider,
+        sceneViewId: connection.sceneViewId,
+      },
+      isSearching: false,
+      totalRows: 0,
+      rows: [],
     });
   }
 
@@ -439,7 +490,9 @@ export class SceneTreeController {
       }
 
       if (locatedIndex == null) {
-        throw new Error('Cannot locate node. Location index is undefined.');
+        throw new SceneTreeOperationFailedError(
+          'Cannot locate node. Location index is undefined.'
+        );
       }
 
       return locatedIndex.value;
@@ -978,7 +1031,11 @@ export class SceneTreeController {
         } else if (res != null) {
           resolve(res);
         } else {
-          reject(new Error('Invalid response. Both error and result are null'));
+          reject(
+            new SceneTreeError(
+              'Invalid response. Both error and result are null'
+            )
+          );
         }
       });
     });
@@ -1005,12 +1062,22 @@ export class SceneTreeController {
       if (jwt != null) {
         return then(jwt);
       } else {
-        throw new Error(
+        throw new SceneTreeUnauthorizedError(
           'SceneTreeController cannot perform request. Viewer JWT is undefined.'
         );
       }
+    } else if (connection.type === 'cancelled') {
+      throw new SceneTreeConnectionCancelledError(
+        `Request attempted, but controller was cancelled`
+      );
     } else {
-      throw new Error('SceneTreeController is not in connected state');
+      throw new SceneTreeError('SceneTreeController is not in connected state');
+    }
+  }
+
+  private ifErrorIsFatal(error: unknown, then: VoidFunction): void {
+    if (!(error instanceof SceneTreeConnectionCancelledError)) {
+      then();
     }
   }
 
@@ -1020,13 +1087,24 @@ export class SceneTreeController {
     if (isGrpcServiceError(e)) {
       if (e.code === grpc.Code.FailedPrecondition) {
         return new SceneTreeErrorDetails(
+          'SCENE_TREE_DISABLED',
           SceneTreeErrorCode.SCENE_TREE_DISABLED
         );
+      } else if (e.code === grpc.Code.Unauthenticated) {
+        return new SceneTreeErrorDetails(
+          'UNAUTHORIZED',
+          SceneTreeErrorCode.UNAUTHORIZED
+        );
       } else {
-        return new SceneTreeErrorDetails(SceneTreeErrorCode.UNKNOWN);
+        return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
       }
+    } else if (e instanceof SceneTreeUnauthorizedError) {
+      return new SceneTreeErrorDetails(
+        'UNAUTHORIZED',
+        SceneTreeErrorCode.UNAUTHORIZED
+      );
     } else {
-      return new SceneTreeErrorDetails(SceneTreeErrorCode.UNKNOWN);
+      return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
     }
   }
 
@@ -1047,7 +1125,8 @@ export class SceneTreeController {
   }
 
   private log(message?: string, ...optionalParams: unknown[]): void {
-    if (this.debugLogs) {
+    // if (this.debugLogs) {
+    if (true) {
       console.debug(message, optionalParams);
     }
   }
