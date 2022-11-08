@@ -1125,8 +1125,7 @@ export class SceneTreeController {
   }
 
   private log(message?: string, ...optionalParams: unknown[]): void {
-    // if (this.debugLogs) {
-    if (true) {
+    if (this.debugLogs) {
       console.debug(message, optionalParams);
     }
   }
