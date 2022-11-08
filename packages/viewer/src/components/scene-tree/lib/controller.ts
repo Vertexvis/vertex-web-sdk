@@ -319,7 +319,7 @@ export class SceneTreeController {
         );
 
         try {
-          await this.connect(() => `${viewer.token}a`);
+          await this.connect(() => viewer.token);
         } catch (e) {
           this.ifErrorIsFatal(e, () => {
             console.error('Scene tree controller erred connecting.', e);
