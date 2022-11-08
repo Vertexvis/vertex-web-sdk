@@ -233,3 +233,33 @@ function buildOperationTypes(
     }
   });
 }
+
+export function toPbSceneViewStateFeatures(
+  features: string[]
+): vertexvis.protobuf.stream.SceneViewStateFeature[] {
+  return features.map((feature) => {
+    switch (feature) {
+      case 'Camera':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_CAMERA;
+      case 'Material Overrides':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_MATERIAL_OVERRIDE;
+      case 'Selection':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_SELECTION;
+      case 'Visibility':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_VISIBILITY;
+      case 'Transforms':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_TRANSFORM;
+      case 'Cross Section':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION;
+      default:
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_INVALID;
+    }
+  });
+}

@@ -9,7 +9,7 @@ import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation } from './mapper';
+import { buildSceneOperation, toPbSceneViewStateFeatures } from './mapper';
 import {
   ItemOperation,
   SceneItemOperations,
@@ -254,6 +254,28 @@ export class Scene {
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
+      },
+      true
+    );
+  }
+
+  /**
+   * Applies the specified features of the provided scene view state to the scene.
+   */
+  public async applyPartialSceneViewState(
+    sceneViewStateId: UUID.UUID,
+    featuresToApply: string[],
+    opts: SceneExecutionOptions = {}
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
+
+    return await this.stream.loadSceneViewState(
+      {
+        sceneViewStateId: { hex: sceneViewStateId },
+        frameCorrelationId: opts.suppliedCorrelationId
+          ? { value: opts.suppliedCorrelationId }
+          : undefined,
+        sceneViewStateFeatureSubset: pbFeatures,
       },
       true
     );

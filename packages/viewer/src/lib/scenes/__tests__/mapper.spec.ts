@@ -1,6 +1,7 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 
-import { buildSceneOperation } from '../mapper';
+import { buildSceneOperation, toPbSceneViewStateFacets } from '../mapper';
 
 describe(buildSceneOperation, () => {
   it('maps a clear transform operation', () => {
@@ -22,5 +23,18 @@ describe(buildSceneOperation, () => {
         },
       ],
     });
+  });
+});
+
+describe(toPbSceneViewStateFeatures, () => {
+  it('maps to SceneViewStateFeature', () => {
+    expect(
+      toPbSceneViewStateFacets(['camera', 'material_override'])
+    ).toMatchObject([
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_CAMERA,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_MATERIAL_OVERRIDE,
+    ]);
   });
 });
