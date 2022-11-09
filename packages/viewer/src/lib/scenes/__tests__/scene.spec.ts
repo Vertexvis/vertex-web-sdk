@@ -465,7 +465,7 @@ describe(Scene, () => {
   describe(Scene.prototype.applyPartialSceneViewState, () => {
     it('should applyPartialSceneViewState', async () => {
       const mockSceneViewStateId = new Uuid();
-      await scene.applyPartialSceneViewState(mockSceneViewStateId, ['Camera'], {
+      await scene.applyPartialSceneViewState(mockSceneViewStateId, ['camera'], {
         suppliedCorrelationId: 'foo',
       });
 

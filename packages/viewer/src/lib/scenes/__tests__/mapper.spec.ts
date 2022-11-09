@@ -30,12 +30,12 @@ describe(toPbSceneViewStateFeatures, () => {
   it('maps to SceneViewStateFeature', () => {
     expect(
       toPbSceneViewStateFeatures([
-        'Camera',
-        'Material Overrides',
-        'Selection',
-        'Visibility',
-        'Transforms',
-        'Cross Section',
+        'camera',
+        'material_overrides',
+        'selection',
+        'visibility',
+        'transforms',
+        'cross_section',
       ])
     ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
