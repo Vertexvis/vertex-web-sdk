@@ -249,6 +249,67 @@ describe(SceneTreeController, () => {
       );
     });
 
+    it('does not throw an error if the controller is cancelled before a connection completes', async () => {
+      const { controller, client } = createController(10);
+      const getTree = createGetTreeResponse(10, 100, (node) =>
+        node.setVisible(false)
+      );
+      (client.getTree as jest.Mock).mockImplementation(async (...args) => {
+        await new Promise((resolve) => setTimeout(resolve, 25));
+        mockGrpcUnaryResult(getTree)(...args);
+      });
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+
+      const connectPromise = controller.connect(jwtProvider);
+      controller.cancel();
+
+      await expect(connectPromise).resolves.not.toThrow();
+
+      expect(onStateChange).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'failure',
+          }),
+        })
+      );
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'cancelled',
+          }),
+        })
+      );
+    });
+
+    it('includes unauthorized in error details', async () => {
+      const { controller, client } = createController(10);
+      const error = { code: grpc.Code.Unauthenticated, metadata: {} };
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryError(error)
+      );
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+
+      await expect(controller.connect(jwtProvider)).rejects.toMatchObject(
+        error
+      );
+
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'failure',
+            details: new SceneTreeErrorDetails(
+              'UNAUTHORIZED',
+              SceneTreeErrorCode.UNAUTHORIZED
+            ),
+          }),
+        })
+      );
+    });
+
     it('emits subscription failure if no handshake is received within the timeout', async () => {
       const subscriptionHandshakeTimeout = 50;
       const { controller, client } = createController(
