@@ -606,6 +606,7 @@ export class SceneTree {
    */
   protected disconnectedCallback(): void {
     this.stateMap.viewerDisposable?.dispose();
+    this.controller?.cancel();
   }
 
   /**
@@ -652,6 +653,7 @@ export class SceneTree {
 
     if (this.viewer == null) {
       this.errorDetails = new SceneTreeErrorDetails(
+        'MISSING_VIEWER',
         SceneTreeErrorCode.MISSING_VIEWER
       );
     }
@@ -822,6 +824,7 @@ export class SceneTree {
       this.connectionError.emit(state.connection.details);
     } else if (state.connection.type === 'disconnected') {
       this.errorDetails = new SceneTreeErrorDetails(
+        'DISCONNECTED',
         SceneTreeErrorCode.DISCONNECTED
       );
     } else {

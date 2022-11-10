@@ -247,6 +247,29 @@ describe('<vertex-scene-tree>', () => {
       );
     });
 
+    it('cancels the controller when the component is disconnected', async () => {
+      const client = mockSceneTreeClient();
+      mockGetTree({ client });
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page } = await newSceneTreeSpec({
+        controller,
+        stream,
+        viewerSelector: '#viewer',
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await page.waitForChanges();
+
+      const cancelSpy = jest.spyOn(controller, 'cancel');
+
+      tree.remove();
+
+      expect(cancelSpy).toHaveBeenCalled();
+    });
+
     it('initializes the default controller with a custom transport for subscriptions by default', async () => {
       await newSpecPage({
         components: [SceneTree],
