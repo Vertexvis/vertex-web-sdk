@@ -1,6 +1,8 @@
 jest.mock('@vertexvis/stream-api');
 
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { random } from '../../../testing';
@@ -437,6 +439,44 @@ describe(Scene, () => {
         {
           frameCorrelationId: { value: 'foo' },
           includeCamera: true,
+        },
+        true
+      );
+    });
+  });
+
+  describe(Scene.prototype.applySceneViewState, () => {
+    it('should applySceneViewState', async () => {
+      const mockSceneViewStateId = new Uuid();
+      await scene.applySceneViewState(mockSceneViewStateId, {
+        suppliedCorrelationId: 'foo',
+      });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+        },
+        true
+      );
+    });
+  });
+
+  describe(Scene.prototype.applyPartialSceneViewState, () => {
+    it('should applyPartialSceneViewState', async () => {
+      const mockSceneViewStateId = new Uuid();
+      await scene.applyPartialSceneViewState(mockSceneViewStateId, ['camera'], {
+        suppliedCorrelationId: 'foo',
+      });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+          sceneViewStateFeatureSubset: [
+            vertexvis.protobuf.stream.SceneViewStateFeature
+              .SCENE_VIEW_STATE_FEATURE_CAMERA,
+          ],
         },
         true
       );
