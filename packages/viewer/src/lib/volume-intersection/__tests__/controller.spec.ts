@@ -1,9 +1,6 @@
 import { Point } from '@vertexvis/geometry';
 
-import {
-  DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT,
-  VolumeIntersectionQueryController,
-} from '../controller';
+import { VolumeIntersectionQueryController } from '../controller';
 import { VolumeIntersectionQueryModel } from '../model';
 
 describe('volume intersection controller', () => {
@@ -45,15 +42,13 @@ describe('volume intersection controller', () => {
       return controller.execute();
     }
 
-    const promises = new Array(DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT)
-      .fill(undefined)
-      .map(() => drag());
+    const firstDrag = drag();
 
     await expect(drag()).rejects.toThrow();
 
     jest.advanceTimersByTime(500);
 
-    await Promise.all(promises);
+    await firstDrag;
 
     mockExecute.mockImplementation(async () => {
       return;

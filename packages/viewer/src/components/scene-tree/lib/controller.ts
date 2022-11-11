@@ -906,6 +906,8 @@ export class SceneTreeController {
 
         if (this.isViewLoading(rows) && this.loadingTimer == null) {
           this.loadingTimer = window.setTimeout(() => {
+            const state = this.getState();
+            console.log(state);
             this.updateState({
               ...this.getState(),
               shouldShowLoading: true,

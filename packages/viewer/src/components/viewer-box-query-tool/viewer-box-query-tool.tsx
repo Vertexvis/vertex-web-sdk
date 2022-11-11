@@ -63,6 +63,7 @@ export class ViewerBoxQueryTool {
   private hostEl!: HTMLVertexViewerBoxQueryToolElement;
 
   private interactionHandler?: VolumeIntersectionQueryInteractionHandler;
+  private interactionHandlerDisposable?: Disposable;
 
   private screenBoundsChangedDisposable?: Disposable;
 
@@ -83,7 +84,7 @@ export class ViewerBoxQueryTool {
   public disconnectedCallback(): void {
     this.model?.reset();
     this.screenBoundsChangedDisposable?.dispose();
-    this.interactionHandler?.dispose();
+    this.deregisterInteractionHandler();
   }
 
   /**
@@ -154,17 +155,20 @@ export class ViewerBoxQueryTool {
     this.updateTypeAttribute(details?.type);
   }
 
-  private registerInteractionHandler(
+  private async registerInteractionHandler(
     controller: VolumeIntersectionQueryController,
     viewer: HTMLVertexViewerElement
-  ): void {
+  ): Promise<void> {
     this.interactionHandler = new VolumeIntersectionQueryInteractionHandler(
       controller
     );
-    viewer.registerInteractionHandler(this.interactionHandler);
+    this.interactionHandlerDisposable = await viewer.registerInteractionHandler(
+      this.interactionHandler
+    );
   }
 
   private deregisterInteractionHandler(): void {
+    this.interactionHandlerDisposable?.dispose();
     this.interactionHandler?.dispose();
     this.interactionHandler = undefined;
   }

@@ -1,5 +1,8 @@
 import { Point } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
+import { boxQueryCursor } from '../cursors';
+import { InteractionApi } from '../interactions';
 import { InteractionHandler } from '../interactions/interactionHandler';
 import { VolumeIntersectionQueryController } from './controller';
 
@@ -7,7 +10,10 @@ export class VolumeIntersectionQueryInteractionHandler
   implements InteractionHandler
 {
   private element?: HTMLElement;
+  private api?: InteractionApi;
   private isInteracting?: boolean;
+  private crosshairCursorDisposable?: Disposable;
+  private waitCursorDisposable?: Disposable;
 
   public constructor(private controller: VolumeIntersectionQueryController) {
     this.handleDragBegin = this.handleDragBegin.bind(this);
@@ -15,16 +21,22 @@ export class VolumeIntersectionQueryInteractionHandler
     this.handleDragEnd = this.handleDragEnd.bind(this);
   }
 
-  public initialize(element: HTMLElement): void {
+  public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
+    this.api = api;
 
     this.element.addEventListener('pointerdown', this.handleDragBegin);
+    this.addCrosshairCursor();
   }
 
   public dispose(): void {
     this.element?.removeEventListener('pointerdown', this.handleDragBegin);
     window.removeEventListener('pointermove', this.handleDrag);
     window.removeEventListener('pointerup', this.handleDragEnd);
+    this.crosshairCursorDisposable?.dispose();
+
+    this.element = undefined;
+    this.api = undefined;
   }
 
   private handleDragBegin(event: PointerEvent): void {
@@ -41,11 +53,27 @@ export class VolumeIntersectionQueryInteractionHandler
     this.controller.setEndPoint(Point.create(event.offsetX, event.offsetY));
   }
 
-  private handleDragEnd(): void {
-    this.controller.execute();
+  private async handleDragEnd(): Promise<void> {
     this.isInteracting = false;
 
     window.removeEventListener('pointermove', this.handleDrag);
     window.removeEventListener('pointerup', this.handleDragEnd);
+
+    this.crosshairCursorDisposable?.dispose();
+    this.addWaitCursor();
+    try {
+      await this.controller.execute();
+    } finally {
+      this.waitCursorDisposable?.dispose();
+      this.addCrosshairCursor();
+    }
+  }
+
+  private addCrosshairCursor(): void {
+    this.crosshairCursorDisposable = this.api?.addCursor(boxQueryCursor);
+  }
+
+  private addWaitCursor(): void {
+    this.waitCursorDisposable = this.api?.addCursor('wait');
   }
 }

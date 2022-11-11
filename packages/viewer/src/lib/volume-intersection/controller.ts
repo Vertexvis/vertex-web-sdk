@@ -3,8 +3,6 @@ import { Point } from '@vertexvis/geometry';
 import { SceneItemOperationsBuilder } from '../scenes';
 import { VolumeIntersectionQueryModel } from './model';
 
-export const DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT = 5;
-
 export type OperationTransform = (
   builder: SceneItemOperationsBuilder
 ) => SceneItemOperationsBuilder;
@@ -12,12 +10,11 @@ export type OperationTransform = (
 export class VolumeIntersectionQueryController {
   private previousViewerCameraControls?: boolean;
   private operationTransform: OperationTransform;
-  private inFlightOperations = 0;
+  private operationInFlight = false;
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
-    private viewer: HTMLVertexViewerElement,
-    private maxInFlightOperations = DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT
+    private viewer: HTMLVertexViewerElement
   ) {
     this.operationTransform = (builder) => builder.select();
   }
@@ -47,11 +44,7 @@ export class VolumeIntersectionQueryController {
     this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
     this.model.complete();
 
-    if (
-      screenBounds != null &&
-      this.inFlightOperations < this.maxInFlightOperations
-    ) {
-      this.inFlightOperations = this.inFlightOperations + 1;
+    if (screenBounds != null && !this.operationInFlight) {
       try {
         const scene = await this.viewer.scene();
         await scene
@@ -67,11 +60,11 @@ export class VolumeIntersectionQueryController {
         console.error('Failed to perform volume intersection query', e);
         throw e;
       } finally {
-        this.inFlightOperations = this.inFlightOperations - 1;
+        this.operationInFlight = false;
       }
-    } else if (this.inFlightOperations >= this.maxInFlightOperations) {
+    } else if (this.operationInFlight) {
       throw new Error(
-        `Unable to perform volume intersection query due to the limit of ${this.maxInFlightOperations}.`
+        `Unable to perform volume intersection query as there is already one in-flight.`
       );
     }
   }
