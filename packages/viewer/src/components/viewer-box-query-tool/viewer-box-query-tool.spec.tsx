@@ -4,6 +4,7 @@ jest.mock('../../workers/png-decoder-pool');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import { Async } from '@vertexvis/utils';
 
 import {
   key1,
@@ -209,6 +210,91 @@ describe('vertex-viewer-box-query-tool', () => {
             operationTypes: expect.arrayContaining([
               {
                 changeSelection: {},
+              },
+            ]),
+          }),
+        ]),
+      })
+    );
+  });
+
+  it('disables the interaction handler while an operation is being executed', async () => {
+    const { stream, ws } = makeViewerStream();
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.root as HTMLVertexViewerElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+    const streamSpy = jest
+      .spyOn(stream, 'createSceneAlteration')
+      .mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return {};
+      });
+
+    await drawInclusiveBox(page, viewer);
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await drawExclusiveBox(page, viewer);
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+    await Async.delay(10);
+
+    await drawExclusiveBox(page, viewer);
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+    await Async.delay(10);
+
+    expect(streamSpy).toHaveBeenCalledTimes(2);
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operations: expect.arrayContaining([
+          expect.objectContaining({
+            volume: {
+              exclusive: false,
+              frustumByRectangle: {
+                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+              },
+              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+            },
+            operationTypes: expect.arrayContaining([
+              {
+                changeSelection: expect.objectContaining({
+                  material: expect.any(Object),
+                }),
+              },
+            ]),
+          }),
+        ]),
+      })
+    );
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operations: expect.arrayContaining([
+          expect.objectContaining({
+            volume: {
+              exclusive: true,
+              frustumByRectangle: {
+                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+              },
+              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+            },
+            operationTypes: expect.arrayContaining([
+              {
+                changeSelection: expect.objectContaining({
+                  material: expect.any(Object),
+                }),
               },
             ]),
           }),
