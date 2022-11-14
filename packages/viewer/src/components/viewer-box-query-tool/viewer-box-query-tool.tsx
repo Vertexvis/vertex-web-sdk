@@ -11,6 +11,8 @@ import {
 
 export type VolumeIntersectionQueryType = 'select' | 'deselect';
 
+export type VolumeIntersectionQueryMode = 'exclusive' | 'inclusive';
+
 /**
  * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
  * a query for items in a specific area of the viewer. This tool then allows for an
@@ -56,6 +58,21 @@ export class ViewerBoxQueryTool {
   @Prop()
   public operationType: VolumeIntersectionQueryType = 'select';
 
+  /**
+   * An optional value to specify a singular mode of intersection query. This value
+   * defaults to `undefined`, which will indicate that both `exclusive` and `inclusive`
+   * queries should be made, with `inclusive` being represented by a left to right
+   * drag behavior and `exclusive` being represented by a right to left drag.
+   *
+   * Setting this value to `inclusive` will cause dragging left to right and left to right
+   * to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.
+   *
+   * Setting this value to `exclusive` will cause dragging left to right and left to right
+   * to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+   */
+  @Prop()
+  public mode?: VolumeIntersectionQueryMode;
+
   @State()
   private details?: VolumeIntersectionQueryDetails;
 
@@ -72,7 +89,7 @@ export class ViewerBoxQueryTool {
   }
 
   public componentWillLoad(): void {
-    this.model = this.model ?? new VolumeIntersectionQueryModel();
+    this.model = this.model ?? new VolumeIntersectionQueryModel(this.mode);
 
     this.screenBoundsChangedDisposable = this.model.onScreenBoundsChanged(
       this.handleScreenBoundsChanged
@@ -116,6 +133,14 @@ export class ViewerBoxQueryTool {
         ? (builder) => builder.select()
         : (builder) => builder.deselect()
     );
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('mode')
+  protected handleModeChange(updatedMode?: VolumeIntersectionQueryMode): void {
+    this.model?.setMode(updatedMode);
   }
 
   /**

@@ -66,7 +66,10 @@ import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandle
 import { Scene } from './lib/scenes/scene';
 import { VolumeIntersectionQueryController } from './lib/volume-intersection/controller';
 import { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
-import { VolumeIntersectionQueryType } from './components/viewer-box-query-tool/viewer-box-query-tool';
+import {
+  VolumeIntersectionQueryMode,
+  VolumeIntersectionQueryType,
+} from './components/viewer-box-query-tool/viewer-box-query-tool';
 import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
 import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
@@ -577,6 +580,10 @@ export namespace Components {
      * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
      */
     controller?: VolumeIntersectionQueryController;
+    /**
+     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.  Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.  Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+     */
+    mode?: VolumeIntersectionQueryMode;
     /**
      * The model that contains the points representing the corners of the box displayed on screen, the type of the query to be performed, and methods for setting these values.
      */
@@ -1972,6 +1979,10 @@ declare namespace LocalJSX {
      * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
      */
     controller?: VolumeIntersectionQueryController;
+    /**
+     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.  Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.  Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+     */
+    mode?: VolumeIntersectionQueryMode;
     /**
      * The model that contains the points representing the corners of the box displayed on screen, the type of the query to be performed, and methods for setting these values.
      */

@@ -1,6 +1,8 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
+import { VolumeIntersectionQueryMode } from '../../components/viewer-box-query-tool/viewer-box-query-tool';
+
 export type QueryType = 'inclusive' | 'exclusive';
 
 export interface VolumeIntersectionQueryDetails {
@@ -20,6 +22,8 @@ export class VolumeIntersectionQueryModel {
     VolumeIntersectionQueryDetails | undefined
   >();
 
+  public constructor(private mode?: VolumeIntersectionQueryMode) {}
+
   public setStartPoint(point: Point.Point): void {
     this.startPoint = point;
 
@@ -31,6 +35,10 @@ export class VolumeIntersectionQueryModel {
 
     this.updateQueryType();
     this.screenBoundsChanged.emit(this.getQueryDetails());
+  }
+
+  public setMode(mode?: VolumeIntersectionQueryMode): void {
+    this.mode = mode;
   }
 
   public complete(): void {
@@ -88,10 +96,12 @@ export class VolumeIntersectionQueryModel {
 
   private updateQueryType(): void {
     if (this.startPoint != null && this.endPoint != null) {
-      this.type =
+      const directionalType =
         Point.subtract(this.endPoint, this.startPoint).x > 0
           ? 'exclusive'
           : 'inclusive';
+
+      this.type = this.mode ?? directionalType;
     }
   }
 }
