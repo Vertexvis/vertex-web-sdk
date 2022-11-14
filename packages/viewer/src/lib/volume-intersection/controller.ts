@@ -46,6 +46,7 @@ export class VolumeIntersectionQueryController {
 
     if (screenBounds != null && !this.operationInFlight) {
       try {
+        this.operationInFlight = true;
         const scene = await this.viewer.scene();
         await scene
           .items((op) =>

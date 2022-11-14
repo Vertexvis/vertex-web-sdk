@@ -226,12 +226,13 @@ async function drawExclusiveBox(
 
   const pointerDownEvent = new MouseEvent('pointerdown', {
     buttons: 1,
+    clientX: 5,
+    clientY: 5,
   });
-  Object.defineProperty(pointerDownEvent, 'offsetX', { value: 5 });
-  Object.defineProperty(pointerDownEvent, 'offsetY', { value: 5 });
-  const pointerMoveEvent = new MouseEvent('pointermove');
-  Object.defineProperty(pointerMoveEvent, 'offsetX', { value: 15 });
-  Object.defineProperty(pointerMoveEvent, 'offsetY', { value: 15 });
+  const pointerMoveEvent = new MouseEvent('pointermove', {
+    clientX: 15,
+    clientY: 15,
+  });
 
   canvas?.dispatchEvent(pointerDownEvent);
   await page.waitForChanges();
@@ -247,12 +248,13 @@ async function drawInclusiveBox(
 
   const pointerDownEvent = new MouseEvent('pointerdown', {
     buttons: 1,
+    clientX: 15,
+    clientY: 15,
   });
-  Object.defineProperty(pointerDownEvent, 'offsetX', { value: 15 });
-  Object.defineProperty(pointerDownEvent, 'offsetY', { value: 15 });
-  const pointerMoveEvent = new MouseEvent('pointermove');
-  Object.defineProperty(pointerMoveEvent, 'offsetX', { value: 5 });
-  Object.defineProperty(pointerMoveEvent, 'offsetY', { value: 5 });
+  const pointerMoveEvent = new MouseEvent('pointermove', {
+    clientX: 5,
+    clientY: 5,
+  });
 
   canvas?.dispatchEvent(pointerDownEvent);
   await page.waitForChanges();
