@@ -9,7 +9,7 @@ import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation } from './mapper';
+import { buildSceneOperation, toPbSceneViewStateFeatures } from './mapper';
 import {
   ItemOperation,
   SceneItemOperations,
@@ -224,6 +224,17 @@ export type TerminalItemOperationBuilder =
 export type ImageScaleProvider = () => Point.Point | undefined;
 
 /**
+ * The features of a scene view state that can be applied to the current scene
+ */
+export type SceneViewStateFeature =
+  | 'camera'
+  | 'cross_section'
+  | 'material_overrides'
+  | 'selection'
+  | 'transforms'
+  | 'visibility';
+
+/**
  * A class that represents the `Scene` that has been loaded into the viewer. On
  * it, you can retrieve attributes of the scene, such as the camera. It also
  * contains methods for updating the scene and performing requests to rerender
@@ -254,6 +265,28 @@ export class Scene {
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
+      },
+      true
+    );
+  }
+
+  /**
+   * Applies the specified features of the provided scene view state to the scene.
+   */
+  public async applyPartialSceneViewState(
+    sceneViewStateId: UUID.UUID,
+    featuresToApply: SceneViewStateFeature[],
+    opts: SceneExecutionOptions = {}
+  ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
+
+    return await this.stream.loadSceneViewState(
+      {
+        sceneViewStateId: { hex: sceneViewStateId },
+        frameCorrelationId: opts.suppliedCorrelationId
+          ? { value: opts.suppliedCorrelationId }
+          : undefined,
+        sceneViewStateFeatureSubset: pbFeatures,
       },
       true
     );

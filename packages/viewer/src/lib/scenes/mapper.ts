@@ -6,6 +6,7 @@ import { UUID } from '@vertexvis/utils';
 import { Animation, FlyTo, FrameCamera } from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
+import { SceneViewStateFeature } from './scene';
 
 export interface BuildSceneOperationContext {
   dimensions: Dimensions.Dimensions;
@@ -230,6 +231,36 @@ function buildOperationTypes(
         };
       default:
         return {};
+    }
+  });
+}
+
+export function toPbSceneViewStateFeatures(
+  features: SceneViewStateFeature[]
+): vertexvis.protobuf.stream.SceneViewStateFeature[] {
+  return features.map((feature) => {
+    switch (feature) {
+      case 'camera':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_CAMERA;
+      case 'material_overrides':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_MATERIAL_OVERRIDE;
+      case 'selection':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_SELECTION;
+      case 'visibility':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_VISIBILITY;
+      case 'transforms':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_TRANSFORM;
+      case 'cross_section':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION;
+      default:
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_INVALID;
     }
   });
 }
