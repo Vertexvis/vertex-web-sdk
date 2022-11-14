@@ -254,8 +254,7 @@ describe('vertex-viewer-box-query-tool', () => {
     window.dispatchEvent(new MouseEvent('pointerup'));
 
     await page.waitForChanges();
-    await Async.delay(10);
-
+\
     expect(streamSpy).toHaveBeenCalledTimes(2);
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({

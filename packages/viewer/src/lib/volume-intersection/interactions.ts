@@ -54,7 +54,11 @@ export class VolumeIntersectionQueryInteractionHandler
   }
 
   private handleDragBegin(event: PointerEvent): void {
-    if (this.enabled && event.buttons === 1 && !this.isInteracting) {
+    if (
+      this.enabled &&
+      this.isPrimaryMouseButtonClick(event) &&
+      !this.isInteracting
+    ) {
       this.elementBounds = this.element?.getBoundingClientRect();
       this.isInteracting = true;
       this.controller.setStartPoint(
@@ -75,13 +79,13 @@ export class VolumeIntersectionQueryInteractionHandler
   }
 
   private async handleDragEnd(): Promise<void> {
+    this.isInteracting = false;
+
+    window.removeEventListener('pointermove', this.handleDrag);
+    window.removeEventListener('pointerup', this.handleDragEnd);
+
+    this.crosshairCursorDisposable?.dispose();
     if (this.enabled) {
-      this.isInteracting = false;
-
-      window.removeEventListener('pointermove', this.handleDrag);
-      window.removeEventListener('pointerup', this.handleDragEnd);
-
-      this.crosshairCursorDisposable?.dispose();
       this.addWaitCursor();
       try {
         await this.controller.execute();
@@ -90,6 +94,10 @@ export class VolumeIntersectionQueryInteractionHandler
         this.addCrosshairCursor();
       }
     }
+  }
+
+  private isPrimaryMouseButtonClick(event: PointerEvent): boolean {
+    return event.buttons === 1;
   }
 
   private addCrosshairCursor(): void {

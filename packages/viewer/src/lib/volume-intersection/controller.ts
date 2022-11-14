@@ -82,6 +82,10 @@ export class VolumeIntersectionQueryController {
       throw new Error(
         `Unable to perform volume intersection query as there is already one in-flight.`
       );
+    } else {
+      throw new Error(
+        `Unable to perform volume intersection query. No screen bounds have been drawn.`
+      );
     }
   }
 }
