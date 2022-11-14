@@ -82,10 +82,14 @@ export class ViewerBoxQueryTool {
   private interactionHandler?: VolumeIntersectionQueryInteractionHandler;
   private interactionHandlerDisposable?: Disposable;
 
+  private operationStartedDisposable?: Disposable;
+  private operationCompleteDisposable?: Disposable;
   private screenBoundsChangedDisposable?: Disposable;
 
   public constructor() {
     this.handleScreenBoundsChanged = this.handleScreenBoundsChanged.bind(this);
+    this.handleExecuteStarted = this.handleExecuteStarted.bind(this);
+    this.handleExecuteComplete = this.handleExecuteComplete.bind(this);
   }
 
   public componentWillLoad(): void {
@@ -96,11 +100,14 @@ export class ViewerBoxQueryTool {
     );
 
     this.handleViewerChanged(this.viewer);
+    this.handleControllerChange(this.controller);
   }
 
   public disconnectedCallback(): void {
     this.model?.reset();
     this.screenBoundsChangedDisposable?.dispose();
+    this.operationStartedDisposable?.dispose();
+    this.operationCompleteDisposable?.dispose();
     this.deregisterInteractionHandler();
   }
 
@@ -146,6 +153,24 @@ export class ViewerBoxQueryTool {
   /**
    * @ignore
    */
+  @Watch('controller')
+  protected handleControllerChange(
+    controller?: VolumeIntersectionQueryController
+  ): void {
+    this.operationStartedDisposable?.dispose();
+    this.operationCompleteDisposable?.dispose();
+
+    this.operationStartedDisposable = controller?.onExecuteStarted(
+      this.handleExecuteStarted
+    );
+    this.operationStartedDisposable = controller?.onExecuteComplete(
+      this.handleExecuteComplete
+    );
+  }
+
+  /**
+   * @ignore
+   */
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
@@ -178,6 +203,14 @@ export class ViewerBoxQueryTool {
     this.details = details;
 
     this.updateTypeAttribute(details?.type);
+  }
+
+  private handleExecuteStarted(): void {
+    this.interactionHandler?.disable();
+  }
+
+  private handleExecuteComplete(): void {
+    this.interactionHandler?.enable();
   }
 
   private async registerInteractionHandler(

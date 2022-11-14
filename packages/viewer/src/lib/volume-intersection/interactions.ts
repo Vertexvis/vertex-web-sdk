@@ -12,6 +12,7 @@ export class VolumeIntersectionQueryInteractionHandler
   private element?: HTMLElement;
   private api?: InteractionApi;
   private isInteracting?: boolean;
+  private enabled?: boolean;
   private elementBounds?: DOMRect;
   private crosshairCursorDisposable?: Disposable;
   private waitCursorDisposable?: Disposable;
@@ -20,6 +21,8 @@ export class VolumeIntersectionQueryInteractionHandler
     this.handleDragBegin = this.handleDragBegin.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
+
+    this.enabled = true;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -39,10 +42,19 @@ export class VolumeIntersectionQueryInteractionHandler
 
     this.element = undefined;
     this.api = undefined;
+    this.enabled = true;
+  }
+
+  public disable(): void {
+    this.enabled = false;
+  }
+
+  public enable(): void {
+    this.enabled = true;
   }
 
   private handleDragBegin(event: PointerEvent): void {
-    if (event.buttons === 1 && !this.isInteracting) {
+    if (this.enabled && event.buttons === 1 && !this.isInteracting) {
       this.elementBounds = this.element?.getBoundingClientRect();
       this.isInteracting = true;
       this.controller.setStartPoint(
@@ -55,24 +67,28 @@ export class VolumeIntersectionQueryInteractionHandler
   }
 
   private handleDrag(event: PointerEvent): void {
-    this.controller.setEndPoint(
-      getMouseClientPosition(event, this.elementBounds)
-    );
+    if (this.enabled) {
+      this.controller.setEndPoint(
+        getMouseClientPosition(event, this.elementBounds)
+      );
+    }
   }
 
   private async handleDragEnd(): Promise<void> {
-    this.isInteracting = false;
+    if (this.enabled) {
+      this.isInteracting = false;
 
-    window.removeEventListener('pointermove', this.handleDrag);
-    window.removeEventListener('pointerup', this.handleDragEnd);
+      window.removeEventListener('pointermove', this.handleDrag);
+      window.removeEventListener('pointerup', this.handleDragEnd);
 
-    this.crosshairCursorDisposable?.dispose();
-    this.addWaitCursor();
-    try {
-      await this.controller.execute();
-    } finally {
-      this.waitCursorDisposable?.dispose();
-      this.addCrosshairCursor();
+      this.crosshairCursorDisposable?.dispose();
+      this.addWaitCursor();
+      try {
+        await this.controller.execute();
+      } finally {
+        this.waitCursorDisposable?.dispose();
+        this.addCrosshairCursor();
+      }
     }
   }
 

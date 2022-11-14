@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { SceneItemOperationsBuilder } from '../scenes';
 import { VolumeIntersectionQueryModel } from './model';
@@ -11,6 +12,9 @@ export class VolumeIntersectionQueryController {
   private previousViewerCameraControls?: boolean;
   private operationTransform: OperationTransform;
   private operationInFlight = false;
+
+  private executeStarted = new EventDispatcher<void>();
+  private executeComplete = new EventDispatcher<void>();
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
@@ -38,15 +42,23 @@ export class VolumeIntersectionQueryController {
     this.operationTransform = operationTransform;
   }
 
+  public onExecuteStarted(listener: Listener<void>): Disposable {
+    return this.executeStarted.on(listener);
+  }
+
+  public onExecuteComplete(listener: Listener<void>): Disposable {
+    return this.executeComplete.on(listener);
+  }
+
   public async execute(): Promise<void> {
     const screenBounds = this.model.getScreenBounds();
     const type = this.model.getType();
-    this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
     this.model.complete();
 
     if (screenBounds != null && !this.operationInFlight) {
       try {
         this.operationInFlight = true;
+        this.executeStarted.emit();
         const scene = await this.viewer.scene();
         await scene
           .items((op) =>
@@ -61,7 +73,10 @@ export class VolumeIntersectionQueryController {
         console.error('Failed to perform volume intersection query', e);
         throw e;
       } finally {
+        this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
+        this.previousViewerCameraControls = undefined;
         this.operationInFlight = false;
+        this.executeComplete.emit();
       }
     } else if (this.operationInFlight) {
       throw new Error(
