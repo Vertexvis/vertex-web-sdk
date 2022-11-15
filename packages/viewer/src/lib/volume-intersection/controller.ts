@@ -1,9 +1,8 @@
 import { Point } from '@vertexvis/geometry';
+import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { SceneItemOperationsBuilder } from '../scenes';
 import { VolumeIntersectionQueryModel } from './model';
-
-export const DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT = 5;
 
 export type OperationTransform = (
   builder: SceneItemOperationsBuilder
@@ -12,12 +11,14 @@ export type OperationTransform = (
 export class VolumeIntersectionQueryController {
   private previousViewerCameraControls?: boolean;
   private operationTransform: OperationTransform;
-  private inFlightOperations = 0;
+  private operationInFlight = false;
+
+  private executeStarted = new EventDispatcher<void>();
+  private executeComplete = new EventDispatcher<void>();
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
-    private viewer: HTMLVertexViewerElement,
-    private maxInFlightOperations = DEFAULT_CONCURRENT_VOLUME_QUERY_LIMIT
+    private viewer: HTMLVertexViewerElement
   ) {
     this.operationTransform = (builder) => builder.select();
   }
@@ -41,18 +42,23 @@ export class VolumeIntersectionQueryController {
     this.operationTransform = operationTransform;
   }
 
+  public onExecuteStarted(listener: Listener<void>): Disposable {
+    return this.executeStarted.on(listener);
+  }
+
+  public onExecuteComplete(listener: Listener<void>): Disposable {
+    return this.executeComplete.on(listener);
+  }
+
   public async execute(): Promise<void> {
     const screenBounds = this.model.getScreenBounds();
     const type = this.model.getType();
-    this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
     this.model.complete();
 
-    if (
-      screenBounds != null &&
-      this.inFlightOperations < this.maxInFlightOperations
-    ) {
-      this.inFlightOperations = this.inFlightOperations + 1;
+    if (screenBounds != null && !this.operationInFlight) {
       try {
+        this.operationInFlight = true;
+        this.executeStarted.emit();
         const scene = await this.viewer.scene();
         await scene
           .items((op) =>
@@ -67,11 +73,18 @@ export class VolumeIntersectionQueryController {
         console.error('Failed to perform volume intersection query', e);
         throw e;
       } finally {
-        this.inFlightOperations = this.inFlightOperations - 1;
+        this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
+        this.previousViewerCameraControls = undefined;
+        this.operationInFlight = false;
+        this.executeComplete.emit();
       }
-    } else if (this.inFlightOperations >= this.maxInFlightOperations) {
+    } else if (this.operationInFlight) {
       throw new Error(
-        `Unable to perform volume intersection query due to the limit of ${this.maxInFlightOperations}.`
+        `Unable to perform volume intersection query as there is already one in-flight.`
+      );
+    } else {
+      throw new Error(
+        `Unable to perform volume intersection query. No screen bounds have been drawn.`
       );
     }
   }

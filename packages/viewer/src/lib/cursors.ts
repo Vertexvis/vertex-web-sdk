@@ -173,3 +173,9 @@ export const labelPinCursor = {
   offsetX: 17,
   offsetY: 29,
 };
+
+export const boxQueryCursor = {
+  url: "data:image/svg+xml;utf8,%3Csvg id='icons' xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bstroke:%23fff;stroke-miterlimit:10;stroke-width:2px;%7D.cls-2%7Bfill:%23fff;%7D.cls-2,.cls-3%7Bfill-rule:evenodd;%7D%3C/style%3E%3C/defs%3E%3Cpath class='cls-2' d='M1.25,17V1L12.59,12.62H5.81l-.41.12Z'/%3E%3Cpath class='cls-2' d='M10.33,17.69l-3.6,1.53L1.8,8.14,5.48,6.58Z'/%3E  %3Cpath class='cls-3' d='M9,17l-1.84.77-3.1-7.37,1.84-.78Z'/%3E%3Cpath class='cls-3' d='M2.25,3.41V14.6l3-2.87.43-.14h4.76Z'/%3E%3Cpath class='cls-1' d='M21.36,22.5H15.5V16.64a.5.5,0,0,0-1,0V22.5H8.64a.5.5,0,0,0,0,1H14.5v5.86a.5.5,0,0,0,1,0V23.5h5.86a.5.5,0,0,0,0-1Z' /%3E  %3Cpath d='M21.36,22.5H15.5V16.64a.5.5,0,0,0-1,0V22.5H8.64a.5.5,0,0,0,0,1H14.5v5.86a.5.5,0,0,0,1,0V23.5h5.86a.5.5,0,0,0,0-1Z' /%3E%3C/svg%3E",
+  offsetX: -30,
+  offsetY: -30,
+};

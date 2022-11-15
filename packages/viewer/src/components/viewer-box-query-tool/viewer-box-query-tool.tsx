@@ -11,6 +11,8 @@ import {
 
 export type VolumeIntersectionQueryType = 'select' | 'deselect';
 
+export type VolumeIntersectionQueryMode = 'exclusive' | 'inclusive';
+
 /**
  * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
  * a query for items in a specific area of the viewer. This tool then allows for an
@@ -56,6 +58,21 @@ export class ViewerBoxQueryTool {
   @Prop()
   public operationType: VolumeIntersectionQueryType = 'select';
 
+  /**
+   * An optional value to specify a singular mode of intersection query. This value
+   * defaults to `undefined`, which will indicate that both `exclusive` and `inclusive`
+   * queries should be made, with `inclusive` being represented by a left to right
+   * drag behavior and `exclusive` being represented by a right to left drag.
+   *
+   * Setting this value to `inclusive` will cause dragging left to right and left to right
+   * to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.
+   *
+   * Setting this value to `exclusive` will cause dragging left to right and left to right
+   * to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+   */
+  @Prop()
+  public mode?: VolumeIntersectionQueryMode;
+
   @State()
   private details?: VolumeIntersectionQueryDetails;
 
@@ -63,27 +80,35 @@ export class ViewerBoxQueryTool {
   private hostEl!: HTMLVertexViewerBoxQueryToolElement;
 
   private interactionHandler?: VolumeIntersectionQueryInteractionHandler;
+  private interactionHandlerDisposable?: Disposable;
 
+  private operationStartedDisposable?: Disposable;
+  private operationCompleteDisposable?: Disposable;
   private screenBoundsChangedDisposable?: Disposable;
 
   public constructor() {
     this.handleScreenBoundsChanged = this.handleScreenBoundsChanged.bind(this);
+    this.handleExecuteStarted = this.handleExecuteStarted.bind(this);
+    this.handleExecuteComplete = this.handleExecuteComplete.bind(this);
   }
 
   public componentWillLoad(): void {
-    this.model = this.model ?? new VolumeIntersectionQueryModel();
+    this.model = this.model ?? new VolumeIntersectionQueryModel(this.mode);
 
     this.screenBoundsChangedDisposable = this.model.onScreenBoundsChanged(
       this.handleScreenBoundsChanged
     );
 
     this.handleViewerChanged(this.viewer);
+    this.handleControllerChange(this.controller);
   }
 
   public disconnectedCallback(): void {
     this.model?.reset();
     this.screenBoundsChangedDisposable?.dispose();
-    this.interactionHandler?.dispose();
+    this.operationStartedDisposable?.dispose();
+    this.operationCompleteDisposable?.dispose();
+    this.deregisterInteractionHandler();
   }
 
   /**
@@ -114,6 +139,32 @@ export class ViewerBoxQueryTool {
       updatedOperationType === 'select'
         ? (builder) => builder.select()
         : (builder) => builder.deselect()
+    );
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('mode')
+  protected handleModeChange(updatedMode?: VolumeIntersectionQueryMode): void {
+    this.model?.setMode(updatedMode);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('controller')
+  protected handleControllerChange(
+    controller?: VolumeIntersectionQueryController
+  ): void {
+    this.operationStartedDisposable?.dispose();
+    this.operationCompleteDisposable?.dispose();
+
+    this.operationStartedDisposable = controller?.onExecuteStarted(
+      this.handleExecuteStarted
+    );
+    this.operationStartedDisposable = controller?.onExecuteComplete(
+      this.handleExecuteComplete
     );
   }
 
@@ -154,17 +205,28 @@ export class ViewerBoxQueryTool {
     this.updateTypeAttribute(details?.type);
   }
 
-  private registerInteractionHandler(
+  private handleExecuteStarted(): void {
+    this.interactionHandler?.disable();
+  }
+
+  private handleExecuteComplete(): void {
+    this.interactionHandler?.enable();
+  }
+
+  private async registerInteractionHandler(
     controller: VolumeIntersectionQueryController,
     viewer: HTMLVertexViewerElement
-  ): void {
+  ): Promise<void> {
     this.interactionHandler = new VolumeIntersectionQueryInteractionHandler(
       controller
     );
-    viewer.registerInteractionHandler(this.interactionHandler);
+    this.interactionHandlerDisposable = await viewer.registerInteractionHandler(
+      this.interactionHandler
+    );
   }
 
   private deregisterInteractionHandler(): void {
+    this.interactionHandlerDisposable?.dispose();
     this.interactionHandler?.dispose();
     this.interactionHandler = undefined;
   }
