@@ -218,6 +218,62 @@ describe('vertex-viewer-box-query-tool', () => {
     );
   });
 
+  it('sends a clear all selection and select query for the frustum using the clearAndSelect default operation', async () => {
+    const { stream, ws } = makeViewerStream();
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-box-query-tool operationType="clearAndSelect"></vertex-viewer-box-query-tool>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.root as HTMLVertexViewerElement;
+
+    const streamSpy = jest.spyOn(stream, 'createSceneAlteration');
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await drawInclusiveBox(page, viewer);
+
+    const pointerUpEvent = new MouseEvent('pointerup');
+
+    window.dispatchEvent(pointerUpEvent);
+    await page.waitForChanges();
+
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operations: expect.arrayContaining([
+          expect.objectContaining({
+            all: {},
+            operationTypes: expect.arrayContaining([
+              {
+                changeSelection: {},
+              },
+            ]),
+          }),
+          expect.objectContaining({
+            volume: {
+              exclusive: false,
+              frustumByRectangle: {
+                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+              },
+              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+            },
+            operationTypes: expect.arrayContaining([
+              {
+                changeSelection: expect.objectContaining({
+                  material: expect.any(Object),
+                }),
+              },
+            ]),
+          }),
+        ]),
+      })
+    );
+  });
+
   it('disables the interaction handler while an operation is being executed', async () => {
     const { stream, ws } = makeViewerStream();
 

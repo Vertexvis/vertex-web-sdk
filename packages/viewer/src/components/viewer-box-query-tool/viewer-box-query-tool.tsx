@@ -188,8 +188,8 @@ export class ViewerBoxQueryTool {
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        {this.details != null && (
-          <vertex-viewer-layer>
+        <vertex-viewer-layer>
+          {this.details != null && (
             <div
               class="bounds"
               style={{
@@ -205,8 +205,8 @@ export class ViewerBoxQueryTool {
                 </div>
               </slot>
             </div>
-          </vertex-viewer-layer>
-        )}
+          )}
+        </vertex-viewer-layer>
       </Host>
     );
   }
