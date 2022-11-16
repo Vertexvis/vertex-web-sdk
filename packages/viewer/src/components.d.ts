@@ -589,7 +589,7 @@ export namespace Components {
      */
     model?: VolumeIntersectionQueryModel;
     /**
-     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `select`, and can be changed to `deselect`.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.  `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
      */
     operationType: VolumeIntersectionQueryType;
     /**
@@ -1988,7 +1988,7 @@ declare namespace LocalJSX {
      */
     model?: VolumeIntersectionQueryModel;
     /**
-     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `select`, and can be changed to `deselect`.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.  `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
      */
     operationType?: VolumeIntersectionQueryType;
     /**
