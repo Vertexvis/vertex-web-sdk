@@ -17,6 +17,7 @@ export class VolumeIntersectionQueryModel {
 
   private dragStarted = new EventDispatcher<void>();
   private dragComplete = new EventDispatcher<VolumeIntersectionQueryDetails>();
+  private dragCancelled = new EventDispatcher<void>();
 
   private screenBoundsChanged = new EventDispatcher<
     VolumeIntersectionQueryDetails | undefined
@@ -31,10 +32,15 @@ export class VolumeIntersectionQueryModel {
   }
 
   public setEndPoint(point: Point.Point): void {
-    this.endPoint = point;
+    if (
+      this.startPoint != null &&
+      Point.distance(this.startPoint, point) >= 2
+    ) {
+      this.endPoint = point;
 
-    this.updateQueryType();
-    this.screenBoundsChanged.emit(this.getQueryDetails());
+      this.updateQueryType();
+      this.screenBoundsChanged.emit(this.getQueryDetails());
+    }
   }
 
   public setMode(mode?: VolumeIntersectionQueryMode): void {
@@ -47,6 +53,12 @@ export class VolumeIntersectionQueryModel {
       this.dragComplete.emit(this.getQueryDetails());
       this.reset();
     }
+  }
+
+  public cancel(): void {
+    this.screenBoundsChanged.emit(undefined);
+    this.dragCancelled.emit();
+    this.reset();
   }
 
   public reset(): void {
@@ -79,6 +91,10 @@ export class VolumeIntersectionQueryModel {
     listener: Listener<VolumeIntersectionQueryDetails>
   ): Disposable {
     return this.dragComplete.on(listener);
+  }
+
+  public onDragCancelled(listener: Listener<void>): Disposable {
+    return this.dragCancelled.on(listener);
   }
 
   private getQueryDetails(): VolumeIntersectionQueryDetails {

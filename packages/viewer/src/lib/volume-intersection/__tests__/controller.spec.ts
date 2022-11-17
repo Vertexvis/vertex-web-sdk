@@ -6,16 +6,21 @@ import { VolumeIntersectionQueryModel } from '../model';
 describe('volume intersection controller', () => {
   const mockQuery = {
     withVolumeIntersection: jest.fn(),
+    all: jest.fn(),
+    withItemId: jest.fn(),
+  };
+  const mockOperations = {
+    select: jest.fn(),
+    deselect: jest.fn(),
+    materialOverride: jest.fn(),
   };
   const mockBuilder = {
     where: (fn) => {
       fn(mockQuery);
-      return { select: jest.fn() };
+      return mockOperations;
     },
   };
-  const mockExecute = jest.fn(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  });
+  const mockExecute = jest.fn();
   const model = new VolumeIntersectionQueryModel();
   const mockViewer = {
     scene: () => ({
@@ -28,23 +33,34 @@ describe('volume intersection controller', () => {
     }),
   };
 
+  async function drag(
+    controller: VolumeIntersectionQueryController
+  ): Promise<void> {
+    controller.setStartPoint(Point.create(1, 1));
+    controller.setEndPoint(Point.create(5, 5));
+    return controller.execute();
+  }
+
+  beforeEach(() => {
+    mockExecute.mockReset();
+    jest.clearAllMocks();
+  });
+
   it('limits the number of in flight operations', async () => {
     jest.useFakeTimers();
+
+    mockExecute.mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    });
 
     const controller = new VolumeIntersectionQueryController(
       model,
       mockViewer as unknown as HTMLVertexViewerElement
     );
 
-    async function drag(): Promise<void> {
-      controller.setStartPoint(Point.create(1, 1));
-      controller.setEndPoint(Point.create(2, 2));
-      return controller.execute();
-    }
+    const firstDrag = drag(controller);
 
-    const firstDrag = drag();
-
-    await expect(drag()).rejects.toThrow();
+    await expect(drag(controller)).rejects.toThrow();
 
     jest.advanceTimersByTime(500);
 
@@ -54,6 +70,38 @@ describe('volume intersection controller', () => {
       return;
     });
 
-    await expect(drag()).resolves.toBeUndefined();
+    await expect(drag(controller)).resolves.toBeUndefined();
+  });
+
+  it('supports changing the base operation', async () => {
+    const controller = new VolumeIntersectionQueryController(
+      model,
+      mockViewer as unknown as HTMLVertexViewerElement
+    );
+
+    controller.setOperationTransform((builder) =>
+      builder.materialOverride('#ff0000')
+    );
+
+    await drag(controller);
+
+    expect(mockOperations.materialOverride).toHaveBeenCalledWith('#ff0000');
+  });
+
+  it('supports changing the additional operations', async () => {
+    const controller = new VolumeIntersectionQueryController(
+      model,
+      mockViewer as unknown as HTMLVertexViewerElement
+    );
+
+    controller.setAdditionalTransforms([
+      (op) => op.where((q) => q.withItemId('id')).materialOverride('#00ff00'),
+    ]);
+
+    await drag(controller);
+
+    expect(mockQuery.all).not.toHaveBeenCalled();
+    expect(mockQuery.withItemId).toHaveBeenCalledWith('id');
+    expect(mockOperations.materialOverride).toHaveBeenCalledWith('#00ff00');
   });
 });

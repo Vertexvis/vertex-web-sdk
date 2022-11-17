@@ -9,7 +9,10 @@ import {
   VolumeIntersectionQueryModel,
 } from '../../lib/volume-intersection/model';
 
-export type VolumeIntersectionQueryType = 'select' | 'deselect';
+export type VolumeIntersectionQueryType =
+  | 'clearAndSelect'
+  | 'select'
+  | 'deselect';
 
 export type VolumeIntersectionQueryMode = 'exclusive' | 'inclusive';
 
@@ -49,14 +52,18 @@ export class ViewerBoxQueryTool {
 
   /**
    * The default operation to perform when a drag has completed and the intersection
-   * query will be run. Defaults to `select`, and can be changed to `deselect`.
+   * query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.
+   *
+   * `clearAndSelect` will clear all existing selection, and select the results of the query.
+   * `select` will maintain existing selection, and select the results of the query.
+   * `deselect` will maintain existing selection, and deselect the results of the query.
    *
    * The operation behavior for this intersection query tool can also be changed by
    * providing a custom implementation of the `VolumeIntersectionQueryController`, or
    * by using the `setOperationTransform` method of the default controller.
    */
   @Prop()
-  public operationType: VolumeIntersectionQueryType = 'select';
+  public operationType: VolumeIntersectionQueryType = 'clearAndSelect';
 
   /**
    * An optional value to specify a singular mode of intersection query. This value
@@ -101,6 +108,7 @@ export class ViewerBoxQueryTool {
 
     this.handleViewerChanged(this.viewer);
     this.handleControllerChange(this.controller);
+    this.handleDefaultOperationChange(this.operationType);
   }
 
   public disconnectedCallback(): void {
@@ -135,11 +143,17 @@ export class ViewerBoxQueryTool {
   protected handleDefaultOperationChange(
     updatedOperationType: VolumeIntersectionQueryType
   ): void {
-    this.controller?.setOperationTransform(
-      updatedOperationType === 'select'
-        ? (builder) => builder.select()
-        : (builder) => builder.deselect()
-    );
+    switch (updatedOperationType) {
+      case 'clearAndSelect':
+        this.setDefaultClearAndSelectOperation();
+        break;
+      case 'select':
+        this.setDefaultSelectOperation();
+        break;
+      case 'deselect':
+        this.setDefaultDeselectOperation();
+        break;
+    }
   }
 
   /**
@@ -234,5 +248,22 @@ export class ViewerBoxQueryTool {
   private updateTypeAttribute(type?: QueryType): void {
     this.hostEl.setAttribute('inclusive', `${type === 'inclusive'}`);
     this.hostEl.setAttribute('exclusive', `${type === 'exclusive'}`);
+  }
+
+  private setDefaultClearAndSelectOperation(): void {
+    this.controller?.setOperationTransform((builder) => builder.select());
+    this.controller?.setAdditionalTransforms([
+      (op) => op.where((q) => q.all()).deselect(),
+    ]);
+  }
+
+  private setDefaultSelectOperation(): void {
+    this.controller?.setOperationTransform((builder) => builder.select());
+    this.controller?.setAdditionalTransforms([]);
+  }
+
+  private setDefaultDeselectOperation(): void {
+    this.controller?.setOperationTransform((builder) => builder.deselect());
+    this.controller?.setAdditionalTransforms([]);
   }
 }
