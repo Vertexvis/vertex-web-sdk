@@ -11,8 +11,8 @@ export type LoadableResource = StreamKeyResource;
 
 export interface Resource {
   resource: LoadableResource;
-  queries: QueryResource[];
-  fragments: FragmentAttribute[];
+  subResource?: PathResource;
+  queries: QueryValue[];
 }
 
 export function fromUrn(urn: string): Resource {
@@ -22,7 +22,8 @@ export function fromUrn(urn: string): Resource {
     throw new Error('Invalid URN. Expected URN scheme.');
   }
 
-  const [nid, resourceType, resourceId] = uri.path.split(':');
+  const [nid, resourceType, resourceId, ...subResourcePath] =
+    uri.path.split(/[:/]/);
 
   if (nid !== 'vertexvis') {
     throw new Error('Invalid URN. Expected URN to be vertexvis namespace');
@@ -30,10 +31,17 @@ export function fromUrn(urn: string): Resource {
 
   switch (resourceType) {
     case 'stream-key':
+      const queries = fromQuery(uri.query);
+      const subResource =
+        fromSubResourcePath(subResourcePath.join('/')) ??
+        (queries.find((q) => q.type === 'scene-view-state') as
+          | SceneViewStateResource
+          | undefined);
+
       return {
         resource: { type: 'stream-key', id: resourceId },
-        queries: fromQuery(uri.query),
-        fragments: fromFragment(uri.fragment),
+        subResource,
+        queries: queries.filter((q) => q.type !== 'scene-view-state'),
       };
     default:
       throw new InvalidResourceUrnError(
@@ -44,45 +52,46 @@ export function fromUrn(urn: string): Resource {
 
 export interface SceneViewStateResource {
   type: 'scene-view-state';
+  id?: string;
+}
+
+export type PathResource = SceneViewStateResource;
+
+function fromSubResourcePath(path?: string): PathResource | undefined {
+  if (path != null) {
+    const [subResourceType, subResourceId] = path.split('/');
+
+    switch (subResourceType) {
+      case 'scene-view-states':
+        return {
+          type: 'scene-view-state',
+          id: subResourceId,
+        };
+      default:
+        return undefined;
+    }
+  }
+}
+
+export interface SuppliedIdQueryValue {
+  type: 'supplied-id';
   id: string;
 }
 
-export type QueryResource = SceneViewStateResource;
+export type QueryValue = SceneViewStateResource | SuppliedIdQueryValue;
 
-function fromQuery(query?: string): QueryResource[] {
+function fromQuery(query?: string): QueryValue[] {
   if (query != null) {
     return query.split('&').map((queryFragment) => {
       const [resourceType, resourceId] = queryFragment.split('=');
 
       switch (resourceType) {
+        case 'supplied-id':
+          return { type: 'supplied-id', id: resourceId };
         case 'scene-view-state':
           return { type: 'scene-view-state', id: resourceId };
         default:
-          throw new Error('Invalid URN. Unknown query resource type');
-      }
-    });
-  } else {
-    return [];
-  }
-}
-
-export interface ResourceIdTypeFragment {
-  type: 'id-type';
-  value: string;
-}
-
-export type FragmentAttribute = ResourceIdTypeFragment;
-
-function fromFragment(fragment?: string): FragmentAttribute[] {
-  if (fragment != null) {
-    return fragment.split('&').map((fragmentComponent) => {
-      const [attributeType, attributeValue] = fragmentComponent.split('=');
-
-      switch (attributeType) {
-        case 'id-type':
-          return { type: 'id-type', value: attributeValue };
-        default:
-          throw new Error('Invalid URN. Unknown fragment attribute type');
+          throw new Error('Invalid URN. Unknown query value type');
       }
     });
   } else {

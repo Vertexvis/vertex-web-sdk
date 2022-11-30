@@ -42,7 +42,7 @@ import {
   Orientation,
   SynchronizedClock,
 } from '../types';
-import { Resource } from '../types/loadableResource';
+import { Resource, SuppliedIdQueryValue } from '../types/loadableResource';
 import {
   Connected,
   Connecting,
@@ -190,27 +190,27 @@ export class ViewerStream extends StreamApi {
 
     const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
     const hasQueryChanged = !Objects.isEqual(pQueries, resource.queries);
-    const hasQuery = resource.queries[0] != null;
     const isConnecting =
       state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
+    const suppliedIdQuery = resource.queries.find(
+      (q) => q.type === 'supplied-id'
+    ) as SuppliedIdQueryValue | undefined;
 
     if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
       this.disconnect();
       return this.loadIfDisconnected(urn);
     } else if (
       isConnected &&
-      hasQuery &&
       hasQueryChanged &&
-      resource.queries[0].type === 'scene-view-state'
+      resource.subResource?.type === 'scene-view-state'
     ) {
-      const idType = resource.fragments.find((f) => f.type === 'id-type');
       const payload = {
-        ...(idType == null || idType.value === 'default'
-          ? { sceneViewStateId: { hex: resource.queries[0].id } }
+        ...(resource.subResource.id != null
+          ? { sceneViewStateId: { hex: resource.subResource.id } }
           : {}),
-        ...(idType?.value === 'supplied'
-          ? { sceneViewStateSuppliedId: { value: resource.queries[0].id } }
+        ...(suppliedIdQuery != null
+          ? { sceneViewStateSuppliedId: { value: suppliedIdQuery.id } }
           : {}),
       };
 
@@ -377,9 +377,9 @@ export class ViewerStream extends StreamApi {
   }
 
   private async requestNewStream(resource: Resource): Promise<StreamResult> {
-    const idType = resource.fragments.find((f) => f.type === 'id-type');
-    const isDefaultIdType = idType == null || idType.value === 'default';
-    const isSuppliedIdType = idType == null || idType.value === 'supplied';
+    const suppliedIdQuery = resource.queries.find(
+      (q) => q.type === 'supplied-id'
+    ) as SuppliedIdQueryValue | undefined;
 
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
@@ -388,12 +388,14 @@ export class ViewerStream extends StreamApi {
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
-          resource.queries[0]?.type === 'scene-view-state' && isDefaultIdType
-            ? { hex: resource.queries[0].id }
+          resource.subResource?.type === 'scene-view-state' &&
+          resource.subResource.id != null
+            ? { hex: resource.subResource.id }
             : undefined,
         sceneViewStateSuppliedId:
-          resource.queries[0]?.type === 'scene-view-state' && isSuppliedIdType
-            ? { value: resource.queries[0].id }
+          resource.subResource?.type === 'scene-view-state' &&
+          suppliedIdQuery != null
+            ? { value: suppliedIdQuery.id }
             : undefined,
       })
     );
