@@ -185,11 +185,14 @@ export class ViewerStream extends StreamApi {
     urn: string,
     state: Connected | Connecting | Reconnecting
   ): Promise<void> {
-    const { resource: pResource, queries: pQueries } = state.resource;
+    const { resource: pResource, subResource: pSubResource } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
 
     const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
-    const hasQueryChanged = !Objects.isEqual(pQueries, resource.queries);
+    const hasSubResourceChanged = !Objects.isEqual(
+      pSubResource,
+      resource.subResource
+    );
     const isConnecting =
       state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
@@ -197,12 +200,12 @@ export class ViewerStream extends StreamApi {
       (q) => q.type === 'supplied-id'
     ) as SuppliedIdQueryValue | undefined;
 
-    if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
+    if (hasResourceChanged || (isConnecting && hasSubResourceChanged)) {
       this.disconnect();
       return this.loadIfDisconnected(urn);
     } else if (
       isConnected &&
-      hasQueryChanged &&
+      hasSubResourceChanged &&
       resource.subResource?.type === 'scene-view-state'
     ) {
       const payload = {

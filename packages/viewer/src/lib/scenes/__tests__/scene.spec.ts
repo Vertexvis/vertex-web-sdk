@@ -2,8 +2,8 @@ jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { StreamApi } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
@@ -447,7 +447,7 @@ describe(Scene, () => {
 
   describe(Scene.prototype.applySceneViewState, () => {
     it('should applySceneViewState', async () => {
-      const mockSceneViewStateId = new Uuid();
+      const mockSceneViewStateId = UUID.create();
       await scene.applySceneViewState(mockSceneViewStateId, {
         suppliedCorrelationId: 'foo',
       });
@@ -464,7 +464,7 @@ describe(Scene, () => {
 
   describe(Scene.prototype.applyPartialSceneViewState, () => {
     it('should applyPartialSceneViewState', async () => {
-      const mockSceneViewStateId = new Uuid();
+      const mockSceneViewStateId = UUID.create();
       await scene.applyPartialSceneViewState(mockSceneViewStateId, ['camera'], {
         suppliedCorrelationId: 'foo',
       });
