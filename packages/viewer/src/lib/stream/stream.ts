@@ -198,10 +198,23 @@ export class ViewerStream extends StreamApi {
     if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
       this.disconnect();
       return this.loadIfDisconnected(urn);
-    } else if (isConnected && hasQuery && hasQueryChanged) {
-      await this.loadSceneViewState({
-        sceneViewStateId: { hex: resource.queries[0].id },
-      });
+    } else if (
+      isConnected &&
+      hasQuery &&
+      hasQueryChanged &&
+      resource.queries[0].type === 'scene-view-state'
+    ) {
+      const idType = resource.fragments.find((f) => f.type === 'id-type');
+      const payload = {
+        ...(idType == null || idType.value === 'default'
+          ? { sceneViewStateId: { hex: resource.queries[0].id } }
+          : {}),
+        ...(idType?.value === 'supplied'
+          ? { sceneViewStateSuppliedId: { value: resource.queries[0].id } }
+          : {}),
+      };
+
+      await this.loadSceneViewState(payload);
       this.updateState({ ...state, resource });
     }
   }
@@ -364,6 +377,10 @@ export class ViewerStream extends StreamApi {
   }
 
   private async requestNewStream(resource: Resource): Promise<StreamResult> {
+    const idType = resource.fragments.find((f) => f.type === 'id-type');
+    const isDefaultIdType = idType == null || idType.value === 'default';
+    const isSuppliedIdType = idType == null || idType.value === 'supplied';
+
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
@@ -371,8 +388,12 @@ export class ViewerStream extends StreamApi {
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
-          resource.queries[0]?.type === 'scene-view-state'
+          resource.queries[0]?.type === 'scene-view-state' && isDefaultIdType
             ? { hex: resource.queries[0].id }
+            : undefined,
+        sceneViewStateSuppliedId:
+          resource.queries[0]?.type === 'scene-view-state' && isSuppliedIdType
+            ? { value: resource.queries[0].id }
             : undefined,
       })
     );

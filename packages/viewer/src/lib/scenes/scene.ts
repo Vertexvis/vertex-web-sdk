@@ -9,7 +9,11 @@ import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation, toPbSceneViewStateFeatures } from './mapper';
+import {
+  buildSceneOperation,
+  buildSceneViewStateIdentifier,
+  toPbSceneViewStateFeatures,
+} from './mapper';
 import {
   ItemOperation,
   SceneItemOperations,
@@ -224,6 +228,21 @@ export type TerminalItemOperationBuilder =
 export type ImageScaleProvider = () => Point.Point | undefined;
 
 /**
+ * An object describing an ID for the scene view state. Can either be an
+ * object containing the ID generated on creation, or an object containing
+ * a supplied id provided during creation.
+ */
+export type SceneViewStateIdentifier =
+  | {
+      type: 'id';
+      value: UUID.UUID;
+    }
+  | {
+      type: 'supplied-id';
+      value: string;
+    };
+
+/**
  * The features of a scene view state that can be applied to the current scene
  */
 export type SceneViewStateFeature =
@@ -256,12 +275,14 @@ export class Scene {
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID,
+    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier,
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
+
     return await this.stream.loadSceneViewState(
       {
-        sceneViewStateId: { hex: sceneViewStateId },
+        ...pbIdField,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
@@ -274,15 +295,16 @@ export class Scene {
    * Applies the specified features of the provided scene view state to the scene.
    */
   public async applyPartialSceneViewState(
-    sceneViewStateId: UUID.UUID,
+    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
     const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
 
     return await this.stream.loadSceneViewState(
       {
-        sceneViewStateId: { hex: sceneViewStateId },
+        ...pbIdField,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,

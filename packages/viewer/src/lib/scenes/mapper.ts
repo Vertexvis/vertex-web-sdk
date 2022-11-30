@@ -6,10 +6,30 @@ import { UUID } from '@vertexvis/utils';
 import { Animation, FlyTo, FrameCamera } from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
-import { SceneViewStateFeature } from './scene';
+import { SceneViewStateFeature, SceneViewStateIdentifier } from './scene';
 
 export interface BuildSceneOperationContext {
   dimensions: Dimensions.Dimensions;
+}
+
+export function buildSceneViewStateIdentifier(
+  id: UUID.UUID | SceneViewStateIdentifier
+):
+  | Pick<
+      vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+      'sceneViewStateId'
+    >
+  | Pick<
+      vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+      'sceneViewStateSuppliedId'
+    > {
+  if (typeof id === 'string') {
+    return { sceneViewStateId: { hex: id } };
+  } else {
+    return id.type === 'id'
+      ? { sceneViewStateId: { hex: id.value } }
+      : { sceneViewStateSuppliedId: { value: id.value } };
+  }
 }
 
 export function buildSceneOperation(
