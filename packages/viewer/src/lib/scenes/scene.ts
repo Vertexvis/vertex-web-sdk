@@ -235,11 +235,11 @@ export type ImageScaleProvider = () => Point.Point | undefined;
 export type SceneViewStateIdentifier =
   | {
       type: 'id';
-      value: UUID.UUID;
+      id: UUID.UUID;
     }
   | {
       type: 'supplied-id';
-      value: string;
+      id: string;
     };
 
 /**

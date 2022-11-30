@@ -13,7 +13,7 @@ export interface BuildSceneOperationContext {
 }
 
 export function buildSceneViewStateIdentifier(
-  id: UUID.UUID | SceneViewStateIdentifier
+  identifier: UUID.UUID | SceneViewStateIdentifier
 ):
   | Pick<
       vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
@@ -23,12 +23,12 @@ export function buildSceneViewStateIdentifier(
       vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
       'sceneViewStateSuppliedId'
     > {
-  if (typeof id === 'string') {
-    return { sceneViewStateId: { hex: id } };
+  if (typeof identifier === 'string') {
+    return { sceneViewStateId: { hex: identifier } };
   } else {
-    return id.type === 'id'
-      ? { sceneViewStateId: { hex: id.value } }
-      : { sceneViewStateSuppliedId: { value: id.value } };
+    return identifier.type === 'supplied-id'
+      ? { sceneViewStateSuppliedId: { value: identifier.id } }
+      : { sceneViewStateId: { hex: identifier.id } };
   }
 }
 
