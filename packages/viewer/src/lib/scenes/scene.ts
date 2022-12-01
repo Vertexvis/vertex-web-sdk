@@ -5,6 +5,7 @@ import { UUID } from '@vertexvis/utils';
 
 import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
+import { SceneViewStateIdentifier } from '../types';
 import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
@@ -228,21 +229,6 @@ export type TerminalItemOperationBuilder =
 export type ImageScaleProvider = () => Point.Point | undefined;
 
 /**
- * An object describing an ID for the scene view state. Can either be an
- * object containing the ID generated on creation, or an object containing
- * a supplied id provided during creation.
- */
-export type SceneViewStateIdentifier =
-  | {
-      type: 'id';
-      id: UUID.UUID;
-    }
-  | {
-      type: 'supplied-id';
-      id: string;
-    };
-
-/**
  * The features of a scene view state that can be applied to the current scene
  */
 export type SceneViewStateFeature =
@@ -275,7 +261,9 @@ export class Scene {
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
@@ -295,7 +283,9 @@ export class Scene {
    * Applies the specified features of the provided scene view state to the scene.
    */
   public async applyPartialSceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {

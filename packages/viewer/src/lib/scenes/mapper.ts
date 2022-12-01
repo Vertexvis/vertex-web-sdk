@@ -3,17 +3,22 @@ import { Dimensions } from '@vertexvis/geometry';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { Animation, FlyTo, FrameCamera } from '../types';
+import {
+  Animation,
+  FlyTo,
+  FrameCamera,
+  SceneViewStateIdentifier,
+} from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
-import { SceneViewStateFeature, SceneViewStateIdentifier } from './scene';
+import { SceneViewStateFeature } from './scene';
 
 export interface BuildSceneOperationContext {
   dimensions: Dimensions.Dimensions;
 }
 
 export function buildSceneViewStateIdentifier(
-  identifier: UUID.UUID | SceneViewStateIdentifier
+  identifier: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier
 ):
   | Pick<
       vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
@@ -25,10 +30,14 @@ export function buildSceneViewStateIdentifier(
     > {
   if (typeof identifier === 'string') {
     return { sceneViewStateId: { hex: identifier } };
+  } else if (SceneViewStateIdentifier.isSceneViewStateId(identifier)) {
+    return { sceneViewStateId: { hex: identifier.id } };
+  } else if (SceneViewStateIdentifier.isSceneViewStateSuppliedId(identifier)) {
+    return { sceneViewStateSuppliedId: { value: identifier.suppliedId } };
   } else {
-    return identifier.type === 'supplied-id'
-      ? { sceneViewStateSuppliedId: { value: identifier.id } }
-      : { sceneViewStateId: { hex: identifier.id } };
+    throw new Error(
+      'Unable to build scene view state identifier, input must be a string or `SceneViewStateIdentifier`.'
+    );
   }
 }
 

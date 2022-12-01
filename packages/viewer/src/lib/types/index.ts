@@ -10,6 +10,7 @@ import * as FlyTo from './flyToOptions';
 import * as FrameCamera from './frameCamera';
 import * as Interactions from './interactions';
 import * as LoadableResource from './loadableResource';
+import * as SceneViewStateIdentifier from './sceneViewStateIdentifier';
 
 export * from './depthBuffer';
 export * from './entities';
@@ -34,4 +35,5 @@ export {
   FrameCamera,
   Interactions,
   LoadableResource,
+  SceneViewStateIdentifier,
 };
