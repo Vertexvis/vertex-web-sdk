@@ -36,6 +36,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private primaryInteraction: MouseInteraction = this.rotateInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
+  private lastPrimaryRotateInteraction?: MouseInteraction;
   private isDragging = false;
   private lastMoveEvent?: BaseEvent;
   private interactionTimer?: number;
@@ -130,9 +131,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     switch (type) {
       case 'rotate':
         this.primaryInteraction = this.rotateInteraction;
+        this.lastPrimaryRotateInteraction = this.rotateInteraction;
         break;
       case 'rotate-point':
         this.primaryInteraction = this.rotatePointInteraction;
+        this.lastPrimaryRotateInteraction = this.rotatePointInteraction;
         break;
       case 'zoom':
         this.primaryInteraction = this.zoomInteraction;
@@ -238,11 +241,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.currentInteraction = this.rotateInteraction;
     }
 
-    if (event.buttons === 1 || event.buttons === 4) {
+    if (event.buttons === 1) {
       this.draggingInteraction =
         this.currentInteraction || this.primaryInteraction;
     } else if (event.buttons === 2) {
       this.draggingInteraction = this.panInteraction;
+    } else if (event.buttons === 4) {
+      this.draggingInteraction =
+        this.lastPrimaryRotateInteraction ?? this.rotateInteraction;
     }
 
     if (

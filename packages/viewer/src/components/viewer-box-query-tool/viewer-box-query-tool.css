@@ -43,7 +43,9 @@
 }
 
 .outline {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -59,10 +61,13 @@
 }
 
 .fill {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   opacity: var(--viewer-box-query-outline-fill-opacity);
+  border-radius: var(--viewer-box-query-outline-border-radius);
 }
 
 :host([exclusive="true"]) .fill {
