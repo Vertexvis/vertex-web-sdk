@@ -3,13 +3,42 @@ import { Dimensions } from '@vertexvis/geometry';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { Animation, FlyTo, FrameCamera } from '../types';
+import {
+  Animation,
+  FlyTo,
+  FrameCamera,
+  SceneViewStateIdentifier,
+} from '../types';
 import { ItemOperation } from './operations';
 import { QueryExpression } from './queries';
 import { SceneViewStateFeature } from './scene';
 
 export interface BuildSceneOperationContext {
   dimensions: Dimensions.Dimensions;
+}
+
+export function buildSceneViewStateIdentifier(
+  identifier: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier
+):
+  | Pick<
+      vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+      'sceneViewStateId'
+    >
+  | Pick<
+      vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+      'sceneViewStateSuppliedId'
+    > {
+  if (typeof identifier === 'string') {
+    return { sceneViewStateId: { hex: identifier } };
+  } else if (SceneViewStateIdentifier.isSceneViewStateId(identifier)) {
+    return { sceneViewStateId: { hex: identifier.id } };
+  } else if (SceneViewStateIdentifier.isSceneViewStateSuppliedId(identifier)) {
+    return { sceneViewStateSuppliedId: { value: identifier.suppliedId } };
+  } else {
+    throw new Error(
+      'Unable to build scene view state identifier, input must be a string or `SceneViewStateIdentifier`.'
+    );
+  }
 }
 
 export function buildSceneOperation(

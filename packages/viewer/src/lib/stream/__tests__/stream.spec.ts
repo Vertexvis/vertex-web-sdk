@@ -108,7 +108,7 @@ describe(ViewerStream, () => {
         (s) =>
           s.type === 'connected' &&
           s.resource.resource.id === '123' &&
-          s.resource.queries[0]?.id === 'svs'
+          s.resource.subResource?.id === 'svs'
       );
       stream.load(`${urn123}?scene-view-state=svs`, clientId, deviceId, config);
 

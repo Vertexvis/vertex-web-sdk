@@ -42,7 +42,7 @@ import {
   Orientation,
   SynchronizedClock,
 } from '../types';
-import { Resource } from '../types/loadableResource';
+import { Resource, SuppliedIdQueryValue } from '../types/loadableResource';
 import {
   Connected,
   Connecting,
@@ -185,23 +185,39 @@ export class ViewerStream extends StreamApi {
     urn: string,
     state: Connected | Connecting | Reconnecting
   ): Promise<void> {
-    const { resource: pResource, queries: pQueries } = state.resource;
+    const { resource: pResource, subResource: pSubResource } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
 
     const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
-    const hasQueryChanged = !Objects.isEqual(pQueries, resource.queries);
-    const hasQuery = resource.queries[0] != null;
+    const hasSubResourceChanged = !Objects.isEqual(
+      pSubResource,
+      resource.subResource
+    );
     const isConnecting =
       state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
+    const suppliedIdQuery = resource.queries.find(
+      (q) => q.type === 'supplied-id'
+    ) as SuppliedIdQueryValue | undefined;
 
-    if (hasResourceChanged || (isConnecting && hasQueryChanged)) {
+    if (hasResourceChanged || (isConnecting && hasSubResourceChanged)) {
       this.disconnect();
       return this.loadIfDisconnected(urn);
-    } else if (isConnected && hasQuery && hasQueryChanged) {
-      await this.loadSceneViewState({
-        sceneViewStateId: { hex: resource.queries[0].id },
-      });
+    } else if (
+      isConnected &&
+      hasSubResourceChanged &&
+      resource.subResource?.type === 'scene-view-state'
+    ) {
+      const payload = {
+        ...(resource.subResource.id != null
+          ? { sceneViewStateId: { hex: resource.subResource.id } }
+          : {}),
+        ...(suppliedIdQuery != null
+          ? { sceneViewStateSuppliedId: { value: suppliedIdQuery.id } }
+          : {}),
+      };
+
+      await this.loadSceneViewState(payload);
       this.updateState({ ...state, resource });
     }
   }
@@ -364,6 +380,10 @@ export class ViewerStream extends StreamApi {
   }
 
   private async requestNewStream(resource: Resource): Promise<StreamResult> {
+    const suppliedIdQuery = resource.queries.find(
+      (q) => q.type === 'supplied-id'
+    ) as SuppliedIdQueryValue | undefined;
+
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
@@ -371,8 +391,14 @@ export class ViewerStream extends StreamApi {
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
-          resource.queries[0]?.type === 'scene-view-state'
-            ? { hex: resource.queries[0].id }
+          resource.subResource?.type === 'scene-view-state' &&
+          resource.subResource.id != null
+            ? { hex: resource.subResource.id }
+            : undefined,
+        sceneViewStateSuppliedId:
+          resource.subResource?.type === 'scene-view-state' &&
+          suppliedIdQuery != null
+            ? { value: suppliedIdQuery.id }
             : undefined,
       })
     );
