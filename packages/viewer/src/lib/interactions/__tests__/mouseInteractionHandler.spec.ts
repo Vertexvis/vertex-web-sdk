@@ -46,6 +46,12 @@ describe(MouseInteractionHandler, () => {
     buttons: 2,
     bubbles: true,
   });
+  const mouseMoveAuxiliaryButton = new MouseEvent('mousemove', {
+    screenX: 110,
+    screenY: 60,
+    buttons: 4,
+    bubbles: true,
+  });
   const mouseUp = new MouseEvent('mouseup', {
     screenX: 100,
     screenY: 50,
@@ -173,6 +179,23 @@ describe(MouseInteractionHandler, () => {
     expect(panInteraction.endDrag).toHaveBeenCalledTimes(1);
   });
 
+  it('begins a drag of rotate interaction if the secondary mouse has moved more than 2 pixels', async () => {
+    await simulateAuxiliaryInteractions(50);
+
+    expect(rotateInteraction.beginDrag).toHaveBeenCalledTimes(1);
+    expect(rotateInteraction.drag).toHaveBeenCalledTimes(1);
+    expect(rotateInteraction.endDrag).toHaveBeenCalledTimes(1);
+  });
+
+  it('begins a drag of rotate-point interaction if the secondary mouse has moved more than 2 pixels and it was last used', async () => {
+    handler.setPrimaryInteractionType('rotate-point');
+    await simulateAuxiliaryInteractions(50);
+
+    expect(rotatePointInteraction.beginDrag).toHaveBeenCalledTimes(1);
+    expect(rotatePointInteraction.drag).toHaveBeenCalledTimes(1);
+    expect(rotatePointInteraction.endDrag).toHaveBeenCalledTimes(1);
+  });
+
   it('removes window listeners on mouse up', async () => {
     await simulatePrimaryInteractions(50);
     window.dispatchEvent(mouseMovePrimaryButton);
@@ -266,6 +289,15 @@ describe(MouseInteractionHandler, () => {
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton);
+    await delay(interactionDelay || 0);
+    window.dispatchEvent(mouseUp);
+  }
+
+  async function simulateAuxiliaryInteractions(
+    interactionDelay?: number
+  ): Promise<void> {
+    div.dispatchEvent(mouseDown);
+    window.dispatchEvent(mouseMoveAuxiliaryButton);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
