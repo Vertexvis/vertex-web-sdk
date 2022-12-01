@@ -2,8 +2,8 @@ jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { StreamApi } from '@vertexvis/stream-api';
+import { UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
@@ -447,10 +447,45 @@ describe(Scene, () => {
 
   describe(Scene.prototype.applySceneViewState, () => {
     it('should applySceneViewState', async () => {
-      const mockSceneViewStateId = new Uuid();
+      const mockSceneViewStateId = UUID.create();
       await scene.applySceneViewState(mockSceneViewStateId, {
         suppliedCorrelationId: 'foo',
       });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+        },
+        true
+      );
+    });
+
+    it('should support supplied ids', async () => {
+      await scene.applySceneViewState(
+        { suppliedId: 'supplied-id' },
+        {
+          suppliedCorrelationId: 'foo',
+        }
+      );
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateSuppliedId: { value: 'supplied-id' },
+          frameCorrelationId: { value: 'foo' },
+        },
+        true
+      );
+    });
+
+    it('should support object-based ids', async () => {
+      const mockSceneViewStateId = UUID.create();
+      await scene.applySceneViewState(
+        { id: mockSceneViewStateId },
+        {
+          suppliedCorrelationId: 'foo',
+        }
+      );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
         {
@@ -464,10 +499,55 @@ describe(Scene, () => {
 
   describe(Scene.prototype.applyPartialSceneViewState, () => {
     it('should applyPartialSceneViewState', async () => {
-      const mockSceneViewStateId = new Uuid();
+      const mockSceneViewStateId = UUID.create();
       await scene.applyPartialSceneViewState(mockSceneViewStateId, ['camera'], {
         suppliedCorrelationId: 'foo',
       });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+          sceneViewStateFeatureSubset: [
+            vertexvis.protobuf.stream.SceneViewStateFeature
+              .SCENE_VIEW_STATE_FEATURE_CAMERA,
+          ],
+        },
+        true
+      );
+    });
+
+    it('should support supplied ids', async () => {
+      await scene.applyPartialSceneViewState(
+        { suppliedId: 'supplied-id' },
+        ['camera'],
+        {
+          suppliedCorrelationId: 'foo',
+        }
+      );
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateSuppliedId: { value: 'supplied-id' },
+          frameCorrelationId: { value: 'foo' },
+          sceneViewStateFeatureSubset: [
+            vertexvis.protobuf.stream.SceneViewStateFeature
+              .SCENE_VIEW_STATE_FEATURE_CAMERA,
+          ],
+        },
+        true
+      );
+    });
+
+    it('should support object-based ids', async () => {
+      const mockSceneViewStateId = UUID.create();
+      await scene.applyPartialSceneViewState(
+        { id: mockSceneViewStateId },
+        ['camera'],
+        {
+          suppliedCorrelationId: 'foo',
+        }
+      );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
         {

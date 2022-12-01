@@ -5,11 +5,16 @@ import { UUID } from '@vertexvis/utils';
 
 import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
+import { SceneViewStateIdentifier } from '../types';
 import { Frame } from '../types/frame';
 import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation, toPbSceneViewStateFeatures } from './mapper';
+import {
+  buildSceneOperation,
+  buildSceneViewStateIdentifier,
+  toPbSceneViewStateFeatures,
+} from './mapper';
 import {
   ItemOperation,
   SceneItemOperations,
@@ -256,12 +261,16 @@ export class Scene {
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
+
     return await this.stream.loadSceneViewState(
       {
-        sceneViewStateId: { hex: sceneViewStateId },
+        ...pbIdField,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
@@ -274,15 +283,18 @@ export class Scene {
    * Applies the specified features of the provided scene view state to the scene.
    */
   public async applyPartialSceneViewState(
-    sceneViewStateId: UUID.UUID,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: SceneExecutionOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
+    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
     const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
 
     return await this.stream.loadSceneViewState(
       {
-        sceneViewStateId: { hex: sceneViewStateId },
+        ...pbIdField,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
           : undefined,
