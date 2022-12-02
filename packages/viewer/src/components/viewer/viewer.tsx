@@ -416,6 +416,7 @@ export class Viewer {
 
   private interactionHandlers: InteractionHandler[] = [];
   private defaultInteractionHandlerDisposables: Array<Disposable> = [];
+  private tapHandlerDisposable?: Disposable;
   private interactionApi!: InteractionApi;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private defaultTapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
@@ -1130,6 +1131,7 @@ export class Viewer {
 
   private async initializeDefaultInteractionHandlers(): Promise<void> {
     await this.initializeDefaultCameraInteractionHandlers();
+    await this.initializeDefaultTapInteractionHandler();
     this.initializeDefaultKeyboardInteractionHandlers();
 
     if (this.rotateAroundTapPoint) {
@@ -1158,14 +1160,7 @@ export class Viewer {
     this.clearDefaultCameraInteractionHandlers();
 
     if (this.cameraControls) {
-      // default to pointer events if allowed by browser.
       if (window.PointerEvent != null) {
-        const tapInteractionHandler = new TapInteractionHandler(
-          'pointerdown',
-          'pointerup',
-          'pointermove',
-          () => this.getResolvedConfig()
-        );
         this.baseInteractionHandler =
           this.baseInteractionHandler ??
           new PointerInteractionHandler(() => this.getResolvedConfig());
@@ -1175,23 +1170,12 @@ export class Viewer {
         const multiPointerDisposable = await this.registerInteractionHandler(
           new MultiPointerInteractionHandler()
         );
-        const tapDisposable = await this.registerInteractionHandler(
-          tapInteractionHandler
-        );
 
         this.defaultInteractionHandlerDisposables = [
           baseDisposable,
           multiPointerDisposable,
-          tapDisposable,
         ];
       } else {
-        const tapInteractionHandler = new TapInteractionHandler(
-          'mousedown',
-          'mouseup',
-          'mousemove',
-          () => this.getResolvedConfig()
-        );
-
         // fallback to touch events and mouse events as a default
         this.baseInteractionHandler =
           this.baseInteractionHandler ??
@@ -1202,14 +1186,10 @@ export class Viewer {
         const touchDisposable = await this.registerInteractionHandler(
           new TouchInteractionHandler()
         );
-        const tapDisposable = await this.registerInteractionHandler(
-          tapInteractionHandler
-        );
 
         this.defaultInteractionHandlerDisposables = [
           baseDisposable,
           touchDisposable,
-          tapDisposable,
         ];
       }
     }
@@ -1239,6 +1219,34 @@ export class Viewer {
       this.registerTapKeyInteraction(flyToPosition);
 
       this.defaultTapKeyInteractions = [flyToPart, flyToPosition];
+    }
+  }
+
+  private async initializeDefaultTapInteractionHandler(): Promise<void> {
+    if (this.tapHandlerDisposable == null) {
+      if (window.PointerEvent != null) {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'pointerdown',
+          'pointerup',
+          'pointermove',
+          () => this.getResolvedConfig()
+        );
+
+        this.tapHandlerDisposable = await this.registerInteractionHandler(
+          tapInteractionHandler
+        );
+      } else {
+        const tapInteractionHandler = new TapInteractionHandler(
+          'mousedown',
+          'mouseup',
+          'mousemove',
+          () => this.getResolvedConfig()
+        );
+
+        this.tapHandlerDisposable = await this.registerInteractionHandler(
+          tapInteractionHandler
+        );
+      }
     }
   }
 

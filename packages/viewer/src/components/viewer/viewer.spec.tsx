@@ -10,6 +10,7 @@ import { Dimensions } from '@vertexvis/geometry';
 import { Async, Color } from '@vertexvis/utils';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
+import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import * as Storage from '../../lib/storage';
@@ -136,7 +137,8 @@ describe('vertex-viewer', () => {
       expect(handler.dispose).toHaveBeenCalled();
 
       const handlers = await viewer.getInteractionHandlers();
-      expect(handlers).toHaveLength(0);
+      expect(handlers).toHaveLength(1);
+      expect(handlers[0]).toBeInstanceOf(TapInteractionHandler);
     });
   });
 
@@ -504,7 +506,10 @@ describe('vertex-viewer', () => {
       viewer.cameraControls = false;
       await page.waitForChanges();
 
-      expect(await viewer.getInteractionHandlers()).toHaveLength(0);
+      expect(await viewer.getInteractionHandlers()).toHaveLength(1);
+      expect((await viewer.getInteractionHandlers())[0]).toBeInstanceOf(
+        TapInteractionHandler
+      );
 
       viewer.cameraControls = true;
       await page.waitForChanges();

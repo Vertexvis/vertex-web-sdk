@@ -200,9 +200,8 @@ export class ViewerBoxQueryTool {
               }}
             >
               <slot name="bounds">
-                <div class="outline">
-                  <div class="fill" />
-                </div>
+                <div class="outline"></div>
+                <div class="fill"></div>
               </slot>
             </div>
           )}
