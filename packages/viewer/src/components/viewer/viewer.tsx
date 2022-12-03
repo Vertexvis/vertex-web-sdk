@@ -460,12 +460,9 @@ export class Viewer {
     }
 
     if (this.src != null) {
-      try {
-        this.load(this.src);
-      } catch (e) {
-        // Consumer cannot handle this error. Just log it.
+      this.load(this.src).catch((e) => {
         console.error('Error loading scene', e);
-      }
+      });
     }
 
     this.initializeDefaultInteractionHandlers();
@@ -896,7 +893,7 @@ export class Viewer {
 
   private handleElementResize(entries: ResizeObserverEntry[]): void {
     const dimensionsHaveChanged =
-      entries.length >= 0 &&
+      entries.length > 0 &&
       this.dimensions != null &&
       !Dimensions.isEqual(entries[0].contentRect, this.viewport);
 

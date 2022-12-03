@@ -121,8 +121,6 @@ export function makeLookAtViewMatrix(
     0  , 0  , 0  , 1,
   ];
   /* eslint-enable prettier/prettier */
-
-  return Matrix4.makeIdentity();
 }
 
 /**
@@ -156,6 +154,4 @@ export function makeLookAtMatrix(
     0  , 0  , 0  , 1
   ];
   /* eslint-enable prettier/prettier */
-
-  return Matrix4.makeIdentity();
 }

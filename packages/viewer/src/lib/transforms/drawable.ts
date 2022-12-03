@@ -75,7 +75,7 @@ export function computeDrawable2dBounds(
 
   elements
     .filter((m) => m.points.valid)
-    .map((m) => {
+    .forEach((m) => {
       m.points
         .toArray()
         .map((pt) => viewport.transformNdcPointToViewport(pt))
