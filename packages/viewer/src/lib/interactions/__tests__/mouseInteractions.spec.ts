@@ -150,7 +150,6 @@ describe(PanInteraction, () => {
 
 describe(ZoomInteraction, () => {
   const api = new (InteractionApi as jest.Mock<InteractionApi>)();
-  api.transformCamera;
 
   const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
   const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
