@@ -456,11 +456,12 @@ export class PerspectiveCamera
     return super.fitCameraToBoundingBox(boundingBox, distance, this.viewVector);
   }
 
-  public update(camera: Partial<FrameCamera.FrameCamera>): Camera {
+  public update(camera: Partial<FrameCamera.PerspectiveFrameCamera>): Camera {
+    const fovY = camera.fovY ?? this.fovY;
     return new PerspectiveCamera(
       this.stream,
       this.aspect,
-      { ...this.perspectiveData, ...camera },
+      { ...this.perspectiveData, ...camera, fovY },
       this.boundingBox,
       this.decodeFrame,
       this.flyToOptions

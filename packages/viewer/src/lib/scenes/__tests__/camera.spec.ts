@@ -89,6 +89,32 @@ describe(PerspectiveCamera, () => {
     }
   );
 
+  describe(PerspectiveCamera.prototype.update, () => {
+    const forward = FrameCamera.createPerspective({
+      position: { x: 0, y: 0, z: 5 },
+    });
+    const camera = new PerspectiveCamera(
+      stream,
+      0.5,
+      forward,
+      boundingBox,
+      jest.fn()
+    );
+
+    it('supports setting the fovY', () => {
+      const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
+
+      expect(distance).toBeCloseTo(5);
+
+      const updated = camera.update({
+        ...camera,
+        fovY: 90.2,
+      }) as PerspectiveCamera;
+
+      expect(updated.fovY).toEqual(90.2);
+    });
+  });
+
   describe(PerspectiveCamera.prototype.rotateAroundAxis, () => {
     const camera = new PerspectiveCamera(
       stream,

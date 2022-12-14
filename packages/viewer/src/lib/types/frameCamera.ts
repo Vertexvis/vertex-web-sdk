@@ -136,6 +136,11 @@ export function toProtobuf(
         position: { ...camera.position },
         lookAt: { ...camera.lookAt },
         up: { ...camera.up },
+        fovY: camera.fovY
+          ? {
+              value: camera.fovY,
+            }
+          : null,
       },
       position: { ...camera.position },
       lookAt: { ...camera.lookAt },
