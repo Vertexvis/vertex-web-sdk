@@ -194,7 +194,7 @@ export class FrameCameraBase implements FrameCameraLike {
         near,
         far,
         aspectRatio,
-        45
+        camera.fovY ?? 45
       );
     }
   }
@@ -290,7 +290,7 @@ export class FramePerspectiveCamera
     public readonly near: number,
     public readonly far: number,
     public readonly aspectRatio: number,
-    public readonly fovY = 45
+    public readonly fovY: number
   ) {
     super(position, lookAt, up, near, far, aspectRatio);
   }

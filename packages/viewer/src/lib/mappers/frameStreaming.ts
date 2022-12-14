@@ -31,15 +31,17 @@ export const fromPbPerspectiveCamera: M.Func<
   M.read(
     M.mapProp('position', M.compose(M.required('position'), fromPbVector3f)),
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
-    M.mapProp('up', M.compose(M.required('up'), fromPbVector3f))
+    M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
+    M.getProp('fovY')
   ),
-  ([position, lookAt, up]) => ({
-    position,
-    lookAt,
-    up,
-    // TODO: map fovY property when available
-    fovY: 45,
-  })
+  ([position, lookAt, up, fovY]) => {
+    return {
+      position,
+      lookAt,
+      up,
+      fovY: fovY?.value != null ? fovY.value : 45,
+    };
+  }
 );
 
 export const fromPbOrthographicCamera: M.Func<
@@ -74,15 +76,17 @@ export const fromPbCamera: M.Func<
     M.mapProp('perspective', M.ifDefined(fromPbPerspectiveCamera)),
     M.mapProp('orthographic', M.ifDefined(fromPbOrthographicCamera))
   ),
-  ([position, lookAt, up, perspective, orthographic]) =>
-    perspective ??
-    orthographic ?? {
-      position: position ?? Vector3.back(),
-      lookAt: lookAt ?? Vector3.origin(),
-      up: up ?? Vector3.up(),
-      // TODO: map fovY property when available
-      fovY: 45,
-    }
+  ([position, lookAt, up, perspective, orthographic]) => {
+    return (
+      perspective ??
+      orthographic ?? {
+        position: position ?? Vector3.back(),
+        lookAt: lookAt ?? Vector3.origin(),
+        up: up ?? Vector3.up(),
+        fovY: 45,
+      }
+    );
+  }
 );
 
 export const fromPbSectionPlane: M.Func<
