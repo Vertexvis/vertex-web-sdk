@@ -59,6 +59,8 @@
     </style>
 
     <script type="module">
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.x/dist/esm/index.mjs';
+
       window.addEventListener('DOMContentLoaded', () => {
         main();
       });
@@ -68,6 +70,37 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+
+
+        viewer.addEventListener('tap', async (event) => {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+
+          const result = await raycaster.hitItems(position);
+
+          if (result.hits && result.hits.length == 0) {
+            await scene
+              .items((op) => [
+                op.where(q => q.all()).clearMaterialOverrides(),
+                op.where(q => q.all()).deselect(),
+                op.where((q) => q.not(not => not.withSelected())).materialOverride(ColorMaterial.fromHex('#ff0000')),
+                op.where((q) => q.not(not => not.withSelected())).select(),
+              ])
+              .execute();
+          } else {
+            await scene
+              .items((op) => [
+                op
+                  .where((q1) =>  q1.not( q2 => q2.not(q => q.withItemId(result.hits[0].itemId.hex))))
+                  .materialOverride(ColorMaterial.fromHex('#ff0000')),
+                op
+                  .where((q) => q.withItemId(result.hits[0].itemId.hex))
+                  .select(),
+              ])
+              .execute();
+          }
+        });
       }
     </script>
   </head>
@@ -85,9 +118,8 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:key"
+          src="urn:vertexvis:stream-key:zUiZPQPnEscHG2E9OuRJOzFs8wXxsS15PJqT"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"

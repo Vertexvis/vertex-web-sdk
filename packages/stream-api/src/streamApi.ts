@@ -341,6 +341,8 @@ export class StreamApi {
     payload: vertexvis.protobuf.stream.ICreateSceneAlterationPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    console.log('alteration request: ');
+    console.log(payload);
     return this.sendRequest({ createSceneAlteration: payload }, withResponse);
   }
 

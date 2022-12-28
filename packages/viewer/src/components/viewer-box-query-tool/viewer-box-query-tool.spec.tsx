@@ -104,12 +104,16 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            volume: {
-              exclusive: true,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: true,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {
@@ -152,12 +156,16 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            volume: {
-              exclusive: false,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: false,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {
@@ -200,12 +208,16 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            volume: {
-              exclusive: false,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: false,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {
@@ -246,7 +258,11 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            all: {},
+            queryExpression: {
+              operand: {
+                root: {},
+              },
+            },
             operationTypes: expect.arrayContaining([
               {
                 changeSelection: {},
@@ -254,12 +270,16 @@ describe('vertex-viewer-box-query-tool', () => {
             ]),
           }),
           expect.objectContaining({
-            volume: {
-              exclusive: false,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: false,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {
@@ -316,12 +336,16 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            volume: {
-              exclusive: false,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: false,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {
@@ -338,12 +362,16 @@ describe('vertex-viewer-box-query-tool', () => {
       expect.objectContaining({
         operations: expect.arrayContaining([
           expect.objectContaining({
-            volume: {
-              exclusive: true,
-              frustumByRectangle: {
-                rectangle: { height: 10, width: 10, x: 5, y: 5 },
+            queryExpression: {
+              operand: {
+                volume: {
+                  exclusive: true,
+                  frustumByRectangle: {
+                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                  },
+                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                },
               },
-              viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
             },
             operationTypes: expect.arrayContaining([
               {

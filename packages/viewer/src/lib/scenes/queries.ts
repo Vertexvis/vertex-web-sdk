@@ -32,6 +32,10 @@ interface SceneTreeRangeQueryExpression {
   range: SceneTreeRange;
 }
 
+interface NotQueryExpression {
+  type: 'not';
+  query: QueryExpression;
+}
 interface MetadataQueryExpression {
   type: 'metadata';
   filter: string;
@@ -66,7 +70,8 @@ export type QueryExpression =
   | PointQueryExpression
   | VolumeIntersectionQueryExpression
   | MetadataQueryExpression
-  | AllSelectedQueryExpression;
+  | AllSelectedQueryExpression
+  | NotQueryExpression;
 
 /**
  * An interface that represents a query is "complete" and can be turned into an
@@ -90,6 +95,11 @@ interface BooleanQuery {
 export class RootQuery implements ItemQuery<SingleQuery> {
   public all(): AllQuery {
     return new AllQuery();
+  }
+
+  public not(query: (q: RootQuery) => TerminalQuery): NotQuery {
+    const expression: QueryExpression = query(new RootQuery()).build();
+    return new NotQuery(expression);
   }
 
   public withItemIds(ids: string[]): BulkQuery {
@@ -133,6 +143,16 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     exclusive?: boolean
   ): VolumeIntersectionQuery {
     return new VolumeIntersectionQuery(rectangle, exclusive);
+  }
+}
+
+export class NotQuery implements TerminalQuery {
+  public constructor(private query: QueryExpression) {}
+  public build(): QueryExpression {
+    return {
+      type: 'not',
+      query: this.query,
+    };
   }
 }
 
