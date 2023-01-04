@@ -33,6 +33,43 @@ describe(RootQuery, () => {
     });
   });
 
+  it('should support not queries', () => {
+    const notWithSelectedQuery = new RootQuery().not().withSelected();
+
+    expect(notWithSelectedQuery.build()).toEqual({
+      type: 'not',
+      query: {
+        type: 'all-selected',
+      },
+    });
+  });
+
+  it('should support nested not queries and remove redundancies', () => {
+    const notWithSelectedQuery = new RootQuery()
+      .not()
+      .not()
+      .withSuppliedId(suppliedId);
+
+    expect(notWithSelectedQuery.build()).toEqual({
+      type: 'supplied-id',
+      value: suppliedId,
+    });
+
+    const notWithSelectedQueryNot = new RootQuery()
+      .not()
+      .not()
+      .not()
+      .withSuppliedId(suppliedId);
+
+    expect(notWithSelectedQueryNot.build()).toEqual({
+      type: 'not',
+      query: {
+        type: 'supplied-id',
+        value: suppliedId,
+      },
+    });
+  });
+
   it('should support single or multiple queries', () => {
     const itemQueryBuilder = new RootQuery()
       .withItemId(itemId.toString())

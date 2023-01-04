@@ -63,10 +63,14 @@ describe(Scene, () => {
         },
         operations: [
           {
-            item: {
-              sceneItemQuery: {
-                id: {
-                  hex: itemId.toString(),
+            queryExpression: {
+              operand: {
+                item: {
+                  sceneItemQuery: {
+                    id: {
+                      hex: itemId.toString(),
+                    },
+                  },
                 },
               },
             },
@@ -95,10 +99,14 @@ describe(Scene, () => {
         },
         operations: [
           {
-            item: {
-              sceneItemQuery: {
-                id: {
-                  hex: itemId.toString(),
+            queryExpression: {
+              operand: {
+                item: {
+                  sceneItemQuery: {
+                    id: {
+                      hex: itemId.toString(),
+                    },
+                  },
                 },
               },
             },
@@ -126,8 +134,12 @@ describe(Scene, () => {
         },
         operations: [
           {
-            override: {
-              selection: {},
+            queryExpression: {
+              operand: {
+                override: {
+                  selection: {},
+                },
+              },
             },
             operationTypes: [
               {
@@ -163,9 +175,13 @@ describe(Scene, () => {
         },
         operations: [
           {
-            sceneTreeRange: {
-              end: 19,
-              start: 0,
+            queryExpression: {
+              operand: {
+                sceneTreeRange: {
+                  end: 19,
+                  start: 0,
+                },
+              },
             },
             operationTypes: [
               {
@@ -194,9 +210,13 @@ describe(Scene, () => {
         },
         operations: [
           {
-            metadata: {
-              valueFilter: 'foo',
-              keys: ['bar', 'baz'],
+            queryExpression: {
+              operand: {
+                metadata: {
+                  valueFilter: 'foo',
+                  keys: ['bar', 'baz'],
+                },
+              },
             },
             operationTypes: [
               {
@@ -233,7 +253,11 @@ describe(Scene, () => {
         },
         operations: [
           {
-            all: {},
+            queryExpression: {
+              operand: {
+                root: {},
+              },
+            },
             operationTypes: [
               {
                 changeVisibility: {
@@ -243,21 +267,25 @@ describe(Scene, () => {
             ],
           },
           {
-            or: {
-              queries: [
-                {
-                  sceneItemQuery: {
-                    id: {
-                      hex: itemId.toString(),
+            queryExpression: {
+              operand: {
+                itemCollection: {
+                  queries: [
+                    {
+                      sceneItemQuery: {
+                        id: {
+                          hex: itemId.toString(),
+                        },
+                      },
                     },
-                  },
+                    {
+                      sceneItemQuery: {
+                        suppliedId,
+                      },
+                    },
+                  ],
                 },
-                {
-                  sceneItemQuery: {
-                    suppliedId,
-                  },
-                },
-              ],
+              },
             },
             operationTypes: [
               {
@@ -268,7 +296,11 @@ describe(Scene, () => {
             ],
           },
           {
-            all: {},
+            queryExpression: {
+              operand: {
+                root: {},
+              },
+            },
             operationTypes: [
               {
                 changeMaterial: {
@@ -320,9 +352,13 @@ describe(Scene, () => {
         },
         operations: [
           {
-            item: {
-              sceneItemQuery: {
-                id: { hex: itemId.toString() },
+            queryExpression: {
+              operand: {
+                item: {
+                  sceneItemQuery: {
+                    id: { hex: itemId.toString() },
+                  },
+                },
               },
             },
             operationTypes: [
@@ -352,9 +388,13 @@ describe(Scene, () => {
         },
         operations: [
           {
-            item: {
-              sceneItemQuery: {
-                id: { hex: itemId.toString() },
+            queryExpression: {
+              operand: {
+                item: {
+                  sceneItemQuery: {
+                    id: { hex: itemId.toString() },
+                  },
+                },
               },
             },
             operationTypes: [
@@ -384,9 +424,13 @@ describe(Scene, () => {
         },
         operations: [
           {
-            item: {
-              sceneItemQuery: {
-                id: { hex: itemId.toString() },
+            queryExpression: {
+              operand: {
+                item: {
+                  sceneItemQuery: {
+                    id: { hex: itemId.toString() },
+                  },
+                },
               },
             },
             operationTypes: [

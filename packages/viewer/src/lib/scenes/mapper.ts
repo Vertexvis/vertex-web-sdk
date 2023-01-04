@@ -41,6 +41,96 @@ export function buildSceneViewStateIdentifier(
   }
 }
 
+export function buildQueryExpression(
+  query: QueryExpression,
+  context: BuildSceneOperationContext
+): vertexvis.protobuf.stream.IQueryExpression {
+  switch (query.type) {
+    case 'and':
+    case 'or':
+      return {
+        operand: {
+          itemCollection: {
+            queries: query.expressions.map((exp) => ({
+              sceneItemQuery: buildSceneItemQuery(exp),
+            })),
+          },
+        },
+      };
+    case 'not':
+      return {
+        not: {
+          expression: buildQueryExpression(query.query, context),
+        },
+      };
+    case 'item-id':
+    case 'supplied-id':
+      return {
+        operand: {
+          item: {
+            sceneItemQuery: buildSceneItemQuery(query),
+          },
+        },
+      };
+    case 'all':
+      return {
+        operand: {
+          root: {},
+        },
+      };
+    case 'scene-tree-range':
+      return {
+        operand: {
+          sceneTreeRange: {
+            start: query.range.start,
+            end: query.range.end,
+          },
+        },
+      };
+    case 'metadata':
+      return {
+        operand: {
+          metadata: {
+            valueFilter: query.filter,
+            keys: query.keys,
+            exactMatch: query.exactMatch,
+          },
+        },
+      };
+    case 'all-selected':
+      return {
+        operand: {
+          override: {
+            selection: {},
+          },
+        },
+      };
+    case 'point':
+      return {
+        operand: {
+          point: {
+            point: query.point,
+            viewport: context.dimensions,
+          },
+        },
+      };
+    case 'volume-intersection':
+      return {
+        operand: {
+          volume: {
+            frustumByRectangle: {
+              rectangle: query.rectangle,
+            },
+            exclusive: query.exclusive,
+            viewport: context.dimensions,
+          },
+        },
+      };
+    default:
+      return {};
+  }
+}
+
 export function buildSceneOperation(
   query: QueryExpression,
   operations: ItemOperation[],
@@ -48,76 +138,12 @@ export function buildSceneOperation(
 ): vertexvis.protobuf.stream.ISceneOperation {
   const operationTypes = buildOperationTypes(operations);
 
-  switch (query.type) {
-    case 'and':
-    case 'or':
-      return {
-        [query.type]: {
-          queries: query.expressions.map((exp) => ({
-            sceneItemQuery: buildSceneItemQuery(exp),
-          })),
-        },
-        operationTypes,
-      };
-    case 'item-id':
-    case 'supplied-id':
-      return {
-        item: {
-          sceneItemQuery: buildSceneItemQuery(query),
-        },
-        operationTypes,
-      };
-    case 'all':
-      return {
-        all: {},
-        operationTypes,
-      };
-    case 'scene-tree-range':
-      return {
-        sceneTreeRange: {
-          start: query.range.start,
-          end: query.range.end,
-        },
-        operationTypes,
-      };
-    case 'metadata':
-      return {
-        metadata: {
-          valueFilter: query.filter,
-          keys: query.keys,
-          exactMatch: query.exactMatch,
-        },
-        operationTypes,
-      };
-    case 'all-selected':
-      return {
-        override: {
-          selection: {},
-        },
-        operationTypes,
-      };
-    case 'point':
-      return {
-        point: {
-          point: query.point,
-          viewport: context.dimensions,
-        },
-        operationTypes,
-      };
-    case 'volume-intersection':
-      return {
-        volume: {
-          frustumByRectangle: {
-            rectangle: query.rectangle,
-          },
-          exclusive: query.exclusive,
-          viewport: context.dimensions,
-        },
-        operationTypes,
-      };
-    default:
-      return {};
-  }
+  const queryExpression = buildQueryExpression(query, context);
+
+  return {
+    queryExpression,
+    operationTypes,
+  };
 }
 
 function buildSceneItemQuery(

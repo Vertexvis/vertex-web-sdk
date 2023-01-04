@@ -14,7 +14,11 @@ describe(buildSceneOperation, () => {
         }
       )
     ).toMatchObject({
-      all: {},
+      queryExpression: {
+        operand: {
+          root: {},
+        },
+      },
       operationTypes: [
         {
           clearTransform: {
