@@ -34,7 +34,7 @@ describe(RootQuery, () => {
   });
 
   it('should support not queries', () => {
-    const notWithSelectedQuery = new RootQuery().not((q) => q.withSelected());
+    const notWithSelectedQuery = new RootQuery().not().withSelected();
 
     expect(notWithSelectedQuery.build()).toEqual({
       type: 'not',
@@ -44,19 +44,28 @@ describe(RootQuery, () => {
     });
   });
 
-  it('should support nested not queries', () => {
-    const notWithSelectedQuery = new RootQuery().not((q) =>
-      q.not((not) => not.withSuppliedId(suppliedId))
-    );
+  it('should support nested not queries and remove redundancies', () => {
+    const notWithSelectedQuery = new RootQuery()
+      .not()
+      .not()
+      .withSuppliedId(suppliedId);
 
     expect(notWithSelectedQuery.build()).toEqual({
+      type: 'supplied-id',
+      value: suppliedId,
+    });
+
+    const notWithSelectedQueryNot = new RootQuery()
+      .not()
+      .not()
+      .not()
+      .withSuppliedId(suppliedId);
+
+    expect(notWithSelectedQueryNot.build()).toEqual({
       type: 'not',
       query: {
-        type: 'not',
-        query: {
-          type: 'supplied-id',
-          value: suppliedId,
-        },
+        type: 'supplied-id',
+        value: suppliedId,
       },
     });
   });

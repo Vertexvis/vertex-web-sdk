@@ -77,8 +77,24 @@ export type QueryExpression =
  * An interface that represents a query is "complete" and can be turned into an
  * expression.
  */
-interface TerminalQuery {
-  build(): QueryExpression;
+abstract class TerminalQuery {
+  protected inverted: boolean;
+  public constructor(inverted: boolean) {
+    this.inverted = inverted;
+  }
+
+  public build(): QueryExpression {
+    if (this.inverted) {
+      return {
+        type: 'not',
+        query: this.queryExpressionBuilder(),
+      };
+    } else {
+      return this.queryExpressionBuilder();
+    }
+  }
+
+  public abstract queryExpressionBuilder(): QueryExpression;
 }
 
 interface ItemQuery<N> {
@@ -93,33 +109,33 @@ interface BooleanQuery {
 }
 
 export class RootQuery implements ItemQuery<SingleQuery> {
+  public constructor(private inverted: boolean = false) {}
   public all(): AllQuery {
     return new AllQuery();
   }
 
-  public not(query: (q: RootQuery) => TerminalQuery): NotQuery {
-    const expression: QueryExpression = query(new RootQuery()).build();
-    return new NotQuery(expression);
+  public not(): RootQuery {
+    return new NotQuery(!this.inverted);
   }
 
   public withItemIds(ids: string[]): BulkQuery {
-    return new BulkQuery(ids, 'item-id');
+    return new BulkQuery(ids, 'item-id', this.inverted);
   }
 
   public withSuppliedIds(ids: string[]): BulkQuery {
-    return new BulkQuery(ids, 'supplied-id');
+    return new BulkQuery(ids, 'supplied-id', this.inverted);
   }
 
   public withItemId(id: string): SingleQuery {
-    return new SingleQuery({ type: 'item-id', value: id });
+    return new SingleQuery({ type: 'item-id', value: id }, this.inverted);
   }
 
   public withSuppliedId(id: string): SingleQuery {
-    return new SingleQuery({ type: 'supplied-id', value: id });
+    return new SingleQuery({ type: 'supplied-id', value: id }, this.inverted);
   }
 
   public withSceneTreeRange(range: SceneTreeRange): SceneTreeRangeQuery {
-    return new SceneTreeRangeQuery(range);
+    return new SceneTreeRangeQuery(range, this.inverted);
   }
 
   public withMetadata(
@@ -127,45 +143,47 @@ export class RootQuery implements ItemQuery<SingleQuery> {
     keys: string[],
     exactMatch: boolean
   ): MetadataQuery {
-    return new MetadataQuery(filter, keys, exactMatch);
+    return new MetadataQuery(filter, keys, exactMatch, this.inverted);
   }
 
   public withSelected(): AllSelectedQuery {
-    return new AllSelectedQuery();
+    return new AllSelectedQuery(this.inverted);
   }
 
   public withPoint(point: Point.Point): PointQuery {
-    return new PointQuery(point);
+    return new PointQuery(point, this.inverted);
   }
 
   public withVolumeIntersection(
     rectangle: Rectangle.Rectangle,
     exclusive?: boolean
   ): VolumeIntersectionQuery {
-    return new VolumeIntersectionQuery(rectangle, exclusive);
+    return new VolumeIntersectionQuery(rectangle, this.inverted, exclusive);
   }
 }
 
-export class NotQuery implements TerminalQuery {
-  public constructor(private query: QueryExpression) {}
-  public build(): QueryExpression {
-    return {
-      type: 'not',
-      query: this.query,
-    };
+export class NotQuery extends RootQuery {
+  public constructor(inverted: boolean) {
+    super(inverted);
   }
 }
 
-export class AllQuery implements TerminalQuery {
-  public build(): QueryExpression {
+export class AllQuery extends TerminalQuery {
+  public constructor(inverted = false) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): QueryExpression {
     return { type: 'all' };
   }
 }
 
-export class SceneTreeRangeQuery implements TerminalQuery {
-  public constructor(private range: SceneTreeRange) {}
+export class SceneTreeRangeQuery extends TerminalQuery {
+  public constructor(private range: SceneTreeRange, inverted: boolean) {
+    super(inverted);
+  }
 
-  public build(): SceneTreeRangeQueryExpression {
+  public queryExpressionBuilder(): SceneTreeRangeQueryExpression {
     return {
       type: 'scene-tree-range',
       range: this.range,
@@ -173,14 +191,17 @@ export class SceneTreeRangeQuery implements TerminalQuery {
   }
 }
 
-export class MetadataQuery implements TerminalQuery {
+export class MetadataQuery extends TerminalQuery {
   public constructor(
     private filter: string,
     private keys: string[],
-    private exactMatch: boolean
-  ) {}
+    private exactMatch: boolean,
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
 
-  public build(): MetadataQueryExpression {
+  public queryExpressionBuilder(): MetadataQueryExpression {
     return {
       type: 'metadata',
       filter: this.filter,
@@ -190,18 +211,24 @@ export class MetadataQuery implements TerminalQuery {
   }
 }
 
-export class AllSelectedQuery implements TerminalQuery {
-  public build(): AllSelectedQueryExpression {
+export class AllSelectedQuery extends TerminalQuery {
+  public constructor(inverted: boolean) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): AllSelectedQueryExpression {
     return {
       type: 'all-selected',
     };
   }
 }
 
-export class PointQuery implements TerminalQuery {
-  public constructor(private point: Point.Point) {}
+export class PointQuery extends TerminalQuery {
+  public constructor(private point: Point.Point, inverted: boolean) {
+    super(inverted);
+  }
 
-  public build(): PointQueryExpression {
+  public queryExpressionBuilder(): PointQueryExpression {
     return {
       type: 'point',
       point: this.point,
@@ -209,13 +236,16 @@ export class PointQuery implements TerminalQuery {
   }
 }
 
-export class VolumeIntersectionQuery implements TerminalQuery {
+export class VolumeIntersectionQuery extends TerminalQuery {
   public constructor(
     private rectangle: Rectangle.Rectangle,
+    inverted: boolean,
     private exclusive?: boolean
-  ) {}
+  ) {
+    super(inverted);
+  }
 
-  public build(): VolumeIntersectionQueryExpression {
+  public queryExpressionBuilder(): VolumeIntersectionQueryExpression {
     return {
       type: 'volume-intersection',
       rectangle: this.rectangle,
@@ -224,13 +254,16 @@ export class VolumeIntersectionQuery implements TerminalQuery {
   }
 }
 
-export class BulkQuery implements TerminalQuery {
+export class BulkQuery extends TerminalQuery {
   public constructor(
     private ids: string[],
-    private type: 'item-id' | 'supplied-id'
-  ) {}
+    private type: 'item-id' | 'supplied-id',
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
 
-  public build(): QueryExpression {
+  public queryExpressionBuilder(): QueryExpression {
     return {
       type: 'or',
       expressions: this.ids.map((id) => {
@@ -243,38 +276,48 @@ export class BulkQuery implements TerminalQuery {
   }
 }
 
-class SingleQuery implements TerminalQuery, BooleanQuery {
-  public constructor(private query: QueryExpression) {}
+class SingleQuery extends TerminalQuery implements BooleanQuery {
+  public constructor(private query: QueryExpression, inverted: boolean) {
+    super(inverted);
+  }
 
-  public build(): QueryExpression {
+  public queryExpressionBuilder(): QueryExpression {
     return { ...this.query };
   }
 
   public and(): AndQuery {
-    return new AndQuery([this.query]);
+    return new AndQuery([this.query], this.inverted);
   }
 
   public or(): OrQuery {
-    return new OrQuery([this.query]);
+    return new OrQuery([this.query], this.inverted);
   }
 }
 
-export class OrQuery implements TerminalQuery, ItemQuery<OrQuery> {
-  public constructor(private expressions: QueryExpression[]) {}
+export class OrQuery extends TerminalQuery implements ItemQuery<OrQuery> {
+  public constructor(
+    private expressions: QueryExpression[],
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
 
-  public build(): QueryExpression {
+  public queryExpressionBuilder(): QueryExpression {
     return { type: 'or', expressions: [...this.expressions] };
   }
 
   public withItemId(id: string): OrQuery {
-    return new OrQuery([...this.expressions, { type: 'item-id', value: id }]);
+    return new OrQuery(
+      [...this.expressions, { type: 'item-id', value: id }],
+      this.inverted
+    );
   }
 
   public withSuppliedId(id: string): OrQuery {
-    return new OrQuery([
-      ...this.expressions,
-      { type: 'supplied-id', value: id },
-    ]);
+    return new OrQuery(
+      [...this.expressions, { type: 'supplied-id', value: id }],
+      this.inverted
+    );
   }
 
   public or(): OrQuery {
@@ -282,22 +325,30 @@ export class OrQuery implements TerminalQuery, ItemQuery<OrQuery> {
   }
 }
 
-export class AndQuery implements TerminalQuery, ItemQuery<AndQuery> {
-  public constructor(private expressions: QueryExpression[]) {}
+export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
+  public constructor(
+    private expressions: QueryExpression[],
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
 
-  public build(): QueryExpression {
+  public queryExpressionBuilder(): QueryExpression {
     return { type: 'and', expressions: [...this.expressions] };
   }
 
   public withItemId(id: string): AndQuery {
-    return new AndQuery([...this.expressions, { type: 'item-id', value: id }]);
+    return new AndQuery(
+      [...this.expressions, { type: 'item-id', value: id }],
+      this.inverted
+    );
   }
 
   public withSuppliedId(id: string): AndQuery {
-    return new AndQuery([
-      ...this.expressions,
-      { type: 'supplied-id', value: id },
-    ]);
+    return new AndQuery(
+      [...this.expressions, { type: 'supplied-id', value: id }],
+      this.inverted
+    );
   }
 
   public and(): AndQuery {
