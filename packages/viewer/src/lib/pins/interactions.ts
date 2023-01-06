@@ -72,7 +72,6 @@ export class PinsInteractionHandler implements InteractionHandler {
       const [hit] = await api.hitItems(pt);
 
       if (hit?.hitPoint != null && this.elementRect != null) {
-        const relativePoint = translatePointToRelative(pt, this.elementRect);
         if (
           hit?.hitPoint != null &&
           hit?.hitPoint.x != null &&
@@ -103,6 +102,12 @@ export class PinsInteractionHandler implements InteractionHandler {
               });
               break;
             case 'pin-text':
+              const isNewPin = existingPin == null;
+              const relativePoint = translatePointToRelative(
+                pt,
+                this.elementRect,
+                isNewPin
+              );
               this.controller.setPin({
                 type: 'text',
                 id: pinId,
@@ -117,6 +122,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 },
                 attributes,
               });
+              this.controller.setSelectedPinId(pinId);
               break;
           }
         }

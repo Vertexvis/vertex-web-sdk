@@ -232,7 +232,6 @@ describe('vertex-viewer-pin-label', () => {
     input.dispatchEvent(
       new KeyboardEvent('keydown', {
         key: 'Enter',
-        metaKey: true,
       })
     );
 

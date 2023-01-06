@@ -29,13 +29,39 @@ export function translatePointToScreen(
  */
 export function translatePointToRelative(
   pt: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  includeOffset?: boolean
 ): Point.Point {
+  const verticalScaleFactor = 1 / canvasDimensions.height;
+  const horizontalScaleFactor = 1 / canvasDimensions.width;
+  const canvasCenterPoint = Dimensions.center(canvasDimensions);
+
   const point = Point.scale(
-    Point.subtract(pt, Dimensions.center(canvasDimensions)),
-    1 / canvasDimensions.width,
-    1 / canvasDimensions.height
+    Point.subtract(pt, canvasCenterPoint),
+    horizontalScaleFactor,
+    verticalScaleFactor
   );
 
-  return constrainRelativePoint(point, Range.create(-0.5, 0.5));
+  if (includeOffset) {
+    const offset = Point.scale(
+      Point.create(20, 20),
+      horizontalScaleFactor,
+      verticalScaleFactor
+    );
+
+    // We want to place the label towards the center of the screen.
+    // The given point corresponds to the upper left corner of the label, so increase the offset
+    // when placing it to the left or above to ensure that part of the label line is visible
+    const centerIsToTheRightInXDirection = canvasCenterPoint.x > pt.x;
+    const xOffset = centerIsToTheRightInXDirection ? offset.x : -3 * offset.x;
+
+    const centerIsBelowInYDirection = canvasCenterPoint.y > pt.y;
+    const yOffset = centerIsBelowInYDirection ? offset.y : -3 * offset.y;
+
+    const offsetPoint = Point.add(point, Point.create(xOffset, yOffset));
+
+    return constrainRelativePoint(offsetPoint, Range.create(-0.5, 0.5));
+  } else {
+    return constrainRelativePoint(point, Range.create(-0.5, 0.5));
+  }
 }

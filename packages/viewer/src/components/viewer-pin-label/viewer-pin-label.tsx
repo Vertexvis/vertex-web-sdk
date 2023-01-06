@@ -115,11 +115,9 @@ export class VertexPinLabel {
   public async setFocus(): Promise<void> {
     // HTMLInputElement.focus() doesn't exist in tests.
     if (typeof this.inputEl?.focus === 'function') {
-      if (this.focused) {
-        this.inputEl?.focus();
-      } else {
-        this.inputEl?.blur();
-      }
+      this.focused = true;
+      this.labelFocused.emit(this.pin?.id);
+      this.inputEl?.focus();
     }
   }
 
@@ -318,11 +316,13 @@ export class VertexPinLabel {
   };
 
   private handleInputKeyDown = (event: KeyboardEvent): void => {
+    event.stopPropagation();
     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      this.textareaRows += 1;
+      this.value += '\n';
+    } else if (event.key === 'Enter') {
       event.preventDefault();
       this.submit();
-    } else if (event.key === 'Enter') {
-      this.textareaRows += 1;
     }
   };
 
