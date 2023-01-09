@@ -577,7 +577,7 @@ export class SceneTree {
 
       if (definedMetadataKeys.length === 0) {
         console.warn(
-          "No metadata keys were found to perform the search. Defaulting to ['VERTEX_SCENE_ITEM_NAME']"
+          "No metadata keys were found to perform the selection. Defaulting to ['VERTEX_SCENE_ITEM_NAME']"
         );
       }
 
