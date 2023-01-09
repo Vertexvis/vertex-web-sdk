@@ -317,7 +317,10 @@ export class VertexPinLabel {
 
   private handleInputKeyDown = (event: KeyboardEvent): void => {
     event.stopPropagation();
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+    if (
+      event.key === 'Enter' &&
+      (event.ctrlKey || event.metaKey || event.shiftKey)
+    ) {
       this.textareaRows += 1;
       this.value += '\n';
     } else if (event.key === 'Enter') {
