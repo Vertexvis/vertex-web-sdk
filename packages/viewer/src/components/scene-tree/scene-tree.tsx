@@ -570,10 +570,21 @@ export class SceneTree {
     options?: SceneTreeOperationOptions
   ): Promise<void> {
     if (this.viewer != null) {
-      const columnsToSearch =
+      const definedMetadataKeys =
         this.metadataSearchKeys.length > 0
           ? this.metadataSearchKeys
           : this.metadataKeys;
+
+      if (definedMetadataKeys.length === 0) {
+        console.warn(
+          "No metadata keys were found to perform the search. Defaulting to ['VERTEX_SCENE_ITEM_NAME']"
+        );
+      }
+
+      const columnsToSearch =
+        definedMetadataKeys.length > 0
+          ? definedMetadataKeys
+          : ['VERTEX_SCENE_ITEM_NAME'];
 
       await selectFilterResults(
         this.viewer,

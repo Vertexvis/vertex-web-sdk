@@ -63,6 +63,7 @@ import { decodeSceneTreeJwt } from './lib/jwt';
 import {
   deselectItem,
   hideItem,
+  selectFilterResults,
   selectItem,
   selectRangeInSceneTree,
   showItem,
@@ -550,6 +551,52 @@ describe('<vertex-scene-tree>', () => {
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtClientY(30);
       expect(row?.node.name).toBe(res.toObject().itemsList[1].name);
+    });
+  });
+
+  describe(SceneTree.prototype.selectFilteredItems, () => {
+    it('defaults to the name for selection if no metadatakeys are defined', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      mockGetTree({ client });
+      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+
+      (selectFilterResults as jest.Mock).mockClear();
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      await tree.selectFilteredItems('query');
+      expect(selectFilterResults).toHaveBeenCalledWith(
+        expect.anything(),
+        'query',
+        ['VERTEX_SCENE_ITEM_NAME'],
+        expect.anything(),
+        {
+          append: false,
+        }
+      );
+    });
+
+    it('uses the metadata search keys provided', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      mockGetTree({ client });
+      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+
+      const expectedKeys = ['key1', 'key2'];
+      (selectFilterResults as jest.Mock).mockClear();
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      tree.metadataSearchKeys = expectedKeys;
+      await tree.selectFilteredItems('query');
+      expect(selectFilterResults).toHaveBeenCalledWith(
+        expect.anything(),
+        'query',
+        expectedKeys,
+        expect.anything(),
+        {
+          append: false,
+        }
+      );
     });
   });
 
