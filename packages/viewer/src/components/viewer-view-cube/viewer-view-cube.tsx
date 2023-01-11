@@ -35,13 +35,13 @@ export class ViewerViewCube {
    * The label for the side of the cube on the positive x-axis.
    */
   @Prop()
-  public xPositiveLabel = 'Left';
+  public xPositiveLabel = 'Right';
 
   /**
    * The label for the side of the cube on the negative x-axis.
    */
   @Prop()
-  public xNegativeLabel = 'Right';
+  public xNegativeLabel = 'Left';
 
   /**
    * The label for the side of the cube on the positive y-axis.
