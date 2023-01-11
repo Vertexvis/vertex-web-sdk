@@ -6,4 +6,16 @@
   right: 0;
   overflow: hidden;
   pointer-events: none;
+
+  /**
+  * @prop --viewer-pin-tool-initial-label-offset-x: The number of pixels to offset
+  the label in the x direction. Defaults to 20.
+  */
+  --viewer-pin-tool-initial-label-offset-x: 20;
+
+  /**
+  * @prop --viewer-pin-tool-initial-label-offset-y: The number of pixels to offset
+  the label in the y direction. Defaults to 20.
+  */
+  --viewer-pin-tool-initial-label-offset-y: 20;
 }

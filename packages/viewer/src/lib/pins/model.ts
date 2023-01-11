@@ -90,14 +90,14 @@ export class PinModel {
    * @param pin A pin entity to draw.
    * @returns `true` if the entity has been added.
    */
-  public addPin(pin: Pin, surpressEvent = false): boolean {
+  public addPin(pin: Pin, suppressEvent = false): boolean {
     if (this.entities[pin.id] == null) {
       this.entities = {
         ...this.entities,
         [pin.id]: pin,
       };
 
-      if (!surpressEvent) {
+      if (!suppressEvent) {
         this.entitiesChanged.emit(this.getPins());
       }
       return true;

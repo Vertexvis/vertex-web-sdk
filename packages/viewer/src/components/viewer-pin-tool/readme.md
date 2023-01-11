@@ -190,6 +190,14 @@ storage mechanism, then rehydrate them.
 | `viewer`        | --              | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.                                                                                            | `HTMLVertexViewerElement \| undefined` | `undefined`      |
 
 
+## CSS Custom Properties
+
+| Name                                       | Description                                                                  |
+| ------------------------------------------ | ---------------------------------------------------------------------------- |
+| `--viewer-pin-tool-initial-label-offset-x` | The number of pixels to offset the label in the x direction. Defaults to 20. |
+| `--viewer-pin-tool-initial-label-offset-y` | The number of pixels to offset the label in the y direction. Defaults to 20. |
+
+
 ## Dependencies
 
 ### Depends on

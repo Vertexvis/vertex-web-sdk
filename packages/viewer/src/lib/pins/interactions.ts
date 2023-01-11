@@ -17,6 +17,9 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private cursor?: Disposable;
 
+  private xOffset?: number;
+  private yOffset?: number;
+
   private rectObserver = new ElementRectObserver();
 
   private droppableSurfaces: EntityType[] = [
@@ -29,8 +32,14 @@ export class PinsInteractionHandler implements InteractionHandler {
     return this.rectObserver.rect;
   }
 
-  public constructor(controller: PinController) {
+  public constructor(
+    controller: PinController,
+    xOffset: number,
+    yOffset: number
+  ) {
     this.controller = controller;
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -72,7 +81,6 @@ export class PinsInteractionHandler implements InteractionHandler {
       const [hit] = await api.hitItems(pt);
 
       if (hit?.hitPoint != null && this.elementRect != null) {
-        const relativePoint = translatePointToRelative(pt, this.elementRect);
         if (
           hit?.hitPoint != null &&
           hit?.hitPoint.x != null &&
@@ -103,6 +111,14 @@ export class PinsInteractionHandler implements InteractionHandler {
               });
               break;
             case 'pin-text':
+              const isNewPin = existingPin == null;
+              const relativePoint = translatePointToRelative(
+                pt,
+                this.elementRect,
+                isNewPin,
+                this.xOffset,
+                this.yOffset
+              );
               this.controller.setPin({
                 type: 'text',
                 id: pinId,
@@ -117,6 +133,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 },
                 attributes,
               });
+              this.controller.setSelectedPinId(pinId);
               break;
           }
         }

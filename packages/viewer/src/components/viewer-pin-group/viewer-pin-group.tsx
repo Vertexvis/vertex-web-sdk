@@ -82,6 +82,10 @@ export class ViewerPinGroup {
     if (this.pinController == null) {
       this.pinController = new PinController(this.pinModel);
     }
+
+    if (this.selected) {
+      this.labelEl?.setFocus();
+    }
   }
 
   protected disconnectedCallback(): void {
