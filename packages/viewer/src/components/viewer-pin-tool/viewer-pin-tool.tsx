@@ -243,12 +243,24 @@ export class ViewerPinTool {
   }
 
   private setupInteractionHandler(): void {
+    const hostStyles = window.getComputedStyle(this.hostEl);
+    const xOffset = hostStyles
+      .getPropertyValue('--viewer-pin-tool-initial-label-offset-x')
+      .trim();
+    const yOffset = hostStyles
+      .getPropertyValue('--viewer-pin-tool-initial-label-offset-y')
+      .trim();
+
     this.clearInteractionHandler();
 
     if (this.pinController != null) {
       this.registeredInteractionHandler =
         this.viewer?.registerInteractionHandler(
-          new PinsInteractionHandler(this.pinController)
+          new PinsInteractionHandler(
+            this.pinController,
+            parseInt(xOffset),
+            parseInt(yOffset)
+          )
         );
     }
   }

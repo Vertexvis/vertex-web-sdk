@@ -17,6 +17,9 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private cursor?: Disposable;
 
+  private xOffset?: number;
+  private yOffset?: number;
+
   private rectObserver = new ElementRectObserver();
 
   private droppableSurfaces: EntityType[] = [
@@ -29,8 +32,14 @@ export class PinsInteractionHandler implements InteractionHandler {
     return this.rectObserver.rect;
   }
 
-  public constructor(controller: PinController) {
+  public constructor(
+    controller: PinController,
+    xOffset: number,
+    yOffset: number
+  ) {
     this.controller = controller;
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -106,7 +115,9 @@ export class PinsInteractionHandler implements InteractionHandler {
               const relativePoint = translatePointToRelative(
                 pt,
                 this.elementRect,
-                isNewPin
+                isNewPin,
+                this.xOffset,
+                this.yOffset
               );
               this.controller.setPin({
                 type: 'text',
