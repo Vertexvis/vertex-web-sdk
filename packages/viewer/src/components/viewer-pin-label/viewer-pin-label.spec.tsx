@@ -307,7 +307,7 @@ describe('vertex-viewer-pin-label', () => {
       'min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px))'
     );
     expect(label.style.minWidth).toBe(
-      'min(16px, min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px)))'
+      'min(8px, min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px)))'
     );
   });
 
