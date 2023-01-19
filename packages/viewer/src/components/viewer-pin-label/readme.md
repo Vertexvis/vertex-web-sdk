@@ -49,7 +49,7 @@ Type: `Promise<void>`
 | `--viewer-annotations-pin-label-focused-border-color` | A CSS color that specifies the color of the label's border when focused.              |
 | `--viewer-annotations-pin-label-max-height`           | A CSS length that specifies the maximum height of the label. Defaults to `50rem`.     |
 | `--viewer-annotations-pin-label-max-width`            | A CSS length that specifies the maximum width of the label. Defaults to `25rem`.      |
-| `--viewer-annotations-pin-label-min-width`            | A CSS length that specifies the minimum width of the label. Defaults to `1rem`.       |
+| `--viewer-annotations-pin-label-min-width`            | A CSS length that specifies the minimum width of the label. Defaults to `2rem`.       |
 | `--viewer-annotations-pin-label-padding-x`            | A var that specifies the horizontal padding of the label                              |
 | `--viewer-annotations-pin-label-padding-y`            | A var that specifies the vertical padding of the label                                |
 
