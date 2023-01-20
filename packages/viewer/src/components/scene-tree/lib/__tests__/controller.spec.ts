@@ -324,7 +324,7 @@ describe(SceneTreeController, () => {
 
     it('emits subscription failure if no handshake is received within the timeout', async () => {
       const subscriptionHandshakeTimeout = 50;
-      const { controller, client, stream } = createController(
+      const { controller, client } = createController(
         10,
         subscriptionHandshakeTimeout
       );
