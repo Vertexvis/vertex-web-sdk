@@ -247,7 +247,7 @@ export class VertexPinLabel {
 
   private computeMinWidth(): string {
     if (this.contentElBounds != null) {
-      const expected = `${this.contentElBounds.width + 16}px`;
+      const expected = `${this.contentElBounds.width + 8}px`;
 
       return `min(${expected}, ${this.computeMaxWidth()})`;
     } else {
@@ -350,6 +350,9 @@ export class VertexPinLabel {
       this.relativePointerDownPosition &&
       this.pinPointerDownPosition != null
     ) {
+      // Prevent selection of any text while interacting with the label
+      event.preventDefault();
+
       const point = getMouseClientPosition(event, this.elementBounds);
       const relative = translatePointToRelative(point, this.elementBounds);
 

@@ -155,13 +155,13 @@ export class PinsInteractionHandler implements InteractionHandler {
       this.controller.getToolMode() === 'edit' &&
       isDroppableSurface
     ) {
-      this.addCursor(this.getCusorType());
+      this.addCursor(this.getCursorType());
     } else {
       this.clearCursor();
     }
   };
 
-  private getCusorType(): Cursor {
+  private getCursorType(): Cursor {
     switch (this.controller.getToolType()) {
       case 'pin-icon':
         return pinCursor;
