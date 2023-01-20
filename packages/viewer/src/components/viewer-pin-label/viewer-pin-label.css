@@ -55,7 +55,7 @@
 
   /**
    * @prop --viewer-annotations-pin-label-min-width: A CSS length that
-   * specifies the minimum width of the label. Defaults to `1rem`.
+   * specifies the minimum width of the label. Defaults to `2rem`.
    */
   --viewer-annotations-pin-label-min-width: 2rem;
 
