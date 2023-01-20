@@ -105,21 +105,6 @@ describe(SceneTreeController, () => {
     stream.invokeOnData(resp);
   };
 
-  const waitForConnection = async (
-    stream: ResponseStreamMock<unknown>,
-    controller: SceneTreeController
-  ): Promise<void> => {
-    initiateHandshakeOnStream(stream);
-    await new Promise((resolve) => {
-      controller.onStateChange.on((state: SceneTreeState) => {
-        const connected = state.connection.type === 'connected';
-        if (connected) {
-          resolve(connected);
-        }
-      });
-    });
-  };
-
   describe(SceneTreeController.prototype.connect, () => {
     it('emits connecting and connected state changes', async () => {
       const { controller, client, stream } = createController(10);

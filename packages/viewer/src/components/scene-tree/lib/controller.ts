@@ -221,7 +221,7 @@ export class SceneTreeController {
       connection.subscriptionStatusState.stream.cancel();
       this.clearHandshakeTimer();
 
-      const stream = await this.subscribe(jwtProvider, sceneViewId);
+      const stream = await this.subscribe();
 
       this.invalidatePage(0);
       this.updateState({
@@ -285,7 +285,7 @@ export class SceneTreeController {
 
       const [, stream] = await Promise.all([
         this.fetchPage(0),
-        this.subscribe(jwtProvider, sceneViewId),
+        this.subscribe(),
       ]);
 
       this.updateState({
@@ -797,10 +797,7 @@ export class SceneTreeController {
    * Performs a network request that will listen to server-side changes of the
    * scene tree's data.
    */
-  private subscribe(
-    jwtProvider: JwtProvider,
-    sceneViewId: string
-  ): Promise<ResponseStream<SubscribeResponse>> {
+  private subscribe(): Promise<ResponseStream<SubscribeResponse>> {
     return this.ifConnectionHasJwt((jwt) => {
       const stream = this.requestServerStream(jwt, (metadata) => {
         const sub = this.client.subscribe(new SubscribeRequest(), metadata);
