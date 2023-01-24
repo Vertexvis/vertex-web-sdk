@@ -260,7 +260,9 @@ describe('vertex-viewer-box-query-tool', () => {
           expect.objectContaining({
             queryExpression: {
               operand: {
-                root: {},
+                override: {
+                  selection: {},
+                },
               },
             },
             operationTypes: expect.arrayContaining([

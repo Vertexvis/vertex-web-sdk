@@ -252,7 +252,7 @@ export class ViewerBoxQueryTool {
   private setDefaultClearAndSelectOperation(): void {
     this.controller?.setOperationTransform((builder) => builder.select());
     this.controller?.setAdditionalTransforms([
-      (op) => op.where((q) => q.all()).deselect(),
+      (op) => op.where((q) => q.withSelected()).deselect(),
     ]);
   }
 
