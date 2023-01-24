@@ -258,7 +258,7 @@ describe('vertex-viewer-transform-widget', () => {
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
-  it.only('performs a transform when initialized with a position', async () => {
+  it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
     const page = await newSpecPage({
