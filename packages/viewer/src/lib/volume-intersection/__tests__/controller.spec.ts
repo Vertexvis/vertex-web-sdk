@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+import { StreamRequestError } from '@vertexvis/stream-api';
 
 import { VolumeIntersectionQueryController } from '../controller';
 import { VolumeIntersectionQueryModel } from '../model';
@@ -103,5 +104,30 @@ describe('volume intersection controller', () => {
     expect(mockQuery.all).not.toHaveBeenCalled();
     expect(mockQuery.withItemId).toHaveBeenCalledWith('id');
     expect(mockOperations.materialOverride).toHaveBeenCalledWith('#00ff00');
+  });
+
+  it('indicates when the operation has been aborted', async () => {
+    const requestError = new StreamRequestError(
+      'request-id',
+      {},
+      'Operation aborted.',
+      undefined
+    );
+
+    mockExecute.mockImplementation(async () => {
+      await new Promise((_resolve, reject) => reject(requestError));
+    });
+
+    const controller = new VolumeIntersectionQueryController(
+      model,
+      mockViewer as unknown as HTMLVertexViewerElement
+    );
+
+    const handleExecuteAborted = jest.fn();
+    controller.onExecuteAborted(handleExecuteAborted);
+
+    await drag(controller);
+
+    expect(handleExecuteAborted).toHaveBeenCalledWith(requestError);
   });
 });
