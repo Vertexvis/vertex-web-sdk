@@ -77,11 +77,17 @@ export interface ConnectingState {
   sceneViewId: string;
 }
 
+export interface SubscriptionStatusState {
+  attempt: number;
+  stream: ResponseStream<SubscribeResponse>;
+}
+
 export interface ConnectedState {
   type: 'connected';
   jwtProvider: JwtProvider;
   sceneViewId: string;
   subscription: Disposable;
+  subscriptionStatusState?: SubscriptionStatusState;
 }
 
 export interface ConnectionFailedState {
@@ -133,6 +139,7 @@ type ConnectionState =
 export class SceneTreeController {
   private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
+  private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
 
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -196,6 +203,58 @@ export class SceneTreeController {
     this.debugLogs = debugLogs;
   }
 
+  private async handleSubscriptionHandshakeTimeout(
+    jwtProvider: JwtProvider,
+    sceneViewId: string
+  ): Promise<void> {
+    const connection = this.getState().connection;
+    if (
+      this.isConnectedState(connection) &&
+      connection.subscriptionStatusState?.attempt != null &&
+      connection.subscriptionStatusState.attempt <
+        SceneTreeController.MAX_SUBSCRIPTION_RETRY_COUNT
+    ) {
+      const newAttempt = connection.subscriptionStatusState.attempt + 1;
+      console.warn(
+        `Failed to subscribe within the allotted timeout. Retry attempt={${newAttempt}}`
+      );
+      connection.subscriptionStatusState.stream.cancel();
+      this.clearHandshakeTimer();
+
+      const stream = await this.subscribe();
+
+      this.invalidatePage(0);
+      this.updateState({
+        ...this.state,
+        connection: {
+          ...connection,
+          type: 'connected',
+          subscriptionStatusState: {
+            attempt: newAttempt,
+            stream,
+          },
+        },
+      });
+
+      this.subscriptionHandshakeTimer = window.setTimeout(() => {
+        this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
+      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
+    } else {
+      this.updateState({
+        ...this.state,
+        connection: {
+          type: 'failure',
+          jwtProvider,
+          sceneViewId,
+          details: new SceneTreeErrorDetails(
+            'SUBSCRIPTION_FAILURE',
+            SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+          ),
+        },
+      });
+    }
+  }
+
   public async connect(jwtProvider: JwtProvider): Promise<void> {
     const { connection } = this.state;
     const jwt = jwtProvider();
@@ -224,34 +283,28 @@ export class SceneTreeController {
     try {
       this.log('Scene tree controller connecting.');
 
-      await this.fetchPage(0);
-
-      this.subscriptionHandshakeTimer = window.setTimeout(() => {
-        this.updateState({
-          ...this.state,
-          connection: {
-            type: 'failure',
-            jwtProvider,
-            sceneViewId,
-            details: new SceneTreeErrorDetails(
-              'SUBSCRIPTION_FAILURE',
-              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
-            ),
-          },
-        });
-      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
-
-      const stream = await this.subscribe();
-      stream.on('end', () => this.startConnectionLostReconnectTimer());
+      const [, stream] = await Promise.all([
+        this.fetchPage(0),
+        this.subscribe(),
+      ]);
 
       this.updateState({
         ...this.state,
         connection: {
-          ...connecting,
+          jwtProvider,
+          sceneViewId,
           type: 'connected',
           subscription: { dispose: () => stream.cancel() },
+          subscriptionStatusState: {
+            attempt: 0,
+            stream,
+          },
         },
       });
+
+      this.subscriptionHandshakeTimer = window.setTimeout(() => {
+        this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
+      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
     } catch (e) {
       this.ifErrorIsFatal(e, () => {
         this.updateState({
@@ -837,6 +890,7 @@ export class SceneTreeController {
 
       stream.on('end', () => {
         this.invalidateAfterOffset(0);
+        this.startConnectionLostReconnectTimer();
       });
 
       return stream;
@@ -878,6 +932,7 @@ export class SceneTreeController {
       const res = await page.res;
 
       const currentPage = this.getPage(page.index);
+
       // Only handle the result if the page has not been invalidated.
       if (currentPage?.id === page.id) {
         const cursor = res.getCursor();
@@ -966,7 +1021,9 @@ export class SceneTreeController {
   }
 
   private updateState(newState: SceneTreeState): void {
-    if (this.loadingTimer && !this.isViewLoading(newState.rows)) {
+    const updateLoadingTimer =
+      this.loadingTimer && !this.isViewLoading(newState.rows);
+    if (updateLoadingTimer) {
       clearTimeout(this.loadingTimer);
       this.loadingTimer = undefined;
       this.state = {
@@ -1124,5 +1181,11 @@ export class SceneTreeController {
     if (this.debugLogs) {
       console.debug(message, optionalParams);
     }
+  }
+
+  private isConnectedState(
+    connection: ConnectionState
+  ): connection is ConnectedState {
+    return connection.type === 'connected';
   }
 }

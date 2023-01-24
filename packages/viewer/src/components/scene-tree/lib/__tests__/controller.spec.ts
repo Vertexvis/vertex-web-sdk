@@ -96,9 +96,18 @@ describe(SceneTreeController, () => {
     'jwt-context': JSON.stringify({ jwt }),
   });
 
+  const initiateHandshakeOnStream = (
+    stream: ResponseStreamMock<unknown>
+  ): void => {
+    const resp = new SubscribeResponse();
+    resp.setHandshake(new Handshake());
+
+    stream.invokeOnData(resp);
+  };
+
   describe(SceneTreeController.prototype.connect, () => {
     it('emits connecting and connected state changes', async () => {
-      const { controller, client } = createController(10);
+      const { controller, client, stream } = createController(10);
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false)
       );
@@ -109,6 +118,7 @@ describe(SceneTreeController, () => {
       controller.onStateChange.on(onStateChange);
       await controller.connect(jwtProvider);
 
+      initiateHandshakeOnStream(stream);
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({
@@ -131,7 +141,7 @@ describe(SceneTreeController, () => {
     });
 
     it('does not clear rows in disconnected state if scene views are same', async () => {
-      const { controller, client } = createController(10);
+      const { controller, client, stream } = createController(10);
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false)
       );
@@ -150,6 +160,7 @@ describe(SceneTreeController, () => {
         }
       });
       await controller.connect(jwtProvider);
+      initiateHandshakeOnStream(stream);
 
       onStateChange.mockClear();
       await controller.connect(jwtProvider);
@@ -163,7 +174,7 @@ describe(SceneTreeController, () => {
     });
 
     it('disconnects if connected', async () => {
-      const { controller, client } = createController(10);
+      const { controller, client, stream } = createController(10);
       const getTree1 = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false)
       );
@@ -173,6 +184,7 @@ describe(SceneTreeController, () => {
 
       await controller.connect(jwtProvider);
 
+      initiateHandshakeOnStream(stream);
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
 
@@ -185,7 +197,7 @@ describe(SceneTreeController, () => {
 
       const newJwt = signJwt(random.guid());
       await controller.connect(() => newJwt);
-
+      initiateHandshakeOnStream(stream);
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'disconnected' }),
@@ -329,7 +341,7 @@ describe(SceneTreeController, () => {
       await controller.connect(jwtProvider);
 
       await new Promise((resolve) => {
-        setTimeout(resolve, subscriptionHandshakeTimeout + 50);
+        setTimeout(resolve, subscriptionHandshakeTimeout * 3 + 50);
       });
 
       expect(onStateChange).toHaveBeenCalledWith(
@@ -460,6 +472,7 @@ describe(SceneTreeController, () => {
       const cancel = jest.spyOn(stream, 'cancel');
 
       await controller.connect(jwtProvider);
+      initiateHandshakeOnStream(stream);
 
       controller.disconnect();
       expect(cancel).toHaveBeenCalled();
@@ -472,6 +485,7 @@ describe(SceneTreeController, () => {
       );
       await controller.connect(jwtProvider);
 
+      initiateHandshakeOnStream(stream);
       stream.invokeOnEnd();
       await Async.delay(50);
 
@@ -1308,12 +1322,13 @@ describe(SceneTreeController, () => {
 
   describe(SceneTreeController.prototype.setMetadataKeys, () => {
     it('refetches pages in active rows with additional metadata values', async () => {
-      const { controller, client } = createController(10);
+      const { controller, client, stream } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
 
       await controller.connect(jwtProvider);
+      initiateHandshakeOnStream(stream);
       await controller.updateActiveRowRange(0, 9);
 
       const pendingRows = new Promise<Row[]>((resolve) => {
