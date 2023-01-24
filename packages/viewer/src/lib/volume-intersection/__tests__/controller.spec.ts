@@ -124,10 +124,17 @@ describe('volume intersection controller', () => {
     );
 
     const handleExecuteAborted = jest.fn();
+    const handleExecuteComplete = jest.fn();
     controller.onExecuteAborted(handleExecuteAborted);
+    controller.onExecuteComplete(handleExecuteComplete);
 
     await drag(controller);
 
     expect(handleExecuteAborted).toHaveBeenCalledWith(requestError);
+    expect(handleExecuteComplete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        aborted: true,
+      })
+    );
   });
 });

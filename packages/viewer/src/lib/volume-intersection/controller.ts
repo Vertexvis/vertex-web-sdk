@@ -16,14 +16,19 @@ export type AdditionalTransform = (
   executor: SceneItemQueryExecutor
 ) => TerminalItemOperationBuilder;
 
+export interface CompleteExecutionDetails {
+  aborted: boolean;
+}
+
 export class VolumeIntersectionQueryController {
   private previousViewerCameraControls?: boolean;
   private operationTransform: OperationTransform;
   private additionalTransforms: AdditionalTransform[] = [];
   private operationInFlight = false;
+  private operationAborted = false;
 
   private executeStarted = new EventDispatcher<void>();
-  private executeComplete = new EventDispatcher<void>();
+  private executeComplete = new EventDispatcher<CompleteExecutionDetails>();
   private executeAborted = new EventDispatcher<StreamRequestError>();
 
   public constructor(
@@ -72,7 +77,9 @@ export class VolumeIntersectionQueryController {
     return this.executeStarted.on(listener);
   }
 
-  public onExecuteComplete(listener: Listener<void>): Disposable {
+  public onExecuteComplete(
+    listener: Listener<CompleteExecutionDetails>
+  ): Disposable {
     return this.executeComplete.on(listener);
   }
 
@@ -119,6 +126,7 @@ export class VolumeIntersectionQueryController {
           e.summary?.toLocaleLowerCase().includes('operation aborted')
         ) {
           this.executeAborted.emit(e);
+          this.operationAborted = true;
         } else {
           console.error('Failed to perform volume intersection query', e);
           throw e;
@@ -127,7 +135,10 @@ export class VolumeIntersectionQueryController {
         this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
         this.previousViewerCameraControls = undefined;
         this.operationInFlight = false;
-        this.executeComplete.emit();
+        this.executeComplete.emit({
+          aborted: this.operationAborted,
+        });
+        this.operationAborted = false;
       }
     } else if (this.operationInFlight) {
       this.model.cancel();
