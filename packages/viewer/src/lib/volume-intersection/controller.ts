@@ -1,4 +1,5 @@
 import { Point } from '@vertexvis/geometry';
+import { StreamRequestError } from '@vertexvis/stream-api';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import {
@@ -23,6 +24,7 @@ export class VolumeIntersectionQueryController {
 
   private executeStarted = new EventDispatcher<void>();
   private executeComplete = new EventDispatcher<void>();
+  private executeAborted = new EventDispatcher<StreamRequestError>();
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
@@ -74,6 +76,10 @@ export class VolumeIntersectionQueryController {
     return this.executeComplete.on(listener);
   }
 
+  public onExecuteAborted(listener: Listener<StreamRequestError>): Disposable {
+    return this.executeAborted.on(listener);
+  }
+
   public async execute(): Promise<void> {
     const screenBounds = this.model.getScreenBounds();
     const type = this.model.getType();
@@ -108,8 +114,15 @@ export class VolumeIntersectionQueryController {
           ])
           .execute();
       } catch (e) {
-        console.error('Failed to perform volume intersection query', e);
-        throw e;
+        if (
+          e instanceof StreamRequestError &&
+          e.summary?.toLocaleLowerCase().includes('operation aborted')
+        ) {
+          this.executeAborted.emit(e);
+        } else {
+          console.error('Failed to perform volume intersection query', e);
+          throw e;
+        }
       } finally {
         this.viewer.cameraControls = this.previousViewerCameraControls ?? true;
         this.previousViewerCameraControls = undefined;
