@@ -110,6 +110,7 @@ export class ViewerTransformWidget {
     }
 
     this.handleViewerChanged(this.viewer, undefined);
+    this.handlePositionChanged(this.position, undefined);
 
     readDOM(() => {
       const hostStyles = window.getComputedStyle(this.hostEl);
