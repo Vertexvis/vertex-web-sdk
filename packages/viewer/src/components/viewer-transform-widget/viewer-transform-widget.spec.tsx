@@ -258,6 +258,117 @@ describe('vertex-viewer-transform-widget', () => {
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
+  it.only('performs a transform when initialized with a position', async () => {
+    const { stream, ws } = makeViewerStream();
+    const position = Vector3.create(1, 1, 1);
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget
+            position={position}
+          ></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const onInteractionEnded = jest.fn();
+    const onInteractionStarted = jest.fn();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionStarted', onInteractionStarted);
+
+    await page.waitForChanges();
+
+    widget.hovered = new TriangleMesh(
+      jest.fn(),
+      'x-translate',
+      new TriangleMeshPoints(
+        true,
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Point.create(),
+        Point.create(),
+        Point.create(),
+        Point.create()
+      ),
+      '#000000',
+      '#000000'
+    );
+    const beginSpy = jest.spyOn(stream, 'beginInteraction');
+    const updateSpy = jest.spyOn(stream, 'updateInteraction');
+    const endSpy = jest
+      .spyOn(stream, 'endInteraction')
+      .mockReturnValue(Promise.resolve({}));
+
+    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    );
+
+    widget.shadowRoot
+      ?.querySelector('canvas')
+      ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    expect(beginSpy).toHaveBeenCalled();
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(1, 1, 1),
+            scale: 1,
+          },
+        },
+      })
+    );
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    expect(endSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(1, 1, 1),
+            scale: 1,
+          },
+        },
+      })
+    );
+
+    await page.waitForChanges();
+    expect(onInteractionEnded).toHaveBeenCalled();
+    expect(onInteractionStarted).toHaveBeenCalled();
+  });
+
   it('updates widget bounds when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({

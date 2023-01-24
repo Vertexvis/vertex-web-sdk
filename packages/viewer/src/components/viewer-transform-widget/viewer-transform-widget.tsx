@@ -110,7 +110,6 @@ export class ViewerTransformWidget {
     }
 
     this.handleViewerChanged(this.viewer, undefined);
-    this.handlePositionChanged(this.position, undefined);
 
     readDOM(() => {
       const hostStyles = window.getComputedStyle(this.hostEl);
@@ -180,8 +179,8 @@ export class ViewerTransformWidget {
 
     console.debug(
       `Updating widget position [previous=${JSON.stringify(
-        newPosition
-      )}, current=${JSON.stringify(oldPosition)}]`
+        oldPosition
+      )}, current=${JSON.stringify(newPosition)}]`
     );
     this.widget?.updateTransform(this.currentTransform);
 
@@ -450,6 +449,7 @@ export class ViewerTransformWidget {
 
     if (this.position != null) {
       this.currentTransform = Matrix4.makeTranslation(this.position);
+      this.startingTransform = this.currentTransform;
       this.widget.updateTransform(this.currentTransform);
     }
     if (this.viewer?.frame != null) {
