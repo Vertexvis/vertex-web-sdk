@@ -229,6 +229,9 @@ export class SceneTreeController {
         connection: {
           ...connection,
           type: 'connected',
+          subscription: {
+            dispose: () => stream.cancel(),
+          },
           subscriptionStatusState: {
             attempt: newAttempt,
             stream,
@@ -375,7 +378,7 @@ export class SceneTreeController {
           await this.connect(() => viewer.token);
         } catch (e) {
           this.ifErrorIsFatal(e, () => {
-            console.error('Scene tree controller erred connecting.', e);
+            console.error('Scene tree controller errored connecting.', e);
           });
         }
       }
