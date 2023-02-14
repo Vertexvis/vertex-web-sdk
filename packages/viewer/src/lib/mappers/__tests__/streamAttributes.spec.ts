@@ -118,7 +118,7 @@ describe(toPbStreamAttributes, () => {
   describe('selection highlighting', () => {
     it('should support changing the default halo highlighting parameters', () => {
       const res = toPbStreamAttributes({
-        selectionHighlighting: { width: 2, color: 0xff0000, opacity: 0.25 },
+        selectionHighlighting: { lineWidth: 2, color: 0xff0000, opacity: 0.25 },
       });
       expect(res).toMatchObject({
         selectionHighlighting: {
