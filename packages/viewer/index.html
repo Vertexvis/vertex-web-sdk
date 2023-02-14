@@ -68,47 +68,26 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
-
-        viewer.addEventListener('tap', async (event) => {
-          const { position } = event.detail;
-          const scene = await viewer.scene();
-          const raycaster = await scene.raycaster();
-
-          const result = await raycaster.hitItems(position);
-
-          console.log('hi, result.hits: ', result.hits)
-          if (result.hits && result.hits.length == 0) {
-            await scene
-              .items((op) => op.where((q) => q.all()).deselect())
-              .execute();
-          } else {
-            await scene
-              .items((op) => [
-                op.where((q) => q.all()).deselect(),
-                op.where((q) => q.withItemId(result.hits[0].itemId.hex)).select()
-              ])
-              .execute();
-          }
-        });
-        }
+      }
     </script>
   </head>
 
   <body>
     <div class="app">
-      <!-- <div class="tree">
+      <div class="tree">
         <vertex-scene-tree
           id="scene-tree"
           config-env="platdev"
           viewer-selector="#viewer"
         >
         </vertex-scene-tree>
-      </div> -->
+      </div>
       <div class="workarea">
         <vertex-viewer
           id="viewer"
+          client-id="client-id"
           config-env="platdev"
-          src="urn:vertexvis:stream-key:PF9qtRw25O_NGflEaqqQpYuLSOBZieIUnJBa"
+          src="urn:vertexvis:stream-key:key"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
