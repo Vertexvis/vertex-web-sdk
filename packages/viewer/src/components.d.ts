@@ -32,6 +32,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  SelectionHighlightingOptions,
 } from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FrameCameraBase } from './lib/types/frame';
@@ -552,6 +553,10 @@ export namespace Components {
      * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
      */
     scene: () => Promise<Scene>;
+    /**
+     * Specifies the halo selection properties
+     */
+    selectionHighlighting?: SelectionHighlightingOptions;
     /**
      * The default hex color or material to use when selecting items.
      */
@@ -1955,6 +1960,10 @@ declare namespace LocalJSX {
      * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
      */
     rotateAroundTapPoint?: boolean;
+    /**
+     * Specifies the halo selection properties
+     */
+    selectionHighlighting?: SelectionHighlightingOptions;
     /**
      * The default hex color or material to use when selecting items.
      */

@@ -217,6 +217,11 @@ describe('vertex-viewer', () => {
             stream={stream}
             experimentalGhostingOpacity={1}
             featureLines={{ width: 1 }}
+            selectionHighlighting={{
+              lineWidth: 2,
+              color: '#fff222',
+              opacity: 0.3,
+            }}
             featureHighlighting={{ highlightColor: 0xff0000 }}
             depthBuffers="all"
             featureMaps="all"
@@ -235,6 +240,11 @@ describe('vertex-viewer', () => {
             experimentalGhosting: 1,
             featureLines: { width: 1 },
             featureHighlighting: { highlightColor: 0xff0000 },
+            selectionHighlighting: {
+              lineWidth: 2,
+              color: '#fff222',
+              opacity: 0.3,
+            },
             featureMaps: 'all',
           }),
           dimensions: { width: 200, height: 150 },
