@@ -10,6 +10,12 @@ export interface FeatureLineOptions {
   color?: Color3;
 }
 
+export interface SelectionHighlightingOptions {
+  lineWidth: number;
+  color?: Color3;
+  opacity?: number;
+}
+
 export interface FeatureHighlightOptions {
   highlightColor?: Color3;
   occludedOpacity?: number;
@@ -36,4 +42,5 @@ export interface StreamAttributes {
   featureHighlighting?: FeatureHighlightOptions;
   featureMaps?: FrameType;
   experimentalRenderingOptions?: string;
+  selectionHighlighting?: SelectionHighlightingOptions;
 }

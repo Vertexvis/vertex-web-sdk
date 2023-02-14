@@ -6,6 +6,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
 import { toPbRGBi } from './material';
@@ -63,6 +64,26 @@ const toPbFeatureLines: M.Func<
   ([lineWidth, lineColor]) => ({ lineWidth, lineColor })
 );
 
+const toPbSelectionHighlighting: M.Func<
+  SelectionHighlightingOptions | undefined,
+  vertexvis.protobuf.stream.ISelectionHighlightAttributes | undefined
+> = M.defineMapper(
+  M.read(
+    M.ifDefined(M.mapProp('color', M.ifDefined(toPbRGBi))),
+    M.ifDefined(M.mapProp('opacity', toPbFloatValue)),
+    M.ifDefined(M.getProp('lineWidth'))
+  ),
+  ([color, opacity, lineWidth]) => {
+    if (color || opacity || lineWidth) {
+      return {
+        color,
+        opacity,
+        lineWidth,
+      };
+    } else return undefined;
+  }
+);
+
 const toPbFeatureHighlight: M.Func<
   FeatureHighlightOptions | undefined,
   vertexvis.protobuf.stream.IFeatureHighlightAttributes
@@ -102,15 +123,21 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('featureLines', toPbFeatureLines),
     M.mapProp('featureHighlighting', toPbFeatureHighlight),
     M.mapProp('featureMaps', toPbFrameType),
-    M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions)
+    M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions),
+    M.mapProp('selectionHighlighting', toPbSelectionHighlighting)
   ),
-  ([db, eg, ndl, fl, fh, fm, ero]) => ({
-    depthBuffers: db,
-    experimentalGhosting: eg,
-    noDefaultLights: ndl,
-    featureLines: fl,
-    featureHighlighting: fh,
-    featureMaps: fm,
-    experimentalRenderingOptions: ero,
-  })
+  ([db, eg, ndl, fl, fh, fm, ero, hs]) => {
+    const value = {
+      depthBuffers: db,
+      experimentalGhosting: eg,
+      noDefaultLights: ndl,
+      featureLines: fl,
+      featureHighlighting: fh,
+      featureMaps: fm,
+      experimentalRenderingOptions: ero,
+      selectionHighlighting: hs,
+    };
+
+    return value;
+  }
 );

@@ -32,6 +32,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  SelectionHighlightingOptions,
 } from './interfaces';
 import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FrameCameraBase } from './lib/types/frame';
@@ -552,6 +553,10 @@ export namespace Components {
      * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
      */
     scene: () => Promise<Scene>;
+    /**
+     * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+     */
+    selectionHighlighting?: SelectionHighlightingOptions;
     /**
      * The default hex color or material to use when selecting items.
      */
@@ -1955,6 +1960,10 @@ declare namespace LocalJSX {
      * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
      */
     rotateAroundTapPoint?: boolean;
+    /**
+     * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+     */
+    selectionHighlighting?: SelectionHighlightingOptions;
     /**
      * The default hex color or material to use when selecting items.
      */

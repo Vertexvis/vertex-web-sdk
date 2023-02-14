@@ -20,6 +20,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
 import { Config, parseConfig, PartialConfig } from '../../lib/config';
@@ -242,6 +243,16 @@ export class Viewer {
    * Specifies if and how to render feature lines.
    */
   @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
+
+  /**
+   * Specifies the halo selection properties.
+   * Parameter notes:
+   *  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
+   *  color is optional. This will be the color of the selected items in the viewer.
+   *  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+   */
+  @Prop({ attribute: null })
+  public selectionHighlighting?: SelectionHighlightingOptions;
 
   /**
    * Specifies how selected features should be highlighted.
@@ -760,6 +771,14 @@ export class Viewer {
    */
   @Watch('featureLines')
   protected handleFeatureLinesChanged(): void {
+    this.updateStreamAttributes();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('selectionHighlighting')
+  protected handleSelectionHighlightingChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -1369,6 +1388,7 @@ export class Viewer {
       featureHighlighting: this.featureHighlighting,
       featureMaps: this.featureMaps,
       experimentalRenderingOptions: this.experimentalRenderingOptions,
+      selectionHighlighting: this.selectionHighlighting,
     };
   }
 

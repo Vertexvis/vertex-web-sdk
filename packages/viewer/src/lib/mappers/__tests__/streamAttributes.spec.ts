@@ -115,6 +115,23 @@ describe(toPbStreamAttributes, () => {
     });
   });
 
+  describe('selection highlighting', () => {
+    it('should support changing the default halo highlighting parameters', () => {
+      const res = toPbStreamAttributes({
+        selectionHighlighting: { lineWidth: 2, color: 0xff0000, opacity: 0.25 },
+      });
+      expect(res).toMatchObject({
+        selectionHighlighting: {
+          lineWidth: 2,
+          color: { r: 255, g: 0, b: 0 },
+          opacity: {
+            value: 0.25,
+          },
+        },
+      });
+    });
+  });
+
   describe('feature highlighting', () => {
     it('enables feature highlighting if set', () => {
       const res = toPbStreamAttributes({
