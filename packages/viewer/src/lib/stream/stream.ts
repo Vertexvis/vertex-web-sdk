@@ -384,14 +384,12 @@ export class ViewerStream extends StreamApi {
       (q) => q.type === 'supplied-id'
     ) as SuppliedIdQueryValue | undefined;
 
-    const v = toPbStreamAttributesOrThrow(this.streamAttributes);
-    v;
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
         dimensions: this.dimensions,
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
-        streamAttributes: v,
+        streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
           resource.subResource?.type === 'scene-view-state' &&
           resource.subResource.id != null
