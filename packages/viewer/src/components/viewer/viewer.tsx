@@ -245,7 +245,11 @@ export class Viewer {
   @Prop({ attribute: null }) public featureLines?: FeatureLineOptions;
 
   /**
-   * Specifies the halo selection properties
+   * Specifies the halo selection properties.
+   * Parameter notes:
+   *  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
+   *  color is optional. This will be the color of the selected items in the viewer.
+   *  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
    */
   @Prop({ attribute: null })
   public selectionHighlighting?: SelectionHighlightingOptions;
