@@ -34,7 +34,6 @@ import {
   FrameType,
   SelectionHighlightingOptions,
 } from './interfaces';
-import { ColorMaterial } from './lib/scenes/colorMaterial';
 import { Frame, FrameCameraBase } from './lib/types/frame';
 import { ViewerStream } from './lib/stream/stream';
 import {
@@ -557,10 +556,6 @@ export namespace Components {
      * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
      */
     selectionHighlighting?: SelectionHighlightingOptions;
-    /**
-     * The default hex color or material to use when selecting items.
-     */
-    selectionMaterial: string | ColorMaterial;
     /**
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */
@@ -1964,10 +1959,6 @@ declare namespace LocalJSX {
      * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
      */
     selectionHighlighting?: SelectionHighlightingOptions;
-    /**
-     * The default hex color or material to use when selecting items.
-     */
-    selectionMaterial?: string | ColorMaterial;
     /**
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
      */

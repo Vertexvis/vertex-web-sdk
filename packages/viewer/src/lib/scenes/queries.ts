@@ -1,6 +1,5 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { ColorMaterial } from './colorMaterial';
 import { SceneItemOperationsBuilder } from './scene';
 
 interface AllQueryExpression {
@@ -357,16 +356,11 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
 }
 
 export class SceneItemQueryExecutor {
-  public constructor(private defaultSelectionMaterial: ColorMaterial) {}
-
   public where(
     query: (q: RootQuery) => TerminalQuery
   ): SceneItemOperationsBuilder {
     const expression: QueryExpression = query(new RootQuery()).build();
 
-    return new SceneItemOperationsBuilder(
-      expression,
-      this.defaultSelectionMaterial
-    );
+    return new SceneItemOperationsBuilder(expression);
   }
 }

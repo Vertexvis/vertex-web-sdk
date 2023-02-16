@@ -79,35 +79,3 @@ export const fromHex = (hex: string, opacity?: number): ColorMaterial => {
     diffuse: color != null ? { ...color } : { ...defaultColor.diffuse },
   };
 };
-
-/**
- * The default material that is used for selected items.
- */
-export const defaultSelectionMaterial: ColorMaterial = {
-  opacity: defaultColor.opacity,
-  glossiness: defaultColor.glossiness,
-  diffuse: {
-    r: 255,
-    g: 255,
-    b: 0,
-    a: 0,
-  },
-  ambient: {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 0,
-  },
-  specular: {
-    r: 255,
-    g: 255,
-    b: 255,
-    a: 0,
-  },
-  emissive: {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 0,
-  },
-};

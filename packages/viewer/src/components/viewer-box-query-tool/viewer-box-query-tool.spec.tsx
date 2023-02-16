@@ -117,9 +117,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: expect.objectContaining({
-                  material: expect.any(Object),
-                }),
+                changeSelection: {},
               },
             ]),
           }),
@@ -169,9 +167,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: expect.objectContaining({
-                  material: expect.any(Object),
-                }),
+                changeSelection: {},
               },
             ]),
           }),
@@ -285,9 +281,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: expect.objectContaining({
-                  material: expect.any(Object),
-                }),
+                changeSelection: {},
               },
             ]),
           }),
@@ -351,9 +345,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: expect.objectContaining({
-                  material: expect.any(Object),
-                }),
+                changeSelection: {},
               },
             ]),
           }),
@@ -377,9 +369,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: expect.objectContaining({
-                  material: expect.any(Object),
-                }),
+                changeSelection: {},
               },
             ]),
           }),

@@ -269,16 +269,7 @@ function buildOperationTypes(
         };
       case 'select':
         return {
-          changeSelection: {
-            material: {
-              d: op.material.opacity,
-              ns: op.material.glossiness,
-              ka: op.material.ambient,
-              kd: op.material.diffuse,
-              ks: op.material.specular,
-              ke: op.material.emissive,
-            },
-          },
+          changeSelection: {},
         };
       case 'deselect':
         return {
