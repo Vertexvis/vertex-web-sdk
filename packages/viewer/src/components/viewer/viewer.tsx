@@ -56,11 +56,6 @@ import {
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
-import {
-  ColorMaterial,
-  defaultSelectionMaterial,
-  fromHex,
-} from '../../lib/scenes/colorMaterial';
 import { Scene } from '../../lib/scenes/scene';
 import {
   getStorageEntry,
@@ -276,12 +271,6 @@ export class Viewer {
    * be used when needing the highest rendering performance.
    */
   @Prop() public featureMaps?: FrameType;
-
-  /**
-   * The default hex color or material to use when selecting items.
-   */
-  @Prop() public selectionMaterial: string | ColorMaterial =
-    defaultSelectionMaterial;
 
   /**
    * An optional value that will debounce frame updates when resizing
@@ -1332,10 +1321,6 @@ export class Viewer {
     const { frame, sceneId, sceneViewId, worldOrientation } =
       this.stateMap.streamState;
 
-    const selectionMaterial =
-      typeof this.selectionMaterial === 'string'
-        ? fromHex(this.selectionMaterial)
-        : this.selectionMaterial;
     return new Scene(
       this.getStream(),
       frame,
@@ -1343,8 +1328,7 @@ export class Viewer {
       () => this.getImageScale(),
       this.viewport,
       sceneId,
-      sceneViewId,
-      selectionMaterial
+      sceneViewId
     );
   }
 

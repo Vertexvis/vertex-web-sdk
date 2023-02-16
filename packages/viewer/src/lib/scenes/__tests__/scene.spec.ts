@@ -18,7 +18,6 @@ describe(Scene, () => {
   const streamApi = new StreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
   const viewport = new Viewport(50, 50);
-  const colorMaterial = ColorMaterial.fromHex('#ff0000');
   const scene = new Scene(
     streamApi,
     makePerspectiveFrame(),
@@ -26,8 +25,7 @@ describe(Scene, () => {
     imageScaleProvider,
     viewport,
     sceneId,
-    sceneViewId,
-    colorMaterial
+    sceneViewId
   );
 
   afterEach(() => {
@@ -143,11 +141,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: colorMaterial.diffuse,
-                  }),
-                },
+                changeSelection: {},
               },
             ],
           },
@@ -185,11 +179,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: colorMaterial.diffuse,
-                  }),
-                },
+                changeSelection: {},
               },
             ],
           },
@@ -220,11 +210,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: colorMaterial.diffuse,
-                  }),
-                },
+                changeSelection: {},
               },
             ],
           },
@@ -340,7 +326,7 @@ describe(Scene, () => {
       });
     });
 
-    it('uses default selection material if color is not specified', () => {
+    it('supports selection', () => {
       const itemId = random.guid();
       scene
         .items((op) => op.where((q) => q.withItemId(itemId)).select())
@@ -363,83 +349,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: colorMaterial.diffuse,
-                  }),
-                },
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    it('selection uses specified material', () => {
-      const itemId = random.guid();
-      const material = ColorMaterial.fromHex('#0000ff');
-      scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).select(material))
-        .execute();
-
-      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
-        sceneViewId: {
-          hex: sceneViewId,
-        },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                item: {
-                  sceneItemQuery: {
-                    id: { hex: itemId.toString() },
-                  },
-                },
-              },
-            },
-            operationTypes: [
-              {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: material.diffuse,
-                  }),
-                },
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    it('selection uses hex color', () => {
-      const itemId = random.guid();
-      const material = ColorMaterial.fromHex('#0000ff');
-      scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).select('#0000ff'))
-        .execute();
-
-      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
-        sceneViewId: {
-          hex: sceneViewId,
-        },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                item: {
-                  sceneItemQuery: {
-                    id: { hex: itemId.toString() },
-                  },
-                },
-              },
-            },
-            operationTypes: [
-              {
-                changeSelection: {
-                  material: expect.objectContaining({
-                    kd: material.diffuse,
-                  }),
-                },
+                changeSelection: {},
               },
             ],
           },

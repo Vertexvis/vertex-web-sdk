@@ -1,6 +1,6 @@
 import { Color } from '@vertexvis/utils';
 
-import { ColorMaterial, fromHex } from '../colorMaterial';
+import { ColorMaterial } from '../colorMaterial';
 import { SceneOperationBuilder } from '../operations';
 
 describe(SceneOperationBuilder, () => {
@@ -43,11 +43,10 @@ describe(SceneOperationBuilder, () => {
   });
 
   it('create a select operation', () => {
-    const material = fromHex('#ff0000');
     const builder = new SceneOperationBuilder();
-    const definitions = builder.select(material).build();
+    const definitions = builder.select().build();
 
-    expect(definitions).toEqual([{ type: 'select', material }]);
+    expect(definitions).toEqual([{ type: 'select' }]);
   });
 
   it('create a deselect operation', () => {

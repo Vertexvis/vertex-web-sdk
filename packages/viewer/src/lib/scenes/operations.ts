@@ -12,7 +12,6 @@ interface HideItemOperation {
 
 interface SelectItemOperation {
   type: 'select';
-  material: ColorMaterial;
 }
 
 interface DeselectItemOperation {
@@ -92,9 +91,9 @@ export class SceneOperationBuilder
     );
   }
 
-  public select(material: ColorMaterial): SceneOperationBuilder {
+  public select(): SceneOperationBuilder {
     return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'select', material }])
+      this.operations.concat([{ type: 'select' }])
     );
   }
 
