@@ -117,7 +117,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ]),
           }),
@@ -167,7 +167,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ]),
           }),
@@ -217,7 +217,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: false },
               },
             ]),
           }),
@@ -263,7 +263,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: false },
               },
             ]),
           }),
@@ -281,7 +281,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ]),
           }),
@@ -345,7 +345,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ]),
           }),
@@ -369,7 +369,7 @@ describe('vertex-viewer-box-query-tool', () => {
             },
             operationTypes: expect.arrayContaining([
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ]),
           }),

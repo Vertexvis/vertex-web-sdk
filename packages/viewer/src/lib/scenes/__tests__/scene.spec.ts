@@ -141,7 +141,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ],
           },
@@ -179,7 +179,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ],
           },
@@ -210,7 +210,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ],
           },
@@ -349,7 +349,7 @@ describe(Scene, () => {
             },
             operationTypes: [
               {
-                changeSelection: {},
+                changeSelection: { selected: true },
               },
             ],
           },

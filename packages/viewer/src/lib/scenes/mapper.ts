@@ -269,11 +269,11 @@ function buildOperationTypes(
         };
       case 'select':
         return {
-          changeSelection: {},
+          changeSelection: { selected: true },
         };
       case 'deselect':
         return {
-          changeSelection: {},
+          changeSelection: { selected: false },
         };
       default:
         return {};
