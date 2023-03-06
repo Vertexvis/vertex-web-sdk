@@ -114,9 +114,7 @@ export function measureCanvasRenderer(
 export function createCanvasRenderer(): CanvasRenderer {
   let accumulatedCorrelationIds: string[] = [];
 
-  async function addCorrelationIds(
-    frame: Frame | undefined
-  ): Promise<Frame | undefined> {
+  function addCorrelationIds(frame: Frame | undefined): Frame | undefined {
     if (frame != null) {
       const frameWithCorrelationIds = frame.copy({
         correlationIds: [
