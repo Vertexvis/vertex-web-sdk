@@ -75,6 +75,29 @@ const drawFrame6: DrawFrame = {
   beforeDraw: jest.fn(),
 };
 
+const drawFrame7: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makePerspectiveFrame({
+    ...Fixtures.drawFramePayloadPerspective,
+    frameCorrelationIds: ['corr-id-1'],
+  }),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+};
+
+const drawFrame8: DrawFrame = {
+  canvas,
+  canvasDimensions: Dimensions.create(100, 50),
+  frame: Fixtures.makePerspectiveFrame({
+    ...Fixtures.drawFramePayloadPerspective,
+    sequenceNumber: 2,
+    frameCorrelationIds: ['corr-id-2'],
+  }),
+  viewport: new Viewport(100, 50),
+  beforeDraw: jest.fn(),
+};
+
 describe(createCanvasRenderer, () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -143,6 +166,51 @@ describe(createCanvasRenderer, () => {
       0,
       image2.image.width,
       image2.image.height
+    );
+  });
+
+  it('tracks predicate skipped correlation ids and appends to following frames', async () => {
+    const renderer = createCanvasRenderer();
+
+    (loadImageBytes as jest.Mock)
+      .mockImplementationOnce(async () => {
+        await Async.delay(5);
+
+        return image;
+      })
+      .mockResolvedValue(image2);
+
+    const firstResult = await renderer({
+      ...drawFrame7,
+      predicate: () => false,
+    });
+    const secondResult = await renderer(drawFrame8);
+
+    expect(firstResult).toBeUndefined();
+    expect(secondResult?.correlationIds).toMatchObject(
+      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
+    );
+  });
+
+  it('tracks sequence number skipped correlation ids and appends to following frames', async () => {
+    const renderer = createCanvasRenderer();
+
+    (loadImageBytes as jest.Mock)
+      .mockImplementationOnce(async () => {
+        await Async.delay(5);
+
+        return image;
+      })
+      .mockResolvedValue(image2);
+
+    const firstDraw = renderer(drawFrame7);
+    const secondDraw = renderer(drawFrame8);
+    const firstResult = await firstDraw;
+    const secondResult = await secondDraw;
+
+    expect(firstResult).toBeUndefined();
+    expect(secondResult?.correlationIds).toMatchObject(
+      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
     );
   });
 

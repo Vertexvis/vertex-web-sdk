@@ -61,6 +61,34 @@ export class Frame {
     const png = await decodePng(bytes);
     return FeatureMap.fromPng(png, this.image.imageAttr);
   }
+
+  public copy({
+    correlationIds,
+    sequenceNumber,
+    dimensions,
+    image,
+    scene,
+    depthBufferBytes,
+    featureMapBytes,
+  }: {
+    correlationIds?: string[];
+    sequenceNumber?: number;
+    dimensions?: Dimensions.Dimensions;
+    image?: FrameImage;
+    scene?: FrameScene;
+    depthBufferBytes?: Uint8Array;
+    featureMapBytes?: Uint8Array;
+  }): Frame {
+    return new Frame(
+      correlationIds ?? this.correlationIds,
+      sequenceNumber ?? this.sequenceNumber,
+      dimensions ?? this.dimensions,
+      image ?? this.image,
+      scene ?? this.scene,
+      depthBufferBytes ?? this.depthBufferBytes,
+      featureMapBytes ?? this.featureMapBytes
+    );
+  }
 }
 
 export interface FrameImageLike {
