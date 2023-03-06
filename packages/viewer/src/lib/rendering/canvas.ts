@@ -112,6 +112,29 @@ export function measureCanvasRenderer(
 }
 
 export function createCanvasRenderer(): CanvasRenderer {
+  let skippedCorrelationIds: string[] = [];
+
+  async function trackCorrelationIds(
+    data: DrawFrame,
+    frame: Frame | undefined
+  ): Promise<Frame | undefined> {
+    if (frame == null) {
+      skippedCorrelationIds = [
+        ...skippedCorrelationIds,
+        ...data.frame.correlationIds,
+      ];
+
+      return frame;
+    } else {
+      const frameWithCorrelationIds = frame.appendCorrelationIds(
+        skippedCorrelationIds
+      );
+      skippedCorrelationIds = [];
+
+      return frameWithCorrelationIds;
+    }
+  }
+
   function loadFrame(): (data: DrawFrame) => Promise<HtmlImage | undefined> {
     let lastLoadedFrameNumber = -1;
 
@@ -156,7 +179,14 @@ export function createCanvasRenderer(): CanvasRenderer {
     const predicatePassing = data.predicate?.() ?? true;
 
     if (predicatePassing) {
-      return load(data).then((image) => draw(data, image));
+      return load(data).then((image) =>
+        draw(data, image).then((frame) => trackCorrelationIds(data, frame))
+      );
+    } else {
+      skippedCorrelationIds = [
+        ...skippedCorrelationIds,
+        ...data.frame.correlationIds,
+      ];
     }
   };
 }

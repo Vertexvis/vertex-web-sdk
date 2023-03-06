@@ -61,6 +61,18 @@ export class Frame {
     const png = await decodePng(bytes);
     return FeatureMap.fromPng(png, this.image.imageAttr);
   }
+
+  public appendCorrelationIds(ids: string[]): Frame {
+    return new Frame(
+      [...this.correlationIds, ...ids],
+      this.sequenceNumber,
+      this.dimensions,
+      this.image,
+      this.scene,
+      this.depthBufferBytes,
+      this.featureMapBytes
+    );
+  }
 }
 
 export interface FrameImageLike {
