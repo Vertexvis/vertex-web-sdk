@@ -98,18 +98,6 @@ const drawFrame8: DrawFrame = {
   beforeDraw: jest.fn(),
 };
 
-const drawFrame9: DrawFrame = {
-  canvas,
-  canvasDimensions: Dimensions.create(100, 50),
-  frame: Fixtures.makePerspectiveFrame({
-    ...Fixtures.drawFramePayloadPerspective,
-    sequenceNumber: 3,
-    frameCorrelationIds: ['corr-id-3'],
-  }),
-  viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
-};
-
 describe(createCanvasRenderer, () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -219,14 +207,10 @@ describe(createCanvasRenderer, () => {
     const secondDraw = renderer(drawFrame8);
     const firstResult = await firstDraw;
     const secondResult = await secondDraw;
-    const thirdResult = await renderer(drawFrame9);
 
     expect(firstResult).toBeUndefined();
     expect(secondResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-2'])
-    );
-    expect(thirdResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-3', 'corr-id-1'])
+      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
     );
   });
 

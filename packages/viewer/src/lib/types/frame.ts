@@ -62,15 +62,31 @@ export class Frame {
     return FeatureMap.fromPng(png, this.image.imageAttr);
   }
 
-  public appendCorrelationIds(ids: string[]): Frame {
+  public copy({
+    correlationIds,
+    sequenceNumber,
+    dimensions,
+    image,
+    scene,
+    depthBufferBytes,
+    featureMapBytes,
+  }: {
+    correlationIds?: string[];
+    sequenceNumber?: number;
+    dimensions?: Dimensions.Dimensions;
+    image?: FrameImage;
+    scene?: FrameScene;
+    depthBufferBytes?: Uint8Array;
+    featureMapBytes?: Uint8Array;
+  }): Frame {
     return new Frame(
-      [...this.correlationIds, ...ids],
-      this.sequenceNumber,
-      this.dimensions,
-      this.image,
-      this.scene,
-      this.depthBufferBytes,
-      this.featureMapBytes
+      correlationIds ?? this.correlationIds,
+      sequenceNumber ?? this.sequenceNumber,
+      dimensions ?? this.dimensions,
+      image ?? this.image,
+      scene ?? this.scene,
+      depthBufferBytes ?? this.depthBufferBytes,
+      featureMapBytes ?? this.featureMapBytes
     );
   }
 }

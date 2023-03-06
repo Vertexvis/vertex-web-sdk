@@ -112,27 +112,25 @@ export function measureCanvasRenderer(
 }
 
 export function createCanvasRenderer(): CanvasRenderer {
-  let skippedCorrelationIds: string[] = [];
+  let accumulatedCorrelationIds: string[] = [];
 
-  async function trackCorrelationIds(
-    data: DrawFrame,
+  async function addCorrelationIds(
     frame: Frame | undefined
   ): Promise<Frame | undefined> {
-    if (frame == null) {
-      skippedCorrelationIds = [
-        ...skippedCorrelationIds,
-        ...data.frame.correlationIds,
-      ];
-
-      return frame;
-    } else {
-      const frameWithCorrelationIds = frame.appendCorrelationIds(
-        skippedCorrelationIds
-      );
-      skippedCorrelationIds = [];
+    if (frame != null) {
+      const frameWithCorrelationIds = frame.copy({
+        correlationIds: [
+          ...frame.correlationIds,
+          ...accumulatedCorrelationIds.filter(
+            (id) => !frame.correlationIds.includes(id)
+          ),
+        ],
+      });
+      accumulatedCorrelationIds = [];
 
       return frameWithCorrelationIds;
     }
+    return frame;
   }
 
   function loadFrame(): (data: DrawFrame) => Promise<HtmlImage | undefined> {
@@ -178,15 +176,15 @@ export function createCanvasRenderer(): CanvasRenderer {
   return async (data) => {
     const predicatePassing = data.predicate?.() ?? true;
 
+    accumulatedCorrelationIds = [
+      ...accumulatedCorrelationIds,
+      ...data.frame.correlationIds,
+    ];
+
     if (predicatePassing) {
       return load(data).then((image) =>
-        draw(data, image).then((frame) => trackCorrelationIds(data, frame))
+        draw(data, image).then(addCorrelationIds)
       );
-    } else {
-      skippedCorrelationIds = [
-        ...skippedCorrelationIds,
-        ...data.frame.correlationIds,
-      ];
     }
   };
 }
