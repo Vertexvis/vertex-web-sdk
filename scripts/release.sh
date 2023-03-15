@@ -10,12 +10,12 @@ then
   exit 1
 fi
 
-# # Check if the local repo is clean
-# if test -n "$(git status --porcelain --untracked-files=no)"
-# then
-#   echo "Working directory contains uncommitted changes."
-#   exit 1
-# fi
+# Check if the local repo is clean
+if test -n "$(git status --porcelain --untracked-files=no)"
+then
+  echo "Working directory contains uncommitted changes."
+  exit 1
+fi
 
 # Check if upstream has changes
 if test -n "$(git status -sb --porcelain origin | grep "\[behind")"
