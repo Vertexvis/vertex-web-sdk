@@ -27,7 +27,7 @@ fi
 # Create temp branch to run release scripts
 timestamp=$(date "+%s")
 local_branch=release-temp/$timestamp
-git checkout -tb $local_branch
+git checkout --track=direct -b $local_branch
 
 # Bump version and generate docs with updated versions
 if test -n "$ASK_VERSION"
