@@ -12,7 +12,7 @@ import {
   SceneTreeOperationOptions,
   ScrollToOptions,
   SelectItemOptions,
-} from './components/scene-tree/interfaces';
+} from './components/scene-tree/types';
 import { Config, PartialConfig } from './lib/config';
 import { Environment } from './lib/environment';
 import {
@@ -68,9 +68,12 @@ import { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
 import {
   VolumeIntersectionQueryMode,
   VolumeIntersectionQueryType,
-} from './components/viewer-box-query-tool/viewer-box-query-tool';
-import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
-import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
+} from './components/viewer-box-query-tool/types';
+import {
+  ViewerToolbarDirection,
+  ViewerToolbarPlacement,
+} from './components/viewer-toolbar/types';
+import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/types';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
 import {
   ViewerIconName,
@@ -107,11 +110,6 @@ import {
 } from './lib/pins/model';
 import { PinController } from './lib/pins/controller';
 import { SpinnerSize } from './components/viewer-spinner/viewer-spinner';
-import {
-  ViewerToolbarDirection,
-  ViewerToolbarPlacement as ViewerToolbarPlacement1,
-} from './components/viewer-toolbar/viewer-toolbar';
-import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { TransformController } from './lib/transforms/controller';
 import { Drawable } from './lib/transforms/drawable';
 export namespace Components {

@@ -24,14 +24,6 @@ import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
 import {
-  MetadataKey,
-  RowArg,
-  RowDataProvider,
-  SceneTreeOperationOptions,
-  ScrollToOptions,
-  SelectItemOptions,
-} from './interfaces';
-import {
   FilterTreeOptions,
   SceneTreeController,
   SceneTreeState,
@@ -48,6 +40,14 @@ import {
   selectRangeInSceneTree,
   showItem,
 } from './lib/viewer-ops';
+import {
+  MetadataKey,
+  RowArg,
+  RowDataProvider,
+  SceneTreeOperationOptions,
+  ScrollToOptions,
+  SelectItemOptions,
+} from './types';
 
 /**
  * The minimum amount of time provided by requestIdleCallback to clear purged

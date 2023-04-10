@@ -8,13 +8,10 @@ import {
   VolumeIntersectionQueryDetails,
   VolumeIntersectionQueryModel,
 } from '../../lib/volume-intersection/model';
-
-export type VolumeIntersectionQueryType =
-  | 'clearAndSelect'
-  | 'select'
-  | 'deselect';
-
-export type VolumeIntersectionQueryMode = 'exclusive' | 'inclusive';
+import {
+  VolumeIntersectionQueryMode,
+  VolumeIntersectionQueryType,
+} from './types';
 
 /**
  * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
