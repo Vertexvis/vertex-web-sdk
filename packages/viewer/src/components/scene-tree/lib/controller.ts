@@ -949,8 +949,6 @@ export class SceneTreeController {
           currentPage.metadataKeys
         );
 
-        console.log(fetchedRows);
-
         const start = this.state.rows.slice(0, offset);
         const end = this.state.rows.slice(
           start.length + fetchedRows.length,
