@@ -58,6 +58,7 @@ import {
   getSceneTreeOffsetTop,
   getSceneTreeViewportHeight,
 } from './lib/dom';
+import { SceneTreeErrorCode } from './lib/errors';
 import { webSocketSubscriptionTransportFactory } from './lib/grpc';
 import { decodeSceneTreeJwt } from './lib/jwt';
 import {
@@ -244,8 +245,39 @@ describe('<vertex-scene-tree>', () => {
       expect(errorMessage).not.toBeNull();
 
       expect(errorMessage?.firstChild?.firstChild?.nodeValue).toEqual(
-        'Could not find reference to the viewer'
+        'Could not find reference to the viewer.'
       );
+    });
+
+    it('emits error if tree GetList is aborted', (done) => {
+      async function test(): Promise<void> {
+        const client = mockSceneTreeClient();
+        mockGetTreeError(client, grpc.Code.Aborted);
+
+        const { stream, ws } = makeViewerStream();
+        const controller = new SceneTreeController(client, 100);
+        const { viewer } = await newSceneTreeSpec({
+          controller,
+          stream,
+          template: () => (
+            <div>
+              <vertex-scene-tree
+                controller={controller}
+                onConnectionError={(e) => {
+                  if (e.detail.code === SceneTreeErrorCode.ABORTED) {
+                    done();
+                  }
+                }}
+                viewerSelector="#viewer"
+              ></vertex-scene-tree>
+              <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
+            </div>
+          ),
+        });
+        await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      }
+
+      test();
     });
 
     it('cancels the controller when the component is disconnected', async () => {

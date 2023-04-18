@@ -1151,6 +1151,8 @@ export class SceneTreeController {
           'UNAUTHORIZED',
           SceneTreeErrorCode.UNAUTHORIZED
         );
+      } else if (e.code === grpc.Code.Aborted) {
+        return new SceneTreeErrorDetails('ABORTED', SceneTreeErrorCode.ABORTED);
       } else {
         return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
       }
