@@ -1,7 +1,7 @@
 import { Component, h, Prop } from '@stencil/core';
 
-import { ViewerToolbarPlacement } from '../viewer-toolbar/viewer-toolbar';
-import { ViewerToolbarGroupDirection } from '../viewer-toolbar-group/viewer-toolbar-group';
+import { ViewerToolbarPlacement } from '../viewer-toolbar/types';
+import { ViewerToolbarGroupDirection } from '../viewer-toolbar-group/types';
 
 @Component({
   tag: 'vertex-viewer-default-toolbar',

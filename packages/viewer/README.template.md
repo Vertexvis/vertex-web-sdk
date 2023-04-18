@@ -145,6 +145,25 @@ import { defineCustomElements } from '@vertexvis/viewer';
 defineCustomElements();
 ```
 
+## Interacting With Component Properties
+
+Some of our components provide default values for properties that can be used
+once the component is ready. Before interacting with these properties, the
+`componentOnReady` method must be awaited to ensure the property is defined.
+
+```js
+function main() {
+  await defineCustomElements();
+
+  const sceneTree = document.querySelector("scene-tree");
+  await sceneTree.componentOnReady();
+
+  sceneTree.controller.stateChanged(state => {
+    console.log(`Scene Tree Row Count: ${state.totalRows}`);
+  });
+}
+```
+
 ## Polyfills
 
 If you plan on targeting IE11 or Edge <= 18, you'll also need to supply

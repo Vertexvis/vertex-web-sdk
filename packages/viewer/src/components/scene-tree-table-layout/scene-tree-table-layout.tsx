@@ -21,7 +21,7 @@ import { readDOM } from '../../lib/stencil';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { isLoadedRow, LoadedRow, Row } from '../scene-tree/lib/row';
-import { RowDataProvider } from '../scene-tree/scene-tree';
+import { RowDataProvider } from '../scene-tree/types';
 import {
   DomScrollToOptions,
   getSceneTreeTableOffsetTop,

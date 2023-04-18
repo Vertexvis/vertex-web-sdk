@@ -6,26 +6,25 @@
  */
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
+  MetadataKey,
   RowArg,
   RowDataProvider,
   SceneTreeOperationOptions,
   ScrollToOptions,
   SelectItemOptions,
-} from './components/scene-tree/scene-tree';
+} from './components/scene-tree/types';
 import { Config, PartialConfig } from './lib/config';
 import { Environment } from './lib/environment';
 import {
   FilterTreeOptions,
   SceneTreeController,
 } from './components/scene-tree/lib/controller';
-import { MetadataKey } from './components/scene-tree/interfaces';
 import { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
 import { Row } from './components/scene-tree/lib/row';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeOperationHandler } from './components/scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from './components/scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
-import { RowDataProvider as RowDataProvider1 } from './components/scene-tree/scene-tree';
 import { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
 import { FrameCameraType } from './lib/types/frameCamera';
 import {
@@ -69,9 +68,12 @@ import { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
 import {
   VolumeIntersectionQueryMode,
   VolumeIntersectionQueryType,
-} from './components/viewer-box-query-tool/viewer-box-query-tool';
-import { ViewerToolbarPlacement } from './components/viewer-toolbar/viewer-toolbar';
-import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/viewer-toolbar-group';
+} from './components/viewer-box-query-tool/types';
+import {
+  ViewerToolbarDirection,
+  ViewerToolbarPlacement,
+} from './components/viewer-toolbar/types';
+import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/types';
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
 import {
   ViewerIconName,
@@ -108,11 +110,6 @@ import {
 } from './lib/pins/model';
 import { PinController } from './lib/pins/controller';
 import { SpinnerSize } from './components/viewer-spinner/viewer-spinner';
-import {
-  ViewerToolbarDirection,
-  ViewerToolbarPlacement as ViewerToolbarPlacement1,
-} from './components/viewer-toolbar/viewer-toolbar';
-import { ViewerToolbarGroupDirection as ViewerToolbarGroupDirection1 } from './components/viewer-toolbar-group/viewer-toolbar-group';
 import { TransformController } from './lib/transforms/controller';
 import { Drawable } from './lib/transforms/drawable';
 export namespace Components {
@@ -359,7 +356,7 @@ export namespace Components {
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
-    rowData?: RowDataProvider1;
+    rowData?: RowDataProvider;
     rowHeight: number;
     rows: Row[];
     scrollOffset: number;
@@ -1807,7 +1804,7 @@ declare namespace LocalJSX {
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
      */
-    rowData?: RowDataProvider1;
+    rowData?: RowDataProvider;
     rowHeight?: number;
     rows?: Row[];
     scrollOffset?: number;

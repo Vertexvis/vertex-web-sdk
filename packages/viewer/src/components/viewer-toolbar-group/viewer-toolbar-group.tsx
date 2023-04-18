@@ -1,7 +1,7 @@
 import { Component, h, Prop } from '@stencil/core';
 import classNames from 'classnames';
 
-export type ViewerToolbarGroupDirection = 'horizontal' | 'vertical';
+import { ViewerToolbarGroupDirection } from './types';
 
 @Component({
   tag: 'vertex-viewer-toolbar-group',

@@ -27,7 +27,7 @@ import {
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-import { MetadataKey } from '../interfaces';
+import { MetadataKey } from '../types';
 import {
   SceneTreeConnectionCancelledError,
   SceneTreeError,

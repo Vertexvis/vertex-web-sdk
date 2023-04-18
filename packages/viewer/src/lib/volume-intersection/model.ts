@@ -1,7 +1,7 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
-import { VolumeIntersectionQueryMode } from '../../components/viewer-box-query-tool/viewer-box-query-tool';
+import { VolumeIntersectionQueryMode } from '../../components/viewer-box-query-tool/types';
 
 export type QueryType = 'inclusive' | 'exclusive';
 

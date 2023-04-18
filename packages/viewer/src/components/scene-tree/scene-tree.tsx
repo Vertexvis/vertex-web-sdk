@@ -23,7 +23,6 @@ import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
-import { MetadataKey } from './interfaces';
 import {
   FilterTreeOptions,
   SceneTreeController,
@@ -40,10 +39,15 @@ import {
   selectItem,
   selectRangeInSceneTree,
   showItem,
-  ViewerSelectItemOptions,
 } from './lib/viewer-ops';
-
-export type RowDataProvider = (row: Row) => Record<string, unknown>;
+import {
+  MetadataKey,
+  RowArg,
+  RowDataProvider,
+  SceneTreeOperationOptions,
+  ScrollToOptions,
+  SelectItemOptions,
+} from './types';
 
 /**
  * The minimum amount of time provided by requestIdleCallback to clear purged
@@ -77,38 +81,6 @@ type OperationHandler = (data: {
   id: string;
   node: Node.AsObject;
 }) => void;
-
-export type RowArg = number | Row | Node.AsObject;
-
-/**
- * A set of options to configure the scroll to index behavior.
- */
-export interface ScrollToOptions {
-  /**
-   * Indicates if this operation will be animated. Defaults to `false`.
-   */
-  animate?: boolean;
-
-  /**
-   * Indicates where in the viewport the scrolled to item should be placed.
-   * Defaults to `middle`.
-   */
-  position?: 'start' | 'middle' | 'end';
-}
-
-export interface SceneTreeOperationOptions {
-  suppliedCorrelationId?: string;
-}
-
-/**
- * A set of options to configure selection behavior.
- */
-export interface SelectItemOptions extends ViewerSelectItemOptions {
-  /**
-   * Specifies that the next deselected ancestor node should be selected.
-   */
-  recurseParent?: boolean;
-}
 
 /**
  * @slot header - A slot that places content above the rows in the tree. By

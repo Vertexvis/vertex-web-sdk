@@ -22,25 +22,29 @@ instance.
 <html>
   <body>
     <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
   </body>
 </html>
 ```
 
-## Custom Rows
+## Customizing Tree Display
 
-The tree provides a default row component that is responsible for displaying the
-content for a row. If you want to customize the appearance or behavior or a row,
-you can use the `<vertex-scene-tree-row>` or provide your own HTML.
+The tree provides a default table layout, with a single column of cells that is
+responsible for displaying the content for a row. If you want to customize the appearance
+or behavior of a row, you can use a combination of the `<vertex-scene-tree-table-layout>`,
+`<vertex-scene-tree-table-column>`, and `<vertex-scene-tree-table-cell>` elements, or
+provide your own HTML.
 
 Custom rows require the use of [binding][#binding] to bind row data to the
 template. You can use the `rowData` callback in conjunction with binding to
 pass custom data and handlers to your row.
 
-**Example:** Customizing a `<vertex-scene-tree-row>`.
+**Example:** Customizing a `<vertex-scene-tree-table-layout>`.
 
-Refer to the [`<vertex-scene-tree-row>`](../scene-tree-row/readme.md) for more
-information about this component.
+Refer to the [`<vertex-scene-tree-table-layout>`](../scene-tree-table-layout/readme.md),
+[`<vertex-scene-tree-table-column>`](../scene-tree-table-column/readme.md), and 
+[`<vertex-scene-tree-table-cell>`](../scene-tree-table-cell/readme.md) docs for more
+information about these components.
 
 ```html
 <html>
@@ -53,25 +57,33 @@ information about this component.
   </head>
   <body>
     <vertex-scene-tree viewer-selector="#viewer">
-      <template>
-        <vertex-scene-tree-row prop:node="{{row.node}}">
-          <button class="my-btn" slot="right-gutter" event:click="{{row.data.handleClick}}">
-            {{row.data.buttonLabel}}
-          </button>
-        </vertex-scene-tree-row>
-      </template>
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle>
+              <button class="my-btn" slot="right-gutter" event:click="{{row.data.handleClick}}">
+                {{row.data.buttonLabel}}
+              </button>
+            </vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
 
     <script type="module">
-      const tree = document.querySelector('vertex-scene-tree');
-      tree.rowData = (row) => {
-        return {
-          handleClick: () => console.log('clicked row button', row);
-          buttonLabel: `Click ${row.index}`
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        tree.rowData = (row) => {
+          return {
+            handleClick: () => console.log('clicked row button', row),
+            buttonLabel: `Click ${row.index}`
+          }
         }
       }
+
+      main();
     </script>
   </body>
 </html>
@@ -83,26 +95,303 @@ information about this component.
 <html>
   <head>
     <style>
-      .label {
-        color: blue;
+      .my-row {
+        display: flex;
       }
 
       .my-btn {
         color: red;
+        margin-left: auto;
+      }
+
+      .my-expand-btn {
+        color: green;
+      }
+
+      .my-expand-btn[data-can-expand="false"] {
+        pointer-events: none;
+        display: none;
+      }
+
+      .my-expand-label[data-expanded="true"] {
+        display: none;
+      }
+
+      .my-collapse-label[data-expanded="false"] {
+        display: none;
+      }
+
+      span[data-can-expand="false"] {
+        margin-left: 0.25rem;
       }
     </style>
   </head>
   <body>
     <vertex-scene-tree viewer-selector="#viewer">
-      <template>
-        <div>
-          <span>{{row.node.name}}</span>
-          <button class="my-btn" slot="right-gutter">Click Me</button>
-        </div>
-      </template>
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <div class="my-row">
+              <button class="my-expand-btn" event:click="{{row.data.handleExpansion}}" attr:data-can-expand="{{row.data.canExpand}}">
+                <span class="my-expand-label" attr:data-expanded="{{row.data.expanded}}">></span>
+                <span class="my-collapse-label" attr:data-expanded="{{row.data.expanded}}">v</span>
+              </button>
+              <span attr:data-can-expand="{{row.data.canExpand}}">{{row.node.name}}</span>
+              <button class="my-btn">Click Me</button>
+            </div>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        tree.rowData = (row) => {
+          return {
+            handleExpansion: () => tree.toggleExpandItem(row),
+            canExpand: !row.node.isLeaf,
+            expanded: row.node.expanded
+          }
+        }
+      }
+
+      main();
+    </script>
+  </body>
+</html>
+```
+
+**Example:** Customizing column data.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.depth}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+  </body>
+</html>
+```
+
+## Metadata
+
+The tree provides support for retrieving metadata values with each row, which can
+then be leveraged to change the values displayed in each `<vertex-scene-tree-table-cell>`.
+By providing a set of metadata keys using the `metadataKeys` property, these values will be
+made available when binding to the `row.metadata` object.
+
+**Example:** Customizing displayed metadata.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        tree.metadataKeys = [
+          "VERTEX_SCENE_ITEM_NAME",
+          "InstanceID"
+        ];
+      }
+
+      main();
+    </script>
+  </body>
+</html>
+```
+
+## Filtering
+
+The tree can be filtered to narrow in on specific rows based on a specified search term.
+By default, this filter will match against both the item name (`VERTEX_SCENE_ITEM_NAME` metadata key)
+and any additional specified `metadataKeys`. This behavior can be overridden by providing a set of
+metadata keys to search against using the `metadataSearchKeys` property.
+
+**Example:** Customizing metadata search keys.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        
+        tree.metadataKeys = [
+          "VERTEX_SCENE_ITEM_NAME",
+          "InstanceID"
+        ];
+
+        tree.metadataSearchKeys = [
+          "InstanceID"
+        ];
+      }
+
+      main();
+    </script>
+  </body>
+</html>
+```
+
+In addition to filtering from the default [`<vertex-scene-tree-search>`](../scene-tree-search/readme.md) element, filtering
+can also be done programmatically using the `filterItems` method.
+
+**Example:**
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <div slot="header">My Custom Header</div>
+
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+
+    <button id="product-filter-one">Filter to product 1</button>
+    <button id="product-filter-two">Filter to product 2</button>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        
+        tree.metadataKeys = [
+          "VERTEX_SCENE_ITEM_NAME",
+          "InstanceID"
+        ];
+
+        const button1 = document.querySelector('#product-filter-one');
+        const button2 = document.querySelector('#product-filter-two');
+
+        button1.addEventListener('click', () => {
+          tree.filterItems("113950", {
+            columns: ["InstanceID"],
+            exactMatch: true
+          });
+        });
+        button2.addEventListener('click', () => {
+          tree.filterItems("111800", {
+            columns: ["InstanceID"],
+            exactMatch: true
+          });
+        });
+      }
+
+      main();
+    </script>
+  </body>
+</html>
+```
+
+## Retrieving Metadata Keys
+
+The tree also provides support for retrieving the set of available metadata keys for the
+scene. This can be done by performing a lookup using the `controller` property of the 
+`<vertex-scene-tree>` element. Once retrieved, these keys can then be used to filter
+the tree. See the `SceneTreeController` class for more information.
+
+**Example:** Retrieving available metadata keys.
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        
+        // Ensure the component has initialized so the `controller` is defined.
+        await tree.componentOnReady();
+
+        tree.controller.stateChanged(async (sceneTreeState) => {
+          // Verify that our controller is connected prior to attempting
+          // to fetch the metadata keys.
+          if (tree.controller.isConnected) {
+            // ex. ['InstanceID', 'PRODUCT_NAME']
+            console.log(await tree.fetchMetadataKeys());
+          }
+        });
+      }
+
+      main();
+    </script>
   </body>
 </html>
 ```
@@ -186,7 +475,7 @@ replace the header and want search behavior, your header slot should include a
         <button slot="after">A</button>
       </vertex-scene-tree-toolbar>
     </vertex-scene-tree>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
   </body>
 </html>
 ```
@@ -222,7 +511,64 @@ stack toolbars.
         <button slot="after">A</button>
       </vertex-scene-tree-toolbar>
     </vertex-scene-tree>
+    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj"></vertex-viewer>
+  </body>
+</html>
+```
+
+## Troubleshooting
+
+### Filtering
+
+#### Expected results not appearing
+
+By default, filtering occurs against the `VERTEX_SCENE_ITEM_NAME` metadata. This can be 
+configured through a couple different options:
+- Providing values via the `metadataSearchKeys` property will cause all filters to be checked
+  against the provided metadata keys. This can be used to customize the filter behavior to either
+  include additional metadata properties, or to exclude the default `VERTEX_SCENE_ITEM_NAME` metadata.
+- Providing values via the `columns` option when programmatically filtering with the `filterItems` method.
+  This behaves similarly to the `metadataSearchKeys`, but will not default to including the `VERTEX_SCENE_ITEM_NAME`
+  metadata. To have the programmatic filter behave the same way as the default search, [`VERTEX_SCENE_ITEM_NAME`] can
+  be provided for this option.
+
+#### Working with metadata that includes spaces
+
+When binding data for metadata keys that include spaces, we expect that the space is preserved in the binding.
+
+**Example:** Binding metadata values for a key with a space
+
+```html
+<html>
+  <body>
+    <vertex-scene-tree viewer-selector="#viewer">
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell prop:value="{{row.metadata.Metadata property with spaces}}" visibility-toggle></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
     <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key"></vertex-viewer>
+
+    <script type="module">
+      function main() {
+        const tree = document.querySelector('vertex-scene-tree');
+        tree.metadataKeys = [
+          "VERTEX_SCENE_ITEM_NAME",
+          "Metadata property with spaces"
+        ];
+      }
+
+      main();
+    </script>
   </body>
 </html>
 ```
