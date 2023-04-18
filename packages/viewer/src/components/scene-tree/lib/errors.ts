@@ -7,6 +7,7 @@ export enum SceneTreeErrorCode {
   DISCONNECTED = 3,
   SUBSCRIPTION_FAILURE = 4,
   UNAUTHORIZED = 5,
+  ABORTED = 6,
 }
 
 export class SceneTreeErrorDetails {
@@ -28,13 +29,15 @@ function getSceneTreeErrorMessage(code: SceneTreeErrorCode): string {
     case SceneTreeErrorCode.SCENE_TREE_DISABLED:
       return 'The tree for this scene is not enabled. Enable the tree for this scene to interact with the tree.';
     case SceneTreeErrorCode.MISSING_VIEWER:
-      return 'Could not find reference to the viewer';
+      return 'Could not find reference to the viewer.';
     case SceneTreeErrorCode.DISCONNECTED:
       return 'Disconnected from server.';
     case SceneTreeErrorCode.SUBSCRIPTION_FAILURE:
-      return 'The tree was not able to receive subscription events';
+      return 'The tree was not able to receive subscription events.';
     case SceneTreeErrorCode.UNAUTHORIZED:
       return 'The tree was unauthorized to connect to the server. The associated Viewer may not be connected.';
+    case SceneTreeErrorCode.ABORTED:
+      return 'Unable to load the tree for this scene.';
   }
 }
 

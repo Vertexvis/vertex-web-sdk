@@ -949,6 +949,8 @@ export class SceneTreeController {
           currentPage.metadataKeys
         );
 
+        console.log(fetchedRows);
+
         const start = this.state.rows.slice(0, offset);
         const end = this.state.rows.slice(
           start.length + fetchedRows.length,
@@ -1151,6 +1153,8 @@ export class SceneTreeController {
           'UNAUTHORIZED',
           SceneTreeErrorCode.UNAUTHORIZED
         );
+      } else if (e.code === grpc.Code.Aborted) {
+        return new SceneTreeErrorDetails('ABORTED', SceneTreeErrorCode.ABORTED);
       } else {
         return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
       }
