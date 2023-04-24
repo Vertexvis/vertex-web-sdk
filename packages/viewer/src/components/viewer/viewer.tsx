@@ -1015,8 +1015,6 @@ export class Viewer {
       this.handleConnectionFailed(previous, state);
     } else if (state.type === 'disconnected') {
       this.handleDisconnected(previous, state);
-    } else if (state.type === 'reconnecting') {
-      this.frame = undefined;
     }
   }
 
