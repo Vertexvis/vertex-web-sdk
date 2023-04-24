@@ -411,6 +411,7 @@ export class Viewer {
   private resizeObserver?: ResizeObserver;
   private isResizing?: boolean;
   private isResizeUpdate?: boolean;
+  private skippedCorrelationIds: string[] = [];
 
   private resizeTimer?: NodeJS.Timeout;
 
@@ -508,8 +509,15 @@ export class Viewer {
    */
   @Method()
   public async dispatchFrameDrawn(frame: Frame): Promise<void> {
-    this.internalFrameDrawnDispatcher.emit(frame);
-    this.frameDrawn.emit(frame);
+    const frameWithSkippedCorrelationIds = frame.copy({
+      correlationIds: [...frame.correlationIds, ...this.skippedCorrelationIds],
+    });
+
+    // Skip setting the `frame` property to the copy, since we rely on strict
+    // equality with `state.frame` to determine if we should draw it.
+    this.frame = frame;
+    this.internalFrameDrawnDispatcher.emit(frameWithSkippedCorrelationIds);
+    this.frameDrawn.emit(frameWithSkippedCorrelationIds);
   }
 
   /**
@@ -1128,6 +1136,11 @@ export class Viewer {
 
         if (drawnFrame != null) {
           this.dispatchFrameDrawn(drawnFrame);
+        } else {
+          this.skippedCorrelationIds = [
+            ...this.skippedCorrelationIds,
+            ...this.frame.correlationIds,
+          ];
         }
       }
     }
