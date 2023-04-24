@@ -8,6 +8,7 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
+import { UUID } from '@vertexvis/utils';
 
 import { decodePng } from '../../workers/png-decoder-pool';
 import { constrainViewVector } from '../rendering/vectors';
@@ -29,8 +30,13 @@ export class Frame {
     public readonly image: FrameImage,
     public readonly scene: FrameScene,
     private readonly depthBufferBytes: Uint8Array | undefined,
-    private readonly featureMapBytes: Uint8Array | undefined
+    private readonly featureMapBytes: Uint8Array | undefined,
+    private readonly id = UUID.create()
   ) {}
+
+  public getId(): UUID.UUID {
+    return this.id;
+  }
 
   public async depthBuffer(): Promise<DepthBuffer | undefined> {
     if (this.cachedDepthBuffer == null) {
@@ -86,7 +92,8 @@ export class Frame {
       image ?? this.image,
       scene ?? this.scene,
       depthBufferBytes ?? this.depthBufferBytes,
-      featureMapBytes ?? this.featureMapBytes
+      featureMapBytes ?? this.featureMapBytes,
+      this.id
     );
   }
 }

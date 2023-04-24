@@ -1,7 +1,15 @@
 import { BoundingBox, Line3, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Dimensions } from '@vertexvis/geometry';
 
+import { makeImageAttributes } from '../../../testing/fixtures';
 import { FrameCamera } from '..';
-import { FrameOrthographicCamera, FramePerspectiveCamera } from '../frame';
+import {
+  Frame,
+  FrameImage,
+  FrameOrthographicCamera,
+  FramePerspectiveCamera,
+  FrameScene,
+} from '../frame';
 
 describe(FramePerspectiveCamera, () => {
   const camera = new FramePerspectiveCamera(
@@ -136,5 +144,21 @@ describe(FrameOrthographicCamera, () => {
         )
       );
     });
+  });
+});
+
+describe(Frame, () => {
+  it('should include the ID on a copy', () => {
+    const frame = new Frame(
+      [],
+      2,
+      {} as Dimensions,
+      new FrameImage(makeImageAttributes(1, 2), new Uint8Array()),
+      {} as FrameScene,
+      undefined,
+      undefined
+    );
+
+    expect(frame.getId()).toEqual(frame.copy({}).getId());
   });
 });
