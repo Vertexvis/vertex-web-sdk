@@ -1015,6 +1015,8 @@ export class Viewer {
       this.handleConnectionFailed(previous, state);
     } else if (state.type === 'disconnected') {
       this.handleDisconnected(previous, state);
+    } else if (state.type === 'reconnecting') {
+      this.frame = undefined;
     }
   }
 
@@ -1047,7 +1049,7 @@ export class Viewer {
       this.deviceIdChange.emit(state.deviceId);
     }
 
-    if (this.frame !== state.frame) {
+    if (this.frame?.sequenceNumber !== state.frame.sequenceNumber) {
       this.updateFrame(state.frame);
     }
 
@@ -1086,7 +1088,7 @@ export class Viewer {
     if (
       this.canvasElement != null &&
       canvasDimensions != null &&
-      this.frame !== frame
+      this.frame?.sequenceNumber !== frame.sequenceNumber
     ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
