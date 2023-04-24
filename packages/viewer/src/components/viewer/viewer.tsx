@@ -1047,7 +1047,7 @@ export class Viewer {
       this.deviceIdChange.emit(state.deviceId);
     }
 
-    if (this.frame?.sequenceNumber !== state.frame.sequenceNumber) {
+    if (this.frame?.getId() !== state.frame.getId()) {
       this.updateFrame(state.frame);
     }
 
@@ -1086,7 +1086,7 @@ export class Viewer {
     if (
       this.canvasElement != null &&
       canvasDimensions != null &&
-      this.frame?.sequenceNumber !== frame.sequenceNumber
+      this.frame?.getId() !== frame.getId()
     ) {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
