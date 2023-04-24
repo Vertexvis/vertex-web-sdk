@@ -32,9 +32,7 @@ export class Frame {
     private readonly depthBufferBytes: Uint8Array | undefined,
     private readonly featureMapBytes: Uint8Array | undefined,
     private readonly id = UUID.create()
-  ) {
-    this.id = UUID.create();
-  }
+  ) {}
 
   public getId(): UUID.UUID {
     return this.id;
