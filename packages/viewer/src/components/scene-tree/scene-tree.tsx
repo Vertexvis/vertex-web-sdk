@@ -183,8 +183,19 @@ export class SceneTree {
   @Prop()
   public metadataKeys: MetadataKey[] = [];
 
+  /**
+   * An event that is emitted when this <vertex-scene-tree> encounters a connection
+   * error.
+   */
   @Event()
   public connectionError!: EventEmitter<SceneTreeErrorDetails>;
+
+  /**
+   * An event that is emitted when the first row of this <vertex-scene-tree> has
+   * been rendered.
+   */
+  @Event()
+  public firstRowRendered!: EventEmitter<void>;
 
   @State()
   private rows: Row[] = [];
@@ -215,6 +226,7 @@ export class SceneTree {
   private el!: HTMLElement;
 
   private lastSelectedItemId?: string;
+  private firstCellRendered = false;
 
   /**
    * Schedules a render of the rows in the scene tree. Useful if any custom
@@ -862,6 +874,14 @@ export class SceneTree {
       });
     } catch (e) {
       console.error('Failed to filter tree with exception: ', e);
+    }
+  }
+
+  @Listen('cellLoaded')
+  protected async handleCellLoaded(): Promise<void> {
+    if (!this.firstCellRendered && this.rows.length > 0) {
+      this.firstCellRendered = true;
+      this.firstRowRendered.emit();
     }
   }
 

@@ -594,9 +594,10 @@ When binding data for metadata keys that include spaces, we expect that the spac
 
 ## Events
 
-| Event             | Description | Type                                 |
-| ----------------- | ----------- | ------------------------------------ |
-| `connectionError` |             | `CustomEvent<SceneTreeErrorDetails>` |
+| Event              | Description                                                                                | Type                                 |
+| ------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| `connectionError`  | An event that is emitted when this <vertex-scene-tree> encounters a connection error.      | `CustomEvent<SceneTreeErrorDetails>` |
+| `firstRowRendered` | An event that is emitted when the first row of this <vertex-scene-tree> has been rendered. | `CustomEvent<void>`                  |
 
 
 ## Methods
