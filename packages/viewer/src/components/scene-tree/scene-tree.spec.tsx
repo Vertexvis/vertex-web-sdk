@@ -1199,6 +1199,36 @@ describe('<vertex-scene-tree>', () => {
       });
     });
   });
+
+  describe('initial load', () => {
+    it('fires an event once when the first row has rendered', async () => {
+      const client = mockSceneTreeClient();
+      mockGetTree({ client });
+      const firstRowRendered = jest.fn();
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller, stream });
+
+      tree.addEventListener('firstRowRendered', firstRowRendered);
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await waitForSceneTreeConnected();
+
+      const row = tree.querySelectorAll(
+        'vertex-scene-tree-table-cell'
+      )[0] as HTMLVertexSceneTreeTableCellElement;
+
+      row.dispatchEvent(new CustomEvent('cellLoaded', { bubbles: true }));
+      expect(firstRowRendered).toHaveBeenCalled();
+
+      firstRowRendered.mockClear();
+
+      row.dispatchEvent(new CustomEvent('cellLoaded', { bubbles: true }));
+      expect(firstRowRendered).not.toHaveBeenCalled();
+    });
+  });
 });
 
 async function newSceneTreeSpec(data: {
