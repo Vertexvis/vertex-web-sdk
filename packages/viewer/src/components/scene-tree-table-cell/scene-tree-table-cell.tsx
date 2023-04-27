@@ -132,6 +132,14 @@ export class SceneTreeTableCell {
   @Event({ bubbles: true })
   public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
 
+  /**
+   * Used for internals or testing.
+   *
+   * @private
+   */
+  @Event({ bubbles: true })
+  public cellLoaded!: EventEmitter<void>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -141,6 +149,8 @@ export class SceneTreeTableCell {
     this.hoverListener = this.hoverController?.stateChanged((id?: string) => {
       this.hovered = id === this.node?.id?.hex;
     });
+
+    this.cellLoaded.emit();
   }
 
   public disconnectedCallback(): void {

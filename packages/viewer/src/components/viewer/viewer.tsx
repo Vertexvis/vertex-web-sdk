@@ -96,6 +96,11 @@ interface DisconnectedStatus {
   status: 'disconnected';
 }
 
+interface ConnectionFailedStatus {
+  status: 'connection-failed';
+  errorMessage: string;
+}
+
 /**
  * Internal state values for the component. Used to preserve values across live
  * reload refreshes.
@@ -112,7 +117,8 @@ interface StateMap {
 export type ConnectionStatus =
   | ConnectingStatus
   | ConnectedStatus
-  | DisconnectedStatus;
+  | DisconnectedStatus
+  | ConnectionFailedStatus;
 
 @Component({
   tag: 'vertex-viewer',
@@ -1061,6 +1067,10 @@ export class Viewer {
     if (previous.type !== 'connection-failed') {
       this.token = undefined;
       this.errorMessage = state.message;
+      this.emitConnectionChange({
+        status: 'connection-failed',
+        errorMessage: state.message,
+      });
     }
   }
 
