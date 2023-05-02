@@ -53,8 +53,6 @@ export function computeArrowNdcValues(
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
 
-  console.log(direction, transformedDirection);
-
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,

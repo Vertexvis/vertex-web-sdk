@@ -33,8 +33,8 @@ export class ViewerHitResultIndicator {
 
   private transform?: Matrix4.Matrix4;
 
-  private arrowColor: Color.Color | string = '#ffffff';
-  private planeColor: Color.Color | string = '#00ffff';
+  private arrowColor: Color.Color | string = '#0099cc';
+  private planeColor: Color.Color | string = '#0099cc';
   private planeOpacity: number | string = 0.5;
 
   private indicator?: HitIndicator;
@@ -121,7 +121,8 @@ export class ViewerHitResultIndicator {
         oldPosition
       )}, current=${JSON.stringify(newPosition)}]`
     );
-    this.indicator?.updateTransform(this.transform);
+
+    this.indicator?.updateTransformAndNormal(this.transform, this.normal);
   }
 
   @Watch('normal')
@@ -135,8 +136,8 @@ export class ViewerHitResultIndicator {
       )}, current=${JSON.stringify(newNormal)}]`
     );
 
-    if (this.normal != null) {
-      this.indicator?.updateNormal(this.normal);
+    if (newNormal) {
+      this.indicator?.updateTransformAndNormal(this.transform, this.normal);
     }
   }
 
@@ -190,7 +191,9 @@ export class ViewerHitResultIndicator {
     console.debug(
       `Initializing hit indicator. [initial-position=${JSON.stringify(
         this.position
-      )}, has-initial-frame=${this.viewer?.frame != null}]`
+      )}, initial-normal=${JSON.stringify(this.normal)} has-initial-frame=${
+        this.viewer?.frame != null
+      }]`
     );
 
     this.indicator = new HitIndicator(canvasRef, {
@@ -200,7 +203,7 @@ export class ViewerHitResultIndicator {
 
     if (this.position != null) {
       this.transform = this.createTransform();
-      this.indicator.updateTransform(this.transform);
+      this.indicator.updateTransformAndNormal(this.transform, this.normal);
     }
     if (this.viewer?.frame != null) {
       this.indicator.updateFrame(this.viewer.frame, true);

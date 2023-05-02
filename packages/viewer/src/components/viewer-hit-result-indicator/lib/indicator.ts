@@ -8,7 +8,11 @@ import { axisPositions } from '../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../lib/transforms/axis-translation';
 import { Drawable } from '../../../lib/transforms/drawable';
 import { AxisLine } from '../../../lib/transforms/line';
-import { RectangleMesh, TriangleMesh } from '../../../lib/transforms/mesh';
+import {
+  Mesh,
+  RectangleMesh,
+  TriangleMesh,
+} from '../../../lib/transforms/mesh';
 import { computePointNdcValues } from '../../../lib/transforms/point';
 import { computeRectangleNdcValues } from '../../../lib/transforms/rectangle';
 import { Frame, Viewport } from '../../../lib/types';
@@ -40,7 +44,7 @@ export class HitIndicator implements Disposable {
 
   private axis?: AxisLine;
   private arrow?: TriangleMesh;
-  private point?: RectangleMesh;
+  private point?: Mesh;
   private plane?: RectangleMesh;
 
   private drawableElements: Drawable[] = [];
@@ -101,11 +105,15 @@ export class HitIndicator implements Disposable {
     }
   }
 
-  public updateTransform(transform?: Matrix4.Matrix4): void {
+  public updateTransformAndNormal(
+    transform?: Matrix4.Matrix4,
+    normal?: Vector3.Vector3
+  ): void {
     this.transform = transform;
+    this.normal = normal;
 
-    if (transform != null && this.normal != null && this.frame != null) {
-      this.createOrUpdateElements(transform, this.normal, this.frame);
+    if (transform != null && normal != null && this.frame != null) {
+      this.createOrUpdateElements(transform, normal, this.frame);
       this.sortMeshes(
         this.frame,
         this.arrow,
@@ -113,18 +121,6 @@ export class HitIndicator implements Disposable {
         this.plane,
         this.axis
       );
-      this.draw();
-    } else {
-      this.clear();
-      this.reglFrameDisposable?.cancel();
-      this.reglFrameDisposable = undefined;
-    }
-  }
-
-  public updateNormal(normal?: Vector3.Vector3): void {
-    if (this.transform != null && normal != null && this.frame != null) {
-      this.normal = normal;
-      this.createOrUpdateElements(this.transform, normal, this.frame);
       this.draw();
     } else {
       this.clear();
@@ -239,7 +235,7 @@ export class HitIndicator implements Disposable {
         opacity: 0.75,
       }
     );
-    this.point = new RectangleMesh(
+    this.point = new Mesh(
       createShape,
       'hit-plane',
       computePointNdcValues(
@@ -248,7 +244,7 @@ export class HitIndicator implements Disposable {
         normal,
         triangleSize
       ),
-      '#ffffff',
+      '#000000',
       '#000000',
       {
         join: 'round' as JoinStyle,

@@ -5,6 +5,53 @@ import { ShapeProps } from 'regl-shape';
 import { CreateShape } from '../../lib/transforms/shape';
 import { Drawable, DrawablePoints } from './drawable';
 
+export class MeshPoints implements DrawablePoints {
+  public constructor(
+    public valid: boolean,
+    public world: Vector3.Vector3[],
+    public screen: Point.Point[],
+    private computeShortestDistance?: (vector: Vector3.Vector3) => number
+  ) {}
+
+  public shortestDistanceFrom(vector: Vector3.Vector3): number {
+    return this.computeShortestDistance != null
+      ? this.computeShortestDistance(vector)
+      : this.toWorldArray()
+          .map((v) => Vector3.distance(v, vector))
+          .sort((a, b) => a - b)[0];
+  }
+
+  public toWorldArray(): Vector3.Vector3[] {
+    return [...this.world, this.world[0]];
+  }
+
+  public toArray(): Point.Point[] {
+    return [...this.screen, this.screen[0]];
+  }
+}
+
+export class Mesh extends Drawable<MeshPoints> {
+  public constructor(
+    createShape: CreateShape,
+    identifier: string,
+    points: MeshPoints,
+    outlineColor: Color.Color | string = '#000000',
+    fillColor: Color.Color | string = '#000000',
+    shapeProps: Partial<ShapeProps> = {}
+  ) {
+    super(
+      createShape,
+      identifier,
+      points,
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
+      typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
+      shapeProps
+    );
+  }
+}
+
 export class TriangleMeshPoints implements DrawablePoints {
   public constructor(
     public valid: boolean,

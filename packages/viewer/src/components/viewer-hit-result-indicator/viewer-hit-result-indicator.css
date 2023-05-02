@@ -9,13 +9,13 @@
   * @prop --viewer-hit-result-indicator-x-axis-arrow-color: A CSS color for the arrow
   * at the end of the X axis on this widget. Defaults to `#ea3324`.
   */
-  --viewer-hit-result-indicator-arrow-color: '#000000';
+  --viewer-hit-result-indicator-arrow-color: '#0099cc';
 
   /**
   * @prop --viewer-hit-result-indicator-y-axis-arrow-color: A CSS color for the arrow
   * at the end of the Y axis on this widget. Defaults to `#4faf32`.
   */
-  --viewer-hit-result-indicator-plane-color: '#00ffff';
+  --viewer-hit-result-indicator-plane-color: '#0099cc';
 
   /**
   * @prop --viewer-hit-result-indicator-z-axis-arrow-color: A CSS color for the arrow

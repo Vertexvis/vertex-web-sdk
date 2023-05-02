@@ -16,9 +16,10 @@ export function computeRectangleNdcValues(
 
   const position = Vector3.fromMatrixPosition(transform);
 
-  const worldX = Vector3.normalize(
-    Vector3.cross(transformedDirection, Vector3.up())
-  );
+  const worldX =
+    Math.abs(Vector3.dot(transformedDirection, Vector3.up())) === 1
+      ? Vector3.left()
+      : Vector3.normalize(Vector3.cross(transformedDirection, Vector3.up()));
   const worldY = Vector3.normalize(Vector3.cross(worldX, transformedDirection));
   const xRay = Ray.create({
     origin: position,
