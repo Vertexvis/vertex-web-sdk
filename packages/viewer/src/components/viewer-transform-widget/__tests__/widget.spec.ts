@@ -400,4 +400,97 @@ describe(TransformWidget, () => {
       widget.getDrawableElements().some((e) => e.fillColor === '#111111')
     ).toBe(true);
   });
+
+  it('uses the disabled color if the specific axis are disabled', async () => {
+    const widget = new TransformWidget(canvas, {
+      xArrow: '#777777',
+      yArrow: '#888888',
+      zArrow: '#999999',
+      disabledColor: '#333333',
+    });
+
+    widget.updateDisabledAxis({
+      xRotation: true,
+      yRotation: true,
+      zRotation: true,
+    });
+    const frame = makePerspectiveFrame();
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+    );
+    widget.updateTransform(positionTransform);
+
+    // the rotatation meshes should all have the disabled fill color
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#333333' && e.identifier.includes('rotate')
+        ).length
+    ).toBe(3);
+
+    // The disabled rotation meshes should have no impact on the translation meshes
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#777777' && e.identifier.includes('translate')
+        ).length
+    ).toBe(1);
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#888888' && e.identifier.includes('translate')
+        ).length
+    ).toBe(1);
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#999999' && e.identifier.includes('translate')
+        ).length
+    ).toBe(1);
+
+    // re-enabling the rotation axis should draw the client given color
+    widget.updateDisabledAxis({
+      xRotation: false,
+      yRotation: false,
+      zRotation: false,
+    });
+
+    // no rotation mesh contains a disabled color
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#333333' && e.identifier.includes('rotate')
+        ).length
+    ).toBe(0);
+
+    // the colors should now be present
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#777777' && e.identifier.includes('rotate')
+        ).length
+    ).toBe(1);
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#888888' && e.identifier.includes('rotate')
+        ).length
+    ).toBe(1);
+    expect(
+      widget
+        .getDrawableElements()
+        .filter(
+          (e) => e.fillColor === '#999999' && e.identifier.includes('rotate')
+        ).length
+    ).toBe(1);
+  });
 });

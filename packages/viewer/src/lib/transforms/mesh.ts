@@ -34,14 +34,14 @@ export class TriangleMeshPoints implements DrawablePoints {
 }
 
 export class TriangleMesh extends Drawable<TriangleMeshPoints> {
-  private disabled: boolean | undefined;
   public constructor(
     createShape: CreateShape,
     identifier: string,
     points: TriangleMeshPoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
-    shapeProps: Partial<ShapeProps> = {}
+    shapeProps: Partial<ShapeProps> = {},
+    private disabled: boolean = false
   ) {
     super(
       createShape,

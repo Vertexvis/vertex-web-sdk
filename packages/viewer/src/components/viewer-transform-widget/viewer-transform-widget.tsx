@@ -395,6 +395,7 @@ export class ViewerTransformWidget {
 
     widget.updateCursor(canvasPoint);
     widget.updateTransform(this.currentTransform);
+
     widget.updateDisabledAxis({
       xRotation: true,
       yRotation: true,

@@ -369,6 +369,86 @@ describe('vertex-viewer-transform-widget', () => {
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
+  it('sets the widget to disabled on an interaction, and re-enables available axis', async () => {
+    const { stream, ws } = makeViewerStream();
+    const position = Vector3.create(1, 1, 1);
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget
+            xRotationDisabled={true}
+            yRotationDisabled={true}
+            zRotationDisabled={true}
+            position={position}
+          ></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    await page.waitForChanges();
+
+    widget.hovered = new TriangleMesh(
+      jest.fn(),
+      'x-translate',
+      new TriangleMeshPoints(
+        true,
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Point.create(),
+        Point.create(),
+        Point.create(),
+        Point.create()
+      ),
+      '#000000',
+      '#000000'
+    );
+
+    widget.shadowRoot
+      ?.querySelector('canvas')
+      ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(mockTransformWidget.updateDisabledAxis).toHaveBeenCalledWith({
+      xRotation: true,
+      yRotation: true,
+      zRotation: true,
+      xTranslation: true,
+      yTranslation: true,
+      zTranslation: true,
+    });
+
+    expect(mockTransformWidget.updateDisabledAxis).toHaveBeenCalledWith({
+      xRotation: true,
+      yRotation: true,
+      zRotation: true,
+      xTranslation: false,
+      yTranslation: false,
+      zTranslation: false,
+    });
+  });
+
   it('updates widget bounds when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
