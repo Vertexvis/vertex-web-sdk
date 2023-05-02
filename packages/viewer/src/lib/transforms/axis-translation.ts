@@ -42,7 +42,7 @@ export function zAxisArrowPositions(
   );
 }
 
-function computeArrowNdcValues(
+export function computeArrowNdcValues(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
@@ -52,6 +52,8 @@ function computeArrowNdcValues(
     direction,
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
+
+  console.log(direction, transformedDirection);
 
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(

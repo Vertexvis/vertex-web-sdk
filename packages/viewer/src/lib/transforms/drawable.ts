@@ -50,6 +50,7 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
   }
 
   public updateFillColor(color?: Color.Color | string): void {
+    console.log(color);
     if (color != null) {
       this.fillColor =
         typeof color === 'string' ? color : Color.toHexString(color);
