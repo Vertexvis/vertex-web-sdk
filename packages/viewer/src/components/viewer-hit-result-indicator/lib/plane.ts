@@ -55,15 +55,12 @@ export function computePlaneNdcValues(
     position
   );
 
+  const world = [bottomLeft, topLeft, topRight, bottomRight];
+
   return new MeshPoints(
     !isNaN(worldX.x),
-    [bottomLeft, topLeft, bottomRight, topRight],
-    [
-      Vector3.transformMatrix(bottomLeft, camera.projectionViewMatrix),
-      Vector3.transformMatrix(topLeft, camera.projectionViewMatrix),
-      Vector3.transformMatrix(bottomRight, camera.projectionViewMatrix),
-      Vector3.transformMatrix(topRight, camera.projectionViewMatrix),
-    ],
+    [bottomLeft, topLeft, topRight, bottomRight],
+    world.map((v) => Vector3.transformMatrix(v, camera.projectionViewMatrix)),
     (vector) => Vector3.distance(position, vector)
   );
 }
