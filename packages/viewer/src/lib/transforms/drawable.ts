@@ -20,6 +20,8 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
 
   public initialFillColor?: string;
 
+  protected disabled: boolean | undefined;
+
   public draw: DrawShape;
 
   public constructor(
@@ -27,7 +29,8 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     public identifier: string,
     public points: T,
     public outlineColor: string,
-    public fillColor?: string,
+    protected fillColor?: string,
+    private disabledColor = '#cccccc',
     public shapeProps: Partial<ShapeProps> = {}
   ) {
     const pointsAsArray = points.toArray();
@@ -43,14 +46,14 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
       count: pointsAsArray.length,
       thickness: 2,
       join: 'rect' as JoinStyle,
-      fill: this.fillColor,
+      fill: !!this.disabled ? this.disabledColor : this.fillColor,
       color: this.outlineColor,
       ...shapeProps,
     });
   }
 
   public updateFillColor(color?: Color.Color | string): void {
-    if (color != null) {
+    if (color != null && !this.disabled) {
       this.fillColor =
         typeof color === 'string' ? color : Color.toHexString(color);
     }
@@ -62,6 +65,18 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
       flattenPointArray(points.toArray()).forEach(
         (v, i) => (this.pointsArray[i] = v)
       );
+    }
+  }
+
+  public isDisabled(): boolean {
+    return !!this.disabled;
+  }
+
+  public getFillColor(): string | undefined {
+    if (this.isDisabled()) {
+      return this.disabledColor;
+    } else {
+      return this.fillColor;
     }
   }
 }

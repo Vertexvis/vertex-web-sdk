@@ -67,6 +67,42 @@ export class ViewerTransformWidget {
   public controller?: TransformController;
 
   /**
+   * Determines whether or not the x-rotation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public xRotationDisabled = false;
+
+  /**
+   * Determines whether or not the y-rotation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public yRotationDisabled = false;
+
+  /**
+   * Determines whether or not the z-rotation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public zRotationDisabled = false;
+
+  /**
+   * Determines whether or not the x-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public xTranslationDisabled = false;
+
+  /**
+   * Determines whether or not the y-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public yTranslationDisabled = false;
+
+  /**
+   * Determines whether or not the z-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public zTranslationDisabled = false;
+
+  /**
    * @internal
    * @ignore
    *
@@ -256,6 +292,7 @@ export class ViewerTransformWidget {
 
     if (
       this.hovered != null &&
+      !this.hovered.isDisabled() &&
       canvasBounds != null &&
       this.viewer != null &&
       this.position != null &&
@@ -290,6 +327,8 @@ export class ViewerTransformWidget {
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.addEventListener('pointermove', this.handleDrag);
       window.addEventListener('pointerup', this.handleEndTransform);
+    } else if (this.hovered != null && this.hovered.isDisabled()) {
+      console.log('Currently disabled');
     }
   };
 
@@ -431,6 +470,21 @@ export class ViewerTransformWidget {
     }
   }
 
+  private handleSettingDisabledAxis(): void {
+    if (this.widget) {
+      this.widget.updateDisabledAxis({
+        xRotation: this.xRotationDisabled,
+        yRotation: this.yRotationDisabled,
+        zRotation: this.zRotationDisabled,
+        xTranslation: this.xTranslationDisabled,
+        yTranslation: this.yTranslationDisabled,
+        zTranslation: this.zTranslationDisabled,
+      });
+    } else {
+      console.warn('Cannot set disabled values - no widget defined');
+    }
+  }
+
   private setupTransformWidget = (
     canvasRef: HTMLCanvasElement
   ): TransformWidget => {
@@ -445,6 +499,7 @@ export class ViewerTransformWidget {
       yArrow: this.yArrowColor,
       zArrow: this.zArrowColor,
       hovered: this.hoveredColor,
+      disabledColor: this.disabledColor,
     });
 
     if (this.position != null) {
@@ -455,6 +510,8 @@ export class ViewerTransformWidget {
     if (this.viewer?.frame != null) {
       this.widget.updateFrame(this.viewer.frame, true);
     }
+
+    this.handleSettingDisabledAxis();
 
     this.hoveredChangeDisposable = this.widget.onHoveredChanged(
       this.handleHoveredDrawableChanged

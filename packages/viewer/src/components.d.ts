@@ -1234,6 +1234,30 @@ export namespace Components {
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
     viewer?: HTMLVertexViewerElement;
+    /**
+     * Determines whether or not the x-rotation is disabled on the widget
+     */
+    xRotationDisabled: boolean;
+    /**
+     * Determines whether or not the x-translation is disabled on the widget
+     */
+    xTranslationDisabled: boolean;
+    /**
+     * Determines whether or not the y-rotation is disabled on the widget
+     */
+    yRotationDisabled: boolean;
+    /**
+     * Determines whether or not the y-translation is disabled on the widget
+     */
+    yTranslationDisabled: boolean;
+    /**
+     * Determines whether or not the z-rotation is disabled on the widget
+     */
+    zRotationDisabled: boolean;
+    /**
+     * Determines whether or not the z-translation is disabled on the widget
+     */
+    zTranslationDisabled: boolean;
   }
   interface VertexViewerViewCube {
     /**
@@ -1667,9 +1691,16 @@ declare namespace LocalJSX {
      * A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys?: MetadataKey[];
+    /**
+     * An event that is emitted when this <vertex-scene-tree> encounters a connection error.
+     */
     onConnectionError?: (
       event: VertexSceneTreeCustomEvent<SceneTreeErrorDetails>
     ) => void;
+    /**
+     * An event that is emitted when the first row of this <vertex-scene-tree> has been rendered.
+     */
+    onFirstRowRendered?: (event: VertexSceneTreeCustomEvent<void>) => void;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
@@ -1730,6 +1761,11 @@ declare namespace LocalJSX {
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
     node?: Node.AsObject;
+    /**
+     * Used for internals or testing.
+     * @private
+     */
+    onCellLoaded?: (event: VertexSceneTreeTableCellCustomEvent<void>) => void;
     /**
      * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
      */
@@ -2691,6 +2727,30 @@ declare namespace LocalJSX {
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
     viewer?: HTMLVertexViewerElement;
+    /**
+     * Determines whether or not the x-rotation is disabled on the widget
+     */
+    xRotationDisabled?: boolean;
+    /**
+     * Determines whether or not the x-translation is disabled on the widget
+     */
+    xTranslationDisabled?: boolean;
+    /**
+     * Determines whether or not the y-rotation is disabled on the widget
+     */
+    yRotationDisabled?: boolean;
+    /**
+     * Determines whether or not the y-translation is disabled on the widget
+     */
+    yTranslationDisabled?: boolean;
+    /**
+     * Determines whether or not the z-rotation is disabled on the widget
+     */
+    zRotationDisabled?: boolean;
+    /**
+     * Determines whether or not the z-translation is disabled on the widget
+     */
+    zTranslationDisabled?: boolean;
   }
   interface VertexViewerViewCube {
     /**

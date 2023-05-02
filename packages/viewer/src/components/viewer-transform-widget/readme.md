@@ -7,11 +7,17 @@
 
 ## Properties
 
-| Property     | Attribute | Description                                                                                                                                                  | Type                                   | Default     |
-| ------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
-| `controller` | --        | The controller that is responsible for performing transforms.                                                                                                | `TransformController \| undefined`     | `undefined` |
-| `position`   | --        | The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget. | `Vector3 \| undefined`                 | `undefined` |
-| `viewer`     | --        | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property               | Attribute                | Description                                                                                                                                                  | Type                                   | Default     |
+| ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
+| `controller`           | --                       | The controller that is responsible for performing transforms.                                                                                                | `TransformController \| undefined`     | `undefined` |
+| `position`             | --                       | The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget. | `Vector3 \| undefined`                 | `undefined` |
+| `viewer`               | --                       | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| `xRotationDisabled`    | `x-rotation-disabled`    | Determines whether or not the x-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `xTranslationDisabled` | `x-translation-disabled` | Determines whether or not the x-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
+| `yRotationDisabled`    | `y-rotation-disabled`    | Determines whether or not the y-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `yTranslationDisabled` | `y-translation-disabled` | Determines whether or not the y-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
+| `zRotationDisabled`    | `z-rotation-disabled`    | Determines whether or not the z-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `zTranslationDisabled` | `z-translation-disabled` | Determines whether or not the z-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
 
 
 ## Events
