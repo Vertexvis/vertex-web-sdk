@@ -1,6 +1,71 @@
 # vertex-viewer-transform-widget
 
 
+### Example
+This example includes a transform widget with the x,y, and z rotation axis disabled.
+
+The position of the widget is set on the hit result from a viewer tap.
+
+The widget expects a part selected, which also occurs on a valid hit result.
+
+```html
+<html>
+<body>
+  <vertex-viewer
+    id="viewer"
+    config-env="platprod"
+    src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
+  >
+    <vertex-viewer-transform-widget
+      id="transform-widget"
+      y-rotation-disabled
+      x-rotation-disabled
+      z-rotation-disabled
+    ></vertex-viewer-transform-widget>
+  </vertex-viewer>
+
+  <script type="module">
+    window.addEventListener('load', () => main());
+
+    async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+
+        const viewer = document.getElementById('viewer');
+        const tree = document.getElementById('scene-tree');
+        const widget = document.getElementById('transform-widget');
+
+        viewer.addEventListener('tap', async (event) => {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+
+          const result = await raycaster.hitItems(position);
+
+          if (result.hits && result.hits.length == 0) {
+            await scene
+              .items((op) => op.where((q) => q.all()).deselect())
+              .execute();
+          } else {
+            const widget = document.getElementById('transform-widget');
+            const hit = result.hits[0];
+
+            widget.position = hit.hitPoint;
+            await scene
+              .items((op) => [
+                op.where((q) => q.all()).deselect(),
+                op
+                  .where((q) => q.withItemId(hit.itemId.hex))
+                  .select(),
+              ])
+              .execute();
+          }
+        });
+    }
+  </script>
+</body>
+</html>
+```
+
 
 <!-- Auto Generated Below -->
 
