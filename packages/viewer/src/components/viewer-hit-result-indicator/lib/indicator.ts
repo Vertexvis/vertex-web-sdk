@@ -8,14 +8,10 @@ import { axisPositions } from '../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../lib/transforms/axis-translation';
 import { Drawable } from '../../../lib/transforms/drawable';
 import { AxisLine } from '../../../lib/transforms/line';
-import {
-  Mesh,
-  RectangleMesh,
-  TriangleMesh,
-} from '../../../lib/transforms/mesh';
-import { computePointNdcValues } from '../../../lib/transforms/point';
-import { computeRectangleNdcValues } from '../../../lib/transforms/rectangle';
+import { Mesh, TriangleMesh } from '../../../lib/transforms/mesh';
 import { Frame, Viewport } from '../../../lib/types';
+import { computePlaneNdcValues } from './plane';
+import { computePointNdcValues } from './point';
 
 export interface DrawableElementColors {
   arrow?: Color.Color | string;
@@ -34,9 +30,6 @@ export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
 // size as zooming occurs.
 export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
 
-export const MAX_PERSPECTIVE_TRIANGLE_SIZE = 100;
-export const MAX_ORTHOGRAPHIC_TRIANGLE_SIZE = 100;
-
 export class HitIndicator implements Disposable {
   private reglCommand?: regl.Regl;
 
@@ -45,7 +38,7 @@ export class HitIndicator implements Disposable {
   private axis?: AxisLine;
   private arrow?: TriangleMesh;
   private point?: Mesh;
-  private plane?: RectangleMesh;
+  private plane?: Mesh;
 
   private drawableElements: Drawable[] = [];
 
@@ -220,10 +213,10 @@ export class HitIndicator implements Disposable {
       '#000000',
       this.arrowFillColor
     );
-    this.plane = new RectangleMesh(
+    this.plane = new Mesh(
       createShape,
       'hit-plane',
-      computeRectangleNdcValues(
+      computePlaneNdcValues(
         transform,
         frame.scene.camera,
         normal,
@@ -282,7 +275,7 @@ export class HitIndicator implements Disposable {
     }
     if (this.plane != null) {
       this.plane.updatePoints(
-        computeRectangleNdcValues(
+        computePlaneNdcValues(
           transform,
           frame.scene.camera,
           normal,

@@ -1,7 +1,7 @@
 import { Angle, Matrix4, Quaternion, Ray, Vector3 } from '@vertexvis/geometry';
 
-import { FrameCameraBase } from '../types';
-import { MeshPoints } from './mesh';
+import { MeshPoints } from '../../../lib/transforms/mesh';
+import { FrameCameraBase } from '../../../lib/types';
 
 export function computePointNdcValues(
   transform: Matrix4.Matrix4,
@@ -16,10 +16,6 @@ export function computePointNdcValues(
 
   const position = Vector3.fromMatrixPosition(transform);
 
-  // const worldX =
-  //   Math.abs(Vector3.dot(transformedDirection, Vector3.up())) === 1
-  //     ? Vector3.left()
-  //     : Vector3.normalize(Vector3.cross(transformedDirection, Vector3.up()));
   const worldX = Vector3.normalize(
     Vector3.cross(transformedDirection, Vector3.normalize(camera.viewVector))
   );
@@ -33,10 +29,10 @@ export function computePointNdcValues(
     direction: worldY,
   });
 
-  const bottomLeft = Ray.at(xRay, -(rectangleSize / 2));
-  const topLeft = Ray.at(yRay, -(rectangleSize / 2));
-  const bottomRight = Ray.at(yRay, rectangleSize / 2);
-  const topRight = Ray.at(xRay, rectangleSize / 2);
+  const bottomLeft = Ray.at(xRay, -(rectangleSize / 2.5));
+  const topLeft = Ray.at(yRay, -(rectangleSize / 2.5));
+  const bottomRight = Ray.at(yRay, rectangleSize / 2.5);
+  const topRight = Ray.at(xRay, rectangleSize / 2.5);
 
   const bottomLeftRotated = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
