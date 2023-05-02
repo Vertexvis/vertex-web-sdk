@@ -395,11 +395,13 @@ export class ViewerTransformWidget {
 
     widget.updateCursor(canvasPoint);
     widget.updateTransform(this.currentTransform);
-    widget.updateColors({
-      xArrow: this.disabledColor,
-      yArrow: this.disabledColor,
-      zArrow: this.disabledColor,
-      hovered: this.disabledColor,
+    widget.updateDisabledAxis({
+      xRotation: true,
+      yRotation: true,
+      zRotation: true,
+      xTranslation: true,
+      yTranslation: true,
+      zTranslation: true,
     });
 
     window.removeEventListener('pointermove', this.handleDrag);
@@ -417,11 +419,14 @@ export class ViewerTransformWidget {
 
     window.addEventListener('pointermove', this.handlePointerMove);
 
-    this.getTransformWidget().updateColors({
-      xArrow: this.xArrowColor,
-      yArrow: this.yArrowColor,
-      zArrow: this.zArrowColor,
-      hovered: this.hoveredColor,
+    this.getTransformWidget().updateDisabledAxis({
+      xRotation: this.xRotationDisabled,
+      yRotation: this.yRotationDisabled,
+      zRotation: this.zRotationDisabled,
+
+      xTranslation: this.xTranslationDisabled,
+      yTranslation: this.yTranslationDisabled,
+      zTranslation: this.zTranslationDisabled,
     });
   };
 

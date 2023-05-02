@@ -20,8 +20,6 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
 
   public initialFillColor?: string;
 
-  protected disabled: boolean | undefined;
-
   public draw: DrawShape;
 
   public constructor(
@@ -65,10 +63,6 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
         (v, i) => (this.pointsArray[i] = v)
       );
     }
-  }
-
-  public isDisabled(): boolean {
-    return !!this.disabled;
   }
 }
 
