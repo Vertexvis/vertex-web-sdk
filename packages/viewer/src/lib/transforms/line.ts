@@ -46,7 +46,6 @@ export class AxisLine extends Drawable<AxisLinePoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
-      undefined,
       shapeProps
     );
   }
@@ -91,7 +90,6 @@ export class RotationLine extends Drawable<RotationLinePoints> {
       typeof outlineColor === 'string'
         ? outlineColor
         : Color.toHexString(outlineColor),
-      undefined,
       undefined,
       shapeProps
     );

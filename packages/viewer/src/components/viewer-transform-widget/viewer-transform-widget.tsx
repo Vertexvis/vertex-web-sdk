@@ -292,7 +292,6 @@ export class ViewerTransformWidget {
 
     if (
       this.hovered != null &&
-      !this.hovered.isDisabled() &&
       canvasBounds != null &&
       this.viewer != null &&
       this.position != null &&
@@ -327,8 +326,6 @@ export class ViewerTransformWidget {
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.addEventListener('pointermove', this.handleDrag);
       window.addEventListener('pointerup', this.handleEndTransform);
-    } else if (this.hovered != null && this.hovered.isDisabled()) {
-      console.log('Currently disabled');
     }
   };
 

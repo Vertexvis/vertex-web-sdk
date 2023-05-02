@@ -40,7 +40,6 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
     points: TriangleMeshPoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
-    disabledColor: Color.Color | string = '#cccccc',
     shapeProps: Partial<ShapeProps> = {}
   ) {
     super(
@@ -51,9 +50,6 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
-      typeof disabledColor === 'string'
-        ? disabledColor
-        : Color.toHexString(disabledColor),
       shapeProps
     );
   }
