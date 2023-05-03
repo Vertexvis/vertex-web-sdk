@@ -27,7 +27,11 @@ import {
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../../testing/fixtures';
-import { HitIndicator } from '../indicator';
+import {
+  DEFAULT_PLANE_SIZE_SCALAR,
+  DEFAULT_POINT_SIZE_SCALAR,
+  HitIndicator,
+} from '../indicator';
 import { computePlaneNdcValues } from '../plane';
 import { computePointNdcValues } from '../point';
 
@@ -81,7 +85,7 @@ function createMeshes(
       transform,
       frame.scene.camera,
       normal,
-      expectedTriangleSize
+      expectedTriangleSize * DEFAULT_PLANE_SIZE_SCALAR
     ),
     '#000000',
     '#000000'
@@ -93,7 +97,7 @@ function createMeshes(
       transform,
       frame.scene.camera,
       normal,
-      expectedTriangleSize
+      expectedTriangleSize * DEFAULT_POINT_SIZE_SCALAR
     ),
     '#000000',
     '#000000'
