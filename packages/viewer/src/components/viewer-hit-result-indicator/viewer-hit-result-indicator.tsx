@@ -3,6 +3,7 @@ import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
 import { readDOM, writeDOM } from '../../lib/stencil';
+import { parseCssColorValue } from './lib/dom';
 import { DEFAULT_PLANE_OPACITY, HitIndicator } from './lib/indicator';
 
 @Component({
@@ -62,22 +63,21 @@ export class ViewerHitResultIndicator {
     readDOM(() => {
       const hostStyles = window.getComputedStyle(this.hostEl);
 
-      this.arrowColor = hostStyles
-        .getPropertyValue('--viewer-hit-result-indicator-arrow-color')
-        .trim()
-        .replace(/["]*/g, '');
-      this.planeColor = hostStyles
-        .getPropertyValue('--viewer-hit-result-indicator-plane-color')
-        .trim()
-        .replace(/["]*/g, '');
-      this.outlineColor = hostStyles
-        .getPropertyValue('--viewer-hit-result-indicator-outline-color')
-        .trim()
-        .replace(/["]*/g, '');
+      this.arrowColor = parseCssColorValue(
+        hostStyles,
+        '--viewer-hit-result-indicator-arrow-color'
+      );
+      this.planeColor = parseCssColorValue(
+        hostStyles,
+        '--viewer-hit-result-indicator-plane-color'
+      );
+      this.outlineColor = parseCssColorValue(
+        hostStyles,
+        '--viewer-hit-result-indicator-outline-color'
+      );
       this.planeOpacity = hostStyles
         .getPropertyValue('--viewer-hit-result-indicator-plane-opacity')
-        .trim()
-        .replace(/["]*/g, '');
+        .trim();
 
       this.indicator?.updateColors({
         arrow: this.arrowColor,
@@ -217,10 +217,8 @@ export class ViewerHitResultIndicator {
       }
     );
 
-    if (this.position != null) {
-      this.transform = this.createTransform();
-      this.indicator.updateTransformAndNormal(this.transform, this.normal);
-    }
+    this.transform = this.createTransform();
+    this.indicator.updateTransformAndNormal(this.transform, this.normal);
     if (this.viewer?.frame != null) {
       this.indicator.updateFrame(this.viewer.frame);
     }

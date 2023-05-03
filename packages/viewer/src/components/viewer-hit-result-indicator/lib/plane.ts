@@ -32,25 +32,25 @@ export function computePlaneNdcValues(
 
   const bottomLeft = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(xRay, -(planeSize * 5)),
+    Ray.at(xRay, -planeSize),
     transformedDirection,
     position
   );
   const topLeft = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(yRay, -(planeSize * 5)),
+    Ray.at(yRay, -planeSize),
     transformedDirection,
     position
   );
   const bottomRight = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(yRay, planeSize * 5),
+    Ray.at(yRay, planeSize),
     transformedDirection,
     position
   );
   const topRight = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(xRay, planeSize * 5),
+    Ray.at(xRay, planeSize),
     transformedDirection,
     position
   );

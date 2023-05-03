@@ -23,6 +23,14 @@ export interface DrawableElementOpacities {
   plane?: string | number;
 }
 
+// The default amount to scale the computed `triangleSize` by when
+// computing the points for the hit position indicator.
+export const DEFAULT_POINT_SIZE_SCALAR = 0.4;
+
+// The default amount to scale the computed `triangleSize` by when
+// computing the points for the hit plane indicator.
+export const DEFAULT_PLANE_SIZE_SCALAR = 5;
+
 export const DEFAULT_PLANE_OPACITY = 0.75;
 
 export class HitIndicator extends ReglComponent {
@@ -134,7 +142,7 @@ export class HitIndicator extends ReglComponent {
         transform,
         frame.scene.camera,
         normal,
-        triangleSize
+        triangleSize * DEFAULT_PLANE_SIZE_SCALAR
       ),
       this.outlineColor,
       this.planeFillColor,
@@ -150,7 +158,7 @@ export class HitIndicator extends ReglComponent {
         transform,
         frame.scene.camera,
         normal,
-        triangleSize
+        triangleSize * DEFAULT_POINT_SIZE_SCALAR
       ),
       this.outlineColor,
       this.outlineColor,
@@ -199,7 +207,7 @@ export class HitIndicator extends ReglComponent {
           transform,
           frame.scene.camera,
           normal,
-          triangleSize
+          triangleSize * DEFAULT_PLANE_SIZE_SCALAR
         )
       );
     }
@@ -209,7 +217,7 @@ export class HitIndicator extends ReglComponent {
           transform,
           frame.scene.camera,
           normal,
-          triangleSize
+          triangleSize * DEFAULT_POINT_SIZE_SCALAR
         )
       );
     }

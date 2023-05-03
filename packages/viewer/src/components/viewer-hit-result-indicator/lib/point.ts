@@ -29,10 +29,10 @@ export function computePointNdcValues(
     direction: worldY,
   });
 
-  const bottomLeft = Ray.at(xRay, -(rectangleSize / 2.5));
-  const topLeft = Ray.at(yRay, -(rectangleSize / 2.5));
-  const bottomRight = Ray.at(yRay, rectangleSize / 2.5);
-  const topRight = Ray.at(xRay, rectangleSize / 2.5);
+  const bottomLeft = Ray.at(xRay, -rectangleSize);
+  const topLeft = Ray.at(yRay, -rectangleSize);
+  const bottomRight = Ray.at(yRay, rectangleSize);
+  const topRight = Ray.at(xRay, rectangleSize);
 
   const bottomLeftRotated = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
