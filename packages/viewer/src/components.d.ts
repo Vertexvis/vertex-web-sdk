@@ -728,6 +728,20 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  interface VertexViewerHitResultIndicator {
+    /**
+     * The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.
+     */
+    normal?: Vector3.Vector3;
+    /**
+     * The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position.
+     */
+    position?: Vector3.Vector3;
+    /**
+     * The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
   interface VertexViewerIcon {
     /**
      * The name of the icon to render.
@@ -1485,6 +1499,13 @@ declare global {
     prototype: HTMLVertexViewerDomRendererElement;
     new (): HTMLVertexViewerDomRendererElement;
   };
+  interface HTMLVertexViewerHitResultIndicatorElement
+    extends Components.VertexViewerHitResultIndicator,
+      HTMLStencilElement {}
+  var HTMLVertexViewerHitResultIndicatorElement: {
+    prototype: HTMLVertexViewerHitResultIndicatorElement;
+    new (): HTMLVertexViewerHitResultIndicatorElement;
+  };
   interface HTMLVertexViewerIconElement
     extends Components.VertexViewerIcon,
       HTMLStencilElement {}
@@ -1649,6 +1670,7 @@ declare global {
     'vertex-viewer-dom-element': HTMLVertexViewerDomElementElement;
     'vertex-viewer-dom-group': HTMLVertexViewerDomGroupElement;
     'vertex-viewer-dom-renderer': HTMLVertexViewerDomRendererElement;
+    'vertex-viewer-hit-result-indicator': HTMLVertexViewerHitResultIndicatorElement;
     'vertex-viewer-icon': HTMLVertexViewerIconElement;
     'vertex-viewer-layer': HTMLVertexViewerLayerElement;
     'vertex-viewer-markup': HTMLVertexViewerMarkupElement;
@@ -2172,6 +2194,20 @@ declare namespace LocalJSX {
     drawMode?: ViewerDomRendererDrawMode;
     /**
      * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
+     */
+    viewer?: HTMLVertexViewerElement;
+  }
+  interface VertexViewerHitResultIndicator {
+    /**
+     * The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.
+     */
+    normal?: Vector3.Vector3;
+    /**
+     * The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position.
+     */
+    position?: Vector3.Vector3;
+    /**
+     * The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
     viewer?: HTMLVertexViewerElement;
   }
@@ -2827,6 +2863,7 @@ declare namespace LocalJSX {
     'vertex-viewer-dom-element': VertexViewerDomElement;
     'vertex-viewer-dom-group': VertexViewerDomGroup;
     'vertex-viewer-dom-renderer': VertexViewerDomRenderer;
+    'vertex-viewer-hit-result-indicator': VertexViewerHitResultIndicator;
     'vertex-viewer-icon': VertexViewerIcon;
     'vertex-viewer-layer': VertexViewerLayer;
     'vertex-viewer-markup': VertexViewerMarkup;
@@ -2886,6 +2923,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
       'vertex-viewer-dom-renderer': LocalJSX.VertexViewerDomRenderer &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
+      'vertex-viewer-hit-result-indicator': LocalJSX.VertexViewerHitResultIndicator &
+        JSXBase.HTMLAttributes<HTMLVertexViewerHitResultIndicatorElement>;
       'vertex-viewer-icon': LocalJSX.VertexViewerIcon &
         JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
       'vertex-viewer-layer': LocalJSX.VertexViewerLayer &

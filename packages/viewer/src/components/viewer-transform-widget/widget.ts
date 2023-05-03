@@ -26,7 +26,8 @@ import { testDrawable } from '../../lib/transforms/hits';
 import { AxisLine, RotationLine } from '../../lib/transforms/line';
 import { TriangleMesh } from '../../lib/transforms/mesh';
 import { CreateShape } from '../../lib/transforms/shape';
-import { Frame, Viewport } from '../../lib/types';
+import { Frame } from '../../lib/types';
+import { ReglComponent } from '../../lib/webgl/regl-component';
 
 export interface DrawableElementColors {
   xArrow?: Color.Color | string;
@@ -46,22 +47,7 @@ export interface DisabledAxis {
   zTranslation: boolean;
 }
 
-// Scalar that is used in combination with a perspective camera's
-// components to determine the relative size of the meshes.
-// This attempts to keep the widget approximately the same
-// size as zooming occurs.
-export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
-
-// Scalar that is used in combination with an orthographic camera's
-// components to determine the relative size of the meshes.
-// This attempts to keep the widget approximately the same
-// size as zooming occurs.
-export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
-
-export class TransformWidget implements Disposable {
-  private reglCommand?: regl.Regl;
-
-  private viewport: Viewport;
+export class TransformWidget extends ReglComponent {
   private cursor?: Point.Point;
 
   private xAxis?: AxisLine;
@@ -93,14 +79,10 @@ export class TransformWidget implements Disposable {
   private rotationLines: RotationLine[] = [];
   private translationMeshes: TriangleMesh[] = [];
   private rotationMeshes: TriangleMesh[] = [];
-  private drawableElements: Drawable[] = [];
   private hoveredElement?: Drawable;
 
-  private frame?: Frame;
   private transform?: Matrix4.Matrix4;
   private bounds?: Rectangle.Rectangle;
-
-  private reglFrameDisposable?: regl.Cancellable;
 
   private hoveredChanged = new EventDispatcher<Drawable | undefined>();
 
@@ -114,10 +96,10 @@ export class TransformWidget implements Disposable {
   private disabledColor: Color.Color | string;
 
   public constructor(
-    private canvasElement: HTMLCanvasElement,
+    canvasElement: HTMLCanvasElement,
     colors: DrawableElementColors = {}
   ) {
-    this.viewport = new Viewport(canvasElement.width, canvasElement.height);
+    super(canvasElement);
 
     this.xArrowFillColor = colors.xArrow;
     this.yArrowFillColor = colors.yArrow;
@@ -154,22 +136,6 @@ export class TransformWidget implements Disposable {
     this.updateDisabledOnTriangles();
   }
 
-  public updateFrame(frame: Frame, updateElements = true): void {
-    this.frame = frame;
-
-    if (updateElements && frame != null && this.transform != null) {
-      this.createOrUpdateElements(this.transform, frame);
-      this.sortMeshes(
-        frame,
-        ...this.axisLines,
-        ...this.rotationLines,
-        ...this.translationMeshes,
-        ...this.rotationMeshes
-      );
-      this.draw();
-    }
-  }
-
   public updateCursor(cursor?: Point.Point): void {
     this.cursor = cursor;
 
@@ -184,15 +150,7 @@ export class TransformWidget implements Disposable {
     this.transform = transform;
 
     if (transform != null && this.frame != null) {
-      this.createOrUpdateElements(transform, this.frame);
-      this.sortMeshes(
-        this.frame,
-        ...this.axisLines,
-        ...this.rotationLines,
-        ...this.translationMeshes,
-        ...this.rotationMeshes
-      );
-      this.draw();
+      this.updateAndDraw();
     } else {
       this.clear();
       this.reglFrameDisposable?.cancel();
@@ -220,32 +178,10 @@ export class TransformWidget implements Disposable {
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
 
-  public updateDimensions(canvasElement: HTMLCanvasElement): void {
-    this.viewport = new Viewport(canvasElement.width, canvasElement.height);
-
-    if (this.transform != null && this.frame != null) {
-      this.createOrUpdateElements(this.transform, this.frame);
-    }
-  }
-
   public onHoveredChanged(
     listener: Listener<Drawable | undefined>
   ): Disposable {
     return this.hoveredChanged.on(listener);
-  }
-
-  private draw(): void {
-    if (this.reglFrameDisposable == null) {
-      this.reglFrameDisposable = this.reglCommand?.frame(() => {
-        this.drawableElements.forEach((el) => el.draw({ fill: el.fillColor }));
-      });
-    }
-  }
-
-  private clear(): void {
-    this.reglCommand?.clear({
-      color: [0, 0, 0, 0],
-    });
   }
 
   private updateDisabledOnTriangles(): void {
@@ -290,38 +226,24 @@ export class TransformWidget implements Disposable {
     }
   }
 
-  private sortMeshes(frame: Frame, ...drawableElements: Drawable[]): void {
-    const compare = (d1: Drawable, d2: Drawable): number =>
-      d1.points.shortestDistanceFrom(frame.scene.camera.position) -
-      d2.points.shortestDistanceFrom(frame.scene.camera.position);
-
-    this.axisLines = this.axisLines.sort(compare);
-    this.translationMeshes = this.translationMeshes.sort(compare);
-    this.rotationMeshes = this.rotationMeshes.sort(compare);
-
-    // Reverse sorted elements to draw the closest element last.
-    // This causes it to appear above any other element.
-    this.drawableElements = drawableElements
-      .filter((el) => el.points.valid)
-      .sort(compare)
-      .reverse();
+  protected hasData(): boolean {
+    return this.transform != null;
   }
 
-  private createOrUpdateElements(
-    transform: Matrix4.Matrix4,
-    frame: Frame
-  ): void {
-    if (this.xArrow == null || this.yArrow == null || this.zArrow == null) {
-      this.createElements(transform, frame);
-    } else {
-      this.updateElements(transform, frame);
-    }
+  protected createOrUpdateElements(): void {
+    if (this.transform != null && this.frame != null) {
+      if (this.xArrow == null || this.yArrow == null || this.zArrow == null) {
+        this.createElements(this.transform, this.frame);
+      } else {
+        this.updateElements(this.transform, this.frame);
+      }
 
-    this.bounds = computeDrawable2dBounds(
-      this.viewport,
-      ...this.rotationMeshes,
-      ...this.translationMeshes
-    );
+      this.bounds = computeDrawable2dBounds(
+        this.viewport,
+        ...this.rotationMeshes,
+        ...this.translationMeshes
+      );
+    }
   }
 
   private createElements(transform: Matrix4.Matrix4, frame: Frame): void {
@@ -331,7 +253,10 @@ export class TransformWidget implements Disposable {
     });
     const { createShape } = shapeBuilder(this.reglCommand);
 
-    const triangleSize = this.computeTriangleSize(transform, frame);
+    const triangleSize = this.computeTriangleSize(
+      Vector3.fromMatrixPosition(transform),
+      frame
+    );
 
     this.xArrow = new TriangleMesh(
       createShape,
@@ -405,6 +330,13 @@ export class TransformWidget implements Disposable {
     this.translationMeshes = [this.xArrow, this.yArrow, this.zArrow];
     this.rotationMeshes = [this.xRotation, this.yRotation, this.zRotation];
     this.updateDisabledOnTriangles();
+
+    this.availableElements = [
+      ...this.axisLines,
+      ...this.rotationLines,
+      ...this.translationMeshes,
+      ...this.rotationMeshes,
+    ];
   }
 
   private getXRotationColor(): Color.Color | string | undefined {
@@ -448,7 +380,10 @@ export class TransformWidget implements Disposable {
     transform: Matrix4.Matrix4,
     frame: Frame
   ): void {
-    const triangleSize = this.computeTriangleSize(transform, frame);
+    const triangleSize = this.computeTriangleSize(
+      Vector3.fromMatrixPosition(transform),
+      frame
+    );
 
     const xyRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
@@ -547,7 +482,10 @@ export class TransformWidget implements Disposable {
   }
 
   private updateElements(transform: Matrix4.Matrix4, frame: Frame): void {
-    const triangleSize = this.computeTriangleSize(transform, frame);
+    const triangleSize = this.computeTriangleSize(
+      Vector3.fromMatrixPosition(transform),
+      frame
+    );
 
     if (this.xArrow != null) {
       this.xArrow.updatePoints(
@@ -633,18 +571,5 @@ export class TransformWidget implements Disposable {
         triangleSize
       )
     );
-  }
-
-  private computeTriangleSize(
-    transform: Matrix4.Matrix4,
-    frame: Frame
-  ): number {
-    const position = Vector3.fromMatrixPosition(transform);
-
-    return frame.scene.camera.isOrthographic()
-      ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
-      : Vector3.magnitude(
-          Vector3.subtract(position, frame.scene.camera.position)
-        ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
   }
 }

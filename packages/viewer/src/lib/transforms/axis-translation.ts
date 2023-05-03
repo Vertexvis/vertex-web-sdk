@@ -42,7 +42,7 @@ export function zAxisArrowPositions(
   );
 }
 
-function computeArrowNdcValues(
+export function computeArrowNdcValues(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
