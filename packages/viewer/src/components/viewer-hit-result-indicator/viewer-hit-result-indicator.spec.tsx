@@ -76,7 +76,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
     indicator.position = Vector3.create(1, 1, 1);
     indicator.normal = Vector3.up();
@@ -112,7 +112,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
     indicator.position = Vector3.create(1, 1, 1);
 
