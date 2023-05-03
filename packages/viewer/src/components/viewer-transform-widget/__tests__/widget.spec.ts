@@ -26,16 +26,16 @@ import {
   FrameScene,
 } from '../../../lib/types';
 import {
+  DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
+  DEFAULT_PERSPECTIVE_MESH_SCALAR,
+} from '../../../lib/webgl/regl-component';
+import {
   makeDepthImagePng,
   makeFeatureMapBytes,
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
-import {
-  DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
-  DEFAULT_PERSPECTIVE_MESH_SCALAR,
-  TransformWidget,
-} from '../widget';
+import { TransformWidget } from '../widget';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 

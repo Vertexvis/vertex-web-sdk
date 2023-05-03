@@ -176,14 +176,14 @@ export class ViewerHitResultIndicator {
         this.canvasRef.width = this.viewer.viewport.width;
         this.canvasRef.height = this.viewer.viewport.height;
 
-        this.updateIndicatorDimensions();
+        this.updateAndRedrawIndicator();
       }
     });
   };
 
   private handleResize = (): void => {
     if (this.canvasRef != null) {
-      this.updateIndicatorDimensions();
+      this.updateAndRedrawIndicator();
     }
   };
 
@@ -228,9 +228,9 @@ export class ViewerHitResultIndicator {
     return this.indicator;
   };
 
-  private updateIndicatorDimensions = (): void => {
+  private updateAndRedrawIndicator = (): void => {
     readDOM(() => {
-      this.getIndicator().updateDimensions();
+      this.getIndicator().updateAndDraw();
     });
   };
 

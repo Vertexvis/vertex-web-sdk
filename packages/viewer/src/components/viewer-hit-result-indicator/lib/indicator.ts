@@ -1,15 +1,15 @@
 import { Matrix4 } from '@vertexvis/geometry';
-import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
-import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Vector3 } from '@vertexvis/geometry';
+import { Color } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder, { JoinStyle } from 'regl-shape';
 
 import { axisPositions } from '../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../lib/transforms/axis-translation';
-import { Drawable } from '../../../lib/transforms/drawable';
 import { AxisLine } from '../../../lib/transforms/line';
 import { Mesh, TriangleMesh } from '../../../lib/transforms/mesh';
 import { Frame } from '../../../lib/types';
+import { ReglComponent } from '../../../lib/webgl/regl-component';
 import { computePlaneNdcValues } from './plane';
 import { computePointNdcValues } from './point';
 
@@ -23,38 +23,16 @@ export interface DrawableElementOpacities {
   plane?: string | number;
 }
 
-// Scalar that is used in combination with a perspective camera's
-// components to determine the relative size of the meshes.
-// This attempts to keep the widget approximately the same
-// size as zooming occurs.
-export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
-
-// Scalar that is used in combination with an orthographic camera's
-// components to determine the relative size of the meshes.
-// This attempts to keep the widget approximately the same
-// size as zooming occurs.
-export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
-
 export const DEFAULT_PLANE_OPACITY = 0.75;
 
-export class HitIndicator implements Disposable {
-  private reglCommand?: regl.Regl;
-
+export class HitIndicator extends ReglComponent {
   private axis?: AxisLine;
   private arrow?: TriangleMesh;
   private point?: Mesh;
   private plane?: Mesh;
 
-  private drawableElements: Drawable[] = [];
-
-  private frame?: Frame;
   private transform?: Matrix4.Matrix4;
   private normal?: Vector3.Vector3;
-  private bounds?: Rectangle.Rectangle;
-
-  private reglFrameDisposable?: regl.Cancellable;
-
-  private hoveredChanged = new EventDispatcher<Drawable | undefined>();
 
   private arrowFillColor?: Color.Color | string;
   private planeFillColor?: Color.Color | string;
@@ -63,43 +41,16 @@ export class HitIndicator implements Disposable {
   private planeOpacity?: string | number;
 
   public constructor(
-    private canvasElement: HTMLCanvasElement,
+    canvasElement: HTMLCanvasElement,
     colors: DrawableElementColors = {},
     opacities: DrawableElementOpacities = {}
   ) {
+    super(canvasElement);
+
     this.arrowFillColor = colors.arrow;
     this.planeFillColor = colors.plane;
     this.outlineColor = colors.outline;
     this.planeOpacity = opacities.plane;
-  }
-
-  public dispose(): void {
-    this.reglFrameDisposable?.cancel();
-  }
-
-  /**
-   * @internal - visible for testing
-   */
-  public getDrawableElements(): Drawable[] {
-    return this.drawableElements;
-  }
-
-  public boundsContainsPoint(point: Point.Point): boolean {
-    return (
-      this.bounds != null &&
-      this.frame != null &&
-      Rectangle.containsPoints(this.bounds, point)
-    );
-  }
-
-  public updateFrame(frame: Frame): void {
-    this.frame = frame;
-
-    if (frame != null && this.transform != null && this.normal != null) {
-      this.createOrUpdateElements(this.transform, this.normal, frame);
-      this.sortMeshes(frame, this.arrow, this.point, this.plane, this.axis);
-      this.draw();
-    }
   }
 
   public updateTransformAndNormal(
@@ -110,15 +61,7 @@ export class HitIndicator implements Disposable {
     this.normal = normal;
 
     if (transform != null && normal != null && this.frame != null) {
-      this.createOrUpdateElements(transform, normal, this.frame);
-      this.sortMeshes(
-        this.frame,
-        this.arrow,
-        this.point,
-        this.plane,
-        this.axis
-      );
-      this.draw();
+      this.updateAndDraw();
     } else {
       this.clear();
       this.reglFrameDisposable?.cancel();
@@ -142,60 +85,18 @@ export class HitIndicator implements Disposable {
     this.planeOpacity = opacities.plane;
   }
 
-  public updateDimensions(): void {
+  protected hasData(): boolean {
+    return this.transform != null && this.normal != null;
+  }
+
+  protected createOrUpdateElements(): void {
     if (this.transform != null && this.normal != null && this.frame != null) {
-      this.createOrUpdateElements(this.transform, this.normal, this.frame);
+      if (this.arrow == null) {
+        this.createElements(this.transform, this.normal, this.frame);
+      } else {
+        this.updateElements(this.transform, this.normal, this.frame);
+      }
     }
-  }
-
-  public onHoveredChanged(
-    listener: Listener<Drawable | undefined>
-  ): Disposable {
-    return this.hoveredChanged.on(listener);
-  }
-
-  private draw(): void {
-    if (this.reglFrameDisposable == null) {
-      this.reglFrameDisposable = this.reglCommand?.frame(() => {
-        this.drawableElements.forEach((el) => el?.draw({ fill: el.fillColor }));
-      });
-    }
-  }
-
-  private clear(): void {
-    this.reglCommand?.clear({
-      color: [0, 0, 0, 0],
-    });
-  }
-
-  private createOrUpdateElements(
-    transform: Matrix4.Matrix4,
-    normal: Vector3.Vector3,
-    frame: Frame
-  ): void {
-    if (this.arrow == null) {
-      this.createElements(transform, normal, frame);
-    } else {
-      this.updateElements(transform, normal, frame);
-    }
-  }
-
-  private sortMeshes(
-    frame: Frame,
-    ...drawableElements: Array<Drawable | undefined>
-  ): void {
-    const compare = (d1: Drawable, d2: Drawable): number =>
-      d1.points.shortestDistanceFrom(frame.scene.camera.position) -
-      d2.points.shortestDistanceFrom(frame.scene.camera.position);
-
-    // Reverse sorted elements to draw the closest element last.
-    // This causes it to appear above any other element.
-    this.drawableElements = (
-      drawableElements.filter((el) => el != null) as Drawable[]
-    )
-      .filter((el) => el.points.valid)
-      .sort(compare)
-      .reverse();
   }
 
   private createElements(
@@ -209,7 +110,10 @@ export class HitIndicator implements Disposable {
     });
     const { createShape } = shapeBuilder(this.reglCommand);
 
-    const triangleSize = this.computeTriangleSize(transform, frame);
+    const triangleSize = this.computeTriangleSize(
+      Vector3.fromMatrixPosition(transform),
+      frame
+    );
 
     this.arrow = new TriangleMesh(
       createShape,
@@ -262,6 +166,8 @@ export class HitIndicator implements Disposable {
       this.outlineColor,
       this.arrowFillColor
     );
+
+    this.availableElements = [this.arrow, this.point, this.plane, this.axis];
   }
 
   private updateElements(
@@ -269,7 +175,10 @@ export class HitIndicator implements Disposable {
     normal: Vector3.Vector3,
     frame: Frame
   ): void {
-    const triangleSize = this.computeTriangleSize(transform, frame);
+    const triangleSize = this.computeTriangleSize(
+      Vector3.fromMatrixPosition(transform),
+      frame
+    );
 
     if (this.arrow != null) {
       this.arrow.updatePoints(
@@ -304,21 +213,6 @@ export class HitIndicator implements Disposable {
         )
       );
     }
-  }
-
-  private computeTriangleSize(
-    transform: Matrix4.Matrix4,
-    frame: Frame
-  ): number {
-    const position = Vector3.fromMatrixPosition(transform);
-
-    const size = frame.scene.camera.isOrthographic()
-      ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
-      : Vector3.magnitude(
-          Vector3.subtract(position, frame.scene.camera.position)
-        ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
-
-    return size;
   }
 
   private getPlaneOpacity(): number {

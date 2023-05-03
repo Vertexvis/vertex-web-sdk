@@ -91,7 +91,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     expect(mockIndicator.updateFrame).toHaveBeenCalledWith(frame);
   });
 
-  it('updates indicator bounds when the viewer dimensions change', async () => {
+  it('updates and redraws the indicator when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
       components: [Viewer, ViewerHitResultIndicator],
@@ -126,6 +126,6 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
     await page.waitForChanges();
 
-    expect(mockIndicator.updateDimensions).toHaveBeenCalled();
+    expect(mockIndicator.updateAndDraw).toHaveBeenCalled();
   });
 });

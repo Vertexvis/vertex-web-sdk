@@ -18,16 +18,16 @@ import {
   FrameScene,
 } from '../../../../lib/types';
 import {
+  DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
+  DEFAULT_PERSPECTIVE_MESH_SCALAR,
+} from '../../../../lib/webgl/regl-component';
+import {
   makeDepthImagePng,
   makeFeatureMapBytes,
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../../testing/fixtures';
-import {
-  DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
-  DEFAULT_PERSPECTIVE_MESH_SCALAR,
-  HitIndicator,
-} from '../indicator';
+import { HitIndicator } from '../indicator';
 import { computePlaneNdcValues } from '../plane';
 import { computePointNdcValues } from '../point';
 
