@@ -76,6 +76,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 | ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
 | `controller`           | --                       | The controller that is responsible for performing transforms.                                                                                                | `TransformController \| undefined`     | `undefined` |
 | `position`             | --                       | The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget. | `Vector3 \| undefined`                 | `undefined` |
+| `rotation`             | --                       | The starting angle for the transform widget. This rotation will be updated as the rotations occur.                                                           | `Euler \| undefined`                   | `undefined` |
 | `viewer`               | --                       | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
 | `xRotationDisabled`    | `x-rotation-disabled`    | Determines whether or not the x-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
 | `xTranslationDisabled` | `x-translation-disabled` | Determines whether or not the x-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
@@ -92,6 +93,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 | `interactionEnded`   | An event that is emitted when the interaction has ended             | `CustomEvent<[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined>` |
 | `interactionStarted` | An event that is emitted an interaction with the widget has started | `CustomEvent<void>`                                                                                                                                          |
 | `positionChanged`    | An event that is emitted when the position of the widget changes.   | `CustomEvent<Vector3 \| undefined>`                                                                                                                          |
+| `rotationChanged`    | An event that is emitted when the rotation of the widget changes.   | `CustomEvent<Euler \| undefined>`                                                                                                                            |
 
 
 ## CSS Custom Properties

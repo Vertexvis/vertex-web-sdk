@@ -8,7 +8,14 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Angle, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Euler,
+  Matrix4,
+  Point,
+  Quaternion,
+  Vector3,
+} from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -35,6 +42,12 @@ export class ViewerTransformWidget {
   public positionChanged!: EventEmitter<Vector3.Vector3 | undefined>;
 
   /**
+   * An event that is emitted when the rotation of the widget changes.
+   */
+  @Event({ bubbles: true })
+  public rotationChanged!: EventEmitter<Euler.Euler | undefined>;
+
+  /**
    * An event that is emitted when the interaction has ended
    */
   @Event({ bubbles: true })
@@ -59,6 +72,13 @@ export class ViewerTransformWidget {
    */
   @Prop({ mutable: true })
   public position?: Vector3.Vector3;
+
+  /**
+   * The starting angle for the transform widget. This rotation will be updated
+   * as the rotations occur.
+   */
+  @Prop({ mutable: true })
+  public rotation?: Euler.Euler;
 
   /**
    * The controller that is responsible for performing transforms.
@@ -205,12 +225,32 @@ export class ViewerTransformWidget {
   /**
    * @ignore
    */
+  @Watch('rotation')
+  protected handleRotationChanged(
+    newRotation: Euler.Euler,
+    oldRotation?: Euler.Euler
+  ): void {
+    this.currentTransform = this.getTransformForHewRotation(newRotation);
+    this.startingTransform = this.currentTransform;
+    this.widget?.updateTransform(this.currentTransform);
+    console.debug(
+      `Updating widget rotation [previous=${JSON.stringify(
+        oldRotation
+      )}, current=${JSON.stringify(newRotation)}]`
+    );
+
+    this.rotationChanged.emit(newRotation);
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('position')
   protected handlePositionChanged(
     newPosition?: Vector3.Vector3,
     oldPosition?: Vector3.Vector3
   ): void {
-    this.currentTransform = this.getTransform(oldPosition, newPosition);
+    this.currentTransform = this.getTransformForNewPosition(newPosition);
     this.startingTransform = this.currentTransform;
 
     console.debug(
@@ -531,28 +571,44 @@ export class ViewerTransformWidget {
     });
   };
 
-  private getTransform = (
-    oldPosition?: Vector3.Vector3,
+  private getTransformForNewPosition = (
     newPosition?: Vector3.Vector3
   ): Matrix4.Matrix4 | undefined => {
-    if (oldPosition != null && newPosition != null) {
-      const currentTransformAsObject =
+    if (newPosition != null) {
+      const c =
         this.currentTransform != null
-          ? Matrix4.toObject(this.currentTransform)
-          : Matrix4.toObject(Matrix4.makeIdentity());
+          ? this.currentTransform
+          : Matrix4.makeIdentity();
 
-      // Maintain existing rotation, but update the position
-      // treating it as a global position, rather than applying
-      // the existing rotation to the new position.
-      return Matrix4.fromObject({
-        ...currentTransformAsObject,
-        m14: newPosition.x,
-        m24: newPosition.y,
-        m34: newPosition.z,
-      });
+      const currentRotation = Matrix4.makeRotation(
+        Quaternion.fromMatrixRotation(c)
+      );
+      const position = Matrix4.makeTranslation(newPosition);
+
+      return Matrix4.multiply(position, currentRotation);
     } else if (newPosition != null) {
       return Matrix4.makeTranslation(newPosition);
     }
+  };
+
+  private getTransformForHewRotation = (
+    newRotationEuler: Euler.Euler
+  ): Matrix4.Matrix4 | undefined => {
+    const c =
+      this.currentTransform != null
+        ? this.currentTransform
+        : Matrix4.makeIdentity();
+
+    const oldRotation = Matrix4.invert(
+      Matrix4.makeRotation(Quaternion.fromMatrixRotation(c))
+    );
+
+    const newRotation = Matrix4.makeRotation(
+      Quaternion.fromEuler(newRotationEuler)
+    );
+    const oldTranslation = Matrix4.multiply(c, oldRotation);
+
+    return Matrix4.multiply(oldTranslation, newRotation);
   };
 
   private getCanvasBounds = (): DOMRect | undefined => {

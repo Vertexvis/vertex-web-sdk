@@ -1231,6 +1231,10 @@ export namespace Components {
      */
     position?: Vector3.Vector3;
     /**
+     * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
+     */
+    rotation?: Euler.Euler;
+    /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
     viewer?: HTMLVertexViewerElement;
@@ -2720,9 +2724,19 @@ declare namespace LocalJSX {
       event: VertexViewerTransformWidgetCustomEvent<Vector3.Vector3 | undefined>
     ) => void;
     /**
+     * An event that is emitted when the rotation of the widget changes.
+     */
+    onRotationChanged?: (
+      event: VertexViewerTransformWidgetCustomEvent<Euler.Euler | undefined>
+    ) => void;
+    /**
      * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
      */
     position?: Vector3.Vector3;
+    /**
+     * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
+     */
+    rotation?: Euler.Euler;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */

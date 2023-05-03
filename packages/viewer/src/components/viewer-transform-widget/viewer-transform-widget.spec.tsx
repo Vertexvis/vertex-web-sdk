@@ -395,7 +395,6 @@ describe('vertex-viewer-transform-widget', () => {
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await page.waitForChanges();
-    await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
