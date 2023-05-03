@@ -9,13 +9,18 @@ import { computeArrowNdcValues } from '../../../lib/transforms/axis-translation'
 import { Drawable } from '../../../lib/transforms/drawable';
 import { AxisLine } from '../../../lib/transforms/line';
 import { Mesh, TriangleMesh } from '../../../lib/transforms/mesh';
-import { Frame, Viewport } from '../../../lib/types';
+import { Frame } from '../../../lib/types';
 import { computePlaneNdcValues } from './plane';
 import { computePointNdcValues } from './point';
 
 export interface DrawableElementColors {
   arrow?: Color.Color | string;
   plane?: Color.Color | string;
+  outline?: Color.Color | string;
+}
+
+export interface DrawableElementOpacities {
+  plane?: string | number;
 }
 
 // Scalar that is used in combination with a perspective camera's
@@ -30,10 +35,10 @@ export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
 // size as zooming occurs.
 export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
 
+export const DEFAULT_PLANE_OPACITY = 0.75;
+
 export class HitIndicator implements Disposable {
   private reglCommand?: regl.Regl;
-
-  private viewport: Viewport;
 
   private axis?: AxisLine;
   private arrow?: TriangleMesh;
@@ -53,15 +58,19 @@ export class HitIndicator implements Disposable {
 
   private arrowFillColor?: Color.Color | string;
   private planeFillColor?: Color.Color | string;
+  private outlineColor?: Color.Color | string;
+
+  private planeOpacity?: string | number;
 
   public constructor(
     private canvasElement: HTMLCanvasElement,
-    colors: DrawableElementColors = {}
+    colors: DrawableElementColors = {},
+    opacities: DrawableElementOpacities = {}
   ) {
-    this.viewport = new Viewport(canvasElement.width, canvasElement.height);
-
     this.arrowFillColor = colors.arrow;
     this.planeFillColor = colors.plane;
+    this.outlineColor = colors.outline;
+    this.planeOpacity = opacities.plane;
   }
 
   public dispose(): void {
@@ -83,15 +92,10 @@ export class HitIndicator implements Disposable {
     );
   }
 
-  public updateFrame(frame: Frame, updateElements = true): void {
+  public updateFrame(frame: Frame): void {
     this.frame = frame;
 
-    if (
-      updateElements &&
-      frame != null &&
-      this.transform != null &&
-      this.normal != null
-    ) {
+    if (frame != null && this.transform != null && this.normal != null) {
       this.createOrUpdateElements(this.transform, this.normal, frame);
       this.sortMeshes(frame, this.arrow, this.point, this.plane, this.axis);
       this.draw();
@@ -125,13 +129,20 @@ export class HitIndicator implements Disposable {
   public updateColors(colors: DrawableElementColors): void {
     this.arrowFillColor = colors.arrow ?? this.arrowFillColor;
     this.planeFillColor = colors.plane ?? this.planeFillColor;
+    this.outlineColor = colors.outline ?? this.outlineColor;
     this.arrow?.updateFillColor(this.arrowFillColor);
     this.plane?.updateFillColor(this.planeFillColor);
+    this.arrow?.updateOutlineColor(this.outlineColor);
+    this.plane?.updateOutlineColor(this.outlineColor);
+    this.point?.updateOutlineColor(this.outlineColor);
+    this.axis?.updateOutlineColor(this.outlineColor);
   }
 
-  public updateDimensions(canvasElement: HTMLCanvasElement): void {
-    this.viewport = new Viewport(canvasElement.width, canvasElement.height);
+  public updateOpacities(opacities: DrawableElementOpacities): void {
+    this.planeOpacity = opacities.plane;
+  }
 
+  public updateDimensions(): void {
     if (this.transform != null && this.normal != null && this.frame != null) {
       this.createOrUpdateElements(this.transform, this.normal, this.frame);
     }
@@ -209,8 +220,7 @@ export class HitIndicator implements Disposable {
         normal,
         triangleSize
       ),
-      // this.outlineColor,
-      '#000000',
+      this.outlineColor,
       this.arrowFillColor
     );
     this.plane = new Mesh(
@@ -222,33 +232,34 @@ export class HitIndicator implements Disposable {
         normal,
         triangleSize
       ),
-      '#000000',
+      this.outlineColor,
       this.planeFillColor,
       {
-        opacity: 0.75,
+        opacity: this.getPlaneOpacity(),
+        depth: 0.5,
       }
     );
     this.point = new Mesh(
       createShape,
-      'hit-plane',
+      'hit-position',
       computePointNdcValues(
         transform,
         frame.scene.camera,
         normal,
         triangleSize
       ),
-      '#000000',
-      '#000000',
+      this.outlineColor,
+      this.outlineColor,
       {
         join: 'round' as JoinStyle,
+        depth: 1,
       }
     );
     this.axis = new AxisLine(
       createShape,
       'hit-normal-axis',
       axisPositions(transform, frame.scene.camera, this.arrow),
-      // this.outlineColor,
-      '#000000',
+      this.outlineColor,
       this.arrowFillColor
     );
   }
@@ -308,5 +319,14 @@ export class HitIndicator implements Disposable {
         ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
     return size;
+  }
+
+  private getPlaneOpacity(): number {
+    if (this.planeOpacity != null) {
+      return typeof this.planeOpacity === 'string'
+        ? parseFloat(this.planeOpacity)
+        : this.planeOpacity;
+    }
+    return DEFAULT_PLANE_OPACITY;
   }
 }

@@ -56,6 +56,13 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     }
   }
 
+  public updateOutlineColor(color?: Color.Color | string): void {
+    if (color != null) {
+      this.outlineColor =
+        typeof color === 'string' ? color : Color.toHexString(color);
+    }
+  }
+
   public updatePoints(points?: T): void {
     if (points != null) {
       this.points = points;

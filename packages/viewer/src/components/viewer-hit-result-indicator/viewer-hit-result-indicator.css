@@ -6,20 +6,26 @@
   height: 100%;
   pointer-events: none;
   /**
-  * @prop --viewer-hit-result-indicator-x-axis-arrow-color: A CSS color for the arrow
-  * at the end of the X axis on this widget. Defaults to `#ea3324`.
+  * @prop --viewer-hit-result-indicator-arrow-color: A CSS color for the arrow
+  * representing the normal for this hit indicator. Defaults to `#0099cc`.
   */
   --viewer-hit-result-indicator-arrow-color: '#0099cc';
 
   /**
-  * @prop --viewer-hit-result-indicator-y-axis-arrow-color: A CSS color for the arrow
-  * at the end of the Y axis on this widget. Defaults to `#4faf32`.
+  * @prop --viewer-hit-result-indicator-plane-color: A CSS color for the plane
+  * for this hit indicator. Defaults to `#0099cc`.
   */
   --viewer-hit-result-indicator-plane-color: '#0099cc';
 
   /**
-  * @prop --viewer-hit-result-indicator-z-axis-arrow-color: A CSS color for the arrow
-  * at the end of the Z axis on this widget. Defaults to `#0000ff`.
+  * @prop --viewer-hit-result-indicator-outline-color: A CSS color for the outline
+  * of the plane and arrow. Defaults to `#000000`.
+  */
+  --viewer-hit-result-indicator-outline-color: '#000000';
+
+  /**
+  * @prop --viewer-hit-result-indicator-plane-opacity: A CSS number for the opacity
+  * of the plane for this hit indicator. Defaults to `0.75`.
   */
   --viewer-hit-result-indicator-plane-opacity: 0.75;
 }

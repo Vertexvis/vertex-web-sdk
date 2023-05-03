@@ -110,3 +110,65 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
     return !!this.disabled;
   }
 }
+
+export class RectangleMeshPoints implements DrawablePoints {
+  public constructor(
+    public valid: boolean,
+    public worldCenter: Vector3.Vector3,
+    public worldBottomLeft: Vector3.Vector3,
+    public worldTopLeft: Vector3.Vector3,
+    public worldBottomRight: Vector3.Vector3,
+    public worldTopRight: Vector3.Vector3,
+    public center: Point.Point,
+    public bottomLeft: Point.Point,
+    public topLeft: Point.Point,
+    public bottomRight: Point.Point,
+    public topRight: Point.Point
+  ) {}
+
+  public shortestDistanceFrom(vector: Vector3.Vector3): number {
+    return Vector3.distance(this.worldCenter, vector);
+  }
+
+  public toWorldArray(): Vector3.Vector3[] {
+    return [
+      this.worldBottomLeft,
+      this.worldTopLeft,
+      this.worldTopRight,
+      this.worldBottomRight,
+      this.worldBottomLeft,
+    ];
+  }
+
+  public toArray(): Point.Point[] {
+    return [
+      this.bottomLeft,
+      this.topLeft,
+      this.topRight,
+      this.bottomRight,
+      this.bottomLeft,
+    ];
+  }
+}
+
+export class RectangleMesh extends Drawable<RectangleMeshPoints> {
+  public constructor(
+    createShape: CreateShape,
+    identifier: string,
+    points: RectangleMeshPoints,
+    outlineColor: Color.Color | string = '#000000',
+    fillColor: Color.Color | string = '#000000',
+    shapeProps: Partial<ShapeProps> = {}
+  ) {
+    super(
+      createShape,
+      identifier,
+      points,
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
+      typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
+      shapeProps
+    );
+  }
+}

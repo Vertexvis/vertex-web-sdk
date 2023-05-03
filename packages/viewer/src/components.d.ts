@@ -1816,13 +1816,16 @@ export namespace Components {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerHitResultIndicator {
+        /**
+          * The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.
+         */
         "normal"?: Vector3.Vector3;
         /**
-          * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
+          * The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position.
          */
         "position"?: Vector3.Vector3;
         /**
-          * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
+          * The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
         "viewer"?: HTMLVertexViewerElement;
     }
@@ -4352,13 +4355,16 @@ declare namespace LocalJSX {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerHitResultIndicator {
+        /**
+          * The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.
+         */
         "normal"?: Vector3.Vector3;
         /**
-          * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
+          * The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position.
          */
         "position"?: Vector3.Vector3;
         /**
-          * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
+          * The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.
          */
         "viewer"?: HTMLVertexViewerElement;
     }

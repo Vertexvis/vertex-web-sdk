@@ -3,7 +3,7 @@ import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
 import { readDOM, writeDOM } from '../../lib/stencil';
-import { HitIndicator } from './lib/indicator';
+import { DEFAULT_PLANE_OPACITY, HitIndicator } from './lib/indicator';
 
 @Component({
   tag: 'vertex-viewer-hit-result-indicator',
@@ -12,19 +12,24 @@ import { HitIndicator } from './lib/indicator';
 })
 export class ViewerHitResultIndicator {
   /**
-   * The viewer to connect to transforms. If nested within a <vertex-viewer>,
+   * The viewer to connect to this indicator. If nested within a <vertex-viewer>,
    * this property will be populated automatically.
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
   /**
-   * The starting position of this transform widget. This position will be updated
-   * as transforms occur. Setting this value to `undefined` will remove the widget.
+   * The position of this indicator. A point will be displayed at this position,
+   * and it will be used alongside the provided `normal` to display a plane and
+   * normal arrow centered at the position.
    */
   @Prop({ mutable: true })
   public position?: Vector3.Vector3;
 
+  /**
+   * The normal of this indicator. This value will be represented as an arrow,
+   * and will be used alongside the provided `position` to display a plane.
+   */
   @Prop({ mutable: true })
   public normal?: Vector3.Vector3;
 
@@ -35,11 +40,11 @@ export class ViewerHitResultIndicator {
 
   private arrowColor: Color.Color | string = '#0099cc';
   private planeColor: Color.Color | string = '#0099cc';
-  private planeOpacity: number | string = 0.5;
+  private outlineColor: Color.Color | string = '#000000';
+  private planeOpacity: number | string = DEFAULT_PLANE_OPACITY;
 
   private indicator?: HitIndicator;
 
-  private canvasBounds?: DOMRect;
   private canvasResizeObserver?: ResizeObserver;
   private canvasRef?: HTMLCanvasElement;
 
@@ -60,22 +65,27 @@ export class ViewerHitResultIndicator {
       this.arrowColor = hostStyles
         .getPropertyValue('--viewer-hit-result-indicator-arrow-color')
         .trim()
-        .replace('"', '')
-        .replace('"', '');
+        .replace(/["]*/g, '');
       this.planeColor = hostStyles
         .getPropertyValue('--viewer-hit-result-indicator-plane-color')
         .trim()
-        .replace('"', '')
-        .replace('"', '');
+        .replace(/["]*/g, '');
+      this.outlineColor = hostStyles
+        .getPropertyValue('--viewer-hit-result-indicator-outline-color')
+        .trim()
+        .replace(/["]*/g, '');
       this.planeOpacity = hostStyles
         .getPropertyValue('--viewer-hit-result-indicator-plane-opacity')
         .trim()
-        .replace('"', '')
-        .replace('"', '');
+        .replace(/["]*/g, '');
 
       this.indicator?.updateColors({
         arrow: this.arrowColor,
         plane: this.planeColor,
+        outline: this.outlineColor,
+      });
+      this.indicator?.updateOpacities({
+        plane: this.planeOpacity,
       });
     });
   }
@@ -166,14 +176,14 @@ export class ViewerHitResultIndicator {
         this.canvasRef.width = this.viewer.viewport.width;
         this.canvasRef.height = this.viewer.viewport.height;
 
-        this.updateCanvasBounds(this.canvasRef);
+        this.updateIndicatorDimensions();
       }
     });
   };
 
   private handleResize = (): void => {
     if (this.canvasRef != null) {
-      this.updateCanvasBounds(this.canvasRef);
+      this.updateIndicatorDimensions();
     }
   };
 
@@ -196,27 +206,31 @@ export class ViewerHitResultIndicator {
       }]`
     );
 
-    this.indicator = new HitIndicator(canvasRef, {
-      arrow: this.arrowColor,
-      plane: this.planeColor,
-    });
+    this.indicator = new HitIndicator(
+      canvasRef,
+      {
+        arrow: this.arrowColor,
+        plane: this.planeColor,
+      },
+      {
+        plane: this.planeOpacity,
+      }
+    );
 
     if (this.position != null) {
       this.transform = this.createTransform();
       this.indicator.updateTransformAndNormal(this.transform, this.normal);
     }
     if (this.viewer?.frame != null) {
-      this.indicator.updateFrame(this.viewer.frame, true);
+      this.indicator.updateFrame(this.viewer.frame);
     }
 
     return this.indicator;
   };
 
-  private updateCanvasBounds = (canvasElement: HTMLCanvasElement): void => {
+  private updateIndicatorDimensions = (): void => {
     readDOM(() => {
-      this.canvasBounds = canvasElement.getBoundingClientRect();
-
-      this.getIndicator().updateDimensions(canvasElement);
+      this.getIndicator().updateDimensions();
     });
   };
 
