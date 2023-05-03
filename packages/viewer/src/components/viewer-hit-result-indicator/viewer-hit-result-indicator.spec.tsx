@@ -74,7 +74,6 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await page.waitForChanges();
-    await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
@@ -110,7 +109,6 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     ) as HTMLVertexViewerHitResultIndicatorElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
-    await page.waitForChanges();
     await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
