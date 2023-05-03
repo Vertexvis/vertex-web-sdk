@@ -1,17 +1,89 @@
 # vertex-viewer-transform-widget
 
 
+### Example
+This example includes a transform widget with the x,y, and z rotation axis disabled.
+
+The position of the widget is set on the hit result from a viewer tap.
+
+The widget expects a part selected, which also occurs on a valid hit result.
+
+```html
+<html>
+<body>
+  <vertex-viewer
+    id="viewer"
+    config-env="platprod"
+    src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
+  >
+    <vertex-viewer-transform-widget
+      id="transform-widget"
+      y-rotation-disabled
+      x-rotation-disabled
+      z-rotation-disabled
+    ></vertex-viewer-transform-widget>
+  </vertex-viewer>
+
+  <script type="module">
+    window.addEventListener('load', () => main());
+
+    async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
+
+        const viewer = document.getElementById('viewer');
+        const tree = document.getElementById('scene-tree');
+        const widget = document.getElementById('transform-widget');
+
+        viewer.addEventListener('tap', async (event) => {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+
+          const result = await raycaster.hitItems(position);
+
+          if (result.hits && result.hits.length == 0) {
+            await scene
+              .items((op) => op.where((q) => q.all()).deselect())
+              .execute();
+          } else {
+            const widget = document.getElementById('transform-widget');
+            const hit = result.hits[0];
+
+            widget.position = hit.hitPoint;
+            await scene
+              .items((op) => [
+                op.where((q) => q.all()).deselect(),
+                op
+                  .where((q) => q.withItemId(hit.itemId.hex))
+                  .select(),
+              ])
+              .execute();
+          }
+        });
+    }
+  </script>
+</body>
+</html>
+```
+
 
 <!-- Auto Generated Below -->
 
 
 ## Properties
 
-| Property     | Attribute | Description                                                                                                                                                  | Type                                   | Default     |
-| ------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
-| `controller` | --        | The controller that is responsible for performing transforms.                                                                                                | `TransformController \| undefined`     | `undefined` |
-| `position`   | --        | The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget. | `Vector3 \| undefined`                 | `undefined` |
-| `viewer`     | --        | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| Property               | Attribute                | Description                                                                                                                                                  | Type                                   | Default     |
+| ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
+| `controller`           | --                       | The controller that is responsible for performing transforms.                                                                                                | `TransformController \| undefined`     | `undefined` |
+| `position`             | --                       | The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget. | `Vector3 \| undefined`                 | `undefined` |
+| `rotation`             | --                       | The starting angle for the transform widget. This rotation will be updated as the rotations occur.                                                           | `Euler \| undefined`                   | `undefined` |
+| `viewer`               | --                       | The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+| `xRotationDisabled`    | `x-rotation-disabled`    | Determines whether or not the x-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `xTranslationDisabled` | `x-translation-disabled` | Determines whether or not the x-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
+| `yRotationDisabled`    | `y-rotation-disabled`    | Determines whether or not the y-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `yTranslationDisabled` | `y-translation-disabled` | Determines whether or not the y-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
+| `zRotationDisabled`    | `z-rotation-disabled`    | Determines whether or not the z-rotation is disabled on the widget                                                                                           | `boolean`                              | `false`     |
+| `zTranslationDisabled` | `z-translation-disabled` | Determines whether or not the z-translation is disabled on the widget                                                                                        | `boolean`                              | `false`     |
 
 
 ## Events
@@ -21,6 +93,7 @@
 | `interactionEnded`   | An event that is emitted when the interaction has ended             | `CustomEvent<[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] \| undefined>` |
 | `interactionStarted` | An event that is emitted an interaction with the widget has started | `CustomEvent<void>`                                                                                                                                          |
 | `positionChanged`    | An event that is emitted when the position of the widget changes.   | `CustomEvent<Vector3 \| undefined>`                                                                                                                          |
+| `rotationChanged`    | An event that is emitted when the rotation of the widget changes.   | `CustomEvent<Euler \| undefined>`                                                                                                                            |
 
 
 ## CSS Custom Properties

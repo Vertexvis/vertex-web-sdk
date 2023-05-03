@@ -6,6 +6,7 @@ const mockUpdateFrame = jest.fn();
 const mockUpdateCursor = jest.fn();
 const mockUpdateColors = jest.fn();
 const mockUpdateDimensions = jest.fn();
+const mockUpdateDisabledAxis = jest.fn();
 
 export class TransformWidget {
   public boundsContainsPoint = mockBoundsContainsPoint;
@@ -15,6 +16,7 @@ export class TransformWidget {
   public updateCursor = mockUpdateCursor;
   public updateColors = mockUpdateColors;
   public updateDimensions = mockUpdateDimensions;
+  public updateDisabledAxis = mockUpdateDisabledAxis;
 
   public constructor(...args: unknown[]) {
     mockTransformWidgetConstructor(...args);

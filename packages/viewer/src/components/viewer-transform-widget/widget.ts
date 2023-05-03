@@ -34,6 +34,16 @@ export interface DrawableElementColors {
   zArrow?: Color.Color | string;
   hovered?: Color.Color | string;
   outline?: Color.Color | string;
+  disabledColor?: Color.Color | string;
+}
+
+export interface DisabledAxis {
+  xRotation: boolean;
+  yRotation: boolean;
+  zRotation: boolean;
+  xTranslation: boolean;
+  yTranslation: boolean;
+  zTranslation: boolean;
 }
 
 // Scalar that is used in combination with a perspective camera's
@@ -70,6 +80,15 @@ export class TransformWidget implements Disposable {
   private zxRotationLine?: RotationLine;
   private zyRotationLine?: RotationLine;
 
+  private disabledAxis: DisabledAxis = {
+    xTranslation: false,
+    yTranslation: false,
+    zTranslation: false,
+    xRotation: false,
+    yRotation: false,
+    zRotation: false,
+  };
+
   private axisLines: AxisLine[] = [];
   private rotationLines: RotationLine[] = [];
   private translationMeshes: TriangleMesh[] = [];
@@ -88,8 +107,11 @@ export class TransformWidget implements Disposable {
   private xArrowFillColor?: Color.Color | string;
   private yArrowFillColor?: Color.Color | string;
   private zArrowFillColor?: Color.Color | string;
+
   private hoveredArrowFillColor?: Color.Color | string;
   private outlineColor?: Color.Color | string;
+
+  private disabledColor: Color.Color | string;
 
   public constructor(
     private canvasElement: HTMLCanvasElement,
@@ -102,6 +124,7 @@ export class TransformWidget implements Disposable {
     this.zArrowFillColor = colors.zArrow;
     this.hoveredArrowFillColor = colors.hovered;
     this.outlineColor = colors.outline;
+    this.disabledColor = colors.disabledColor ?? '#cccccc';
   }
 
   public dispose(): void {
@@ -121,6 +144,14 @@ export class TransformWidget implements Disposable {
       this.frame != null &&
       Rectangle.containsPoints(this.bounds, point)
     );
+  }
+
+  public updateDisabledAxis(axis: Partial<DisabledAxis>): void {
+    this.disabledAxis = {
+      ...this.disabledAxis,
+      ...axis,
+    };
+    this.updateDisabledOnTriangles();
   }
 
   public updateFrame(frame: Frame, updateElements = true): void {
@@ -169,19 +200,23 @@ export class TransformWidget implements Disposable {
     }
   }
 
-  public updateColors(colors: DrawableElementColors): void {
+  public updateColors(colors: DrawableElementColors = {}): void {
     this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
     this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
     this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
-    this.xArrow?.updateFillColor(this.xArrowFillColor);
-    this.yArrow?.updateFillColor(this.yArrowFillColor);
-    this.zArrow?.updateFillColor(this.zArrowFillColor);
-    this.xRotation?.updateFillColor(this.xArrowFillColor);
-    this.yRotation?.updateFillColor(this.yArrowFillColor);
-    this.zRotation?.updateFillColor(this.zArrowFillColor);
+    this.xAxis?.updateFillColor(this.disabledColor);
+    this.yAxis?.updateFillColor(this.disabledColor);
+    this.zAxis?.updateFillColor(this.disabledColor);
+
+    this.xArrow?.updateFillColor(this.getXTranslationColor());
+    this.yArrow?.updateFillColor(this.getYTranslationColor());
+    this.zArrow?.updateFillColor(this.getZTranslationColor());
+    this.xRotation?.updateFillColor(this.getXRotationColor());
+    this.yRotation?.updateFillColor(this.getYRotationColor());
+    this.zRotation?.updateFillColor(this.getZRotationColor());
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
 
@@ -213,13 +248,24 @@ export class TransformWidget implements Disposable {
     });
   }
 
+  private updateDisabledOnTriangles(): void {
+    this.xRotation?.setDisabled(this.disabledAxis.xRotation);
+    this.yRotation?.setDisabled(this.disabledAxis.yRotation);
+    this.zRotation?.setDisabled(this.disabledAxis.zRotation);
+    this.xArrow?.setDisabled(this.disabledAxis.xTranslation);
+    this.yArrow?.setDisabled(this.disabledAxis.yTranslation);
+    this.zArrow?.setDisabled(this.disabledAxis.zTranslation);
+
+    this.updateColors();
+  }
+
   private updateHovered(): void {
     const previousHovered = this.hoveredElement;
     const currentFrame = this.frame;
 
     if (currentFrame != null) {
       this.hoveredElement = [...this.translationMeshes, ...this.rotationMeshes]
-        .filter((el) => el.points.valid)
+        .filter((el) => el.points.valid && !el.isDisabled())
         .find((m) =>
           this.cursor != null
             ? testDrawable(m, currentFrame, this.viewport, this.cursor)
@@ -292,63 +338,65 @@ export class TransformWidget implements Disposable {
       'x-translate',
       xAxisArrowPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.xArrowFillColor
+      this.getXTranslationColor()
     );
+
     this.xRotation = new TriangleMesh(
       createShape,
       'x-rotate',
       xAxisRotationPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.xArrowFillColor
+      this.getXRotationColor()
     );
     this.xAxis = new AxisLine(
       createShape,
       'x-axis',
       axisPositions(transform, frame.scene.camera, this.xArrow),
       this.outlineColor,
-      this.xArrowFillColor
+      this.getXTranslationColor()
     );
     this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
       yAxisArrowPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.yArrowFillColor
+      this.getYTranslationColor()
     );
+
     this.yRotation = new TriangleMesh(
       createShape,
       'y-rotate',
       yAxisRotationPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.yArrowFillColor
+      this.getYRotationColor()
     );
     this.yAxis = new AxisLine(
       createShape,
       'y-axis',
       axisPositions(transform, frame.scene.camera, this.yArrow),
       this.outlineColor,
-      this.yArrowFillColor
+      this.getYTranslationColor()
     );
     this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
       zAxisArrowPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.zArrowFillColor
+      this.getZTranslationColor()
     );
     this.zAxis = new AxisLine(
       createShape,
       'z-axis',
       axisPositions(transform, frame.scene.camera, this.zArrow),
       this.outlineColor,
-      this.zArrowFillColor
+      this.getZTranslationColor()
     );
     this.zRotation = new TriangleMesh(
       createShape,
       'z-rotate',
       zAxisRotationPositions(transform, frame.scene.camera, triangleSize),
       this.outlineColor,
-      this.zArrowFillColor
+      this.getZRotationColor()
     );
 
     this.createRotationLines(createShape, transform, frame);
@@ -356,6 +404,43 @@ export class TransformWidget implements Disposable {
     this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
     this.translationMeshes = [this.xArrow, this.yArrow, this.zArrow];
     this.rotationMeshes = [this.xRotation, this.yRotation, this.zRotation];
+    this.updateDisabledOnTriangles();
+  }
+
+  private getXRotationColor(): Color.Color | string | undefined {
+    return this.xRotation?.isDisabled()
+      ? this.disabledColor
+      : this.xArrowFillColor;
+  }
+
+  private getYRotationColor(): Color.Color | string | undefined {
+    return this.yRotation?.isDisabled()
+      ? this.disabledColor
+      : this.yArrowFillColor;
+  }
+
+  private getZRotationColor(): Color.Color | string | undefined {
+    return this.zRotation?.isDisabled()
+      ? this.disabledColor
+      : this.zArrowFillColor;
+  }
+
+  private getXTranslationColor(): Color.Color | string | undefined {
+    return this.xArrow?.isDisabled()
+      ? this.disabledColor
+      : this.xArrowFillColor;
+  }
+
+  private getYTranslationColor(): Color.Color | string | undefined {
+    return this.yArrow?.isDisabled()
+      ? this.disabledColor
+      : this.yArrowFillColor;
+  }
+
+  private getZTranslationColor(): Color.Color | string | undefined {
+    return this.zArrow?.isDisabled()
+      ? this.disabledColor
+      : this.zArrowFillColor;
   }
 
   private createRotationLines(

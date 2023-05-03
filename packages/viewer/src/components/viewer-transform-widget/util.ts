@@ -199,7 +199,7 @@ function computeTranslation(
   return rotatedDelta.x + rotatedDelta.y + rotatedDelta.z;
 }
 
-function computeRotation(
+export function computeRotation(
   rotationAxis: Quaternion.Quaternion,
   current: Matrix4.Matrix4
 ): Matrix4.Matrix4 {
