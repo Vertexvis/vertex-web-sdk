@@ -207,6 +207,10 @@ export class TransformWidget implements Disposable {
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
+    this.xAxis?.updateFillColor(this.disabledColor);
+    this.yAxis?.updateFillColor(this.disabledColor);
+    this.zAxis?.updateFillColor(this.disabledColor);
+
     this.xArrow?.updateFillColor(this.getXTranslationColor());
     this.yArrow?.updateFillColor(this.getYTranslationColor());
     this.zArrow?.updateFillColor(this.getZTranslationColor());

@@ -225,6 +225,27 @@ export class ViewerTransformWidget {
   /**
    * @ignore
    */
+  @Watch('xTranslationDisabled')
+  @Watch('yTranslationDisabled')
+  @Watch('zTranslationDisabled')
+  @Watch('xRotationDisabled')
+  @Watch('yRotationDisabled')
+  @Watch('zRotationDisabled')
+  protected handleDisabledPropertyChanged(): void {
+    this.getTransformWidget().updateDisabledAxis({
+      xRotation: this.xRotationDisabled,
+      yRotation: this.yRotationDisabled,
+      zRotation: this.zRotationDisabled,
+
+      xTranslation: this.xTranslationDisabled,
+      yTranslation: this.yTranslationDisabled,
+      zTranslation: this.zTranslationDisabled,
+    });
+  }
+
+  /**
+   * @ignore
+   */
   @Watch('rotation')
   protected handleRotationChanged(
     newRotation: Euler.Euler,
