@@ -3,13 +3,16 @@
   "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
     "inlineSources": false,
-    "sourceMap": false,
-    "inlineSourceMap": true,
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h",
     "target": "es2017"
   },
-  "include": ["src", "types/*.d.ts", "src/components.d.ts", "src/regl-shape.d.ts"],
+  "include": [
+    "src",
+    "types/*.d.ts",
+    "src/components.d.ts",
+    "src/regl-shape.d.ts"
+  ],
   "exclude": ["dist", "node_modules"]
 }

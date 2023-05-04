@@ -79,7 +79,6 @@
     "@types/jest": "^27.5.1",
     "@types/jsonwebtoken": "^8.5.8",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
-    "@vertexvis/rollup-plugin-vertexvis-copyright": "^0.4.1",
     "@vertexvis/rollup-plugin-web-workers": "^0.1.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "@vertexwebsdk/build": "0.17.0",
