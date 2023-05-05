@@ -1,5 +1,6 @@
 import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
+export const ALMOST_ONE = 0.9999;
 /**
  * There are an infinite number of orthogonal vectors, this function is used to choose one.
  * @param normal
@@ -31,22 +32,21 @@ export function computeRotationMatrix(
   normal1: Vector3.Vector3,
   normal2: Vector3.Vector3
 ): Matrix4.Matrix4 {
-  const angle = Vector3.angleTo(normal2, normal1);
-
   const dot = Vector3.dot(normal1, normal2);
   // the angle is almost 0 in this case.
-  if (dot > 0.999) {
+  if (dot > ALMOST_ONE) {
     const axisDirection = chooseOrthogonalVector(normal1);
 
     const quaternion = Quaternion.fromAxisAngle(axisDirection, Math.PI);
     return Matrix4.makeRotation(quaternion);
   }
   // the angle is almost 180 in this case.
-  else if (dot <= -0.999) {
+  else if (dot <= -ALMOST_ONE) {
     return Matrix4.makeIdentity();
   }
   // the angle is between 0 & 180
   else {
+    const angle = Vector3.angleTo(normal2, normal1);
     const axisDirection = Vector3.normalize(Vector3.cross(normal1, normal2));
     return Matrix4.makeRotation(
       Quaternion.fromAxisAngle(axisDirection, angle + Math.PI)

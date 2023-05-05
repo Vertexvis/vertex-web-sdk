@@ -14,3 +14,22 @@ export function randomVector3(): Vector3.Vector3 {
     random.floating()
   );
 }
+
+export function randomNormalVector3(): Vector3.Vector3 {
+  return Vector3.normalize(
+    Vector3.create(
+      random.floating({
+        min: 0,
+        max: 1,
+      }),
+      random.floating({
+        min: 0,
+        max: 1,
+      }),
+      random.floating({
+        min: 0,
+        max: 1,
+      })
+    )
+  );
+}
