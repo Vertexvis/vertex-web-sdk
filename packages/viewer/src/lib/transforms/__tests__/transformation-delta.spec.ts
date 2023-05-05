@@ -1,6 +1,6 @@
 import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
-import { random, randomNormalVector3, randomVector3 } from '../../../testing';
+import { randomNormalVector3, randomVector3 } from '../../../testing';
 import * as TransformationDelta from '../transformation-delta';
 
 describe('transformation delta functions', () => {
