@@ -2150,7 +2150,7 @@
   dependencies:
     "@vertexvis/typescript-config-vertexvis" "1.1.0"
 
-"@vertexvis/rollup-plugin-vertexvis-copyright@0.4.1", "@vertexvis/rollup-plugin-vertexvis-copyright@^0.4.1":
+"@vertexvis/rollup-plugin-vertexvis-copyright@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-vertexvis-copyright/-/rollup-plugin-vertexvis-copyright-0.4.1.tgz#31805332f33f90a9c2e63241ed2d1829bb333628"
   integrity sha512-/I+8bhex494KJqS/aD+fqltBwlDzHay0Y85E9Onn5mrs/4utiTfHaHxy3ybpEFvG5dCIWWOcjWL8OdEW/BBrLQ==

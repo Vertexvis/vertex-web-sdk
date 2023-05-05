@@ -20,6 +20,8 @@ install_mo() {
     chmod +x mo
     mv mo ./.lib/mo
   fi
+
+  cat ./.lib/mo
 }
 
 install_mo

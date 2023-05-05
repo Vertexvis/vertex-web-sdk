@@ -1,6 +1,5 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
-import { copyright } from '@vertexvis/rollup-plugin-vertexvis-copyright';
 import workers from '@vertexvis/rollup-plugin-web-workers';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
@@ -11,11 +10,10 @@ import jestConfig from './jest-shared.config';
 
 export const config: Config = {
   namespace: 'viewer',
-  nodeResolve: {
-    browser: true,
-  },
+  sourceMap: true,
+  nodeResolve: { browser: true },
+  preamble: copyright(),
   plugins: [
-    copyright(),
     workers({
       plugins: [
         commonjs(),
@@ -54,3 +52,8 @@ export const config: Config = {
     shadowDomShim: true,
   },
 };
+
+function copyright(): string {
+  const year = new Date(Date.now()).getFullYear();
+  return `Copyright (c) ${year} Vertex Software LLC. All rights reserved.`;
+}
