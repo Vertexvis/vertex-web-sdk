@@ -1,12 +1,12 @@
 /**
  * @module Viewer
  */
-import * as Matricies from './lib/rendering/matrices';
 import * as ColorMaterial from './lib/scenes/colorMaterial';
+import * as TransformationDelta from './lib/transforms/transformation-delta';
 
 export { ColorMaterial };
 
-export { Matricies };
+export { TransformationDelta };
 
 export * from './components';
 export * from './components/scene-tree/lib';
