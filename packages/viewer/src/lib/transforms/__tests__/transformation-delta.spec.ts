@@ -1,9 +1,20 @@
 import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
-import { randomNormalVector3, randomVector3 } from '../../../testing';
+import { random, randomNormalVector3, randomVector3 } from '../../../testing';
 import * as TransformationDelta from '../transformation-delta';
 
 describe('transformation delta functions', () => {
+  const generatedExpectedRotation = (
+    normal1: Vector3.Vector3,
+    normal2: Vector3.Vector3
+  ): Matrix4.Matrix4 => {
+    const direction = Vector3.normalize(Vector3.cross(normal1, normal2));
+
+    const angle = Vector3.angleTo(normal2, normal1);
+    return Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(direction, angle + Math.PI)
+    );
+  };
   describe('chooseOrthogonalVector', () => {
     it('returns a normalized orthogonal vector cross the normal with (1, 0, 0)', () => {
       const normal = Vector3.create(1, 2, 3);
@@ -58,23 +69,109 @@ describe('transformation delta functions', () => {
       ]);
     });
 
-    it('compute based on the normalized cross of the two normals + PI', () => {
-      const normal1 = randomNormalVector3();
-      const normal2 = randomNormalVector3();
-
-      const direction = Vector3.normalize(Vector3.cross(normal1, normal2));
-
-      const angle = Vector3.angleTo(normal2, normal1);
-      const expected = Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(direction, angle + Math.PI)
+    it('compute based on the normalized cross of the two normals + PI - static output', () => {
+      const normal1 = Vector3.normalize(
+        Vector3.create(
+          0.1993226759480711,
+          0.8827308315910894,
+          0.4255076377826886
+        )
+      );
+      const normal2 = Vector3.normalize(
+        Vector3.create(
+          0.8725693698462239,
+          0.3901546914165199,
+          0.2939421908672582
+        )
       );
       const result = TransformationDelta.computeRotationMatrix(
         normal1,
         normal2
       );
 
-      expect(result).toEqual(expected);
+      expect(result).toEqual([
+        -0.6189055856631775, 0.7744285252647052, 0.13121103342041504, 0,
+        -0.6105258914121656, -0.36920312455323145, -0.7006762367424141, 0,
+        -0.4941801411937754, -0.5137601698034454, 0.7013105417525358, 0, 0, 0,
+        0, 1,
+      ]);
     });
+
+    it('compute based on the normalized cross of the two normals + PI case xy/yz', () => {
+      const normal1 = Vector3.normalize(
+        Vector3.create({
+          x: random.integer({ min: 1, max: 10 }),
+          y: random.integer({ min: 1, max: 10 }),
+          z: 0,
+        })
+      );
+      const normal2 = Vector3.normalize(
+        Vector3.create({
+          x: 0,
+          y: random.integer({
+            min: 1,
+            max: 10,
+          }),
+          z: random.integer({ min: 1, max: 10 }),
+        })
+      );
+
+      const result = TransformationDelta.computeRotationMatrix(
+        normal1,
+        normal2
+      );
+
+      expect(result).toEqual(generatedExpectedRotation(normal1, normal2));
+    });
+  });
+
+  it('compute based on the normalized cross of the two normals + PI case xz/xy', () => {
+    const normal1 = Vector3.normalize(
+      Vector3.create({
+        x: random.integer({ min: 1, max: 10 }),
+        y: 0,
+        z: random.integer({ min: 1, max: 10 }),
+      })
+    );
+    const normal2 = Vector3.normalize(
+      Vector3.create({
+        x: random.integer({
+          min: 1,
+          max: 10,
+        }),
+        y: random.integer({
+          min: 1,
+          max: 10,
+        }),
+        z: 0,
+      })
+    );
+
+    const result = TransformationDelta.computeRotationMatrix(normal1, normal2);
+
+    expect(result).toEqual(generatedExpectedRotation(normal1, normal2));
+  });
+
+  it('compute based on the normalized cross of the two normals + PI case yz/xz', () => {
+    const normal1 = Vector3.normalize(
+      Vector3.create({
+        x: 0,
+        y: random.integer({ min: 1, max: 10 }),
+        z: random.integer({ min: 1, max: 10 }),
+      })
+    );
+    const normal2 = Vector3.normalize(
+      Vector3.create({
+        x: random.integer({
+          min: 1,
+          max: 10,
+        }),
+        y: 0,
+        z: random.integer({ min: 1, max: 10 }),
+      })
+    );
+    const result = TransformationDelta.computeRotationMatrix(normal1, normal2);
+    expect(result).toEqual(generatedExpectedRotation(normal1, normal2));
   });
 
   describe('computeTransformationDelta', () => {
