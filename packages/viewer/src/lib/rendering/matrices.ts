@@ -3,7 +3,7 @@
  * @see https://github.com/openframeworks/openFrameworks/blob/356612673304e2f8b0584bc4080b58ee36db62f7/libs/openFrameworks/math/ofMatrix4x4.cpp
  */
 
-import { Angle, Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Angle, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
 import { FrameCamera } from '../types';
 import { isOrthographicFrameCamera } from '../types/frameCamera';
@@ -154,4 +154,30 @@ export function makeLookAtMatrix(
     0  , 0  , 0  , 1
   ];
   /* eslint-enable prettier/prettier */
+}
+
+export function experimentalMakeTransformationMatrix(
+  normal1: Vector3.Vector3,
+  position1: Vector3.Vector3,
+  normal2: Vector3.Vector3,
+  position2: Vector3.Vector3
+): Matrix4.Matrix4 {
+  const translationDeltaMatrix = Matrix4.makeTranslation(
+    Vector3.subtract(position2, position1)
+  );
+  const angle = Vector3.angleTo(normal2, normal1);
+
+  const axisDirection = Vector3.normalize(Vector3.cross(normal1, normal2));
+
+  const translation = Matrix4.makeTranslation(position1);
+
+  const rotationMatrix = Matrix4.makeRotation(
+    Quaternion.fromAxisAngle(axisDirection, angle)
+  );
+
+  const r = Matrix4.multiply(
+    Matrix4.multiply(translation, rotationMatrix),
+    Matrix4.makeTranslation(Vector3.negate(position1))
+  );
+  return Matrix4.multiply(translationDeltaMatrix, r);
 }

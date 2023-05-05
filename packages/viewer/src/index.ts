@@ -1,9 +1,12 @@
 /**
  * @module Viewer
  */
+import * as Matricies from './lib/rendering/matrices';
 import * as ColorMaterial from './lib/scenes/colorMaterial';
 
 export { ColorMaterial };
+
+export { Matricies };
 
 export * from './components';
 export * from './components/scene-tree/lib';

@@ -199,6 +199,12 @@ function computeTranslation(
   return rotatedDelta.x + rotatedDelta.y + rotatedDelta.z;
 }
 
+/**
+ * This helper makes a translation matrix from the negated position
+ * @param rotationAxis
+ * @param current
+ * @returns
+ */
 export function computeRotation(
   rotationAxis: Quaternion.Quaternion,
   current: Matrix4.Matrix4

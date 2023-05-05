@@ -251,7 +251,7 @@ export class ViewerTransformWidget {
     newRotation: Euler.Euler,
     oldRotation?: Euler.Euler
   ): void {
-    this.currentTransform = this.getTransformForHewRotation(newRotation);
+    this.currentTransform = this.getTransformForNewRotation(newRotation);
     this.startingTransform = this.currentTransform;
     this.widget?.updateTransform(this.currentTransform);
     console.debug(
@@ -612,7 +612,7 @@ export class ViewerTransformWidget {
     }
   };
 
-  private getTransformForHewRotation = (
+  private getTransformForNewRotation = (
     newRotationEuler: Euler.Euler
   ): Matrix4.Matrix4 | undefined => {
     const c =
