@@ -200,20 +200,21 @@ function computeTranslation(
 }
 
 /**
- * This helper makes a translation matrix from the negated position
- * @param rotationAxis
+ * Computes a rotation Matrix4 by applying the rotation at the given position,
+ * then translating it back to convert it to a world delta.
+ * @param rotation
  * @param current
  * @returns
  */
 export function computeRotation(
-  rotationAxis: Quaternion.Quaternion,
+  rotation: Quaternion.Quaternion,
   current: Matrix4.Matrix4
 ): Matrix4.Matrix4 {
   return Matrix4.multiply(
     Matrix4.multiply(
       Matrix4.multiply(
         Matrix4.makeTranslation(Vector3.fromMatrixPosition(current)),
-        Matrix4.makeRotation(rotationAxis)
+        Matrix4.makeRotation(rotation)
       ),
       Matrix4.makeTranslation(
         Vector3.negate(Vector3.fromMatrixPosition(current))

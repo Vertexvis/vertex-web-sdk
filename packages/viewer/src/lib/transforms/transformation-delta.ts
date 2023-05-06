@@ -2,7 +2,8 @@ import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
 export const ALMOST_ONE = 0.9999;
 /**
- * There are an infinite number of orthogonal vectors, this function is used to choose one.
+ * For any single vector, there are an infinite number of potential orthogonal vectors. This function will determine
+ * one orthogonal vector by crossing the provided vector with a unit vector in the positive X, Y, or Z directions.
  * @param normal
  * @returns
  */
@@ -23,10 +24,14 @@ export function chooseOrthogonalVector(
 }
 
 /**
- * Computes the rotation matrix for two normal vectors.
+ * Computes the rotation matrix for two normal vectors. If both normals are anti-parallel,
+ * this will compute the rotation matrix delta based on the angle from both normals.
+ * If the normals are anti-parallel, the identity matrix will be returned, as no rotation is necessary in this case.
+ * If the normals are parallel, an axis direction based on a chosen orthogonal vector will be used
+ * to compute the rotation matrix to rotate the plane 180 degrees.
  * @param normal1
  * @param normal2
- * @returns
+ * @returns an anti-parallel rotation Matrix4 betwen the given normals
  */
 export function computeRotationMatrix(
   normal1: Vector3.Vector3,
@@ -53,13 +58,19 @@ export function computeRotationMatrix(
     );
   }
 }
+
 /**
- * Computes the translation & rotation matrix delta between two world positions and two normals vectors.
+ * Computes the translation & rotation matrix delta between two world positions and two normals vectors
+ * such that the computed translation matrix will be the delta between position 1 and position 2,
+ * and the rotation will be rotated to be anti-parallel.
+ *
  * @param normal1
  * @param position1
  * @param normal2
  * @param position2
- * @returns
+ *
+ * @returns Matrix4 translation matrix delta from position1 to
+ * position2 & an anti-parallel rotation delta.
  */
 export function computeTransformationDelta(
   normal1: Vector3.Vector3,

@@ -2,11 +2,8 @@
  * @module Viewer
  */
 import * as ColorMaterial from './lib/scenes/colorMaterial';
-import * as TransformationDelta from './lib/transforms/transformation-delta';
 
 export { ColorMaterial };
-
-export { TransformationDelta };
 
 export * from './components';
 export * from './components/scene-tree/lib';
@@ -23,6 +20,7 @@ export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export * from './lib/pins';
 export { Scene } from './lib/scenes';
+export * from './lib/transforms';
 export {
   EntityType,
   FrameCameraBase,
