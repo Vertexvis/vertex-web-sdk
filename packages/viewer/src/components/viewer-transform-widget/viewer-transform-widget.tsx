@@ -573,7 +573,7 @@ export class ViewerTransformWidget {
     }
 
     if (this.position != null) {
-      this.currentTransform = Matrix4.makeTranslation(this.position);
+      this.currentTransform = this.getTransformForNewPosition(this.position);
       this.startingTransform = this.currentTransform;
       this.widget.updateTransform(this.currentTransform);
     }
