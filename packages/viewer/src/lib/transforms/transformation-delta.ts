@@ -24,7 +24,7 @@ export function chooseOrthogonalVector(
 }
 
 /**
- * Computes the rotation matrix for two normal vectors. If both normals are anti-parallel,
+ * Computes the rotation matrix for two normals. If both normals are neither parallel or anti-parallel,
  * this will compute the rotation matrix delta based on the angle from both normals.
  * If the normals are anti-parallel, the identity matrix will be returned, as no rotation is necessary in this case.
  * If the normals are parallel, an axis direction based on a chosen orthogonal vector will be used
