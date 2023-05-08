@@ -60,7 +60,7 @@ export function computeRotationMatrix(
 }
 
 /**
- * Computes the translation & rotation matrix delta between two world positions and two normals vectors
+ * Computes the translation & rotation matrix delta between two world positions and two normals.
  * such that the computed translation matrix will be the delta between position 1 and position 2,
  * and the rotation will be rotated to be anti-parallel.
  *
