@@ -20,6 +20,7 @@ export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export * from './lib/pins';
 export { Scene } from './lib/scenes';
+export * from './lib/transforms';
 export {
   EntityType,
   FrameCameraBase,

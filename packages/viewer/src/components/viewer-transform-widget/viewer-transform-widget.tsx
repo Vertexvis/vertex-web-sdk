@@ -251,7 +251,7 @@ export class ViewerTransformWidget {
     newRotation: Euler.Euler,
     oldRotation?: Euler.Euler
   ): void {
-    this.currentTransform = this.getTransformForHewRotation(newRotation);
+    this.currentTransform = this.getTransformForNewRotation(newRotation);
     this.startingTransform = this.currentTransform;
     this.widget?.updateTransform(this.currentTransform);
     console.debug(
@@ -566,6 +566,12 @@ export class ViewerTransformWidget {
       disabledColor: this.disabledColor,
     });
 
+    if (this.rotation != null) {
+      this.currentTransform = this.getTransformForNewRotation(this.rotation);
+      this.startingTransform = this.currentTransform;
+      this.widget.updateTransform(this.currentTransform);
+    }
+
     if (this.position != null) {
       this.currentTransform = Matrix4.makeTranslation(this.position);
       this.startingTransform = this.currentTransform;
@@ -612,7 +618,7 @@ export class ViewerTransformWidget {
     }
   };
 
-  private getTransformForHewRotation = (
+  private getTransformForNewRotation = (
     newRotationEuler: Euler.Euler
   ): Matrix4.Matrix4 | undefined => {
     const c =
