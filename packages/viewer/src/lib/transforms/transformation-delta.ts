@@ -27,7 +27,7 @@ export function calculateOrthogonalCoordinate(
  * If the normals are parallel, an axis direction based on a chosen orthogonal vector will be used
  * to compute the rotation matrix to rotate the plane 180 degrees.
  * @param normal1
- * @param normal2r
+ * @param normal2
  * @returns an anti-parallel rotation Matrix4 betwen the given normals
  */
 export function computeRotationMatrix(
