@@ -32,7 +32,7 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
   ) {
     const pointsAsArray = points.toArray();
 
-    this.pointsArray = new Float64Array(pointsAsArray.length * 2);
+    this.pointsArray = new Float64Array(pointsAsArray.length * 2 + 4);
     flattenPointArray(pointsAsArray).forEach(
       (v, i) => (this.pointsArray[i] = v)
     );
