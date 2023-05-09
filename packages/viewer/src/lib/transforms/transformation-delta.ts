@@ -1,26 +1,23 @@
 import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 
 export const ALMOST_ONE = 0.9999;
+
 /**
- * For any single vector, there are an infinite number of potential orthogonal vectors. This function will determine
- * one orthogonal vector by crossing the provided vector with a unit vector in the positive X, Y, or Z directions.
+ * Calculates orthogonal coordinate frame with z-Vector pointing towards N
  * @param normal
  * @returns
  */
-export function chooseOrthogonalVector(
-  normal: Vector3.Vector3
+export function calculateOrthogonalCoordinate(
+  norm: Vector3.Vector3
 ): Vector3.Vector3 {
-  const absNorm = Vector3.create(
-    Math.abs(normal.x),
-    Math.abs(normal.y),
-    Math.abs(normal.z)
-  );
-  const x = absNorm.x < absNorm.y && absNorm.x < absNorm.z ? 1.0 : 0.0;
-  const y = absNorm.y <= absNorm.x && absNorm.y < absNorm.z ? 1.0 : 0.0;
-  const z = absNorm.z <= absNorm.x && absNorm.z <= absNorm.y ? 1.0 : 0.0;
+  const dx0 = Vector3.create(0, norm.z, -norm.y);
+  const dx1 = Vector3.create(-norm.z, 0, norm.x);
 
-  const vector = Vector3.create(x, y, z);
-  return Vector3.normalize(Vector3.cross(normal, vector));
+  const mag2Dx0 = Vector3.magnitudeSquared(dx0);
+  const mag2Dx1 = Vector3.magnitudeSquared(dx1);
+
+  const dx = Vector3.normalize(mag2Dx0 > mag2Dx1 ? dx0 : dx1);
+  return Vector3.normalize(Vector3.cross(norm, dx));
 }
 
 /**
@@ -30,7 +27,7 @@ export function chooseOrthogonalVector(
  * If the normals are parallel, an axis direction based on a chosen orthogonal vector will be used
  * to compute the rotation matrix to rotate the plane 180 degrees.
  * @param normal1
- * @param normal2
+ * @param normal2r
  * @returns an anti-parallel rotation Matrix4 betwen the given normals
  */
 export function computeRotationMatrix(
@@ -40,7 +37,7 @@ export function computeRotationMatrix(
   const dot = Vector3.dot(normal1, normal2);
   // the angle is almost 0 in this case.
   if (dot > ALMOST_ONE) {
-    const axisDirection = chooseOrthogonalVector(normal1);
+    const axisDirection = calculateOrthogonalCoordinate(normal1);
 
     const quaternion = Quaternion.fromAxisAngle(axisDirection, Math.PI);
     return Matrix4.makeRotation(quaternion);

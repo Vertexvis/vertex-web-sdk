@@ -15,33 +15,34 @@ describe('transformation delta functions', () => {
       Quaternion.fromAxisAngle(direction, angle + Math.PI)
     );
   };
-  describe('chooseOrthogonalVector', () => {
-    it('returns a normalized orthogonal vector cross the normal with (1, 0, 0)', () => {
+  describe('calculateOrthogonalCoordinate', () => {
+    it('returns a normalized orthogonal vector cross the normal with (0, z, -y)', () => {
       const normal = Vector3.create(1, 2, 3);
-      const result = TransformationDelta.chooseOrthogonalVector(normal);
+
+      const result = TransformationDelta.calculateOrthogonalCoordinate(normal);
 
       expect(result).toEqual(
-        Vector3.normalize(Vector3.cross(normal, Vector3.create(1, 0, 0)))
+        Vector3.normalize(
+          Vector3.cross(
+            normal,
+            Vector3.normalize(Vector3.create(0, normal.z, -normal.y))
+          )
+        )
       );
     });
 
-    it('returns a normalized orthogonal vector cross the normal with (0, 1, 0)', () => {
-      const normal = Vector3.create(2, 1, 3);
-
-      const result = TransformationDelta.chooseOrthogonalVector(normal);
-
-      expect(result).toEqual(
-        Vector3.normalize(Vector3.cross(normal, Vector3.create(0, 1, 0)))
-      );
-    });
-
-    it('returns a normalized orthogonal vector cross the normal with (0, 0, 1)', () => {
+    it('returns a normalized orthogonal vector cross the normal with (-z, 0, x)', () => {
       const normal = Vector3.create(3, 2, 1);
 
-      const result = TransformationDelta.chooseOrthogonalVector(normal);
+      const result = TransformationDelta.calculateOrthogonalCoordinate(normal);
 
       expect(result).toEqual(
-        Vector3.normalize(Vector3.cross(normal, Vector3.create(0, 0, 1)))
+        Vector3.normalize(
+          Vector3.cross(
+            normal,
+            Vector3.normalize(Vector3.create(-normal.z, 0, normal.x))
+          )
+        )
       );
     });
   });
@@ -63,9 +64,10 @@ describe('transformation delta functions', () => {
       const result = TransformationDelta.computeRotationMatrix(normal, normal);
 
       expect(result).toEqual([
-        0.045050168671940005, -0.9989847257604241, 8.462255466143613e-17, 0,
-        -0.9989847257604241, -0.045050168671940005, 8.852469186159776e-17, 0,
-        -8.462255466143613e-17, -8.852469186159776e-17, -1, 0, 0, 0, 0, 1,
+        0.14772550097833792, -0.8915748018863913, -0.42810226465406753, 0,
+        -0.8915748018863913, -0.3074078891850285, 0.33255790820253756, 0,
+        -0.4281022646540674, 0.3325579082025378, -0.8403176117933095, 0, 0, 0,
+        0, 1,
       ]);
     });
 
