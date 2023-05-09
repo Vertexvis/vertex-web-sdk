@@ -3,21 +3,24 @@ import { Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 export const ALMOST_ONE = 0.9999;
 
 /**
- * Calculates orthogonal coordinate frame with z-Vector pointing towards N
+ * For any single normal vector, there are an infinite number of potential orthogonal vectors. This function will
+ * calculate a single vector evaluating the length of two candidates, and picking the one with the higher squared magnitude
  * @param normal
  * @returns
  */
 export function calculateOrthogonalCoordinate(
   norm: Vector3.Vector3
 ): Vector3.Vector3 {
-  const dx0 = Vector3.create(0, norm.z, -norm.y);
-  const dx1 = Vector3.create(-norm.z, 0, norm.x);
+  const orthogonalCandidate0 = Vector3.create(0, norm.z, -norm.y);
+  const orthogonalCandidate1 = Vector3.create(-norm.z, 0, norm.x);
 
-  const mag2Dx0 = Vector3.magnitudeSquared(dx0);
-  const mag2Dx1 = Vector3.magnitudeSquared(dx1);
+  const theChosenOne =
+    Vector3.magnitudeSquared(orthogonalCandidate0) >
+    Vector3.magnitudeSquared(orthogonalCandidate1)
+      ? orthogonalCandidate0
+      : orthogonalCandidate1;
 
-  const dx = mag2Dx0 > mag2Dx1 ? dx0 : dx1;
-  return Vector3.normalize(Vector3.cross(norm, dx));
+  return Vector3.normalize(Vector3.cross(norm, theChosenOne));
 }
 
 /**
