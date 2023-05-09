@@ -23,10 +23,7 @@ describe('transformation delta functions', () => {
 
       expect(result).toEqual(
         Vector3.normalize(
-          Vector3.cross(
-            normal,
-            Vector3.normalize(Vector3.create(0, normal.z, -normal.y))
-          )
+          Vector3.cross(normal, Vector3.create(0, normal.z, -normal.y))
         )
       );
     });
@@ -38,10 +35,7 @@ describe('transformation delta functions', () => {
 
       expect(result).toEqual(
         Vector3.normalize(
-          Vector3.cross(
-            normal,
-            Vector3.normalize(Vector3.create(-normal.z, 0, normal.x))
-          )
+          Vector3.cross(normal, Vector3.create(-normal.z, 0, normal.x))
         )
       );
     });
@@ -64,10 +58,10 @@ describe('transformation delta functions', () => {
       const result = TransformationDelta.computeRotationMatrix(normal, normal);
 
       expect(result).toEqual([
-        0.14772550097833792, -0.8915748018863913, -0.42810226465406753, 0,
-        -0.8915748018863913, -0.3074078891850285, 0.33255790820253756, 0,
-        -0.4281022646540674, 0.3325579082025378, -0.8403176117933095, 0, 0, 0,
-        0, 1,
+        0.14772550097833792, -0.8915748018863914, -0.4281022646540676, 0,
+        -0.8915748018863914, -0.3074078891850287, 0.33255790820253756, 0,
+        -0.4281022646540675, 0.3325579082025378, -0.84031761179331, 0, 0, 0, 0,
+        1,
       ]);
     });
 
