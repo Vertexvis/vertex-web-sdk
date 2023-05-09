@@ -10,7 +10,6 @@ import { axisPositions } from '../../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../../lib/transforms/axis-translation';
 import { AxisLine } from '../../../../lib/transforms/line';
 import { Mesh, TriangleMesh } from '../../../../lib/transforms/mesh';
-import { flattenPointArray } from '../../../../lib/transforms/util';
 import {
   Frame,
   FrameCameraBase,
@@ -27,6 +26,7 @@ import {
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../../testing/fixtures';
+import { createdPaddedFloat64Array } from '../../../../testing/webgl';
 import {
   DEFAULT_PLANE_SIZE_SCALAR,
   DEFAULT_POINT_SIZE_SCALAR,
@@ -197,19 +197,19 @@ describe(HitIndicator, () => {
     indicator.updateTransformAndNormal(hithitPositionTransform, hitNormal);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.arrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.arrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.axis.points.toArray())),
+      createdPaddedFloat64Array(meshes.axis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.plane.points.toArray())),
+      createdPaddedFloat64Array(meshes.plane.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.point.points.toArray())),
+      createdPaddedFloat64Array(meshes.point.points),
       expect.anything()
     );
   });
@@ -234,19 +234,19 @@ describe(HitIndicator, () => {
     indicator.updateTransformAndNormal(hithitPositionTransform, hitNormal);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.arrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.arrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.axis.points.toArray())),
+      createdPaddedFloat64Array(meshes.axis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.plane.points.toArray())),
+      createdPaddedFloat64Array(meshes.plane.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.point.points.toArray())),
+      createdPaddedFloat64Array(meshes.point.points),
       expect.anything()
     );
   });
