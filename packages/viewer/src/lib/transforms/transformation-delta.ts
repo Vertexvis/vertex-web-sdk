@@ -16,7 +16,7 @@ export function calculateOrthogonalCoordinate(
   const mag2Dx0 = Vector3.magnitudeSquared(dx0);
   const mag2Dx1 = Vector3.magnitudeSquared(dx1);
 
-  const dx = Vector3.normalize(mag2Dx0 > mag2Dx1 ? dx0 : dx1);
+  const dx = mag2Dx0 > mag2Dx1 ? dx0 : dx1;
   return Vector3.normalize(Vector3.cross(norm, dx));
 }
 
