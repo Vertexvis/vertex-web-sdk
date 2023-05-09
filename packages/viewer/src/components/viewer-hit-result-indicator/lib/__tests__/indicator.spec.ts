@@ -8,10 +8,8 @@ import shapeBuilder from 'regl-shape';
 
 import { axisPositions } from '../../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../../lib/transforms/axis-translation';
-import { DrawablePoints } from '../../../../lib/transforms/drawable';
 import { AxisLine } from '../../../../lib/transforms/line';
 import { Mesh, TriangleMesh } from '../../../../lib/transforms/mesh';
-import { flattenPointArray } from '../../../../lib/transforms/util';
 import {
   Frame,
   FrameCameraBase,
@@ -28,6 +26,7 @@ import {
   makeOrthographicFrame,
   makePerspectiveFrame,
 } from '../../../../testing/fixtures';
+import { createdPaddedFloat64Array } from '../../../../testing/webgl';
 import {
   DEFAULT_PLANE_SIZE_SCALAR,
   DEFAULT_POINT_SIZE_SCALAR,
@@ -137,13 +136,6 @@ function updateFrameCameraPosition(
     makeDepthImagePng(100, 50),
     makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))
   );
-}
-
-function createdPaddedFloat64Array(points: DrawablePoints): Float64Array {
-  return new Float64Array([
-    ...flattenPointArray(points.toArray()),
-    ...new Array(4).fill(0),
-  ]);
 }
 
 describe(HitIndicator, () => {
