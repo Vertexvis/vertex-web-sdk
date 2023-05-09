@@ -15,6 +15,7 @@ import {
   yAxisArrowPositions,
   zAxisArrowPositions,
 } from '../../../lib/transforms/axis-translation';
+import { DrawablePoints } from '../../../lib/transforms/drawable';
 import { testDrawable } from '../../../lib/transforms/hits';
 import { AxisLine } from '../../../lib/transforms/line';
 import { TriangleMesh } from '../../../lib/transforms/mesh';
@@ -36,7 +37,6 @@ import {
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
 import { TransformWidget } from '../widget';
-import { DrawablePoints } from '../../../lib/transforms/drawable';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 
@@ -145,7 +145,10 @@ function updateFrameCameraPosition(
 }
 
 function createdPaddedFloat64Array(points: DrawablePoints): Float64Array {
-  return new Float64Array([...flattenPointArray(points.toArray()), ...new Array(4).fill(0)]);
+  return new Float64Array([
+    ...flattenPointArray(points.toArray()),
+    ...new Array(4).fill(0),
+  ]);
 }
 
 describe(TransformWidget, () => {

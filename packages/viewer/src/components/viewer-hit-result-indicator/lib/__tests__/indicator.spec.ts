@@ -8,6 +8,7 @@ import shapeBuilder from 'regl-shape';
 
 import { axisPositions } from '../../../../lib/transforms/axis-lines';
 import { computeArrowNdcValues } from '../../../../lib/transforms/axis-translation';
+import { DrawablePoints } from '../../../../lib/transforms/drawable';
 import { AxisLine } from '../../../../lib/transforms/line';
 import { Mesh, TriangleMesh } from '../../../../lib/transforms/mesh';
 import { flattenPointArray } from '../../../../lib/transforms/util';
@@ -34,7 +35,6 @@ import {
 } from '../indicator';
 import { computePlaneNdcValues } from '../plane';
 import { computePointNdcValues } from '../point';
-import { DrawablePoints } from '../../../../lib/transforms/drawable';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 
@@ -139,11 +139,12 @@ function updateFrameCameraPosition(
   );
 }
 
-
 function createdPaddedFloat64Array(points: DrawablePoints): Float64Array {
-  return new Float64Array([...flattenPointArray(points.toArray()), ...new Array(4).fill(0)]);
+  return new Float64Array([
+    ...flattenPointArray(points.toArray()),
+    ...new Array(4).fill(0),
+  ]);
 }
-
 
 describe(HitIndicator, () => {
   const canvas = document.createElement('canvas');
