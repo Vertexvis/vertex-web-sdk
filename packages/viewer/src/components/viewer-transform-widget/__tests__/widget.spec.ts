@@ -36,6 +36,7 @@ import {
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
 import { TransformWidget } from '../widget';
+import { DrawablePoints } from '../../../lib/transforms/drawable';
 
 type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
 
@@ -143,6 +144,10 @@ function updateFrameCameraPosition(
   );
 }
 
+function createdPaddedFloat64Array(points: DrawablePoints): Float64Array {
+  return new Float64Array([...flattenPointArray(points.toArray()), ...new Array(4).fill(0)]);
+}
+
 describe(TransformWidget, () => {
   const canvas = document.createElement('canvas');
 
@@ -177,27 +182,27 @@ describe(TransformWidget, () => {
     widget.updateTransform(positionTransform);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.xArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.xArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.yArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.yArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.zArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.zArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.xAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.xAxis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.yAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.yAxis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.zAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.zAxis.points),
       expect.anything()
     );
   });
@@ -218,27 +223,27 @@ describe(TransformWidget, () => {
     widget.updateTransform(positionTransform);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.xArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.xArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.yArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.yArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.zArrow.points.toArray())),
+      createdPaddedFloat64Array(meshes.zArrow.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.xAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.xAxis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.yAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.yAxis.points),
       expect.anything()
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
-      new Float64Array(flattenPointArray(meshes.zAxis.points.toArray())),
+      createdPaddedFloat64Array(meshes.zAxis.points),
       expect.anything()
     );
   });
