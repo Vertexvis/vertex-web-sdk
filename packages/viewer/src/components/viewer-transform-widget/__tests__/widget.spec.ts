@@ -493,4 +493,35 @@ describe(TransformWidget, () => {
         ).length
     ).toBe(1);
   });
+
+  it('supports initializing with disabled values', async () => {
+    const widget = new TransformWidget(
+      canvas,
+      {
+        xArrow: '#777777',
+        yArrow: '#888888',
+        zArrow: '#999999',
+        disabledColor: '#333333',
+      },
+      {
+        xRotation: true,
+      }
+    );
+
+    const frame = makePerspectiveFrame();
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+    );
+    widget.updateTransform(positionTransform);
+
+    expect(
+      widget
+        .getDrawableElements()
+        .find(
+          (e) => e.fillColor === '#333333' && e.identifier.includes('x-rotate')
+        )
+    ).toBeDefined();
+  });
 });

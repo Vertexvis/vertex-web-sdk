@@ -232,7 +232,7 @@ export class ViewerTransformWidget {
   @Watch('yRotationDisabled')
   @Watch('zRotationDisabled')
   protected handleDisabledPropertyChanged(): void {
-    this.getTransformWidget().updateDisabledAxis({
+    this.widget?.updateDisabledAxis({
       xRotation: this.xRotationDisabled,
       yRotation: this.yRotationDisabled,
       zRotation: this.zRotationDisabled,
