@@ -9,19 +9,19 @@
   * @prop --viewer-hit-result-indicator-arrow-color: A CSS color for the arrow
   * representing the normal for this hit indicator. Defaults to `#0099cc`.
   */
-  --viewer-hit-result-indicator-arrow-color: '#0099cc';
+  --viewer-hit-result-indicator-arrow-color: #0099cc;
 
   /**
   * @prop --viewer-hit-result-indicator-plane-color: A CSS color for the plane
   * for this hit indicator. Defaults to `#0099cc`.
   */
-  --viewer-hit-result-indicator-plane-color: '#0099cc';
+  --viewer-hit-result-indicator-plane-color: #0099cc;
 
   /**
   * @prop --viewer-hit-result-indicator-outline-color: A CSS color for the outline
   * of the plane and arrow. Defaults to `#000000`.
   */
-  --viewer-hit-result-indicator-outline-color: '#000000';
+  --viewer-hit-result-indicator-outline-color: #000000;
 
   /**
   * @prop --viewer-hit-result-indicator-plane-opacity: A CSS number for the opacity

@@ -97,7 +97,8 @@ export class TransformWidget extends ReglComponent {
 
   public constructor(
     canvasElement: HTMLCanvasElement,
-    colors: DrawableElementColors = {}
+    colors: DrawableElementColors = {},
+    initialDisabledAxes: Partial<DisabledAxis> = {}
   ) {
     super(canvasElement);
 
@@ -107,6 +108,13 @@ export class TransformWidget extends ReglComponent {
     this.hoveredArrowFillColor = colors.hovered;
     this.outlineColor = colors.outline;
     this.disabledColor = colors.disabledColor ?? '#cccccc';
+
+    this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
+    this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
+    this.disabledAxis.zTranslation = initialDisabledAxes.zTranslation ?? false;
+    this.disabledAxis.xRotation = initialDisabledAxes.xRotation ?? false;
+    this.disabledAxis.yRotation = initialDisabledAxes.yRotation ?? false;
+    this.disabledAxis.zRotation = initialDisabledAxes.zRotation ?? false;
   }
 
   public dispose(): void {
