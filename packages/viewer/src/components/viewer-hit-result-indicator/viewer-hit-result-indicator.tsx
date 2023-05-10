@@ -79,8 +79,6 @@ export class ViewerHitResultIndicator {
         .getPropertyValue('--viewer-hit-result-indicator-plane-opacity')
         .trim();
 
-      console.log(this.arrowColor);
-
       this.indicator?.updateColors({
         arrow: this.arrowColor,
         plane: this.planeColor,
