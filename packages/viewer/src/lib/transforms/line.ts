@@ -81,7 +81,8 @@ export class RotationLine extends Drawable<RotationLinePoints> {
     outlineColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {
       join: 'round' as JoinStyle,
-    }
+    },
+    public disabled: boolean = false
   ) {
     super(
       createShape,
@@ -93,5 +94,9 @@ export class RotationLine extends Drawable<RotationLinePoints> {
       undefined,
       shapeProps
     );
+  }
+
+  public setDisabled(disabled: boolean): void {
+    this.disabled = disabled;
   }
 }

@@ -28,7 +28,8 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     public points: T,
     public outlineColor: string,
     public fillColor?: string,
-    public shapeProps: Partial<ShapeProps> = {}
+    public shapeProps: Partial<ShapeProps> = {},
+    public disabled: boolean = false
   ) {
     const pointsAsArray = points.toArray();
 

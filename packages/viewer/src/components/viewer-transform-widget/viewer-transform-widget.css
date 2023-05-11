@@ -29,12 +29,6 @@
   * when it is hovered. Defaults to `#ffff00`.
   */
   --viewer-transform-widget-hovered-arrow-color: #ffff00;
-
-  /**
-  * @prop --viewer-transform-widget-disabled-arrow-color: A CSS color for the arrow
-  * when it is disabled. Defaults to `#cccccc`.
-  */
-  --viewer-transform-widget-disabled-arrow-color: #cccccc;
 }
 
 .widget {
