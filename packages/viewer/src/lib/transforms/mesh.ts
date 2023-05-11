@@ -88,7 +88,7 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {},
-    private disabled: boolean = false
+    public disabled: boolean = false
   ) {
     super(
       createShape,

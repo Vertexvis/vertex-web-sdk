@@ -401,12 +401,11 @@ describe(TransformWidget, () => {
     ).toBe(true);
   });
 
-  it('uses the disabled color if the specific axis are disabled', async () => {
+  it('uses an opacity if the specific axis are disabled', async () => {
     const widget = new TransformWidget(canvas, {
       xArrow: '#777777',
       yArrow: '#888888',
       zArrow: '#999999',
-      disabledColor: '#333333',
     });
 
     widget.updateDisabledAxis({
@@ -426,9 +425,7 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#333333' && e.identifier.includes('rotate')
-        ).length
+        .filter((e) => e.disabled && e.identifier.includes('rotate')).length
     ).toBe(3);
 
     // The disabled rotation meshes should have no impact on the translation meshes
@@ -465,9 +462,7 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#333333' && e.identifier.includes('rotate')
-        ).length
+        .filter((e) => e.disabled && e.identifier.includes('rotate')).length
     ).toBe(0);
 
     // the colors should now be present
@@ -501,7 +496,6 @@ describe(TransformWidget, () => {
         xArrow: '#777777',
         yArrow: '#888888',
         zArrow: '#999999',
-        disabledColor: '#333333',
       },
       {
         xRotation: true,
@@ -519,9 +513,7 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .find(
-          (e) => e.fillColor === '#333333' && e.identifier.includes('x-rotate')
-        )
+        .find((e) => e.disabled && e.identifier.includes('x-rotate'))
     ).toBeDefined();
   });
 });

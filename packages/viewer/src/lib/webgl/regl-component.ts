@@ -67,7 +67,12 @@ export abstract class ReglComponent implements Disposable {
   protected draw(): void {
     if (this.reglFrameDisposable == null) {
       this.reglFrameDisposable = this.reglCommand?.frame(() => {
-        this.drawableElements.forEach((el) => el?.draw({ fill: el.fillColor }));
+        this.drawableElements.forEach((el) =>
+          el?.draw({
+            fill: el.fillColor,
+            opacity: !!el.disabled ? 0.2 : 1,
+          })
+        );
       });
     }
   }

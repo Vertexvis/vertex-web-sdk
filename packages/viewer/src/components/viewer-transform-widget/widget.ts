@@ -35,7 +35,6 @@ export interface DrawableElementColors {
   zArrow?: Color.Color | string;
   hovered?: Color.Color | string;
   outline?: Color.Color | string;
-  disabledColor?: Color.Color | string;
 }
 
 export interface DisabledAxis {
@@ -93,8 +92,6 @@ export class TransformWidget extends ReglComponent {
   private hoveredArrowFillColor?: Color.Color | string;
   private outlineColor?: Color.Color | string;
 
-  private disabledColor: Color.Color | string;
-
   public constructor(
     canvasElement: HTMLCanvasElement,
     colors: DrawableElementColors = {},
@@ -107,7 +104,6 @@ export class TransformWidget extends ReglComponent {
     this.zArrowFillColor = colors.zArrow;
     this.hoveredArrowFillColor = colors.hovered;
     this.outlineColor = colors.outline;
-    this.disabledColor = colors.disabledColor ?? '#cccccc';
 
     this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
     this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
@@ -141,7 +137,7 @@ export class TransformWidget extends ReglComponent {
       ...this.disabledAxis,
       ...axis,
     };
-    this.updateDisabledOnTriangles();
+    this.updateDisabledOnDrawables();
   }
 
   public updateCursor(cursor?: Point.Point): void {
@@ -173,10 +169,6 @@ export class TransformWidget extends ReglComponent {
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
-    this.xAxis?.updateFillColor(this.disabledColor);
-    this.yAxis?.updateFillColor(this.disabledColor);
-    this.zAxis?.updateFillColor(this.disabledColor);
-
     this.xArrow?.updateFillColor(this.getXTranslationColor());
     this.yArrow?.updateFillColor(this.getYTranslationColor());
     this.zArrow?.updateFillColor(this.getZTranslationColor());
@@ -192,10 +184,19 @@ export class TransformWidget extends ReglComponent {
     return this.hoveredChanged.on(listener);
   }
 
-  private updateDisabledOnTriangles(): void {
+  private updateDisabledOnDrawables(): void {
     this.xRotation?.setDisabled(this.disabledAxis.xRotation);
+    this.xyRotationLine?.setDisabled(this.disabledAxis.xRotation);
+    this.xzRotationLine?.setDisabled(this.disabledAxis.xRotation);
+
     this.yRotation?.setDisabled(this.disabledAxis.yRotation);
+    this.yzRotationLine?.setDisabled(this.disabledAxis.yRotation);
+    this.yxRotationLine?.setDisabled(this.disabledAxis.yRotation);
+
     this.zRotation?.setDisabled(this.disabledAxis.zRotation);
+    this.zxRotationLine?.setDisabled(this.disabledAxis.zRotation);
+    this.zyRotationLine?.setDisabled(this.disabledAxis.zRotation);
+
     this.xArrow?.setDisabled(this.disabledAxis.xTranslation);
     this.yArrow?.setDisabled(this.disabledAxis.yTranslation);
     this.zArrow?.setDisabled(this.disabledAxis.zTranslation);
@@ -337,7 +338,7 @@ export class TransformWidget extends ReglComponent {
     this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
     this.translationMeshes = [this.xArrow, this.yArrow, this.zArrow];
     this.rotationMeshes = [this.xRotation, this.yRotation, this.zRotation];
-    this.updateDisabledOnTriangles();
+    this.updateDisabledOnDrawables();
 
     this.availableElements = [
       ...this.axisLines,
@@ -348,39 +349,27 @@ export class TransformWidget extends ReglComponent {
   }
 
   private getXRotationColor(): Color.Color | string | undefined {
-    return this.xRotation?.isDisabled()
-      ? this.disabledColor
-      : this.xArrowFillColor;
+    return this.xArrowFillColor;
   }
 
   private getYRotationColor(): Color.Color | string | undefined {
-    return this.yRotation?.isDisabled()
-      ? this.disabledColor
-      : this.yArrowFillColor;
+    return this.yArrowFillColor;
   }
 
   private getZRotationColor(): Color.Color | string | undefined {
-    return this.zRotation?.isDisabled()
-      ? this.disabledColor
-      : this.zArrowFillColor;
+    return this.zArrowFillColor;
   }
 
   private getXTranslationColor(): Color.Color | string | undefined {
-    return this.xArrow?.isDisabled()
-      ? this.disabledColor
-      : this.xArrowFillColor;
+    return this.xArrowFillColor;
   }
 
   private getYTranslationColor(): Color.Color | string | undefined {
-    return this.yArrow?.isDisabled()
-      ? this.disabledColor
-      : this.yArrowFillColor;
+    return this.yArrowFillColor;
   }
 
   private getZTranslationColor(): Color.Color | string | undefined {
-    return this.zArrow?.isDisabled()
-      ? this.disabledColor
-      : this.zArrowFillColor;
+    return this.zArrowFillColor;
   }
 
   private createRotationLines(

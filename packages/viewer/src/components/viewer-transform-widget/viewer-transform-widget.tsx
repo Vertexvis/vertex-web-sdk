@@ -141,7 +141,6 @@ export class ViewerTransformWidget {
   private yArrowColor: Color.Color | string = '#4faf32';
   private zArrowColor: Color.Color | string = '#0000ff';
   private hoveredColor: Color.Color | string = '#ffff00';
-  private disabledColor: Color.Color | string = '#cccccc';
 
   private widget?: TransformWidget;
   private dragging?: Drawable;
@@ -181,9 +180,6 @@ export class ViewerTransformWidget {
         .trim();
       this.hoveredColor = hostStyles
         .getPropertyValue('--viewer-transform-widget-hovered-arrow-color')
-        .trim();
-      this.disabledColor = hostStyles
-        .getPropertyValue('--viewer-transform-widget-disabled-arrow-color')
         .trim();
     });
   }
@@ -563,7 +559,6 @@ export class ViewerTransformWidget {
       yArrow: this.yArrowColor,
       zArrow: this.zArrowColor,
       hovered: this.hoveredColor,
-      disabledColor: this.disabledColor,
     });
 
     if (this.rotation != null) {
