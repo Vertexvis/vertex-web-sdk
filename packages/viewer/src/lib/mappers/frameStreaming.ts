@@ -138,7 +138,7 @@ export const fromPbCrossSectioning: M.Func<
     })
 );
 
-export const fromPbItemSetSummary: M.Func<
+const fromPbItemSetSummary: M.Func<
   vertexvis.protobuf.stream.IItemSetSummary,
   DisplayListSummary.ItemSetSummary
 > = M.defineMapper(
@@ -152,7 +152,7 @@ export const fromPbItemSetSummary: M.Func<
   })
 );
 
-export const fromPbDisplayListSummary: M.Func<
+const fromPbDisplayListSummary: M.Func<
   vertexvis.protobuf.stream.IDisplayListSummary,
   DisplayListSummary.DisplayListSummary
 > = M.defineMapper(
