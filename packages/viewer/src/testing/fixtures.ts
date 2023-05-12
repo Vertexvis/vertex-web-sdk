@@ -35,6 +35,14 @@ const baseDrawFramePayload: Partial<DrawFramePayload> = {
       sectionPlanes: [{ normal: { x: 0, y: 0, z: 0 }, offset: 0 }],
     },
     hasChanged: false,
+    displayListSummary: {
+      visibleSummary: {
+        count: 100,
+      },
+      selectedVisibleSummary: {
+        count: 0,
+      },
+    },
   },
   imageAttributes: {
     frameDimensions: { width: 100, height: 50 },
