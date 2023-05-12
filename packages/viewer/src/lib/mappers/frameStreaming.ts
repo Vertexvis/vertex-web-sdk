@@ -6,6 +6,7 @@ import { Mapper as M } from '@vertexvis/utils';
 import { Token } from '../token';
 import {
   CrossSectioning,
+  DisplayListSummary,
   Frame,
   FrameCamera,
   FrameCameraBase,
@@ -137,6 +138,35 @@ export const fromPbCrossSectioning: M.Func<
     })
 );
 
+export const fromPbItemSetSummary: M.Func<
+  vertexvis.protobuf.stream.IItemSetSummary,
+  DisplayListSummary.ItemSetSummary
+> = M.defineMapper(
+  M.read(
+    M.requiredProp('count'),
+    M.mapProp('boundingBox', M.ifDefined(fromPbBoundingBox3f))
+  ),
+  ([count, boundingBox]) => ({
+    count,
+    boundingBox: boundingBox ?? undefined,
+  })
+);
+
+export const fromPbDisplayListSummary: M.Func<
+  vertexvis.protobuf.stream.IDisplayListSummary,
+  DisplayListSummary.DisplayListSummary
+> = M.defineMapper(
+  M.read(
+    M.mapProp('visibleSummary', M.ifDefined(fromPbItemSetSummary)),
+    M.mapProp('selectedVisibleSummary', M.ifDefined(fromPbItemSetSummary))
+  ),
+  ([visibleSummary, selectedVisibleSummary]) =>
+    DisplayListSummary.create({
+      visibleSummary: visibleSummary ?? undefined,
+      selectedVisibleSummary: selectedVisibleSummary ?? undefined,
+    })
+);
+
 const fromPbFrameImageAttributes: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   ImageAttributesLike
@@ -165,6 +195,7 @@ const fromPbSceneAttributes: M.Func<
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
+    displayListSummary: DisplayListSummary.DisplayListSummary;
   }
 > = M.defineMapper(
   M.read(
@@ -177,13 +208,18 @@ const fromPbSceneAttributes: M.Func<
       'crossSectioning',
       M.compose(M.required('crossSectioning'), fromPbCrossSectioning)
     ),
-    M.requiredProp('hasChanged')
+    M.requiredProp('hasChanged'),
+    M.mapProp(
+      'displayListSummary',
+      M.compose(M.required('displayListSummary'), fromPbDisplayListSummary)
+    )
   ),
-  ([camera, boundingBox, crossSectioning, hasChanged]) => ({
+  ([camera, boundingBox, crossSectioning, hasChanged, displayListSummary]) => ({
     camera,
     boundingBox,
     crossSectioning,
     hasChanged,
+    displayListSummary,
   })
 );
 
@@ -194,6 +230,7 @@ const fromPbFrameSceneAttributes: M.Func<
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
+    displayListSummary: DisplayListSummary.DisplayListSummary;
   }
 > = M.defineMapper(
   M.read(
@@ -229,7 +266,8 @@ function fromPbFrameScene(
         sceneAttr.boundingBox,
         sceneAttr.crossSectioning,
         worldOrientation,
-        sceneAttr.hasChanged
+        sceneAttr.hasChanged,
+        sceneAttr.displayListSummary
       )
   );
 }

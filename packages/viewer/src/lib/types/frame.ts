@@ -15,6 +15,7 @@ import { constrainViewVector } from '../rendering/vectors';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
+import * as DisplayListSummary from './displayListSummary';
 import { FeatureMap } from './featureMap';
 import * as FrameCamera from './frameCamera';
 import { Orientation } from './orientation';
@@ -121,7 +122,8 @@ export class FrameScene {
     public readonly boundingBox: BoundingBox.BoundingBox,
     public readonly crossSection: CrossSectioning.CrossSectioning,
     public readonly worldOrientation: Orientation,
-    public readonly hasChanged: boolean
+    public readonly hasChanged: boolean,
+    public readonly displayListSummary: DisplayListSummary.DisplayListSummary
   ) {}
 }
 
