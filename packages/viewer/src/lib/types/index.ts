@@ -4,6 +4,7 @@
 import * as Animation from './animation';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
+import * as DisplayListSummary from './displayListSummary';
 import * as Events from './events';
 import * as Flags from './flags';
 import * as FlyTo from './flyToOptions';
@@ -29,6 +30,7 @@ export {
   Animation,
   ClippingPlanes,
   CrossSectioning,
+  DisplayListSummary,
   Events,
   Flags,
   FlyTo,

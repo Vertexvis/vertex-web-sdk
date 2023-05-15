@@ -61,6 +61,14 @@ export function drawFrame(
       crossSectioning: {
         sectionPlanes: [],
       },
+      displayListSummary: {
+        visibleSummary: {
+          count: 100,
+        },
+        selectedVisibleSummary: {
+          count: 0,
+        },
+      },
     },
     imageAttributes: {
       frameDimensions: { width: 200, height: 150 },
