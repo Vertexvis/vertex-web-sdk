@@ -6,7 +6,6 @@ import { Mapper as M } from '@vertexvis/utils';
 import { Token } from '../token';
 import {
   CrossSectioning,
-  DisplayListSummary,
   Frame,
   FrameCamera,
   FrameCameraBase,
@@ -14,6 +13,7 @@ import {
   FrameScene,
   ImageAttributesLike,
   Orientation,
+  SceneViewSummary,
 } from '../types';
 import { fromPbUuid } from './core';
 import {
@@ -140,7 +140,7 @@ export const fromPbCrossSectioning: M.Func<
 
 const fromPbItemSetSummary: M.Func<
   vertexvis.protobuf.stream.IItemSetSummary,
-  DisplayListSummary.ItemSetSummary
+  SceneViewSummary.ItemSetSummary
 > = M.defineMapper(
   M.read(
     M.requiredProp('count'),
@@ -154,14 +154,14 @@ const fromPbItemSetSummary: M.Func<
 
 const fromPbDisplayListSummary: M.Func<
   vertexvis.protobuf.stream.IDisplayListSummary,
-  DisplayListSummary.DisplayListSummary
+  SceneViewSummary.SceneViewSummary
 > = M.defineMapper(
   M.read(
     M.mapProp('visibleSummary', M.ifDefined(fromPbItemSetSummary)),
     M.mapProp('selectedVisibleSummary', M.ifDefined(fromPbItemSetSummary))
   ),
   ([visibleSummary, selectedVisibleSummary]) =>
-    DisplayListSummary.create({
+    SceneViewSummary.create({
       visibleSummary: visibleSummary ?? undefined,
       selectedVisibleSummary: selectedVisibleSummary ?? undefined,
     })
@@ -195,7 +195,7 @@ const fromPbSceneAttributes: M.Func<
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
-    displayListSummary: DisplayListSummary.DisplayListSummary;
+    displayListSummary: SceneViewSummary.SceneViewSummary;
   }
 > = M.defineMapper(
   M.read(
@@ -230,7 +230,7 @@ const fromPbFrameSceneAttributes: M.Func<
     boundingBox: BoundingBox.BoundingBox;
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
-    displayListSummary: DisplayListSummary.DisplayListSummary;
+    displayListSummary: SceneViewSummary.SceneViewSummary;
   }
 > = M.defineMapper(
   M.read(

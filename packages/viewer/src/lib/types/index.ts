@@ -4,7 +4,6 @@
 import * as Animation from './animation';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
-import * as DisplayListSummary from './displayListSummary';
 import * as Events from './events';
 import * as Flags from './flags';
 import * as FlyTo from './flyToOptions';
@@ -12,6 +11,7 @@ import * as FrameCamera from './frameCamera';
 import * as Interactions from './interactions';
 import * as LoadableResource from './loadableResource';
 import * as SceneViewStateIdentifier from './sceneViewStateIdentifier';
+import * as SceneViewSummary from './sceneViewSummary';
 
 export * from './depthBuffer';
 export * from './entities';
@@ -30,7 +30,6 @@ export {
   Animation,
   ClippingPlanes,
   CrossSectioning,
-  DisplayListSummary,
   Events,
   Flags,
   FlyTo,
@@ -38,4 +37,5 @@ export {
   Interactions,
   LoadableResource,
   SceneViewStateIdentifier,
+  SceneViewSummary,
 };
