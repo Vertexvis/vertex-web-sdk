@@ -1,3 +1,5 @@
+import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import { Frame, SceneViewSummary } from '..';
 
@@ -52,20 +54,18 @@ function copyWithValidSummary(frame: Frame, count: number): Frame {
   return copyWithSummary(frame, {
     selectedVisibleSummary: {
       count,
+      boundingBox: BoundingBox.create(Vector3.create(), Vector3.right()),
     },
     visibleSummary: {
       count,
+      boundingBox: BoundingBox.create(Vector3.create(), Vector3.right()),
     },
   });
 }
 
 function copyWithInvalidSummary(frame: Frame): Frame {
   return copyWithSummary(frame, {
-    selectedVisibleSummary: {
-      count: -1,
-    },
-    visibleSummary: {
-      count: -1,
-    },
+    selectedVisibleSummary: { count: -1 },
+    visibleSummary: { count: -1 },
   });
 }

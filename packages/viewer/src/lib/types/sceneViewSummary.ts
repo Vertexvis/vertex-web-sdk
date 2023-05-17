@@ -31,7 +31,7 @@ export function copySummaryIfInvalid(current: Frame, previous?: Frame): Frame {
 
 function isInvalid(summary: SceneViewSummary): boolean {
   return (
-    summary.selectedVisibleSummary.count === -1 ||
-    summary.visibleSummary.count === -1
+    summary.visibleSummary?.boundingBox == null ||
+    summary.selectedVisibleSummary?.boundingBox == null
   );
 }
