@@ -77,7 +77,7 @@ import {
   StencilBufferManager,
   Viewport,
 } from '../../lib/types';
-import { Frame } from '../../lib/types/frame';
+import { Frame, FrameScene } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
   getElementBackgroundColor,
