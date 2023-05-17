@@ -11,6 +11,7 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { Events } from '../../lib/types';
 import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 
@@ -145,16 +146,20 @@ export class SceneTreeTableCell {
 
   private hoverListener?: Disposable;
 
+  private longPressTimer?: number;
+
   public componentDidLoad(): void {
     this.hoverListener = this.hoverController?.stateChanged((id?: string) => {
       this.hovered = id === this.node?.id?.hex;
     });
 
     this.cellLoaded.emit();
+    this.clearLongPressTimer();
   }
 
   public disconnectedCallback(): void {
     this.hoverListener?.dispose();
+    this.clearLongPressTimer();
   }
 
   public componentWillRender(): void {
@@ -172,6 +177,7 @@ export class SceneTreeTableCell {
         onPointerEnter={this.handleCellPointerEnter}
         onPointerLeave={this.handleCellPointerLeave}
         onPointerUp={this.handleCellPointerUp}
+        onPointerDown={this.handleCellPointerDown}
       >
         <div class="wrapper">
           <div class="no-shrink">
@@ -254,7 +260,12 @@ export class SceneTreeTableCell {
   };
 
   private handleCellPointerUp = (event: PointerEvent): void => {
-    if (!this.isScrolling && this.node != null && this.tree != null) {
+    if (
+      !this.isScrolling &&
+      this.node != null &&
+      this.tree != null &&
+      this.longPressTimer != null
+    ) {
       if (this.selectionHandler != null) {
         this.selectionHandler(event, this.node, this.tree);
       } else {
@@ -262,6 +273,11 @@ export class SceneTreeTableCell {
       }
       this.selectionToggled.emit({ node: this.node, originalEvent: event });
     }
+    this.clearLongPressTimer();
+  };
+
+  private handleCellPointerDown = (event: PointerEvent): void => {
+    this.restartLongPressTimer();
   };
 
   private toggleExpansion = (event: PointerEvent): void => {
@@ -324,4 +340,18 @@ export class SceneTreeTableCell {
   ): void => {
     tree.toggleExpandItem(node);
   };
+
+  private clearLongPressTimer(): void {
+    if (this.longPressTimer != null) {
+      window.clearTimeout(this.longPressTimer);
+    }
+    this.longPressTimer = undefined;
+  }
+
+  private restartLongPressTimer(): void {
+    this.clearLongPressTimer();
+    this.longPressTimer = window.setTimeout(() => {
+      this.clearLongPressTimer();
+    }, Events.defaultEventConfig.longPressThreshold);
+  }
 }

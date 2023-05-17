@@ -2,6 +2,7 @@
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { Async } from '@vertexvis/utils';
 import Chance from 'chance';
 
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
@@ -10,6 +11,10 @@ import { SceneTreeTableCell } from './scene-tree-table-cell';
 const random = new Chance();
 
 describe('<vertex-scene-tree-table-cell>', () => {
+  const pointerDownEvent = new MouseEvent('pointerdown', {
+    button: 0,
+  });
+
   it('renders empty element if node is undefined', async () => {
     const { cell } = await newComponentSpec({
       html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
@@ -206,9 +211,31 @@ describe('<vertex-scene-tree-table-cell>', () => {
     (cell as any).tree = tree;
 
     const originalEvent = new MouseEvent('pointerup', { button: 0 });
+    cell.dispatchEvent(pointerDownEvent);
     cell.dispatchEvent(originalEvent);
 
     expect(tree.selectItem).toHaveBeenCalled();
+  });
+
+  it('does not select cell on long press', async () => {
+    const node = createNode({ selected: false });
+    const { cell } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>
+      `,
+      node,
+    });
+
+    const tree = { selectItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cell as any).tree = tree;
+
+    const originalEvent = new MouseEvent('pointerup', { button: 0 });
+    cell.dispatchEvent(pointerDownEvent);
+    await Async.delay(550); // mock a long press on mobile
+    cell.dispatchEvent(originalEvent);
+
+    expect(tree.selectItem).not.toHaveBeenCalled();
   });
 
   it('supports custom selection handling', async () => {
@@ -232,6 +259,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
+    cell.dispatchEvent(pointerDownEvent);
     const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       altKey: true,
@@ -254,6 +282,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
+    cell.dispatchEvent(pointerDownEvent);
     const originalEvent = new MouseEvent('pointerup', {
       button: 0,
       metaKey: true,
@@ -280,6 +309,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
+    cell.dispatchEvent(pointerDownEvent);
     cell.dispatchEvent(
       new MouseEvent('pointerup', { button: 0, ctrlKey: true })
     );
@@ -303,6 +333,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
+    cell.dispatchEvent(pointerDownEvent);
     cell.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
 
     expect(tree.selectItem).toHaveBeenCalledWith(
@@ -323,6 +354,8 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const tree = { deselectItem: jest.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
+
+    cell.dispatchEvent(pointerDownEvent);
 
     cell.dispatchEvent(
       new MouseEvent('pointerup', { button: 0, metaKey: true })
@@ -348,6 +381,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       button: 0,
       ctrlKey: true,
     });
+    cell.dispatchEvent(pointerDownEvent);
     cell.dispatchEvent(originalEvent);
 
     expect(tree.deselectItem).toHaveBeenCalled();
