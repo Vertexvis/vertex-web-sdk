@@ -5,14 +5,12 @@ export interface ItemSetSummary {
   boundingBox?: BoundingBox.BoundingBox;
 }
 
-export interface DisplayListSummary {
+export interface SceneViewSummary {
   visibleSummary: ItemSetSummary;
   selectedVisibleSummary: ItemSetSummary;
 }
 
-export function create(
-  data: Partial<DisplayListSummary> = {}
-): DisplayListSummary {
+export function create(data: Partial<SceneViewSummary> = {}): SceneViewSummary {
   return {
     visibleSummary: data.visibleSummary ?? { count: 0 },
     selectedVisibleSummary: data.selectedVisibleSummary ?? { count: 0 },

@@ -15,10 +15,10 @@ import { constrainViewVector } from '../rendering/vectors';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
-import * as DisplayListSummary from './displayListSummary';
 import { FeatureMap } from './featureMap';
 import * as FrameCamera from './frameCamera';
 import { Orientation } from './orientation';
+import * as SceneViewSummary from './sceneViewSummary';
 
 export class Frame {
   private cachedDepthBuffer?: Promise<DepthBuffer | undefined>;
@@ -123,7 +123,7 @@ export class FrameScene {
     public readonly crossSection: CrossSectioning.CrossSectioning,
     public readonly worldOrientation: Orientation,
     public readonly hasChanged: boolean,
-    public readonly displayListSummary: DisplayListSummary.DisplayListSummary
+    public readonly sceneViewSummary: SceneViewSummary.SceneViewSummary
   ) {}
 }
 
