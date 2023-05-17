@@ -159,6 +159,7 @@ export class SceneTreeTableCell {
 
   public disconnectedCallback(): void {
     this.hoverListener?.dispose();
+    this.clearLongPressTimer();
   }
 
   public componentWillRender(): void {
