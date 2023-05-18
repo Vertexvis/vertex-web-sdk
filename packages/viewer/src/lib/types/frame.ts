@@ -125,6 +125,31 @@ export class FrameScene {
     public readonly hasChanged: boolean,
     public readonly sceneViewSummary: SceneViewSummary.SceneViewSummary
   ) {}
+
+  public copy({
+    camera,
+    boundingBox,
+    crossSection,
+    worldOrientation,
+    hasChanged,
+    sceneViewSummary,
+  }: Partial<{
+    camera: FrameCameraBase;
+    boundingBox: BoundingBox.BoundingBox;
+    crossSection: CrossSectioning.CrossSectioning;
+    worldOrientation: Orientation;
+    hasChanged: boolean;
+    sceneViewSummary: SceneViewSummary.SceneViewSummary;
+  }>): FrameScene {
+    return new FrameScene(
+      camera ?? this.camera,
+      boundingBox ?? this.boundingBox,
+      crossSection ?? this.crossSection,
+      worldOrientation ?? this.worldOrientation,
+      hasChanged ?? this.hasChanged,
+      sceneViewSummary ?? this.sceneViewSummary
+    );
+  }
 }
 
 interface FrameCameraMatrices {

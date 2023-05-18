@@ -73,6 +73,7 @@ import { ViewerStream } from '../../lib/stream/stream';
 import {
   FrameCamera,
   Orientation,
+  SceneViewSummary,
   StencilBufferManager,
   Viewport,
 } from '../../lib/types';
@@ -1101,7 +1102,10 @@ export class Viewer {
       const canvas = this.canvasElement.getContext('2d');
       if (canvas != null) {
         const previousFrame = this.frame;
-        this.frame = frame;
+        this.frame = SceneViewSummary.copySummaryIfInvalid(
+          frame,
+          previousFrame
+        );
 
         this.updateInteractionApi(previousFrame);
 
