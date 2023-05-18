@@ -64,8 +64,5 @@ function copyWithValidSummary(frame: Frame, count: number): Frame {
 }
 
 function copyWithInvalidSummary(frame: Frame): Frame {
-  return copyWithSummary(frame, {
-    selectedVisibleSummary: { count: -1 },
-    visibleSummary: { count: -1 },
-  });
+  return copyWithSummary(frame, {});
 }

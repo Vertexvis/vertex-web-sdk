@@ -8,14 +8,14 @@ export interface ItemSetSummary {
 }
 
 export interface SceneViewSummary {
-  visibleSummary: ItemSetSummary;
-  selectedVisibleSummary: ItemSetSummary;
+  visibleSummary?: ItemSetSummary;
+  selectedVisibleSummary?: ItemSetSummary;
 }
 
 export function create(data: Partial<SceneViewSummary> = {}): SceneViewSummary {
   return {
-    visibleSummary: data.visibleSummary ?? { count: 0 },
-    selectedVisibleSummary: data.selectedVisibleSummary ?? { count: 0 },
+    visibleSummary: data.visibleSummary,
+    selectedVisibleSummary: data.selectedVisibleSummary,
   };
 }
 
@@ -30,8 +30,5 @@ export function copySummaryIfInvalid(current: Frame, previous?: Frame): Frame {
 }
 
 function isInvalid(summary: SceneViewSummary): boolean {
-  return (
-    summary.visibleSummary?.boundingBox == null ||
-    summary.selectedVisibleSummary?.boundingBox == null
-  );
+  return summary.visibleSummary == null;
 }
