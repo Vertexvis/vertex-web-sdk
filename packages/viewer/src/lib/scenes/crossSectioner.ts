@@ -23,7 +23,16 @@ export class CrossSectioner {
     vertexvis.protobuf.stream.IUpdateCrossSectioningResult | undefined
   > {
     const res = await this.stream.updateCrossSectioning(
-      { crossSectioning },
+      {
+        crossSectioning: {
+          sectionPlanes: crossSectioning.sectionPlanes,
+          highlightColor: crossSectioning.highlightColor,
+          lineWidth:
+            crossSectioning?.lineWidth != null
+              ? { value: crossSectioning.lineWidth }
+              : null,
+        },
+      },
       true
     );
 

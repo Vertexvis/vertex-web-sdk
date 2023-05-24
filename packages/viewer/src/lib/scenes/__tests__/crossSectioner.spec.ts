@@ -33,7 +33,29 @@ describe(CrossSectioner, () => {
 
       expect(api.updateCrossSectioning).toHaveBeenCalledWith(
         expect.objectContaining({
-          crossSectioning: updatedSectioning,
+          crossSectioning: {
+            ...updatedSectioning,
+            lineWidth: null,
+          },
+        }),
+        true
+      );
+    });
+
+    it('updates cross sectioning line width', () => {
+      crossSectioner.update({
+        ...updatedSectioning,
+        lineWidth: 0.5,
+      });
+
+      expect(api.updateCrossSectioning).toHaveBeenCalledWith(
+        expect.objectContaining({
+          crossSectioning: {
+            ...updatedSectioning,
+            lineWidth: {
+              value: 0.5,
+            },
+          },
         }),
         true
       );

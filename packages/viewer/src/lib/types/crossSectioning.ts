@@ -9,11 +9,13 @@ export interface SectionPlane {
 export interface CrossSectioning {
   sectionPlanes: Array<SectionPlane>;
   highlightColor?: Color.Color;
+  lineWidth?: number;
 }
 
 export function create(data: Partial<CrossSectioning> = {}): CrossSectioning {
   return {
     sectionPlanes: data.sectionPlanes || [],
     highlightColor: data.highlightColor,
+    lineWidth: data.lineWidth,
   };
 }
