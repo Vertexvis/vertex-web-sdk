@@ -28,8 +28,8 @@ describe(CrossSectioner, () => {
       updateCrossSectioning: 'sandy',
     });
 
-    it('updates cross sectioning', () => {
-      crossSectioner.update(updatedSectioning);
+    it('updates cross sectioning', async () => {
+      await crossSectioner.update(updatedSectioning);
 
       expect(api.updateCrossSectioning).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -42,8 +42,8 @@ describe(CrossSectioner, () => {
       );
     });
 
-    it('updates cross sectioning line width', () => {
-      crossSectioner.update({
+    it('updates cross sectioning line width', async () => {
+      await crossSectioner.update({
         ...updatedSectioning,
         lineWidth: 0.5,
       });
