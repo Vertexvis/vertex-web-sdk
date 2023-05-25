@@ -28,12 +28,34 @@ describe(CrossSectioner, () => {
       updateCrossSectioning: 'sandy',
     });
 
-    it('updates cross sectioning', () => {
-      crossSectioner.update(updatedSectioning);
+    it('updates cross sectioning', async () => {
+      await crossSectioner.update(updatedSectioning);
 
       expect(api.updateCrossSectioning).toHaveBeenCalledWith(
         expect.objectContaining({
-          crossSectioning: updatedSectioning,
+          crossSectioning: {
+            ...updatedSectioning,
+            lineWidth: null,
+          },
+        }),
+        true
+      );
+    });
+
+    it('updates cross sectioning line width', async () => {
+      await crossSectioner.update({
+        ...updatedSectioning,
+        lineWidth: 0.5,
+      });
+
+      expect(api.updateCrossSectioning).toHaveBeenCalledWith(
+        expect.objectContaining({
+          crossSectioning: {
+            ...updatedSectioning,
+            lineWidth: {
+              value: 0.5,
+            },
+          },
         }),
         true
       );
