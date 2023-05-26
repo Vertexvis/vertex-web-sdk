@@ -1325,15 +1325,10 @@ export class Viewer {
     });
   }
 
-  private createScene(): Scene {
-    if (this.stateMap.streamState.type !== 'connected') {
-      throw new IllegalStateError(
-        'Cannot create scene. Viewer stream is not connected.'
-      );
-    }
+  private async createScene(): Promise<Scene> {
+    const state = await this.waitForConnectedState();
 
-    const { frame, sceneId, sceneViewId, worldOrientation } =
-      this.stateMap.streamState;
+    const { frame, sceneId, sceneViewId, worldOrientation } = state;
 
     return new Scene(
       this.getStream(),
@@ -1499,6 +1494,25 @@ export class Viewer {
       }
     }
     return this.deviceId;
+  }
+
+  private async waitForConnectedState(): Promise<Connected> {
+    if (this.stateMap.streamState.type !== 'connected') {
+      return new Promise<Connected>((resolve, reject) => {
+        const disposable = this.getStream().onStateChanged((state) => {
+          if (state.type === 'connected') {
+            resolve(state);
+          }
+        });
+
+        setTimeout(() => {
+          disposable.dispose();
+          reject(new Error('Timed out waiting for connected state.'));
+        }, 15000);
+      });
+    }
+
+    return this.stateMap.streamState;
   }
 }
 

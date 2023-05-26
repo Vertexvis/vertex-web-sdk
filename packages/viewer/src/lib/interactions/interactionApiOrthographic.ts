@@ -238,7 +238,7 @@ export class InteractionApiOrthographic extends InteractionApi {
     t: CameraTransform<OrthographicCamera>
   ): Promise<void> {
     if (this.isInteracting()) {
-      const scene = this.getScene();
+      const scene = await this.getScene();
       const viewport = this.getViewport();
       const frame = this.getFrame();
       const depthBuffer = await frame?.depthBuffer();

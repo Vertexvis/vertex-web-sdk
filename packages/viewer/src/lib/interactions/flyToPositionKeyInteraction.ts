@@ -7,7 +7,7 @@ import { FrameCamera } from '../types';
 import { KeyInteraction } from './keyInteraction';
 import { TapEventDetails } from './tapEventDetails';
 
-type SceneProvider = () => Scene;
+type SceneProvider = () => Promise<Scene>;
 
 export class FlyToPositionKeyInteraction
   implements KeyInteraction<TapEventDetails>
@@ -37,7 +37,7 @@ export class FlyToPositionKeyInteraction
       hitResult.hitItems.hits.length > 0 &&
       hitResult.hitItems.hits[0].hitPoint != null
     ) {
-      const camera = this.sceneProvider().camera();
+      const camera = (await this.sceneProvider()).camera();
       const hit = hitResult.hitItems.hits[0];
 
       if (
