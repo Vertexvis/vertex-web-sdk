@@ -79,6 +79,7 @@ import {
 import { Frame } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
+  DEFAULT_VIEWER_SCENE_WAIT_MS,
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
@@ -1507,7 +1508,7 @@ export class Viewer {
         setTimeout(() => {
           disposable.dispose();
           reject(new Error('Timed out waiting for connected state.'));
-        }, 15000);
+        }, DEFAULT_VIEWER_SCENE_WAIT_MS);
       });
     }
 
