@@ -18,6 +18,7 @@ import { random } from '../../testing';
 import { makeImagePng } from '../../testing/fixtures';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
 import {
+  gracefulReconnect,
   key1,
   key2,
   loadViewerStreamKey,
@@ -743,6 +744,34 @@ describe('vertex-viewer', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('scene', () => {
+    it('handles reconnect behavior', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
+
+      const result = await gracefulReconnect(
+        { viewer, stream, ws },
+        {
+          beforeReconnect: async () => await viewer.scene(),
+        }
+      );
+
+      expect(result).toBeDefined();
     });
   });
 
