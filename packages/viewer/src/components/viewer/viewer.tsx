@@ -1498,6 +1498,9 @@ export class Viewer {
 
   private async waitForConnectedState(): Promise<Connected> {
     if (this.stateMap.streamState.type !== 'connected') {
+      console.debug(
+        'Stream was not in a connected state. Waiting for successful connection.'
+      );
       return new Promise<Connected>((resolve, reject) => {
         const disposable = this.getStream().onStateChanged((state) => {
           if (state.type === 'connected') {
