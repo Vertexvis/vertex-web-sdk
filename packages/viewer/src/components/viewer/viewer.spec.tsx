@@ -467,6 +467,10 @@ describe('vertex-viewer', () => {
     });
 
     it('emits an interaction finished event on last interaction', async () => {
+      let interactionEndedPromiseResolve: VoidFunction;
+      const interactionEndedPromise = new Promise<void>((resolve) => {
+        interactionEndedPromiseResolve = resolve;
+      });
       const onInteractionEnded = jest.fn();
 
       const { stream, ws } = makeViewerStream();
@@ -476,6 +480,9 @@ describe('vertex-viewer', () => {
       await loadViewerStreamKey(key1, { viewer, stream, ws });
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
+      viewer.addEventListener('interactionFinished', () =>
+        interactionEndedPromiseResolve()
+      );
       viewer.addEventListener('interactionFinished', onInteractionEnded);
 
       canvas?.dispatchEvent(
@@ -492,7 +499,12 @@ describe('vertex-viewer', () => {
         new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
       );
 
-      expect(onInteractionEnded).toHaveBeenCalled();
+      // Wait for `endInteraction` to fire the `interactionFinished` event.
+      // `endInteraction` will wait for any `beginInteraction` to finish
+      // prior to processing the call.
+      return interactionEndedPromise.then(() => {
+        expect(onInteractionEnded).toHaveBeenCalled();
+      });
     });
   });
 

@@ -56,6 +56,7 @@ export interface ZoomData {
  */
 export abstract class InteractionApi {
   protected currentCamera?: Camera;
+  private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
@@ -204,7 +205,9 @@ export abstract class InteractionApi {
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
       this.interactionStartedEmitter.emit();
-      this.currentCamera = (await this.getScene()).camera();
+      this.sceneLoadingPromise = this.getScene();
+      this.currentCamera = (await this.sceneLoadingPromise).camera();
+      this.sceneLoadingPromise = undefined;
       await this.stream.beginInteraction();
     }
   }
@@ -546,6 +549,8 @@ export abstract class InteractionApi {
    * Marks the end of an interaction.
    */
   public async endInteraction(): Promise<void> {
+    await this.sceneLoadingPromise;
+
     if (this.isInteracting()) {
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;

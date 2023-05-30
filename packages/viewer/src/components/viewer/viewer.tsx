@@ -29,7 +29,6 @@ import { cssCursor } from '../../lib/dom';
 import { Environment } from '../../lib/environment';
 import {
   ComponentInitializationError,
-  IllegalStateError,
   InteractionHandlerError,
   ViewerInitializationError,
 } from '../../lib/errors';
