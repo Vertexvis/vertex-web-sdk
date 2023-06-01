@@ -23,7 +23,7 @@ import {
 } from '../types';
 import { TapEventDetails, TapEventKeys } from './tapEventDetails';
 
-export type SceneProvider = () => Scene;
+export type SceneProvider = () => Promise<Scene>;
 
 export type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
@@ -56,6 +56,7 @@ export interface ZoomData {
  */
 export abstract class InteractionApi {
   protected currentCamera?: Camera;
+  private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
@@ -204,7 +205,9 @@ export abstract class InteractionApi {
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
       this.interactionStartedEmitter.emit();
-      this.currentCamera = this.getScene().camera();
+      this.sceneLoadingPromise = this.getScene();
+      this.currentCamera = (await this.sceneLoadingPromise).camera();
+      this.sceneLoadingPromise = undefined;
       await this.stream.beginInteraction();
     }
   }
@@ -218,7 +221,7 @@ export abstract class InteractionApi {
    */
   public async transformCamera(t: CameraTransform): Promise<void> {
     if (this.isInteracting()) {
-      const scene = this.getScene();
+      const scene = await this.getScene();
       const viewport = this.getViewport();
       const frame = this.getFrame();
       const depthBuffer = await frame?.depthBuffer();
@@ -346,7 +349,7 @@ export abstract class InteractionApi {
    * new image for the updated scene.
    */
   public async viewAll(): Promise<void> {
-    await this.getScene().camera().viewAll().render();
+    await (await this.getScene()).camera().viewAll().render();
   }
 
   /**
@@ -546,6 +549,8 @@ export abstract class InteractionApi {
    * Marks the end of an interaction.
    */
   public async endInteraction(): Promise<void> {
+    await this.sceneLoadingPromise;
+
     if (this.isInteracting()) {
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
@@ -600,7 +605,7 @@ export abstract class InteractionApi {
   public async hitItems(
     pt: Point.Point
   ): Promise<vertexvis.protobuf.stream.IHit[]> {
-    const res = await this.getScene().raycaster().hitItems(pt);
+    const res = await (await this.getScene()).raycaster().hitItems(pt);
     return res?.hits ?? [];
   }
 

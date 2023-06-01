@@ -29,7 +29,6 @@ import { cssCursor } from '../../lib/dom';
 import { Environment } from '../../lib/environment';
 import {
   ComponentInitializationError,
-  IllegalStateError,
   InteractionHandlerError,
   ViewerInitializationError,
 } from '../../lib/errors';
@@ -80,6 +79,7 @@ import {
 import { Frame } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
+  DEFAULT_VIEWER_SCENE_WAIT_MS,
   getElementBackgroundColor,
   getElementBoundingClientRect,
 } from './utils';
@@ -1325,15 +1325,10 @@ export class Viewer {
     });
   }
 
-  private createScene(): Scene {
-    if (this.stateMap.streamState.type !== 'connected') {
-      throw new IllegalStateError(
-        'Cannot create scene. Viewer stream is not connected.'
-      );
-    }
+  private async createScene(): Promise<Scene> {
+    const state = await this.waitForConnectedState();
 
-    const { frame, sceneId, sceneViewId, worldOrientation } =
-      this.stateMap.streamState;
+    const { frame, sceneId, sceneViewId, worldOrientation } = state;
 
     return new Scene(
       this.getStream(),
@@ -1499,6 +1494,28 @@ export class Viewer {
       }
     }
     return this.deviceId;
+  }
+
+  private async waitForConnectedState(): Promise<Connected> {
+    if (this.stateMap.streamState.type !== 'connected') {
+      console.debug(
+        'Stream was not in a connected state. Waiting for successful connection.'
+      );
+      return new Promise<Connected>((resolve, reject) => {
+        const disposable = this.getStream().onStateChanged((state) => {
+          if (state.type === 'connected') {
+            resolve(state);
+          }
+        });
+
+        setTimeout(() => {
+          disposable.dispose();
+          reject(new Error('Timed out waiting for connected state.'));
+        }, DEFAULT_VIEWER_SCENE_WAIT_MS);
+      });
+    }
+
+    return this.stateMap.streamState;
   }
 }
 

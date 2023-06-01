@@ -1,5 +1,7 @@
 import { Color } from '@vertexvis/utils';
 
+export const DEFAULT_VIEWER_SCENE_WAIT_MS = 15000;
+
 export function getElementBackgroundColor(
   element: HTMLElement
 ): Color.Color | undefined {

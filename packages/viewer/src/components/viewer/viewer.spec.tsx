@@ -18,6 +18,7 @@ import { random } from '../../testing';
 import { makeImagePng } from '../../testing/fixtures';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
 import {
+  gracefulReconnect,
   key1,
   key2,
   loadViewerStreamKey,
@@ -467,6 +468,10 @@ describe('vertex-viewer', () => {
     });
 
     it('emits an interaction finished event on last interaction', async () => {
+      let interactionEndedPromiseResolve: VoidFunction;
+      const interactionEndedPromise = new Promise<void>((resolve) => {
+        interactionEndedPromiseResolve = resolve;
+      });
       const onInteractionEnded = jest.fn();
 
       const { stream, ws } = makeViewerStream();
@@ -476,6 +481,9 @@ describe('vertex-viewer', () => {
       await loadViewerStreamKey(key1, { viewer, stream, ws });
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
+      viewer.addEventListener('interactionFinished', () =>
+        interactionEndedPromiseResolve()
+      );
       viewer.addEventListener('interactionFinished', onInteractionEnded);
 
       canvas?.dispatchEvent(
@@ -492,7 +500,12 @@ describe('vertex-viewer', () => {
         new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
       );
 
-      expect(onInteractionEnded).toHaveBeenCalled();
+      // Wait for `endInteraction` to fire the `interactionFinished` event.
+      // `endInteraction` will wait for any `beginInteraction` to finish
+      // prior to processing the call.
+      return interactionEndedPromise.then(() => {
+        expect(onInteractionEnded).toHaveBeenCalled();
+      });
     });
   });
 
@@ -731,6 +744,34 @@ describe('vertex-viewer', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('scene', () => {
+    it('handles reconnect behavior', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
+
+      const result = await gracefulReconnect(
+        { viewer, stream, ws },
+        {
+          beforeReconnect: async () => await viewer.scene(),
+        }
+      );
+
+      expect(result).toBeDefined();
     });
   });
 

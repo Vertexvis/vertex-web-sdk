@@ -10,7 +10,7 @@ import { ViewerStream } from '../lib/stream/stream';
 import * as Fixtures from './fixtures';
 import { random } from './random';
 
-interface LoadViewerStreamKeyCtx {
+interface ViewerStreamOperationCtx {
   stream: ViewerStream;
   ws: WebSocketClientMock;
   viewer: HTMLVertexViewerElement;
@@ -36,7 +36,7 @@ export function makeViewerStream(): {
 
 export async function loadViewerStreamKey(
   urn: string,
-  { viewer, stream, ws }: LoadViewerStreamKeyCtx,
+  { viewer, stream, ws }: ViewerStreamOperationCtx,
   {
     token = random.string({ alpha: true }),
     beforeConnected,
@@ -73,6 +73,42 @@ export async function loadViewerStreamKey(
     )
   );
   await loaded;
+}
+
+interface GracefulReconnectOptions<T = void> {
+  beforeReconnect?: () => Promise<T>;
+}
+
+export async function gracefulReconnect<T = void>(
+  { viewer, stream, ws }: ViewerStreamOperationCtx,
+  { beforeReconnect }: GracefulReconnectOptions<T> = {}
+): Promise<T | undefined> {
+  jest
+    .spyOn(stream, 'reconnect')
+    .mockResolvedValue(StreamFixtures.Responses.reconnect().response);
+  jest
+    .spyOn(stream, 'syncTime')
+    .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
+
+  const connecting = stream.stateChanged.onceWhen(
+    (s) => s.type === 'reconnecting'
+  );
+
+  ws.receiveMessage(encode(StreamFixtures.Requests.gracefulReconnect()));
+  const result = await beforeReconnect?.();
+
+  await connecting;
+  await Async.delay(10);
+
+  ws.receiveMessage(
+    encode(
+      StreamFixtures.Requests.drawFrame({
+        payload: Fixtures.drawFramePayloadPerspective,
+      })
+    )
+  );
+
+  return result;
 }
 
 export function receiveFrame(
