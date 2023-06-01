@@ -412,10 +412,6 @@ export class SceneTreeController {
     }
 
     const { connection } = this.state;
-    if (connection.type === 'connected') {
-      connection.subscription.dispose();
-    }
-
     this.updateState({
       connection: {
         type: 'disconnected',
