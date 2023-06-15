@@ -228,6 +228,11 @@ export class Viewer {
   @Prop() public experimentalGhostingOpacity = 0;
 
   /**
+   * Specifies the opacity, between 0 and 1, for a phantom feature, where 0 is completely hidden and 1 is completely visible.
+   */
+  @Prop() public phantomOpacity = 0.5;
+
+  /**
    * Specifies whether to use the default lights for the scene. When false, default
    * lights are used. When true, no default lights are used, and the lights must
    * be specified separately.
@@ -746,6 +751,11 @@ export class Viewer {
    */
   @Watch('experimentalGhostingOpacity')
   protected handleExperimentalGhostingOpacityChanged(): void {
+    this.updateStreamAttributes();
+  }
+
+  @Watch('phantomOpacity')
+  protected handlePhantomOpacityChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -1376,6 +1386,7 @@ export class Viewer {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalGhosting: this.experimentalGhostingOpacity,
+      phantom: this.phantomOpacity,
       noDefaultLights: this.noDefaultLights,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,

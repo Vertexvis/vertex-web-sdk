@@ -37,6 +37,15 @@ export interface ClearTransformOperation {
   cascade?: boolean;
 }
 
+export interface ChangePhantomOperation {
+  type: 'change-phantom';
+  phantomState?: boolean;
+}
+
+interface ClearPhantomOperation {
+  type: 'clear-phantom';
+}
+
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
@@ -45,7 +54,9 @@ export type ItemOperation =
   | ChangeMaterialOperation
   | ClearItemOperation
   | TransformOperation
-  | ClearTransformOperation;
+  | ClearTransformOperation
+  | ChangePhantomOperation
+  | ClearPhantomOperation;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
@@ -55,6 +66,8 @@ export interface SceneItemOperations<T> {
   deselect(): T;
   clearMaterialOverrides(): T;
   clearTransforms(): T;
+  setPhantom(phantomState?: boolean): T;
+  clearPhantom(): T;
 }
 
 /**
@@ -120,6 +133,18 @@ export class SceneOperationBuilder
   public clearTransforms(cascade = true): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'clear-transform', cascade }])
+    );
+  }
+
+  public setPhantom(phantomState?: boolean): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'change-phantom', phantomState }])
+    );
+  }
+
+  public clearPhantom(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'clear-phantom' }])
     );
   }
 }

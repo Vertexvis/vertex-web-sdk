@@ -62,4 +62,27 @@ describe(SceneOperationBuilder, () => {
 
     expect(definitions).toEqual([{ type: 'clear-transform', cascade: true }]);
   });
+
+  it('creates a change phantom operation with phantomState parameter', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.setPhantom(true).build();
+
+    expect(definitions).toEqual([
+      { type: 'change-phantom', phantomState: true },
+    ]);
+  });
+
+  it('creates a change phantom operation without parameter', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.setPhantom().build();
+
+    expect(definitions).toEqual([{ type: 'change-phantom' }]);
+  });
+
+  it('creates a clear phantom operation', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.clearPhantom().build();
+
+    expect(definitions).toEqual([{ type: 'clear-phantom' }]);
+  });
 });

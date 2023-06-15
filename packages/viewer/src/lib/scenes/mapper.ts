@@ -275,6 +275,14 @@ function buildOperationTypes(
         return {
           changeSelection: { selected: false },
         };
+      case 'change-phantom':
+        return {
+          changePhantom: { phantom: op.phantomState ?? true },
+        };
+      case 'clear-phantom':
+        return {
+          changePhantom: { phantom: false },
+        };
       default:
         return {};
     }
