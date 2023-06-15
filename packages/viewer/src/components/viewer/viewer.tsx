@@ -230,7 +230,7 @@ export class Viewer {
   /**
    * Specifies the opacity, between 0 and 1, for a phantom feature, where 0 is completely hidden and 1 is completely visible.
    */
-  @Prop() public phantomOpacity = 0.5;
+  @Prop() public phantomOpacity = 0.1;
 
   /**
    * Specifies whether to use the default lights for the scene. When false, default
@@ -1386,7 +1386,7 @@ export class Viewer {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalGhosting: this.experimentalGhostingOpacity,
-      phantom: this.phantomOpacity,
+      phantomOpacity: this.phantomOpacity,
       noDefaultLights: this.noDefaultLights,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,

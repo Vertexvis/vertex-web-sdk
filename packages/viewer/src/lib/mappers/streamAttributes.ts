@@ -53,7 +53,7 @@ const toPbExperimentalGhosting: M.Func<
   (attr) => attr
 );
 
-const toPbPhantom: M.Func<
+const toPbPhantomOpacity: M.Func<
   number | undefined,
   vertexvis.protobuf.stream.IPhantomAttributes
 > = M.defineMapper(
@@ -131,7 +131,7 @@ export const toPbStreamAttributes: M.Func<
   M.read(
     M.mapProp('depthBuffers', toPbFrameType),
     M.mapProp('experimentalGhosting', toPbExperimentalGhosting),
-    M.mapProp('phantom', toPbPhantom),
+    M.mapProp('phantomOpacity', toPbPhantomOpacity),
     M.mapProp('noDefaultLights', toPbNoDefaultLights),
     M.mapProp('featureLines', toPbFeatureLines),
     M.mapProp('featureHighlighting', toPbFeatureHighlight),
