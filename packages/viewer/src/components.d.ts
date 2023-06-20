@@ -31,6 +31,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  PhantomOptions,
   SelectionHighlightingOptions,
 } from './interfaces';
 import { Frame, FrameCameraBase } from './lib/types/frame';
@@ -483,9 +484,9 @@ export namespace Components {
      */
     noDefaultLights: boolean;
     /**
-     * Specifies the opacity, between 0 and 1, for a phantom feature, where 0 is completely hidden and 1 is completely visible.
+     * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
      */
-    phantomOpacity: number;
+    phantom?: PhantomOptions;
     /**
      * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
      * @example
@@ -2010,9 +2011,9 @@ declare namespace LocalJSX {
      */
     onTokenExpired?: (event: VertexViewerCustomEvent<void>) => void;
     /**
-     * Specifies the opacity, between 0 and 1, for a phantom feature, where 0 is completely hidden and 1 is completely visible.
+     * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
      */
-    phantomOpacity?: number;
+    phantom?: PhantomOptions;
     /**
      * An optional value that will debounce frame updates when resizing this viewer element.
      */

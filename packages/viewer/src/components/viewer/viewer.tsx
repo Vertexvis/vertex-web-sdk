@@ -20,6 +20,7 @@ import {
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
+  PhantomOptions,
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
@@ -228,9 +229,11 @@ export class Viewer {
   @Prop() public experimentalGhostingOpacity = 0;
 
   /**
-   * Specifies the opacity, between 0 and 1, for a phantom feature, where 0 is completely hidden and 1 is completely visible.
+   * Specifies how phantom parts should appear.
+   * The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
    */
-  @Prop() public phantomOpacity = 0.1;
+  @Prop({ attribute: null })
+  public phantom?: PhantomOptions = { opacity: 0.1 };
 
   /**
    * Specifies whether to use the default lights for the scene. When false, default
@@ -754,8 +757,8 @@ export class Viewer {
     this.updateStreamAttributes();
   }
 
-  @Watch('phantomOpacity')
-  protected handlePhantomOpacityChanged(): void {
+  @Watch('phantom')
+  protected handlePhantomChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -1386,7 +1389,7 @@ export class Viewer {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalGhosting: this.experimentalGhostingOpacity,
-      phantomOpacity: this.phantomOpacity,
+      phantom: this.phantom,
       noDefaultLights: this.noDefaultLights,
       featureLines: this.featureLines,
       featureHighlighting: this.featureHighlighting,
