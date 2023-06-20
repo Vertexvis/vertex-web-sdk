@@ -229,7 +229,8 @@ describe(Scene, () => {
             .show(),
           op
             .where((q) => q.all())
-            .materialOverride(ColorMaterial.fromHex('#ff1122')),
+            .materialOverride(ColorMaterial.fromHex('#ff1122'))
+            .setPhantom(true),
         ])
         .execute();
 
@@ -318,6 +319,11 @@ describe(Scene, () => {
                     },
                     ns: ColorMaterial.defaultColor.glossiness,
                   },
+                },
+              },
+              {
+                changePhantom: {
+                  phantom: true,
                 },
               },
             ],

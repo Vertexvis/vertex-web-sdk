@@ -143,6 +143,20 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  public setPhantom(phantomState?: boolean): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.setPhantom(phantomState)
+    );
+  }
+
+  public clearPhantom(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearPhantom()
+    );
+  }
+
   public build(): QueryOperation {
     return {
       query: this.query,

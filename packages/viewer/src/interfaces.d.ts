@@ -22,6 +22,10 @@ export interface FeatureHighlightOptions {
   outline?: FeatureLineOptions;
 }
 
+export interface PhantomOptions {
+  opacity?: number;
+}
+
 export interface HTMLDomRendererPositionableElement {
   position: Vector3.Vector3;
   positionJson: string;
@@ -37,6 +41,7 @@ export interface HTMLDomRendererPositionableElement {
 export interface StreamAttributes {
   depthBuffers?: FrameType;
   experimentalGhosting?: number;
+  phantom?: PhantomOptions;
   noDefaultLights?: boolean;
   featureLines?: FeatureLineOptions;
   featureHighlighting?: FeatureHighlightOptions;
