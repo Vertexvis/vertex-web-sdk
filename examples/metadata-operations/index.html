@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
   <head>
-    <title>Phantom Parts</title>
+    <title>Metadata Operations</title>
 
     <!-- Live reload script -->
     <script src="http://localhost:35729/livereload.js?snipver=1"></script>
 
+    <link rel="stylesheet" type="text/css" href="styles.css" />
     <script type="module" src="main.js"></script>
 
     <link
@@ -20,35 +21,15 @@
       nomodule
       src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer.js"
     ></script>
-
-    <style>
-      html,
-      body {
-        font-family: Roboto, Arial, Helvetica, sans-serif;
-        width: 100%;
-        height: 85%;
-        padding: 0;
-        margin: 0;
-      }
-
-      .app {
-        display: flex;
-        width: 100%;
-        height: 100%;
-      }
-
-      #viewer {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
   </head>
   <body>
-    <h1>Instructions</h1>
-    <ul>
-      <li>Click a part to set as phantom.</li>
-      <li>Press 'r' to reset phantom state for all parts.</li>
-    </ul>
-    <vertex-viewer id="viewer" class="viewer"> </vertex-viewer>
+    <vertex-viewer id="viewer" class="viewer">
+      <vertex-viewer-toolbar data-viewer="viewer">
+        <input id="metadata-key" type="text" placeholder="Metadata Key" />
+        <input id="metadata-value" type="text" placeholder="Metadata Value" />
+        <button id="search-btn">Search</button>
+        <button id="clear-btn">Clear</button>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
   </body>
 </html>

@@ -1,23 +1,28 @@
-export async function loadViewerWithQueryParams(viewer) {
-  const clientId = readDefaultClientId();
-  const key = readDefaultStreamKey();
-  viewer.setAttribute('client-id', clientId);
-  await viewer.load(`urn:vertexvis:stream-key:${key}`);
+const DEFAULT_ENV = 'platprod';
+const DEFAULT_STREAM_KEY = 'ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4';
+
+export async function loadViewerWithQueryParams(
+  viewer,
+  { env, streamKey } = {
+    streamKey: getStreamKey() || DEFAULT_STREAM_KEY,
+    env: getEnvironment() || DEFAULT_ENV,
+  }
+) {
+  viewer.configEnv = env;
+  await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
 }
 
-export function readDefaultClientId() {
-  const urlParams = readUrlParams();
-
-  return urlParams.clientid || '';
+export function getStreamKey() {
+  const urlParams = getUrlPParams();
+  return urlParams.streamkey;
 }
 
-export function readDefaultStreamKey() {
-  const urlParams = readUrlParams();
-
-  return urlParams.streamkey || '';
+export function getEnvironment() {
+  const urlParams = getUrlPParams();
+  return urlParams.env;
 }
 
-function readUrlParams() {
+function getUrlPParams() {
   return window.location.search
     .slice(1, window.location.search.length)
     .split('&')

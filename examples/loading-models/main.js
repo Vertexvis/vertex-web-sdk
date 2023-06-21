@@ -1,5 +1,5 @@
-import { readDefaultStreamKey } from '../helpers.js';
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+import { getStreamKey } from '../helpers.js';
+import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.17.x/dist/esm/loader.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function main() {
   const viewer = document.querySelector('vertex-viewer');
-  const streamKey = readDefaultStreamKey();
+  const streamKey = getStreamKey();
 
   loadModelByStreamKey(viewer, streamKey);
 }

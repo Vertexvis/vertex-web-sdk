@@ -1,19 +1,23 @@
+import { loadViewerWithQueryParams } from '../helpers.js';
+
 window.addEventListener('DOMContentLoaded', () => {
-  main()
+  main();
 });
 
 async function main() {
   await window.customElements.whenDefined('vertex-viewer');
   const viewer = document.querySelector('vertex-viewer');
 
-  window.addEventListener("keydown", async (event) => {
+  await loadViewerWithQueryParams(viewer);
+
+  window.addEventListener('keydown', async (event) => {
     const scene = await viewer.scene();
 
     // press 'r' to reset phantom state
-    if ( event.key === 'r') {
-          await scene
-            .items((op) => op.where((q) => q.all()).clearPhantom())
-            .execute();
+    if (event.key === 'r') {
+      await scene
+        .items((op) => op.where((q) => q.all()).clearPhantom())
+        .execute();
     }
   });
 
@@ -29,9 +33,7 @@ async function main() {
 
       await scene
         .items((op) => [
-          op
-            .where((q) => q.withItemId(hit.itemId.hex))
-            .setPhantom(true),
+          op.where((q) => q.withItemId(hit.itemId.hex)).setPhantom(true),
         ])
         .execute();
     }
