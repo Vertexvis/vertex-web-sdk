@@ -1,3 +1,6 @@
+// These steps should be updated with the scene item IDs for each step in the
+// work instruction.
+
 const step1 = {
   operationSets: [
     {

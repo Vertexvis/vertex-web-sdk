@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
-<head>
+  <head>
     <title>Phantom Parts</title>
 
     <!-- Live reload script -->
@@ -9,16 +9,16 @@
     <script type="module" src="main.js"></script>
 
     <link
-            rel="stylesheet"
-            href="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.css"
+      rel="stylesheet"
+      href="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.css"
     />
     <script
-            type="module"
-            src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.esm.js"
+      type="module"
+      src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.esm.js"
     ></script>
     <script
-            nomodule
-            src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer.js"
+      nomodule
+      src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer.js"
     ></script>
 
     <style>
@@ -42,19 +42,13 @@
         height: 100%;
       }
     </style>
-</head>
-<body>
-
-<h1>Instructions</h1>
-<ul>
-    <li>Click a part to set as phantom.</li>
-    <li>Press 'r' to reset phantom state for all parts.</li>
-</ul>
-<vertex-viewer
-        id="viewer"
-        class="viewer"
-        src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
->
-</vertex-viewer>
-</body>
+  </head>
+  <body>
+    <h1>Instructions</h1>
+    <ul>
+      <li>Click a part to set as phantom.</li>
+      <li>Press 'r' to reset phantom state for all parts.</li>
+    </ul>
+    <vertex-viewer id="viewer" class="viewer"> </vertex-viewer>
+  </body>
 </html>

@@ -1,14 +1,18 @@
 import { TransformationDelta } from 'https://unpkg.com/@vertexvis/viewer@0.17.x/dist/esm/index.mjs';
+import { loadViewerWithQueryParams } from '../helpers.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-  main()
+  main();
 });
 
 async function main() {
   await window.customElements.whenDefined('vertex-viewer');
+  const viewer = document.querySelector('vertex-viewer');
+
+  await loadViewerWithQueryParams(viewer);
+
   let hit1 = undefined;
   let hit2 = undefined;
-  const viewer = document.querySelector('vertex-viewer');
 
   function resetIndicators() {
     const indicator = document.getElementById('indicator-1');
@@ -24,13 +28,13 @@ async function main() {
     hit2 = undefined;
   }
 
-  window.addEventListener("keydown", async (event) => {
+  window.addEventListener('keydown', async (event) => {
     const transformWidget = document.getElementById('transform-widget');
     // press 'a' to align
     if (event.key === 'a') {
       if (hit1 != null && hit2 != null) {
         const translationDelta = TransformationDelta.computeTransformationDelta(
-          hit1.hitNormal, 
+          hit1.hitNormal,
           hit1.hitPoint,
           hit2.hitNormal,
           hit2.hitPoint
@@ -40,10 +44,10 @@ async function main() {
         transformWidget.controller?.endTransform();
       }
     }
-    // press 'f' to flip normals 
-    else if ( event.key === 'f') {
+    // press 'f' to flip normals
+    else if (event.key === 'f') {
       const translationDelta = TransformationDelta.computeTransformationDelta(
-        hit2.hitNormal, 
+        hit2.hitNormal,
         hit2.hitPoint,
         hit2.hitNormal,
         hit2.hitPoint
@@ -54,12 +58,12 @@ async function main() {
       transformWidget.controller?.endTransform();
     }
 
-      // press 'r' to reload
-      else if ( event.key === 'r') {
-        window?.location.reload();
-      }
+    // press 'r' to reload
+    else if (event.key === 'r') {
+      window?.location.reload();
+    }
   });
-  
+
   viewer.addEventListener('tap', async (event) => {
     const { position } = event.detail;
     const scene = await viewer.scene();
@@ -68,31 +72,26 @@ async function main() {
     const result = await raycaster.hitItems(position);
 
     if (result.hits && result.hits.length == 0) {
-      await scene
-        .items((op) => op.where((q) => q.all()).deselect())
-        .execute();
+      await scene.items((op) => op.where((q) => q.all()).deselect()).execute();
 
-        resetIndicators();
+      resetIndicators();
     } else if (hit1 != null) {
       const indicator = document.getElementById('indicator-2');
       hit2 = result.hits[0];
       indicator.position = hit2.hitPoint;
       indicator.normal = hit2.hitNormal;
-    } 
-    else {
+    } else {
       const hit = result.hits[0];
 
       const indicator = document.getElementById('indicator-1');
-      indicator.position = hit.hitPoint
-      indicator.normal = hit.hitNormal
-      
+      indicator.position = hit.hitPoint;
+      indicator.normal = hit.hitNormal;
+
       hit1 = hit;
       await scene
         .items((op) => [
           op.where((q) => q.all()).deselect(),
-          op
-            .where((q) => q.withItemId(hit.itemId.hex))
-            .select(),
+          op.where((q) => q.withItemId(hit.itemId.hex)).select(),
         ])
         .execute();
     }
