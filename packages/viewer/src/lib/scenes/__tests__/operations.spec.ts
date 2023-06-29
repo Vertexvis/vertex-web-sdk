@@ -85,4 +85,27 @@ describe(SceneOperationBuilder, () => {
 
     expect(definitions).toEqual([{ type: 'clear-phantom' }]);
   });
+
+  it('creates a change end item operation with endItemState parameter', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.setEndItem(true).build();
+
+    expect(definitions).toEqual([
+      { type: 'change-end-item', endItemState: true },
+    ]);
+  });
+
+  it('creates a change end item operation without parameter', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.setEndItem().build();
+
+    expect(definitions).toEqual([{ type: 'change-end-item' }]);
+  });
+
+  it('creates a clear end item operation', () => {
+    const builder = new SceneOperationBuilder();
+    const definitions = builder.clearEndItem().build();
+
+    expect(definitions).toEqual([{ type: 'clear-end-item' }]);
+  });
 });
