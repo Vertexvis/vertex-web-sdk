@@ -26,6 +26,8 @@ async function main() {
     }
   });
 
+  let lastSelectedId;
+
   viewer.addEventListener('tap', async (event) => {
     const { position } = event.detail;
     const scene = await viewer.scene();
@@ -37,17 +39,33 @@ async function main() {
     if (result.hits && result.hits.length > 0) {
       const hit = result.hits[0];
 
-      await scene
-        .items((op) => [
-          op.where((q) => q.all()).deselect(),
-          op.where((q) => q.withItemId(hit.itemId.hex)).select(),
-        ])
-        .execute();
-    } else {
+      // If the shift key is pressed, select the item's parent
+      if (event.detail.shiftKey && hit.ancestors.length > 0) {
+        const ancestors = hit.ancestors.reverse();
+        const toSelectId =
+          ancestors[ancestors.findIndex((a) => a.itemId.hex === lastSelectedId) + 1]
+            .itemId.hex;
+
         await scene
-        .items((op) => [
-          op.where((q) => q.all()).deselect(),
-        ])
+            .items((op) => [
+              op.where((q) => q.all()).deselect(),
+              op.where((q) => q.withItemId(toSelectId)).select(),
+            ])
+            .execute();
+
+        lastSelectedId = toSelectId;
+      } else {
+        await scene
+            .items((op) => [
+              op.where((q) => q.all()).deselect(),
+              op.where((q) => q.withItemId(hit.itemId.hex)).select(),
+            ])
+            .execute();
+        lastSelectedId = hit.itemId.hex;
+      }
+    } else {
+      await scene
+        .items((op) => [op.where((q) => q.all()).deselect()])
         .execute();
     }
   });

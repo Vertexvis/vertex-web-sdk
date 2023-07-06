@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
     <title>End Items</title>
 
@@ -15,8 +15,8 @@
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
-            href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-            rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet"
     />
 
     <link rel="stylesheet" href="/dist/viewer/viewer.css" />
@@ -62,41 +62,28 @@
         height: 100%;
       }
     </style>
-
-    <script type="module">
-      window.addEventListener('DOMContentLoaded', () => {
-        main();
-      });
-
-      async function main() {
-        await window.customElements.whenDefined('vertex-viewer');
-
-        const viewer = document.getElementById('viewer');
-        const tree = document.getElementById('scene-tree');
-      }
-    </script>
 </head>
 
 <body>
-<h1>Instructions</h1>
+<h1>End Item Instructions</h1>
 <ul>
-    <li>Click a part to set as phantom.</li>
+    <li>Click a part to select it. Hold down shift while clicking a part to select its parent.</li>
     <li>Press 'e' to set the selected parts as end item. This works best when a subassembly is selected.</li>
     <li>Press 'r' to reset end item state for all parts.</li>
 </ul>
 <div class="app">
     <div class="tree">
         <vertex-scene-tree
-                id="scene-tree"
-                viewer-selector="#viewer"
+            id="scene-tree"
+            viewer-selector="#viewer"
         >
         </vertex-scene-tree>
     </div>
     <div class="workarea">
         <vertex-viewer
-                id="viewer"
-                class="viewer"
-                src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
+            id="viewer"
+            class="viewer"
+            src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
         >
         </vertex-viewer>
     </div>
