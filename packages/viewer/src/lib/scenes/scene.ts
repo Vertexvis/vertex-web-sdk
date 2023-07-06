@@ -157,6 +157,20 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  public setEndItem(endItemState?: boolean): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.setEndItem(endItemState)
+    );
+  }
+
+  public clearEndItem(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearEndItem()
+    );
+  }
+
   public build(): QueryOperation {
     return {
       query: this.query,

@@ -230,7 +230,8 @@ describe(Scene, () => {
           op
             .where((q) => q.all())
             .materialOverride(ColorMaterial.fromHex('#ff1122'))
-            .setPhantom(true),
+            .setPhantom(true)
+            .setEndItem(true),
         ])
         .execute();
 
@@ -324,6 +325,11 @@ describe(Scene, () => {
               {
                 changePhantom: {
                   phantom: true,
+                },
+              },
+              {
+                changeEndItem: {
+                  endItem: true,
                 },
               },
             ],

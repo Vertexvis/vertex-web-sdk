@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <title>End Items</title>
+
+    <!-- Live reload script -->
+    <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+    <script type="module" src="main.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.css"
+    />
+    <script
+        type="module"
+        src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer/viewer.esm.js"
+    ></script>
+    <script
+        nomodule
+        src="https://unpkg.com/@vertexvis/viewer@0.17.x/dist/viewer.js"
+    ></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .app {
+        display: flex;
+        width: 100%;
+        height: 75%;
+      }
+
+      .tree {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        flex-shrink: 0;
+        border-right: 1px solid lightgray;
+      }
+
+      .workarea {
+        width: 100%;
+        height: 100%;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+</head>
+
+<body>
+<h1>End Item Instructions</h1>
+<ul>
+    <li>Click a part to select it. Hold down shift while clicking a part to select its parent.</li>
+    <li>Press 'e' to set the selected parts as end item. This works best when a subassembly is selected.</li>
+    <li>Press 'r' to reset end item state for all parts.</li>
+</ul>
+<div class="app">
+    <div class="tree">
+        <vertex-scene-tree
+            id="scene-tree"
+            viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+    </div>
+    <div class="workarea">
+        <vertex-viewer
+            id="viewer"
+            class="viewer"
+            src="urn:vertexvis:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4"
+        >
+        </vertex-viewer>
+    </div>
+</div>
+</body>
+</html>

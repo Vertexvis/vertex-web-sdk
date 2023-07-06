@@ -46,6 +46,15 @@ interface ClearPhantomOperation {
   type: 'clear-phantom';
 }
 
+export interface ChangeEndItemOperation {
+  type: 'change-end-item';
+  endItemState?: boolean;
+}
+
+interface ClearEndItemOperation {
+  type: 'clear-end-item';
+}
+
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
@@ -56,7 +65,9 @@ export type ItemOperation =
   | TransformOperation
   | ClearTransformOperation
   | ChangePhantomOperation
-  | ClearPhantomOperation;
+  | ClearPhantomOperation
+  | ChangeEndItemOperation
+  | ClearEndItemOperation;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
@@ -68,6 +79,8 @@ export interface SceneItemOperations<T> {
   clearTransforms(): T;
   setPhantom(phantomState?: boolean): T;
   clearPhantom(): T;
+  setEndItem(endItemState?: boolean): T;
+  clearEndItem(): T;
 }
 
 /**
@@ -145,6 +158,18 @@ export class SceneOperationBuilder
   public clearPhantom(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'clear-phantom' }])
+    );
+  }
+
+  public setEndItem(endItemState?: boolean): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'change-end-item', endItemState }])
+    );
+  }
+
+  public clearEndItem(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'clear-end-item' }])
     );
   }
 }

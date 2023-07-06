@@ -283,6 +283,14 @@ function buildOperationTypes(
         return {
           changePhantom: { phantom: false },
         };
+      case 'change-end-item':
+        return {
+          changeEndItem: { endItem: op.endItemState ?? true },
+        };
+      case 'clear-end-item':
+        return {
+          changeEndItem: { endItem: false },
+        };
       default:
         return {};
     }
