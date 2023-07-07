@@ -75,6 +75,17 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(cell.shadowRoot?.querySelector('.icon-expanded')).toBeFalsy();
   });
 
+  it('does not render expand or collapse icon if item is an end item', async () => {
+    const node = createNode({ endItem: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.icon-collapsed')).toBeFalsy();
+    expect(cell.shadowRoot?.querySelector('.icon-expanded')).toBeFalsy();
+  });
+
   it('renders visible icon if visibility toggle is true and item is visible', async () => {
     const node = createNode({ visible: true });
     const { cell } = await newComponentSpec({
@@ -483,6 +494,8 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     partiallyVisible: false,
     columnsList: [],
     filterHit: false,
+    phantom: false,
+    endItem: false,
     ...values,
   };
 }

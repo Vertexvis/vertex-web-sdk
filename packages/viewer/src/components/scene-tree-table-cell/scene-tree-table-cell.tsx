@@ -168,6 +168,7 @@ export class SceneTreeTableCell {
     this.toggleAttribute('is-selected', !!this.node?.selected);
     this.toggleAttribute('is-partial', !!this.node?.partiallyVisible);
     this.toggleAttribute('is-leaf', !!this.node?.isLeaf);
+    this.toggleAttribute('is-end-item', !!this.node?.endItem);
     this.toggleAttribute('is-filter-hit', !!this.node?.filterHit);
   }
 
@@ -192,7 +193,7 @@ export class SceneTreeTableCell {
                 this.toggleExpansion(event);
               }}
             >
-              {!this.node?.isLeaf && (
+              {!this.node?.isLeaf && !this.node?.endItem && (
                 <div
                   class={classNames('icon', {
                     'icon-expanded': !this.node?.isLeaf && this.node?.expanded,

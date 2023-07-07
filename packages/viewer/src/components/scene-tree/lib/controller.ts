@@ -1081,6 +1081,7 @@ export class SceneTreeController {
         if (err != null) {
           reject(err);
         } else if (res != null) {
+          console.log(res);
           resolve(res);
         } else {
           reject(
