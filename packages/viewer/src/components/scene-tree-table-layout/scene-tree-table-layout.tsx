@@ -841,7 +841,6 @@ export class SceneTreeTableLayout {
 
   private getViewportRows(startIndex: number, endIndex: number): Row[] {
     const rows = this.rows.slice(startIndex, endIndex + 1);
-    console.log(rows);
     return rows.map((row) => (row != null ? this.populateRowData(row) : row));
   }
 
