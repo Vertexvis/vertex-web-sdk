@@ -585,6 +585,8 @@ export class SceneTreeTableLayout {
           depth: 0,
           columnsList: [],
           filterHit: false,
+          phantom: false,
+          endItem: false,
         },
         metadata: {},
         data: {},

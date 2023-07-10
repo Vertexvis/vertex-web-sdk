@@ -72,7 +72,8 @@
   flex-shrink: 0;
 }
 
-:host([is-leaf]) .expand-btn {
+:host([is-leaf]) .expand-btn,
+:host([is-end-item]) .expand-btn {
   visibility: hidden;
   cursor: default;
 }
