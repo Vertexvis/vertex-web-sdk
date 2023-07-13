@@ -173,12 +173,17 @@ export class SceneTreeTableCell {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    // Overrides the `.hydrated` visibility when we have nothing to display
+    const hiddenStyle =
+      this.node == null ? { visibility: 'hidden' } : undefined;
+
     return (
       <Host
         onPointerEnter={this.handleCellPointerEnter}
         onPointerLeave={this.handleCellPointerLeave}
         onPointerUp={this.handleCellPointerUp}
         onPointerDown={this.handleCellPointerDown}
+        style={hiddenStyle}
       >
         <div class="wrapper">
           <div class="no-shrink">
