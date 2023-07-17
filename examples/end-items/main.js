@@ -9,7 +9,7 @@ async function main() {
   window.addEventListener('keydown', async (event) => {
     const scene = await viewer.scene();
 
-    // press 'e' to set end item state
+    // press 'e' to set end item state as true
     if (event.key === 'e') {
       console.log('setting end item state');
       await scene
@@ -17,11 +17,11 @@ async function main() {
         .execute();
     }
 
-    // press 'r' to reset end item state
+    // press 'r' to set end item state as false
     if (event.key === 'r') {
-      console.log('resetting end item state');
+      console.log('removing end item state');
       await scene
-        .items((op) => op.where((q) => q.all()).clearEndItem())
+        .items((op) => op.where((q) => q.withSelected()).setEndItem(false))
         .execute();
     }
   });
