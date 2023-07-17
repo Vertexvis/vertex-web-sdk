@@ -351,7 +351,6 @@ export class SceneTreeController {
   }
 
   private startConnectionLostReconnectTimer(): void {
-    console.log(this.reconnectTimer);
     this.startReconnectTimer(
       this.connectOptions.lostConnectionReconnectInSeconds ||
         SceneTreeController.LOST_CONNECTION_RECONNECT_IN_SECONDS
@@ -897,8 +896,6 @@ export class SceneTreeController {
 
       stream.on('end', (status) => {
         this.invalidateAfterOffset(0);
-
-        console.log(status);
 
         if (this.state.connection.type === 'connected') {
           this.startConnectionLostReconnectTimer();
