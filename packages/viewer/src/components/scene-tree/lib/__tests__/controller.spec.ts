@@ -470,7 +470,7 @@ describe(SceneTreeController, () => {
       expect(pages).toEqual([]);
     });
 
-    it('does not cancel subscription when disconnected', async () => {
+    it('cancels subscription when disconnected', async () => {
       const { controller, stream, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
@@ -482,7 +482,7 @@ describe(SceneTreeController, () => {
       initiateHandshakeOnStream(stream);
 
       controller.disconnect();
-      expect(cancel).not.toHaveBeenCalled();
+      expect(cancel).toHaveBeenCalled();
     });
 
     it('resubscribes on server termination', async () => {

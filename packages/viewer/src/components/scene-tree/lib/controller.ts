@@ -139,7 +139,7 @@ type ConnectionState =
  * notifying the view about state changes.
  */
 export class SceneTreeController {
-  private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
+  private static IDLE_RECONNECT_IN_SECONDS = 4 * 1;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
 
@@ -225,7 +225,9 @@ export class SceneTreeController {
 
       const stream = await this.subscribe();
 
-      this.invalidatePage(0);
+      this.invalidateAfterOffset(0);
+      this.fetchUnloadedPagesInActiveRows();
+
       this.updateState({
         ...this.state,
         connection: {
@@ -425,6 +427,11 @@ export class SceneTreeController {
       isSearching: false,
       totalRows: reset ? 0 : this.state.totalRows,
       rows: reset ? [] : this.state.rows,
+      filterTerm: reset ? undefined : this.state.filterTerm,
+      totalFilteredRows: reset ? undefined : this.state.totalFilteredRows,
+      shouldShowEmptyResults: reset
+        ? undefined
+        : this.state.shouldShowEmptyResults,
     });
   }
 
@@ -894,7 +901,7 @@ export class SceneTreeController {
         }
       });
 
-      stream.on('end', (status) => {
+      stream.on('end', () => {
         this.invalidateAfterOffset(0);
 
         if (this.state.connection.type === 'connected') {

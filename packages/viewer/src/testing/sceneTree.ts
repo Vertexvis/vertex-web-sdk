@@ -29,7 +29,6 @@ export class ResponseStreamMock<T> implements ResponseStream<T> {
 
   public on(type: string, handler: any): ResponseStream<T> {
     if (type === 'data') {
-      console.log(handler);
       this.onData.on(handler);
     } else if (type === 'end') {
       this.onEnd.on(handler);

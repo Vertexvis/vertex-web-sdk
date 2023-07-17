@@ -287,6 +287,53 @@ describe('<vertex-scene-tree>', () => {
       expect(emptyResults?.innerHTML).toEqual('No Results Found.');
     });
 
+    it('clears the loading spinner on initial load if it has already appeared', async () => {
+      const subscription = new ResponseStreamMock();
+      const client = mockSceneTreeClient(subscription);
+      mockGetTree({ client, itemCount: 0, totalCount: 0 });
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100, {
+        spinnerDelay: 5,
+      });
+      const { tree, viewer, page } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.shouldShowLoading) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      expect(tree.shadowRoot?.querySelector('.loading')).not.toBeNull();
+
+      controller.updateActiveRowRange(0, 1);
+
+      mockGetTree({ client });
+
+      subscription.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (!state.shouldShowLoading) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      expect(tree.shadowRoot?.querySelector('.loading')).toBeNull();
+    });
+
     it('emits error if tree GetList is aborted', (done) => {
       async function test(): Promise<void> {
         const client = mockSceneTreeClient();
@@ -507,14 +554,9 @@ describe('<vertex-scene-tree>', () => {
       });
       await page.waitForChanges();
 
-      const test = tree.querySelectorAll('vertex-scene-tree-table-cell');
-
-      console.log(test);
-
       const row = tree.querySelectorAll(
         'vertex-scene-tree-table-cell'
       )[0] as HTMLVertexSceneTreeTableCellElement;
-      console.log(row);
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
   });
