@@ -21,17 +21,17 @@ then
   next_testing_version=`npx semver "$published_version" --increment prerelease`
   echo "Publishing testing version $next_testing_version"
 
-  # npx lerna version --no-push --no-git-tag-version --exact "$next_testing_version" --yes
-  # git commit -am "testing release $next_testing_version"
-  # npx lerna publish from-package --testing --preid "$preid" --exact --dist-tag "$dist_tag" --yes
+  npx lerna version --no-push --no-git-tag-version --exact "$next_testing_version" --yes
+  git commit -am "testing release $next_testing_version"
+  npx lerna publish from-package --testing --preid "$preid" --exact --dist-tag "$dist_tag" --yes
 else
   echo "No published testing version found for $next_version"
 
   next_testing_version=`npx semver "$version" --increment pre"$next_bump" --preid "$preid"`
   echo "Publishing testing version $next_testing_version"
 
-  # npx lerna version --no-push --no-git-tag-version --exact "$next_testing_version" --yes
-  # git commit -am "testing release $next_testing_version"
-  # npx lerna publish from-package --testing --preid "$preid" --exact --dist-tag "$dist_tag" --yes
+  npx lerna version --no-push --no-git-tag-version --exact "$next_testing_version" --yes
+  git commit -am "testing release $next_testing_version"
+  npx lerna publish from-package --testing --preid "$preid" --exact --dist-tag "$dist_tag" --yes
 fi
 
