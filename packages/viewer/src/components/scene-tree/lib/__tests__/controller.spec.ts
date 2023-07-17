@@ -286,6 +286,13 @@ describe(SceneTreeController, () => {
           }),
         })
       );
+      expect(onStateChange).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({
+            type: 'connected',
+          }),
+        })
+      );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({

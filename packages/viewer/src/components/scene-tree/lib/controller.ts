@@ -147,7 +147,7 @@ export class SceneTreeController {
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
   private metadataKeys: MetadataKey[] = [];
-  private debugLogs = true;
+  private debugLogs = false;
 
   private reconnectTimer?: number;
   private loadingTimer?: number;
@@ -408,7 +408,7 @@ export class SceneTreeController {
 
     if (reset) {
       this.pages.clear();
-      this.activeRowRange = [0, 0];
+      this.activeRowRange = [];
     }
 
     const { connection } = this.state;
@@ -431,7 +431,7 @@ export class SceneTreeController {
     this.clearReconnectTimer();
 
     this.pages.clear();
-    this.activeRowRange = [0, 0];
+    this.activeRowRange = [];
 
     const { connection } = this.state;
     if (connection.type === 'connected') {
@@ -658,7 +658,7 @@ export class SceneTreeController {
       this.updateState({
         ...this.state,
         isSearching: true,
-        filterTerm: term,
+        filterTerm: term !== '' ? term : undefined,
       });
       try {
         const res = await this.requestUnary<FilterResponse>(
@@ -789,6 +789,8 @@ export class SceneTreeController {
    */
   public async updateActiveRowRange(start: number, end: number): Promise<void> {
     this.activeRowRange = this.constrainRowOffsets(start, end);
+
+    this.tryClearLoadingTimer(this.state);
 
     await this.fetchUnloadedPagesInActiveRows();
   }
@@ -970,7 +972,8 @@ export class SceneTreeController {
             totalRows: totalRows,
             rows: rows,
             shouldShowEmptyResults:
-              this.state.filterTerm != null && rows.length === 0,
+              this.state.filterTerm != null &&
+              (rows.length === 0 || this.state.totalFilteredRows === 0),
           });
         } else {
           this.updateState({
@@ -978,7 +981,8 @@ export class SceneTreeController {
             totalRows: totalRows,
             rows: rows,
             shouldShowEmptyResults:
-              this.state.filterTerm != null && rows.length === 0,
+              this.state.filterTerm != null &&
+              (rows.length === 0 || this.state.totalFilteredRows === 0),
           });
         }
       }
@@ -1044,22 +1048,27 @@ export class SceneTreeController {
     }
   }
 
-  private updateState(newState: SceneTreeState): void {
+  private tryClearLoadingTimer(state: SceneTreeState): boolean {
     const loadingShowingOrTimerStarted =
       this.state.shouldShowLoading || this.loadingTimer != null;
     const updateLoadingTimer =
-      loadingShowingOrTimerStarted && !this.isViewLoading(newState.rows);
+      loadingShowingOrTimerStarted && !this.isViewLoading(state.rows);
     if (updateLoadingTimer) {
       this.clearLoadingTimer();
-      this.state = {
-        ...newState,
-        shouldShowLoading: false,
-      };
-    } else {
-      this.state = {
-        ...newState,
-      };
+      return true;
     }
+    return false;
+  }
+
+  private updateState(newState: SceneTreeState): void {
+    const didClearLoadingTimer = this.tryClearLoadingTimer(newState);
+
+    this.state = {
+      ...newState,
+      shouldShowLoading: didClearLoadingTimer
+        ? false
+        : newState.shouldShowLoading,
+    };
 
     this.onStateChange.emit(this.state);
   }

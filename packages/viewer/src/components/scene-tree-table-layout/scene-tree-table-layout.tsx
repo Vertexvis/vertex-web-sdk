@@ -254,6 +254,10 @@ export class SceneTreeTableLayout {
     this.resizeObserver?.observe(this.hostEl);
   }
 
+  public async componentWillRender(): Promise<void> {
+    await this.computeAndUpdateViewportRows();
+  }
+
   public componentDidRender(): void {
     this.layoutColumns();
 
@@ -267,15 +271,6 @@ export class SceneTreeTableLayout {
     this.resizeObserver?.disconnect();
     this.stateMap.columnWidths = [];
     this.stateMap.columnWidthPercentages = [];
-  }
-
-  @Watch('rows')
-  @Watch('totalRows')
-  @Watch('scrollOffset')
-  @Watch('controller')
-  @Watch('overScanCount')
-  protected handleRenderedContentChange(): void {
-    this.computeAndUpdateViewportRows();
   }
 
   /**

@@ -469,9 +469,14 @@ describe('<vertex-scene-tree>', () => {
       });
       await page.waitForChanges();
 
+      const test = tree.querySelectorAll('vertex-scene-tree-table-cell');
+
+      console.log(test);
+
       const row = tree.querySelectorAll(
         'vertex-scene-tree-table-cell'
       )[0] as HTMLVertexSceneTreeTableCellElement;
+      console.log(row);
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
   });
