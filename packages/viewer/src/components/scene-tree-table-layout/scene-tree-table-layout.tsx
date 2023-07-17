@@ -8,7 +8,6 @@ import {
   Method,
   Prop,
   State,
-  Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
