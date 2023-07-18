@@ -545,6 +545,7 @@ describe('<vertex-scene-tree>', () => {
       tree.controller = controller;
       page?.body.appendChild(tree);
 
+      await page.waitForChanges();
       await new Promise<void>((resolve) => {
         controller.onStateChange.on((state) => {
           if (state.connection.type === 'connected') {
