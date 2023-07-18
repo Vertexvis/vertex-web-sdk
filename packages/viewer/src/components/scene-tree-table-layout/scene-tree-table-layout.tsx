@@ -357,11 +357,7 @@ export class SceneTreeTableLayout {
   private async computeAndUpdateViewportRows(): Promise<void> {
     this.computeViewportRows();
 
-    if (
-      this.controller?.isConnected &&
-      this.viewportStartIndex >= 0 &&
-      this.viewportEndIndex >= 0
-    ) {
+    if (this.controller?.isConnected && this.totalRows > 0) {
       await this.controller.updateActiveRowRange(
         this.viewportStartIndex,
         this.viewportEndIndex
