@@ -206,6 +206,9 @@ export class SceneTree {
   @State()
   private showLoader = false;
 
+  @State()
+  private showEmptyResults = false;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -619,6 +622,7 @@ export class SceneTree {
           : undefined
       );
       this.controller = new SceneTreeController(client, 100);
+      this.controller?.setMetadataKeys(this.metadataKeys);
     }
 
     this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
@@ -683,6 +687,12 @@ export class SceneTree {
                 <vertex-viewer-spinner class="loading" size="md" />
               </slot>
             )}
+            {this.showEmptyResults && (
+              <slot name="empty-results">
+                <div class="empty-results">No Results Found.</div>
+              </slot>
+            )}
+
             <slot />
           </div>
         )}
@@ -811,6 +821,7 @@ export class SceneTree {
 
   private handleControllerStateChange(state: SceneTreeState): void {
     this.showLoader = !!state.shouldShowLoading;
+    this.showEmptyResults = !!state.shouldShowEmptyResults;
     this.rows = state.rows;
     this.totalRows = state.totalRows;
 

@@ -56,6 +56,8 @@ export interface SceneTreeState {
   connection: ConnectionState;
   isSearching: boolean;
   shouldShowLoading?: boolean;
+  shouldShowEmptyResults?: boolean;
+  filterTerm?: string;
 }
 
 interface Page {
@@ -137,7 +139,7 @@ type ConnectionState =
  * notifying the view about state changes.
  */
 export class SceneTreeController {
-  private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
+  private static IDLE_RECONNECT_IN_SECONDS = 4 * 1;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
 
@@ -223,7 +225,9 @@ export class SceneTreeController {
 
       const stream = await this.subscribe();
 
-      this.invalidatePage(0);
+      this.invalidateAfterOffset(0);
+      this.fetchUnloadedPagesInActiveRows();
+
       this.updateState({
         ...this.state,
         connection: {
@@ -291,23 +295,25 @@ export class SceneTreeController {
         this.subscribe(),
       ]);
 
-      this.updateState({
-        ...this.state,
-        connection: {
-          jwtProvider,
-          sceneViewId,
-          type: 'connected',
-          subscription: { dispose: () => stream.cancel() },
-          subscriptionStatusState: {
-            attempt: 0,
-            stream,
+      if (this.state.connection.type !== 'cancelled') {
+        this.updateState({
+          ...this.state,
+          connection: {
+            jwtProvider,
+            sceneViewId,
+            type: 'connected',
+            subscription: { dispose: () => stream.cancel() },
+            subscriptionStatusState: {
+              attempt: 0,
+              stream,
+            },
           },
-        },
-      });
+        });
 
-      this.subscriptionHandshakeTimer = window.setTimeout(() => {
-        this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
-      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
+        this.subscriptionHandshakeTimer = window.setTimeout(() => {
+          this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
+        }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
+      }
     } catch (e) {
       this.ifErrorIsFatal(e, () => {
         this.updateState({
@@ -325,10 +331,6 @@ export class SceneTreeController {
     }
 
     this.startIdleReconnectTimer();
-
-    if (this.metadataKeys.length > 0) {
-      this.setMetadataKeys(this.metadataKeys);
-    }
   }
 
   private clearReconnectTimer(): void {
@@ -412,6 +414,10 @@ export class SceneTreeController {
     }
 
     const { connection } = this.state;
+    if (connection.type === 'connected') {
+      connection.subscription.dispose();
+    }
+
     this.updateState({
       connection: {
         type: 'disconnected',
@@ -421,6 +427,11 @@ export class SceneTreeController {
       isSearching: false,
       totalRows: reset ? 0 : this.state.totalRows,
       rows: reset ? [] : this.state.rows,
+      filterTerm: reset ? undefined : this.state.filterTerm,
+      totalFilteredRows: reset ? undefined : this.state.totalFilteredRows,
+      shouldShowEmptyResults: reset
+        ? undefined
+        : this.state.shouldShowEmptyResults,
     });
   }
 
@@ -658,6 +669,7 @@ export class SceneTreeController {
       this.updateState({
         ...this.state,
         isSearching: true,
+        filterTerm: term !== '' ? term : undefined,
       });
       try {
         const res = await this.requestUnary<FilterResponse>(
@@ -789,6 +801,8 @@ export class SceneTreeController {
   public async updateActiveRowRange(start: number, end: number): Promise<void> {
     this.activeRowRange = this.constrainRowOffsets(start, end);
 
+    this.tryClearLoadingTimer(this.state);
+
     await this.fetchUnloadedPagesInActiveRows();
   }
 
@@ -889,7 +903,10 @@ export class SceneTreeController {
 
       stream.on('end', () => {
         this.invalidateAfterOffset(0);
-        this.startConnectionLostReconnectTimer();
+
+        if (this.state.connection.type === 'connected') {
+          this.startConnectionLostReconnectTimer();
+        }
       });
 
       return stream;
@@ -959,23 +976,24 @@ export class SceneTreeController {
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
         if (this.isViewLoading(rows) && this.loadingTimer == null) {
-          this.loadingTimer = window.setTimeout(() => {
-            this.updateState({
-              ...this.getState(),
-              shouldShowLoading: true,
-            });
-          }, this.connectOptions.spinnerDelay);
+          this.restartLoadingTimer();
 
           this.updateState({
             ...this.state,
             totalRows: totalRows,
             rows: rows,
+            shouldShowEmptyResults:
+              this.state.filterTerm != null &&
+              (rows.length === 0 || this.state.totalFilteredRows === 0),
           });
         } else {
           this.updateState({
             ...this.state,
             totalRows: totalRows,
             rows: rows,
+            shouldShowEmptyResults:
+              this.state.filterTerm != null &&
+              (rows.length === 0 || this.state.totalFilteredRows === 0),
           });
         }
       }
@@ -1014,26 +1032,54 @@ export class SceneTreeController {
 
   private isViewLoading(rows: Row[]): boolean {
     return (
+      this.state.filterTerm == null &&
       rows[this.activeRowRange[0]] == null &&
       rows[this.activeRowRange[1]] == null
     );
   }
 
-  private updateState(newState: SceneTreeState): void {
-    const updateLoadingTimer =
-      this.loadingTimer && !this.isViewLoading(newState.rows);
-    if (updateLoadingTimer) {
+  private restartLoadingTimer(): void {
+    if (this.loadingTimer != null) {
+      this.clearLoadingTimer();
+    }
+
+    this.loadingTimer = window.setTimeout(() => {
+      this.loadingTimer = undefined;
+      this.updateState({
+        ...this.getState(),
+        shouldShowLoading: true,
+      });
+    }, this.connectOptions.spinnerDelay);
+  }
+
+  private clearLoadingTimer(): void {
+    if (this.loadingTimer != null) {
       clearTimeout(this.loadingTimer);
       this.loadingTimer = undefined;
-      this.state = {
-        ...newState,
-        shouldShowLoading: false,
-      };
-    } else {
-      this.state = {
-        ...newState,
-      };
     }
+  }
+
+  private tryClearLoadingTimer(state: SceneTreeState): boolean {
+    const loadingShowingOrTimerStarted =
+      this.state.shouldShowLoading || this.loadingTimer != null;
+    const updateLoadingTimer =
+      loadingShowingOrTimerStarted && !this.isViewLoading(state.rows);
+    if (updateLoadingTimer) {
+      this.clearLoadingTimer();
+      return true;
+    }
+    return false;
+  }
+
+  private updateState(newState: SceneTreeState): void {
+    const didClearLoadingTimer = this.tryClearLoadingTimer(newState);
+
+    this.state = {
+      ...newState,
+      shouldShowLoading: didClearLoadingTimer
+        ? false
+        : newState.shouldShowLoading,
+    };
 
     this.onStateChange.emit(this.state);
   }
