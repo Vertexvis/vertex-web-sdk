@@ -8,6 +8,7 @@ import {
   Method,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
@@ -270,6 +271,11 @@ export class SceneTreeTableLayout {
     this.resizeObserver?.disconnect();
     this.stateMap.columnWidths = [];
     this.stateMap.columnWidthPercentages = [];
+  }
+
+  @Watch('totalRows')
+  protected handleTotalRowsChanged(): void {
+    this.computeAndUpdateViewportRows();
   }
 
   /**
