@@ -139,7 +139,7 @@ type ConnectionState =
  * notifying the view about state changes.
  */
 export class SceneTreeController {
-  private static IDLE_RECONNECT_IN_SECONDS = 4 * 1;
+  private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
 
