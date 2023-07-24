@@ -1,7 +1,15 @@
 import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
-import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
+import {
+  ListChange,
+  Node,
+  TreeChangeType,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import {
+  FilterResponse,
+  GetTreeResponse,
+  SubscribeResponse,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import type {
   ResponseStream,
   Status,
@@ -73,4 +81,29 @@ export function createGetTreeResponse(
   res.setCursor(cursor);
 
   return res;
+}
+
+export function createFilterTreeResponse(resultCount: number): FilterResponse {
+  const res = new FilterResponse();
+  res.setNumberOfResults(resultCount);
+
+  return res;
+}
+
+export function createSubscribeResponse(
+  change: TreeChangeType
+): SubscribeResponse {
+  const res = new SubscribeResponse();
+  res.setChange(change);
+
+  return res;
+}
+
+export function createListChange(start: number): TreeChangeType {
+  const change = new TreeChangeType();
+  const listChange = new ListChange();
+  listChange.setStart(start);
+  change.setListChange(listChange);
+
+  return change;
 }

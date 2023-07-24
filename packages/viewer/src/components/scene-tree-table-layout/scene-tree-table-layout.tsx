@@ -8,6 +8,7 @@ import {
   Method,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 import {
@@ -272,6 +273,13 @@ export class SceneTreeTableLayout {
     this.stateMap.columnWidthPercentages = [];
   }
 
+  @Watch('rows')
+  @Watch('totalRows')
+  @Watch('rowHeight')
+  protected async handleViewportRowsPropsChanged(): Promise<void> {
+    await this.computeAndUpdateViewportRows();
+  }
+
   /**
    * Scrolls the table to the provided top value.
    *
@@ -357,7 +365,7 @@ export class SceneTreeTableLayout {
   private async computeAndUpdateViewportRows(): Promise<void> {
     this.computeViewportRows();
 
-    if (this.controller?.isConnected) {
+    if (this.controller?.isConnected && this.totalRows > 0) {
       await this.controller.updateActiveRowRange(
         this.viewportStartIndex,
         this.viewportEndIndex

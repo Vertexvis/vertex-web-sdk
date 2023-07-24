@@ -36,7 +36,10 @@ import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { ViewerStream } from '../../lib/stream/stream';
 import { defaultFlags } from '../../lib/types/flags';
 import {
+  createFilterTreeResponse,
   createGetTreeResponse,
+  createListChange,
+  createSubscribeResponse,
   mockGrpcUnaryError,
   mockGrpcUnaryResult,
   random,
@@ -247,6 +250,88 @@ describe('<vertex-scene-tree>', () => {
       expect(errorMessage?.firstChild?.firstChild?.nodeValue).toEqual(
         'Could not find reference to the viewer.'
       );
+    });
+
+    it('renders no results found with no filter results', async () => {
+      const subscription = new ResponseStreamMock();
+      const client = mockSceneTreeClient(subscription);
+      mockGetTree({ client });
+      mockFilterTree(client, 0);
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller, stream });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await waitForSceneTreeConnected();
+
+      await tree.filterItems('filter');
+
+      mockGetTree({ client, itemCount: 0, totalCount: 0 });
+
+      subscription.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.shouldShowEmptyResults) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      const emptyResults = tree.shadowRoot?.querySelector('.empty-results');
+
+      expect(emptyResults?.innerHTML).toEqual('No Results Found.');
+    });
+
+    it('clears the loading spinner on initial load if it has already appeared', async () => {
+      const subscription = new ResponseStreamMock();
+      const client = mockSceneTreeClient(subscription);
+      mockGetTree({ client, itemCount: 0, totalCount: 0 });
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100, {
+        spinnerDelay: 5,
+      });
+      const { tree, viewer, page } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.shouldShowLoading) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      expect(tree.shadowRoot?.querySelector('.loading')).not.toBeNull();
+
+      controller.updateActiveRowRange(0, 1);
+
+      mockGetTree({ client });
+
+      subscription.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (!state.shouldShowLoading) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      expect(tree.shadowRoot?.querySelector('.loading')).toBeNull();
     });
 
     it('emits error if tree GetList is aborted', (done) => {
@@ -460,6 +545,7 @@ describe('<vertex-scene-tree>', () => {
       tree.controller = controller;
       page?.body.appendChild(tree);
 
+      await page.waitForChanges();
       await new Promise<void>((resolve) => {
         controller.onStateChange.on((state) => {
           if (state.connection.type === 'connected') {
@@ -1307,9 +1393,11 @@ interface MockGetTreeOptions {
   transform?: (node: Node) => void;
 }
 
-function mockSceneTreeClient(): SceneTreeAPIClient {
+function mockSceneTreeClient(
+  subscriptionMock = new ResponseStreamMock()
+): SceneTreeAPIClient {
   const client = new SceneTreeAPIClient('https://example.com');
-  (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
+  (client.subscribe as jest.Mock).mockReturnValue(subscriptionMock);
   return client;
 }
 
@@ -1333,6 +1421,11 @@ function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
   (client.getTree as jest.Mock).mockImplementationOnce(
     mockGrpcUnaryError(error)
   );
+}
+
+function mockFilterTree(client: SceneTreeAPIClient, resultCount = 10): void {
+  const res = createFilterTreeResponse(resultCount);
+  (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
 }
 
 function signJwt(viewId: string): string {

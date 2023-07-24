@@ -72,7 +72,8 @@
   visibility: visible;
 }
 
-.error {
+.error,
+.empty-results {
   display: flex;
   flex-direction: column;
   align-items: center;
