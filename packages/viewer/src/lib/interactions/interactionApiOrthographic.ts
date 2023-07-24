@@ -85,7 +85,7 @@ export class InteractionApiOrthographic extends InteractionApi {
       const normalizedUpVector = Vector3.normalize(camera.up);
       const normalizedViewVector = Vector3.normalize(viewVector);
 
-      const d = Vector3.magnitude(viewVector) * Math.tan(camera.fovHeight);
+      const d = Vector3.magnitude(viewVector); //* Math.tan(camera.fovHeight);
       const epsilonX = (delta.x * d) / viewport.width;
       const epsilonY = (delta.y / viewport.width) * d;
 
@@ -96,7 +96,7 @@ export class InteractionApiOrthographic extends InteractionApi {
         Vector3.scale(epsilonY, yvec)
       );
 
-      return camera.moveBy(offset);
+      return camera.moveBy(Vector3.scale(4, offset));
     });
   }
 

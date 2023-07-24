@@ -25,11 +25,26 @@ export abstract class MultiTouchInteractionHandler
     point2: Point.Point
   ): void {
     if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.scale(
-        Point.add(
-          Point.subtract(point1, this.currentPosition1),
-          Point.subtract(point2, this.currentPosition2)
-        ),
+      // const delta = Point.scale(
+      //   Point.add(
+      //     Point.subtract(point1, this.currentPosition1),
+      //     Point.subtract(point2, this.currentPosition2)
+      //   ),
+      //   0.25,
+      //   0.25
+      // );
+
+      const center1 = Point.create(
+        (this.currentPosition1.x + this.currentPosition2.x) / 2,
+        (this.currentPosition1.y + this.currentPosition2.y) / 2
+      );
+
+      const center2 = Point.create(
+        (point1.x + point2.x) / 2,
+        (point1.y + point2.y) / 2
+      );
+      const panDelta = Point.scale(
+        Point.subtract(point1, this.currentPosition1),
         0.25,
         0.25
       );
@@ -48,12 +63,21 @@ export abstract class MultiTouchInteractionHandler
           Matrix2.dot(previousToCurrent)
         )
       );
-      this.interactionApi?.beginInteraction();
-      this.interactionApi?.zoomCamera(zoom);
-      this.interactionApi?.panCameraByDelta(delta);
+      const center = Point.create(
+        (this.currentPosition1.x + this.currentPosition2.x) / 2,
+        (this.currentPosition1.y + this.currentPosition2.y) / 2
+      );
 
-      // Setting a minimum angle to prevent wobbling
+      this.interactionApi?.beginInteraction();
+      this.interactionApi?.zoomCameraToPoint(center, zoom);
+
+      this.interactionApi?.panCameraByDelta(panDelta);
+
+      // // Setting a minimum angle to prevent wobbling
       if (Math.abs(angle) > 0.5) {
+        document.getElementById('my-delta-2')!.textContent =
+          JSON.stringify(angle);
+
         this.interactionApi?.twistCamera(angle);
       }
     }

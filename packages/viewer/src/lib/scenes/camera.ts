@@ -409,6 +409,11 @@ export class PerspectiveCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
+    if (delta.x === 0 && delta.y === 0 && delta.z === 0) {
+      return this;
+    }
+    document.getElementById('my-delta')!.textContent = JSON.stringify(delta);
+
     return this.update({
       position: Vector3.add(this.position, delta),
       lookAt: Vector3.add(this.lookAt, delta),
@@ -578,6 +583,11 @@ export class OrthographicCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
+    if (delta.x === 0 && delta.y === 0 && delta.z === 0) {
+      return this;
+    }
+    document.getElementById('my-delta')!.textContent = JSON.stringify(delta);
+
     return this.update({
       lookAt: Vector3.add(this.lookAt, delta),
     });
