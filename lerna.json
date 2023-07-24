@@ -6,7 +6,8 @@
     "version": {
       "allowBranch": [
         "master",
-        "release-temp/*"
+        "release-temp/*",
+        "publish-testing"
       ]
     }
   }

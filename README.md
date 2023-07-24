@@ -90,6 +90,19 @@ release, and create a release in Github.
 If the publishing, open a new PR with any fixes and merge your changes. CI will
 attempt to republish the previous release that failed.
 
+## Test Releases
+
+The project supports publishing an NPM package that can be used for testing purposes
+in other applications. This package is published using a Github Actions workflow
+specific to the `publish-testing` branch.
+
+Once a branch has been updated with the latest changes in the `master` branch,
+it can be pushed to the `publish-testing` branch which will automatically start
+a publish workflow. This package can then be found on NPM under the `testing` tag.
+
+Run `git push -u origin local_branch:publish-testing` to update the branch
+with your changes and start the workflow.
+
 ## Semver
 
 Versioning changes should be based on [semver]. If your package has not reached
