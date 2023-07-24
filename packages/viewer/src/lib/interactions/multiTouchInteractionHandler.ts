@@ -25,11 +25,7 @@ export abstract class MultiTouchInteractionHandler
     point2: Point.Point
   ): void {
     if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.scale(
-        Point.subtract(point1, this.currentPosition1),
-        0.25,
-        0.25
-      );
+      const delta = Point.subtract(point1, this.currentPosition1);
 
       const distance =
         Point.distance(point1, point2) -

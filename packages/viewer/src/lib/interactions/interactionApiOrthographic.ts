@@ -96,7 +96,7 @@ export class InteractionApiOrthographic extends InteractionApi {
         Vector3.scale(epsilonY, yvec)
       );
 
-      return camera.moveBy(Vector3.scale(4, offset));
+      return camera.moveBy(offset);
     });
   }
 
