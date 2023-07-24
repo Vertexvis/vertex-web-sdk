@@ -99,7 +99,7 @@ describe(InteractionApi, () => {
   );
 
   describe(InteractionApiOrthographic.prototype.panCameraByDelta, () => {
-    it('uses the fovHeight value of the orthographic camera', async () => {
+    it('uses the view vector of the orthographic camera', async () => {
       const data = FrameCamera.createOrthographic({
         fovHeight: Angle.toRadians(135),
       });
@@ -121,7 +121,7 @@ describe(InteractionApi, () => {
       );
       await api.endInteraction();
 
-      expect(moveBy.mock.calls[0][0].x).toBeCloseTo(-1);
+      expect(moveBy.mock.calls[0][0].x).toBeCloseTo(1);
     });
   });
 

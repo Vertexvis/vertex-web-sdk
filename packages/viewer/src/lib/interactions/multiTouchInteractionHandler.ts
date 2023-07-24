@@ -25,7 +25,10 @@ export abstract class MultiTouchInteractionHandler
     point2: Point.Point
   ): void {
     if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.subtract(point1, this.currentPosition1);
+      const delta = Point.add(
+        Point.subtract(point1, this.currentPosition1),
+        Point.subtract(point2, this.currentPosition2)
+      );
 
       const distance =
         Point.distance(point1, point2) -
@@ -50,7 +53,7 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.zoomCameraToPoint(center, zoom);
       this.interactionApi?.panCameraByDelta(delta);
 
-      // // Setting a minimum angle to prevent wobbling
+      // Setting a minimum angle to prevent wobbling
       if (Math.abs(angle) > 0.5) {
         this.interactionApi?.twistCamera(angle);
       }
