@@ -290,10 +290,10 @@ export class SceneTreeController {
     try {
       this.log('Scene tree controller connecting.');
 
-      const [, stream] = await Promise.all([
-        this.fetchPage(0),
-        this.subscribe(),
-      ]);
+      // Ensure we have a subscription prior to attempting to get the first page
+      // to make sure we receive any ListChange that comes through
+      const stream = await this.subscribe();
+      await this.fetchPage(0);
 
       if (this.state.connection.type !== 'cancelled') {
         this.updateState({
