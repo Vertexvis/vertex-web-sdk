@@ -143,7 +143,6 @@ export class ViewerStream extends StreamApi {
     this.deviceId = deviceId;
     this.config = config;
 
-    console.log('LOADING CONFIG');
     if (this.state.type === 'disconnected') {
       return this.loadIfDisconnected(urn);
     } else if (this.state.type === 'connection-failed') {

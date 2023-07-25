@@ -20,7 +20,7 @@ describe(LoadableResource.fromUrn, () => {
   });
 
   it('parses a sub resource for a scene view state by query param for a URN', () => {
-    const urn = 'urn:verte:stream-key:123?scene-view-state=234';
+    const urn = 'urn:vertex:stream-key:123?scene-view-state=234';
     const { resource, subResource } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(subResource).toEqual({ type: 'scene-view-state', id: '234' });

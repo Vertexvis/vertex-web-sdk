@@ -16,7 +16,6 @@ export interface Resource {
 }
 
 export function fromUrn(urn: string): Resource {
-  console.log('LOADING FROM URN');
   const uri = Uri.parse(urn);
 
   if (uri.scheme !== 'urn' || uri.path == null) {
