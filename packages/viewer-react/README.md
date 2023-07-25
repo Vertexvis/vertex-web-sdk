@@ -41,7 +41,7 @@ import { VertexViewer } from '@vertexvis/viewer-react';
 
 export function App() {
   return (<div>
-    <VertexViewer src="urn:vertexvis:stream-key:123" />
+    <VertexViewer src="urn:vertex:stream-key:123" />
   </div>);
 }
 ```

@@ -23,9 +23,9 @@ describe(ViewerStream, () => {
   const streamAttributes = {};
   const frameBgColor = Color.create(255, 255, 255);
 
-  const urn123 = 'urn:vertexvis:stream-key:123';
-  const urn234 = 'urn:vertexvis:stream-key:234';
-  const urnMalformed = 'urn:vertexvis:invalid-type:234';
+  const urn123 = 'urn:vertex:stream-key:123';
+  const urn234 = 'urn:vertex:stream-key:234';
+  const urnMalformed = 'urn:vertex:invalid-type:234';
 
   const expiryInMs = 50;
   const offlineReconnectThresholdInMs = 25;

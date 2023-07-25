@@ -10,7 +10,7 @@ pin, as well as a text pin that has an anchor dot on the model with a relative
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-pin-tool id="pin-tool" mode="edit" tool="pin-text">
     </vertex-viewer-pin-tool>
   </vertex-viewer>
@@ -29,7 +29,7 @@ the tool by setting the `tool` attribute.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-pin-tool id="pin-tool" mode="edit" tool="pin-icon">
     </vertex-viewer-pin-tool>
 
@@ -71,7 +71,7 @@ operate on pins.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-pin-tool id="pin-tool" mode="edit" tool="pin-text">
     </vertex-viewer-pin-tool>
 
@@ -121,7 +121,7 @@ storage mechanism, then rehydrate them.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-pin-tool id="pin-tool" mode="edit" tool="pin-text">
     </vertex-viewer-pin-tool>
 

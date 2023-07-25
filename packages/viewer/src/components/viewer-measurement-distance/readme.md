@@ -14,7 +14,7 @@ display its results.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" depth-buffers="final">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" depth-buffers="final">
     <vertex-viewer-measurement-distance
       id="measurement"
       mode="replace"
@@ -54,7 +54,7 @@ include: `millimeters`, `centimeters`, `meters`, `inches`, `feet`, `yards`.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-measurements>
       <vertex-viewer-measurement-distance
         start-json="[10, -5, 0]"
@@ -77,7 +77,7 @@ string.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-measurements>
       <vertex-viewer-measurement-distance
         id="measurement"
@@ -115,7 +115,7 @@ The component exposes slots for customizing the HTML of the anchors.
   </style>
 </head>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-measurements>
       <vertex-viewer-measurement-distance
         id="measurement"
@@ -153,7 +153,7 @@ using the `anchor-label-offset` attribute.
   </style>
 </head>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-measurements>
       <vertex-viewer-measurement-distance
         id="measurement"

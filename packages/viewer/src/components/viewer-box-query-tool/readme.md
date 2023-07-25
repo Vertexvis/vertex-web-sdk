@@ -33,7 +33,7 @@ type of query to be performed on pointer up is populated on the `<vertex-viewer-
     </style>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-box-query-tool>
         <div class="my-box" slot="bounds"></div>
       </vertex-viewer-box-query-tool>

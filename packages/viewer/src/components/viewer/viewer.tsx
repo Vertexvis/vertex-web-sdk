@@ -134,7 +134,7 @@ export class Viewer {
    * A URN of the scene resource to load when the component is mounted in the
    * DOM tree. The specified resource is a URN in the following format:
    *
-   *  * `urn:vertexvis:scene:<sceneid>`
+   *  * `urn:vertex:scene:<sceneid>`
    */
   @Prop() public src?: string;
 
@@ -828,7 +828,7 @@ export class Viewer {
    * resolves when the scene has been loaded. The specified scene is
    * provided as a URN in the following format:
    *
-   *  * `urn:vertexvis:scene:<sceneid>`
+   *  * `urn:vertex:scene:<sceneid>`
    *
    * @param urn The URN of the resource to load.
    */

@@ -15,7 +15,7 @@ markup is added, it's assigned an ID. This ID can be passed to
 ```html
 <html>
 <body>
-  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer src="urn:vertex:stream-key:my-key">
     <vertex-viewer-markup id="markup">
       <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
     </vertex-viewer-markup>
@@ -41,7 +41,7 @@ the component.
 ```html
 <html>
 <body>
-  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer src="urn:vertex:stream-key:my-key">
     <vertex-viewer-markup tool="circle">
       <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
     </vertex-viewer-markup>
@@ -63,7 +63,7 @@ as children, provide a unique ID to the element.
 <body>
   <button id="add-markup-btn">Add markup</button>
 
-  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer src="urn:vertex:stream-key:my-key">
     <vertex-viewer-markup id="markup">
       <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
 
@@ -138,7 +138,7 @@ be cloned and added to the component.
     </vertex-viewer-markup-arrow>
   </template>
 
-  <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer src="urn:vertex:stream-key:my-key">
     <!-- Pass the template ID to use for arrow markup -->
     <vertex-viewer-markup arrow-template-id="my-arrow-markup">
       <vertex-viewer-markup-tool></vertex-viewer-markup-tool>

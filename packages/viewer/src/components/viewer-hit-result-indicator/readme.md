@@ -49,7 +49,7 @@ displayed. This can be set directly on the element to display a static indicator
     </script>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj">
       <vertex-viewer-hit-result-indicator></vertex-viewer-hit-result-indicator>
     </vertex-viewer>
   </body>
@@ -105,7 +105,7 @@ the result of the `Raycaster.hitItems()` method.
     </script>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xhh2xijQy-XO9aHtS-P5Rl51vGmadZUCrfPj">
       <vertex-viewer-hit-result-indicator></vertex-viewer-hit-result-indicator>
     </vertex-viewer>
   </body>

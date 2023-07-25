@@ -16,7 +16,7 @@ viewer's scene changes. The cube can be embedded within a
 ```html
 <html>
   <body>
-    <vertex-viewer src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer src="urn:vertex:stream-key:my-key">
       <vertex-viewer-toolbar placement="top-right">
         <vertex-viewer-view-cube></vertex-viewer-view-cube>
       </vertex-viewer-toolbar>

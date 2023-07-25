@@ -21,9 +21,9 @@ interface LoadViewerStreamKeyOptions {
   beforeConnected?: VoidFunction;
 }
 
-export const key1 = 'urn:vertexvis:stream-key:123';
+export const key1 = 'urn:vertex:stream-key:123';
 
-export const key2 = 'urn:vertexvis:stream-key:234';
+export const key2 = 'urn:vertex:stream-key:234';
 
 export function makeViewerStream(): {
   stream: ViewerStream;
