@@ -9,7 +9,7 @@ export async function loadViewerWithQueryParams(
   }
 ) {
   viewer.configEnv = env;
-  await viewer.load(`urn:vertexvis:stream-key:${streamKey}`);
+  await viewer.load(`urn:vertex:stream-key:${streamKey}`);
 }
 
 export function getStreamKey() {
