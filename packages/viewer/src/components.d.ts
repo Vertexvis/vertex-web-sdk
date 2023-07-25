@@ -475,7 +475,7 @@ export namespace Components {
      */
     keyboardControls: boolean;
     /**
-     * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
+     * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      * @param urn The URN of the resource to load.
      */
     load: (urn: string) => Promise<void>;
@@ -559,7 +559,7 @@ export namespace Components {
      */
     selectionHighlighting?: SelectionHighlightingOptions;
     /**
-     * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
+     * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      */
     src?: string;
     stencilBuffer: StencilBufferManager;
@@ -2028,7 +2028,7 @@ declare namespace LocalJSX {
      */
     selectionHighlighting?: SelectionHighlightingOptions;
     /**
-     * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertexvis:scene:<sceneid>`
+     * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      */
     src?: string;
     stencilBuffer?: StencilBufferManager;

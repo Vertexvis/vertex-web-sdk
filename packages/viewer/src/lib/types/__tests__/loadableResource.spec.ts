@@ -10,32 +10,31 @@ describe(LoadableResource.fromUrn, () => {
   });
 
   it('throws if vertex scheme is not eedc', () => {
-    expect(() => LoadableResource.fromUrn('urn:vertexvis:foo')).toThrow();
+    expect(() => LoadableResource.fromUrn('urn:vertex:foo')).toThrow();
   });
 
   it('parses URN for a stream key', () => {
-    const urn = 'urn:vertexvis:stream-key:123';
+    const urn = 'urn:vertex:stream-key:123';
     const { resource } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
   });
 
   it('parses a sub resource for a scene view state by query param for a URN', () => {
-    const urn = 'urn:vertexvis:stream-key:123?scene-view-state=234';
+    const urn = 'urn:vertex:stream-key:123?scene-view-state=234';
     const { resource, subResource } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(subResource).toEqual({ type: 'scene-view-state', id: '234' });
   });
 
   it('parses a sub resource for a scene view state for a URN', () => {
-    const urn = 'urn:vertexvis:stream-key:123/scene-view-states/234';
+    const urn = 'urn:vertex:stream-key:123/scene-view-states/234';
     const { resource, subResource } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(subResource).toEqual({ type: 'scene-view-state', id: '234' });
   });
 
   it('parses query param for a URN', () => {
-    const urn =
-      'urn:vertexvis:stream-key:123/scene-view-states?supplied-id=234';
+    const urn = 'urn:vertex:stream-key:123/scene-view-states?supplied-id=234';
     const { resource, subResource, queries } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(subResource).toEqual({ type: 'scene-view-state', id: undefined });
@@ -44,7 +43,7 @@ describe(LoadableResource.fromUrn, () => {
 
   it('parses multiple query params for a URN', () => {
     const urn =
-      'urn:vertexvis:stream-key:123?supplied-id=234&supplied-id=345&supplied-id=456';
+      'urn:vertex:stream-key:123?supplied-id=234&supplied-id=345&supplied-id=456';
     const { resource, queries } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(queries![0]).toEqual({ type: 'supplied-id', id: '234' });

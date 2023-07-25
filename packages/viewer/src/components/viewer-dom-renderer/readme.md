@@ -30,7 +30,7 @@ _note: In order to support multiple viewer-dom-renderer components in your viewe
     </style>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-dom-renderer>
         <vertex-viewer-dom-element position="[0, 0, 0]">
           <div class="pin">1</div>
@@ -64,7 +64,7 @@ is a helper library for common 3D math operations.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-dom-renderer>
         <vertex-viewer-dom-element
           position="[0, 100, 0]"
@@ -84,7 +84,7 @@ is a helper library for common 3D math operations.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-dom-renderer>
         <vertex-viewer-dom-element id="my-pin">
           <div class="pin">1</div>
@@ -123,7 +123,7 @@ group of elements.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-dom-renderer>
         <vertex-viewer-dom-group position="[500, 0, 0]" scale="[0.5, 0.5, 0.5]">
           <!-- Pin 1 -->
@@ -158,7 +158,7 @@ property.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-dom-renderer>
         <!-- Element with billboarding disabled -->
         <vertex-viewer-dom-element id="my-pin" billboard-off>
@@ -191,7 +191,7 @@ attribute.
   </head>
   <body>
     <!-- Opt-in to depth buffers for all frames. -->
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" depth-buffers="all">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" depth-buffers="all">
       <vertex-viewer-dom-renderer>
         <!-- This element will be included in occlusion testing. -->
         <vertex-viewer-dom-element position="[0, 0, 100]">

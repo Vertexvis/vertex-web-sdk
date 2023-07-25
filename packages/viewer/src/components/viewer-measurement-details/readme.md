@@ -18,7 +18,7 @@ components.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" feature-maps="final">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" feature-maps="final">
     <vertex-viewer-measurement-precise
       id="measurement"
     ></vertex-viewer-measurement-precise>
@@ -57,7 +57,7 @@ Currently supported units include: `millimeters`, `centimeters`, `meters`,
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         distance-units="inches"
@@ -78,7 +78,7 @@ in real space and should return a string.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         id="measurement-details"
@@ -105,7 +105,7 @@ include: `degrees` and `radians`.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         angle-units="radians"
@@ -126,7 +126,7 @@ in degrees, and should return a string.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
     <vertex-viewer-toolbar placement="bottom-right">
       <vertex-viewer-measurement-details
         id="measurement-details"

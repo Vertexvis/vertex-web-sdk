@@ -121,7 +121,7 @@ describe(InteractionApi, () => {
       );
       await api.endInteraction();
 
-      expect(moveBy.mock.calls[0][0].x).toBeCloseTo(1);
+      expect(moveBy.mock.calls[0][0].x).toBeCloseTo(0.5);
     });
   });
 
@@ -180,13 +180,13 @@ describe(InteractionApi, () => {
       );
       await api.endInteraction();
 
-      expect(update.mock.calls[0][0].lookAt?.x).toBeCloseTo(1);
-      expect(update.mock.calls[0][0].lookAt?.y).toBeCloseTo(-1);
+      expect(update.mock.calls[0][0].lookAt?.x).toBeCloseTo(2);
+      expect(update.mock.calls[0][0].lookAt?.y).toBeCloseTo(-2);
       expect(update.mock.calls[0][0].lookAt?.z).toBe(0);
       expect(
         (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera)
           .fovHeight
-      ).toBe(3);
+      ).toBe(5);
     });
   });
 });

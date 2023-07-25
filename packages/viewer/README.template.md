@@ -36,7 +36,7 @@ file that references our published JS bundles from a CDN.
   </head>
 
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:123" client-id="123"></vertex-viewer>
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:123" client-id="123"></vertex-viewer>
   </body>
 </html>
 ```
@@ -77,7 +77,7 @@ async function main() {
 
   // Wait for the component to be registered.
   await customElements.whenDefined('vertex-viewer');
-  viewer.load("urn:vertexvis:stream-key:123")
+  viewer.load("urn:vertex:stream-key:123")
 }
 ```
 
@@ -111,7 +111,7 @@ async function main() {
   await defineCustomElements();
 
   const viewer = document.querySelector("viewer");
-  await viewer.load("urn:vertexvis:stream-key:123");
+  await viewer.load("urn:vertex:stream-key:123");
   console.log("Loaded!");
 }
 

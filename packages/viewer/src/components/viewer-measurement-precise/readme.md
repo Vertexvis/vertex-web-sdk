@@ -22,7 +22,7 @@ precise measurement to work.
 ```html
 <html>
 <body>
-  <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key" feature-maps="final">
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" feature-maps="final">
     <vertex-viewer-measurement-precise
       id="measurement"
     ></vertex-viewer-measurement-precise>

@@ -17,7 +17,7 @@ viewport of a `<vertex-viewer>`.
     </style>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertexvis:stream-key:my-key">
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
       <vertex-viewer-layer>
         <div class="toolbar">
           <button>Click Me</button>

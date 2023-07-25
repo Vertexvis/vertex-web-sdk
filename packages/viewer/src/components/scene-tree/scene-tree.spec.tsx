@@ -165,7 +165,7 @@ describe('<vertex-scene-tree>', () => {
           ),
         });
 
-      const key1 = `urn:vertexvis:stream-key:${decodeSceneTreeJwt(token).view}`;
+      const key1 = `urn:vertex:stream-key:${decodeSceneTreeJwt(token).view}`;
       loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
       await page.waitForChanges();
@@ -173,9 +173,7 @@ describe('<vertex-scene-tree>', () => {
       rowData.mockClear();
 
       const newJwt = signJwt(random.guid());
-      const key2 = `urn:vertexvis:stream-key:${
-        decodeSceneTreeJwt(newJwt).view
-      }`;
+      const key2 = `urn:vertex:stream-key:${decodeSceneTreeJwt(newJwt).view}`;
       loadViewerStreamKey(key2, { viewer, stream, ws }, { token: newJwt });
       await waitForSceneTreeConnected();
       await page.waitForChanges();
