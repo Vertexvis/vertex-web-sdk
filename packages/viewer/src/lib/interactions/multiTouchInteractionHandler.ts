@@ -45,8 +45,8 @@ export abstract class MultiTouchInteractionHandler
         )
       );
       const center = Point.create(
-        (this.currentPosition1.x + this.currentPosition2.x) / 2,
-        (this.currentPosition1.y + this.currentPosition2.y) / 2
+        (point1.x + point2.x) / 2,
+        (point1.y + point2.y) / 2
       );
 
       this.interactionApi?.beginInteraction();
