@@ -85,9 +85,10 @@ export class InteractionApiOrthographic extends InteractionApi {
       const normalizedUpVector = Vector3.normalize(camera.up);
       const normalizedViewVector = Vector3.normalize(viewVector);
 
+      const throttledDelta = Point.scale(delta, 0.5, 0.5);
       const d = Vector3.magnitude(viewVector);
-      const epsilonX = (delta.x * d) / viewport.width;
-      const epsilonY = (delta.y / viewport.width) * d;
+      const epsilonX = (throttledDelta.x * d) / viewport.width;
+      const epsilonY = (throttledDelta.y / viewport.width) * d;
 
       const xvec = Vector3.cross(normalizedUpVector, normalizedViewVector);
       const yvec = Vector3.cross(normalizedViewVector, xvec);
@@ -204,7 +205,8 @@ export class InteractionApiOrthographic extends InteractionApi {
       if (this.orthographicZoomData != null) {
         const { hitPt, hitPlane } = this.orthographicZoomData;
 
-        const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
+        const relativeDelta =
+          2 * (camera.fovHeight / viewport.height) * delta * 2;
         const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
         const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
         const diff = Vector3.scale(
