@@ -58,6 +58,7 @@ export interface SceneTreeState {
   shouldShowLoading?: boolean;
   shouldShowEmptyResults?: boolean;
   filterTerm?: string;
+  handshakeReceived?: boolean;
 }
 
 interface Page {
@@ -290,6 +291,7 @@ export class SceneTreeController {
     try {
       this.log('Scene tree controller connecting.');
 
+      this.restartLoadingTimer();
       // Ensure we have a subscription prior to attempting to get the first page
       // to make sure we receive any ListChange that comes through
       const stream = await this.subscribe();
@@ -310,9 +312,7 @@ export class SceneTreeController {
           },
         });
 
-        this.subscriptionHandshakeTimer = window.setTimeout(() => {
-          this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
-        }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
+        this.restartHandshakeTimer(jwtProvider, sceneViewId);
       }
     } catch (e) {
       this.ifErrorIsFatal(e, () => {
@@ -339,9 +339,24 @@ export class SceneTreeController {
     }
   }
 
+  private restartHandshakeTimer(
+    jwtProvider: JwtProvider,
+    sceneViewId: string
+  ): void {
+    this.clearHandshakeTimer();
+
+    if (!this.state.handshakeReceived) {
+      this.subscriptionHandshakeTimer = window.setTimeout(() => {
+        this.handleSubscriptionHandshakeTimeout(jwtProvider, sceneViewId);
+        this.subscriptionHandshakeTimer = undefined;
+      }, this.connectOptions.subscriptionHandshakeGracePeriodInMs);
+    }
+  }
+
   private clearHandshakeTimer(): void {
     if (this.subscriptionHandshakeTimer != null) {
       window.clearTimeout(this.subscriptionHandshakeTimer);
+      this.subscriptionHandshakeTimer = undefined;
     }
   }
 
@@ -432,6 +447,7 @@ export class SceneTreeController {
       shouldShowEmptyResults: reset
         ? undefined
         : this.state.shouldShowEmptyResults,
+      handshakeReceived: reset ? undefined : this.state.handshakeReceived,
     });
   }
 
@@ -801,7 +817,7 @@ export class SceneTreeController {
   public async updateActiveRowRange(start: number, end: number): Promise<void> {
     this.activeRowRange = this.constrainRowOffsets(start, end);
 
-    this.tryClearLoadingTimer(this.state);
+    this.tryClearLoadingState();
 
     await this.fetchUnloadedPagesInActiveRows();
   }
@@ -820,6 +836,7 @@ export class SceneTreeController {
       stream.on('data', (msg: SubscribeResponse) => {
         if (msg.hasHandshake()) {
           this.clearHandshakeTimer();
+          this.updateState({ ...this.state, handshakeReceived: true });
         }
 
         this.startIdleReconnectTimer();
@@ -915,8 +932,10 @@ export class SceneTreeController {
 
   private async fetchUnloadedPagesInActiveRows(): Promise<void> {
     const [startPage, endPage] = this.getPageIndexesForRange(
-      this.activeRowRange[0],
-      this.activeRowRange[1]
+      // Verify the first page is loaded properly even if the `activeRowRange`
+      // has not been specified by the underlying table layout after a reconnect.
+      this.activeRowRange[0] ?? 0,
+      this.activeRowRange[1] ?? 0
     );
 
     const pages = this.getNonLoadedPageIndexes(startPage - 1, endPage + 1);
@@ -991,6 +1010,8 @@ export class SceneTreeController {
             ...this.state,
             totalRows: totalRows,
             rows: rows,
+            shouldShowLoading:
+              rows.length === 0 && this.state.shouldShowLoading,
             shouldShowEmptyResults:
               this.state.filterTerm != null &&
               (rows.length === 0 || this.state.totalFilteredRows === 0),
@@ -1056,6 +1077,14 @@ export class SceneTreeController {
     if (this.loadingTimer != null) {
       clearTimeout(this.loadingTimer);
       this.loadingTimer = undefined;
+    }
+  }
+
+  private tryClearLoadingState(): void {
+    const didClearLoadingTimer = this.tryClearLoadingTimer(this.state);
+
+    if (didClearLoadingTimer) {
+      this.updateState({ ...this.state, shouldShowLoading: false });
     }
   }
 
