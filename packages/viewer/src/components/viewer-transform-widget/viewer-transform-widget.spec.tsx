@@ -203,13 +203,18 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000'
     );
-    const beginSpy = jest.spyOn(stream, 'beginInteraction');
+    const beginSpy = jest
+      .spyOn(stream, 'beginInteraction')
+      .mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     const endSpy = jest
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
     (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
@@ -221,6 +226,8 @@ describe('vertex-viewer-transform-widget', () => {
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
 
     expect(beginSpy).toHaveBeenCalled();
     expect(updateSpy).toHaveBeenCalledWith(
@@ -311,7 +318,9 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000'
     );
-    const beginSpy = jest.spyOn(stream, 'beginInteraction');
+    const beginSpy = jest
+      .spyOn(stream, 'beginInteraction')
+      .mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     const endSpy = jest
       .spyOn(stream, 'endInteraction')
@@ -332,6 +341,8 @@ describe('vertex-viewer-transform-widget', () => {
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
 
     expect(beginSpy).toHaveBeenCalled();
     expect(updateSpy).toHaveBeenCalledWith(
@@ -538,9 +549,13 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000'
     );
 
+    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const endSpy = jest.spyOn(stream, 'endInteraction');
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
     (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
@@ -550,6 +565,10 @@ describe('vertex-viewer-transform-widget', () => {
     widget.shadowRoot
       ?.querySelector('canvas')
       ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
 
     (mockTransformWidget.updateTransform as jest.Mock).mockClear();
     widget.position = undefined;

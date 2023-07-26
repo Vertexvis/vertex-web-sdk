@@ -377,7 +377,6 @@ export class ViewerTransformWidget {
         this.currentTransform
       );
 
-      this.controller?.beginTransform();
       this.interactionStarted.emit();
 
       window.removeEventListener('pointermove', this.handlePointerMove);
@@ -400,6 +399,10 @@ export class ViewerTransformWidget {
       this.viewer.frame != null &&
       this.position != null
     ) {
+      // Begin the transform on the first `pointermove` event as opposed to the
+      // `pointerdown` to prevent accidental no-op transforms (identity matrix).
+      await this.controller?.beginTransform();
+
       const currentCanvas = convertPointToCanvas(
         Point.create(event.clientX, event.clientY),
         canvasBounds

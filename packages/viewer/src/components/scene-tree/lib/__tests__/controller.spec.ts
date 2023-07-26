@@ -41,6 +41,8 @@ import { sign } from 'jsonwebtoken';
 
 import {
   createGetTreeResponse,
+  createListChange,
+  createSubscribeResponse,
   mockGrpcUnaryError,
   mockGrpcUnaryResult,
   random,
@@ -241,6 +243,42 @@ describe(SceneTreeController, () => {
       );
     });
 
+    it('responds to a ListChange without active rows', async () => {
+      const { controller, client, stream } = createController(10);
+      const getTreeEmpty = createGetTreeResponse(0, 0);
+      const getTree = createGetTreeResponse(10, 100, (node) =>
+        node.setVisible(false)
+      );
+
+      (client.getTree as jest.Mock)
+        .mockImplementationOnce(mockGrpcUnaryResult(getTreeEmpty))
+        .mockImplementationOnce(mockGrpcUnaryResult(getTree));
+
+      let treeStatePromiseResolve: VoidFunction | undefined;
+      const treeStatePromise = new Promise<void>((resolve) => {
+        treeStatePromiseResolve = resolve;
+      });
+      const onStateChange = jest.fn((state) => {
+        if (state.rows.length > 0) {
+          treeStatePromiseResolve?.();
+        }
+      });
+      controller.onStateChange.on(onStateChange);
+
+      await controller.connect(jwtProvider);
+
+      stream.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await treeStatePromise;
+
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          connection: expect.objectContaining({ type: 'connected' }),
+          totalRows: 100,
+        })
+      );
+    });
+
     it('emits failure if connect failed', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
@@ -362,6 +400,32 @@ describe(SceneTreeController, () => {
           }),
         })
       );
+    });
+
+    it('does not retry the subscription if a handshake was received before before the first page', async () => {
+      const subscriptionHandshakeTimeout = 50;
+      const { controller, client, stream } = createController(
+        10,
+        subscriptionHandshakeTimeout
+      );
+      const getTree = createGetTreeResponse(10, 100, (node) =>
+        node.setVisible(false)
+      );
+      (client.getTree as jest.Mock).mockImplementation((...args) => {
+        initiateHandshakeOnStream(stream);
+        mockGrpcUnaryResult(getTree, 250)(...args);
+      });
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+
+      await controller.connect(jwtProvider);
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, subscriptionHandshakeTimeout * 3 + 50);
+      });
+
+      expect(client.getTree as jest.Mock).toHaveBeenCalledTimes(1);
     });
 
     it('handles the subscription handshake', async () => {
