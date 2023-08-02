@@ -277,6 +277,10 @@ export class SceneTreeTableLayout {
   @Watch('totalRows')
   @Watch('rowHeight')
   protected async handleViewportRowsPropsChanged(): Promise<void> {
+    if (this.isComputingCellHeight) {
+      await this.computeCellHeight();
+    }
+
     await this.computeAndUpdateViewportRows();
   }
 
@@ -624,7 +628,7 @@ export class SceneTreeTableLayout {
       }
       this.rowHeight = height ?? this.rowHeight;
       element.remove();
-      this.isComputingCellHeight = false;
+      this.isComputingCellHeight = this.rowHeight === 0;
     }
   };
 
