@@ -220,15 +220,6 @@ export class Viewer {
   @Prop() public depthBuffers?: FrameType;
 
   /**
-   * Specifies the opacity, between 0 and 100, for an experimental ghosting
-   * feature. When the value is non-zero, any scene items that are hidden will
-   * be appear translucent.
-   *
-   * **Note:** This feature is experimental, and may cause slower frame rates.
-   */
-  @Prop() public experimentalGhostingOpacity = 0;
-
-  /**
    * Specifies how phantom parts should appear.
    * The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
    */
@@ -746,14 +737,6 @@ export class Viewer {
    */
   @Watch('depthBuffers')
   protected handleDepthBuffersChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('experimentalGhostingOpacity')
-  protected handleExperimentalGhostingOpacityChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -1388,7 +1371,6 @@ export class Viewer {
   private getStreamAttributes(): StreamAttributes {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
-      experimentalGhosting: this.experimentalGhostingOpacity,
       phantom: this.phantom,
       noDefaultLights: this.noDefaultLights,
       featureLines: this.featureLines,

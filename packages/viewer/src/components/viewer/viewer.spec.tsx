@@ -216,7 +216,6 @@ describe('vertex-viewer', () => {
           <vertex-viewer
             clientId={clientId}
             stream={stream}
-            experimentalGhostingOpacity={1}
             featureLines={{ width: 1 }}
             selectionHighlighting={{
               lineWidth: 2,
@@ -238,7 +237,6 @@ describe('vertex-viewer', () => {
           frameBgColor: expect.objectContaining({ r: 0, g: 0, b: 255 }),
           streamAttributes: expect.objectContaining({
             depthBuffers: 'all',
-            experimentalGhosting: 1,
             featureLines: { width: 1 },
             featureHighlighting: { highlightColor: 0xff0000 },
             selectionHighlighting: {
@@ -300,11 +298,11 @@ describe('vertex-viewer', () => {
         })
       );
 
-      viewer.experimentalGhostingOpacity = 1;
+      viewer.phantom = { opacity: 1 };
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
-            experimentalGhosting: 1,
+            phantom: expect.objectContaining({ opacity: 1 }),
           }),
         })
       );

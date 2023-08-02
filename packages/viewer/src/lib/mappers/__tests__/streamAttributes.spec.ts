@@ -67,38 +67,18 @@ describe(toPbStreamAttributes, () => {
     });
   });
 
-  describe('ghosting', () => {
-    it('enables ghosting if opacity is > 0', () => {
-      const res = toPbStreamAttributes({ experimentalGhosting: 1 });
-      expect(res).toMatchObject({
-        experimentalGhosting: expect.objectContaining({
-          enabled: { value: true },
-          opacity: { value: 1 },
-        }),
-      });
-    });
-
+  describe('phantom', () => {
     it('clamps opacity to [0, 1]', () => {
-      const res1 = toPbStreamAttributes({ experimentalGhosting: 2 });
-      const res2 = toPbStreamAttributes({ experimentalGhosting: -1 });
+      const res1 = toPbStreamAttributes({ phantom: { opacity: 2 } });
+      const res2 = toPbStreamAttributes({ phantom: { opacity: -1 } });
       expect(res1).toMatchObject({
-        experimentalGhosting: expect.objectContaining({
-          enabled: { value: true },
+        phantomItems: expect.objectContaining({
           opacity: { value: 1 },
         }),
       });
       expect(res2).toMatchObject({
-        experimentalGhosting: expect.objectContaining({
-          enabled: { value: false },
-        }),
-      });
-    });
-
-    it('disables ghosting if opacity not set', () => {
-      const res = toPbStreamAttributes({ experimentalGhosting: undefined });
-      expect(res).toMatchObject({
-        experimentalGhosting: expect.objectContaining({
-          enabled: { value: false },
+        phantomItems: expect.objectContaining({
+          opacity: { value: 0 },
         }),
       });
     });
