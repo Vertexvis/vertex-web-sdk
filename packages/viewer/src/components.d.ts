@@ -425,10 +425,6 @@ export namespace Components {
     deviceId?: string;
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
-     * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
-     */
-    experimentalGhostingOpacity: number;
-    /**
      * @private
      */
     experimentalRenderingOptions: string;
@@ -1917,10 +1913,6 @@ declare namespace LocalJSX {
      * @private
      */
     deviceId?: string;
-    /**
-     * Specifies the opacity, between 0 and 100, for an experimental ghosting feature. When the value is non-zero, any scene items that are hidden will be appear translucent.  **Note:** This feature is experimental, and may cause slower frame rates.
-     */
-    experimentalGhostingOpacity?: number;
     /**
      * @private
      */

@@ -40,20 +40,6 @@ const toPbFrameType: M.Func<
   (type) => type
 );
 
-const toPbExperimentalGhosting: M.Func<
-  number | undefined,
-  vertexvis.protobuf.stream.IGhostingAttributes
-> = M.defineMapper(
-  (opacity) => {
-    const enabled = opacity != null && opacity > 0;
-    return {
-      enabled: { value: enabled },
-      opacity: enabled ? { value: clamp(opacity ?? 0, 0, 1) } : undefined,
-    };
-  },
-  (attr) => attr
-);
-
 const toPbPhantom: M.Func<
   PhantomOptions | undefined,
   vertexvis.protobuf.stream.IPhantomAttributes
@@ -126,7 +112,6 @@ export const toPbStreamAttributes: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapProp('depthBuffers', toPbFrameType),
-    M.mapProp('experimentalGhosting', toPbExperimentalGhosting),
     M.mapProp('phantom', toPbPhantom),
     M.mapProp('noDefaultLights', toPbNoDefaultLights),
     M.mapProp('featureLines', toPbFeatureLines),
@@ -135,10 +120,9 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions),
     M.mapProp('selectionHighlighting', toPbSelectionHighlighting)
   ),
-  ([db, eg, pi, ndl, fl, fh, fm, ero, hs]) => {
+  ([db, pi, ndl, fl, fh, fm, ero, hs]) => {
     const value = {
       depthBuffers: db,
-      experimentalGhosting: eg,
       phantomItems: pi,
       noDefaultLights: ndl,
       featureLines: fl,

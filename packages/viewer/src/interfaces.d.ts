@@ -40,7 +40,6 @@ export interface HTMLDomRendererPositionableElement {
 
 export interface StreamAttributes {
   depthBuffers?: FrameType;
-  experimentalGhosting?: number;
   phantom?: PhantomOptions;
   noDefaultLights?: boolean;
   featureLines?: FeatureLineOptions;
