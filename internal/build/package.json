@@ -1,6 +1,6 @@
 {
   "name": "@vertexwebsdk/build",
-  "version": "0.17.5",
+  "version": "0.18.0",
   "description": "Private repo for shared build tooling.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
