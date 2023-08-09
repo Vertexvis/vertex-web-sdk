@@ -176,7 +176,7 @@ describe(InteractionApi, () => {
     });
   });
 
-  describe.only(InteractionApi.prototype.zoomCameraToPoint, () => {
+  describe(InteractionApi.prototype.zoomCameraToPoint, () => {
     it('replaces the camera if interacting', async () => {
       await api.beginInteraction();
       await api.zoomCameraToPoint(Point.create(10, 10), 1);
