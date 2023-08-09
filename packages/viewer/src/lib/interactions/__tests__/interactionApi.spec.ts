@@ -1,19 +1,35 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
-import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+import { EventEmitter } from '@stencil/core';
+import {
+  Angle,
+  BoundingBox,
+  Dimensions,
+  Point,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { random } from '../../../testing';
-import { makePerspectiveFrame } from '../../../testing/fixtures';
+import {
+  copyDrawFramePayloadPerspective,
+  drawFramePayloadPerspective,
+  makePerspectiveFrame,
+} from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
-import * as ColorMaterial from '../../scenes/colorMaterial';
 import { Interactions, Orientation, Viewport } from '../../types';
 import { Frame } from '../../types/frame';
-import { InteractionApi } from '../interactionApi';
+import { PerspectiveFrameCamera } from '../../types/frameCamera';
+import {
+  InteractionApi,
+  InteractionConfigProvider,
+  SceneProvider,
+} from '../interactionApi';
 import { InteractionApiPerspective } from '../interactionApiPerspective';
+import { TapEventDetails } from '../tapEventDetails';
 
 describe(InteractionApi, () => {
   const emitTap = jest.fn();
@@ -32,34 +48,39 @@ describe(InteractionApi, () => {
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
-    sceneViewId,
-    ColorMaterial.fromHex('#ffffff')
+    sceneViewId
   );
   const frameProvider = (): Frame | undefined => frame;
-  const sceneProvider = (): Scene => scene;
+  const sceneProvider = async (): Promise<Scene> => scene;
   const viewportProvider = (): Viewport => new Viewport(100, 100);
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
 
   let api: InteractionApi;
 
+  function createInteractionApi(
+    props: InteractionApiProps = {}
+  ): InteractionApiPerspective {
+    return new InteractionApiPerspective(
+      props.streamApi ?? streamApi,
+      props.cursorManager ?? new CursorManager(),
+      props.interactionConfigProvider ?? interactionConfigProvider,
+      props.sceneProvider ?? sceneProvider,
+      props.frameProvider ?? frameProvider,
+      props.viewportProvider ?? viewportProvider,
+      props.tapEmitter ?? { emit: emitTap },
+      props.doubleTapEmitter ?? { emit: emitDoubleTap },
+      props.longPressEmitter ?? { emit: emitLongPress },
+      props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
+      props.interactionFinishedEmitter ?? { emit: emitInteractionFinished }
+    );
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
 
-    api = new InteractionApiPerspective(
-      streamApi,
-      new CursorManager(),
-      interactionConfigProvider,
-      sceneProvider,
-      frameProvider,
-      viewportProvider,
-      { emit: emitTap },
-      { emit: emitDoubleTap },
-      { emit: emitLongPress },
-      { emit: emitInteractionStarted },
-      { emit: emitInteractionFinished }
-    );
+    api = createInteractionApi();
   });
 
   describe(InteractionApi.prototype.beginInteraction, () => {
@@ -155,12 +176,166 @@ describe(InteractionApi, () => {
     });
   });
 
-  describe(InteractionApi.prototype.zoomCameraToPoint, () => {
+  describe.only(InteractionApi.prototype.zoomCameraToPoint, () => {
     it('replaces the camera if interacting', async () => {
       await api.beginInteraction();
       await api.zoomCameraToPoint(Point.create(10, 10), 1);
       await api.endInteraction();
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+
+    it('prevents zooming past the hit point when configured', async () => {
+      const configuredApi = createInteractionApi({
+        interactionConfigProvider: () => ({
+          ...Interactions.defaultInteractionConfig,
+          useMinimumPerspectiveZoomDistance: false,
+        }),
+      });
+
+      await configuredApi.beginInteraction();
+      for (let i = 0; i < 100; i++) {
+        await configuredApi.zoomCameraToPoint(Point.create(10, 10), 10);
+      }
+      await configuredApi.endInteraction();
+
+      const lastCall: PerspectiveFrameCamera = (
+        streamApi.replaceCamera as jest.Mock
+      ).mock.lastCall[0].camera.perspective;
+
+      expect(lastCall.position.z).toBeCloseTo(0);
+    });
+
+    it('allows zooming past the hit point', async () => {
+      await api.beginInteraction();
+      for (let i = 0; i < 100; i++) {
+        await api.zoomCameraToPoint(Point.create(10, 10), 10);
+      }
+      await api.endInteraction();
+
+      const lastCall: PerspectiveFrameCamera = (
+        streamApi.replaceCamera as jest.Mock
+      ).mock.lastCall[0].camera.perspective;
+
+      expect(lastCall.position.z).not.toBeCloseTo(0);
+    });
+
+    it('uses the camera orientation and bounding box to determine zoom speed', async () => {
+      const visibleBounds = {
+        xmin: -100,
+        ymin: -200,
+        zmin: -300,
+        xmax: 100,
+        ymax: 200,
+        zmax: 300,
+      };
+      const closeFrameZ = makePerspectiveFrame(
+        copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
+          sceneAttributes: {
+            visibleBoundingBox: visibleBounds,
+            camera: {
+              perspective: {
+                position: { x: 0, y: 0, z: 0.25 },
+                up: { x: 0, y: 1, z: 0 },
+              },
+            },
+          },
+        })
+      );
+      const closeFrameY = makePerspectiveFrame(
+        copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
+          sceneAttributes: {
+            visibleBoundingBox: visibleBounds,
+            camera: {
+              perspective: {
+                position: { x: 0, y: 0.25, z: 0 },
+                up: { x: 0, y: 0, z: 1 },
+              },
+            },
+          },
+        })
+      );
+      const closeFrameX = makePerspectiveFrame(
+        copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
+          sceneAttributes: {
+            visibleBoundingBox: visibleBounds,
+            camera: {
+              perspective: {
+                position: { x: 0.25, y: 0, z: 0 },
+                up: { x: 0, y: 1, z: 0 },
+              },
+            },
+          },
+        })
+      );
+      const apiCloseX = createInteractionApi({
+        sceneProvider: async () =>
+          new Scene(
+            streamApi,
+            closeFrameX,
+            fromPbFrameOrThrow(Orientation.DEFAULT),
+            () => Point.create(1, 1),
+            Dimensions.create(50, 50),
+            sceneId,
+            sceneViewId
+          ),
+        frameProvider: () => closeFrameX,
+      });
+
+      await apiCloseX.beginInteraction();
+      await apiCloseX.zoomCameraToPoint(Point.create(50, 50), 1);
+      await apiCloseX.endInteraction();
+
+      const lastCallX: PerspectiveFrameCamera = (
+        streamApi.replaceCamera as jest.Mock
+      ).mock.lastCall[0].camera.perspective;
+
+      const apiCloseY = createInteractionApi({
+        sceneProvider: async () =>
+          new Scene(
+            streamApi,
+            closeFrameY,
+            fromPbFrameOrThrow(Orientation.DEFAULT),
+            () => Point.create(1, 1),
+            Dimensions.create(50, 50),
+            sceneId,
+            sceneViewId
+          ),
+        frameProvider: () => closeFrameY,
+      });
+
+      await apiCloseY.beginInteraction();
+      await apiCloseY.zoomCameraToPoint(Point.create(50, 50), 1);
+      await apiCloseY.endInteraction();
+
+      const lastCallY: PerspectiveFrameCamera = (
+        streamApi.replaceCamera as jest.Mock
+      ).mock.lastCall[0].camera.perspective;
+
+      const apiCloseZ = createInteractionApi({
+        sceneProvider: async () =>
+          new Scene(
+            streamApi,
+            closeFrameZ,
+            fromPbFrameOrThrow(Orientation.DEFAULT),
+            () => Point.create(1, 1),
+            Dimensions.create(50, 50),
+            sceneId,
+            sceneViewId
+          ),
+        frameProvider: () => closeFrameZ,
+      });
+
+      await apiCloseZ.beginInteraction();
+      await apiCloseZ.zoomCameraToPoint(Point.create(50, 50), 1);
+      await apiCloseZ.endInteraction();
+
+      const lastCallZ: PerspectiveFrameCamera = (
+        streamApi.replaceCamera as jest.Mock
+      ).mock.lastCall[0].camera.perspective;
+
+      expect(lastCallX.lookAt.x).toBeCloseTo(-7.426);
+      expect(lastCallY.lookAt.y).toBeCloseTo(-15.1);
+      expect(lastCallZ.lookAt.z).toBeCloseTo(-22.777);
     });
 
     it('does nothing if not interacting', async () => {
@@ -278,3 +453,17 @@ describe(InteractionApi, () => {
     });
   });
 });
+
+interface InteractionApiProps {
+  streamApi?: StreamApi;
+  cursorManager?: CursorManager;
+  interactionConfigProvider?: InteractionConfigProvider;
+  sceneProvider?: SceneProvider;
+  frameProvider?: () => Frame | undefined;
+  viewportProvider?: () => Viewport;
+  tapEmitter?: EventEmitter<TapEventDetails>;
+  doubleTapEmitter?: EventEmitter<TapEventDetails>;
+  longPressEmitter?: EventEmitter<TapEventDetails>;
+  interactionStartedEmitter?: EventEmitter<void>;
+  interactionFinishedEmitter?: EventEmitter<void>;
+}
