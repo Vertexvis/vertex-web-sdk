@@ -149,7 +149,7 @@ export class SceneTreeController {
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
   private metadataKeys: MetadataKey[] = [];
-  private debugLogs = true;
+  private debugLogs = false;
 
   private reconnectTimer?: number;
   private loadingTimer?: number;
