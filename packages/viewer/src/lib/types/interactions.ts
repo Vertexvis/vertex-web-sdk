@@ -18,10 +18,19 @@ export interface InteractionConfig {
    * update the camera.
    */
   interactionDelay: number;
+
+  /**
+   * Whether the `zoomCameraToPoint` interaction through the `InteractionApiPerspective`
+   * will enforce a minimum distance when moving the camera. When set, the camera will be
+   * able to move through geometry under the cursor, rather than being restricted by the
+   * point under the cursor. Defaults to `true`.
+   */
+  useMinimumPerspectiveZoomDistance: boolean;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
   finePointerThreshold: 1,
   coarsePointerThreshold: 3,
   interactionDelay: 75,
+  useMinimumPerspectiveZoomDistance: true,
 };

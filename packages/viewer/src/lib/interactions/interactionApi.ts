@@ -462,53 +462,6 @@ export abstract class InteractionApi {
     });
   }
 
-  public async zoomCameraToPoint(
-    point: Point.Point,
-    delta: number
-  ): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      const cam = frame.scene.camera;
-      const dir = cam.direction;
-
-      const frameCam = camera.toFrameCamera();
-      const ray = viewport.transformPointToRay(point, frame.image, frameCam);
-
-      if (this.zoomData == null) {
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, cam.lookAt);
-        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
-        if (fallbackPt == null) {
-          console.warn(
-            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
-          );
-          return camera;
-        }
-
-        const hitPt =
-          depthBuffer != null
-            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-            : fallbackPt;
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-        this.zoomData = { hitPt, hitPlane };
-      }
-
-      if (this.zoomData != null) {
-        const { hitPt, hitPlane } = this.zoomData;
-        const distance = Vector3.distance(camera.position, hitPt);
-        const epsilon = (6 * distance * delta) / viewport.height;
-
-        const position = Ray.at(ray, epsilon);
-        const lookAt = Plane.projectPoint(hitPlane, position);
-        const newCamera = camera.update({ position, lookAt });
-        const newDistance = Vector3.distance(position, lookAt);
-
-        if (newDistance >= newCamera.near) {
-          return newCamera;
-        }
-      }
-      return camera;
-    });
-  }
-
   /**
    * Performs a pivot operation of the scene's camera, updating the lookAt
    * while maintaining the position, and requests a new image for the
@@ -656,4 +609,9 @@ export abstract class InteractionApi {
    *  viewer.
    */
   public abstract panCameraByDelta(delta: Point.Point): Promise<void>;
+
+  public abstract zoomCameraToPoint(
+    point: Point.Point,
+    delta: number
+  ): Promise<void>;
 }

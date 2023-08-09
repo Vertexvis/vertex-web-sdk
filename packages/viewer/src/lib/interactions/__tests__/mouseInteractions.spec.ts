@@ -3,6 +3,7 @@ jest.mock('../interactionApi');
 import { Point } from '@vertexvis/geometry';
 
 import { InteractionApi } from '../interactionApi';
+import { InteractionApiPerspective } from '../interactionApiPerspective';
 import {
   PanInteraction,
   RotateInteraction,
@@ -149,7 +150,8 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api = new (InteractionApi as jest.Mock<InteractionApi>)();
+  const api =
+    new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
 
   const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
   const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
