@@ -2,13 +2,7 @@ jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
 import { EventEmitter } from '@stencil/core';
-import {
-  Angle,
-  BoundingBox,
-  Dimensions,
-  Point,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { random } from '../../../testing';
