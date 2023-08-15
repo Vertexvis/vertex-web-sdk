@@ -1,5 +1,6 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { vueOutputTarget } from '@stencil/vue-output-target';
 import workers from '@vertexvis/rollup-plugin-web-workers';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
@@ -32,6 +33,15 @@ export const config: Config = {
       excludeComponents: [
         // Omitted because the React scene tree component doesn't support
         // rendering a row as a React element.
+        'vertex-scene-tree-row',
+      ],
+    }),
+    vueOutputTarget({
+      componentCorePackage: '@vertexvis/viewer',
+      proxiesFile: '../viewer-vue/src/generated/components.ts',
+      excludeComponents: [
+        // Omitted because the Vue scene tree component doesn't support
+        // rendering a row as a Vue element.
         'vertex-scene-tree-row',
       ],
     }),
