@@ -13,6 +13,7 @@ web platform.
 | [@vertexvis/html-templates]  | ![npm](https://img.shields.io/npm/v/@vertexvis/html-templates)  | HTML templating utilities used with web components. |
 | [@vertexvis/viewer]          | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)          | The Web SDK containing web components to view 3D models. |
 | [@vertexvis/viewer-react]    | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)    | Contains React bindings for Vertex's Web SDK. |
+| [@vertexvis/viewer-vue]      | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-vue)      | Contains Vue bindings for Vertex's Web SDK. |
 
 ## Documentation
 
@@ -116,6 +117,7 @@ major and patch will be treated as minor.
 [@vertexvis/html-templates]: ./packages/html-templates
 [@vertexvis/viewer]: ./packages/viewer
 [@vertexvis/viewer-react]: ./packages/viewer-react
+[@vertexvis/viewer-vue]: ./packages/viewer-vue
 
 ## Examples
 
