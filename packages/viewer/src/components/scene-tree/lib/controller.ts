@@ -845,7 +845,7 @@ export class SceneTreeController {
           // when a `ListChange` was sent.
           if (this.state.firstFetchComplete) {
             this.log(
-              'Scene tree did not have the first page before the handshake completed'
+              'Scene tree first fetch completed before handshake received, invalidating current pages'
             );
 
             this.invalidateAfterOffset(0);
