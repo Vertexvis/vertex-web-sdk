@@ -59,6 +59,7 @@ export interface SceneTreeState {
   shouldShowEmptyResults?: boolean;
   filterTerm?: string;
   handshakeReceived?: boolean;
+  firstFetchComplete?: boolean;
 }
 
 interface Page {
@@ -448,6 +449,7 @@ export class SceneTreeController {
         ? undefined
         : this.state.shouldShowEmptyResults,
       handshakeReceived: reset ? undefined : this.state.handshakeReceived,
+      firstFetchComplete: reset ? undefined : this.state.firstFetchComplete,
     });
   }
 
@@ -837,6 +839,18 @@ export class SceneTreeController {
         if (msg.hasHandshake()) {
           this.clearHandshakeTimer();
           this.updateState({ ...this.state, handshakeReceived: true });
+
+          // Verify that we've loaded the first page of the tree when we receive
+          // a handshake in the case that the listener was not fully registered
+          // when a `ListChange` was sent.
+          if (this.state.firstFetchComplete) {
+            this.log(
+              'Scene tree first fetch completed before handshake received, invalidating current pages'
+            );
+
+            this.invalidateAfterOffset(0);
+            this.fetchUnloadedPagesInActiveRows();
+          }
         }
 
         this.startIdleReconnectTimer();
@@ -1015,6 +1029,7 @@ export class SceneTreeController {
             shouldShowEmptyResults:
               this.state.filterTerm != null &&
               (rows.length === 0 || this.state.totalFilteredRows === 0),
+            firstFetchComplete: true,
           });
         }
       }

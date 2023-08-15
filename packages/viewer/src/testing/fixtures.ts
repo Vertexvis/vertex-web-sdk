@@ -83,6 +83,29 @@ export const drawFramePayloadOrthographic: DrawFramePayload = {
   },
 };
 
+export function copyDrawFramePayloadPerspective(
+  payload: DrawFramePayload,
+  partial: Partial<DrawFramePayload>
+): DrawFramePayload {
+  return {
+    ...payload,
+    ...partial,
+    sceneAttributes: {
+      ...payload.sceneAttributes,
+      ...partial.sceneAttributes,
+      camera: {
+        ...partial.sceneAttributes?.camera,
+        perspective: {
+          position: { x: 0, y: 0, z: 100 },
+          lookAt: { x: 0, y: 0, z: 0 },
+          up: { x: 0, y: 1, z: 0 },
+          ...partial.sceneAttributes?.camera?.perspective,
+        },
+      },
+    },
+  };
+}
+
 export function makePerspectiveFrame(
   payload: DrawFramePayload = drawFramePayloadPerspective
 ): Frame {
