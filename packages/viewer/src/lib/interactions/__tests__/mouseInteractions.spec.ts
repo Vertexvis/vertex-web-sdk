@@ -1,8 +1,10 @@
 jest.mock('../interactionApi');
+jest.mock('../interactionApiPerspective');
 
 import { Point } from '@vertexvis/geometry';
 
 import { InteractionApi } from '../interactionApi';
+import { InteractionApiPerspective } from '../interactionApiPerspective';
 import {
   PanInteraction,
   RotateInteraction,
@@ -149,7 +151,8 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api = new (InteractionApi as jest.Mock<InteractionApi>)();
+  const api =
+    new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
 
   const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
   const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
@@ -168,7 +171,7 @@ describe(ZoomInteraction, () => {
   });
 
   describe(ZoomInteraction.prototype.drag, () => {
-    it('first drag rotates camera using delta between begin drag and drag', () => {
+    it('first drag zooms camera using delta between begin drag and drag', () => {
       const interaction = new ZoomInteraction();
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
@@ -177,7 +180,7 @@ describe(ZoomInteraction, () => {
       expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, 5);
     });
 
-    it('continuous drags rotate camera using delta between calls', () => {
+    it('continuous drags zoom camera using delta between calls', () => {
       const interaction = new ZoomInteraction();
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
