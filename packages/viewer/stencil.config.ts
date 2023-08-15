@@ -39,11 +39,6 @@ export const config: Config = {
     vueOutputTarget({
       componentCorePackage: '@vertexvis/viewer',
       proxiesFile: '../viewer-vue/src/generated/components.ts',
-      excludeComponents: [
-        // Omitted because the Vue scene tree component doesn't support
-        // rendering a row as a Vue element.
-        'vertex-scene-tree-row',
-      ],
     }),
     {
       type: 'dist',
