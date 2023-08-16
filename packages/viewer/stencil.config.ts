@@ -1,5 +1,6 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { vueOutputTarget } from '@stencil/vue-output-target';
 import workers from '@vertexvis/rollup-plugin-web-workers';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
@@ -34,6 +35,10 @@ export const config: Config = {
         // rendering a row as a React element.
         'vertex-scene-tree-row',
       ],
+    }),
+    vueOutputTarget({
+      componentCorePackage: '@vertexvis/viewer',
+      proxiesFile: '../viewer-vue/src/generated/components.ts',
     }),
     {
       type: 'dist',
