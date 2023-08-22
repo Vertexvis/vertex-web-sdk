@@ -39,6 +39,8 @@ export const config: Config = {
     vueOutputTarget({
       componentCorePackage: '@vertexvis/viewer',
       proxiesFile: '../viewer-vue/src/generated/components.ts',
+      includeImportCustomElements: true,
+      customElementsDir: 'dist/components',
     }),
     {
       type: 'dist',
@@ -46,6 +48,9 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements-bundle',
+    },
+    {
+      type: 'dist-custom-elements',
     },
     {
       type: 'docs-readme',

@@ -1,3 +1,9 @@
-import { rollupConfig } from '@vertexwebsdk/build';
+import { config, input, output, typescript } from '@vertexvis/build-tools';
 
-export default rollupConfig({ external: ['@vertexvis/viewer/loader'] });
+export default config(
+  input('src/index.ts'),
+  typescript(),
+  output({
+    inlineDynamicImports: true,
+  })
+);
