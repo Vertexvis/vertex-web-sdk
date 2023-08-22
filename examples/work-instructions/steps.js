@@ -22,7 +22,7 @@ const step1 = {
       ],
       query: {
         type: 'itemId',
-        values: ['5285ebd3-7028-403f-862a-c384da7ec687'],
+        values: ['73b19c01-ebab-4e4c-afad-80d5fce7c1f1'],
       },
     },
   ],
@@ -53,9 +53,10 @@ const step2 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
         ],
       },
     },
@@ -69,8 +70,7 @@ const step2 = {
       query: {
         type: 'itemId',
         values: [
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
         ],
       },
     },
@@ -105,11 +105,12 @@ const step3 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
         ],
       },
     },
@@ -123,8 +124,8 @@ const step3 = {
       query: {
         type: 'itemId',
         values: [
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
         ],
       },
     },
@@ -156,13 +157,13 @@ const step4 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
+          '5fef7133-f8e7-490d-821e-604288f75377',
         ],
       },
     },
@@ -176,8 +177,7 @@ const step4 = {
       query: {
         type: 'itemId',
         values: [
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
+          '5fef7133-f8e7-490d-821e-604288f75377',
         ],
       },
     },
@@ -209,15 +209,14 @@ const step5 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
-          '9d9c1df6-4453-4a50-b153-9399f0987ec0',
-          '3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
+          '5fef7133-f8e7-490d-821e-604288f75377',
+          'c5bc911d-24e6-4fe4-bade-084d4c822d64',
         ],
       },
     },
@@ -231,8 +230,7 @@ const step5 = {
       query: {
         type: 'itemId',
         values: [
-          '9d9c1df6-4453-4a50-b153-9399f0987ec0',
-          '3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f',
+          'c5bc911d-24e6-4fe4-bade-084d4c822d64',
         ],
       },
     },
@@ -264,16 +262,17 @@ const step6 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
-          '9d9c1df6-4453-4a50-b153-9399f0987ec0',
-          '3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f',
-          '45ecbf55-2648-4d19-b154-948995d352e4',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
+          '5fef7133-f8e7-490d-821e-604288f75377',
+          'c5bc911d-24e6-4fe4-bade-084d4c822d64',
+          'b91b709b-9ed4-4db5-9491-d2f72501c701',
+          'f506b883-f01f-45da-92a9-1b0e517d833d',
+          'ed8041b5-b398-4772-ad44-92fde2d7fa44',
         ],
       },
     },
@@ -286,7 +285,11 @@ const step6 = {
       ],
       query: {
         type: 'itemId',
-        values: ['45ecbf55-2648-4d19-b154-948995d352e4'],
+        values: [
+          'b91b709b-9ed4-4db5-9491-d2f72501c701',
+          'f506b883-f01f-45da-92a9-1b0e517d833d',
+          'ed8041b5-b398-4772-ad44-92fde2d7fa44',
+        ],
       },
     },
   ],
@@ -317,18 +320,20 @@ const step7 = {
       query: {
         type: 'itemId',
         values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
-          '9d9c1df6-4453-4a50-b153-9399f0987ec0',
-          '3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f',
-          '45ecbf55-2648-4d19-b154-948995d352e4',
-          'dc173751-caf4-4875-8af1-60e25219f712',
-          '9a7b9526-81ae-4faa-a08f-b9ac2b7f73a2',
+          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
+          'e36ee1ff-3c6f-492c-b55b-634bd8ba045c',
+          '641770ce-8452-4fa7-8057-cd4e9828fb8f',
+          '9a77532f-bdef-4944-a213-d8992db51eb6',
+          '662d569f-b9bc-47e7-8f78-99a116c213da',
+          '69ba9c9f-79dc-4851-a499-98b5d4e7bd4e',
+          '5fef7133-f8e7-490d-821e-604288f75377',
+          'c5bc911d-24e6-4fe4-bade-084d4c822d64',
+          'b91b709b-9ed4-4db5-9491-d2f72501c701',
+          'f506b883-f01f-45da-92a9-1b0e517d833d',
+          'ed8041b5-b398-4772-ad44-92fde2d7fa44',
+          '4ea1f850-2c97-43ce-bcc0-38f67b5916a7',
+          'b92fe17d-bfe3-47a6-a58f-9c064f17dfda',
+          'a71e5a5b-1d9f-4743-a8dd-de8a068bb4ad',
         ],
       },
     },
@@ -342,8 +347,9 @@ const step7 = {
       query: {
         type: 'itemId',
         values: [
-          'dc173751-caf4-4875-8af1-60e25219f712',
-          '9a7b9526-81ae-4faa-a08f-b9ac2b7f73a2',
+          '4ea1f850-2c97-43ce-bcc0-38f67b5916a7',
+          'b92fe17d-bfe3-47a6-a58f-9c064f17dfda',
+          'a71e5a5b-1d9f-4743-a8dd-de8a068bb4ad',
         ],
       },
     },
@@ -355,7 +361,7 @@ const step8 = {
     {
       operations: [
         {
-          type: 'hide',
+          type: 'show',
         },
         {
           type: 'clearOverrides',
@@ -364,30 +370,6 @@ const step8 = {
       query: {
         type: 'all',
         values: [],
-      },
-    },
-    {
-      operations: [
-        {
-          type: 'show',
-        },
-      ],
-      query: {
-        type: 'itemId',
-        values: [
-          '5285ebd3-7028-403f-862a-c384da7ec687',
-          '91d46792-83dd-45e6-a08e-19c00a15151d',
-          '2836ac74-c2f4-4930-a4e4-9b4a2739f0e7',
-          '2cc87a1c-2f13-45c9-9813-63f0aa3ca3b8',
-          '431a7821-a395-4f63-8a8f-76dced649f06',
-          '6810ea77-0df0-442c-a2d5-3a033e304ba1',
-          '858f4c38-7018-480f-b748-b3f14f7ea2d2',
-          '9d9c1df6-4453-4a50-b153-9399f0987ec0',
-          '3fbd32ab-d67b-4a92-9b3a-8e75a42eb46f',
-          '45ecbf55-2648-4d19-b154-948995d352e4',
-          'dc173751-caf4-4875-8af1-60e25219f712',
-          '9a7b9526-81ae-4faa-a08f-b9ac2b7f73a2',
-        ],
       },
     },
   ],

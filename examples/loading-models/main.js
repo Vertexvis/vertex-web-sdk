@@ -14,7 +14,7 @@ async function main() {
 
 /**
  * Loads a scene by a Vertex stream key. For more information
- * on generating a stream key, see https://developer.vertexvis.com/docs/guides/authentication#in-the-viewer-sdk
+ * on generating a stream key, see https://developer.vertexvis.com/docs/guides/authentication#viewer-component
  */
 async function loadModelByStreamKey(viewer, streamKey) {
   await viewer.load(`urn:vertex:stream-key:${streamKey}`);

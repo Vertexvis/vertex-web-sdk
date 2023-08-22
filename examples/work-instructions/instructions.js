@@ -36,12 +36,6 @@ export async function applyWorkInstruction(scene, stepNumber) {
  * @param {*} viewer the viewer element to use to create the initial scene.
  */
 export async function initializeWorkInstructions(viewer) {
-  await loadViewerWithQueryParams(viewer, {
-    env: 'platprod',
-    // Replace with your own stream key.
-    streamKey: 'replace-me',
-  });
-
   const scene = await viewer.scene();
   await applyWorkInstruction(scene, 0);
 }

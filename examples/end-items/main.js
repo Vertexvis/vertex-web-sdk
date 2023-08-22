@@ -35,7 +35,6 @@ async function main() {
 
     const result = await raycaster.hitItems(position);
 
-    console.log(result);
     if (result.hits && result.hits.length > 0) {
       const hit = result.hits[0];
 
