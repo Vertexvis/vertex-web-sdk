@@ -1,5 +1,4 @@
 import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.x/dist/esm/index.mjs';
-import { loadViewerWithQueryParams } from '../helpers.js';
 import steps from './steps.js';
 
 /**
