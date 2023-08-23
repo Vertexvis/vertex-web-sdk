@@ -7,7 +7,7 @@ import { h } from '@stencil/core';
 import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions } from '@vertexvis/geometry';
-import { Async, Color } from '@vertexvis/utils';
+import { Async } from '@vertexvis/utils';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
@@ -25,10 +25,7 @@ import {
   makeViewerStream,
   receiveFrame,
 } from '../../testing/viewer';
-import {
-  getElementBackgroundColor,
-  getElementBoundingClientRect,
-} from './utils';
+import { getElementBoundingClientRect, getElementPropertyValue } from './utils';
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
@@ -206,9 +203,7 @@ describe('vertex-viewer', () => {
     });
 
     it('loads stream with correct stream attributes', async () => {
-      (getElementBackgroundColor as jest.Mock).mockReturnValue(
-        Color.fromHexString('#0000ff')
-      );
+      (getElementPropertyValue as jest.Mock).mockReturnValue('#0000ff');
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
@@ -252,9 +247,7 @@ describe('vertex-viewer', () => {
     });
 
     it('updates the stream with correct stream attributes', async () => {
-      (getElementBackgroundColor as jest.Mock).mockReturnValue(
-        Color.fromHexString('#00ffff')
-      );
+      (getElementPropertyValue as jest.Mock).mockReturnValue('#00ffff');
 
       /* eslint-disable @typescript-eslint/no-explicit-any */
       const mutationObserver = (global as any).MutationObserver;
