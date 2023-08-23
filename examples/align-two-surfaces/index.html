@@ -31,37 +31,40 @@
         margin: 0;
       }
 
-      .app {
+      .container {
         display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
       }
 
       #viewer {
         width: 100%;
-        height: calc(100% - 250px);
+        height: 100%;
       }
     </style>
   </head>
   <body>
-    <h1>Instructions</h1>
-    <ul>
-      <li>Click parts to set indicators 1 & 2</li>
-      <li>Click whitespace to clear indicators</li>
-      <li>Press 'a' to align parts when both indicators are set</li>
-      <li>Press 'f' to flip the normals when both indicators are set</li>
-      <li>Press 'r' to reset.</li>
-    </ul>
-    <vertex-viewer id="viewer" class="viewer">
-      <vertex-viewer-transform-widget
-        id="transform-widget"
-      ></vertex-viewer-transform-widget>
-      <vertex-viewer-hit-result-indicator
-        id="indicator-1"
-      ></vertex-viewer-hit-result-indicator>
-      <vertex-viewer-hit-result-indicator
-        id="indicator-2"
-      ></vertex-viewer-hit-result-indicator>
-    </vertex-viewer>
+    <div class="container">
+      <h1>Instructions</h1>
+      <ul>
+        <li>Click parts to set indicators 1 & 2</li>
+        <li>Click whitespace to clear indicators</li>
+        <li>Press 'a' to align parts when both indicators are set</li>
+        <li>Press 'f' to flip the normals when both indicators are set</li>
+        <li>Press 'r' to reset.</li>
+      </ul>
+      <vertex-viewer id="viewer" class="viewer">
+        <vertex-viewer-transform-widget
+          id="transform-widget"
+        ></vertex-viewer-transform-widget>
+        <vertex-viewer-hit-result-indicator
+          id="indicator-1"
+        ></vertex-viewer-hit-result-indicator>
+        <vertex-viewer-hit-result-indicator
+          id="indicator-2"
+        ></vertex-viewer-hit-result-indicator>
+      </vertex-viewer>
+    </div>
   </body>
 </html>
