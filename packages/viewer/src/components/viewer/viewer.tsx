@@ -1167,48 +1167,17 @@ export class Viewer {
   }
 
   private updateViewerBackground(): void {
-    const imageBackground = getElementPropertyValue(
-      this.hostElement,
-      '--image-background'
-    );
-    const viewerBackground = getElementPropertyValue(
-      this.hostElement,
-      '--viewer-background'
-    );
+    const backgroundColor = this.getBackgroundColor();
 
     writeDOM(() => {
       this.viewerContainerElement?.style.setProperty(
         'background',
-        viewerBackground ?? '#ffffff'
+        backgroundColor != null ? Color.toHexString(backgroundColor) : '#ffffff'
       );
       this.canvasContainerElement?.style.setProperty(
         'background',
-        imageBackground ?? viewerBackground ?? '#ffffff'
+        backgroundColor != null ? Color.toHexString(backgroundColor) : '#ffffff'
       );
-    });
-
-    readDOM(() => {
-      const hostStyles = window.getComputedStyle(this.hostElement);
-      const viewerBackgroundProperty = hostStyles.getPropertyValue(
-        '--viewer-background'
-      );
-      const imageBackgroundProperty =
-        hostStyles.getPropertyValue('--image-background');
-      const viewerBackground =
-        viewerBackgroundProperty !== '' ? viewerBackgroundProperty : undefined;
-      const imageBackground =
-        imageBackgroundProperty !== '' ? imageBackgroundProperty : undefined;
-
-      writeDOM(() => {
-        this.viewerContainerElement?.style.setProperty(
-          'background',
-          viewerBackground ?? '#ffffff'
-        );
-        this.canvasContainerElement?.style.setProperty(
-          'background',
-          imageBackground ?? viewerBackground ?? '#ffffff'
-        );
-      });
     });
   }
 
@@ -1424,7 +1393,7 @@ export class Viewer {
 
       return propertyColor != null
         ? Color.fromCss(propertyColor)
-        : getElementBackgroundColor(this.canvasContainerElement);
+        : Color.create(255, 255, 255);
     }
   }
 
