@@ -57,7 +57,7 @@ import {
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { Scene } from '../../lib/scenes/scene';
-import { readDOM, writeDOM } from '../../lib/stencil';
+import { writeDOM } from '../../lib/stencil';
 import {
   getStorageEntry,
   StorageKeys,
@@ -82,7 +82,6 @@ import { Frame } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
   DEFAULT_VIEWER_SCENE_WAIT_MS,
-  getElementBackgroundColor,
   getElementBoundingClientRect,
   getElementPropertyValue,
 } from './utils';
