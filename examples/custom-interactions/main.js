@@ -60,12 +60,12 @@ class CustomInteractionHandler {
    */
   async handleTouchMove(event) {
     this.tryBeginInteraction();
-    this.api.panCamera(this.getPositionDelta(event.touches[0]));
+    this.api.panCameraByDelta(this.getPositionDelta(event.touches[0]));
     this.setLastPosition(event.touches[0]);
   }
   async handleMouseMove(event) {
     this.tryBeginInteraction();
-    this.api.panCamera(this.getPositionDelta(event));
+    this.api.panCameraByDelta(this.getPositionDelta(event));
     this.setLastPosition(event);
   }
 

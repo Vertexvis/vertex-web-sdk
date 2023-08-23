@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function main() {
+  await window.customElements.whenDefined('vertex-viewer');
   const viewer = document.querySelector('vertex-viewer');
   await loadViewerWithQueryParams(viewer);
   await initializeWorkInstructions(viewer);
