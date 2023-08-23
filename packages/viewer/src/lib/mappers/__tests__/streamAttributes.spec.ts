@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { Color } from '@vertexvis/utils';
 
 import { toPbStreamAttributes } from '../streamAttributes';
 
@@ -126,6 +127,25 @@ describe(toPbStreamAttributes, () => {
           highlightColor: { r: 255, g: 0, b: 0 },
           occludedOpacity: { value: 0.5 },
           outline: { lineWidth: 2, lineColor: { r: 0, g: 255, b: 0 } },
+        },
+      });
+    });
+  });
+
+  describe('frame options', () => {
+    it('should support changing the background color', () => {
+      const res = toPbStreamAttributes({
+        frames: {
+          frameBackgroundColor: Color.create(1, 2, 3),
+        },
+      });
+      expect(res).toMatchObject({
+        frames: {
+          frameBackgroundColor: {
+            r: 1,
+            g: 2,
+            b: 3,
+          },
         },
       });
     });

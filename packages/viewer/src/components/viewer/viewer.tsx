@@ -414,6 +414,7 @@ export class Viewer {
   private canvasRenderer!: CanvasRenderer;
 
   private mutationObserver?: MutationObserver;
+  private styleObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
   private isResizing?: boolean;
   private isResizeUpdate?: boolean;
@@ -930,6 +931,12 @@ export class Viewer {
       childList: true,
       subtree: true,
     });
+
+    this.styleObserver = new MutationObserver((_) => this.syncViewerStyles());
+    this.styleObserver.observe(this.hostElement, {
+      attributes: true,
+      attributeFilter: ['style'],
+    });
   }
 
   private injectViewerApi(): void {
@@ -953,6 +960,19 @@ export class Viewer {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (node as any).viewer = this.hostElement;
       });
+  }
+
+  private syncViewerStyles(): void {
+    const backgroundColor = this.getBackgroundColor();
+
+    this.stream?.update({
+      frameBgColor: backgroundColor,
+      streamAttributes: {
+        frames: {
+          frameBackgroundColor: backgroundColor,
+        },
+      },
+    });
   }
 
   private calculateComponentDimensions(): void {

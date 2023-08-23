@@ -250,6 +250,67 @@ describe('vertex-viewer', () => {
         })
       );
     });
+
+    it('updates the stream with correct stream attributes', async () => {
+      (getElementBackgroundColor as jest.Mock).mockReturnValue(
+        Color.fromHexString('#00ffff')
+      );
+
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      const mutationObserver = (global as any).MutationObserver;
+      let observerFns: VoidFunction[] = [];
+      (global as any).MutationObserver = class {
+        public disconnect = jest.fn();
+        public observe = jest.fn();
+
+        public constructor(fn: VoidFunction) {
+          observerFns = [...observerFns, fn];
+        }
+      };
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            featureLines={{ width: 1 }}
+            selectionHighlighting={{
+              lineWidth: 2,
+              color: '#fff222',
+              opacity: 0.3,
+            }}
+            featureHighlighting={{ highlightColor: 0xff0000 }}
+            depthBuffers="all"
+            featureMaps="all"
+          />
+        ),
+      });
+
+      const update = jest.spyOn(stream, 'update');
+      await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (global as any).MutationObserver = mutationObserver;
+
+      observerFns.forEach((fn) => fn());
+
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          frameBgColor: expect.objectContaining({ r: 0, g: 255, b: 255 }),
+          streamAttributes: expect.objectContaining({
+            frames: {
+              frameBackgroundColor: expect.objectContaining({
+                r: 0,
+                g: 255,
+                b: 255,
+              }),
+            },
+          }),
+        })
+      );
+    });
   });
 
   describe(Viewer.prototype.unload, () => {
