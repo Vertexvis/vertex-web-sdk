@@ -57,6 +57,7 @@ import {
   measureCanvasRenderer,
 } from '../../lib/rendering';
 import { Scene } from '../../lib/scenes/scene';
+import { readDOM, writeDOM } from '../../lib/stencil';
 import {
   getStorageEntry,
   StorageKeys,
@@ -83,6 +84,7 @@ import {
   DEFAULT_VIEWER_SCENE_WAIT_MS,
   getElementBackgroundColor,
   getElementBoundingClientRect,
+  getElementPropertyValue,
 } from './utils';
 
 interface ConnectedStatus {
@@ -408,7 +410,8 @@ export class Viewer {
     streamState: { type: 'disconnected' },
   };
 
-  private containerElement?: HTMLElement;
+  private viewerContainerElement?: HTMLElement;
+  private canvasContainerElement?: HTMLElement;
   private canvasElement?: HTMLCanvasElement;
 
   private canvasRenderer!: CanvasRenderer;
@@ -462,8 +465,8 @@ export class Viewer {
   protected componentDidLoad(): void {
     this.interactionApi = this.createInteractionApi();
 
-    if (this.containerElement != null) {
-      this.resizeObserver?.observe(this.containerElement);
+    if (this.canvasContainerElement != null) {
+      this.resizeObserver?.observe(this.canvasContainerElement);
     }
 
     if (this.src != null) {
@@ -483,12 +486,13 @@ export class Viewer {
     return (
       <Host>
         <div
+          ref={(ref) => (this.viewerContainerElement = ref)}
           class="viewer-container"
           style={{ cursor: cssCursor(this.cursor ?? '') }}
           onContextMenu={(event) => event.preventDefault()}
         >
           <div
-            ref={(ref) => (this.containerElement = ref)}
+            ref={(ref) => (this.canvasContainerElement = ref)}
             class={classnames('canvas-container', {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
@@ -967,11 +971,7 @@ export class Viewer {
 
     this.stream?.update({
       frameBgColor: backgroundColor,
-      streamAttributes: {
-        frames: {
-          frameBackgroundColor: backgroundColor,
-        },
-      },
+      streamAttributes: this.getStreamAttributes(),
     });
   }
 
@@ -1158,10 +1158,58 @@ export class Viewer {
         const drawnFrame = await this.canvasRenderer(data);
 
         if (drawnFrame != null) {
+          this.updateViewerBackground();
+
           this.dispatchFrameDrawn(drawnFrame);
         }
       }
     }
+  }
+
+  private updateViewerBackground(): void {
+    const imageBackground = getElementPropertyValue(
+      this.hostElement,
+      '--image-background'
+    );
+    const viewerBackground = getElementPropertyValue(
+      this.hostElement,
+      '--viewer-background'
+    );
+
+    writeDOM(() => {
+      this.viewerContainerElement?.style.setProperty(
+        'background',
+        viewerBackground ?? '#ffffff'
+      );
+      this.canvasContainerElement?.style.setProperty(
+        'background',
+        imageBackground ?? viewerBackground ?? '#ffffff'
+      );
+    });
+
+    readDOM(() => {
+      const hostStyles = window.getComputedStyle(this.hostElement);
+      const viewerBackgroundProperty = hostStyles.getPropertyValue(
+        '--viewer-background'
+      );
+      const imageBackgroundProperty =
+        hostStyles.getPropertyValue('--image-background');
+      const viewerBackground =
+        viewerBackgroundProperty !== '' ? viewerBackgroundProperty : undefined;
+      const imageBackground =
+        imageBackgroundProperty !== '' ? imageBackgroundProperty : undefined;
+
+      writeDOM(() => {
+        this.viewerContainerElement?.style.setProperty(
+          'background',
+          viewerBackground ?? '#ffffff'
+        );
+        this.canvasContainerElement?.style.setProperty(
+          'background',
+          imageBackground ?? viewerBackground ?? '#ffffff'
+        );
+      });
+    });
   }
 
   private async initializeDefaultInteractionHandlers(): Promise<void> {
@@ -1363,8 +1411,20 @@ export class Viewer {
    * JPEG images.
    */
   private getBackgroundColor(): Color.Color | undefined {
-    if (this.containerElement != null) {
-      return getElementBackgroundColor(this.containerElement);
+    if (this.canvasContainerElement != null) {
+      const imageBackground = getElementPropertyValue(
+        this.hostElement,
+        '--image-background'
+      );
+      const viewerBackground = getElementPropertyValue(
+        this.hostElement,
+        '--viewer-background'
+      );
+      const propertyColor = imageBackground ?? viewerBackground;
+
+      return propertyColor != null
+        ? Color.fromCss(propertyColor)
+        : getElementBackgroundColor(this.canvasContainerElement);
     }
   }
 
@@ -1398,6 +1458,9 @@ export class Viewer {
       featureMaps: this.featureMaps,
       experimentalRenderingOptions: this.experimentalRenderingOptions,
       selectionHighlighting: this.selectionHighlighting,
+      frames: {
+        frameBackgroundColor: this.getBackgroundColor(),
+      },
     };
   }
 

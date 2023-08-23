@@ -12,3 +12,12 @@ export function getElementBackgroundColor(
 export function getElementBoundingClientRect(element: HTMLElement): ClientRect {
   return element.getBoundingClientRect();
 }
+
+export function getElementPropertyValue(
+  element: HTMLElement,
+  property: string
+): string | undefined {
+  const styles = window.getComputedStyle(element);
+  const value = styles.getPropertyValue(property);
+  return value !== '' ? value : undefined;
+}
