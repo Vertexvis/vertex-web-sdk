@@ -5,6 +5,7 @@ import { Mapper as M } from '@vertexvis/utils';
 import {
   FeatureHighlightOptions,
   FeatureLineOptions,
+  FrameOptions,
   FrameType,
   PhantomOptions,
   SelectionHighlightingOptions,
@@ -106,6 +107,14 @@ const toPbExperimentalRenderingOptions: M.Func<string | undefined, string> =
     (attr) => attr
   );
 
+const toPbFrameOptions: M.Func<
+  FrameOptions | undefined,
+  vertexvis.protobuf.stream.IFrameAttributes
+> = M.defineMapper(
+  M.read(M.ifDefined(M.mapProp('frameBackgroundColor', M.ifDefined(toPbRGBi)))),
+  ([frameBackgroundColor]) => ({ frameBackgroundColor })
+);
+
 export const toPbStreamAttributes: M.Func<
   StreamAttributes,
   vertexvis.protobuf.stream.IStreamAttributes
@@ -118,9 +127,10 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('featureHighlighting', toPbFeatureHighlight),
     M.mapProp('featureMaps', toPbFrameType),
     M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions),
-    M.mapProp('selectionHighlighting', toPbSelectionHighlighting)
+    M.mapProp('selectionHighlighting', toPbSelectionHighlighting),
+    M.mapProp('frames', toPbFrameOptions)
   ),
-  ([db, pi, ndl, fl, fh, fm, ero, hs]) => {
+  ([db, pi, ndl, fl, fh, fm, ero, hs, fa]) => {
     const value = {
       depthBuffers: db,
       phantomItems: pi,
@@ -130,6 +140,7 @@ export const toPbStreamAttributes: M.Func<
       featureMaps: fm,
       experimentalRenderingOptions: ero,
       selectionHighlighting: hs,
+      frames: fa,
     };
 
     return value;

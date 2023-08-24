@@ -26,6 +26,10 @@ export interface PhantomOptions {
   opacity?: number;
 }
 
+export interface FrameOptions {
+  frameBackgroundColor?: Color3;
+}
+
 export interface HTMLDomRendererPositionableElement {
   position: Vector3.Vector3;
   positionJson: string;
@@ -47,4 +51,5 @@ export interface StreamAttributes {
   featureMaps?: FrameType;
   experimentalRenderingOptions?: string;
   selectionHighlighting?: SelectionHighlightingOptions;
+  frames?: FrameOptions;
 }
