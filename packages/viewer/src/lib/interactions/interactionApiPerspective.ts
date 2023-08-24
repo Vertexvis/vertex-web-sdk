@@ -7,7 +7,6 @@ import { CursorManager } from '../cursors';
 import { PerspectiveCamera } from '../scenes';
 import { Viewport } from '../types';
 import {
-  CameraTransform,
   InteractionApi,
   InteractionConfigProvider,
   SceneProvider,
@@ -24,7 +23,7 @@ interface ZoomPositionData {
 
 const CAMERA_MIN_ZOOM_SCALAR = 0.2;
 
-export class InteractionApiPerspective extends InteractionApi {
+export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera> {
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -149,31 +148,6 @@ export class InteractionApiPerspective extends InteractionApi {
         return camera;
       }
     );
-  }
-
-  public async transformCamera(
-    t: CameraTransform<PerspectiveCamera>
-  ): Promise<void> {
-    if (this.isInteracting()) {
-      const scene = await this.getScene();
-      const viewport = this.getViewport();
-      const frame = this.getFrame();
-      const depthBuffer = await frame?.depthBuffer();
-
-      this.currentCamera =
-        this.currentCamera != null && viewport != null && frame != null
-          ? t({
-              camera: this.currentCamera as PerspectiveCamera,
-              viewport,
-              scale: scene.scale(),
-              boundingBox: scene.boundingBox(),
-              frame,
-              depthBuffer,
-            })
-          : undefined;
-
-      await this.currentCamera?.render();
-    }
   }
 
   private computeZoomDistances(

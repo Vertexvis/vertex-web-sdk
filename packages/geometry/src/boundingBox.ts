@@ -84,3 +84,15 @@ export function union(box: BoundingBox, ...rest: BoundingBox[]): BoundingBox {
   });
 }
 /* eslint-enable padding-line-between-statements */
+
+/**
+ * Returns the distance between the min and max for the provided
+ * bounding box for each axis.
+ */
+export const lengths = (box: BoundingBox): Vector3.Vector3 => {
+  return Vector3.create(
+    Math.abs(box.min.x) + Math.abs(box.max.x),
+    Math.abs(box.min.y) + Math.abs(box.max.y),
+    Math.abs(box.min.z) + Math.abs(box.max.z)
+  );
+};

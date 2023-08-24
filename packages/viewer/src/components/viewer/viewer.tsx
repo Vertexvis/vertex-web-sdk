@@ -713,7 +713,7 @@ export class Viewer {
     this.initializeDefaultKeyboardInteractionHandlers();
   }
 
-  /**
+  /**re
    * @ignore
    */
   @Watch('rotateAroundTapPoint')

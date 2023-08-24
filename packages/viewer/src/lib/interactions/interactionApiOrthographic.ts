@@ -8,7 +8,6 @@ import { OrthographicCamera } from '../scenes';
 import { DepthBuffer, Viewport } from '../types';
 import { ZoomData } from './interactionApi';
 import {
-  CameraTransform,
   InteractionApi,
   InteractionConfigProvider,
   SceneProvider,
@@ -19,7 +18,7 @@ interface OrthographicZoomData extends ZoomData {
   startingScreenPt: Point.Point;
 }
 
-export class InteractionApiOrthographic extends InteractionApi {
+export class InteractionApiOrthographic extends InteractionApi<OrthographicCamera> {
   private orthographicZoomData?: OrthographicZoomData;
 
   public constructor(
@@ -234,30 +233,5 @@ export class InteractionApiOrthographic extends InteractionApi {
     return hasDepth
       ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
       : fallbackPoint;
-  }
-
-  public async transformCamera(
-    t: CameraTransform<OrthographicCamera>
-  ): Promise<void> {
-    if (this.isInteracting()) {
-      const scene = await this.getScene();
-      const viewport = this.getViewport();
-      const frame = this.getFrame();
-      const depthBuffer = await frame?.depthBuffer();
-
-      this.currentCamera =
-        this.currentCamera != null && viewport != null && frame != null
-          ? t({
-              camera: this.currentCamera as OrthographicCamera,
-              viewport,
-              scale: scene.scale(),
-              boundingBox: scene.boundingBox(),
-              frame,
-              depthBuffer,
-            })
-          : undefined;
-
-      await this.currentCamera?.render();
-    }
   }
 }
