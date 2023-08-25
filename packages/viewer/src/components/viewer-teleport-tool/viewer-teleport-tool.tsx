@@ -12,14 +12,12 @@ import { Disposable } from '@vertexvis/utils';
 
 import { TeleportInteractionHandler } from '../../lib/teleportation/interactions';
 import { WalkModeController } from '../../lib/walk-mode/controller';
-import { WalkModeModel } from '../../lib/walk-mode/model';
-
-export type ViewerTeleportMode = 'teleport' | 'teleport-and-align';
+import { ViewerTeleportMode, WalkModeModel } from '../../lib/walk-mode/model';
 
 /**
  * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
  * around a model, which is particularly useful for walking through a model.
- * This tool is best used in combination with the `WalkInteractionHandler`.
+ * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
  */
 @Component({
   tag: 'vertex-viewer-teleport-tool',
@@ -70,8 +68,8 @@ export class ViewerTeleportTool {
   @Prop({ mutable: true })
   public model: WalkModeModel = new WalkModeModel();
 
-  @Event({ bubbles: true })
-  public teleportComplete!: EventEmitter<void>;
+  // @Event({ bubbles: true })
+  // public teleportComplete!: EventEmitter<void>;
 
   private interactionHandlerDisposable?: Disposable;
   private interactionHandler?: TeleportInteractionHandler;
@@ -130,6 +128,11 @@ export class ViewerTeleportTool {
     }
   }
 
+  @Watch('controller')
+  protected handleControllerChanged(): void {
+    this.setupInteractionHandler();
+  }
+
   protected render(): JSX.Element {
     return <Host></Host>;
   }
@@ -144,6 +147,7 @@ export class ViewerTeleportTool {
   private clearInteractionHandler(): void {
     this.interactionHandlerDisposable?.dispose();
     this.interactionHandlerDisposable = undefined;
+    this.interactionHandler?.dispose();
     this.interactionHandler = undefined;
   }
 

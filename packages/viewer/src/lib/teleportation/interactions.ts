@@ -19,6 +19,8 @@ export class TeleportInteractionHandler implements InteractionHandler {
   private rectObserver = new ElementRectObserver();
 
   private downPosition?: Point.Point;
+
+  private enabledChangeDisposable?: Disposable;
   private teleportModeChangeDisposable?: Disposable;
   private cursorDisposable?: Disposable;
 
@@ -28,13 +30,22 @@ export class TeleportInteractionHandler implements InteractionHandler {
   ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
+    this.handleEnabledChange = this.handleEnabledChange.bind(this);
     this.handleTeleportModeChange = this.handleTeleportModeChange.bind(this);
+
+    this.enabledChangeDisposable = this.controller.onEnabledChange(
+      this.handleEnabledChange
+    );
   }
 
   public dispose(): void {
-    this.element?.removeEventListener('pointerdown', this.handlePointerDown);
-    this.teleportModeChangeDisposable?.dispose();
-    this.cursorDisposable?.dispose();
+    this.disable();
+    this.enabledChangeDisposable?.dispose();
+
+    this.element = undefined;
+    this.api = undefined;
+
+    this.rectObserver.disconnect();
   }
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
@@ -43,15 +54,29 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
     this.rectObserver.observe(element);
 
-    element.addEventListener('pointerdown', this.handlePointerDown);
-    this.teleportModeChangeDisposable = this.controller.onTeleportModeChange(
-      this.handleTeleportModeChange
-    );
-    this.handleTeleportModeChange(this.controller.getTeleportMode());
+    this.handleEnabledChange(this.controller.getEnabled());
   }
 
   public setAnimations(config?: AnimationConfiguration): void {
     this.animationConfiguration = config;
+  }
+
+  public enable(): void {
+    this.disable();
+
+    this.teleportModeChangeDisposable = this.controller.onTeleportModeChange(
+      this.handleTeleportModeChange
+    );
+    this.element?.addEventListener('pointerdown', this.handlePointerDown);
+
+    this.handleTeleportModeChange(this.controller.getTeleportMode());
+  }
+
+  public disable(): void {
+    this.teleportModeChangeDisposable?.dispose();
+    this.cursorDisposable?.dispose();
+
+    this.element?.removeEventListener('pointerdown', this.handlePointerDown);
   }
 
   private async handlePointerDown(event: PointerEvent): Promise<void> {
@@ -171,7 +196,17 @@ export class TeleportInteractionHandler implements InteractionHandler {
     );
   }
 
+  private handleEnabledChange(enabled: boolean): void {
+    console.log(enabled);
+    if (enabled) {
+      this.enable();
+    } else {
+      this.disable();
+    }
+  }
+
   private handleTeleportModeChange(mode?: ViewerTeleportMode): void {
+    console.log(mode);
     if (mode != null) {
       this.cursorDisposable = this.api?.addCursor('crosshair');
     } else {

@@ -1,7 +1,9 @@
 import { BoundingSphere, Vector3 } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { Frame } from '../types';
+import { WalkModeController } from './controller';
 
 export class WalkInteractionHandler implements InteractionHandler {
   private api?: InteractionApi;
@@ -10,27 +12,41 @@ export class WalkInteractionHandler implements InteractionHandler {
   private pressed: Record<string, boolean> = {};
   private handlers: Record<string, VoidFunction> = {};
 
+  private enabledChangeDisposable?: Disposable;
+
   public constructor(
+    private controller: WalkModeController,
     private walkSpeed = 5,
     private pivotDegrees = 1,
     private repeatInterval = 25
   ) {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleEnabledChange = this.handleEnabledChange.bind(this);
+    this.updateCamera = this.updateCamera.bind(this);
 
     this.handlers = {
-      w: this.walkForward,
-      a: this.walkLeft,
-      s: this.walkBackward,
-      d: this.walkRight,
-      arrowup: this.pivotUp,
-      arrowdown: this.pivotDown,
-      arrowleft: this.pivotLeft,
-      arrowright: this.pivotRight,
+      w: this.walkForward.bind(this),
+      a: this.walkLeft.bind(this),
+      s: this.walkBackward.bind(this),
+      d: this.walkRight.bind(this),
+      arrowup: this.pivotUp.bind(this),
+      arrowdown: this.pivotDown.bind(this),
+      arrowleft: this.pivotLeft.bind(this),
+      arrowright: this.pivotRight.bind(this),
+      pageup: this.moveUp.bind(this),
+      pagedown: this.moveDown.bind(this),
     };
+
+    this.enabledChangeDisposable = this.controller.onEnabledChange(
+      this.handleEnabledChange
+    );
   }
 
   public dispose(): void {
+    this.disable();
+    this.enabledChangeDisposable?.dispose();
+
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('keyup', this.handleKeyUp);
   }
@@ -38,8 +54,19 @@ export class WalkInteractionHandler implements InteractionHandler {
   public initialize(_: HTMLElement, api: InteractionApi): void {
     this.api = api;
 
+    this.handleEnabledChange(this.controller.getEnabled());
+  }
+
+  public enable(): void {
+    this.disable();
+
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
+  }
+
+  public disable(): void {
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('keyup', this.handleKeyUp);
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -69,7 +96,15 @@ export class WalkInteractionHandler implements InteractionHandler {
     }
   };
 
-  private beginInteraction = (): void => {
+  private handleEnabledChange(enabled: boolean): void {
+    if (enabled) {
+      this.enable();
+    } else {
+      this.disable();
+    }
+  }
+
+  private beginInteraction(): void {
     if (!this.api?.isInteracting()) {
       this.api?.beginInteraction();
     }
@@ -77,7 +112,7 @@ export class WalkInteractionHandler implements InteractionHandler {
     if (this.interval == null) {
       this.interval = setInterval(this.updateCamera, this.repeatInterval);
     }
-  };
+  }
 
   private endInteraction = async (): Promise<void> => {
     if (this.interval != null) {
@@ -87,55 +122,55 @@ export class WalkInteractionHandler implements InteractionHandler {
     }
   };
 
-  private updateCamera = (): void => {
+  private updateCamera(): void {
     Object.keys(this.handlers).forEach((key) => {
       if (this.pressed[key]) {
         this.handlers[key]();
       }
     });
-  };
+  }
 
-  private pivotLeft = (): void => {
+  private pivotLeft(): void {
     this.api?.pivotCamera(0, this.pivotDegrees);
-  };
+  }
 
-  private pivotRight = (): void => {
+  private pivotRight(): void {
     this.api?.pivotCamera(0, -this.pivotDegrees);
-  };
+  }
 
-  private pivotUp = (): void => {
+  private pivotUp(): void {
     this.api?.pivotCamera(-this.pivotDegrees, 0);
-  };
+  }
 
-  private pivotDown = (): void => {
+  private pivotDown(): void {
     this.api?.pivotCamera(this.pivotDegrees, 0);
-  };
+  }
 
-  private walkForward = (): void => {
+  private walkForward(): void {
     this.walk(Vector3.forward());
-  };
+  }
 
-  private walkBackward = (): void => {
+  private walkBackward(): void {
     this.walk(Vector3.back());
-  };
+  }
 
-  private walkLeft = (): void => {
+  private walkLeft(): void {
     this.walk(Vector3.left());
-  };
+  }
 
-  private walkRight = (): void => {
+  private walkRight(): void {
     this.walk(Vector3.right());
-  };
+  }
 
-  private moveUp = (): void => {
+  private moveUp(): void {
     this.walk(Vector3.down());
-  };
+  }
 
-  private moveDown = (): void => {
+  private moveDown(): void {
     this.walk(Vector3.up());
-  };
+  }
 
-  private walk = (delta: Vector3.Vector3): void => {
+  private walk(delta: Vector3.Vector3): void {
     this.api?.transformCamera(({ camera, frame }) => {
       const { position, up, lookAt } = camera;
 
@@ -168,13 +203,13 @@ export class WalkInteractionHandler implements InteractionHandler {
         lookAt: Vector3.add(lookAt, translation),
       });
     });
-  };
+  }
 
-  private relativeWalkSpeed = (frame: Frame): number => {
+  private relativeWalkSpeed(frame: Frame): number {
     const speedScalar = (5 / this.walkSpeed) * 100;
     const boundingBoxScalar = BoundingSphere.create(
       frame.scene.boundingBox
     ).radius;
     return boundingBoxScalar / speedScalar;
-  };
+  }
 }

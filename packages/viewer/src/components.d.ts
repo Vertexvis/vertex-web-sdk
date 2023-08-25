@@ -51,9 +51,8 @@ import { PointToPointHitProvider } from "./components/viewer-measurement-distanc
 import { Pin, PinModel, TextPin, ViewerPinToolMode, ViewerPinToolType } from "./lib/pins/model";
 import { PinController } from "./lib/pins/controller";
 import { SpinnerSize } from "./components/viewer-spinner/viewer-spinner";
-import { ViewerTeleportMode } from "./components/viewer-teleport-tool/viewer-teleport-tool";
+import { ViewerTeleportMode, WalkModeModel } from "./lib/walk-mode/model";
 import { WalkModeController } from "./lib/walk-mode/controller";
-import { WalkModeModel } from "./lib/walk-mode/model";
 import { TransformController } from "./lib/transforms/controller";
 import { Drawable } from "./lib/transforms/drawable";
 export namespace Components {
@@ -1207,6 +1206,22 @@ export namespace Components {
          */
         "zPositiveLabel": string;
     }
+    interface VertexViewerWalkModeTool {
+        "controller"?: WalkModeController;
+        /**
+          * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
+         */
+        "enabled": boolean;
+        "model": WalkModeModel;
+        /**
+          * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+         */
+        "teleportMode"?: ViewerTeleportMode;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
 }
 export interface VertexSceneTreeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1263,10 +1278,6 @@ export interface VertexViewerMeasurementDistanceCustomEvent<T> extends CustomEve
 export interface VertexViewerPinLabelCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLVertexViewerPinLabelElement;
-}
-export interface VertexViewerTeleportToolCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLVertexViewerTeleportToolElement;
 }
 export interface VertexViewerTransformWidgetCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1507,6 +1518,12 @@ declare global {
         prototype: HTMLVertexViewerViewCubeElement;
         new (): HTMLVertexViewerViewCubeElement;
     };
+    interface HTMLVertexViewerWalkModeToolElement extends Components.VertexViewerWalkModeTool, HTMLStencilElement {
+    }
+    var HTMLVertexViewerWalkModeToolElement: {
+        prototype: HTMLVertexViewerWalkModeToolElement;
+        new (): HTMLVertexViewerWalkModeToolElement;
+    };
     interface HTMLElementTagNameMap {
         "vertex-scene-tree": HTMLVertexSceneTreeElement;
         "vertex-scene-tree-search": HTMLVertexSceneTreeSearchElement;
@@ -1547,6 +1564,7 @@ declare global {
         "vertex-viewer-toolbar-group": HTMLVertexViewerToolbarGroupElement;
         "vertex-viewer-transform-widget": HTMLVertexViewerTransformWidgetElement;
         "vertex-viewer-view-cube": HTMLVertexViewerViewCubeElement;
+        "vertex-viewer-walk-mode-tool": HTMLVertexViewerWalkModeToolElement;
     }
 }
 declare namespace LocalJSX {
@@ -2559,7 +2577,6 @@ declare namespace LocalJSX {
          */
         "mode"?: ViewerTeleportMode;
         "model"?: WalkModeModel;
-        "onTeleportComplete"?: (event: VertexViewerTeleportToolCustomEvent<void>) => void;
         /**
           * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
          */
@@ -2681,6 +2698,22 @@ declare namespace LocalJSX {
          */
         "zPositiveLabel"?: string;
     }
+    interface VertexViewerWalkModeTool {
+        "controller"?: WalkModeController;
+        /**
+          * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
+         */
+        "enabled"?: boolean;
+        "model"?: WalkModeModel;
+        /**
+          * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+         */
+        "teleportMode"?: ViewerTeleportMode;
+        /**
+          * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
+         */
+        "viewer"?: HTMLVertexViewerElement;
+    }
     interface IntrinsicElements {
         "vertex-scene-tree": VertexSceneTree;
         "vertex-scene-tree-search": VertexSceneTreeSearch;
@@ -2721,6 +2754,7 @@ declare namespace LocalJSX {
         "vertex-viewer-toolbar-group": VertexViewerToolbarGroup;
         "vertex-viewer-transform-widget": VertexViewerTransformWidget;
         "vertex-viewer-view-cube": VertexViewerViewCube;
+        "vertex-viewer-walk-mode-tool": VertexViewerWalkModeTool;
     }
 }
 export { LocalJSX as JSX };
@@ -2766,6 +2800,7 @@ declare module "@stencil/core" {
             "vertex-viewer-toolbar-group": LocalJSX.VertexViewerToolbarGroup & JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
             "vertex-viewer-transform-widget": LocalJSX.VertexViewerTransformWidget & JSXBase.HTMLAttributes<HTMLVertexViewerTransformWidgetElement>;
             "vertex-viewer-view-cube": LocalJSX.VertexViewerViewCube & JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
+            "vertex-viewer-walk-mode-tool": LocalJSX.VertexViewerWalkModeTool & JSXBase.HTMLAttributes<HTMLVertexViewerWalkModeToolElement>;
         }
     }
 }
