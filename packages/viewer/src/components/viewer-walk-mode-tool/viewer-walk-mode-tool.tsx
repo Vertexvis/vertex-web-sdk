@@ -1,6 +1,8 @@
 import {
   Component,
   Element,
+  Event,
+  EventEmitter,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
@@ -80,6 +82,12 @@ export class ViewerWalkModeTool {
   @Prop()
   public enabled = true;
 
+  /**
+   * Event emitted when the `WalkModeController` associated with this tool changes.
+   */
+  @Event()
+  public controllerChanged!: EventEmitter<WalkModeController>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -148,6 +156,11 @@ export class ViewerWalkModeTool {
     this.updateTeleportTool();
   }
 
+  protected handleControllerChanged(): void {
+    this.updateTeleportTool();
+    this.controllerChanged.emit(this.controller);
+  }
+
   protected render(): JSX.Element {
     return (
       <Host>
@@ -162,6 +175,7 @@ export class ViewerWalkModeTool {
   private setupController(): void {
     if (this.controller == null) {
       this.controller = new WalkModeController(this.model);
+      this.controllerChanged.emit(this.controller);
     }
   }
 

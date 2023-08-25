@@ -1,11 +1,13 @@
 import {
   Component,
+  EventEmitter,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
   Prop,
   Watch,
 } from '@stencil/core';
+import { Event } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { TeleportInteractionHandler } from '../../lib/teleportation/interactions';
@@ -66,8 +68,11 @@ export class ViewerTeleportTool {
   @Prop({ mutable: true })
   public model: WalkModeModel = new WalkModeModel();
 
-  // @Event({ bubbles: true })
-  // public teleportComplete!: EventEmitter<void>;
+  /**
+   * Event emitted when the `WalkModeController` associated with this tool changes.
+   */
+  @Event()
+  public controllerChanged!: EventEmitter<WalkModeController>;
 
   private interactionHandlerDisposable?: Disposable;
   private interactionHandler?: TeleportInteractionHandler;
@@ -129,6 +134,7 @@ export class ViewerTeleportTool {
   @Watch('controller')
   protected handleControllerChanged(): void {
     this.setupInteractionHandler();
+    this.controllerChanged.emit(this.controller);
   }
 
   protected render(): JSX.Element {
@@ -139,6 +145,7 @@ export class ViewerTeleportTool {
     if (this.controller == null) {
       this.controller = new WalkModeController(this.model);
       this.controller.setTeleportMode(this.mode);
+      this.controllerChanged.emit(this.controller);
     }
   }
 

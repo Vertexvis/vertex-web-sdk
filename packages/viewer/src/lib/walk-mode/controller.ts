@@ -13,6 +13,8 @@ export class WalkModeController {
     'VERTEX-SCENE-TREE',
     'VERTEX-SCENE-TREE-SEARCH',
     'VERTEX-VIEWER-PIN-TOOL',
+    'INPUT',
+    'TEXTAREA',
   ];
 
   private excludePredicates: Array<(el: Element) => boolean> = [];
@@ -21,6 +23,12 @@ export class WalkModeController {
     this.updateModelExclusions();
   }
 
+  /**
+   * Sets whether downstream walk mode interaction handlers are enabled.
+   * Setting this value to `false` will remove all event listeners for
+   * the interactions, and setting this value to `true` will add or
+   * re-add the event listeners.
+   */
   public setEnabled(enabled: boolean): void {
     this.model.setEnabled(enabled);
   }
@@ -63,6 +71,11 @@ export class WalkModeController {
     });
   }
 
+  /**
+   * Adds a custom keybinding for a specific walk operation. This will append to the
+   * existing set of keybindings to allow for multiple keybindings for a specific
+   * operation. To replace the defaults, see `replaceKeyBinding`.
+   */
   public addKeyBinding(
     operation: ViewerWalkModeOperation,
     ...keys: string[]
@@ -70,6 +83,21 @@ export class WalkModeController {
     this.model.addKeyBinding(operation, new KeyBinding(...keys));
   }
 
+  /**
+   * Adds a custom keybinding for a specific walk operation. This will replace any
+   * existing keybindings to allow for overriding the default behavior.
+   *
+   * @example
+   * ```
+   * const walkModeTool = document.querySelector('vertex-viewer-walk-mode-tool');
+   *
+   * // Remove keybinding for the `PIVOT_UP` operation
+   * walkModeTool.controller.replaceKeyBinding('PIVOT_UP');
+   *
+   * // Replace keybinding for `WALK_FORWARD` with `ArrowUp` instead of `w`
+   * walkModeTool.controller.replaceKeyBinding('WALK_FORWARD', 'ArrowUp');
+   * ```
+   */
   public replaceKeyBinding(
     operation: ViewerWalkModeOperation,
     ...keys: string[]
@@ -77,6 +105,21 @@ export class WalkModeController {
     this.model.replaceKeyBinding(operation, new KeyBinding(...keys));
   }
 
+  /**
+   * Adds an exclusion for specific elements when responding to keyboard
+   * events. This is useful when there are other elements on screen that
+   * require keyboard interaction and the walk mode handlers should not
+   * respond to the keyboard events. Can be either a element's `tagName`
+   * or a predicate. Returns a `Disposable` that can be used to remove the
+   * exclusion.
+   *
+   * Default `tagName` exclusions:
+   * 'VERTEX-SCENE-TREE'
+   * 'VERTEX-SCENE-TREE-SEARCH'
+   * 'VERTEX-VIEWER-PIN-TOOL'
+   * 'INPUT'
+   * 'TEXTAREA'
+   */
   public excludeElement(predicate: (el: Element) => boolean): Disposable;
   public excludeElement(tagName: string): Disposable;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
