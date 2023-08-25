@@ -1207,11 +1207,17 @@ export namespace Components {
         "zPositiveLabel": string;
     }
     interface VertexViewerWalkModeTool {
+        /**
+          * The `WalkModeController` responsible for controlling `KeyBinding`s and excluded elements, as well as updating the `WalkModeModel` with various configuration settings.
+         */
         "controller"?: WalkModeController;
         /**
           * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
          */
         "enabled": boolean;
+        /**
+          * The `WalkModeModel` responsible for tracking configuration and emitting events for interaction handlers to respond to.
+         */
         "model": WalkModeModel;
         /**
           * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
@@ -2699,11 +2705,17 @@ declare namespace LocalJSX {
         "zPositiveLabel"?: string;
     }
     interface VertexViewerWalkModeTool {
+        /**
+          * The `WalkModeController` responsible for controlling `KeyBinding`s and excluded elements, as well as updating the `WalkModeModel` with various configuration settings.
+         */
         "controller"?: WalkModeController;
         /**
           * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
          */
         "enabled"?: boolean;
+        /**
+          * The `WalkModeModel` responsible for tracking configuration and emitting events for interaction handlers to respond to.
+         */
         "model"?: WalkModeModel;
         /**
           * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.

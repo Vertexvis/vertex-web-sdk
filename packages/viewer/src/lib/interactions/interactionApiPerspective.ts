@@ -150,6 +150,44 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     );
   }
 
+  public walk(delta: Vector3.Vector3): void {
+    this.transformCamera(({ camera, boundingBox }) => {
+      const { position, up, lookAt } = camera;
+
+      const normalizedUp = Vector3.normalize(up);
+      const normalizedViewVector = Vector3.normalize(camera.viewVector);
+
+      const boundingBoxScalar = Math.min(
+        ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      );
+      const scaledDelta = Vector3.scale(boundingBoxScalar, delta);
+      const localX = Vector3.cross(normalizedUp, normalizedViewVector);
+      const localZ = Vector3.cross(localX, normalizedUp);
+
+      const translationX = Vector3.scale(
+        scaledDelta.x,
+        Vector3.normalize(localX)
+      );
+      const translationY = Vector3.scale(
+        scaledDelta.y,
+        Vector3.normalize(normalizedUp)
+      );
+      const translationZ = Vector3.scale(
+        scaledDelta.z,
+        Vector3.normalize(localZ)
+      );
+      const translation = Vector3.negate(
+        Vector3.add(translationX, translationY, translationZ)
+      );
+
+      return camera.update({
+        ...camera,
+        position: Vector3.add(position, translation),
+        lookAt: Vector3.add(lookAt, translation),
+      });
+    });
+  }
+
   private computeZoomDistances(
     delta: number,
     camera: PerspectiveCamera,

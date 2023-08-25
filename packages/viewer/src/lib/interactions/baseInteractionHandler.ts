@@ -241,6 +241,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.currentInteraction = this.rotateInteraction;
     }
 
+    console.log(this.currentInteraction, this.primaryInteraction);
+
     if (event.buttons === 1) {
       this.draggingInteraction =
         this.currentInteraction || this.primaryInteraction;

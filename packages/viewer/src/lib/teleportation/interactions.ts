@@ -5,8 +5,7 @@ import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
 import { InteractionApi, InteractionHandler } from '../interactions';
 import { Camera, CameraRenderOptions } from '../scenes';
-import { WalkModeController } from '../walk-mode/controller';
-import { ViewerTeleportMode } from '../walk-mode/model';
+import { ViewerTeleportMode, WalkModeModel } from '../walk-mode/model';
 
 export interface AnimationConfiguration {
   durationMs: number;
@@ -25,7 +24,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   private cursorDisposable?: Disposable;
 
   public constructor(
-    private controller: WalkModeController,
+    private model: WalkModeModel,
     private animationConfiguration?: AnimationConfiguration
   ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
@@ -33,7 +32,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     this.handleEnabledChange = this.handleEnabledChange.bind(this);
     this.handleTeleportModeChange = this.handleTeleportModeChange.bind(this);
 
-    this.enabledChangeDisposable = this.controller.onEnabledChange(
+    this.enabledChangeDisposable = this.model.onEnabledChange(
       this.handleEnabledChange
     );
   }
@@ -54,7 +53,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
     this.rectObserver.observe(element);
 
-    this.handleEnabledChange(this.controller.getEnabled());
+    this.handleEnabledChange(this.model.getEnabled());
   }
 
   public setAnimations(config?: AnimationConfiguration): void {
@@ -64,12 +63,12 @@ export class TeleportInteractionHandler implements InteractionHandler {
   public enable(): void {
     this.disable();
 
-    this.teleportModeChangeDisposable = this.controller.onTeleportModeChange(
+    this.teleportModeChangeDisposable = this.model.onTeleportModeChange(
       this.handleTeleportModeChange
     );
     this.element?.addEventListener('pointerdown', this.handlePointerDown);
 
-    this.handleTeleportModeChange(this.controller.getTeleportMode());
+    this.handleTeleportModeChange(this.model.getTeleportMode());
   }
 
   public disable(): void {
@@ -86,7 +85,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private async handlePointerUp(event: PointerEvent): Promise<void> {
-    const mode = this.controller.getTeleportMode();
+    const mode = this.model.getTeleportMode();
     const threshold = this.api?.pixelThreshold() ?? 2;
     const pt = getMouseClientPosition(event, this.rectObserver.rect);
 
@@ -141,7 +140,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     hitPosition: Vector3.Vector3
   ): Camera {
     const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.controller.getHeightScalar();
+    const heightScalar = this.model.getTeleportHeightScalar();
 
     const cameraPlane = Plane.fromNormalAndCoplanarPoint(
       camera.up,
@@ -183,7 +182,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     hitNormal: Vector3.Vector3
   ): Camera {
     const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.controller.getHeightScalar();
+    const heightScalar = this.model.getTeleportHeightScalar();
 
     const upRay = Ray.create({
       origin: hitPosition,
@@ -191,13 +190,12 @@ export class TeleportInteractionHandler implements InteractionHandler {
     });
 
     return camera.alignTo(
-      Ray.at(upRay, shortestBoundingBoxLength * heightScalar),
+      Ray.at(upRay, shortestBoundingBoxLength / heightScalar),
       hitNormal
     );
   }
 
   private handleEnabledChange(enabled: boolean): void {
-    console.log(enabled);
     if (enabled) {
       this.enable();
     } else {
@@ -206,7 +204,6 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private handleTeleportModeChange(mode?: ViewerTeleportMode): void {
-    console.log(mode);
     if (mode != null) {
       this.cursorDisposable = this.api?.addCursor('crosshair');
     } else {

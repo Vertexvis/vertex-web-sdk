@@ -1,7 +1,5 @@
 import {
   Component,
-  Event,
-  EventEmitter,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
@@ -154,16 +152,14 @@ export class ViewerTeleportTool {
   private async setupInteractionHandler(): Promise<void> {
     this.clearInteractionHandler();
 
-    if (this.controller != null) {
-      this.interactionHandler = new TeleportInteractionHandler(
-        this.controller,
-        !this.animationsDisabled && this.animationMs != null
-          ? { durationMs: this.animationMs }
-          : undefined
-      );
+    this.interactionHandler = new TeleportInteractionHandler(
+      this.model,
+      !this.animationsDisabled && this.animationMs != null
+        ? { durationMs: this.animationMs }
+        : undefined
+    );
 
-      this.interactionHandlerDisposable =
-        await this.viewer?.registerInteractionHandler(this.interactionHandler);
-    }
+    this.interactionHandlerDisposable =
+      await this.viewer?.registerInteractionHandler(this.interactionHandler);
   }
 }

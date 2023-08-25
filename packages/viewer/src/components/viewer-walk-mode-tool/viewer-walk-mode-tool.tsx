@@ -1,8 +1,6 @@
 import {
   Component,
   Element,
-  Event,
-  EventEmitter,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
@@ -11,12 +9,14 @@ import {
 } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
+import { InteractionType } from '../../lib/interactions/baseInteractionHandler';
 import { WalkModeController } from '../../lib/walk-mode/controller';
 import { WalkInteractionHandler } from '../../lib/walk-mode/interactions';
 import { ViewerTeleportMode, WalkModeModel } from '../../lib/walk-mode/model';
 
 interface StateMap {
   teleportTool?: HTMLVertexViewerTeleportToolElement;
+  previousPrimaryInteractionType?: InteractionType;
 }
 
 /**
@@ -36,9 +36,18 @@ export class ViewerWalkModeTool {
   @Prop()
   public viewer?: HTMLVertexViewerElement;
 
+  /**
+   * The `WalkModeController` responsible for controlling `KeyBinding`s and excluded
+   * elements, as well as updating the `WalkModeModel` with various configuration
+   * settings.
+   */
   @Prop({ mutable: true })
   public controller?: WalkModeController;
 
+  /**
+   * The `WalkModeModel` responsible for tracking configuration and emitting
+   * events for interaction handlers to respond to.
+   */
   @Prop({ mutable: true })
   public model: WalkModeModel = new WalkModeModel();
 
@@ -93,6 +102,7 @@ export class ViewerWalkModeTool {
   protected componentDidLoad(): void {
     this.ensureTeleportToolConfigured();
     this.updateTeleportTool();
+    this.updateViewerInteractionMode();
   }
 
   /**
@@ -115,6 +125,7 @@ export class ViewerWalkModeTool {
   @Watch('enabled')
   protected handleEnabledChanged(): void {
     this.controller?.setEnabled(this.enabled);
+    this.updateViewerInteractionMode();
   }
 
   /**
@@ -124,6 +135,7 @@ export class ViewerWalkModeTool {
   protected handleViewerChanged(): void {
     this.setupInteractionHandler();
     this.updateTeleportTool();
+    this.updateViewerInteractionMode();
   }
 
   /**
@@ -163,12 +175,10 @@ export class ViewerWalkModeTool {
   private async setupInteractionHandler(): Promise<void> {
     this.clearInteractionHandler();
 
-    if (this.controller != null) {
-      this.interactionHandler = new WalkInteractionHandler(this.controller);
+    this.interactionHandler = new WalkInteractionHandler(this.model);
 
-      this.interactionHandlerDisposable =
-        await this.viewer?.registerInteractionHandler(this.interactionHandler);
-    }
+    this.interactionHandlerDisposable =
+      await this.viewer?.registerInteractionHandler(this.interactionHandler);
   }
 
   private async ensureTeleportToolConfigured(): Promise<void> {
@@ -201,6 +211,25 @@ export class ViewerWalkModeTool {
       this.stateMap.teleportTool.controller = this.controller;
       this.stateMap.teleportTool.model = this.model;
       this.stateMap.teleportTool.mode = this.teleportMode;
+    }
+  }
+
+  private async updateViewerInteractionMode(): Promise<void> {
+    const baseInteractionHandler =
+      await this.viewer?.getBaseInteractionHandler();
+    if (this.enabled && baseInteractionHandler != null) {
+      this.stateMap.previousPrimaryInteractionType =
+        baseInteractionHandler.getPrimaryInteractionType();
+      baseInteractionHandler.setPrimaryInteractionType('pivot');
+    } else if (
+      baseInteractionHandler != null &&
+      baseInteractionHandler.getPrimaryInteractionType() === 'pivot' &&
+      this.stateMap.previousPrimaryInteractionType != null
+    ) {
+      baseInteractionHandler.setPrimaryInteractionType(
+        this.stateMap.previousPrimaryInteractionType
+      );
+      this.stateMap.previousPrimaryInteractionType = undefined;
     }
   }
 }
