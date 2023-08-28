@@ -146,6 +146,8 @@ export class ViewerTeleportTool {
       this.controller = new WalkModeController(this.model);
       this.controller.setTeleportMode(this.mode);
       this.controllerChanged.emit(this.controller);
+    } else {
+      this.controller.setTeleportMode(this.mode);
     }
   }
 

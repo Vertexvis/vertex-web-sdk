@@ -104,21 +104,17 @@ export class TeleportInteractionHandler implements InteractionHandler {
       const hits = await this.api?.hitItems(pt);
       const hit = hits != null ? hits[0] : undefined;
 
-      if (hit?.hitNormal != null) {
+      if (hit?.hitNormal != null && hit?.hitPoint) {
         await this.beginInteraction();
 
         await this.api?.transformCamera(({ camera, boundingBox }) => {
           return mode === 'teleport'
-            ? this.teleport(
-                camera,
-                boundingBox,
-                hit.hitPoint as Vector3.Vector3
-              )
+            ? this.teleport(camera, boundingBox, hit.hitPoint)
             : this.teleportAndAlign(
                 camera,
                 boundingBox,
-                hit.hitPoint as Vector3.Vector3,
-                hit.hitNormal as Vector3.Vector3
+                hit.hitPoint,
+                hit.hitNormal
               );
         }, this.renderConfiguration());
 

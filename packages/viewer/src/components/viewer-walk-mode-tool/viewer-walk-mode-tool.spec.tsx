@@ -14,9 +14,10 @@ import {
   makeViewerStream,
 } from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
-import { ViewerTeleportTool } from './viewer-teleport-tool';
+import { ViewerTeleportTool } from '../viewer-teleport-tool/viewer-teleport-tool';
+import { ViewerWalkModeTool } from './viewer-walk-mode-tool';
 
-describe('vertex-viewer-teleport-tool', () => {
+describe('vertex-viewer-walk-mode-tool', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -42,19 +43,16 @@ describe('vertex-viewer-teleport-tool', () => {
   it('supports the teleport interaction', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
-      components: [Viewer, ViewerTeleportTool],
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-teleport-tool
-            animationsDisabled={true}
-            mode="teleport"
-          ></vertex-viewer-teleport-tool>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
         </vertex-viewer>
       ),
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = jest.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -72,8 +70,8 @@ describe('vertex-viewer-teleport-tool', () => {
       'canvas'
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
-    ) as HTMLVertexViewerTeleportToolElement;
+      'vertex-viewer-walk-mode-tool'
+    ) as HTMLVertexViewerWalkModeToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
 
@@ -100,26 +98,24 @@ describe('vertex-viewer-teleport-tool', () => {
             z: expectedPositionZ - viewVectorDistance,
           },
         }),
-      })
+      }),
+      true
     );
   });
 
   it('supports the teleport and align interaction', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
-      components: [Viewer, ViewerTeleportTool],
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-teleport-tool
-            animationsDisabled={true}
-            mode="teleport-and-align"
-          ></vertex-viewer-teleport-tool>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport-and-align"></vertex-viewer-walk-mode-tool>
         </vertex-viewer>
       ),
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = jest.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -137,8 +133,8 @@ describe('vertex-viewer-teleport-tool', () => {
       'canvas'
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
-    ) as HTMLVertexViewerTeleportToolElement;
+      'vertex-viewer-walk-mode-tool'
+    ) as HTMLVertexViewerWalkModeToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
 
@@ -165,140 +161,210 @@ describe('vertex-viewer-teleport-tool', () => {
             z: mockHit.hitPoint.z - viewVectorDistance,
           },
         }),
+      }),
+      true
+    );
+  });
+
+  it('supports keyboard walk movement', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.root as HTMLVertexViewerElement;
+    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    mockHitInteraction(stream);
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const minLength = Math.min(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+    );
+
+    await page.waitForChanges();
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'w' }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'a' }));
+
+    await page.waitForChanges();
+
+    const stepDistance = minLength / 100;
+
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        camera: expect.objectContaining({
+          position: {
+            x: -stepDistance,
+            y: 0,
+            z: camera.position.z - stepDistance,
+          },
+          lookAt: {
+            x: -stepDistance,
+            y: 0,
+            z: camera.lookAt.z - stepDistance,
+          },
+        }),
+      })
+    );
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 's' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 's' }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'd' }));
+
+    await page.waitForChanges();
+
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        camera: expect.objectContaining({
+          position: {
+            x: 0,
+            y: 0,
+            z: camera.position.z + stepDistance,
+          },
+          lookAt: {
+            x: 0,
+            y: 0,
+            z: camera.lookAt.z + stepDistance,
+          },
+        }),
       })
     );
   });
 
-  it('supports animations', async () => {
+  it('supports keyboard pivot movement', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
-      components: [Viewer, ViewerTeleportTool],
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-teleport-tool mode="teleport"></vertex-viewer-teleport-tool>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
         </vertex-viewer>
       ),
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = jest.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
-    const camera = viewer.frame?.scene
-      .camera as FrameCamera.PerspectiveFrameCamera;
-    const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
-    const boundingBox = viewer.frame?.scene
-      .boundingBox as BoundingBox.BoundingBox;
-    const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
-    );
+    await page.waitForChanges();
 
-    const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
-    ) as HTMLCanvasElement;
-    const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
-    ) as HTMLVertexViewerTeleportToolElement;
-
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowUp' }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft' }));
 
     await page.waitForChanges();
 
-    canvas.dispatchEvent(new MouseEvent('pointerdown'));
-    window.dispatchEvent(new MouseEvent('pointerup'));
+    const upLeftCall = streamSpy.mock.calls[1][0];
+
+    expect(upLeftCall.camera.lookAt.x).toBeCloseTo(-1.745);
+    expect(upLeftCall.camera.lookAt.y).toBeCloseTo(1.745);
+    expect(upLeftCall.camera.lookAt.z).toBeCloseTo(0.03);
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown' }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowRight' }));
 
     await page.waitForChanges();
 
-    const expectedPositionZ = mockHit.hitPoint.z + minLength / 10;
+    const downRightCall = streamSpy.mock.calls[3][0];
 
-    expect(streamSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        camera: expect.objectContaining({
-          position: {
-            x: 0,
-            y: 0,
-            z: expectedPositionZ,
-          },
-          lookAt: {
-            x: 0,
-            y: 0,
-            z: expectedPositionZ - viewVectorDistance,
-          },
-        }),
-      }),
-      true
-    );
+    expect(downRightCall.camera.lookAt.x).toBeCloseTo(1.745);
+    expect(downRightCall.camera.lookAt.y).toBeCloseTo(-1.745);
+    expect(downRightCall.camera.lookAt.z).toBeCloseTo(0.03);
   });
 
-  it('supports changing animation properties', async () => {
+  it('supports keyboard vertical movement', async () => {
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
-      components: [Viewer, ViewerTeleportTool],
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
-          <vertex-viewer-teleport-tool mode="teleport"></vertex-viewer-teleport-tool>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
         </vertex-viewer>
       ),
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = jest.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const camera = viewer.frame?.scene
       .camera as FrameCamera.PerspectiveFrameCamera;
-    const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
       ...Vector3.toArray(BoundingBox.lengths(boundingBox))
     );
 
-    const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
-    ) as HTMLCanvasElement;
-    const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
-    ) as HTMLVertexViewerTeleportToolElement;
+    await page.waitForChanges();
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
-    tool.animationsDisabled = false;
-    tool.animationMs = 10000;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageUp' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'PageUp' }));
 
     await page.waitForChanges();
 
-    canvas.dispatchEvent(new MouseEvent('pointerdown'));
-    window.dispatchEvent(new MouseEvent('pointerup'));
-
-    await page.waitForChanges();
-
-    const expectedPositionZ = mockHit.hitPoint.z + minLength / 10;
+    const stepDistance = minLength / 100;
 
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         camera: expect.objectContaining({
           position: {
             x: 0,
-            y: 0,
-            z: expectedPositionZ,
+            y: stepDistance,
+            z: camera.position.z,
           },
           lookAt: {
             x: 0,
-            y: 0,
-            z: expectedPositionZ - viewVectorDistance,
+            y: stepDistance,
+            z: camera.lookAt.z,
           },
         }),
-        animation: expect.objectContaining({
-          duration: expect.objectContaining({
-            seconds: 10,
-          }),
+      })
+    );
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' }));
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'PageDown' }));
+
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        camera: expect.objectContaining({
+          position: {
+            x: 0,
+            y: -stepDistance,
+            z: camera.position.z,
+          },
+          lookAt: {
+            x: 0,
+            y: -stepDistance,
+            z: camera.lookAt.z,
+          },
         }),
-      }),
-      true
+      })
     );
   });
 });

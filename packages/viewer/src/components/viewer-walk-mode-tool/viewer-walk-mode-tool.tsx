@@ -99,12 +99,18 @@ export class ViewerWalkModeTool {
   /**
    * @ignore
    */
-  protected componentDidLoad(): void {
+  protected componentWillLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
-    this.ensureTeleportToolConfigured();
+  }
+
+  /**
+   * @ignore
+   */
+  protected async componentDidLoad(): Promise<void> {
+    await this.ensureTeleportToolConfigured();
     this.updateTeleportTool();
-    this.setPivotInteractionMode();
+    await this.setPivotInteractionMode();
   }
 
   /**
@@ -165,8 +171,8 @@ export class ViewerWalkModeTool {
       <Host>
         <slot
           name="teleport-tool"
-          onSlotchange={() => {
-            this.ensureTeleportToolConfigured();
+          onSlotchange={async () => {
+            await this.ensureTeleportToolConfigured();
             this.updateTeleportTool();
           }}
         ></slot>
