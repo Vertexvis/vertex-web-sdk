@@ -2,6 +2,7 @@ import { Vector3 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { InteractionApiPerspective, InteractionHandler } from '../interactions';
+import { targetIsElement } from './dom';
 import { ViewerWalkModeOperation, WalkModeModel } from './model';
 
 export class WalkInteractionHandler implements InteractionHandler {
@@ -78,7 +79,7 @@ export class WalkInteractionHandler implements InteractionHandler {
     const key = event.key.toLowerCase();
 
     const exclude =
-      event.target instanceof Element &&
+      targetIsElement(event.target) &&
       this.model.isElementExcluded(event.target);
 
     if (!event.repeat && !exclude) {
