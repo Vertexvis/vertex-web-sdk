@@ -1,5 +1,6 @@
 import {
   Component,
+  Event,
   EventEmitter,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
@@ -7,7 +8,6 @@ import {
   Prop,
   Watch,
 } from '@stencil/core';
-import { Event } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { TeleportInteractionHandler } from '../../lib/teleportation/interactions';

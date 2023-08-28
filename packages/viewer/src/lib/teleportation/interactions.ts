@@ -104,7 +104,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
       const hits = await this.api?.hitItems(pt);
       const hit = hits != null ? hits[0] : undefined;
 
-      if (hit != null && hit.hitNormal != null) {
+      if (hit?.hitNormal != null) {
         await this.beginInteraction();
 
         await this.api?.transformCamera(({ camera, boundingBox }) => {
