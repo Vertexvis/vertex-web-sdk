@@ -1426,10 +1426,18 @@ export interface VertexViewerPinLabelCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerPinLabelElement;
 }
+export interface VertexViewerTeleportToolCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerTeleportToolElement;
+}
 export interface VertexViewerTransformWidgetCustomEvent<T>
   extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerTransformWidgetElement;
+}
+export interface VertexViewerWalkModeToolCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerWalkModeToolElement;
 }
 declare global {
   interface HTMLVertexSceneTreeElement
@@ -2799,6 +2807,12 @@ declare namespace LocalJSX {
     mode?: ViewerTeleportMode;
     model?: WalkModeModel;
     /**
+     * Event emitted when the `WalkModeController` associated with this tool changes.
+     */
+    onControllerChanged?: (
+      event: VertexViewerTeleportToolCustomEvent<WalkModeController>
+    ) => void;
+    /**
      * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
      */
     viewer?: HTMLVertexViewerElement;
@@ -2940,6 +2954,12 @@ declare namespace LocalJSX {
      * The `WalkModeModel` responsible for tracking configuration and emitting events for interaction handlers to respond to.
      */
     model?: WalkModeModel;
+    /**
+     * Event emitted when the `WalkModeController` associated with this tool changes.
+     */
+    onControllerChanged?: (
+      event: VertexViewerWalkModeToolCustomEvent<WalkModeController>
+    ) => void;
     /**
      * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
      */

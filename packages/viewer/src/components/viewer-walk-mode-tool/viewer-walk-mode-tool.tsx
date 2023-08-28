@@ -89,7 +89,7 @@ export class ViewerWalkModeTool {
   public controllerChanged!: EventEmitter<WalkModeController>;
 
   @Element()
-  private hostEl!: HTMLElement;
+  private hostEl?: HTMLElement;
 
   private interactionHandlerDisposable?: Disposable;
   private interactionHandler?: WalkInteractionHandler;
@@ -99,18 +99,12 @@ export class ViewerWalkModeTool {
   /**
    * @ignore
    */
-  protected componentWillLoad(): void {
+  protected componentDidLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
-  }
-
-  /**
-   * @ignore
-   */
-  protected componentDidLoad(): void {
     this.ensureTeleportToolConfigured();
     this.updateTeleportTool();
-    this.updateViewerInteractionMode();
+    this.setPivotInteractionMode();
   }
 
   /**
@@ -118,6 +112,7 @@ export class ViewerWalkModeTool {
    */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
+    this.setPivotInteractionMode();
   }
 
   /**
@@ -125,6 +120,7 @@ export class ViewerWalkModeTool {
    */
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
+    this.resetInteractionMode();
   }
 
   /**
@@ -133,7 +129,7 @@ export class ViewerWalkModeTool {
   @Watch('enabled')
   protected handleEnabledChanged(): void {
     this.controller?.setEnabled(this.enabled);
-    this.updateViewerInteractionMode();
+    this.toggleInteractionMode();
   }
 
   /**
@@ -143,19 +139,22 @@ export class ViewerWalkModeTool {
   protected handleViewerChanged(): void {
     this.setupInteractionHandler();
     this.updateTeleportTool();
-    this.updateViewerInteractionMode();
+    this.toggleInteractionMode();
   }
 
   /**
    * @ignore
    */
-  @Watch('controller')
   @Watch('model')
   @Watch('teleportMode')
   protected handleTeleportToolPropChanged(): void {
     this.updateTeleportTool();
   }
 
+  /**
+   * @ignore
+   */
+  @Watch('controller')
   protected handleControllerChanged(): void {
     this.updateTeleportTool();
     this.controllerChanged.emit(this.controller);
@@ -166,7 +165,10 @@ export class ViewerWalkModeTool {
       <Host>
         <slot
           name="teleport-tool"
-          onSlotchange={this.ensureTeleportToolConfigured}
+          onSlotchange={() => {
+            this.ensureTeleportToolConfigured();
+            this.updateTeleportTool();
+          }}
         ></slot>
       </Host>
     );
@@ -187,8 +189,6 @@ export class ViewerWalkModeTool {
   }
 
   private async setupInteractionHandler(): Promise<void> {
-    this.clearInteractionHandler();
-
     this.interactionHandler = new WalkInteractionHandler(this.model);
 
     this.interactionHandlerDisposable =
@@ -196,26 +196,29 @@ export class ViewerWalkModeTool {
   }
 
   private async ensureTeleportToolConfigured(): Promise<void> {
-    const slotted: Element | undefined =
-      this.hostEl.querySelector(
-        'vertex-viewer-teleport-tool[slot="teleport-tool"]'
-      ) ?? undefined;
-    const slottedTeleportTool =
-      slotted?.tagName === 'VERTEX-VIEWER-TELEPORT-TOOL'
-        ? (slotted as HTMLVertexViewerTeleportToolElement)
-        : undefined;
+    if (this.hostEl != null) {
+      const slotted: Element | undefined =
+        this.hostEl?.querySelector(
+          'vertex-viewer-teleport-tool[slot="teleport-tool"]'
+        ) ?? undefined;
+      const slottedTeleportTool =
+        slotted?.tagName === 'VERTEX-VIEWER-TELEPORT-TOOL'
+          ? (slotted as HTMLVertexViewerTeleportToolElement)
+          : undefined;
 
-    if (slottedTeleportTool != null) {
-      this.stateMap.teleportTool = slottedTeleportTool;
-    } else {
-      const slot: HTMLSlotElement | undefined =
-        this.hostEl?.shadowRoot?.querySelector('slot[name="teleport-tool"]') ??
-        undefined;
+      if (slottedTeleportTool != null) {
+        this.stateMap.teleportTool = slottedTeleportTool;
+      } else {
+        const slot: HTMLSlotElement | undefined =
+          this.hostEl?.shadowRoot?.querySelector(
+            'slot[name="teleport-tool"]'
+          ) ?? undefined;
 
-      this.stateMap.teleportTool = document.createElement(
-        'vertex-viewer-teleport-tool'
-      );
-      slot?.appendChild(this.stateMap.teleportTool);
+        this.stateMap.teleportTool = document.createElement(
+          'vertex-viewer-teleport-tool'
+        );
+        slot?.appendChild(this.stateMap.teleportTool);
+      }
     }
   }
 
@@ -228,14 +231,34 @@ export class ViewerWalkModeTool {
     }
   }
 
-  private async updateViewerInteractionMode(): Promise<void> {
+  private toggleInteractionMode(): void {
+    if (this.enabled) {
+      this.setPivotInteractionMode();
+    } else {
+      this.resetInteractionMode();
+    }
+  }
+
+  private async setPivotInteractionMode(): Promise<void> {
     const baseInteractionHandler =
       await this.viewer?.getBaseInteractionHandler();
+
     if (this.enabled && baseInteractionHandler != null) {
-      this.stateMap.previousPrimaryInteractionType =
+      const interactionType =
         baseInteractionHandler.getPrimaryInteractionType();
+      this.stateMap.previousPrimaryInteractionType =
+        interactionType === 'pivot'
+          ? this.stateMap.previousPrimaryInteractionType
+          : interactionType;
       baseInteractionHandler.setPrimaryInteractionType('pivot');
-    } else if (
+    }
+  }
+
+  private async resetInteractionMode(): Promise<void> {
+    const baseInteractionHandler =
+      await this.viewer?.getBaseInteractionHandler();
+
+    if (
       baseInteractionHandler != null &&
       baseInteractionHandler.getPrimaryInteractionType() === 'pivot' &&
       this.stateMap.previousPrimaryInteractionType != null

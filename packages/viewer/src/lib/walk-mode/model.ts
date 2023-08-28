@@ -70,13 +70,13 @@ export class WalkModeModel {
   private enabledChanged: EventDispatcher<boolean> = new EventDispatcher();
 
   private teleportModeChanged: EventDispatcher<ViewerTeleportMode | undefined> =
-    new EventDispatcher();
+    new EventDispatcher<ViewerTeleportMode | undefined>();
 
   private configurationChanged: EventDispatcher<ViewerWalkModeConfiguration> =
-    new EventDispatcher();
+    new EventDispatcher<ViewerWalkModeConfiguration>();
 
   private keyBindingsChanged: EventDispatcher<ViewerWalkModeKeyBindings> =
-    new EventDispatcher();
+    new EventDispatcher<ViewerWalkModeKeyBindings>();
 
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;

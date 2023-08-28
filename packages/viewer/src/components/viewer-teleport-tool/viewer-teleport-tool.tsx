@@ -157,8 +157,6 @@ export class ViewerTeleportTool {
   }
 
   private async setupInteractionHandler(): Promise<void> {
-    this.clearInteractionHandler();
-
     this.interactionHandler = new TeleportInteractionHandler(
       this.model,
       !this.animationsDisabled && this.animationMs != null

@@ -16,6 +16,13 @@
 | `viewer`       | --              | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.                                                                                                                                                                                                                                                                                                                                                                                                                                          | `HTMLVertexViewerElement \| undefined`            | `undefined`           |
 
 
+## Events
+
+| Event               | Description                                                                    | Type                              |
+| ------------------- | ------------------------------------------------------------------------------ | --------------------------------- |
+| `controllerChanged` | Event emitted when the `WalkModeController` associated with this tool changes. | `CustomEvent<WalkModeController>` |
+
+
 ## Dependencies
 
 ### Depends on

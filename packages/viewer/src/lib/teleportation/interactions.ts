@@ -18,6 +18,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   private rectObserver = new ElementRectObserver();
 
   private downPosition?: Point.Point;
+  private downButtons?: number;
 
   private enabledChangeDisposable?: Disposable;
   private teleportModeChangeDisposable?: Disposable;
@@ -80,6 +81,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
   private async handlePointerDown(event: PointerEvent): Promise<void> {
     this.downPosition = getMouseClientPosition(event, this.rectObserver.rect);
+    this.downButtons = event.buttons;
 
     window.addEventListener('pointerup', this.handlePointerUp);
   }
@@ -88,11 +90,16 @@ export class TeleportInteractionHandler implements InteractionHandler {
     const mode = this.model.getTeleportMode();
     const threshold = this.api?.pixelThreshold() ?? 2;
     const pt = getMouseClientPosition(event, this.rectObserver.rect);
+    const isRightClick = this.downButtons === 2;
+    const hasModifier =
+      event.shiftKey || event.altKey || event.metaKey || event.ctrlKey;
 
     if (
       mode != null &&
       this.downPosition != null &&
-      Point.distance(this.downPosition, pt) <= threshold
+      Point.distance(this.downPosition, pt) <= threshold &&
+      !isRightClick &&
+      !hasModifier
     ) {
       const hits = await this.api?.hitItems(pt);
       const hit = hits != null ? hits[0] : undefined;
@@ -162,7 +169,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
     const newPosition = Ray.at(
       rayToHitPosition,
-      distanceToHitPosition - shortestBoundingBoxLength * heightScalar
+      distanceToHitPosition - shortestBoundingBoxLength / heightScalar
     );
     const newPositionViewVectorRay = Ray.create({
       origin: newPosition,
