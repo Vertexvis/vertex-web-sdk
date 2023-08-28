@@ -367,4 +367,54 @@ describe('vertex-viewer-walk-mode-tool', () => {
       })
     );
   });
+
+  it('supports a custom teleport tool', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-walk-mode-tool teleportMode="teleport">
+            <vertex-viewer-teleport-tool
+              slot="teleport-tool"
+              animationMs={5000}
+            ></vertex-viewer-teleport-tool>
+          </vertex-viewer-walk-mode-tool>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.root as HTMLVertexViewerElement;
+    const streamSpy = jest.spyOn(stream, 'flyTo');
+    mockHitInteraction(stream);
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const tool = viewer.querySelector(
+      'vertex-viewer-walk-mode-tool'
+    ) as HTMLVertexViewerWalkModeToolElement;
+
+    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+
+    await page.waitForChanges();
+
+    canvas.dispatchEvent(new MouseEvent('pointerdown'));
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(streamSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        animation: expect.objectContaining({
+          duration: expect.objectContaining({
+            seconds: 5,
+          }),
+        }),
+      }),
+      true
+    );
+  });
 });
