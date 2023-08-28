@@ -109,12 +109,16 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
         await this.api?.transformCamera(({ camera, boundingBox }) => {
           return mode === 'teleport'
-            ? this.teleport(camera, boundingBox, hit.hitPoint)
+            ? this.teleport(
+                camera,
+                boundingBox,
+                hit.hitPoint as Vector3.Vector3
+              )
             : this.teleportAndAlign(
                 camera,
                 boundingBox,
-                hit.hitPoint,
-                hit.hitNormal
+                hit.hitPoint as Vector3.Vector3,
+                hit.hitNormal as Vector3.Vector3
               );
         }, this.renderConfiguration());
 
