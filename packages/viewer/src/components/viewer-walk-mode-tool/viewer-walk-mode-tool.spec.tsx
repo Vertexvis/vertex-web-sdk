@@ -282,9 +282,9 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
     const upLeftCall = streamSpy.mock.calls[1][0];
 
-    expect(upLeftCall.camera.lookAt.x).toBeCloseTo(-1.745);
-    expect(upLeftCall.camera.lookAt.y).toBeCloseTo(1.745);
-    expect(upLeftCall.camera.lookAt.z).toBeCloseTo(0.03);
+    expect(upLeftCall.camera?.lookAt?.x).toBeCloseTo(-1.745);
+    expect(upLeftCall.camera?.lookAt?.y).toBeCloseTo(1.745);
+    expect(upLeftCall.camera?.lookAt?.z).toBeCloseTo(0.03);
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
@@ -296,9 +296,9 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
     const downRightCall = streamSpy.mock.calls[3][0];
 
-    expect(downRightCall.camera.lookAt.x).toBeCloseTo(1.745);
-    expect(downRightCall.camera.lookAt.y).toBeCloseTo(-1.745);
-    expect(downRightCall.camera.lookAt.z).toBeCloseTo(0.03);
+    expect(downRightCall.camera?.lookAt?.x).toBeCloseTo(1.745);
+    expect(downRightCall.camera?.lookAt?.y).toBeCloseTo(-1.745);
+    expect(downRightCall.camera?.lookAt?.z).toBeCloseTo(0.03);
   });
 
   it('supports keyboard vertical movement', async () => {
