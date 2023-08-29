@@ -193,7 +193,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
     const upRay = Ray.create({
       origin: hitPosition,
-      direction: camera.up,
+      direction: hitNormal,
     });
 
     return camera.alignTo(

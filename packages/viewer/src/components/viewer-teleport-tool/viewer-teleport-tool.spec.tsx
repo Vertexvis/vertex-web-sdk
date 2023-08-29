@@ -25,13 +25,13 @@ describe('vertex-viewer-teleport-tool', () => {
     hitPoint: Vector3.create(0, 0, -100),
     hitNormal: Vector3.up(),
   };
-  function mockHitInteraction(stream: ViewerStream): void {
+  function mockHitInteraction(stream: ViewerStream, hit = mockHit): void {
     jest.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
       beginInteraction: {},
     });
     jest.spyOn(stream, 'hitItems').mockResolvedValueOnce({
       hitItems: {
-        hits: [mockHit],
+        hits: [hit],
       },
     });
     jest.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
@@ -120,7 +120,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
     const viewer = page.root as HTMLVertexViewerElement;
     const streamSpy = jest.spyOn(stream, 'replaceCamera');
-    mockHitInteraction(stream);
+    mockHitInteraction(stream, { ...mockHit, hitNormal: Vector3.right() });
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
@@ -155,13 +155,13 @@ describe('vertex-viewer-teleport-tool', () => {
       expect.objectContaining({
         camera: expect.objectContaining({
           position: {
-            x: 0,
-            y: height,
+            x: height,
+            y: 0,
             z: mockHit.hitPoint.z,
           },
           lookAt: {
-            x: 0,
-            y: height,
+            x: height,
+            y: 0,
             z: mockHit.hitPoint.z - viewVectorDistance,
           },
         }),
