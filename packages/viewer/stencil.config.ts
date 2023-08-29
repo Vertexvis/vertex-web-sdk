@@ -45,7 +45,9 @@ export const config: Config = {
       esmLoaderPath: '../loader',
     },
     {
-      type: 'dist-custom-elements-bundle',
+      type: 'dist-custom-elements',
+      autoDefineCustomElements: true,
+      minify: true,
     },
     {
       type: 'docs-readme',
