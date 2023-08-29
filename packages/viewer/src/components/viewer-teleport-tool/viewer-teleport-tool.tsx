@@ -51,7 +51,7 @@ export class ViewerTeleportTool {
 
   /**
    * Indicates whether animations will be used when performing camera
-   * operations. Defaults to `true`.
+   * operations. Defaults to `false`.
    */
   @Prop()
   public animationsDisabled = false;

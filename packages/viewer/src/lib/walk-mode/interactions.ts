@@ -202,7 +202,6 @@ export class WalkInteractionHandler implements InteractionHandler {
   }
 
   private relativeWalkSpeed(): number {
-    const speedScalar = (5 / this.model.getKeyboardWalkSpeed()) * 100;
-    return 1 / speedScalar;
+    return this.model.getKeyboardWalkSpeed() / 500;
   }
 }

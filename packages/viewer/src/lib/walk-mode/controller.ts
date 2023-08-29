@@ -43,10 +43,11 @@ export class WalkModeController {
   /**
    * Updates the configuration for downstream walk mode interaction handlers.
    *
-   * `teleportHeightScalar` - scalar used for fine-tuning the distance to offset
-   * the camera from a surface when performing a `teleport-and-align`. A larger
-   * number here will result in a shorter distance from the surface and vice-versa.
-   * Defaults to `8.5`.
+   * `teleportHeightPercentage` - percentage used for fine-tuning the distance to offset
+   * the camera from a surface when performing a `teleport-and-align`. This percentage is
+   * used alongside the shortest side of the visible bounding box to determine how far to
+   * place the camera from the surface that has been hit, with a larger percentage placing
+   * the camera further from the surface and vice-versa. Defaults to 11.75%.
    *
    * `keyboardWalkSpeed` - speed to move the camera when performing keyboard-based
    * walk interactions. A larger number here will result in a faster walk speed through

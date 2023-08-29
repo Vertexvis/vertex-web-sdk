@@ -3,7 +3,7 @@ import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import { KeyBinding } from '../keyBinding';
 
 export interface ViewerWalkModeConfiguration {
-  teleportHeightScalar: number;
+  teleportHeightPercentage: number;
   keyboardWalkSpeed: number;
   keyboardPivotDegrees: number;
   keyboardRepeatIntervalMs: number;
@@ -56,7 +56,7 @@ export class WalkModeModel {
   };
 
   private configuration: ViewerWalkModeConfiguration = {
-    teleportHeightScalar: 8.5,
+    teleportHeightPercentage: 8.5,
     keyboardWalkSpeed: 5,
     keyboardPivotDegrees: 1,
     keyboardRepeatIntervalMs: 25,
@@ -121,8 +121,8 @@ export class WalkModeModel {
     return this.teleportMode;
   }
 
-  public getTeleportHeightScalar(): number {
-    return this.configuration.teleportHeightScalar;
+  public getTeleportHeightPercentage(): number {
+    return this.configuration.teleportHeightPercentage;
   }
 
   public getKeyboardWalkSpeed(): number {

@@ -147,7 +147,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     hitPosition: Vector3.Vector3
   ): Camera {
     const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.model.getTeleportHeightScalar();
+    const heightScalar = this.model.getTeleportHeightPercentage() / 100;
 
     const cameraPlane = Plane.fromNormalAndCoplanarPoint(
       camera.up,
@@ -169,7 +169,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
     const newPosition = Ray.at(
       rayToHitPosition,
-      distanceToHitPosition - shortestBoundingBoxLength / heightScalar
+      distanceToHitPosition - shortestBoundingBoxLength * heightScalar
     );
     const newPositionViewVectorRay = Ray.create({
       origin: newPosition,
@@ -189,7 +189,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     hitNormal: Vector3.Vector3
   ): Camera {
     const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.model.getTeleportHeightScalar();
+    const heightScalar = this.model.getTeleportHeightPercentage() / 100;
 
     const upRay = Ray.create({
       origin: hitPosition,
@@ -197,7 +197,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     });
 
     return camera.alignTo(
-      Ray.at(upRay, shortestBoundingBoxLength / heightScalar),
+      Ray.at(upRay, shortestBoundingBoxLength * heightScalar),
       hitNormal
     );
   }
