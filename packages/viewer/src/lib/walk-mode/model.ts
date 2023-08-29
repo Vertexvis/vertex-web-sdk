@@ -56,7 +56,7 @@ export class WalkModeModel {
   };
 
   private configuration: ViewerWalkModeConfiguration = {
-    teleportHeightPercentage: 8.5,
+    teleportHeightPercentage: 11.75,
     keyboardWalkSpeed: 5,
     keyboardPivotDegrees: 1,
     keyboardRepeatIntervalMs: 25,
