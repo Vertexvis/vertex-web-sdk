@@ -7,7 +7,6 @@ import { CursorManager } from '../cursors';
 import { PerspectiveCamera } from '../scenes';
 import { Viewport } from '../types';
 import {
-  CameraTransform,
   InteractionApi,
   InteractionConfigProvider,
   SceneProvider,
@@ -24,7 +23,7 @@ interface ZoomPositionData {
 
 const CAMERA_MIN_ZOOM_SCALAR = 0.2;
 
-export class InteractionApiPerspective extends InteractionApi {
+export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera> {
   public constructor(
     stream: StreamApi,
     cursors: CursorManager,
@@ -151,29 +150,42 @@ export class InteractionApiPerspective extends InteractionApi {
     );
   }
 
-  public async transformCamera(
-    t: CameraTransform<PerspectiveCamera>
-  ): Promise<void> {
-    if (this.isInteracting()) {
-      const scene = await this.getScene();
-      const viewport = this.getViewport();
-      const frame = this.getFrame();
-      const depthBuffer = await frame?.depthBuffer();
+  public walk(delta: Vector3.Vector3): void {
+    this.transformCamera(({ camera, boundingBox }) => {
+      const { position, up, lookAt } = camera;
 
-      this.currentCamera =
-        this.currentCamera != null && viewport != null && frame != null
-          ? t({
-              camera: this.currentCamera as PerspectiveCamera,
-              viewport,
-              scale: scene.scale(),
-              boundingBox: scene.boundingBox(),
-              frame,
-              depthBuffer,
-            })
-          : undefined;
+      const normalizedUp = Vector3.normalize(up);
+      const normalizedViewVector = Vector3.normalize(camera.viewVector);
 
-      await this.currentCamera?.render();
-    }
+      const boundingBoxScalar = Math.min(
+        ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      );
+      const scaledDelta = Vector3.scale(boundingBoxScalar, delta);
+      const localX = Vector3.cross(normalizedUp, normalizedViewVector);
+      const localZ = Vector3.cross(localX, normalizedUp);
+
+      const translationX = Vector3.scale(
+        scaledDelta.x,
+        Vector3.normalize(localX)
+      );
+      const translationY = Vector3.scale(
+        scaledDelta.y,
+        Vector3.normalize(normalizedUp)
+      );
+      const translationZ = Vector3.scale(
+        scaledDelta.z,
+        Vector3.normalize(localZ)
+      );
+      const translation = Vector3.negate(
+        Vector3.add(translationX, translationY, translationZ)
+      );
+
+      return camera.update({
+        ...camera,
+        position: Vector3.add(position, translation),
+        lookAt: Vector3.add(lookAt, translation),
+      });
+    });
   }
 
   private computeZoomDistances(

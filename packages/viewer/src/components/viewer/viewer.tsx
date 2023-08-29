@@ -461,7 +461,7 @@ export class Viewer {
   /**
    * @ignore
    */
-  protected componentDidLoad(): void {
+  protected async componentDidLoad(): Promise<void> {
     this.interactionApi = this.createInteractionApi();
 
     if (this.canvasContainerElement != null) {
@@ -474,7 +474,7 @@ export class Viewer {
       });
     }
 
-    this.initializeDefaultInteractionHandlers();
+    await this.initializeDefaultInteractionHandlers();
     this.injectViewerApi();
   }
 

@@ -28,7 +28,7 @@ import { buildFlyToOperation } from './mapper';
 
 const PI_OVER_360 = 0.008726646259972;
 
-interface CameraRenderOptions {
+export interface CameraRenderOptions {
   animation?: Animation.Animation;
 }
 

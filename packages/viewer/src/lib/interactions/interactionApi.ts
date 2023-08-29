@@ -13,7 +13,7 @@ import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import { Camera, Scene } from '../scenes';
+import { Camera, CameraRenderOptions, Scene } from '../scenes';
 import {
   DepthBuffer,
   EntityType,
@@ -54,7 +54,7 @@ export interface ZoomData {
  * The `InteractionApi` provides methods that API developers can use to modify
  * the internal state of an interaction.
  */
-export abstract class InteractionApi {
+export abstract class InteractionApi<T extends Camera = Camera> {
   protected currentCamera?: Camera;
   private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
@@ -219,7 +219,17 @@ export abstract class InteractionApi {
    * @param t A function to transform the camera. Function will be passed the
    *  camera and scene viewport and is expected to return an updated camera.
    */
-  public async transformCamera(t: CameraTransform): Promise<void> {
+  public async transformCamera(t: CameraTransform<T>): Promise<void>;
+  public async transformCamera(
+    t: CameraTransform<T>,
+    renderOptions?: CameraRenderOptions
+  ): Promise<void>;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async transformCamera(...args: any[]): Promise<void> {
+    const t = args[0];
+    const renderOptions = args[1];
+
     if (this.isInteracting()) {
       const scene = await this.getScene();
       const viewport = this.getViewport();
@@ -238,7 +248,7 @@ export abstract class InteractionApi {
             })
           : undefined;
 
-      await this.currentCamera?.render();
+      await this.currentCamera?.render(renderOptions);
     }
   }
 

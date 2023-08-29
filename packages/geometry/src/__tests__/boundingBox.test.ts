@@ -113,3 +113,18 @@ describe(BoundingBox.fromVectors, () => {
     );
   });
 });
+
+describe(BoundingBox.lengths, () => {
+  it('returns the lengths of a bounding box', () => {
+    const box = BoundingBox.create(
+      Vector3.create(-100, -200, -300),
+      Vector3.create(100, 200, 300)
+    );
+
+    expect(BoundingBox.lengths(box)).toMatchObject({
+      x: 200,
+      y: 400,
+      z: 600,
+    });
+  });
+});
