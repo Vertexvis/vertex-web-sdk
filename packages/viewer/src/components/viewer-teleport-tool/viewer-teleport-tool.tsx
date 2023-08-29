@@ -14,6 +14,10 @@ import { TeleportInteractionHandler } from '../../lib/teleportation/interactions
 import { WalkModeController } from '../../lib/walk-mode/controller';
 import { ViewerTeleportMode, WalkModeModel } from '../../lib/walk-mode/model';
 
+interface StateMap {
+  shouldClearDepthBuffers?: boolean;
+}
+
 /**
  * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
  * around a model, which is particularly useful for walking through a model.
@@ -41,6 +45,10 @@ export class ViewerTeleportTool {
    *
    * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated
    * to align to the plane represented by the hit result's position and normal.
+   *
+   * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the
+   * hit result constrained by the plane represented by the camera's current `position` and `up`
+   * vectors.
    *
    * `undefined` - no teleportation will occur when clicking.
    *
@@ -77,12 +85,15 @@ export class ViewerTeleportTool {
   private interactionHandlerDisposable?: Disposable;
   private interactionHandler?: TeleportInteractionHandler;
 
+  private stateMap: StateMap = {};
+
   /**
    * @ignore
    */
   protected componentWillLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   /**
@@ -90,6 +101,7 @@ export class ViewerTeleportTool {
    */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   /**
@@ -97,6 +109,7 @@ export class ViewerTeleportTool {
    */
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
+    this.resetDepthBuffers();
   }
 
   /**
@@ -105,6 +118,12 @@ export class ViewerTeleportTool {
   @Watch('mode')
   protected handleModeChange(): void {
     this.controller?.setTeleportMode(this.mode);
+
+    if (this.mode != null) {
+      this.setDepthBuffers();
+    } else {
+      this.resetDepthBuffers();
+    }
   }
 
   /**
@@ -113,6 +132,7 @@ export class ViewerTeleportTool {
   @Watch('viewer')
   protected handleViewerChanged(): void {
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   @Watch('animationMs')
@@ -148,6 +168,24 @@ export class ViewerTeleportTool {
       this.controllerChanged.emit(this.controller);
     } else {
       this.controller.setTeleportMode(this.mode);
+    }
+  }
+
+  private setDepthBuffers(): void {
+    if (
+      this.mode != null &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
+      this.stateMap.shouldClearDepthBuffers = true;
+      this.viewer.depthBuffers = 'final';
+    }
+  }
+
+  private resetDepthBuffers(): void {
+    if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
+      this.viewer.depthBuffers = undefined;
+      this.stateMap.shouldClearDepthBuffers = undefined;
     }
   }
 
