@@ -78,7 +78,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -141,7 +141,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -406,7 +406,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -461,7 +461,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
     tool.controller?.addKeyBinding(ViewerWalkModeOperation.WALK_FORWARD, '1');
 
     await page.waitForChanges();
@@ -551,7 +551,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
     tool.controller?.replaceKeyBinding(
       ViewerWalkModeOperation.WALK_FORWARD,
       '1'

@@ -75,7 +75,7 @@ describe('vertex-viewer-teleport-tool', () => {
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -140,7 +140,7 @@ describe('vertex-viewer-teleport-tool', () => {
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -202,7 +202,7 @@ describe('vertex-viewer-teleport-tool', () => {
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
 
     await page.waitForChanges();
 
@@ -265,7 +265,7 @@ describe('vertex-viewer-teleport-tool', () => {
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
-    tool.controller?.updateConfiguration({ teleportHeightScalar: 10 });
+    tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
     tool.animationsDisabled = false;
     tool.animationMs = 10000;
 
