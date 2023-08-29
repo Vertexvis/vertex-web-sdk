@@ -9,9 +9,9 @@
 
   <script type="module" src="main.js"></script>
 
-  <link rel="stylesheet" href="https://unpkg.com/@vertexvis/viewer@0.18.x/dist/viewer/viewer.css" />
-  <script type="module" src="https://unpkg.com/@vertexvis/viewer@0.18.x/dist/viewer/viewer.esm.js"></script>
-  <script nomodule src="https://unpkg.com/@vertexvis/viewer@0.18.x/dist/viewer.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@vertexvis/viewer@0.19.0-canary.1/dist/viewer/viewer.css" />
+  <script type="module" src="https://unpkg.com/@vertexvis/viewer@0.19.0-canary.1/dist/viewer/viewer.esm.js"></script>
+  <script nomodule src="https://unpkg.com/@vertexvis/viewer@0.19.0-canary.1/dist/viewer.js"></script>
 
   <style>
     html,
@@ -54,7 +54,7 @@
     }
 
     svg {
-      color: black;
+      fill: currentColor;
     }
 
     .toolbar {
@@ -89,10 +89,10 @@
       <li>Press the ArrowUp, ArrowLeft, ArrowRight, and ArrowDown keys to look around the model.</li>
       <li>Press the PageUp and PageDown keys to move vertically.</li>
       <li>Press the buttons on the bottom toolbar to teleport toward a surface or teleport and align to a surface.</li>
-      <li>Press Escape clear the teleport tool.</li>
+      <li>Press Escape, or click the active button again to clear the teleport tool.</li>
       <li>Increase or decrease the value in the bottom-right input to change walk speed.</li>
     </ul>
-    <vertex-viewer id="viewer" class="viewer" src="urn:vertex:stream-key:ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4">
+    <vertex-viewer id="viewer" class="viewer" src="urn:vertex:stream-key:PQCK50vCcLn3cVW7Q5DZtNIatNgWj9nx9tA5">
       <vertex-viewer-walk-mode-tool id="walk-mode-tool"></vertex-viewer-walk-mode-tool>
 
       <vertex-viewer-default-toolbar data-viewer="viewer" placement="top-left"></vertex-viewer-default-toolbar>
