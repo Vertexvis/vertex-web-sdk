@@ -3,7 +3,11 @@ import { Disposable } from '@vertexvis/utils';
 
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
-import { InteractionApi, InteractionHandler } from '../interactions';
+import {
+  CameraTransform,
+  InteractionApi,
+  InteractionHandler,
+} from '../interactions';
 import { Camera, CameraRenderOptions } from '../scenes';
 import { ViewerTeleportMode, WalkModeModel } from '../walk-mode/model';
 
@@ -89,7 +93,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   private async handlePointerUp(event: PointerEvent): Promise<void> {
     const mode = this.model.getTeleportMode();
     const threshold = this.api?.pixelThreshold() ?? 2;
-    const pt = getMouseClientPosition(event, this.rectObserver.rect);
+    const point = getMouseClientPosition(event, this.rectObserver.rect);
     const isRightClick = this.downButtons === 2;
     const hasModifier =
       event.shiftKey || event.altKey || event.metaKey || event.ctrlKey;
@@ -97,32 +101,17 @@ export class TeleportInteractionHandler implements InteractionHandler {
     if (
       mode != null &&
       this.downPosition != null &&
-      Point.distance(this.downPosition, pt) <= threshold &&
+      Point.distance(this.downPosition, point) <= threshold &&
       !isRightClick &&
       !hasModifier
     ) {
-      const hits = await this.api?.hitItems(pt);
-      const hit = hits != null ? hits[0] : undefined;
-
-      if (hit?.hitNormal != null && hit?.hitPoint) {
-        await this.beginInteraction();
-
-        await this.api?.transformCamera(({ camera, boundingBox }) => {
-          return mode === 'teleport'
-            ? this.teleport(
-                camera,
-                boundingBox,
-                hit.hitPoint as Vector3.Vector3
-              )
-            : this.teleportAndAlign(
-                camera,
-                boundingBox,
-                hit.hitPoint as Vector3.Vector3,
-                hit.hitNormal as Vector3.Vector3
-              );
-        }, this.renderConfiguration());
-
-        await this.endInteraction();
+      switch (mode) {
+        case 'teleport':
+          return this.teleportToHit(point);
+        case 'teleport-toward':
+          return this.teleportTowardHit(point);
+        case 'teleport-and-align':
+          return this.teleportAndAlign(point);
       }
     }
 
@@ -141,65 +130,135 @@ export class TeleportInteractionHandler implements InteractionHandler {
     await this.api?.endInteraction();
   }
 
-  private teleport(
-    camera: Camera,
-    boundingBox: BoundingBox.BoundingBox,
-    hitPosition: Vector3.Vector3
-  ): Camera {
-    const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.model.getTeleportHeightPercentage() / 100;
+  private async teleportTowardHit(point: Point.Point): Promise<void> {
+    const worldPoint = await this.api?.getWorldPointFromViewport(point);
+    const mouseRay = this.api?.getRayFromPoint(point);
 
-    const cameraPlane = Plane.fromNormalAndCoplanarPoint(
-      camera.up,
-      camera.position
-    );
-    const projectedHitPosition = Plane.projectPoint(cameraPlane, hitPosition);
+    if (mouseRay != null) {
+      const { teleportDistancePercentage, teleportCollisionOffset } =
+        this.model.getConfiguration();
+      const teleportDistanceScalar = teleportDistancePercentage / 100;
+      return this.performInteraction(({ camera, boundingBox }) => {
+        const stepDistance =
+          Vector3.magnitude(BoundingBox.diagonal(boundingBox)) *
+          teleportDistanceScalar;
 
-    const rayToHitPosition = Ray.create({
-      origin: camera.position,
-      direction: Vector3.normalize(
-        Vector3.subtract(projectedHitPosition, camera.position)
-      ),
-    });
-    const distanceToHitPosition = Vector3.distance(
-      camera.position,
-      projectedHitPosition
-    );
-    const distanceToLookAt = Vector3.distance(camera.position, camera.lookAt);
+        const positionPlane = Plane.fromNormalAndCoplanarPoint(
+          camera.up,
+          camera.position
+        );
+        const projectedWorldPoint = Plane.projectPoint(
+          positionPlane,
+          worldPoint ?? camera.position
+        );
+        const projectedNextStep = Plane.projectPoint(
+          positionPlane,
+          Ray.at(mouseRay, stepDistance)
+        );
+        const mouseRayAtWorldPoint = Ray.create({
+          ...mouseRay,
+          origin: projectedWorldPoint,
+        });
+        const distanceToWorldPoint = Vector3.distance(
+          camera.position,
+          projectedWorldPoint
+        );
 
-    const newPosition = Ray.at(
-      rayToHitPosition,
-      distanceToHitPosition - shortestBoundingBoxLength * heightScalar
-    );
-    const newPositionViewVectorRay = Ray.create({
-      origin: newPosition,
-      direction: Vector3.normalize(camera.viewVector),
-    });
-
-    return camera.update({
-      position: newPosition,
-      lookAt: Ray.at(newPositionViewVectorRay, distanceToLookAt),
-    });
+        if (
+          distanceToWorldPoint < stepDistance &&
+          distanceToWorldPoint > teleportCollisionOffset * 1.1
+        ) {
+          return camera.update({
+            position: Plane.projectPoint(
+              positionPlane,
+              Ray.at(mouseRayAtWorldPoint, -teleportCollisionOffset)
+            ),
+          });
+        } else {
+          return camera.update({
+            position: projectedNextStep,
+          });
+        }
+      });
+    }
   }
 
-  private teleportAndAlign(
-    camera: Camera,
-    boundingBox: BoundingBox.BoundingBox,
-    hitPosition: Vector3.Vector3,
-    hitNormal: Vector3.Vector3
-  ): Camera {
-    const shortestBoundingBoxLength = this.shortestLength(boundingBox);
-    const heightScalar = this.model.getTeleportHeightPercentage() / 100;
+  private async teleportToHit(point: Point.Point): Promise<void> {
+    const worldPoint = await this.api?.getWorldPointFromViewport(point);
 
-    const upRay = Ray.create({
-      origin: hitPosition,
-      direction: camera.up,
-    });
+    if (worldPoint != null) {
+      return this.performInteraction(({ camera, boundingBox }) => {
+        const shortestBoundingBoxLength = this.shortestLength(boundingBox);
+        const heightScalar = this.model.getTeleportHeightPercentage() / 100;
 
-    return camera.alignTo(
-      Ray.at(upRay, shortestBoundingBoxLength * heightScalar),
-      hitNormal
-    );
+        const cameraPlane = Plane.fromNormalAndCoplanarPoint(
+          camera.up,
+          camera.position
+        );
+        const projectedHitPosition = Plane.projectPoint(
+          cameraPlane,
+          worldPoint
+        );
+
+        const rayToHitPosition = Ray.create({
+          origin: camera.position,
+          direction: Vector3.normalize(
+            Vector3.subtract(projectedHitPosition, camera.position)
+          ),
+        });
+        const distanceToHitPosition = Vector3.distance(
+          camera.position,
+          projectedHitPosition
+        );
+        const distanceToLookAt = Vector3.distance(
+          camera.position,
+          camera.lookAt
+        );
+
+        const newPosition = Ray.at(
+          rayToHitPosition,
+          distanceToHitPosition - shortestBoundingBoxLength * heightScalar
+        );
+        const newPositionViewVectorRay = Ray.create({
+          origin: newPosition,
+          direction: Vector3.normalize(camera.viewVector),
+        });
+
+        return camera.update({
+          position: newPosition,
+          lookAt: Ray.at(newPositionViewVectorRay, distanceToLookAt),
+        });
+      });
+    }
+  }
+
+  private async teleportAndAlign(point: Point.Point): Promise<void> {
+    const hits = await this.api?.hitItems(point);
+    const hit = hits != null ? hits[0] : undefined;
+
+    if (hit?.hitNormal != null && hit?.hitPoint) {
+      await this.performInteraction(({ camera, boundingBox }) => {
+        const shortestBoundingBoxLength = this.shortestLength(boundingBox);
+        const heightScalar = this.model.getTeleportHeightPercentage() / 100;
+
+        const upRay = Ray.create({
+          origin: hit.hitPoint as Vector3.Vector3,
+          direction: hit.hitNormal as Vector3.Vector3,
+        });
+
+        return camera.alignTo(
+          Ray.at(upRay, shortestBoundingBoxLength * heightScalar),
+          hit.hitNormal as Vector3.Vector3
+        );
+      });
+    }
+  }
+
+  private async performInteraction(fn: CameraTransform<Camera>): Promise<void> {
+    console.log('perform interaction');
+    await this.beginInteraction();
+    await this.api?.transformCamera(fn, this.renderConfiguration());
+    await this.endInteraction();
   }
 
   private handleEnabledChange(enabled: boolean): void {
