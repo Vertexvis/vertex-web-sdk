@@ -211,10 +211,10 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private handleTeleportModeChange(mode?: ViewerTeleportMode): void {
+    this.cursorDisposable?.dispose();
+
     if (mode != null) {
       this.cursorDisposable = this.api?.addCursor('crosshair');
-    } else {
-      this.cursorDisposable?.dispose();
     }
   }
 
