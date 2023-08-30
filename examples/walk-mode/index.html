@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+
+<head>
+  <title>Walk Mode</title>
+
+  <!-- Live reload script -->
+  <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+  <script type="module" src="main.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/@vertexvis/viewer@0.19.x/dist/viewer/viewer.css" />
+  <script type="module" src="https://unpkg.com/@vertexvis/viewer@0.19.x/dist/viewer/viewer.esm.js"></script>
+  <script nomodule src="https://unpkg.com/@vertexvis/viewer@0.19.x/dist/viewer.js"></script>
+
+  <style>
+    html,
+    body {
+      font-family: Roboto, Arial, Helvetica, sans-serif;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    #viewer {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    button {
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0.25rem;
+      outline: none;
+      border: none;
+      background: transparent;
+      border-radius: 0.25rem;
+      box-sizing: content-box;
+    }
+
+    button:hover {
+      cursor: pointer;
+      background-color: #cccccc;
+    }
+
+    svg {
+      fill: currentColor;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem;
+      background-color: #eeeeee;
+      border: 1px solid #cccccc;
+      border-radius: 0.25rem;
+      gap: 0.25rem;
+    }
+
+    .walk-speed-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    #walk-speed {
+      display: flex;
+      justify-content: center;
+      width: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="heading">Walk Mode Instructions</h1>
+    <ul>
+      <li>Press the W, A, S, and D keys to walk throughout the model.</li>
+      <li>Press the ArrowUp, ArrowLeft, ArrowRight, and ArrowDown keys to look around the model.</li>
+      <li>Press the PageUp and PageDown keys to move vertically.</li>
+      <li>Press the buttons on the bottom toolbar to teleport toward a surface or teleport and align to a surface.</li>
+      <li>Press Escape, or click the active button again to clear the teleport tool.</li>
+      <li>Increase or decrease the value in the bottom-right input to change walk speed.</li>
+    </ul>
+    <vertex-viewer id="viewer" class="viewer" src="urn:vertex:stream-key:PQCK50vCcLn3cVW7Q5DZtNIatNgWj9nx9tA5">
+      <vertex-viewer-walk-mode-tool id="walk-mode-tool"></vertex-viewer-walk-mode-tool>
+
+      <vertex-viewer-default-toolbar data-viewer="viewer" placement="top-left"></vertex-viewer-default-toolbar>
+      <vertex-viewer-toolbar placement="bottom-center">
+        <div class="toolbar">
+          <button id="teleport" title="Teleport">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+              <path
+                d="M13.53,11.5a4.13,4.13,0,0,0-1.65-.93,11.17,11.17,0,0,0-1.84-.4l.88-1.4a.49.49,0,0,0,0-.51A.51.51,0,0,0,10.5,8h-2V1.5a.5.5,0,0,0-1,0V8h-2a.51.51,0,0,0-.44.26.49.49,0,0,0,0,.51L6,10.16a8.92,8.92,0,0,0-2.43.65,3.39,3.39,0,0,0-1,.67,1.49,1.49,0,0,0-.46,1,1.51,1.51,0,0,0,.6,1.14,5.3,5.3,0,0,0,2.19,1A13.4,13.4,0,0,0,8,15a12.38,12.38,0,0,0,4.05-.61,4.19,4.19,0,0,0,1.33-.73A1.51,1.51,0,0,0,14,12.5,1.45,1.45,0,0,0,13.53,11.5ZM9.6,9,8,11.56,6.4,9Zm3.15,3.91a4.45,4.45,0,0,1-1.79.78A12.39,12.39,0,0,1,8,14a11.25,11.25,0,0,1-3.72-.56,3,3,0,0,1-1-.55C3,12.72,3,12.59,3,12.5s0-.18.19-.34a3.33,3.33,0,0,1,1.33-.7,10.19,10.19,0,0,1,2-.4l1.07,1.71a.5.5,0,0,0,.84,0l1.07-1.71a8.78,8.78,0,0,1,2.64.64,2.28,2.28,0,0,1,.71.47.47.47,0,0,1,.18.33C13,12.59,13,12.72,12.75,12.91Z">
+              </path>
+            </svg>
+          </button>
+          <button id="teleport-and-align" title="Teleport and Align">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+              <path
+                d="M13.5,13H2.5a.48.48,0,0,0,0,1h11a.48.48,0,0,0,0-1Zm-5.92-.25a.5.5,0,0,0,.84,0l2.5-4a.49.49,0,0,0,0-.51A.51.51,0,0,0,10.5,8h-2V1.5a.5.5,0,0,0-1,0V8h-2a.51.51,0,0,0-.44.26.49.49,0,0,0,0,.51ZM9.6,9,8,11.56,6.4,9Z">
+              </path>
+            </svg>
+          </button>
+        </div>
+      </vertex-viewer-toolbar>
+
+      <vertex-viewer-toolbar placement="bottom-right">
+        <div class="walk-speed-toolbar">
+          <span>Walk Speed:</span>
+          <div class="toolbar">
+            <button id="decrement-speed">-</button>
+            <div id="walk-speed">5</div>
+            <button id="increment-speed">+</button>
+          </div>
+        </div>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
+  </div>
+</body>
+
+</html>
