@@ -5,7 +5,7 @@ import { KeyBinding } from '../keyBinding';
 export interface ViewerWalkModeConfiguration {
   teleportHeightPercentage: number;
   teleportDistancePercentage: number;
-  teleportCollisionOffset: number;
+  teleportCollisionDistance: number;
   keyboardWalkSpeed: number;
   keyboardPivotDegrees: number;
   keyboardRepeatIntervalMs: number;
@@ -63,7 +63,7 @@ export class WalkModeModel {
   private configuration: ViewerWalkModeConfiguration = {
     teleportHeightPercentage: 11.75,
     teleportDistancePercentage: 2,
-    teleportCollisionOffset: 1000,
+    teleportCollisionDistance: 1000,
     keyboardWalkSpeed: 5,
     keyboardPivotDegrees: 1,
     keyboardRepeatIntervalMs: 25,

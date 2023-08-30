@@ -135,12 +135,13 @@ export class TeleportInteractionHandler implements InteractionHandler {
     const mouseRay = this.api?.getRayFromPoint(point);
 
     if (mouseRay != null) {
-      const { teleportDistancePercentage, teleportCollisionOffset } =
+      const { teleportDistancePercentage, teleportCollisionDistance } =
         this.model.getConfiguration();
       const teleportDistanceScalar = teleportDistancePercentage / 100;
+
       return this.performInteraction(({ camera, boundingBox }) => {
         const stepDistance =
-          Vector3.magnitude(BoundingBox.diagonal(boundingBox)) *
+          Math.max(...Vector3.toArray(BoundingBox.lengths(boundingBox))) *
           teleportDistanceScalar;
 
         const positionPlane = Plane.fromNormalAndCoplanarPoint(
@@ -151,14 +152,6 @@ export class TeleportInteractionHandler implements InteractionHandler {
           positionPlane,
           worldPoint ?? camera.position
         );
-        const projectedNextStep = Plane.projectPoint(
-          positionPlane,
-          Ray.at(mouseRay, stepDistance)
-        );
-        const mouseRayAtWorldPoint = Ray.create({
-          ...mouseRay,
-          origin: projectedWorldPoint,
-        });
         const distanceToWorldPoint = Vector3.distance(
           camera.position,
           projectedWorldPoint
@@ -166,17 +159,36 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
         if (
           distanceToWorldPoint < stepDistance &&
-          distanceToWorldPoint > teleportCollisionOffset * 1.1
+          distanceToWorldPoint > teleportCollisionDistance * 1.1
         ) {
+          const mouseRayAtWorldPoint = Ray.create({
+            ...mouseRay,
+            origin: projectedWorldPoint,
+          });
+          const nextPosition = Plane.projectPoint(
+            positionPlane,
+            Ray.at(mouseRayAtWorldPoint, -teleportCollisionDistance)
+          );
+
           return camera.update({
-            position: Plane.projectPoint(
-              positionPlane,
-              Ray.at(mouseRayAtWorldPoint, -teleportCollisionOffset)
+            position: nextPosition,
+            lookAt: Vector3.add(
+              camera.lookAt,
+              Vector3.subtract(nextPosition, camera.position)
             ),
           });
         } else {
+          const projectedNextStep = Plane.projectPoint(
+            positionPlane,
+            Ray.at(mouseRay, stepDistance)
+          );
+
           return camera.update({
             position: projectedNextStep,
+            lookAt: Vector3.add(
+              camera.lookAt,
+              Vector3.subtract(projectedNextStep, camera.position)
+            ),
           });
         }
       });
@@ -184,7 +196,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private async teleportToHit(point: Point.Point): Promise<void> {
-    const worldPoint = await this.api?.getWorldPointFromViewport(point);
+    const worldPoint = await this.getWorldPointWithFallback(point);
 
     if (worldPoint != null) {
       return this.performInteraction(({ camera, boundingBox }) => {
@@ -255,10 +267,25 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private async performInteraction(fn: CameraTransform<Camera>): Promise<void> {
-    console.log('perform interaction');
     await this.beginInteraction();
     await this.api?.transformCamera(fn, this.renderConfiguration());
     await this.endInteraction();
+  }
+
+  private async getWorldPointWithFallback(
+    point: Point.Point
+  ): Promise<Vector3.Vector3 | undefined> {
+    const worldPoint = await this.api?.getWorldPointFromViewport(point);
+
+    if (worldPoint == null) {
+      const hits = await this.api?.hitItems(point);
+      const hit = hits != null ? hits[0] : undefined;
+
+      return hit?.hitPoint != null
+        ? (hit.hitPoint as Vector3.Vector3)
+        : worldPoint;
+    }
+    return worldPoint;
   }
 
   private handleEnabledChange(enabled: boolean): void {

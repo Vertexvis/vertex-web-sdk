@@ -65,10 +65,10 @@ export class ViewerTeleportTool {
   public animationsDisabled = false;
 
   /**
-   * The duration of animations, in milliseconds. Defaults to `1000`.
+   * The duration of animations, in milliseconds. Defaults to `500`.
    */
   @Prop()
-  public animationMs?: number = 1000;
+  public animationMs?: number = 500;
 
   @Prop({ mutable: true })
   public controller?: WalkModeController;
