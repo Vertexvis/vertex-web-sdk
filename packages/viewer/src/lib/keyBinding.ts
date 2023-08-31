@@ -6,7 +6,10 @@ export class KeyBinding {
   }
 
   public matches(keys: Record<string, boolean>): boolean {
-    return this.bindings.every((binding) => this.bindingMatches(keys, binding));
+    return (
+      this.bindings.length > 0 &&
+      this.bindings.every((binding) => this.bindingMatches(keys, binding))
+    );
   }
 
   private bindingMatches(
