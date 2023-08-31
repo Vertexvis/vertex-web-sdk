@@ -14,6 +14,10 @@ import { TeleportInteractionHandler } from '../../lib/teleportation/interactions
 import { WalkModeController } from '../../lib/walk-mode/controller';
 import { ViewerTeleportMode, WalkModeModel } from '../../lib/walk-mode/model';
 
+interface StateMap {
+  shouldClearDepthBuffers?: boolean;
+}
+
 /**
  * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
  * around a model, which is particularly useful for walking through a model.
@@ -42,6 +46,10 @@ export class ViewerTeleportTool {
    * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated
    * to align to the plane represented by the hit result's position and normal.
    *
+   * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the
+   * hit result constrained by the plane represented by the camera's current `position` and `up`
+   * vectors.
+   *
    * `undefined` - no teleportation will occur when clicking.
    *
    * Defaults to `undefined`.
@@ -57,10 +65,10 @@ export class ViewerTeleportTool {
   public animationsDisabled = false;
 
   /**
-   * The duration of animations, in milliseconds. Defaults to `1000`.
+   * The duration of animations, in milliseconds. Defaults to `500`.
    */
   @Prop()
-  public animationMs?: number = 1000;
+  public animationMs?: number = 500;
 
   @Prop({ mutable: true })
   public controller?: WalkModeController;
@@ -77,12 +85,15 @@ export class ViewerTeleportTool {
   private interactionHandlerDisposable?: Disposable;
   private interactionHandler?: TeleportInteractionHandler;
 
+  private stateMap: StateMap = {};
+
   /**
    * @ignore
    */
   protected componentWillLoad(): void {
     this.setupController();
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   /**
@@ -90,6 +101,7 @@ export class ViewerTeleportTool {
    */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   /**
@@ -97,6 +109,7 @@ export class ViewerTeleportTool {
    */
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
+    this.resetDepthBuffers();
   }
 
   /**
@@ -105,6 +118,12 @@ export class ViewerTeleportTool {
   @Watch('mode')
   protected handleModeChange(): void {
     this.controller?.setTeleportMode(this.mode);
+
+    if (this.mode != null) {
+      this.setDepthBuffers();
+    } else {
+      this.resetDepthBuffers();
+    }
   }
 
   /**
@@ -112,9 +131,14 @@ export class ViewerTeleportTool {
    */
   @Watch('viewer')
   protected handleViewerChanged(): void {
+    this.clearInteractionHandler();
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('animationMs')
   protected handleAnimationMsChanged(): void {
     if (this.animationMs != null) {
@@ -122,6 +146,9 @@ export class ViewerTeleportTool {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('animationsDisabled')
   protected handleAnimationsDisabledChanged(): void {
     if (this.animationsDisabled) {
@@ -131,10 +158,21 @@ export class ViewerTeleportTool {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('controller')
   protected handleControllerChanged(): void {
     this.setupInteractionHandler();
+    this.setupController();
     this.controllerChanged.emit(this.controller);
+  }
+
+  @Watch('model')
+  protected handleModelChanged(): void {
+    this.setupController();
+    this.clearInteractionHandler();
+    this.setupInteractionHandler();
   }
 
   protected render(): JSX.Element {
@@ -148,6 +186,25 @@ export class ViewerTeleportTool {
       this.controllerChanged.emit(this.controller);
     } else {
       this.controller.setTeleportMode(this.mode);
+      this.controller.updateModel(this.model);
+    }
+  }
+
+  private setDepthBuffers(): void {
+    if (
+      this.mode != null &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
+      this.stateMap.shouldClearDepthBuffers = true;
+      this.viewer.depthBuffers = 'final';
+    }
+  }
+
+  private resetDepthBuffers(): void {
+    if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
+      this.viewer.depthBuffers = undefined;
+      this.stateMap.shouldClearDepthBuffers = undefined;
     }
   }
 
@@ -159,14 +216,16 @@ export class ViewerTeleportTool {
   }
 
   private async setupInteractionHandler(): Promise<void> {
-    this.interactionHandler = new TeleportInteractionHandler(
-      this.model,
-      !this.animationsDisabled && this.animationMs != null
-        ? { durationMs: this.animationMs }
-        : undefined
-    );
+    if (this.interactionHandler == null) {
+      this.interactionHandler = new TeleportInteractionHandler(
+        this.model,
+        !this.animationsDisabled && this.animationMs != null
+          ? { durationMs: this.animationMs }
+          : undefined
+      );
 
-    this.interactionHandlerDisposable =
-      await this.viewer?.registerInteractionHandler(this.interactionHandler);
+      this.interactionHandlerDisposable =
+        await this.viewer?.registerInteractionHandler(this.interactionHandler);
+    }
   }
 }

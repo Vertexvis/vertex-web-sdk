@@ -24,6 +24,13 @@ export class WalkModeController {
   }
 
   /**
+   * @internal
+   */
+  public updateModel(model: WalkModeModel): void {
+    this.model = model;
+  }
+
+  /**
    * Sets whether downstream walk mode interaction handlers are enabled.
    * Setting this value to `false` will remove all event listeners for
    * the interactions, and setting this value to `true` will add or
@@ -48,6 +55,20 @@ export class WalkModeController {
    * used alongside the shortest side of the visible bounding box to determine how far to
    * place the camera from the surface that has been hit, with a larger percentage placing
    * the camera further from the surface and vice-versa. Defaults to 11.75%.
+   *
+   * `teleportDistancePercentage` - percentage used for fine-tuning the distance moved per
+   * click with the `teleport-toward` mode. This percentage is used alongside the longest
+   * side of the visible bounding box to determine how far to move the camera's position
+   * with each click, with a larger percentage moving the camera further and vice-versa.
+   * Defaults to 2%.
+   *
+   * `teleportCollisionDistance` - distance used alongside the `teleportCollisionPercentage`
+   * to determine whether a click with the `teleport-toward` mode would cause a "collision",
+   * or would pass through the point clicked. If such a collision would occur, the camera is
+   * instead placed this distance back from the point clicked once, then allowed to pass
+   * through the point on subsequent clicks. Note that this will not apply if clicks occur
+   * in quick succession without setting the `depthBuffers` property on the `<vertex-viewer>`
+   * to `all` frames. Defaults to `1000`.
    *
    * `keyboardWalkSpeed` - speed to move the camera when performing keyboard-based
    * walk interactions. A larger number here will result in a faster walk speed through

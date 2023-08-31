@@ -4,12 +4,17 @@ import { KeyBinding } from '../keyBinding';
 
 export interface ViewerWalkModeConfiguration {
   teleportHeightPercentage: number;
+  teleportDistancePercentage: number;
+  teleportCollisionDistance: number;
   keyboardWalkSpeed: number;
   keyboardPivotDegrees: number;
   keyboardRepeatIntervalMs: number;
 }
 
-export type ViewerTeleportMode = 'teleport' | 'teleport-and-align';
+export type ViewerTeleportMode =
+  | 'teleport'
+  | 'teleport-and-align'
+  | 'teleport-toward';
 
 export enum ViewerWalkModeOperation {
   'MOVE_DOWN' = 'MOVE_DOWN',
@@ -57,6 +62,8 @@ export class WalkModeModel {
 
   private configuration: ViewerWalkModeConfiguration = {
     teleportHeightPercentage: 11.75,
+    teleportDistancePercentage: 2,
+    teleportCollisionDistance: 1000,
     keyboardWalkSpeed: 5,
     keyboardPivotDegrees: 1,
     keyboardRepeatIntervalMs: 25,
