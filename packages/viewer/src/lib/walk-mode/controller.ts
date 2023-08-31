@@ -24,6 +24,13 @@ export class WalkModeController {
   }
 
   /**
+   * @internal
+   */
+  public updateModel(model: WalkModeModel): void {
+    this.model = model;
+  }
+
+  /**
    * Sets whether downstream walk mode interaction handlers are enabled.
    * Setting this value to `false` will remove all event listeners for
    * the interactions, and setting this value to `true` will add or

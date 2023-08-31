@@ -143,6 +143,7 @@ export class ViewerWalkModeTool {
    */
   @Watch('viewer')
   protected handleViewerChanged(): void {
+    this.clearInteractionHandler();
     this.setupInteractionHandler();
     this.updateTeleportTool();
     this.toggleInteractionMode();
@@ -151,9 +152,8 @@ export class ViewerWalkModeTool {
   /**
    * @ignore
    */
-  @Watch('model')
   @Watch('teleportMode')
-  protected handleTeleportToolPropChanged(): void {
+  protected handleTeleportModeChanged(): void {
     this.updateTeleportTool();
   }
 
@@ -164,6 +164,16 @@ export class ViewerWalkModeTool {
   protected handleControllerChanged(): void {
     this.updateTeleportTool();
     this.controllerChanged.emit(this.controller);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('model')
+  protected handleModelChanged(): void {
+    this.setupController();
+    this.clearInteractionHandler();
+    this.setupInteractionHandler();
   }
 
   protected render(): JSX.Element {
@@ -184,6 +194,8 @@ export class ViewerWalkModeTool {
     if (this.controller == null) {
       this.controller = new WalkModeController(this.model);
       this.controllerChanged.emit(this.controller);
+    } else {
+      this.controller.updateModel(this.model);
     }
   }
 
@@ -195,10 +207,12 @@ export class ViewerWalkModeTool {
   }
 
   private async setupInteractionHandler(): Promise<void> {
-    this.interactionHandler = new WalkInteractionHandler(this.model);
+    if (this.interactionHandler == null) {
+      this.interactionHandler = new WalkInteractionHandler(this.model);
 
-    this.interactionHandlerDisposable =
-      await this.viewer?.registerInteractionHandler(this.interactionHandler);
+      this.interactionHandlerDisposable =
+        await this.viewer?.registerInteractionHandler(this.interactionHandler);
+    }
   }
 
   private async ensureTeleportToolConfigured(): Promise<void> {

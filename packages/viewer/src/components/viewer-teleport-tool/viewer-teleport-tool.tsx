@@ -131,10 +131,14 @@ export class ViewerTeleportTool {
    */
   @Watch('viewer')
   protected handleViewerChanged(): void {
+    this.clearInteractionHandler();
     this.setupInteractionHandler();
     this.setDepthBuffers();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('animationMs')
   protected handleAnimationMsChanged(): void {
     if (this.animationMs != null) {
@@ -142,6 +146,9 @@ export class ViewerTeleportTool {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('animationsDisabled')
   protected handleAnimationsDisabledChanged(): void {
     if (this.animationsDisabled) {
@@ -151,10 +158,21 @@ export class ViewerTeleportTool {
     }
   }
 
+  /**
+   * @ignore
+   */
   @Watch('controller')
   protected handleControllerChanged(): void {
     this.setupInteractionHandler();
+    this.setupController();
     this.controllerChanged.emit(this.controller);
+  }
+
+  @Watch('model')
+  protected handleModelChanged(): void {
+    this.setupController();
+    this.clearInteractionHandler();
+    this.setupInteractionHandler();
   }
 
   protected render(): JSX.Element {
@@ -168,6 +186,7 @@ export class ViewerTeleportTool {
       this.controllerChanged.emit(this.controller);
     } else {
       this.controller.setTeleportMode(this.mode);
+      this.controller.updateModel(this.model);
     }
   }
 
@@ -197,14 +216,16 @@ export class ViewerTeleportTool {
   }
 
   private async setupInteractionHandler(): Promise<void> {
-    this.interactionHandler = new TeleportInteractionHandler(
-      this.model,
-      !this.animationsDisabled && this.animationMs != null
-        ? { durationMs: this.animationMs }
-        : undefined
-    );
+    if (this.interactionHandler == null) {
+      this.interactionHandler = new TeleportInteractionHandler(
+        this.model,
+        !this.animationsDisabled && this.animationMs != null
+          ? { durationMs: this.animationMs }
+          : undefined
+      );
 
-    this.interactionHandlerDisposable =
-      await this.viewer?.registerInteractionHandler(this.interactionHandler);
+      this.interactionHandlerDisposable =
+        await this.viewer?.registerInteractionHandler(this.interactionHandler);
+    }
   }
 }
