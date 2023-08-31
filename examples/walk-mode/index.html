@@ -88,7 +88,7 @@
       <li>Press the W, A, S, and D keys to walk throughout the model.</li>
       <li>Press the ArrowUp, ArrowLeft, ArrowRight, and ArrowDown keys to look around the model.</li>
       <li>Press the PageUp and PageDown keys to move vertically.</li>
-      <li>Press the buttons on the bottom toolbar to teleport toward a surface or teleport and align to a surface.</li>
+      <li>Press the buttons on the bottom toolbar to teleport forward, teleport to a surface, or teleport and align to a surface.</li>
       <li>Press Escape, or click the active button again to clear the teleport tool.</li>
       <li>Increase or decrease the value in the bottom-right input to change walk speed.</li>
     </ul>
@@ -98,6 +98,15 @@
       <vertex-viewer-default-toolbar data-viewer="viewer" placement="top-left"></vertex-viewer-default-toolbar>
       <vertex-viewer-toolbar placement="bottom-center">
         <div class="toolbar">
+          <button id="teleport-toward" title="Teleport Toward">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+              <mask id="box">
+                <polygon points="0,0,16,0,16,10,10,12,10,8,6,8,6,12,0,12" fill="white"></polygon>
+              </mask>
+              <path d="M7.58,3.25a.5.5,0,0,1,.84,0l2.5,4a.49.49,0,0,1,0,.51A.51.51,0,0,1,10.5,8h-2V14.5a.5.5,0,0,1-1,0V8h-2a.51.51,0,0,1-.44-.26a.49.49,0,0,1,0,-.51ZM9.6,7,8,4.44,6.4,7Z"></path>
+              <rect mask="url(#box)" x="1" y="1" width="14" height="9" rx="1" stroke="currentColor" fill="transparent">
+            </svg>
+          </button>
           <button id="teleport" title="Teleport">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
               <path

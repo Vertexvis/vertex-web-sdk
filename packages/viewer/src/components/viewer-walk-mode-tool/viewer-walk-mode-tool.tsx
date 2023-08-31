@@ -64,6 +64,10 @@ export class ViewerWalkModeTool {
    * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated
    * to align to the plane represented by the hit result's position and normal.
    *
+   * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the
+   * hit result constrained by the plane represented by the camera's current `position` and `up`
+   * vectors.
+   *
    * `undefined` - no teleportation will occur when clicking.
    *
    * Defaults to `undefined`.
