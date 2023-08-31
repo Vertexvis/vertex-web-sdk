@@ -46,7 +46,7 @@ async function main() {
   });
 
   /**
-   * Enables the `teleport` mode when clicked.
+   * Enables the `teleport-toward` mode when clicked.
    * See https://github.com/Vertexvis/vertex-web-sdk/blob/master/packages/viewer/src/components/viewer-teleport-tool/readme.md
    * for more details on the various modes.
    */
