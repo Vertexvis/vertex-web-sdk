@@ -210,9 +210,9 @@ export class Viewer {
    * Specifies when a depth buffer is requested from rendering. Possible values
    * are:
    *
-   * * `undefined`: A depth buffer is never requested.
-   * * `final`: A depth buffer is only requested on the final frame.
-   * * `all`: A depth buffer is requested for every frame.
+   *  * `undefined`: A depth buffer is never requested.
+   *  * `final`: A depth buffer is only requested on the final frame.
+   *  * `all`: A depth buffer is requested for every frame.
    *
    * Depth buffers can increase the amount of data that's sent to a client and
    * can impact rendering performance. Values of `undefined` or `final` should
@@ -249,9 +249,9 @@ export class Viewer {
   /**
    * Specifies the halo selection properties.
    * Parameter notes:
-   *  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
-   *  color is optional. This will be the color of the selected items in the viewer.
-   *  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+   *  * lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
+   *  * color is optional. This will be the color of the selected items in the viewer.
+   *  * opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
    */
   @Prop({ attribute: null })
   public selectionHighlighting?: SelectionHighlightingOptions;
@@ -269,9 +269,9 @@ export class Viewer {
    *
    * Possible values are:
    *
-   * * `undefined`: A feature map is never requested.
-   * * `final`: A feature map is only requested on the final frame.
-   * * `all`: A feature map is requested for every frame.
+   *  * `undefined`: A feature map is never requested.
+   *  * `final`: A feature map is only requested on the final frame.
+   *  * `all`: A feature map is requested for every frame.
    *
    * Feature maps can increase the amount of data that's sent to a client and
    * can impact rendering performance. Values of `undefined` or `final` should
@@ -318,6 +318,11 @@ export class Viewer {
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
+   *
+   * This event can be used in combination with the {@link VertexViewer.scene scene} method
+   * to query for items at the point of the tap.
+   *
+   * @see {@link Scene.raycaster Scene.raycaster} for more information.
    */
   @Event() public tap!: EventEmitter<TapEventDetails>;
 

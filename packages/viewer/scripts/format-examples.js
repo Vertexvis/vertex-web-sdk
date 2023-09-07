@@ -4,25 +4,49 @@ const { execSync } = require('child_process');
 
 const stdin = fs.readFileSync(process.stdin.fd, 'utf-8');
 
-const docExampleMatches = stdin.matchAll(/``` (.*) ```/g);
-const typeDefNewFormatted = [...docExampleMatches].reduce(function (
-  typeDefNewFormatted,
+const docExampleMatches = stdin.matchAll(/```([^ ]*) (.*) ```/g);
+const docMatches = stdin.matchAll(/[ ]*[*](.*)/g);
+const typeDefFormattedExamples = [...docExampleMatches].reduce(function (
+  typeDefFormattedExamples,
   exampleMatch
 ) {
-  const formattedMatch = `\`\`\`\n${formatExample(
-    exampleMatch[1]
+  const type = exampleMatch[1];
+
+  const formattedMatch = `\`\`\`${type}\n${formatExample(
+    exampleMatch[2],
+    type !== '' ? type : undefined
   )}\`\`\``.replace(/^/gm, '* ');
 
-  return typeDefNewFormatted.replace(exampleMatch[0], `\n${formattedMatch}`);
+  return typeDefFormattedExamples.replace(
+    exampleMatch[0],
+    `\n${formattedMatch}`
+  );
 },
 stdin);
+const typeDefFormattedMultiline = [...docMatches].reduce(function (
+  typeDefFormattedMultiline,
+  mutilineMatch
+) {
+  const indentationMatch = mutilineMatch[0].match(/([ ]*)[*]/);
+  const indentation = indentationMatch[1] == null ? '' : indentationMatch[1];
+  const formattedMatch = `${indentation}*${mutilineMatch[1].replace(
+    /([^ ])  ([^ ])/gm,
+    `$1\n${indentation}*\n${indentation}* $2`
+  )}`;
 
-process.stdout.write(typeDefNewFormatted);
+  return typeDefFormattedMultiline.replace(
+    mutilineMatch[0],
+    `${formattedMatch}`
+  );
+},
+typeDefFormattedExamples);
 
-function formatExample(example) {
+process.stdout.write(typeDefFormattedMultiline);
+
+function formatExample(example, parser = 'typescript') {
   return String(
     execSync(
-      'yarn -s prettier --parser typescript --config ../../.prettierrc.json',
+      `yarn -s prettier --parser ${parser} --config ../../.prettierrc.json`,
       {
         input: example,
       }

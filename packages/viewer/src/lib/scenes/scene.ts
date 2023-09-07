@@ -23,11 +23,11 @@ import {
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { Raycaster } from './raycaster';
 
-interface SceneExecutionOptions {
+export interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
 }
 
-interface ResetViewOptions {
+export interface ResetViewOptions {
   includeCamera?: boolean;
   suppliedCorrelationId?: string;
 }
@@ -50,6 +50,29 @@ export class SceneItemOperationsBuilder
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
   }
 
+  /**
+   * Specifies that the items matching the query should have their default material overridden to match the specified material.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Override the material for the item with the `item-uuid` ID to
+   * // be red with an opacity of 0.5.
+   * await scene.items((op) => [
+   *   op
+   *     .where((q) => q.withItemId('item-uuid'))
+   *     .materialOverride(ColorMaterial.create(255, 0, 0, 0.5)),
+   * ]);
+   *
+   * // Override the material for the item with the `item-uuid` ID to
+   * // be red with an opacity of 1.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).materialOverride('#ff0000'),
+   * ]).execute();
+   * ```
+   */
   public materialOverride(
     color: ColorMaterial | string
   ): SceneItemOperationsBuilder {
@@ -66,22 +89,92 @@ export class SceneItemOperationsBuilder
     }
   }
 
+  /**
+   * Specifies that the items matching the query should be hidden.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).hide(),
+   * ]).execute();
+   * ```
+   */
   public hide(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(this.query, this.builder.hide());
   }
 
+  /**
+   * Specifies that the items matching the query should be shown.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Show the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).show(),
+   * ]).execute();
+   * ```
+   */
   public show(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(this.query, this.builder.show());
   }
 
+  /**
+   * Specifies that the items matching the query should be selected.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Select the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).select(),
+   * ]).execute();
+   * ```
+   */
   public select(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(this.query, this.builder.select());
   }
 
+  /**
+   * Specifies that the items matching the query should be deselected.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Deselect the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).deselect(),
+   * ]).execute();
+   * ```
+   */
   public deselect(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(this.query, this.builder.deselect());
   }
 
+  /**
+   * Specifies that the items matching the query should have any overridden material removed.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Clear the overridden material on the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearMaterialOverrides(),
+   * ]);
+   * ```
+   */
   public clearMaterialOverrides(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -89,6 +182,24 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * Specifies that the items matching the query should have their transformation matrix overridden to
+   * match the specified transformation matrix.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Override the transformation matrix for the item with the `item-uuid` ID to
+   * // move the element along the x-axis
+   * await scene.items((op) => [
+   *   op
+   *     .where((q) => q.withItemId('item-uuid'))
+   *     .transform(Matrix4.makeTranslation(Vector3.create(100, 0, 0))),
+   * ]);
+   * ```
+   */
   public transform(
     matrix: vertexvis.protobuf.core.IMatrix4x4f | number[]
   ): SceneItemOperationsBuilder {
@@ -136,6 +247,29 @@ export class SceneItemOperationsBuilder
     }
   }
 
+  /**
+   * Specifies that the items matching the query should have their overridden transformation
+   * matrix removed. The `cascade` flag determines whether children of the items matching
+   * the query should also have their overridden transformation matrix removed, and defaults to `true`.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+
+   * // Clear the overridden the transformation matrix for the item with the `item-uuid` ID
+   * // and do not cascade to preserve transformations on children
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearTransforms(false),
+   * ]);
+   *
+   * // Clear the overridden the transformation matrix for the item with the `item-uuid` ID
+   * // and cascade to clear overridden transformations on children
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearTransforms(true),
+   * ]);
+   * ```
+   */
   public clearTransforms(cascade = true): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -143,6 +277,25 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * Specifies that the items matching the query should have their phantom state overridden to match the specified `phantomState` flag. If the `phantomState` flag is not provided, it will default to `true`.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Mark the item with the `item-uuid` ID as phantom
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).setPhantom(true),
+   * ]);
+   *
+   * // Unmark the item with the `item-uuid` ID as phantom
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).setPhantom(false),
+   * ]);
+   * ```
+   */
   public setPhantom(phantomState?: boolean): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -150,6 +303,20 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * Specifies that the items matching the query should have their overridden phantom state removed.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Clear the overridden phantom state of the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearPhantom(),
+   * ]);
+   * ```
+   */
   public clearPhantom(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -157,6 +324,31 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * Specifies that the items matching the query should have their end item state overridden to match
+   * the specified `endItemState` flag. If the `endItemState` flag is not provided, it will default to `true`.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Mark the item with the `item-uuid` ID as an end item
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).setEndItem(true),
+   * ]);
+   *
+   * // Unmark the item with the `item-uuid` ID as an end item
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).setEndItem(false),
+   * ]);
+   * ```
+   *
+   * @remarks
+   * End item states do not propagate to children similar to other states like other operations. I.e.
+   * calling setEndItem(false) on an item will cause it to be unmarked as an end item, but any children
+   * where setEndItem(true) was called previously will remain as end items.
+   */
   public setEndItem(endItemState?: boolean): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -164,6 +356,20 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * Specifies that the items matching the query should have their overridden end item state removed.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Clear the overridden end item state of the item with the `item-uuid` ID
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearEndItem(),
+   * ]);
+   * ```
+   */
   public clearEndItem(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
@@ -171,6 +377,9 @@ export class SceneItemOperationsBuilder
     );
   }
 
+  /**
+   * @internal
+   */
   public build(): QueryOperation {
     return {
       query: this.query,
@@ -318,6 +527,23 @@ export class Scene {
   /**
    * Returns an executor that accepts a function as a parameter that contains one or many operations to apply
    * to the scene view. The operations will be applied transactionally.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Deselect everything, then select a specific item by ID
+   * await scene.items(op => [
+   *   op.where(q => q.all()).deselect(),
+   *   op.where(q => q.withItemId('item-id')).select(),
+   * ]).execute();
+   * ```
+   *
+   * @see {@link RootQuery} for more information on available queries.
+   *
+   * @see {@link SceneItemOperationsBuilder} for more information on available operations.
+   *
    * @param operations
    */
   public items(
@@ -341,7 +567,21 @@ export class Scene {
   }
 
   /**
-   * An instance of the current camera of the scene.
+   * An instance of the current camera of the scene. The camera provides a number of
+   * methods that can be used in combination with the `render` method to make programmatic
+   * updates to the scene's camera.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   * const camera = scene.camera();
+   *
+   * // Fit the camera to the visible bounding box of the scene with a 1 second animation
+   * await camera.viewAll().render({ animation: { milliseconds: 1000 } });
+   * ```
+   *
+   * @see {@link Camera} for more information on available camera operations.
    */
   public camera(): Camera {
     const { scene } = this.frame;
@@ -379,6 +619,9 @@ export class Scene {
     }
   }
 
+  /**
+   * Returns the current visible BoundingBox for the scene.
+   */
   public boundingBox(): BoundingBox.BoundingBox {
     return this.frame.scene.boundingBox;
   }
