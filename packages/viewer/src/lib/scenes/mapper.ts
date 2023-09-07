@@ -320,7 +320,7 @@ export function toPbSceneViewStateFeatures(
       case 'cross_section':
         return vertexvis.protobuf.stream.SceneViewStateFeature
           .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION;
-     case 'phantom':
+      case 'phantom':
         return vertexvis.protobuf.stream.SceneViewStateFeature
           .SCENE_VIEW_STATE_FEATURE_PHANTOM;
       default:
