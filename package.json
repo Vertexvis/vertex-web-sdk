@@ -16,7 +16,6 @@
     "generate:vscode-workspace": "./scripts/generate_vscode_workspace.sh",
     "generate:docs": "lerna run generate:docs && typedoc --tsconfig tsconfig.docs.json",
     "generate:npmrc": "./scripts/generate_npmrc.sh",
-    "generate:readme": "./scripts/generate_readme.sh",
     "build": "lerna run build",
     "release": "./scripts/release.sh",
     "release:ask": "ASK_VERSION=true ./scripts/release.sh",
