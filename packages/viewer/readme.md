@@ -183,6 +183,54 @@ function main() {
 }
 ```
 
+## Documentation
+
+Each component provided by the `@vertexvis/viewer` package also exposes
+its own component-level README with additional examples and property definitions.
+See below for the list of components and links to their READMEs:
+
+- [\<vertex-viewer>](./src/components/viewer)
+  - [\<vertex-viewer-walk-mode-tool>](./src/components/viewer-walk-mode-tool)
+  - [\<vertex-viewer-view-cube>](./src/components/viewer-view-cube)
+  - [\<vertex-viewer-transform-widget>](./src/components/viewer-transform-widget)
+  - [\<vertex-viewer-toolbar>](./src/components/viewer-toolbar)
+  - [\<vertex-viewer-toolbar-group>](./src/components/viewer-toolbar-group)
+  - [\<vertex-viewer-teleport-tool>](./src/components/viewer-teleport-tool)
+  - [\<vertex-viewer-spinner>](./src/components/viewer-spinner)
+  - [\<vertex-viewer-pin-tool>](./src/components/viewer-pin-tool)
+  - [\<vertex-viewer-pin-label>](./src/components/viewer-pin-label)
+  - [\<vertex-viewer-pin-label-line>](./src/components/viewer-pin-label-line)
+  - [\<vertex-viewer-pin-group>](./src/components/viewer-pin-group)
+  - [\<vertex-viewer-measurement-precise>](./src/components/viewer-measurement-precise)
+  - [\<vertex-viewer-measurement-overlays>](./src/components/viewer-measurement-overlays)
+  - [\<vertex-viewer-measurement-line>](./src/components/viewer-measurement-line)
+  - [\<vertex-viewer-measurement-distance>](./src/components/viewer-measurement-distance)
+  - [\<vertex-viewer-measurement-details>](./src/components/viewer-measurement-details)
+  - [\<vertex-viewer-markup>](./src/components/viewer-markup)
+  - [\<vertex-viewer-markup-tool>](./src/components/viewer-markup-tool)
+  - [\<vertex-viewer-markup-freeform>](./src/components/viewer-markup-freeform)
+  - [\<vertex-viewer-markup-circle>](./src/components/viewer-markup-circle)
+  - [\<vertex-viewer-markup-arrow>](./src/components/viewer-markup-arrow)
+  - [\<vertex-viewer-layer>](./src/components/viewer-layer)
+  - [\<vertex-viewer-icon>](./src/components/viewer-icon)
+  - [\<vertex-viewer-hit-result-indicator>](./src/components/viewer-hit-result-indicator)
+  - [\<vertex-viewer-dom-renderer>](./src/components/viewer-dom-renderer)
+  - [\<vertex-viewer-dom-group>](./src/components/viewer-dom-group)
+  - [\<vertex-viewer-dom-element>](./src/components/viewer-dom-element)
+  - [\<vertex-viewer-default-toolbar>](./src/components/viewer-default-toolbar)
+  - [\<vertex-viewer-button>](./src/components/viewer-button)
+  - [\<vertex-viewer-box-query-tool>](./src/components/viewer-box-query-tool)
+- [\<vertex-scene-tree>](./src/components/scene-tree)
+  - [\<vertex-scene-tree-toolbar>](./src/components/scene-tree-toolbar)
+  - [\<vertex-scene-tree-toolbar-group>](./src/components/scene-tree-toolbar-group)
+  - [\<vertex-scene-tree-table-resize-divider>](./src/components/scene-tree-table-resize-divider)
+  - [\<vertex-scene-tree-table-layout>](./src/components/scene-tree-table-layout)
+  - [\<vertex-scene-tree-table-header>](./src/components/scene-tree-table-header)
+  - [\<vertex-scene-tree-table-column>](./src/components/scene-tree-table-column)
+  - [\<vertex-scene-tree-table-cell>](./src/components/scene-tree-table-cell)
+  - [\<vertex-scene-tree-search>](./src/components/scene-tree-search)
+
+
 ## Examples
 
 Check out our [examples](../../examples) directory and

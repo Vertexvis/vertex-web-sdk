@@ -183,6 +183,15 @@ function main() {
 }
 ```
 
+## Documentation
+
+Each component provided by the `@vertexvis/viewer` package also exposes
+its own component-level README with additional examples and property definitions.
+See below for the list of components and links to their READMEs:
+
+{{readmes}}
+
+
 ## Examples
 
 Check out our [examples](../../examples) directory and

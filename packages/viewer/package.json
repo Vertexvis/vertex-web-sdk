@@ -42,7 +42,7 @@
     "test:ci": "stencil test --spec --coverage",
     "test:coverage": "stencil test --spec --coverage --maxWorkers=50%",
     "generate": "stencil generate",
-    "generate:docs": "../../scripts/generate_docs.sh && ./scripts/generate_components_readme.sh",
+    "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs"
   },
   "dependencies": {

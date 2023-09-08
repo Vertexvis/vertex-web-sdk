@@ -20,7 +20,8 @@ web platform.
 Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/).
 
 Each component of the `@vertexvis/viewer` packages also exposes a component-level README with
-additional examples and property definitions. See the [components README](./packages/viewer/src/components/README.md)
+additional examples and property definitions. See the 
+[@vertexvis/viewer README documentation section](./packages/viewer/readme.md#documentation)
 for a list of components and their READMEs.
 
 ## Setup & Installing
