@@ -40,6 +40,7 @@ describe(toPbSceneViewStateFeatures, () => {
         'visibility',
         'transforms',
         'cross_section',
+        'phantom',
       ])
     ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
@@ -54,6 +55,8 @@ describe(toPbSceneViewStateFeatures, () => {
         .SCENE_VIEW_STATE_FEATURE_TRANSFORM,
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION,
+      vertexvis.protobuf.stream.SceneViewStateFeature
+        .SCENE_VIEW_STATE_FEATURE_PHANTOM,
     ]);
   });
 
