@@ -30,7 +30,7 @@ const typeDefFormattedMultiline = [...docMatches].reduce(function (
   const indentationMatch = mutilineMatch[0].match(/([ ]*)[*]/);
   const indentation = indentationMatch[1] == null ? '' : indentationMatch[1];
   const formattedMatch = `${indentation}*${mutilineMatch[1].replace(
-    /([^ ])  ([^ ])/gm,
+    /([^ ])[ ]{2}([^ ])/gm,
     `$1\n${indentation}*\n${indentation}* $2`
   )}`;
 
