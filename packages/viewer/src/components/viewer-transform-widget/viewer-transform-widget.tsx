@@ -611,8 +611,6 @@ export class ViewerTransformWidget {
       const position = Matrix4.makeTranslation(newPosition);
 
       return Matrix4.multiply(position, currentRotation);
-    } else if (newPosition != null) {
-      return Matrix4.makeTranslation(newPosition);
     }
   };
 
