@@ -183,6 +183,12 @@ function main() {
 }
 ```
 
+## Examples
+
+Check out our [examples](../../examples) directory and
+[Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to
+get an idea of what you can do with Vertex's Viewer component.
+
 ## Documentation
 
 Each component provided by the `@vertexvis/viewer` package also exposes
@@ -229,13 +235,6 @@ See below for the list of components and links to their READMEs:
   - [\<vertex-scene-tree-table-column>](./src/components/scene-tree-table-column)
   - [\<vertex-scene-tree-table-cell>](./src/components/scene-tree-table-cell)
   - [\<vertex-scene-tree-search>](./src/components/scene-tree-search)
-
-
-## Examples
-
-Check out our [examples](../../examples) directory and
-[Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to
-get an idea of what you can do with Vertex's Viewer component.
 
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components

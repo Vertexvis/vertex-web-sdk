@@ -31,17 +31,6 @@ for a list of components and their READMEs.
 2. Install top-level dependencies. `yarn install`
 3. Bootstrap the project. `yarn bootstrap`
 
-## Examples
-
-These examples make use of more modern EcmaScript features. You'll need a browser that supports ES modules. Most modern browsers (Chrome, Edge, Firefox, Safari) support these features.
-
-- Run `yarn examples:start` to spin up a local development environment.
-- Open your browser to <http://localhost:8080> to browse the examples. The development environment supports live refresh, so any changes you make the examples will automatically refresh your browser.
-
-### Contributing Examples
-
-We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.
-
 ### VS Code Workspaces
 
 This repository contains a script to generate a VS Code workspace file. With VS
@@ -52,6 +41,17 @@ The workspace file will be created automatically when running `yarn install`.
 Otherwise you can generate the file manually by running `yarn generate:vscode-workspace`.
 
 Running `code ./vertex-web-sdk.code-workspace` will open VS Code workspace.
+
+## Examples
+
+These examples make use of more modern EcmaScript features. You'll need a browser that supports ES modules. Most modern browsers (Chrome, Edge, Firefox, Safari) support these features.
+
+- Run `yarn examples:start` to spin up a local development environment.
+- Open your browser to <http://localhost:8080> to browse the examples. The development environment supports live refresh, so any changes you make the examples will automatically refresh your browser.
+
+### Contributing Examples
+
+We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.
 
 ## Building
 
