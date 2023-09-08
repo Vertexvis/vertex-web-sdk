@@ -218,8 +218,7 @@ export abstract class Camera {
   }
 
   /**
-   * Performs a `flyTo` operation with the current visible bounding box of
-   * the scene.
+   * Fits the camera to the visible bounding box of the scene.
    *
    * @example
    * ```typescript
