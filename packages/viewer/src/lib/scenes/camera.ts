@@ -151,6 +151,55 @@ export abstract class Camera {
    * Specifies that the next render of the camera will be repositioned to one of
    * the options specified in `options`.
    *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector("vertex-viewer");
+   * const scene = await viewer.scene();
+   * const camera = scene.camera();
+   *
+   * // Fly to and fit to a specific item by ID with an animation of 1 second
+   * await camera
+   *   .flyTo({ itemId: "item-id" })
+   *   .render({ animation: { milliseconds: 1000 } });
+   *
+   * // Fly to and fit to a specific item by supplied ID with an animation of 1 second
+   * await camera
+   *   .flyTo({ itemSuppliedId: "item-supplied-id" })
+   *   .render({ animation: { milliseconds: 1000 } });
+   *
+   * // Fly to and fit to the bounding box of the current set of selected items
+   * // with an animation of 1 second
+   * await camera
+   *   .flyTo({
+   *     boundingBox:
+   *       viewer.frame.scene.sceneViewSummary.selectedVisibleSummary.boundingBox,
+   *   })
+   *   .render({ animation: { milliseconds: 1000 } });
+   *
+   * // Fly to a specific camera
+   * await camera
+   *   .flyTo({
+   *     camera: {
+   *       position: {
+   *         x: 1,
+   *         y: 2,
+   *         z: 3,
+   *       },
+   *       lookAt: {
+   *         x: 0,
+   *         y: 0,
+   *         z: 0,
+   *       },
+   *       up: {
+   *         x: 0,
+   *         y: 1,
+   *         z: 0,
+   *       },
+   *     },
+   *   })
+   *   .render({ animation: { milliseconds: 1000 } });
+   * ```
+   *
    * @param paramsOrQuery An object or query describing how the camera should
    * be positioned.
    */
@@ -168,6 +217,19 @@ export abstract class Camera {
     }
   }
 
+  /**
+   * Fits the camera to the visible bounding box of the scene.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   * const camera = scene.camera();
+   *
+   * // Fit to the visible bounding box of the scene with an animation of 1 second
+   * await camera.viewAll().render({ animation: { milliseconds: 1000 } });
+   * ```
+   */
   public viewAll(): Camera {
     return this.fitToBoundingBox(this.boundingBox);
   }
@@ -226,7 +288,11 @@ export abstract class Camera {
   }
 
   /**
-   * Repositions the camera by rotating its current position around an axis.
+   * Repositions the camera by rotating its current position around an axis placed
+   * at the `lookAt` point. This method internally will call {@link Camera.rotateAroundAxisAtPoint}
+   * with the `point` parameter set to the current `lookAt` point.
+   *
+   * @see {@link Camera.rotateAroundAxisAtPoint} for more information.
    *
    * @param angleInRadians The angle, in radians, to rotate.
    * @param axis A normalized vector to rotate around.
@@ -243,6 +309,27 @@ export abstract class Camera {
    * This will place the camera at the provided position, set the up vector to
    * the provided normal, and place the lookAt on the defined plane. The point
    * chosen for the lookAt will be determined using the current view vector.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector("vertex-viewer");
+   *
+   * viewer.addEventListener("tap", async (event) => {
+   *   const scene = await viewer.scene();
+   *   const raycaster = scene.raycaster();
+   *
+   *   const [hit] = await raycaster.hitItems(event.detail.position);
+   *
+   *   if (hit != null) {
+   *     const camera = scene.camera();
+   *
+   *     // Align to the plane represented by the hit result with an animation of 1 second
+   *     await camera
+   *       .alignTo(hit.hitPoint, hit.hitNormal)
+   *       .render({ animation: { milliseconds: 1000 } });
+   *   }
+   * });
+   * ```
    *
    * @param position The position to place the camera at.
    * @param normal The normal of the plane to align to.
@@ -288,6 +375,8 @@ export abstract class Camera {
    * Updates the `position` and `up` vectors of the camera to the given standard
    * view.
    *
+   * @see {@link StandardView} for the available standard views.
+   *
    * @param standardView The standard view to apply.
    * @returns A new camera.
    */
@@ -327,6 +416,30 @@ export abstract class Camera {
    * Repositions the camera by rotating its current position around an axis
    * defined at a specific world point.
    *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   *
+   * viewer.addEventListener('tap', async (event) => {
+   *   const scene = await viewer.scene();
+   *   const raycaster = scene.raycaster();
+   *
+   *   const [hit] = await raycaster.hitItems(event.detail.position);
+   *
+   *   if (hit != null) {
+   *     const camera = scene.camera();
+   *
+   *     // Using the current `up` vector of the camera, rotate 45 degrees
+   *     // about the hit position with an animation of 1 second
+   *     await camera.rotateAroundAxisAtPoint(
+   *       Angle.toRadians(45),
+   *       hit.hitPoint,
+   *       camera.up,
+   *     ).render({ animation: { milliseconds: 1000 } });
+   *   }
+   * });
+   * ```
+   *
    * @param angleInRadians The angle, in radians, to rotate.
    * @param point The point in world space to place the axis at.
    * @param axis A normalized vector to rotate around.
@@ -364,7 +477,38 @@ export abstract class Camera {
   public abstract moveBy(delta: Vector3.Vector3): Camera;
 
   /**
-   * Updates the `position`, `lookAt` and/or `up` vectors of the camera.
+   * Updates the `position`, `lookAt` and/or `up` vectors of the camera. Each
+   * vector can be omitted in the payload, and the resulting camera will keep
+   * the previous `position`, `lookAt`, or `up` vectors.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector("vertex-viewer");
+   * const scene = await viewer.scene();
+   * const camera = scene.camera();
+   *
+   * // Update the camera to place it at the origin
+   * await camera
+   *   .update({
+   *     position: {
+   *       x: 0,
+   *       y: 0,
+   *       z: 0,
+   *     },
+   *   })
+   *   .render({ animation: { milliseconds: 1000 } });
+   *
+   * // Update the camera to look at the origin
+   * await camera
+   *   .update({
+   *     lookAt: {
+   *       x: 0,
+   *       y: 0,
+   *       z: 0,
+   *     },
+   *   })
+   *   .render({ animation: { milliseconds: 1000 } });
+   * ```
    *
    * @param camera The values to update the camera to.
    */

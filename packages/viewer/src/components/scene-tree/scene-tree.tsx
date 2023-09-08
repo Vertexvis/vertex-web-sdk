@@ -80,7 +80,7 @@ type OperationHandler = (data: {
   viewer: HTMLVertexViewerElement;
   id: string;
   node: Node.AsObject;
-}) => void;
+}) => void | Promise<void>;
 
 /**
  * @slot header - A slot that places content above the rows in the tree. By

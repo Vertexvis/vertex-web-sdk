@@ -113,7 +113,10 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     }
   }
 
-  protected ifNoInteraction(event: PointerEvent, f: () => void): void {
+  protected ifNoInteraction(
+    event: PointerEvent,
+    f: () => void | Promise<void>
+  ): void {
     const startPos = Point.create(event.clientX, event.clientY);
     let didInteract = false;
 

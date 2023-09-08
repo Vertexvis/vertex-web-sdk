@@ -19,9 +19,24 @@ export * from './lib/interactions/interactionHandler';
 export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export * from './lib/pins';
-export { Scene } from './lib/scenes';
+export {
+  Camera,
+  CrossSectioner,
+  Raycaster,
+  RaycasterOptions,
+  ResetViewOptions,
+  RootQuery,
+  Scene,
+  SceneExecutionOptions,
+  SceneItemOperationsBuilder,
+  SceneItemQueryExecutor,
+  SceneOperationBuilder,
+  SceneViewStateFeature,
+  TerminalItemOperationBuilder,
+} from './lib/scenes';
 export * from './lib/transforms';
 export {
+  CrossSectioning,
   EntityType,
   FrameCameraBase,
   LoadableResource,
@@ -30,6 +45,8 @@ export {
   FrameScene as ReceivedFrameScene,
   FrameOrthographicCamera as ReceivedOrthographicCamera,
   FramePerspectiveCamera as ReceivedPerspectiveCamera,
+  SceneViewStateIdentifier,
+  StandardView,
   SynchronizedClock,
   Viewport,
 } from './lib/types';

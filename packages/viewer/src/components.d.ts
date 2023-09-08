@@ -131,7 +131,9 @@ export namespace Components {
      */
     config?: PartialConfig | string;
     /**
-     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
+     *
+     * Use the `config` property for manually setting hosts.
      */
     configEnv: Environment;
     controller?: SceneTreeController;
@@ -185,7 +187,9 @@ export namespace Components {
      */
     hideItem: (row: RowArg) => Promise<void>;
     /**
-     * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.  **Note:** This is an asynchronous operation. The update may happen on the next frame.
+     * Schedules a render of the rows in the scene tree. Useful if any custom data in your scene tree has changed, and you want to update the row's contents.
+     *
+     * **Note:** This is an asynchronous operation. The update may happen on the next frame.
      */
     invalidateRows: () => Promise<void>;
     /**
@@ -206,7 +210,22 @@ export namespace Components {
     overScanCount: number;
     /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     * @example
+     * ```html
+     * <script>
+     *   const table = document.querySelector('vertex-scene-tree-table');
+     *   table.rowData = (row) => {
+     *     return { func: () => console.log('row', row.node.name) };
+     *   };
+     * </script>
+     * <vertex-scene-tree>
+     *   <vertex-scene-tree-table>
+     *     <vertex-scene-tree-table-column>
+     *       <template> <button event:click="{{row.data.func}}">Hi</button> </template>
+     *     </vertex-scene-tree-table-column>
+     *   </vertex-scene-tree-table>
+     * </vertex-scene-tree>
+     * ```
      */
     rowData?: RowDataProvider;
     /**
@@ -232,7 +251,9 @@ export namespace Components {
       options?: SceneTreeOperationOptions | undefined
     ) => Promise<void>;
     /**
-     * Performs an API call that will select the item associated to the given row or row index.  This method supports a `recurseParent` option that allows for recursively selecting the next unselected parent node. This behavior is considered stateful. Each call to `selectItem` will track the ancestry of the passed in `rowArg`. If calling `selectItem` with a row not belonging to the ancestry of a previous selection, then this method will perform a standard selection.
+     * Performs an API call that will select the item associated to the given row or row index.
+     *
+     * This method supports a `recurseParent` option that allows for recursively selecting the next unselected parent node. This behavior is considered stateful. Each call to `selectItem` will track the ancestry of the passed in `rowArg`. If calling `selectItem` with a row not belonging to the ancestry of a previous selection, then this method will perform a standard selection.
      * @param row The row, row index or node to select.
      * @param options A set of options to configure selection behavior.
      */
@@ -352,12 +373,31 @@ export namespace Components {
     layoutOffset: number;
     layoutWidth?: number;
     /**
-     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
+     *
+     * This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
     overScanCount: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
-     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     *
+     * This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+     * @example
+     * ```html
+     * <script>
+     *   const table = document.querySelector('vertex-scene-tree-table');
+     *   table.rowData = (row) => {
+     *     return { func: () => console.log('row', row.node.name) };
+     *   };
+     * </script>
+     * <vertex-scene-tree>
+     *   <vertex-scene-tree-table>
+     *     <vertex-scene-tree-table-column>
+     *       <template> <button event:click="{{row.data.func}}">Hi</button> </template>
+     *     </vertex-scene-tree-table-column>
+     *   </vertex-scene-tree-table>
+     * </vertex-scene-tree>
+     * ```
      */
     rowData?: RowDataProvider;
     rowHeight: number;
@@ -385,7 +425,11 @@ export namespace Components {
   interface VertexSceneTreeToolbarGroup {}
   interface VertexViewer {
     /**
-     * Adds a cursor to the viewer, and displays it if the cursor has the highest priority.  Cursors are managed as a prioritized list. A cursor is displayed if it has the highest priority or if the cursor is the most recently added cursor in the set of cursors with the same priority.  To remove a cursor, call `dispose()` on the returned disposable.
+     * Adds a cursor to the viewer, and displays it if the cursor has the highest priority.
+     *
+     * Cursors are managed as a prioritized list. A cursor is displayed if it has the highest priority or if the cursor is the most recently added cursor in the set of cursors with the same priority.
+     *
+     * To remove a cursor, call `dispose()` on the returned disposable.
      * @param cursor The cursor to add.
      * @param priority The priority of the cursor.
      * @returns A disposable that can be used to remove the cursor.
@@ -412,12 +456,20 @@ export namespace Components {
      */
     config?: PartialConfig | string;
     /**
-     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
+     *
+     * Use the `config` property for manually setting hosts.
      * @see Viewer.config
      */
     configEnv: Environment;
     /**
-     * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Specifies when a depth buffer is requested from rendering. Possible values are:   * `undefined`: A depth buffer is never requested.
+     *
+     * * `final`: A depth buffer is only requested on the final frame.
+     *
+     * * `all`: A depth buffer is requested for every frame.
+     *
+     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     depthBuffers?: FrameType;
     /**
@@ -439,7 +491,15 @@ export namespace Components {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.  Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     *
+     * Possible values are:   * `undefined`: A feature map is never requested.
+     *
+     * * `final`: A feature map is only requested on the final frame.
+     *
+     * * `all`: A feature map is requested for every frame.
+     *
+     * Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     featureMaps?: FrameType;
     /**
@@ -486,7 +546,9 @@ export namespace Components {
      */
     phantom?: PhantomOptions;
     /**
-     * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
+     * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.
+     *
+     * `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
      * @example
      * ```
      * class CustomInteractionHandler extends InteractionHandler {
@@ -514,7 +576,9 @@ export namespace Components {
       interactionHandler: InteractionHandler
     ) => Promise<Disposable>;
     /**
-     * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.  `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
+     * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.
+     *
+     * `KeyInteraction`s are used to build custom keyboard shortcuts for the viewer using the current state of they keyboard to determine whether the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />` to disable the default keyboard shortcuts provided by the viewer.
      * @example
      * ```
      * class CustomKeyboardInteraction extends KeyInteraction<TapEventDetails> {
@@ -553,7 +617,13 @@ export namespace Components {
      */
     scene: () => Promise<Scene>;
     /**
-     * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+     * Specifies the halo selection properties. Parameter notes:
+     *
+     * * lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
+     *
+     * * color is optional. This will be the color of the selected items in the viewer.
+     *
+     * * opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
      */
     selectionHighlighting?: SelectionHighlightingOptions;
     /**
@@ -581,7 +651,11 @@ export namespace Components {
      */
     controller?: VolumeIntersectionQueryController;
     /**
-     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.  Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.  Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.
+     *
+     * Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.
+     *
+     * Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
      */
     mode?: VolumeIntersectionQueryMode;
     /**
@@ -589,7 +663,11 @@ export namespace Components {
      */
     model?: VolumeIntersectionQueryModel;
     /**
-     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.  `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.
+     *
+     * `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.
+     *
+     * The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
      */
     operationType: VolumeIntersectionQueryType;
     /**
@@ -635,7 +713,14 @@ export namespace Components {
     matrix: Matrix4.Matrix4;
     /**
      * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
-     * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
+     * @example
+     * ```html
+     * <style>
+     *   vertex-viewer-dom-element[occluded] {
+     *     opacity: 0;
+     *   }
+     * </style>
+     * ```
      */
     occluded: boolean;
     /**
@@ -715,15 +800,21 @@ export namespace Components {
   }
   interface VertexViewerDomRenderer {
     /**
-     * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     * The current camera of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
     camera?: FrameCameraBase;
     /**
-     * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
     depthBuffer?: DepthBuffer;
     /**
-     * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
+     * Specifies the drawing mode for the renderer.
+     *
+     * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */
     drawMode: ViewerDomRendererDrawMode;
     /**
@@ -751,7 +842,13 @@ export namespace Components {
      */
     name?: ViewerIconName;
     /**
-     * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+     * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px
+     *
+     * * `md`: 24px
+     *
+     * * `lg`: 32px
+     *
+     * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
      */
     size?: ViewerIconSize;
   }
@@ -851,11 +948,15 @@ export namespace Components {
   interface VertexViewerMarkupArrow {
     dispose: () => Promise<void>;
     /**
-     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     end?: Point.Point;
     /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     endJson?: string;
     /**
@@ -863,25 +964,35 @@ export namespace Components {
      */
     mode: ViewerMarkupArrowMode;
     /**
-     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     start?: Point.Point;
     /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     startJson?: string;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMarkupCircle {
     /**
-     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     bounds?: Rectangle.Rectangle;
     /**
-     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
     dispose: () => Promise<void>;
@@ -890,17 +1001,23 @@ export namespace Components {
      */
     mode: ViewerMarkupCircleMode;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMarkupFreeform {
     /**
-     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     bounds?: Rectangle.Rectangle;
     /**
-     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
     dispose: () => Promise<void>;
@@ -909,15 +1026,21 @@ export namespace Components {
      */
     mode: ViewerMarkupFreeformMode;
     /**
-     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     points?: Point.Point[];
     /**
-     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     pointsJson?: string;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
@@ -931,7 +1054,9 @@ export namespace Components {
      */
     circleTemplateId?: string;
     /**
-     * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     * Disables markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     disabled: boolean;
     /**
@@ -943,11 +1068,15 @@ export namespace Components {
      */
     reset: () => Promise<void>;
     /**
-     * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     * The type of markup.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     tool: ViewerMarkupToolType;
     /**
-     * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markup.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
@@ -1047,7 +1176,13 @@ export namespace Components {
      */
     measurementModel: MeasurementModel;
     /**
-     * A mode that specifies how the measurement component should behave.  When unset, the component will not respond to interactions with the handles.  When `edit`, the measurement anchors are interactive and the user is able to reposition them.  When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
+     * A mode that specifies how the measurement component should behave.
+     *
+     * When unset, the component will not respond to interactions with the handles.
+     *
+     * When `edit`, the measurement anchors are interactive and the user is able to reposition them.
+     *
+     * When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
      */
     mode: ViewerMeasurementDistanceMode;
     /**
@@ -1210,7 +1345,9 @@ export namespace Components {
      */
     primaryColor: Color.Color | string | undefined;
     /**
-     * The type of pin.  This property will automatically be set.
+     * The type of pin.
+     *
+     * This property will automatically be set.
      */
     tool: ViewerPinToolType;
     /**
@@ -1220,7 +1357,13 @@ export namespace Components {
   }
   interface VertexViewerSpinner {
     /**
-     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 24px  * `md`: 32px  * `lg`: 64px
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px
+     *
+     * * `sm`: 24px
+     *
+     * * `md`: 32px
+     *
+     * * `lg`: 64px
      */
     size?: SpinnerSize;
   }
@@ -1235,7 +1378,17 @@ export namespace Components {
     animationsDisabled: boolean;
     controller?: WalkModeController;
     /**
-     * The type of teleportation to perform when clicking.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+     * The type of teleportation to perform when clicking.
+     *
+     * `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.
+     *
+     * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `undefined` - no teleportation will occur when clicking.
+     *
+     * Defaults to `undefined`.
      */
     mode?: ViewerTeleportMode;
     model: WalkModeModel;
@@ -1350,7 +1503,9 @@ export namespace Components {
      */
     controller?: WalkModeController;
     /**
-     * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
+     * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.
+     *
+     * Defaults to `true`.
      */
     enabled: boolean;
     /**
@@ -1358,7 +1513,17 @@ export namespace Components {
      */
     model: WalkModeModel;
     /**
-     * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+     * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.
+     *
+     * `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.
+     *
+     * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `undefined` - no teleportation will occur when clicking.
+     *
+     * Defaults to `undefined`.
      */
     teleportMode?: ViewerTeleportMode;
     /**
@@ -1770,7 +1935,9 @@ declare namespace LocalJSX {
      */
     config?: PartialConfig | string;
     /**
-     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
+     *
+     * Use the `config` property for manually setting hosts.
      */
     configEnv?: Environment;
     controller?: SceneTreeController;
@@ -1802,7 +1969,22 @@ declare namespace LocalJSX {
     overScanCount?: number;
     /**
      * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
-     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     * @example
+     * ```html
+     * <script>
+     *   const table = document.querySelector('vertex-scene-tree-table');
+     *   table.rowData = (row) => {
+     *     return { func: () => console.log('row', row.node.name) };
+     *   };
+     * </script>
+     * <vertex-scene-tree>
+     *   <vertex-scene-tree-table>
+     *     <vertex-scene-tree-table-column>
+     *       <template> <button event:click="{{row.data.func}}">Hi</button> </template>
+     *     </vertex-scene-tree-table-column>
+     *   </vertex-scene-tree-table>
+     * </vertex-scene-tree>
+     * ```
      */
     rowData?: RowDataProvider;
     /**
@@ -1928,12 +2110,31 @@ declare namespace LocalJSX {
       event: VertexSceneTreeTableLayoutCustomEvent<void>
     ) => void;
     /**
-     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.  This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
+     * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
+     *
+     * This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
      */
     overScanCount?: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.  This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
-     * @example ```html <script>   const table = document.querySelector('vertex-scene-tree-table');   table.rowData = (row) => {     return { func: () => console.log('row', row.node.name) };   } </script>  <vertex-scene-tree>  <vertex-scene-tree-table>    <vertex-scene-tree-table-column>      <template>        <button event:click="{{row.data.func}}">Hi</button>      </template>    </vertex-scene-tree-table-column>  </vertex-scene-tree-table> </vertex-scene-tree> ```
+     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     *
+     * This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
+     * @example
+     * ```html
+     * <script>
+     *   const table = document.querySelector('vertex-scene-tree-table');
+     *   table.rowData = (row) => {
+     *     return { func: () => console.log('row', row.node.name) };
+     *   };
+     * </script>
+     * <vertex-scene-tree>
+     *   <vertex-scene-tree-table>
+     *     <vertex-scene-tree-table-column>
+     *       <template> <button event:click="{{row.data.func}}">Hi</button> </template>
+     *     </vertex-scene-tree-table-column>
+     *   </vertex-scene-tree-table>
+     * </vertex-scene-tree>
+     * ```
      */
     rowData?: RowDataProvider;
     rowHeight?: number;
@@ -1968,12 +2169,20 @@ declare namespace LocalJSX {
      */
     config?: PartialConfig | string;
     /**
-     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.
+     * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
+     *
+     * Use the `config` property for manually setting hosts.
      * @see Viewer.config
      */
     configEnv?: Environment;
     /**
-     * Specifies when a depth buffer is requested from rendering. Possible values are:  * `undefined`: A depth buffer is never requested. * `final`: A depth buffer is only requested on the final frame. * `all`: A depth buffer is requested for every frame.  Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Specifies when a depth buffer is requested from rendering. Possible values are:   * `undefined`: A depth buffer is never requested.
+     *
+     * * `final`: A depth buffer is only requested on the final frame.
+     *
+     * * `all`: A depth buffer is requested for every frame.
+     *
+     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     depthBuffers?: FrameType;
     /**
@@ -1994,7 +2203,15 @@ declare namespace LocalJSX {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.  Possible values are:  * `undefined`: A feature map is never requested. * `final`: A feature map is only requested on the final frame. * `all`: A feature map is requested for every frame.  Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     *
+     * Possible values are:   * `undefined`: A feature map is never requested.
+     *
+     * * `final`: A feature map is only requested on the final frame.
+     *
+     * * `all`: A feature map is requested for every frame.
+     *
+     * Feature maps can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
      */
     featureMaps?: FrameType;
     /**
@@ -2064,6 +2281,9 @@ declare namespace LocalJSX {
     onSceneReady?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
+     *
+     * This event can be used in combination with the {@link VertexViewer.scene scene} method to query for items at the point of the tap.
+     * @see {@link Scene.raycaster Scene.raycaster} for more information.
      */
     onTap?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
     /**
@@ -2084,7 +2304,13 @@ declare namespace LocalJSX {
      */
     rotateAroundTapPoint?: boolean;
     /**
-     * Specifies the halo selection properties. Parameter notes:  lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.  color is optional. This will be the color of the selected items in the viewer.  opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
+     * Specifies the halo selection properties. Parameter notes:
+     *
+     * * lineWidth values supported currently are 0-5. This width is currently the value x2. For example, 1 will have a pixel width of 2.
+     *
+     * * color is optional. This will be the color of the selected items in the viewer.
+     *
+     * * opacity is also optional. The opacity will be applied to everything selected besides the highlighted outer line.
      */
     selectionHighlighting?: SelectionHighlightingOptions;
     /**
@@ -2108,7 +2334,11 @@ declare namespace LocalJSX {
      */
     controller?: VolumeIntersectionQueryController;
     /**
-     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.  Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.  Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
+     * An optional value to specify a singular mode of intersection query. This value defaults to `undefined`, which will indicate that both `exclusive` and `inclusive` queries should be made, with `inclusive` being represented by a left to right drag behavior and `exclusive` being represented by a right to left drag.
+     *
+     * Setting this value to `inclusive` will cause dragging left to right and left to right to result in an `inclusive` query, and the box will only be styled for `inclusive` queries.
+     *
+     * Setting this value to `exclusive` will cause dragging left to right and left to right to result in an `exclusive` query, and the box will only be styled for `exclusive` queries.
      */
     mode?: VolumeIntersectionQueryMode;
     /**
@@ -2116,7 +2346,11 @@ declare namespace LocalJSX {
      */
     model?: VolumeIntersectionQueryModel;
     /**
-     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.  `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.  The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
+     * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.
+     *
+     * `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.
+     *
+     * The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
      */
     operationType?: VolumeIntersectionQueryType;
     /**
@@ -2162,7 +2396,14 @@ declare namespace LocalJSX {
     matrix?: Matrix4.Matrix4;
     /**
      * Indicates if the element is hidden by geometry. This property can be used with a CSS selector to modify the appearance of the element when its occluded.
-     * @example ```html <style>   vertex-viewer-dom-element[occluded] {     opacity: 0;   } </style> ```
+     * @example
+     * ```html
+     * <style>
+     *   vertex-viewer-dom-element[occluded] {
+     *     opacity: 0;
+     *   }
+     * </style>
+     * ```
      */
     occluded?: boolean;
     /**
@@ -2250,15 +2491,21 @@ declare namespace LocalJSX {
   }
   interface VertexViewerDomRenderer {
     /**
-     * The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     * The current camera of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
     camera?: FrameCameraBase;
     /**
-     * The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
      */
     depthBuffer?: DepthBuffer;
     /**
-     * Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
+     * Specifies the drawing mode for the renderer.
+     *
+     * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */
     drawMode?: ViewerDomRendererDrawMode;
     /**
@@ -2286,7 +2533,13 @@ declare namespace LocalJSX {
      */
     name?: ViewerIconName;
     /**
-     * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
+     * The size of the icon. Can be `'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `sm`: 16px
+     *
+     * * `md`: 24px
+     *
+     * * `lg`: 32px
+     *
+     * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
      */
     size?: ViewerIconSize;
   }
@@ -2363,11 +2616,15 @@ declare namespace LocalJSX {
   }
   interface VertexViewerMarkupArrow {
     /**
-     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     end?: Point.Point;
     /**
-     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the ending anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     endJson?: string;
     /**
@@ -2387,25 +2644,35 @@ declare namespace LocalJSX {
      */
     onViewRendered?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
     /**
-     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     start?: Point.Point;
     /**
-     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The position of the starting anchor, as a JSON string. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     startJson?: string;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMarkupCircle {
     /**
-     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     bounds?: Rectangle.Rectangle;
     /**
-     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
     /**
@@ -2425,17 +2692,23 @@ declare namespace LocalJSX {
      */
     onViewRendered?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMarkupFreeform {
     /**
-     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     bounds?: Rectangle.Rectangle;
     /**
-     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
+     * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.
+     *
+     * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
     /**
@@ -2457,15 +2730,21 @@ declare namespace LocalJSX {
       event: VertexViewerMarkupFreeformCustomEvent<void>
     ) => void;
     /**
-     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     points?: Point.Point[];
     /**
-     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
+     * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
+     *
+     * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     pointsJson?: string;
     /**
-     * The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
@@ -2479,7 +2758,9 @@ declare namespace LocalJSX {
      */
     circleTemplateId?: string;
     /**
-     * Disables markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     * Disables markups.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     disabled?: boolean;
     /**
@@ -2495,11 +2776,15 @@ declare namespace LocalJSX {
      */
     onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
     /**
-     * The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
+     * The type of markup.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
     tool?: ViewerMarkupToolType;
     /**
-     * The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
+     * The viewer to connect to markup.
+     *
+     * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
      */
     viewer?: HTMLVertexViewerElement;
   }
@@ -2593,7 +2878,13 @@ declare namespace LocalJSX {
      */
     measurementModel?: MeasurementModel;
     /**
-     * A mode that specifies how the measurement component should behave.  When unset, the component will not respond to interactions with the handles.  When `edit`, the measurement anchors are interactive and the user is able to reposition them.  When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
+     * A mode that specifies how the measurement component should behave.
+     *
+     * When unset, the component will not respond to interactions with the handles.
+     *
+     * When `edit`, the measurement anchors are interactive and the user is able to reposition them.
+     *
+     * When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
      */
     mode?: ViewerMeasurementDistanceMode;
     /**
@@ -2777,7 +3068,9 @@ declare namespace LocalJSX {
      */
     primaryColor?: Color.Color | string | undefined;
     /**
-     * The type of pin.  This property will automatically be set.
+     * The type of pin.
+     *
+     * This property will automatically be set.
      */
     tool?: ViewerPinToolType;
     /**
@@ -2787,7 +3080,13 @@ declare namespace LocalJSX {
   }
   interface VertexViewerSpinner {
     /**
-     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px  * `sm`: 24px  * `md`: 32px  * `lg`: 64px
+     * The size of the spinner. Can be `'xs' | 'sm' | 'md' | 'lg' | undefined`. Predefined sizes are set to:   * `xm`: 16px
+     *
+     * * `sm`: 24px
+     *
+     * * `md`: 32px
+     *
+     * * `lg`: 64px
      */
     size?: SpinnerSize;
   }
@@ -2802,7 +3101,17 @@ declare namespace LocalJSX {
     animationsDisabled?: boolean;
     controller?: WalkModeController;
     /**
-     * The type of teleportation to perform when clicking.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+     * The type of teleportation to perform when clicking.
+     *
+     * `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.
+     *
+     * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `undefined` - no teleportation will occur when clicking.
+     *
+     * Defaults to `undefined`.
      */
     mode?: ViewerTeleportMode;
     model?: WalkModeModel;
@@ -2947,7 +3256,9 @@ declare namespace LocalJSX {
      */
     controller?: WalkModeController;
     /**
-     * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.  Defaults to `true`.
+     * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.
+     *
+     * Defaults to `true`.
      */
     enabled?: boolean;
     /**
@@ -2961,7 +3272,17 @@ declare namespace LocalJSX {
       event: VertexViewerWalkModeToolCustomEvent<WalkModeController>
     ) => void;
     /**
-     * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.  `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.  `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.  `undefined` - no teleportation will occur when clicking.  Defaults to `undefined`.
+     * The type of teleportation to perform when clicking. This value is passed through to a `<vertex-viewer-teleport-tool>`'s mode attribute.
+     *
+     * `teleport` - the camera's `position` is moved to the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `teleport-and-align` - the camera's `position`, `lookAt`, and `up` vectors are updated to align to the plane represented by the hit result's position and normal.
+     *
+     * `teleport-toward` - the camera's `position` is moved a fixed distance toward the location of the hit result constrained by the plane represented by the camera's current `position` and `up` vectors.
+     *
+     * `undefined` - no teleportation will occur when clicking.
+     *
+     * Defaults to `undefined`.
      */
     teleportMode?: ViewerTeleportMode;
     /**

@@ -7,7 +7,7 @@ import { ImageScaleProvider } from './scene';
 /**
  * Optional raycaster options available on a hit request.
  */
-interface RaycasterOptions {
+export interface RaycasterOptions {
   includeMetadata: boolean;
 }
 
@@ -31,7 +31,32 @@ export class Raycaster implements RaycasterLike {
    * Performs request on the stream to find items that intersect
    * the given point.
    *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector("vertex-viewer");
+   *
+   * viewer.addEventListener("tap", async (event) => {
+   *   const scene = await viewer.scene();
+   *   const raycaster = scene.raycaster();
+   *
+   *   // Query the scene for the item at the position of the `tap` event
+   *   const [hit] = await raycaster.hitItems(event.detail.position);
+   *
+   *   if (hit != null) {
+   *     // If there was an item present at the position, select it
+   *     await scene.items((op) =>
+   *       op.where((q) => q.withItemId(hit.itemId.hex)).select()
+   *     );
+   *   }
+   * });
+   * ```
+   *
+   * @see {@link Scene.items} for more information on the operations that
+   * can be performed on a hit result.
+   *
    * @param point The point to cast from looking for intersections.
+   * @param options Optional set of options for the request @see {@link RaycasterOptions}
+   * for available options.
    */
   public async hitItems(
     point: Point.Point,
