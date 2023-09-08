@@ -232,7 +232,8 @@ export type SceneViewStateFeature =
   | 'material_overrides'
   | 'selection'
   | 'transforms'
-  | 'visibility';
+  | 'visibility'
+  | 'phantom';
 
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
