@@ -26,6 +26,8 @@ import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
 
+const PI_OVER_360 = 0.008726646259972;
+
 export interface CameraRenderOptions {
   animation?: Animation.Animation;
 }
@@ -111,16 +113,17 @@ export abstract class Camera {
     protected flyToOptions?: FlyTo.FlyToOptions
   ) {}
 
-  /**
-   * Updates the position of the camera such that the given bounding box will
-   * be contained within the camera's view.
-   *
-   * @param boundingBox The bounding box to position to.
-   */
-  public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
-    return this.flyTo({
-      boundingBox,
-    });
+  protected fitCameraToBoundingBox(
+    boundingBox: BoundingBox.BoundingBox,
+    distance: number,
+    viewVector: Vector3.Vector3
+  ): Camera {
+    const vvec = Vector3.scale(distance, Vector3.normalize(viewVector));
+
+    const lookAt = BoundingBox.center(boundingBox);
+    const position = Vector3.subtract(lookAt, vvec);
+
+    return this.update({ lookAt, position, viewVector: vvec });
   }
 
   /**
@@ -448,6 +451,16 @@ export abstract class Camera {
     axis: Vector3.Vector3
   ): Camera;
 
+  /**
+   * Updates the position of the camera such that the given bounding box will
+   * be contained within the camera's view.
+   *
+   * @param boundingBox The bounding box to position to.
+   */
+  public abstract fitToBoundingBox(
+    boundingBox: BoundingBox.BoundingBox
+  ): Camera;
+
   public abstract get position(): Vector3.Vector3;
   public abstract get lookAt(): Vector3.Vector3;
   public abstract get up(): Vector3.Vector3;
@@ -567,6 +580,25 @@ export class PerspectiveCamera
         Vector3.origin()
       ),
     });
+  }
+
+  public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
+    const radius =
+      1.1 *
+      Vector3.magnitude(
+        Vector3.subtract(boundingBox.max, BoundingBox.center(boundingBox))
+      );
+
+    // ratio of the height of the frustum to the distance along the view vector
+    let hOverD = Math.tan((this.fovY ?? 45) * PI_OVER_360);
+
+    if (this.aspect < 1.0) {
+      hOverD *= this.aspect;
+    }
+
+    const distance = Math.abs(radius / hOverD);
+
+    return super.fitCameraToBoundingBox(boundingBox, distance, this.viewVector);
   }
 
   public update(camera: Partial<FrameCamera.PerspectiveFrameCamera>): Camera {
@@ -727,6 +759,22 @@ export class OrthographicCamera
         axis,
         Vector3.origin()
       ),
+    });
+  }
+
+  public fitToBoundingBox(boundingBox: BoundingBox.BoundingBox): Camera {
+    const boundingSphere = BoundingSphere.create(boundingBox);
+
+    const fitAll = super.fitCameraToBoundingBox(
+      boundingBox,
+      boundingSphere.radius,
+      this.viewVector
+    );
+
+    return this.update({
+      lookAt: fitAll.lookAt,
+      viewVector: fitAll.viewVector,
+      fovHeight: boundingSphere.radius * 2,
     });
   }
 
