@@ -17,11 +17,12 @@ web platform.
 
 ## Documentation
 
-Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/).
+Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/) and
+our [developer guides](https://developer.vertexvis.com/docs/guides/render-your-first-scene).
 
 Each component of the `@vertexvis/viewer` packages also exposes a component-level README with
 additional examples and property definitions. See the 
-[@vertexvis/viewer README documentation section](./packages/viewer/readme.md#documentation)
+[@vertexvis/viewer documentation section](./packages/viewer/readme.md#documentation)
 for a list of components and their READMEs.
 
 ## Setup & Installing
