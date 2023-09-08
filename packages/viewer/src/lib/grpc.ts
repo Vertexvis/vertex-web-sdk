@@ -1,8 +1,8 @@
 import { grpc } from '@improbable-eng/grpc-web';
 
-type GrpcCaller<R, E> = (handler: GrpcHandler<R, E>) => void;
+type GrpcCaller<R, E> = (handler: GrpcHandler<R, E>) => void | Promise<void>;
 
-type GrpcHandler<R, E> = (err: E | null, res: R | null) => void;
+type GrpcHandler<R, E> = (err: E | null, res: R | null) => void | Promise<void>;
 
 export type JwtProvider = () =>
   | Promise<string | undefined>

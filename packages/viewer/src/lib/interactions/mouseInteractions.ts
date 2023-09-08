@@ -193,7 +193,10 @@ export class ZoomInteraction extends MouseInteraction {
     }
   }
 
-  private operateWithTimer(api: InteractionApi, f: () => void): void {
+  private operateWithTimer(
+    api: InteractionApi,
+    f: () => void | Promise<void>
+  ): void {
     if (!this.didTransformBegin) {
       this.beginInteraction(api);
     }
