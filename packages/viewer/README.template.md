@@ -189,5 +189,13 @@ Check out our [examples](../../examples) directory and
 [Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to
 get an idea of what you can do with Vertex's Viewer component.
 
+## Documentation
+
+Each component provided by the `@vertexvis/viewer` package also exposes
+its own component-level README with additional examples and property definitions.
+See below for the list of components and links to their READMEs:
+
+{{readmes}}
+
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components

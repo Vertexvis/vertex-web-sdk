@@ -17,7 +17,13 @@ web platform.
 
 ## Documentation
 
-Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/).
+Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/) and
+our [developer guides](https://developer.vertexvis.com/docs/guides/render-your-first-scene).
+
+Each component of the `@vertexvis/viewer` package also exposes a component-level README with
+additional examples and property definitions. See the 
+[@vertexvis/viewer documentation section](./packages/viewer/readme.md#documentation)
+for a list of components and their READMEs.
 
 ## Setup & Installing
 
@@ -35,6 +41,17 @@ The workspace file will be created automatically when running `yarn install`.
 Otherwise you can generate the file manually by running `yarn generate:vscode-workspace`.
 
 Running `code ./vertex-web-sdk.code-workspace` will open VS Code workspace.
+
+## Examples
+
+These examples make use of more modern EcmaScript features. You'll need a browser that supports ES modules. Most modern browsers (Chrome, Edge, Firefox, Safari) support these features.
+
+- Run `yarn examples:start` to spin up a local development environment.
+- Open your browser to <http://localhost:8080> to browse the examples. The development environment supports live refresh, so any changes you make the examples will automatically refresh your browser.
+
+### Contributing Examples
+
+We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.
 
 ## Building
 
@@ -101,7 +118,7 @@ Once a branch has been updated with the latest changes in the `master` branch,
 it can be pushed to the `publish-testing` branch which will automatically start
 a publish workflow. This package can then be found on NPM under the `testing` tag.
 
-Run `git push -u origin local_branch:publish-testing` to update the branch
+Run `git push origin local_branch:publish-testing` to update the branch
 with your changes and start the workflow.
 
 ## Semver
@@ -118,14 +135,3 @@ major and patch will be treated as minor.
 [@vertexvis/viewer]: ./packages/viewer
 [@vertexvis/viewer-react]: ./packages/viewer-react
 [@vertexvis/viewer-vue]: ./packages/viewer-vue
-
-## Examples
-
-These examples make use of more modern EcmaScript features. You'll need a browser that supports ES modules. Most modern browsers (Chrome, Edge, Firefox, Safari) support these features.
-
-- Run `yarn examples:start` to spin up a local development environment.
-- Open your browser to <http://localhost:8080> to browse the examples. The development environment supports live refresh, so any changes you make the examples will automatically refresh your browser.
-
-### Contributing Examples
-
-We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.
