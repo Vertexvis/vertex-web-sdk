@@ -137,13 +137,9 @@ export function buildSceneOperation(
   context: BuildSceneOperationContext
 ): vertexvis.protobuf.stream.ISceneOperation {
   const operationTypes = buildOperationTypes(operations);
-
   const queryExpression = buildQueryExpression(query, context);
 
-  return {
-    queryExpression,
-    operationTypes,
-  };
+  return { queryExpression, operationTypes };
 }
 
 function buildSceneItemQuery(
@@ -240,57 +236,39 @@ function buildOperationTypes(
           },
         };
       case 'clear-override':
-        return {
-          changeMaterial: {},
-        };
+        return { changeMaterial: {} };
       case 'change-transform':
-        return {
-          changeTransform: {
-            transform: { ...op.transform },
-          },
-        };
+        return { changeTransform: { transform: { ...op.transform } } };
       case 'clear-transform':
-        return {
-          clearTransform: {
-            cascade: op.cascade,
-          },
-        };
+        return { clearTransform: { cascade: op.cascade } };
       case 'hide':
-        return {
-          changeVisibility: {
-            visible: false,
-          },
-        };
+        return { changeVisibility: { visible: false } };
       case 'show':
+        return { changeVisibility: { visible: true } };
+      case 'select':
+        return { changeSelection: { selected: true } };
+      case 'deselect':
+        return { changeSelection: { selected: false } };
+      case 'change-phantom':
+        return { changePhantom: { phantom: op.phantomState ?? true } };
+      case 'clear-phantom':
+        return { changePhantom: { phantom: false } };
+      case 'change-end-item':
+        return { changeEndItem: { endItem: op.endItemState ?? true } };
+      case 'clear-end-item':
+        return { changeEndItem: { endItem: false } };
+      case 'view-rendition-by-id':
         return {
-          changeVisibility: {
-            visible: true,
+          viewRendition: {
+            id: new vertexvis.protobuf.core.Uuid({ hex: op.id }),
           },
         };
-      case 'select':
-        return {
-          changeSelection: { selected: true },
-        };
-      case 'deselect':
-        return {
-          changeSelection: { selected: false },
-        };
-      case 'change-phantom':
-        return {
-          changePhantom: { phantom: op.phantomState ?? true },
-        };
-      case 'clear-phantom':
-        return {
-          changePhantom: { phantom: false },
-        };
-      case 'change-end-item':
-        return {
-          changeEndItem: { endItem: op.endItemState ?? true },
-        };
-      case 'clear-end-item':
-        return {
-          changeEndItem: { endItem: false },
-        };
+      case 'view-rendition-by-supplied-id':
+        return { viewRendition: { suppliedId: op.suppliedId } };
+      case 'view-default-rendition':
+        return { viewDefaultRendition: {} };
+      case 'clear-rendition':
+        return { clearRendition: {} };
       default:
         return {};
     }

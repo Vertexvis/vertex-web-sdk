@@ -1,30 +1,34 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 
+import { random } from '../../../testing/random';
 import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
 
 describe(buildSceneOperation, () => {
-  it('maps a clear transform operation', () => {
+  it('maps operations', () => {
+    const renId = random.guid();
+    const renSuppliedId = random.string();
+
     expect(
       buildSceneOperation(
         { type: 'all' },
-        [{ type: 'clear-transform', cascade: true }],
-        {
-          dimensions: Dimensions.create(100, 100),
-        }
+        [
+          { type: 'clear-transform', cascade: true },
+          { type: 'view-rendition-by-id', id: renId },
+          { type: 'view-rendition-by-supplied-id', suppliedId: renSuppliedId },
+          { type: 'view-default-rendition' },
+          { type: 'clear-rendition' },
+        ],
+        { dimensions: Dimensions.create(100, 100) }
       )
     ).toMatchObject({
-      queryExpression: {
-        operand: {
-          root: {},
-        },
-      },
+      queryExpression: { operand: { root: {} } },
       operationTypes: [
-        {
-          clearTransform: {
-            cascade: true,
-          },
-        },
+        { clearTransform: { cascade: true } },
+        { viewRendition: { id: { hex: renId } } },
+        { viewRendition: { suppliedId: renSuppliedId } },
+        { viewDefaultRendition: {} },
+        { clearRendition: {} },
       ],
     });
   });
