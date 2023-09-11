@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer-vue",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Vue bindings for the Vertex Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -33,7 +33,7 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
-    "@vertexvis/viewer": "0.19.0"
+    "@vertexvis/viewer": "0.19.1"
   },
   "devDependencies": {
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
