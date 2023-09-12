@@ -168,7 +168,8 @@ function buildSceneItemQuery(
 export function buildFlyToOperation(
   frameCorrelationId: UUID.UUID,
   options: FlyTo.FlyToOptions,
-  animation?: Animation.Animation
+  animation?: Animation.Animation,
+  baseCamera?: FrameCamera.FrameCamera
 ): vertexvis.protobuf.stream.IFlyToPayload {
   const payload = {
     frameCorrelationId: {
@@ -179,6 +180,8 @@ export function buildFlyToOperation(
           duration: toProtoDuration(animation.milliseconds),
         }
       : undefined,
+    baseCamera:
+      baseCamera != null ? FrameCamera.toProtobuf(baseCamera) : undefined,
   };
 
   switch (options.flyTo.type) {

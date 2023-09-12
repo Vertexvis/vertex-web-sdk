@@ -72,7 +72,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.interactionApi = api;
     element.addEventListener(this.downEvent, this.handleDownEvent);
     element.addEventListener('mousedown', this.handleDoubleClick);
-    element.addEventListener('wheel', this.handleMouseWheel);
+    element.addEventListener('wheel', this.handleMouseWheel, {
+      passive: false,
+    });
   }
 
   public dispose(): void {

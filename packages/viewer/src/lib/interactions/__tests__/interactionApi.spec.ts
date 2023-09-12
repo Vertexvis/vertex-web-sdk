@@ -123,8 +123,11 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.viewAll, () => {
     it('replaces the camera', async () => {
+      (streamApi.flyTo as jest.Mock).mockResolvedValueOnce({
+        flyTo: {},
+      });
       await api.viewAll();
-      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+      expect(streamApi.flyTo).toHaveBeenCalledTimes(1);
     });
   });
 
