@@ -1,5 +1,6 @@
 import { Color } from '@vertexvis/utils';
 
+import { random } from '../../../testing/random';
 import { ColorMaterial } from '../colorMaterial';
 import { SceneOperationBuilder } from '../operations';
 
@@ -107,5 +108,25 @@ describe(SceneOperationBuilder, () => {
     const definitions = builder.clearEndItem().build();
 
     expect(definitions).toEqual([{ type: 'clear-end-item' }]);
+  });
+
+  it('creates rendition operations', () => {
+    const id = random.guid();
+    const suppliedId = random.string();
+
+    const builder = new SceneOperationBuilder();
+    const definitions = builder
+      .viewRenditionById(id)
+      .viewRenditionBySuppliedId(suppliedId)
+      .viewDefaultRendition()
+      .clearRendition()
+      .build();
+
+    expect(definitions).toEqual([
+      { type: 'view-rendition-by-id', id },
+      { type: 'view-rendition-by-supplied-id', suppliedId },
+      { type: 'view-default-rendition' },
+      { type: 'clear-rendition' },
+    ]);
   });
 });
