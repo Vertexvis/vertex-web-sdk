@@ -27,5 +27,6 @@ install_mo() {
 install_mo
 
 # Update readme with correct version.
-export version=`cat package.json | jq -r '.version'`
+export version=$(../../scripts/generate_version.sh)
+export readmes=$(../../scripts/generate_component_readmes.sh)
 cat ./README.template.md | ./.lib/mo > README.md
