@@ -34,8 +34,8 @@ export interface ResetViewOptions {
 
 /**
  * A class that is responsible for building operations for a specific scene.
- * This executor requires a query, and expects `execute()` to be invoked in order
- * for the changes to take effect.
+ * This executor requires a query, and expects `execute()` to be invoked in
+ * order for the changes to take effect.
  */
 export class SceneItemOperationsBuilder
   implements SceneItemOperations<SceneItemOperationsBuilder>
@@ -51,7 +51,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their default material overridden to match the specified material.
+   * Specifies that the items matching the query should have their default
+   * material overridden to match the specified material.
    *
    * @example
    * ```typescript
@@ -162,7 +163,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have any overridden material removed.
+   * Specifies that the items matching the query should have any overridden
+   * material removed.
    *
    * @example
    * ```typescript
@@ -183,8 +185,9 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their transformation matrix overridden to
-   * match the specified transformation matrix.
+   * Specifies that the items matching the query should have their
+   * transformation matrix overridden to match the specified transformation
+   * matrix.
    *
    * @example
    * ```typescript
@@ -248,15 +251,16 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden transformation
-   * matrix removed. The `cascade` flag determines whether children of the items matching
-   * the query should also have their overridden transformation matrix removed, and defaults to `true`.
+   * Specifies that the items matching the query should have their overridden
+   * transformation matrix removed. The `cascade` flag determines whether
+   * children of the items matching the query should also have their overridden
+   * transformation matrix removed, and defaults to `true`.
    *
    * @example
    * ```typescript
    * const viewer = document.querySelector('vertex-viewer');
    * const scene = await viewer.scene();
-
+   *
    * // Clear the overridden the transformation matrix for the item with the `item-uuid` ID
    * // and do not cascade to preserve transformations on children
    * await scene.items((op) => [
@@ -278,7 +282,9 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their phantom state overridden to match the specified `phantomState` flag. If the `phantomState` flag is not provided, it will default to `true`.
+   * Specifies that the items matching the query should have their phantom state
+   * overridden to match the specified `phantomState` flag. If the
+   * `phantomState` flag is not provided, it will default to `true`.
    *
    * @example
    * ```typescript
@@ -304,7 +310,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden phantom state removed.
+   * Specifies that the items matching the query should have their overridden
+   * phantom state removed.
    *
    * @example
    * ```typescript
@@ -325,8 +332,9 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their end item state overridden to match
-   * the specified `endItemState` flag. If the `endItemState` flag is not provided, it will default to `true`.
+   * Specifies that the items matching the query should have their end item
+   * state overridden to match the specified `endItemState` flag. If the
+   * `endItemState` flag is not provided, it will default to `true`.
    *
    * @example
    * ```typescript
@@ -345,9 +353,10 @@ export class SceneItemOperationsBuilder
    * ```
    *
    * @remarks
-   * End item states do not propagate to children similar to other states like other operations. I.e.
-   * calling setEndItem(false) on an item will cause it to be unmarked as an end item, but any children
-   * where setEndItem(true) was called previously will remain as end items.
+   * End item states do not propagate to children similar to other states like
+   * other operations. I.e. calling setEndItem(false) on an item will cause it
+   * to be unmarked as an end item, but any children where setEndItem(true) was
+   * called previously will remain as end items.
    */
   public setEndItem(endItemState?: boolean): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
@@ -357,7 +366,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden end item state removed.
+   * Specifies that the items matching the query should have their overridden
+   * end item state removed.
    *
    * @example
    * ```typescript
@@ -374,6 +384,100 @@ export class SceneItemOperationsBuilder
     return new SceneItemOperationsBuilder(
       this.query,
       this.builder.clearEndItem()
+    );
+  }
+
+  /**
+   * Changes the rendition of an item matching the query. This operation only
+   * applies to items that reference a revision that contains the given
+   * rendition.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the matching item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).viewRenditionById('rendition-uuid'),
+   * ]);
+   * ```
+   */
+  public viewRenditionById(id: UUID.UUID): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.viewRenditionById(id)
+    );
+  }
+
+  /**
+   * Changes the rendition of any item matching the query that contains a
+   * rendition with the given supplied ID. This operation only applies to items
+   * that reference a revision that contain a rendition with a matching supplied
+   * ID.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the given item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).viewRenditionBySuppliedId('rendition-supplied-id'),
+   * ]);
+   * ```
+   */
+  public viewRenditionBySuppliedId(
+    suppliedId: string
+  ): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.viewRenditionBySuppliedId(suppliedId)
+    );
+  }
+
+  /**
+   * Changes the rendition of items matching the query back to their revision's
+   * default rendition. This operation only applies to items that reference a
+   * revision.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the given item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).viewDefaultRendition(),
+   * ]);
+   * ```
+   */
+  public viewDefaultRendition(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.viewDefaultRendition()
+    );
+  }
+
+  /**
+   * Clears the rendition of items matching the query, which will revert the
+   * item back to the rendition used when creating the item.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the given item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearRendition(),
+   * ]);
+   * ```
+   */
+  public clearRendition(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearRendition()
     );
   }
 

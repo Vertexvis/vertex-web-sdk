@@ -1,4 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import { UUID } from '@vertexvis/utils';
 
 import { ColorMaterial } from './colorMaterial';
 
@@ -55,6 +56,24 @@ interface ClearEndItemOperation {
   type: 'clear-end-item';
 }
 
+interface ViewRenditionById {
+  type: 'view-rendition-by-id';
+  id: UUID.UUID;
+}
+
+interface ViewRenditionBySuppliedId {
+  type: 'view-rendition-by-supplied-id';
+  suppliedId: string;
+}
+
+interface ViewDefaultRendition {
+  type: 'view-default-rendition';
+}
+
+interface ClearRendition {
+  type: 'clear-rendition';
+}
+
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
@@ -67,7 +86,11 @@ export type ItemOperation =
   | ChangePhantomOperation
   | ClearPhantomOperation
   | ChangeEndItemOperation
-  | ClearEndItemOperation;
+  | ClearEndItemOperation
+  | ViewRenditionById
+  | ViewRenditionBySuppliedId
+  | ViewDefaultRendition
+  | ClearRendition;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
@@ -81,6 +104,10 @@ export interface SceneItemOperations<T> {
   clearPhantom(): T;
   setEndItem(endItemState?: boolean): T;
   clearEndItem(): T;
+  viewRenditionById(id: UUID.UUID): T;
+  viewRenditionBySuppliedId(id: string): T;
+  viewDefaultRendition(): T;
+  clearRendition(): T;
 }
 
 /**
@@ -170,6 +197,32 @@ export class SceneOperationBuilder
   public clearEndItem(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'clear-end-item' }])
+    );
+  }
+
+  public viewRenditionById(id: UUID.UUID): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'view-rendition-by-id', id }])
+    );
+  }
+
+  public viewRenditionBySuppliedId(suppliedId: string): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([
+        { type: 'view-rendition-by-supplied-id', suppliedId },
+      ])
+    );
+  }
+
+  public viewDefaultRendition(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'view-default-rendition' }])
+    );
+  }
+
+  public clearRendition(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat([{ type: 'clear-rendition' }])
     );
   }
 }
