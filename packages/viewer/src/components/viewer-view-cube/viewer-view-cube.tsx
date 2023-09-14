@@ -160,11 +160,21 @@ export class ViewerViewCube {
             this.worldOrientation.matrix
           );
 
-          scene
-            .camera()
-            .standardView(worldStandardView)
-            .viewAll()
-            .render(animation);
+          // Check to see if any geometry is visible. If not, don't perform viewAll
+          const currentBoundingBox = scene.boundingBox();
+          if (
+            currentBoundingBox?.max != null &&
+            Vector3.isEqual(currentBoundingBox.max, Vector3.origin()) &&
+            Vector3.isEqual(currentBoundingBox.min, Vector3.origin())
+          ) {
+            scene.camera().standardView(worldStandardView).render(animation);
+          } else {
+            scene
+              .camera()
+              .standardView(worldStandardView)
+              .viewAll()
+              .render(animation);
+          }
         }
       };
     }

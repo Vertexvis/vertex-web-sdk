@@ -4,7 +4,7 @@ jest.mock('../../lib/rendering/imageLoaders');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { FrameCameraBase, Orientation } from '../../lib/types';
@@ -206,6 +206,41 @@ describe('vertex-viewer-view-cube interactions', () => {
       })
     );
     expect(cameraMock.viewAll).toHaveBeenCalled();
+    expect(cameraMock.render).toHaveBeenCalledWith(
+      expect.objectContaining({
+        animation: expect.objectContaining({
+          milliseconds: 500,
+        }),
+      })
+    );
+  });
+
+  it('performs standard view when side clicked with no visible geometry', async () => {
+    (sceneMock.boundingBox as jest.Mock).mockReturnValue(
+      BoundingBox.create(Vector3.origin(), Vector3.origin())
+    );
+
+    const page = await newSpecPage({
+      components: [ViewerViewCube],
+      template: () => <vertex-viewer-view-cube />,
+    });
+
+    page.rootInstance.viewer = viewer;
+
+    const frontEl = page.root?.shadowRoot?.querySelector(
+      '.cube-side-face-front'
+    );
+    frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+
+    await awaitScene;
+
+    expect(cameraMock.standardView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        position: Vector3.back(),
+        up: Vector3.up(),
+      })
+    );
+    expect(cameraMock.viewAll).not.toHaveBeenCalled();
     expect(cameraMock.render).toHaveBeenCalledWith(
       expect.objectContaining({
         animation: expect.objectContaining({
