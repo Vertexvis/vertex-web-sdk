@@ -65,7 +65,9 @@ export class TapInteractionHandler implements InteractionHandler {
     this.element = element;
     this.interactionApi = api;
     element.addEventListener(this.downEvent, this.handleDown);
-    element.addEventListener('touchstart', this.handleTouchStart);
+    element.addEventListener('touchstart', this.handleTouchStart, {
+      passive: true,
+    });
   }
 
   private handleTouchStart(event: TouchEvent): void {

@@ -1,6 +1,7 @@
 const realApi = jest.requireActual('@vertexvis/stream-api');
 jest.mock('@vertexvis/stream-api');
 
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Angle,
   BoundingBox,
@@ -17,6 +18,19 @@ import {
   fromBoundingBoxAndPerspectiveCamera,
 } from '../../types/clippingPlanes';
 import { OrthographicCamera, PerspectiveCamera } from '../camera';
+
+function boundingBoxToProto(
+  box: BoundingBox.BoundingBox
+): vertexvis.protobuf.core.IBoundingBox3f {
+  return {
+    xmin: box.min.x,
+    ymin: box.min.y,
+    zmin: box.min.z,
+    xmax: box.max.x,
+    ymax: box.max.y,
+    zmax: box.max.z,
+  };
+}
 
 describe(PerspectiveCamera, () => {
   const stream = new StreamApi();
@@ -37,7 +51,11 @@ describe(PerspectiveCamera, () => {
   });
 
   describe(PerspectiveCamera.prototype.fitToBoundingBox, () => {
-    describe('when aspect ratio < 1', () => {
+    it('calls flyTo', async () => {
+      const updatedBoundingBox = BoundingBox.create(
+        Vector3.down(),
+        Vector3.up()
+      );
       const camera = new PerspectiveCamera(
         stream,
         0.5,
@@ -46,14 +64,15 @@ describe(PerspectiveCamera, () => {
         jest.fn()
       );
 
-      it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
-        const updatedCamera = camera.fitToBoundingBox(
-          BoundingBox.create(Vector3.up(), Vector3.down())
-        );
-        expect(updatedCamera.position.x).toBeCloseTo(1.419);
-        expect(updatedCamera.position.y).toBeCloseTo(2.838);
-        expect(updatedCamera.position.z).toBeCloseTo(4.258);
-      });
+      await camera.fitToBoundingBox(updatedBoundingBox).render();
+
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: undefined,
+          boundingBox: boundingBoxToProto(updatedBoundingBox),
+        }),
+        true
+      );
     });
   });
 
@@ -374,16 +393,11 @@ describe(PerspectiveCamera, () => {
 
       await newCamera.viewAll().render();
 
-      expect(stream.replaceCamera).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          camera: expect.objectContaining({
-            perspective: expect.objectContaining({
-              lookAt: Vector3.create(1.5, 1.5, 1.5),
-              position: Vector3.create(1.5, 1.5, 3.7998473026935273),
-              up: Vector3.create(0, 1, 0),
-            }),
-          }),
-        })
+          boundingBox: boundingBoxToProto(newBoundingBox),
+        }),
+        true
       );
     });
 
@@ -415,13 +429,7 @@ describe(PerspectiveCamera, () => {
           animation: {
             duration: { nanos: 500000000, seconds: 0 },
           },
-          camera: expect.objectContaining({
-            perspective: expect.objectContaining({
-              lookAt: Vector3.create(1.5, 1.5, 1.5),
-              position: Vector3.create(1.5, 1.5, 3.7998473026935273),
-              up: Vector3.create(0, 1, 0),
-            }),
-          }),
+          boundingBox: boundingBoxToProto(newBoundingBox),
         }),
         true
       );
@@ -503,7 +511,11 @@ describe(OrthographicCamera, () => {
   });
 
   describe(OrthographicCamera.prototype.fitToBoundingBox, () => {
-    describe('when aspect ratio < 1', () => {
+    it('calls flyTo', async () => {
+      const updatedBoundingBox = BoundingBox.create(
+        Vector3.down(),
+        Vector3.up()
+      );
       const camera = new OrthographicCamera(
         stream,
         0.5,
@@ -512,14 +524,15 @@ describe(OrthographicCamera, () => {
         jest.fn()
       );
 
-      it('updates the camera with near and far values scaled relative to the smaller aspect ratio', () => {
-        const updatedCamera = camera.fitToBoundingBox(
-          BoundingBox.create(Vector3.up(), Vector3.down())
-        );
-        expect(updatedCamera.position.x).toBeCloseTo(0.2672);
-        expect(updatedCamera.position.y).toBeCloseTo(0.5345);
-        expect(updatedCamera.position.z).toBeCloseTo(0.8017);
-      });
+      await camera.fitToBoundingBox(updatedBoundingBox).render();
+
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          animation: undefined,
+          boundingBox: boundingBoxToProto(updatedBoundingBox),
+        }),
+        true
+      );
     });
   });
 
@@ -850,29 +863,12 @@ describe(OrthographicCamera, () => {
 
       await newCamera.viewAll().render();
 
-      const expectedViewVector = constrainViewVector(
-        Vector3.subtract(
-          Vector3.create(1.5, 1.5, 1.5),
-          Vector3.create(1.5, 1.5, 2.2993497565961882)
-        ),
-        BoundingSphere.create(newBoundingBox)
-      );
-
-      expect(stream.replaceCamera).toHaveBeenCalledWith(
+      expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          camera: expect.objectContaining({
-            orthographic: expect.objectContaining({
-              lookAt: Vector3.create(1.5, 1.5, 1.5),
-              up: Vector3.create(0, 1, 0),
-            }),
-          }),
-        })
+          boundingBox: boundingBoxToProto(newBoundingBox),
+        }),
+        true
       );
-      const resultViewVector = (stream.replaceCamera as jest.Mock).mock
-        .calls[0][0].camera.orthographic.viewVector;
-      expect(resultViewVector.x).toBeCloseTo(expectedViewVector.x);
-      expect(resultViewVector.y).toBeCloseTo(expectedViewVector.y);
-      expect(resultViewVector.z).toBeCloseTo(expectedViewVector.z);
     });
 
     it('viewAll should support animations', async () => {
@@ -897,33 +893,15 @@ describe(OrthographicCamera, () => {
         },
       });
 
-      const expectedViewVector = constrainViewVector(
-        Vector3.subtract(
-          Vector3.create(1.5, 1.5, 1.5),
-          Vector3.create(1.5, 1.5, 2.2993497565961882)
-        ),
-        BoundingSphere.create(newBoundingBox)
-      );
-
       expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: {
             duration: { nanos: 500000000, seconds: 0 },
           },
-          camera: expect.objectContaining({
-            orthographic: expect.objectContaining({
-              lookAt: Vector3.create(1.5, 1.5, 1.5),
-              up: Vector3.create(0, 1, 0),
-            }),
-          }),
+          boundingBox: boundingBoxToProto(newBoundingBox),
         }),
         true
       );
-      const resultViewVector = (stream.flyTo as jest.Mock).mock.calls[0][0]
-        .camera.orthographic.viewVector;
-      expect(resultViewVector.x).toBeCloseTo(expectedViewVector.x);
-      expect(resultViewVector.y).toBeCloseTo(expectedViewVector.y);
-      expect(resultViewVector.z).toBeCloseTo(expectedViewVector.z);
     });
 
     it('should compute near and far clipping planes correctly', () => {
