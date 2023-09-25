@@ -164,7 +164,7 @@ export class ViewerStream extends StreamApi {
     if (fields.dimensions != null && fields.dimensions !== this.dimensions) {
       this.dimensions = fields.dimensions;
       this.ifState('connected', () =>
-        this.updateDimensions({ dimensions: this.dimensions })
+        this.updateDimensions({ dimensions: this.getDimensions() })
       );
     }
 

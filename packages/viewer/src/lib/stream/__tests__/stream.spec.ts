@@ -232,7 +232,7 @@ describe(ViewerStream, () => {
       startStream.mockRestore();
     });
 
-    it('always requests at least a 1x1 pixel', async () => {
+    it('always requests at least a 1x1 image', async () => {
       const { stream, ws } = makeStreamBase();
 
       const startSpy = jest
@@ -395,7 +395,7 @@ describe(ViewerStream, () => {
       await expect(reconnected).resolves.toBe(false);
     });
 
-    it('always requests at least a 1x1 pixel', async () => {
+    it('always requests at least a 1x1 image', async () => {
       const { stream, ws } = makeStreamBase();
 
       jest
@@ -516,6 +516,39 @@ describe(ViewerStream, () => {
 
       stream.update({ dimensions: Dimensions.create(100, 100) });
       expect(updateDimensions).toHaveBeenCalled();
+    });
+
+    it('always request at least a 1x1 image', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({});
+      expect(updateDimensions).not.toBeCalled();
+
+      stream.update({ dimensions: Dimensions.create(0, 0) });
+
+      expect(updateDimensions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimensions: {
+            width: 1,
+            height: 1,
+          },
+        })
+      );
     });
   });
 
