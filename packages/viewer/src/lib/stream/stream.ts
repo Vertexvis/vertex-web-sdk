@@ -387,7 +387,7 @@ export class ViewerStream extends StreamApi {
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
         streamKey: { value: resource.resource.id },
-        dimensions: this.dimensions,
+        dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
@@ -421,7 +421,7 @@ export class ViewerStream extends StreamApi {
     const res = fromPbReconnectResponseOrThrow(
       await this.reconnect({
         streamId: { hex: state.streamId },
-        dimensions: this.dimensions,
+        dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
       })
@@ -579,6 +579,15 @@ export class ViewerStream extends StreamApi {
       this.state = state;
       this.stateChanged.emit(this.state);
     }
+  }
+
+  private getDimensions(): Dimensions.Dimensions {
+    if (Dimensions.area(this.dimensions) === 0) {
+      // Ensure we always request at least a 1-pixel frame, even if the dimensions
+      // haven't been set higher than zero.
+      return Dimensions.create(1, 1);
+    }
+    return this.dimensions;
   }
 
   private ifState<T>(
