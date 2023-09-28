@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/stream-api",
-  "version": "0.19.1",
+  "version": "0.19.2",
   "description": "A websocket client for interacting with Vertex's stream API.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -42,8 +42,8 @@
     "@types/jest": "^27.5.1",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
-    "@vertexvis/utils": "0.19.1",
-    "@vertexwebsdk/build": "0.19.1",
+    "@vertexvis/utils": "0.19.2",
+    "@vertexwebsdk/build": "0.19.2",
     "eslint": "^8.17.0",
     "jest": "^27.5.1",
     "protobufjs": "^6.9.0",
