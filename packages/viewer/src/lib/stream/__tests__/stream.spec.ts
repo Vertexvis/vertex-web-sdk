@@ -231,6 +231,39 @@ describe(ViewerStream, () => {
       await expect(failure).resolves.toBeDefined();
       startStream.mockRestore();
     });
+
+    it('always requests at least a 1x1 image', async () => {
+      const { stream, ws } = makeStreamBase();
+
+      const startSpy = jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const connecting = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+      );
+
+      stream.load(urn123, clientId, deviceId, config);
+      await expect(connecting).resolves.toBeDefined();
+
+      await simulateFrame(ws);
+      const connected = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected'
+      );
+      await expect(connected).resolves.toBeDefined();
+
+      expect(startSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimensions: expect.objectContaining({
+            width: 1,
+            height: 1,
+          }),
+        })
+      );
+    });
   });
 
   describe('reconnect', () => {
@@ -361,6 +394,46 @@ describe(ViewerStream, () => {
 
       await expect(reconnected).resolves.toBe(false);
     });
+
+    it('always requests at least a 1x1 image', async () => {
+      const { stream, ws } = makeStreamBase();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      const reconnectSpy = jest
+        .spyOn(stream, 'reconnect')
+        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+
+      const closeWs = jest.spyOn(ws, 'close');
+
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      const reconnected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      ws.receiveMessage(encode(Fixtures.Requests.gracefulReconnect()));
+
+      expect(closeWs).toHaveBeenCalled();
+      await expect(reconnected123).resolves.toBeDefined();
+
+      expect(reconnectSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimensions: expect.objectContaining({
+            width: 1,
+            height: 1,
+          }),
+        })
+      );
+    });
   });
 
   describe('refresh token', () => {
@@ -444,15 +517,54 @@ describe(ViewerStream, () => {
       stream.update({ dimensions: Dimensions.create(100, 100) });
       expect(updateDimensions).toHaveBeenCalled();
     });
+
+    it('always request at least a 1x1 image', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({});
+      expect(updateDimensions).not.toBeCalled();
+
+      stream.update({ dimensions: Dimensions.create(0, 0) });
+
+      expect(updateDimensions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimensions: {
+            width: 1,
+            height: 1,
+          },
+        })
+      );
+    });
   });
 
   function makeStream(): { stream: ViewerStream; ws: WebSocketClientMock } {
+    const { stream, ws } = makeStreamBase();
+    stream.update({ dimensions, streamAttributes, frameBgColor });
+
+    return { stream, ws };
+  }
+
+  function makeStreamBase(): { stream: ViewerStream; ws: WebSocketClientMock } {
     const ws = new WebSocketClientMock();
     const stream = new ViewerStream(ws, {
       tokenRefreshOffsetInSeconds: 0,
       offlineThresholdInSeconds: offlineReconnectThresholdInMs / 1000,
     });
-    stream.update({ dimensions, streamAttributes, frameBgColor });
 
     return { stream, ws };
   }
