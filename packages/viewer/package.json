@@ -64,7 +64,7 @@
     "google-protobuf": "3.19.4",
     "jwt-decode": "^3.1.2",
     "param-case": "^3.0.4",
-    "protobufjs": "^7.2.4",
+    "protobufjs": "^6.11.4",
     "regl": "^2.1.0",
     "regl-shape": "^1.1.0",
     "requestidlecallback-polyfill": "^1.0.2",
