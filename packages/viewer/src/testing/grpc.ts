@@ -1,17 +1,5 @@
 import { UnaryResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 
-export function mockGrpcUnaryResult(
-  result: unknown,
-  timeout = 10
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): (...args: any[]) => unknown {
-  return (_, __, handler) => {
-    setTimeout(() => {
-      handler(null, result);
-    }, timeout);
-  };
-}
-
 export function mockCancellableGrpcUnaryResult(
   result: unknown,
   timeout = 10,
@@ -30,6 +18,14 @@ export function mockCancellableGrpcUnaryResult(
       },
     };
   };
+}
+
+export function mockGrpcUnaryResult(
+  result: unknown,
+  timeout = 10
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): (...args: any[]) => unknown {
+  return mockCancellableGrpcUnaryResult(result, timeout);
 }
 
 export function mockGrpcUnaryError(
