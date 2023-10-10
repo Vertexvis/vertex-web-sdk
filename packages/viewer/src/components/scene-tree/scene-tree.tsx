@@ -687,13 +687,12 @@ export class SceneTree {
                 <vertex-viewer-spinner class="loading" size="md" />
               </slot>
             )}
+            <slot />
             {this.showEmptyResults && (
               <slot name="empty-results">
                 <div class="empty-results">No Results Found.</div>
               </slot>
             )}
-
-            <slot />
           </div>
         )}
 

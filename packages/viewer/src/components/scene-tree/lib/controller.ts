@@ -24,6 +24,7 @@ import {
   ResponseStream,
   SceneTreeAPIClient,
   ServiceError,
+  UnaryResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
@@ -150,6 +151,7 @@ export class SceneTreeController {
   private activeRowRange = [0, 0];
   private metadataKeys: MetadataKey[] = [];
   private debugLogs = false;
+  private pendingFilterGrpcRes?: UnaryResponse;
 
   private reconnectTimer?: number;
   private loadingTimer?: number;
@@ -689,33 +691,46 @@ export class SceneTreeController {
         isSearching: true,
         filterTerm: term !== '' ? term : undefined,
       });
-      try {
-        const res = await this.requestUnary<FilterResponse>(
-          jwt,
-          (metadata, handler) => {
-            const req = new FilterRequest();
-            req.setFilter(term);
-            req.setFullTree(options.includeCollapsed ?? true);
-            req.setExactMatch(!!options.exactMatch);
-            if (options.columns) req.setColumnsKeysList(options.columns);
 
-            this.client.filter(req, metadata, handler);
-          }
-        );
+      // Cancel any in-flight filter requests, and wait for the request
+      // to complete prior to making another filter request. This prevents
+      // a race condition between requests from different keystrokes.
+      this.pendingFilterGrpcRes?.cancel();
+      this.pendingFilterGrpcRes = undefined;
 
-        const { numberOfResults } = res.toObject();
+      if (this.state.filterTerm === term || term === '') {
+        try {
+          const res = await this.requestUnary<FilterResponse>(
+            jwt,
+            (metadata, handler) => {
+              const req = new FilterRequest();
+              req.setFilter(term);
+              req.setFullTree(options.includeCollapsed ?? true);
+              req.setExactMatch(!!options.exactMatch);
+              if (options.columns) req.setColumnsKeysList(options.columns);
 
-        this.updateState({
-          ...this.state,
-          totalFilteredRows: numberOfResults,
-          isSearching: false,
-        });
-      } catch (e) {
-        console.error('Failed to filter search ', e);
-        this.updateState({
-          ...this.state,
-          isSearching: false,
-        });
+              this.pendingFilterGrpcRes = this.client.filter(
+                req,
+                metadata,
+                handler
+              );
+            }
+          );
+
+          const { numberOfResults } = res.toObject();
+
+          this.updateState({
+            ...this.state,
+            totalFilteredRows: numberOfResults,
+            isSearching: false,
+          });
+        } catch (e) {
+          console.error('Failed to filter search ', e);
+          this.updateState({
+            ...this.state,
+            isSearching: false,
+          });
+        }
       }
     });
   }

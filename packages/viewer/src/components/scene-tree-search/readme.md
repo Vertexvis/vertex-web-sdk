@@ -36,6 +36,16 @@ functionality will need to be wired programmatically to
 
 ## Methods
 
+### `clear() => Promise<void>`
+
+Clears the current search term and clears any debounced filters.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `setFocus() => Promise<void>`
 
 Gives focus to the the component's internal text input.
