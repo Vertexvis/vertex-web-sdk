@@ -287,6 +287,10 @@ export namespace Components {
   }
   interface VertexSceneTreeSearch {
     /**
+     * Clears the current search term and clears any debounced filters.
+     */
+    clear: () => Promise<void>;
+    /**
      * The scene tree controller
      */
     controller?: SceneTreeController;

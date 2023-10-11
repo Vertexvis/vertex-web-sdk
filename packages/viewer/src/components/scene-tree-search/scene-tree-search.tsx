@@ -72,6 +72,7 @@ export class SceneTreeSearch {
 
   private inputEl?: HTMLInputElement;
   private onStateChangeDisposable?: Disposable;
+  private searchDisposable?: Disposable;
 
   /**
    * Gives focus to the the component's internal text input.
@@ -106,6 +107,15 @@ export class SceneTreeSearch {
    */
   protected disconnectedCallback(): void {
     this.onStateChangeDisposable?.dispose();
+  }
+
+  /**
+   * Clears the current search term and clears any debounced filters.
+   */
+  @Method()
+  public async clear(): Promise<void> {
+    this.value = '';
+    this.searchDisposable?.dispose();
   }
 
   /**
@@ -183,7 +193,12 @@ export class SceneTreeSearch {
   };
 
   private handleDebounceChanged(): void {
-    this.search = debounceEvent(this.search, this.debounce);
+    const emitter = debounceEvent(this.search, this.debounce);
+
+    // Track this emitter in two separate variables to maintain the `EventEmitter` typing for
+    // `this.search`. This allows for correct generation of `CustomEvent` types.
+    this.search = emitter;
+    this.searchDisposable = emitter;
   }
 
   private setupController(): void {

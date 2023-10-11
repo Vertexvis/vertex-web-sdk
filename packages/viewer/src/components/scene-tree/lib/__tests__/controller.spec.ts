@@ -43,6 +43,7 @@ import {
   createGetTreeResponse,
   createListChange,
   createSubscribeResponse,
+  mockCancellableGrpcUnaryResult,
   mockGrpcUnaryError,
   mockGrpcUnaryResult,
   random,
@@ -1205,6 +1206,51 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalFilteredRows: 5,
+        })
+      );
+    });
+
+    it('cancels in-flight filter requests when a new request is made', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      const filterRes = new FilterResponse();
+      filterRes.setNumberOfResults(5);
+      const firstFilterCancel = jest.fn();
+      (client.filter as jest.Mock).mockImplementationOnce(
+        mockCancellableGrpcUnaryResult(filterRes, 10000, firstFilterCancel)
+      );
+
+      const onStateChange = jest.fn();
+      controller.onStateChange.on(onStateChange);
+      await controller.connect(jwtProvider);
+
+      const req = new FilterRequest();
+      req.setFilter(term);
+      req.setFullTree(true);
+      req.setExactMatch(false);
+
+      controller.filter(term);
+
+      const secondFilterRes = new FilterResponse();
+      secondFilterRes.setNumberOfResults(10);
+      (client.filter as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(secondFilterRes)
+      );
+
+      await controller.filter(term);
+
+      expect(client.filter).toHaveBeenCalledWith(
+        req,
+        metadata,
+        expect.anything()
+      );
+      expect(firstFilterCancel).toHaveBeenCalled();
+      expect(onStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          totalFilteredRows: 10,
         })
       );
     });
