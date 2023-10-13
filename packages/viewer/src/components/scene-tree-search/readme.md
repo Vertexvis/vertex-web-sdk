@@ -18,13 +18,13 @@ functionality will need to be wired programmatically to
 
 ## Properties
 
-| Property      | Attribute     | Description                                                                     | Type                               | Default     |
-| ------------- | ------------- | ------------------------------------------------------------------------------- | ---------------------------------- | ----------- |
-| `controller`  | --            | The scene tree controller                                                       | `SceneTreeController \| undefined` | `undefined` |
-| `debounce`    | `debounce`    | Specifies the delay, in milliseconds, to emit `search` events after user input. | `number`                           | `350`       |
-| `disabled`    | `disabled`    | If `true`, disables user interaction of the component.                          | `boolean`                          | `false`     |
-| `placeholder` | `placeholder` | Placeholder text if `value` is empty.                                           | `string \| undefined`              | `undefined` |
-| `value`       | `value`       | The current text value of the component. Value is updated on user interaction.  | `string`                           | `''`        |
+| Property      | Attribute     | Description                                                                                                                                                                                                                                                                                                    | Type                               | Default     |
+| ------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ----------- |
+| `controller`  | --            | The scene tree controller                                                                                                                                                                                                                                                                                      | `SceneTreeController \| undefined` | `undefined` |
+| `debounce`    | `debounce`    | Specifies the delay, in milliseconds, to emit `search` events after user input.  If this value is specified, searches will automatically occur after a keystroke has occurred and the debounce threshold has elapsed.  Defaults to `undefined`, and searches only occur on an `Enter` press or a `blur` event. | `number \| undefined`              | `undefined` |
+| `disabled`    | `disabled`    | If `true`, disables user interaction of the component.                                                                                                                                                                                                                                                         | `boolean`                          | `false`     |
+| `placeholder` | `placeholder` | Placeholder text if `value` is empty.                                                                                                                                                                                                                                                                          | `string \| undefined`              | `undefined` |
+| `value`       | `value`       | The current text value of the component. Value is updated on user interaction.                                                                                                                                                                                                                                 | `string`                           | `''`        |
 
 
 ## Events
