@@ -28,9 +28,15 @@ export class SceneTreeSearch {
   /**
    * Specifies the delay, in milliseconds, to emit `search` events after user
    * input.
+   *
+   * If this value is specified, searches will automatically occur after a
+   * keystroke has occurred and the debounce threshold has elapsed.
+   *
+   * Defaults to `undefined`, and searches only occur on an `Enter` press
+   * or a `blur` event.
    */
   @Prop()
-  public debounce = 350;
+  public debounce?: number;
 
   /**
    * If `true`, disables user interaction of the component.
@@ -70,6 +76,7 @@ export class SceneTreeSearch {
   @State()
   private isSearching = false;
 
+  private lastEmittedValue?: string;
   private inputEl?: HTMLInputElement;
   private onStateChangeDisposable?: Disposable;
   private searchDisposable?: Disposable;
@@ -147,6 +154,7 @@ export class SceneTreeSearch {
             onInput={this.handleTextInput}
             onFocus={this.handleTextFocus}
             onBlur={this.handleTextBlur}
+            onKeyPress={this.handleKeyPress}
           />
 
           <div
@@ -173,7 +181,10 @@ export class SceneTreeSearch {
   private handleTextInput = (event: Event): void => {
     const input = event.target as HTMLInputElement;
     this.value = input.value;
-    this.search.emit(this.value);
+
+    if (this.debounce != null || this.value === '') {
+      this.emitCurrentValue();
+    }
   };
 
   private handleTextFocus = (): void => {
@@ -182,18 +193,34 @@ export class SceneTreeSearch {
 
   private handleTextBlur = (): void => {
     this.focused = false;
+
+    this.searchDisposable?.dispose();
+
+    if (this.value !== this.lastEmittedValue) {
+      this.emitCurrentValue();
+    }
+  };
+
+  private handleKeyPress = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter') {
+      this.searchDisposable?.dispose();
+      this.emitCurrentValue();
+    }
   };
 
   private handleClear = (event: MouseEvent): void => {
     event.preventDefault();
 
     this.value = '';
-    this.search.emit(this.value);
+    this.searchDisposable?.dispose();
+    this.emitCurrentValue();
     this.setFocus();
   };
 
   private handleDebounceChanged(): void {
-    const emitter = debounceEvent(this.search, this.debounce);
+    this.searchDisposable?.dispose();
+
+    const emitter = debounceEvent(this.search, this.debounce ?? 0);
 
     // Track this emitter in two separate variables to maintain the `EventEmitter` typing for
     // `this.search`. This allows for correct generation of `CustomEvent` types.
@@ -209,5 +236,10 @@ export class SceneTreeSearch {
         this.isSearching = state.isSearching;
       }
     );
+  }
+
+  private emitCurrentValue(): void {
+    this.lastEmittedValue = this.value;
+    this.search.emit(this.value);
   }
 }

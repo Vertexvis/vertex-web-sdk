@@ -296,8 +296,12 @@ export namespace Components {
     controller?: SceneTreeController;
     /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
+     *
+     * If this value is specified, searches will automatically occur after a keystroke has occurred and the debounce threshold has elapsed.
+     *
+     * Defaults to `undefined`, and searches only occur on an `Enter` press or a `blur` event.
      */
-    debounce: number;
+    debounce?: number;
     /**
      * If `true`, disables user interaction of the component.
      */
@@ -2007,6 +2011,10 @@ declare namespace LocalJSX {
     controller?: SceneTreeController;
     /**
      * Specifies the delay, in milliseconds, to emit `search` events after user input.
+     *
+     * If this value is specified, searches will automatically occur after a keystroke has occurred and the debounce threshold has elapsed.
+     *
+     * Defaults to `undefined`, and searches only occur on an `Enter` press or a `blur` event.
      */
     debounce?: number;
     /**

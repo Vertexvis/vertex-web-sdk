@@ -158,6 +158,112 @@ describe('vertex-scene-tree-search', () => {
     );
   });
 
+  it('does not emit search events without Enter press by default', async () => {
+    const onSearch = jest.fn();
+
+    const page = await newSpecPage({
+      components: [SceneTreeSearch],
+      template: () => <vertex-scene-tree-search onSearch={onSearch} />,
+    });
+
+    const input = page.root?.shadowRoot?.querySelector(
+      '.input'
+    ) as HTMLInputElement;
+    input.value = 'text';
+    input.dispatchEvent(new Event('input'));
+
+    await Async.delay(50);
+    expect(onSearch).not.toHaveBeenCalled();
+
+    await Async.delay(100);
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it('emits search events when Enter is pressed', async () => {
+    const onSearch = jest.fn();
+
+    const page = await newSpecPage({
+      components: [SceneTreeSearch],
+      template: () => <vertex-scene-tree-search onSearch={onSearch} />,
+    });
+
+    const input = page.root?.shadowRoot?.querySelector(
+      '.input'
+    ) as HTMLInputElement;
+    input.value = 'text';
+    input.dispatchEvent(new Event('input'));
+
+    await Async.delay(5);
+    expect(onSearch).not.toHaveBeenCalled();
+
+    input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+
+    await Async.delay(1);
+    expect(onSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: 'text',
+      })
+    );
+  });
+
+  it('emits search events when a blur occurs, and content has not been emitted', async () => {
+    const onSearch = jest.fn();
+
+    const page = await newSpecPage({
+      components: [SceneTreeSearch],
+      template: () => <vertex-scene-tree-search onSearch={onSearch} />,
+    });
+
+    const input = page.root?.shadowRoot?.querySelector(
+      '.input'
+    ) as HTMLInputElement;
+    input.value = 'text';
+    input.dispatchEvent(new Event('input'));
+
+    await Async.delay(5);
+    expect(onSearch).not.toHaveBeenCalled();
+
+    input.dispatchEvent(new Event('blur'));
+
+    await Async.delay(1);
+    expect(onSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: 'text',
+      })
+    );
+  });
+
+  it('does not emit search events when a blur occurs, and content has been emitted', async () => {
+    const onSearch = jest.fn();
+
+    const page = await newSpecPage({
+      components: [SceneTreeSearch],
+      template: () => <vertex-scene-tree-search onSearch={onSearch} />,
+    });
+
+    const input = page.root?.shadowRoot?.querySelector(
+      '.input'
+    ) as HTMLInputElement;
+    input.value = 'text';
+    input.dispatchEvent(new Event('input'));
+
+    await Async.delay(5);
+    expect(onSearch).not.toHaveBeenCalled();
+
+    input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+    await Async.delay(1);
+    expect(onSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: 'text',
+      })
+    );
+
+    input.dispatchEvent(new Event('blur'));
+
+    await Async.delay(1);
+    expect(onSearch).toHaveBeenCalledTimes(1);
+  });
+
   it('emits search event when cleared', async () => {
     const onSearch = jest.fn();
 
