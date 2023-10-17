@@ -7,14 +7,15 @@ import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { FrameDecoder } from '../mappers';
 import { SceneViewStateIdentifier } from '../types';
 import { Frame } from '../types/frame';
-import { Camera, OrthographicCamera, PerspectiveCamera } from '.';
+import {
+  Camera,
+  CameraRenderOptions,
+  OrthographicCamera,
+  PerspectiveCamera,
+} from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import {
-  buildSceneOperation,
-  buildSceneViewStateIdentifier,
-  toPbSceneViewStateFeatures,
-} from './mapper';
+import { buildSceneOperation } from './mapper';
 import {
   ItemOperation,
   SceneItemOperations,
@@ -22,9 +23,16 @@ import {
 } from './operations';
 import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { Raycaster } from './raycaster';
+import { SceneViewStateLoader } from './sceneViewStateLoader';
 
 export interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
+}
+
+export interface ApplySceneViewStateOptions
+  extends SceneExecutionOptions,
+    CameraRenderOptions {
+  waitForAnimation?: boolean;
 }
 
 export interface ResetViewOptions {
@@ -555,6 +563,8 @@ export type SceneViewStateFeature =
  * the scene.
  */
 export class Scene {
+  private sceneViewStateLoader: SceneViewStateLoader;
+
   public constructor(
     private stream: StreamApi,
     private frame: Frame,
@@ -563,7 +573,14 @@ export class Scene {
     private dimensions: Dimensions.Dimensions,
     public readonly sceneId: UUID.UUID,
     public readonly sceneViewId: UUID.UUID
-  ) {}
+  ) {
+    this.sceneViewStateLoader = new SceneViewStateLoader(
+      stream,
+      decodeFrame,
+      sceneId,
+      sceneViewId
+    );
+  }
 
   /**
    * Applies the provided scene view state to the scene.
@@ -572,18 +589,11 @@ export class Scene {
     sceneViewStateId:
       | UUID.UUID
       | SceneViewStateIdentifier.SceneViewStateIdentifier,
-    opts: SceneExecutionOptions = {}
+    opts: ApplySceneViewStateOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
-    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
-
-    return await this.stream.loadSceneViewState(
-      {
-        ...pbIdField,
-        frameCorrelationId: opts.suppliedCorrelationId
-          ? { value: opts.suppliedCorrelationId }
-          : undefined,
-      },
-      true
+    return await this.sceneViewStateLoader.applySceneViewState(
+      sceneViewStateId,
+      opts
     );
   }
 
@@ -595,20 +605,12 @@ export class Scene {
       | UUID.UUID
       | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
-    opts: SceneExecutionOptions = {}
+    opts: ApplySceneViewStateOptions = {}
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
-    const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
-    const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
-
-    return await this.stream.loadSceneViewState(
-      {
-        ...pbIdField,
-        frameCorrelationId: opts.suppliedCorrelationId
-          ? { value: opts.suppliedCorrelationId }
-          : undefined,
-        sceneViewStateFeatureSubset: pbFeatures,
-      },
-      true
+    return await this.sceneViewStateLoader.applyPartialSceneViewState(
+      sceneViewStateId,
+      featuresToApply,
+      opts
     );
   }
 
