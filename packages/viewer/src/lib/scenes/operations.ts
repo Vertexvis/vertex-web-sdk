@@ -3,6 +3,8 @@ import { UUID } from '@vertexvis/utils';
 
 import { ColorMaterial } from './colorMaterial';
 
+export type RepresentationId = UUID.UUID | 'empty' | 'entire-part';
+
 interface ShowItemOperation {
   type: 'show';
 }
@@ -74,6 +76,15 @@ interface ClearRendition {
   type: 'clear-rendition';
 }
 
+interface ViewRepresentation {
+  type: 'view-representation';
+  id: RepresentationId;
+}
+
+interface ClearRepresentation {
+  type: 'clear-representation';
+}
+
 export type ItemOperation =
   | ShowItemOperation
   | HideItemOperation
@@ -90,7 +101,9 @@ export type ItemOperation =
   | ViewRenditionById
   | ViewRenditionBySuppliedId
   | ViewDefaultRendition
-  | ClearRendition;
+  | ClearRendition
+  | ViewRepresentation
+  | ClearRepresentation;
 
 export interface SceneItemOperations<T> {
   materialOverride(color: ColorMaterial): T;
@@ -108,6 +121,8 @@ export interface SceneItemOperations<T> {
   viewRenditionBySuppliedId(id: string): T;
   viewDefaultRendition(): T;
   clearRendition(): T;
+  viewRepresentation(id: RepresentationId): T;
+  clearRepresentation(): T;
 }
 
 /**
@@ -223,6 +238,18 @@ export class SceneOperationBuilder
   public clearRendition(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat([{ type: 'clear-rendition' }])
+    );
+  }
+
+  public viewRepresentation(id: RepresentationId): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat({ type: 'view-representation', id })
+    );
+  }
+
+  public clearRepresentation(): SceneOperationBuilder {
+    return new SceneOperationBuilder(
+      this.operations.concat({ type: 'clear-representation' })
     );
   }
 }
