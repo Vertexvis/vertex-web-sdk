@@ -3,6 +3,8 @@ import { UUID } from '@vertexvis/utils';
 
 import { ColorMaterial } from './colorMaterial';
 
+export type RepresentationId = UUID.UUID | 'empty' | 'entire-part';
+
 interface ShowItemOperation {
   type: 'show';
 }
@@ -74,7 +76,6 @@ interface ClearRendition {
   type: 'clear-rendition';
 }
 
-type RepresentationId = UUID.UUID | 'empty' | 'entire-part';
 interface ViewRepresentation {
   type: 'view-representation';
   id: RepresentationId;

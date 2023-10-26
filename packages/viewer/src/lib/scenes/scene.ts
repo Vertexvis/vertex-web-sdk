@@ -18,6 +18,7 @@ import { CrossSectioner } from './crossSectioner';
 import { buildSceneOperation } from './mapper';
 import {
   ItemOperation,
+  RepresentationId,
   SceneItemOperations,
   SceneOperationBuilder,
 } from './operations';
@@ -486,6 +487,50 @@ export class SceneItemOperationsBuilder
     return new SceneItemOperationsBuilder(
       this.query,
       this.builder.clearRendition()
+    );
+  }
+
+  /**
+   * Changes the representation of items matching a query. This operation only
+   * applies to items that reference a rendition with the given representation
+   * ID.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the given item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).viewRepresentation('rep-id'),
+   * ]);
+   * ```
+   */
+  public viewRepresentation(id: RepresentationId): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.viewRepresentation(id)
+    );
+  }
+
+  /**
+   * Clears the representation for items matching the query.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Switch the rendition of the given item.
+   * await scene.items((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).clearRepresentation(),
+   * ]);
+   * ```
+   */
+  public clearRepresentation(): SceneItemOperationsBuilder {
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearRepresentation()
     );
   }
 
