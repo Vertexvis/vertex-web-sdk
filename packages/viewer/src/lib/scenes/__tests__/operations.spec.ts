@@ -120,6 +120,10 @@ describe(SceneOperationBuilder, () => {
       .viewRenditionBySuppliedId(suppliedId)
       .viewDefaultRendition()
       .clearRendition()
+      .viewRepresentation('empty')
+      .viewRepresentation('entire-part')
+      .viewRepresentation(id)
+      .clearRepresentation()
       .build();
 
     expect(definitions).toEqual([
@@ -127,6 +131,10 @@ describe(SceneOperationBuilder, () => {
       { type: 'view-rendition-by-supplied-id', suppliedId },
       { type: 'view-default-rendition' },
       { type: 'clear-rendition' },
+      { type: 'view-representation', id: 'empty' },
+      { type: 'view-representation', id: 'entire-part' },
+      { type: 'view-representation', id },
+      { type: 'clear-representation' },
     ]);
   });
 });

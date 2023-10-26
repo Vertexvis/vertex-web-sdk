@@ -1,5 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
+import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
 
 import { random } from '../../../testing/random';
 import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
@@ -7,6 +8,7 @@ import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
 describe(buildSceneOperation, () => {
   it('maps operations', () => {
     const renId = random.guid();
+    const repId = random.guid();
     const renSuppliedId = random.string();
 
     expect(
@@ -18,6 +20,10 @@ describe(buildSceneOperation, () => {
           { type: 'view-rendition-by-supplied-id', suppliedId: renSuppliedId },
           { type: 'view-default-rendition' },
           { type: 'clear-rendition' },
+          { type: 'view-representation', id: 'empty' },
+          { type: 'view-representation', id: 'entire-part' },
+          { type: 'view-representation', id: repId },
+          { type: 'clear-representation' },
         ],
         { dimensions: Dimensions.create(100, 100) }
       )
@@ -29,6 +35,20 @@ describe(buildSceneOperation, () => {
         { viewRendition: { suppliedId: renSuppliedId } },
         { viewDefaultRendition: {} },
         { clearRendition: {} },
+        {
+          viewRepresentation: {
+            predefinedId:
+              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+          },
+        },
+        {
+          viewRepresentation: {
+            predefinedId:
+              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+          },
+        },
+        { viewRepresentation: { id: { hex: repId } } },
+        { clearRepresentation: {} },
       ],
     });
   });

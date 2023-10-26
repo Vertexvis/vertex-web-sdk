@@ -1,5 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
+import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -272,6 +273,30 @@ function buildOperationTypes(
         return { viewDefaultRendition: {} };
       case 'clear-rendition':
         return { clearRendition: {} };
+      case 'view-representation':
+        if (op.id === 'empty') {
+          return {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+            },
+          };
+        } else if (op.id === 'entire-part') {
+          return {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+            },
+          };
+        } else {
+          return {
+            viewRepresentation: {
+              id: new vertexvis.protobuf.core.Uuid({ hex: op.id }),
+            },
+          };
+        }
+      case 'clear-representation':
+        return { clearRepresentation: {} };
       default:
         return {};
     }
