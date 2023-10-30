@@ -14,6 +14,13 @@
 | `tree`          | --                | A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.                                                                                                                                                                                        | `HTMLVertexSceneTreeElement \| undefined`              | `undefined` |
 
 
+## Events
+
+| Event            | Description                                                                                                                                                    | Type                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `columnsResized` | An event that is emitted when the columns of this `<vertex-scene-tree-table-layout>` are resized with an array containing the widths of the columns in pixels. | `CustomEvent<number[]>` |
+
+
 ## Methods
 
 ### `scrollToPosition(top: number, options: Pick<DomScrollToOptions, 'behavior'>) => Promise<void>`

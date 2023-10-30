@@ -43,7 +43,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     jest.clearAllMocks();
     (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
     (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(0);
-    (getSceneTreeTableViewportWidth as jest.Mock).mockReturnValue(0);
+    (getSceneTreeTableViewportWidth as jest.Mock).mockReturnValue(200);
   });
 
   it('updates the layout position on resize', async () => {
@@ -395,6 +395,126 @@ describe('<vertex-scene-tree-table-layout>', () => {
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
     ).toContain('grid-template-columns:  100px 1fr');
+  });
+
+  it('emits events on column resize', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    let resizeDetail: number[] = [];
+    const resizeListener = jest.fn((event) => {
+      resizeDetail = event.detail;
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  100px 1fr');
+
+    table.addEventListener('columnsResized', resizeListener);
+
+    table
+      .querySelector('div.templated-divider-div')
+      ?.dispatchEvent(new MouseEvent('pointerdown', { clientX: 0 }));
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 10 }));
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  110px 1fr');
+    expect(resizeDetail).toHaveLength(2);
+    expect(resizeDetail[0]).toBeCloseTo(110);
+    expect(resizeDetail[1]).toBeCloseTo(90);
+  });
+
+  it('initializes with widths adjusted down', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="300">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="100">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  150px 1fr');
+  });
+
+  it('initializes with widths adjusted up', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    const controller = new SceneTreeController(client, 100);
+    const { table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout>
+        <template slot="divider">
+          <div class="templated-divider-div" />
+        </template>
+
+        <vertex-scene-tree-table-column initial-width="75">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+        <vertex-scene-tree-table-column initial-width="25">
+          <template>
+            <div class="templated-div" />
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    expect(
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+    ).toContain('grid-template-columns:  150px 1fr');
   });
 
   it('debounces isScrolling updates for the cells', async () => {
