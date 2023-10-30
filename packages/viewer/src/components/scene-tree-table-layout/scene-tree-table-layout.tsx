@@ -170,6 +170,13 @@ export class SceneTreeTableLayout {
   @Event()
   public layoutRendered!: EventEmitter<void>;
 
+  /**
+   * An event that is emitted when the columns of this `<vertex-scene-tree-table-layout>`
+   * are resized with an array containing the widths of the columns in pixels.
+   */
+  @Event({ bubbles: true })
+  public columnsResized!: EventEmitter<number[]>;
+
   @Element()
   private hostEl!: HTMLElement;
 
@@ -236,11 +243,11 @@ export class SceneTreeTableLayout {
   }
 
   public componentDidLoad(): void {
+    this.computeInitialColumnWidths();
     this.computeColumnGridLayout();
     this.ensureDividerTemplateDefined();
     this.computeCellHeight();
     this.computeHeaderHeight();
-    this.computeInitialColumnWidths();
     this.rebindHeaderData();
 
     this.tableElement?.addEventListener('scroll', this.handleScrollChanged, {
@@ -452,6 +459,8 @@ export class SceneTreeTableLayout {
       this.stateMap.columnWidths = this.stateMap.columnWidthPercentages.map(
         (w) => w * layoutWidth
       );
+
+      this.columnsResized.emit(this.stateMap.columnWidths);
     }
   };
 
@@ -475,9 +484,18 @@ export class SceneTreeTableLayout {
 
     const layoutWidth = this.getLayoutWidth();
     if (layoutWidth != null) {
-      this.stateMap.columnWidthPercentages = this.columnElements.map(
-        (c) => (c.initialWidth ?? 100) / layoutWidth
+      const columnWidthSum = this.stateMap.columnWidths.reduce(
+        (result, w) => result + w,
+        0
       );
+      const scaledColumnWidths = this.stateMap.columnWidths.map(
+        (w) => w * (layoutWidth / columnWidthSum)
+      );
+
+      this.stateMap.columnWidthPercentages = scaledColumnWidths.map(
+        (w) => w / layoutWidth
+      );
+      this.stateMap.columnWidths = scaledColumnWidths;
     }
   };
 
@@ -786,16 +804,18 @@ export class SceneTreeTableLayout {
       this.lastDividerPointerPosition != null &&
       this.resizingColumnIndex != null
     ) {
+      const resizingIndex = this.resizingColumnIndex;
       const diff = Point.subtract(this.lastDividerPointerPosition, current);
 
-      if (
-        Math.abs(diff.x) >= 1 &&
-        this.isValidResize(diff, this.resizingColumnIndex)
-      ) {
-        this.stateMap.columnWidths[this.resizingColumnIndex] -= diff.x;
+      if (Math.abs(diff.x) >= 1 && this.isValidResize(diff, resizingIndex)) {
+        this.stateMap.columnWidths = this.stateMap.columnWidths.map((w, i) =>
+          i === resizingIndex ? w - diff.x : w
+        );
 
-        if (this.resizingColumnIndex + 1 < this.stateMap.columnWidths.length) {
-          this.stateMap.columnWidths[this.resizingColumnIndex + 1] += diff.x;
+        if (resizingIndex + 1 < this.stateMap.columnWidths.length) {
+          this.stateMap.columnWidths = this.stateMap.columnWidths.map((w, i) =>
+            i === resizingIndex + 1 ? w + diff.x : w
+          );
         }
 
         this.lastDividerPointerPosition = current;
@@ -814,6 +834,7 @@ export class SceneTreeTableLayout {
     this.resizingColumnIndex = undefined;
 
     this.recomputeColumnPercentages();
+    this.recomputeColumnWidths();
 
     window.removeEventListener('pointermove', this.handleDividerPointerMove);
     window.removeEventListener('pointerup', this.handleDividerPointerUp);

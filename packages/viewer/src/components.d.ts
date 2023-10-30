@@ -2118,6 +2118,12 @@ declare namespace LocalJSX {
     layoutHeight?: number;
     layoutOffset?: number;
     layoutWidth?: number;
+    /**
+     * An event that is emitted when the columns of this `<vertex-scene-tree-table-layout>` are resized with an array containing the widths of the columns in pixels.
+     */
+    onColumnsResized?: (
+      event: VertexSceneTreeTableLayoutCustomEvent<number[]>
+    ) => void;
     onLayoutRendered?: (
       event: VertexSceneTreeTableLayoutCustomEvent<void>
     ) => void;
