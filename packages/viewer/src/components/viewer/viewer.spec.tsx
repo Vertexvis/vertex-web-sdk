@@ -10,7 +10,6 @@ import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions } from '@vertexvis/geometry';
 import { Async, UUID } from '@vertexvis/utils';
-import * as Fixtures from '../../testing/fixtures';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
@@ -18,6 +17,7 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import * as Storage from '../../lib/storage';
 import { random } from '../../testing';
+import * as Fixtures from '../../testing/fixtures';
 import { makeImagePng } from '../../testing/fixtures';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
 import {
