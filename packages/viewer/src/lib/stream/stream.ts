@@ -336,7 +336,24 @@ export class ViewerStream extends StreamApi {
         const frame = fromPbFrameOrThrow(stream.worldOrientation)(req);
 
         if (this.state.type === 'connected') {
-          this.updateState({ ...this.state, frame });
+          if (
+            frame.depthBufferBytes !== undefined ||
+            this.state.frame.temporalRefinementCorrelationId !==
+              frame.temporalRefinementCorrelationId
+          ) {
+            this.updateState({
+              ...this.state,
+              frame: frame,
+              fallbackDepthBufferBytes: frame.depthBufferBytes,
+            });
+          } else {
+            this.updateState({
+              ...this.state,
+              frame: frame.copy({
+                depthBufferBytes: this.state.fallbackDepthBufferBytes,
+              }),
+            });
+          }
         }
       }
     });
@@ -376,6 +393,7 @@ export class ViewerStream extends StreamApi {
       token: stream.token,
       frame,
       clock,
+      fallbackDepthBufferBytes: undefined,
     });
   }
 
@@ -389,6 +407,7 @@ export class ViewerStream extends StreamApi {
         streamKey: { value: resource.resource.id },
         dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
+        clientSupportsTemporalRefinement: true,
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
           resource.subResource?.type === 'scene-view-state' &&
@@ -412,6 +431,7 @@ export class ViewerStream extends StreamApi {
       token: res.token,
       worldOrientation: res.worldOrientation,
       frame: undefined,
+      fallbackDepthBufferBytes: undefined,
     };
   }
 
@@ -424,6 +444,7 @@ export class ViewerStream extends StreamApi {
         dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
+        clientSupportsTemporalRefinement: true,
       })
     );
     return { ...state, token: res.token };

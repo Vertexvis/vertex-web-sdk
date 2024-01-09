@@ -1,3 +1,5 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+
 jest.mock('./utils');
 jest.mock('../../lib/rendering/imageLoaders');
 jest.mock('../../workers/png-decoder-pool');
@@ -7,7 +9,8 @@ import { h } from '@stencil/core';
 import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions } from '@vertexvis/geometry';
-import { Async } from '@vertexvis/utils';
+import { Async, UUID } from '@vertexvis/utils';
+import * as Fixtures from '../../testing/fixtures';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
@@ -617,6 +620,113 @@ describe('vertex-viewer', () => {
       await page.waitForChanges();
 
       expect(await viewer.getKeyInteractions()).toHaveLength(2);
+    });
+  });
+
+  describe('temporal AA', () => {
+    it('reuses previous depth buffer if temporal correlation id matches', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+            <vertex-viewer
+                clientId={clientId}
+                stream={stream}
+            />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      const onFrameDrawn = jest.fn();
+
+      viewer.addEventListener('frameDrawn', onFrameDrawn);
+
+      const tcri = new vertexvis.protobuf.core.Uuid({ hex: UUID.create() });
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        sequenceNumber: 2,
+        temporalRefinementCorrelationId: tcri,
+      }));
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        sequenceNumber: 3,
+        temporalRefinementCorrelationId: tcri,
+        depthBuffer: null,
+      }));
+
+      await Async.delay(10);
+
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+          }),
+        })
+      );
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+          }),
+        })
+      );
+    });
+
+    it('does not reuse previous depth buffer if temporal correlation id does not match', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+            <vertex-viewer
+                clientId={clientId}
+                stream={stream}
+            />
+        ),
+      });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      const onFrameDrawn = jest.fn();
+
+      viewer.addEventListener('frameDrawn', onFrameDrawn);
+
+      const tcri = new vertexvis.protobuf.core.Uuid({ hex: UUID.create() });
+      const tcri2 = new vertexvis.protobuf.core.Uuid({ hex: UUID.create() });
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        sequenceNumber: 2,
+        temporalRefinementCorrelationId: tcri,
+      }));
+
+      receiveFrame(ws, (payload) => ({
+        ...payload,
+        sequenceNumber: 3,
+        temporalRefinementCorrelationId: tcri2,
+        depthBuffer: null,
+      }));
+
+      await Async.delay(10);
+
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+          }),
+        })
+      );
+      expect(onFrameDrawn).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            depthBufferBytes: undefined,
+          }),
+        })
+      );
     });
   });
 

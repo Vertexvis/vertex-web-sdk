@@ -2049,9 +2049,9 @@
     "@types/react" "*"
 
 "@types/react@*", "@types/react@^17", "@types/react@^17.0.22":
-  version "17.0.64"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.64.tgz#468162c66c33ddb4548eb1a0e36682028d9e9a62"
-  integrity sha512-IlgbX/vglDTwrCRgad6fTCzOT+D/5C0xwuvrzfuqfhg9gJrkFqAGADpUFlEtqbrP1IEo9QLSbo41MaFfoIu9Aw==
+  version "17.0.74"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.74.tgz#ea93059a55e5cfc7a76e7712fe8db5317dd29ee3"
+  integrity sha512-nBtFGaeTMzpiL/p73xbmCi00SiCQZDTJUk9ZuHOLtil3nI+y7l269LHkHIAYpav99ZwGnPJzuJsJpfLXjiQ52g==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -2216,10 +2216,10 @@
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.1"
 
-"@vertexvis/frame-streaming-protos@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.12.0.tgz#fe7759e0b3a8e8a4f88eccd0a14414f9001c76d0"
-  integrity sha512-LcePeheuspMC11ylOXPyInyrBOBKYfKJQSpI4sqmkN3uo+ZTZxPh4TxKURoDfwsYIvtaPvE7CQgqJuaiccMa6w==
+"@vertexvis/frame-streaming-protos@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.0.tgz#b49c08855467edb429dcf7d9c6904b7c6215486d"
+  integrity sha512-8aIRjGNFZ/UHY1sS85MsISC0sIJgI6hQtgQKpKNQXHK2HIJ5Cwe3ZNT0Khk5pmcpLpGExczyvern5kTWaLMW7Q==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
