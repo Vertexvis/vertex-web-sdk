@@ -627,12 +627,7 @@ describe('vertex-viewer', () => {
     it('reuses previous depth buffer if temporal correlation id matches', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
-        template: () => (
-            <vertex-viewer
-                clientId={clientId}
-                stream={stream}
-            />
-        ),
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
@@ -662,7 +657,8 @@ describe('vertex-viewer', () => {
         2,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         })
       );
@@ -670,7 +666,8 @@ describe('vertex-viewer', () => {
         3,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         })
       );
@@ -679,12 +676,7 @@ describe('vertex-viewer', () => {
     it('does not reuse previous depth buffer if temporal correlation id does not match', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
-        template: () => (
-            <vertex-viewer
-                clientId={clientId}
-                stream={stream}
-            />
-        ),
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
@@ -715,7 +707,8 @@ describe('vertex-viewer', () => {
         2,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         })
       );
