@@ -90,6 +90,16 @@ describe(TouchInteractionHandler, () => {
     expect(api.rotateCamera).toHaveBeenCalledTimes(1);
   });
 
+  it('prevents default behavior for touch events', () => {
+    div.dispatchEvent(touchStart1);
+    window.dispatchEvent(touchMoveWithOneFingerTouch);
+    window.dispatchEvent(touchEnd1);
+
+    expect(touchStart1.defaultPrevented).toBe(true);
+    expect(touchMoveWithOneFingerTouch.defaultPrevented).toBe(true);
+    expect(touchEnd1.defaultPrevented).toBe(true);
+  });
+
   describe(TouchInteractionHandler.prototype.dispose, () => {
     it('should not handle events if disposed', () => {
       handler.dispose();

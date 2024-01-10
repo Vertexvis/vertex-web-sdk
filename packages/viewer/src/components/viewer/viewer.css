@@ -18,6 +18,9 @@
   height: 300px;
   min-width: 1px;
   min-height: 1px;
+
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .canvas-container {
