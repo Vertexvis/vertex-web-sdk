@@ -337,7 +337,7 @@ export class ViewerStream extends StreamApi {
 
         if (this.state.type === 'connected') {
           if (
-            frame.depthBufferBytes !== null ||
+            frame.depthBufferBytes != null ||
             this.state.frame.temporalRefinementCorrelationId !==
               frame.temporalRefinementCorrelationId
           ) {
