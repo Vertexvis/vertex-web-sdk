@@ -26,11 +26,12 @@ export class Frame {
 
   public constructor(
     public readonly correlationIds: string[],
+    public readonly temporalRefinementCorrelationId: string,
     public readonly sequenceNumber: number,
     public readonly dimensions: Dimensions.Dimensions,
     public readonly image: FrameImage,
     public readonly scene: FrameScene,
-    private readonly depthBufferBytes: Uint8Array | undefined,
+    public readonly depthBufferBytes: Uint8Array | undefined,
     private readonly featureMapBytes: Uint8Array | undefined,
     private readonly id = UUID.create()
   ) {}
@@ -71,6 +72,7 @@ export class Frame {
 
   public copy({
     correlationIds,
+    temporalRefinementCorrelationId,
     sequenceNumber,
     dimensions,
     image,
@@ -79,6 +81,7 @@ export class Frame {
     featureMapBytes,
   }: {
     correlationIds?: string[];
+    temporalRefinementCorrelationId?: string;
     sequenceNumber?: number;
     dimensions?: Dimensions.Dimensions;
     image?: FrameImage;
@@ -88,6 +91,7 @@ export class Frame {
   }): Frame {
     return new Frame(
       correlationIds ?? this.correlationIds,
+      temporalRefinementCorrelationId ?? this.temporalRefinementCorrelationId,
       sequenceNumber ?? this.sequenceNumber,
       dimensions ?? this.dimensions,
       image ?? this.image,

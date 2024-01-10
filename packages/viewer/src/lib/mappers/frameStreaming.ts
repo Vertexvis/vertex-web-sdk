@@ -283,9 +283,13 @@ export function fromPbFrame(
       fromPbFrameScene(worldOrientation),
       fromPbFrameImage,
       M.mapProp('depthBuffer', fromPbBytesValue),
-      M.mapProp('featureMap', fromPbBytesValue)
+      M.mapProp('featureMap', fromPbBytesValue),
+      M.mapProp('temporalRefinementCorrelationId', (id) =>
+        id != null ? fromPbUuid(id) : null
+      )
     ),
-    ([cIds, seq, fd, s, i, db, fm]) => new Frame(cIds, seq, fd, i, s, db, fm)
+    ([cIds, seq, fd, s, i, db, fm, trci]) =>
+      new Frame(cIds, trci || '', seq, fd, i, s, db, fm)
   );
 }
 

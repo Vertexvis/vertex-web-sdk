@@ -116,6 +116,7 @@ function updateFrameCameraPosition(
 ): Frame {
   return new Frame(
     baseFrame.correlationIds,
+    baseFrame.temporalRefinementCorrelationId,
     baseFrame.sequenceNumber,
     baseFrame.dimensions,
     baseFrame.image,

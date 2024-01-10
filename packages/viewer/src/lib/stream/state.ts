@@ -26,6 +26,7 @@ export interface Connected {
   readonly token: Token;
   readonly frame: Frame;
   readonly clock: SynchronizedClock;
+  readonly fallbackDepthBufferBytes: Uint8Array | undefined;
 }
 
 export interface ConnectionFailed {
