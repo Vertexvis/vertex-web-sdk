@@ -26,6 +26,8 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
 
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length >= 1) {
+      event.preventDefault();
+
       const touch1 = event.touches[0];
       const touch2 = event.touches[1];
 
@@ -43,6 +45,8 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
   }
 
   private handleTouchMove(event: TouchEvent): void {
+    event.preventDefault();
+
     if (event.touches.length === 1) {
       this.handleOnePointTouchMove(event.touches[0]);
     } else if (event.touches.length === 2) {
@@ -60,6 +64,8 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
   }
 
   private handleTouchEnd(event: TouchEvent): void {
+    event.preventDefault();
+
     this.interactionApi?.endInteraction();
 
     this.isInteracting = false;
