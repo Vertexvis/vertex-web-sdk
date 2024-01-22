@@ -77,11 +77,17 @@ interface FrameStreamOptions {
    * The number of seconds before we consider loading a scene failed.
    */
   loadTimeoutInSeconds?: number;
+
+  /**
+   * Enable temporal refinement of still images.
+   */
+  enableTemporalRefinement?: boolean;
 }
 
 interface UpdateFields {
   dimensions?: ViewerStream['dimensions'];
   streamAttributes?: ViewerStream['streamAttributes'];
+  enableTemporalRefinement?: ViewerStream['enableTemporalRefinement'];
   frameBgColor?: ViewerStream['frameBgColor'];
   config?: ViewerStream['config'];
   clientId?: ViewerStream['clientId'];
@@ -93,6 +99,7 @@ export class ViewerStream extends StreamApi {
 
   private dimensions: Dimensions.Dimensions;
   private streamAttributes: StreamAttributes;
+  private enableTemporalRefinement: boolean;
   private frameBgColor: Color3;
   private config: Config;
   private clientId: string | undefined;
@@ -108,6 +115,7 @@ export class ViewerStream extends StreamApi {
 
     this.dimensions = Dimensions.create(0, 0);
     this.streamAttributes = {};
+    this.enableTemporalRefinement = opts.enableTemporalRefinement ?? true;
     this.frameBgColor = Color.create(255, 255, 255);
     this.config = parseConfig('platprod');
 
@@ -115,6 +123,7 @@ export class ViewerStream extends StreamApi {
       tokenRefreshOffsetInSeconds: opts.tokenRefreshOffsetInSeconds ?? 30,
       offlineThresholdInSeconds: opts.offlineThresholdInSeconds ?? 30,
       loadTimeoutInSeconds: opts.loadTimeoutInSeconds ?? 15,
+      enableTemporalRefinement: opts.enableTemporalRefinement ?? true,
     };
   }
 
@@ -178,6 +187,17 @@ export class ViewerStream extends StreamApi {
           streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         })
       );
+    }
+
+    if (
+      fields.enableTemporalRefinement != null &&
+      fields.enableTemporalRefinement !== this.enableTemporalRefinement
+    ) {
+      this.enableTemporalRefinement = fields.enableTemporalRefinement;
+
+      if (this.state.type === 'connected') {
+        this.closeAndReconnect(this.state);
+      }
     }
   }
 
@@ -407,7 +427,7 @@ export class ViewerStream extends StreamApi {
         streamKey: { value: resource.resource.id },
         dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
-        clientSupportsTemporalRefinement: true,
+        clientSupportsTemporalRefinement: this.enableTemporalRefinement,
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         sceneViewStateId:
           resource.subResource?.type === 'scene-view-state' &&
@@ -444,7 +464,7 @@ export class ViewerStream extends StreamApi {
         dimensions: this.getDimensions(),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
-        clientSupportsTemporalRefinement: true,
+        clientSupportsTemporalRefinement: this.enableTemporalRefinement,
       })
     );
     return { ...state, token: res.token };

@@ -235,6 +235,11 @@ export class Viewer {
   @Prop() public noDefaultLights = false;
 
   /**
+   * Specifies whether to enable temporal refinement of still images.
+   */
+  @Prop() public enableTemporalRefinement = true;
+
+  /**
    * @private
    * @internal
    * Specifies experimental rendering options. For Vertex use only.
@@ -456,6 +461,7 @@ export class Viewer {
       this.stream ??
       new ViewerStream(new WebSocketClientImpl(), {
         loggingEnabled: this.getResolvedConfig().flags.logWsMessages,
+        enableTemporalRefinement: this.enableTemporalRefinement,
       });
     this.addStreamListeners();
 
@@ -765,6 +771,14 @@ export class Viewer {
   @Watch('experimentalRenderingOptions')
   protected handleExperimentalRenderingOptionsChanged(): void {
     this.updateStreamAttributes();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('enableTemporalRefinement')
+  protected handleEnableTemporalRefinementChanged(): void {
+    this.updateEnableTemporalRefinement();
   }
 
   /**
@@ -1446,6 +1460,12 @@ export class Viewer {
 
   private updateStreamAttributes(): void {
     this.stream?.update({ streamAttributes: this.getStreamAttributes() });
+  }
+
+  private updateEnableTemporalRefinement(): void {
+    this.stream?.update({
+      enableTemporalRefinement: this.enableTemporalRefinement,
+    });
   }
 
   private updateInteractionApi(previousFrame?: Frame): void {
