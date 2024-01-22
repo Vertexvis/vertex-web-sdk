@@ -487,6 +487,10 @@ export namespace Components {
     deviceId?: string;
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
+     * Specifies whether to enable temporal refinement of still images.
+     */
+    enableTemporalRefinement: boolean;
+    /**
      * @private
      */
     experimentalRenderingOptions: string;
@@ -2208,6 +2212,10 @@ declare namespace LocalJSX {
      * @private
      */
     deviceId?: string;
+    /**
+     * Specifies whether to enable temporal refinement of still images.
+     */
+    enableTemporalRefinement?: boolean;
     /**
      * @private
      */
