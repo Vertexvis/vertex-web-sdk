@@ -36,6 +36,6 @@
     "packages/*"
   ],
   "resolutions": {
-    "@types/react": "^17"
+    "@types/react": "^18"
   }
 }
