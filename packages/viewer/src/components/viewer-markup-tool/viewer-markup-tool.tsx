@@ -18,7 +18,10 @@ import {
   FreeformMarkup,
   Markup,
 } from '../../lib/types/markup';
-import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
+import {
+  isVertexViewerArrowMarkup,
+  LineEndStyle,
+} from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
@@ -92,6 +95,18 @@ export class ViewerMarkupTool {
   public viewer?: HTMLVertexViewerElement;
 
   /**
+   * The line end style of the starting anchor. This default to none.
+   */
+  @Prop({ mutable: true })
+  public startLineEndStyle: LineEndStyle = 'none';
+
+  /**
+   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   */
+  @Prop({ mutable: true })
+  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
+
+  /**
    * An event that is dispatched when a user begins a new markup.
    */
   @Event({ bubbles: true })
@@ -157,6 +172,22 @@ export class ViewerMarkupTool {
    */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('startLineEndStyle')
+  protected handleStartLineEndStyleChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('endLineEndStyle')
+  protected handleEndLineEndStyleChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -314,6 +345,16 @@ export class ViewerMarkupTool {
 
     if (!this.disabled) {
       const newMarkupElement = this.createNewMarkupElement();
+
+      if (this.tool === 'arrow') {
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).startLineEndStyle = this.startLineEndStyle;
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).endLineEndStyle = this.endLineEndStyle;
+      }
+
       newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(

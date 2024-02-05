@@ -22,8 +22,11 @@ import {
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { ArrowMarkupInteractionHandler } from './interactions';
 import {
+  arrowheadPointsToPathPoints,
   arrowheadPointsToPolygonPoints,
-  createArrowheadPoints,
+  createLineEndStylePoints,
+  LineEndStyle,
+  LineEndStylePoints,
   parsePoint,
 } from './utils';
 import { BoundingBox1d } from './viewer-markup-arrow-components';
@@ -84,6 +87,18 @@ export class ViewerMarkupArrow {
    */
   @Prop({ attribute: 'end' })
   public endJson?: string;
+
+  /**
+   * The line end style of the starting anchor. This default to none.
+   */
+  @Prop({ mutable: true })
+  public startLineEndStyle: LineEndStyle = 'none';
+
+  /**
+   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   */
+  @Prop({ mutable: true })
+  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
 
   /**
    * A mode that specifies how the markup component should behave. When
@@ -221,6 +236,52 @@ export class ViewerMarkupArrow {
     this.end = this.end || parsePoint(this.endJson);
   }
 
+  private renderLineEndStyle(
+    endStyle: LineEndStyle,
+    arrowheadPoints: LineEndStylePoints
+  ): h.JSX.IntrinsicElements {
+    if (endStyle === 'arrow-triangle') {
+      return (
+        <polygon
+          id="line-end-arrow-triangle"
+          class="head"
+          points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+        />
+      );
+    } else if (endStyle === 'arrow-line') {
+      return (
+        <path
+          id="line-end-arrow-line"
+          class="head"
+          d={arrowheadPointsToPathPoints(arrowheadPoints)}
+        />
+      );
+    } else if (endStyle === 'hash') {
+      return (
+        <line
+          id="line-end-none"
+          class="head"
+          x1={arrowheadPoints.hashLeft.x}
+          y1={arrowheadPoints.hashLeft.y}
+          x2={arrowheadPoints.hashRight.x}
+          y2={arrowheadPoints.hashRight.y}
+        />
+      );
+    } else if (endStyle === 'dot') {
+      return (
+        <circle
+          id="line-end-circle"
+          class="head"
+          cx={arrowheadPoints.tip.x}
+          cy={arrowheadPoints.tip.y}
+          r={arrowheadPoints.radius}
+        />
+      );
+    } else {
+      return <div />;
+    }
+  }
+
   public render(): h.JSX.IntrinsicElements {
     if (this.start != null && this.end != null && this.elementBounds != null) {
       const screenStart = translatePointToScreen(
@@ -228,7 +289,23 @@ export class ViewerMarkupArrow {
         this.elementBounds
       );
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
-      const arrowheadPoints = createArrowheadPoints(screenStart, screenEnd);
+      const arrowheadStartPoints = createLineEndStylePoints(
+        screenEnd,
+        screenStart
+      );
+      const arrowheadEndPoints = createLineEndStylePoints(
+        screenStart,
+        screenEnd
+      );
+
+      const lineStartingPoint =
+        this.startLineEndStyle === 'arrow-triangle'
+          ? arrowheadStartPoints.base
+          : arrowheadStartPoints.tip;
+      const lineEndingPoint =
+        this.endLineEndStyle === 'arrow-triangle'
+          ? arrowheadEndPoints.base
+          : arrowheadEndPoints.tip;
 
       if (isValidPointData(screenStart, screenEnd)) {
         return (
@@ -238,18 +315,17 @@ export class ViewerMarkupArrow {
                 <SvgShadow id="arrow-shadow" />
               </defs>
               <g filter="url(#arrow-shadow)">
-                <polygon
-                  id="arrow-head"
-                  class="head"
-                  points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
-                />
+                {this.renderLineEndStyle(
+                  this.startLineEndStyle,
+                  arrowheadStartPoints
+                )}
                 <line
                   id="arrow-line"
                   class="line"
-                  x1={screenStart.x}
-                  y1={screenStart.y}
-                  x2={arrowheadPoints.base.x}
-                  y2={arrowheadPoints.base.y}
+                  x1={lineStartingPoint.x}
+                  y1={lineStartingPoint.y}
+                  x2={lineEndingPoint.x}
+                  y2={lineEndingPoint.y}
                 />
                 {this.mode === 'edit' && (
                   <line
@@ -260,6 +336,10 @@ export class ViewerMarkupArrow {
                     x2={screenEnd.x}
                     y2={screenEnd.y}
                   />
+                )}
+                {this.renderLineEndStyle(
+                  this.endLineEndStyle,
+                  arrowheadEndPoints
                 )}
               </g>
             </svg>

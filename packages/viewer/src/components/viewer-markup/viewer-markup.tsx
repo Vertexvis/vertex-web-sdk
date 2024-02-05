@@ -20,7 +20,10 @@ import {
   FreeformMarkup,
   Markup,
 } from '../../lib/types/markup';
-import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
+import {
+  isVertexViewerArrowMarkup,
+  LineEndStyle,
+} from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
@@ -86,6 +89,18 @@ export class ViewerMarkup {
    */
   @Prop()
   public selectNew = false;
+
+  /**
+   * The line end style of the starting anchor. This default to none.
+   */
+  @Prop({ mutable: true })
+  public startLineEndStyle: LineEndStyle = 'none';
+
+  /**
+   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   */
+  @Prop({ mutable: true })
+  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
 
   /**
    * Dispatched when a new markup is added, either through user interaction
@@ -162,6 +177,8 @@ export class ViewerMarkup {
       el.id = id;
       el.start = start;
       el.end = end;
+      el.startLineEndStyle = this.startLineEndStyle;
+      el.endLineEndStyle = this.endLineEndStyle;
 
       return this.appendMarkupElement(el);
     } else if (markup instanceof CircleMarkup) {
@@ -327,6 +344,22 @@ export class ViewerMarkup {
    */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
+    this.updatePropsOnMarkupTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('startLineEndStyle')
+  protected handleStartLineEndStyleChanged(): void {
+    this.updatePropsOnMarkupTool();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('endLineEndStyle')
+  protected handleEndLineEndStyleChanged(): void {
     this.updatePropsOnMarkupTool();
   }
 
@@ -525,7 +558,10 @@ export class ViewerMarkup {
   }
 
   private updatePropsOnMarkup(
-    element: HTMLVertexViewerMarkupArrowElement
+    element:
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
   ): void {
     element.viewer = this.viewer;
     element.classList.add('viewer-markup__markup');
@@ -540,6 +576,8 @@ export class ViewerMarkup {
       tool.freeformTemplateId = this.freeformTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;
+      tool.startLineEndStyle = this.startLineEndStyle;
+      tool.endLineEndStyle = this.endLineEndStyle;
     }
   }
 
