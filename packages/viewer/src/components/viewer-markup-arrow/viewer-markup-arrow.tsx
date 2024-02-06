@@ -327,7 +327,13 @@ export class ViewerMarkupArrow {
                   x2={lineEndingPoint.x}
                   y2={lineEndingPoint.y}
                 />
-                {this.mode === 'edit' && (
+                {this.renderLineEndStyle(
+                  this.endLineEndStyle,
+                  arrowheadEndPoints
+                )}
+              </g>
+              {this.mode === 'edit' && (
+                <g>
                   <line
                     id="bounding-box-1d-line"
                     class="bounds-line"
@@ -336,12 +342,8 @@ export class ViewerMarkupArrow {
                     x2={screenEnd.x}
                     y2={screenEnd.y}
                   />
-                )}
-                {this.renderLineEndStyle(
-                  this.endLineEndStyle,
-                  arrowheadEndPoints
-                )}
-              </g>
+                </g>
+              )}
             </svg>
             {this.mode === 'edit' && (
               <BoundingBox1d
