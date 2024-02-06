@@ -261,10 +261,10 @@ export class ViewerMarkupArrow {
         <line
           id="line-end-none"
           class="head"
-          x1={arrowheadPoints.hashLeft.x}
-          y1={arrowheadPoints.hashLeft.y}
-          x2={arrowheadPoints.hashRight.x}
-          y2={arrowheadPoints.hashRight.y}
+          x1={arrowheadPoints.hash.leftPoint.x}
+          y1={arrowheadPoints.hash.leftPoint.y}
+          x2={arrowheadPoints.hash.rightPoint.x}
+          y2={arrowheadPoints.hash.rightPoint.y}
         />
       );
     } else if (endStyle === 'dot') {

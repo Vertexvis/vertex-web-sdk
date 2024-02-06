@@ -12,27 +12,23 @@ export type LineEndStyle =
 export interface LineEndStylePoints {
   tip: Point.Point;
   base: Point.Point;
-  arrowTriangleLeft: Point.Point;
-  arrowTriangleRight: Point.Point;
-  arrowLineLeft: Point.Point;
-  arrowLineRight: Point.Point;
-  hashLeft: Point.Point;
-  hashRight: Point.Point;
+  arrowTriangle: ArrowheadPoints;
+  arrowLine: ArrowheadPoints;
+  hash: ArrowheadPoints;
   radius: number;
 }
 
 export interface ArrowheadPoints {
-  arrowLeftPoint: Point.Point;
-  arrowRightPoint: Point.Point;
+  leftPoint: Point.Point;
+  rightPoint: Point.Point;
 }
 
 export function createArrowheadPoints(
   start: Point.Point,
   end: Point.Point,
   arrowSideLength: number,
-  arrowHeadAngle: number
+  arrowHeadTheta: number
 ): ArrowheadPoints {
-  const arrowTheta = Angle.toRadians(arrowHeadAngle / 2);
   const arrowOrthogonalVector = Point.orthogonalVector(start, end);
   const normalizedDirection = Point.normalDirectionVector(start, end);
 
@@ -41,11 +37,11 @@ export function createArrowheadPoints(
     Point.add(
       Point.scaleProportional(
         normalizedDirection,
-        arrowSideLength * Math.cos(arrowTheta)
+        arrowSideLength * Math.cos(arrowHeadTheta)
       ),
       Point.scaleProportional(
         arrowOrthogonalVector,
-        arrowSideLength * Math.sin(arrowTheta)
+        arrowSideLength * Math.sin(arrowHeadTheta)
       )
     )
   );
@@ -54,18 +50,18 @@ export function createArrowheadPoints(
     Point.subtract(
       Point.scaleProportional(
         normalizedDirection,
-        arrowSideLength * Math.cos(arrowTheta)
+        arrowSideLength * Math.cos(arrowHeadTheta)
       ),
       Point.scaleProportional(
         arrowOrthogonalVector,
-        arrowSideLength * Math.sin(arrowTheta)
+        arrowSideLength * Math.sin(arrowHeadTheta)
       )
     )
   );
 
   return {
-    arrowLeftPoint: arrowLeft,
-    arrowRightPoint: arrowRight,
+    leftPoint: arrowLeft,
+    rightPoint: arrowRight,
   };
 }
 
@@ -81,14 +77,12 @@ export function createLineEndStylePoints(
   const hashHeight = Math.max(4, Math.min(12, distance * 0.16));
   const radius = Math.min(5, distance * 0.1);
 
-  // Shared arrowhead properties
-  const arrowRelativeHeight = arrowHeadHeight / distance;
-  const arrowBasePosition = Point.add(
-    Point.scaleProportional(end, 1 - arrowRelativeHeight),
-    Point.scaleProportional(start, arrowRelativeHeight)
-  );
-
   // Triangle arrow position
+  const triangleArrowRelativeHeight = arrowHeadHeight / distance;
+  const triangleArrowBasePosition = Point.add(
+    Point.scaleProportional(end, 1 - triangleArrowRelativeHeight),
+    Point.scaleProportional(start, triangleArrowRelativeHeight)
+  );
   const triangleArrowTheta = Angle.toRadians(triangleArrowAngle / 2);
   const triangleArrowSideLength =
     arrowHeadHeight / Math.cos(triangleArrowTheta);
@@ -96,7 +90,7 @@ export function createLineEndStylePoints(
     start,
     end,
     triangleArrowSideLength,
-    triangleArrowAngle
+    triangleArrowTheta
   );
 
   // Line arrow position
@@ -106,23 +100,21 @@ export function createLineEndStylePoints(
     start,
     end,
     lineArrowSideLength,
-    lineArrowAngle
+    lineArrowTheta
   );
 
   // Hash position
-  // Setting the arrowHeadAngle to 180 degrees results in a
+  // Setting the arrowHeadAngle to 90 degrees results in a
   // straight hash mark perpendicular to the direction of the line
-  const hashLine = createArrowheadPoints(start, end, hashHeight, 180);
+  const hashLineTheta = Angle.toRadians(90);
+  const hashLine = createArrowheadPoints(start, end, hashHeight, hashLineTheta);
 
   return {
     tip: end,
-    base: arrowBasePosition,
-    arrowTriangleLeft: triangleArrow.arrowLeftPoint,
-    arrowTriangleRight: triangleArrow.arrowRightPoint,
-    arrowLineLeft: lineArrow.arrowLeftPoint,
-    arrowLineRight: lineArrow.arrowRightPoint,
-    hashLeft: hashLine.arrowLeftPoint,
-    hashRight: hashLine.arrowRightPoint,
+    base: triangleArrowBasePosition,
+    arrowTriangle: triangleArrow,
+    arrowLine: lineArrow,
+    hash: hashLine,
     radius: radius,
   };
 }
@@ -132,9 +124,9 @@ export function arrowheadPointsToPolygonPoints(
 ): string {
   return [
     points.tip,
-    points.arrowTriangleRight,
+    points.arrowTriangle.rightPoint,
     points.base,
-    points.arrowTriangleLeft,
+    points.arrowTriangle.leftPoint,
   ]
     .map((pt) => `${pt.x},${pt.y}`)
     .join(' ');
@@ -143,7 +135,7 @@ export function arrowheadPointsToPolygonPoints(
 export function arrowheadPointsToPathPoints(
   points: LineEndStylePoints
 ): string {
-  return `M${points.arrowLineRight.x} ${points.arrowLineRight.y} L${points.tip.x} ${points.tip.y} L${points.arrowLineLeft.x} ${points.arrowLineLeft.y} L${points.tip.x} ${points.tip.y} Z`;
+  return `M${points.arrowLine.rightPoint.x} ${points.arrowLine.rightPoint.y} L${points.tip.x} ${points.tip.y} L${points.arrowLine.leftPoint.x} ${points.arrowLine.leftPoint.y} L${points.tip.x} ${points.tip.y} Z`;
 }
 
 export function isVertexViewerArrowMarkup(
