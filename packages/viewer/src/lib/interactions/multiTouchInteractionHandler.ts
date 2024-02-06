@@ -3,17 +3,14 @@ import { Angle, Matrix2, Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 
-export const SUFFICIENT_ANGLE_HISTORY_SIZE = 5;
-
 export abstract class MultiTouchInteractionHandler
   implements InteractionHandler
 {
   protected element?: HTMLElement;
   protected interactionApi?: InteractionApi;
-  protected currentPosition1?: Point.Point;
-  protected currentPosition2?: Point.Point;
 
-  private previousAngles: number[] = [];
+  private previousFirstPoints: Point.Point[] = [];
+  private previousSecondPoints: Point.Point[] = [];
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
@@ -28,57 +25,144 @@ export abstract class MultiTouchInteractionHandler
     point1: Point.Point,
     point2: Point.Point
   ): void {
-    if (this.currentPosition1 != null && this.currentPosition2 != null) {
-      const delta = Point.add(
-        Point.subtract(point1, this.currentPosition1),
-        Point.subtract(point2, this.currentPosition2)
-      );
+    this.previousFirstPoints = [...this.previousFirstPoints, point1];
+    this.previousSecondPoints = [...this.previousSecondPoints, point2];
 
-      const distance =
-        Point.distance(point1, point2) -
-        Point.distance(this.currentPosition1, this.currentPosition2);
-      const zoom = distance * 0.5;
-      const previousToCurrent = Matrix2.create(
-        Point.subtract(this.currentPosition1, this.currentPosition2),
-        Point.subtract(point1, point2)
-      );
-      const angle = Angle.toDegrees(
-        Math.atan2(
-          Matrix2.determinant(previousToCurrent),
-          Matrix2.dot(previousToCurrent)
-        )
-      );
-      const center = Point.create(
-        (point1.x + point2.x) / 2,
-        (point1.y + point2.y) / 2
-      );
+    // Process updates to touch points on animation frame callbacks to batch
+    // the processing. Because each event can potentially only represent a single
+    // touch point moving, two opposing angles can be computed sequentially. This
+    // results in a wobbling effect if those angles are both sent, and this batched
+    // processing helps to reduce that effect.
+    window.requestAnimationFrame(() => {
+      if (
+        this.previousFirstPoints.length > 1 &&
+        this.previousSecondPoints.length > 1 &&
+        this.previousFirstPoints.length === this.previousSecondPoints.length
+      ) {
+        const previousFirstPoints = this.previousFirstPoints;
+        const previousSecondPoints = this.previousSecondPoints;
 
-      this.interactionApi?.beginInteraction();
-      this.interactionApi?.zoomCameraToPoint(center, zoom);
-      this.interactionApi?.panCameraByDelta(delta);
+        this.previousFirstPoints = this.previousFirstPoints.slice(-1);
+        this.previousSecondPoints = this.previousSecondPoints.slice(-1);
 
-      // Leverage historical angles computed to help prevent wobbling during
-      // pan interactions. The singular computed angle can represent a single
-      // touch point moving rather than the combined movement, where the first
-      // event computes an angle like `0.3` and the second event computes an angle
-      // like `-0.3`, which shouldn't actually result in a twist forward and back.
-      const angleSum = this.previousAngles.reduce((a, r) => a + r, angle);
-      const sufficientData =
-        this.previousAngles.length >= SUFFICIENT_ANGLE_HISTORY_SIZE;
-      const largeMovement = Math.abs(angleSum) >= 3;
-      if (sufficientData || largeMovement) {
-        this.interactionApi?.twistCamera(angleSum);
-        this.previousAngles = [];
-      } else {
-        this.previousAngles = [angle, ...this.previousAngles];
+        const changes = previousFirstPoints.reduce<{
+          deltas: Point.Point[];
+          zooms: number[];
+          angles: number[];
+        }>(
+          (result, previousFirstPoint, i) => {
+            if (i < previousFirstPoints.length - 1) {
+              const firstPoint = previousFirstPoints[i + 1];
+              const previousSecondPoint = previousSecondPoints[i];
+              const secondPoint = previousSecondPoints[i + 1];
+
+              return {
+                deltas: [
+                  ...result.deltas,
+                  this.computeDelta(
+                    previousFirstPoint,
+                    previousSecondPoint,
+                    firstPoint,
+                    secondPoint
+                  ),
+                ],
+                zooms: [
+                  ...result.zooms,
+                  this.computeZoom(
+                    previousFirstPoint,
+                    previousSecondPoint,
+                    firstPoint,
+                    secondPoint
+                  ),
+                ],
+                angles: [
+                  ...result.angles,
+                  this.computeAngle(
+                    previousFirstPoint,
+                    previousSecondPoint,
+                    firstPoint,
+                    secondPoint
+                  ),
+                ],
+              };
+            }
+            return result;
+          },
+          {
+            deltas: [],
+            zooms: [],
+            angles: [],
+          }
+        );
+
+        const delta = changes.deltas.reduce(
+          (r, d) => Point.add(r, d),
+          Point.create()
+        );
+        const zoom = changes.zooms.reduce((z, d) => z + d, 0);
+        const angle = changes.angles.reduce((a, d) => a + d, 0);
+
+        const center = Point.create(
+          (previousFirstPoints[previousFirstPoints.length - 1].x +
+            previousSecondPoints[previousSecondPoints.length - 1].x) /
+            2,
+          (previousFirstPoints[previousFirstPoints.length - 1].y +
+            previousSecondPoints[previousSecondPoints.length - 1].y) /
+            2
+        );
+
+        this.interactionApi?.beginInteraction();
+        this.interactionApi?.zoomCameraToPoint(center, zoom);
+        this.interactionApi?.panCameraByDelta(delta);
+        this.interactionApi?.twistCamera(angle);
       }
-    }
-
-    this.currentPosition1 = point1;
-    this.currentPosition2 = point2;
+    });
   }
 
   protected endTwoPointTouch(): void {
-    this.previousAngles = [];
+    this.previousFirstPoints = [];
+    this.previousSecondPoints = [];
+  }
+
+  private computeDelta(
+    previousPoint1: Point.Point,
+    previousPoint2: Point.Point,
+    point1: Point.Point,
+    point2: Point.Point
+  ): Point.Point {
+    return Point.add(
+      Point.subtract(point1, previousPoint1),
+      Point.subtract(point2, previousPoint2)
+    );
+  }
+
+  private computeZoom(
+    previousPoint1: Point.Point,
+    previousPoint2: Point.Point,
+    point1: Point.Point,
+    point2: Point.Point
+  ): number {
+    const distance =
+      Point.distance(point1, point2) -
+      Point.distance(previousPoint1, previousPoint2);
+    return distance * 0.5;
+  }
+
+  private computeAngle(
+    previousPoint1: Point.Point,
+    previousPoint2: Point.Point,
+    point1: Point.Point,
+    point2: Point.Point
+  ): number {
+    const previousToCurrent = Matrix2.create(
+      Point.subtract(previousPoint1, previousPoint2),
+      Point.subtract(point1, point2)
+    );
+    return Angle.toDegrees(
+      Math.atan2(
+        Matrix2.determinant(previousToCurrent),
+        Matrix2.dot(previousToCurrent)
+      )
+    );
   }
 }

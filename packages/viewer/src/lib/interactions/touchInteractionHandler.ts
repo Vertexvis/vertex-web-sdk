@@ -4,6 +4,7 @@ import { InteractionApi } from './interactionApi';
 import { MultiTouchInteractionHandler } from './multiTouchInteractionHandler';
 
 export class TouchInteractionHandler extends MultiTouchInteractionHandler {
+  private currentPosition1?: Point.Point;
   private isInteracting?: boolean;
 
   public constructor() {
@@ -27,15 +28,6 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length >= 1) {
       event.preventDefault();
-
-      const touch1 = event.touches[0];
-      const touch2 = event.touches[1];
-
-      this.currentPosition1 = Point.create(touch1.screenX, touch1.screenY);
-      this.currentPosition2 =
-        touch2 != null
-          ? Point.create(touch2.screenX, touch2.screenY)
-          : undefined;
 
       window.addEventListener('touchmove', this.handleTouchMove, {
         passive: false,
