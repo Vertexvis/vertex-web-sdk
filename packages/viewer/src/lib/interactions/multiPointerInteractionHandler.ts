@@ -66,5 +66,6 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.removeEventListener('pointerup', this.handlePointerUp);
     }
+    this.endTwoPointTouch();
   }
 }

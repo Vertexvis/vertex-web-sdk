@@ -72,6 +72,8 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
 
     window.removeEventListener('touchmove', this.handleTouchMove);
     window.removeEventListener('touchend', this.handleTouchEnd);
+
+    this.endTwoPointTouch();
   }
 
   private handleOnePointTouchMove(touch: Touch): void {

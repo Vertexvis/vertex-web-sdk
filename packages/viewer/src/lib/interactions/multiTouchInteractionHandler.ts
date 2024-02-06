@@ -3,6 +3,8 @@ import { Angle, Matrix2, Point } from '@vertexvis/geometry';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 
+export const SUFFICIENT_ANGLE_HISTORY_SIZE = 5;
+
 export abstract class MultiTouchInteractionHandler
   implements InteractionHandler
 {
@@ -10,6 +12,8 @@ export abstract class MultiTouchInteractionHandler
   protected interactionApi?: InteractionApi;
   protected currentPosition1?: Point.Point;
   protected currentPosition2?: Point.Point;
+
+  private previousAngles: number[] = [];
 
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
@@ -53,13 +57,28 @@ export abstract class MultiTouchInteractionHandler
       this.interactionApi?.zoomCameraToPoint(center, zoom);
       this.interactionApi?.panCameraByDelta(delta);
 
-      // Setting a minimum angle to prevent wobbling
-      if (Math.abs(angle) > 0.5) {
-        this.interactionApi?.twistCamera(angle);
+      // Leverage historical angles computed to help prevent wobbling during
+      // pan interactions. The singular computed angle can represent a single
+      // touch point moving rather than the combined movement, where the first
+      // event computes an angle like `0.3` and the second event computes an angle
+      // like `-0.3`, which shouldn't actually result in a twist forward and back.
+      const angleSum = this.previousAngles.reduce((a, r) => a + r, angle);
+      const sufficientData =
+        this.previousAngles.length >= SUFFICIENT_ANGLE_HISTORY_SIZE;
+      const largeMovement = Math.abs(angleSum) >= 3;
+      if (sufficientData || largeMovement) {
+        this.interactionApi?.twistCamera(angleSum);
+        this.previousAngles = [];
+      } else {
+        this.previousAngles = [angle, ...this.previousAngles];
       }
     }
 
     this.currentPosition1 = point1;
     this.currentPosition2 = point2;
+  }
+
+  protected endTwoPointTouch(): void {
+    this.previousAngles = [];
   }
 }
