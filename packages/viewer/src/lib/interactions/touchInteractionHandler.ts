@@ -30,7 +30,7 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
       event.preventDefault();
 
       const touch1 = event.touches[0];
-      const touch2 = event.touches[0];
+      const touch2 = event.touches[1];
 
       this.currentPosition1 = Point.create(touch1.screenX, touch1.screenY);
 
