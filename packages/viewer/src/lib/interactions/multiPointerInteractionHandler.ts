@@ -34,6 +34,8 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
     if (keys.length === 1) {
       window.addEventListener('pointermove', this.handlePointerMove);
       window.addEventListener('pointerup', this.handlePointerUp);
+    } else if (keys.length === 2) {
+      this.beginTwoPointTouch(this.touchPoints[0], this.touchPoints[1]);
     }
   }
 

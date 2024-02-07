@@ -1,5 +1,6 @@
 import { Angle, Matrix2, Point } from '@vertexvis/geometry';
 
+import { requestAnimationFrame } from '../window';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 
@@ -21,6 +22,11 @@ export abstract class MultiTouchInteractionHandler
     this.element = undefined;
   }
 
+  protected beginTwoPointTouch(point1: Point.Point, point2: Point.Point): void {
+    this.previousFirstPoints = [...this.previousFirstPoints, point1];
+    this.previousSecondPoints = [...this.previousSecondPoints, point2];
+  }
+
   protected handleTwoPointTouchMove(
     point1: Point.Point,
     point2: Point.Point
@@ -33,7 +39,7 @@ export abstract class MultiTouchInteractionHandler
     // touch point moving, two opposing angles can be computed sequentially. This
     // results in a wobbling effect if those angles are both sent, and this batched
     // processing helps to reduce that effect.
-    window.requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       if (
         this.previousFirstPoints.length > 1 &&
         this.previousSecondPoints.length > 1 &&

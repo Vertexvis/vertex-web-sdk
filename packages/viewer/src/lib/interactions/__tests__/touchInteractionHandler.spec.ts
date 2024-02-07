@@ -1,8 +1,10 @@
 jest.mock('../interactionApiPerspective');
 jest.mock('../mouseInteractions');
+jest.mock('../../window');
 
 import { Point } from '@vertexvis/geometry';
 
+import { requestAnimationFrame } from '../../window';
 import { InteractionApiPerspective } from '../interactionApiPerspective';
 import { TouchInteractionHandler } from '../touchInteractionHandler';
 
@@ -70,6 +72,8 @@ describe(TouchInteractionHandler, () => {
   });
 
   it('performs a pan and zoom with a two finger touch', () => {
+    (requestAnimationFrame as jest.Mock).mockImplementation((fn) => fn());
+
     div.dispatchEvent(touchStart2);
     window.dispatchEvent(touchMoveWithTwoFingerTouch);
     window.dispatchEvent(touchEnd1);
