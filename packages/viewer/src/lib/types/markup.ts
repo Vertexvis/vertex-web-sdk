@@ -7,8 +7,8 @@ export interface ArrowMarkupInit {
   start?: Point.Point;
   end?: Point.Point;
   id?: string;
-  startLineEndStyle?: LineAnchorStyle;
-  endLineEndStyle?: LineAnchorStyle;
+  startLineAnchorStyle?: LineAnchorStyle;
+  endLineAnchorStyle?: LineAnchorStyle;
 }
 
 export class ArrowMarkup {
