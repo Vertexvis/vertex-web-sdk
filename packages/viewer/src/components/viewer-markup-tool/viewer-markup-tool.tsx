@@ -20,7 +20,7 @@ import {
 } from '../../lib/types/markup';
 import {
   isVertexViewerArrowMarkup,
-  LineEndStyle,
+  LineAnchorStyle,
 } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
@@ -95,16 +95,16 @@ export class ViewerMarkupTool {
   public viewer?: HTMLVertexViewerElement;
 
   /**
-   * The line end style of the starting anchor. This default to none.
+   * The style of the starting anchor. This defaults to none.
    */
   @Prop({ mutable: true })
-  public startLineEndStyle: LineEndStyle = 'none';
+  public startLineAnchorStyle: LineAnchorStyle = 'none';
 
   /**
-   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   * The style of the ending anchor. This defaults to 'arrow-triangle.'
    */
   @Prop({ mutable: true })
-  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
+  public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
 
   /**
    * An event that is dispatched when a user begins a new markup.
@@ -178,16 +178,16 @@ export class ViewerMarkupTool {
   /**
    * @ignore
    */
-  @Watch('startLineEndStyle')
-  protected handleStartLineEndStyleChanged(): void {
+  @Watch('startLineAnchorStyle')
+  protected handleStartLineAnchorStyleChanged(): void {
     this.updateMarkupElement();
   }
 
   /**
    * @ignore
    */
-  @Watch('endLineEndStyle')
-  protected handleEndLineEndStyleChanged(): void {
+  @Watch('endLineAnchorStyle')
+  protected handleEndLineAnchorStyleChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -349,10 +349,10 @@ export class ViewerMarkupTool {
       if (this.tool === 'arrow') {
         (
           newMarkupElement as HTMLVertexViewerMarkupArrowElement
-        ).startLineEndStyle = this.startLineEndStyle;
+        ).startLineAnchorStyle = this.startLineAnchorStyle;
         (
           newMarkupElement as HTMLVertexViewerMarkupArrowElement
-        ).endLineEndStyle = this.endLineEndStyle;
+        ).endLineAnchorStyle = this.endLineAnchorStyle;
       }
 
       newMarkupElement.mode = 'create';

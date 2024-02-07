@@ -2,14 +2,14 @@ import { Angle } from '@vertexvis/geometry';
 
 import * as Point from '../../../../geometry/src/point';
 
-export type LineEndStyle =
+export type LineAnchorStyle =
   | 'arrow-triangle'
   | 'arrow-line'
   | 'dot'
   | 'hash'
   | 'none';
 
-export interface LineEndStylePoints {
+export interface LineAnchorStylePoints {
   tip: Point.Point;
   base: Point.Point;
   arrowTriangle: ArrowheadPoints;
@@ -65,12 +65,12 @@ export function createArrowheadPoints(
   };
 }
 
-export function createLineEndStylePoints(
+export function createLineAnchorStylePoints(
   start: Point.Point,
   end: Point.Point,
   triangleArrowAngle = 65,
   lineArrowAngle = 85
-): LineEndStylePoints {
+): LineAnchorStylePoints {
   // Adjust the size of the end style to the distance between the start and end points
   const distance = Point.distance(start, end);
   const arrowHeadHeight = Math.max(4, Math.min(16, distance * 0.25));
@@ -120,7 +120,7 @@ export function createLineEndStylePoints(
 }
 
 export function arrowheadPointsToPolygonPoints(
-  points: LineEndStylePoints
+  points: LineAnchorStylePoints
 ): string {
   return [
     points.tip,
@@ -133,7 +133,7 @@ export function arrowheadPointsToPolygonPoints(
 }
 
 export function arrowheadPointsToPathPoints(
-  points: LineEndStylePoints
+  points: LineAnchorStylePoints
 ): string {
   return `M${points.arrowLine.rightPoint.x} ${points.arrowLine.rightPoint.y} L${points.tip.x} ${points.tip.y} L${points.arrowLine.leftPoint.x} ${points.arrowLine.leftPoint.y} L${points.tip.x} ${points.tip.y} Z`;
 }

@@ -81,7 +81,7 @@ import {
   ViewerIconSize,
 } from './components/viewer-icon/viewer-icon';
 import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
-import { LineEndStyle } from './components/viewer-markup-arrow/utils';
+import { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
 import { Markup } from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
@@ -899,9 +899,9 @@ export namespace Components {
      */
     disabled: boolean;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle: LineEndStyle;
+    endLineAnchorStyle: LineAnchorStyle;
     /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
@@ -954,9 +954,9 @@ export namespace Components {
      */
     selectedMarkupId?: string;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle: LineEndStyle;
+    startLineAnchorStyle: LineAnchorStyle;
     /**
      * The type of markup to perform.
      */
@@ -981,9 +981,9 @@ export namespace Components {
      */
     endJson?: string;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle: LineEndStyle;
+    endLineAnchorStyle: LineAnchorStyle;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      */
@@ -1001,9 +1001,9 @@ export namespace Components {
      */
     startJson?: string;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle: LineEndStyle;
+    startLineAnchorStyle: LineAnchorStyle;
     /**
      * The viewer to connect to markups.
      *
@@ -1089,9 +1089,9 @@ export namespace Components {
      */
     disabled: boolean;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle: LineEndStyle;
+    endLineAnchorStyle: LineAnchorStyle;
     /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
@@ -1101,9 +1101,9 @@ export namespace Components {
      */
     reset: () => Promise<void>;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle: LineEndStyle;
+    startLineAnchorStyle: LineAnchorStyle;
     /**
      * The type of markup.
      *
@@ -2614,9 +2614,9 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle?: LineEndStyle;
+    endLineAnchorStyle?: LineAnchorStyle;
     /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
@@ -2661,9 +2661,9 @@ declare namespace LocalJSX {
      */
     selectedMarkupId?: string;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle?: LineEndStyle;
+    startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The type of markup to perform.
      */
@@ -2687,9 +2687,9 @@ declare namespace LocalJSX {
      */
     endJson?: string;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle?: LineEndStyle;
+    endLineAnchorStyle?: LineAnchorStyle;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      */
@@ -2719,9 +2719,9 @@ declare namespace LocalJSX {
      */
     startJson?: string;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle?: LineEndStyle;
+    startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The viewer to connect to markups.
      *
@@ -2831,9 +2831,9 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
-     * The line end style of the ending anchor. This default to 'arrow-triangle.'
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
      */
-    endLineEndStyle?: LineEndStyle;
+    endLineAnchorStyle?: LineAnchorStyle;
     /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
@@ -2847,9 +2847,9 @@ declare namespace LocalJSX {
      */
     onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
     /**
-     * The line end style of the starting anchor. This default to none.
+     * The style of the starting anchor. This defaults to none.
      */
-    startLineEndStyle?: LineEndStyle;
+    startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The type of markup.
      *

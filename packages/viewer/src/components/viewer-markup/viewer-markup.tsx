@@ -22,7 +22,7 @@ import {
 } from '../../lib/types/markup';
 import {
   isVertexViewerArrowMarkup,
-  LineEndStyle,
+  LineAnchorStyle,
 } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
@@ -91,16 +91,16 @@ export class ViewerMarkup {
   public selectNew = false;
 
   /**
-   * The line end style of the starting anchor. This default to none.
+   * The style of the starting anchor. This defaults to none.
    */
   @Prop({ mutable: true })
-  public startLineEndStyle: LineEndStyle = 'none';
+  public startLineAnchorStyle: LineAnchorStyle = 'none';
 
   /**
-   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   * The style of the ending anchor. This defaults to 'arrow-triangle.'
    */
   @Prop({ mutable: true })
-  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
+  public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
 
   /**
    * Dispatched when a new markup is added, either through user interaction
@@ -177,8 +177,8 @@ export class ViewerMarkup {
       el.id = id;
       el.start = start;
       el.end = end;
-      el.startLineEndStyle = this.startLineEndStyle;
-      el.endLineEndStyle = this.endLineEndStyle;
+      el.startLineAnchorStyle = this.startLineAnchorStyle;
+      el.endLineAnchorStyle = this.endLineAnchorStyle;
 
       return this.appendMarkupElement(el);
     } else if (markup instanceof CircleMarkup) {
@@ -350,16 +350,16 @@ export class ViewerMarkup {
   /**
    * @ignore
    */
-  @Watch('startLineEndStyle')
-  protected handleStartLineEndStyleChanged(): void {
+  @Watch('startLineAnchorStyle')
+  protected handleStartLineAnchorStyleChanged(): void {
     this.updatePropsOnMarkupTool();
   }
 
   /**
    * @ignore
    */
-  @Watch('endLineEndStyle')
-  protected handleEndLineEndStyleChanged(): void {
+  @Watch('endLineAnchorStyle')
+  protected handleEndLineAnchorStyleChanged(): void {
     this.updatePropsOnMarkupTool();
   }
 
@@ -576,8 +576,8 @@ export class ViewerMarkup {
       tool.freeformTemplateId = this.freeformTemplateId;
       tool.tool = this.tool;
       tool.viewer = this.viewer;
-      tool.startLineEndStyle = this.startLineEndStyle;
-      tool.endLineEndStyle = this.endLineEndStyle;
+      tool.startLineAnchorStyle = this.startLineAnchorStyle;
+      tool.endLineAnchorStyle = this.endLineAnchorStyle;
     }
   }
 

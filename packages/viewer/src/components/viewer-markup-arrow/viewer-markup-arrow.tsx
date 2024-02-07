@@ -24,9 +24,9 @@ import { ArrowMarkupInteractionHandler } from './interactions';
 import {
   arrowheadPointsToPathPoints,
   arrowheadPointsToPolygonPoints,
-  createLineEndStylePoints,
-  LineEndStyle,
-  LineEndStylePoints,
+  createLineAnchorStylePoints,
+  LineAnchorStyle,
+  LineAnchorStylePoints,
   parsePoint,
 } from './utils';
 import { BoundingBox1d } from './viewer-markup-arrow-components';
@@ -89,16 +89,16 @@ export class ViewerMarkupArrow {
   public endJson?: string;
 
   /**
-   * The line end style of the starting anchor. This default to none.
+   * The style of the starting anchor. This defaults to none.
    */
   @Prop({ mutable: true })
-  public startLineEndStyle: LineEndStyle = 'none';
+  public startLineAnchorStyle: LineAnchorStyle = 'none';
 
   /**
-   * The line end style of the ending anchor. This default to 'arrow-triangle.'
+   * The style of the ending anchor. This defaults to 'arrow-triangle.'
    */
   @Prop({ mutable: true })
-  public endLineEndStyle: LineEndStyle = 'arrow-triangle';
+  public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
 
   /**
    * A mode that specifies how the markup component should behave. When
@@ -236,30 +236,30 @@ export class ViewerMarkupArrow {
     this.end = this.end || parsePoint(this.endJson);
   }
 
-  private renderLineEndStyle(
-    endStyle: LineEndStyle,
-    arrowheadPoints: LineEndStylePoints
+  private renderLineAnchorStyle(
+    anchorStyle: LineAnchorStyle,
+    arrowheadPoints: LineAnchorStylePoints
   ): h.JSX.IntrinsicElements {
-    if (endStyle === 'arrow-triangle') {
+    if (anchorStyle === 'arrow-triangle') {
       return (
         <polygon
-          id="line-end-arrow-triangle"
+          id="line-anchor-arrow-triangle"
           class="head"
           points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
         />
       );
-    } else if (endStyle === 'arrow-line') {
+    } else if (anchorStyle === 'arrow-line') {
       return (
         <path
-          id="line-end-arrow-line"
+          id="line-anchor-arrow-line"
           class="head"
           d={arrowheadPointsToPathPoints(arrowheadPoints)}
         />
       );
-    } else if (endStyle === 'hash') {
+    } else if (anchorStyle === 'hash') {
       return (
         <line
-          id="line-end-none"
+          id="line-anchor-hash"
           class="head"
           x1={arrowheadPoints.hash.leftPoint.x}
           y1={arrowheadPoints.hash.leftPoint.y}
@@ -267,10 +267,10 @@ export class ViewerMarkupArrow {
           y2={arrowheadPoints.hash.rightPoint.y}
         />
       );
-    } else if (endStyle === 'dot') {
+    } else if (anchorStyle === 'dot') {
       return (
         <circle
-          id="line-end-circle"
+          id="line-anchor-circle"
           class="head"
           cx={arrowheadPoints.tip.x}
           cy={arrowheadPoints.tip.y}
@@ -289,25 +289,17 @@ export class ViewerMarkupArrow {
         this.elementBounds
       );
       const screenEnd = translatePointToScreen(this.end, this.elementBounds);
-      const arrowheadStartPoints = createLineEndStylePoints(
-        screenEnd,
-        screenStart
-      );
-      const arrowheadEndPoints = createLineEndStylePoints(
-        screenStart,
-        screenEnd
-      );
-
-      const lineStartingPoint =
-        this.startLineEndStyle === 'arrow-triangle'
-          ? arrowheadStartPoints.base
-          : arrowheadStartPoints.tip;
-      const lineEndingPoint =
-        this.endLineEndStyle === 'arrow-triangle'
-          ? arrowheadEndPoints.base
-          : arrowheadEndPoints.tip;
 
       if (isValidPointData(screenStart, screenEnd)) {
+        const arrowheadStartPoints = createLineAnchorStylePoints(
+          screenEnd,
+          screenStart
+        );
+        const arrowheadEndPoints = createLineAnchorStylePoints(
+          screenStart,
+          screenEnd
+        );
+
         return (
           <Host>
             <svg class="svg" onTouchStart={this.handleTouchStart}>
@@ -315,20 +307,20 @@ export class ViewerMarkupArrow {
                 <SvgShadow id="arrow-shadow" />
               </defs>
               <g filter="url(#arrow-shadow)">
-                {this.renderLineEndStyle(
-                  this.startLineEndStyle,
+                {this.renderLineAnchorStyle(
+                  this.startLineAnchorStyle,
                   arrowheadStartPoints
                 )}
                 <line
                   id="arrow-line"
                   class="line"
-                  x1={lineStartingPoint.x}
-                  y1={lineStartingPoint.y}
-                  x2={lineEndingPoint.x}
-                  y2={lineEndingPoint.y}
+                  x1={arrowheadEndPoints.tip.x}
+                  y1={arrowheadEndPoints.tip.y}
+                  x2={arrowheadStartPoints.tip.x}
+                  y2={arrowheadStartPoints.tip.y}
                 />
-                {this.renderLineEndStyle(
-                  this.endLineEndStyle,
+                {this.renderLineAnchorStyle(
+                  this.endLineAnchorStyle,
                   arrowheadEndPoints
                 )}
               </g>
