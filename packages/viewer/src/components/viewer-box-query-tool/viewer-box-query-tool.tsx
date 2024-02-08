@@ -1,4 +1,14 @@
-import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
+import {
+  Component,
+  Element,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  State,
+  Watch,
+} from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
 import { VolumeIntersectionQueryController } from '../../lib/volume-intersection/controller';
@@ -79,6 +89,12 @@ export class ViewerBoxQueryTool {
 
   @State()
   private details?: VolumeIntersectionQueryDetails;
+
+  /**
+   * Event emitted when the `VolumeIntersectionQueryController` associated with this tool changes.
+   */
+  @Event()
+  public controllerChanged!: EventEmitter<VolumeIntersectionQueryController>;
 
   @Element()
   private hostEl!: HTMLVertexViewerBoxQueryToolElement;
@@ -177,6 +193,8 @@ export class ViewerBoxQueryTool {
     this.operationStartedDisposable = controller?.onExecuteComplete(
       this.handleExecuteComplete
     );
+
+    this.controllerChanged.emit(this.controller);
   }
 
   /**
