@@ -56,6 +56,13 @@ type of query to be performed on pointer up is populated on the `<vertex-viewer-
 | `viewer`        | --               | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `HTMLVertexViewerElement \| undefined`           | `undefined`        |
 
 
+## Events
+
+| Event               | Description                                                                                   | Type                                             |
+| ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `controllerChanged` | Event emitted when the `VolumeIntersectionQueryController` associated with this tool changes. | `CustomEvent<VolumeIntersectionQueryController>` |
+
+
 ## CSS Custom Properties
 
 | Name                                                | Description                                                                                                                                                                                                     |
