@@ -1590,6 +1590,10 @@ export interface VertexViewerCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerElement;
 }
+export interface VertexViewerBoxQueryToolCustomEvent<T> extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerBoxQueryToolElement;
+}
 export interface VertexViewerDomElementCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerDomElementElement;
@@ -2396,6 +2400,12 @@ declare namespace LocalJSX {
      * The model that contains the points representing the corners of the box displayed on screen, the type of the query to be performed, and methods for setting these values.
      */
     model?: VolumeIntersectionQueryModel;
+    /**
+     * Event emitted when the `VolumeIntersectionQueryController` associated with this tool changes.
+     */
+    onControllerChanged?: (
+      event: VertexViewerBoxQueryToolCustomEvent<VolumeIntersectionQueryController>
+    ) => void;
     /**
      * The default operation to perform when a drag has completed and the intersection query will be run. Defaults to `clearAndSelect`, and can be changed to `select` or `deselect`.
      *

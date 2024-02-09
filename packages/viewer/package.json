@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "The Vertex SDK for viewing models.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",

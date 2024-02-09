@@ -76,6 +76,27 @@ describe('vertex-viewer-box-query-tool', () => {
     expect(bounds).toBeNull();
   });
 
+  it('notifies when the controller changes', async () => {
+    const { stream, ws } = makeViewerStream();
+
+    const onControllerChanged = jest.fn();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-box-query-tool
+            onControllerChanged={onControllerChanged}
+          ></vertex-viewer-box-query-tool>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.root as HTMLVertexViewerElement;
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+
+    expect(onControllerChanged).toHaveBeenCalled();
+  });
+
   it('sends a selection query for the frustum using exclusive', async () => {
     const { stream, ws } = makeViewerStream();
 

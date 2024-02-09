@@ -34,6 +34,8 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
     if (keys.length === 1) {
       window.addEventListener('pointermove', this.handlePointerMove);
       window.addEventListener('pointerup', this.handlePointerUp);
+    } else if (keys.length === 2) {
+      this.beginTwoPointTouch(this.touchPoints[0], this.touchPoints[1]);
     }
   }
 
@@ -59,12 +61,11 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
     const keys = Object.keys(this.touchPoints);
     if (keys.length === 1) {
       this.interactionApi?.endInteraction();
-      this.currentPosition1 = undefined;
-      this.currentPosition2 = undefined;
     }
     if (keys.length === 0) {
       window.removeEventListener('pointermove', this.handlePointerMove);
       window.removeEventListener('pointerup', this.handlePointerUp);
     }
+    this.endTwoPointTouch();
   }
 }
