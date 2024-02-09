@@ -1,21 +1,29 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
 
+import { LineAnchorStyle } from '../../components/viewer-markup-arrow/utils';
+
 export interface ArrowMarkupInit {
   start?: Point.Point;
   end?: Point.Point;
   id?: string;
+  startLineAnchorStyle?: LineAnchorStyle;
+  endLineAnchorStyle?: LineAnchorStyle;
 }
 
 export class ArrowMarkup {
   public readonly start: Point.Point;
   public readonly end: Point.Point;
   public readonly id: string;
+  public readonly startLineAnchorStyle: LineAnchorStyle;
+  public readonly endLineAnchorStyle: LineAnchorStyle;
 
   public constructor(init: ArrowMarkupInit) {
     this.start = init.start ?? Point.create();
     this.end = init.end ?? Point.create();
     this.id = init.id ?? `arrow-markup--${UUID.create()}`;
+    this.startLineAnchorStyle = init.startLineAnchorStyle ?? 'none';
+    this.endLineAnchorStyle = init.endLineAnchorStyle ?? 'arrow-triangle';
   }
 }
 

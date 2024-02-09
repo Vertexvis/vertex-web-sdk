@@ -81,6 +81,7 @@ import {
   ViewerIconSize,
 } from './components/viewer-icon/viewer-icon';
 import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
+import { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
 import { Markup } from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
@@ -898,6 +899,10 @@ export namespace Components {
      */
     disabled: boolean;
     /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle: LineAnchorStyle;
+    /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
@@ -949,6 +954,10 @@ export namespace Components {
      */
     selectedMarkupId?: string;
     /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle: LineAnchorStyle;
+    /**
      * The type of markup to perform.
      */
     tool: ViewerMarkupToolType;
@@ -972,6 +981,10 @@ export namespace Components {
      */
     endJson?: string;
     /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle: LineAnchorStyle;
+    /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      */
     mode: ViewerMarkupArrowMode;
@@ -987,6 +1000,10 @@ export namespace Components {
      * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     startJson?: string;
+    /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle: LineAnchorStyle;
     /**
      * The viewer to connect to markups.
      *
@@ -1072,6 +1089,10 @@ export namespace Components {
      */
     disabled: boolean;
     /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle: LineAnchorStyle;
+    /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
@@ -1079,6 +1100,10 @@ export namespace Components {
      * Resets the state of the internally managed markup element to allow for creating a new markup. This state is automatically managed when this element is placed as a child of a `<vertex-viewer-markup>` element.
      */
     reset: () => Promise<void>;
+    /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle: LineAnchorStyle;
     /**
      * The type of markup.
      *
@@ -2599,6 +2624,10 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle?: LineAnchorStyle;
+    /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
@@ -2642,6 +2671,10 @@ declare namespace LocalJSX {
      */
     selectedMarkupId?: string;
     /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle?: LineAnchorStyle;
+    /**
      * The type of markup to perform.
      */
     tool?: ViewerMarkupToolType;
@@ -2663,6 +2696,10 @@ declare namespace LocalJSX {
      * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     endJson?: string;
+    /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle?: LineAnchorStyle;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      */
@@ -2691,6 +2728,10 @@ declare namespace LocalJSX {
      * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
      */
     startJson?: string;
+    /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The viewer to connect to markups.
      *
@@ -2800,6 +2841,10 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
+     * The style of the ending anchor. This defaults to 'arrow-triangle.'
+     */
+    endLineAnchorStyle?: LineAnchorStyle;
+    /**
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
@@ -2811,6 +2856,10 @@ declare namespace LocalJSX {
      * An event that is dispatched when a user has finished their markup.
      */
     onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
+    /**
+     * The style of the starting anchor. This defaults to none.
+     */
+    startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The type of markup.
      *

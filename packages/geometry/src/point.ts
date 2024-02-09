@@ -90,6 +90,69 @@ export function scale(pt: Point, scaleX: number, scaleY: number): Point {
 }
 
 /**
+ * Returns a new `Point` where `x` and `y` are multiplied by the given scale
+ * factor.
+ */
+export function scaleProportional(pt: Point, scale: number): Point {
+  return {
+    x: pt.x * scale,
+    y: pt.y * scale,
+  };
+}
+
+/**
+ * Returns the magnitude of a point.
+ */
+export function magnitude(pt: Point): number {
+  return Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+}
+
+/**
+ * Transforms a vector into the corresponding normal (unit) vector.
+ */
+export function normalizeVector(pt: Point): Point {
+  const magnitudeOfPoint = magnitude(pt);
+  if (magnitudeOfPoint === 0) {
+    return create(0, 0);
+  } else {
+    return scaleProportional(pt, 1 / magnitudeOfPoint);
+  }
+}
+
+/**
+ * Returns a new normal (unit) vector pointing between the two given points.
+ */
+export function normalDirectionVector(ptA: Point, ptB: Point): Point {
+  return normalizeVector(subtract(ptB, ptA));
+}
+
+/**
+ * Returns a vector orthogonal to the vector between the two given points.
+ */
+export function orthogonalVector(ptA: Point, ptB: Point): Point {
+  const unitVectorBetweenPoints = normalDirectionVector(ptA, ptB);
+
+  // Handle vectors that are parallel to the x or y axis
+  if (unitVectorBetweenPoints.x === 0 || unitVectorBetweenPoints.y === 0) {
+    return create(-1 * unitVectorBetweenPoints.y, unitVectorBetweenPoints.x);
+  }
+
+  if (
+    Math.abs(unitVectorBetweenPoints.x) > Math.abs(unitVectorBetweenPoints.y)
+  ) {
+    const vectorXValue = 1 - Math.pow(unitVectorBetweenPoints.x, 2);
+    const vectorYValue =
+      -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
+    return normalizeVector(create(vectorXValue, vectorYValue));
+  } else {
+    const vectorXValue =
+      -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
+    const vectorYValue = 1 - Math.pow(unitVectorBetweenPoints.y, 2);
+    return normalizeVector(create(vectorXValue, vectorYValue));
+  }
+}
+
+/**
  * Parses a JSON string representation of a Point and returns an object.
  *
  * @param json A JSON string, either in the form `[x,y]` or `{"x": 0, "y": 0}`

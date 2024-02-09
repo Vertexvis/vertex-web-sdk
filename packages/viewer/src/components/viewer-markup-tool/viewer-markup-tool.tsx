@@ -18,7 +18,10 @@ import {
   FreeformMarkup,
   Markup,
 } from '../../lib/types/markup';
-import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
+import {
+  isVertexViewerArrowMarkup,
+  LineAnchorStyle,
+} from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
@@ -92,6 +95,18 @@ export class ViewerMarkupTool {
   public viewer?: HTMLVertexViewerElement;
 
   /**
+   * The style of the starting anchor. This defaults to none.
+   */
+  @Prop({ mutable: true })
+  public startLineAnchorStyle: LineAnchorStyle = 'none';
+
+  /**
+   * The style of the ending anchor. This defaults to 'arrow-triangle.'
+   */
+  @Prop({ mutable: true })
+  public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
+
+  /**
    * An event that is dispatched when a user begins a new markup.
    */
   @Event({ bubbles: true })
@@ -157,6 +172,22 @@ export class ViewerMarkupTool {
    */
   @Watch('disabled')
   protected handleDisabledChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('startLineAnchorStyle')
+  protected handleStartLineAnchorStyleChanged(): void {
+    this.updateMarkupElement();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('endLineAnchorStyle')
+  protected handleEndLineAnchorStyleChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -314,6 +345,16 @@ export class ViewerMarkupTool {
 
     if (!this.disabled) {
       const newMarkupElement = this.createNewMarkupElement();
+
+      if (this.tool === 'arrow') {
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).startLineAnchorStyle = this.startLineAnchorStyle;
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).endLineAnchorStyle = this.endLineAnchorStyle;
+      }
+
       newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(
