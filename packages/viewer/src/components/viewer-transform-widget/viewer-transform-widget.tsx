@@ -149,6 +149,7 @@ export class ViewerTransformWidget {
 
   private canvasBounds?: DOMRect;
   private canvasResizeObserver?: ResizeObserver;
+  private hostStyleObserver?: MutationObserver;
   private canvasRef?: HTMLCanvasElement;
 
   private hoveredChangeDisposable?: Disposable;
@@ -157,6 +158,7 @@ export class ViewerTransformWidget {
     window.addEventListener('pointermove', this.handlePointerMove);
 
     this.canvasResizeObserver = new ResizeObserver(this.handleResize);
+    this.hostStyleObserver = new MutationObserver(this.handleStyleChange);
 
     if (this.canvasRef != null) {
       this.canvasResizeObserver.observe(this.canvasRef);
@@ -164,30 +166,20 @@ export class ViewerTransformWidget {
       this.setupTransformWidget(this.canvasRef);
     }
 
-    this.handleViewerChanged(this.viewer, undefined);
-
-    readDOM(() => {
-      const hostStyles = window.getComputedStyle(this.hostEl);
-
-      this.xArrowColor = hostStyles
-        .getPropertyValue('--viewer-transform-widget-x-axis-arrow-color')
-        .trim();
-      this.yArrowColor = hostStyles
-        .getPropertyValue('--viewer-transform-widget-y-axis-arrow-color')
-        .trim();
-      this.zArrowColor = hostStyles
-        .getPropertyValue('--viewer-transform-widget-z-axis-arrow-color')
-        .trim();
-      this.hoveredColor = hostStyles
-        .getPropertyValue('--viewer-transform-widget-hovered-arrow-color')
-        .trim();
+    this.hostStyleObserver.observe(this.hostEl, {
+      attributes: true,
+      attributeFilter: ['style'],
     });
+
+    this.handleViewerChanged(this.viewer, undefined);
+    this.handleStyleChange();
   }
 
   protected disconnectedCallback(): void {
     window.removeEventListener('pointermove', this.handlePointerMove);
 
     this.canvasResizeObserver?.disconnect();
+    this.hostStyleObserver?.disconnect();
 
     this.hoveredChangeDisposable?.dispose();
     this.widget?.dispose();
@@ -244,12 +236,14 @@ export class ViewerTransformWidget {
    */
   @Watch('rotation')
   protected handleRotationChanged(
-    newRotation: Euler.Euler,
+    newRotation?: Euler.Euler,
     oldRotation?: Euler.Euler
   ): void {
-    this.currentTransform = this.getTransformForNewRotation(newRotation);
-    this.startingTransform = this.currentTransform;
-    this.widget?.updateTransform(this.currentTransform);
+    if (newRotation != null) {
+      this.currentTransform = this.getTransformForNewRotation(newRotation);
+      this.startingTransform = this.currentTransform;
+      this.widget?.updateTransform(this.currentTransform);
+    }
     console.debug(
       `Updating widget rotation [previous=${JSON.stringify(
         oldRotation
@@ -325,6 +319,32 @@ export class ViewerTransformWidget {
     if (this.canvasRef != null) {
       this.updateCanvasBounds(this.canvasRef);
     }
+  };
+
+  private handleStyleChange = (): void => {
+    readDOM(() => {
+      const hostStyles = window.getComputedStyle(this.hostEl);
+
+      this.xArrowColor = hostStyles
+        .getPropertyValue('--viewer-transform-widget-x-axis-arrow-color')
+        .trim();
+      this.yArrowColor = hostStyles
+        .getPropertyValue('--viewer-transform-widget-y-axis-arrow-color')
+        .trim();
+      this.zArrowColor = hostStyles
+        .getPropertyValue('--viewer-transform-widget-z-axis-arrow-color')
+        .trim();
+      this.hoveredColor = hostStyles
+        .getPropertyValue('--viewer-transform-widget-hovered-arrow-color')
+        .trim();
+
+      this.getTransformWidget().updateColors({
+        xArrow: this.xArrowColor,
+        yArrow: this.yArrowColor,
+        zArrow: this.zArrowColor,
+        hovered: this.hoveredColor,
+      });
+    });
   };
 
   private handlePointerMove = (event: PointerEvent): void => {

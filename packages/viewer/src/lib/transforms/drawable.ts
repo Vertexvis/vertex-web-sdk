@@ -50,10 +50,16 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     });
   }
 
-  public updateFillColor(color?: Color.Color | string): void {
+  public updateFillColor(
+    color?: Color.Color | string,
+    isInitialColor = false
+  ): void {
     if (color != null) {
       this.fillColor =
         typeof color === 'string' ? color : Color.toHexString(color);
+      this.initialFillColor = isInitialColor
+        ? this.fillColor
+        : this.initialFillColor;
     }
   }
 
