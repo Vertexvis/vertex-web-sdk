@@ -240,7 +240,7 @@ function buildOperationTypes(
           },
         };
       case 'clear-override':
-        return { changeMaterial: {} };
+        return { clearMaterial: {} };
       case 'change-transform':
         return { changeTransform: { transform: { ...op.transform } } };
       case 'clear-transform':

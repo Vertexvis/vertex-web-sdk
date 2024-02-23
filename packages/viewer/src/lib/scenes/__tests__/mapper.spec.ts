@@ -24,6 +24,7 @@ describe(buildSceneOperation, () => {
           { type: 'view-representation', id: 'entire-part' },
           { type: 'view-representation', id: repId },
           { type: 'clear-representation' },
+          { type: 'clear-override' },
         ],
         { dimensions: Dimensions.create(100, 100) }
       )
@@ -49,6 +50,7 @@ describe(buildSceneOperation, () => {
         },
         { viewRepresentation: { id: { hex: repId } } },
         { clearRepresentation: {} },
+        { clearMaterial: {} },
       ],
     });
   });

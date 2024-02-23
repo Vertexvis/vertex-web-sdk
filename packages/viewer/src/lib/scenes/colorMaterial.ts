@@ -43,7 +43,7 @@ export const defaultColor: ColorMaterial = {
 };
 
 /**
- * This helper creats an rgb value color
+ * This helper creates an rgb value color
  * @param hex
  * @param opacity
  */
