@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/geometry",
-  "version": "0.20.0",
+  "version": "0.20.2",
   "description": "Library for 2D and 3D geometric types.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
