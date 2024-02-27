@@ -114,6 +114,17 @@ export class ViewerMarkup {
   >;
 
   /**
+   * Dispatched when an existing piece of markup is changed, either through user interaction
+   * or programmatically.
+   */
+  @Event()
+  public markupChanged!: EventEmitter<
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
+  >;
+
+  /**
    * Dispatched when a markup is removed, either through user
    * interaction or programmatically.
    */
@@ -385,6 +396,17 @@ export class ViewerMarkup {
     }
 
     this.getMarkupTool()?.reset();
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('markupUpdated')
+  protected async handleMarkupUpdated(
+    event: CustomEvent<Markup>
+  ): Promise<void> {
+    const e = event as CustomEvent<Markup>;
+    this.markupChanged.emit(e);
   }
 
   /**

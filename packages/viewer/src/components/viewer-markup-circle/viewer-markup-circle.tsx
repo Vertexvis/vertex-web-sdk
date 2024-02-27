@@ -94,6 +94,12 @@ export class ViewerMarkupCircle {
   public editEnd!: EventEmitter<void>;
 
   /**
+   * An event that is dispatched with the updated markup element after the markup has changed.
+   */
+  @Event({ bubbles: true })
+  public markupUpdated!: EventEmitter<HTMLVertexViewerMarkupCircleElement>;
+
+  /**
    * An event that is dispatched when this markup element is in view
    * mode (`this.mode === ""`), and it completes a rerender.
    */
@@ -109,7 +115,8 @@ export class ViewerMarkupCircle {
   private interactionHandler = new CircleMarkupInteractionHandler(
     this.hostEl,
     this.editBegin,
-    this.editEnd
+    this.editEnd,
+    this.markupUpdated
   );
 
   private registeredHandler?: Disposable;

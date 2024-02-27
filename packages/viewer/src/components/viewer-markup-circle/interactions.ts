@@ -20,7 +20,8 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupCircleElement,
     private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>
+    private readonly editEnd: EventEmitter<void>,
+    private readonly markupUpdated: EventEmitter<HTMLVertexViewerMarkupCircleElement>
   ) {
     super();
   }
@@ -97,6 +98,10 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
       ) {
         this.anchor = 'bottom-right';
         this.editEnd.emit();
+
+        if (this.markupEl.mode === 'edit') {
+          this.markupUpdated.emit(this.markupEl);
+        }
       } else {
         this.markupEl.bounds = undefined;
       }

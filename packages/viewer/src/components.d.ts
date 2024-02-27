@@ -2642,6 +2642,16 @@ declare namespace LocalJSX {
       >
     ) => void;
     /**
+     * Dispatched when an existing piece of markup is changed, either through user interaction or programmatically.
+     */
+    onMarkupChanged?: (
+      event: VertexViewerMarkupCustomEvent<
+        | HTMLVertexViewerMarkupArrowElement
+        | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupFreeformElement
+      >
+    ) => void;
+    /**
      * Dispatched when a markup is removed, either through user interaction or programmatically.
      */
     onMarkupRemoved?: (
@@ -2713,6 +2723,12 @@ declare namespace LocalJSX {
      */
     onEditEnd?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
     /**
+     * An event that is dispatched with the updated markup element after the markup has changed.
+     */
+    onMarkupUpdated?: (
+      event: VertexViewerMarkupArrowCustomEvent<HTMLVertexViewerMarkupArrowElement>
+    ) => void;
+    /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
     onViewRendered?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
@@ -2765,6 +2781,12 @@ declare namespace LocalJSX {
      */
     onEditEnd?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
     /**
+     * An event that is dispatched with the updated markup element after the markup has changed.
+     */
+    onMarkupUpdated?: (
+      event: VertexViewerMarkupCircleCustomEvent<HTMLVertexViewerMarkupCircleElement>
+    ) => void;
+    /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
     onViewRendered?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
@@ -2800,6 +2822,12 @@ declare namespace LocalJSX {
      * An event that is dispatched when the user has finished editing the markup.
      */
     onEditEnd?: (event: VertexViewerMarkupFreeformCustomEvent<void>) => void;
+    /**
+     * An event that is dispatched with the updated markup element after the markup has changed.
+     */
+    onMarkupUpdated?: (
+      event: VertexViewerMarkupFreeformCustomEvent<HTMLVertexViewerMarkupFreeformElement>
+    ) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */

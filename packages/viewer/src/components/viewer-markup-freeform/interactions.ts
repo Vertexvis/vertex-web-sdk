@@ -25,7 +25,8 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupFreeformElement,
     private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>
+    private readonly editEnd: EventEmitter<void>,
+    private readonly markupUpdated: EventEmitter<HTMLVertexViewerMarkupCircleElement>
   ) {
     super();
   }
@@ -113,6 +114,10 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
 
         this.markupEl.points = [...this.markupEl.points, position];
         this.editEnd.emit();
+
+        if (this.markupEl.mode === 'edit') {
+          this.markupUpdated.emit(this.markupEl);
+        }
       } else {
         this.markupEl.points = undefined;
       }
@@ -158,6 +163,10 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
 
     this.resizeBounds = undefined;
     this.editEnd.emit();
+
+    if (this.markupEl.mode === 'edit') {
+      this.markupUpdated.emit(this.markupEl);
+    }
   };
 
   private updateMinAndMax(position: Point.Point): void {

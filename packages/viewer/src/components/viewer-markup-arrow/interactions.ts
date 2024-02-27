@@ -18,7 +18,8 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupArrowElement,
     private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>
+    private readonly editEnd: EventEmitter<void>,
+    private readonly markupUpdated: EventEmitter<HTMLVertexViewerMarkupArrowElement>
   ) {
     super();
   }
@@ -108,6 +109,10 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
         Point.distance(screenStart, screenEnd) >= 2
       ) {
         this.editEnd.emit();
+
+        if (this.markupEl.mode === 'edit') {
+          this.markupUpdated.emit(this.markupEl);
+        }
       } else {
         this.markupEl.start = undefined;
         this.markupEl.end = undefined;

@@ -134,6 +134,12 @@ export class ViewerMarkupArrow {
   public editEnd!: EventEmitter<void>;
 
   /**
+   * An event that is dispatched with the updated markup element after the markup has changed.
+   */
+  @Event({ bubbles: true })
+  public markupUpdated!: EventEmitter<HTMLVertexViewerMarkupArrowElement>;
+
+  /**
    * An event that is dispatched when this markup element is in view
    * mode (`this.mode === ""`), and it completes a rerender.
    */
@@ -149,7 +155,8 @@ export class ViewerMarkupArrow {
   private interactionHandler = new ArrowMarkupInteractionHandler(
     this.hostEl,
     this.editBegin,
-    this.editEnd
+    this.editEnd,
+    this.markupUpdated
   );
 
   private registeredInteraction?: Disposable;
