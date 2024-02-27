@@ -406,7 +406,12 @@ export class ViewerMarkup {
     event: CustomEvent<Markup>
   ): Promise<void> {
     const e = event as CustomEvent<Markup>;
-    this.markupChanged.emit(e);
+    this.markupChanged.emit(
+      e.detail as
+        | HTMLVertexViewerMarkupArrowElement
+        | HTMLVertexViewerMarkupCircleElement
+        | HTMLVertexViewerMarkupFreeformElement
+    );
   }
 
   /**
