@@ -2216,10 +2216,10 @@
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.1"
 
-"@vertexvis/frame-streaming-protos@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.0.tgz#b49c08855467edb429dcf7d9c6904b7c6215486d"
-  integrity sha512-8aIRjGNFZ/UHY1sS85MsISC0sIJgI6hQtgQKpKNQXHK2HIJ5Cwe3ZNT0Khk5pmcpLpGExczyvern5kTWaLMW7Q==
+"@vertexvis/frame-streaming-protos@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.1.tgz#b3ec132cd98009a49645093387932648702a8255"
+  integrity sha512-GFnzOuDDMKua5J7ws+JB8QNqPSiCHmp3UA241phFltL1Lcvl/8Dkq1tS78ks/8J3BJNVEJRdV8Da9ywQk/27XA==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -4805,9 +4805,9 @@ iobuffer@^5.0.4:
   integrity sha512-+6FgslkBHjNVLB3wGm/4tsKLo6lU4UJFWRe7oZFA++0MXRkKkWvyHkYZHfqO+AVKT9dj73tDo8mHzVFv+40B/g==
 
 ip@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
-  integrity sha1-vd7XARQpCCjAoDnnLvJfWq7ENUo=
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.9.tgz#8dfbcc99a754d07f425310b86a99546b1151e396"
+  integrity sha512-cyRxvOEpNHNtchU3Ln9KC/auJgup87llfQpQ+t5ghoC/UhL16SWzbueiCsdTnWmqAWl7LadfuwhlqmtOaqMHdQ==
 
 is-arrayish@^0.2.1:
   version "0.2.1"

@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/stream-api",
-  "version": "0.20.0",
+  "version": "0.20.2",
   "description": "A websocket client for interacting with Vertex's stream API.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -36,7 +36,7 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.13.0"
+    "@vertexvis/frame-streaming-protos": "^0.13.1"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
