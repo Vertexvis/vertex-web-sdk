@@ -292,33 +292,35 @@ describe(Scene, () => {
             operationTypes: [
               {
                 changeMaterial: {
-                  material: {
-                    d: 255,
-                    ka: {
-                      a: 0,
-                      b: 0,
-                      g: 0,
-                      r: 0,
+                  materialOverride: {
+                    colorMaterial: {
+                      d: 255,
+                      ka: {
+                        a: 0,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                      },
+                      kd: {
+                        a: 255,
+                        b: 34,
+                        g: 17,
+                        r: 255,
+                      },
+                      ke: {
+                        a: 0,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                      },
+                      ks: {
+                        a: 0,
+                        b: 0,
+                        g: 0,
+                        r: 0,
+                      },
+                      ns: ColorMaterial.defaultColor.glossiness,
                     },
-                    kd: {
-                      a: 255,
-                      b: 34,
-                      g: 17,
-                      r: 255,
-                    },
-                    ke: {
-                      a: 0,
-                      b: 0,
-                      g: 0,
-                      r: 0,
-                    },
-                    ks: {
-                      a: 0,
-                      b: 0,
-                      g: 0,
-                      r: 0,
-                    },
-                    ns: ColorMaterial.defaultColor.glossiness,
                   },
                 },
               },

@@ -229,18 +229,20 @@ function buildOperationTypes(
       case 'change-material':
         return {
           changeMaterial: {
-            material: {
-              d: op.material.opacity,
-              ns: op.material.glossiness,
-              ka: op.material.ambient,
-              kd: op.material.diffuse,
-              ks: op.material.specular,
-              ke: op.material.emissive,
+            materialOverride: {
+              colorMaterial: {
+                d: op.material.opacity,
+                ns: op.material.glossiness,
+                ka: op.material.ambient,
+                kd: op.material.diffuse,
+                ks: op.material.specular,
+                ke: op.material.emissive,
+              },
             },
           },
         };
       case 'clear-override':
-        return { changeMaterial: {} };
+        return { clearMaterial: {} };
       case 'change-transform':
         return { changeTransform: { transform: { ...op.transform } } };
       case 'clear-transform':
