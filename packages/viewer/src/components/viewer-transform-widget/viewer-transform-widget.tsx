@@ -239,11 +239,24 @@ export class ViewerTransformWidget {
     newRotation?: Euler.Euler,
     oldRotation?: Euler.Euler
   ): void {
-    if (newRotation != null) {
-      this.currentTransform = this.getTransformForNewRotation(newRotation);
+    const rotationToApply = newRotation ?? Euler.create();
+
+    this.currentTransform = this.getTransformForNewRotation(rotationToApply);
+    this.startingTransform = this.currentTransform;
+
+    // If the removal of the previous rotation above results in an identity matrix,
+    // clear the transformation on the widget to prevent it from appearing at the origin.
+    if (
+      newRotation == null &&
+      this.currentTransform != null &&
+      Matrix4.isIdentity(this.currentTransform)
+    ) {
+      this.currentTransform = undefined;
       this.startingTransform = this.currentTransform;
-      this.widget?.updateTransform(this.currentTransform);
     }
+
+    this.widget?.updateTransform(this.currentTransform);
+
     console.debug(
       `Updating widget rotation [previous=${JSON.stringify(
         oldRotation

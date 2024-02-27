@@ -14,7 +14,7 @@ jest.mock('./util', () => ({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Euler, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
@@ -577,6 +577,52 @@ describe('vertex-viewer-transform-widget', () => {
 
     expect(endSpy).toHaveBeenCalled();
     expect(mockTransformWidget.updateTransform).toHaveBeenCalledWith(undefined);
+  });
+
+  it('clears the widget position if the component rotation is cleared and there is no translation', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    widget.position = Vector3.create(1, 1, 1);
+    await page.waitForChanges();
+    widget.rotation = Euler.create({ x: 1, y: 1, z: 1 });
+    await page.waitForChanges();
+
+    (mockTransformWidget.updateTransform as jest.Mock).mockClear();
+    widget.position = undefined;
+    await page.waitForChanges();
+    widget.rotation = undefined;
+    await page.waitForChanges();
+
+    expect(mockTransformWidget.updateTransform).toHaveBeenNthCalledWith(
+      1,
+      undefined
+    );
+    expect(mockTransformWidget.updateTransform).toHaveBeenNthCalledWith(
+      2,
+      undefined
+    );
   });
 
   it('should dispatch an event when the position of the widget changes', async () => {
