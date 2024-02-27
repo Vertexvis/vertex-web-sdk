@@ -169,12 +169,12 @@ export class TransformWidget extends ReglComponent {
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
-    this.xArrow?.updateFillColor(this.getXTranslationColor());
-    this.yArrow?.updateFillColor(this.getYTranslationColor());
-    this.zArrow?.updateFillColor(this.getZTranslationColor());
-    this.xRotation?.updateFillColor(this.getXRotationColor());
-    this.yRotation?.updateFillColor(this.getYRotationColor());
-    this.zRotation?.updateFillColor(this.getZRotationColor());
+    this.xArrow?.updateFillColor(this.getXTranslationColor(), true);
+    this.yArrow?.updateFillColor(this.getYTranslationColor(), true);
+    this.zArrow?.updateFillColor(this.getZTranslationColor(), true);
+    this.xRotation?.updateFillColor(this.getXRotationColor(), true);
+    this.yRotation?.updateFillColor(this.getYRotationColor(), true);
+    this.zRotation?.updateFillColor(this.getZRotationColor(), true);
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
 
