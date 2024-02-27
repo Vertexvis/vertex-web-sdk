@@ -362,16 +362,36 @@ export class ViewerMarkup {
    * @ignore
    */
   @Watch('startLineAnchorStyle')
-  protected handleStartLineAnchorStyleChanged(): void {
+  protected async handleStartLineAnchorStyleChanged(): Promise<void> {
     this.updatePropsOnMarkupTool();
+
+    // If a piece of arrow markup is currently selected, then update its anchor style
+    const markup = await this.getMarkupElements();
+    markup.forEach((m) => {
+      if (m.id === this.selectedMarkupId) {
+        (m as HTMLVertexViewerMarkupArrowElement).startLineAnchorStyle =
+          this.startLineAnchorStyle;
+        this.markupChanged.emit(m);
+      }
+    });
   }
 
   /**
    * @ignore
    */
   @Watch('endLineAnchorStyle')
-  protected handleEndLineAnchorStyleChanged(): void {
+  protected async handleEndLineAnchorStyleChanged(): Promise<void> {
     this.updatePropsOnMarkupTool();
+
+    // If a piece of arrow markup is currently selected, then update its anchor style
+    const markup = await this.getMarkupElements();
+    markup.forEach((m) => {
+      if (m.id === this.selectedMarkupId) {
+        (m as HTMLVertexViewerMarkupArrowElement).endLineAnchorStyle =
+          this.endLineAnchorStyle;
+        this.markupChanged.emit(m);
+      }
+    });
   }
 
   /**
