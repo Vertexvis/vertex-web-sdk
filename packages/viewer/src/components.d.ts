@@ -82,7 +82,7 @@ import {
 } from './components/viewer-icon/viewer-icon';
 import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
 import { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
-import { Markup } from './lib/types/markup';
+import { Markup, MarkupInteraction } from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
@@ -2715,18 +2715,16 @@ declare namespace LocalJSX {
      */
     mode?: ViewerMarkupArrowMode;
     /**
-     * An event that is dispatched anytime the user begins editing the markup.
+     * An event that is dispatched anytime the user begins interacting with the markup.
      */
-    onEditBegin?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
+    onInteractionBegin?: (
+      event: VertexViewerMarkupArrowCustomEvent<void>
+    ) => void;
     /**
-     * An event that is dispatched when the user has finished editing the markup.
+     * An event that is dispatched when the user has finished interacting with the markup.
      */
-    onEditEnd?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
-    /**
-     * An event that is dispatched with the updated markup element after the markup has changed.
-     */
-    onMarkupUpdated?: (
-      event: VertexViewerMarkupArrowCustomEvent<HTMLVertexViewerMarkupArrowElement>
+    onInteractionEnd?: (
+      event: VertexViewerMarkupArrowCustomEvent<MarkupInteraction>
     ) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
@@ -2773,18 +2771,16 @@ declare namespace LocalJSX {
      */
     mode?: ViewerMarkupCircleMode;
     /**
-     * An event that is dispatched anytime the user begins editing the markup.
+     * An event that is dispatched anytime the user begins interacting with the markup.
      */
-    onEditBegin?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
+    onInteractionBegin?: (
+      event: VertexViewerMarkupCircleCustomEvent<void>
+    ) => void;
     /**
-     * An event that is dispatched when the user has finished editing the markup.
+     * An event that is dispatched when the user has finished interacting with the markup.
      */
-    onEditEnd?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
-    /**
-     * An event that is dispatched with the updated markup element after the markup has changed.
-     */
-    onMarkupUpdated?: (
-      event: VertexViewerMarkupCircleCustomEvent<HTMLVertexViewerMarkupCircleElement>
+    onInteractionEnd?: (
+      event: VertexViewerMarkupCircleCustomEvent<MarkupInteraction>
     ) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
@@ -2815,18 +2811,16 @@ declare namespace LocalJSX {
      */
     mode?: ViewerMarkupFreeformMode;
     /**
-     * An event that is dispatched anytime the user begins editing the markup.
+     * An event that is dispatched anytime the user begins interacting with the markup.
      */
-    onEditBegin?: (event: VertexViewerMarkupFreeformCustomEvent<void>) => void;
+    onInteractionBegin?: (
+      event: VertexViewerMarkupFreeformCustomEvent<void>
+    ) => void;
     /**
-     * An event that is dispatched when the user has finished editing the markup.
+     * An event that is dispatched when the user has finished interacting with the markup.
      */
-    onEditEnd?: (event: VertexViewerMarkupFreeformCustomEvent<void>) => void;
-    /**
-     * An event that is dispatched with the updated markup element after the markup has changed.
-     */
-    onMarkupUpdated?: (
-      event: VertexViewerMarkupFreeformCustomEvent<HTMLVertexViewerMarkupFreeformElement>
+    onInteractionEnd?: (
+      event: VertexViewerMarkupFreeformCustomEvent<MarkupInteraction>
     ) => void;
     /**
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.

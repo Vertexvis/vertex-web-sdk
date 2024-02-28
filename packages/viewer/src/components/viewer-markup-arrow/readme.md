@@ -21,12 +21,11 @@
 
 ## Events
 
-| Event           | Description                                                                                                             | Type                                              |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `editBegin`     | An event that is dispatched anytime the user begins editing the markup.                                                 | `CustomEvent<void>`                               |
-| `editEnd`       | An event that is dispatched when the user has finished editing the markup.                                              | `CustomEvent<void>`                               |
-| `markupUpdated` | An event that is dispatched with the updated markup element after the markup has changed.                               | `CustomEvent<HTMLVertexViewerMarkupArrowElement>` |
-| `viewRendered`  | An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender. | `CustomEvent<void>`                               |
+| Event              | Description                                                                                                             | Type                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `interactionBegin` | An event that is dispatched anytime the user begins interacting with the markup.                                        | `CustomEvent<void>`              |
+| `interactionEnd`   | An event that is dispatched when the user has finished interacting with the markup.                                     | `CustomEvent<MarkupInteraction>` |
+| `viewRendered`     | An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender. | `CustomEvent<void>`              |
 
 
 ## Methods

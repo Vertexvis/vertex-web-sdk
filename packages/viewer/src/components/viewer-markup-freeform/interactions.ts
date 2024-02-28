@@ -3,6 +3,7 @@ import { Point, Rectangle } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { MarkupInteractionHandler } from '../../lib/markup/interactions';
+import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
@@ -24,9 +25,8 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
 
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupFreeformElement,
-    private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>,
-    private readonly markupUpdated: EventEmitter<HTMLVertexViewerMarkupCircleElement>
+    private readonly interactionBegin: EventEmitter<void>,
+    private readonly interactionEnd: EventEmitter<MarkupInteraction>
   ) {
     super();
   }
@@ -72,7 +72,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       this.updateMinAndMax(position);
       this.markupEl.points = this.markupEl.points ?? [position];
 
-      this.editBegin.emit();
+      this.interactionBegin.emit();
       this.acceptInteraction();
     }
   }
@@ -113,11 +113,9 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.updateMinAndMax(position);
 
         this.markupEl.points = [...this.markupEl.points, position];
-        this.editEnd.emit();
 
-        if (this.markupEl.mode === 'edit') {
-          this.markupUpdated.emit(this.markupEl);
-        }
+        const newlyCreatedMarkup = this.markupEl.mode !== 'edit';
+        this.interactionEnd.emit({ markup: this.markupEl, newlyCreatedMarkup });
       } else {
         this.markupEl.points = undefined;
       }
@@ -162,11 +160,9 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
     window.removeEventListener('pointerup', this.handleResizeInteractionEnd);
 
     this.resizeBounds = undefined;
-    this.editEnd.emit();
 
-    if (this.markupEl.mode === 'edit') {
-      this.markupUpdated.emit(this.markupEl);
-    }
+    const newlyCreatedMarkup = this.markupEl.mode !== 'edit';
+    this.interactionEnd.emit({ markup: this.markupEl, newlyCreatedMarkup });
   };
 
   private updateMinAndMax(position: Point.Point): void {

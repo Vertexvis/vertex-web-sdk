@@ -3,6 +3,7 @@ import { Point, Rectangle } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { MarkupInteractionHandler } from '../../lib/markup/interactions';
+import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   BoundingBox2dAnchorPosition,
@@ -19,9 +20,8 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
 
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupCircleElement,
-    private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>,
-    private readonly markupUpdated: EventEmitter<HTMLVertexViewerMarkupCircleElement>
+    private readonly interactionBegin: EventEmitter<void>,
+    private readonly interactionEnd: EventEmitter<MarkupInteraction>
   ) {
     super();
   }
@@ -61,7 +61,7 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
         this.markupEl.bounds ?? Rectangle.create(position.x, position.y, 0, 0);
       this.resizeBounds = this.markupEl.bounds;
 
-      this.editBegin.emit();
+      this.interactionBegin.emit();
       this.acceptInteraction();
     }
   }
@@ -97,11 +97,9 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
         this.markupEl.bounds?.height > 0
       ) {
         this.anchor = 'bottom-right';
-        this.editEnd.emit();
 
-        if (this.markupEl.mode === 'edit') {
-          this.markupUpdated.emit(this.markupEl);
-        }
+        const newlyCreatedMarkup = this.markupEl.mode !== 'edit';
+        this.interactionEnd.emit({ markup: this.markupEl, newlyCreatedMarkup });
       } else {
         this.markupEl.bounds = undefined;
       }
