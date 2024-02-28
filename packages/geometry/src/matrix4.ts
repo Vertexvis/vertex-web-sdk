@@ -687,6 +687,15 @@ export function position(matrix: Matrix4, other: Matrix4): Matrix4 {
 }
 
 /**
+ * Returns true if the matrix is an identity matrix.
+ */
+export function isIdentity(matrix: Matrix4): boolean {
+  const identity = makeIdentity();
+
+  return matrix.every((v, i) => v === identity[i]);
+}
+
+/**
  * Returns an object representation of a `Matrix4`.
  */
 export function toObject(m: Matrix4): Matrix4AsObject {
