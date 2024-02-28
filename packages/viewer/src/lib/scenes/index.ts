@@ -6,8 +6,10 @@ export * from './camera';
 export * from './crossSectioner';
 export { SceneOperationBuilder } from './operations';
 export {
+  AllHiddenQuery,
   AllQuery,
   AllSelectedQuery,
+  AllVisibleQuery,
   AndQuery,
   MetadataQuery,
   NotQuery,

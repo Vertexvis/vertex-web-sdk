@@ -106,6 +106,26 @@ export function buildQueryExpression(
           },
         },
       };
+    case 'all-visible':
+      return {
+        operand: {
+          override: {
+            visibility: {
+              visibility_state: true,
+            },
+          },
+        },
+      };
+    case 'all-hidden':
+      return {
+        operand: {
+          override: {
+            visibility: {
+              visibility_state: false,
+            },
+          },
+        },
+      };
     case 'point':
       return {
         operand: {
