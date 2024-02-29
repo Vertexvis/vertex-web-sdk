@@ -1,5 +1,7 @@
+import * as Euler from './euler';
 import { lerp as lerpNumber } from './math';
 import * as Matrix4 from './matrix4';
+import * as Quaternion from './quaternion';
 
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a
@@ -268,6 +270,21 @@ export function angleTo(a: Vector3, b: Vector3): number {
   const theta = dot(a, b) / (magnitude(a) * magnitude(b));
   // Clamp to avoid numerical problems.
   return Math.acos(theta);
+}
+
+/**
+ * Returns the Euler angle, in radians with the `xyz` ordering, between two vectors.
+ */
+export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
+  const normalizedA = normalize(a);
+  const normalizedB = normalize(b);
+
+  const angle = Math.acos(dot(normalizedA, normalizedB));
+  const axis = normalize(cross(normalizedA, normalizedB));
+
+  return Euler.fromRotationMatrix(
+    Matrix4.makeRotation(Quaternion.fromAxisAngle(axis, angle))
+  );
 }
 
 /**
