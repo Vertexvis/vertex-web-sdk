@@ -13,6 +13,7 @@ import {
 import { Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
+import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
@@ -80,18 +81,18 @@ export class ViewerMarkupCircle {
   public viewer?: HTMLVertexViewerElement;
 
   /**
-   * An event that is dispatched anytime the user begins editing the
+   * An event that is dispatched anytime the user begins interacting with the
    * markup.
    */
   @Event({ bubbles: true })
-  public editBegin!: EventEmitter<void>;
+  public interactionBegin!: EventEmitter<void>;
 
   /**
-   * An event that is dispatched when the user has finished editing the
+   * An event that is dispatched when the user has finished interacting with the
    * markup.
    */
   @Event({ bubbles: true })
-  public editEnd!: EventEmitter<void>;
+  public interactionEnd!: EventEmitter<MarkupInteraction>;
 
   /**
    * An event that is dispatched when this markup element is in view
@@ -108,8 +109,8 @@ export class ViewerMarkupCircle {
 
   private interactionHandler = new CircleMarkupInteractionHandler(
     this.hostEl,
-    this.editBegin,
-    this.editEnd
+    this.interactionBegin,
+    this.interactionEnd
   );
 
   private registeredHandler?: Disposable;

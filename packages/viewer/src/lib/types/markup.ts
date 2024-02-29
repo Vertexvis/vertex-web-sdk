@@ -3,6 +3,14 @@ import { UUID } from '@vertexvis/utils';
 
 import { LineAnchorStyle } from '../../components/viewer-markup-arrow/utils';
 
+export interface MarkupInteraction {
+  markup:
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement;
+  newlyCreatedMarkup: boolean;
+}
+
 export interface ArrowMarkupInit {
   start?: Point.Point;
   end?: Point.Point;

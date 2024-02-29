@@ -337,10 +337,13 @@ export class ViewerMarkupTool {
       markupElement.dispose();
       markupElement.viewer = undefined;
       markupElement.removeEventListener(
-        'editBegin',
-        this.handleMarkupEditBegin
+        'interactionBegin',
+        this.handleMarkupInteractionBegin
       );
-      markupElement.removeEventListener('editEnd', this.handleMarkupEditEnd);
+      markupElement.removeEventListener(
+        'interactionEnd',
+        this.handleMarkupInteractionEnd
+      );
     }
 
     if (!this.disabled) {
@@ -358,20 +361,23 @@ export class ViewerMarkupTool {
       newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
       newMarkupElement.addEventListener(
-        'editBegin',
-        this.handleMarkupEditBegin
+        'interactionBegin',
+        this.handleMarkupInteractionBegin
       );
-      newMarkupElement.addEventListener('editEnd', this.handleMarkupEditEnd);
+      newMarkupElement.addEventListener(
+        'interactionEnd',
+        this.handleMarkupInteractionEnd
+      );
       this.stateMap.markupElement = newMarkupElement;
       this.hostEl.append(newMarkupElement);
     }
   }
 
-  private handleMarkupEditBegin = (): void => {
+  private handleMarkupInteractionBegin = (): void => {
     this.markupBegin.emit();
   };
 
-  private handleMarkupEditEnd = (): void => {
+  private handleMarkupInteractionEnd = (): void => {
     const { markupElement } = this.stateMap;
     if (isVertexViewerFreeformMarkup(markupElement)) {
       const { points, bounds } = markupElement;
