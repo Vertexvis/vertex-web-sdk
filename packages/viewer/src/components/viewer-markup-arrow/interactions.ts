@@ -3,6 +3,7 @@ import { Point } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { MarkupInteractionHandler } from '../../lib/markup/interactions';
+import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   translatePointToRelative,
@@ -17,8 +18,8 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
 
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupArrowElement,
-    private readonly editBegin: EventEmitter<void>,
-    private readonly editEnd: EventEmitter<void>
+    private readonly interactionBegin: EventEmitter<void>,
+    private readonly interactionEnd: EventEmitter<MarkupInteraction>
   ) {
     super();
   }
@@ -55,7 +56,7 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
           this.elementBounds
         );
 
-      this.editBegin.emit();
+      this.interactionBegin.emit();
       this.acceptInteraction();
     }
   }
@@ -107,7 +108,8 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
         screenEnd != null &&
         Point.distance(screenStart, screenEnd) >= 2
       ) {
-        this.editEnd.emit();
+        const newlyCreatedMarkup = this.markupEl.mode !== 'edit';
+        this.interactionEnd.emit({ markup: this.markupEl, newlyCreatedMarkup });
       } else {
         this.markupEl.start = undefined;
         this.markupEl.end = undefined;

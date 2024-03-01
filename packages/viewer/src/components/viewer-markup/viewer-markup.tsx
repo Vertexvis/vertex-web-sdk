@@ -19,6 +19,7 @@ import {
   CircleMarkup,
   FreeformMarkup,
   Markup,
+  MarkupInteraction,
 } from '../../lib/types/markup';
 import {
   isVertexViewerArrowMarkup,
@@ -108,6 +109,17 @@ export class ViewerMarkup {
    */
   @Event()
   public markupAdded!: EventEmitter<
+    | HTMLVertexViewerMarkupArrowElement
+    | HTMLVertexViewerMarkupCircleElement
+    | HTMLVertexViewerMarkupFreeformElement
+  >;
+
+  /**
+   * Dispatched when an existing piece of markup is changed, either through user interaction
+   * or programmatically.
+   */
+  @Event()
+  public markupChanged!: EventEmitter<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
     | HTMLVertexViewerMarkupFreeformElement
@@ -351,16 +363,31 @@ export class ViewerMarkup {
    * @ignore
    */
   @Watch('startLineAnchorStyle')
-  protected handleStartLineAnchorStyleChanged(): void {
+  protected async handleStartLineAnchorStyleChanged(): Promise<void> {
     this.updatePropsOnMarkupTool();
+
+    // If a piece of arrow markup is currently selected, then update its anchor style
+    const selectedArrow = await this.getSelectedArrowMarkup();
+    if (selectedArrow != null) {
+      selectedArrow.startLineAnchorStyle = this.startLineAnchorStyle;
+      this.markupChanged.emit(selectedArrow);
+    }
   }
 
   /**
    * @ignore
    */
   @Watch('endLineAnchorStyle')
-  protected handleEndLineAnchorStyleChanged(): void {
+  protected async handleEndLineAnchorStyleChanged(): Promise<void> {
     this.updatePropsOnMarkupTool();
+
+    // If a piece of arrow markup is currently selected, then update its anchor style
+    const selectedArrow = await this.getSelectedArrowMarkup();
+
+    if (selectedArrow != null) {
+      selectedArrow.endLineAnchorStyle = this.endLineAnchorStyle;
+      this.markupChanged.emit(selectedArrow);
+    }
   }
 
   /**
@@ -385,6 +412,21 @@ export class ViewerMarkup {
     }
 
     this.getMarkupTool()?.reset();
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('interactionEnd')
+  protected async handleMarkupUpdated(
+    event: CustomEvent<MarkupInteraction>
+  ): Promise<void> {
+    const e = event as CustomEvent<MarkupInteraction>;
+
+    // Do not emit the markupChanged event if the markup was just created
+    if (!e.detail.newlyCreatedMarkup) {
+      this.markupChanged.emit(e.detail.markup);
+    }
   }
 
   /**
@@ -585,5 +627,15 @@ export class ViewerMarkup {
     return this.hostEl.querySelector('vertex-viewer-markup-tool') as
       | HTMLVertexViewerMarkupToolElement
       | undefined;
+  }
+
+  private async getSelectedArrowMarkup(): Promise<
+    HTMLVertexViewerMarkupArrowElement | undefined
+  > {
+    if (this.selectedMarkupId != null) {
+      const selected = await this.getMarkupElement(this.selectedMarkupId);
+
+      return isVertexViewerArrowMarkup(selected) ? selected : undefined;
+    }
   }
 }

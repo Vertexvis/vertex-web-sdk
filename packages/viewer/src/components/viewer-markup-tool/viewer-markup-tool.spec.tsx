@@ -316,13 +316,13 @@ describe('vertex-viewer-markup-tool', () => {
     const markupEl =
       toolEl.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
-    markupEl.dispatchEvent(new CustomEvent('editBegin'));
+    markupEl.dispatchEvent(new CustomEvent('interactionBegin'));
     expect(onMarkupBegin).toHaveBeenCalled();
 
     markupEl.start = start;
     markupEl.end = end;
 
-    markupEl.dispatchEvent(new CustomEvent('editEnd'));
+    markupEl.dispatchEvent(new CustomEvent('interactionEnd'));
     expect(onMarkupEnd).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: expect.objectContaining({
