@@ -111,7 +111,7 @@ export function buildQueryExpression(
         operand: {
           override: {
             visibility: {
-              visibility_state: true,
+              visibilityState: true,
             },
           },
         },
@@ -121,7 +121,7 @@ export function buildQueryExpression(
         operand: {
           override: {
             visibility: {
-              visibility_state: false,
+              visibilityState: false,
             },
           },
         },

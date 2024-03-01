@@ -231,7 +231,7 @@ describe(Scene, () => {
               operand: {
                 override: {
                   visibility: {
-                    visibility_state: true,
+                    visibilityState: true,
                   },
                 },
               },
