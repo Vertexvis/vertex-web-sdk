@@ -130,10 +130,10 @@ describe(Vector3.eulerTo, () => {
   it('returns an euler angle with no rotation if the vectors if the angle between them is near 180 degrees', () => {
     expect(
       Vector3.eulerTo(Vector3.create(15, 1e-6, 0), Vector3.left())
-    ).toMatchObject(Euler.create());
+    ).toMatchObject(Euler.create({ x: Math.PI }));
     expect(
       Vector3.eulerTo(Vector3.create(15, 0, -1e-6), Vector3.left())
-    ).toMatchObject(Euler.create());
+    ).toMatchObject(Euler.create({ x: Math.PI }));
   });
 });
 

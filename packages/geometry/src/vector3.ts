@@ -1,3 +1,4 @@
+import { Angle, Vector3 } from '.';
 import * as Euler from './euler';
 import { lerp as lerpNumber } from './math';
 import * as Matrix4 from './matrix4';
@@ -279,23 +280,22 @@ export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
   const normalizedA = normalize(a);
   const normalizedB = normalize(b);
 
-  const angle = Math.acos(dot(normalizedA, normalizedB));
-  const axis = normalize(cross(normalizedA, normalizedB));
+  const dotDelta = Math.cos(Angle.toRadians(1));
+  const dotAB = dot(normalizedA, normalizedB);
+  const vectorsAreParallel = Math.abs(dotAB) > dotDelta;
 
-  const closeToParallel = Math.abs(angle) <= 1e-6;
-  const closeToAntiParallel = Math.abs(angle - Math.PI) <= 1e-6;
-  const vectorsAreParallel = closeToParallel || closeToAntiParallel;
-  const crossAxisIsDefined = (Object.keys(axis) as Array<keyof Vector3>).every(
-    (key) => !isNaN(axis[key])
-  );
-
-  if (vectorsAreParallel || !crossAxisIsDefined) {
-    return Euler.create();
+  if (vectorsAreParallel) {
+    return dotAB > 1 - 1e-6 ? Euler.create() : Euler.create({ x: Math.PI });
   }
 
-  return Euler.fromRotationMatrix(
-    Matrix4.makeRotation(Quaternion.fromAxisAngle(axis, angle))
+  const normalizedQ = Quaternion.normalize(
+    Quaternion.create({
+      w: 1 + dotAB,
+      ...cross(normalizedA, normalizedB),
+    })
   );
+
+  return Euler.fromRotationMatrix(Matrix4.makeRotation(normalizedQ));
 }
 
 /**

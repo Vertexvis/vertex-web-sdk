@@ -45,6 +45,32 @@ export function fromJson(json: string): Quaternion {
 }
 
 /**
+ * Returns a quaternion with that will have a magnitude of 1.
+ */
+export function normalize(q: Quaternion): Quaternion {
+  return scale(1 / magnitude(q), q);
+}
+
+/**
+ * Returns the magnitude of the provided quaternion.
+ */
+export function magnitude(q: Quaternion): number {
+  return Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+}
+
+/**
+ * Returns a quaternion where each component is multiplied by the `scalar`.
+ */
+export function scale(scalar: number, q: Quaternion): Quaternion {
+  return create({
+    w: q.w * scalar,
+    x: q.x * scalar,
+    y: q.y * scalar,
+    z: q.z * scalar,
+  });
+}
+
+/**
  * Creates a `Quaternion` that is rotated the given radians around an axis.
  *
  * @param axis The axis to rotate around.
