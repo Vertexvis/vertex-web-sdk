@@ -282,7 +282,9 @@ export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
   const angle = Math.acos(dot(normalizedA, normalizedB));
   const axis = normalize(cross(normalizedA, normalizedB));
 
-  const vectorsAreParallel = angle === Math.PI || angle === 0;
+  const closeToParallel = Math.abs(angle) <= 1e-6;
+  const closeToAntiParallel = Math.abs(angle - Math.PI) <= 1e-6;
+  const vectorsAreParallel = closeToParallel || closeToAntiParallel;
   const crossAxisIsDefined = (Object.keys(axis) as Array<keyof Vector3>).every(
     (key) => !isNaN(axis[key])
   );

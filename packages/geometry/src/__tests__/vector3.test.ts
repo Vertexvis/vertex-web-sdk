@@ -118,15 +118,21 @@ describe(Vector3.eulerTo, () => {
     expect(angle3.z).toBeCloseTo(0);
   });
 
-  it('returns an euler angle with no rotation if the vectors if the angle between them is 0 degrees', () => {
+  it('returns an euler angle with no rotation if the vectors if the angle between them is near 0 degrees', () => {
     expect(
-      Vector3.eulerTo(Vector3.create(0, 15, 0), Vector3.up())
+      Vector3.eulerTo(Vector3.create(1e-6, 15, 0), Vector3.up())
+    ).toMatchObject(Euler.create());
+    expect(
+      Vector3.eulerTo(Vector3.create(0, 15, -1e-6), Vector3.up())
     ).toMatchObject(Euler.create());
   });
 
-  it('returns an euler angle with no rotation if the vectors if the angle between them is 180 degrees', () => {
+  it('returns an euler angle with no rotation if the vectors if the angle between them is near 180 degrees', () => {
     expect(
-      Vector3.eulerTo(Vector3.create(15, 0, 0), Vector3.left())
+      Vector3.eulerTo(Vector3.create(15, 1e-6, 0), Vector3.left())
+    ).toMatchObject(Euler.create());
+    expect(
+      Vector3.eulerTo(Vector3.create(15, 0, -1e-6), Vector3.left())
     ).toMatchObject(Euler.create());
   });
 });
