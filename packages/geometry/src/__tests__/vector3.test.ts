@@ -1,3 +1,4 @@
+import { Euler } from '..';
 import * as Angle from '../angle';
 import * as Matrix4 from '../matrix4';
 import * as Vector3 from '../vector3';
@@ -94,6 +95,39 @@ describe(Vector3.angleTo, () => {
       Vector3.create(1, 2, 3)
     );
     expect(angle).toEqual(0.3875966866551805);
+  });
+});
+
+describe(Vector3.eulerTo, () => {
+  it('calculates the euler angle between two vectors', () => {
+    const angle1 = Vector3.eulerTo(Vector3.create(1, 1, 0), Vector3.up());
+    const angle2 = Vector3.eulerTo(
+      Vector3.create(1, 2, 3),
+      Vector3.create(3, 2, 1)
+    );
+    const angle3 = Vector3.eulerTo(Vector3.create(0, 1, 1), Vector3.up());
+
+    expect(angle1.x).toBeCloseTo(0);
+    expect(angle1.y).toBeCloseTo(0);
+    expect(angle1.z).toBeCloseTo(Math.PI / 4);
+    expect(angle2.x).toBeCloseTo(Angle.toRadians(-14));
+    expect(angle2.y).toBeCloseTo(Angle.toRadians(38));
+    expect(angle2.z).toBeCloseTo(Angle.toRadians(-14));
+    expect(angle3.x).toBeCloseTo(-Math.PI / 4);
+    expect(angle3.y).toBeCloseTo(0);
+    expect(angle3.z).toBeCloseTo(0);
+  });
+
+  it('returns an euler angle with no rotation if the vectors if the angle between them is 0 degrees', () => {
+    expect(
+      Vector3.eulerTo(Vector3.create(0, 15, 0), Vector3.up())
+    ).toMatchObject(Euler.create());
+  });
+
+  it('returns an euler angle with no rotation if the vectors if the angle between them is 180 degrees', () => {
+    expect(
+      Vector3.eulerTo(Vector3.create(15, 0, 0), Vector3.left())
+    ).toMatchObject(Euler.create());
   });
 });
 
