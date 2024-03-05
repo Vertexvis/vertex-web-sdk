@@ -275,6 +275,9 @@ export function angleTo(a: Vector3, b: Vector3): number {
 
 /**
  * Returns the Euler angle, in radians with the `xyz` ordering, between two vectors.
+ *
+ * This method will normalize both vectors for the calculation, and uses the
+ * algorithm described in https://www.xarg.org/proof/quaternion-from-two-vectors/.
  */
 export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
   const normalizedA = normalize(a);
