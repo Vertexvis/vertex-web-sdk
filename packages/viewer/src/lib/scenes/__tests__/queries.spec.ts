@@ -160,4 +160,12 @@ describe(RootQuery, () => {
       point,
     });
   });
+
+  it('should support visibility queries for visible items', () => {
+    const itemQueryBuilder = new RootQuery().withVisible();
+
+    expect(itemQueryBuilder.build()).toEqual({
+      type: 'all-visible',
+    });
+  });
 });

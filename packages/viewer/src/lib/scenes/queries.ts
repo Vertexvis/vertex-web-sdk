@@ -46,6 +46,10 @@ interface AllSelectedQueryExpression {
   type: 'all-selected';
 }
 
+interface AllVisibleQueryExpression {
+  type: 'all-visible';
+}
+
 interface PointQueryExpression {
   type: 'point';
   point: Point.Point;
@@ -70,6 +74,7 @@ export type QueryExpression =
   | VolumeIntersectionQueryExpression
   | MetadataQueryExpression
   | AllSelectedQueryExpression
+  | AllVisibleQueryExpression
   | NotQueryExpression;
 
 /**
@@ -288,6 +293,22 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   }
 
   /**
+   * Specifies that the operation should be performed on any item that is visible.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Select all items that are visible
+   * await scene.items((op) => [op.where((q) => q.withVisible()).select()]).execute();
+   * ```
+   */
+  public withVisible(): AllVisibleQuery {
+    return new AllVisibleQuery(this.inverted);
+  }
+
+  /**
    * Specifies that the operation should be performed on any item present at the provided `point` in the image.
    * This query operates on the item found at that `point` similar to using `withItemId` in combination with
    * `raycaster.hitItems`, which can be useful if the additional metadata from the `raycaster.hitItems`
@@ -410,6 +431,18 @@ export class AllSelectedQuery extends TerminalQuery {
   public queryExpressionBuilder(): AllSelectedQueryExpression {
     return {
       type: 'all-selected',
+    };
+  }
+}
+
+export class AllVisibleQuery extends TerminalQuery {
+  public constructor(inverted: boolean) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): AllVisibleQueryExpression {
+    return {
+      type: 'all-visible',
     };
   }
 }

@@ -2216,10 +2216,10 @@
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.1"
 
-"@vertexvis/frame-streaming-protos@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.1.tgz#b3ec132cd98009a49645093387932648702a8255"
-  integrity sha512-GFnzOuDDMKua5J7ws+JB8QNqPSiCHmp3UA241phFltL1Lcvl/8Dkq1tS78ks/8J3BJNVEJRdV8Da9ywQk/27XA==
+"@vertexvis/frame-streaming-protos@^0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.2.tgz#b2b19cac18877ba320685c6a6de80c2028a7b5d0"
+  integrity sha512-5GuU3e84ArZvT1vTvNl8ahGOi0cdWVxUzzMUX8p8eogLD/1kjm10ZkY52nlBUTthouH1tXn1dhmYNe6l20A8PA==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -2240,10 +2240,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-web-workers/-/rollup-plugin-web-workers-0.1.0.tgz#53c0981df8127125e3fd3c67ddc0169693efec58"
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
-"@vertexvis/scene-tree-protos@^0.1.18":
-  version "0.1.18"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.18.tgz#b3d9f984040d6ef6bd74b77244c56f59ad71244b"
-  integrity sha512-Y/KKpgctXupXlJntLmbhvs+dHytDYSTRqnuewuqwFRlnZhri9HhLgbtC/Zw7pqAeE0sYNOfT2wK5cAIUKVXNBQ==
+"@vertexvis/scene-tree-protos@^0.1.20":
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.20.tgz#d68d60bd282e890b90311f0a734dbf2842ce29cf"
+  integrity sha512-oYK998gBqpA1t03XerD08dgVprEsGgGgfPqtfFcBnbsxMLfeNVNPTBjsRQne/oRXyde3Q7GBRgfMc7JuzSlCCQ==
 
 "@vertexvis/scene-view-protos@^0.2.1":
   version "0.2.1"

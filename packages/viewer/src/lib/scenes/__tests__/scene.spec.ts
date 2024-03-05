@@ -218,6 +218,34 @@ describe(Scene, () => {
       });
     });
 
+    it('should support passing visibility queries', () => {
+      scene.items((op) => op.where((q) => q.withVisible()).select()).execute();
+
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        operations: [
+          {
+            queryExpression: {
+              operand: {
+                override: {
+                  visibility: {
+                    visibilityState: true,
+                  },
+                },
+              },
+            },
+            operationTypes: [
+              {
+                changeSelection: { selected: true },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     it('should support passing multiple operations in one request', () => {
       const itemId = random.guid();
       const suppliedId = random.guid();
