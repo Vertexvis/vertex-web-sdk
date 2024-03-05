@@ -8,6 +8,7 @@ export { SceneOperationBuilder } from './operations';
 export {
   AllQuery,
   AllSelectedQuery,
+  AllVisibleQuery,
   AndQuery,
   MetadataQuery,
   NotQuery,
