@@ -206,6 +206,10 @@ export namespace Components {
      */
     metadataSearchKeys: MetadataKey[];
     /**
+     * Indicates whether the metadata search should remove hidden items from the results.
+     */
+    metadataSearchRemoveHiddenItems: boolean;
+    /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
     overScanCount: number;
@@ -1994,6 +1998,10 @@ declare namespace LocalJSX {
      * A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys?: MetadataKey[];
+    /**
+     * Indicates whether the metadata search should remove hidden items from the results.
+     */
+    metadataSearchRemoveHiddenItems?: boolean;
     /**
      * An event that is emitted when this <vertex-scene-tree> encounters a connection error.
      */

@@ -89,15 +89,40 @@ export function buildQueryExpression(
         },
       };
     case 'metadata':
-      return {
-        operand: {
-          metadata: {
-            valueFilter: query.filter,
-            keys: query.keys,
-            exactMatch: query.exactMatch,
+      if (query.removeHiddenItems) {
+        return {
+          and: {
+            first: {
+              operand: {
+                metadata: {
+                  valueFilter: query.filter,
+                  keys: query.keys,
+                  exactMatch: query.exactMatch,
+                },
+              },
+            },
+            second: {
+              operand: {
+                override: {
+                  visibility: {
+                    visibilityState: true,
+                  },
+                },
+              },
+            },
           },
-        },
-      };
+        };
+      } else {
+        return {
+          operand: {
+            metadata: {
+              valueFilter: query.filter,
+              keys: query.keys,
+              exactMatch: query.exactMatch,
+            },
+          },
+        };
+      }
     case 'all-selected':
       return {
         operand: {

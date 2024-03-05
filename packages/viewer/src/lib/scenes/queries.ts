@@ -35,11 +35,13 @@ interface NotQueryExpression {
   type: 'not';
   query: QueryExpression;
 }
+
 interface MetadataQueryExpression {
   type: 'metadata';
   filter: string;
   keys: string[];
   exactMatch: boolean;
+  removeHiddenItems?: boolean;
 }
 
 interface AllSelectedQueryExpression {
@@ -266,9 +268,16 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   public withMetadata(
     filter: string,
     keys: string[],
-    exactMatch: boolean
+    exactMatch: boolean,
+    removeHiddenItems?: boolean
   ): MetadataQuery {
-    return new MetadataQuery(filter, keys, exactMatch, this.inverted);
+    return new MetadataQuery(
+      filter,
+      keys,
+      exactMatch,
+      removeHiddenItems,
+      this.inverted
+    );
   }
 
   /**
@@ -387,6 +396,7 @@ export class MetadataQuery extends TerminalQuery {
     private filter: string,
     private keys: string[],
     private exactMatch: boolean,
+    private removeHiddenItems?: boolean,
     inverted: boolean
   ) {
     super(inverted);
@@ -398,6 +408,7 @@ export class MetadataQuery extends TerminalQuery {
       filter: this.filter,
       keys: this.keys,
       exactMatch: this.exactMatch,
+      removeHiddenItems: this.removeHiddenItems,
     };
   }
 }

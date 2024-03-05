@@ -66,13 +66,18 @@ export async function selectFilterResults(
   filter: string,
   keys: string[],
   exactMatch: boolean,
+  removeHiddenResults: boolean,
   { append = false, suppliedCorrelationId }: ViewerSelectItemOptions
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
     .items((op) => [
       ...(append ? [] : [op.where((q) => q.all()).deselect()]),
-      op.where((q) => q.withMetadata(filter, keys, exactMatch)).select(),
+      op
+        .where((q) =>
+          q.withMetadata(filter, keys, exactMatch, removeHiddenResults)
+        )
+        .select(),
     ])
     .execute({
       suppliedCorrelationId,

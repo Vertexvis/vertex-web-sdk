@@ -171,6 +171,12 @@ export class SceneTree {
   public metadataSearchExactMatch = false;
 
   /**
+   * Indicates whether the metadata search should remove hidden items from the results.
+   */
+  @Prop({ mutable: true })
+  public metadataSearchRemoveHiddenItems = false;
+
+  /**
    * A list of the metadata keys that a scene tree search should be performed on.
    */
   @Prop({ mutable: true })
@@ -578,6 +584,7 @@ export class SceneTree {
         term,
         columnsToSearch,
         this.metadataSearchExactMatch,
+        this.metadataSearchRemoveHiddenItems,
         {
           append: false,
           ...options,
@@ -881,6 +888,7 @@ export class SceneTree {
       await this.filterItems(event.detail, {
         columns: columnsToSearch,
         exactMatch: this.metadataSearchExactMatch,
+        removeHiddenItems: this.metadataSearchRemoveHiddenItems,
       });
     } catch (e) {
       console.error('Failed to filter tree with exception: ', e);
