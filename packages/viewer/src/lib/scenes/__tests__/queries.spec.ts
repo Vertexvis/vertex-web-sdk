@@ -168,12 +168,4 @@ describe(RootQuery, () => {
       type: 'all-visible',
     });
   });
-
-  it('should support visibility queries for hidden items', () => {
-    const itemQueryBuilder = new RootQuery().withHidden();
-
-    expect(itemQueryBuilder.build()).toEqual({
-      type: 'all-hidden',
-    });
-  });
 });
