@@ -1,5 +1,8 @@
+import { Angle, Vector3 } from '.';
+import * as Euler from './euler';
 import { lerp as lerpNumber } from './math';
 import * as Matrix4 from './matrix4';
+import * as Quaternion from './quaternion';
 
 /**
  * A `Vector3` represents a vector of 3 dimensions values. It may represent a
@@ -268,6 +271,34 @@ export function angleTo(a: Vector3, b: Vector3): number {
   const theta = dot(a, b) / (magnitude(a) * magnitude(b));
   // Clamp to avoid numerical problems.
   return Math.acos(theta);
+}
+
+/**
+ * Returns the Euler angle, in radians with the `xyz` ordering, between two vectors.
+ *
+ * This method will normalize both vectors for the calculation, and uses the
+ * algorithm described in https://www.xarg.org/proof/quaternion-from-two-vectors/.
+ */
+export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
+  const normalizedA = normalize(a);
+  const normalizedB = normalize(b);
+
+  const dotDelta = Math.cos(Angle.toRadians(1));
+  const dotAB = dot(normalizedA, normalizedB);
+  const vectorsAreParallel = Math.abs(dotAB) > dotDelta;
+
+  if (vectorsAreParallel) {
+    return dotAB > 1 - 1e-6 ? Euler.create() : Euler.create({ x: Math.PI });
+  }
+
+  const normalizedQ = Quaternion.normalize(
+    Quaternion.create({
+      w: 1 + dotAB,
+      ...cross(normalizedA, normalizedB),
+    })
+  );
+
+  return Euler.fromRotationMatrix(Matrix4.makeRotation(normalizedQ));
 }
 
 /**

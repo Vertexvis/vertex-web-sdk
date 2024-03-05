@@ -16,6 +16,40 @@ describe(Quaternion.fromJson, () => {
   });
 });
 
+describe(Quaternion.normalize, () => {
+  it('normalizes the provided quaternion', () => {
+    const q = Quaternion.create({ w: 1, x: 2, y: 3, z: 4 });
+    const normalized = Quaternion.normalize(q);
+    expect(normalized.w).toBeCloseTo(0.1825);
+    expect(normalized.x).toBeCloseTo(0.365);
+    expect(normalized.y).toBeCloseTo(0.5475);
+    expect(normalized.z).toBeCloseTo(0.73);
+  });
+});
+
+describe(Quaternion.magnitude, () => {
+  it('returns the magnitude of the provided quaternion', () => {
+    const magnitude = Quaternion.magnitude(
+      Quaternion.create({ w: 1, x: 2, y: 3, z: 4 })
+    );
+    expect(magnitude).toBeCloseTo(5.48);
+  });
+});
+
+describe(Quaternion.scale, () => {
+  it('scales the provided quaternion', () => {
+    const q = Quaternion.create({ w: 1, x: 2, y: 3, z: 4 });
+    expect(Quaternion.scale(100, q)).toMatchObject(
+      Quaternion.create({
+        w: 100,
+        x: 200,
+        y: 300,
+        z: 400,
+      })
+    );
+  });
+});
+
 describe(Quaternion.fromAxisAngle, () => {
   it('rotates quaternion around axis', () => {
     const q = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
