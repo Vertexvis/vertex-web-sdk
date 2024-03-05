@@ -280,8 +280,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
       filter,
       keys,
       exactMatch,
-      removeHiddenItems,
-      this.inverted
+      this.inverted,
+      removeHiddenItems
     );
   }
 
@@ -417,8 +417,8 @@ export class MetadataQuery extends TerminalQuery {
     private filter: string,
     private keys: string[],
     private exactMatch: boolean,
-    private removeHiddenItems?: boolean,
-    inverted: boolean
+    inverted: boolean,
+    private removeHiddenItems?: boolean
   ) {
     super(inverted);
   }
