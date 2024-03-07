@@ -567,7 +567,7 @@ export class SceneTree {
   ): Promise<void> {
     if (this.viewer != null) {
       const metadataSearchKeys =
-        this.searchOptions?.searchKeys ?? this.metadataSearchKeys;
+        this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
       const definedMetadataKeys =
         metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
 
@@ -888,7 +888,7 @@ export class SceneTree {
   @Listen('search')
   protected async handleSearch(event: CustomEvent<string>): Promise<void> {
     const metadataSearchKeys =
-      this.searchOptions?.searchKeys ?? this.metadataSearchKeys;
+      this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
     const columnsToSearch =
       metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
 

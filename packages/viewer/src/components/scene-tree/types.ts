@@ -10,7 +10,7 @@ export type RowDataProvider = (row: Row) => Record<string, unknown>;
 export type RowArg = number | Row | Node.AsObject;
 
 export interface FilterOptions {
-  searchKeys?: MetadataKey[];
+  metadataSearchKeys?: MetadataKey[];
   exactMatch?: boolean;
   removeHiddenItems?: boolean;
 }
