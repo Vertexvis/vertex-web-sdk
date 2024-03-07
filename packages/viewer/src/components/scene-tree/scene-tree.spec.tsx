@@ -686,6 +686,7 @@ describe('<vertex-scene-tree>', () => {
         'query',
         ['VERTEX_SCENE_ITEM_NAME'],
         expect.anything(),
+        expect.anything(),
         {
           append: false,
         }
@@ -708,6 +709,7 @@ describe('<vertex-scene-tree>', () => {
         expect.anything(),
         'query',
         expectedKeys,
+        expect.anything(),
         expect.anything(),
         {
           append: false,
@@ -1275,11 +1277,13 @@ describe('<vertex-scene-tree>', () => {
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       tree.metadataKeys = ['foo', 'bar', 'baz'];
       tree.metadataSearchExactMatch = false;
+      tree.metadataSearchRemoveHiddenItems = false;
 
       tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
       expect(filter).toHaveBeenCalledWith('term', {
         columns: tree.metadataKeys,
         exactMatch: false,
+        removeHiddenItems: false,
       });
     });
   });
