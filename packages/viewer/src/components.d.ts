@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
+  FilterOptions,
   MetadataKey,
   RowArg,
   RowDataProvider,
@@ -198,17 +199,13 @@ export namespace Components {
      */
     metadataKeys: MetadataKey[];
     /**
-     * Indicates whether the metadata search should use an exact match.
+     * @deprecated Use `searchOptions` Indicates whether the metadata search should use an exact match.
      */
     metadataSearchExactMatch: boolean;
     /**
-     * A list of the metadata keys that a scene tree search should be performed on.
+     * @deprecated Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys: MetadataKey[];
-    /**
-     * Indicates whether the metadata search should remove hidden items from the results.
-     */
-    metadataSearchRemoveHiddenItems: boolean;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
@@ -246,6 +243,10 @@ export namespace Components {
      * @returns A promise that resolves when the operation is finished.
      */
     scrollToItem: (itemId: string, options?: ScrollToOptions) => Promise<void>;
+    /**
+     * A set of options to configure scene tree searching behavior.
+     */
+    searchOptions: FilterOptions;
     /**
      * Performs an async request that will select the filtered items in the tree that match the given term.
      * @param term The filter term.
@@ -1991,17 +1992,13 @@ declare namespace LocalJSX {
      */
     metadataKeys?: MetadataKey[];
     /**
-     * Indicates whether the metadata search should use an exact match.
+     * @deprecated Use `searchOptions` Indicates whether the metadata search should use an exact match.
      */
     metadataSearchExactMatch?: boolean;
     /**
-     * A list of the metadata keys that a scene tree search should be performed on.
+     * @deprecated Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys?: MetadataKey[];
-    /**
-     * Indicates whether the metadata search should remove hidden items from the results.
-     */
-    metadataSearchRemoveHiddenItems?: boolean;
     /**
      * An event that is emitted when this <vertex-scene-tree> encounters a connection error.
      */
@@ -2036,6 +2033,10 @@ declare namespace LocalJSX {
      * ```
      */
     rowData?: RowDataProvider;
+    /**
+     * A set of options to configure scene tree searching behavior.
+     */
+    searchOptions?: FilterOptions;
     /**
      * An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.
      */

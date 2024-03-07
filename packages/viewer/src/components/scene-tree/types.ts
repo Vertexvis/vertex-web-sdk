@@ -9,6 +9,12 @@ export type RowDataProvider = (row: Row) => Record<string, unknown>;
 
 export type RowArg = number | Row | Node.AsObject;
 
+export interface FilterOptions {
+  searchKeys?: MetadataKey[];
+  exactMatch?: boolean;
+  removeHiddenItems?: boolean;
+}
+
 /**
  * A set of options to configure the scroll to index behavior.
  */
