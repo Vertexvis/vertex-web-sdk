@@ -81,7 +81,8 @@ export class TransformWidget extends ReglComponent {
   private hoveredElement?: Drawable;
 
   private transform?: Matrix4.Matrix4;
-  private bounds?: Rectangle.Rectangle;
+  private interactiveBounds?: Rectangle.Rectangle;
+  private fullBounds?: Rectangle.Rectangle;
 
   private hoveredChanged = new EventDispatcher<Drawable | undefined>();
 
@@ -124,11 +125,15 @@ export class TransformWidget extends ReglComponent {
     return this.drawableElements;
   }
 
+  public getFullBounds(): Rectangle.Rectangle | undefined {
+    return this.fullBounds;
+  }
+
   public boundsContainsPoint(point: Point.Point): boolean {
     return (
-      this.bounds != null &&
+      this.interactiveBounds != null &&
       this.frame != null &&
-      Rectangle.containsPoints(this.bounds, point)
+      Rectangle.containsPoints(this.interactiveBounds, point)
     );
   }
 
@@ -247,10 +252,16 @@ export class TransformWidget extends ReglComponent {
         this.updateElements(this.transform, this.frame);
       }
 
-      this.bounds = computeDrawable2dBounds(
+      this.interactiveBounds = computeDrawable2dBounds(
         this.viewport,
         ...this.rotationMeshes,
         ...this.translationMeshes
+      );
+      this.fullBounds = computeDrawable2dBounds(
+        this.viewport,
+        ...this.rotationMeshes,
+        ...this.translationMeshes,
+        ...this.axisLines
       );
     }
   }

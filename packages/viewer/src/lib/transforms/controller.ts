@@ -5,6 +5,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 export class TransformController {
   private isTransforming = false;
   private currentDelta: Matrix4.Matrix4 = Matrix4.makeIdentity();
+  private endDebounceTimeout?: NodeJS.Timeout;
 
   public constructor(private stream: StreamApi) {}
 
@@ -34,6 +35,8 @@ export class TransformController {
   public async updateTransform(delta: Matrix4.Matrix4): Promise<void> {
     this.currentDelta = delta;
 
+    console.log(delta);
+
     await this.stream.updateInteraction({
       transform: {
         delta: this.toDeltaTransform(this.currentDelta, true),
@@ -57,31 +60,43 @@ export class TransformController {
 
   public async endTransform(): Promise<void> {
     if (this.isTransforming) {
-      console.debug(
-        `Ending transform interaction [delta=${this.currentDelta}]`
-      );
-
-      await this.stream.endInteraction({
-        transform: {
-          delta: this.toDeltaTransform(this.currentDelta),
-        },
-      });
-      this.isTransforming = false;
-      this.currentDelta = Matrix4.makeIdentity();
+      this.endInteraction();
     }
   }
 
-  public async endInteraction(): Promise<void> {
+  public async endTransformDebounced(callback?: VoidFunction): Promise<void> {
     if (this.isTransforming) {
-      await this.stream.endInteraction();
-      this.isTransforming = false;
-      this.currentDelta = Matrix4.makeIdentity();
+      this.restartEndInteractionTimeout(callback);
     }
   }
 
   public clearTransform(): void {
     this.currentDelta = Matrix4.makeIdentity();
     this.endTransform();
+  }
+
+  private async endInteraction(): Promise<void> {
+    console.debug(`Ending transform interaction [delta=${this.currentDelta}]`);
+
+    await this.stream.endInteraction({
+      transform: {
+        delta: this.toDeltaTransform(this.currentDelta),
+      },
+    });
+    this.isTransforming = false;
+    this.currentDelta = Matrix4.makeIdentity();
+  }
+
+  private restartEndInteractionTimeout(callback?: VoidFunction): void {
+    if (this.endDebounceTimeout != null) {
+      clearTimeout(this.endDebounceTimeout);
+      this.endDebounceTimeout = undefined;
+    }
+    this.endDebounceTimeout = setTimeout(() => {
+      this.endDebounceTimeout = undefined;
+      this.endInteraction();
+      callback?.();
+    }, 500);
   }
 
   private toDeltaTransform(

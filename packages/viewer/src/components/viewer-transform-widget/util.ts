@@ -4,10 +4,16 @@ import {
   Point,
   Quaternion,
   Ray,
+  Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
 
 import { Frame, Viewport } from '../../lib/types';
+
+export interface PointAndPosition {
+  point: Point.Point;
+  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+}
 
 export function convertPointToCanvas(
   point: Point.Point,
@@ -181,6 +187,21 @@ export function computeUpdatedTransform(
   }
 }
 
+export function computeRotationAxis(
+  current: Matrix4.Matrix4,
+  viewVector: Vector3.Vector3,
+  a: Vector3.Vector3,
+  b: Vector3.Vector3
+): Vector3.Vector3 {
+  const rotation = Quaternion.fromMatrixRotation(current);
+  const rotatedA = Vector3.transformMatrix(a, Matrix4.makeRotation(rotation));
+  const rotatedB = Vector3.transformMatrix(b, Matrix4.makeRotation(rotation));
+
+  return Vector3.dot(viewVector, rotatedA) > Vector3.dot(viewVector, rotatedB)
+    ? rotatedA
+    : rotatedB;
+}
+
 function computeTranslation(
   current: Matrix4.Matrix4,
   previous: Vector3.Vector3,
@@ -222,4 +243,98 @@ export function computeRotation(
     ),
     current
   );
+}
+
+export function computeInputPosition(
+  frame: Frame,
+  viewport: Viewport,
+  // boundingBox: BoundingBox.BoundingBox,
+  bounds: Rectangle.Rectangle,
+  origin: Vector3.Vector3,
+  shapePoints: Point.Point[]
+): PointAndPosition {
+  const paddedBounds = Rectangle.pad(bounds, 5);
+  const canvasPoints = shapePoints.map((sp) =>
+    viewport.transformNdcPointToViewport(sp)
+  );
+
+  const topLeft = Rectangle.topLeft(paddedBounds);
+  const topRight = Point.add(topLeft, Point.create(paddedBounds.width, 0));
+  const bottomRight = Rectangle.bottomRight(paddedBounds);
+  const bottomLeft = Point.subtract(
+    bottomRight,
+    Point.create(paddedBounds.width, 0)
+  );
+
+  const center = Point.scale(
+    canvasPoints.reduce((sum, pt) => Point.add(sum, pt), Point.create()),
+    1 / canvasPoints.length,
+    1 / canvasPoints.length
+  );
+
+  const closestPoint = [topRight, bottomLeft, bottomRight].reduce(
+    (closest, pt) =>
+      Point.distance(center, pt) < Point.distance(center, closest)
+        ? pt
+        : closest,
+    topLeft
+  );
+
+  switch (closestPoint) {
+    case topLeft:
+      return { point: closestPoint, position: 'top-left' };
+    case topRight:
+      return { point: closestPoint, position: 'top-right' };
+    case bottomLeft:
+      return { point: closestPoint, position: 'bottom-left' };
+    default:
+      return { point: closestPoint, position: 'bottom-right' };
+  }
+
+  // const furthestPoint = shapePoints.reduce(
+  //   (fp, p) =>
+  //     Vector3.distance(origin, p) > Vector3.distance(origin, fp) ? p : fp,
+  //   origin
+  // );
+  // const ray = Ray.create({
+  //   origin: furthestPoint,
+  //   direction: Vector3.normalize(Vector3.subtract(furthestPoint, origin)),
+  // });
+  // const furthestCanvasPoint = viewport.transformWorldToViewport(
+  //   furthestPoint,
+  //   frame.scene.camera.projectionViewMatrix
+  // );
+
+  // const closestBoundingBoxPoint = boundingBox.
+
+  // const boundsTopLeft = Rectangle.topLeft(bounds);
+  // const boundsBottomRight = Rectangle.bottomRight(bounds);
+
+  // const closestPoint =
+  //   Point.distance(furthestCanvasPoint, boundsTopLeft) >
+  //   Point.distance(furthestCanvasPoint, boundsBottomRight)
+  //     ? boundsTopLeft
+  //     : boundsBottomRight;
+
+  // const closestPointRay = frame.scene.camera.isPerspective()
+  //   ? viewport.transformPointToRay(
+  //       closestPoint,
+  //       frame.image,
+  //       frame.scene.camera
+  //     )
+  //   : viewport.transformPointToOrthographicRay(
+  //       closestPoint,
+  //       frame.image,
+  //       frame.scene.camera
+  //     );
+
+  // const positionPlane = Plane.create({
+  //   normal: Vector3.normalize(
+  //     Vector3.subtract(frame.scene.camera.position, origin)
+  //   ),
+  // });
+
+  // const worldIntersection = Ray.intersectPlane(closestPointRay, positionPlane);
+
+  // return Ray.at(ray, 100);
 }

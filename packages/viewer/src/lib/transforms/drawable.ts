@@ -1,4 +1,4 @@
-import { Point, Rectangle, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 import { JoinStyle, ShapeProps } from 'regl-shape';
 
@@ -100,4 +100,17 @@ export function computeDrawable2dBounds(
     });
 
   return Rectangle.fromPoints(min, max);
+}
+
+export function computeDrawable3dBounds(
+  ...elements: Drawable[]
+): BoundingBox.BoundingBox | undefined {
+  return BoundingBox.fromVectors(
+    elements
+      .filter((m) => m.points.valid)
+      .reduce(
+        (vectors, m) => [...vectors, ...m.points.toWorldArray()],
+        [] as Vector3.Vector3[]
+      )
+  );
 }
