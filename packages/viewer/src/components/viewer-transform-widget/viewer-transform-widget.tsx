@@ -308,6 +308,7 @@ export class ViewerTransformWidget {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    console.log(this.inputValue);
     return (
       <Host>
         <canvas
@@ -574,12 +575,19 @@ export class ViewerTransformWidget {
       this.startingTransform != null &&
       this.lastInputValue != null
     ) {
+      const rotation = Matrix4.makeRotation(
+        Quaternion.fromMatrixRotation(this.currentTransform)
+      );
+
       switch (this.lastDragged.identifier) {
         case 'x-translate':
           this.currentTransform = Matrix4.multiply(
             this.currentTransform,
             Matrix4.makeTranslation(
-              Vector3.create(value - this.lastInputValue, 0, 0)
+              Vector3.transformMatrix(
+                Vector3.create(value - this.lastInputValue, 0, 0),
+                rotation
+              )
             )
           );
           break;
@@ -587,7 +595,10 @@ export class ViewerTransformWidget {
           this.currentTransform = Matrix4.multiply(
             this.currentTransform,
             Matrix4.makeTranslation(
-              Vector3.create(0, value - this.lastInputValue, 0)
+              Vector3.transformMatrix(
+                Vector3.create(0, value - this.lastInputValue, 0),
+                rotation
+              )
             )
           );
           break;
@@ -595,7 +606,10 @@ export class ViewerTransformWidget {
           this.currentTransform = Matrix4.multiply(
             this.currentTransform,
             Matrix4.makeTranslation(
-              Vector3.create(0, 0, value - this.lastInputValue)
+              Vector3.transformMatrix(
+                Vector3.create(0, 0, value - this.lastInputValue),
+                rotation
+              )
             )
           );
           break;
@@ -764,20 +778,28 @@ export class ViewerTransformWidget {
     if (
       dragging != null &&
       this.currentTransform != null &&
-      this.dragStartTransform
+      this.dragStartTransform != null
     ) {
-      const translationDiff = Vector3.subtract(
-        Vector3.fromMatrixPosition(this.currentTransform),
-        Vector3.fromMatrixPosition(this.dragStartTransform)
+      const diff = Matrix4.multiply(
+        this.currentTransform,
+        Matrix4.invert(this.dragStartTransform)
       );
-      const rotationDiff = Euler.fromRotationMatrix(
-        Matrix4.multiply(
-          this.currentTransform,
-          Matrix4.invert(this.dragStartTransform)
-        )
+      const rotation = Matrix4.makeRotation(
+        Quaternion.fromMatrixRotation(this.currentTransform)
+      );
+      const translationDiff = Vector3.transformMatrix(
+        // Vector3.negate(Vector3.fromMatrixPosition(diff)),
+        Vector3.fromMatrixPosition(diff),
+        rotation
+      );
+      const rotationDiff = Euler.fromRotationMatrix(Matrix4.invert(diff));
+      const rotationDiff2 = Euler.fromRotationMatrix(
+        Matrix4.multiply(rotation, Matrix4.invert(diff))
       );
 
       this.lastInputValue = this.inputValue;
+
+      console.log(rotationDiff2);
 
       switch (dragging.identifier) {
         case 'x-translate':
@@ -789,15 +811,45 @@ export class ViewerTransformWidget {
         case 'z-translate':
           this.inputValue = translationDiff.z;
           break;
-        case 'x-rotate':
-          this.inputValue = Angle.toDegrees(-rotationDiff.x);
+        case 'x-rotate': {
+          const rotationAxis = Vector3.transformMatrix(
+            Vector3.right(),
+            rotation
+          );
+
+          const angle =
+            rotationAxis.x * rotationDiff.x +
+            rotationAxis.y * rotationDiff.y +
+            rotationAxis.z * rotationDiff.z;
+
+          this.inputValue = Angle.toDegrees(angle);
           break;
-        case 'y-rotate':
-          this.inputValue = Angle.toDegrees(-rotationDiff.y);
+        }
+        case 'y-rotate': {
+          const rotationAxis = Vector3.transformMatrix(Vector3.up(), rotation);
+
+          const angle =
+            rotationAxis.x * rotationDiff.x +
+            rotationAxis.y * rotationDiff.y +
+            rotationAxis.z * rotationDiff.z;
+
+          this.inputValue = Angle.toDegrees(angle);
           break;
-        case 'z-rotate':
-          this.inputValue = Angle.toDegrees(-rotationDiff.z);
+        }
+        case 'z-rotate': {
+          const rotationAxis = Vector3.transformMatrix(
+            Vector3.back(),
+            rotation
+          );
+
+          const angle =
+            rotationAxis.x * rotationDiff.x +
+            rotationAxis.y * rotationDiff.y +
+            rotationAxis.z * rotationDiff.z;
+
+          this.inputValue = Angle.toDegrees(angle);
           break;
+        }
       }
     }
   };
