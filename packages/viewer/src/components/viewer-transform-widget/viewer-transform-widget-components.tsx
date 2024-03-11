@@ -15,14 +15,15 @@ export interface TransformWidgetInputProps {
   point: Point.Point;
   placement: TransformWidgetInputPlacement;
 
-  value?: number | string;
+  value?: number;
+  decimalPlaces: number;
 
   onChange?: (value: number) => void | Promise<void>;
 }
 
 export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
-> = ({ viewport, point, placement, value, onChange }) => {
+> = ({ viewport, point, placement, value, decimalPlaces, onChange }) => {
   const inputPlacement = computeInputPlacement(
     viewport,
     Dimensions.create(100, 30),
@@ -51,7 +52,7 @@ export const TransformWidgetInput: FunctionalComponent<
         ...inputPlacement,
       }}
       type="number"
-      value={`${value}`}
+      value={value?.toFixed(decimalPlaces)}
       onChange={handleChange}
     ></input>
   );

@@ -1151,9 +1151,18 @@ export namespace Components {
     }
     interface VertexViewerTransformWidget {
         /**
+          * The unit to show for rotation inputs. Defaults to `degrees`.
+          * @see AngleUnitType
+         */
+        "angleUnit": AngleUnitType;
+        /**
           * The controller that is responsible for performing transforms.
          */
         "controller"?: TransformController;
+        /**
+          * The number of decimal places to show in the input. Defaults to `1`.
+         */
+        "decimalPlaces": number;
         /**
           * The unit to show for translation inputs. Defaults to `millimeters`.
           * @see DistanceUnitType
@@ -2697,9 +2706,18 @@ declare namespace LocalJSX {
     }
     interface VertexViewerTransformWidget {
         /**
+          * The unit to show for rotation inputs. Defaults to `degrees`.
+          * @see AngleUnitType
+         */
+        "angleUnit"?: AngleUnitType;
+        /**
           * The controller that is responsible for performing transforms.
          */
         "controller"?: TransformController;
+        /**
+          * The number of decimal places to show in the input. Defaults to `1`.
+         */
+        "decimalPlaces"?: number;
         /**
           * The unit to show for translation inputs. Defaults to `millimeters`.
           * @see DistanceUnitType

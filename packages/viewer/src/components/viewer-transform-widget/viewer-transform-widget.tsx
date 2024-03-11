@@ -23,13 +23,11 @@ import classNames from 'classnames';
 import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Drawable } from '../../lib/transforms/drawable';
-import { DistanceUnits, DistanceUnitType } from '../../lib/types';
+import { AngleUnitType, DistanceUnitType } from '../../lib/types';
 import {
-  computeInputDisplayed,
+  computeInputDisplayValue,
   computeInputPosition,
   computeInputTransform,
-  computeRotationAxis,
-  computeTranslation,
   computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
@@ -138,6 +136,20 @@ export class ViewerTransformWidget {
    */
   @Prop()
   public distanceUnit: DistanceUnitType = 'millimeters';
+
+  /**
+   * The unit to show for rotation inputs. Defaults to `degrees`.
+   *
+   * @see AngleUnitType
+   */
+  @Prop()
+  public angleUnit: AngleUnitType = 'degrees';
+
+  /**
+   * The number of decimal places to show in the input. Defaults to `1`.
+   */
+  @Prop()
+  public decimalPlaces = 1;
 
   /**
    * @internal
@@ -341,7 +353,8 @@ export class ViewerTransformWidget {
               viewport={this.viewer.viewport}
               point={this.inputPosition.point}
               placement={this.inputPosition.position}
-              value={parseFloat(this.inputValue.toFixed(1))}
+              value={this.inputValue}
+              decimalPlaces={this.decimalPlaces}
               onChange={this.handleInputChange}
             />
           )}
@@ -587,7 +600,9 @@ export class ViewerTransformWidget {
         computeInputTransform(
           this.lastDragged.identifier,
           value,
-          this.lastInputValue
+          this.lastInputValue,
+          this.distanceUnit,
+          this.angleUnit
         )
       );
 
@@ -735,10 +750,12 @@ export class ViewerTransformWidget {
     ) {
       this.lastInputValue = this.inputValue;
 
-      this.inputValue = computeInputDisplayed(
+      this.inputValue = computeInputDisplayValue(
         dragging.identifier,
         this.currentTransform,
-        this.dragStartTransform
+        this.dragStartTransform,
+        this.distanceUnit,
+        this.angleUnit
       );
     }
   };

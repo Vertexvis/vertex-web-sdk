@@ -1,5 +1,4 @@
 import {
-  Angle,
   Euler,
   Matrix4,
   Plane,
@@ -10,7 +9,14 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 
-import { Frame, Viewport } from '../../lib/types';
+import {
+  AngleUnits,
+  AngleUnitType,
+  DistanceUnits,
+  DistanceUnitType,
+  Frame,
+  Viewport,
+} from '../../lib/types';
 
 export interface PointAndPosition {
   point: Point.Point;
@@ -78,45 +84,53 @@ export function convertCanvasPointToWorld(
 export function computeInputTransform(
   identifier: string,
   value: number,
-  lastValue: number
+  lastValue: number,
+  distanceUnit: DistanceUnitType = 'millimeters',
+  angleUnit: AngleUnitType = 'degrees'
 ): Matrix4.Matrix4 {
+  const units = new DistanceUnits(distanceUnit);
+  const angles = new AngleUnits(angleUnit);
+
+  const rotation = (): number =>
+    angleUnit === 'degrees'
+      ? angles.convertTo(value - lastValue)
+      : value - lastValue;
+  const position = (): number =>
+    units.convertRealValueToWorld(value - lastValue);
+
   switch (identifier) {
     case 'x-translate':
-      return Matrix4.makeTranslation(Vector3.create(value - lastValue, 0, 0));
+      return Matrix4.makeTranslation(Vector3.create(position(), 0, 0));
     case 'y-translate':
-      return Matrix4.makeTranslation(Vector3.create(0, value - lastValue, 0));
+      return Matrix4.makeTranslation(Vector3.create(0, position(), 0));
     case 'z-translate':
-      return Matrix4.makeTranslation(Vector3.create(0, 0, value - lastValue));
+      return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
     case 'x-rotate':
       return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          Vector3.left(),
-          Angle.toRadians(value - lastValue)
-        )
+        Quaternion.fromAxisAngle(Vector3.left(), rotation())
       );
     case 'y-rotate':
       return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          Vector3.down(),
-          Angle.toRadians(value - lastValue)
-        )
+        Quaternion.fromAxisAngle(Vector3.down(), rotation())
       );
     case 'z-rotate':
       return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          Vector3.forward(),
-          Angle.toRadians(value - lastValue)
-        )
+        Quaternion.fromAxisAngle(Vector3.forward(), rotation())
       );
   }
   return Matrix4.makeIdentity();
 }
 
-export function computeInputDisplayed(
+export function computeInputDisplayValue(
   identifier: string,
   current: Matrix4.Matrix4,
-  start: Matrix4.Matrix4
+  start: Matrix4.Matrix4,
+  distanceUnit: DistanceUnitType = 'millimeters',
+  angleUnit: AngleUnitType = 'degrees'
 ): number {
+  const units = new DistanceUnits(distanceUnit);
+  const angles = new AngleUnits(angleUnit);
+
   const rotation = (): Matrix4.Matrix4 =>
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
   const transformDiff = (): Matrix4.Matrix4 =>
@@ -134,19 +148,22 @@ export function computeInputDisplayed(
       )
     );
 
+  const convertAngle = (angle: number): number =>
+    angleUnit === 'radians' ? angle : angles.convertTo(angle);
+
   switch (identifier) {
     case 'x-translate':
-      return relativeTranslationDiff().x;
+      return units.convertWorldValueToReal(relativeTranslationDiff().x);
     case 'y-translate':
-      return relativeTranslationDiff().y;
+      return units.convertWorldValueToReal(relativeTranslationDiff().y);
     case 'z-translate':
-      return relativeTranslationDiff().z;
+      return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return Angle.toDegrees(relativeRotationDiff().x);
+      return convertAngle(relativeRotationDiff().x);
     case 'y-rotate':
-      return Angle.toDegrees(relativeRotationDiff().y);
+      return convertAngle(relativeRotationDiff().y);
     case 'z-rotate':
-      return Angle.toDegrees(relativeRotationDiff().z);
+      return convertAngle(relativeRotationDiff().z);
   }
   return 0;
 }
