@@ -35,8 +35,6 @@ export class TransformController {
   public async updateTransform(delta: Matrix4.Matrix4): Promise<void> {
     this.currentDelta = delta;
 
-    console.log(delta);
-
     await this.stream.updateInteraction({
       transform: {
         delta: this.toDeltaTransform(this.currentDelta, true),

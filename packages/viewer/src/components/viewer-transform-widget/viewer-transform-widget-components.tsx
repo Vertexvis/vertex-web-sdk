@@ -15,7 +15,7 @@ export interface TransformWidgetInputProps {
   point: Point.Point;
   placement: TransformWidgetInputPlacement;
 
-  value?: number;
+  value?: number | string;
 
   onChange?: (value: number) => void | Promise<void>;
 }
@@ -32,7 +32,11 @@ export const TransformWidgetInput: FunctionalComponent<
 
   const handleChange = (event: Event): void => {
     if (event.target != null) {
-      onChange?.(parseFloat((event.target as HTMLInputElement).value));
+      const parsed = parseFloat((event.target as HTMLInputElement).value);
+
+      if (!isNaN(parsed)) {
+        onChange?.(parseFloat((event.target as HTMLInputElement).value));
+      }
     }
   };
 

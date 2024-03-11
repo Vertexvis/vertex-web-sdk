@@ -1,4 +1,6 @@
 import {
+  Angle,
+  Euler,
   Matrix4,
   Plane,
   Point,
@@ -73,6 +75,82 @@ export function convertCanvasPointToWorld(
   return undefined;
 }
 
+export function computeInputTransform(
+  identifier: string,
+  value: number,
+  lastValue: number
+): Matrix4.Matrix4 {
+  switch (identifier) {
+    case 'x-translate':
+      return Matrix4.makeTranslation(Vector3.create(value - lastValue, 0, 0));
+    case 'y-translate':
+      return Matrix4.makeTranslation(Vector3.create(0, value - lastValue, 0));
+    case 'z-translate':
+      return Matrix4.makeTranslation(Vector3.create(0, 0, value - lastValue));
+    case 'x-rotate':
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          Vector3.left(),
+          Angle.toRadians(value - lastValue)
+        )
+      );
+    case 'y-rotate':
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          Vector3.down(),
+          Angle.toRadians(value - lastValue)
+        )
+      );
+    case 'z-rotate':
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          Vector3.forward(),
+          Angle.toRadians(value - lastValue)
+        )
+      );
+  }
+  return Matrix4.makeIdentity();
+}
+
+export function computeInputDisplayed(
+  identifier: string,
+  current: Matrix4.Matrix4,
+  start: Matrix4.Matrix4
+): number {
+  const rotation = (): Matrix4.Matrix4 =>
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
+  const transformDiff = (): Matrix4.Matrix4 =>
+    Matrix4.multiply(current, Matrix4.invert(start));
+  const relativeTranslationDiff = (): Vector3.Vector3 =>
+    Vector3.transformMatrix(
+      Vector3.fromMatrixPosition(transformDiff()),
+      Matrix4.invert(rotation())
+    );
+  const relativeRotationDiff = (): Euler.Euler =>
+    Euler.create(
+      Vector3.transformMatrix(
+        Euler.fromRotationMatrix(Matrix4.invert(transformDiff())),
+        Matrix4.invert(rotation())
+      )
+    );
+
+  switch (identifier) {
+    case 'x-translate':
+      return relativeTranslationDiff().x;
+    case 'y-translate':
+      return relativeTranslationDiff().y;
+    case 'z-translate':
+      return relativeTranslationDiff().z;
+    case 'x-rotate':
+      return Angle.toDegrees(relativeRotationDiff().x);
+    case 'y-rotate':
+      return Angle.toDegrees(relativeRotationDiff().y);
+    case 'z-rotate':
+      return Angle.toDegrees(relativeRotationDiff().z);
+  }
+  return 0;
+}
+
 export function computeUpdatedTransform(
   current: Matrix4.Matrix4,
   previous: Vector3.Vector3,
@@ -81,107 +159,64 @@ export function computeUpdatedTransform(
   angle: number,
   identifier: string
 ): Matrix4.Matrix4 {
+  const delta = Vector3.subtract(next, previous);
+
   switch (identifier) {
     case 'x-translate': {
       return Matrix4.multiply(
         current,
-        Matrix4.makeTranslation(
-          Vector3.create(
-            computeTranslation(current, previous, next, Vector3.right()),
-            0,
-            0
-          )
-        )
+        computeTranslation(current, Vector3.right(), delta)
       );
     }
     case 'y-translate':
       return Matrix4.multiply(
         current,
-        Matrix4.makeTranslation(
-          Vector3.create(
-            0,
-            computeTranslation(current, previous, next, Vector3.up()),
-            0
-          )
-        )
+        computeTranslation(current, Vector3.up(), delta)
       );
     case 'z-translate':
       return Matrix4.multiply(
         current,
-        Matrix4.makeTranslation(
-          Vector3.create(
-            0,
-            0,
-            computeTranslation(current, previous, next, Vector3.back())
+        computeTranslation(current, Vector3.back(), delta)
+      );
+    case 'x-rotate':
+      return Matrix4.multiply(
+        computeRotation(
+          current,
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(
+              computeRotationAxis(current, viewVector, Vector3.right()),
+              angle
+            )
           )
-        )
-      );
-    case 'x-rotate': {
-      const rotation = Quaternion.fromMatrixRotation(current);
-      const rotatedRight = Vector3.transformMatrix(
-        Vector3.right(),
-        Matrix4.makeRotation(rotation)
-      );
-      const rotatedLeft = Vector3.transformMatrix(
-        Vector3.left(),
-        Matrix4.makeRotation(rotation)
-      );
-
-      const rotationAxis =
-        Vector3.dot(viewVector, rotatedRight) >
-        Vector3.dot(viewVector, rotatedLeft)
-          ? rotatedRight
-          : rotatedLeft;
-
-      return computeRotation(
-        Quaternion.fromAxisAngle(rotationAxis, angle),
+        ),
         current
       );
-    }
-    case 'y-rotate': {
-      const rotation = Quaternion.fromMatrixRotation(current);
-      const rotatedUp = Vector3.transformMatrix(
-        Vector3.up(),
-        Matrix4.makeRotation(rotation)
-      );
-      const rotatedDown = Vector3.transformMatrix(
-        Vector3.down(),
-        Matrix4.makeRotation(rotation)
-      );
-
-      const rotationAxis =
-        Vector3.dot(viewVector, rotatedUp) >
-        Vector3.dot(viewVector, rotatedDown)
-          ? rotatedUp
-          : rotatedDown;
-
-      return computeRotation(
-        Quaternion.fromAxisAngle(rotationAxis, angle),
+    case 'y-rotate':
+      return Matrix4.multiply(
+        computeRotation(
+          current,
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(
+              computeRotationAxis(current, viewVector, Vector3.up()),
+              angle
+            )
+          )
+        ),
         current
       );
-    }
-    case 'z-rotate': {
-      const rotation = Quaternion.fromMatrixRotation(current);
-      const rotatedForward = Vector3.transformMatrix(
-        Vector3.forward(),
-        Matrix4.makeRotation(rotation)
-      );
-      const rotatedBack = Vector3.transformMatrix(
-        Vector3.back(),
-        Matrix4.makeRotation(rotation)
-      );
-
-      const rotationAxis =
-        Vector3.dot(viewVector, rotatedForward) >
-        Vector3.dot(viewVector, rotatedBack)
-          ? rotatedForward
-          : rotatedBack;
-
-      return computeRotation(
-        Quaternion.fromAxisAngle(rotationAxis, angle),
+    case 'z-rotate':
+      return Matrix4.multiply(
+        computeRotation(
+          current,
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(
+              computeRotationAxis(current, viewVector, Vector3.forward()),
+              angle
+            )
+          )
+        ),
         current
       );
-    }
     default:
       return current;
   }
@@ -190,34 +225,33 @@ export function computeUpdatedTransform(
 export function computeRotationAxis(
   current: Matrix4.Matrix4,
   viewVector: Vector3.Vector3,
-  a: Vector3.Vector3,
-  b: Vector3.Vector3
+  axis: Vector3.Vector3
 ): Vector3.Vector3 {
-  const rotation = Quaternion.fromMatrixRotation(current);
-  const rotatedA = Vector3.transformMatrix(a, Matrix4.makeRotation(rotation));
-  const rotatedB = Vector3.transformMatrix(b, Matrix4.makeRotation(rotation));
+  const rotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
+  const rotatedAxis = Vector3.transformMatrix(axis, rotation);
+  const rotatedNegatedAxis = Vector3.transformMatrix(
+    Vector3.negate(axis),
+    rotation
+  );
 
-  return Vector3.dot(viewVector, rotatedA) > Vector3.dot(viewVector, rotatedB)
-    ? rotatedA
-    : rotatedB;
+  return Vector3.dot(viewVector, rotatedAxis) >
+    Vector3.dot(viewVector, rotatedNegatedAxis)
+    ? rotatedAxis
+    : rotatedNegatedAxis;
 }
 
-function computeTranslation(
+export function computeTranslation(
   current: Matrix4.Matrix4,
-  previous: Vector3.Vector3,
-  next: Vector3.Vector3,
-  direction: Vector3.Vector3
-): number {
-  const rotatedTranslationAxis = Vector3.transformMatrix(
-    direction,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(current))
-  );
-  const rotatedDelta = Vector3.multiply(
-    rotatedTranslationAxis,
-    Vector3.subtract(next, previous)
-  );
+  axis: Vector3.Vector3,
+  delta: Vector3.Vector3
+): Matrix4.Matrix4 {
+  const rotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
+  const rotatedAxis = Vector3.transformMatrix(axis, rotation);
+  const rotatedDelta = Vector3.multiply(rotatedAxis, delta);
 
-  return rotatedDelta.x + rotatedDelta.y + rotatedDelta.z;
+  return Matrix4.makeTranslation(
+    Vector3.scale(rotatedDelta.x + rotatedDelta.y + rotatedDelta.z, axis)
+  );
 }
 
 /**
@@ -228,29 +262,21 @@ function computeTranslation(
  * @returns
  */
 export function computeRotation(
-  rotation: Quaternion.Quaternion,
-  current: Matrix4.Matrix4
+  current: Matrix4.Matrix4,
+  delta: Matrix4.Matrix4
 ): Matrix4.Matrix4 {
   return Matrix4.multiply(
     Matrix4.multiply(
-      Matrix4.multiply(
-        Matrix4.makeTranslation(Vector3.fromMatrixPosition(current)),
-        Matrix4.makeRotation(rotation)
-      ),
-      Matrix4.makeTranslation(
-        Vector3.negate(Vector3.fromMatrixPosition(current))
-      )
+      Matrix4.makeTranslation(Vector3.fromMatrixPosition(current)),
+      delta
     ),
-    current
+    Matrix4.makeTranslation(Vector3.negate(Vector3.fromMatrixPosition(current)))
   );
 }
 
 export function computeInputPosition(
-  frame: Frame,
   viewport: Viewport,
-  // boundingBox: BoundingBox.BoundingBox,
   bounds: Rectangle.Rectangle,
-  origin: Vector3.Vector3,
   shapePoints: Point.Point[]
 ): PointAndPosition {
   const paddedBounds = Rectangle.pad(bounds, 5);
@@ -290,51 +316,4 @@ export function computeInputPosition(
     default:
       return { point: closestPoint, position: 'bottom-right' };
   }
-
-  // const furthestPoint = shapePoints.reduce(
-  //   (fp, p) =>
-  //     Vector3.distance(origin, p) > Vector3.distance(origin, fp) ? p : fp,
-  //   origin
-  // );
-  // const ray = Ray.create({
-  //   origin: furthestPoint,
-  //   direction: Vector3.normalize(Vector3.subtract(furthestPoint, origin)),
-  // });
-  // const furthestCanvasPoint = viewport.transformWorldToViewport(
-  //   furthestPoint,
-  //   frame.scene.camera.projectionViewMatrix
-  // );
-
-  // const closestBoundingBoxPoint = boundingBox.
-
-  // const boundsTopLeft = Rectangle.topLeft(bounds);
-  // const boundsBottomRight = Rectangle.bottomRight(bounds);
-
-  // const closestPoint =
-  //   Point.distance(furthestCanvasPoint, boundsTopLeft) >
-  //   Point.distance(furthestCanvasPoint, boundsBottomRight)
-  //     ? boundsTopLeft
-  //     : boundsBottomRight;
-
-  // const closestPointRay = frame.scene.camera.isPerspective()
-  //   ? viewport.transformPointToRay(
-  //       closestPoint,
-  //       frame.image,
-  //       frame.scene.camera
-  //     )
-  //   : viewport.transformPointToOrthographicRay(
-  //       closestPoint,
-  //       frame.image,
-  //       frame.scene.camera
-  //     );
-
-  // const positionPlane = Plane.create({
-  //   normal: Vector3.normalize(
-  //     Vector3.subtract(frame.scene.camera.position, origin)
-  //   ),
-  // });
-
-  // const worldIntersection = Ray.intersectPlane(closestPointRay, positionPlane);
-
-  // return Ray.at(ray, 100);
 }

@@ -50,8 +50,8 @@ export {
   SynchronizedClock,
   Viewport,
 } from './lib/types';
+export * from './lib/types/distanceUnits';
 export * from './lib/types/markup';
-export * from './lib/types/measurementUnits';
 export * from './lib/volume-intersection';
 
 import { TapEventDetails } from './lib/interactions/tapEventDetails';

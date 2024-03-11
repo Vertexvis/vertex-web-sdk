@@ -1155,6 +1155,11 @@ export namespace Components {
          */
         "controller"?: TransformController;
         /**
+          * The unit to show for translation inputs. Defaults to `millimeters`.
+          * @see DistanceUnitType
+         */
+        "distanceUnit": DistanceUnitType;
+        /**
           * @ignore Visible for testing.
          */
         "hovered"?: Drawable;
@@ -2695,6 +2700,11 @@ declare namespace LocalJSX {
           * The controller that is responsible for performing transforms.
          */
         "controller"?: TransformController;
+        /**
+          * The unit to show for translation inputs. Defaults to `millimeters`.
+          * @see DistanceUnitType
+         */
+        "distanceUnit"?: DistanceUnitType;
         /**
           * @ignore Visible for testing.
          */

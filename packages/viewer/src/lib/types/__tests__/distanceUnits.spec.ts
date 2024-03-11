@@ -1,10 +1,6 @@
 import { Vector3 } from '@vertexvis/geometry';
 
-import {
-  AreaUnits,
-  DistanceUnits,
-  DistanceUnitType,
-} from '../measurementUnits';
+import { AreaUnits, DistanceUnits, DistanceUnitType } from '../distanceUnits';
 
 interface DisanceUnitTest {
   unitType: DistanceUnitType;
