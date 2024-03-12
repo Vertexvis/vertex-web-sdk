@@ -9,6 +9,7 @@ jest.mock('./util', () => ({
   convertPointToCanvas: jest.fn(),
   convertCanvasPointToWorld: jest.fn(),
   computeUpdatedTransform: jest.fn(),
+  computeInputDisplayValue: jest.fn(),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

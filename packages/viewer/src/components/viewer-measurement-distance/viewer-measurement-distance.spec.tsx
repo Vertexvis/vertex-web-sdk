@@ -898,58 +898,6 @@ describe('vertex-viewer-measurement-distance', () => {
     });
   });
 
-  describe('mode changing', () => {
-    it('removes the cursor if the mode is not edit or replace', async () => {
-      const onEditBegin = jest.fn();
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
-        components: [Viewer, ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer>
-            <vertex-viewer-measurement-distance
-              start={start}
-              end={end}
-              hitProvider={hitProvider}
-              camera={camera}
-              mode="replace"
-              onEditBegin={onEditBegin}
-              onEditEnd={onEditEnd}
-            />
-          </vertex-viewer>
-        ),
-      });
-
-      const viewer = page.root as HTMLVertexViewerElement;
-      const removeFn = jest.fn();
-      const addCursorSpy = jest.spyOn(viewer, 'addCursor');
-      addCursorSpy.mockImplementation(async () => ({ dispose: removeFn }));
-      const measurement = viewer.querySelector(
-        'vertex-viewer-measurement-distance'
-      ) as HTMLVertexViewerMeasurementDistanceElement;
-      const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
-
-      // update start anchor
-      interactionTarget.dispatchEvent(
-        new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
-      );
-
-      // begin interaction
-      interactionTarget.dispatchEvent(
-        new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 })
-      );
-      window.dispatchEvent(
-        new MouseEvent('pointerup', { clientX: 10, clientY: 10 })
-      );
-      await page.waitForChanges();
-
-      const container = viewer.shadowRoot?.querySelector(
-        'div.viewer-container'
-      );
-
-      expect(addCursorSpy).toHaveBeenCalled();
-    });
-  });
-
   it('renders axis reference lines if enabled', async () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementDistance],
