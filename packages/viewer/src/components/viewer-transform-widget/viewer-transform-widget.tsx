@@ -31,7 +31,7 @@ import {
   computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
-  PointAndPosition,
+  PointAndPlacement,
 } from './util';
 import { TransformWidgetInput } from './viewer-transform-widget-components';
 import { TransformWidget } from './widget';
@@ -161,7 +161,7 @@ export class ViewerTransformWidget {
   public hovered?: Drawable;
 
   @State()
-  protected inputPosition?: PointAndPosition;
+  protected inputPosition?: PointAndPlacement;
 
   @State()
   protected inputValue?: number;
@@ -367,7 +367,7 @@ export class ViewerTransformWidget {
               bounds={this.inputBounds}
               viewport={this.viewer.viewport}
               point={this.inputPosition.point}
-              placement={this.inputPosition.position}
+              placement={this.inputPosition.placement}
               angle={this.getDisplayedAngle()}
               distance={this.getDisplayedDistance()}
               decimalPlaces={this.decimalPlaces}
@@ -408,13 +408,11 @@ export class ViewerTransformWidget {
   };
 
   private handleInputResize = (): void => {
-    console.log(this.inputRef);
     if (this.inputRef != null) {
       const inputElement = this.inputRef;
 
       readDOM(() => {
         this.inputBounds = inputElement.getBoundingClientRect();
-        console.log(this.inputBounds);
       });
     }
   };
@@ -624,7 +622,6 @@ export class ViewerTransformWidget {
   private handleInputIncrement = (): void => {
     if (this.inputValue != null && this.lastInputValue != null) {
       this.inputValue = this.lastInputValue + 1;
-      console.log(this.inputValue);
       this.handleInputChange(this.inputValue);
     }
   };

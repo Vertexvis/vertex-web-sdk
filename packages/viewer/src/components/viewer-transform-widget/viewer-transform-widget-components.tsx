@@ -54,13 +54,13 @@ export const TransformWidgetInput: FunctionalComponent<
 }) => {
   const angles = new AngleUnits(angleUnit);
   const units = new DistanceUnits(distanceUnit);
-  const displayValue =
-    distance != null
-      ? `${distance.toFixed(decimalPlaces)} ${units.unit.abbreviatedName}`
-      : `${angle?.toFixed(decimalPlaces)} ${angles.unit.abbreviatedName}`;
+  const definedValue = distance ?? angle ?? 0;
+  const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))} ${
+    distance != null ? units.unit.abbreviatedName : angles.unit.abbreviatedName
+  }`;
   const inputPlacement = computeInputPlacement(
     viewport,
-    bounds ?? Dimensions.create(100, 30),
+    bounds ?? Dimensions.create(0, 0),
     point,
     placement
   );

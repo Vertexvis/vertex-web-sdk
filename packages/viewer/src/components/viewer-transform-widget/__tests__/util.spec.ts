@@ -3,12 +3,16 @@ import {
   Matrix4,
   Point,
   Quaternion,
+  Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
 
 import { Viewport } from '../../../lib/types';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import {
+  computeInputDisplayValue,
+  computeInputPosition,
+  computeInputTransform,
   computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
@@ -231,6 +235,218 @@ describe('vertex-viewer-transform-widget utils', () => {
           'non-matching-identifier'
         )
       ).toMatchObject(Matrix4.makeTranslation(Vector3.back()));
+    });
+  });
+
+  describe(computeInputTransform, () => {
+    it('computes an updated translation based on the difference', () => {
+      expect(computeInputTransform('x-translate', 100, 90)).toMatchObject(
+        Matrix4.makeTranslation(Vector3.create(10, 0, 0))
+      );
+    });
+
+    it('computes an updated rotation based on the difference', () => {
+      expect(computeInputTransform('x-rotate', 90, 0)).toMatchObject(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+        )
+      );
+    });
+
+    it('converts distance units', () => {
+      const transformMm = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'millimeters'
+      );
+      expect(Vector3.fromMatrixPosition(transformMm).x).toBeCloseTo(10);
+
+      const transformCm = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'centimeters'
+      );
+      expect(Vector3.fromMatrixPosition(transformCm).x).toBeCloseTo(100);
+
+      const transformM = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'meters'
+      );
+      expect(Vector3.fromMatrixPosition(transformM).x).toBeCloseTo(10000);
+
+      const transformIn = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'inches'
+      );
+      expect(Vector3.fromMatrixPosition(transformIn).x).toBeCloseTo(254);
+
+      const transformFt = computeInputTransform('x-translate', 100, 90, 'feet');
+      expect(Vector3.fromMatrixPosition(transformFt).x).toBeCloseTo(3048);
+
+      const transformYd = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'yards'
+      );
+      expect(Vector3.fromMatrixPosition(transformYd).x).toBeCloseTo(9144);
+    });
+
+    it('converts angle units', () => {
+      expect(
+        computeInputTransform('x-rotate', 90, 0, undefined, 'degrees')
+      ).toMatchObject(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+        )
+      );
+
+      expect(
+        computeInputTransform('x-rotate', Math.PI / 2, 0, undefined, 'radians')
+      ).toMatchObject(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+        )
+      );
+    });
+  });
+
+  describe(computeInputDisplayValue, () => {
+    it('determines the display value for translation', () => {
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0))
+        )
+      ).toBeCloseTo(10);
+    });
+
+    it('determines the display value for rotation', () => {
+      expect(
+        computeInputDisplayValue(
+          'x-rotate',
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+          ),
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
+          )
+        )
+      ).toBeCloseTo(45);
+    });
+
+    it('converts distance units', () => {
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'millimeters'
+        )
+      ).toBeCloseTo(10);
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'centimeters'
+        )
+      ).toBeCloseTo(1);
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'meters'
+        )
+      ).toBeCloseTo(0.01);
+
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'inches'
+        )
+      ).toBeCloseTo(0.394);
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'feet'
+        )
+      ).toBeCloseTo(0.0328);
+      expect(
+        computeInputDisplayValue(
+          'x-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'yards'
+        )
+      ).toBeCloseTo(0.011);
+    });
+
+    it('converts angle units', () => {
+      expect(
+        computeInputDisplayValue(
+          'x-rotate',
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+          ),
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
+          ),
+          undefined,
+          'degrees'
+        )
+      ).toBeCloseTo(45);
+
+      expect(
+        computeInputDisplayValue(
+          'x-rotate',
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
+          ),
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
+          ),
+          undefined,
+          'radians'
+        )
+      ).toBeCloseTo(Math.PI / 4);
+    });
+  });
+
+  describe(computeInputPosition, () => {
+    it('positions based on the closest corner', () => {
+      const viewport = new Viewport(100, 100);
+      const rectangle = Rectangle.create(25, 25, 50, 50);
+
+      const topLeft = computeInputPosition(viewport, rectangle, [
+        Point.create(-0.5, 0.5),
+      ]);
+      const topRight = computeInputPosition(viewport, rectangle, [
+        Point.create(0.5, 0.5),
+      ]);
+      const bottomLeft = computeInputPosition(viewport, rectangle, [
+        Point.create(-0.5, -0.5),
+      ]);
+      const bottomRight = computeInputPosition(viewport, rectangle, [
+        Point.create(0.5, -0.5),
+      ]);
+
+      expect(topLeft.placement).toBe('top-left');
+      expect(topRight.placement).toBe('top-right');
+      expect(bottomLeft.placement).toBe('bottom-left');
+      expect(bottomRight.placement).toBe('bottom-right');
     });
   });
 });

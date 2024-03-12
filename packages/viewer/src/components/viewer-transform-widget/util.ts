@@ -17,10 +17,11 @@ import {
   Frame,
   Viewport,
 } from '../../lib/types';
+import { TransformWidgetInputPlacement } from './viewer-transform-widget-components';
 
-export interface PointAndPosition {
+export interface PointAndPlacement {
   point: Point.Point;
-  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  placement: TransformWidgetInputPlacement;
 }
 
 export function convertPointToCanvas(
@@ -289,7 +290,7 @@ export function computeInputPosition(
   viewport: Viewport,
   bounds: Rectangle.Rectangle,
   shapePoints: Point.Point[]
-): PointAndPosition {
+): PointAndPlacement {
   const paddedBounds = Rectangle.pad(bounds, 5);
   const canvasPoints = shapePoints.map((sp) =>
     viewport.transformNdcPointToViewport(sp)
@@ -319,12 +320,12 @@ export function computeInputPosition(
 
   switch (closestPoint) {
     case topLeft:
-      return { point: closestPoint, position: 'top-left' };
+      return { point: closestPoint, placement: 'top-left' };
     case topRight:
-      return { point: closestPoint, position: 'top-right' };
+      return { point: closestPoint, placement: 'top-right' };
     case bottomLeft:
-      return { point: closestPoint, position: 'bottom-left' };
+      return { point: closestPoint, placement: 'bottom-left' };
     default:
-      return { point: closestPoint, position: 'bottom-right' };
+      return { point: closestPoint, placement: 'bottom-right' };
   }
 }

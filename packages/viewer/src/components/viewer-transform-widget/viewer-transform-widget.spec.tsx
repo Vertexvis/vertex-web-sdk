@@ -5,17 +5,21 @@ jest.mock('../../lib/stencil', () => ({
   readDOM: jest.fn((callback) => callback()),
   writeDOM: jest.fn((callback) => callback()),
 }));
-jest.mock('./util', () => ({
-  convertPointToCanvas: jest.fn(),
-  convertCanvasPointToWorld: jest.fn(),
-  computeUpdatedTransform: jest.fn(),
-  computeInputDisplayValue: jest.fn(),
-}));
+jest.mock('./util', () => {
+  const actual = jest.requireActual('./util');
+
+  return {
+    ...actual,
+    convertPointToCanvas: jest.fn(),
+    convertCanvasPointToWorld: jest.fn(),
+    computeUpdatedTransform: jest.fn(),
+  };
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Euler, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+import { Euler, Matrix4, Point, Rectangle, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
@@ -266,6 +270,206 @@ describe('vertex-viewer-transform-widget', () => {
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
+  it('supports input-based position transforms', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+      Rectangle.create(0, 0, 100, 100)
+    );
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const onInteractionEnded = jest.fn();
+    const onInteractionStarted = jest.fn();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    widget.position = Vector3.create(1, 1, 1);
+    widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionStarted', onInteractionStarted);
+
+    await page.waitForChanges();
+
+    widget.hovered = new TriangleMesh(
+      jest.fn(),
+      'x-translate',
+      new TriangleMeshPoints(
+        true,
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Point.create(),
+        Point.create(),
+        Point.create(),
+        Point.create()
+      ),
+      '#000000',
+      '#000000'
+    );
+    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = jest.spyOn(stream, 'updateInteraction');
+    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    );
+
+    widget.shadowRoot
+      ?.querySelector('canvas')
+      ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+
+    const input = widget.shadowRoot?.querySelector('input') as HTMLInputElement;
+
+    input.value = '100';
+
+    input.dispatchEvent(new Event('change'));
+
+    await page.waitForChanges();
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(100, 0, 0),
+            scale: 1,
+          },
+        },
+      })
+    );
+  });
+
+  it('supports input-based rotation transforms', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+      Rectangle.create(0, 0, 100, 100)
+    );
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const onInteractionEnded = jest.fn();
+    const onInteractionStarted = jest.fn();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    widget.position = Vector3.create(1, 1, 1);
+    widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionStarted', onInteractionStarted);
+
+    await page.waitForChanges();
+
+    widget.hovered = new TriangleMesh(
+      jest.fn(),
+      'x-rotate',
+      new TriangleMeshPoints(
+        true,
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Point.create(),
+        Point.create(),
+        Point.create(),
+        Point.create()
+      ),
+      '#000000',
+      '#000000'
+    );
+    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = jest.spyOn(stream, 'updateInteraction');
+    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    );
+
+    widget.shadowRoot
+      ?.querySelector('canvas')
+      ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    await page.waitForChanges();
+    updateSpy.mockClear();
+
+    const input = widget.shadowRoot?.querySelector('input') as HTMLInputElement;
+
+    input.value = '90';
+
+    input.dispatchEvent(new Event('change'));
+
+    await page.waitForChanges();
+
+    const call = updateSpy.mock.calls[0][0];
+
+    expect(call.transform?.delta?.basisY?.x).toBeCloseTo(0);
+    expect(call.transform?.delta?.basisY?.y).toBeCloseTo(0);
+    expect(call.transform?.delta?.basisY?.z).toBeCloseTo(-1);
+    expect(call.transform?.delta?.basisZ?.x).toBeCloseTo(0);
+    expect(call.transform?.delta?.basisZ?.y).toBeCloseTo(1);
+    expect(call.transform?.delta?.basisZ?.z).toBeCloseTo(0);
+  });
+
   it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
@@ -279,6 +483,10 @@ describe('vertex-viewer-transform-widget', () => {
         </vertex-viewer>
       ),
     });
+
+    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+      Rectangle.create(0, 0, 100, 100)
+    );
 
     const viewer = page.body.querySelector(
       'vertex-viewer'
@@ -377,8 +585,12 @@ describe('vertex-viewer-transform-widget', () => {
     );
 
     await page.waitForChanges();
+
+    const input = widget.shadowRoot?.querySelector('input');
+
     expect(onInteractionEnded).toHaveBeenCalled();
     expect(onInteractionStarted).toHaveBeenCalled();
+    expect(input?.value).toBe('1 mm');
   });
 
   it('sets the widget to disabled on an interaction, and re-enables available axis', async () => {
