@@ -49,7 +49,6 @@
 
 .widget-input.wrapper {
   position: absolute;
-  box-sizing: border-box;
   pointer-events: auto;
   display: flex;
   border: 1px solid #cccccc;
@@ -57,16 +56,13 @@
 }
 
 input.widget-input {
+  box-sizing: border-box;
   text-align: center;
   border: none;
   width: 100%;
+  outline: none;
 }
 
-.widget-input.left-step,
-.widget-input.right-step {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  background-color: white;
-  border: none;
+input.widget-input:focus {
+  outline: none;
 }

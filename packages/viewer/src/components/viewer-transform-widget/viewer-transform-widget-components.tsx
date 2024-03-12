@@ -58,7 +58,7 @@ export const TransformWidgetInput: FunctionalComponent<
   const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))} ${
     distance != null ? units.unit.abbreviatedName : angles.unit.abbreviatedName
   }`;
-  const inputPlacement = computeInputPlacement(
+  const inputPlacement = constrainInputToViewport(
     viewport,
     bounds ?? Dimensions.create(0, 0),
     point,
@@ -111,13 +111,16 @@ interface InputPlacement {
   bottom?: string;
 }
 
-function computeInputPlacement(
+function constrainInputToViewport(
   viewport: Viewport,
   inputDimensions: Dimensions.Dimensions,
   point: Point.Point,
-  placement: TransformWidgetInputPlacement
+  placement: TransformWidgetInputPlacement,
+  padding = 5
 ): InputPlacement {
   const { width, height } = viewport.dimensions;
+  const paddedWidth = inputDimensions.width + padding;
+  const paddedHeight = inputDimensions.height + padding;
 
   function toCssLength(length: number): string {
     return `${length}px`;
@@ -126,32 +129,28 @@ function computeInputPlacement(
   switch (placement) {
     case 'top-left':
       return {
-        right: toCssLength(
-          constrainTo(width - inputDimensions.width, width - point.x)
-        ),
+        right: toCssLength(constrainTo(width - paddedWidth, width - point.x)),
         bottom: toCssLength(
-          constrainTo(height - inputDimensions.height, height - point.y)
+          constrainTo(height - paddedHeight, height - point.y)
         ),
       };
     case 'top-right':
       return {
-        left: toCssLength(constrainTo(width - inputDimensions.width, point.x)),
+        left: toCssLength(constrainTo(width - paddedWidth, point.x)),
         bottom: toCssLength(
-          constrainTo(height - inputDimensions.height, height - point.y)
+          constrainTo(height - paddedHeight, height - point.y)
         ),
       };
     case 'bottom-left':
       return {
-        right: toCssLength(
-          constrainTo(width - inputDimensions.width, width - point.x)
-        ),
-        top: toCssLength(constrainTo(height - inputDimensions.height, point.y)),
+        right: toCssLength(constrainTo(width - paddedWidth, width - point.x)),
+        top: toCssLength(constrainTo(height - paddedHeight, point.y)),
       };
     case 'bottom-right':
     default:
       return {
-        left: toCssLength(constrainTo(width - inputDimensions.width, point.x)),
-        top: toCssLength(constrainTo(height - inputDimensions.height, point.y)),
+        left: toCssLength(constrainTo(width - paddedWidth, point.x)),
+        top: toCssLength(constrainTo(height - paddedHeight, point.y)),
       };
   }
 }
