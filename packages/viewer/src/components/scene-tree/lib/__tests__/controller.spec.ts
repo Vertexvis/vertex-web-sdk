@@ -1158,6 +1158,7 @@ describe(SceneTreeController, () => {
       req.setFilter(term);
       req.setFullTree(true);
       req.setExactMatch(false);
+      req.setRemoveHiddenItems(false);
 
       await controller.filter(term);
 
@@ -1190,12 +1191,14 @@ describe(SceneTreeController, () => {
       req.setFilter(term);
       req.setFullTree(false);
       req.setExactMatch(true);
+      req.setRemoveHiddenItems(true);
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
       await controller.filter(term, {
         includeCollapsed: false,
         exactMatch: true,
+        removeHiddenItems: true,
       });
 
       expect(client.filter).toHaveBeenCalledWith(
@@ -1231,6 +1234,7 @@ describe(SceneTreeController, () => {
       req.setFilter(term);
       req.setFullTree(true);
       req.setExactMatch(false);
+      req.setRemoveHiddenItems(false);
 
       controller.filter(term);
 

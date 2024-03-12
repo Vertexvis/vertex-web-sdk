@@ -41,6 +41,7 @@ import {
   showItem,
 } from './lib/viewer-ops';
 import {
+  FilterOptions,
   MetadataKey,
   RowArg,
   RowDataProvider,
@@ -165,12 +166,20 @@ export class SceneTree {
   public controller?: SceneTreeController;
 
   /**
+   * A set of options to configure scene tree searching behavior.
+   */
+  @Prop({ mutable: true })
+  public searchOptions: FilterOptions = {};
+
+  /**
+   * @deprecated Use `searchOptions`
    * Indicates whether the metadata search should use an exact match.
    */
   @Prop({ mutable: true })
   public metadataSearchExactMatch = false;
 
   /**
+   * @deprecated Use `searchOptions`
    * A list of the metadata keys that a scene tree search should be performed on.
    */
   @Prop({ mutable: true })
@@ -557,10 +566,10 @@ export class SceneTree {
     options?: SceneTreeOperationOptions
   ): Promise<void> {
     if (this.viewer != null) {
+      const metadataSearchKeys =
+        this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
       const definedMetadataKeys =
-        this.metadataSearchKeys.length > 0
-          ? this.metadataSearchKeys
-          : this.metadataKeys;
+        metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
 
       if (definedMetadataKeys.length === 0) {
         console.warn(
@@ -573,11 +582,17 @@ export class SceneTree {
           ? definedMetadataKeys
           : ['VERTEX_SCENE_ITEM_NAME'];
 
+      const shouldSearchExactMatch =
+        this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
+      const shouldSearchRemoveHiddenItems =
+        this.searchOptions?.removeHiddenItems ?? false;
+
       await selectFilterResults(
         this.viewer,
         term,
         columnsToSearch,
-        this.metadataSearchExactMatch,
+        shouldSearchExactMatch,
+        shouldSearchRemoveHiddenItems,
         {
           append: false,
           ...options,
@@ -872,15 +887,21 @@ export class SceneTree {
 
   @Listen('search')
   protected async handleSearch(event: CustomEvent<string>): Promise<void> {
+    const metadataSearchKeys =
+      this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
     const columnsToSearch =
-      this.metadataSearchKeys.length > 0
-        ? this.metadataSearchKeys
-        : this.metadataKeys;
+      metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
+
+    const shouldSearchExactMatch =
+      this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
+    const shouldSearchRemoveHiddenItems =
+      this.searchOptions?.removeHiddenItems ?? false;
 
     try {
       await this.filterItems(event.detail, {
         columns: columnsToSearch,
-        exactMatch: this.metadataSearchExactMatch,
+        exactMatch: shouldSearchExactMatch,
+        removeHiddenItems: shouldSearchRemoveHiddenItems,
       });
     } catch (e) {
       console.error('Failed to filter tree with exception: ', e);

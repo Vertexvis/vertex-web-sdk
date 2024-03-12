@@ -478,6 +478,12 @@ export class ViewerMeasurementDistance {
   protected handleModeChanged(): void {
     this.warnIfDepthBuffersDisabled();
 
+    // If we're not in edit or replace mode, ensure that the measurement
+    // cursor is removed.
+    if (this.mode === '') {
+      this.stateMap.hoverCursor?.dispose();
+    }
+
     if (this.viewer != null) {
       this.removeInteractionListeners(this.viewer);
       this.addInteractionListeners(this.viewer);

@@ -124,6 +124,11 @@ export interface FilterTreeOptions {
   exactMatch?: boolean;
 
   /**
+   * Indicates whether the metadata search should remove hidden items from the results.
+   */
+  removeHiddenItems?: boolean;
+
+  /**
    * The metadata keys to filter the tree on.
    */
   columns?: MetadataKey[];
@@ -707,6 +712,7 @@ export class SceneTreeController {
               req.setFilter(term);
               req.setFullTree(options.includeCollapsed ?? true);
               req.setExactMatch(!!options.exactMatch);
+              req.setRemoveHiddenItems(!!options.removeHiddenItems);
               if (options.columns) req.setColumnsKeysList(options.columns);
 
               this.pendingFilterGrpcRes = this.client.filter(
@@ -871,6 +877,14 @@ export class SceneTreeController {
         this.startIdleReconnectTimer();
 
         const { change } = msg.toObject();
+
+        // Update the number of filtered results if changed
+        if (change?.filterChange != null) {
+          this.updateState({
+            ...this.state,
+            totalFilteredRows: change.filterChange.numberOfResults,
+          });
+        }
 
         if (change?.listChange != null) {
           this.log('Received list change', change.listChange.start);
