@@ -104,6 +104,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 | Name                                            | Description                                                                               |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `--viewer-transform-widget-hovered-arrow-color` | A CSS color for the arrow when it is hovered. Defaults to `#ffff00`.                      |
+| `--viewer-transform-widget-input-width`         | A CSS length for the width of the input displayed near the handles. Defaults to `7em`.    |
 | `--viewer-transform-widget-x-axis-arrow-color`  | A CSS color for the arrow at the end of the X axis on this widget. Defaults to `#ea3324`. |
 | `--viewer-transform-widget-y-axis-arrow-color`  | A CSS color for the arrow at the end of the Y axis on this widget. Defaults to `#4faf32`. |
 | `--viewer-transform-widget-z-axis-arrow-color`  | A CSS color for the arrow at the end of the Z axis on this widget. Defaults to `#0000ff`. |

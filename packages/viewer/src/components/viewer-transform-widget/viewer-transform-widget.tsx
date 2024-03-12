@@ -23,12 +23,7 @@ import classNames from 'classnames';
 import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Drawable } from '../../lib/transforms/drawable';
-import {
-  AngleUnits,
-  AngleUnitType,
-  DistanceUnits,
-  DistanceUnitType,
-} from '../../lib/types';
+import { AngleUnitType, DistanceUnitType } from '../../lib/types';
 import {
   computeInputDisplayValue,
   computeInputPosition,
