@@ -878,6 +878,14 @@ export class SceneTreeController {
 
         const { change } = msg.toObject();
 
+        // Update the number of filtered results if changed
+        if (change?.filterChange != null) {
+          this.updateState({
+            ...this.state,
+            totalFilteredRows: change.filterChange.numberOfResults,
+          });
+        }
+
         if (change?.listChange != null) {
           this.log('Received list change', change.listChange.start);
           this.invalidateAfterOffset(change.listChange.start);
