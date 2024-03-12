@@ -2,7 +2,13 @@
 import { FunctionalComponent, h } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
 
-import { Viewport } from '../../lib/types';
+import {
+  AngleUnits,
+  AngleUnitType,
+  DistanceUnits,
+  DistanceUnitType,
+  Viewport,
+} from '../../lib/types';
 
 export type TransformWidgetInputPlacement =
   | 'top-left'
@@ -11,22 +17,50 @@ export type TransformWidgetInputPlacement =
   | 'bottom-right';
 
 export interface TransformWidgetInputProps {
+  ref: (el?: HTMLInputElement) => void;
+  bounds?: DOMRect;
+
   viewport: Viewport;
   point: Point.Point;
   placement: TransformWidgetInputPlacement;
 
-  value?: number;
+  distance?: number;
+  angle?: number;
   decimalPlaces: number;
+  distanceUnit: DistanceUnitType;
+  angleUnit: AngleUnitType;
 
   onChange?: (value: number) => void | Promise<void>;
+  onIncrement?: VoidFunction;
+  onDecrement?: VoidFunction;
 }
 
 export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
-> = ({ viewport, point, placement, value, decimalPlaces, onChange }) => {
+> = ({
+  ref,
+  bounds,
+  viewport,
+  point,
+  placement,
+  distance,
+  angle,
+  decimalPlaces,
+  distanceUnit,
+  angleUnit,
+  onChange,
+  onIncrement,
+  onDecrement,
+}) => {
+  const angles = new AngleUnits(angleUnit);
+  const units = new DistanceUnits(distanceUnit);
+  const displayValue =
+    distance != null
+      ? `${distance.toFixed(decimalPlaces)} ${units.unit.abbreviatedName}`
+      : `${angle?.toFixed(decimalPlaces)} ${angles.unit.abbreviatedName}`;
   const inputPlacement = computeInputPlacement(
     viewport,
-    Dimensions.create(100, 30),
+    bounds ?? Dimensions.create(100, 30),
     point,
     placement
   );
@@ -41,20 +75,28 @@ export const TransformWidgetInput: FunctionalComponent<
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'ArrowUp') {
+      onIncrement?.();
+    } else if (event.key === 'ArrowDown') {
+      onDecrement?.();
+    }
+  };
+
   return (
-    <input
-      style={{
-        position: 'absolute',
-        width: '100px',
-        height: '30px',
-        boxSizing: 'border-box',
-        pointerEvents: 'auto',
-        ...inputPlacement,
-      }}
-      type="number"
-      value={value?.toFixed(decimalPlaces)}
-      onChange={handleChange}
-    ></input>
+    <div
+      class="widget-input wrapper"
+      style={{ ...inputPlacement }}
+      onKeyDown={handleKeyDown}
+    >
+      <input
+        ref={ref}
+        class="widget-input"
+        type="text"
+        value={displayValue}
+        onChange={handleChange}
+      ></input>
+    </div>
   );
 };
 

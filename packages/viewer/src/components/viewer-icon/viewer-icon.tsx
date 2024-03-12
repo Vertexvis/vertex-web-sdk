@@ -10,6 +10,7 @@ export type ViewerIconName =
   | 'eye-half'
   | 'eye-half-dotted'
   | 'chevron-right'
+  | 'chevron-left'
   | 'chevron-down'
   | 'search'
   | 'close-circle'
@@ -69,6 +70,10 @@ export class ViewerIcon {
     } else if (this.name === 'chevron-right') {
       return this.renderSvgIcon(
         <path d="M10.83,7.62l-4-3.5A.5.5,0,0,0,6,4.5v7a.5.5,0,0,0,.83.38l4-3.5a.51.51,0,0,0,0-.76Z" />
+      );
+    } else if (this.name === 'chevron-left') {
+      return this.renderSvgIcon(
+        <path d="M9.71,4a.51.51,0,0,0-.54.08l-4,3.5a.51.51,0,0,0,0,.76l4,3.5A.5.5,0,0,0,10,11.5v-7A.51.51,0,0,0,9.71,4Z" />
       );
     } else if (this.name === 'chevron-down') {
       return this.renderSvgIcon(

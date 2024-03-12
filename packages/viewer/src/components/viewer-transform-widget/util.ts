@@ -91,10 +91,7 @@ export function computeInputTransform(
   const units = new DistanceUnits(distanceUnit);
   const angles = new AngleUnits(angleUnit);
 
-  const rotation = (): number =>
-    angleUnit === 'degrees'
-      ? angles.convertTo(value - lastValue)
-      : value - lastValue;
+  const rotation = (): number => angles.convertFrom(value - lastValue);
   const position = (): number =>
     units.convertRealValueToWorld(value - lastValue);
 
@@ -148,9 +145,6 @@ export function computeInputDisplayValue(
       )
     );
 
-  const convertAngle = (angle: number): number =>
-    angleUnit === 'radians' ? angle : angles.convertTo(angle);
-
   switch (identifier) {
     case 'x-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().x);
@@ -159,11 +153,11 @@ export function computeInputDisplayValue(
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return convertAngle(relativeRotationDiff().x);
+      return angles.convertTo(relativeRotationDiff().x);
     case 'y-rotate':
-      return convertAngle(relativeRotationDiff().y);
+      return angles.convertTo(relativeRotationDiff().y);
     case 'z-rotate':
-      return convertAngle(relativeRotationDiff().z);
+      return angles.convertTo(relativeRotationDiff().z);
   }
   return 0;
 }

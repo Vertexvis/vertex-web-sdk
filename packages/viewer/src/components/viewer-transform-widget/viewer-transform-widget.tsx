@@ -23,7 +23,12 @@ import classNames from 'classnames';
 import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Drawable } from '../../lib/transforms/drawable';
-import { AngleUnitType, DistanceUnitType } from '../../lib/types';
+import {
+  AngleUnits,
+  AngleUnitType,
+  DistanceUnits,
+  DistanceUnitType,
+} from '../../lib/types';
 import {
   computeInputDisplayValue,
   computeInputPosition,
@@ -186,9 +191,12 @@ export class ViewerTransformWidget {
   private lastInputValue?: number;
 
   private canvasBounds?: DOMRect;
+  private inputBounds?: DOMRect;
   private canvasResizeObserver?: ResizeObserver;
+  private inputResizeObserver?: ResizeObserver;
   private hostStyleObserver?: MutationObserver;
   private canvasRef?: HTMLCanvasElement;
+  private inputRef?: HTMLInputElement;
 
   private hoveredChangeDisposable?: Disposable;
 
@@ -196,6 +204,7 @@ export class ViewerTransformWidget {
     window.addEventListener('pointermove', this.handlePointerMove);
 
     this.canvasResizeObserver = new ResizeObserver(this.handleResize);
+    this.inputResizeObserver = new ResizeObserver(this.handleInputResize);
     this.hostStyleObserver = new MutationObserver(this.handleStyleChange);
 
     if (this.canvasRef != null) {
@@ -211,12 +220,14 @@ export class ViewerTransformWidget {
 
     this.handleViewerChanged(this.viewer, undefined);
     this.handleStyleChange();
+    this.handleInputResize();
   }
 
   protected disconnectedCallback(): void {
     window.removeEventListener('pointermove', this.handlePointerMove);
 
     this.canvasResizeObserver?.disconnect();
+    this.inputResizeObserver?.disconnect();
     this.hostStyleObserver?.disconnect();
 
     this.hoveredChangeDisposable?.dispose();
@@ -350,12 +361,26 @@ export class ViewerTransformWidget {
           this.inputValue != null &&
           this.viewer?.viewport && (
             <TransformWidgetInput
+              ref={(el) => {
+                if (el != null) {
+                  this.inputResizeObserver?.observe(el);
+                } else if (this.inputRef != null) {
+                  this.inputResizeObserver?.unobserve(this.inputRef);
+                }
+                this.inputRef = el;
+              }}
+              bounds={this.inputBounds}
               viewport={this.viewer.viewport}
               point={this.inputPosition.point}
               placement={this.inputPosition.position}
-              value={this.inputValue}
+              angle={this.getDisplayedAngle()}
+              distance={this.getDisplayedDistance()}
               decimalPlaces={this.decimalPlaces}
+              distanceUnit={this.distanceUnit}
+              angleUnit={this.angleUnit}
               onChange={this.handleInputChange}
+              onIncrement={this.handleInputIncrement}
+              onDecrement={this.handleInputDecrement}
             />
           )}
       </Host>
@@ -384,6 +409,18 @@ export class ViewerTransformWidget {
   private handleResize = (): void => {
     if (this.canvasRef != null) {
       this.updateCanvasBounds(this.canvasRef);
+    }
+  };
+
+  private handleInputResize = (): void => {
+    console.log(this.inputRef);
+    if (this.inputRef != null) {
+      const inputElement = this.inputRef;
+
+      readDOM(() => {
+        this.inputBounds = inputElement.getBoundingClientRect();
+        console.log(this.inputBounds);
+      });
     }
   };
 
@@ -589,6 +626,21 @@ export class ViewerTransformWidget {
     });
   };
 
+  private handleInputIncrement = (): void => {
+    if (this.inputValue != null && this.lastInputValue != null) {
+      this.inputValue = this.lastInputValue + 1;
+      console.log(this.inputValue);
+      this.handleInputChange(this.inputValue);
+    }
+  };
+
+  private handleInputDecrement = (): void => {
+    if (this.inputValue != null && this.lastInputValue != null) {
+      this.inputValue = this.lastInputValue - 1;
+      this.handleInputChange(this.inputValue);
+    }
+  };
+
   private handleInputChange = async (value: number): Promise<void> => {
     if (
       this.lastDragged != null &&
@@ -782,6 +834,22 @@ export class ViewerTransformWidget {
         widgetBounds,
         dragging.points.toArray()
       );
+    }
+  };
+
+  private getDisplayedAngle = (): number | undefined => {
+    const draggingIdentifier =
+      this.dragging?.identifier ?? this.lastDragged?.identifier;
+    if (draggingIdentifier?.includes('rotate')) {
+      return this.inputValue;
+    }
+  };
+
+  private getDisplayedDistance = (): number | undefined => {
+    const draggingIdentifier =
+      this.dragging?.identifier ?? this.lastDragged?.identifier;
+    if (draggingIdentifier?.includes('translate')) {
+      return this.inputValue;
     }
   };
 

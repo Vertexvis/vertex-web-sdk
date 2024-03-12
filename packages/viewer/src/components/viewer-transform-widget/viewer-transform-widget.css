@@ -29,6 +29,12 @@
   * when it is hovered. Defaults to `#ffff00`.
   */
   --viewer-transform-widget-hovered-arrow-color: #ffff00;
+
+  /**
+  * @prop --viewer-transform-widget-input-width: A CSS length for the width of the
+  * input displayed near the handles. Defaults to `7em`.
+  */
+  --viewer-transform-widget-input-width: 7em;
 }
 
 .widget {
@@ -39,4 +45,28 @@
 
 .widget.hovered {
   pointer-events: auto;
+}
+
+.widget-input.wrapper {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  border: 1px solid #cccccc;
+  width: var(--viewer-transform-widget-input-width);
+}
+
+input.widget-input {
+  text-align: center;
+  border: none;
+  width: 100%;
+}
+
+.widget-input.left-step,
+.widget-input.right-step {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  background-color: white;
+  border: none;
 }
