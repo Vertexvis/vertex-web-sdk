@@ -1476,6 +1476,10 @@ export namespace Components {
      */
     rotation?: Euler.Euler;
     /**
+     * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
+     */
+    showInputs: boolean;
+    /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
     viewer?: HTMLVertexViewerElement;
@@ -3312,6 +3316,10 @@ declare namespace LocalJSX {
      * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
      */
     rotation?: Euler.Euler;
+    /**
+     * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
+     */
+    showInputs?: boolean;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */

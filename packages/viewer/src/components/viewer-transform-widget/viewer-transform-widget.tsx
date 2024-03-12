@@ -130,6 +130,13 @@ export class ViewerTransformWidget {
   public zTranslationDisabled = false;
 
   /**
+   * Whether to show inputs beside the widget handles when they are interacted with.
+   * Defaults to `true`.
+   */
+  @Prop()
+  public showInputs = true;
+
+  /**
    * The unit to show for translation inputs. Defaults to `millimeters`.
    *
    * @see DistanceUnitType
@@ -215,7 +222,6 @@ export class ViewerTransformWidget {
 
     this.handleViewerChanged(this.viewer, undefined);
     this.handleStyleChange();
-    this.handleInputResize();
   }
 
   protected disconnectedCallback(): void {
@@ -352,32 +358,30 @@ export class ViewerTransformWidget {
           onPointerDown={this.handleBeginDrag}
         />
 
-        {this.inputPosition &&
-          this.inputValue != null &&
-          this.viewer?.viewport && (
-            <TransformWidgetInput
-              ref={(el) => {
-                if (el != null) {
-                  this.inputResizeObserver?.observe(el);
-                } else if (this.inputRef != null) {
-                  this.inputResizeObserver?.unobserve(this.inputRef);
-                }
-                this.inputRef = el;
-              }}
-              bounds={this.inputBounds}
-              viewport={this.viewer.viewport}
-              point={this.inputPosition.point}
-              placement={this.inputPosition.placement}
-              angle={this.getDisplayedAngle()}
-              distance={this.getDisplayedDistance()}
-              decimalPlaces={this.decimalPlaces}
-              distanceUnit={this.distanceUnit}
-              angleUnit={this.angleUnit}
-              onChange={this.handleInputChange}
-              onIncrement={this.handleInputIncrement}
-              onDecrement={this.handleInputDecrement}
-            />
-          )}
+        {this.showInputs && this.inputPosition && this.viewer?.viewport && (
+          <TransformWidgetInput
+            ref={(el) => {
+              if (el != null) {
+                this.inputResizeObserver?.observe(el);
+              } else if (this.inputRef != null) {
+                this.inputResizeObserver?.unobserve(this.inputRef);
+              }
+              this.inputRef = el;
+            }}
+            bounds={this.inputBounds}
+            viewport={this.viewer.viewport}
+            point={this.inputPosition.point}
+            placement={this.inputPosition.placement}
+            angle={this.getDisplayedAngle()}
+            distance={this.getDisplayedDistance()}
+            decimalPlaces={this.decimalPlaces}
+            distanceUnit={this.distanceUnit}
+            angleUnit={this.angleUnit}
+            onChange={this.handleInputChange}
+            onIncrement={this.handleInputIncrement}
+            onDecrement={this.handleInputDecrement}
+          />
+        )}
       </Host>
     );
   }
@@ -776,15 +780,6 @@ export class ViewerTransformWidget {
     });
   };
 
-  private get currentRotation(): Matrix4.Matrix4 {
-    if (this.currentTransform != null) {
-      return Matrix4.makeRotation(
-        Quaternion.fromMatrixRotation(this.currentTransform)
-      );
-    }
-    return Matrix4.makeIdentity();
-  }
-
   private updateInputValue = (): void => {
     const dragging = this.dragging ?? this.lastDragged;
     if (
@@ -812,20 +807,24 @@ export class ViewerTransformWidget {
   };
 
   private updateInputPosition = (): void => {
-    const widget = this.getTransformWidget();
-    const widgetBounds = widget.getFullBounds();
     const dragging = this.dragging ?? this.lastDragged;
     if (
+      this.showInputs &&
       this.viewer?.frame != null &&
       this.position != null &&
-      dragging != null &&
-      widgetBounds != null
+      dragging != null
     ) {
-      this.inputPosition = computeInputPosition(
-        this.viewer.viewport,
-        widgetBounds,
-        dragging.points.toArray()
-      );
+      const widget = this.getTransformWidget();
+      const widgetBounds = widget.getFullBounds();
+
+      this.inputPosition =
+        widgetBounds != null
+          ? computeInputPosition(
+              this.viewer.viewport,
+              widgetBounds,
+              dragging.points.toArray()
+            )
+          : undefined;
     }
   };
 
