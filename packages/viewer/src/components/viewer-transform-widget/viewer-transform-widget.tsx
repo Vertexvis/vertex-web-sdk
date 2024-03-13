@@ -365,6 +365,13 @@ export class ViewerTransformWidget {
     this.positionChanged.emit(newPosition);
   }
 
+  @Watch('distanceUnit')
+  @Watch('angleUnit')
+  @Watch('decimalPlaces')
+  protected handleDistanceUnitChanged(): void {
+    this.updateInputValue();
+  }
+
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
