@@ -18,6 +18,8 @@ export class TransformController {
   public async beginTransform(
     delta: Matrix4.Matrix4 = Matrix4.makeIdentity()
   ): Promise<void> {
+    this.clearEndInteractionTimeout();
+
     if (!this.isTransforming) {
       this.currentDelta = delta;
       this.isTransforming = true;
@@ -58,13 +60,16 @@ export class TransformController {
 
   public async endTransform(): Promise<void> {
     if (this.isTransforming) {
-      this.endInteraction();
+      await this.endInteraction();
     }
   }
 
-  public async endTransformDebounced(callback?: VoidFunction): Promise<void> {
+  public async endTransformDebounced(
+    startCallback?: VoidFunction,
+    endCallback?: VoidFunction
+  ): Promise<void> {
     if (this.isTransforming) {
-      this.restartEndInteractionTimeout(callback);
+      this.restartEndInteractionTimeout(startCallback, endCallback);
     }
   }
 
@@ -76,6 +81,8 @@ export class TransformController {
   private async endInteraction(): Promise<void> {
     console.debug(`Ending transform interaction [delta=${this.currentDelta}]`);
 
+    this.clearEndInteractionTimeout();
+
     await this.stream.endInteraction({
       transform: {
         delta: this.toDeltaTransform(this.currentDelta),
@@ -85,16 +92,24 @@ export class TransformController {
     this.currentDelta = Matrix4.makeIdentity();
   }
 
-  private restartEndInteractionTimeout(callback?: VoidFunction): void {
+  private restartEndInteractionTimeout(
+    startCallback?: VoidFunction,
+    endCallback?: VoidFunction
+  ): void {
+    this.clearEndInteractionTimeout();
+
+    this.endDebounceTimeout = setTimeout(async () => {
+      startCallback?.();
+      await this.endInteraction();
+      endCallback?.();
+    }, 500);
+  }
+
+  private clearEndInteractionTimeout(): void {
     if (this.endDebounceTimeout != null) {
       clearTimeout(this.endDebounceTimeout);
       this.endDebounceTimeout = undefined;
     }
-    this.endDebounceTimeout = setTimeout(() => {
-      this.endDebounceTimeout = undefined;
-      this.endInteraction();
-      callback?.();
-    }, 500);
   }
 
   private toDeltaTransform(

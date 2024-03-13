@@ -15,6 +15,7 @@ jest.mock('./util', () => {
     computeUpdatedTransform: jest.fn(),
   };
 });
+jest.mock('./dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -587,10 +588,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     const input = widget.shadowRoot?.querySelector('input');
+    const units = widget.shadowRoot?.querySelector('.widget-input.units');
 
     expect(onInteractionEnded).toHaveBeenCalled();
     expect(onInteractionStarted).toHaveBeenCalled();
-    expect(input?.value).toBe('1 mm');
+    expect(input?.value).toBe('1');
+    expect(units?.innerHTML).toBe('mm');
   });
 
   it('sets the widget to disabled on an interaction, and re-enables available axis', async () => {

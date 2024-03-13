@@ -23,7 +23,13 @@ import classNames from 'classnames';
 import { readDOM, writeDOM } from '../../lib/stencil';
 import { TransformController } from '../../lib/transforms/controller';
 import { Drawable } from '../../lib/transforms/drawable';
-import { AngleUnitType, DistanceUnitType } from '../../lib/types';
+import {
+  AngleUnits,
+  AngleUnitType,
+  DistanceUnits,
+  DistanceUnitType,
+} from '../../lib/types';
+import { focusInputElement } from './dom';
 import {
   computeInputDisplayValue,
   computeInputPosition,
@@ -33,7 +39,10 @@ import {
   convertPointToCanvas,
   PointAndPlacement,
 } from './util';
-import { TransformWidgetInput } from './viewer-transform-widget-components';
+import {
+  TransformWidgetInput,
+  TransformWidgetInputWrapper,
+} from './viewer-transform-widget-components';
 import { TransformWidget } from './widget';
 
 @Component({
@@ -171,7 +180,13 @@ export class ViewerTransformWidget {
   protected inputPosition?: PointAndPlacement;
 
   @State()
-  protected inputValue?: number;
+  protected inputValue = 0;
+
+  @State()
+  protected isEndingTransform = false;
+
+  @State()
+  protected inputShouldFocus = false;
 
   @Element()
   private hostEl!: HTMLElement;
@@ -198,6 +213,7 @@ export class ViewerTransformWidget {
   private inputResizeObserver?: ResizeObserver;
   private hostStyleObserver?: MutationObserver;
   private canvasRef?: HTMLCanvasElement;
+  private inputWrapperRef?: HTMLDivElement;
   private inputRef?: HTMLInputElement;
 
   private hoveredChangeDisposable?: Disposable;
@@ -233,6 +249,12 @@ export class ViewerTransformWidget {
 
     this.hoveredChangeDisposable?.dispose();
     this.widget?.dispose();
+  }
+
+  protected componentDidRender(): void {
+    if (this.inputShouldFocus && this.inputRef != null) {
+      focusInputElement(this.inputRef);
+    }
   }
 
   /**
@@ -359,28 +381,34 @@ export class ViewerTransformWidget {
         />
 
         {this.showInputs && this.inputPosition && this.viewer?.viewport && (
-          <TransformWidgetInput
+          <TransformWidgetInputWrapper
             ref={(el) => {
               if (el != null) {
                 this.inputResizeObserver?.observe(el);
               } else if (this.inputRef != null) {
                 this.inputResizeObserver?.unobserve(this.inputRef);
               }
-              this.inputRef = el;
+              this.inputWrapperRef = el;
             }}
             bounds={this.inputBounds}
             viewport={this.viewer.viewport}
             point={this.inputPosition.point}
             placement={this.inputPosition.placement}
-            angle={this.getDisplayedAngle()}
-            distance={this.getDisplayedDistance()}
-            decimalPlaces={this.decimalPlaces}
-            distanceUnit={this.distanceUnit}
-            angleUnit={this.angleUnit}
-            onChange={this.handleInputChange}
-            onIncrement={this.handleInputIncrement}
-            onDecrement={this.handleInputDecrement}
-          />
+            displayUnit={this.getDisplayedUnits()}
+          >
+            <TransformWidgetInput
+              ref={(el) => {
+                this.inputRef = el;
+              }}
+              angle={this.getDisplayedAngle()}
+              disabled={this.isEndingTransform}
+              distance={this.getDisplayedDistance()}
+              decimalPlaces={this.decimalPlaces}
+              onChange={this.handleInputChange}
+              onIncrement={this.handleInputIncrement}
+              onDecrement={this.handleInputDecrement}
+            />
+          </TransformWidgetInputWrapper>
         )}
       </Host>
     );
@@ -412,11 +440,11 @@ export class ViewerTransformWidget {
   };
 
   private handleInputResize = (): void => {
-    if (this.inputRef != null) {
-      const inputElement = this.inputRef;
+    if (this.inputWrapperRef != null) {
+      const wrapperElement = this.inputWrapperRef;
 
       readDOM(() => {
-        this.inputBounds = inputElement.getBoundingClientRect();
+        this.inputBounds = wrapperElement.getBoundingClientRect();
       });
     }
   };
@@ -477,6 +505,8 @@ export class ViewerTransformWidget {
       this.dragging = this.hovered;
 
       if (this.dragging.identifier !== this.lastDragged?.identifier) {
+        this.inputValue = 0;
+        this.updateInputPosition();
         this.dragStartTransform = this.currentTransform;
       }
       this.lastDragged = undefined;
@@ -576,10 +606,6 @@ export class ViewerTransformWidget {
 
     this.dragging = undefined;
     this.lastWorldPosition = undefined;
-    this.position =
-      this.currentTransform != null
-        ? Vector3.fromMatrixPosition(this.currentTransform)
-        : this.position;
     this.lastAngle = 0;
 
     this.updateInputPosition();
@@ -588,14 +614,7 @@ export class ViewerTransformWidget {
     widget.updateCursor(canvasPoint);
     widget.updateTransform(this.currentTransform);
 
-    widget.updateDisabledAxis({
-      xRotation: true,
-      yRotation: true,
-      zRotation: true,
-      xTranslation: true,
-      yTranslation: true,
-      zTranslation: true,
-    });
+    this.beginEndTransform();
 
     window.removeEventListener('pointermove', this.handleDrag);
     window.removeEventListener('pointerup', this.handleEndTransform);
@@ -612,32 +631,34 @@ export class ViewerTransformWidget {
 
     window.addEventListener('pointermove', this.handlePointerMove);
 
-    this.getTransformWidget().updateDisabledAxis({
-      xRotation: this.xRotationDisabled,
-      yRotation: this.yRotationDisabled,
-      zRotation: this.zRotationDisabled,
-
-      xTranslation: this.xTranslationDisabled,
-      yTranslation: this.yTranslationDisabled,
-      zTranslation: this.zTranslationDisabled,
-    });
+    this.completeEndTransform();
   };
 
   private handleInputIncrement = (): void => {
     if (this.inputValue != null && this.lastInputValue != null) {
       this.inputValue = this.lastInputValue + 1;
-      this.handleInputChange(this.inputValue);
+      if (this.isModifyingAngleUnits()) {
+        this.inputValue = this.inputValue % 360;
+      }
+      this.updateTransformFromInput(this.inputValue);
     }
   };
 
   private handleInputDecrement = (): void => {
     if (this.inputValue != null && this.lastInputValue != null) {
       this.inputValue = this.lastInputValue - 1;
-      this.handleInputChange(this.inputValue);
+      if (this.isModifyingAngleUnits() && this.inputValue < 0) {
+        this.inputValue = this.inputValue + 360;
+      }
+      this.updateTransformFromInput(this.inputValue);
     }
   };
 
-  private handleInputChange = async (value: number): Promise<void> => {
+  private handleInputChange = (value: number): void => {
+    this.updateTransformFromInput(value);
+  };
+
+  private updateTransformFromInput = async (value: number): Promise<void> => {
     if (
       this.lastDragged != null &&
       this.currentTransform != null &&
@@ -665,12 +686,10 @@ export class ViewerTransformWidget {
         )
       );
       this.updateInputPosition();
-      await this.controller?.endTransformDebounced(() => {
-        this.position =
-          this.currentTransform != null
-            ? Vector3.fromMatrixPosition(this.currentTransform)
-            : this.position;
-      });
+      await this.controller?.endTransformDebounced(
+        this.beginEndTransform,
+        this.completeEndTransform
+      );
     }
   };
 
@@ -828,10 +847,59 @@ export class ViewerTransformWidget {
     }
   };
 
-  private getDisplayedAngle = (): number | undefined => {
+  private beginEndTransform = (): void => {
+    const widget = this.getTransformWidget();
+
+    widget.updateDisabledAxis({
+      xRotation: true,
+      yRotation: true,
+      zRotation: true,
+      xTranslation: true,
+      yTranslation: true,
+      zTranslation: true,
+    });
+
+    this.isEndingTransform = true;
+  };
+
+  private completeEndTransform = (): void => {
+    const widget = this.getTransformWidget();
+
+    widget.updateDisabledAxis({
+      xRotation: this.xRotationDisabled,
+      yRotation: this.yRotationDisabled,
+      zRotation: this.zRotationDisabled,
+
+      xTranslation: this.xTranslationDisabled,
+      yTranslation: this.yTranslationDisabled,
+      zTranslation: this.zTranslationDisabled,
+    });
+
+    this.isEndingTransform = false;
+    this.inputShouldFocus = true;
+
+    if (this.currentTransform != null) {
+      this.position = Vector3.fromMatrixPosition(this.currentTransform);
+      this.rotation = Euler.fromRotationMatrix(this.currentTransform);
+    }
+  };
+
+  private isModifyingAngleUnits = (): boolean => {
     const draggingIdentifier =
       this.dragging?.identifier ?? this.lastDragged?.identifier;
-    if (draggingIdentifier?.includes('rotate')) {
+
+    return !!draggingIdentifier?.includes('rotate');
+  };
+
+  private getDisplayedUnits = (): AngleUnits | DistanceUnits => {
+    if (this.isModifyingAngleUnits()) {
+      return new AngleUnits(this.angleUnit);
+    }
+    return new DistanceUnits(this.distanceUnit);
+  };
+
+  private getDisplayedAngle = (): number | undefined => {
+    if (this.isModifyingAngleUnits()) {
       return this.inputValue;
     }
   };

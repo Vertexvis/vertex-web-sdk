@@ -2,13 +2,7 @@
 import { FunctionalComponent, h } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
 
-import {
-  AngleUnits,
-  AngleUnitType,
-  DistanceUnits,
-  DistanceUnitType,
-  Viewport,
-} from '../../lib/types';
+import { AngleUnits, DistanceUnits, Viewport } from '../../lib/types';
 
 export type TransformWidgetInputPlacement =
   | 'top-left'
@@ -16,19 +10,42 @@ export type TransformWidgetInputPlacement =
   | 'bottom-left'
   | 'bottom-right';
 
-export interface TransformWidgetInputProps {
-  ref: (el?: HTMLInputElement) => void;
+export interface TransformWidgetInputWrapperProps {
+  ref: (el?: HTMLDivElement) => void;
   bounds?: DOMRect;
 
   viewport: Viewport;
   point: Point.Point;
   placement: TransformWidgetInputPlacement;
 
+  displayUnit: DistanceUnits | AngleUnits;
+}
+
+export const TransformWidgetInputWrapper: FunctionalComponent<
+  TransformWidgetInputWrapperProps
+> = ({ ref, bounds, viewport, point, placement, displayUnit }, children) => {
+  const inputPlacement = constrainInputToViewport(
+    viewport,
+    bounds ?? Dimensions.create(0, 0),
+    point,
+    placement
+  );
+
+  return (
+    <div ref={ref} class="widget-input wrapper" style={{ ...inputPlacement }}>
+      {children}
+      <div class="widget-input units">{displayUnit.unit.abbreviatedName}</div>
+    </div>
+  );
+};
+
+export interface TransformWidgetInputProps {
+  ref: (el?: HTMLInputElement) => void;
+
+  disabled?: boolean;
   distance?: number;
   angle?: number;
   decimalPlaces: number;
-  distanceUnit: DistanceUnitType;
-  angleUnit: AngleUnitType;
 
   onChange?: (value: number) => void | Promise<void>;
   onIncrement?: VoidFunction;
@@ -39,31 +56,16 @@ export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
 > = ({
   ref,
-  bounds,
-  viewport,
-  point,
-  placement,
+  disabled,
   distance,
   angle,
   decimalPlaces,
-  distanceUnit,
-  angleUnit,
   onChange,
   onIncrement,
   onDecrement,
 }) => {
-  const angles = new AngleUnits(angleUnit);
-  const units = new DistanceUnits(distanceUnit);
   const definedValue = distance ?? angle ?? 0;
-  const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))} ${
-    distance != null ? units.unit.abbreviatedName : angles.unit.abbreviatedName
-  }`;
-  const inputPlacement = constrainInputToViewport(
-    viewport,
-    bounds ?? Dimensions.create(0, 0),
-    point,
-    placement
-  );
+  const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))}`;
 
   const handleChange = (event: Event): void => {
     if (event.target != null) {
@@ -76,6 +78,8 @@ export const TransformWidgetInput: FunctionalComponent<
   };
 
   const handleKeyDown = (event: KeyboardEvent): void => {
+    event.stopPropagation();
+
     if (event.key === 'ArrowUp') {
       onIncrement?.();
     } else if (event.key === 'ArrowDown') {
@@ -84,19 +88,15 @@ export const TransformWidgetInput: FunctionalComponent<
   };
 
   return (
-    <div
-      class="widget-input wrapper"
-      style={{ ...inputPlacement }}
+    <input
+      ref={ref}
+      disabled={disabled}
+      class="widget-input"
+      type="text"
+      value={displayValue}
+      onChange={handleChange}
       onKeyDown={handleKeyDown}
-    >
-      <input
-        ref={ref}
-        class="widget-input"
-        type="text"
-        value={displayValue}
-        onChange={handleChange}
-      ></input>
-    </div>
+    ></input>
   );
 };
 

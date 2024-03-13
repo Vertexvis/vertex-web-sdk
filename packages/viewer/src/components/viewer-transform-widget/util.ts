@@ -145,6 +145,8 @@ export function computeInputDisplayValue(
         Matrix4.invert(rotation())
       )
     );
+  const asPositiveAngle = (angle: number): number =>
+    angle < 0 ? angle + 360 : angle;
 
   switch (identifier) {
     case 'x-translate':
@@ -154,11 +156,11 @@ export function computeInputDisplayValue(
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return angles.convertTo(relativeRotationDiff().x);
+      return asPositiveAngle(angles.convertTo(relativeRotationDiff().x));
     case 'y-rotate':
-      return angles.convertTo(relativeRotationDiff().y);
+      return asPositiveAngle(angles.convertTo(relativeRotationDiff().y));
     case 'z-rotate':
-      return angles.convertTo(relativeRotationDiff().z);
+      return asPositiveAngle(angles.convertTo(relativeRotationDiff().z));
   }
   return 0;
 }
