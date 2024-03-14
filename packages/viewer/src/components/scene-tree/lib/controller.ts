@@ -973,7 +973,7 @@ export class SceneTreeController {
     });
   }
 
-  private async fetchUnloadedPagesInActiveRows(): Promise<void> {
+  public async fetchUnloadedPagesInActiveRows(): Promise<void> {
     const [startPage, endPage] = this.getPageIndexesForRange(
       // Verify the first page is loaded properly even if the `activeRowRange`
       // has not been specified by the underlying table layout after a reconnect.
@@ -1081,7 +1081,7 @@ export class SceneTreeController {
     }
   }
 
-  private invalidateAfterOffset(offset: number): void {
+  public invalidateAfterOffset(offset: number): void {
     const pageIndex = Math.floor(offset / this.rowLimit);
 
     for (const index of this.pages.keys()) {
