@@ -373,6 +373,7 @@ export class ViewerTransformWidget {
   @Watch('decimalPlaces')
   protected handleInputFormattingChanged(): void {
     this.updateInputValue();
+    this.lastInputValue = this.inputValue;
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -646,9 +647,18 @@ export class ViewerTransformWidget {
 
   private handleInputStep = (step: number): void => {
     if (this.inputValue != null && this.lastInputValue != null) {
-      this.inputValue = this.lastInputValue + step;
+      // If modifying angle units, we want to adjust the step to always
+      // perform the equivalent of a 1 degree rotation.
       if (this.isModifyingAngleUnits()) {
-        this.inputValue = Angle.normalize(this.inputValue);
+        const angles = new AngleUnits(this.angleUnit);
+        const previous = Angle.toDegrees(
+          angles.convertFrom(this.lastInputValue)
+        );
+        const next = Angle.toRadians(Angle.normalize(previous + step));
+
+        this.inputValue = angles.convertTo(next);
+      } else {
+        this.inputValue = this.lastInputValue + step;
       }
       this.updateTransformFromInput(this.inputValue);
     }

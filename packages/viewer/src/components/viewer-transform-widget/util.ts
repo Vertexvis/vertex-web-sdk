@@ -148,6 +148,8 @@ export function computeInputDisplayValue(
       )
     );
 
+  console.log(relativeRotationDiff().x);
+
   switch (identifier) {
     case 'x-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().x);
