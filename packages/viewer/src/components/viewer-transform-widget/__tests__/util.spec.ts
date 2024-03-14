@@ -240,13 +240,15 @@ describe('vertex-viewer-transform-widget utils', () => {
 
   describe(computeInputTransform, () => {
     it('computes an updated translation based on the difference', () => {
-      expect(computeInputTransform('x-translate', 100, 90)).toMatchObject(
-        Matrix4.makeTranslation(Vector3.create(10, 0, 0))
-      );
+      expect(
+        computeInputTransform('x-translate', 100, 90, 'millimeters', 'degrees')
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(10, 0, 0)));
     });
 
     it('computes an updated rotation based on the difference', () => {
-      expect(computeInputTransform('x-rotate', 90, 0)).toMatchObject(
+      expect(
+        computeInputTransform('x-rotate', 90, 0, 'millimeters', 'degrees')
+      ).toMatchObject(
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
         )
@@ -258,7 +260,8 @@ describe('vertex-viewer-transform-widget utils', () => {
         'x-translate',
         100,
         90,
-        'millimeters'
+        'millimeters',
+        'degrees'
       );
       expect(Vector3.fromMatrixPosition(transformMm).x).toBeCloseTo(10);
 
@@ -266,7 +269,8 @@ describe('vertex-viewer-transform-widget utils', () => {
         'x-translate',
         100,
         90,
-        'centimeters'
+        'centimeters',
+        'degrees'
       );
       expect(Vector3.fromMatrixPosition(transformCm).x).toBeCloseTo(100);
 
@@ -274,7 +278,8 @@ describe('vertex-viewer-transform-widget utils', () => {
         'x-translate',
         100,
         90,
-        'meters'
+        'meters',
+        'degrees'
       );
       expect(Vector3.fromMatrixPosition(transformM).x).toBeCloseTo(10000);
 
@@ -282,25 +287,33 @@ describe('vertex-viewer-transform-widget utils', () => {
         'x-translate',
         100,
         90,
-        'inches'
+        'inches',
+        'degrees'
       );
       expect(Vector3.fromMatrixPosition(transformIn).x).toBeCloseTo(254);
 
-      const transformFt = computeInputTransform('x-translate', 100, 90, 'feet');
+      const transformFt = computeInputTransform(
+        'x-translate',
+        100,
+        90,
+        'feet',
+        'degrees'
+      );
       expect(Vector3.fromMatrixPosition(transformFt).x).toBeCloseTo(3048);
 
       const transformYd = computeInputTransform(
         'x-translate',
         100,
         90,
-        'yards'
+        'yards',
+        'degrees'
       );
       expect(Vector3.fromMatrixPosition(transformYd).x).toBeCloseTo(9144);
     });
 
     it('converts angle units', () => {
       expect(
-        computeInputTransform('x-rotate', 90, 0, undefined, 'degrees')
+        computeInputTransform('x-rotate', 90, 0, 'millimeters', 'degrees')
       ).toMatchObject(
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
@@ -308,7 +321,13 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
 
       expect(
-        computeInputTransform('x-rotate', Math.PI / 2, 0, undefined, 'radians')
+        computeInputTransform(
+          'x-rotate',
+          Math.PI / 2,
+          0,
+          'millimeters',
+          'radians'
+        )
       ).toMatchObject(
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
@@ -323,7 +342,9 @@ describe('vertex-viewer-transform-widget utils', () => {
         computeInputDisplayValue(
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
-          Matrix4.makeTranslation(Vector3.create(90, 0, 0))
+          Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'millimeters',
+          'degrees'
         )
       ).toBeCloseTo(10);
     });
@@ -337,7 +358,9 @@ describe('vertex-viewer-transform-widget utils', () => {
           ),
           Matrix4.makeRotation(
             Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
-          )
+          ),
+          'millimeters',
+          'degrees'
         )
       ).toBeCloseTo(45);
     });
@@ -348,7 +371,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'millimeters'
+          'millimeters',
+          'degrees'
         )
       ).toBeCloseTo(10);
       expect(
@@ -356,7 +380,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'centimeters'
+          'centimeters',
+          'degrees'
         )
       ).toBeCloseTo(1);
       expect(
@@ -364,7 +389,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'meters'
+          'meters',
+          'degrees'
         )
       ).toBeCloseTo(0.01);
 
@@ -373,7 +399,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'inches'
+          'inches',
+          'degrees'
         )
       ).toBeCloseTo(0.394);
       expect(
@@ -381,7 +408,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'feet'
+          'feet',
+          'degrees'
         )
       ).toBeCloseTo(0.0328);
       expect(
@@ -389,7 +417,8 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
-          'yards'
+          'yards',
+          'degrees'
         )
       ).toBeCloseTo(0.011);
     });
@@ -404,7 +433,7 @@ describe('vertex-viewer-transform-widget utils', () => {
           Matrix4.makeRotation(
             Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
           ),
-          undefined,
+          'millimeters',
           'degrees'
         )
       ).toBeCloseTo(45);
@@ -418,7 +447,7 @@ describe('vertex-viewer-transform-widget utils', () => {
           Matrix4.makeRotation(
             Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
           ),
-          undefined,
+          'millimeters',
           'radians'
         )
       ).toBeCloseTo(Math.PI / 4);

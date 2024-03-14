@@ -365,10 +365,13 @@ export class ViewerTransformWidget {
     this.positionChanged.emit(newPosition);
   }
 
+  /**
+   * @ignore
+   */
   @Watch('distanceUnit')
   @Watch('angleUnit')
   @Watch('decimalPlaces')
-  protected handleDistanceUnitChanged(): void {
+  protected handleInputFormattingChanged(): void {
     this.updateInputValue();
   }
 
@@ -412,8 +415,8 @@ export class ViewerTransformWidget {
               distance={this.getDisplayedDistance()}
               decimalPlaces={this.decimalPlaces}
               onChange={this.handleInputChange}
-              onIncrement={this.handleInputIncrement}
-              onDecrement={this.handleInputDecrement}
+              onIncrement={() => this.handleInputStep(1)}
+              onDecrement={() => this.handleInputStep(-1)}
             />
           </TransformWidgetInputWrapper>
         )}
@@ -641,21 +644,11 @@ export class ViewerTransformWidget {
     this.completeEndTransform();
   };
 
-  private handleInputIncrement = (): void => {
+  private handleInputStep = (step: number): void => {
     if (this.inputValue != null && this.lastInputValue != null) {
-      this.inputValue = this.lastInputValue + 1;
+      this.inputValue = this.lastInputValue + step;
       if (this.isModifyingAngleUnits()) {
-        this.inputValue = this.inputValue % 360;
-      }
-      this.updateTransformFromInput(this.inputValue);
-    }
-  };
-
-  private handleInputDecrement = (): void => {
-    if (this.inputValue != null && this.lastInputValue != null) {
-      this.inputValue = this.lastInputValue - 1;
-      if (this.isModifyingAngleUnits() && this.inputValue < 0) {
-        this.inputValue = this.inputValue + 360;
+        this.inputValue = Angle.normalize(this.inputValue);
       }
       this.updateTransformFromInput(this.inputValue);
     }

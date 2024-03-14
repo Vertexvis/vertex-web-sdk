@@ -1,4 +1,5 @@
 import {
+  Angle,
   Euler,
   Matrix4,
   Plane,
@@ -86,8 +87,8 @@ export function computeInputTransform(
   identifier: string,
   value: number,
   lastValue: number,
-  distanceUnit: DistanceUnitType = 'millimeters',
-  angleUnit: AngleUnitType = 'degrees'
+  distanceUnit: DistanceUnitType,
+  angleUnit: AngleUnitType
 ): Matrix4.Matrix4 {
   const units = new DistanceUnits(distanceUnit);
   const angles = new AngleUnits(angleUnit);
@@ -115,16 +116,17 @@ export function computeInputTransform(
       return Matrix4.makeRotation(
         Quaternion.fromAxisAngle(Vector3.forward(), rotation())
       );
+    default:
+      return Matrix4.makeIdentity();
   }
-  return Matrix4.makeIdentity();
 }
 
 export function computeInputDisplayValue(
   identifier: string,
   current: Matrix4.Matrix4,
   start: Matrix4.Matrix4,
-  distanceUnit: DistanceUnitType = 'millimeters',
-  angleUnit: AngleUnitType = 'degrees'
+  distanceUnit: DistanceUnitType,
+  angleUnit: AngleUnitType
 ): number {
   const units = new DistanceUnits(distanceUnit);
   const angles = new AngleUnits(angleUnit);
@@ -145,8 +147,6 @@ export function computeInputDisplayValue(
         Matrix4.invert(rotation())
       )
     );
-  const asPositiveAngle = (angle: number): number =>
-    angle < 0 ? angle + 360 : angle;
 
   switch (identifier) {
     case 'x-translate':
@@ -156,13 +156,14 @@ export function computeInputDisplayValue(
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return asPositiveAngle(angles.convertTo(relativeRotationDiff().x));
+      return Angle.normalize(angles.convertTo(relativeRotationDiff().x));
     case 'y-rotate':
-      return asPositiveAngle(angles.convertTo(relativeRotationDiff().y));
+      return Angle.normalize(angles.convertTo(relativeRotationDiff().y));
     case 'z-rotate':
-      return asPositiveAngle(angles.convertTo(relativeRotationDiff().z));
+      return Angle.normalize(angles.convertTo(relativeRotationDiff().z));
+    default:
+      return 0;
   }
-  return 0;
 }
 
 export function computeUpdatedTransform(
@@ -293,6 +294,12 @@ export function computeInputPosition(
   bounds: Rectangle.Rectangle,
   shapePoints: Point.Point[]
 ): PointAndPlacement {
+  if (shapePoints.length === 0) {
+    throw new Error(
+      'Unable to compute input position. At least one shape point must be provided.'
+    );
+  }
+
   const paddedBounds = Rectangle.pad(bounds, 5);
   const canvasPoints = shapePoints.map((sp) =>
     viewport.transformNdcPointToViewport(sp)
