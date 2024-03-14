@@ -183,7 +183,7 @@ export class SceneTree {
    * A list of the metadata keys that a scene tree search should be performed on.
    */
   @Prop({ mutable: true })
-  public metadataSearchKeys: MetadataKey[] = [];
+  public metadataSearchKeys?: MetadataKey[];
 
   /**
    * A list of part metadata keys that will be made available to each row. This
@@ -569,7 +569,9 @@ export class SceneTree {
       const metadataSearchKeys =
         this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
       const definedMetadataKeys =
-        metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
+        metadataSearchKeys && metadataSearchKeys.length > 0
+          ? metadataSearchKeys
+          : this.metadataKeys;
 
       if (definedMetadataKeys.length === 0) {
         console.warn(
@@ -890,7 +892,9 @@ export class SceneTree {
     const metadataSearchKeys =
       this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
     const columnsToSearch =
-      metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
+      metadataSearchKeys && metadataSearchKeys.length > 0
+        ? metadataSearchKeys
+        : this.metadataKeys;
 
     const shouldSearchExactMatch =
       this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
@@ -899,7 +903,10 @@ export class SceneTree {
 
     try {
       await this.filterItems(event.detail, {
-        columns: columnsToSearch,
+        columns:
+          metadataSearchKeys != null && metadataSearchKeys.length === 0
+            ? undefined
+            : columnsToSearch,
         exactMatch: shouldSearchExactMatch,
         removeHiddenItems: shouldSearchRemoveHiddenItems,
       });
