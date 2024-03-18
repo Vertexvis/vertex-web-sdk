@@ -14,11 +14,11 @@ import * as SceneViewStateIdentifier from './sceneViewStateIdentifier';
 import * as SceneViewSummary from './sceneViewSummary';
 
 export * from './depthBuffer';
+export * from './distanceUnits';
 export * from './entities';
 export * from './featureMap';
 export * from './frame';
 export * from './markup';
-export * from './measurementUnits';
 export * from './orientation';
 export * from './standardView';
 export * from './stencilBuffer';
