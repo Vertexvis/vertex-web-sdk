@@ -5,6 +5,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 export class TransformController {
   private isTransforming = false;
   private currentDelta: Matrix4.Matrix4 = Matrix4.makeIdentity();
+  private endDebounceTimeout?: NodeJS.Timeout;
 
   public constructor(private stream: StreamApi) {}
 
@@ -17,6 +18,8 @@ export class TransformController {
   public async beginTransform(
     delta: Matrix4.Matrix4 = Matrix4.makeIdentity()
   ): Promise<void> {
+    this.clearEndInteractionTimeout();
+
     if (!this.isTransforming) {
       this.currentDelta = delta;
       this.isTransforming = true;
@@ -57,31 +60,56 @@ export class TransformController {
 
   public async endTransform(): Promise<void> {
     if (this.isTransforming) {
-      console.debug(
-        `Ending transform interaction [delta=${this.currentDelta}]`
-      );
-
-      await this.stream.endInteraction({
-        transform: {
-          delta: this.toDeltaTransform(this.currentDelta),
-        },
-      });
-      this.isTransforming = false;
-      this.currentDelta = Matrix4.makeIdentity();
+      await this.endInteraction();
     }
   }
 
-  public async endInteraction(): Promise<void> {
+  public async endTransformDebounced(
+    startCallback?: VoidFunction,
+    endCallback?: VoidFunction
+  ): Promise<void> {
     if (this.isTransforming) {
-      await this.stream.endInteraction();
-      this.isTransforming = false;
-      this.currentDelta = Matrix4.makeIdentity();
+      this.restartEndInteractionTimeout(startCallback, endCallback);
     }
   }
 
   public clearTransform(): void {
     this.currentDelta = Matrix4.makeIdentity();
     this.endTransform();
+  }
+
+  private async endInteraction(): Promise<void> {
+    console.debug(`Ending transform interaction [delta=${this.currentDelta}]`);
+
+    this.clearEndInteractionTimeout();
+
+    await this.stream.endInteraction({
+      transform: {
+        delta: this.toDeltaTransform(this.currentDelta),
+      },
+    });
+    this.isTransforming = false;
+    this.currentDelta = Matrix4.makeIdentity();
+  }
+
+  private restartEndInteractionTimeout(
+    startCallback?: VoidFunction,
+    endCallback?: VoidFunction
+  ): void {
+    this.clearEndInteractionTimeout();
+
+    this.endDebounceTimeout = setTimeout(async () => {
+      startCallback?.();
+      await this.endInteraction();
+      endCallback?.();
+    }, 500);
+  }
+
+  private clearEndInteractionTimeout(): void {
+    if (this.endDebounceTimeout != null) {
+      clearTimeout(this.endDebounceTimeout);
+      this.endDebounceTimeout = undefined;
+    }
   }
 
   private toDeltaTransform(

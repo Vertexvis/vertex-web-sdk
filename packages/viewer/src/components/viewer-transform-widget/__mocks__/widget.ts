@@ -1,4 +1,5 @@
 const mockTransformWidgetConstructor = jest.fn();
+const mockGetFullBounds = jest.fn();
 const mockBoundsContainsPoint = jest.fn();
 const mockOnHoveredChanged = jest.fn();
 const mockUpdateTransform = jest.fn();
@@ -9,6 +10,7 @@ const mockUpdateDimensions = jest.fn();
 const mockUpdateDisabledAxis = jest.fn();
 
 export class TransformWidget {
+  public getFullBounds = mockGetFullBounds;
   public boundsContainsPoint = mockBoundsContainsPoint;
   public onHoveredChanged = mockOnHoveredChanged;
   public updateTransform = mockUpdateTransform;

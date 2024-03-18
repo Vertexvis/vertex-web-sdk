@@ -1451,9 +1451,23 @@ export namespace Components {
   }
   interface VertexViewerTransformWidget {
     /**
+     * The unit to show for rotation inputs. Defaults to `degrees`.
+     * @see AngleUnitType
+     */
+    angleUnit: AngleUnitType;
+    /**
      * The controller that is responsible for performing transforms.
      */
     controller?: TransformController;
+    /**
+     * The number of decimal places to show in the input. Defaults to `1`.
+     */
+    decimalPlaces: number;
+    /**
+     * The unit to show for translation inputs. Defaults to `millimeters`.
+     * @see DistanceUnitType
+     */
+    distanceUnit: DistanceUnitType;
     /**
      * @ignore Visible for testing.
      */
@@ -1466,6 +1480,10 @@ export namespace Components {
      * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
      */
     rotation?: Euler.Euler;
+    /**
+     * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
+     */
+    showInputs: boolean;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
@@ -3254,9 +3272,23 @@ declare namespace LocalJSX {
   }
   interface VertexViewerTransformWidget {
     /**
+     * The unit to show for rotation inputs. Defaults to `degrees`.
+     * @see AngleUnitType
+     */
+    angleUnit?: AngleUnitType;
+    /**
      * The controller that is responsible for performing transforms.
      */
     controller?: TransformController;
+    /**
+     * The number of decimal places to show in the input. Defaults to `1`.
+     */
+    decimalPlaces?: number;
+    /**
+     * The unit to show for translation inputs. Defaults to `millimeters`.
+     * @see DistanceUnitType
+     */
+    distanceUnit?: DistanceUnitType;
     /**
      * @ignore Visible for testing.
      */
@@ -3293,6 +3325,10 @@ declare namespace LocalJSX {
      * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
      */
     rotation?: Euler.Euler;
+    /**
+     * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
+     */
+    showInputs?: boolean;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
