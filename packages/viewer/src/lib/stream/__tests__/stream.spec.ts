@@ -493,6 +493,32 @@ describe(ViewerStream, () => {
       expect(updateStream).toHaveBeenCalled();
     });
 
+    it('does not update stream attributes if equal', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateStream = jest.spyOn(stream, 'updateStream');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({ streamAttributes: { featureLines: { width: 1 } } });
+      expect(updateStream).toHaveBeenCalled();
+      updateStream.mockClear();
+
+      stream.update({ streamAttributes: { featureLines: { width: 1 } } });
+      expect(updateStream).not.toHaveBeenCalled();
+    });
+
     it('updates dimensions if defined', async () => {
       const { stream, ws } = makeStream();
 
@@ -516,6 +542,32 @@ describe(ViewerStream, () => {
 
       stream.update({ dimensions: Dimensions.create(100, 100) });
       expect(updateDimensions).toHaveBeenCalled();
+    });
+
+    it('does not update dimensions if equal', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+
+      stream.update({ dimensions: Dimensions.create(100, 100) });
+      expect(updateDimensions).toHaveBeenCalled();
+      updateDimensions.mockClear();
+
+      stream.update({ dimensions: Dimensions.create(100, 100) });
+      expect(updateDimensions).not.toHaveBeenCalled();
     });
 
     it('always request at least a 1x1 image', async () => {
