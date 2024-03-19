@@ -50,6 +50,7 @@ export interface TransformWidgetInputProps {
   onChange?: (value: number) => void | Promise<void>;
   onIncrement?: VoidFunction;
   onDecrement?: VoidFunction;
+  onUndo?: VoidFunction;
 }
 
 export const TransformWidgetInput: FunctionalComponent<
@@ -63,6 +64,7 @@ export const TransformWidgetInput: FunctionalComponent<
   onChange,
   onIncrement,
   onDecrement,
+  onUndo,
 }) => {
   const definedValue = distance ?? angle ?? 0;
   const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))}`;
@@ -78,12 +80,16 @@ export const TransformWidgetInput: FunctionalComponent<
   };
 
   const handleKeyDown = (event: KeyboardEvent): void => {
-    event.stopPropagation();
+    const commandOrControlModifier = event.ctrlKey || event.metaKey;
 
     if (event.key === 'ArrowUp') {
       onIncrement?.();
     } else if (event.key === 'ArrowDown') {
       onDecrement?.();
+    } else if (event.key === 'z' && commandOrControlModifier) {
+      event.preventDefault();
+
+      onUndo?.();
     }
   };
 

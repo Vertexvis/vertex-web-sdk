@@ -33,6 +33,40 @@ describe(Angle.fromPointsInDegrees, () => {
   });
 });
 
+describe(Angle.normalize, () => {
+  it('should normalize a negative value', () => {
+    const normalized = Angle.normalize(-180);
+    expect(normalized).toEqual(180);
+  });
+
+  it('should normalize a value over 360', () => {
+    const normalized = Angle.normalize(540);
+    expect(normalized).toEqual(180);
+  });
+
+  it('should not change a positive value', () => {
+    const normalized = Angle.normalize(90);
+    expect(normalized).toEqual(90);
+  });
+});
+
+describe(Angle.normalizeRadians, () => {
+  it('should normalize a negative value', () => {
+    const normalized = Angle.normalizeRadians(-Math.PI);
+    expect(normalized).toEqual(Math.PI);
+  });
+
+  it('should normalize a value over 360', () => {
+    const normalized = Angle.normalizeRadians(3 * Math.PI);
+    expect(normalized).toEqual(Math.PI);
+  });
+
+  it('should not change a positive value', () => {
+    const normalized = Angle.normalizeRadians(Math.PI);
+    expect(normalized).toEqual(Math.PI);
+  });
+});
+
 describe(Angle.toDegrees, () => {
   it('should convert degrees to radians', () => {
     const radians = Angle.toRadians(180);

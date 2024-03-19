@@ -18,6 +18,15 @@ import {
   convertPointToCanvas,
 } from '../util';
 
+function expectMatrixCloseTo(
+  actual: Matrix4.Matrix4,
+  expected: Matrix4.Matrix4
+): void {
+  expected.forEach((ev, i) => {
+    expect(ev).toBeCloseTo(actual[i]);
+  });
+}
+
 describe('vertex-viewer-transform-widget utils', () => {
   describe(convertPointToCanvas, () => {
     it('converts a point to the bounds of the canvas', () => {
@@ -241,14 +250,27 @@ describe('vertex-viewer-transform-widget utils', () => {
   describe(computeInputTransform, () => {
     it('computes an updated translation based on the difference', () => {
       expect(
-        computeInputTransform('x-translate', 100, 90, 'millimeters', 'degrees')
+        computeInputTransform(
+          Matrix4.makeIdentity(),
+          'x-translate',
+          100,
+          90,
+          'millimeters',
+          'degrees'
+        )
       ).toMatchObject(Matrix4.makeTranslation(Vector3.create(10, 0, 0)));
     });
 
     it('computes an updated rotation based on the difference', () => {
-      expect(
-        computeInputTransform('x-rotate', 90, 0, 'millimeters', 'degrees')
-      ).toMatchObject(
+      expectMatrixCloseTo(
+        computeInputTransform(
+          Matrix4.makeIdentity(),
+          'x-rotate',
+          90,
+          0,
+          'millimeters',
+          'degrees'
+        ),
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
         )
@@ -257,6 +279,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('converts distance units', () => {
       const transformMm = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -266,6 +289,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(Vector3.fromMatrixPosition(transformMm).x).toBeCloseTo(10);
 
       const transformCm = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -275,6 +299,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(Vector3.fromMatrixPosition(transformCm).x).toBeCloseTo(100);
 
       const transformM = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -284,6 +309,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(Vector3.fromMatrixPosition(transformM).x).toBeCloseTo(10000);
 
       const transformIn = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -293,6 +319,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(Vector3.fromMatrixPosition(transformIn).x).toBeCloseTo(254);
 
       const transformFt = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -302,6 +329,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(Vector3.fromMatrixPosition(transformFt).x).toBeCloseTo(3048);
 
       const transformYd = computeInputTransform(
+        Matrix4.makeIdentity(),
         'x-translate',
         100,
         90,
@@ -312,23 +340,29 @@ describe('vertex-viewer-transform-widget utils', () => {
     });
 
     it('converts angle units', () => {
-      expect(
-        computeInputTransform('x-rotate', 90, 0, 'millimeters', 'degrees')
-      ).toMatchObject(
+      expectMatrixCloseTo(
+        computeInputTransform(
+          Matrix4.makeIdentity(),
+          'x-rotate',
+          90,
+          0,
+          'millimeters',
+          'degrees'
+        ),
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
         )
       );
 
-      expect(
+      expectMatrixCloseTo(
         computeInputTransform(
+          Matrix4.makeIdentity(),
           'x-rotate',
           Math.PI / 2,
           0,
           'millimeters',
           'radians'
-        )
-      ).toMatchObject(
+        ),
         Matrix4.makeRotation(
           Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
         )

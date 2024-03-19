@@ -84,6 +84,7 @@ export function convertCanvasPointToWorld(
 }
 
 export function computeInputTransform(
+  current: Matrix4.Matrix4,
   identifier: string,
   value: number,
   lastValue: number,
@@ -99,22 +100,40 @@ export function computeInputTransform(
 
   switch (identifier) {
     case 'x-translate':
-      return Matrix4.makeTranslation(Vector3.create(position(), 0, 0));
+      return appliedToCurrent(
+        current,
+        Matrix4.makeTranslation(Vector3.create(position(), 0, 0))
+      );
     case 'y-translate':
-      return Matrix4.makeTranslation(Vector3.create(0, position(), 0));
+      return appliedToCurrent(
+        current,
+        Matrix4.makeTranslation(Vector3.create(0, position(), 0))
+      );
     case 'z-translate':
-      return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
+      return appliedToCurrent(
+        current,
+        Matrix4.makeTranslation(Vector3.create(0, 0, position()))
+      );
     case 'x-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.left(), rotation())
+      return appliedToCurrent(
+        current,
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.left(), rotation())
+        )
       );
     case 'y-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.down(), rotation())
+      return appliedToCurrent(
+        current,
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.down(), rotation())
+        )
       );
     case 'z-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.forward(), rotation())
+      return appliedToCurrent(
+        current,
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.forward(), rotation())
+        )
       );
     default:
       return Matrix4.makeIdentity();
@@ -141,11 +160,8 @@ export function computeInputDisplayValue(
       Matrix4.invert(rotation())
     );
   const relativeRotationDiff = (): Euler.Euler =>
-    Euler.create(
-      Vector3.transformMatrix(
-        Euler.fromRotationMatrix(Matrix4.invert(transformDiff())),
-        Matrix4.invert(rotation())
-      )
+    Euler.fromRotationMatrix(
+      Matrix4.multiply(Matrix4.invert(rotation()), start)
     );
 
   switch (identifier) {
@@ -156,11 +172,11 @@ export function computeInputDisplayValue(
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().x));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().x));
     case 'y-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().y));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().y));
     case 'z-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().z));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().z));
     default:
       return 0;
   }
@@ -266,6 +282,16 @@ export function computeTranslation(
 
   return Matrix4.makeTranslation(
     Vector3.scale(rotatedDelta.x + rotatedDelta.y + rotatedDelta.z, axis)
+  );
+}
+
+function appliedToCurrent(
+  current: Matrix4.Matrix4,
+  delta: Matrix4.Matrix4
+): Matrix4.Matrix4 {
+  return Matrix4.multiply(
+    Matrix4.multiply(current, delta),
+    Matrix4.invert(current)
   );
 }
 
