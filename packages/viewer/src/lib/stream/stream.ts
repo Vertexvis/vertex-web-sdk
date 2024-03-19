@@ -17,6 +17,7 @@ import {
   Objects,
   Uri,
 } from '@vertexvis/utils';
+import deepEqual from 'fast-deep-equal';
 
 import { Color3, StreamAttributes } from '../../interfaces';
 import { Config, parseConfig } from '../config';
@@ -170,7 +171,10 @@ export class ViewerStream extends StreamApi {
       ? fields.frameBgColor
       : this.frameBgColor;
 
-    if (fields.dimensions != null && fields.dimensions !== this.dimensions) {
+    if (
+      fields.dimensions != null &&
+      !deepEqual(fields.dimensions, this.dimensions)
+    ) {
       this.dimensions = fields.dimensions;
       this.ifState('connected', () =>
         this.updateDimensions({ dimensions: this.getDimensions() })
@@ -179,7 +183,7 @@ export class ViewerStream extends StreamApi {
 
     if (
       fields.streamAttributes != null &&
-      this.streamAttributes !== fields.streamAttributes
+      !deepEqual(this.streamAttributes, fields.streamAttributes)
     ) {
       this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
