@@ -22,8 +22,8 @@ function expectMatrixCloseTo(
   actual: Matrix4.Matrix4,
   expected: Matrix4.Matrix4
 ): void {
-  expected.forEach((ev, i) => {
-    expect(ev).toBeCloseTo(actual[i]);
+  actual.forEach((ev, i) => {
+    expect(ev).toBeCloseTo(expected[i]);
   });
 }
 
