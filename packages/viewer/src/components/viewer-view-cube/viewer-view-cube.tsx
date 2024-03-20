@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
-import { Vector3 } from '@vertexvis/geometry';
+import { Plane, Ray, Vector3 } from '@vertexvis/geometry';
 
 import { readDOM } from '../../lib/stencil';
 import {
@@ -72,6 +72,19 @@ export class ViewerViewCube {
    */
   @Prop()
   public standardViewsOff = false;
+
+  /**
+   * Whether to perform a `fitAll` when clicking on the view cube. If this
+   * is set to `false`, the current `lookAt` point will be maintained, and the
+   * camera's `position` and `up` vectors will be aligned to the standard view.
+   * Defaults to `true`.
+   *
+   * **Note** Setting this value to `false` can result in the camera being placed
+   * underneath geometry depending on the current `viewVector` length, resulting
+   * in a view that may be unexpected.
+   */
+  @Prop()
+  public fitAll = true;
 
   /**
    * The duration of the animation, in milliseconds, when a user performs a
@@ -168,6 +181,23 @@ export class ViewerViewCube {
             Vector3.isEqual(currentBoundingBox.min, Vector3.origin())
           ) {
             scene.camera().standardView(worldStandardView).render(animation);
+          } else if (!this.fitAll) {
+            const initialCamera = scene.camera();
+            const standardViewRay = Ray.create({
+              origin: initialCamera.lookAt,
+              direction: Vector3.normalize(worldStandardView.position),
+            });
+
+            scene
+              .camera()
+              .update({
+                up: worldStandardView.up,
+                position: Ray.at(
+                  standardViewRay,
+                  Vector3.magnitude(initialCamera.viewVector)
+                ),
+              })
+              .render(animation);
           } else {
             scene
               .camera()

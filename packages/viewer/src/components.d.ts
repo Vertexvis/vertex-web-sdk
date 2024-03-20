@@ -1520,6 +1520,12 @@ export namespace Components {
     animationDuration: number;
     camera?: FramePerspectiveCamera;
     /**
+     * Whether to perform a `fitAll` when clicking on the view cube. If this is set to `false`, the current `lookAt` point will be maintained, and the camera's `position` and `up` vectors will be aligned to the standard view. Defaults to `true`.
+     *
+     * **Note** Setting this value to `false` can result in the camera being placed underneath geometry depending on the current `viewVector` length, resulting in a view that may be unexpected.
+     */
+    fitAll: boolean;
+    /**
      * Disables interactions for standard views.
      */
     standardViewsOff: boolean;
@@ -3364,6 +3370,12 @@ declare namespace LocalJSX {
      */
     animationDuration?: number;
     camera?: FramePerspectiveCamera;
+    /**
+     * Whether to perform a `fitAll` when clicking on the view cube. If this is set to `false`, the current `lookAt` point will be maintained, and the camera's `position` and `up` vectors will be aligned to the standard view. Defaults to `true`.
+     *
+     * **Note** Setting this value to `false` can result in the camera being placed underneath geometry depending on the current `viewVector` length, resulting in a view that may be unexpected.
+     */
+    fitAll?: boolean;
     /**
      * Disables interactions for standard views.
      */
