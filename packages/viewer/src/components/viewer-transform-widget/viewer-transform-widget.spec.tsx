@@ -12,7 +12,8 @@ jest.mock('./util', () => {
     ...actual,
     convertPointToCanvas: jest.fn(),
     convertCanvasPointToWorld: jest.fn(),
-    computeUpdatedTransform: jest.fn(),
+    computeHandleDeltaTransform: jest.fn(),
+    // computeInputDeltaTransform: jest.fn(),
   };
 });
 jest.mock('./dom');
@@ -41,7 +42,7 @@ import {
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import {
-  computeUpdatedTransform,
+  computeHandleDeltaTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
@@ -240,8 +241,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
     );
 
     widget.shadowRoot
@@ -351,8 +352,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -453,8 +454,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -571,8 +572,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -663,14 +664,15 @@ describe('vertex-viewer-transform-widget', () => {
     );
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
+    jest.spyOn(stream, 'endInteraction').mockReturnValue(Promise.resolve({}));
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -721,6 +723,134 @@ describe('vertex-viewer-transform-widget', () => {
     expect(call2.transform?.delta?.basisZ?.x).toBeCloseTo(0);
     expect(call2.transform?.delta?.basisZ?.y).toBeCloseTo(1);
     expect(call2.transform?.delta?.basisZ?.z).toBeCloseTo(0);
+  });
+
+  it('supports an undo of the most recent transform', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+    await page.waitForChanges();
+
+    const onInteractionEnded = jest.fn();
+    const onInteractionStarted = jest.fn();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+
+    widget.position = Vector3.create(1, 1, 1);
+    widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionStarted', onInteractionStarted);
+
+    await page.waitForChanges();
+
+    widget.hovered = new TriangleMesh(
+      jest.fn(),
+      'x-translate',
+      new TriangleMeshPoints(
+        true,
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Vector3.create(),
+        Point.create(),
+        Point.create(),
+        Point.create(),
+        Point.create()
+      ),
+      '#000000',
+      '#000000'
+    );
+    const beginSpy = jest
+      .spyOn(stream, 'beginInteraction')
+      .mockReturnValue(Promise.resolve({}));
+    const updateSpy = jest.spyOn(stream, 'updateInteraction');
+    const endSpy = jest
+      .spyOn(stream, 'endInteraction')
+      .mockReturnValue(Promise.resolve({}));
+
+    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+      Vector3.create(1, 1, 1)
+    );
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    );
+
+    widget.shadowRoot
+      ?.querySelector('canvas')
+      ?.dispatchEvent(new MouseEvent('pointerdown'));
+
+    window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await page.waitForChanges();
+
+    expect(beginSpy).toHaveBeenCalled();
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(1, 1, 1),
+            scale: 1,
+          },
+        },
+      })
+    );
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    expect(endSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(1, 1, 1),
+            scale: 1,
+          },
+        },
+      })
+    );
+
+    updateSpy.mockClear();
+
+    widget.EXPERIMENTAL_undo();
+    await page.waitForChanges();
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transform: {
+          delta: {
+            basisX: Vector3.create(1, 0, 0),
+            basisY: Vector3.create(0, 1, 0),
+            basisZ: Vector3.create(0, 0, 1),
+            xlate: Vector3.create(-1, -1, -1),
+            scale: 1,
+          },
+        },
+      })
+    );
   });
 
   it('performs a transform when initialized with a position', async () => {
@@ -794,8 +924,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
     );
 
     widget.shadowRoot
@@ -1026,7 +1156,7 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
       Vector3.create(2, 2, 2)
     );
 

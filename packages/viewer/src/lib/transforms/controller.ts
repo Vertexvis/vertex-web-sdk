@@ -4,6 +4,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 export class TransformController {
   private isTransforming = false;
+  private previousDelta?: Matrix4.Matrix4;
   private currentDelta: Matrix4.Matrix4 = Matrix4.makeIdentity();
   private endDebounceTimeout?: NodeJS.Timeout;
 
@@ -75,7 +76,28 @@ export class TransformController {
 
   public clearTransform(): void {
     this.currentDelta = Matrix4.makeIdentity();
+    this.previousDelta = undefined;
     this.endTransform();
+  }
+
+  public async EXPERIMENTAL_undoTransform(): Promise<
+    Matrix4.Matrix4 | undefined
+  > {
+    if (this.previousDelta != null) {
+      const undoDelta = Matrix4.invert(this.previousDelta);
+
+      console.debug(`Undo of previous transform [delta-applied=${undoDelta}]`);
+
+      await this.beginTransform();
+      await this.updateTransform(Matrix4.invert(this.previousDelta));
+      await this.endTransform();
+
+      this.previousDelta = undefined;
+
+      return undoDelta;
+    } else {
+      console.debug('No previous transform to undo.');
+    }
   }
 
   private async endInteraction(): Promise<void> {
@@ -83,6 +105,7 @@ export class TransformController {
 
     this.clearEndInteractionTimeout();
 
+    this.previousDelta = this.currentDelta;
     await this.stream.endInteraction({
       transform: {
         delta: this.toDeltaTransform(this.currentDelta),

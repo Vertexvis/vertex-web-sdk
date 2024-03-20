@@ -32,9 +32,9 @@
 
   /**
   * @prop --viewer-transform-widget-input-width: A CSS length for the width of the
-  * input displayed near the handles. Defaults to `7em`.
+  * input displayed near the handles. Defaults to `8em`.
   */
-  --viewer-transform-widget-input-width: 7em;
+  --viewer-transform-widget-input-width: 8em;
 }
 
 .widget {
@@ -52,28 +52,50 @@
   pointer-events: auto;
   display: flex;
   align-items: center;
-  border: 1px solid #cccccc;
+  border: 1px solid #444444;
+  border-radius: 4px;
   width: var(--viewer-transform-widget-input-width);
   text-align: center;
   background-color: white;
+  box-sizing: border-box;
 }
 
 .widget-input.units {
+  position: relative;
   width: 25%;
+  height: 100%;
   padding: 0 0.25rem;
   font-size: 0.8125rem;
   color: #444444;
 }
 
 input.widget-input {
+  position: relative;
   text-align: center;
   box-sizing: border-box;
   width: 75%;
+  height: 100%;
   outline: none;
   border-width: 0 1px 0 0;
-  border-color: #cccccc;
+  border-color: #444444;
+  border-radius: 2px 0 0 2px;
   font-size: 0.875rem;
   color: #444444;
+}
+
+input.widget-input.x-translate,
+input.widget-input.x-rotate {
+  border-left: 5px solid var(--viewer-transform-widget-x-axis-arrow-color);
+}
+
+input.widget-input.y-translate,
+input.widget-input.y-rotate {
+  border-left: 5px solid var(--viewer-transform-widget-y-axis-arrow-color);
+}
+
+input.widget-input.z-translate,
+input.widget-input.z-rotate {
+  border-left: 5px solid var(--viewer-transform-widget-z-axis-arrow-color);
 }
 
 input.widget-input:disabled {

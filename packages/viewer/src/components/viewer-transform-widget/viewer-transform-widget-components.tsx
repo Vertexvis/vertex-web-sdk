@@ -32,7 +32,14 @@ export const TransformWidgetInputWrapper: FunctionalComponent<
   );
 
   return (
-    <div ref={ref} class="widget-input wrapper" style={{ ...inputPlacement }}>
+    <div
+      ref={ref}
+      class="widget-input wrapper"
+      style={{
+        ...inputPlacement,
+        height: bounds?.height != null ? `${bounds.height}px` : undefined,
+      }}
+    >
       {children}
       <div class="widget-input units">{displayUnit.unit.abbreviatedName}</div>
     </div>
@@ -42,31 +49,28 @@ export const TransformWidgetInputWrapper: FunctionalComponent<
 export interface TransformWidgetInputProps {
   ref: (el?: HTMLInputElement) => void;
 
+  identifier?: string;
   disabled?: boolean;
-  distance?: number;
-  angle?: number;
-  decimalPlaces: number;
 
   onChange?: (value: number) => void | Promise<void>;
   onIncrement?: VoidFunction;
   onDecrement?: VoidFunction;
+  onBlur?: VoidFunction;
+  onUndo?: VoidFunction;
 }
 
 export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
 > = ({
   ref,
+  identifier,
   disabled,
-  distance,
-  angle,
-  decimalPlaces,
   onChange,
   onIncrement,
   onDecrement,
+  onBlur,
+  onUndo,
 }) => {
-  const definedValue = distance ?? angle ?? 0;
-  const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))}`;
-
   const handleChange = (event: Event): void => {
     if (event.target != null) {
       const parsed = parseFloat((event.target as HTMLInputElement).value);
@@ -78,12 +82,16 @@ export const TransformWidgetInput: FunctionalComponent<
   };
 
   const handleKeyDown = (event: KeyboardEvent): void => {
-    event.stopPropagation();
+    const commandOrControlModifier = event.ctrlKey || event.metaKey;
 
     if (event.key === 'ArrowUp') {
       onIncrement?.();
     } else if (event.key === 'ArrowDown') {
       onDecrement?.();
+    } else if (event.key === 'z' && commandOrControlModifier && onUndo) {
+      event.preventDefault();
+
+      onUndo();
     }
   };
 
@@ -91,11 +99,11 @@ export const TransformWidgetInput: FunctionalComponent<
     <input
       ref={ref}
       disabled={disabled}
-      class="widget-input"
+      class={`widget-input ${identifier}`}
       type="text"
-      value={displayValue}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
+      onBlur={onBlur}
     ></input>
   );
 };
