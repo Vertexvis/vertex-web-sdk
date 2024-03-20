@@ -455,10 +455,7 @@ export class ViewerTransformWidget {
               ref={(el) => {
                 this.inputRef = el;
               }}
-              angle={this.getDisplayedAngle()}
               disabled={this.isEndingTransform}
-              distance={this.getDisplayedDistance()}
-              decimalPlaces={this.decimalPlaces}
               onChange={this.handleInputChange}
               onIncrement={() => this.handleInputStep(1)}
               onDecrement={() => this.handleInputStep(-1)}

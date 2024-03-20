@@ -43,9 +43,6 @@ export interface TransformWidgetInputProps {
   ref: (el?: HTMLInputElement) => void;
 
   disabled?: boolean;
-  distance?: number;
-  angle?: number;
-  decimalPlaces: number;
 
   onChange?: (value: number) => void | Promise<void>;
   onIncrement?: VoidFunction;
@@ -55,20 +52,7 @@ export interface TransformWidgetInputProps {
 
 export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
-> = ({
-  ref,
-  disabled,
-  distance,
-  angle,
-  decimalPlaces,
-  onChange,
-  onIncrement,
-  onDecrement,
-  onUndo,
-}) => {
-  const definedValue = distance ?? angle ?? 0;
-  const displayValue = `${parseFloat(definedValue.toFixed(decimalPlaces))}`;
-
+> = ({ ref, disabled, onChange, onIncrement, onDecrement, onUndo }) => {
   const handleChange = (event: Event): void => {
     if (event.target != null) {
       const parsed = parseFloat((event.target as HTMLInputElement).value);
@@ -99,7 +83,6 @@ export const TransformWidgetInput: FunctionalComponent<
       disabled={disabled}
       class="widget-input"
       type="text"
-      value={displayValue}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
     ></input>
