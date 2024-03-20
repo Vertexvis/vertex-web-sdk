@@ -455,6 +455,9 @@ export class ViewerTransformWidget {
               ref={(el) => {
                 this.inputRef = el;
               }}
+              identifier={
+                this.dragging?.identifier ?? this.lastDragged?.identifier
+              }
               disabled={this.isEndingTransform}
               onChange={this.handleInputChange}
               onIncrement={() => this.handleInputStep(1)}

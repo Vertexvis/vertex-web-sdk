@@ -42,6 +42,7 @@ export const TransformWidgetInputWrapper: FunctionalComponent<
 export interface TransformWidgetInputProps {
   ref: (el?: HTMLInputElement) => void;
 
+  identifier?: string;
   disabled?: boolean;
 
   onChange?: (value: number) => void | Promise<void>;
@@ -52,7 +53,15 @@ export interface TransformWidgetInputProps {
 
 export const TransformWidgetInput: FunctionalComponent<
   TransformWidgetInputProps
-> = ({ ref, disabled, onChange, onIncrement, onDecrement, onUndo }) => {
+> = ({
+  ref,
+  identifier,
+  disabled,
+  onChange,
+  onIncrement,
+  onDecrement,
+  onUndo,
+}) => {
   const handleChange = (event: Event): void => {
     if (event.target != null) {
       const parsed = parseFloat((event.target as HTMLInputElement).value);
@@ -81,7 +90,7 @@ export const TransformWidgetInput: FunctionalComponent<
     <input
       ref={ref}
       disabled={disabled}
-      class="widget-input"
+      class={`widget-input ${identifier}`}
       type="text"
       onChange={handleChange}
       onKeyDown={handleKeyDown}
