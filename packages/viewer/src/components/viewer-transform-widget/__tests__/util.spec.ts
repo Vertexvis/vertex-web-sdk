@@ -10,10 +10,10 @@ import {
 import { Viewport } from '../../../lib/types';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import {
+  computeHandleDeltaTransform,
+  computeInputDeltaTransform,
   computeInputDisplayValue,
   computeInputPosition,
-  computeInputTransform,
-  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from '../util';
@@ -73,10 +73,10 @@ describe('vertex-viewer-transform-widget utils', () => {
     });
   });
 
-  describe(computeUpdatedTransform, () => {
+  describe(computeHandleDeltaTransform, () => {
     it('computes updated x translation', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.right(),
@@ -84,12 +84,12 @@ describe('vertex-viewer-transform-widget utils', () => {
           0,
           'x-translate'
         )
-      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(1, 0, 1)));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(1, 0, 0)));
     });
 
     it('computes updated y translation', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.up(),
@@ -97,12 +97,12 @@ describe('vertex-viewer-transform-widget utils', () => {
           0,
           'y-translate'
         )
-      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 1, 1)));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 1, 0)));
     });
 
     it('computes updated z translation', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.forward(),
@@ -110,12 +110,12 @@ describe('vertex-viewer-transform-widget utils', () => {
           0,
           'z-translate'
         )
-      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0, 0)));
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0, -1)));
     });
 
     it('computes updated x rotation when view vector is closer to parallel with negative x', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -135,7 +135,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes updated x rotation when view vector is closer to parallel with positive x', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -155,7 +155,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes updated y rotation when view vector is closer to parallel with negative y', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -175,7 +175,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes updated y rotation when view vector is closer to parallel with positive y', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -195,7 +195,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes updated z rotation when view vector is closer to parallel with negative z', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -215,7 +215,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes updated z rotation when view vector is closer to parallel with positive z', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeIdentity(),
           Vector3.origin(),
           Vector3.forward(),
@@ -235,7 +235,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('returns the current position if no matching identifier is provided', () => {
       expect(
-        computeUpdatedTransform(
+        computeHandleDeltaTransform(
           Matrix4.makeTranslation(Vector3.back()),
           Vector3.origin(),
           Vector3.forward(),
@@ -247,10 +247,10 @@ describe('vertex-viewer-transform-widget utils', () => {
     });
   });
 
-  describe(computeInputTransform, () => {
+  describe(computeInputDeltaTransform, () => {
     it('computes an updated translation based on the difference', () => {
       expect(
-        computeInputTransform(
+        computeInputDeltaTransform(
           Matrix4.makeIdentity(),
           'x-translate',
           100,
@@ -263,7 +263,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('computes an updated rotation based on the difference', () => {
       expectMatrixCloseTo(
-        computeInputTransform(
+        computeInputDeltaTransform(
           Matrix4.makeIdentity(),
           'x-rotate',
           90,
@@ -278,7 +278,7 @@ describe('vertex-viewer-transform-widget utils', () => {
     });
 
     it('converts distance units', () => {
-      const transformMm = computeInputTransform(
+      const transformMm = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -288,7 +288,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
       expect(Vector3.fromMatrixPosition(transformMm).x).toBeCloseTo(10);
 
-      const transformCm = computeInputTransform(
+      const transformCm = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -298,7 +298,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
       expect(Vector3.fromMatrixPosition(transformCm).x).toBeCloseTo(100);
 
-      const transformM = computeInputTransform(
+      const transformM = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -308,7 +308,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
       expect(Vector3.fromMatrixPosition(transformM).x).toBeCloseTo(10000);
 
-      const transformIn = computeInputTransform(
+      const transformIn = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -318,7 +318,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
       expect(Vector3.fromMatrixPosition(transformIn).x).toBeCloseTo(254);
 
-      const transformFt = computeInputTransform(
+      const transformFt = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -328,7 +328,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
       expect(Vector3.fromMatrixPosition(transformFt).x).toBeCloseTo(3048);
 
-      const transformYd = computeInputTransform(
+      const transformYd = computeInputDeltaTransform(
         Matrix4.makeIdentity(),
         'x-translate',
         100,
@@ -341,7 +341,7 @@ describe('vertex-viewer-transform-widget utils', () => {
 
     it('converts angle units', () => {
       expectMatrixCloseTo(
-        computeInputTransform(
+        computeInputDeltaTransform(
           Matrix4.makeIdentity(),
           'x-rotate',
           90,
@@ -355,7 +355,7 @@ describe('vertex-viewer-transform-widget utils', () => {
       );
 
       expectMatrixCloseTo(
-        computeInputTransform(
+        computeInputDeltaTransform(
           Matrix4.makeIdentity(),
           'x-rotate',
           Math.PI / 2,
