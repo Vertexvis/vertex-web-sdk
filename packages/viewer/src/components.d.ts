@@ -1451,6 +1451,23 @@ export namespace Components {
   }
   interface VertexViewerTransformWidget {
     /**
+     * **EXPERIMENTAL.**
+     *
+     * Performs an undo of the most recent set of transform manipulations, categorized by the last pause in interactivity (pointerup on a handle, Enter press on an input, keyup on an input).
+     *
+     * Note that this *does not* work repeatedly. I.e. only one undo can be performed, and once another set of transform manipulations is performed, the history is lost.
+     */
+    EXPERIMENTAL_undo: () => Promise<void>;
+    /**
+     * **EXPERIMENTAL.**
+     *
+     * Enables Command+Z and Control+Z keybindings to perform an undo of the previous delta transformation.
+     * @see
+     *
+     * `EXPERIMENTAL_undo`
+     */
+    EXPERIMENTAL_undoKeybindings: boolean;
+    /**
      * The unit to show for rotation inputs. Defaults to `degrees`.
      * @see AngleUnitType
      */
@@ -3271,6 +3288,15 @@ declare namespace LocalJSX {
     direction?: ViewerToolbarGroupDirection;
   }
   interface VertexViewerTransformWidget {
+    /**
+     * **EXPERIMENTAL.**
+     *
+     * Enables Command+Z and Control+Z keybindings to perform an undo of the previous delta transformation.
+     * @see
+     *
+     * `EXPERIMENTAL_undo`
+     */
+    EXPERIMENTAL_undoKeybindings?: boolean;
     /**
      * The unit to show for rotation inputs. Defaults to `degrees`.
      * @see AngleUnitType

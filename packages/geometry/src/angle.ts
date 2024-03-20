@@ -30,10 +30,17 @@ export function fromPointsInDegrees(a: Point.Point, b: Point.Point): Angle {
 }
 
 /**
- * Normalizes the given angle, in degrees, to a number between 0 and 359.
+ * Normalizes the given angle, in degrees, to a number greater than or equal to 0 and less than 360.
  */
 export function normalize(degrees: Angle): Angle {
   return (degrees + 3600) % 360;
+}
+
+/**
+ * Normalizes the given angle, in radians, to a number greater than or equal to 0 and less than 2 PI.
+ */
+export function normalizeRadians(radians: Angle): Angle {
+  return toRadians(normalize(toDegrees(radians)));
 }
 
 /**

@@ -5,6 +5,7 @@ import {
   EventEmitter,
   h,
   Host,
+  Method,
   Prop,
   State,
   Watch,
@@ -31,10 +32,10 @@ import {
 } from '../../lib/types';
 import { focusInputElement } from './dom';
 import {
+  computeHandleDeltaTransform,
+  computeInputDeltaTransform,
   computeInputDisplayValue,
   computeInputPosition,
-  computeInputTransform,
-  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
   PointAndPlacement,
@@ -168,6 +169,17 @@ export class ViewerTransformWidget {
   public decimalPlaces = 1;
 
   /**
+   * **EXPERIMENTAL.**
+   *
+   * Enables Command+Z and Control+Z keybindings to perform an undo of
+   * the previous delta transformation.
+   *
+   * @see `EXPERIMENTAL_undo`
+   */
+  @Prop()
+  public EXPERIMENTAL_undoKeybindings = false;
+
+  /**
    * @internal
    * @ignore
    *
@@ -254,6 +266,39 @@ export class ViewerTransformWidget {
   protected componentDidRender(): void {
     if (this.inputShouldFocus && this.inputRef != null) {
       focusInputElement(this.inputRef);
+      this.inputShouldFocus = false;
+    }
+  }
+
+  /**
+   * **EXPERIMENTAL.**
+   *
+   * Performs an undo of the most recent set of transform manipulations,
+   * categorized by the last pause in interactivity (pointerup on a handle,
+   * Enter press on an input, keyup on an input).
+   *
+   * Note that this *does not* work repeatedly. I.e. only one undo can be
+   * performed, and once another set of transform manipulations is performed,
+   * the history is lost.
+   */
+  @Method()
+  public async EXPERIMENTAL_undo(): Promise<void> {
+    const undoDelta = await this.controller?.EXPERIMENTAL_undoTransform();
+
+    if (this.currentTransform != null && undoDelta != null) {
+      this.currentTransform = Matrix4.multiply(
+        undoDelta,
+        this.currentTransform
+      );
+
+      this.widget?.updateTransform(this.currentTransform);
+
+      this.updateInputPosition();
+      this.updateInputValue();
+      this.lastInputValue = this.inputValue;
+
+      this.position = Vector3.fromMatrixPosition(this.currentTransform);
+      this.rotation = Euler.fromRotationMatrix(this.currentTransform);
     }
   }
 
@@ -411,13 +456,21 @@ export class ViewerTransformWidget {
               ref={(el) => {
                 this.inputRef = el;
               }}
-              angle={this.getDisplayedAngle()}
+              identifier={
+                this.dragging?.identifier ?? this.lastDragged?.identifier
+              }
               disabled={this.isEndingTransform}
-              distance={this.getDisplayedDistance()}
-              decimalPlaces={this.decimalPlaces}
               onChange={this.handleInputChange}
               onIncrement={() => this.handleInputStep(1)}
               onDecrement={() => this.handleInputStep(-1)}
+              onBlur={() => {
+                this.inputShouldFocus = false;
+              }}
+              onUndo={
+                this.EXPERIMENTAL_undoKeybindings
+                  ? this.EXPERIMENTAL_undo
+                  : undefined
+              }
             />
           </TransformWidgetInputWrapper>
         )}
@@ -651,10 +704,8 @@ export class ViewerTransformWidget {
       // perform the equivalent of a 1 degree rotation.
       if (this.isModifyingAngleUnits()) {
         const angles = new AngleUnits(this.angleUnit);
-        const previous = Angle.toDegrees(
-          angles.convertFrom(this.lastInputValue)
-        );
-        const next = Angle.toRadians(Angle.normalize(previous + step));
+        const previous = angles.convertFrom(this.lastInputValue);
+        const next = Angle.normalizeRadians(previous + Angle.toRadians(step));
 
         this.inputValue = angles.convertTo(next);
       } else {
@@ -676,7 +727,8 @@ export class ViewerTransformWidget {
       this.lastInputValue != null
     ) {
       this.transformCurrent(
-        computeInputTransform(
+        computeInputDeltaTransform(
+          this.currentTransform,
           this.lastDragged.identifier,
           value,
           this.lastInputValue,
@@ -685,6 +737,7 @@ export class ViewerTransformWidget {
         )
       );
 
+      this.updateInputValue();
       this.lastInputValue = value;
 
       await this.controller?.beginTransform();
@@ -727,13 +780,15 @@ export class ViewerTransformWidget {
       this.viewer != null &&
       this.viewer.frame != null
     ) {
-      this.currentTransform = computeUpdatedTransform(
-        this.currentTransform,
-        previous,
-        next,
-        this.viewer?.frame.scene.camera.viewVector,
-        angle,
-        this.dragging.identifier
+      this.transformCurrent(
+        computeHandleDeltaTransform(
+          this.currentTransform,
+          previous,
+          next,
+          this.viewer?.frame.scene.camera.viewVector,
+          angle,
+          this.dragging.identifier
+        )
       );
 
       this.getTransformWidget().updateTransform(this.currentTransform);
@@ -825,13 +880,23 @@ export class ViewerTransformWidget {
         this.distanceUnit,
         this.angleUnit
       );
+
+      if (this.inputRef != null) {
+        const definedValue =
+          this.getDisplayedDistance() ?? this.getDisplayedAngle() ?? 0;
+        const displayValue = `${parseFloat(
+          definedValue.toFixed(this.decimalPlaces)
+        )}`;
+
+        this.inputRef.value = displayValue;
+      }
     }
   };
 
   private transformCurrent = (transform: Matrix4.Matrix4): void => {
     this.currentTransform =
       this.currentTransform != null
-        ? Matrix4.multiply(this.currentTransform, transform)
+        ? Matrix4.multiply(transform, this.currentTransform)
         : transform;
   };
 

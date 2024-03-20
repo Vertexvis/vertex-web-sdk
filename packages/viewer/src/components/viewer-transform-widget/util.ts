@@ -83,7 +83,27 @@ export function convertCanvasPointToWorld(
   return undefined;
 }
 
-export function computeInputTransform(
+export function computeInputDeltaTransform(
+  current: Matrix4.Matrix4,
+  identifier: string,
+  value: number,
+  lastValue: number,
+  distanceUnit: DistanceUnitType,
+  angleUnit: AngleUnitType
+): Matrix4.Matrix4 {
+  return appliedToCurrent(
+    current,
+    computeInputGlobalTransform(
+      identifier,
+      value,
+      lastValue,
+      distanceUnit,
+      angleUnit
+    )
+  );
+}
+
+function computeInputGlobalTransform(
   identifier: string,
   value: number,
   lastValue: number,
@@ -141,11 +161,8 @@ export function computeInputDisplayValue(
       Matrix4.invert(rotation())
     );
   const relativeRotationDiff = (): Euler.Euler =>
-    Euler.create(
-      Vector3.transformMatrix(
-        Euler.fromRotationMatrix(Matrix4.invert(transformDiff())),
-        Matrix4.invert(rotation())
-      )
+    Euler.fromRotationMatrix(
+      Matrix4.multiply(Matrix4.invert(rotation()), start)
     );
 
   switch (identifier) {
@@ -156,17 +173,17 @@ export function computeInputDisplayValue(
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
     case 'x-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().x));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().x));
     case 'y-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().y));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().y));
     case 'z-rotate':
-      return Angle.normalize(angles.convertTo(relativeRotationDiff().z));
+      return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().z));
     default:
       return 0;
   }
 }
 
-export function computeUpdatedTransform(
+export function computeHandleDeltaTransform(
   current: Matrix4.Matrix4,
   previous: Vector3.Vector3,
   next: Vector3.Vector3,
@@ -174,63 +191,52 @@ export function computeUpdatedTransform(
   angle: number,
   identifier: string
 ): Matrix4.Matrix4 {
-  const delta = Vector3.subtract(next, previous);
+  return appliedToCurrent(
+    current,
+    computeHandleGlobalTransform(
+      current,
+      Vector3.subtract(next, previous),
+      viewVector,
+      angle,
+      identifier
+    )
+  );
+}
 
+function computeHandleGlobalTransform(
+  current: Matrix4.Matrix4,
+  delta: Vector3.Vector3,
+  viewVector: Vector3.Vector3,
+  angle: number,
+  identifier: string
+): Matrix4.Matrix4 {
   switch (identifier) {
-    case 'x-translate': {
-      return Matrix4.multiply(
-        current,
-        computeTranslation(current, Vector3.right(), delta)
-      );
-    }
+    case 'x-translate':
+      return computeTranslation(current, Vector3.right(), delta);
     case 'y-translate':
-      return Matrix4.multiply(
-        current,
-        computeTranslation(current, Vector3.up(), delta)
-      );
+      return computeTranslation(current, Vector3.up(), delta);
     case 'z-translate':
-      return Matrix4.multiply(
-        current,
-        computeTranslation(current, Vector3.back(), delta)
-      );
+      return computeTranslation(current, Vector3.back(), delta);
     case 'x-rotate':
-      return Matrix4.multiply(
-        computeRotation(
-          current,
-          Matrix4.makeRotation(
-            Quaternion.fromAxisAngle(
-              computeRotationAxis(current, viewVector, Vector3.right()),
-              angle
-            )
-          )
-        ),
-        current
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          computeRotationAxis(current, viewVector, Vector3.right()),
+          angle
+        )
       );
     case 'y-rotate':
-      return Matrix4.multiply(
-        computeRotation(
-          current,
-          Matrix4.makeRotation(
-            Quaternion.fromAxisAngle(
-              computeRotationAxis(current, viewVector, Vector3.up()),
-              angle
-            )
-          )
-        ),
-        current
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          computeRotationAxis(current, viewVector, Vector3.up()),
+          angle
+        )
       );
     case 'z-rotate':
-      return Matrix4.multiply(
-        computeRotation(
-          current,
-          Matrix4.makeRotation(
-            Quaternion.fromAxisAngle(
-              computeRotationAxis(current, viewVector, Vector3.forward()),
-              angle
-            )
-          )
-        ),
-        current
+      return Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(
+          computeRotationAxis(current, viewVector, Vector3.forward()),
+          angle
+        )
       );
     default:
       return current;
@@ -251,8 +257,8 @@ export function computeRotationAxis(
 
   return Vector3.dot(viewVector, rotatedAxis) >
     Vector3.dot(viewVector, rotatedNegatedAxis)
-    ? rotatedAxis
-    : rotatedNegatedAxis;
+    ? axis
+    : Vector3.negate(axis);
 }
 
 export function computeTranslation(
@@ -266,26 +272,6 @@ export function computeTranslation(
 
   return Matrix4.makeTranslation(
     Vector3.scale(rotatedDelta.x + rotatedDelta.y + rotatedDelta.z, axis)
-  );
-}
-
-/**
- * Computes a rotation Matrix4 by applying the rotation at the given position,
- * then translating it back to convert it to a world delta.
- * @param rotation
- * @param current
- * @returns
- */
-export function computeRotation(
-  current: Matrix4.Matrix4,
-  delta: Matrix4.Matrix4
-): Matrix4.Matrix4 {
-  return Matrix4.multiply(
-    Matrix4.multiply(
-      Matrix4.makeTranslation(Vector3.fromMatrixPosition(current)),
-      delta
-    ),
-    Matrix4.makeTranslation(Vector3.negate(Vector3.fromMatrixPosition(current)))
   );
 }
 
@@ -337,4 +323,14 @@ export function computeInputPosition(
     default:
       return { point: closestPoint, placement: 'bottom-right' };
   }
+}
+
+function appliedToCurrent(
+  current: Matrix4.Matrix4,
+  delta: Matrix4.Matrix4
+): Matrix4.Matrix4 {
+  return Matrix4.multiply(
+    Matrix4.multiply(current, delta),
+    Matrix4.invert(current)
+  );
 }
