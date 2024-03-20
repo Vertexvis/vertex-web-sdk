@@ -32,10 +32,10 @@ import {
 } from '../../lib/types';
 import { focusInputElement } from './dom';
 import {
+  computeHandleDeltaTransform,
+  computeInputDeltaTransform,
   computeInputDisplayValue,
   computeInputPosition,
-  computeInputTransform,
-  computeUpdatedTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
   PointAndPlacement,
@@ -466,11 +466,11 @@ export class ViewerTransformWidget {
               onBlur={() => {
                 this.inputShouldFocus = false;
               }}
-              onUndo={() => {
-                if (this.EXPERIMENTAL_undoKeybindings) {
-                  this.EXPERIMENTAL_undo();
-                }
-              }}
+              onUndo={
+                this.EXPERIMENTAL_undoKeybindings
+                  ? this.EXPERIMENTAL_undo
+                  : undefined
+              }
             />
           </TransformWidgetInputWrapper>
         )}
@@ -727,7 +727,7 @@ export class ViewerTransformWidget {
       this.lastInputValue != null
     ) {
       this.transformCurrent(
-        computeInputTransform(
+        computeInputDeltaTransform(
           this.currentTransform,
           this.lastDragged.identifier,
           value,
@@ -780,13 +780,15 @@ export class ViewerTransformWidget {
       this.viewer != null &&
       this.viewer.frame != null
     ) {
-      this.currentTransform = computeUpdatedTransform(
-        this.currentTransform,
-        previous,
-        next,
-        this.viewer?.frame.scene.camera.viewVector,
-        angle,
-        this.dragging.identifier
+      this.transformCurrent(
+        computeHandleDeltaTransform(
+          this.currentTransform,
+          previous,
+          next,
+          this.viewer?.frame.scene.camera.viewVector,
+          angle,
+          this.dragging.identifier
+        )
       );
 
       this.getTransformWidget().updateTransform(this.currentTransform);

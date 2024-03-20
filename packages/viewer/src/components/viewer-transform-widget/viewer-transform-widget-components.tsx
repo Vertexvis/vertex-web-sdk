@@ -88,10 +88,10 @@ export const TransformWidgetInput: FunctionalComponent<
       onIncrement?.();
     } else if (event.key === 'ArrowDown') {
       onDecrement?.();
-    } else if (event.key === 'z' && commandOrControlModifier) {
+    } else if (event.key === 'z' && commandOrControlModifier && onUndo) {
       event.preventDefault();
 
-      onUndo?.();
+      onUndo();
     }
   };
 

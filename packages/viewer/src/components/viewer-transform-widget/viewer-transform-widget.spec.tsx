@@ -12,7 +12,8 @@ jest.mock('./util', () => {
     ...actual,
     convertPointToCanvas: jest.fn(),
     convertCanvasPointToWorld: jest.fn(),
-    computeUpdatedTransform: jest.fn(),
+    computeHandleDeltaTransform: jest.fn(),
+    // computeInputDeltaTransform: jest.fn(),
   };
 });
 jest.mock('./dom');
@@ -41,7 +42,7 @@ import {
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import {
-  computeUpdatedTransform,
+  computeHandleDeltaTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
@@ -240,8 +241,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
     );
 
     widget.shadowRoot
@@ -351,8 +352,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -453,8 +454,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -571,8 +572,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -670,8 +671,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
     );
 
     widget.shadowRoot
@@ -789,8 +790,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
     );
 
     widget.shadowRoot
@@ -923,8 +924,8 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
     );
 
     widget.shadowRoot
@@ -1155,7 +1156,7 @@ describe('vertex-viewer-transform-widget', () => {
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1)
     );
-    (computeUpdatedTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
       Vector3.create(2, 2, 2)
     );
 
