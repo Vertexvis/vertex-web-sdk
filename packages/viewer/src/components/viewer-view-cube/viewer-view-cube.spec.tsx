@@ -215,10 +215,10 @@ describe('vertex-viewer-view-cube interactions', () => {
     );
   });
 
-  it('performs a standard view without a fit all when side clicked with fitAll set to false', async () => {
+  it('performs a standard view without a fit all when side clicked with viewAll set to false', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube fitAll={false} />,
+      template: () => <vertex-viewer-view-cube viewAll={false} />,
     });
 
     page.rootInstance.viewer = viewer;

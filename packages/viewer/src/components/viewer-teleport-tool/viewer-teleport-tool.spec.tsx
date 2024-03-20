@@ -334,7 +334,7 @@ describe('vertex-viewer-teleport-tool', () => {
     );
   });
 
-  it.only('handles collision', async () => {
+  it('handles collision', async () => {
     const collisionDistance = 10;
     const { stream, ws } = makeViewerStream();
     const page = await newSpecPage({
