@@ -290,6 +290,8 @@ export class ViewerTransformWidget {
         this.currentTransform
       );
 
+      this.widget?.updateTransform(this.currentTransform);
+
       this.updateInputPosition();
       this.updateInputValue();
       this.lastInputValue = this.inputValue;
