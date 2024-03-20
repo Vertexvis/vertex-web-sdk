@@ -12,7 +12,7 @@ import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { constrainViewVector } from '../../rendering/vectors';
-import { FrameCamera } from '../../types';
+import { FrameCamera, StandardView } from '../../types';
 import {
   fromBoundingBoxAndOrthographicCamera,
   fromBoundingBoxAndPerspectiveCamera,
@@ -202,6 +202,63 @@ describe(PerspectiveCamera, () => {
       expect(result).toMatchObject({
         position: Vector3.right(),
         lookAt: Vector3.right(),
+      });
+    });
+  });
+
+  describe(PerspectiveCamera.prototype.standardView, () => {
+    const camera = new PerspectiveCamera(
+      stream,
+      1,
+      {
+        ...data,
+        position: Vector3.origin(),
+      },
+      boundingBox,
+      jest.fn()
+    );
+
+    it('positions the camera based on the standard view', () => {
+      const standardView = StandardView.TOP;
+      const result = camera.standardView(standardView);
+      expect(result).toMatchObject({
+        position: standardView.position,
+        lookAt: Vector3.origin(),
+        up: standardView.up,
+        viewVector: Vector3.down(),
+      });
+    });
+  });
+
+  describe(PerspectiveCamera.prototype.standardViewFixedLookAt, () => {
+    const camera = new PerspectiveCamera(
+      stream,
+      1,
+      {
+        ...data,
+        position: Vector3.create(0, 0, 100),
+        lookAt: Vector3.create(100, 0, 0),
+      },
+      boundingBox,
+      jest.fn()
+    );
+
+    it('positions the camera based on the standard view and maintains the lookAt', () => {
+      const standardView = StandardView.TOP;
+      const result = camera.standardViewFixedLookAt(standardView);
+      const expectedPosition = Vector3.add(
+        camera.lookAt,
+        Vector3.scale(
+          Vector3.magnitude(camera.viewVector),
+          standardView.position
+        )
+      );
+
+      expect(result).toMatchObject({
+        position: expectedPosition,
+        lookAt: camera.lookAt,
+        up: standardView.up,
+        viewVector: Vector3.subtract(camera.lookAt, expectedPosition),
       });
     });
   });

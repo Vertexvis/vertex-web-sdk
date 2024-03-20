@@ -175,29 +175,17 @@ export class ViewerViewCube {
 
           // Check to see if any geometry is visible. If not, don't perform viewAll
           const currentBoundingBox = scene.boundingBox();
-          if (
+          if (!this.fitAll) {
+            scene
+              .camera()
+              .standardViewFixedLookAt(worldStandardView)
+              .render(animation);
+          } else if (
             currentBoundingBox?.max != null &&
             Vector3.isEqual(currentBoundingBox.max, Vector3.origin()) &&
             Vector3.isEqual(currentBoundingBox.min, Vector3.origin())
           ) {
             scene.camera().standardView(worldStandardView).render(animation);
-          } else if (!this.fitAll) {
-            const initialCamera = scene.camera();
-            const standardViewRay = Ray.create({
-              origin: initialCamera.lookAt,
-              direction: Vector3.normalize(worldStandardView.position),
-            });
-
-            scene
-              .camera()
-              .update({
-                up: worldStandardView.up,
-                position: Ray.at(
-                  standardViewRay,
-                  Vector3.magnitude(initialCamera.viewVector)
-                ),
-              })
-              .render(animation);
           } else {
             scene
               .camera()

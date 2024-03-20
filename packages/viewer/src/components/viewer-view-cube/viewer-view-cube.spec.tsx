@@ -215,6 +215,37 @@ describe('vertex-viewer-view-cube interactions', () => {
     );
   });
 
+  it('performs a standard view without a fit all when side clicked with fitAll set to false', async () => {
+    const page = await newSpecPage({
+      components: [ViewerViewCube],
+      template: () => <vertex-viewer-view-cube fitAll={false} />,
+    });
+
+    page.rootInstance.viewer = viewer;
+
+    const frontEl = page.root?.shadowRoot?.querySelector(
+      '.cube-side-face-front'
+    );
+    frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+
+    await awaitScene;
+
+    expect(cameraMock.standardViewFixedLookAt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        position: Vector3.back(),
+        up: Vector3.up(),
+      })
+    );
+    expect(cameraMock.viewAll).not.toHaveBeenCalled();
+    expect(cameraMock.render).toHaveBeenCalledWith(
+      expect.objectContaining({
+        animation: expect.objectContaining({
+          milliseconds: 500,
+        }),
+      })
+    );
+  });
+
   it('performs standard view when side clicked with no visible geometry', async () => {
     (sceneMock.boundingBox as jest.Mock).mockReturnValue(
       BoundingBox.create(Vector3.origin(), Vector3.origin())
