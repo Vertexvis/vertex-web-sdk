@@ -57,11 +57,13 @@
   width: var(--viewer-transform-widget-input-width);
   text-align: center;
   background-color: white;
+  box-sizing: border-box;
 }
 
 .widget-input.units {
   position: relative;
   width: 25%;
+  height: 100%;
   padding: 0 0.25rem;
   font-size: 0.8125rem;
   color: #444444;
@@ -72,6 +74,7 @@ input.widget-input {
   text-align: center;
   box-sizing: border-box;
   width: 75%;
+  height: 100%;
   outline: none;
   border-width: 0 1px 0 0;
   border-color: #444444;

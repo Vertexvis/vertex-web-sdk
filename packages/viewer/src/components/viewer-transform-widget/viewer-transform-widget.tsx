@@ -266,6 +266,7 @@ export class ViewerTransformWidget {
   protected componentDidRender(): void {
     if (this.inputShouldFocus && this.inputRef != null) {
       focusInputElement(this.inputRef);
+      this.inputShouldFocus = false;
     }
   }
 
@@ -462,6 +463,9 @@ export class ViewerTransformWidget {
               onChange={this.handleInputChange}
               onIncrement={() => this.handleInputStep(1)}
               onDecrement={() => this.handleInputStep(-1)}
+              onBlur={() => {
+                this.inputShouldFocus = false;
+              }}
               onUndo={() => {
                 if (this.EXPERIMENTAL_undoKeybindings) {
                   this.EXPERIMENTAL_undo();

@@ -32,7 +32,14 @@ export const TransformWidgetInputWrapper: FunctionalComponent<
   );
 
   return (
-    <div ref={ref} class="widget-input wrapper" style={{ ...inputPlacement }}>
+    <div
+      ref={ref}
+      class="widget-input wrapper"
+      style={{
+        ...inputPlacement,
+        height: bounds?.height != null ? `${bounds.height}px` : undefined,
+      }}
+    >
       {children}
       <div class="widget-input units">{displayUnit.unit.abbreviatedName}</div>
     </div>
@@ -48,6 +55,7 @@ export interface TransformWidgetInputProps {
   onChange?: (value: number) => void | Promise<void>;
   onIncrement?: VoidFunction;
   onDecrement?: VoidFunction;
+  onBlur?: VoidFunction;
   onUndo?: VoidFunction;
 }
 
@@ -60,6 +68,7 @@ export const TransformWidgetInput: FunctionalComponent<
   onChange,
   onIncrement,
   onDecrement,
+  onBlur,
   onUndo,
 }) => {
   const handleChange = (event: Event): void => {
@@ -94,6 +103,7 @@ export const TransformWidgetInput: FunctionalComponent<
       type="text"
       onChange={handleChange}
       onKeyDown={handleKeyDown}
+      onBlur={onBlur}
     ></input>
   );
 };

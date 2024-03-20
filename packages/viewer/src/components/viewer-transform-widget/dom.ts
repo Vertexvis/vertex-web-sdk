@@ -1,3 +1,6 @@
 export function focusInputElement(element: HTMLInputElement): void {
-  element.focus();
+  if (window.document.activeElement !== element) {
+    element.focus();
+    element.setSelectionRange(element.value.length, element.value.length);
+  }
 }
