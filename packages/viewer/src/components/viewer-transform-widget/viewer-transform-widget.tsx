@@ -468,7 +468,7 @@ export class ViewerTransformWidget {
               }}
               onUndo={
                 this.EXPERIMENTAL_undoKeybindings
-                  ? this.EXPERIMENTAL_undo
+                  ? () => this.EXPERIMENTAL_undo()
                   : undefined
               }
             />
