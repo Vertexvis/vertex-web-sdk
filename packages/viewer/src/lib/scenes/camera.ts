@@ -372,7 +372,7 @@ export abstract class Camera {
 
   /**
    * Updates the `position` and `up` vectors of the camera to the given standard
-   * view.
+   * view, and sets the `lookAt` point to the origin.
    *
    * @see {@link StandardView} for the available standard views.
    *
@@ -385,6 +385,32 @@ export abstract class Camera {
       viewVector: Vector3.subtract(Vector3.origin(), standardView.position),
       lookAt: Vector3.origin(),
       up: standardView.up,
+    });
+  }
+
+  /**
+   * Updates the `position` and `up` vectors of the camera to the given standard
+   * view, maintaining the existing `lookAt` point.
+   *
+   * @see {@link StandardView} for the available standard views.
+   *
+   * @param standardView The standard view to apply.
+   * @returns A new camera.
+   */
+  public standardViewFixedLookAt(standardView: StandardView): Camera {
+    const standardViewRay = Ray.create({
+      origin: this.lookAt,
+      direction: Vector3.normalize(standardView.position),
+    });
+    const updatedPosition = Ray.at(
+      standardViewRay,
+      Vector3.magnitude(this.viewVector)
+    );
+
+    return this.update({
+      up: standardView.up,
+      position: Ray.at(standardViewRay, Vector3.magnitude(this.viewVector)),
+      viewVector: Vector3.subtract(this.lookAt, updatedPosition),
     });
   }
 

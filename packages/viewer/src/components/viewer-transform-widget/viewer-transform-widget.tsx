@@ -570,8 +570,9 @@ export class ViewerTransformWidget {
 
       if (this.dragging.identifier !== this.lastDragged?.identifier) {
         this.inputValue = 0;
-        this.updateInputPosition();
         this.dragStartTransform = this.currentTransform;
+        this.updateInputPosition();
+        this.updateInputValue();
       }
       this.lastDragged = undefined;
 

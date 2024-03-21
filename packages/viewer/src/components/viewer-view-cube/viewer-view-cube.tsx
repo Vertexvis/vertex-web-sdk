@@ -74,6 +74,19 @@ export class ViewerViewCube {
   public standardViewsOff = false;
 
   /**
+   * Whether to perform a `viewAll` when clicking on the view cube. If this
+   * is set to `false`, the current `lookAt` point will be maintained, and the
+   * camera's `position` and `up` vectors will be aligned to the standard view.
+   * Defaults to `true`.
+   *
+   * **Note** Setting this value to `false` can result in the camera being placed
+   * underneath geometry depending on the current `viewVector` length, resulting
+   * in a view that may be unexpected.
+   */
+  @Prop()
+  public viewAll = true;
+
+  /**
    * The duration of the animation, in milliseconds, when a user performs a
    * standard view interaction. Set to 0 to disable animations.
    */
@@ -162,7 +175,12 @@ export class ViewerViewCube {
 
           // Check to see if any geometry is visible. If not, don't perform viewAll
           const currentBoundingBox = scene.boundingBox();
-          if (
+          if (!this.viewAll) {
+            scene
+              .camera()
+              .standardViewFixedLookAt(worldStandardView)
+              .render(animation);
+          } else if (
             currentBoundingBox?.max != null &&
             Vector3.isEqual(currentBoundingBox.max, Vector3.origin()) &&
             Vector3.isEqual(currentBoundingBox.min, Vector3.origin())

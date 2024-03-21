@@ -12,6 +12,7 @@ export const cameraMock =
 (cameraMock.moveBy as jest.Mock).mockReturnValue(cameraMock);
 (cameraMock.rotateAroundAxis as jest.Mock).mockReturnValue(cameraMock);
 (cameraMock.standardView as jest.Mock).mockReturnValue(cameraMock);
+(cameraMock.standardViewFixedLookAt as jest.Mock).mockReturnValue(cameraMock);
 (cameraMock.update as jest.Mock).mockReturnValue(cameraMock);
 (cameraMock.viewAll as jest.Mock).mockReturnValue(cameraMock);
 
