@@ -20,7 +20,7 @@ curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
   "tag_name": "$version",
   "target_commitish": "$sha",
   "name": "$version",
-  "body": "Automated release for $version<br/><br/>$notes",
+  "body": "Automated release for $version\n\n$notes",
   "draft": false,
   "prelease": false
 }

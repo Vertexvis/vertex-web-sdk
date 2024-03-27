@@ -4,22 +4,36 @@ set -e
 
 . "$(pwd)"/scripts/utils.sh
 
-function trim_comments() {
-  echo $1 | sed -r "s/(^\")|(\"$)//g" | sed -r 's/(<!--[^->]*-->)//g'
+function __read_summary() {
+  READING_SUMMARY=1
+  LINE_REGEX="^[ ]*-.*"
+  SUMMARY_CONTENTS=""
+  while IFS="" read -r line; do
+    if [[ "$line" == "##"* ]] && [[ ! "$line" == *"## Summary"* ]]; then
+      READING_SUMMARY=0
+    elif [[ "$line" =~ $LINE_REGEX ]] && [[ $READING_SUMMARY -ne 0 ]]; then
+      SUMMARY_CONTENTS="$SUMMARY_CONTENTS\n${line//$'\r'/}"
+    fi
+  done < <(printf "$1")
+
+  echo "$SUMMARY_CONTENTS"
 }
 
 function get_release_notes() {
   PR_NUMBER=$(git log -1 | grep -oE '(\(#)([0-9]*)[)]' | grep -oE '[0-9]*')
 
-  DESC=$(
-    curl -L https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER \
-      -H "Accept: application/vnd.github+json" \
-      -H "Authorization: token $GITHUB_TOKEN" \
-      | jq '.body'
-  )
+  if [ ! -z "$PR_NUMBER" ]; then
+    DESC=$(
+      curl -L https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        | jq '.body'
+    )
 
-  DESC=$(trim_comments "$DESC")
-  RELEASE_NOTES=$(echo $DESC | grep -oE '[#]{2} Summary.*' | grep -oE '[-]([^\\])*')
-
-  echo "Release Notes:<br/>"$RELEASE_NOTES | sed -r 's/[-]/<br\/>-/g'
+    SUMMARY=$(__read_summary "$DESC")
+    
+    echo "Release Notes:$SUMMARY\n"
+  else
+    echo ""
+  fi
 }
