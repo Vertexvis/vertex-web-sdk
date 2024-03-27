@@ -6,17 +6,20 @@ set -e
 
 function __read_summary() {
   READING_SUMMARY=1
-  LINE_REGEX="^[ ]*-.*"
-  SUMMARY_CONTENTS=""
+  LIST_ITEM_REGEX="^[ ]*-.*"
+  RELEASE_SUMMARY=""
+
   while IFS="" read -r line; do
     if [[ "$line" == "##"* ]] && [[ ! "$line" == *"## Summary"* ]]; then
+      # If we encounter another header after the Summary header, ignore future lines
       READING_SUMMARY=0
-    elif [[ "$line" =~ $LINE_REGEX ]] && [[ $READING_SUMMARY -ne 0 ]]; then
-      SUMMARY_CONTENTS="$SUMMARY_CONTENTS\n${line//$'\r'/}"
+    elif [[ "$line" =~ $LIST_ITEM_REGEX ]] && [[ $READING_SUMMARY -ne 0 ]]; then
+      # If we encounter a list item in the summary, append it to the release summary
+      RELEASE_SUMMARY="$RELEASE_SUMMARY\n${line//$'\r'/}"
     fi
   done < <(printf "$1")
 
-  echo "$SUMMARY_CONTENTS"
+  echo "$RELEASE_SUMMARY"
 }
 
 function get_release_notes() {
@@ -30,9 +33,9 @@ function get_release_notes() {
         | jq '.body'
     )
 
-    SUMMARY=$(__read_summary "$DESC")
+    RELEASE_SUMMARY=$(__read_summary "$DESC")
     
-    echo "Release Notes:$SUMMARY\n"
+    echo "Release Notes:$RELEASE_SUMMARY\n"
   else
     echo ""
   fi
