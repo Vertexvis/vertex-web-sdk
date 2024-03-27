@@ -27,11 +27,11 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@vertexvis/viewer@0.20.3/dist/viewer/viewer.css"
+      href="https://unpkg.com/@vertexvis/viewer@0.21.0/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://unpkg.com/@vertexvis/viewer@0.20.3/dist/viewer/viewer.esm.js"
+      src="https://unpkg.com/@vertexvis/viewer@0.21.0/dist/viewer/viewer.esm.js"
     ></script>
   </head>
 
@@ -53,7 +53,7 @@ These utilities can be imported from a CDN as shown below:
   </head>
   <body>
     <script type="module">
-      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.20.3/dist/esm/index.mjs';
+      import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.21.0/dist/esm/index.mjs';
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');
@@ -90,7 +90,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^0.20.3"
+    "@vertexvis/viewer": "^0.21.0"
   }
 }
 ```
