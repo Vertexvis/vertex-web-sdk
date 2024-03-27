@@ -111,10 +111,10 @@ attempt to republish the previous release that failed.
 ### Release Notes
 
 Releases will be populated with release notes automatically based on the contents of
-the PR description. The release notes are generated using the contents of the `Summary`
-section of the PR, or the entirety of the body if that section is not present, and will
-take any items that are in a list format. This can also be edited after the release has
-been created.
+the release PR description. The release notes are generated using the contents of the
+`Summary` section of the PR, or the entirety of the body if that section is not present,
+and will take any items that are in a list format. This can also be edited after the release
+has been created.
 
 ## Test Releases
 
