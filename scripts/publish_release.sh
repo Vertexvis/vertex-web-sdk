@@ -5,8 +5,10 @@
 set -e
 
 . "$(pwd)"/scripts/utils.sh
+. "$(pwd)"/scripts/release_notes.sh
 
 version="v$(get_version)"
+notes="$(get_release_notes)"
 sha="$(git rev-parse HEAD)"
 
 npx lerna publish from-package --yes
@@ -18,7 +20,7 @@ curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
   "tag_name": "$version",
   "target_commitish": "$sha",
   "name": "$version",
-  "body": "Automated release for $version\n",
+  "body": "Automated release for $version\n\n$notes",
   "draft": false,
   "prelease": false
 }
