@@ -105,8 +105,16 @@ You can then create a PR from the release branch. Once your PR has been approved
 and merged, the CI pipeline will automatically publish packages to NPM, tag the
 release, and create a release in Github.
 
-If the publishing, open a new PR with any fixes and merge your changes. CI will
+If the publishing fails, open a new PR with any fixes and merge your changes. CI will
 attempt to republish the previous release that failed.
+
+### Release Notes
+
+Releases will be populated with release notes automatically based on the contents of
+the PR description. The release notes are generated using the contents of the `Summary`
+section of the PR, or the entirety of the body if that section is not present, and will
+take any items that are in a list format. This can also be edited after the release has
+been created.
 
 ## Test Releases
 
