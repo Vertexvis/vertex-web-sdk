@@ -5,7 +5,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
 import { PerspectiveCamera } from '../scenes';
-import { Viewport } from '../types';
+import { FrameCameraBase, Viewport } from '../types';
 import {
   InteractionApi,
   InteractionConfigProvider,
@@ -35,7 +35,8 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     doubleTapEmitter: EventEmitter<TapEventDetails>,
     longPressEmitter: EventEmitter<TapEventDetails>,
     interactionStartedEmitter: EventEmitter<void>,
-    interactionFinishedEmitter: EventEmitter<void>
+    interactionFinishedEmitter: EventEmitter<void>,
+    cameraChangedEmitter: EventEmitter<FrameCameraBase | undefined>
   ) {
     super(
       stream,
@@ -48,7 +49,8 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       doubleTapEmitter,
       longPressEmitter,
       interactionStartedEmitter,
-      interactionFinishedEmitter
+      interactionFinishedEmitter,
+      cameraChangedEmitter
     );
   }
 
