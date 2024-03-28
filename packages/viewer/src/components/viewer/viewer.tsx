@@ -86,7 +86,7 @@ import {
   StencilBufferManager,
   Viewport,
 } from '../../lib/types';
-import { Frame } from '../../lib/types/frame';
+import { Frame, FrameCameraBase } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
 import {
   DEFAULT_VIEWER_SCENE_WAIT_MS,
@@ -424,6 +424,11 @@ export class Viewer {
    * Emits an event when the user hs finished an interaction.
    */
   @Event() public interactionFinished!: EventEmitter<void>;
+
+  /**
+   * Emits an event when the camera has changed.
+   */
+  @Event() public cameraChanged!: EventEmitter<FrameCameraBase | undefined>;
 
   /**
    * Emits an event when the camera type changes.
@@ -1386,7 +1391,8 @@ export class Viewer {
           this.doubletap,
           this.longpress,
           this.interactionStarted,
-          this.interactionFinished
+          this.interactionFinished,
+          this.cameraChanged
         )
       : new InteractionApiOrthographic(
           this.stream,
@@ -1399,7 +1405,8 @@ export class Viewer {
           this.doubletap,
           this.longpress,
           this.interactionStarted,
-          this.interactionFinished
+          this.interactionFinished,
+          this.cameraChanged
         );
   }
 

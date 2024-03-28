@@ -9,7 +9,7 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Disposable } from '@vertexvis/utils';
+import { Disposable, EventDispatcher } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
@@ -74,7 +74,8 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>,
     private interactionStartedEmitter: EventEmitter<void>,
-    private interactionFinishedEmitter: EventEmitter<void>
+    private interactionFinishedEmitter: EventEmitter<void>,
+    private cameraChangedEmitter: EventEmitter<FrameCameraBase | undefined>
   ) {
     this.tap = this.tap.bind(this);
     this.doubleTap = this.doubleTap.bind(this);
@@ -247,6 +248,8 @@ export abstract class InteractionApi<T extends Camera = Camera> {
               depthBuffer,
             })
           : undefined;
+
+      this.cameraChangedEmitter.emit(this.currentCamera?.toFrameCamera());
 
       await this.currentCamera?.render(renderOptions);
     }

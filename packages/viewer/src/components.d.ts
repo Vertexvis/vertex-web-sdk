@@ -2422,6 +2422,12 @@ declare namespace LocalJSX {
       event: VertexViewerCustomEvent<AnnotationState>
     ) => void;
     /**
+     * Emits an event when the camera has changed.
+     */
+    onCameraChanged?: (
+      event: VertexViewerCustomEvent<FrameCameraBase | undefined>
+    ) => void;
+    /**
      * Emits an event when the camera type changes.
      */
     onCameraTypeChanged?: (

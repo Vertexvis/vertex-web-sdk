@@ -6,7 +6,7 @@ import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
 import { updateLookAtRelativeToBoundingBoxCenter } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
-import { DepthBuffer, Viewport } from '../types';
+import { DepthBuffer, FrameCameraBase, Viewport } from '../types';
 import { ZoomData } from './interactionApi';
 import {
   InteractionApi,
@@ -33,7 +33,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     doubleTapEmitter: EventEmitter<TapEventDetails>,
     longPressEmitter: EventEmitter<TapEventDetails>,
     interactionStartedEmitter: EventEmitter<void>,
-    interactionFinishedEmitter: EventEmitter<void>
+    interactionFinishedEmitter: EventEmitter<void>,
+    cameraChangedEmitter: EventEmitter<FrameCameraBase | undefined>
   ) {
     super(
       stream,
@@ -46,7 +47,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       doubleTapEmitter,
       longPressEmitter,
       interactionStartedEmitter,
-      interactionFinishedEmitter
+      interactionFinishedEmitter,
+      cameraChangedEmitter
     );
   }
 
