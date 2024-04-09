@@ -1,5 +1,5 @@
 const DEFAULT_ENV = 'platprod';
-const DEFAULT_STREAM_KEY = 'ocgUAlbpe5dWkOjkHjUWzv7Sm1qWJpTi9sa4';
+const DEFAULT_STREAM_KEY = 'wzTRPxHgI8ylWKevQIDPA-GhL_8PhWwqLj4w';
 
 export async function loadViewerWithQueryParams(
   viewer,
