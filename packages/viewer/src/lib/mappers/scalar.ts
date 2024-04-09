@@ -8,6 +8,8 @@ export const toPbStringValue = toPbScalarWrapper<string>();
 
 export const fromPbBytesValue = fromPbScalarWrapper<Uint8Array>();
 
+export const fromPbStringValue = fromPbScalarWrapper<string>();
+
 function toPbScalarWrapper<T>(): M.Func<
   T | undefined,
   { value: T | undefined } | undefined

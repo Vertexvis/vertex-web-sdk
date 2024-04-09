@@ -1,6 +1,21 @@
 import { once } from './eventTargets';
 
 /**
+ * Converts an async generator to an array of results.
+ *
+ * @param generator The generator to convert.
+ * @returns A promise that resolves with an array of results yielded by the
+ *  generator.
+ */
+export async function asArray<T>(generator: AsyncGenerator<T>): Promise<T[]> {
+  const res = [];
+  for await (const next of generator) {
+    res.push(next);
+  }
+  return res;
+}
+
+/**
  * Returns a promise that resolves successfully after the given delay.
  *
  * @param ms The delay in milliseconds.

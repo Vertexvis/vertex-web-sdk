@@ -12,6 +12,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { toProtoDuration, WebSocketClientImpl } from '@vertexvis/stream-api';
 import { Color, Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import classnames from 'classnames';
@@ -24,6 +25,10 @@ import {
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
+import {
+  AnnotationController,
+  AnnotationState,
+} from '../../lib/annotations/controller';
 import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
@@ -321,6 +326,14 @@ export class Viewer {
   public viewport: Viewport = Viewport.fromDimensions(Dimensions.create(0, 0));
 
   /**
+   * The annotation controller for accessing annotations associated with the
+   * scene view.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true }) public annotations: AnnotationController | undefined;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -395,6 +408,11 @@ export class Viewer {
   @Event() public cameraTypeChanged!: EventEmitter<FrameCameraType>;
 
   /**
+   * Emits an event when the state for annotation changes.
+   */
+  @Event() public annotationStateChanged!: EventEmitter<AnnotationState>;
+
+  /**
    * Used for internals or testing.
    *
    * @private
@@ -457,10 +475,21 @@ export class Viewer {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
     this.registerSlotChangeListeners();
 
+    const config = this.getResolvedConfig();
+    const client = new SceneViewAPIClient(config.network.sceneViewHost);
+    this.annotations = new AnnotationController(
+      client,
+      () => this.token,
+      () => this.deviceId
+    );
+    this.annotations.onStateChange.on((state) =>
+      this.annotationStateChanged.emit(state)
+    );
+
     this.stream =
       this.stream ??
       new ViewerStream(new WebSocketClientImpl(), {
-        loggingEnabled: this.getResolvedConfig().flags.logWsMessages,
+        loggingEnabled: config.flags.logWsMessages,
         enableTemporalRefinement: this.enableTemporalRefinement,
       });
     this.addStreamListeners();
@@ -755,11 +784,17 @@ export class Viewer {
     this.updateStreamAttributes();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('phantom')
   protected handlePhantomChanged(): void {
     this.updateStreamAttributes();
   }
 
+  /**
+   * @ignore
+   */
   @Watch('noDefaultLights')
   protected handleNoDefaultLightsChanged(): void {
     this.updateStreamAttributes();
@@ -841,6 +876,9 @@ export class Viewer {
   @Method()
   public async load(urn: string): Promise<void> {
     if (this.stream != null && this.dimensions != null) {
+      const { EXPERIMENTAL_annotationPollingIntervalInMs } =
+        this.getResolvedConfig();
+
       this.calculateComponentDimensions();
 
       this.stream.update({
@@ -856,6 +894,10 @@ export class Viewer {
         this.getResolvedConfig()
       );
       this.sceneReady.emit();
+
+      if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
+        this.annotations?.connect(EXPERIMENTAL_annotationPollingIntervalInMs);
+      }
     } else {
       throw new ViewerInitializationError(
         'Cannot load scene. Viewer has not been initialized.'
@@ -870,7 +912,9 @@ export class Viewer {
   @Method()
   public async unload(): Promise<void> {
     if (this.stream != null) {
+      this.annotations?.disconnect();
       this.stream.disconnect();
+
       this.frame = undefined;
       this.errorMessage = undefined;
     }
