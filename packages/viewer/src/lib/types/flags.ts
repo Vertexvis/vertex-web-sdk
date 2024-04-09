@@ -35,7 +35,14 @@ type Flag =
    * RPCs. By default this transport will be used, and streaming messages will
    * be sent over WebSocket.
    */
-  | 'grpcUseStreamingWebSocketTransport';
+  | 'grpcUseStreamingWebSocketTransport'
+
+  /**
+   * Enables or disables the fetching of annotations. This is an experimental
+   * feature and may change.
+   */
+  | 'EXPERIMENTAL_fetchAnnotations';
+
 /**
  * A set of experimental features that can be enabled through the viewer's
  * config.
@@ -49,6 +56,7 @@ export const defaultFlags: Flags = {
   logFrameRate: false,
   letterboxFrames: false,
   grpcUseStreamingWebSocketTransport: true,
+  EXPERIMENTAL_fetchAnnotations: false,
 };
 
 export function createFlags(
