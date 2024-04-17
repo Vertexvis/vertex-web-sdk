@@ -1,6 +1,8 @@
 import { grpc } from '@improbable-eng/grpc-web';
 
-type GrpcCaller<R, E> = (handler: GrpcHandler<R, E>) => void | Promise<void>;
+export type GrpcCaller<R, E> = (
+  handler: GrpcHandler<R, E>
+) => void | Promise<void>;
 
 type GrpcHandler<R, E> = (err: E | null, res: R | null) => void | Promise<void>;
 
@@ -23,6 +25,19 @@ export function requestUnary<R, E = unknown>(
       }
     });
   });
+}
+
+export async function* requestPaged<R, E = unknown>(
+  fetch: (cursor: string | undefined) => GrpcCaller<R, E>,
+  next: (res: R) => string | undefined
+): AsyncGenerator<R, void, void> {
+  let cursor = undefined;
+
+  do {
+    const res = await requestUnary(fetch(cursor));
+    yield res;
+    cursor = next(res);
+  } while (cursor != null);
 }
 
 export async function createMetadata(

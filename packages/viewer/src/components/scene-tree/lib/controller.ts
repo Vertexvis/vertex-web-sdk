@@ -1186,6 +1186,7 @@ export class SceneTreeController {
     });
   }
 
+  // TODO(dan): used shared grpc lib
   private requestUnary<R>(
     jwt: string,
     req: (
@@ -1212,6 +1213,7 @@ export class SceneTreeController {
     });
   }
 
+  // TODO(dan): move to shared grpc lib
   private requestServerStream<R>(
     jwt: string,
     req: (metadata: grpc.Metadata) => ResponseStream<R>

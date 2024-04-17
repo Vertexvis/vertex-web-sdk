@@ -3,6 +3,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 jest.mock('./utils');
 jest.mock('../../lib/rendering/imageLoaders');
 jest.mock('../../workers/png-decoder-pool');
+jest.mock('../../lib/annotations/controller');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -927,6 +928,49 @@ describe('vertex-viewer', () => {
       );
 
       expect(result).toBeDefined();
+    });
+  });
+
+  describe('annotations', () => {
+    it('polls for annotations if experimental flag is set', async () => {
+      const interval = random.integer();
+
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            config={
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              { EXPERIMENTAL_annotationPollingIntervalInMs: interval } as any
+            }
+          />
+        ),
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await Async.delay(1);
+
+      expect(connectSpy).toHaveBeenCalledWith(interval);
+    });
+
+    it('does not poll for annotations by default', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await Async.delay(1);
+
+      expect(connectSpy).not.toHaveBeenCalled();
     });
   });
 

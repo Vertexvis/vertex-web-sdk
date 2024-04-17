@@ -48,6 +48,10 @@ import {
   StencilBufferManager,
   Viewport,
 } from './lib/types';
+import {
+  AnnotationController,
+  AnnotationState,
+} from './lib/annotations/controller';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import {
@@ -453,6 +457,11 @@ export namespace Components {
       cursor: Cursor,
       priority?: number | undefined
     ) => Promise<Disposable>;
+    /**
+     * The annotation controller for accessing annotations associated with the scene view.
+     * @readonly
+     */
+    annotations: AnnotationController | undefined;
     /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
      */
@@ -2254,6 +2263,11 @@ declare namespace LocalJSX {
   interface VertexSceneTreeToolbarGroup {}
   interface VertexViewer {
     /**
+     * The annotation controller for accessing annotations associated with the scene view.
+     * @readonly
+     */
+    annotations?: AnnotationController | undefined;
+    /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
      */
     cameraControls?: boolean;
@@ -2332,6 +2346,12 @@ declare namespace LocalJSX {
      * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
      */
     noDefaultLights?: boolean;
+    /**
+     * Emits an event when the state for annotation changes.
+     */
+    onAnnotationStateChanged?: (
+      event: VertexViewerCustomEvent<AnnotationState>
+    ) => void;
     /**
      * Emits an event when the camera type changes.
      */

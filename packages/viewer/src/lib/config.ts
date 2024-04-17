@@ -27,6 +27,7 @@ export interface Config {
   >;
   EXPERIMENTAL_adaptiveRendering: Omit<AdaptiveRenderingSettings, 'enabled'>;
   EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
+  EXPERIMENTAL_annotationPollingIntervalInMs: number | undefined;
 }
 
 export type PartialConfig = DeepPartial<Config>;
@@ -47,6 +48,7 @@ const config: Config = {
   EXPERIMENTAL_frameDelivery: {},
   EXPERIMENTAL_adaptiveRendering: {},
   EXPERIMENTAL_qualityOfService: {},
+  EXPERIMENTAL_annotationPollingIntervalInMs: undefined,
 };
 
 const platdevConfig: Config = {

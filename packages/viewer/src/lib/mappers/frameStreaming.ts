@@ -15,7 +15,7 @@ import {
   Orientation,
   SceneViewSummary,
 } from '../types';
-import { fromPbUuid } from './core';
+import { fromPbUuid } from './corePbJs';
 import {
   fromPbBoundingBox3f,
   fromPbDim,

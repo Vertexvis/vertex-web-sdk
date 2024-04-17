@@ -36,6 +36,7 @@ type Flag =
    * be sent over WebSocket.
    */
   | 'grpcUseStreamingWebSocketTransport';
+
 /**
  * A set of experimental features that can be enabled through the viewer's
  * config.

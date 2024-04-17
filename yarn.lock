@@ -2049,12 +2049,11 @@
     "@types/react" "*"
 
 "@types/react@*", "@types/react@^18", "@types/react@^18.2.48":
-  version "18.2.68"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.68.tgz#b4d0c3a9c883165d11842f7b998532743fc5adda"
-  integrity sha512-Fj/BAR6LDSRkqinWfo9nGzW9ndpjEtP049oIW8KWToucUq7AJVCr/fyY9NFpaJaCXnGrKHLLs2mwiHYE1SxaxA==
+  version "18.2.79"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.79.tgz#c40efb4f255711f554d47b449f796d1c7756d865"
+  integrity sha512-RwGAGXPl9kSXwdNTafkOEuFrTBD5SA2B3iEB96xi8+xu5ddUa/cpvyVCSNn+asgLCTHkb5ZxN8gbuibYJi4s1w==
   dependencies:
     "@types/prop-types" "*"
-    "@types/scheduler" "*"
     csstype "^3.0.2"
 
 "@types/resolve@0.0.8":
@@ -2070,11 +2069,6 @@
   integrity sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==
   dependencies:
     "@types/node" "*"
-
-"@types/scheduler@*":
-  version "0.16.2"
-  resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
-  integrity sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==
 
 "@types/semver@^7.3.9":
   version "7.3.9"
@@ -2245,10 +2239,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.21.tgz#a52c0476483609d2d927934cdd55c10a219a7c38"
   integrity sha512-HuV0B5k3ujypeDJBsNUQCN1zeOOe8/IkNyi7E7uEQiR0sTGmjPtGhmlmOEPeYhkbxhptb+ZCFzN5n01WIyeZxw==
 
-"@vertexvis/scene-view-protos@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.2.1.tgz#208edeb78715f8db525629525da63d814410f692"
-  integrity sha512-+z7b4/cjKsCQ1OC8XZYHECIgJN3hRFW2xgM3TmwrKlrr23Lr1N99Aad9JS5v2mkL66IN32w9Dpd1XMraJm1+yA==
+"@vertexvis/scene-view-protos@^0.3.2":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.3.3.tgz#cd541c61ebf9245c20f6288b7dda49ec480d8ece"
+  integrity sha512-jnaykr2sifJ1E2mpsYOiB4Z4TmpusLVM3xK6NsWFv0CzdJlXL+DFZLv2IM7UI/cVgidADPPlf938NhnDicTEhg==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"

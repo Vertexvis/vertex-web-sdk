@@ -1,4 +1,4 @@
-export * from './core';
+export * from './corePbJs';
 export * from './frameStreaming';
 export * from './geometry';
 export * from './material';
