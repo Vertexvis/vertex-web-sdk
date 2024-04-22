@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  justify-content: center;
+
+  border-radius: 12px;
+  border-width: 1px;
+  border-style: solid;
+
+  width: 24px;
+  height: 24px;
+}
