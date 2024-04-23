@@ -46,10 +46,10 @@ component.
 
 ## Properties
 
-| Property | Attribute | Description                                                                                                                                                                                                                                                          | Type                                                                                                                                                       | Default     |
-| -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `name`   | `name`    | The name of the icon to render.                                                                                                                                                                                                                                      | `"chevron-down" \| "chevron-right" \| "close-circle" \| "eye-half" \| "eye-half-dotted" \| "eye-open" \| "fit-all" \| "pin-fill" \| "search" \| undefined` | `undefined` |
-| `size`   | `size`    | The size of the icon. Can be `'sm' \| 'md' \| 'lg' \| undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`. | `"lg" \| "md" \| "sm" \| undefined`                                                                                                                        | `'md'`      |
+| Property | Attribute | Description                                                                                                                                                                                                                                                          | Type                                                                                                                                                                         | Default     |
+| -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `name`   | `name`    | The name of the icon to render.                                                                                                                                                                                                                                      | `"chevron-down" \| "chevron-right" \| "close-circle" \| "comment-show" \| "eye-half" \| "eye-half-dotted" \| "eye-open" \| "fit-all" \| "pin-fill" \| "search" \| undefined` | `undefined` |
+| `size`   | `size`    | The size of the icon. Can be `'sm' \| 'md' \| 'lg' \| undefined`. Predefined sizes are set to:   * `sm`: 16px  * `md`: 24px  * `lg`: 32px  A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`. | `"lg" \| "md" \| "sm" \| undefined`                                                                                                                                          | `'md'`      |
 
 
 ## Dependencies
@@ -57,6 +57,7 @@ component.
 ### Used by
 
  - [vertex-scene-tree-search](../scene-tree-search)
+ - [vertex-viewer-annotation-callout](../viewer-annotation-callout)
  - [vertex-viewer-default-toolbar](../viewer-default-toolbar)
  - [vertex-viewer-pin-group](../viewer-pin-group)
 
@@ -64,6 +65,7 @@ component.
 ```mermaid
 graph TD;
   vertex-scene-tree-search --> vertex-viewer-icon
+  vertex-viewer-annotation-callout --> vertex-viewer-icon
   vertex-viewer-default-toolbar --> vertex-viewer-icon
   vertex-viewer-pin-group --> vertex-viewer-icon
   style vertex-viewer-icon fill:#f9f,stroke:#333,stroke-width:4px
