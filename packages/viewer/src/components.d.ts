@@ -32,13 +32,14 @@ import { Cursor } from "./lib/cursors";
 import { BaseInteractionHandler } from "./lib/interactions/baseInteractionHandler";
 import { Scene } from "./lib/scenes/scene";
 import { CalloutAnnotationData } from "./lib/annotations/annotation";
+import { ViewerIconSize } from "./components/viewer-icon/viewer-icon";
 import { VolumeIntersectionQueryController } from "./lib/volume-intersection/controller";
 import { VolumeIntersectionQueryModel } from "./lib/volume-intersection/model";
 import { VolumeIntersectionQueryMode, VolumeIntersectionQueryType } from "./components/viewer-box-query-tool/types";
 import { ViewerToolbarDirection, ViewerToolbarPlacement } from "./components/viewer-toolbar/types";
 import { ViewerToolbarGroupDirection } from "./components/viewer-toolbar-group/types";
 import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/viewer-dom-renderer";
-import { ViewerIconName, ViewerIconSize } from "./components/viewer-icon/viewer-icon";
+import { ViewerIconName, ViewerIconSize as ViewerIconSize1 } from "./components/viewer-icon/viewer-icon";
 import { ViewerMarkupToolType } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { LineAnchorStyle } from "./components/viewer-markup-arrow/utils";
 import { Markup, MarkupInteraction } from "./lib/types/markup";
@@ -486,6 +487,7 @@ export namespace Components {
     }
     interface VertexViewerAnnotationCallout {
         "data": CalloutAnnotationData;
+        "size": ViewerIconSize;
     }
     interface VertexViewerBoxQueryTool {
         /**
@@ -2021,6 +2023,7 @@ declare namespace LocalJSX {
     }
     interface VertexViewerAnnotationCallout {
         "data": CalloutAnnotationData;
+        "size"?: ViewerIconSize;
     }
     interface VertexViewerBoxQueryTool {
         /**

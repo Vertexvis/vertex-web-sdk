@@ -24,7 +24,7 @@ describe('viewer-annotation-callout', () => {
     expect(page.root).toEqualHtml(`
       <vertex-viewer-annotation-callout>
         <mock:shadow-root>
-          <div class="content" style="border-color: #ffffff; background-color: #000000;">
+          <div class="content sm" style="border-color: #ffffff; background-color: #000000;">
             <vertex-viewer-icon class="icon" name="close-circle" size="sm" style="color: #ffffff;"/>
           </div>
         </mock:shadow-root>
