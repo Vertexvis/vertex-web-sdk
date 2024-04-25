@@ -18,14 +18,16 @@ describe('viewer-annotation-callout', () => {
   it('renders callout with border, fill and icon', async () => {
     const page = await newSpecPage({
       components: [ViewerAnnotationCallout],
-      template: () => <vertex-viewer-annotation-callout data={callout} />,
+      template: () => (
+        <vertex-viewer-annotation-callout data={callout} iconSize="md" />
+      ),
     });
 
     expect(page.root).toEqualHtml(`
       <vertex-viewer-annotation-callout>
         <mock:shadow-root>
-          <div class="content sm" style="border-color: #ffffff; background-color: #000000;">
-            <vertex-viewer-icon class="icon" name="close-circle" size="sm" style="color: #ffffff;"/>
+          <div class="content md" style="border-color: #ffffff; background-color: #000000;">
+            <vertex-viewer-icon class="icon" name="close-circle" size="md" style="color: #ffffff;"/>
           </div>
         </mock:shadow-root>
       </vertex-viewer-annotation-callout>

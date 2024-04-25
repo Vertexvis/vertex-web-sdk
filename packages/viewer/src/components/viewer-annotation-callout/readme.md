@@ -7,10 +7,10 @@
 
 ## Properties
 
-| Property            | Attribute | Description | Type                                | Default     |
-| ------------------- | --------- | ----------- | ----------------------------------- | ----------- |
-| `data` _(required)_ | --        |             | `CalloutAnnotationData`             | `undefined` |
-| `size`              | `size`    |             | `"lg" \| "md" \| "sm" \| undefined` | `'sm'`      |
+| Property            | Attribute   | Description                                                   | Type                                | Default     |
+| ------------------- | ----------- | ------------------------------------------------------------- | ----------------------------------- | ----------- |
+| `data` _(required)_ | --          | The data that describes how to render the callout annotation. | `CalloutAnnotationData`             | `undefined` |
+| `iconSize`          | `icon-size` | The icon size to display.                                     | `"lg" \| "md" \| "sm" \| undefined` | `'sm'`      |
 
 
 ## Dependencies

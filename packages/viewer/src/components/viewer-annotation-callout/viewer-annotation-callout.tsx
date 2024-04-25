@@ -10,15 +10,21 @@ import { ViewerIconSize } from '../viewer-icon/viewer-icon';
   shadow: true,
 })
 export class ViewerAnnotationCallout {
+  /**
+   * The data that describes how to render the callout annotation.
+   */
   @Prop() public data!: CalloutAnnotationData;
 
-  @Prop() public size: ViewerIconSize = 'sm';
+  /**
+   * The icon size to display.
+   */
+  @Prop() public iconSize: ViewerIconSize = 'sm';
 
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>
         <div
-          class={classNames('content', this.size)}
+          class={classNames('content', this.iconSize)}
           style={{
             borderColor: this.data.primaryColor,
             backgroundColor: this.data.accentColor,
@@ -27,7 +33,7 @@ export class ViewerAnnotationCallout {
           <vertex-viewer-icon
             class="icon"
             name={this.data.icon}
-            size={this.size}
+            size={this.iconSize}
             style={{ color: this.data.primaryColor }}
           ></vertex-viewer-icon>
         </div>

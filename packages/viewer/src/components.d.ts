@@ -675,8 +675,14 @@ export namespace Components {
     viewport: Viewport;
   }
   interface VertexViewerAnnotationCallout {
+    /**
+     * The data that describes how to render the callout annotation.
+     */
     data: CalloutAnnotationData;
-    size: ViewerIconSize;
+    /**
+     * The icon size to display.
+     */
+    iconSize: ViewerIconSize;
   }
   interface VertexViewerBoxQueryTool {
     /**
@@ -2468,8 +2474,14 @@ declare namespace LocalJSX {
     viewport?: Viewport;
   }
   interface VertexViewerAnnotationCallout {
+    /**
+     * The data that describes how to render the callout annotation.
+     */
     data: CalloutAnnotationData;
-    size?: ViewerIconSize;
+    /**
+     * The icon size to display.
+     */
+    iconSize?: ViewerIconSize;
   }
   interface VertexViewerBoxQueryTool {
     /**
