@@ -1,6 +1,8 @@
 import type { Vector3 } from '@vertexvis/geometry';
 import type { UUID } from '@vertexvis/utils';
 
+import type { ViewerIconName } from '../../components/viewer-icon/viewer-icon';
+
 export interface AnnotationSet {
   id: UUID.UUID;
   createdAt: Date;
@@ -20,9 +22,9 @@ export interface Annotation {
 export interface CalloutAnnotationData {
   type: 'com.vertexvis.annotations.Callout';
   position: Vector3.Vector3;
-  icon: CalloutAnnotationDataIcon;
+  icon: ViewerIconName;
+  primaryColor: string;
+  accentColor: string;
 }
-
-export type CalloutAnnotationDataIcon = 'comment';
 
 type AnnotationData = CalloutAnnotationData;

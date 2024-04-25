@@ -69,6 +69,8 @@ import { KeyInteraction } from './lib/interactions/keyInteraction';
 import { Cursor } from './lib/cursors';
 import { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
 import { Scene } from './lib/scenes/scene';
+import { CalloutAnnotationData } from './lib/annotations/annotation';
+import { ViewerIconSize } from './components/viewer-icon/viewer-icon';
 import { VolumeIntersectionQueryController } from './lib/volume-intersection/controller';
 import { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
 import {
@@ -83,7 +85,7 @@ import { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/t
 import { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
 import {
   ViewerIconName,
-  ViewerIconSize,
+  ViewerIconSize as ViewerIconSize1,
 } from './components/viewer-icon/viewer-icon';
 import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
 import { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
@@ -671,6 +673,16 @@ export namespace Components {
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
      */
     viewport: Viewport;
+  }
+  interface VertexViewerAnnotationCallout {
+    /**
+     * The data that describes how to render the callout annotation.
+     */
+    data: CalloutAnnotationData;
+    /**
+     * The icon size to display.
+     */
+    iconSize: ViewerIconSize;
   }
   interface VertexViewerBoxQueryTool {
     /**
@@ -1771,6 +1783,13 @@ declare global {
     prototype: HTMLVertexViewerElement;
     new (): HTMLVertexViewerElement;
   };
+  interface HTMLVertexViewerAnnotationCalloutElement
+    extends Components.VertexViewerAnnotationCallout,
+      HTMLStencilElement {}
+  var HTMLVertexViewerAnnotationCalloutElement: {
+    prototype: HTMLVertexViewerAnnotationCalloutElement;
+    new (): HTMLVertexViewerAnnotationCalloutElement;
+  };
   interface HTMLVertexViewerBoxQueryToolElement
     extends Components.VertexViewerBoxQueryTool,
       HTMLStencilElement {}
@@ -1992,6 +2011,7 @@ declare global {
     'vertex-scene-tree-toolbar': HTMLVertexSceneTreeToolbarElement;
     'vertex-scene-tree-toolbar-group': HTMLVertexSceneTreeToolbarGroupElement;
     'vertex-viewer': HTMLVertexViewerElement;
+    'vertex-viewer-annotation-callout': HTMLVertexViewerAnnotationCalloutElement;
     'vertex-viewer-box-query-tool': HTMLVertexViewerBoxQueryToolElement;
     'vertex-viewer-button': HTMLVertexViewerButtonElement;
     'vertex-viewer-default-toolbar': HTMLVertexViewerDefaultToolbarElement;
@@ -2452,6 +2472,16 @@ declare namespace LocalJSX {
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
      */
     viewport?: Viewport;
+  }
+  interface VertexViewerAnnotationCallout {
+    /**
+     * The data that describes how to render the callout annotation.
+     */
+    data: CalloutAnnotationData;
+    /**
+     * The icon size to display.
+     */
+    iconSize?: ViewerIconSize;
   }
   interface VertexViewerBoxQueryTool {
     /**
@@ -3511,6 +3541,7 @@ declare namespace LocalJSX {
     'vertex-scene-tree-toolbar': VertexSceneTreeToolbar;
     'vertex-scene-tree-toolbar-group': VertexSceneTreeToolbarGroup;
     'vertex-viewer': VertexViewer;
+    'vertex-viewer-annotation-callout': VertexViewerAnnotationCallout;
     'vertex-viewer-box-query-tool': VertexViewerBoxQueryTool;
     'vertex-viewer-button': VertexViewerButton;
     'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
@@ -3567,6 +3598,8 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
       'vertex-viewer': LocalJSX.VertexViewer &
         JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
+      'vertex-viewer-annotation-callout': LocalJSX.VertexViewerAnnotationCallout &
+        JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationCalloutElement>;
       'vertex-viewer-box-query-tool': LocalJSX.VertexViewerBoxQueryTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerBoxQueryToolElement>;
       'vertex-viewer-button': LocalJSX.VertexViewerButton &
