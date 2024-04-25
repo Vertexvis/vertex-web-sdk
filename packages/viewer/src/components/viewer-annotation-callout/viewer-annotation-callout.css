@@ -1,5 +1,18 @@
 :host {
   display: block;
+
+
+  /**
+    * @prop --viewer-annotation-callout-primary-color: A CSS color that
+    * specifies a the primary color of the callout.
+    */
+    --viewer-annotation-callout-primary-color: var(--blue-700);
+
+  /**
+   * @prop --viewer-annotation-callout-accent-color: A CSS color that
+   * specifies a contrasting color to the primary color.
+   */
+   --viewer-annotation-callout-accent-color: var(--white);
 }
 
 .content {
@@ -8,8 +21,8 @@
   box-sizing: border-box;
   justify-content: center;
 
-  border-width: 1px;
-  border-style: solid;
+  background-color: var(--viewer-annotation-callout-primary-color);
+  border: 1px solid var(--viewer-annotation-callout-accent-color);
 }
 
 .content.sm {

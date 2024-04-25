@@ -1,4 +1,7 @@
+import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 import {
+  CalloutAnnotationData,
+  CustomAnnotationData,
   SceneAnnotation,
   SceneAnnotationData,
   SceneAnnotationSet,
@@ -15,6 +18,7 @@ import { UUID } from '@vertexvis/utils';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
+import { AnnotationData } from '../lib/annotations/annotation';
 import { random } from './random';
 
 export function createSceneAnnotationSet({
@@ -81,13 +85,13 @@ export function createSceneAnnotation({
   createdAt = new Date(),
   modifiedAt = new Date(),
   suppliedId = random.string(),
-  data = JSON.stringify({}),
+  data = { type: 'custom', jsonType: random.string(), jsonData: {} },
 }: {
   id?: UUID.UUID;
   createdAt?: Date;
   modifiedAt?: Date;
   suppliedId?: string;
-  data?: string;
+  data?: AnnotationData;
 } = {}): SceneAnnotation {
   const ann = new SceneAnnotation();
   ann.setId(createUuid2l(id));
@@ -99,7 +103,42 @@ export function createSceneAnnotation({
   ann.setSuppliedId(suppliedIdValue);
 
   const dataValue = new SceneAnnotationData();
-  dataValue.setJson(data);
+
+  if (data.type === 'callout') {
+    const callout = new CalloutAnnotationData();
+
+    const position = new Vector3f();
+    position.setX(data.position.x);
+    position.setY(data.position.y);
+    position.setZ(data.position.z);
+    callout.setPosition(position);
+
+    if (data.icon != null) {
+      const icon = new StringValue();
+      icon.setValue(data.icon);
+      callout.setIcon(icon);
+    }
+
+    if (data.primaryColor != null) {
+      const primaryColor = new StringValue();
+      primaryColor.setValue(data.primaryColor);
+      callout.setPrimaryColor(primaryColor);
+    }
+
+    if (data.accentColor != null) {
+      const accentColor = new StringValue();
+      accentColor.setValue(data.accentColor);
+      callout.setAccentColor(accentColor);
+    }
+
+    dataValue.setCallout(callout);
+  } else if (data.type === 'custom') {
+    const custom = new CustomAnnotationData();
+    custom.setType(data.jsonType);
+    custom.setJsonData(JSON.stringify(data.jsonData));
+    dataValue.setCustomJson(custom);
+  }
+
   ann.setData(dataValue);
 
   return ann;
