@@ -4,7 +4,7 @@
 
   /**
     * @prop --viewer-annotation-callout-primary-color: A CSS color that
-    * specifies a the primary color of the callout.
+    * specifies the primary color of the callout.
     */
     --viewer-annotation-callout-primary-color: var(--blue-700);
 
