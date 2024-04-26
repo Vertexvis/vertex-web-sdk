@@ -26,15 +26,15 @@ export class ViewerAnnotationCallout {
         <div
           class={classNames('content', this.iconSize)}
           style={{
-            borderColor: this.data.primaryColor,
-            backgroundColor: this.data.accentColor,
+            borderColor: this.data.accentColor,
+            backgroundColor: this.data.primaryColor,
           }}
         >
           <vertex-viewer-icon
             class="icon"
             name={this.data.icon}
             size={this.iconSize}
-            style={{ color: this.data.primaryColor }}
+            style={{ color: this.data.accentColor }}
           ></vertex-viewer-icon>
         </div>
       </Host>

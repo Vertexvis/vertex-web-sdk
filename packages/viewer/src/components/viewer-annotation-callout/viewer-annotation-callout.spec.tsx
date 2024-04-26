@@ -8,7 +8,7 @@ import { ViewerAnnotationCallout } from './viewer-annotation-callout';
 
 describe('viewer-annotation-callout', () => {
   const callout: CalloutAnnotationData = {
-    type: 'com.vertexvis.annotations.Callout',
+    type: 'callout',
     position: Vector3.create(),
     icon: 'close-circle',
     primaryColor: '#ffffff',
@@ -26,8 +26,8 @@ describe('viewer-annotation-callout', () => {
     expect(page.root).toEqualHtml(`
       <vertex-viewer-annotation-callout>
         <mock:shadow-root>
-          <div class="content md" style="border-color: #ffffff; background-color: #000000;">
-            <vertex-viewer-icon class="icon" name="close-circle" size="md" style="color: #ffffff;"/>
+          <div class="content md" style="border-color: #000000; background-color: #ffffff;">
+            <vertex-viewer-icon class="icon" name="close-circle" size="md" style="color: #000000;"/>
           </div>
         </mock:shadow-root>
       </vertex-viewer-annotation-callout>

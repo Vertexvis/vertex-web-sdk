@@ -18,7 +18,7 @@
 | Name                                        | Description                                                          |
 | ------------------------------------------- | -------------------------------------------------------------------- |
 | `--viewer-annotation-callout-accent-color`  | A CSS color that specifies a contrasting color to the primary color. |
-| `--viewer-annotation-callout-primary-color` | A CSS color that specifies a the primary color of the callout.       |
+| `--viewer-annotation-callout-primary-color` | A CSS color that specifies the primary color of the callout.         |
 
 
 ## Dependencies

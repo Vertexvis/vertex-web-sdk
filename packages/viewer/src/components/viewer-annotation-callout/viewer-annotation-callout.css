@@ -42,3 +42,7 @@
   width: 48px;
   height: 48px;
 }
+
+.icon {
+  color: var(--viewer-annotation-callout-accent-color);
+}
