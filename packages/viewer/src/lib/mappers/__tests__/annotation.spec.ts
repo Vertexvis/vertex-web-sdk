@@ -5,6 +5,7 @@ import {
   createSceneAnnotation,
   createSceneAnnotationSet,
 } from '../../../testing/annotations';
+import { CustomAnnotationData } from '../../annotations/annotation';
 import { fromPbAnnotation, fromPbAnnotationSet } from '../annotation';
 
 describe(fromPbAnnotationSet, () => {
@@ -41,7 +42,11 @@ describe(fromPbAnnotation, () => {
     const createdAt = new Date();
     const modifiedAt = new Date();
     const suppliedId = random.string();
-    const data = JSON.stringify({ type: random.string() });
+    const data = {
+      type: 'custom',
+      jsonType: random.string(),
+      jsonData: {},
+    } as CustomAnnotationData;
 
     const pb = createSceneAnnotation({
       id,
@@ -53,6 +58,16 @@ describe(fromPbAnnotation, () => {
 
     const actual = fromPbAnnotation(pb);
 
-    expect(actual).toMatchObject({ id, createdAt, modifiedAt, suppliedId });
+    expect(actual).toMatchObject({
+      id,
+      createdAt,
+      modifiedAt,
+      suppliedId,
+      data: {
+        type: 'custom',
+        jsonType: data.jsonType,
+        jsonData: data.jsonData,
+      },
+    });
   });
 });

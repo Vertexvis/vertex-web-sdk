@@ -20,11 +20,17 @@ export interface Annotation {
 }
 
 export interface CalloutAnnotationData {
-  type: 'com.vertexvis.annotations.Callout';
+  type: 'callout';
   position: Vector3.Vector3;
-  icon: ViewerIconName;
-  primaryColor: string;
-  accentColor: string;
+  icon?: ViewerIconName;
+  primaryColor?: string;
+  accentColor?: string;
 }
 
-type AnnotationData = CalloutAnnotationData;
+export interface CustomAnnotationData {
+  type: 'custom';
+  jsonType: string;
+  jsonData: Record<string, unknown>;
+}
+
+export type AnnotationData = CalloutAnnotationData | CustomAnnotationData;

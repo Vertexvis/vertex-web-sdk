@@ -13,6 +13,14 @@
 | `iconSize`          | `icon-size` | The icon size to display.                                     | `"lg" \| "md" \| "sm" \| undefined` | `'sm'`      |
 
 
+## CSS Custom Properties
+
+| Name                                        | Description                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| `--viewer-annotation-callout-accent-color`  | A CSS color that specifies a contrasting color to the primary color. |
+| `--viewer-annotation-callout-primary-color` | A CSS color that specifies the primary color of the callout.         |
+
+
 ## Dependencies
 
 ### Depends on
