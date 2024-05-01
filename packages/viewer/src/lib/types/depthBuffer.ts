@@ -84,13 +84,13 @@ export class DepthBuffer implements FrameImageLike {
 
   /**
    * Computes the depth from a 2D point within the coordinate space of the depth
-   * buffer. The returned depth is a value that's between the near and far plane
-   * of the orthographic camera.
+   * buffer. The returned depth is a value that's between 0 and the distance between
+   * the near and far planes of the orthographic camera.
    *
    * @param point A 2D point within the viewport.
    * @param fallbackNormalizedDepth A fallback value if the depth is the max
    *   depth value, or cannot be determined.
-   * @returns A depth between the near and far plane.
+   * @returns A depth between 0 and the distance between the near and far planes.
    */
   public getOrthographicDepthAtPoint(
     point: Point.Point,
@@ -128,6 +128,7 @@ export class DepthBuffer implements FrameImageLike {
     if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
       const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
       const depth = this.pixels[index];
+
       const depthOrFallback =
         depth === DepthBuffer.MAX_DEPTH_VALUE
           ? fallbackNormalizedDepth ?? depth
@@ -205,26 +206,121 @@ export class DepthBuffer implements FrameImageLike {
     return Ray.at(ray, distance);
   }
 
+  public pointTest(
+    worldPt: Vector3.Vector3,
+    viewport: Viewport
+  ): Vector3.Vector3 {
+    const { projectionViewMatrix } = this.camera;
+
+    const screenPt = viewport.transformWorldToViewport(
+      worldPt,
+      projectionViewMatrix
+    );
+
+    const isPerspectiveCamera = this.camera.isPerspective();
+
+    if (isPerspectiveCamera) {
+      const backToWorldPt = viewport.transformPointToWorldSpace(screenPt, this);
+
+      return backToWorldPt;
+    } else {
+      const backToWorldPt = viewport.transformPointToOrthographicWorldSpace(
+        screenPt,
+        this
+      );
+
+      return backToWorldPt;
+    }
+  }
+
   /**
    * Returns `true` if the given point in world space is occluded by any
    * geometry.
    *
    * @param worldPt A point in world space to check.
    * @param viewport A viewport of the viewer.
+   * @param allowGraceWindow A viewport of the viewer.
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const { position, direction, projectionViewMatrix } = this.camera;
+    const {
+      position,
+      direction,
+      projectionViewMatrix,
+      lookAt,
+      near,
+      viewVector,
+    } = this.camera;
+    console.log(`position: ` + JSON.stringify(position));
+    console.log(`direction: ` + JSON.stringify(direction));
+    console.log(`lookAt: ` + JSON.stringify(lookAt));
+
+    console.log(`viewVector: ` + JSON.stringify(viewVector));
+    console.log(`viewVector magnitude: ` + Vector3.magnitude(viewVector));
+    console.log(`near: ` + near);
 
     const eyeToPoint = Vector3.subtract(worldPt, position);
     const projected = Vector3.project(eyeToPoint, direction);
-    const distance = Vector3.magnitude(projected);
+    const distanceToPoint = Vector3.magnitude(projected);
 
-    const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
-    const screenPt = viewport.transformVectorToViewport(ndc);
-    const scaledPt = viewport.transformPointToFrame(screenPt, this);
-    const depth = this.getLinearDepthAtPoint(scaledPt);
+    // Get correct depth for camera type
+    const isPerspectiveCamera = this.camera.isPerspective();
 
-    return distance > depth;
+    if (isPerspectiveCamera) {
+      // Find the depth of the closest geometry at the same point on the screen
+      const screenPt = viewport.transformWorldToViewport(
+        worldPt,
+        projectionViewMatrix
+      );
+      const scaledPt = viewport.transformPointToFrame(screenPt, this);
+      const depthOfClosestGeometry = this.getLinearDepthAtPoint(scaledPt);
+
+      // Allow for a small rounding error
+      const allowableDifference = 0.015 * depthOfClosestGeometry;
+      const depthDifference = depthOfClosestGeometry - distanceToPoint;
+
+      console.log('distanceToPoint: ' + distanceToPoint);
+      console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
+      console.log('allowableDifference: ' + allowableDifference);
+      console.log('depthDifference: ' + depthDifference);
+
+      return (
+        distanceToPoint > depthOfClosestGeometry &&
+        Math.abs(depthDifference) > Math.abs(allowableDifference)
+      );
+    } else {
+      // Find the depth of the closest geometry at the same point on the screen
+      const screenPt = viewport.transformWorldToViewport(
+        worldPt,
+        projectionViewMatrix
+      );
+      const scaledPt = viewport.transformPointToFrame(screenPt, this);
+      const depthOfClosestGeometry = this.getOrthographicDepthAtPoint(scaledPt);
+
+      // Check the world point calculation
+      const backToWorldPt = viewport.transformPointToOrthographicWorldSpace(
+        screenPt,
+        this
+      );
+
+      console.log('next two should be the same world point:');
+      console.log(worldPt);
+      console.log(backToWorldPt);
+
+      console.log('distanceToPoint: ' + distanceToPoint);
+      console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
+
+      // Allow for a small rounding error
+      const allowableDifference = 0.015 * depthOfClosestGeometry;
+      const depthDifference = depthOfClosestGeometry - distanceToPoint;
+
+      console.log('allowableDifference: ' + allowableDifference);
+      console.log('depthDifference: ' + depthDifference);
+
+      return (
+        distanceToPoint > depthOfClosestGeometry &&
+        Math.abs(depthDifference) > Math.abs(allowableDifference)
+      );
+    }
   }
 }

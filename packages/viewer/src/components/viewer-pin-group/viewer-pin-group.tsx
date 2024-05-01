@@ -5,6 +5,7 @@ import {
   h,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
@@ -12,6 +13,7 @@ import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, Pin, TextPin } from '../../lib/pins/model';
 import { PinModel } from '../../lib/pins/model';
+import { DepthBuffer } from '../../lib/types';
 import { translatePointToScreen } from '../viewer-pin-tool/utils';
 import { PinRenderer } from './pin-renderer';
 import { getClosestCenterToPoint } from './utils';
@@ -64,10 +66,32 @@ export class ViewerPinGroup {
   public pinController?: PinController;
 
   /**
-   * Whether or not the pin is "selected"
+   * Whether the pin is "selected"
    */
   @Prop()
   public selected = false;
+
+  /**
+   * @internal
+   * Whether the pin is occluded
+   */
+  @Prop({ mutable: true })
+  public occluded = false;
+
+  /**
+   * The current depth buffer of the frame.
+   *
+   * This property will automatically be set when supplying a viewer to the
+   * component, or when added as a child to `<vertex-viewer>`.
+   */
+  @Prop({ mutable: true })
+  public depthBuffer?: DepthBuffer;
+
+  /**
+   * The viewer synced to this renderer.
+   */
+  @Prop()
+  public viewer?: HTMLVertexViewerElement;
 
   @State()
   private invalidateStateCounter = 0;
@@ -75,6 +99,17 @@ export class ViewerPinGroup {
   private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
   private resizeObserver?: ResizeObserver;
+
+  /**
+   * @ignore
+   */
+  protected componentWillLoad(): void {
+    this.handleViewerChange(this.viewer, undefined);
+
+    if (this.viewer?.frame != null) {
+      this.handleViewerFrameDrawn();
+    }
+  }
 
   protected componentDidLoad(): void {
     this.setLabelObserver();
@@ -85,6 +120,53 @@ export class ViewerPinGroup {
 
     if (this.selected) {
       this.labelEl?.setFocus();
+    }
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('viewer')
+  protected handleViewerChange(
+    newViewer: HTMLVertexViewerElement | undefined,
+    oldViewer: HTMLVertexViewerElement | undefined
+  ): void {
+    oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
+    newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('depthBuffer')
+  protected handleDepthBufferChange(): void {
+    if (this.depthBuffer != null && this.pin != null && this.viewer != null) {
+      const isOccluded = this.depthBuffer.isOccluded(
+        this.pin.worldPosition,
+        this.viewer.viewport
+      );
+      console.log('isOccluded: ' + isOccluded);
+      this.occluded = isOccluded;
+
+      const newWorldPoint = this.depthBuffer.pointTest(
+        this.pin.worldPosition,
+        this.viewer.viewport
+      );
+
+      const indicator = document.querySelector('#indicator') as HTMLVertexViewerHitResultIndicatorElement;
+
+      if (indicator != null) {
+        indicator.position = newWorldPoint;
+        indicator.normal = Vector3.forward();
+      } else {
+        const created = document.createElement(
+          'vertex-viewer-hit-result-indicator'
+        );
+        created.id = 'indicator';
+        created.position = newWorldPoint;
+        created.normal = Vector3.forward();
+        this.viewer.appendChild(created);
+      }
     }
   }
 
@@ -114,10 +196,14 @@ export class ViewerPinGroup {
             this.handleAnchorPointerDown();
           }}
         >
-          <PinRenderer pin={this.pin} selected={this.selected} />
+          <PinRenderer
+            pin={this.pin}
+            selected={this.selected}
+            occluded={this.occluded}
+          />
         </vertex-viewer-dom-element>
 
-        {isTextPin(this.pin) && (
+        {isTextPin(this.pin) && !this.occluded && (
           <Fragment>
             <vertex-viewer-pin-label-line
               id={`pin-label-line-${this.pin?.id}`}
@@ -221,4 +307,9 @@ export class ViewerPinGroup {
     const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);
   }
+
+  private handleViewerFrameDrawn = async (): Promise<void> => {
+    const { frame } = this.viewer || {};
+    this.depthBuffer = await frame?.depthBuffer();
+  };
 }

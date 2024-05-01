@@ -1,5 +1,5 @@
 import { EventEmitter } from '@stencil/core';
-import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import { BoundingSphere, Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
@@ -164,7 +164,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     point: Point.Point,
     delta: number
   ): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
+    return this.transformCamera(({ camera, viewport, frame, depthBuffer, boundingBox }) => {
       if (
         this.orthographicZoomData == null ||
         Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
@@ -204,8 +204,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       if (this.orthographicZoomData != null) {
         const { hitPt, hitPlane } = this.orthographicZoomData;
 
-        const relativeDelta =
-          2 * (camera.fovHeight / viewport.height) * delta * 2;
+        const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
         const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
         const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
         const diff = Vector3.scale(
@@ -213,8 +212,25 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
           Vector3.subtract(hitPt, projectedLookAt)
         );
 
+        const updatedLookAt = Vector3.add(camera.lookAt, diff);
+        const scaledLookAt = Vector3.scale(
+          Vector3.magnitude(camera.lookAt) / Vector3.magnitude(updatedLookAt),
+          updatedLookAt
+        );
+        const scaledDirection = Vector3.scale(
+          BoundingSphere.create(boundingBox).radius,
+          camera.toFrameCamera().direction
+        );
+        const position = Vector3.add(
+          scaledLookAt,
+          Vector3.negate(scaledDirection)
+        );
+
+        // Scale the lookAt point to the same length as it was previously
+        // to maintain zoom and pan behavior.
         return camera.update({
-          lookAt: Vector3.add(camera.lookAt, diff),
+          viewVector: Vector3.subtract(scaledLookAt, position),
+          lookAt: scaledLookAt,
           fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
         });
       }

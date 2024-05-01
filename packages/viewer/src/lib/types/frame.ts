@@ -225,10 +225,6 @@ export class FrameCameraBase implements FrameCameraLike {
     return this.computeCameraMatrices().projectionViewMatrix;
   }
 
-  public get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().projectionViewMatrix;
-  }
-
   public static fromBoundingBox(
     camera: FrameCamera.FrameCamera,
     boundingBox: BoundingBox.BoundingBox,
@@ -461,21 +457,7 @@ export class FrameOrthographicCamera
     return true;
   }
 
-  public override get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
-    const frustumProjectionMatrix = Matrix4.makeFrustum(
-      this.left,
-      this.right,
-      this.top,
-      this.bottom,
-      this.near,
-      this.far
-    );
-    return Matrix4.multiply(
-      frustumProjectionMatrix,
-      this.computeCameraMatrices().viewMatrix
-    );
-  }
-
+  // Method for Orthographic
   protected override computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
       const viewMatrix = Matrix4.makeLookAtView(

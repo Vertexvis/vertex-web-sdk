@@ -4,7 +4,7 @@ import { Color } from '@vertexvis/utils';
 export interface SectionPlane {
   /**
    * A unit vector orthogonal to the plane that is used to
-   * determine what geomtry will remain visible. For example, a `normal` of
+   * determine what geometry will remain visible. For example, a `normal` of
    * `{ x: 1, y: 0, z: 0 }` will cause anything in the negative x direction
    * (from the `offset`) to be occluded.
    */

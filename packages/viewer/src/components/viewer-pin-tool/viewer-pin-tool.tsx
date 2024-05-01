@@ -203,6 +203,11 @@ export class ViewerPinTool {
       <Host>
         <vertex-viewer-dom-renderer viewer={this.viewer} drawMode="2d">
           {this.pins.map((pin) => {
+            <vertex-viewer-hit-result-indicator
+              id="indicator-1"
+              position={pin.worldPosition}
+            />;
+
             return (
               <vertex-viewer-pin-group
                 id={`pin-group-${pin.id}`}
@@ -213,6 +218,7 @@ export class ViewerPinTool {
                 pinController={this.pinController}
                 projectionViewMatrix={this.projectionViewMatrix}
                 selected={this.selectedPinId === pin.id}
+                viewer={this.viewer}
               ></vertex-viewer-pin-group>
             );
           })}

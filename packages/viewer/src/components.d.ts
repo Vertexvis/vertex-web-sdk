@@ -1331,6 +1331,12 @@ export namespace Components {
   }
   interface VertexViewerPinGroup {
     /**
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
      * The dimensions of the canvas for the pins
      */
     elementBounds?: DOMRect;
@@ -1338,6 +1344,7 @@ export namespace Components {
      * The local matrix of this element.
      */
     matrix: Matrix4.Matrix4;
+    occluded: boolean;
     /**
      * The pin to draw for the group
      */
@@ -1355,9 +1362,13 @@ export namespace Components {
      */
     projectionViewMatrix: Matrix4.Matrix4;
     /**
-     * Whether or not the pin is "selected"
+     * Whether the pin is "selected"
      */
     selected: boolean;
+    /**
+     * The viewer synced to this renderer.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinLabel {
     /**
@@ -3189,6 +3200,12 @@ declare namespace LocalJSX {
   }
   interface VertexViewerPinGroup {
     /**
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
      * The dimensions of the canvas for the pins
      */
     elementBounds?: DOMRect;
@@ -3196,6 +3213,7 @@ declare namespace LocalJSX {
      * The local matrix of this element.
      */
     matrix?: Matrix4.Matrix4;
+    occluded?: boolean;
     /**
      * The pin to draw for the group
      */
@@ -3213,9 +3231,13 @@ declare namespace LocalJSX {
      */
     projectionViewMatrix?: Matrix4.Matrix4;
     /**
-     * Whether or not the pin is "selected"
+     * Whether the pin is "selected"
      */
     selected?: boolean;
+    /**
+     * The viewer synced to this renderer.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinLabel {
     /**

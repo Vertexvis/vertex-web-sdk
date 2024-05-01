@@ -95,3 +95,7 @@
   stroke-width: 1;
   stroke: var(--viewer-annotations-pin-selected-stroke);
 }
+
+.pin-occluded {
+  opacity: .25;
+}
