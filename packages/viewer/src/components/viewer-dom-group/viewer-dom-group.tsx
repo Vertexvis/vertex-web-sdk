@@ -17,7 +17,8 @@ import { HTMLDomRendererPositionableElement } from '../../interfaces';
 @Component({
   tag: 'vertex-viewer-dom-group',
   styleUrl: 'viewer-dom-group.css',
-  shadow: true,
+  shadow: false,
+  scoped: true,
 })
 export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
   /**
