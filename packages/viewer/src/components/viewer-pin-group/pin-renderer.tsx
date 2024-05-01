@@ -24,7 +24,7 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
           id="pin-anchor"
           class={classNames('pin-anchor', {
             selected: selected,
-            occluded: occluded,
+            'pin-occluded': occluded,
           })}
           style={{
             background: primaryColor,

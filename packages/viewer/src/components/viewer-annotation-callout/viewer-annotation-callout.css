@@ -23,6 +23,8 @@
 
   background-color: var(--viewer-annotation-callout-primary-color);
   border: 1px solid var(--viewer-annotation-callout-accent-color);
+
+  transition: opacity 0.5s ease-in;
 }
 
 .content.sm {
@@ -45,4 +47,9 @@
 
 .icon {
   color: var(--viewer-annotation-callout-accent-color);
+}
+
+.occluded {
+  opacity: .3;
+  transition: opacity 1s ease-in;
 }

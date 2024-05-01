@@ -680,9 +680,20 @@ export namespace Components {
      */
     data: CalloutAnnotationData;
     /**
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
      * The icon size to display.
      */
     iconSize: ViewerIconSize;
+    occluded: boolean;
+    /**
+     * The viewer synced to this renderer.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerBoxQueryTool {
     /**
@@ -1668,6 +1679,11 @@ export interface VertexViewerCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerElement;
 }
+export interface VertexViewerAnnotationCalloutCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexViewerAnnotationCalloutElement;
+}
 export interface VertexViewerBoxQueryToolCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerBoxQueryToolElement;
@@ -2490,9 +2506,26 @@ declare namespace LocalJSX {
      */
     data: CalloutAnnotationData;
     /**
+     * The current depth buffer of the frame.
+     *
+     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
+     */
+    depthBuffer?: DepthBuffer;
+    /**
      * The icon size to display.
      */
     iconSize?: ViewerIconSize;
+    occluded?: boolean;
+    /**
+     * Dispatched when the callout's occlusion state is changed.
+     */
+    onOcclusionStateChange?: (
+      event: VertexViewerAnnotationCalloutCustomEvent<boolean>
+    ) => void;
+    /**
+     * The viewer synced to this renderer.
+     */
+    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerBoxQueryTool {
     /**

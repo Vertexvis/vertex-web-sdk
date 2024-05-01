@@ -147,28 +147,6 @@ export class ViewerPinGroup {
       );
       console.log('isOccluded: ' + isOccluded);
       this.occluded = isOccluded;
-
-      const newWorldPoint = this.depthBuffer.pointTest(
-        this.pin.worldPosition,
-        this.viewer.viewport
-      );
-
-      const indicator = document.querySelector(
-        '#indicator'
-      ) as HTMLVertexViewerHitResultIndicatorElement;
-
-      if (indicator != null) {
-        indicator.position = newWorldPoint;
-        indicator.normal = Vector3.forward();
-      } else {
-        const created = document.createElement(
-          'vertex-viewer-hit-result-indicator'
-        );
-        created.id = 'indicator';
-        created.position = newWorldPoint;
-        created.normal = Vector3.forward();
-        this.viewer.appendChild(created);
-      }
     }
   }
 

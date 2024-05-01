@@ -212,7 +212,6 @@ graph TD;
   vertex-viewer-pin-tool --> vertex-viewer-dom-renderer
   vertex-viewer-pin-tool --> vertex-viewer-hit-result-indicator
   vertex-viewer-pin-tool --> vertex-viewer-pin-group
-  vertex-viewer-pin-group --> vertex-viewer-hit-result-indicator
   vertex-viewer-pin-group --> vertex-viewer-dom-element
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label

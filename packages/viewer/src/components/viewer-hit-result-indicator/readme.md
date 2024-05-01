@@ -141,13 +141,11 @@ the result of the `Raycaster.hitItems()` method.
 
 ### Used by
 
- - [vertex-viewer-pin-group](../viewer-pin-group)
  - [vertex-viewer-pin-tool](../viewer-pin-tool)
 
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-pin-group --> vertex-viewer-hit-result-indicator
   vertex-viewer-pin-tool --> vertex-viewer-hit-result-indicator
   style vertex-viewer-hit-result-indicator fill:#f9f,stroke:#333,stroke-width:4px
 ```

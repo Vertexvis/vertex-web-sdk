@@ -41,7 +41,6 @@
 
 ### Depends on
 
-- [vertex-viewer-hit-result-indicator](../viewer-hit-result-indicator)
 - [vertex-viewer-dom-element](../viewer-dom-element)
 - [vertex-viewer-pin-label-line](../viewer-pin-label-line)
 - [vertex-viewer-pin-label](../viewer-pin-label)
@@ -50,7 +49,6 @@
 ### Graph
 ```mermaid
 graph TD;
-  vertex-viewer-pin-group --> vertex-viewer-hit-result-indicator
   vertex-viewer-pin-group --> vertex-viewer-dom-element
   vertex-viewer-pin-group --> vertex-viewer-pin-label-line
   vertex-viewer-pin-group --> vertex-viewer-pin-label

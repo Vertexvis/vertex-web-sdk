@@ -206,33 +206,6 @@ export class DepthBuffer implements FrameImageLike {
     return Ray.at(ray, distance);
   }
 
-  public pointTest(
-    worldPt: Vector3.Vector3,
-    viewport: Viewport
-  ): Vector3.Vector3 {
-    const { projectionViewMatrix } = this.camera;
-
-    const screenPt = viewport.transformWorldToViewport(
-      worldPt,
-      projectionViewMatrix
-    );
-
-    const isPerspectiveCamera = this.camera.isPerspective();
-
-    if (isPerspectiveCamera) {
-      const backToWorldPt = viewport.transformPointToWorldSpace(screenPt, this);
-
-      return backToWorldPt;
-    } else {
-      const backToWorldPt = viewport.transformPointToOrthographicWorldSpace(
-        screenPt,
-        this
-      );
-
-      return backToWorldPt;
-    }
-  }
-
   /**
    * Returns `true` if the given point in world space is occluded by any
    * geometry.
@@ -243,22 +216,7 @@ export class DepthBuffer implements FrameImageLike {
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const {
-      position,
-      direction,
-      projectionViewMatrix,
-      lookAt,
-      near,
-      viewVector,
-    } = this.camera;
-    console.log(`position: ` + JSON.stringify(position));
-    console.log(`direction: ` + JSON.stringify(direction));
-    console.log(`lookAt: ` + JSON.stringify(lookAt));
-
-    console.log(`viewVector: ` + JSON.stringify(viewVector));
-    console.log(`viewVector magnitude: ` + Vector3.magnitude(viewVector));
-    console.log(`near: ` + near);
-
+    const { position, direction, projectionViewMatrix } = this.camera;
     const eyeToPoint = Vector3.subtract(worldPt, position);
     const projected = Vector3.project(eyeToPoint, direction);
     const distanceToPoint = Vector3.magnitude(projected);

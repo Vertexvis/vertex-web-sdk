@@ -7,10 +7,19 @@
 
 ## Properties
 
-| Property            | Attribute   | Description                                                   | Type                                | Default     |
-| ------------------- | ----------- | ------------------------------------------------------------- | ----------------------------------- | ----------- |
-| `data` _(required)_ | --          | The data that describes how to render the callout annotation. | `CalloutAnnotationData`             | `undefined` |
-| `iconSize`          | `icon-size` | The icon size to display.                                     | `"lg" \| "md" \| "sm" \| undefined` | `'sm'`      |
+| Property            | Attribute   | Description                                                                                                                                                              | Type                                   | Default     |
+| ------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
+| `data` _(required)_ | --          | The data that describes how to render the callout annotation.                                                                                                            | `CalloutAnnotationData`                | `undefined` |
+| `depthBuffer`       | --          | The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`. | `DepthBuffer \| undefined`             | `undefined` |
+| `iconSize`          | `icon-size` | The icon size to display.                                                                                                                                                | `"lg" \| "md" \| "sm" \| undefined`    | `'sm'`      |
+| `viewer`            | --          | The viewer synced to this renderer.                                                                                                                                      | `HTMLVertexViewerElement \| undefined` | `undefined` |
+
+
+## Events
+
+| Event                  | Description                                               | Type                   |
+| ---------------------- | --------------------------------------------------------- | ---------------------- |
+| `occlusionStateChange` | Dispatched when the callout's occlusion state is changed. | `CustomEvent<boolean>` |
 
 
 ## CSS Custom Properties
