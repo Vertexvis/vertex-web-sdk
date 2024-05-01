@@ -1,5 +1,11 @@
 import { EventEmitter } from '@stencil/core';
-import { BoundingSphere, Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import {
+  BoundingSphere,
+  Plane,
+  Point,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
@@ -164,78 +170,76 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     point: Point.Point,
     delta: number
   ): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame, depthBuffer, boundingBox }) => {
-      if (
-        this.orthographicZoomData == null ||
-        Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
-      ) {
-        const frameCam = camera.toFrameCamera();
-        const dir = frameCam.direction;
-        const ray = viewport.transformPointToOrthographicRay(
-          point,
-          frame.image,
-          frameCam
-        );
-
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
-          dir,
-          frameCam.lookAt
-        );
-        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
-        if (fallbackPt == null) {
-          console.warn(
-            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+    return this.transformCamera(
+      ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
+        if (
+          this.orthographicZoomData == null ||
+          Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
+        ) {
+          const frameCam = camera.toFrameCamera();
+          const dir = frameCam.direction;
+          const ray = viewport.transformPointToOrthographicRay(
+            point,
+            frame.image,
+            frameCam
           );
-          return camera;
+
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt
+          );
+          const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+          if (fallbackPt == null) {
+            console.warn(
+              'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+            );
+            return camera;
+          }
+
+          const hitPt =
+            depthBuffer != null
+              ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+              : fallbackPt;
+          const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+          this.orthographicZoomData = {
+            hitPt,
+            hitPlane,
+            startingScreenPt: point,
+          };
         }
 
-        const hitPt =
-          depthBuffer != null
-            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-            : fallbackPt;
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-        this.orthographicZoomData = {
-          hitPt,
-          hitPlane,
-          startingScreenPt: point,
-        };
+        if (this.orthographicZoomData != null) {
+          const { hitPt, hitPlane } = this.orthographicZoomData;
+
+          const relativeDelta =
+            2 * (camera.fovHeight / viewport.height) * delta;
+          const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
+          const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
+          const diff = Vector3.scale(
+            (camera.fovHeight - fovHeight) / camera.fovHeight,
+            Vector3.subtract(hitPt, projectedLookAt)
+          );
+
+          // Update the view vector according to the new lookAt
+          const updatedLookAt = Vector3.add(camera.lookAt, diff);
+          const scaledDirection = Vector3.scale(
+            BoundingSphere.create(boundingBox).radius,
+            camera.toFrameCamera().direction
+          );
+          const position = Vector3.add(
+            updatedLookAt,
+            Vector3.negate(scaledDirection)
+          );
+
+          return camera.update({
+            viewVector: Vector3.subtract(updatedLookAt, position),
+            lookAt: updatedLookAt,
+            fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
+          });
+        }
+        return camera;
       }
-
-      if (this.orthographicZoomData != null) {
-        const { hitPt, hitPlane } = this.orthographicZoomData;
-
-        const relativeDelta = 2 * (camera.fovHeight / viewport.height) * delta;
-        const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
-        const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
-        const diff = Vector3.scale(
-          (camera.fovHeight - fovHeight) / camera.fovHeight,
-          Vector3.subtract(hitPt, projectedLookAt)
-        );
-
-        const updatedLookAt = Vector3.add(camera.lookAt, diff);
-        const scaledLookAt = Vector3.scale(
-          Vector3.magnitude(camera.lookAt) / Vector3.magnitude(updatedLookAt),
-          updatedLookAt
-        );
-        const scaledDirection = Vector3.scale(
-          BoundingSphere.create(boundingBox).radius,
-          camera.toFrameCamera().direction
-        );
-        const position = Vector3.add(
-          scaledLookAt,
-          Vector3.negate(scaledDirection)
-        );
-
-        // Scale the lookAt point to the same length as it was previously
-        // to maintain zoom and pan behavior.
-        return camera.update({
-          viewVector: Vector3.subtract(scaledLookAt, position),
-          lookAt: scaledLookAt,
-          fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
-        });
-      }
-      return camera;
-    });
+    );
   }
 
   protected getWorldPoint(

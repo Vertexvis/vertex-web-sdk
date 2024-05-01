@@ -153,7 +153,9 @@ export class ViewerPinGroup {
         this.viewer.viewport
       );
 
-      const indicator = document.querySelector('#indicator') as HTMLVertexViewerHitResultIndicatorElement;
+      const indicator = document.querySelector(
+        '#indicator'
+      ) as HTMLVertexViewerHitResultIndicatorElement;
 
       if (indicator != null) {
         indicator.position = newWorldPoint;

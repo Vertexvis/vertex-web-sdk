@@ -276,7 +276,7 @@ export class DepthBuffer implements FrameImageLike {
       const depthOfClosestGeometry = this.getLinearDepthAtPoint(scaledPt);
 
       // Allow for a small rounding error
-      const allowableDifference = 0.015 * depthOfClosestGeometry;
+      const allowableDifference = 0.02 * distanceToPoint;
       const depthDifference = depthOfClosestGeometry - distanceToPoint;
 
       console.log('distanceToPoint: ' + distanceToPoint);
@@ -311,7 +311,7 @@ export class DepthBuffer implements FrameImageLike {
       console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
 
       // Allow for a small rounding error
-      const allowableDifference = 0.015 * depthOfClosestGeometry;
+      const allowableDifference = 0.02 * distanceToPoint;
       const depthDifference = depthOfClosestGeometry - distanceToPoint;
 
       console.log('allowableDifference: ' + allowableDifference);
