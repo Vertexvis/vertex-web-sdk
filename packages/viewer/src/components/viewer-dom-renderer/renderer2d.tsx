@@ -57,7 +57,7 @@ function getElementDepths(
   const results = [] as ElementData[];
 
   for (let i = 0; i < element.children.length; i++) {
-    const child = element.children[i];
+    const child = element.children[i] as HTMLElement;
 
     if (isVertexViewerDomGroup(child)) {
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
@@ -75,6 +75,8 @@ function getElementDepths(
         worldPosition,
         distanceToCamera,
       });
+    } else {
+      results.push(...getElementDepths(child, parentWorldMatrix, camera));
     }
   }
 
