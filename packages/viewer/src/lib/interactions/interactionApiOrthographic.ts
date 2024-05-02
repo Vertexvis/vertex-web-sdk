@@ -211,8 +211,9 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         if (this.orthographicZoomData != null) {
           const { hitPt, hitPlane } = this.orthographicZoomData;
 
+          // The 4 multiplier was chosen to match the desired zoom speed
           const relativeDelta =
-            2 * (camera.fovHeight / viewport.height) * delta;
+            4 * (camera.fovHeight / viewport.height) * delta;
           const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
           const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
           const diff = Vector3.scale(

@@ -212,73 +212,42 @@ export class DepthBuffer implements FrameImageLike {
    *
    * @param worldPt A point in world space to check.
    * @param viewport A viewport of the viewer.
-   * @param allowGraceWindow A viewport of the viewer.
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
     const { position, direction, projectionViewMatrix } = this.camera;
+
+    // Calculate the distance from the camera to the given world point
     const eyeToPoint = Vector3.subtract(worldPt, position);
     const projected = Vector3.project(eyeToPoint, direction);
     const distanceToPoint = Vector3.magnitude(projected);
 
-    // Get correct depth for camera type
+    // Find the screen point corresponding to the world point for the current camera
+    const screenPt = viewport.transformWorldToViewport(
+      worldPt,
+      projectionViewMatrix
+    );
+    const scaledPt = viewport.transformPointToFrame(screenPt, this);
+
+    // Find the depth of the closest geometry at the same point on the screen
+    // Use the correct calculation for the camera type
     const isPerspectiveCamera = this.camera.isPerspective();
+    const depthOfClosestGeometry = isPerspectiveCamera
+      ? this.getLinearDepthAtPoint(scaledPt)
+      : this.getOrthographicDepthAtPoint(scaledPt);
 
-    if (isPerspectiveCamera) {
-      // Find the depth of the closest geometry at the same point on the screen
-      const screenPt = viewport.transformWorldToViewport(
-        worldPt,
-        projectionViewMatrix
-      );
-      const scaledPt = viewport.transformPointToFrame(screenPt, this);
-      const depthOfClosestGeometry = this.getLinearDepthAtPoint(scaledPt);
+    // Allow for a small rounding error
+    const allowableDifference = 0.015 * distanceToPoint;
+    const depthDifference = depthOfClosestGeometry - distanceToPoint;
 
-      // Allow for a small rounding error
-      const allowableDifference = 0.02 * distanceToPoint;
-      const depthDifference = depthOfClosestGeometry - distanceToPoint;
+    console.log('distanceToPoint: ' + distanceToPoint);
+    console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
+    console.log('allowableDifference: ' + allowableDifference);
+    console.log('depthDifference: ' + depthDifference);
 
-      console.log('distanceToPoint: ' + distanceToPoint);
-      console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
-      console.log('allowableDifference: ' + allowableDifference);
-      console.log('depthDifference: ' + depthDifference);
-
-      return (
-        distanceToPoint > depthOfClosestGeometry &&
-        Math.abs(depthDifference) > Math.abs(allowableDifference)
-      );
-    } else {
-      // Find the depth of the closest geometry at the same point on the screen
-      const screenPt = viewport.transformWorldToViewport(
-        worldPt,
-        projectionViewMatrix
-      );
-      const scaledPt = viewport.transformPointToFrame(screenPt, this);
-      const depthOfClosestGeometry = this.getOrthographicDepthAtPoint(scaledPt);
-
-      // Check the world point calculation
-      const backToWorldPt = viewport.transformPointToOrthographicWorldSpace(
-        screenPt,
-        this
-      );
-
-      console.log('next two should be the same world point:');
-      console.log(worldPt);
-      console.log(backToWorldPt);
-
-      console.log('distanceToPoint: ' + distanceToPoint);
-      console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
-
-      // Allow for a small rounding error
-      const allowableDifference = 0.02 * distanceToPoint;
-      const depthDifference = depthOfClosestGeometry - distanceToPoint;
-
-      console.log('allowableDifference: ' + allowableDifference);
-      console.log('depthDifference: ' + depthDifference);
-
-      return (
-        distanceToPoint > depthOfClosestGeometry &&
-        Math.abs(depthDifference) > Math.abs(allowableDifference)
-      );
-    }
+    return (
+      distanceToPoint > depthOfClosestGeometry &&
+      Math.abs(depthDifference) > Math.abs(allowableDifference)
+    );
   }
 }

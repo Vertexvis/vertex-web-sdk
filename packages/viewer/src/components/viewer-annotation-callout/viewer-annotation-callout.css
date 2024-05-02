@@ -51,5 +51,5 @@
 
 .occluded {
   opacity: .3;
-  transition: opacity 1s ease-in;
+  transition: opacity 0.75s ease-in;
 }

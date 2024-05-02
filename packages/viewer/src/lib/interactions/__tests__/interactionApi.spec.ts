@@ -31,6 +31,7 @@ describe(InteractionApi, () => {
   const emitLongPress = jest.fn();
   const emitInteractionStarted = jest.fn();
   const emitInteractionFinished = jest.fn();
+  const emitCameraChanged = jest.fn();
   const streamApi = new StreamApi();
   const sceneId = random.guid();
   const sceneViewId = random.guid();
@@ -66,7 +67,8 @@ describe(InteractionApi, () => {
       props.doubleTapEmitter ?? { emit: emitDoubleTap },
       props.longPressEmitter ?? { emit: emitLongPress },
       props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
-      props.interactionFinishedEmitter ?? { emit: emitInteractionFinished }
+      props.interactionFinishedEmitter ?? { emit: emitInteractionFinished },
+      props.cameraChangedEmitter ?? { emit: emitCameraChanged }
     );
   }
 

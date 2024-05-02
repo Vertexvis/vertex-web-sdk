@@ -105,10 +105,6 @@ export class ViewerPinGroup {
    */
   protected componentWillLoad(): void {
     this.handleViewerChange(this.viewer, undefined);
-
-    if (this.viewer?.frame != null) {
-      this.handleViewerFrameDrawn();
-    }
   }
 
   protected componentDidLoad(): void {
