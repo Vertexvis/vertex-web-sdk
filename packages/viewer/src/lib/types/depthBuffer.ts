@@ -237,17 +237,14 @@ export class DepthBuffer implements FrameImageLike {
       : this.getOrthographicDepthAtPoint(scaledPt);
 
     // Allow for a small rounding error
-    const allowableDifference = 0.015 * distanceToPoint;
-    const depthDifference = depthOfClosestGeometry - distanceToPoint;
-
-    console.log('distanceToPoint: ' + distanceToPoint);
-    console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
-    console.log('allowableDifference: ' + allowableDifference);
-    console.log('depthDifference: ' + depthDifference);
+    // Note that if the world point is coincident with the geometry,
+    // we want to err on the side of returning not occluded
+    const allowableDifference = Math.abs(0.02 * distanceToPoint);
+    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
 
     return (
       distanceToPoint > depthOfClosestGeometry &&
-      Math.abs(depthDifference) > Math.abs(allowableDifference)
+      depthDifference > allowableDifference
     );
   }
 }

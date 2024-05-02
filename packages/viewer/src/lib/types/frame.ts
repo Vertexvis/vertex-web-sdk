@@ -457,7 +457,6 @@ export class FrameOrthographicCamera
     return true;
   }
 
-  // Method for Orthographic
   protected override computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
       const viewMatrix = Matrix4.makeLookAtView(

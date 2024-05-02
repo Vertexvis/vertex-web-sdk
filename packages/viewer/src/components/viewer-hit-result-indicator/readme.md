@@ -137,19 +137,6 @@ the result of the `Raycaster.hitItems()` method.
 | `--viewer-hit-result-indicator-plane-opacity` | A CSS number for the opacity of the plane for this hit indicator. Defaults to `0.75`.            |
 
 
-## Dependencies
-
-### Used by
-
- - [vertex-viewer-pin-tool](../viewer-pin-tool)
-
-### Graph
-```mermaid
-graph TD;
-  vertex-viewer-pin-tool --> vertex-viewer-hit-result-indicator
-  style vertex-viewer-hit-result-indicator fill:#f9f,stroke:#333,stroke-width:4px
-```
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

@@ -1,4 +1,12 @@
-import { Component, h, Host, Prop, Watch } from '@stencil/core';
+import {
+  Component,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  Watch,
+} from '@stencil/core';
 import classNames from 'classnames';
 
 import { CalloutAnnotationData } from '../../lib/annotations/annotation';
@@ -79,7 +87,6 @@ export class ViewerAnnotationCallout {
         this.data.position,
         this.viewer.viewport
       );
-      console.log('isOccluded: ' + isOccluded);
       this.occluded = isOccluded;
 
       if (isOccluded !== previousOcclusionState) {

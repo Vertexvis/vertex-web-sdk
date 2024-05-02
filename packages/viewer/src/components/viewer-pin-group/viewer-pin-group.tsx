@@ -141,7 +141,6 @@ export class ViewerPinGroup {
         this.pin.worldPosition,
         this.viewer.viewport
       );
-      console.log('isOccluded: ' + isOccluded);
       this.occluded = isOccluded;
     }
   }
