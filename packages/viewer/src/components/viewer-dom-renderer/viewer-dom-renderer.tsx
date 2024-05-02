@@ -25,7 +25,8 @@ export type ViewerDomRendererDrawMode = '2d' | '3d';
 @Component({
   tag: 'vertex-viewer-dom-renderer',
   styleUrl: 'viewer-dom-renderer.css',
-  shadow: true,
+  shadow: false,
+  scoped: true,
 })
 export class ViewerDomRenderer {
   /**
