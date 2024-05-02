@@ -43,7 +43,7 @@ export function update3d(
   depthBuffer: DepthBuffer | undefined
 ): void {
   for (let i = 0; i < element.children.length; i++) {
-    const el = element.children[i];
+    const el = element.children[i] as HTMLElement;
     if (isVertexViewerDomElement(el)) {
       updateElement(
         el as HTMLVertexViewerDomElementElement,
@@ -54,6 +54,8 @@ export function update3d(
       );
     } else if (isVertexViewerDomGroup(el)) {
       updateGroup(el, parentWorldMatrix, viewport, camera, depthBuffer);
+    } else {
+      update3d(el, parentWorldMatrix, viewport, camera, depthBuffer);
     }
   }
 }
