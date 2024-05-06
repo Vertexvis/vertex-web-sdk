@@ -10,6 +10,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
+import { constrainViewVector } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
 import { DepthBuffer, Viewport } from '../types';
 import { ZoomData } from './interactionApi';
@@ -93,7 +94,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const throttledDelta = Point.scale(delta, 0.5, 0.5);
       const d = Vector3.magnitude(viewVector);
       const epsilonX = (throttledDelta.x * d) / viewport.width;
-      const epsilonY = (throttledDelta.y / viewport.width) * d;
+      const epsilonY = (throttledDelta.y * d) / viewport.height;
 
       const xvec = Vector3.cross(normalizedUpVector, normalizedViewVector);
       const yvec = Vector3.cross(normalizedViewVector, xvec);
@@ -117,7 +118,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
    * @param screenPt A point in screen coordinates.
    */
   public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, frame, viewport }) => {
+    return this.transformCamera(({ camera, frame, viewport, boundingBox }) => {
+      console.log('panCameraToScreenPoint');
       // Capture the starting state of the pan.
       if (this.panData == null) {
         const startingCamera = camera.toFrameCamera();
@@ -232,8 +234,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
             Vector3.negate(scaledDirection)
           );
 
+
           return camera.update({
-            viewVector: Vector3.subtract(updatedLookAt, position),
             lookAt: updatedLookAt,
             fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
           });
@@ -241,6 +243,65 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         return camera;
       }
     );
+  }
+
+  /**
+   * Performs a rotate operation of the scene around the camera's look at point,
+   * and requests a new image for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public async rotateCamera(delta: Point.Point): Promise<void> {
+    return this.transformCamera(({ camera, viewport, boundingBox }) => {
+      console.log('rotateCamera for orthographic');
+      console.log(camera);
+      const upVector = Vector3.normalize(camera.up);
+      const directionVector = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+
+      const crossX = Vector3.cross(upVector, directionVector);
+      const crossY = Vector3.cross(directionVector, crossX);
+
+      const mouseToWorld = Vector3.normalize({
+        x: delta.x * crossX.x + delta.y * crossY.x,
+        y: delta.x * crossX.y + delta.y * crossY.y,
+        z: delta.x * crossX.z + delta.y * crossY.z,
+      });
+
+      const rotationAxisDirection = Vector3.cross(mouseToWorld, directionVector);
+
+      // The 9.5 multiplier was chosen to match the desired rotation speed
+      const epsilonX = (9.5 * delta.x) / viewport.width;
+      const epsilonY = (9.5 * delta.y) / viewport.height;
+      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+      const updated = camera.rotateAroundAxis(angle, rotationAxisDirection);
+
+      // Update the lookAt point to take the center of the model into account
+      const viewVectorMagnitude = Vector3.magnitude(camera.viewVector);
+      const updatedCenterPoint = Vector3.subtract(
+        BoundingSphere.create(boundingBox).center,
+        updated.lookAt
+      );
+      const orthogonalOffset = Vector3.dot(
+        updated.viewVector,
+        updatedCenterPoint
+      );
+      const viewVectorMagnitudeSquared = Vector3.dot(
+        updated.viewVector,
+        updated.viewVector
+      );
+      const offset = orthogonalOffset / viewVectorMagnitudeSquared;
+
+      const scaledViewVector = Vector3.scale(offset, updated.viewVector);
+      const newLookAt = Vector3.add(scaledViewVector, updated.lookAt);
+
+      return updated.update({
+        lookAt: newLookAt,
+      });
+    });
   }
 
   protected getWorldPoint(

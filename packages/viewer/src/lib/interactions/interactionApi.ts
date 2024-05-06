@@ -3,6 +3,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Angle,
   BoundingBox,
+  BoundingSphere,
   Plane,
   Point,
   Ray,
@@ -362,52 +363,6 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     await (await this.getScene()).camera().viewAll().render();
   }
 
-  /**
-   * Performs a rotate operation of the scene around the camera's look at point,
-   * and requests a new image for the updated scene.
-   *
-   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
-   *  viewer.
-   */
-  public async rotateCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
-      const upVector = Vector3.normalize(camera.up);
-      const viewVector = Vector3.normalize(
-        Vector3.subtract(camera.lookAt, camera.position)
-      );
-
-      const crossX = Vector3.cross(upVector, viewVector);
-      const crossY = Vector3.cross(viewVector, crossX);
-
-      const mouseToWorld = Vector3.normalize({
-        x: delta.x * crossX.x + delta.y * crossY.x,
-        y: delta.x * crossX.y + delta.y * crossY.y,
-        z: delta.x * crossX.z + delta.y * crossY.z,
-      });
-
-      const rotationAxis = Vector3.cross(mouseToWorld, viewVector);
-
-      const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-      const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
-      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
-
-      const updated = camera.rotateAroundAxis(angle, rotationAxis);
-
-      return updated.update({
-        // Scale the lookAt point to the same length as the distance to the
-        // center of the bounding box to maintain zoom and pan behavior.
-        lookAt: Vector3.add(
-          Vector3.scale(
-            Math.abs(camera.signedDistanceToBoundingBoxCenter()) /
-              Vector3.magnitude(updated.viewVector),
-            updated.viewVector
-          ),
-          updated.position
-        ),
-      });
-    });
-  }
-
   public async rotateCameraAtPoint(
     delta: Point.Point,
     point: Point.Point
@@ -438,8 +393,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
 
         const rotationAxis = Vector3.cross(mouseToWorld, vv);
 
-        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+        // The 9.5 multiplier was chosen to match the desired rotation speed
+        const epsilonX = (9.5 * delta.x) / viewport.width;
+        const epsilonY = (9.5 * delta.y) / viewport.height;
         const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
         const updated = camera.rotateAroundAxisAtPoint(
@@ -636,5 +592,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   public abstract zoomCameraToPoint(
     point: Point.Point,
     delta: number
+  ): Promise<void>;
+
+  public abstract rotateCamera(
+    delta: Point.Point
   ): Promise<void>;
 }

@@ -215,12 +215,11 @@ export class DepthBuffer implements FrameImageLike {
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const { position, direction, projectionViewMatrix } = this.camera;
+    const { position, direction, projectionViewMatrix, near } = this.camera;
 
     // Calculate the distance from the camera to the given world point
     const eyeToPoint = Vector3.subtract(worldPt, position);
-    const projected = Vector3.project(eyeToPoint, direction);
-    const distanceToPoint = Vector3.magnitude(projected);
+    const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
 
     // Find the screen point corresponding to the world point for the current camera
     const screenPt = viewport.transformWorldToViewport(

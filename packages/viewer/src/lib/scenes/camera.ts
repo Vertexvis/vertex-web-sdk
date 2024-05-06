@@ -259,6 +259,8 @@ export abstract class Camera {
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 
+        this.updateFlyToOptions(undefined);
+
         return new CameraRenderResult(
           this.stream,
           this.decodeFrame,
@@ -409,7 +411,7 @@ export abstract class Camera {
 
     return this.update({
       up: standardView.up,
-      position: Ray.at(standardViewRay, Vector3.magnitude(this.viewVector)),
+      position: updatedPosition,
       viewVector: Vector3.subtract(this.lookAt, updatedPosition),
     });
   }
