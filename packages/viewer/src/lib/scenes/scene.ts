@@ -747,6 +747,7 @@ export class Scene {
           lookAt: scene.camera.lookAt,
           up: scene.camera.up,
           fovHeight: scene.camera.fovHeight,
+          rotationPoint: scene.camera.lookAt,
         },
         this.frame.scene.boundingBox,
         this.decodeFrame

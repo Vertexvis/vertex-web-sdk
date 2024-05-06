@@ -46,15 +46,17 @@ export class FlyToPositionKeyInteraction
         hit.hitPoint.y != null &&
         hit.hitPoint.z != null
       ) {
+        const newLookAt = Vector3.create(
+          hit.hitPoint.x,
+          hit.hitPoint.y,
+          hit.hitPoint.z
+        );
         await this.stream.flyTo({
           camera: FrameCamera.toProtobuf(
             camera
               .update({
-                lookAt: Vector3.create(
-                  hit.hitPoint.x,
-                  hit.hitPoint.y,
-                  hit.hitPoint.z
-                ),
+                lookAt: newLookAt,
+                rotationPoint: newLookAt,
               })
               .toFrameCamera()
           ),

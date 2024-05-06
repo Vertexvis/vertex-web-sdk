@@ -720,8 +720,11 @@ export class OrthographicCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
+    // The rotation point should match the lookAt point when panning
+    const updatedPoint = Vector3.add(this.lookAt, delta);
     return this.update({
-      lookAt: Vector3.add(this.lookAt, delta),
+      lookAt: updatedPoint,
+      rotationPoint: updatedPoint,
     });
   }
 
@@ -781,7 +784,8 @@ export class OrthographicCamera
       this.near,
       this.far,
       this.aspectRatio,
-      this.fovHeight
+      this.fovHeight,
+      this.rotationPoint
     );
   }
 
@@ -791,6 +795,15 @@ export class OrthographicCamera
 
   public get position(): Vector3.Vector3 {
     return Vector3.add(this.lookAt, Vector3.negate(this.viewVector));
+  }
+
+  /**
+   * A vector, in world space coordinates, of where the camera should be rotated around.
+   * Note that rotationPoint and lookAt are typically located at the same point in the viewport (2D),
+   * but can have different world points (3D).
+   */
+  public get rotationPoint(): Vector3.Vector3 {
+    return { ...this.orthographicData.rotationPoint };
   }
 
   /**

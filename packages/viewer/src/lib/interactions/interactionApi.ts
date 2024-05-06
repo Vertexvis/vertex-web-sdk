@@ -3,7 +3,6 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Angle,
   BoundingBox,
-  BoundingSphere,
   Plane,
   Point,
   Ray,
@@ -594,7 +593,5 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     delta: number
   ): Promise<void>;
 
-  public abstract rotateCamera(
-    delta: Point.Point
-  ): Promise<void>;
+  public abstract rotateCamera(delta: Point.Point): Promise<void>;
 }

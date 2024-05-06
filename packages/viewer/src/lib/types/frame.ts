@@ -250,7 +250,8 @@ export class FrameCameraBase implements FrameCameraLike {
         near,
         far,
         aspectRatio,
-        camera.fovHeight
+        camera.fovHeight,
+        camera.rotationPoint
       );
     } else {
       return new FramePerspectiveCamera(

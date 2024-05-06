@@ -10,7 +10,6 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
-import { constrainViewVector } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
 import { DepthBuffer, Viewport } from '../types';
 import { ZoomData } from './interactionApi';
@@ -159,8 +158,12 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
         if (movePt != null) {
           const delta = Vector3.subtract(hitPt, movePt);
+
+          // rotationPoint should match lookAt after a pan interaction
+          const updatedLookAt = Vector3.add(startingCamera.lookAt, delta);
           return camera.update({
-            lookAt: Vector3.add(startingCamera.lookAt, delta),
+            lookAt: updatedLookAt,
+            rotationPoint: updatedLookAt,
           });
         }
       }
@@ -223,20 +226,11 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
             Vector3.subtract(hitPt, projectedLookAt)
           );
 
-          // Update the view vector according to the new lookAt
+          // rotationPoint should match lookAt after a zoom interaction
           const updatedLookAt = Vector3.add(camera.lookAt, diff);
-          const scaledDirection = Vector3.scale(
-            BoundingSphere.create(boundingBox).radius,
-            camera.toFrameCamera().direction
-          );
-          const position = Vector3.add(
-            updatedLookAt,
-            Vector3.negate(scaledDirection)
-          );
-
-
           return camera.update({
             lookAt: updatedLookAt,
+            rotationPoint: updatedLookAt,
             fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
           });
         }
@@ -254,8 +248,6 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, viewport, boundingBox }) => {
-      console.log('rotateCamera for orthographic');
-      console.log(camera);
       const upVector = Vector3.normalize(camera.up);
       const directionVector = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
@@ -270,17 +262,27 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         z: delta.x * crossX.z + delta.y * crossY.z,
       });
 
-      const rotationAxisDirection = Vector3.cross(mouseToWorld, directionVector);
+      const rotationAxisDirection = Vector3.cross(
+        mouseToWorld,
+        directionVector
+      );
 
       // The 9.5 multiplier was chosen to match the desired rotation speed
       const epsilonX = (9.5 * delta.x) / viewport.width;
       const epsilonY = (9.5 * delta.y) / viewport.height;
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
-      const updated = camera.rotateAroundAxis(angle, rotationAxisDirection);
+      const rotationPoint =
+        camera.rotationPoint != null && camera.rotationPoint?.x != null
+          ? camera.rotationPoint
+          : camera.lookAt;
+      const updated = camera.rotateAroundAxisAtPoint(
+        angle,
+        rotationPoint,
+        rotationAxisDirection
+      );
 
       // Update the lookAt point to take the center of the model into account
-      const viewVectorMagnitude = Vector3.magnitude(camera.viewVector);
       const updatedCenterPoint = Vector3.subtract(
         BoundingSphere.create(boundingBox).center,
         updated.lookAt
@@ -289,8 +291,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         updated.viewVector,
         updatedCenterPoint
       );
-      const viewVectorMagnitudeSquared = Vector3.dot(
-        updated.viewVector,
+      const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(
         updated.viewVector
       );
       const offset = orthogonalOffset / viewVectorMagnitudeSquared;
@@ -298,6 +299,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const scaledViewVector = Vector3.scale(offset, updated.viewVector);
       const newLookAt = Vector3.add(scaledViewVector, updated.lookAt);
 
+      // Update only the lookAt point. The rotationPoint should remain
+      // constant until a different type of interaction is performed.
       return updated.update({
         lookAt: newLookAt,
       });
