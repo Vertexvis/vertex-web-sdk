@@ -89,7 +89,7 @@
 .pin {
   color: var(--viewer-annotations-pin-color);
   cursor: pointer;
-  transition: opacity 0.5s ease-in;
+  transition: opacity 0.3s ease-in;
 }
 
 .pin-selected {
@@ -99,5 +99,5 @@
 
 .pin-occluded {
   opacity: .3;
-  transition: opacity 0.75s ease-in;
+  transition: opacity 0.3s ease-in;
 }

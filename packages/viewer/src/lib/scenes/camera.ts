@@ -802,12 +802,7 @@ export class OrthographicCamera
    */
   public get rotationPoint(): Vector3.Vector3 | undefined {
     const rotationPoint = this.orthographicData.rotationPoint;
-    if (
-      rotationPoint != null &&
-      rotationPoint.x != null &&
-      rotationPoint.y != null &&
-      rotationPoint.z != null
-    ) {
+    if (rotationPoint != null) {
       return rotationPoint;
     } else {
       return undefined;

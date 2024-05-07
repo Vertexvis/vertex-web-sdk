@@ -218,6 +218,7 @@ export class DepthBuffer implements FrameImageLike {
     const { position, direction, projectionViewMatrix } = this.camera;
 
     // Calculate the distance from the camera to the given world point
+    // Use the dot product to find the magnitude of the orthogonal component
     const eyeToPoint = Vector3.subtract(worldPt, position);
     const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
 

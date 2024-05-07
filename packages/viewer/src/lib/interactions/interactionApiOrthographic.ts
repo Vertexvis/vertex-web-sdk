@@ -1,11 +1,5 @@
 import { EventEmitter } from '@stencil/core';
-import {
-  BoundingSphere,
-  Plane,
-  Point,
-  Ray,
-  Vector3,
-} from '@vertexvis/geometry';
+import { BoundingBox, Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
@@ -285,7 +279,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       // This change helps ensure that the lookAt point is consistent between
       // the SDK and back-end system such that the calculated depth buffer is correct.
       const updatedCenterPoint = Vector3.subtract(
-        BoundingSphere.create(boundingBox).center,
+        BoundingBox.center(boundingBox),
         updated.lookAt
       );
       const orthogonalOffset = Vector3.dot(
