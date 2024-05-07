@@ -28,12 +28,13 @@ import { Frame } from '../../types/frame';
 import { InteractionApi } from '../interactionApi';
 import { InteractionApiOrthographic } from '../interactionApiOrthographic';
 
-describe(InteractionApi, () => {
+describe(InteractionApiOrthographic, () => {
   const emitTap = jest.fn();
   const emitDoubleTap = jest.fn();
   const emitLongPress = jest.fn();
   const emitInteractionStarted = jest.fn();
   const emitInteractionFinished = jest.fn();
+  const emitCameraChanged = jest.fn();
   const streamApi = new StreamApi();
   const sceneId = random.guid();
   const sceneViewId = random.guid();
@@ -72,7 +73,8 @@ describe(InteractionApi, () => {
       { emit: emitDoubleTap },
       { emit: emitLongPress },
       { emit: emitInteractionStarted },
-      { emit: emitInteractionFinished }
+      { emit: emitInteractionFinished },
+      { emit: emitCameraChanged }
     );
   });
 

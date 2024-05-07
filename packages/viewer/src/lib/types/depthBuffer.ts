@@ -84,13 +84,13 @@ export class DepthBuffer implements FrameImageLike {
 
   /**
    * Computes the depth from a 2D point within the coordinate space of the depth
-   * buffer. The returned depth is a value that's between the near and far plane
-   * of the orthographic camera.
+   * buffer. The returned depth is a value that's between 0 and the distance between
+   * the near and far planes of the orthographic camera.
    *
    * @param point A 2D point within the viewport.
    * @param fallbackNormalizedDepth A fallback value if the depth is the max
    *   depth value, or cannot be determined.
-   * @returns A depth between the near and far plane.
+   * @returns A depth between 0 and the distance between the near and far planes.
    */
   public getOrthographicDepthAtPoint(
     point: Point.Point,
@@ -128,6 +128,7 @@ export class DepthBuffer implements FrameImageLike {
     if (pixel.x >= 0 && pixel.y >= 0 && pixel.x < width && pixel.y < height) {
       const index = Math.floor(pixel.x) + Math.floor(pixel.y) * width;
       const depth = this.pixels[index];
+
       const depthOrFallback =
         depth === DepthBuffer.MAX_DEPTH_VALUE
           ? fallbackNormalizedDepth ?? depth
@@ -216,15 +217,34 @@ export class DepthBuffer implements FrameImageLike {
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
     const { position, direction, projectionViewMatrix } = this.camera;
 
+    // Calculate the distance from the camera to the given world point
+    // Use the dot product to find the magnitude of the orthogonal component
     const eyeToPoint = Vector3.subtract(worldPt, position);
-    const projected = Vector3.project(eyeToPoint, direction);
-    const distance = Vector3.magnitude(projected);
+    const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
 
-    const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
-    const screenPt = viewport.transformVectorToViewport(ndc);
+    // Find the screen point corresponding to the world point for the current camera
+    const screenPt = viewport.transformWorldToViewport(
+      worldPt,
+      projectionViewMatrix
+    );
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
-    const depth = this.getLinearDepthAtPoint(scaledPt);
 
-    return distance > depth;
+    // Find the depth of the closest geometry at the same point on the screen
+    // Use the correct calculation for the camera type
+    const isPerspectiveCamera = this.camera.isPerspective();
+    const depthOfClosestGeometry = isPerspectiveCamera
+      ? this.getLinearDepthAtPoint(scaledPt)
+      : this.getOrthographicDepthAtPoint(scaledPt);
+
+    // Allow for a small rounding error
+    // Note that if the world point is coincident with the geometry,
+    // we want to err on the side of returning not occluded
+    const allowableDifference = Math.abs(0.02 * distanceToPoint);
+    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
+
+    return (
+      distanceToPoint > depthOfClosestGeometry &&
+      depthDifference > allowableDifference
+    );
   }
 }

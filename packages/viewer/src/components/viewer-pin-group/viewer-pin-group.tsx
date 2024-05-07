@@ -3,6 +3,7 @@ import {
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
+  Listen,
   Prop,
   State,
 } from '@stencil/core';
@@ -64,10 +65,17 @@ export class ViewerPinGroup {
   public pinController?: PinController;
 
   /**
-   * Whether or not the pin is "selected"
+   * Whether the pin is "selected"
    */
   @Prop()
   public selected = false;
+
+  /**
+   * @internal
+   * Whether the pin is occluded
+   */
+  @Prop({ mutable: true, reflect: true })
+  public occluded = false;
 
   @State()
   private invalidateStateCounter = 0;
@@ -86,6 +94,16 @@ export class ViewerPinGroup {
     if (this.selected) {
       this.labelEl?.setFocus();
     }
+  }
+
+  /**
+   * @ignore
+   */
+  @Listen('occlusionStateChanged')
+  protected async handleOcclusionStateChanged(
+    event: CustomEvent<boolean>
+  ): Promise<void> {
+    this.occluded = event.detail;
   }
 
   protected disconnectedCallback(): void {
@@ -114,10 +132,14 @@ export class ViewerPinGroup {
             this.handleAnchorPointerDown();
           }}
         >
-          <PinRenderer pin={this.pin} selected={this.selected} />
+          <PinRenderer
+            pin={this.pin}
+            selected={this.selected}
+            occluded={this.occluded}
+          />
         </vertex-viewer-dom-element>
 
-        {isTextPin(this.pin) && (
+        {isTextPin(this.pin) && !this.occluded && (
           <Fragment>
             <vertex-viewer-pin-label-line
               id={`pin-label-line-${this.pin?.id}`}

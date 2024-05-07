@@ -80,7 +80,7 @@ export function intersectLine(
 }
 
 /**
- * Project's the given `point` onto the given `plane`.
+ * Projects the given `point` onto the given `plane`.
  *
  * @param plane The plane to project onto.
  * @param point The point to project.

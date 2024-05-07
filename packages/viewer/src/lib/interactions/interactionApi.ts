@@ -370,14 +370,13 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    *  viewer.
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
+    return this.transformCamera(({ camera, viewport, boundingBox }) => {
       const upVector = Vector3.normalize(camera.up);
-      const lookAt = Vector3.normalize(
+      const directionVector = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
       );
-
-      const crossX = Vector3.cross(upVector, lookAt);
-      const crossY = Vector3.cross(lookAt, crossX);
+      const crossX = Vector3.cross(upVector, directionVector);
+      const crossY = Vector3.cross(directionVector, crossX);
 
       const mouseToWorld = Vector3.normalize({
         x: delta.x * crossX.x + delta.y * crossY.x,
@@ -385,10 +384,11 @@ export abstract class InteractionApi<T extends Camera = Camera> {
         z: delta.x * crossX.z + delta.y * crossY.z,
       });
 
-      const rotationAxis = Vector3.cross(mouseToWorld, lookAt);
+      const rotationAxis = Vector3.cross(mouseToWorld, directionVector);
 
-      const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-      const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+      // The 9.5 multiplier was chosen to match the desired rotation speed
+      const epsilonX = (9.5 * delta.x) / viewport.width;
+      const epsilonY = (9.5 * delta.y) / viewport.height;
       const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
       return camera.rotateAroundAxis(angle, rotationAxis);
@@ -425,8 +425,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
 
         const rotationAxis = Vector3.cross(mouseToWorld, vv);
 
-        const epsilonX = (3.0 * Math.PI * delta.x) / viewport.width;
-        const epsilonY = (3.0 * Math.PI * delta.y) / viewport.height;
+        // The 9.5 multiplier was chosen to match the desired rotation speed
+        const epsilonX = (9.5 * delta.x) / viewport.width;
+        const epsilonY = (9.5 * delta.y) / viewport.height;
         const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
 
         const updated = camera.rotateAroundAxisAtPoint(

@@ -1,5 +1,5 @@
 import { EventEmitter } from '@stencil/core';
-import { Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import { BoundingBox, Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
@@ -87,7 +87,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const throttledDelta = Point.scale(delta, 0.5, 0.5);
       const d = Vector3.magnitude(viewVector);
       const epsilonX = (throttledDelta.x * d) / viewport.width;
-      const epsilonY = (throttledDelta.y / viewport.width) * d;
+      const epsilonY = (throttledDelta.y * d) / viewport.height;
 
       const xvec = Vector3.cross(normalizedUpVector, normalizedViewVector);
       const yvec = Vector3.cross(normalizedViewVector, xvec);
@@ -111,7 +111,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
    * @param screenPt A point in screen coordinates.
    */
   public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, frame, viewport }) => {
+    return this.transformCamera(({ camera, frame, viewport, boundingBox }) => {
       // Capture the starting state of the pan.
       if (this.panData == null) {
         const startingCamera = camera.toFrameCamera();
@@ -151,8 +151,12 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
         if (movePt != null) {
           const delta = Vector3.subtract(hitPt, movePt);
+
+          // rotationPoint should match lookAt after a pan interaction
+          const updatedLookAt = Vector3.add(startingCamera.lookAt, delta);
           return camera.update({
-            lookAt: Vector3.add(startingCamera.lookAt, delta),
+            lookAt: updatedLookAt,
+            rotationPoint: updatedLookAt,
           });
         }
       }
@@ -164,61 +168,137 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     point: Point.Point,
     delta: number
   ): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      if (
-        this.orthographicZoomData == null ||
-        Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
-      ) {
-        const frameCam = camera.toFrameCamera();
-        const dir = frameCam.direction;
-        const ray = viewport.transformPointToOrthographicRay(
-          point,
-          frame.image,
-          frameCam
-        );
-
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
-          dir,
-          frameCam.lookAt
-        );
-        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
-        if (fallbackPt == null) {
-          console.warn(
-            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+    return this.transformCamera(
+      ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
+        if (
+          this.orthographicZoomData == null ||
+          Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
+        ) {
+          const frameCam = camera.toFrameCamera();
+          const dir = frameCam.direction;
+          const ray = viewport.transformPointToOrthographicRay(
+            point,
+            frame.image,
+            frameCam
           );
-          return camera;
+
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt
+          );
+          const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+          if (fallbackPt == null) {
+            console.warn(
+              'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+            );
+            return camera;
+          }
+
+          const hitPt =
+            depthBuffer != null
+              ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+              : fallbackPt;
+          const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+          this.orthographicZoomData = {
+            hitPt,
+            hitPlane,
+            startingScreenPt: point,
+          };
         }
 
-        const hitPt =
-          depthBuffer != null
-            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-            : fallbackPt;
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-        this.orthographicZoomData = {
-          hitPt,
-          hitPlane,
-          startingScreenPt: point,
-        };
+        if (this.orthographicZoomData != null) {
+          const { hitPt, hitPlane } = this.orthographicZoomData;
+
+          // The 4 multiplier was chosen to match the desired zoom speed
+          const relativeDelta =
+            4 * (camera.fovHeight / viewport.height) * delta;
+          const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
+          const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
+          const diff = Vector3.scale(
+            (camera.fovHeight - fovHeight) / camera.fovHeight,
+            Vector3.subtract(hitPt, projectedLookAt)
+          );
+
+          // rotationPoint should match lookAt after a zoom interaction
+          const updatedLookAt = Vector3.add(camera.lookAt, diff);
+          return camera.update({
+            lookAt: updatedLookAt,
+            rotationPoint: updatedLookAt,
+            fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
+          });
+        }
+        return camera;
       }
+    );
+  }
 
-      if (this.orthographicZoomData != null) {
-        const { hitPt, hitPlane } = this.orthographicZoomData;
+  /**
+   * Performs a rotate operation of the scene around the camera's look at point,
+   * and requests a new image for the updated scene.
+   *
+   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
+   *  viewer.
+   */
+  public async rotateCamera(delta: Point.Point): Promise<void> {
+    return this.transformCamera(({ camera, viewport, boundingBox }) => {
+      const upVector = Vector3.normalize(camera.up);
+      const directionVector = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
 
-        const relativeDelta =
-          2 * (camera.fovHeight / viewport.height) * delta * 2;
-        const fovHeight = Math.max(1, camera.fovHeight - relativeDelta);
-        const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
-        const diff = Vector3.scale(
-          (camera.fovHeight - fovHeight) / camera.fovHeight,
-          Vector3.subtract(hitPt, projectedLookAt)
-        );
+      const crossX = Vector3.cross(upVector, directionVector);
+      const crossY = Vector3.cross(directionVector, crossX);
 
-        return camera.update({
-          lookAt: Vector3.add(camera.lookAt, diff),
-          fovHeight: Math.max(1, camera.fovHeight - relativeDelta),
-        });
-      }
-      return camera;
+      const mouseToWorld = Vector3.normalize({
+        x: delta.x * crossX.x + delta.y * crossY.x,
+        y: delta.x * crossX.y + delta.y * crossY.y,
+        z: delta.x * crossX.z + delta.y * crossY.z,
+      });
+
+      const rotationAxisDirection = Vector3.cross(
+        mouseToWorld,
+        directionVector
+      );
+
+      // The 9.5 multiplier was chosen to match the desired rotation speed
+      const epsilonX = (9.5 * delta.x) / viewport.width;
+      const epsilonY = (9.5 * delta.y) / viewport.height;
+      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+      const rotationPoint =
+        camera.rotationPoint != null && camera.rotationPoint?.x != null
+          ? camera.rotationPoint
+          : camera.lookAt;
+      const updated = camera.rotateAroundAxisAtPoint(
+        angle,
+        rotationPoint,
+        rotationAxisDirection
+      );
+
+      // Update the lookAt point to take the center of the model into account
+      // This change helps ensure that the lookAt point is consistent between
+      // the SDK and back-end system such that the calculated depth buffer is correct.
+      const updatedCenterPoint = Vector3.subtract(
+        BoundingBox.center(boundingBox),
+        updated.lookAt
+      );
+      const orthogonalOffset = Vector3.dot(
+        updated.viewVector,
+        updatedCenterPoint
+      );
+      const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(
+        updated.viewVector
+      );
+      const offset = orthogonalOffset / viewVectorMagnitudeSquared;
+
+      const scaledViewVector = Vector3.scale(offset, updated.viewVector);
+      const newLookAt = Vector3.add(scaledViewVector, updated.lookAt);
+
+      // Update only the lookAt point. The rotationPoint should remain
+      // constant until a different type of interaction is performed.
+      return updated.update({
+        lookAt: newLookAt,
+      });
     });
   }
 

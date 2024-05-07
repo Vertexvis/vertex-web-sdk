@@ -1338,6 +1338,7 @@ export namespace Components {
      * The local matrix of this element.
      */
     matrix: Matrix4.Matrix4;
+    occluded: boolean;
     /**
      * The pin to draw for the group
      */
@@ -1355,7 +1356,7 @@ export namespace Components {
      */
     projectionViewMatrix: Matrix4.Matrix4;
     /**
-     * Whether or not the pin is "selected"
+     * Whether the pin is "selected"
      */
     selected: boolean;
   }
@@ -2572,6 +2573,12 @@ declare namespace LocalJSX {
      */
     occlusionOff?: boolean;
     /**
+     * Dispatched when the occlusion state is changed.
+     */
+    onOcclusionStateChanged?: (
+      event: VertexViewerDomElementCustomEvent<boolean>
+    ) => void;
+    /**
      * An event that is emitted when any property on the dom group changes
      */
     onPropertyChange?: (event: VertexViewerDomElementCustomEvent<void>) => void;
@@ -3196,6 +3203,7 @@ declare namespace LocalJSX {
      * The local matrix of this element.
      */
     matrix?: Matrix4.Matrix4;
+    occluded?: boolean;
     /**
      * The pin to draw for the group
      */
@@ -3213,7 +3221,7 @@ declare namespace LocalJSX {
      */
     projectionViewMatrix?: Matrix4.Matrix4;
     /**
-     * Whether or not the pin is "selected"
+     * Whether the pin is "selected"
      */
     selected?: boolean;
   }

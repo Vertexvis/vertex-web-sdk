@@ -747,6 +747,7 @@ export class Scene {
           lookAt: scene.camera.lookAt,
           up: scene.camera.up,
           fovHeight: scene.camera.fovHeight,
+          rotationPoint: scene.camera.lookAt,
         },
         this.frame.scene.boundingBox,
         this.decodeFrame
@@ -769,6 +770,12 @@ export class Scene {
         'Cannot retrieve camera. Scene has an unknown or invalid camera type.'
       );
     }
+  }
+
+  public isOrthographic(): boolean {
+    const { scene } = this.frame;
+
+    return scene.camera.isOrthographic();
   }
 
   /**

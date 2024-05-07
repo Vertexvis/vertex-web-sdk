@@ -193,6 +193,12 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public occluded = false;
 
   /**
+   * Dispatched when the occlusion state is changed.
+   */
+  @Event({ bubbles: true })
+  public occlusionStateChanged!: EventEmitter<boolean>;
+
+  /**
    * Disables the billboarding behavior of the element. When billboarding is
    * enabled, the element will always be oriented towards the screen.
    */
@@ -227,6 +233,14 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
     prop: string
   ): boolean {
     return prop === 'occluded';
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('occluded')
+  protected handleOcclusionStateChanged(): void {
+    this.occlusionStateChanged.emit(this.occluded);
   }
 
   private syncProperties(): void {

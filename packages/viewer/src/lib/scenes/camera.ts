@@ -409,7 +409,7 @@ export abstract class Camera {
 
     return this.update({
       up: standardView.up,
-      position: Ray.at(standardViewRay, Vector3.magnitude(this.viewVector)),
+      position: updatedPosition,
       viewVector: Vector3.subtract(this.lookAt, updatedPosition),
     });
   }
@@ -718,8 +718,11 @@ export class OrthographicCamera
    * axis.
    */
   public moveBy(delta: Vector3.Vector3): Camera {
+    // The rotation point should match the lookAt point when panning
+    const updatedPoint = Vector3.add(this.lookAt, delta);
     return this.update({
-      lookAt: Vector3.add(this.lookAt, delta),
+      lookAt: updatedPoint,
+      rotationPoint: updatedPoint,
     });
   }
 
@@ -779,7 +782,8 @@ export class OrthographicCamera
       this.near,
       this.far,
       this.aspectRatio,
-      this.fovHeight
+      this.fovHeight,
+      this.rotationPoint
     );
   }
 
@@ -789,6 +793,20 @@ export class OrthographicCamera
 
   public get position(): Vector3.Vector3 {
     return Vector3.add(this.lookAt, Vector3.negate(this.viewVector));
+  }
+
+  /**
+   * A vector, in world space coordinates, of where the camera should be rotated around.
+   * Most interactions (like pan and zoom) will update lookAt and rotationPoint to be the same point.
+   * However, rotation interactions will only update lookAt and not rotationPoint.
+   */
+  public get rotationPoint(): Vector3.Vector3 | undefined {
+    const rotationPoint = this.orthographicData.rotationPoint;
+    if (rotationPoint != null) {
+      return rotationPoint;
+    } else {
+      return undefined;
+    }
   }
 
   /**

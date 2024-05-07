@@ -20,6 +20,7 @@ export interface OrthographicFrameCamera {
   lookAt: Vector3.Vector3;
   up: Vector3.Vector3;
   fovHeight: number;
+  rotationPoint?: Vector3.Vector3;
 }
 
 export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
@@ -76,6 +77,7 @@ export function createOrthographic(
     lookAt: data.lookAt ?? Vector3.origin(),
     up: data.up ?? Vector3.up(),
     fovHeight: data.fovHeight ?? 1.0,
+    rotationPoint: data.rotationPoint ?? data.lookAt ?? Vector3.origin(),
   };
 }
 
