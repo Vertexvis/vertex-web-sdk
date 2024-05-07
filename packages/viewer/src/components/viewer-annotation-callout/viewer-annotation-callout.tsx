@@ -1,9 +1,4 @@
-import {
-  Component,
-  h,
-  Host,
-  Prop,
-} from '@stencil/core';
+import { Component, h, Host, Prop } from '@stencil/core';
 import classNames from 'classnames';
 
 import { CalloutAnnotationData } from '../../lib/annotations/annotation';
