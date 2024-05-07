@@ -118,7 +118,6 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
    */
   public async panCameraToScreenPoint(screenPt: Point.Point): Promise<void> {
     return this.transformCamera(({ camera, frame, viewport, boundingBox }) => {
-      console.log('panCameraToScreenPoint');
       // Capture the starting state of the pan.
       if (this.panData == null) {
         const startingCamera = camera.toFrameCamera();
@@ -283,6 +282,8 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       );
 
       // Update the lookAt point to take the center of the model into account
+      // This change helps ensure that the lookAt point is consistent between
+      // the SDK and back-end system such that the calculated depth buffer is correct.
       const updatedCenterPoint = Vector3.subtract(
         BoundingSphere.create(boundingBox).center,
         updated.lookAt

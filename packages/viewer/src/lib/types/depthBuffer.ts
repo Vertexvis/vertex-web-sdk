@@ -241,11 +241,6 @@ export class DepthBuffer implements FrameImageLike {
     const allowableDifference = Math.abs(0.02 * distanceToPoint);
     const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
 
-    console.log('distanceToPoint: ' + distanceToPoint);
-    console.log('depthOfClosestGeometry: ' + depthOfClosestGeometry);
-    console.log('allowableDifference: ' + allowableDifference);
-    console.log('depthDifference: ' + depthDifference);
-
     return (
       distanceToPoint > depthOfClosestGeometry &&
       depthDifference > allowableDifference

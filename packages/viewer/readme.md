@@ -226,6 +226,7 @@ See below for the list of components and links to their READMEs:
   - [\<vertex-viewer-default-toolbar>](./src/components/viewer-default-toolbar)
   - [\<vertex-viewer-button>](./src/components/viewer-button)
   - [\<vertex-viewer-box-query-tool>](./src/components/viewer-box-query-tool)
+  - [\<vertex-viewer-annotation-callout>](./src/components/viewer-annotation-callout)
 - [\<vertex-scene-tree>](./src/components/scene-tree)
   - [\<vertex-scene-tree-toolbar>](./src/components/scene-tree-toolbar)
   - [\<vertex-scene-tree-toolbar-group>](./src/components/scene-tree-toolbar-group)

@@ -428,7 +428,8 @@ export class FrameOrthographicCamera
     public readonly near: number,
     public readonly far: number,
     public readonly aspectRatio: number,
-    public readonly fovHeight: number
+    public readonly fovHeight: number,
+    public readonly rotationPoint?: Vector3.Vector3
   ) {
     super(
       Vector3.add(lookAt, Vector3.negate(viewVector)),

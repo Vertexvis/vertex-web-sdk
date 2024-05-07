@@ -150,41 +150,6 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     );
   }
 
-  /**
-   * Performs a rotate operation of the scene around the camera's look at point,
-   * and requests a new image for the updated scene.
-   *
-   * @param delta A position delta `{x, y}` in the 2D coordinate space of the
-   *  viewer.
-   */
-  public async rotateCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, viewport, boundingBox }) => {
-      console.log('rotateCamera for perspective');
-
-      const upVector = Vector3.normalize(camera.up);
-      const directionVector = Vector3.normalize(
-        Vector3.subtract(camera.lookAt, camera.position)
-      );
-      const crossX = Vector3.cross(upVector, directionVector);
-      const crossY = Vector3.cross(directionVector, crossX);
-
-      const mouseToWorld = Vector3.normalize({
-        x: delta.x * crossX.x + delta.y * crossY.x,
-        y: delta.x * crossX.y + delta.y * crossY.y,
-        z: delta.x * crossX.z + delta.y * crossY.z,
-      });
-
-      const rotationAxis = Vector3.cross(mouseToWorld, directionVector);
-
-      // The 9.5 multiplier was chosen to match the desired rotation speed
-      const epsilonX = (9.5 * delta.x) / viewport.width;
-      const epsilonY = (9.5 * delta.y) / viewport.height;
-      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
-
-      return camera.rotateAroundAxis(angle, rotationAxis);
-    });
-  }
-
   public walk(delta: Vector3.Vector3): void {
     this.transformCamera(({ camera, boundingBox }) => {
       const { position, up, lookAt } = camera;

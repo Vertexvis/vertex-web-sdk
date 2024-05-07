@@ -772,7 +772,7 @@ export class Scene {
     }
   }
 
-  public isOrthographic(): Camera {
+  public isOrthographic(): boolean {
     const { scene } = this.frame;
 
     return scene.camera.isOrthographic();

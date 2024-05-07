@@ -259,8 +259,6 @@ export abstract class Camera {
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 
-        this.updateFlyToOptions(undefined);
-
         return new CameraRenderResult(
           this.stream,
           this.decodeFrame,
@@ -802,8 +800,18 @@ export class OrthographicCamera
    * Most interactions (like pan and zoom) will update lookAt and rotationPoint to be the same point.
    * However, rotation interactions will only update lookAt and not rotationPoint.
    */
-  public get rotationPoint(): Vector3.Vector3 {
-    return { ...this.orthographicData.rotationPoint };
+  public get rotationPoint(): Vector3.Vector3 | undefined {
+    const rotationPoint = this.orthographicData.rotationPoint;
+    if (
+      rotationPoint != null &&
+      rotationPoint.x != null &&
+      rotationPoint.y != null &&
+      rotationPoint.z != null
+    ) {
+      return rotationPoint;
+    } else {
+      return undefined;
+    }
   }
 
   /**

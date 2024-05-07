@@ -38,6 +38,9 @@ export class FlyToPositionKeyInteraction
       hitResult.hitItems.hits[0].hitPoint != null
     ) {
       const camera = (await this.sceneProvider()).camera();
+      const boundingSphere = BoundingSphere.create(
+        (await this.sceneProvider()).boundingBox()
+      );
       const hit = hitResult.hitItems.hits[0];
 
       if (
@@ -46,64 +49,32 @@ export class FlyToPositionKeyInteraction
         hit.hitPoint.y != null &&
         hit.hitPoint.z != null
       ) {
-        const newLookAt = Vector3.create(
+        const hitPoint = Vector3.create(
           hit.hitPoint.x,
           hit.hitPoint.y,
           hit.hitPoint.z
         );
+        const newLookAt = await this.getLookAtPoint(
+          hitPoint,
+          camera.viewVector,
+          boundingSphere
+        );
 
-        // Check if orthographic
-        if ((await this.sceneProvider()).isOrthographic()) {
-          // Update the lookAt point to take the center of the model into account
-          const updatedCenterPoint = Vector3.subtract(
-            BoundingSphere.create((await this.sceneProvider()).boundingBox())
-              .center,
-            newLookAt
-          );
-          const orthogonalOffset = Vector3.dot(
-            camera.viewVector,
-            updatedCenterPoint
-          );
-          const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(
-            camera.viewVector
-          );
-          const offset = orthogonalOffset / viewVectorMagnitudeSquared;
-
-          const scaledViewVector = Vector3.scale(offset, camera.viewVector);
-          const updatedLookAt = Vector3.add(scaledViewVector, newLookAt);
-
-          await this.stream.flyTo({
-            camera: FrameCamera.toProtobuf(
-              camera
-                .update({
-                  lookAt: updatedLookAt,
-                  rotationPoint: updatedLookAt,
-                })
-                .toFrameCamera()
+        await this.stream.flyTo({
+          camera: FrameCamera.toProtobuf(
+            camera
+              .update({
+                lookAt: newLookAt,
+                rotationPoint: newLookAt,
+              })
+              .toFrameCamera()
+          ),
+          animation: {
+            duration: toProtoDuration(
+              this.configProvider().animation.durationMs
             ),
-            animation: {
-              duration: toProtoDuration(
-                this.configProvider().animation.durationMs
-              ),
-            },
-          });
-        } else {
-          await this.stream.flyTo({
-            camera: FrameCamera.toProtobuf(
-              camera
-                .update({
-                  lookAt: newLookAt,
-                  rotationPoint: newLookAt,
-                })
-                .toFrameCamera()
-            ),
-            animation: {
-              duration: toProtoDuration(
-                this.configProvider().animation.durationMs
-              ),
-            },
-          });
-        }
+          },
+        });
       } else {
         console.debug(
           `No hit position found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}, hit-id={${hit.itemId?.hex}}]`
@@ -113,6 +84,32 @@ export class FlyToPositionKeyInteraction
       console.debug(
         `No hit results found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}]`
       );
+    }
+  }
+
+  protected async getLookAtPoint(
+    hitPoint: Vector3.Vector3,
+    viewVector: Vector3.Vector3,
+    boundingSphere: BoundingSphere.BoundingSphere
+  ): Promise<Vector3.Vector3> {
+    if ((await this.sceneProvider()).isOrthographic()) {
+      // Update the lookAt point to take the center of the model into account
+      // This change helps ensure that the lookAt point is consistent between
+      // the SDK and back-end system such that the calculated depth buffer is correct.
+
+      const updatedCenterPoint = Vector3.subtract(
+        boundingSphere.center,
+        hitPoint
+      );
+      const orthogonalOffset = Vector3.dot(viewVector, updatedCenterPoint);
+      const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(viewVector);
+      const offset = orthogonalOffset / viewVectorMagnitudeSquared;
+
+      const scaledViewVector = Vector3.scale(offset, viewVector);
+      return Vector3.add(scaledViewVector, hitPoint);
+    } else {
+      // For perspective, just return the hit point
+      return hitPoint;
     }
   }
 }

@@ -133,7 +133,7 @@ describe(FlyToPositionKeyInteraction, () => {
       expect.objectContaining({
         camera: expect.objectContaining({
           orthographic: expect.objectContaining({
-            lookAt: Vector3.create(10, 20, 30),
+            lookAt: Vector3.create(10, 20, 0),
           }),
         }),
       })
