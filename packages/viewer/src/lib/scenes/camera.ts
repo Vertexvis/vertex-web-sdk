@@ -799,8 +799,8 @@ export class OrthographicCamera
 
   /**
    * A vector, in world space coordinates, of where the camera should be rotated around.
-   * Note that rotationPoint and lookAt are typically located at the same point in the viewport (2D),
-   * but can have different world points (3D).
+   * Most interactions (like pan and zoom) will update lookAt and rotationPoint to be the same point.
+   * However, rotation interactions will only update lookAt and not rotationPoint.
    */
   public get rotationPoint(): Vector3.Vector3 {
     return { ...this.orthographicData.rotationPoint };

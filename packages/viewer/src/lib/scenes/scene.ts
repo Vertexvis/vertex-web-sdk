@@ -772,6 +772,12 @@ export class Scene {
     }
   }
 
+  public isOrthographic(): Camera {
+    const { scene } = this.frame;
+
+    return scene.camera.isOrthographic();
+  }
+
   /**
    * Returns the current visible BoundingBox for the scene.
    */
