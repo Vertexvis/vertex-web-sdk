@@ -103,8 +103,7 @@ export class ViewerPinGroup {
   protected async handleOcclusionStateChanged(
     event: CustomEvent<boolean>
   ): Promise<void> {
-    const e = event as CustomEvent<boolean>;
-    this.occluded = e.detail;
+    this.occluded = event.detail;
   }
 
   protected disconnectedCallback(): void {
