@@ -3,9 +3,9 @@ import {
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
+  Listen,
   Prop,
   State,
-  Watch,
 } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
@@ -13,7 +13,6 @@ import { Viewport } from '../..';
 import { PinController } from '../../lib/pins/controller';
 import { isTextPin, Pin, TextPin } from '../../lib/pins/model';
 import { PinModel } from '../../lib/pins/model';
-import { DepthBuffer } from '../../lib/types';
 import { translatePointToScreen } from '../viewer-pin-tool/utils';
 import { PinRenderer } from './pin-renderer';
 import { getClosestCenterToPoint } from './utils';
@@ -75,23 +74,8 @@ export class ViewerPinGroup {
    * @internal
    * Whether the pin is occluded
    */
-  @Prop({ mutable: true })
+  @Prop({ mutable: true, reflect: true })
   public occluded = false;
-
-  /**
-   * The current depth buffer of the frame.
-   *
-   * This property will automatically be set when supplying a viewer to the
-   * component, or when added as a child to `<vertex-viewer>`.
-   */
-  @Prop({ mutable: true })
-  public depthBuffer?: DepthBuffer;
-
-  /**
-   * The viewer synced to this renderer.
-   */
-  @Prop()
-  public viewer?: HTMLVertexViewerElement;
 
   @State()
   private invalidateStateCounter = 0;
@@ -99,13 +83,6 @@ export class ViewerPinGroup {
   private labelEl: HTMLVertexViewerPinLabelElement | undefined;
 
   private resizeObserver?: ResizeObserver;
-
-  /**
-   * @ignore
-   */
-  protected componentWillLoad(): void {
-    this.handleViewerChange(this.viewer, undefined);
-  }
 
   protected componentDidLoad(): void {
     this.setLabelObserver();
@@ -122,27 +99,12 @@ export class ViewerPinGroup {
   /**
    * @ignore
    */
-  @Watch('viewer')
-  protected handleViewerChange(
-    newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
-  ): void {
-    oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('depthBuffer')
-  protected handleDepthBufferChange(): void {
-    if (this.depthBuffer != null && this.pin != null && this.viewer != null) {
-      const isOccluded = this.depthBuffer.isOccluded(
-        this.pin.worldPosition,
-        this.viewer.viewport
-      );
-      this.occluded = isOccluded;
-    }
+  @Listen('occlusionStateChanged')
+  protected async handleOcclusionStateChanged(
+    event: CustomEvent<boolean>
+  ): Promise<void> {
+    const e = event as CustomEvent<boolean>;
+    this.occluded = e.detail;
   }
 
   protected disconnectedCallback(): void {
@@ -282,9 +244,4 @@ export class ViewerPinGroup {
     const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);
   }
-
-  private handleViewerFrameDrawn = async (): Promise<void> => {
-    const { frame } = this.viewer || {};
-    this.depthBuffer = await frame?.depthBuffer();
-  };
 }

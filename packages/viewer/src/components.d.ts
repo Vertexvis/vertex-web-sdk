@@ -1342,12 +1342,6 @@ export namespace Components {
   }
   interface VertexViewerPinGroup {
     /**
-     * The current depth buffer of the frame.
-     *
-     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
      * The dimensions of the canvas for the pins
      */
     elementBounds?: DOMRect;
@@ -1376,10 +1370,6 @@ export namespace Components {
      * Whether the pin is "selected"
      */
     selected: boolean;
-    /**
-     * The viewer synced to this renderer.
-     */
-    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinLabel {
     /**
@@ -2517,9 +2507,9 @@ declare namespace LocalJSX {
     iconSize?: ViewerIconSize;
     occluded?: boolean;
     /**
-     * Dispatched when the callout's occlusion state is changed.
+     * Dispatched when the occlusion state is changed.
      */
-    onOcclusionStateChange?: (
+    onOcclusionStateChanged?: (
       event: VertexViewerAnnotationCalloutCustomEvent<boolean>
     ) => void;
     /**
@@ -2615,6 +2605,12 @@ declare namespace LocalJSX {
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
      */
     occlusionOff?: boolean;
+    /**
+     * Dispatched when the occlusion state is changed.
+     */
+    onOcclusionStateChanged?: (
+      event: VertexViewerDomElementCustomEvent<boolean>
+    ) => void;
     /**
      * An event that is emitted when any property on the dom group changes
      */
@@ -3233,12 +3229,6 @@ declare namespace LocalJSX {
   }
   interface VertexViewerPinGroup {
     /**
-     * The current depth buffer of the frame.
-     *
-     * This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.
-     */
-    depthBuffer?: DepthBuffer;
-    /**
      * The dimensions of the canvas for the pins
      */
     elementBounds?: DOMRect;
@@ -3267,10 +3257,6 @@ declare namespace LocalJSX {
      * Whether the pin is "selected"
      */
     selected?: boolean;
-    /**
-     * The viewer synced to this renderer.
-     */
-    viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinLabel {
     /**

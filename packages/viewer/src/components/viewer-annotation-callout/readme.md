@@ -17,9 +17,9 @@
 
 ## Events
 
-| Event                  | Description                                               | Type                   |
-| ---------------------- | --------------------------------------------------------- | ---------------------- |
-| `occlusionStateChange` | Dispatched when the callout's occlusion state is changed. | `CustomEvent<boolean>` |
+| Event                   | Description                                     | Type                   |
+| ----------------------- | ----------------------------------------------- | ---------------------- |
+| `occlusionStateChanged` | Dispatched when the occlusion state is changed. | `CustomEvent<boolean>` |
 
 
 ## CSS Custom Properties

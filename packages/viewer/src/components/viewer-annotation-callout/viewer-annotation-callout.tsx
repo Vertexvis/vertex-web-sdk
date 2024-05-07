@@ -52,10 +52,10 @@ export class ViewerAnnotationCallout {
   public viewer?: HTMLVertexViewerElement;
 
   /**
-   * Dispatched when the callout's occlusion state is changed.
+   * Dispatched when the occlusion state is changed.
    */
   @Event()
-  public occlusionStateChange!: EventEmitter<boolean>;
+  public occlusionStateChanged!: EventEmitter<boolean>;
 
   /**
    * @ignore
@@ -90,7 +90,7 @@ export class ViewerAnnotationCallout {
       this.occluded = isOccluded;
 
       if (isOccluded !== previousOcclusionState) {
-        this.occlusionStateChange.emit(isOccluded);
+        this.occlusionStateChanged.emit(isOccluded);
       }
     }
   }
@@ -99,9 +99,7 @@ export class ViewerAnnotationCallout {
     return (
       <Host>
         <div
-          class={classNames('content', this.iconSize, {
-            occluded: this.occluded,
-          })}
+          class={classNames('content', this.iconSize)}
           style={{
             borderColor: this.data.accentColor,
             backgroundColor: this.data.primaryColor,

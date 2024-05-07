@@ -213,7 +213,6 @@ export class ViewerPinTool {
                 pinController={this.pinController}
                 projectionViewMatrix={this.projectionViewMatrix}
                 selected={this.selectedPinId === pin.id}
-                viewer={this.viewer}
               ></vertex-viewer-pin-group>
             );
           })}

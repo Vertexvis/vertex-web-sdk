@@ -215,7 +215,8 @@ export class DepthBuffer implements FrameImageLike {
    * @returns `true` if the world point is occluded. `false` otherwise.
    */
   public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const { position, direction, projectionViewMatrix } = this.camera;
+    const { position, direction, projectionViewMatrix, far, near } =
+      this.camera;
 
     // Calculate the distance from the camera to the given world point
     // Use the dot product to find the magnitude of the orthogonal component
@@ -239,7 +240,7 @@ export class DepthBuffer implements FrameImageLike {
     // Allow for a small rounding error
     // Note that if the world point is coincident with the geometry,
     // we want to err on the side of returning not occluded
-    const allowableDifference = Math.abs(0.02 * distanceToPoint);
+    const allowableDifference = Math.abs(0.03 * (far - near));
     const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
 
     return (

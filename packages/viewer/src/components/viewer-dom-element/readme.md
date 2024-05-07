@@ -35,9 +35,10 @@ information.
 
 ## Events
 
-| Event            | Description                                                         | Type                |
-| ---------------- | ------------------------------------------------------------------- | ------------------- |
-| `propertyChange` | An event that is emitted when any property on the dom group changes | `CustomEvent<void>` |
+| Event                   | Description                                                         | Type                   |
+| ----------------------- | ------------------------------------------------------------------- | ---------------------- |
+| `occlusionStateChanged` | Dispatched when the occlusion state is changed.                     | `CustomEvent<boolean>` |
+| `propertyChange`        | An event that is emitted when any property on the dom group changes | `CustomEvent<void>`    |
 
 
 ## Dependencies
