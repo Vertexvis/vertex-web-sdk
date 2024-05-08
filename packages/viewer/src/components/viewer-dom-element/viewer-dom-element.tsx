@@ -199,13 +199,14 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public occlusionStateChanged!: EventEmitter<boolean>;
 
   /**
-   * Disables detached testing for this element. Defaults to enabled. When
+   * **EXPERIMENTAL.**
+   * Disables detached testing for this element. Defaults to disabled. When
    * enabled, the elements position will be tested against the current depth
    * buffer. If the position is detached, then the `detached` attribute will be
    * set.
    */
   @Prop()
-  public detachedOff = false;
+  public detachedOff = true;
 
   /**
    * Indicates if the element is detached from geometry. This property can be used

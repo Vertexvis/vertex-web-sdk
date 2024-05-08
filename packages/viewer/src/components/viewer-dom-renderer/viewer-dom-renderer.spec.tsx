@@ -165,7 +165,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
   });
 
   describe('occlusion', () => {
-    it('unsets occluded attribute if element no occluded', async () => {
+    it('unsets occluded attribute if element not occluded', async () => {
       const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(false);
 
@@ -232,6 +232,81 @@ describe('<vertex-viewer-dom-renderer>', () => {
         'vertex-viewer-dom-element'
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
+    });
+  });
+
+  describe('detached', () => {
+    it('unsets detached attribute if element not detached', async () => {
+      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      isDetached.mockReturnValue(false);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            drawMode="3d"
+            camera={camera}
+            depthBuffer={depthBuffer}
+          >
+            <vertex-viewer-dom-element
+              detachedOff={false}
+            ></vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root?.querySelector(
+        'vertex-viewer-dom-element'
+      ) as HTMLElement;
+      expect(el.getAttribute('detached')).toBeNull();
+    });
+
+    it('sets detached attribute if element is detached', async () => {
+      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      isDetached.mockReturnValue(true);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            drawMode="3d"
+            camera={camera}
+            depthBuffer={depthBuffer}
+          >
+            <vertex-viewer-dom-element
+              detachedOff={false}
+            ></vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root?.querySelector(
+        'vertex-viewer-dom-element'
+      ) as HTMLElement;
+      expect(el.getAttribute('detached')).toBe('');
+    });
+
+    it('does not set detached if element detached is disabled', async () => {
+      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      isDetached.mockReturnValue(true);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            drawMode="3d"
+            camera={camera}
+            depthBuffer={depthBuffer}
+          >
+            <vertex-viewer-dom-element></vertex-viewer-dom-element>
+          </vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root?.querySelector(
+        'vertex-viewer-dom-element'
+      ) as HTMLElement;
+      expect(el.getAttribute('detached')).toBeNull();
     });
   });
 

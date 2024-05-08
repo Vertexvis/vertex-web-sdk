@@ -755,7 +755,7 @@ export namespace Components {
      */
     detached: boolean;
     /**
-     * Disables detached testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     * **EXPERIMENTAL.** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
      */
     detachedOff: boolean;
     /**
@@ -2578,7 +2578,7 @@ declare namespace LocalJSX {
      */
     detached?: boolean;
     /**
-     * Disables detached testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     * **EXPERIMENTAL.** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
      */
     detachedOff?: boolean;
     /**

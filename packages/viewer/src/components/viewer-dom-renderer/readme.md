@@ -208,6 +208,46 @@ attribute.
 </html>
 ```
 
+## Detachment
+The renderer supports determining whether an element is detached from geometry based on the element's position and
+depth information returned on a frame. **Note:** you must opt-in to requesting
+a depth buffer for all frames in order for detached determinations to work.
+
+Detachment testing can be enabled or disabled per element by setting its `detached-off`
+attribute.
+
+**This feature is experimental and is turned off by default.**
+
+**Example:** Styling an element when detached.
+
+```html
+<html>
+  <head>
+    <style>
+      vertex-viewer-dom-element[detached] {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Opt-in to depth buffers for all frames. -->
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" depth-buffers="all">
+      <vertex-viewer-dom-renderer>
+        <!-- This element will be included in detachment testing. -->
+        <vertex-viewer-dom-element position="[0, 0, 100]" detached-off="false">
+          <div class="pin">1</div>
+        </vertex-viewer-dom-element>
+
+        <!-- This element will be exempt from detachment testing. -->
+        <vertex-viewer-dom-element position="[0, 0, -100]">
+          <div class="pin">2</div>
+        </vertex-viewer-dom-element>
+      </vertex-viewer-dom-renderer>
+    </vertex-viewer>
+  </body>
+</html>
+```
+
 <!-- Auto Generated Below -->
 
 

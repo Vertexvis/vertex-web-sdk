@@ -207,20 +207,33 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
-   * Returns `true` if the given point in world space is occluded by any
-   * geometry.
+   * Returns the distance from the camera to the given world point.
    *
-   * @param worldPt A point in world space to check.
-   * @param viewport A viewport of the viewer.
-   * @returns `true` if the world point is occluded. `false` otherwise.
+   * @param worldPt A point in world space to determine the distance to.
+   * @returns distance from the camera to the given world point.
    */
-  public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const { position, direction, projectionViewMatrix } = this.camera;
+  public distanceToPoint(worldPt: Vector3.Vector3): number {
+    const { position, direction } = this.camera;
 
     // Calculate the distance from the camera to the given world point
     // Use the dot product to find the magnitude of the orthogonal component
     const eyeToPoint = Vector3.subtract(worldPt, position);
-    const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
+    return Math.abs(Vector3.dot(eyeToPoint, direction));
+  }
+
+  /**
+   * Returns the depth of the closest geometry at the point in the
+   * viewport (2D) corresponding to the given world point (3D).
+   *
+   * @param worldPt A point in world space to check.
+   * @param viewport A viewport of the viewer.
+   * @returns depth of the closest geometry at the corresponding point in the viewport.
+   */
+  public depthOfClosestGeometry(
+    worldPt: Vector3.Vector3,
+    viewport: Viewport
+  ): number {
+    const { projectionViewMatrix } = this.camera;
 
     // Find the screen point corresponding to the world point for the current camera
     const screenPt = viewport.transformWorldToViewport(
@@ -232,9 +245,28 @@ export class DepthBuffer implements FrameImageLike {
     // Find the depth of the closest geometry at the same point on the screen
     // Use the correct calculation for the camera type
     const isPerspectiveCamera = this.camera.isPerspective();
-    const depthOfClosestGeometry = isPerspectiveCamera
+    return isPerspectiveCamera
       ? this.getLinearDepthAtPoint(scaledPt)
       : this.getOrthographicDepthAtPoint(scaledPt);
+  }
+
+  /**
+   * Returns `true` if the given point in world space is occluded by any
+   * geometry.
+   *
+   * @param worldPt A point in world space to check.
+   * @param viewport A viewport of the viewer.
+   * @returns `true` if the world point is occluded. `false` otherwise.
+   */
+  public isOccluded(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
+    // Calculate the distance from the camera to the given world point
+    const distanceToPoint = this.distanceToPoint(worldPt);
+
+    // Find the depth of the closest geometry at the same point on the screen
+    const depthOfClosestGeometry = this.depthOfClosestGeometry(
+      worldPt,
+      viewport
+    );
 
     // Allow for a small rounding error
     // Note that if the world point is coincident with the geometry,
@@ -256,32 +288,20 @@ export class DepthBuffer implements FrameImageLike {
    * @returns `true` if the world point is detached from geometry. `false` otherwise.
    */
   public isDetached(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
-    const { position, direction, projectionViewMatrix } = this.camera;
-
     // Calculate the distance from the camera to the given world point
-    // Use the dot product to find the magnitude of the orthogonal component
-    const eyeToPoint = Vector3.subtract(worldPt, position);
-    const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
-
-    // Find the screen point corresponding to the world point for the current camera
-    const screenPt = viewport.transformWorldToViewport(
-      worldPt,
-      projectionViewMatrix
-    );
-    const scaledPt = viewport.transformPointToFrame(screenPt, this);
+    const distanceToPoint = this.distanceToPoint(worldPt);
 
     // Find the depth of the closest geometry at the same point on the screen
-    // Use the correct calculation for the camera type
-    const isPerspectiveCamera = this.camera.isPerspective();
-    const depthOfClosestGeometry = isPerspectiveCamera
-      ? this.getLinearDepthAtPoint(scaledPt)
-      : this.getOrthographicDepthAtPoint(scaledPt);
+    const depthOfClosestGeometry = this.depthOfClosestGeometry(
+      worldPt,
+      viewport
+    );
 
     // Allow for a small rounding error
-    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
     const allowableDifferenceToStillBeOnSurface = Math.abs(
       0.02 * distanceToPoint
     );
+    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
     const isDetachedFromGeometry =
       depthDifference > allowableDifferenceToStillBeOnSurface;
 

@@ -148,6 +148,7 @@ export class ViewerPinGroup {
             this.selectPin();
             this.handleAnchorPointerDown();
           }}
+          detachedOff={false}
         >
           <PinRenderer
             pin={this.pin}
