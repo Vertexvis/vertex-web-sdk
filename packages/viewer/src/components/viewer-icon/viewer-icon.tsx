@@ -8,6 +8,7 @@ export type ViewerIconName =
   | 'chevron-down'
   | 'chevron-right'
   | 'close-circle'
+  | 'comment-filled'
   | 'comment-show'
   | 'eye-half'
   | 'eye-half-dotted'
@@ -63,6 +64,10 @@ export class ViewerIcon {
       case 'close-circle':
         return this.renderSvgIcon(
           <path d="M8 1a7 7 0 107 7 7 7 0 00-7-7zm2.85 9.15a.49.49 0 01-.7.7L8 8.71l-2.15 2.14a.49.49 0 01-.7-.7L7.29 8 5.15 5.85a.49.49 0 01.7-.7L8 7.29l2.15-2.14a.49.49 0 01.7.7L8.71 8z" />
+        );
+      case 'comment-filled':
+        return this.renderSvgIcon(
+          <path d="M13.5,2H2.5c-.8,0-1.5.7-1.5,1.5v7c0,.8.7,1.5,1.5,1.5h5.8l2.9,2.9c.1.1.4.2.5.1.2-.1.3-.3.3-.5v-2.5h1.5c.8,0,1.5-.7,1.5-1.5V3.5c0-.8-.7-1.5-1.5-1.5Z" />
         );
       case 'comment-show':
         return this.renderSvgIcon(
