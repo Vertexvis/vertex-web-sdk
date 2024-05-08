@@ -199,6 +199,39 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public occlusionStateChanged!: EventEmitter<boolean>;
 
   /**
+   * Disables detached testing for this element. Defaults to enabled. When
+   * enabled, the elements position will be tested against the current depth
+   * buffer. If the position is detached, then the `detached` attribute will be
+   * set.
+   */
+  @Prop()
+  public detachedOff = false;
+
+  /**
+   * Indicates if the element is detached from geometry. This property can be used
+   * with a CSS selector to modify the appearance of the element when its
+   * detached.
+   *
+   * @example
+   *
+   * ```html
+   * <style>
+   *   vertex-viewer-dom-element[detached] {
+   *     opacity: 0;
+   *   }
+   * </style>
+   * ```
+   */
+  @Prop({ reflect: true })
+  public detached = false;
+
+  /**
+   * Dispatched when the detached state is changed.
+   */
+  @Event({ bubbles: true })
+  public detachedStateChanged!: EventEmitter<boolean>;
+
+  /**
    * Disables the billboarding behavior of the element. When billboarding is
    * enabled, the element will always be oriented towards the screen.
    */
@@ -241,6 +274,14 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('occluded')
   protected handleOcclusionStateChanged(): void {
     this.occlusionStateChanged.emit(this.occluded);
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('detached')
+  protected handleDetachedStateChanged(): void {
+    this.detachedStateChanged.emit(this.detached);
   }
 
   private syncProperties(): void {

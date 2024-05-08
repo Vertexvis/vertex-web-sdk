@@ -73,6 +73,9 @@ function updateElement(
   const occluded =
     !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
   element.occluded = occluded ?? false;
+  const detached =
+    !element.detachedOff && depthBuffer?.isDetached(positionWorld, viewport);
+  element.detached = detached ?? false;
   element.classList.add('ready');
 
   if (element.billboardOff) {

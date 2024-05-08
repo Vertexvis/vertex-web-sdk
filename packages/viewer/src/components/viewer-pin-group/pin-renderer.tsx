@@ -8,12 +8,14 @@ interface PinRendererProps {
   pin?: Pin;
   selected: boolean;
   occluded: boolean;
+  detached: boolean;
 }
 
 export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
   pin,
   selected,
   occluded,
+  detached,
 }) => {
   const { primaryColor } = getPinColors(pin);
 
@@ -24,7 +26,7 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
           id="pin-anchor"
           class={classNames('pin-anchor', {
             selected: selected,
-            'pin-occluded': occluded,
+            'pin-occluded': occluded || detached,
           })}
           style={{
             background: primaryColor,
@@ -38,7 +40,7 @@ export const PinRenderer: FunctionalComponent<PinRendererProps> = ({
           size="lg"
           class={classNames('pin', {
             'pin-selected': selected,
-            'pin-occluded': occluded,
+            'pin-occluded': occluded || detached,
           })}
           style={{
             color: primaryColor,

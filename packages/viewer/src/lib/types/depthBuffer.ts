@@ -247,4 +247,44 @@ export class DepthBuffer implements FrameImageLike {
       depthDifference > allowableDifference
     );
   }
+
+  /**
+   * Returns `true` if the given point in world space is detached from geometry.
+   *
+   * @param worldPt A point in world space to check.
+   * @param viewport A viewport of the viewer.
+   * @returns `true` if the world point is detached from geometry. `false` otherwise.
+   */
+  public isDetached(worldPt: Vector3.Vector3, viewport: Viewport): boolean {
+    const { position, direction, projectionViewMatrix } = this.camera;
+
+    // Calculate the distance from the camera to the given world point
+    // Use the dot product to find the magnitude of the orthogonal component
+    const eyeToPoint = Vector3.subtract(worldPt, position);
+    const distanceToPoint = Math.abs(Vector3.dot(eyeToPoint, direction));
+
+    // Find the screen point corresponding to the world point for the current camera
+    const screenPt = viewport.transformWorldToViewport(
+      worldPt,
+      projectionViewMatrix
+    );
+    const scaledPt = viewport.transformPointToFrame(screenPt, this);
+
+    // Find the depth of the closest geometry at the same point on the screen
+    // Use the correct calculation for the camera type
+    const isPerspectiveCamera = this.camera.isPerspective();
+    const depthOfClosestGeometry = isPerspectiveCamera
+      ? this.getLinearDepthAtPoint(scaledPt)
+      : this.getOrthographicDepthAtPoint(scaledPt);
+
+    // Allow for a small rounding error
+    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
+    const allowableDifferenceToStillBeOnSurface = Math.abs(
+      0.02 * distanceToPoint
+    );
+    const isDetachedFromGeometry =
+      depthDifference > allowableDifferenceToStillBeOnSurface;
+
+    return isDetachedFromGeometry;
+  }
 }
