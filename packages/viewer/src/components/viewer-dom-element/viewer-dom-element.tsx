@@ -199,7 +199,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public occlusionStateChanged!: EventEmitter<boolean>;
 
   /**
-   * **EXPERIMENTAL.**
+   * **EXPERIMENTAL**
    * Disables detached testing for this element. Defaults to disabled. When
    * enabled, the elements position will be tested against the current depth
    * buffer. If the position is detached, then the `detached` attribute will be
@@ -209,6 +209,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public detachedOff = true;
 
   /**
+   * **EXPERIMENTAL**
    * Indicates if the element is detached from geometry. This property can be used
    * with a CSS selector to modify the appearance of the element when its
    * detached.
@@ -227,6 +228,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public detached = false;
 
   /**
+   * **EXPERIMENTAL**
    * Dispatched when the detached state is changed.
    */
   @Event({ bubbles: true })

@@ -743,7 +743,7 @@ export namespace Components {
      */
     billboardOff: boolean;
     /**
-     * Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+     * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
      * @example
      * ```html
      * <style>
@@ -755,7 +755,7 @@ export namespace Components {
      */
     detached: boolean;
     /**
-     * **EXPERIMENTAL.** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
      */
     detachedOff: boolean;
     /**
@@ -2566,7 +2566,7 @@ declare namespace LocalJSX {
      */
     billboardOff?: boolean;
     /**
-     * Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+     * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
      * @example
      * ```html
      * <style>
@@ -2578,7 +2578,7 @@ declare namespace LocalJSX {
      */
     detached?: boolean;
     /**
-     * **EXPERIMENTAL.** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
      */
     detachedOff?: boolean;
     /**
@@ -2606,7 +2606,7 @@ declare namespace LocalJSX {
      */
     occlusionOff?: boolean;
     /**
-     * Dispatched when the detached state is changed.
+     * **EXPERIMENTAL** Dispatched when the detached state is changed.
      */
     onDetachedStateChanged?: (
       event: VertexViewerDomElementCustomEvent<boolean>
