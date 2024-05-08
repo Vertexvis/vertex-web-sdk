@@ -743,6 +743,22 @@ export namespace Components {
      */
     billboardOff: boolean;
     /**
+     * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+     * @example
+     * ```html
+     * <style>
+     *   vertex-viewer-dom-element[detached] {
+     *     opacity: 0;
+     *   }
+     * </style>
+     * ```
+     */
+    detached: boolean;
+    /**
+     * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     */
+    detachedOff: boolean;
+    /**
      * Disables interaction events from children.
      */
     interactionsOff: boolean;
@@ -1330,6 +1346,7 @@ export namespace Components {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinGroup {
+    detached: boolean;
     /**
      * The dimensions of the canvas for the pins
      */
@@ -2549,6 +2566,22 @@ declare namespace LocalJSX {
      */
     billboardOff?: boolean;
     /**
+     * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+     * @example
+     * ```html
+     * <style>
+     *   vertex-viewer-dom-element[detached] {
+     *     opacity: 0;
+     *   }
+     * </style>
+     * ```
+     */
+    detached?: boolean;
+    /**
+     * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
+     */
+    detachedOff?: boolean;
+    /**
      * Disables interaction events from children.
      */
     interactionsOff?: boolean;
@@ -2572,6 +2605,12 @@ declare namespace LocalJSX {
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
      */
     occlusionOff?: boolean;
+    /**
+     * **EXPERIMENTAL** Dispatched when the detached state is changed.
+     */
+    onDetachedStateChanged?: (
+      event: VertexViewerDomElementCustomEvent<boolean>
+    ) => void;
     /**
      * Dispatched when the occlusion state is changed.
      */
@@ -3195,6 +3234,7 @@ declare namespace LocalJSX {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinGroup {
+    detached?: boolean;
     /**
      * The dimensions of the canvas for the pins
      */

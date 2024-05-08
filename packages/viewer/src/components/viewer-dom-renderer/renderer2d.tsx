@@ -34,6 +34,8 @@ export function update2d(
 
     const occluded =
       !element.occlusionOff && depthBuffer?.isOccluded(worldPosition, viewport);
+    const detached =
+      !element.detachedOff && depthBuffer?.isDetached(worldPosition, viewport);
     const screenPt = getScreenPosition(
       worldPosition,
       camera.projectionViewMatrix,
@@ -45,6 +47,7 @@ export function update2d(
     update2d(element, worldMatrix, viewport, camera, depthBuffer);
 
     element.occluded = occluded ?? false;
+    element.detached = detached ?? false;
     element.classList.add('ready');
   }
 }

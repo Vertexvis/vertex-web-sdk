@@ -77,6 +77,13 @@ export class ViewerPinGroup {
   @Prop({ mutable: true, reflect: true })
   public occluded = false;
 
+  /**
+   * @internal
+   * Whether the pin is detached
+   */
+  @Prop({ mutable: true, reflect: true })
+  public detached = false;
+
   @State()
   private invalidateStateCounter = 0;
 
@@ -106,6 +113,16 @@ export class ViewerPinGroup {
     this.occluded = event.detail;
   }
 
+  /**
+   * @ignore
+   */
+  @Listen('detachedStateChanged')
+  protected async handleDetachedStateChanged(
+    event: CustomEvent<boolean>
+  ): Promise<void> {
+    this.detached = event.detail;
+  }
+
   protected disconnectedCallback(): void {
     this.labelEl?.removeEventListener('labelChanged', this.invalidateState);
     this.resizeObserver?.disconnect();
@@ -131,11 +148,13 @@ export class ViewerPinGroup {
             this.selectPin();
             this.handleAnchorPointerDown();
           }}
+          detachedOff={false}
         >
           <PinRenderer
             pin={this.pin}
             selected={this.selected}
             occluded={this.occluded}
+            detached={this.detached}
           />
         </vertex-viewer-dom-element>
 
