@@ -9,7 +9,7 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Disposable, EventDispatcher } from '@vertexvis/utils';
+import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
