@@ -174,7 +174,7 @@ property.
 The renderer supports occluding its elements based on the element's position and
 depth information returned on a frame. If depth buffers are requested for all 
 frames, the occlusion state will be updated on every frame. Conversely, if depth 
-buffers are only requested on final frames, the occlusion state only be calculated
+buffers are only requested on final frames, the occlusion state will only be calculated
 on final frames and will always report occluded on transitional frames.
 
 Occlusion can be enabled or disabled per element by setting its `occlusion-off`
@@ -214,7 +214,7 @@ attribute.
 The renderer supports determining whether an element is detached from geometry based on the element's position and
 depth information returned on a frame. If depth buffers are requested for all
 frames, the detached state will be updated on every frame. Conversely, if depth
-buffers are only requested on final frames, the detached state only be calculated
+buffers are only requested on final frames, the detached state will only be calculated
 on final frames and will always report detached on transitional frames.
 
 Detachment testing can be enabled or disabled per element by setting its `detached-off`
