@@ -70,11 +70,14 @@ function updateElement(
   const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
 
   const positionWorld = Vector3.fromMatrixPosition(worldMatrix);
+  const depthBufferIsNull = depthBuffer == null;
   const occluded =
-    !element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport);
+    depthBufferIsNull ||
+    (!element.occlusionOff && depthBuffer?.isOccluded(positionWorld, viewport));
   element.occluded = occluded ?? false;
   const detached =
-    !element.detachedOff && depthBuffer?.isDetached(positionWorld, viewport);
+    depthBufferIsNull ||
+    (!element.detachedOff && depthBuffer?.isDetached(positionWorld, viewport));
   element.detached = detached ?? false;
   element.classList.add('ready');
 

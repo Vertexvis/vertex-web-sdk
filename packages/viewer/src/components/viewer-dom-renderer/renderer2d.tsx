@@ -32,10 +32,15 @@ export function update2d(
   for (let i = 0; i < elements.length; i++) {
     const { element, worldMatrix, worldPosition } = elements[i];
 
+    const depthBufferIsNull = depthBuffer == null;
     const occluded =
-      !element.occlusionOff && depthBuffer?.isOccluded(worldPosition, viewport);
+      depthBufferIsNull ||
+      (!element.occlusionOff &&
+        depthBuffer?.isOccluded(worldPosition, viewport));
     const detached =
-      !element.detachedOff && depthBuffer?.isDetached(worldPosition, viewport);
+      depthBufferIsNull ||
+      (!element.detachedOff &&
+        depthBuffer?.isDetached(worldPosition, viewport));
     const screenPt = getScreenPosition(
       worldPosition,
       camera.projectionViewMatrix,
