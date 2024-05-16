@@ -342,6 +342,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
                   scene: {
                     camera,
                   },
+                  depthBuffer: jest.fn().mockReturnValue(undefined),
                 },
               } as unknown as HTMLVertexViewerElement
             }
