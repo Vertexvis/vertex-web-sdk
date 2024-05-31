@@ -155,7 +155,7 @@ describe(InteractionApiOrthographic, () => {
       expect(update.mock.calls[1][0].lookAt).toMatchObject({
         x: -1,
         y: 0,
-        z: 0,
+        z: 24.999999999999996,
       });
     });
   });
@@ -189,6 +189,31 @@ describe(InteractionApiOrthographic, () => {
         (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera)
           .fovHeight
       ).toBe(5);
+    });
+  });
+
+  describe(InteractionApiOrthographic.prototype.rotateCamera, () => {
+    it('changes the fovHeight and lookAt of the orthographic camera', async () => {
+      const data = FrameCamera.createOrthographic();
+      const mockOrthographicCamera = new OrthographicCamera(
+        streamApi,
+        1,
+        data,
+        BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 100)),
+        fromPbFrameOrThrow(Orientation.DEFAULT)
+      );
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
+      const update = jest.spyOn(mockOrthographicCamera, 'update');
+
+      await api.beginInteraction();
+      await api.rotateCamera(Point.create(10, 0));
+      await api.endInteraction();
+
+      expect(update.mock.calls[0][0].lookAt?.x).toBeCloseTo(0);
+      expect(update.mock.calls[0][0].lookAt?.y).toBeCloseTo(0);
+      expect(update.mock.calls[0][0].lookAt?.z).toBe(0);
     });
   });
 });
