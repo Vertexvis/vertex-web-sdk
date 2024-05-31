@@ -10,7 +10,10 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
 import { FrameDecoder } from '../mappers';
-import { constrainViewVector } from '../rendering/vectors';
+import {
+  constrainViewVector,
+  updateLookAtRelativeToBoundingBoxCenter,
+} from '../rendering/vectors';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import {
   Animation,
@@ -772,12 +775,17 @@ export class OrthographicCamera
   }
 
   public toFrameCamera(): FrameOrthographicCamera {
-    return new FrameOrthographicCamera(
-      constrainViewVector(
-        this.viewVector,
-        BoundingSphere.create(this.boundingBox)
-      ),
+    const boundingSphere = BoundingSphere.create(this.boundingBox);
+    const viewVector = constrainViewVector(this.viewVector, boundingSphere);
+    const lookAt = updateLookAtRelativeToBoundingBoxCenter(
       this.lookAt,
+      viewVector,
+      boundingSphere.center
+    );
+
+    return new FrameOrthographicCamera(
+      viewVector,
+      lookAt,
       this.up,
       this.near,
       this.far,

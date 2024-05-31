@@ -11,7 +11,10 @@ import {
 import { UUID } from '@vertexvis/utils';
 
 import { decodePng } from '../../workers/png-decoder-pool';
-import { constrainViewVector } from '../rendering/vectors';
+import {
+  constrainViewVector,
+  updateLookAtRelativeToBoundingBoxCenter,
+} from '../rendering/vectors';
 import * as ClippingPlanes from './clippingPlanes';
 import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
@@ -240,12 +243,17 @@ export class FrameCameraBase implements FrameCameraLike {
     );
 
     if (FrameCamera.isOrthographicFrameCamera(camera)) {
-      return new FrameOrthographicCamera(
-        constrainViewVector(
-          camera.viewVector,
-          BoundingSphere.create(boundingBox)
-        ),
+      const boundingSphere = BoundingSphere.create(boundingBox);
+      const viewVector = constrainViewVector(camera.viewVector, boundingSphere);
+      const lookAt = updateLookAtRelativeToBoundingBoxCenter(
         camera.lookAt,
+        viewVector,
+        boundingSphere.center
+      );
+
+      return new FrameOrthographicCamera(
+        viewVector,
+        lookAt,
         camera.up,
         near,
         far,

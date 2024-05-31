@@ -4,6 +4,7 @@ import { StreamApi } from '@vertexvis/stream-api';
 
 import { ReceivedFrame } from '../..';
 import { CursorManager } from '../cursors';
+import { updateLookAtRelativeToBoundingBoxCenter } from '../rendering/vectors';
 import { OrthographicCamera } from '../scenes';
 import { DepthBuffer, Viewport } from '../types';
 import { ZoomData } from './interactionApi';
@@ -278,21 +279,11 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       // Update the lookAt point to take the center of the model into account
       // This change helps ensure that the lookAt point is consistent between
       // the SDK and back-end system such that the calculated depth buffer is correct.
-      const updatedCenterPoint = Vector3.subtract(
-        BoundingBox.center(boundingBox),
-        updated.lookAt
-      );
-      const orthogonalOffset = Vector3.dot(
+      const newLookAt = updateLookAtRelativeToBoundingBoxCenter(
+        updated.lookAt,
         updated.viewVector,
-        updatedCenterPoint
+        BoundingBox.center(boundingBox)
       );
-      const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(
-        updated.viewVector
-      );
-      const offset = orthogonalOffset / viewVectorMagnitudeSquared;
-
-      const scaledViewVector = Vector3.scale(offset, updated.viewVector);
-      const newLookAt = Vector3.add(scaledViewVector, updated.lookAt);
 
       // Update only the lookAt point. The rotationPoint should remain
       // constant until a different type of interaction is performed.
