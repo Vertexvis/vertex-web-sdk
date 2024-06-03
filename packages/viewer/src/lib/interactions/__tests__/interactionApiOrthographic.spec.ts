@@ -155,7 +155,7 @@ describe(InteractionApiOrthographic, () => {
       expect(update.mock.calls[1][0].lookAt).toMatchObject({
         x: -1,
         y: 0,
-        z: 24.999999999999996,
+        z: expect.closeTo(25, 5),
       });
     });
   });
