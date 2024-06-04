@@ -162,9 +162,9 @@ export class FrameScene {
 interface FrameCameraMatrices {
   readonly projectionMatrix: Matrix4.Matrix4;
   readonly projectionMatrixInverse: Matrix4.Matrix4;
-  readonly worldMatrix: Matrix4.Matrix4;
-  readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionViewMatrix: Matrix4.Matrix4;
+  readonly viewMatrix: Matrix4.Matrix4;
+  readonly worldMatrix: Matrix4.Matrix4;
 }
 
 interface FrameCameraLike {
@@ -356,7 +356,7 @@ export interface FrameCameraWithMatrices extends FrameCameraBase {
 
 export class FramePerspectiveCamera
   extends FrameCameraBase
-  implements FrameCameraWithMatrices, FramePerspectiveCameraLike
+  implements FramePerspectiveCameraLike
 {
   public constructor(
     public readonly position: Vector3.Vector3,
@@ -422,7 +422,7 @@ export class FramePerspectiveCamera
 
 export class FrameOrthographicCamera
   extends FrameCameraBase
-  implements FrameCameraWithMatrices, FrameOrthographicCameraLike
+  implements FrameOrthographicCameraLike
 {
   public readonly top: number;
   public readonly bottom: number;

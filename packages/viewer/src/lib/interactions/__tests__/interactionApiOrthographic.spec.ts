@@ -83,11 +83,9 @@ describe(InteractionApiOrthographic, () => {
     () => {
       it('uses an orthographic ray to determine a world point', async () => {
         const depthBuffer = (await frame.depthBuffer()) as DepthBuffer;
-        jest
-          .spyOn(depthBuffer, 'getOrthographicDepthAtPoint')
-          .mockImplementation(() => 0);
+        jest.spyOn(depthBuffer, 'getDepthAtPoint').mockImplementation(() => 0);
 
-        const expectedRay = viewport.transformPointToOrthographicRay(
+        const expectedRay = viewport.transformPointToRay(
           Point.create(1, 1),
           frame.image,
           frame.scene.camera

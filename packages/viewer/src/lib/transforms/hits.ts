@@ -48,13 +48,11 @@ export function testTriangle(
   point: Point.Point
 ): boolean {
   if (points.length === 3) {
-    const ray = frame.scene.camera.isOrthographic()
-      ? viewport.transformPointToOrthographicRay(
-          point,
-          frame.image,
-          frame.scene.camera
-        )
-      : viewport.transformPointToRay(point, frame.image, frame.scene.camera);
+    const ray = viewport.transformPointToRay(
+      point,
+      frame.image,
+      frame.scene.camera
+    );
 
     const edge1 = Vector3.subtract(points[1], points[0]);
     const edge2 = Vector3.subtract(points[2], points[0]);

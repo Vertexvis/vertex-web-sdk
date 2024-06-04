@@ -15,7 +15,7 @@ describe(PointToPointHitTester, () => {
     const viewport = new Viewport(100, 100);
     const depthBuffer = makeDepthBuffer(100, 100, undefined, camera);
     const depth = camera.far - camera.near;
-    const ray = viewport.transformPointToOrthographicRay(
+    const ray = viewport.transformPointToRay(
       Point.create(10, 10),
       depthBuffer,
       camera
