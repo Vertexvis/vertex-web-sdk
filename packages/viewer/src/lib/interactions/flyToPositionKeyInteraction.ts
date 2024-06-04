@@ -2,6 +2,7 @@ import { BoundingBox, Point, Vector3 } from '@vertexvis/geometry';
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 
 import { ConfigProvider } from '../config';
+import { updateLookAtRelativeToBoundingBoxCenter } from '../rendering/vectors';
 import { ImageScaleProvider, Scene } from '../scenes';
 import { FrameCamera } from '../types';
 import { KeyInteraction } from './keyInteraction';
@@ -94,17 +95,11 @@ export class FlyToPositionKeyInteraction
       // Update the lookAt point to take the center of the model into account
       // This change helps ensure that the lookAt point is consistent between
       // the SDK and back-end system such that the calculated depth buffer is correct.
-
-      const updatedCenterPoint = Vector3.subtract(
-        BoundingBox.center(scene.boundingBox()),
-        hitPoint
+      return updateLookAtRelativeToBoundingBoxCenter(
+        hitPoint,
+        viewVector,
+        BoundingBox.center(scene.boundingBox())
       );
-      const orthogonalOffset = Vector3.dot(viewVector, updatedCenterPoint);
-      const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(viewVector);
-      const offset = orthogonalOffset / viewVectorMagnitudeSquared;
-
-      const scaledViewVector = Vector3.scale(offset, viewVector);
-      return Vector3.add(scaledViewVector, hitPoint);
     } else {
       // For perspective, just return the hit point
       return hitPoint;
