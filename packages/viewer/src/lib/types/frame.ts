@@ -162,33 +162,12 @@ export class FrameScene {
 interface FrameCameraMatrices {
   readonly projectionMatrix: Matrix4.Matrix4;
   readonly projectionMatrixInverse: Matrix4.Matrix4;
-  readonly worldMatrix: Matrix4.Matrix4;
-  readonly viewMatrix: Matrix4.Matrix4;
   readonly projectionViewMatrix: Matrix4.Matrix4;
+  readonly viewMatrix: Matrix4.Matrix4;
+  readonly worldMatrix: Matrix4.Matrix4;
 }
 
-interface FrameCameraLike {
-  readonly position: Vector3.Vector3;
-  readonly lookAt: Vector3.Vector3;
-  readonly up: Vector3.Vector3;
-  readonly near: number;
-  readonly far: number;
-  readonly aspectRatio: number;
-}
-
-interface FramePerspectiveCameraLike {
-  readonly fovY: number;
-}
-
-interface FrameOrthographicCameraLike {
-  readonly fovHeight: number;
-  readonly top: number;
-  readonly bottom: number;
-  readonly right: number;
-  readonly left: number;
-}
-
-export class FrameCameraBase implements FrameCameraLike {
+export class FrameCameraBase {
   protected cameraMatrices?: FrameCameraMatrices;
 
   public constructor(
@@ -354,10 +333,7 @@ export interface FrameCameraWithMatrices extends FrameCameraBase {
   readonly projectionViewMatrix: Matrix4.Matrix4;
 }
 
-export class FramePerspectiveCamera
-  extends FrameCameraBase
-  implements FrameCameraWithMatrices, FramePerspectiveCameraLike
-{
+export class FramePerspectiveCamera extends FrameCameraBase {
   public constructor(
     public readonly position: Vector3.Vector3,
     public readonly lookAt: Vector3.Vector3,
@@ -420,10 +396,7 @@ export class FramePerspectiveCamera
   }
 }
 
-export class FrameOrthographicCamera
-  extends FrameCameraBase
-  implements FrameCameraWithMatrices, FrameOrthographicCameraLike
-{
+export class FrameOrthographicCamera extends FrameCameraBase {
   public readonly top: number;
   public readonly bottom: number;
   public readonly right: number;

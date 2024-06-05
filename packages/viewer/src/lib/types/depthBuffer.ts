@@ -2,11 +2,7 @@ import { Point, Ray } from '@vertexvis/geometry';
 import { Vector3 } from '@vertexvis/geometry';
 import type { DecodedPng } from 'fast-png';
 
-import {
-  FrameCameraWithMatrices,
-  FrameImageLike,
-  ImageAttributesLike,
-} from './frame';
+import { FrameCameraBase, FrameImageLike, ImageAttributesLike } from './frame';
 import { Viewport } from './viewport';
 
 /**
@@ -33,7 +29,7 @@ export class DepthBuffer implements FrameImageLike {
    * @param pixels A 16-bit typed array of depth values.
    */
   public constructor(
-    public readonly camera: FrameCameraWithMatrices,
+    public readonly camera: FrameCameraBase,
     public readonly imageAttr: ImageAttributesLike,
     public readonly pixels: Uint16Array
   ) {}
@@ -49,7 +45,7 @@ export class DepthBuffer implements FrameImageLike {
    */
   public static fromPng(
     png: Pick<DecodedPng, 'data'>,
-    camera: FrameCameraWithMatrices,
+    camera: FrameCameraBase,
     imageAttr: ImageAttributesLike
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
@@ -61,48 +57,36 @@ export class DepthBuffer implements FrameImageLike {
 
   /**
    * Computes the depth from a 2D point within the coordinate space of the depth
-   * buffer. The returned depth is a value that's between the near and far plane
-   * of the perspective camera.
+   * buffer.
+   *
+   * For perspective cameras, the returned depth is a value that's between
+   * the near and far planes of the camera.
+
+   * For orthographic cameras, the returned depth is a value that's between
+   * 0 and the distance between the near and far planes of the camera.
    *
    * @param point A 2D point within the viewport.
    * @param fallbackNormalizedDepth A fallback value if the depth is the max
    *   depth value, or cannot be determined.
-   * @returns A depth between the near and far plane.
+   * @returns The depth at the point.
    */
-  public getLinearDepthAtPoint(
+  public getDepthAtPoint(
     point: Point.Point,
     fallbackNormalizedDepth?: number
   ): number {
     const { near, far } = this.camera;
+    const isPerspectiveCamera = this.camera.isPerspective();
+
     const depth = this.getNormalizedDepthAtPoint(
       point,
       fallbackNormalizedDepth
     );
 
-    return depth * (far - near) + near;
-  }
-
-  /**
-   * Computes the depth from a 2D point within the coordinate space of the depth
-   * buffer. The returned depth is a value that's between 0 and the distance between
-   * the near and far planes of the orthographic camera.
-   *
-   * @param point A 2D point within the viewport.
-   * @param fallbackNormalizedDepth A fallback value if the depth is the max
-   *   depth value, or cannot be determined.
-   * @returns A depth between 0 and the distance between the near and far planes.
-   */
-  public getOrthographicDepthAtPoint(
-    point: Point.Point,
-    fallbackNormalizedDepth?: number
-  ): number {
-    const { near, far } = this.camera;
-    const depth = this.getNormalizedDepthAtPoint(
-      point,
-      fallbackNormalizedDepth
-    );
-
-    return depth * (far - near);
+    if (isPerspectiveCamera) {
+      return depth * (far - near) + near;
+    } else {
+      return depth * (far - near);
+    }
   }
 
   /**
@@ -155,7 +139,7 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
-   * Computes a 3D point in perspective world space coordinates from the depth value at the
+   * Computes a 3D point in world space coordinates from the depth value at the
    * given pixel and ray.
    *
    * @param point A pixel to use for reading a depth value.
@@ -169,41 +153,24 @@ export class DepthBuffer implements FrameImageLike {
     ray: Ray.Ray,
     fallbackNormalizedDepth?: number
   ): Vector3.Vector3 {
-    const { position, viewVector: vv, far } = this.camera;
-    const distance = this.getLinearDepthAtPoint(point, fallbackNormalizedDepth);
+    const distance = this.getDepthAtPoint(point, fallbackNormalizedDepth);
 
-    // Compute the world position along the ray at the far plane.
-    // This is used to determine the angle with the view vector.
-    const worldPt = Ray.at(ray, far);
-    const eyeToWorldPt = Vector3.subtract(worldPt, position);
+    const isPerspectiveCamera = this.camera.isPerspective();
+    if (isPerspectiveCamera) {
+      const { position, viewVector: vv, far } = this.camera;
 
-    const angle =
-      Vector3.dot(vv, eyeToWorldPt) /
-      (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
-    return Ray.at(ray, distance / angle);
-  }
+      // Compute the world position along the ray at the far plane.
+      // This is used to determine the angle with the view vector.
+      const worldPt = Ray.at(ray, far);
+      const eyeToWorldPt = Vector3.subtract(worldPt, position);
 
-  /**
-   * Computes a 3D point in orthographic world space coordinates from the depth value at the
-   * given pixel and ray.
-   *
-   * @param point A pixel to use for reading a depth value.
-   * @param ray A ray that specifies the origin and direction.
-   * @param fallbackNormalizedDepth A fallback value if the depth is the max
-   *   depth value, or cannot be determined.
-   * @returns A point in world space coordinates.
-   */
-  public getOrthographicWorldPoint(
-    point: Point.Point,
-    ray: Ray.Ray,
-    fallbackNormalizedDepth?: number
-  ): Vector3.Vector3 {
-    const distance = this.getOrthographicDepthAtPoint(
-      point,
-      fallbackNormalizedDepth
-    );
-
-    return Ray.at(ray, distance);
+      const angle =
+        Vector3.dot(vv, eyeToWorldPt) /
+        (Vector3.magnitude(vv) * Vector3.magnitude(eyeToWorldPt));
+      return Ray.at(ray, distance / angle);
+    } else {
+      return Ray.at(ray, distance);
+    }
   }
 
   /**
@@ -243,11 +210,7 @@ export class DepthBuffer implements FrameImageLike {
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
 
     // Find the depth of the closest geometry at the same point on the screen
-    // Use the correct calculation for the camera type
-    const isPerspectiveCamera = this.camera.isPerspective();
-    return isPerspectiveCamera
-      ? this.getLinearDepthAtPoint(scaledPt)
-      : this.getOrthographicDepthAtPoint(scaledPt);
+    return this.getDepthAtPoint(scaledPt);
   }
 
   /**

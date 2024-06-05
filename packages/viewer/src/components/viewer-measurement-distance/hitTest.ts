@@ -42,16 +42,9 @@ export class PointToPointHitTester {
     const buffer = this.pickDepthBuffer(pt);
 
     if (buffer != null) {
-      return this.camera == null || this.camera.isPerspective()
-        ? this.viewport.transformPointToWorldSpace(pt, buffer)
-        : this.viewport.transformPointToOrthographicWorldSpace(pt, buffer);
+      return this.viewport.transformPointToWorldSpace(pt, buffer);
     } else if (ignoreHitTest) {
-      return this.camera == null || this.camera.isPerspective()
-        ? this.viewport.transformPointToWorldSpace(pt, this.depthBuffer)
-        : this.viewport.transformPointToOrthographicWorldSpace(
-            pt,
-            this.depthBuffer
-          );
+      return this.viewport.transformPointToWorldSpace(pt, this.depthBuffer);
     }
   }
 

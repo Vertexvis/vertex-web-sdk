@@ -44,12 +44,13 @@ export function convertCanvasPointToWorld(
     transform != null ? Vector3.fromMatrixPosition(transform) : undefined;
 
   if (point != null && frame != null && viewport != null && position != null) {
+    const ray = viewport.transformPointToRay(
+      point,
+      frame.image,
+      frame.scene.camera
+    );
+
     if (frame.scene.camera.isOrthographic()) {
-      const ray = viewport.transformPointToOrthographicRay(
-        point,
-        frame.image,
-        frame.scene.camera
-      );
       // Offset the point to past the bounding sphere of the model to
       // adjust the position plane location.
       const offsetPoint = Ray.at(
@@ -68,12 +69,6 @@ export function convertCanvasPointToWorld(
         )
       );
     } else {
-      const ray = viewport.transformPointToRay(
-        point,
-        frame.image,
-        frame.scene.camera
-      );
-
       return Ray.intersectPlane(
         ray,
         Plane.fromNormalAndCoplanarPoint(frame.scene.camera.direction, position)

@@ -3,7 +3,7 @@ import { FunctionalComponent, h } from '@stencil/core';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { DepthBuffer, Viewport } from '../../lib/types';
-import { FrameCameraWithMatrices } from '../../lib/types/frame';
+import { FrameCameraBase } from '../../lib/types/frame';
 import { isVertexViewerDomElement } from '../viewer-dom-element/utils';
 import { isVertexViewerDomGroup } from '../viewer-dom-group/utils';
 
@@ -22,7 +22,7 @@ export function update2d(
   hostEl: HTMLElement,
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
-  camera: FrameCameraWithMatrices,
+  camera: FrameCameraBase,
   depthBuffer: DepthBuffer | undefined
 ): void {
   const elements = getElementDepths(hostEl, parentWorldMatrix, camera).sort(
@@ -60,7 +60,7 @@ export function update2d(
 function getElementDepths(
   element: HTMLElement,
   parentWorldMatrix: Matrix4.Matrix4,
-  camera: FrameCameraWithMatrices
+  camera: FrameCameraBase
 ): ElementData[] {
   const results = [] as ElementData[];
 

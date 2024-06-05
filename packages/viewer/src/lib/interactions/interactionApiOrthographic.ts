@@ -68,7 +68,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
     const depthBuffer = await frame.depthBuffer();
     return depthBuffer != null
-      ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer, 0.5)
+      ? viewport.transformPointToWorldSpace(point, depthBuffer, 0.5)
       : undefined;
   }
 
@@ -118,7 +118,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         const startingCamera = camera.toFrameCamera();
         const direction = startingCamera.direction;
 
-        const ray = viewport.transformPointToOrthographicRay(
+        const ray = viewport.transformPointToRay(
           screenPt,
           frame.image,
           startingCamera
@@ -143,7 +143,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
         // Use a ray that originates at the screen and intersects with the hit
         // plane to determine the move distance.
-        const ray = viewport.transformPointToOrthographicRay(
+        const ray = viewport.transformPointToRay(
           screenPt,
           frame.image,
           startingCamera
@@ -177,7 +177,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         ) {
           const frameCam = camera.toFrameCamera();
           const dir = frameCam.direction;
-          const ray = viewport.transformPointToOrthographicRay(
+          const ray = viewport.transformPointToRay(
             point,
             frame.image,
             frameCam
@@ -302,7 +302,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     const framePt = viewport.transformPointToFrame(point, depthBuffer);
     const hasDepth = depthBuffer.hitTest(framePt);
     return hasDepth
-      ? viewport.transformPointToOrthographicWorldSpace(point, depthBuffer)
+      ? viewport.transformPointToWorldSpace(point, depthBuffer)
       : fallbackPoint;
   }
 }

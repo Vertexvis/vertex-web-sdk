@@ -38,19 +38,44 @@ describe(DepthBuffer, () => {
     makeDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
   );
 
-  describe(DepthBuffer.prototype.getLinearDepthAtPoint, () => {
-    it('returns depth between near and far plane', () => {
-      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(1, 1));
+  function createDepthBufferWithDepth(
+    cameraToConsider: FrameCameraBase,
+    depthValue: number
+  ): {
+    ray: Ray.Ray;
+    depthBuffer: DepthBuffer;
+    pt: Point.Point;
+  } {
+    const depthBuffer = new DepthBuffer(
+      cameraToConsider,
+      {
+        frameDimensions: Dimensions.create(100, 100),
+        imageRect: Rectangle.create(0, 0, 100, 100),
+        imageScale: 1,
+      },
+      makeDepthImageBytes(100, 100, depthValue)
+    );
+
+    const viewport = new Viewport(100, 100);
+    const pt = Point.create(50, 50);
+    const ray = viewport.transformPointToRay(pt, depthBuffer, cameraToConsider);
+
+    return { ray, depthBuffer, pt };
+  }
+
+  describe(DepthBuffer.prototype.getDepthAtPoint, () => {
+    it('returns depth between near and far plane for perspective', () => {
+      const depth = depthBuffer.getDepthAtPoint(Point.create(1, 1));
       expect(depth).toBeCloseTo(camera.near + (camera.far - camera.near) / 2);
     });
 
-    it('returns far plane if point outside viewport', () => {
-      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(-1, -1));
+    it('returns far plane if point outside viewport for perspective', () => {
+      const depth = depthBuffer.getDepthAtPoint(Point.create(-1, -1));
       expect(depth).toBeCloseTo(camera.far);
     });
 
-    it('returns fallback depth', () => {
-      const depth = depthBuffer.getLinearDepthAtPoint(Point.create(-1, -1), 0);
+    it('returns fallback depth for perspective', () => {
+      const depth = depthBuffer.getDepthAtPoint(Point.create(-1, -1), 0);
       expect(depth).toBeCloseTo(camera.near);
     });
   });
@@ -95,7 +120,7 @@ describe(DepthBuffer, () => {
 
   describe(DepthBuffer.prototype.getWorldPoint, () => {
     describe('with perspective camera', () => {
-      const camera = new FramePerspectiveCamera(
+      const perspectiveCamera = new FramePerspectiveCamera(
         { x: 0, y: 0, z: 5 },
         Vector3.origin(),
         Vector3.up(),
@@ -105,36 +130,18 @@ describe(DepthBuffer, () => {
         45
       );
 
-      function createDepthBufferWithDepth(depthValue: number): {
-        ray: Ray.Ray;
-        depthBuffer: DepthBuffer;
-        pt: Point.Point;
-      } {
-        const depthBuffer = new DepthBuffer(
-          camera,
-          {
-            frameDimensions: Dimensions.create(100, 100),
-            imageRect: Rectangle.create(0, 0, 100, 100),
-            imageScale: 1,
-          },
-          makeDepthImageBytes(100, 100, depthValue)
-        );
-
-        const viewport = new Viewport(100, 100);
-        const pt = Point.create(50, 50);
-        const ray = viewport.transformPointToRay(pt, depthBuffer, camera);
-
-        return { ray, depthBuffer, pt };
-      }
-
       it('returns correct world position for near plane', () => {
-        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(0);
+        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          perspectiveCamera,
+          0
+        );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(4);
       });
 
       it('returns correct world position for far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          perspectiveCamera,
           DepthBuffer.MAX_DEPTH_VALUE
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
@@ -143,6 +150,7 @@ describe(DepthBuffer, () => {
 
       it('returns correct world position between near and far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          perspectiveCamera,
           DepthBuffer.MAX_DEPTH_VALUE / 2
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
@@ -151,7 +159,7 @@ describe(DepthBuffer, () => {
     });
 
     describe('with orthographic camera', () => {
-      const camera = new FrameOrthographicCamera(
+      const orthographicCamera = new FrameOrthographicCamera(
         { x: 0, y: 0, z: 100 },
         Vector3.origin(),
         Vector3.up(),
@@ -161,51 +169,30 @@ describe(DepthBuffer, () => {
         1
       );
 
-      function createDepthBufferWithDepth(depthValue: number): {
-        ray: Ray.Ray;
-        depthBuffer: DepthBuffer;
-        pt: Point.Point;
-      } {
-        const depthBuffer = new DepthBuffer(
-          camera,
-          {
-            frameDimensions: Dimensions.create(100, 100),
-            imageRect: Rectangle.create(0, 0, 100, 100),
-            imageScale: 1,
-          },
-          makeDepthImageBytes(100, 100, depthValue)
-        );
-
-        const viewport = new Viewport(100, 100);
-        const pt = Point.create(50, 50);
-        const ray = viewport.transformPointToOrthographicRay(
-          pt,
-          depthBuffer,
-          camera
-        );
-
-        return { ray, depthBuffer, pt };
-      }
-
       it('returns correct world position for near plane', () => {
-        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(0);
-        const pos = depthBuffer.getOrthographicWorldPoint(pt, ray);
+        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          orthographicCamera,
+          0
+        );
+        const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(-100);
       });
 
       it('returns correct world position for far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          orthographicCamera,
           DepthBuffer.MAX_DEPTH_VALUE
         );
-        const pos = depthBuffer.getOrthographicWorldPoint(pt, ray);
+        const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(100);
       });
 
       it('returns correct world position between near and far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          orthographicCamera,
           DepthBuffer.MAX_DEPTH_VALUE / 2
         );
-        const pos = depthBuffer.getOrthographicWorldPoint(pt, ray);
+        const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBeCloseTo(0);
       });
     });
