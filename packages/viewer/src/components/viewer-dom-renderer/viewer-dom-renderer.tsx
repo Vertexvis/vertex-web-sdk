@@ -85,6 +85,9 @@ export class ViewerDomRenderer {
 
     this.handleViewerChange(this.viewer, undefined);
 
+    this.hostEl?.addEventListener('wheel', (e) => {
+      console.log('wheel event in dom renderer: ', e);
+    });
     if (this.viewer?.frame != null) {
       this.handleViewerFrameDrawn();
     }
@@ -134,6 +137,19 @@ export class ViewerDomRenderer {
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
+
+    oldViewer?.getInteractionHandlers().then((handlers) => {
+      handlers.forEach((handler) => {
+        console.log('disposing listeners on old viewer: ', this.hostEl);
+        handler.disposeExternalElement(this.hostEl);
+      });
+    });
+    this.viewer?.getInteractionHandlers().then((handlers) => {
+      handlers.forEach((handler) => {
+        console.log('setting up interaction handlers: ', this.hostEl);
+        handler.initializeExternalElement(this.hostEl);
+      });
+    });
   }
 
   /**
