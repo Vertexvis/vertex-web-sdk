@@ -332,6 +332,8 @@ export class VertexPinLabel {
   private handlePointerDown = (event: PointerEvent): void => {
     if (!this.focused) {
       if (this.elementBounds != null) {
+        event.preventDefault();
+        event.stopPropagation();
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
           this.elementBounds
@@ -352,6 +354,7 @@ export class VertexPinLabel {
     ) {
       // Prevent selection of any text while interacting with the label
       event.preventDefault();
+      event.stopPropagation();
 
       const point = getMouseClientPosition(event, this.elementBounds);
       const relative = translatePointToRelative(point, this.elementBounds);
