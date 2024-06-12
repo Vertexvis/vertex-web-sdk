@@ -16,17 +16,25 @@ import { MultiElementInteractionHandler } from './multiElementInteractionHandler
 export class PointerInteractionHandler extends MultiElementInteractionHandler {
   private touchPoints: Set<number>;
 
-  public constructor(getConfig: ConfigProvider) {
+  public constructor(
+    getConfig: ConfigProvider,
+    rotateInteraction = new RotateInteraction(),
+    rotatePointInteraction = new RotatePointInteraction(),
+    zoomInteraction = new ZoomInteraction(),
+    panInteraction = new PanInteraction(),
+    twistInteraction = new TwistInteraction(),
+    pivotInteraction = new PivotInteraction()
+  ) {
     super(
       'pointerdown',
       'pointerup',
       'pointermove',
-      new RotateInteraction(),
-      new RotatePointInteraction(),
-      new ZoomInteraction(),
-      new PanInteraction(),
-      new TwistInteraction(),
-      new PivotInteraction(),
+      rotateInteraction,
+      rotatePointInteraction,
+      zoomInteraction,
+      panInteraction,
+      twistInteraction,
+      pivotInteraction,
       getConfig
     );
     this.touchPoints = new Set();

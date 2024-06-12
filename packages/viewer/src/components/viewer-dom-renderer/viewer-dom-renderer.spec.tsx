@@ -1,3 +1,16 @@
+const dispose = jest.fn();
+const mockRegisterAdditionalElement = jest.fn().mockReturnValue({ dispose });
+jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
+  const { MultiElementInteractionHandler } = jest.requireActual(
+    '../../lib/interactions/multiElementInteractionHandler'
+  );
+  return {
+    PointerInteractionHandler: class extends MultiElementInteractionHandler {
+      public registerAdditionalElement = mockRegisterAdditionalElement;
+    },
+  };
+});
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
@@ -8,6 +21,8 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 
+import { parseConfig } from '../../lib/config';
+import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
 import { DepthBuffer, FrameCameraBase } from '../../lib/types';
 import { makeDepthImageBytes } from '../../testing/fixtures';
 import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
@@ -331,10 +346,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
         isOrthographic: jest.fn().mockReturnValue(false),
       };
 
+      const getInteractionHandlers = jest.fn();
       const page = await newSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
+            propagateEventsToViewer={false}
             viewer={
               {
                 addEventListener,
@@ -344,6 +361,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
                   },
                   depthBuffer: jest.fn().mockReturnValue(undefined),
                 },
+                getInteractionHandlers,
               } as unknown as HTMLVertexViewerElement
             }
           ></vertex-viewer-dom-renderer>
@@ -357,6 +375,40 @@ describe('<vertex-viewer-dom-renderer>', () => {
         expect.any(Function)
       );
       expect(el.camera).toMatchObject(camera);
+
+      expect(getInteractionHandlers).not.toHaveBeenCalled();
+    });
+
+    it('will register itself with any multielement interaction handlers', async () => {
+      const getInteractionHandlers = jest
+        .fn()
+        .mockResolvedValue([
+          new PointerInteractionHandler(() => parseConfig('platdev')),
+        ]);
+
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            viewer={
+              {
+                addEventListener,
+                frame: {
+                  scene: {},
+                  depthBuffer: jest.fn().mockReturnValue(undefined),
+                },
+                getInteractionHandlers,
+              } as unknown as HTMLVertexViewerElement
+            }
+          ></vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerDomRendererElement;
+
+      expect(getInteractionHandlers).toHaveBeenCalled();
+
+      expect(mockRegisterAdditionalElement).toHaveBeenCalledWith(el);
     });
   });
 });
