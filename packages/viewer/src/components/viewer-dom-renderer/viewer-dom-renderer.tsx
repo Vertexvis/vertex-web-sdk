@@ -100,9 +100,6 @@ export class ViewerDomRenderer {
 
     this.handleViewerChange(this.viewer, undefined);
 
-    this.hostEl?.addEventListener('wheel', (e) => {
-      console.log('wheel event in dom renderer: ', e);
-    });
     if (this.viewer?.frame != null) {
       this.handleViewerFrameDrawn();
     }
@@ -177,7 +174,7 @@ export class ViewerDomRenderer {
    */
   private handleEventPropagationToViewer(
     newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
+    _: HTMLVertexViewerElement | undefined
   ): void {
     this.interactionDisposables.forEach((disposable) => {
       disposable.dispose();

@@ -145,8 +145,6 @@ export class ViewerPinGroup {
               e.stopPropagation();
             }
 
-            console.log('e.buttons: ', e.buttons);
-
             this.selectPin();
             this.handleAnchorPointerDown();
           }}
