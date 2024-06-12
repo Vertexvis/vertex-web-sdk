@@ -1,7 +1,7 @@
 import { Point } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
 import { ConfigProvider } from '../config';
-import { BaseInteractionHandler } from './baseInteractionHandler';
 import { InteractionApi } from './interactionApi';
 import {
   PanInteraction,
@@ -11,8 +11,9 @@ import {
   TwistInteraction,
   ZoomInteraction,
 } from './mouseInteractions';
+import { MultiElementInteractionHandler } from './multiElementInteractionHandler';
 
-export class PointerInteractionHandler extends BaseInteractionHandler {
+export class PointerInteractionHandler extends MultiElementInteractionHandler {
   private touchPoints: Set<number>;
 
   public constructor(getConfig: ConfigProvider) {
@@ -37,6 +38,20 @@ export class PointerInteractionHandler extends BaseInteractionHandler {
     super.initialize(element, api);
 
     element.addEventListener('pointerdown', this.handlePointerDown);
+  }
+
+  public addEventListenersToElement(element: HTMLElement): Disposable {
+    element.addEventListener(this.downEvent, this.handleDownEvent);
+    element.addEventListener('wheel', this.handleMouseWheel, {
+      passive: false,
+    });
+
+    return {
+      dispose: () => {
+        element.removeEventListener(this.downEvent, this.handleDownEvent);
+        element.removeEventListener('wheel', this.handleMouseWheel);
+      },
+    };
   }
 
   private handlePointerDown(event: PointerEvent): void {

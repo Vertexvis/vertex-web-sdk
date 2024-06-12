@@ -25,6 +25,14 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
     element.addEventListener('touchstart', this.handleTouchStart);
   }
 
+  public addEventListenersToElement(element: HTMLElement): void {
+    element.addEventListener('touchstart', this.handleTouchStart);
+  }
+
+  public disposeListenersOnElement(element?: HTMLElement): void {
+    element?.removeEventListener('touchstart', this.handleTouchStart);
+  }
+
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length >= 1) {
       event.preventDefault();

@@ -46,8 +46,4 @@ export interface InteractionHandler extends Disposable {
    * @param api The API to modify internal interaction state.
    */
   initialize(element: HTMLElement, api: InteractionApi): void;
-
-  initializeExternalElement(element: HTMLElement): void;
-
-  disposeExternalElement(element: HTMLElement): void;
 }

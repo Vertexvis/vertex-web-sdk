@@ -9,7 +9,9 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
+import { MultiElementInteractionHandler } from '../../lib/interactions/multiElementInteractionHandler';
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FrameCameraBase } from '../../lib/types/frame';
 import { Renderer2d, update2d } from './renderer2d';
@@ -38,6 +40,16 @@ export class ViewerDomRenderer {
    */
   @Prop()
   public drawMode: ViewerDomRendererDrawMode = '3d';
+
+  /**
+   * Specifies whether or not to propogate events to the viewers' interaction handlers
+   *
+   * When `true` any viewer change will result in registering the host element of the dom
+   * renderer as a listenable element to the viewers interaction handlers.
+   * When false, no events will propogate to the viewer.
+   */
+  @Prop()
+  public propagateEventsToViewer = true;
 
   /**
    * The viewer synced to this renderer. This property will automatically be
@@ -69,6 +81,9 @@ export class ViewerDomRenderer {
 
   @State()
   private invalidateFrameCounter = 0;
+
+  @State()
+  private interactionDisposables: Disposable[] = [];
 
   @Element()
   private hostEl!: HTMLElement;
@@ -138,18 +153,9 @@ export class ViewerDomRenderer {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
 
-    oldViewer?.getInteractionHandlers().then((handlers) => {
-      handlers.forEach((handler) => {
-        console.log('disposing listeners on old viewer: ', this.hostEl);
-        handler.disposeExternalElement(this.hostEl);
-      });
-    });
-    this.viewer?.getInteractionHandlers().then((handlers) => {
-      handlers.forEach((handler) => {
-        console.log('setting up interaction handlers: ', this.hostEl);
-        handler.initializeExternalElement(this.hostEl);
-      });
-    });
+    if (this.propagateEventsToViewer) {
+      this.handleEventPropagationToViewer(newViewer, oldViewer);
+    }
   }
 
   /**
@@ -162,6 +168,39 @@ export class ViewerDomRenderer {
 
   private invalidateFrame(): void {
     this.invalidateFrameCounter = this.invalidateFrameCounter + 1;
+  }
+
+  /**
+   * disposes handlers on the old viewer, and registers new handlers on the newly provided viewer.
+   * @param newViewer
+   * @param oldViewer
+   */
+  private handleEventPropagationToViewer(
+    newViewer: HTMLVertexViewerElement | undefined,
+    oldViewer: HTMLVertexViewerElement | undefined
+  ): void {
+    this.interactionDisposables.forEach((disposable) => {
+      disposable.dispose();
+    });
+
+    this.interactionDisposables = [];
+
+    newViewer?.getInteractionHandlers().then((handlers) => {
+      handlers.forEach((handler) => {
+        if (handler instanceof MultiElementInteractionHandler) {
+          try {
+            const disposable = handler.registerAdditionalElement(this.hostEl);
+
+            this.interactionDisposables = [
+              ...this.interactionDisposables,
+              disposable,
+            ];
+          } catch (e) {
+            throw e;
+          }
+        }
+      });
+    });
   }
 
   private async updateElements(): Promise<void> {

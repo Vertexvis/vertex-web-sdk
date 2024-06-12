@@ -70,23 +70,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   public initialize(element: HTMLElement, api: InteractionApi): void {
     this.element = element;
     this.interactionApi = api;
-
-    this.addEventListenersToElement(this.element);
-  }
-
-  public initializeExternalElement(external: HTMLElement): void {
-    this.addEventListenersToElement(external);
-  }
-
-  public disposeExternalElement(external: HTMLElement): void {
-    this.disposeListenersOnElement(external);
-  }
-
-  public dispose(): void {
-    this.disposeListenersOnElement(this.element);
-  }
-
-  private addEventListenersToElement(element: HTMLElement): void {
     element.addEventListener(this.downEvent, this.handleDownEvent);
     element.addEventListener('mousedown', this.handleDoubleClick);
     element.addEventListener('wheel', this.handleMouseWheel, {
@@ -94,7 +77,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     });
   }
 
-  private disposeListenersOnElement(element?: HTMLElement): void {
+  public dispose(): void {
     this.element?.removeEventListener(this.downEvent, this.handleDownEvent);
     this.element?.removeEventListener('mousedown', this.handleDoubleClick);
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
@@ -320,12 +303,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected handleMouseWheel(event: WheelEvent): void {
     event.preventDefault();
 
-    console.log(
-      `Wheel Event In VIEWER: `,
-      event,
-      this.element,
-      this.interactionApi
-    );
     if (
       this.element != null &&
       this.interactionApi != null &&
@@ -333,11 +310,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     ) {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
-
-      console.log('Delta here: ', delta);
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
-      console.log('rect, point: ', rect, point);
+
       SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
         window.setTimeout(() => {
           if (this.interactionApi != null) {

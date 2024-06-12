@@ -873,6 +873,12 @@ export namespace Components {
      */
     drawMode: ViewerDomRendererDrawMode;
     /**
+     * Specifies whether or not to propogate events to the viewers' interaction handlers
+     *
+     * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
+     */
+    propagateEventsToViewer: boolean;
+    /**
      * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
      */
     viewer?: HTMLVertexViewerElement;
@@ -2715,6 +2721,12 @@ declare namespace LocalJSX {
      * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */
     drawMode?: ViewerDomRendererDrawMode;
+    /**
+     * Specifies whether or not to propogate events to the viewers' interaction handlers
+     *
+     * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
+     */
+    propagateEventsToViewer?: boolean;
     /**
      * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
      */
