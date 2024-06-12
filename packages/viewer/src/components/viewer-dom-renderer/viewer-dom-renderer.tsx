@@ -188,16 +188,12 @@ export class ViewerDomRenderer {
     newViewer?.getInteractionHandlers().then((handlers) => {
       handlers.forEach((handler) => {
         if (handler instanceof MultiElementInteractionHandler) {
-          try {
-            const disposable = handler.registerAdditionalElement(this.hostEl);
+          const disposable = handler.registerAdditionalElement(this.hostEl);
 
-            this.interactionDisposables = [
-              ...this.interactionDisposables,
-              disposable,
-            ];
-          } catch (e) {
-            throw e;
-          }
+          this.interactionDisposables = [
+            ...this.interactionDisposables,
+            disposable,
+          ];
         }
       });
     });
