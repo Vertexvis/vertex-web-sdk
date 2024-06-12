@@ -1,12 +1,13 @@
 const dispose = jest.fn();
-const mockRegisterAdditionalElement = jest.fn().mockReturnValue({ dispose });
+const mockRegisterAdditionalElement = jest.fn();
 jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
   const { MultiElementInteractionHandler } = jest.requireActual(
     '../../lib/interactions/multiElementInteractionHandler'
   );
   return {
     PointerInteractionHandler: class extends MultiElementInteractionHandler {
-      public registerAdditionalElement = mockRegisterAdditionalElement;
+      public registerAdditionalElement =
+        mockRegisterAdditionalElement.mockReturnValue({ dispose });
     },
   };
 });
@@ -409,6 +410,43 @@ describe('<vertex-viewer-dom-renderer>', () => {
       expect(getInteractionHandlers).toHaveBeenCalled();
 
       expect(mockRegisterAdditionalElement).toHaveBeenCalledWith(el);
+    });
+
+    it('dispose any handlers on the old viewer', async () => {
+      const getInteractionHandlers = jest
+        .fn()
+        .mockResolvedValue([
+          new PointerInteractionHandler(() => parseConfig('platdev')),
+        ]);
+
+      const viewer = {
+        addEventListener,
+        removeEventListener: jest.fn(),
+        frame: {
+          scene: {},
+          depthBuffer: jest.fn().mockReturnValue(undefined),
+        },
+        getInteractionHandlers,
+      } as unknown as HTMLVertexViewerElement;
+      const page = await newSpecPage({
+        components: [ViewerDomRenderer, ViewerDomElement],
+        template: () => (
+          <vertex-viewer-dom-renderer
+            viewer={{ ...viewer }}
+          ></vertex-viewer-dom-renderer>
+        ),
+      });
+
+      const el = page.root as HTMLVertexViewerDomRendererElement;
+
+      expect(getInteractionHandlers).toHaveBeenCalled();
+
+      expect(mockRegisterAdditionalElement).toHaveBeenCalledWith(el);
+
+      el.viewer = { ...viewer };
+      await page.waitForChanges();
+
+      expect(dispose).toHaveBeenCalledTimes(1);
     });
   });
 });
