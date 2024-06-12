@@ -141,6 +141,10 @@ export class ViewerPinGroup {
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
           onPointerDown={(e) => {
+            if (this.pinController?.getToolMode() === 'edit') {
+              e.stopPropagation();
+            }
+
             this.selectPin();
             this.handleAnchorPointerDown();
           }}
