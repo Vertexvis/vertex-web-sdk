@@ -141,10 +141,6 @@ export class ViewerPinGroup {
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
           onPointerDown={(e) => {
-            if (e.buttons !== 2) {
-              e.stopPropagation();
-            }
-
             this.selectPin();
             this.handleAnchorPointerDown();
           }}
