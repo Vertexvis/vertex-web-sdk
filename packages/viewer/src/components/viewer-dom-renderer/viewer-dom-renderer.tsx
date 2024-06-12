@@ -150,8 +150,8 @@ export class ViewerDomRenderer {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
 
-    if (this.propagateEventsToViewer) {
-      this.handleEventPropagationToViewer(newViewer, oldViewer);
+    if (this.propagateEventsToViewer && newViewer != null) {
+      this.handleEventPropagationToViewer(newViewer);
     }
   }
 
@@ -168,13 +168,11 @@ export class ViewerDomRenderer {
   }
 
   /**
-   * disposes handlers on the old viewer, and registers new handlers on the newly provided viewer.
+   * disposes any existing disposables, and registers new handlers on the newly provided viewer.
    * @param newViewer
-   * @param oldViewer
    */
   private handleEventPropagationToViewer(
-    newViewer: HTMLVertexViewerElement | undefined,
-    _: HTMLVertexViewerElement | undefined
+    newViewer: HTMLVertexViewerElement
   ): void {
     this.interactionDisposables.forEach((disposable) => {
       disposable.dispose();
@@ -182,7 +180,7 @@ export class ViewerDomRenderer {
 
     this.interactionDisposables = [];
 
-    newViewer?.getInteractionHandlers().then((handlers) => {
+    newViewer.getInteractionHandlers().then((handlers) => {
       handlers.forEach((handler) => {
         if (handler instanceof MultiElementInteractionHandler) {
           const disposable = handler.registerAdditionalElement(this.hostEl);
