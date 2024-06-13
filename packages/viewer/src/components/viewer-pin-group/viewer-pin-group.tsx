@@ -140,11 +140,8 @@ export class ViewerPinGroup {
         <vertex-viewer-dom-element
           data-testid={`drawn-pin-${this.pin.id}`}
           position={this.pin.worldPosition}
-          onPointerDown={(e) => {
-            if (e.buttons !== 2) {
-              e.stopPropagation();
-            }
-
+          onPointerDown={async () => {
+            await this.labelEl?.submit();
             this.selectPin();
             this.handleAnchorPointerDown();
           }}

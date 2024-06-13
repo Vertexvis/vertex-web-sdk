@@ -121,6 +121,25 @@ export class VertexPinLabel {
     }
   }
 
+  /**
+   * @internal
+   * submits the current text, unfocuses the input and emits the blur event to consumers
+   */
+  @Method()
+  public async submit(): Promise<void> {
+    this.focused = false;
+    this.labelBlurred.emit(this.pin?.id);
+    if (this.pin != null) {
+      this.pinController?.updatePin({
+        ...this.pin,
+        label: {
+          point: this.pin.label.point,
+          text: this.value,
+        },
+      });
+    }
+  }
+
   @Watch('focused')
   protected watchFocusChange(): void {
     this.labelChanged.emit();
@@ -332,6 +351,8 @@ export class VertexPinLabel {
   private handlePointerDown = (event: PointerEvent): void => {
     if (!this.focused) {
       if (this.elementBounds != null) {
+        event.preventDefault();
+        event.stopPropagation();
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
           this.elementBounds
@@ -352,6 +373,7 @@ export class VertexPinLabel {
     ) {
       // Prevent selection of any text while interacting with the label
       event.preventDefault();
+      event.stopPropagation();
 
       const point = getMouseClientPosition(event, this.elementBounds);
       const relative = translatePointToRelative(point, this.elementBounds);
@@ -410,20 +432,6 @@ export class VertexPinLabel {
   private handleTextBlur = (): void => {
     this.submit();
   };
-
-  private submit(): void {
-    this.focused = false;
-    this.labelBlurred.emit(this.pin?.id);
-    if (this.pin != null) {
-      this.pinController?.updatePin({
-        ...this.pin,
-        label: {
-          point: this.pin.label.point,
-          text: this.value,
-        },
-      });
-    }
-  }
 
   private handleTextInput = (event: Event): void => {
     const input = event.target as HTMLInputElement;

@@ -9,7 +9,9 @@ import {
   Watch,
 } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 
+import { MultiElementInteractionHandler } from '../../lib/interactions/multiElementInteractionHandler';
 import { DepthBuffer, Viewport } from '../../lib/types';
 import { FrameCameraBase } from '../../lib/types/frame';
 import { Renderer2d, update2d } from './renderer2d';
@@ -38,6 +40,18 @@ export class ViewerDomRenderer {
    */
   @Prop()
   public drawMode: ViewerDomRendererDrawMode = '3d';
+
+  /**
+   * Specifies whether to propagate events to the viewer's interaction handlers
+   *
+   * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target
+   * for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+   *
+   * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target
+   * for the viewer.
+   */
+  @Prop()
+  public propagateEventsToViewer = true;
 
   /**
    * The viewer synced to this renderer. This property will automatically be
@@ -69,6 +83,9 @@ export class ViewerDomRenderer {
 
   @State()
   private invalidateFrameCounter = 0;
+
+  @State()
+  private interactionDisposables: Disposable[] = [];
 
   @Element()
   private hostEl!: HTMLElement;
@@ -134,6 +151,10 @@ export class ViewerDomRenderer {
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
+
+    if (this.propagateEventsToViewer && newViewer != null) {
+      this.handleEventPropagationToViewer(newViewer);
+    }
   }
 
   /**
@@ -146,6 +167,33 @@ export class ViewerDomRenderer {
 
   private invalidateFrame(): void {
     this.invalidateFrameCounter = this.invalidateFrameCounter + 1;
+  }
+
+  /**
+   * disposes any existing disposables, and registers new handlers on the newly provided viewer.
+   * @param newViewer
+   */
+  private handleEventPropagationToViewer(
+    newViewer: HTMLVertexViewerElement
+  ): void {
+    this.interactionDisposables.forEach((disposable) => {
+      disposable.dispose();
+    });
+
+    this.interactionDisposables = [];
+
+    newViewer.getInteractionHandlers().then((handlers) => {
+      handlers.forEach((handler) => {
+        if (handler instanceof MultiElementInteractionHandler) {
+          const disposable = handler.registerAdditionalElement(this.hostEl);
+
+          this.interactionDisposables = [
+            ...this.interactionDisposables,
+            disposable,
+          ];
+        }
+      });
+    });
   }
 
   private async updateElements(): Promise<void> {

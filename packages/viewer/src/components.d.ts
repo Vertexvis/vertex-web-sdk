@@ -873,6 +873,14 @@ export namespace Components {
      */
     drawMode: ViewerDomRendererDrawMode;
     /**
+     * Specifies whether to propagate events to the viewer's interaction handlers
+     *
+     * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+     *
+     * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
+     */
+    propagateEventsToViewer: boolean;
+    /**
      * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
      */
     viewer?: HTMLVertexViewerElement;
@@ -1394,6 +1402,7 @@ export namespace Components {
      * Gives focus to the the component's internal text input.
      */
     setFocus: () => Promise<void>;
+    submit: () => Promise<void>;
     /**
      * The current text value of the component. Value is updated on user interaction.
      */
@@ -2715,6 +2724,14 @@ declare namespace LocalJSX {
      * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
      */
     drawMode?: ViewerDomRendererDrawMode;
+    /**
+     * Specifies whether to propagate events to the viewer's interaction handlers
+     *
+     * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+     *
+     * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
+     */
+    propagateEventsToViewer?: boolean;
     /**
      * The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.
      */
