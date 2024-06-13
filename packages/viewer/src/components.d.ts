@@ -1401,6 +1401,10 @@ export namespace Components {
      */
     setFocus: () => Promise<void>;
     /**
+     * submits the current text, unfocuses the input and emits the blur event to consumers
+     */
+    submit: () => Promise<void>;
+    /**
      * The current text value of the component. Value is updated on user interaction.
      */
     value: string;

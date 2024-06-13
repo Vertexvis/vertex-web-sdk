@@ -121,6 +121,24 @@ export class VertexPinLabel {
     }
   }
 
+  /**
+   * submits the current text, unfocuses the input and emits the blur event to consumers
+   */
+  @Method()
+  public async submit(): Promise<void> {
+    this.focused = false;
+    this.labelBlurred.emit(this.pin?.id);
+    if (this.pin != null) {
+      this.pinController?.updatePin({
+        ...this.pin,
+        label: {
+          point: this.pin.label.point,
+          text: this.value,
+        },
+      });
+    }
+  }
+
   @Watch('focused')
   protected watchFocusChange(): void {
     this.labelChanged.emit();
@@ -413,20 +431,6 @@ export class VertexPinLabel {
   private handleTextBlur = (): void => {
     this.submit();
   };
-
-  private submit(): void {
-    this.focused = false;
-    this.labelBlurred.emit(this.pin?.id);
-    if (this.pin != null) {
-      this.pinController?.updatePin({
-        ...this.pin,
-        label: {
-          point: this.pin.label.point,
-          text: this.value,
-        },
-      });
-    }
-  }
 
   private handleTextInput = (event: Event): void => {
     const input = event.target as HTMLInputElement;

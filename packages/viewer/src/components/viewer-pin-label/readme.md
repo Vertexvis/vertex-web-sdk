@@ -35,6 +35,16 @@ Type: `Promise<void>`
 
 
 
+### `submit() => Promise<void>`
+
+submits the current text, unfocuses the input and emits the blur event to consumers
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 
 ## CSS Custom Properties
 
