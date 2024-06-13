@@ -873,7 +873,7 @@ export namespace Components {
      */
     drawMode: ViewerDomRendererDrawMode;
     /**
-     * Specifies whether or not to propogate events to the viewers' interaction handlers
+     * Specifies whether to propagate events to the viewer's interaction handlers
      *
      * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
      */
@@ -2726,7 +2726,7 @@ declare namespace LocalJSX {
      */
     drawMode?: ViewerDomRendererDrawMode;
     /**
-     * Specifies whether or not to propogate events to the viewers' interaction handlers
+     * Specifies whether to propagate events to the viewer's interaction handlers
      *
      * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
      */
