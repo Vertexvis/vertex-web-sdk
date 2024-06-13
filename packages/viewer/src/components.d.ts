@@ -875,7 +875,9 @@ export namespace Components {
     /**
      * Specifies whether to propagate events to the viewer's interaction handlers
      *
-     * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
+     * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+     *
+     * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
      */
     propagateEventsToViewer: boolean;
     /**
@@ -1400,9 +1402,6 @@ export namespace Components {
      * Gives focus to the the component's internal text input.
      */
     setFocus: () => Promise<void>;
-    /**
-     * submits the current text, unfocuses the input and emits the blur event to consumers
-     */
     submit: () => Promise<void>;
     /**
      * The current text value of the component. Value is updated on user interaction.
@@ -2728,7 +2727,9 @@ declare namespace LocalJSX {
     /**
      * Specifies whether to propagate events to the viewer's interaction handlers
      *
-     * When `true` any viewer change will result in registering the host element of the dom renderer as a listenable element to the viewers interaction handlers. When false, no events will propogate to the viewer.
+     * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+     *
+     * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
      */
     propagateEventsToViewer?: boolean;
     /**

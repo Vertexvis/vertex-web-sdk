@@ -122,6 +122,7 @@ export class VertexPinLabel {
   }
 
   /**
+   * @internal
    * submits the current text, unfocuses the input and emits the blur event to consumers
    */
   @Method()

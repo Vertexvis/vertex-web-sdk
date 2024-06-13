@@ -44,9 +44,11 @@ export class ViewerDomRenderer {
   /**
    * Specifies whether to propagate events to the viewer's interaction handlers
    *
-   * When `true` any viewer change will result in registering the host element of the dom
-   * renderer as a listenable element to the viewers interaction handlers.
-   * When false, no events will propogate to the viewer.
+   * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target
+   * for the viewer. This enables camera interactions to be initiated from elements within this renderer.
+   *
+   * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target
+   * for the viewer.
    */
   @Prop()
   public propagateEventsToViewer = true;
