@@ -351,8 +351,10 @@ export class VertexPinLabel {
   private handlePointerDown = (event: PointerEvent): void => {
     if (!this.focused) {
       if (this.elementBounds != null) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event.buttons !== 2) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
           this.elementBounds
