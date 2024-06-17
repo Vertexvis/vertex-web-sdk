@@ -145,6 +145,14 @@ export class ZoomInteraction extends MouseInteraction {
     }
   }
 
+  public setInteractionTimeout(ms: number): void {
+    this.interactionTimeout = ms;
+  }
+
+  public getInteractionTimeout(): number {
+    return this.interactionTimeout;
+  }
+
   public endDrag(event: MouseEvent, api: InteractionApi): void {
     super.endDrag(event, api);
     this.stopInteractionTimer();

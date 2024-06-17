@@ -10,3 +10,4 @@ export * from './interactionEvent';
 export * from './interactionHandler';
 export * from './interactionHandler';
 export * from './keyInteraction';
+export * from './pointerInteractionHandler';

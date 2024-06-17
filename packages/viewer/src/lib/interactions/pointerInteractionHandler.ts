@@ -48,6 +48,14 @@ export class PointerInteractionHandler extends MultiElementInteractionHandler {
     element.addEventListener('pointerdown', this.handlePointerDown);
   }
 
+  public setZoomInteractionTimeout(ms: number): void {
+    this.zoomInteraction.setInteractionTimeout(ms);
+  }
+
+  public getZoomInteractionTimeout(): number {
+    return this.zoomInteraction.getInteractionTimeout();
+  }
+
   public addEventListenersToElement(element: HTMLElement): Disposable {
     element.addEventListener(this.downEvent, this.handleDownEvent);
     element.addEventListener('wheel', this.handleMouseWheel, {

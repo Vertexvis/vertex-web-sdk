@@ -52,12 +52,12 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     protected downEvent: 'mousedown' | 'pointerdown',
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
-    private rotateInteraction: RotateInteraction,
-    private rotatePointInteraction: RotatePointInteraction,
-    private zoomInteraction: ZoomInteraction,
-    private panInteraction: PanInteraction,
-    private twistInteraction: TwistInteraction,
-    private pivotInteraction: PivotInteraction,
+    protected rotateInteraction: RotateInteraction,
+    protected rotatePointInteraction: RotatePointInteraction,
+    protected zoomInteraction: ZoomInteraction,
+    protected panInteraction: PanInteraction,
+    protected twistInteraction: TwistInteraction,
+    protected pivotInteraction: PivotInteraction,
     private getConfig: ConfigProvider
   ) {
     this.handleDownEvent = this.handleDownEvent.bind(this);

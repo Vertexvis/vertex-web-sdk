@@ -17,6 +17,7 @@ export { Environment } from './lib/environment';
 export * from './lib/formatter';
 export * from './lib/interactions/interactionHandler';
 export * from './lib/interactions/keyInteraction';
+export * from './lib/interactions/pointerInteractionHandler';
 export * from './lib/measurement';
 export * from './lib/pins';
 export {
