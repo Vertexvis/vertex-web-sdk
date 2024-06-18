@@ -114,7 +114,7 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
-  public constructor(private interactionTimeout = 1000) {
+  public constructor(private interactionTimeout = 350) {
     super();
   }
 
