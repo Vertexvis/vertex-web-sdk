@@ -26,6 +26,12 @@ export interface InteractionConfig {
    * point under the cursor. Defaults to `true`.
    */
   useMinimumPerspectiveZoomDistance: boolean;
+
+  /**
+   * The amount of time before a wheel zoom interaction is ended. A final frame will be
+   * requested at the end of the interaction.
+   */
+  zoomByWheelInteractionDelay: number | undefined;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
@@ -33,4 +39,5 @@ export const defaultInteractionConfig: InteractionConfig = {
   coarsePointerThreshold: 3,
   interactionDelay: 75,
   useMinimumPerspectiveZoomDistance: true,
+  zoomByWheelInteractionDelay: 350,
 };

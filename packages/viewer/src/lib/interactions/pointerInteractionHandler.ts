@@ -20,7 +20,7 @@ export class PointerInteractionHandler extends MultiElementInteractionHandler {
     getConfig: ConfigProvider,
     rotateInteraction = new RotateInteraction(),
     rotatePointInteraction = new RotatePointInteraction(),
-    zoomInteraction = new ZoomInteraction(),
+    zoomInteraction = new ZoomInteraction(() => getConfig().interactions),
     panInteraction = new PanInteraction(),
     twistInteraction = new TwistInteraction(),
     pivotInteraction = new PivotInteraction()

@@ -2,7 +2,7 @@ import { Point } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../dom';
 import { InteractionType } from './baseInteractionHandler';
-import { InteractionApi } from './interactionApi';
+import { InteractionApi, InteractionConfigProvider } from './interactionApi';
 
 export abstract class MouseInteraction {
   protected currentPosition: Point.Point | undefined;
@@ -114,7 +114,11 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
-  public constructor(private interactionTimeout = 350) {
+  private defaultInteractionDelay = 350;
+
+  public constructor(
+    private interactionConfigProvider: InteractionConfigProvider
+  ) {
     super();
   }
 
@@ -179,11 +183,18 @@ export class ZoomInteraction extends MouseInteraction {
     this.startInteractionTimer(api);
   }
 
+  private getInteractionDelay(): number {
+    return (
+      this.interactionConfigProvider().zoomByWheelInteractionDelay ??
+      this.defaultInteractionDelay
+    );
+  }
+
   private startInteractionTimer(api: InteractionApi): void {
     this.interactionTimer = window.setTimeout(() => {
       this.interactionTimer = undefined;
       this.endInteraction(api);
-    }, this.interactionTimeout);
+    }, this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {

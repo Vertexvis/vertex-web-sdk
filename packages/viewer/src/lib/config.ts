@@ -34,6 +34,8 @@ export type PartialConfig = DeepPartial<Config>;
 
 export type ConfigProvider = () => Config;
 
+export type InteractionConfigProvider = () => Interactions.InteractionConfig;
+
 const config: Config = {
   network: {
     apiHost: 'https://platform.platprod.vertexvis.io',
