@@ -1,6 +1,7 @@
 import { Point } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../dom';
+import { defaultMouseWheelInteractionEndDebounce } from '../types/interactions';
 import { InteractionType } from './baseInteractionHandler';
 import { InteractionApi, InteractionConfigProvider } from './interactionApi';
 
@@ -114,8 +115,6 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
-  private defaultInteractionDelay = 350;
-
   public constructor(
     private interactionConfigProvider: InteractionConfigProvider
   ) {
@@ -165,7 +164,13 @@ export class ZoomInteraction extends MouseInteraction {
     delta: number,
     api: InteractionApi
   ): void {
-    this.operateWithTimer(api, () => api.zoomCameraToPoint(pt, delta));
+    const deltaWithSetting = this.interactionConfigProvider()
+      .reverseMouseWheelDirection
+      ? -delta
+      : delta;
+    this.operateWithTimer(api, () =>
+      api.zoomCameraToPoint(pt, deltaWithSetting)
+    );
   }
 
   private beginInteraction(api: InteractionApi): void {
@@ -184,10 +189,7 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   private getInteractionDelay(): number {
-    return (
-      this.interactionConfigProvider().zoomByWheelInteractionDelay ??
-      this.defaultInteractionDelay
-    );
+    return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
   }
 
   private startInteractionTimer(api: InteractionApi): void {
