@@ -215,7 +215,7 @@ describe(ZoomInteraction, () => {
       interaction.drag(event3, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
-      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, -10);
     });
   });
 
