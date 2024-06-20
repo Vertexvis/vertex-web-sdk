@@ -3,6 +3,10 @@ jest.mock('../interactionApiPerspective');
 
 import { Point } from '@vertexvis/geometry';
 
+import {
+  defaultInteractionConfig,
+  InteractionConfig,
+} from '../../types/interactions';
 import { InteractionApi } from '../interactionApi';
 import { InteractionApiPerspective } from '../interactionApiPerspective';
 import {
@@ -154,6 +158,10 @@ describe(ZoomInteraction, () => {
   const api =
     new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
 
+  const defaultConfigProvider = (): InteractionConfig => ({
+    ...defaultInteractionConfig,
+  });
+
   const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
   const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
   const event3 = new MouseEvent('mousemove', { clientX: 25, clientY: 20 });
@@ -162,7 +170,7 @@ describe(ZoomInteraction, () => {
 
   describe(ZoomInteraction.prototype.beginDrag, () => {
     it('begins interaction once for multiple begin drag calls', () => {
-      const interaction = new ZoomInteraction();
+      const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.beginDrag(event1, canvasPoint, api, element);
 
@@ -172,16 +180,36 @@ describe(ZoomInteraction, () => {
 
   describe(ZoomInteraction.prototype.drag, () => {
     it('first drag zooms camera using delta between begin drag and drag', () => {
-      const interaction = new ZoomInteraction();
+      const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
-      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, 5);
+      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, -5);
     });
 
     it('continuous drags zoom camera using delta between calls', () => {
-      const interaction = new ZoomInteraction();
+      const interaction = new ZoomInteraction(defaultConfigProvider);
+      interaction.beginDrag(event1, canvasPoint, api, element);
+      interaction.drag(event2, api);
+      interaction.drag(event3, api);
+
+      const pt = Point.create(event1.clientX, event1.clientY);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, -10);
+    });
+
+    it('does nothing if begin drag has not been called', () => {
+      const interaction = new ZoomInteraction(defaultConfigProvider);
+      interaction.drag(event1, api);
+
+      expect(api.zoomCamera).not.toHaveBeenCalled();
+    });
+
+    it('supports customizing the zoom direction by inverting the delta', () => {
+      const interaction = new ZoomInteraction(() => ({
+        ...defaultInteractionConfig,
+        reverseMouseWheelDirection: true,
+      }));
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
       interaction.drag(event3, api);
@@ -189,18 +217,11 @@ describe(ZoomInteraction, () => {
       const pt = Point.create(event1.clientX, event1.clientY);
       expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
     });
-
-    it('does nothing if begin drag has not been called', () => {
-      const interaction = new ZoomInteraction();
-      interaction.drag(event1, api);
-
-      expect(api.zoomCamera).not.toHaveBeenCalled();
-    });
   });
 
   describe(ZoomInteraction.prototype.endDrag, () => {
     it('ends interaction if begin drag has been called', () => {
-      const interaction = new ZoomInteraction();
+      const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.endDrag(event1, api);
 
@@ -208,7 +229,7 @@ describe(ZoomInteraction, () => {
     });
 
     it('does nothing if begin drag has not been called', () => {
-      const interaction = new ZoomInteraction();
+      const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.endDrag(event1, api);
 
       expect(api.endInteraction).not.toHaveBeenCalled();
@@ -218,12 +239,18 @@ describe(ZoomInteraction, () => {
   describe(ZoomInteraction.prototype.zoom, () => {
     const timeoutDelay = 50;
 
+    const interactionConfigProvider = (): InteractionConfig => {
+      return {
+        ...defaultInteractionConfig,
+        mouseWheelInteractionEndDebounce: timeoutDelay,
+      };
+    };
     function delay(): Promise<void> {
       return new Promise((resolve) => setTimeout(resolve, timeoutDelay + 10));
     }
 
     it('only begins interaction once within interaction timeout', async () => {
-      const interaction = new ZoomInteraction(timeoutDelay);
+      const interaction = new ZoomInteraction(interactionConfigProvider);
       interaction.zoom(1, api);
       interaction.zoom(1, api);
 
@@ -232,7 +259,7 @@ describe(ZoomInteraction, () => {
     });
 
     it('ends interaction after interaction timeout', async () => {
-      const interaction = new ZoomInteraction(timeoutDelay);
+      const interaction = new ZoomInteraction(interactionConfigProvider);
       interaction.zoom(1, api);
       await delay();
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
