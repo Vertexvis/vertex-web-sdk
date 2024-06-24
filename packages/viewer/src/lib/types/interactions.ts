@@ -38,10 +38,9 @@ export interface InteractionConfig {
 
   /**
    * Reverses which direction the mouse wheel considers positive or negative
-   * on mouse driven zoom events, such as a mouse wheel event
-   * or a mouse drag when using zoom as a primary interaction.
+   * for zoom interactions.
    */
-  reverseMouseZoomDirection: boolean;
+  reverseMouseWheelDirection: boolean;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
@@ -50,5 +49,5 @@ export const defaultInteractionConfig: InteractionConfig = {
   interactionDelay: 75,
   useMinimumPerspectiveZoomDistance: true,
   mouseWheelInteractionEndDebounce: 350,
-  reverseMouseZoomDirection: false,
+  reverseMouseWheelDirection: false,
 };

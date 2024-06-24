@@ -141,7 +141,7 @@ export class ZoomInteraction extends MouseInteraction {
       const delta = Point.subtract(position, this.currentPosition);
 
       if (this.startPt != null) {
-        this.zoomCameraToPointWithDirectionConfig(this.startPt, -delta.y, api);
+        api.zoomCameraToPoint(this.startPt, delta.y);
         this.currentPosition = position;
       }
     }
@@ -155,7 +155,9 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   public zoom(delta: number, api: InteractionApi): void {
-    this.operateWithTimer(api, () => api.zoomCamera(delta));
+    this.operateWithTimer(api, () =>
+      api.zoomCamera(this.getDirectionalDelta(delta))
+    );
   }
 
   public zoomToPoint(
@@ -164,20 +166,8 @@ export class ZoomInteraction extends MouseInteraction {
     api: InteractionApi
   ): void {
     this.operateWithTimer(api, () =>
-      this.zoomCameraToPointWithDirectionConfig(pt, delta, api)
+      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
     );
-  }
-
-  private zoomCameraToPointWithDirectionConfig(
-    pt: Point.Point,
-    givenDelta: number,
-    api: InteractionApi
-  ): Promise<void> {
-    const delta = this.interactionConfigProvider().reverseMouseZoomDirection
-      ? -givenDelta
-      : givenDelta;
-
-    return api.zoomCameraToPoint(pt, delta);
   }
 
   private beginInteraction(api: InteractionApi): void {
@@ -193,6 +183,12 @@ export class ZoomInteraction extends MouseInteraction {
   private resetInteractionTimer(api: InteractionApi): void {
     this.stopInteractionTimer();
     this.startInteractionTimer(api);
+  }
+
+  private getDirectionalDelta(delta: number): number {
+    return this.interactionConfigProvider().reverseMouseWheelDirection
+      ? -delta
+      : delta;
   }
 
   private getInteractionDelay(): number {

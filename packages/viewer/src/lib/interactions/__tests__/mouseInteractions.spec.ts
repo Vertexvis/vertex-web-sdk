@@ -24,6 +24,10 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+afterEach(() => {
+  jest.useRealTimers();
+});
+
 describe(RotateInteraction, () => {
   const api = new InteractionApiMock();
 
@@ -185,7 +189,7 @@ describe(ZoomInteraction, () => {
       interaction.drag(event2, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
-      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, -5);
+      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, 5);
     });
 
     it('continuous drags zoom camera using delta between calls', () => {
@@ -195,7 +199,7 @@ describe(ZoomInteraction, () => {
       interaction.drag(event3, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
-      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, -10);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
     });
 
     it('does nothing if begin drag has not been called', () => {
@@ -206,16 +210,36 @@ describe(ZoomInteraction, () => {
     });
 
     it('supports customizing the zoom direction by inverting the delta', () => {
+      jest.useFakeTimers();
+
       const interaction = new ZoomInteraction(() => ({
         ...defaultInteractionConfig,
         reverseMouseWheelDirection: true,
       }));
-      interaction.beginDrag(event1, canvasPoint, api, element);
-      interaction.drag(event2, api);
-      interaction.drag(event3, api);
+      interaction.zoom(10, api);
 
+      jest.advanceTimersToNextTimer();
+
+      expect(api.zoomCamera).toHaveBeenCalledWith(-10);
+
+      jest.useRealTimers();
+    });
+
+    it('supports customizing the zoomToPoint direction by inverting the delta', () => {
+      jest.useFakeTimers();
+
+      const interaction = new ZoomInteraction(() => ({
+        ...defaultInteractionConfig,
+        reverseMouseWheelDirection: true,
+      }));
       const pt = Point.create(event1.clientX, event1.clientY);
-      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, -10);
+      interaction.zoomToPoint(pt, 10, api);
+
+      jest.advanceTimersToNextTimer();
+
+      expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, -10);
+
+      jest.useRealTimers();
     });
   });
 
