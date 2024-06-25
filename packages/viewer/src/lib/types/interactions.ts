@@ -26,6 +26,21 @@ export interface InteractionConfig {
    * point under the cursor. Defaults to `true`.
    */
   useMinimumPerspectiveZoomDistance: boolean;
+
+  /**
+   * The amount of time before a wheel interaction is ended.
+   *
+   * This delay is used to support successive sets of mouse events, and not cause
+   * abrupt and unexpected ending of mouse interactions during natural pauses in mouse
+   * wheel usage.
+   */
+  mouseWheelInteractionEndDebounce: number;
+
+  /**
+   * Reverses which direction the mouse wheel considers positive or negative
+   * for zoom interactions.
+   */
+  reverseMouseWheelDirection: boolean;
 }
 
 export const defaultInteractionConfig: InteractionConfig = {
@@ -33,4 +48,6 @@ export const defaultInteractionConfig: InteractionConfig = {
   coarsePointerThreshold: 3,
   interactionDelay: 75,
   useMinimumPerspectiveZoomDistance: true,
+  mouseWheelInteractionEndDebounce: 350,
+  reverseMouseWheelDirection: false,
 };

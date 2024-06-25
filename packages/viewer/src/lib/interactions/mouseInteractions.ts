@@ -2,7 +2,7 @@ import { Point } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../dom';
 import { InteractionType } from './baseInteractionHandler';
-import { InteractionApi } from './interactionApi';
+import { InteractionApi, InteractionConfigProvider } from './interactionApi';
 
 export abstract class MouseInteraction {
   protected currentPosition: Point.Point | undefined;
@@ -114,7 +114,9 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
-  public constructor(private interactionTimeout = 1000) {
+  public constructor(
+    private interactionConfigProvider: InteractionConfigProvider
+  ) {
     super();
   }
 
@@ -153,7 +155,9 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   public zoom(delta: number, api: InteractionApi): void {
-    this.operateWithTimer(api, () => api.zoomCamera(delta));
+    this.operateWithTimer(api, () =>
+      api.zoomCamera(this.getDirectionalDelta(delta))
+    );
   }
 
   public zoomToPoint(
@@ -161,7 +165,9 @@ export class ZoomInteraction extends MouseInteraction {
     delta: number,
     api: InteractionApi
   ): void {
-    this.operateWithTimer(api, () => api.zoomCameraToPoint(pt, delta));
+    this.operateWithTimer(api, () =>
+      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
+    );
   }
 
   private beginInteraction(api: InteractionApi): void {
@@ -179,11 +185,21 @@ export class ZoomInteraction extends MouseInteraction {
     this.startInteractionTimer(api);
   }
 
+  private getDirectionalDelta(delta: number): number {
+    return this.interactionConfigProvider().reverseMouseWheelDirection
+      ? -delta
+      : delta;
+  }
+
+  private getInteractionDelay(): number {
+    return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
+  }
+
   private startInteractionTimer(api: InteractionApi): void {
     this.interactionTimer = window.setTimeout(() => {
       this.interactionTimer = undefined;
       this.endInteraction(api);
-    }, this.interactionTimeout);
+    }, this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
