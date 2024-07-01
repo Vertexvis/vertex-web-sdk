@@ -29,6 +29,7 @@ import {
   AnnotationController,
   AnnotationState,
 } from '../../lib/annotations/controller';
+import { ModelViewController } from '../../lib/model-views/controller';
 import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
@@ -334,6 +335,13 @@ export class Viewer {
   @Prop({ mutable: true }) public annotations: AnnotationController | undefined;
 
   /**
+   * The controller for accessing model views associated with the scene view.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true }) public modelViews: ModelViewController | undefined;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -477,6 +485,7 @@ export class Viewer {
 
     const config = this.getResolvedConfig();
     const client = new SceneViewAPIClient(config.network.sceneViewHost);
+
     this.annotations = new AnnotationController(
       client,
       () => this.token,
@@ -484,6 +493,12 @@ export class Viewer {
     );
     this.annotations.onStateChange.on((state) =>
       this.annotationStateChanged.emit(state)
+    );
+
+    this.modelViews = new ModelViewController(
+      client,
+      () => this.token,
+      () => this.deviceId
     );
 
     this.stream =

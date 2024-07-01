@@ -20,6 +20,7 @@ import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { AnnotationData } from '../lib/annotations/annotation';
 import { random } from './random';
+import { createTimestamp, createUuid2l } from './sceneView';
 
 export function createSceneAnnotationSet({
   id = UUID.create(),
@@ -142,26 +143,4 @@ export function createSceneAnnotation({
   ann.setData(dataValue);
 
   return ann;
-}
-
-function createUuid2l(id: UUID.UUID = UUID.create()): Uuid2l {
-  const msbLsb = UUID.toMsbLsb(id);
-  const pb = new Uuid2l();
-  pb.setMsb(msbLsb.msb);
-  pb.setLsb(msbLsb.lsb);
-  return pb;
-}
-
-function createTimestamp(date: Date = new Date()): Timestamp {
-  const timestamp = toProtoTimestamp(date);
-  const res = new Timestamp();
-
-  if (typeof timestamp.seconds === 'number') {
-    res.setSeconds(timestamp.seconds);
-  } else {
-    res.setSeconds(timestamp.seconds.toNumber());
-  }
-
-  res.setNanos(timestamp.nanos);
-  return res;
 }

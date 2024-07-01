@@ -14,6 +14,10 @@ import {
 import { MeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 
 import { random } from './random';
+import { UUID } from '@vertexvis/utils';
+import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { toProtoTimestamp } from '@vertexvis/stream-api';
 
 export function createMeasureResponse(
   ...result: MeasurementResult[]
@@ -82,4 +86,26 @@ export function createVector3(): Vector3f {
   vector.setY(random.floating());
   vector.setZ(random.floating());
   return vector;
+}
+
+export function createUuid2l(id: UUID.UUID = UUID.create()): Uuid2l {
+  const msbLsb = UUID.toMsbLsb(id);
+  const pb = new Uuid2l();
+  pb.setMsb(msbLsb.msb);
+  pb.setLsb(msbLsb.lsb);
+  return pb;
+}
+
+export function createTimestamp(date: Date = new Date()): Timestamp {
+  const timestamp = toProtoTimestamp(date);
+  const res = new Timestamp();
+
+  if (typeof timestamp.seconds === 'number') {
+    res.setSeconds(timestamp.seconds);
+  } else {
+    res.setSeconds(timestamp.seconds.toNumber());
+  }
+
+  res.setNanos(timestamp.nanos);
+  return res;
 }
