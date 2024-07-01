@@ -2,8 +2,8 @@ import { UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
 import {
-  createSceneAnnotation,
-  createSceneAnnotationSet,
+  makeSceneAnnotation,
+  makeSceneAnnotationSet,
 } from '../../../testing/annotations';
 import { CustomAnnotationData } from '../../annotations/annotation';
 import { fromPbAnnotation, fromPbAnnotationSet } from '../annotation';
@@ -16,7 +16,7 @@ describe(fromPbAnnotationSet, () => {
     const name = random.string();
     const suppliedId = random.string();
 
-    const pb = createSceneAnnotationSet({
+    const pb = makeSceneAnnotationSet({
       id,
       createdAt,
       modifiedAt,
@@ -48,7 +48,7 @@ describe(fromPbAnnotation, () => {
       jsonData: {},
     } as CustomAnnotationData;
 
-    const pb = createSceneAnnotation({
+    const pb = makeSceneAnnotation({
       id,
       createdAt,
       modifiedAt,

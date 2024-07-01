@@ -1,8 +1,9 @@
 import { ModelView } from '@vertexvis/scene-view-protos/core/protos/model_views_pb';
 import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { UUID } from '@vertexvis/utils';
-import { createUuid2l } from './sceneView';
+
 import { random } from './random';
+import { makeUuid2l } from './sceneView';
 
 export function makeListItemModelViewsResponse(
   modelViews: ModelView[] = [makeModelView(), makeModelView()]
@@ -18,8 +19,8 @@ export function makeModelView(
   displayName: string = random.string()
 ): ModelView {
   const modelView = new ModelView();
-  modelView.setId(createUuid2l(id));
-  modelView.setPartRevisionId(createUuid2l(partRevisionId));
+  modelView.setId(makeUuid2l(id));
+  modelView.setPartRevisionId(makeUuid2l(partRevisionId));
   modelView.setDisplayName(displayName);
   return modelView;
 }

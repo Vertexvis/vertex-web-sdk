@@ -29,7 +29,6 @@ import {
   AnnotationController,
   AnnotationState,
 } from '../../lib/annotations/controller';
-import { ModelViewController } from '../../lib/model-views/controller';
 import { Config, parseConfig, PartialConfig } from '../../lib/config';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
@@ -57,6 +56,7 @@ import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHand
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { fromPbFrameOrThrow } from '../../lib/mappers';
 import { paintTime, Timing } from '../../lib/meters';
+import { ModelViewController } from '../../lib/model-views/controller';
 import {
   CanvasRenderer,
   createCanvasRenderer,

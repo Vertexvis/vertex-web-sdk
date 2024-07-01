@@ -3,10 +3,11 @@ jest.mock(
 );
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
-import { ModelViewController } from '../controller';
-import { random } from '../../../testing/random';
+
 import { mockGrpcUnaryResult } from '../../../testing';
 import { makeListItemModelViewsResponse } from '../../../testing/modelViews';
+import { random } from '../../../testing/random';
+import { ModelViewController } from '../controller';
 
 describe(ModelViewController, () => {
   const jwt = random.string();
