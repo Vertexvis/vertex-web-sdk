@@ -7,12 +7,12 @@ import { Async, UUID } from '@vertexvis/utils';
 
 import { mockGrpcUnaryResult, random } from '../../../testing';
 import {
-  createCreateSceneViewAnnotationSetResponse,
-  createDeleteSceneViewAnnotationSetResponse,
-  createListSceneAnnotationsResponse,
-  createListSceneViewAnnotationSetsResponse,
-  createSceneAnnotation,
-  createSceneAnnotationSet,
+  makeCreateSceneViewAnnotationSetResponse,
+  makeDeleteSceneViewAnnotationSetResponse,
+  makeListSceneAnnotationsResponse,
+  makeListSceneViewAnnotationSetsResponse,
+  makeSceneAnnotation,
+  makeSceneAnnotationSet,
 } from '../../../testing/annotations';
 import { fromPbAnnotationOrThrow } from '../../mappers/annotation';
 import { AnnotationController, AnnotationState } from '../controller';
@@ -25,11 +25,11 @@ describe(AnnotationController, () => {
 
   describe(AnnotationController.prototype.addAnnotationSet, () => {
     it('calls API to add annotation set to view and emit state change', async () => {
-      const { controller, client } = createAnnotationController(jwt, deviceId);
+      const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
       (client.createSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(createCreateSceneViewAnnotationSetResponse())
+        mockGrpcUnaryResult(makeCreateSceneViewAnnotationSetResponse())
       );
 
       const onStateChange = jest.fn();
@@ -43,7 +43,7 @@ describe(AnnotationController, () => {
 
   describe(AnnotationController.prototype.connect, () => {
     it('polls for updated annotation state until disconnected', async () => {
-      const { controller, client } = createAnnotationController(jwt, deviceId);
+      const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       function wait(): {
         promise: Promise<unknown>;
@@ -84,7 +84,7 @@ describe(AnnotationController, () => {
 
   describe(AnnotationController.prototype.fetch, () => {
     it('calls API to retrieve annotation state', async () => {
-      const { controller, client } = createAnnotationController(jwt, deviceId);
+      const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
       const onStateChange = jest.fn();
@@ -98,11 +98,11 @@ describe(AnnotationController, () => {
 
   describe(AnnotationController.prototype.removeAnnotationSet, () => {
     it('calls API to add annotation set to view and emit state change', async () => {
-      const { controller, client } = createAnnotationController(jwt, deviceId);
+      const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
       (client.deleteSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(createDeleteSceneViewAnnotationSetResponse())
+        mockGrpcUnaryResult(makeDeleteSceneViewAnnotationSetResponse())
       );
 
       const onStateChange = jest.fn();
@@ -115,7 +115,7 @@ describe(AnnotationController, () => {
   });
 });
 
-function createAnnotationController(
+function makeAnnotationController(
   jwt: string,
   deviceId: string
 ): { controller: AnnotationController; client: SceneViewAPIClient } {
@@ -137,23 +137,21 @@ function mockFetchAnnotationState(client: SceneViewAPIClient): AnnotationState {
   const annId2 = UUID.create();
 
   const annotationSets = [
-    createSceneAnnotationSet({ id: setId1 }),
-    createSceneAnnotationSet({ id: setId2 }),
+    makeSceneAnnotationSet({ id: setId1 }),
+    makeSceneAnnotationSet({ id: setId2 }),
   ];
-  const ann1 = createSceneAnnotation({ id: annId1 });
-  const ann2 = createSceneAnnotation({ id: annId2 });
+  const ann1 = makeSceneAnnotation({ id: annId1 });
+  const ann2 = makeSceneAnnotation({ id: annId2 });
 
   (client.listSceneViewAnnotationSets as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryResult(
-      createListSceneViewAnnotationSetsResponse(annotationSets)
-    )
+    mockGrpcUnaryResult(makeListSceneViewAnnotationSetsResponse(annotationSets))
   );
   (client.listSceneAnnotations as jest.Mock)
     .mockImplementationOnce(
-      mockGrpcUnaryResult(createListSceneAnnotationsResponse([ann1]))
+      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann1]))
     )
     .mockImplementationOnce(
-      mockGrpcUnaryResult(createListSceneAnnotationsResponse([ann2]))
+      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann2]))
     );
 
   return {

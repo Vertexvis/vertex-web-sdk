@@ -2,42 +2,42 @@ import { MeasurementResult } from '@vertexvis/scene-view-protos/core/protos/meas
 import { Mapper as M } from '@vertexvis/utils';
 
 import {
-  createMeasureResponse,
-  createMinimumDistanceResult,
-  createPlanarAngleResult,
-  createPlanarDistanceResult,
-  createSurfaceAreaResult,
+  makeMeasureResponse,
+  makeMinimumDistanceResult,
+  makePlanarAngleResult,
+  makePlanarDistanceResult,
+  makeSurfaceAreaResult,
 } from '../../../testing';
 import { mapMeasureResponse, mapMeasureResponseOrThrow } from '../mapper';
 
 describe('mapMeasureResponse', () => {
   it('maps a response with a planar distance', () => {
-    const resp = createMeasureResponse(createPlanarDistanceResult());
+    const resp = makeMeasureResponse(makePlanarDistanceResult());
     const res = mapMeasureResponse(resp.toObject());
     expect(M.isInvalid(res)).toBe(false);
   });
 
   it('maps a response with a planar angle', () => {
-    const resp = createMeasureResponse(createPlanarAngleResult());
+    const resp = makeMeasureResponse(makePlanarAngleResult());
     const res = mapMeasureResponse(resp.toObject());
     expect(M.isInvalid(res)).toBe(false);
   });
 
   it('maps a response with a minimum distance', () => {
-    const resp = createMeasureResponse(createMinimumDistanceResult());
+    const resp = makeMeasureResponse(makeMinimumDistanceResult());
     const res = mapMeasureResponse(resp.toObject());
     expect(M.isInvalid(res)).toBe(false);
   });
 
   it('maps a response with a surface area', () => {
-    const resp = createMeasureResponse(createSurfaceAreaResult());
+    const resp = makeMeasureResponse(makeSurfaceAreaResult());
     const res = mapMeasureResponse(resp.toObject());
     expect(M.isInvalid(res)).toBe(false);
   });
 
   it('throws if response invalid', () => {
     const invalidResult = new MeasurementResult();
-    const resp = createMeasureResponse(invalidResult);
+    const resp = makeMeasureResponse(invalidResult);
     expect(() => mapMeasureResponseOrThrow(resp.toObject())).toThrow();
   });
 });
