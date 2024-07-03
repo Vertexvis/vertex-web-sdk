@@ -52,6 +52,7 @@ import {
   AnnotationController,
   AnnotationState,
 } from './lib/annotations/controller';
+import { ModelViewController } from './lib/model-views/controller';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import {
@@ -566,6 +567,11 @@ export namespace Components {
      * @param urn The URN of the resource to load.
      */
     load: (urn: string) => Promise<void>;
+    /**
+     * The controller for accessing model views associated with the scene view.
+     * @readonly
+     */
+    modelViews: ModelViewController | undefined;
     /**
      * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
      */
@@ -2389,6 +2395,11 @@ declare namespace LocalJSX {
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
      */
     keyboardControls?: boolean;
+    /**
+     * The controller for accessing model views associated with the scene view.
+     * @readonly
+     */
+    modelViews?: ModelViewController | undefined;
     /**
      * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
      */

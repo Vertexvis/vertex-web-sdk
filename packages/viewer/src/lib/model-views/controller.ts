@@ -15,7 +15,7 @@ export interface ListByItemOptions {
 }
 
 /**
- * The controller for managing the annotations of a scene and scene view.
+ * The controller for managing the model views of a scene view.
  */
 export class ModelViewController {
   public constructor(
@@ -30,7 +30,7 @@ export class ModelViewController {
    *
    * @param itemId The ID of the scene item to retrieve model views for.
    * @param options Options to configure fetching of items.
-   * @returns
+   * @returns A page of model views.
    */
   public async listByItem(
     itemId: UUID.UUID,
