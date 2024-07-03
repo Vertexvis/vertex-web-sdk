@@ -6,22 +6,20 @@ import {
   SceneAnnotationData,
   SceneAnnotationSet,
 } from '@vertexvis/scene-view-protos/core/protos/scene_annotations_pb';
-import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import {
   CreateSceneViewAnnotationSetResponse,
   DeleteSceneViewAnnotationSetResponse,
   ListSceneAnnotationsResponse,
   ListSceneViewAnnotationSetsResponse,
 } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
-import { toProtoTimestamp } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { AnnotationData } from '../lib/annotations/annotation';
 import { random } from './random';
+import { makeTimestamp, makeUuid2l } from './sceneView';
 
-export function createSceneAnnotationSet({
+export function makeSceneAnnotationSet({
   id = UUID.create(),
   createdAt = new Date(),
   modifiedAt = new Date(),
@@ -35,9 +33,9 @@ export function createSceneAnnotationSet({
   name?: string;
 } = {}): SceneAnnotationSet {
   const set = new SceneAnnotationSet();
-  set.setId(createUuid2l(id));
-  set.setCreatedAt(createTimestamp(createdAt));
-  set.setModifiedAt(createTimestamp(modifiedAt));
+  set.setId(makeUuid2l(id));
+  set.setCreatedAt(makeTimestamp(createdAt));
+  set.setModifiedAt(makeTimestamp(modifiedAt));
 
   const nameValue = new StringValue();
   nameValue.setValue(name);
@@ -50,18 +48,18 @@ export function createSceneAnnotationSet({
   return set;
 }
 
-export function createCreateSceneViewAnnotationSetResponse(): CreateSceneViewAnnotationSetResponse {
+export function makeCreateSceneViewAnnotationSetResponse(): CreateSceneViewAnnotationSetResponse {
   return new CreateSceneViewAnnotationSetResponse();
 }
 
-export function createDeleteSceneViewAnnotationSetResponse(): DeleteSceneViewAnnotationSetResponse {
+export function makeDeleteSceneViewAnnotationSetResponse(): DeleteSceneViewAnnotationSetResponse {
   return new DeleteSceneViewAnnotationSetResponse();
 }
 
-export function createListSceneViewAnnotationSetsResponse(
+export function makeListSceneViewAnnotationSetsResponse(
   annotationSets: SceneAnnotationSet[] = [
-    createSceneAnnotationSet(),
-    createSceneAnnotationSet(),
+    makeSceneAnnotationSet(),
+    makeSceneAnnotationSet(),
   ]
 ): ListSceneViewAnnotationSetsResponse {
   const res = new ListSceneViewAnnotationSetsResponse();
@@ -69,10 +67,10 @@ export function createListSceneViewAnnotationSetsResponse(
   return res;
 }
 
-export function createListSceneAnnotationsResponse(
+export function makeListSceneAnnotationsResponse(
   annotations: SceneAnnotation[] = [
-    createSceneAnnotation(),
-    createSceneAnnotation(),
+    makeSceneAnnotation(),
+    makeSceneAnnotation(),
   ]
 ): ListSceneAnnotationsResponse {
   const res = new ListSceneAnnotationsResponse();
@@ -80,7 +78,7 @@ export function createListSceneAnnotationsResponse(
   return res;
 }
 
-export function createSceneAnnotation({
+export function makeSceneAnnotation({
   id = UUID.create(),
   createdAt = new Date(),
   modifiedAt = new Date(),
@@ -94,9 +92,9 @@ export function createSceneAnnotation({
   data?: AnnotationData;
 } = {}): SceneAnnotation {
   const ann = new SceneAnnotation();
-  ann.setId(createUuid2l(id));
-  ann.setCreatedAt(createTimestamp(createdAt));
-  ann.setModifiedAt(createTimestamp(modifiedAt));
+  ann.setId(makeUuid2l(id));
+  ann.setCreatedAt(makeTimestamp(createdAt));
+  ann.setModifiedAt(makeTimestamp(modifiedAt));
 
   const suppliedIdValue = new StringValue();
   suppliedIdValue.setValue(suppliedId);
@@ -142,26 +140,4 @@ export function createSceneAnnotation({
   ann.setData(dataValue);
 
   return ann;
-}
-
-function createUuid2l(id: UUID.UUID = UUID.create()): Uuid2l {
-  const msbLsb = UUID.toMsbLsb(id);
-  const pb = new Uuid2l();
-  pb.setMsb(msbLsb.msb);
-  pb.setLsb(msbLsb.lsb);
-  return pb;
-}
-
-function createTimestamp(date: Date = new Date()): Timestamp {
-  const timestamp = toProtoTimestamp(date);
-  const res = new Timestamp();
-
-  if (typeof timestamp.seconds === 'number') {
-    res.setSeconds(timestamp.seconds);
-  } else {
-    res.setSeconds(timestamp.seconds.toNumber());
-  }
-
-  res.setNanos(timestamp.nanos);
-  return res;
 }

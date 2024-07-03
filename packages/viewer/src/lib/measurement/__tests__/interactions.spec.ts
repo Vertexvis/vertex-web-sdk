@@ -10,9 +10,9 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { Async } from '@vertexvis/utils';
 
 import {
-  createMeasureResponse,
-  createMinimumDistanceResult,
   eventually,
+  makeMeasureResponse,
+  makeMinimumDistanceResult,
   mockGrpcUnaryResult,
   random,
 } from '../../../testing';
@@ -190,10 +190,10 @@ describe(MeasurementInteractionHandler, () => {
   }
 
   function mockMeasureResponse(
-    result: MeasurementResult = createMinimumDistanceResult()
+    result: MeasurementResult = makeMinimumDistanceResult()
   ): void {
     (client.measure as jest.Mock).mockImplementation(
-      mockGrpcUnaryResult(createMeasureResponse(result))
+      mockGrpcUnaryResult(makeMeasureResponse(result))
     );
   }
 
