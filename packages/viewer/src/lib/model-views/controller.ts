@@ -8,6 +8,8 @@ import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/proto
 import { UUID } from '@vertexvis/utils';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { ModelViewListResponse } from '../types';
+import { mapListItemModelViewsResponseOrThrow } from './mapper';
 
 export interface ListByItemOptions {
   cursor?: string;
@@ -35,7 +37,7 @@ export class ModelViewController {
   public async listByItem(
     itemId: UUID.UUID,
     { cursor, size = 50 }: ListByItemOptions = {}
-  ): Promise<ListItemModelViewsResponse.AsObject> {
+  ): Promise<ModelViewListResponse> {
     const res: ListItemModelViewsResponse = await requestUnary(
       async (handler) => {
         const deviceId = this.deviceIdProvider();
@@ -59,6 +61,6 @@ export class ModelViewController {
       }
     );
 
-    return res.toObject();
+    return mapListItemModelViewsResponseOrThrow(res.toObject());
   }
 }
