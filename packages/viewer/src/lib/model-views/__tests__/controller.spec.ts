@@ -8,6 +8,7 @@ import { mockGrpcUnaryResult } from '../../../testing';
 import { makeListItemModelViewsResponse } from '../../../testing/modelViews';
 import { random } from '../../../testing/random';
 import { ModelViewController } from '../controller';
+import { mapListItemModelViewsResponseOrThrow } from '../mapper';
 
 describe(ModelViewController, () => {
   const jwt = random.string();
@@ -25,7 +26,9 @@ describe(ModelViewController, () => {
       );
 
       const res = await controller.listByItem(itemId);
-      expect(res).toEqual(expected.toObject());
+      expect(res).toEqual(
+        mapListItemModelViewsResponseOrThrow(expected.toObject())
+      );
     });
   });
 
