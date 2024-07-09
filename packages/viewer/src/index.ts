@@ -18,6 +18,7 @@ export * from './lib/formatter';
 export * from './lib/interactions/interactionHandler';
 export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
+export * from './lib/model-views';
 export * from './lib/pins';
 export {
   Camera,

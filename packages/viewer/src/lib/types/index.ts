@@ -19,7 +19,6 @@ export * from './entities';
 export * from './featureMap';
 export * from './frame';
 export * from './markup';
-export * from './modelViews';
 export * from './orientation';
 export * from './pagination';
 export * from './standardView';

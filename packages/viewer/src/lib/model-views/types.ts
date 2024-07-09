@@ -1,6 +1,6 @@
 import { UUID } from '@vertexvis/utils';
 
-import { PagingLinks } from './pagination';
+import { PagingLinks } from '../types/pagination';
 
 export interface ModelView {
   id: UUID.UUID;
