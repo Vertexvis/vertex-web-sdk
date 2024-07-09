@@ -8,8 +8,8 @@ import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/proto
 import { UUID } from '@vertexvis/utils';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
-import { ModelViewListResponse } from '../types';
 import { mapListItemModelViewsResponseOrThrow } from './mapper';
+import { ModelViewListResponse } from './types';
 
 export interface ListByItemOptions {
   cursor?: string;

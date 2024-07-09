@@ -3,7 +3,7 @@ import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/scenevi
 import { Mapper as M } from '@vertexvis/utils';
 
 import { fromPbUuid2l, mapCursor } from '../mappers';
-import { ModelView, ModelViewListResponse } from '../types';
+import { ModelView, ModelViewListResponse } from './types';
 
 const mapModelView: M.Func<PBModelView.AsObject, ModelView> = M.defineMapper(
   M.read(
