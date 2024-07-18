@@ -1,5 +1,5 @@
 import { loadViewerWithQueryParams } from '../helpers.js';
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@latest/dist/esm/loader.mjs';
 
 class CustomInteractionHandler {
   constructor() {

@@ -93,7 +93,7 @@ is a helper library for common 3D math operations.
     </vertex-viewer>
 
     <script type="module">
-      import { Vector3 } from 'https://unpkg.com/@vertexvis/geometry@latest/dist/cdn/bundle.esm.js';
+      import { Vector3 } from 'https://cdn.jsdelivr.net/npm/@vertexvis/geometry@latest/dist/cdn/bundle.esm.js';
 
       const pin = document.getElementById('my-pin');
 

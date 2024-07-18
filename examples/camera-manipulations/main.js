@@ -1,6 +1,6 @@
 import { loadViewerWithQueryParams } from '../helpers.js';
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.17.x/dist/esm/loader.mjs';
-import { Vector3 } from 'https://unpkg.com/@vertexvis/geometry@0.17.x/dist/cdn/bundle.esm.js';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.17.x/dist/esm/loader.mjs';
+import { Vector3 } from 'https://cdn.jsdelivr.net/npm/@vertexvis/geometry@0.17.x/dist/cdn/bundle.esm.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());
