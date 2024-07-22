@@ -4,7 +4,7 @@ import {
   applyWorkInstruction,
   initializeWorkInstructions,
 } from './instructions.js';
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@latest/dist/esm/loader.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());

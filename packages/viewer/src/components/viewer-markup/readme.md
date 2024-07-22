@@ -77,7 +77,7 @@ as children, provide a unique ID to the element.
   </vertex-viewer>
 
   <script type="module">
-    import { ArrowMarkup } from 'https://unpkg.com/@vertexvis/viewer@latest/dist/viewer/index.esm.js'
+    import { ArrowMarkup } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@latest/dist/viewer/index.esm.js'
 
     const markup = document.getElementById('markup');
     const button = document.getElementById('add-markup-btn');

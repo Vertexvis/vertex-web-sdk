@@ -1,4 +1,4 @@
-import { ColorMaterial } from 'https://unpkg.com/@vertexvis/viewer@0.9.x/dist/esm/index.mjs';
+import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.9.x/dist/esm/index.mjs';
 import steps from './steps.js';
 
 /**

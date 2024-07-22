@@ -1,5 +1,5 @@
 import { getStreamKey } from '../helpers.js';
-import { defineCustomElements } from 'https://unpkg.com/@vertexvis/viewer@0.17.x/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.17.x/dist/esm/loader.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());
