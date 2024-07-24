@@ -498,7 +498,8 @@ export class Viewer {
     this.modelViews = new ModelViewController(
       client,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
+      () => this.scene()
     );
 
     this.stream =
