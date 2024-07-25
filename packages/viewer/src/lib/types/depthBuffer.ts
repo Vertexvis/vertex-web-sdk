@@ -90,6 +90,29 @@ export class DepthBuffer implements FrameImageLike {
   }
 
   /**
+   * Computes the maximum depth of visible geometry within the coordinate
+   * space of the depth buffer.
+   *
+   * For perspective cameras, the maximum depth is the magnitude
+   * of the far plane of the camera.
+   *
+   * For orthographic cameras, the maximum depth is the distance between
+   * the near and far planes of the camera.
+   *
+   * @returns The maximum depth of visible geometry.
+   */
+  public getMaxDepthOfGeometry(): number {
+    const { near, far } = this.camera;
+    const isPerspectiveCamera = this.camera.isPerspective();
+
+    if (isPerspectiveCamera) {
+      return far;
+    } else {
+      return far - near;
+    }
+  }
+
+  /**
    * Computes a depth from a 2D point within the coordinate space of the frame.
    * The returned depth is a normalized value (`[0, 1]`) between the near and
    * far plane.
@@ -260,14 +283,23 @@ export class DepthBuffer implements FrameImageLike {
       viewport
     );
 
-    // Allow for a small rounding error
-    const allowableDifferenceToStillBeOnSurface = Math.abs(
-      0.02 * distanceToPoint
-    );
-    const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
-    const isDetachedFromGeometry =
-      depthDifference > allowableDifferenceToStillBeOnSurface;
+    // If depthDifference is 0, then the point is directly on the surface of the
+    // closest geometry and is not detached. This method allows for a small rounding
+    // error when the point is slightly closer to the camera than the geometry.
+    const distanceFromClosestGeometryToPoint =
+      depthOfClosestGeometry - distanceToPoint;
+    const allowableDifferenceToStillBeOnSurface = 0.02 * distanceToPoint;
+    const pointIsOnSurface =
+      distanceFromClosestGeometryToPoint <
+      allowableDifferenceToStillBeOnSurface;
 
+    // Check to see if the given world point is behind the far plane,
+    // or that the depth of the point is greater than the maximum depth of visible geometry
+    const maximumDepthOfVisibleGeometry = this.getMaxDepthOfGeometry();
+    const pointIsBehindFarPlane =
+      distanceToPoint > maximumDepthOfVisibleGeometry;
+
+    const isDetachedFromGeometry = !pointIsOnSurface || pointIsBehindFarPlane;
     return isDetachedFromGeometry;
   }
 }
