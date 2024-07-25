@@ -39,7 +39,7 @@ export function makeUpdateSceneViewRequest(
   }
 
   const mask = new FieldMask();
-  mask.addPaths('sceneView.modelViewId');
+  mask.addPaths('model_view_id');
   req.setUpdateMask(mask);
 
   return req;

@@ -94,7 +94,7 @@ export class ModelViewController {
       req.setModelViewId(mvUuid2l);
 
       const mask = new FieldMask();
-      mask.addPaths('sceneView.modelViewId');
+      mask.addPaths('model_view_id');
       req.setUpdateMask(mask);
 
       this.client.updateSceneView(req, meta, handler);
@@ -121,7 +121,7 @@ export class ModelViewController {
       req.setModelViewId(svUuid2l);
 
       const mask = new FieldMask();
-      mask.addPaths('sceneView.modelViewId');
+      mask.addPaths('model_view_id');
       req.setUpdateMask(mask);
 
       this.client.updateSceneView(req, meta, handler);
