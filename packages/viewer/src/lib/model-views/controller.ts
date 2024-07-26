@@ -85,7 +85,7 @@ export class ModelViewController {
       const svUuid2l = new Uuid2l();
       svUuid2l.setMsb(svUuid.msb);
       svUuid2l.setLsb(svUuid.lsb);
-      req.setModelViewId(svUuid2l);
+      req.setSceneViewId(svUuid2l);
 
       const mvUuid = UUID.toMsbLsb(modelViewId);
       const mvUuid2l = new Uuid2l();
@@ -118,7 +118,7 @@ export class ModelViewController {
       const svUuid2l = new Uuid2l();
       svUuid2l.setMsb(svUuid.msb);
       svUuid2l.setLsb(svUuid.lsb);
-      req.setModelViewId(svUuid2l);
+      req.setSceneViewId(svUuid2l);
 
       const mask = new FieldMask();
       mask.addPaths('model_view_id');
