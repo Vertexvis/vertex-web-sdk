@@ -283,7 +283,7 @@ export class DepthBuffer implements FrameImageLike {
       viewport
     );
 
-    // If depthDifference is 0, then the point is directly on the surface of the
+    // If distanceFromClosestGeometryToPoint is 0, then the point is directly on the surface of the
     // closest geometry and is not detached. This method allows for a small rounding
     // error when the point is slightly closer to the camera than the geometry.
     const distanceFromClosestGeometryToPoint =
