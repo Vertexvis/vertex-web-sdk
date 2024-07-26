@@ -1,7 +1,7 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { BoundingBox, Dimensions, Vector3 } from '@vertexvis/geometry';
 import { protoToDate } from '@vertexvis/stream-api';
-import { Mapper as M } from '@vertexvis/utils';
+import { Mapper as M, UUID } from '@vertexvis/utils';
 
 import { Token } from '../token';
 import {
@@ -15,7 +15,7 @@ import {
   Orientation,
   SceneViewSummary,
 } from '../types';
-import { fromPbUuid } from './corePbJs';
+import { fromPbJsUuid, fromPbJsUuid2l } from './corePbJs';
 import {
   fromPbBoundingBox3f,
   fromPbDim,
@@ -196,30 +196,31 @@ const fromPbSceneAttributes: M.Func<
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
     displayListSummary: SceneViewSummary.SceneViewSummary;
+    modelViewId: UUID.UUID | undefined;
   }
 > = M.defineMapper(
   M.read(
-    M.mapProp('camera', M.compose(M.required('camera'), fromPbCamera)),
-    M.mapProp(
-      'visibleBoundingBox',
-      M.compose(M.required('visibleBoundingBox'), fromPbBoundingBox3f)
-    ),
-    M.mapProp(
-      'crossSectioning',
-      M.compose(M.required('crossSectioning'), fromPbCrossSectioning)
-    ),
+    M.mapRequiredProp('camera', fromPbCamera),
+    M.mapRequiredProp('visibleBoundingBox', fromPbBoundingBox3f),
+    M.mapRequiredProp('crossSectioning', fromPbCrossSectioning),
     M.requiredProp('hasChanged'),
-    M.mapProp(
-      'displayListSummary',
-      M.compose(M.required('displayListSummary'), fromPbDisplayListSummary)
-    )
+    M.mapRequiredProp('displayListSummary', fromPbDisplayListSummary),
+    M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid2l))
   ),
-  ([camera, boundingBox, crossSectioning, hasChanged, displayListSummary]) => ({
+  ([
     camera,
     boundingBox,
     crossSectioning,
     hasChanged,
     displayListSummary,
+    modelViewId,
+  ]) => ({
+    camera,
+    boundingBox,
+    crossSectioning,
+    hasChanged,
+    displayListSummary,
+    modelViewId: modelViewId != null ? modelViewId : undefined,
   })
 );
 
@@ -231,6 +232,7 @@ const fromPbFrameSceneAttributes: M.Func<
     crossSectioning: CrossSectioning.CrossSectioning;
     hasChanged: boolean;
     displayListSummary: SceneViewSummary.SceneViewSummary;
+    modelViewId: UUID.UUID | undefined;
   }
 > = M.defineMapper(
   M.read(
@@ -267,7 +269,8 @@ function fromPbFrameScene(
         sceneAttr.crossSectioning,
         worldOrientation,
         sceneAttr.hasChanged,
-        sceneAttr.displayListSummary
+        sceneAttr.displayListSummary,
+        sceneAttr.modelViewId
       )
   );
 }
@@ -285,7 +288,7 @@ export function fromPbFrame(
       M.mapProp('depthBuffer', fromPbBytesValue),
       M.mapProp('featureMap', fromPbBytesValue),
       M.mapProp('temporalRefinementCorrelationId', (id) =>
-        id != null ? fromPbUuid(id) : null
+        id != null ? fromPbJsUuid(id) : null
       )
     ),
     ([cIds, seq, fd, s, i, db, fm, trci]) =>
@@ -383,19 +386,19 @@ export const fromPbStartStreamResponse: M.Func<
   M.read(
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('streamId', fromPbUuid)
+      M.mapRequiredProp('streamId', fromPbJsUuid)
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sceneId', fromPbUuid)
+      M.mapRequiredProp('sceneId', fromPbJsUuid)
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sceneViewId', fromPbUuid)
+      M.mapRequiredProp('sceneViewId', fromPbJsUuid)
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sessionId', fromPbUuid)
+      M.mapRequiredProp('sessionId', fromPbJsUuid)
     ),
     M.compose(
       M.requiredProp('startStream'),
