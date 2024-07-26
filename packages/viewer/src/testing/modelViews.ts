@@ -28,7 +28,7 @@ export function makeUpdateSceneViewRequest(
   const svUuid2l = new Uuid2l();
   svUuid2l.setMsb(svUuid.msb);
   svUuid2l.setLsb(svUuid.lsb);
-  req.setModelViewId(svUuid2l);
+  req.setSceneViewId(svUuid2l);
 
   if (modelViewId != null) {
     const mvUuid = UUID.toMsbLsb(modelViewId);
