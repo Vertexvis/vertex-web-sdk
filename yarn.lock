@@ -2239,10 +2239,10 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.22.tgz#fbb532b3d3046c2859caf9ae197bc5715f1c2cab"
   integrity sha512-I4tdrquf1jIPyQNtyZGT7itUfN1QfZ+EVlqdXzUa62Z3w79hMmNmPSRg5efZsrSLxzOYyRJaZ4U7Qp2lOcou2g==
 
-"@vertexvis/scene-view-protos@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.3.tgz#7812a0fc12f4cd00608b1301916d36085a5d076e"
-  integrity sha512-CV/ToNflhSg2FwJvNbRnzRDyZI0/eBDQpa7eg6hAVMXXIXnigIM2Vcx2aE6QRHdrhC0yPXJ0D2kZMOflMvEK/Q==
+"@vertexvis/scene-view-protos@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.4.tgz#d03deb89b9479663131f1f679c3732cf2a7c5bb0"
+  integrity sha512-n4nwcsefsH2mrk2qwDXl1g77N0KLVIPc7vehqp1S76yK+U7BBPKdL4eLdqO9QoYVMvPG47kGRmiqE0BOGaRyGw==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"
