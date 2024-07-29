@@ -47,13 +47,17 @@ describe(ModelViewController, () => {
   describe(ModelViewController.prototype.load, () => {
     it('updates the scene view with the provided model view id', async () => {
       const { controller, client } = makeModelViewController(jwt, deviceId);
-      const expected = makeUpdateSceneViewRequest(sceneViewId, modelViewId);
+      const expected = makeUpdateSceneViewRequest(
+        sceneViewId,
+        itemId,
+        modelViewId
+      );
 
       (client.updateSceneView as jest.Mock).mockImplementationOnce(
         mockGrpcUnaryResult({})
       );
 
-      await controller.load(modelViewId);
+      await controller.load(itemId, modelViewId);
 
       expect(client.updateSceneView).toHaveBeenCalledWith(
         expected,

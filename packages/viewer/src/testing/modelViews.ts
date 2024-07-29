@@ -1,5 +1,6 @@
 import { ModelView } from '@vertexvis/scene-view-protos/core/protos/model_views_pb';
 import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
+import { ItemModelView } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
 import {
   ListItemModelViewsResponse,
   UpdateSceneViewRequest,
@@ -20,6 +21,7 @@ export function makeListItemModelViewsResponse(
 
 export function makeUpdateSceneViewRequest(
   sceneViewId: UUID.UUID,
+  sceneItemId?: UUID.UUID,
   modelViewId?: UUID.UUID
 ): UpdateSceneViewRequest {
   const req = new UpdateSceneViewRequest();
@@ -30,16 +32,23 @@ export function makeUpdateSceneViewRequest(
   svUuid2l.setLsb(svUuid.lsb);
   req.setSceneViewId(svUuid2l);
 
-  if (modelViewId != null) {
+  if (sceneItemId != null && modelViewId != null) {
+    const siUuid = UUID.toMsbLsb(sceneItemId);
+    const siUuid2l = new Uuid2l();
+    siUuid2l.setMsb(siUuid.msb);
+    siUuid2l.setLsb(siUuid.lsb);
     const mvUuid = UUID.toMsbLsb(modelViewId);
     const mvUuid2l = new Uuid2l();
     mvUuid2l.setMsb(mvUuid.msb);
     mvUuid2l.setLsb(mvUuid.lsb);
-    req.setModelViewId(mvUuid2l);
+    const mv = new ItemModelView();
+    mv.setSceneItemId(siUuid2l);
+    mv.setModelViewId(mvUuid2l);
+    req.setItemModelView(mv);
   }
 
   const mask = new FieldMask();
-  mask.addPaths('model_view_id');
+  mask.addPaths('item_model_view');
   req.setUpdateMask(mask);
 
   return req;
