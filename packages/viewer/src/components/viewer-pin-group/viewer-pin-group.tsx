@@ -155,7 +155,7 @@ export class ViewerPinGroup {
           />
         </vertex-viewer-dom-element>
 
-        {isTextPin(this.pin) && !this.occluded && (
+        {isTextPin(this.pin) && !this.occluded && !this.detached && (
           <Fragment>
             <vertex-viewer-pin-label-line
               id={`pin-label-line-${this.pin?.id}`}
