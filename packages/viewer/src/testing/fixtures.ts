@@ -19,6 +19,7 @@ import {
   StencilBuffer,
   Viewport,
 } from '../lib/types';
+import { random } from './random';
 
 const baseDrawFramePayload: Partial<DrawFramePayload> = {
   sequenceNumber: 1,
@@ -43,6 +44,7 @@ const baseDrawFramePayload: Partial<DrawFramePayload> = {
         count: 0,
       },
     },
+    modelViewId: { msb: random.integer(), lsb: random.integer() },
   },
   imageAttributes: {
     frameDimensions: { width: 100, height: 50 },
