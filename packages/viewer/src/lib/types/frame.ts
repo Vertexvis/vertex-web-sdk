@@ -130,7 +130,8 @@ export class FrameScene {
     public readonly crossSection: CrossSectioning.CrossSectioning,
     public readonly worldOrientation: Orientation,
     public readonly hasChanged: boolean,
-    public readonly sceneViewSummary: SceneViewSummary.SceneViewSummary
+    public readonly sceneViewSummary: SceneViewSummary.SceneViewSummary,
+    public readonly modelViewId: UUID.UUID | undefined
   ) {}
 
   public copy({
@@ -140,6 +141,7 @@ export class FrameScene {
     worldOrientation,
     hasChanged,
     sceneViewSummary,
+    modelViewId,
   }: Partial<{
     camera: FrameCameraBase;
     boundingBox: BoundingBox.BoundingBox;
@@ -147,6 +149,7 @@ export class FrameScene {
     worldOrientation: Orientation;
     hasChanged: boolean;
     sceneViewSummary: SceneViewSummary.SceneViewSummary;
+    modelViewId: UUID.UUID | undefined;
   }>): FrameScene {
     return new FrameScene(
       camera ?? this.camera,
@@ -154,7 +157,8 @@ export class FrameScene {
       crossSection ?? this.crossSection,
       worldOrientation ?? this.worldOrientation,
       hasChanged ?? this.hasChanged,
-      sceneViewSummary ?? this.sceneViewSummary
+      sceneViewSummary ?? this.sceneViewSummary,
+      modelViewId ?? this.modelViewId
     );
   }
 }

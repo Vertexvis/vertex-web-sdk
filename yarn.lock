@@ -2048,7 +2048,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^18", "@types/react@^18.2.48":
+"@types/react@*", "@types/react@^18.2.48":
   version "18.3.3"
   resolved "https://registry.npmjs.org/@types/react/-/react-18.3.3.tgz#9679020895318b0915d7a3ab004d92d33375c45f"
   integrity sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==
@@ -2211,9 +2211,9 @@
     prettier "^2.5.1"
 
 "@vertexvis/frame-streaming-protos@^0.13.2":
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.3.tgz#f241a5965f3ff667cea3ad534d1a8d232d741288"
-  integrity sha512-HU+DWXsxGagNE6VWqkAfEWzZ5cxVIdTMwioTelz0MZRp2KD7z3rxDQ8rQshMXC8dpQjFtjqWc0H+p8XWnItPgw==
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.5.tgz#b9b04a1d67c4ffe1fa81fe2493ef977cdfd79bf6"
+  integrity sha512-QTSEn/Mxrda/QJuLeUljw0k6aumIbw6obPnSXV/oJIhRLsmsrRWPisSJ/P6nILZfb8LWzuZwaoaRYHO1EG8tvw==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -2235,9 +2235,9 @@
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
 "@vertexvis/scene-tree-protos@^0.1.21":
-  version "0.1.22"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.22.tgz#fbb532b3d3046c2859caf9ae197bc5715f1c2cab"
-  integrity sha512-I4tdrquf1jIPyQNtyZGT7itUfN1QfZ+EVlqdXzUa62Z3w79hMmNmPSRg5efZsrSLxzOYyRJaZ4U7Qp2lOcou2g==
+  version "0.1.23"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.23.tgz#d0d43f14419db18543c78398d72dcf06efce74e0"
+  integrity sha512-Utb58aiV+k5A+ZPrEUKK4F5ckSRHJyLmLVwHJXVh7iHWNCwXATUaiu9k/YJ6kxUomOSGwL+zIs1lkgRtLDScGw==
 
 "@vertexvis/scene-view-protos@^0.4.4":
   version "0.4.4"
