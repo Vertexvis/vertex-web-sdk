@@ -1,5 +1,6 @@
 import { Pager } from '@vertexvis/scene-view-protos/core/protos/paging_pb';
 import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
+import { ItemModelView } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
 import {
   ListItemModelViewsRequest,
   ListItemModelViewsResponse,
@@ -71,9 +72,13 @@ export class ModelViewController {
   /**
    * Loads the provided model view within the current scene view.
    *
+   * @param sceneItemId The ID of the scene item this model view is being loaded for.
    * @param modelViewId The ID of the model view to load.
    */
-  public async load(modelViewId: UUID.UUID): Promise<void> {
+  public async load(
+    sceneItemId: UUID.UUID,
+    modelViewId: UUID.UUID
+  ): Promise<void> {
     const scene = await this.sceneProvider();
 
     await requestUnary(async (handler) => {
@@ -87,14 +92,21 @@ export class ModelViewController {
       svUuid2l.setLsb(svUuid.lsb);
       req.setSceneViewId(svUuid2l);
 
+      const siUuid = UUID.toMsbLsb(sceneItemId);
+      const siUuid2l = new Uuid2l();
+      siUuid2l.setMsb(siUuid.msb);
+      siUuid2l.setLsb(siUuid.lsb);
       const mvUuid = UUID.toMsbLsb(modelViewId);
       const mvUuid2l = new Uuid2l();
       mvUuid2l.setMsb(mvUuid.msb);
       mvUuid2l.setLsb(mvUuid.lsb);
-      req.setModelViewId(mvUuid2l);
+      const mv = new ItemModelView();
+      mv.setSceneItemId(siUuid2l);
+      mv.setModelViewId(mvUuid2l);
+      req.setItemModelView(mv);
 
       const mask = new FieldMask();
-      mask.addPaths('model_view_id');
+      mask.addPaths('item_model_view');
       req.setUpdateMask(mask);
 
       this.client.updateSceneView(req, meta, handler);
@@ -121,7 +133,7 @@ export class ModelViewController {
       req.setSceneViewId(svUuid2l);
 
       const mask = new FieldMask();
-      mask.addPaths('model_view_id');
+      mask.addPaths('item_model_view');
       req.setUpdateMask(mask);
 
       this.client.updateSceneView(req, meta, handler);
