@@ -2,7 +2,6 @@ import {
   Camera,
   PerspectiveCamera,
 } from '@vertexvis/scene-view-protos/core/protos/camera_pb';
-import { Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 import { ModelView } from '@vertexvis/scene-view-protos/core/protos/model_views_pb';
 import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import { ItemModelView } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
