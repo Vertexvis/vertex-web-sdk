@@ -2,16 +2,22 @@ import { ModelView as PBModelView } from '@vertexvis/scene-view-protos/core/prot
 import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M } from '@vertexvis/utils';
 
-import { fromPbUuid2l, mapCursor } from '../mappers';
+import { fromPbCamera, fromPbUuid2l, mapCursor } from '../mappers';
 import { ModelView, ModelViewListResponse } from './types';
 
 const mapModelView: M.Func<PBModelView.AsObject, ModelView> = M.defineMapper(
   M.read(
     M.mapRequiredProp('id', fromPbUuid2l),
     M.getProp('displayName'),
-    M.mapRequiredProp('partRevisionId', fromPbUuid2l)
+    M.mapRequiredProp('partRevisionId', fromPbUuid2l),
+    M.mapRequiredProp('camera', fromPbCamera)
   ),
-  ([id, displayName, partRevisionId]) => ({ id, displayName, partRevisionId })
+  ([id, displayName, partRevisionId, camera]) => ({
+    id,
+    displayName,
+    partRevisionId,
+    camera,
+  })
 );
 
 const mapListItemModelViewsResponse: M.Func<
