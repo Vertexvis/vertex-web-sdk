@@ -1,3 +1,7 @@
+import {
+  Camera,
+  PerspectiveCamera,
+} from '@vertexvis/scene-view-protos/core/protos/camera_pb';
 import { ModelView } from '@vertexvis/scene-view-protos/core/protos/model_views_pb';
 import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import { ItemModelView } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
@@ -9,7 +13,7 @@ import { UUID } from '@vertexvis/utils';
 import { FieldMask } from 'google-protobuf/google/protobuf/field_mask_pb';
 
 import { random } from './random';
-import { makeUuid2l } from './sceneView';
+import { makeUuid2l, makeVector3 } from './sceneView';
 
 export function makeListItemModelViewsResponse(
   modelViews: ModelView[] = [makeModelView(), makeModelView()]
@@ -63,5 +67,11 @@ export function makeModelView(
   modelView.setId(makeUuid2l(id));
   modelView.setPartRevisionId(makeUuid2l(partRevisionId));
   modelView.setDisplayName(displayName);
+  const camera = new Camera();
+  const perspective = new PerspectiveCamera();
+  perspective.setUp(makeVector3());
+  perspective.setPosition(makeVector3());
+  perspective.setLookAt(makeVector3());
+  modelView.setCamera(camera);
   return modelView;
 }
