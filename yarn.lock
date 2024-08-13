@@ -2211,9 +2211,9 @@
     prettier "^2.5.1"
 
 "@vertexvis/frame-streaming-protos@^0.13.2":
-  version "0.13.5"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.5.tgz#b9b04a1d67c4ffe1fa81fe2493ef977cdfd79bf6"
-  integrity sha512-QTSEn/Mxrda/QJuLeUljw0k6aumIbw6obPnSXV/oJIhRLsmsrRWPisSJ/P6nILZfb8LWzuZwaoaRYHO1EG8tvw==
+  version "0.13.9"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.13.9.tgz#250c9bec3fbe1abc927f8bd3f3eb4dd505cee18b"
+  integrity sha512-oozmHFz8fTIPIK7iph1EhfErhm52aQSwFXRHxbpu+cfZxM1QDpgURhvotqsC+sSAXuWXvH716ypRhrNZ/EP6VA==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -2235,14 +2235,14 @@
   integrity sha512-5pJbF5/nMdqybxpZW2yBIQ9lF3P61ziaC3APTfHXU9APhnVfp+3jdW5PkrWGc45zFn1wCkuwEFhD+ORv3LEePw==
 
 "@vertexvis/scene-tree-protos@^0.1.21":
-  version "0.1.23"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.23.tgz#d0d43f14419db18543c78398d72dcf06efce74e0"
-  integrity sha512-Utb58aiV+k5A+ZPrEUKK4F5ckSRHJyLmLVwHJXVh7iHWNCwXATUaiu9k/YJ6kxUomOSGwL+zIs1lkgRtLDScGw==
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.25.tgz#e41223ed3a5aef9609c7e42c2687649c968c0fd1"
+  integrity sha512-MjeVWG41f6p4en9dtYdV852POeDMMoyqhdTIYJMuUBJvXlW9YjINWXHB+Vd5uNZ1xumU6Rahx1KqTxcOYkPxhw==
 
 "@vertexvis/scene-view-protos@^0.4.5":
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.5.tgz#a4ac4681ca4176f436afadea91ce86dcaaceb3a7"
-  integrity sha512-DPBo3KEaFZl+J/DfWHM4FT5IKbpAG8KEjkp7YCTlCFKzE2NoDJ2VTUdbtYbwsTCxkAX5txEA3uu4dmwlkM3LCA==
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.7.tgz#e0e16fc9e53fec8e92eb664e5d9a04e8d33cf7c0"
+  integrity sha512-R3RULrnqR6l9aCMWRWcctmzxt4l9Sa2Blo/YqBvdAfWuss4VjaZxMgrGOuzcu9RbwCbg9pWDr9p32rvn7UHF3A==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"
