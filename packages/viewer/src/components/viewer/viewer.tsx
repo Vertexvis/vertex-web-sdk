@@ -495,13 +495,6 @@ export class Viewer {
       this.annotationStateChanged.emit(state)
     );
 
-    this.modelViews = new ModelViewController(
-      client,
-      () => this.token,
-      () => this.deviceId,
-      () => this.scene()
-    );
-
     this.stream =
       this.stream ??
       new ViewerStream(new WebSocketClientImpl(), {
@@ -509,6 +502,13 @@ export class Viewer {
         enableTemporalRefinement: this.enableTemporalRefinement,
       });
     this.addStreamListeners();
+
+    this.modelViews = new ModelViewController(
+      client,
+      this.stream,
+      () => this.token,
+      () => this.deviceId
+    );
 
     this.updateStreamAttributes();
     this.stateMap.cursorManager.onChanged.on(() => this.handleCursorChanged());
