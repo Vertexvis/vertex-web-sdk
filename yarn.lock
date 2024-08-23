@@ -2049,9 +2049,9 @@
     "@types/react" "*"
 
 "@types/react@*", "@types/react@^18", "@types/react@^18.2.48":
-  version "18.3.3"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.3.tgz#9679020895318b0915d7a3ab004d92d33375c45f"
-  integrity sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==
+  version "18.3.4"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.4.tgz#dfdd534a1d081307144c00e325c06e00312c93a3"
+  integrity sha512-J7W30FTdfCxDDjmfRM+/JqLHBIyl7xUIp9kwK637FGmY7+mkSFSe6L4jpZzhj5QMfLssSDP4/i75AKkrdC7/Jw==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
@@ -2240,9 +2240,9 @@
   integrity sha512-MjeVWG41f6p4en9dtYdV852POeDMMoyqhdTIYJMuUBJvXlW9YjINWXHB+Vd5uNZ1xumU6Rahx1KqTxcOYkPxhw==
 
 "@vertexvis/scene-view-protos@^0.4.5":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.7.tgz#e0e16fc9e53fec8e92eb664e5d9a04e8d33cf7c0"
-  integrity sha512-R3RULrnqR6l9aCMWRWcctmzxt4l9Sa2Blo/YqBvdAfWuss4VjaZxMgrGOuzcu9RbwCbg9pWDr9p32rvn7UHF3A==
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.4.8.tgz#86921570af4415b0b6ed414af9ac10f38c7441ff"
+  integrity sha512-dQ954cxiAkn10ZVW9C0PcT9bjmefSX2VI4aPuDMvjk1IIJijvB5OcdIrUpnUUKUr53h92jBqyH8+rgIBB/BB3w==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"

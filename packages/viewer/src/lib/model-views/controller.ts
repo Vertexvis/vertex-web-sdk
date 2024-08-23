@@ -7,6 +7,7 @@ import {
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
+import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
 import {
@@ -16,6 +17,7 @@ import {
 import { ModelViewListResponse } from './types';
 
 export interface ListByItemOptions {
+  hasAnnotations?: boolean;
   cursor?: string;
   size?: number;
 }
@@ -41,7 +43,7 @@ export class ModelViewController {
    */
   public async listByItem(
     itemId: UUID.UUID,
-    { cursor, size = 50 }: ListByItemOptions = {}
+    { hasAnnotations, cursor, size = 50 }: ListByItemOptions = {}
   ): Promise<ModelViewListResponse> {
     const res: ListItemModelViewsResponse = await requestUnary(
       async (handler) => {
@@ -54,6 +56,12 @@ export class ModelViewController {
         id.setMsb(msb);
         id.setLsb(lsb);
         req.setItemId(id);
+
+        if (hasAnnotations != null) {
+          const hasAnnotationsVal = new BoolValue();
+          hasAnnotationsVal.setValue(hasAnnotations);
+          req.setHasAnnotations(hasAnnotationsVal);
+        }
 
         const page = new Pager();
         page.setLimit(size);
