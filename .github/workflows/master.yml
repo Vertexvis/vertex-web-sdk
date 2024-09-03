@@ -60,7 +60,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v2
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build-artifact
           path: packages
@@ -100,7 +100,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v2
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build-artifact
           path: packages
@@ -136,7 +136,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v2
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build-artifact
           path: packages
