@@ -8,9 +8,11 @@ import {
   FrameOptions,
   FrameType,
   PhantomOptions,
+  SceneComparisonOptions,
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
+import { toPbJsUuid2l } from './corePbJs';
 import { toPbRGBi } from './material';
 import { toPbFloatValue } from './scalar';
 
@@ -115,6 +117,16 @@ const toPbFrameOptions: M.Func<
   ([frameBackgroundColor]) => ({ frameBackgroundColor })
 );
 
+const toPbSceneComparison: M.Func<
+  SceneComparisonOptions | undefined,
+  vertexvis.protobuf.stream.ISceneComparisonAttributes
+> = M.defineMapper(
+  M.read(M.ifDefined(M.mapProp('sceneIdToCompare', M.ifDefined(toPbJsUuid2l)))),
+  ([sceneIdToCompare]) => ({
+    sceneIdToCompare,
+  })
+);
+
 export const toPbStreamAttributes: M.Func<
   StreamAttributes,
   vertexvis.protobuf.stream.IStreamAttributes
@@ -128,9 +140,10 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('featureMaps', toPbFrameType),
     M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions),
     M.mapProp('selectionHighlighting', toPbSelectionHighlighting),
-    M.mapProp('frames', toPbFrameOptions)
+    M.mapProp('frames', toPbFrameOptions),
+    M.mapProp('sceneComparison', toPbSceneComparison)
   ),
-  ([db, pi, ndl, fl, fh, fm, ero, hs, fa]) => {
+  ([db, pi, ndl, fl, fh, fm, ero, hs, fa, sc]) => {
     const value = {
       depthBuffers: db,
       phantomItems: pi,
@@ -141,6 +154,7 @@ export const toPbStreamAttributes: M.Func<
       experimentalRenderingOptions: ero,
       selectionHighlighting: hs,
       frames: fa,
+      sceneComparison: sc,
     };
 
     return value;
