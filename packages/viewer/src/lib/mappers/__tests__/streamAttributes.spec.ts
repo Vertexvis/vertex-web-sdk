@@ -1,8 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Color, UUID } from '@vertexvis/utils';
-import Long from 'long';
+import { Color } from '@vertexvis/utils';
 
-import { random } from '../../../testing/random';
 import { toPbStreamAttributes } from '../streamAttributes';
 
 describe(toPbStreamAttributes, () => {
@@ -155,7 +153,7 @@ describe(toPbStreamAttributes, () => {
 
   describe('scene comparison', () => {
     it('enables comparing scenes if set', () => {
-      const streamKey = "test";
+      const streamKey = 'test';
 
       const res = toPbStreamAttributes({
         sceneComparison: {
