@@ -31,7 +31,7 @@ export interface FrameOptions {
 }
 
 export interface SceneComparisonOptions {
-  sceneIdToCompare?: UUID.UUID;
+  streamKeyToCompare?: string;
 }
 
 export interface HTMLDomRendererPositionableElement {

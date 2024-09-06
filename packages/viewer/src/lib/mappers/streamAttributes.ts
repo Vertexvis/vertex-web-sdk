@@ -121,9 +121,9 @@ const toPbSceneComparison: M.Func<
   SceneComparisonOptions | undefined,
   vertexvis.protobuf.stream.ISceneComparisonAttributes
 > = M.defineMapper(
-  M.read(M.ifDefined(M.mapProp('sceneIdToCompare', M.ifDefined(toPbJsUuid2l)))),
-  ([sceneIdToCompare]) => ({
-    sceneIdToCompare,
+  M.read(M.ifDefined(M.mapProp('streamKeyToCompare'))),
+  ([streamKeyToCompare]) => ({
+    streamKeyToCompare,
   })
 );
 
