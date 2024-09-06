@@ -33,6 +33,7 @@ import {
   FeatureLineOptions,
   FrameType,
   PhantomOptions,
+  SceneComparisonOptions,
   SelectionHighlightingOptions,
 } from './interfaces';
 import { Frame, FrameCameraBase } from './lib/types/frame';
@@ -651,6 +652,10 @@ export namespace Components {
      * Returns an object that is used to perform operations on the `Scene` that's currently being viewed. These operations include updating items, positioning the camera and performing hit tests.
      */
     scene: () => Promise<Scene>;
+    /**
+     * Specifies if and how to compare to another scene
+     */
+    sceneComparison?: SceneComparisonOptions;
     /**
      * Specifies the halo selection properties. Parameter notes:
      *
@@ -2486,6 +2491,10 @@ declare namespace LocalJSX {
      * Enables or disables the default rotation interaction being changed to rotate around the pointer down location.
      */
     rotateAroundTapPoint?: boolean;
+    /**
+     * Specifies if and how to compare to another scene
+     */
+    sceneComparison?: SceneComparisonOptions;
     /**
      * Specifies the halo selection properties. Parameter notes:
      *

@@ -22,6 +22,7 @@ import {
   FeatureLineOptions,
   FrameType,
   PhantomOptions,
+  SceneComparisonOptions,
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
@@ -272,6 +273,12 @@ export class Viewer {
    */
   @Prop({ attribute: null })
   public featureHighlighting?: FeatureHighlightOptions;
+
+  /**
+   * Specifies if and how to compare to another scene
+   */
+  @Prop({ attribute: null })
+  public sceneComparison?: SceneComparisonOptions;
 
   /**
    * Specifies when a feature map is returned from rendering. Feature maps
@@ -795,32 +802,16 @@ export class Viewer {
   /**
    * @ignore
    */
-  @Watch('depthBuffers')
-  protected handleDepthBuffersChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('phantom')
-  protected handlePhantomChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('noDefaultLights')
-  protected handleNoDefaultLightsChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('experimentalRenderingOptions')
-  protected handleExperimentalRenderingOptionsChanged(): void {
+  @Watch('depthBuffers')
+  @Watch('featureHighlighting')
+  @Watch('featureLines')
+  @Watch('featureMaps')
+  @Watch('noDefaultLights')
+  @Watch('phantom')
+  @Watch('sceneComparison')
+  @Watch('selectionHighlighting')
+  protected handleStreamAttributesChanged(): void {
     this.updateStreamAttributes();
   }
 
@@ -830,38 +821,6 @@ export class Viewer {
   @Watch('enableTemporalRefinement')
   protected handleEnableTemporalRefinementChanged(): void {
     this.updateEnableTemporalRefinement();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('featureLines')
-  protected handleFeatureLinesChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('selectionHighlighting')
-  protected handleSelectionHighlightingChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('featureHighlighting')
-  protected handleFeatureHighlightingChanged(): void {
-    this.updateStreamAttributes();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('featureMaps')
-  protected handleFeatureMapsChanged(): void {
-    this.updateStreamAttributes();
   }
 
   /**
@@ -1498,16 +1457,17 @@ export class Viewer {
   private getStreamAttributes(): StreamAttributes {
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
-      phantom: this.phantom,
-      noDefaultLights: this.noDefaultLights,
-      featureLines: this.featureLines,
-      featureHighlighting: this.featureHighlighting,
-      featureMaps: this.featureMaps,
       experimentalRenderingOptions: this.experimentalRenderingOptions,
-      selectionHighlighting: this.selectionHighlighting,
+      featureHighlighting: this.featureHighlighting,
+      featureLines: this.featureLines,
+      featureMaps: this.featureMaps,
       frames: {
         frameBackgroundColor: this.getBackgroundColor(),
       },
+      noDefaultLights: this.noDefaultLights,
+      phantom: this.phantom,
+      sceneComparison: this.sceneComparison,
+      selectionHighlighting: this.selectionHighlighting,
     };
   }
 

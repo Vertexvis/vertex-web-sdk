@@ -1,5 +1,5 @@
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
-import { Color } from '@vertexvis/utils';
+import { Color, UUID } from '@vertexvis/utils';
 
 export type Color3 = Omit<Color.Color, 'a'> | string | number;
 
@@ -30,6 +30,10 @@ export interface FrameOptions {
   frameBackgroundColor?: Color3;
 }
 
+export interface SceneComparisonOptions {
+  sceneIdToCompare?: UUID.UUID;
+}
+
 export interface HTMLDomRendererPositionableElement {
   position: Vector3.Vector3;
   positionJson: string;
@@ -52,4 +56,5 @@ export interface StreamAttributes {
   experimentalRenderingOptions?: string;
   selectionHighlighting?: SelectionHighlightingOptions;
   frames?: FrameOptions;
+  sceneComparison?: SceneComparisonOptions;
 }
