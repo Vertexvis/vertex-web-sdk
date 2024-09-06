@@ -344,6 +344,18 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9>(
   h: Func<T, R8>,
   i: Func<T, R9>
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9]>;
+export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10>(
+  a: Func<T, R1>,
+  b: Func<T, R2>,
+  c: Func<T, R3>,
+  d: Func<T, R4>,
+  e: Func<T, R5>,
+  f: Func<T, R6>,
+  g: Func<T, R7>,
+  h: Func<T, R8>,
+  i: Func<T, R9>,
+  j: Func<T, R10>
+): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10]>;
 export function read(
   ...mappers: Func<unknown, unknown>[]
 ): Func<unknown, unknown[]> {
@@ -497,6 +509,18 @@ export function compose<T, A, B, C, D, E, F, G, H, R>(
   h: Func<G, H>,
   i: Func<H, R>
 ): Func<T, R>;
+export function compose<T, A, B, C, D, E, F, G, H, I, R>(
+  a: Func<T, A>,
+  b: Func<A, B>,
+  c: Func<B, C>,
+  d: Func<C, D>,
+  e: Func<D, E>,
+  f: Func<E, F>,
+  g: Func<F, G>,
+  h: Func<G, H>,
+  i: Func<H, I>,
+  j: Func<I, R>
+): Func<T, R>;
 export function compose(
   ...decoders: Func<unknown, unknown>[]
 ): Func<unknown, unknown> {
@@ -577,6 +601,18 @@ export function pickFirst<T, A, B, C, D, E, F, G, H, I>(
   h: Func<T, H | undefined>,
   i: Func<T, I | undefined>
 ): Func<T, A | B | C | D | E | F | G | H | I | undefined>;
+export function pickFirst<T, A, B, C, D, E, F, G, H, I, J>(
+  a: Func<T, A | undefined>,
+  b: Func<T, B | undefined>,
+  c: Func<T, C | undefined>,
+  d: Func<T, D | undefined>,
+  e: Func<T, E | undefined>,
+  f: Func<T, F | undefined>,
+  g: Func<T, G | undefined>,
+  h: Func<T, H | undefined>,
+  i: Func<T, I | undefined>,
+  j: Func<T, J | undefined>
+): Func<T, A | B | C | D | E | F | G | H | I | J | undefined>;
 export function pickFirst(
   ...decoders: Func<unknown, unknown | undefined>[]
 ): Func<unknown, unknown | undefined> {
