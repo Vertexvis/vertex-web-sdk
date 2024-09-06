@@ -1455,7 +1455,6 @@ export class Viewer {
   }
 
   private getStreamAttributes(): StreamAttributes {
-    console.log(this.sceneComparison);
     return {
       depthBuffers: this.getDepthBufferStreamAttributesValue(),
       experimentalRenderingOptions: this.experimentalRenderingOptions,
