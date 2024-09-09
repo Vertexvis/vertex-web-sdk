@@ -155,6 +155,21 @@ describe(toPbStreamAttributes, () => {
 
   describe('scene comparison', () => {
     it('enables comparing scenes if set', () => {
+      const streamKey = 'test';
+
+      const res = toPbStreamAttributes({
+        sceneComparison: {
+          streamKeyToCompare: streamKey,
+        },
+      });
+      expect(res).toMatchObject({
+        sceneComparison: {
+          streamKeyToCompare: { value: streamKey },
+        },
+      });
+    });
+
+    it('enables comparing scenes with scene id', () => {
       const sceneId = random.guid();
       const sceneId2l = UUID.toMsbLsb(sceneId);
 
