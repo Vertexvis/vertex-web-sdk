@@ -164,7 +164,7 @@ describe(toPbStreamAttributes, () => {
       });
       expect(res).toMatchObject({
         sceneComparison: {
-          streamKeyToCompare: streamKey,
+          streamKeyToCompare: { value: streamKey },
         },
       });
     });

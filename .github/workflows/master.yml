@@ -15,11 +15,11 @@ jobs:
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -60,7 +60,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v4
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
@@ -68,13 +68,13 @@ jobs:
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -100,7 +100,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v4
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
@@ -108,13 +108,13 @@ jobs:
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -136,7 +136,7 @@ jobs:
       - name: "Checkout changes"
         uses: actions/checkout@v4
       - name: "Download build artifacts"
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
@@ -144,13 +144,13 @@ jobs:
         id: nvm
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
