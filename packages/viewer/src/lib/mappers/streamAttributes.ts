@@ -123,7 +123,7 @@ const toPbSceneComparison: M.Func<
 > = M.defineMapper(
   M.read(
     M.ifDefined(M.mapProp('sceneIdToCompare', M.ifDefined(toPbJsUuid2l))),
-    M.ifDefined(M.getProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))
+    M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))
   ),
   ([sceneIdToCompare, streamKeyToCompare]) => ({
     sceneIdToCompare,
