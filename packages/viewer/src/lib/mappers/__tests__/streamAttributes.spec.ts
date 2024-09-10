@@ -1,8 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Color, UUID } from '@vertexvis/utils';
-import Long from 'long';
+import { Color } from '@vertexvis/utils';
 
-import { random } from '../../../testing/random';
 import { toPbStreamAttributes } from '../streamAttributes';
 
 describe(toPbStreamAttributes, () => {

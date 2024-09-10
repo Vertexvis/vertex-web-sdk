@@ -12,7 +12,6 @@ import {
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
-import { toPbJsUuid2l } from './corePbJs';
 import { toPbRGBi } from './material';
 import { toPbFloatValue, toPbStringValue } from './scalar';
 
