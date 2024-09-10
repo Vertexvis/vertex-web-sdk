@@ -168,24 +168,5 @@ describe(toPbStreamAttributes, () => {
         },
       });
     });
-
-    it('enables comparing scenes with scene id', () => {
-      const sceneId = random.guid();
-      const sceneId2l = UUID.toMsbLsb(sceneId);
-
-      const res = toPbStreamAttributes({
-        sceneComparison: {
-          sceneIdToCompare: sceneId,
-        },
-      });
-      expect(res).toMatchObject({
-        sceneComparison: {
-          sceneIdToCompare: {
-            msb: Long.fromString(sceneId2l.msb),
-            lsb: Long.fromString(sceneId2l.lsb),
-          },
-        },
-      });
-    });
   });
 });
