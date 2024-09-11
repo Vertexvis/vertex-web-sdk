@@ -1,8 +1,6 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Color, UUID } from '@vertexvis/utils';
-import Long from 'long';
+import { Color } from '@vertexvis/utils';
 
-import { random } from '../../../testing/random';
 import { toPbStreamAttributes } from '../streamAttributes';
 
 describe(toPbStreamAttributes, () => {
@@ -165,25 +163,6 @@ describe(toPbStreamAttributes, () => {
       expect(res).toMatchObject({
         sceneComparison: {
           streamKeyToCompare: { value: streamKey },
-        },
-      });
-    });
-
-    it('enables comparing scenes with scene id', () => {
-      const sceneId = random.guid();
-      const sceneId2l = UUID.toMsbLsb(sceneId);
-
-      const res = toPbStreamAttributes({
-        sceneComparison: {
-          sceneIdToCompare: sceneId,
-        },
-      });
-      expect(res).toMatchObject({
-        sceneComparison: {
-          sceneIdToCompare: {
-            msb: Long.fromString(sceneId2l.msb),
-            lsb: Long.fromString(sceneId2l.lsb),
-          },
         },
       });
     });

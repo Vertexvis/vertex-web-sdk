@@ -12,7 +12,6 @@ import {
   SelectionHighlightingOptions,
   StreamAttributes,
 } from '../../interfaces';
-import { toPbJsUuid2l } from './corePbJs';
 import { toPbRGBi } from './material';
 import { toPbFloatValue, toPbStringValue } from './scalar';
 
@@ -122,11 +121,9 @@ const toPbSceneComparison: M.Func<
   vertexvis.protobuf.stream.ISceneComparisonAttributes
 > = M.defineMapper(
   M.read(
-    M.ifDefined(M.mapProp('sceneIdToCompare', M.ifDefined(toPbJsUuid2l))),
     M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))
   ),
-  ([sceneIdToCompare, streamKeyToCompare]) => ({
-    sceneIdToCompare,
+  ([streamKeyToCompare]) => ({
     streamKeyToCompare,
   })
 );
