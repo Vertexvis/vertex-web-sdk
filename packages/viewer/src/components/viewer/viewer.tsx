@@ -58,6 +58,7 @@ import { TouchInteractionHandler } from '../../lib/interactions/touchInteraction
 import { fromPbFrameOrThrow } from '../../lib/mappers';
 import { paintTime, Timing } from '../../lib/meters';
 import { ModelViewController } from '../../lib/model-views/controller';
+import { PmiController } from '../../lib/pmi';
 import {
   CanvasRenderer,
   createCanvasRenderer,
@@ -349,6 +350,13 @@ export class Viewer {
   @Prop({ mutable: true }) public modelViews: ModelViewController | undefined;
 
   /**
+   * The controller for accessing and viewing PMI.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true }) public pmi: PmiController | undefined;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -513,6 +521,12 @@ export class Viewer {
     this.modelViews = new ModelViewController(
       client,
       this.stream,
+      () => this.token,
+      () => this.deviceId
+    );
+
+    this.pmi = new PmiController(
+      client,
       () => this.token,
       () => this.deviceId
     );

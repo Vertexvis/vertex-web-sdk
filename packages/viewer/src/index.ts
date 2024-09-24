@@ -20,6 +20,7 @@ export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export * from './lib/model-views';
 export * from './lib/pins';
+export * from './lib/pmi';
 export {
   Camera,
   CrossSectioner,

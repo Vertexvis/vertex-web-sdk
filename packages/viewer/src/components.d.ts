@@ -54,6 +54,7 @@ import {
   AnnotationState,
 } from './lib/annotations/controller';
 import { ModelViewController } from './lib/model-views/controller';
+import { PmiController } from './lib/pmi';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus } from './components/viewer/viewer';
 import {
@@ -581,6 +582,11 @@ export namespace Components {
      * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
      */
     phantom?: PhantomOptions;
+    /**
+     * The controller for accessing and viewing PMI.
+     * @readonly
+     */
+    pmi: PmiController | undefined;
     /**
      * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.
      *
@@ -2482,6 +2488,11 @@ declare namespace LocalJSX {
      * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
      */
     phantom?: PhantomOptions;
+    /**
+     * The controller for accessing and viewing PMI.
+     * @readonly
+     */
+    pmi?: PmiController | undefined;
     /**
      * An optional value that will debounce frame updates when resizing this viewer element.
      */
