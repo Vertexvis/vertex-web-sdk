@@ -90,7 +90,7 @@
     "eslint-plugin-react": "^7.30.0",
     "jest": "^27.5.1",
     "jsonwebtoken": "^9.0.0",
-    "rollup": "^2.75.6",
+    "rollup": "^3.29.5",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "ts-jest": "^27.1.4",
