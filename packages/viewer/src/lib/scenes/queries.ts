@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { SceneItemOperationsBuilder } from './scene';
+import {
+  SceneAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -598,5 +601,15 @@ export class SceneItemQueryExecutor {
     const expression: QueryExpression = query(new RootQuery()).build();
 
     return new SceneItemOperationsBuilder(expression);
+  }
+}
+
+export class SceneAnnotationQueryExecutor {
+  public where(
+    query: (q: RootQuery) => TerminalQuery
+  ): SceneAnnotationOperationsBuilder {
+    const expression: QueryExpression = query(new RootQuery()).build();
+
+    return new SceneAnnotationOperationsBuilder(expression);
   }
 }

@@ -22,8 +22,10 @@ export * from './lib/model-views';
 export * from './lib/pins';
 export * from './lib/pmi';
 export {
+  AnnotationOperationBuilder,
   Camera,
   CrossSectioner,
+  ItemOperationBuilder,
   Raycaster,
   RaycasterOptions,
   ResetViewOptions,
@@ -32,7 +34,6 @@ export {
   SceneExecutionOptions,
   SceneItemOperationsBuilder,
   SceneItemQueryExecutor,
-  SceneOperationBuilder,
   SceneViewStateFeature,
   TerminalItemOperationBuilder,
 } from './lib/scenes';
