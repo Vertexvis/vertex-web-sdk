@@ -4,7 +4,7 @@
 /* istanbul ignore file */
 export * from './camera';
 export * from './crossSectioner';
-export { AnnotationOperationBuilder, ItemOperationBuilder } from './operations';
+export { SceneOperationBuilder } from './operations';
 export {
   AllQuery,
   AllSelectedQuery,
@@ -15,7 +15,6 @@ export {
   OrQuery,
   PointQuery,
   RootQuery,
-  SceneAnnotationQueryExecutor,
   SceneItemQueryExecutor,
   SceneTreeRangeQuery,
   VolumeIntersectionQuery,
