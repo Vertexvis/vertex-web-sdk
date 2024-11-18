@@ -167,17 +167,6 @@ export function buildQueryExpression(
   }
 }
 
-export function buildSceneOperation(
-  query: QueryExpression,
-  operations: ItemOperation[],
-  context: BuildSceneOperationContext
-): vertexvis.protobuf.stream.ISceneOperation {
-  const operationTypes = buildOperationTypes(operations);
-  const queryExpression = buildQueryExpression(query, context);
-
-  return { queryExpression, operationTypes };
-}
-
 export function buildSceneElementOperationOnItem(
   query: QueryExpression,
   operations: ItemOperation[],
