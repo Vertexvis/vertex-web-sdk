@@ -87,14 +87,7 @@ export class ModelViewController {
     sceneItemId: UUID.UUID,
     modelViewId: UUID.UUID
   ): Promise<void> {
-    console.log(
-      'load in ModelViewController for sceneItemId ' +
-        sceneItemId +
-        ' and modelViewId ' +
-        modelViewId
-    );
     const itemModelView = mapItemModelViewOrThrow({ modelViewId, sceneItemId });
-    console.log(itemModelView);
     this.stream.updateModelView({ itemModelView }, true);
   }
 
