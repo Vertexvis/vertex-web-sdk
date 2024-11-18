@@ -15,24 +15,14 @@ import {
 } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
+import { buildSceneElementOperationOnItem } from './mapper';
 import {
-  buildSceneElementOperationOnAnnotation,
-  buildSceneElementOperationOnItem,
-} from './mapper';
-import {
-  AnnotationOperation,
-  AnnotationOperationBuilder,
-  AnnotationOperations,
   ItemOperation,
-  ItemOperationBuilder,
   RepresentationId,
   SceneItemOperations,
+  SceneOperationBuilder,
 } from './operations';
-import {
-  QueryExpression,
-  SceneAnnotationQueryExecutor,
-  SceneItemQueryExecutor,
-} from './queries';
+import { QueryExpression, SceneItemQueryExecutor } from './queries';
 import { Raycaster } from './raycaster';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
 
@@ -52,21 +42,21 @@ export interface ResetViewOptions {
 }
 
 /**
- * A class that is responsible for building operations for scene items in a specific scene.
+ * A class that is responsible for building operations for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in
  * order for the changes to take effect.
  */
 export class SceneItemOperationsBuilder
   implements SceneItemOperations<SceneItemOperationsBuilder>
 {
-  private builder: ItemOperationBuilder;
+  private builder: SceneOperationBuilder;
 
   public constructor(
     private query: QueryExpression,
-    givenBuilder?: ItemOperationBuilder
+    givenBuilder?: SceneOperationBuilder
   ) {
     this.builder =
-      givenBuilder != null ? givenBuilder : new ItemOperationBuilder();
+      givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
   }
 
   /**
@@ -547,7 +537,7 @@ export class SceneItemOperationsBuilder
   /**
    * @internal
    */
-  public build(): ItemQueryOperation {
+  public build(): QueryOperation {
     return {
       query: this.query,
       operations: this.builder.build(),
@@ -555,127 +545,9 @@ export class SceneItemOperationsBuilder
   }
 }
 
-/**
- * A class that is responsible for building operations for a specific scene.
- * This executor requires a query, and expects `execute()` to be invoked in
- * order for the changes to take effect.
- */
-export class SceneAnnotationOperationsBuilder
-  implements AnnotationOperations<SceneAnnotationOperationsBuilder>
-{
-  private builder: AnnotationOperationBuilder;
-
-  public constructor(
-    private query: QueryExpression,
-    givenBuilder?: AnnotationOperationBuilder
-  ) {
-    this.builder =
-      givenBuilder != null ? givenBuilder : new AnnotationOperationBuilder();
-  }
-
-  /**
-   * Specifies that the items matching the query should be hidden.
-   *
-   * @example
-   * ```typescript
-   * const viewer = document.querySelector('vertex-viewer');
-   * const scene = await viewer.scene();
-   *
-   * // Hide the item with the `item-uuid` ID
-   * await scene.elements((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).hide(),
-   * ]).execute();
-   * ```
-   */
-  public hide(): SceneAnnotationOperationsBuilder {
-    return new SceneAnnotationOperationsBuilder(
-      this.query,
-      this.builder.hide()
-    );
-  }
-
-  /**
-   * Specifies that the items matching the query should be shown.
-   *
-   * @example
-   * ```typescript
-   * const viewer = document.querySelector('vertex-viewer');
-   * const scene = await viewer.scene();
-   *
-   * // Show the item with the `item-uuid` ID
-   * await scene.elements((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).show(),
-   * ]).execute();
-   * ```
-   */
-  public show(): SceneAnnotationOperationsBuilder {
-    return new SceneAnnotationOperationsBuilder(
-      this.query,
-      this.builder.show()
-    );
-  }
-
-  /**
-   * Specifies that the items matching the query should be selected.
-   *
-   * @example
-   * ```typescript
-   * const viewer = document.querySelector('vertex-viewer');
-   * const scene = await viewer.scene();
-   *
-   * // Select the item with the `item-uuid` ID
-   * await scene.elements((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).select(),
-   * ]).execute();
-   * ```
-   */
-  public select(): SceneAnnotationOperationsBuilder {
-    return new SceneAnnotationOperationsBuilder(
-      this.query,
-      this.builder.select()
-    );
-  }
-
-  /**
-   * Specifies that the items matching the query should be deselected.
-   *
-   * @example
-   * ```typescript
-   * const viewer = document.querySelector('vertex-viewer');
-   * const scene = await viewer.scene();
-   *
-   * // Deselect the item with the `item-uuid` ID
-   * await scene.elements((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).deselect(),
-   * ]).execute();
-   * ```
-   */
-  public deselect(): SceneAnnotationOperationsBuilder {
-    return new SceneAnnotationOperationsBuilder(
-      this.query,
-      this.builder.deselect()
-    );
-  }
-
-  /**
-   * @internal
-   */
-  public build(): AnnotationQueryOperation {
-    return {
-      query: this.query,
-      operations: this.builder.build(),
-    };
-  }
-}
-
-export interface ItemQueryOperation {
+export interface QueryOperation {
   query: QueryExpression;
   operations: ItemOperation[];
-}
-
-export interface AnnotationQueryOperation {
-  query: QueryExpression;
-  operations: AnnotationOperation[];
 }
 
 export class OperationExecutor {
@@ -683,8 +555,7 @@ export class OperationExecutor {
     private sceneViewId: UUID.UUID,
     private stream: StreamApi,
     private dimensions: Dimensions.Dimensions,
-    private sceneItemQueryOperations: ItemQueryOperation[],
-    private annotationQueryOperations: AnnotationQueryOperation[]
+    private sceneItemQueryOperations: QueryOperation[]
   ) {}
 
   public async execute(
@@ -695,17 +566,11 @@ export class OperationExecutor {
         dimensions: this.dimensions,
       })
     );
-    const pbAnnotationOperations = this.annotationQueryOperations.map((op) =>
-      buildSceneElementOperationOnAnnotation(op.query, op.operations, {
-        dimensions: this.dimensions,
-      })
-    );
-
     const request = {
       sceneViewId: {
         hex: this.sceneViewId,
       },
-      elementOperations: [...pbItemOperations, ...pbAnnotationOperations],
+      elementOperations: pbItemOperations,
       suppliedCorrelationId:
         executionOptions?.suppliedCorrelationId != null
           ? {
@@ -721,10 +586,6 @@ export class OperationExecutor {
 export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
   | SceneItemOperationsBuilder[];
-
-export type TerminalAnnotationOperationBuilder =
-  | SceneAnnotationOperationsBuilder
-  | SceneAnnotationOperationsBuilder[];
 
 export type ImageScaleProvider = () => Point.Point | undefined;
 
@@ -847,14 +708,13 @@ export class Scene {
       : [sceneOperations];
     const operationList = ops.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
-      [] as ItemQueryOperation[]
+      [] as QueryOperation[]
     );
     return new OperationExecutor(
       this.sceneViewId,
       this.stream,
       this.dimensions,
-      operationList,
-      []
+      operationList
     );
   }
 
@@ -876,16 +736,12 @@ export class Scene {
    *
    * @see {@link RootQuery} for more information on available queries.
    *
-   * @see {@link SceneItemOperationsBuilder} and {@link SceneAnnotationOperationsBuilder} for more information on available operations to the scene items.
+   * @see {@link SceneItemOperationsBuilder} for more information on available operations to the scene items.
    *
    * @param itemOperations
-   * @param annotationOperations
    */
   public elements(
-    itemOperations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder,
-    annotationOperations?: (
-      q: SceneAnnotationQueryExecutor
-    ) => TerminalAnnotationOperationBuilder
+    itemOperations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
   ): OperationExecutor {
     // Operations on scene items
     const sceneItemOperations = itemOperations(new SceneItemQueryExecutor());
@@ -894,38 +750,14 @@ export class Scene {
       : [sceneItemOperations];
     const sceneItemsOperationList = sceneItemOps.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
-      [] as ItemQueryOperation[]
-    );
-
-    if (annotationOperations == null) {
-      return new OperationExecutor(
-        this.sceneViewId,
-        this.stream,
-        this.dimensions,
-        sceneItemsOperationList,
-        []
-      );
-    }
-
-    // Operations on annotation
-    const pmiAnnotationOperations = annotationOperations(
-      new SceneAnnotationQueryExecutor()
-    );
-    const annotationOps = Array.isArray(pmiAnnotationOperations)
-      ? pmiAnnotationOperations
-      : [pmiAnnotationOperations];
-    const annotationsOperationList = annotationOps.reduce(
-      (acc, builder: SceneAnnotationOperationsBuilder) =>
-        acc.concat(builder.build()),
-      [] as AnnotationQueryOperation[]
+      [] as QueryOperation[]
     );
 
     return new OperationExecutor(
       this.sceneViewId,
       this.stream,
       this.dimensions,
-      sceneItemsOperationList,
-      annotationsOperationList
+      sceneItemsOperationList
     );
   }
 
