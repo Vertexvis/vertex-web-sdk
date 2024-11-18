@@ -13,7 +13,7 @@ export async function showItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).show())
+    .elements((op) => op.where((q) => q.withItemId(id)).show())
     .execute({ suppliedCorrelationId });
 }
 
@@ -24,7 +24,7 @@ export async function hideItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).hide())
+    .elements((op) => op.where((q) => q.withItemId(id)).hide())
     .execute({
       suppliedCorrelationId,
     });
@@ -37,7 +37,7 @@ export async function selectItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
+    .elements((op) => [
       ...(append ? [] : [op.where((q) => q.all()).deselect()]),
       op.where((q) => q.withItemId(id)).select(),
     ])
@@ -52,7 +52,7 @@ export async function selectRangeInSceneTree(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
+    .elements((op) => [
       ...(append ? [] : [op.where((q) => q.all()).deselect()]),
       op.where((q) => q.withSceneTreeRange({ start, end })).select(),
     ])
@@ -71,7 +71,7 @@ export async function selectFilterResults(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
+    .elements((op) => [
       ...(append ? [] : [op.where((q) => q.all()).deselect()]),
       op
         .where((q) =>
@@ -91,7 +91,7 @@ export async function deselectItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).deselect())
+    .elements((op) => op.where((q) => q.withItemId(id)).deselect())
     .execute({
       suppliedCorrelationId,
     });

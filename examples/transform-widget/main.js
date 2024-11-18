@@ -52,14 +52,14 @@ async function main() {
       if (event.detail.shiftKey) {
         // If the shift key is pressed, add to the current selection without removing existing selection
         await scene
-          .items((op) => op.where((q) => q.withItemId(hit.itemId.hex)).select())
+          .elements((op) => op.where((q) => q.withItemId(hit.itemId.hex)).select())
           .execute({
             suppliedCorrelationId: SELECTION_CORRELATION_ID,
           });
       } else {
         // Select the part and deselect all other parts
         await scene
-          .items((op) => [
+          .elements((op) => [
             op.where((q) => q.all()).deselect(),
             op.where((q) => q.withItemId(hit.itemId.hex)).select(),
           ])
@@ -70,7 +70,7 @@ async function main() {
     } else {
       // Deselect all parts since the user clicked in the empty space
       await scene
-        .items((op) => [op.where((q) => q.all()).deselect()])
+        .elements((op) => [op.where((q) => q.all()).deselect()])
         .execute();
 
       nextWidgetPosition = undefined;

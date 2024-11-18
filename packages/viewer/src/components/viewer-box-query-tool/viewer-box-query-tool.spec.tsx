@@ -123,26 +123,30 @@ describe('vertex-viewer-box-query-tool', () => {
 
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: true,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: true,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: true },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
   });
@@ -173,26 +177,30 @@ describe('vertex-viewer-box-query-tool', () => {
 
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: false,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: false,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: true },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
   });
@@ -223,26 +231,30 @@ describe('vertex-viewer-box-query-tool', () => {
 
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: false,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: false,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: false },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: false },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
   });
@@ -273,40 +285,44 @@ describe('vertex-viewer-box-query-tool', () => {
 
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                override: {
-                  selection: {},
-                },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: false },
-              },
-            ]),
-          }),
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: false,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    override: {
+                      selection: {},
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: true },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: false },
+                  },
+                ]),
+              }),
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: false,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
+                  },
+                },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
   });
@@ -351,50 +367,58 @@ describe('vertex-viewer-box-query-tool', () => {
     expect(streamSpy).toHaveBeenCalledTimes(2);
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: false,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: false,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: true },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        operations: expect.arrayContaining([
-          expect.objectContaining({
-            queryExpression: {
-              operand: {
-                volume: {
-                  exclusive: true,
-                  frustumByRectangle: {
-                    rectangle: { height: 10, width: 10, x: 5, y: 5 },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              expect.objectContaining({
+                queryExpression: {
+                  operand: {
+                    volume: {
+                      exclusive: true,
+                      frustumByRectangle: {
+                        rectangle: { height: 10, width: 10, x: 5, y: 5 },
+                      },
+                      viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
+                    },
                   },
-                  viewport: { center: { x: 0, y: 0 }, height: 0, width: 0 },
                 },
-              },
-            },
-            operationTypes: expect.arrayContaining([
-              {
-                changeSelection: { selected: true },
-              },
+                operationTypes: expect.arrayContaining([
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ]),
+              }),
             ]),
           }),
-        ]),
+        }),
       })
     );
   });

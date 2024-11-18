@@ -115,7 +115,7 @@ export class VolumeIntersectionQueryController {
 
         const scene = await this.viewer.scene();
         await scene
-          .items((op) => [
+          .elements((op) => [
             ...additionalTransforms(op),
             ...operationTransforms(op),
           ])

@@ -25,7 +25,7 @@ describe('volume intersection controller', () => {
   const model = new VolumeIntersectionQueryModel();
   const mockViewer = {
     scene: () => ({
-      items: (fn) => {
+      elements: (fn) => {
         fn(mockBuilder);
         return {
           execute: mockExecute,

@@ -31,9 +31,14 @@ export class PmiController {
   }: ListAnnotationsOptions = {}): Promise<PmiAnnotationListResponse> {
     const res: ListPmiAnnotationsResponse = await requestUnary(
       async (handler) => {
+        console.log('listAnnotations');
+        console.log('modelViewId: ' + modelViewId);
+
         const deviceId = this.deviceIdProvider();
         const meta = await createMetadata(this.jwtProvider, deviceId);
         const req = new ListPmiAnnotationsRequest();
+
+        console.log(req);
 
         if (modelViewId != null) {
           const { msb, lsb } = UUID.toMsbLsb(modelViewId);

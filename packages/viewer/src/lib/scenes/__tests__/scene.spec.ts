@@ -53,34 +53,38 @@ describe(Scene, () => {
       const itemId = random.guid();
 
       scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .elements((op) => op.where((q) => q.withItemId(itemId)).hide())
         .execute();
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                item: {
-                  sceneItemQuery: {
-                    id: {
-                      hex: itemId.toString(),
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              {
+                queryExpression: {
+                  operand: {
+                    item: {
+                      sceneItemQuery: {
+                        id: {
+                          hex: itemId.toString(),
+                        },
+                      },
                     },
                   },
                 },
+                operationTypes: [
+                  {
+                    changeVisibility: {
+                      visible: false,
+                    },
+                  },
+                ],
               },
-            },
-            operationTypes: [
-              {
-                changeVisibility: {
-                  visible: false,
-                },
-              },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
@@ -88,35 +92,39 @@ describe(Scene, () => {
       const itemId = random.guid();
       const suppliedId = `SuppliedId-${random.guid()}`;
       scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .elements((op) => op.where((q) => q.withItemId(itemId)).hide())
         .execute({ suppliedCorrelationId: suppliedId });
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                item: {
-                  sceneItemQuery: {
-                    id: {
-                      hex: itemId.toString(),
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              {
+                queryExpression: {
+                  operand: {
+                    item: {
+                      sceneItemQuery: {
+                        id: {
+                          hex: itemId.toString(),
+                        },
+                      },
                     },
                   },
                 },
+                operationTypes: [
+                  {
+                    changeVisibility: {
+                      visible: false,
+                    },
+                  },
+                ],
               },
-            },
-            operationTypes: [
-              {
-                changeVisibility: {
-                  visible: false,
-                },
-              },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
         suppliedCorrelationId: {
           value: suppliedId,
         },
@@ -124,34 +132,40 @@ describe(Scene, () => {
     });
 
     it('should support passing withSelected queries', () => {
-      scene.items((op) => op.where((q) => q.withSelected()).select()).execute();
+      scene
+        .elements((op) => op.where((q) => q.withSelected()).select())
+        .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                override: {
-                  selection: {},
-                },
-              },
-            },
-            operationTypes: [
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
               {
-                changeSelection: { selected: true },
+                queryExpression: {
+                  operand: {
+                    override: {
+                      selection: {},
+                    },
+                  },
+                },
+                operationTypes: [
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ],
               },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
     it('should support passing scene-tree range queries', () => {
       scene
-        .items((op) =>
+        .elements((op) =>
           op
             .where((q) =>
               q.withSceneTreeRange({
@@ -167,29 +181,33 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                sceneTreeRange: {
-                  end: 19,
-                  start: 0,
-                },
-              },
-            },
-            operationTypes: [
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
               {
-                changeSelection: { selected: true },
+                queryExpression: {
+                  operand: {
+                    sceneTreeRange: {
+                      end: 19,
+                      start: 0,
+                    },
+                  },
+                },
+                operationTypes: [
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ],
               },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
     it('should support passing metadata queries', () => {
       scene
-        .items((op) =>
+        .elements((op) =>
           op.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
         )
         .execute();
@@ -198,51 +216,61 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                metadata: {
-                  valueFilter: 'foo',
-                  keys: ['bar', 'baz'],
-                },
-              },
-            },
-            operationTypes: [
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
               {
-                changeSelection: { selected: true },
+                queryExpression: {
+                  operand: {
+                    metadata: {
+                      valueFilter: 'foo',
+                      keys: ['bar', 'baz'],
+                    },
+                  },
+                },
+                operationTypes: [
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ],
               },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
     it('should support passing visibility queries', () => {
-      scene.items((op) => op.where((q) => q.withVisible()).select()).execute();
+      scene
+        .elements((op) => op.where((q) => q.withVisible()).select())
+        .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                override: {
-                  visibility: {
-                    visibilityState: true,
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              {
+                queryExpression: {
+                  operand: {
+                    override: {
+                      visibility: {
+                        visibilityState: true,
+                      },
+                    },
                   },
                 },
+                operationTypes: [
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ],
               },
-            },
-            operationTypes: [
-              {
-                changeSelection: { selected: true },
-              },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
@@ -250,7 +278,7 @@ describe(Scene, () => {
       const itemId = random.guid();
       const suppliedId = random.guid();
       scene
-        .items((op) => [
+        .elements((op) => [
           op.where((q) => q.all()).hide(),
           op
             .where((q) => q.withItemId(itemId).or().withSuppliedId(suppliedId))
@@ -267,135 +295,143 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                root: {},
-              },
-            },
-            operationTypes: [
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
               {
-                changeVisibility: {
-                  visible: false,
+                queryExpression: {
+                  operand: {
+                    root: {},
+                  },
                 },
+                operationTypes: [
+                  {
+                    changeVisibility: {
+                      visible: false,
+                    },
+                  },
+                ],
               },
-            ],
-          },
-          {
-            queryExpression: {
-              operand: {
-                itemCollection: {
-                  queries: [
-                    {
-                      sceneItemQuery: {
-                        id: {
-                          hex: itemId.toString(),
+              {
+                queryExpression: {
+                  operand: {
+                    itemCollection: {
+                      queries: [
+                        {
+                          sceneItemQuery: {
+                            id: {
+                              hex: itemId.toString(),
+                            },
+                          },
                         },
-                      },
-                    },
-                    {
-                      sceneItemQuery: {
-                        suppliedId,
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-            operationTypes: [
-              {
-                changeVisibility: {
-                  visible: true,
-                },
-              },
-            ],
-          },
-          {
-            queryExpression: {
-              operand: {
-                root: {},
-              },
-            },
-            operationTypes: [
-              {
-                changeMaterial: {
-                  materialOverride: {
-                    colorMaterial: {
-                      d: 255,
-                      ka: {
-                        a: 0,
-                        b: 0,
-                        g: 0,
-                        r: 0,
-                      },
-                      kd: {
-                        a: 255,
-                        b: 34,
-                        g: 17,
-                        r: 255,
-                      },
-                      ke: {
-                        a: 0,
-                        b: 0,
-                        g: 0,
-                        r: 0,
-                      },
-                      ks: {
-                        a: 0,
-                        b: 0,
-                        g: 0,
-                        r: 0,
-                      },
-                      ns: ColorMaterial.defaultColor.glossiness,
+                        {
+                          sceneItemQuery: {
+                            suppliedId,
+                          },
+                        },
+                      ],
                     },
                   },
                 },
+                operationTypes: [
+                  {
+                    changeVisibility: {
+                      visible: true,
+                    },
+                  },
+                ],
               },
               {
-                changePhantom: {
-                  phantom: true,
+                queryExpression: {
+                  operand: {
+                    root: {},
+                  },
                 },
+                operationTypes: [
+                  {
+                    changeMaterial: {
+                      materialOverride: {
+                        colorMaterial: {
+                          d: 255,
+                          ka: {
+                            a: 0,
+                            b: 0,
+                            g: 0,
+                            r: 0,
+                          },
+                          kd: {
+                            a: 255,
+                            b: 34,
+                            g: 17,
+                            r: 255,
+                          },
+                          ke: {
+                            a: 0,
+                            b: 0,
+                            g: 0,
+                            r: 0,
+                          },
+                          ks: {
+                            a: 0,
+                            b: 0,
+                            g: 0,
+                            r: 0,
+                          },
+                          ns: ColorMaterial.defaultColor.glossiness,
+                        },
+                      },
+                    },
+                  },
+                  {
+                    changePhantom: {
+                      phantom: true,
+                    },
+                  },
+                  {
+                    changeEndItem: {
+                      endItem: true,
+                    },
+                  },
+                ],
               },
-              {
-                changeEndItem: {
-                  endItem: true,
-                },
-              },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
 
     it('supports selection', () => {
       const itemId = random.guid();
       scene
-        .items((op) => op.where((q) => q.withItemId(itemId)).select())
+        .elements((op) => op.where((q) => q.withItemId(itemId)).select())
         .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
         },
-        operations: [
-          {
-            queryExpression: {
-              operand: {
-                item: {
-                  sceneItemQuery: {
-                    id: { hex: itemId.toString() },
+        elementOperations: expect.objectContaining({
+          operation: expect.objectContaining({
+            sceneItemOperation: expect.arrayContaining([
+              {
+                queryExpression: {
+                  operand: {
+                    item: {
+                      sceneItemQuery: {
+                        id: { hex: itemId.toString() },
+                      },
+                    },
                   },
                 },
+                operationTypes: [
+                  {
+                    changeSelection: { selected: true },
+                  },
+                ],
               },
-            },
-            operationTypes: [
-              {
-                changeSelection: { selected: true },
-              },
-            ],
-          },
-        ],
+            ]),
+          }),
+        }),
       });
     });
   });
