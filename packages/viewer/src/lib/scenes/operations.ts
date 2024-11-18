@@ -126,10 +126,10 @@ export interface SceneItemOperations<T> {
 }
 
 /**
- * A class to handle the building of operations for a scene.
+ * A class to handle the building of operations on scene items for a scene.
  */
-export class SceneOperationBuilder
-  implements SceneItemOperations<SceneOperationBuilder>
+export class ItemOperationBuilder
+  implements SceneItemOperations<ItemOperationBuilder>
 {
   public constructor(private operations: ItemOperation[] = []) {}
 
@@ -141,115 +141,165 @@ export class SceneOperationBuilder
     return this.operations.concat();
   }
 
-  public materialOverride(material: ColorMaterial): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public materialOverride(material: ColorMaterial): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'change-material', material }])
     );
   }
 
-  public show(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'show' }])
-    );
+  public show(): ItemOperationBuilder {
+    return new ItemOperationBuilder(this.operations.concat([{ type: 'show' }]));
   }
 
-  public hide(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
-      this.operations.concat([{ type: 'hide' }])
-    );
+  public hide(): ItemOperationBuilder {
+    return new ItemOperationBuilder(this.operations.concat([{ type: 'hide' }]));
   }
 
-  public select(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public select(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'select' }])
     );
   }
 
-  public deselect(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public deselect(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'deselect' }])
     );
   }
 
-  public clearMaterialOverrides(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearMaterialOverrides(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'clear-override' }])
     );
   }
 
   public transform(
     matrix: vertexvis.protobuf.core.IMatrix4x4f
-  ): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  ): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'change-transform', transform: matrix }])
     );
   }
 
-  public clearTransforms(cascade = true): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearTransforms(cascade = true): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'clear-transform', cascade }])
     );
   }
 
-  public setPhantom(phantomState?: boolean): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public setPhantom(phantomState?: boolean): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'change-phantom', phantomState }])
     );
   }
 
-  public clearPhantom(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearPhantom(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'clear-phantom' }])
     );
   }
 
-  public setEndItem(endItemState?: boolean): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public setEndItem(endItemState?: boolean): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'change-end-item', endItemState }])
     );
   }
 
-  public clearEndItem(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearEndItem(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'clear-end-item' }])
     );
   }
 
-  public viewRenditionById(id: UUID.UUID): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public viewRenditionById(id: UUID.UUID): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'view-rendition-by-id', id }])
     );
   }
 
-  public viewRenditionBySuppliedId(suppliedId: string): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public viewRenditionBySuppliedId(suppliedId: string): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([
         { type: 'view-rendition-by-supplied-id', suppliedId },
       ])
     );
   }
 
-  public viewDefaultRendition(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public viewDefaultRendition(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'view-default-rendition' }])
     );
   }
 
-  public clearRendition(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearRendition(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat([{ type: 'clear-rendition' }])
     );
   }
 
-  public viewRepresentation(id: RepresentationId): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public viewRepresentation(id: RepresentationId): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat({ type: 'view-representation', id })
     );
   }
 
-  public clearRepresentation(): SceneOperationBuilder {
-    return new SceneOperationBuilder(
+  public clearRepresentation(): ItemOperationBuilder {
+    return new ItemOperationBuilder(
       this.operations.concat({ type: 'clear-representation' })
+    );
+  }
+}
+
+export type AnnotationOperation =
+  | ShowItemOperation
+  | HideItemOperation
+  | SelectItemOperation
+  | DeselectItemOperation;
+
+export interface AnnotationOperations<T> {
+  show(): T;
+  hide(): T;
+  select(color: ColorMaterial): T;
+  deselect(): T;
+}
+
+/**
+ * A class to handle the building of operations on annotations for a scene.
+ */
+export class AnnotationOperationBuilder
+  implements AnnotationOperations<AnnotationOperationBuilder>
+{
+  public constructor(private operations: AnnotationOperation[] = []) {}
+
+  /**
+   * Constructs the scene operations and returns a definition describing each
+   * operation.
+   */
+  public build(): AnnotationOperation[] {
+    return this.operations.concat();
+  }
+
+  public show(): AnnotationOperationBuilder {
+    return new AnnotationOperationBuilder(
+      this.operations.concat([{ type: 'show' }])
+    );
+  }
+
+  public hide(): AnnotationOperationBuilder {
+    return new AnnotationOperationBuilder(
+      this.operations.concat([{ type: 'hide' }])
+    );
+  }
+
+  public select(): AnnotationOperationBuilder {
+    return new AnnotationOperationBuilder(
+      this.operations.concat([{ type: 'select' }])
+    );
+  }
+
+  public deselect(): AnnotationOperationBuilder {
+    return new AnnotationOperationBuilder(
+      this.operations.concat([{ type: 'deselect' }])
     );
   }
 }

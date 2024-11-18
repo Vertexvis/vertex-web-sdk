@@ -10,7 +10,7 @@ import {
   FrameCamera,
   SceneViewStateIdentifier,
 } from '../types';
-import { ItemOperation } from './operations';
+import { AnnotationOperation, ItemOperation } from './operations';
 import { QueryExpression } from './queries';
 import { SceneViewStateFeature } from './scene';
 
@@ -189,6 +189,17 @@ export function buildSceneElementOperationOnItem(
   return { sceneItemOperation: { queryExpression, operationTypes } };
 }
 
+export function buildSceneElementOperationOnAnnotation(
+  query: QueryExpression,
+  operations: AnnotationOperation[],
+  context: BuildSceneOperationContext
+): vertexvis.protobuf.stream.ISceneElementOperation {
+  const operationTypes = buildAnnotationOperationTypes(operations);
+  const queryExpression = buildQueryExpression(query, context);
+
+  return { pmiAnnotationOperation: { queryExpression, operationTypes } };
+}
+
 function buildSceneItemQuery(
   item: QueryExpression
 ): vertexvis.protobuf.stream.ISceneItemQuery {
@@ -345,6 +356,25 @@ function buildOperationTypes(
         }
       case 'clear-representation':
         return { clearRepresentation: {} };
+      default:
+        return {};
+    }
+  });
+}
+
+function buildAnnotationOperationTypes(
+  operations: AnnotationOperation[]
+): vertexvis.protobuf.stream.IOperationType[] {
+  return operations.map((op) => {
+    switch (op.type) {
+      case 'hide':
+        return { changeVisibility: { visible: false } };
+      case 'show':
+        return { changeVisibility: { visible: true } };
+      case 'select':
+        return { changeSelection: { selected: true } };
+      case 'deselect':
+        return { changeSelection: { selected: false } };
       default:
         return {};
     }

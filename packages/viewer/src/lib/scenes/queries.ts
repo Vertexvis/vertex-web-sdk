@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { SceneItemOperationsBuilder } from './scene';
+import {
+  SceneAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -339,10 +342,10 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   }
 
   /**
-   * Specifies that the operation should be performed on items within the specified `rectangle` boundary 
-   * within the Viewer. The `exclusive` flag here determines whether items that intersect with the `rectangle`, 
+   * Specifies that the operation should be performed on items within the specified `rectangle` boundary
+   * within the Viewer. The `exclusive` flag here determines whether items that intersect with the `rectangle`,
    * but are not contained should be included in the result.
-   * 
+   *
    * @example
    * ```typescript
    * const viewer = document.querySelector('vertex-viewer');
@@ -598,5 +601,15 @@ export class SceneItemQueryExecutor {
     const expression: QueryExpression = query(new RootQuery()).build();
 
     return new SceneItemOperationsBuilder(expression);
+  }
+}
+
+export class SceneAnnotationQueryExecutor {
+  public where(
+    query: (q: RootQuery) => TerminalQuery
+  ): SceneAnnotationOperationsBuilder {
+    const expression: QueryExpression = query(new RootQuery()).build();
+
+    return new SceneAnnotationOperationsBuilder(expression);
   }
 }
