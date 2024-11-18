@@ -59,32 +59,30 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    item: {
-                      sceneItemQuery: {
-                        id: {
-                          hex: itemId.toString(),
-                        },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  item: {
+                    sceneItemQuery: {
+                      id: {
+                        hex: itemId.toString(),
                       },
                     },
                   },
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: false,
-                    },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: false,
+                  },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
 
@@ -99,32 +97,30 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    item: {
-                      sceneItemQuery: {
-                        id: {
-                          hex: itemId.toString(),
-                        },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  item: {
+                    sceneItemQuery: {
+                      id: {
+                        hex: itemId.toString(),
                       },
                     },
                   },
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: false,
-                    },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: false,
+                  },
+                },
+              ],
+            }),
+          },
+        ]),
         suppliedCorrelationId: {
           value: suppliedId,
         },
@@ -140,26 +136,24 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    override: {
-                      selection: {},
-                    },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  override: {
+                    selection: {},
                   },
                 },
-                operationTypes: [
-                  {
-                    changeSelection: { selected: true },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeSelection: { selected: true },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
 
@@ -181,27 +175,25 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    sceneTreeRange: {
-                      end: 19,
-                      start: 0,
-                    },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  sceneTreeRange: {
+                    end: 19,
+                    start: 0,
                   },
                 },
-                operationTypes: [
-                  {
-                    changeSelection: { selected: true },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeSelection: { selected: true },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
 
@@ -216,27 +208,25 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    metadata: {
-                      valueFilter: 'foo',
-                      keys: ['bar', 'baz'],
-                    },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  metadata: {
+                    valueFilter: 'foo',
+                    keys: ['bar', 'baz'],
                   },
                 },
-                operationTypes: [
-                  {
-                    changeSelection: { selected: true },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeSelection: { selected: true },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
 
@@ -249,28 +239,26 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    override: {
-                      visibility: {
-                        visibilityState: true,
-                      },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  override: {
+                    visibility: {
+                      visibilityState: true,
                     },
                   },
                 },
-                operationTypes: [
-                  {
-                    changeSelection: { selected: true },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeSelection: { selected: true },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
 
@@ -295,9 +283,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining(
               {
                 queryExpression: {
                   operand: {
@@ -393,10 +381,10 @@ describe(Scene, () => {
                     },
                   },
                 ],
-              },
-            ]),
-          }),
-        }),
+              }
+            ),
+          },
+        ]),
       });
     });
 
@@ -410,28 +398,26 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
-        elementOperations: expect.objectContaining({
-          operation: expect.objectContaining({
-            sceneItemOperation: expect.arrayContaining([
-              {
-                queryExpression: {
-                  operand: {
-                    item: {
-                      sceneItemQuery: {
-                        id: { hex: itemId.toString() },
-                      },
+        elementOperations: expect.arrayContaining([
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  item: {
+                    sceneItemQuery: {
+                      id: { hex: itemId.toString() },
                     },
                   },
                 },
-                operationTypes: [
-                  {
-                    changeSelection: { selected: true },
-                  },
-                ],
               },
-            ]),
-          }),
-        }),
+              operationTypes: [
+                {
+                  changeSelection: { selected: true },
+                },
+              ],
+            }),
+          },
+        ]),
       });
     });
   });

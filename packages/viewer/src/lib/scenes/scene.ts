@@ -15,7 +15,7 @@ import {
 } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation } from './mapper';
+import { buildSceneElementOperationOnItem } from './mapper';
 import {
   ItemOperation,
   RepresentationId,
@@ -562,7 +562,7 @@ export class OperationExecutor {
     executionOptions?: SceneExecutionOptions
   ): Promise<void> {
     const pbItemOperations = this.sceneItemQueryOperations.map((op) =>
-      buildSceneOperation(op.query, op.operations, {
+      buildSceneElementOperationOnItem(op.query, op.operations, {
         dimensions: this.dimensions,
       })
     );
@@ -570,11 +570,7 @@ export class OperationExecutor {
       sceneViewId: {
         hex: this.sceneViewId,
       },
-      elementOperations: {
-        operation: {
-          sceneItemOperation: pbItemOperations,
-        },
-      },
+      elementOperations: pbItemOperations,
       suppliedCorrelationId:
         executionOptions?.suppliedCorrelationId != null
           ? {

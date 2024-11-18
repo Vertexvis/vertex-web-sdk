@@ -178,6 +178,17 @@ export function buildSceneOperation(
   return { queryExpression, operationTypes };
 }
 
+export function buildSceneElementOperationOnItem(
+  query: QueryExpression,
+  operations: ItemOperation[],
+  context: BuildSceneOperationContext
+): vertexvis.protobuf.stream.ISceneElementOperation {
+  const operationTypes = buildOperationTypes(operations);
+  const queryExpression = buildQueryExpression(query, context);
+
+  return { sceneItemOperation: { queryExpression, operationTypes } };
+}
+
 function buildSceneItemQuery(
   item: QueryExpression
 ): vertexvis.protobuf.stream.ISceneItemQuery {
