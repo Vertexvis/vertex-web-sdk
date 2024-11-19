@@ -82,6 +82,36 @@ export type QueryExpression =
   | AllVisibleQueryExpression
   | NotQueryExpression;
 
+interface AnnotationQueryExpression {
+  type: 'annotation-id';
+  value: string;
+}
+
+export interface AnnotationAndExpression {
+  type: 'and';
+  expressions: SceneAnnotationQueryExpression[];
+}
+
+export interface AnnotationOrExpression {
+  type: 'or';
+  expressions: SceneAnnotationQueryExpression[];
+}
+
+interface AnnotationNotQueryExpression {
+  type: 'not';
+  query: SceneAnnotationQueryExpression;
+}
+
+/**
+ * Represents the sum of all possible types of expressions.
+ */
+export type SceneAnnotationQueryExpression =
+  | AllQueryExpression
+  | AnnotationQueryExpression
+  | AnnotationAndExpression
+  | AnnotationOrExpression
+  | AnnotationNotQueryExpression;
+
 /**
  * An interface that represents a query is "complete" and can be turned into an
  * expression.
@@ -104,6 +134,30 @@ abstract class TerminalQuery {
   }
 
   public abstract queryExpressionBuilder(): QueryExpression;
+}
+
+/**
+ * An interface that represents a query is "complete" and can be turned into an
+ * expression.
+ */
+abstract class TerminalAnnotationQuery {
+  protected inverted: boolean;
+  public constructor(inverted: boolean) {
+    this.inverted = inverted;
+  }
+
+  public build(): SceneAnnotationQueryExpression {
+    if (this.inverted) {
+      return {
+        type: 'not',
+        query: this.queryExpressionBuilder(),
+      };
+    } else {
+      return this.queryExpressionBuilder();
+    }
+  }
+
+  public abstract queryExpressionBuilder(): SceneAnnotationQueryExpression;
 }
 
 interface ItemQuery<N> {
@@ -168,6 +222,24 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    */
   public withItemIds(ids: string[]): BulkQuery {
     return new BulkQuery(ids, 'item-id', this.inverted);
+  }
+
+  /**
+   * Specifies that the operation should be performed on any item matching any one of the provided IDs.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide the item with the `item-uuid-1` ID and the `item-uuid-2` ID
+   * await scene.elements((op) => [
+   *   op.where((q) => q.withItemIds(['item-uuid-1', 'item-uuid-2'])).hide(),
+   * ]).execute();
+   * ```
+   */
+  public withAnnotationIds(ids: string[]): BulkQuery {
+    return new BulkQuery(ids, 'annotation-id', this.inverted);
   }
 
   /**
@@ -606,9 +678,11 @@ export class SceneItemQueryExecutor {
 
 export class SceneAnnotationQueryExecutor {
   public where(
-    query: (q: RootQuery) => TerminalQuery
+    query: (q: RootQuery) => TerminalAnnotationQuery
   ): SceneAnnotationOperationsBuilder {
-    const expression: QueryExpression = query(new RootQuery()).build();
+    const expression: SceneAnnotationQueryExpression = query(
+      new RootQuery()
+    ).build();
 
     return new SceneAnnotationOperationsBuilder(expression);
   }

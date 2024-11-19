@@ -31,6 +31,7 @@ import {
 import {
   QueryExpression,
   SceneAnnotationQueryExecutor,
+  SceneAnnotationQueryExpression,
   SceneItemQueryExecutor,
 } from './queries';
 import { Raycaster } from './raycaster';
@@ -566,7 +567,7 @@ export class SceneAnnotationOperationsBuilder
   private builder: AnnotationOperationBuilder;
 
   public constructor(
-    private query: QueryExpression,
+    private query: SceneAnnotationQueryExpression,
     givenBuilder?: AnnotationOperationBuilder
   ) {
     this.builder =
@@ -674,7 +675,7 @@ export interface ItemQueryOperation {
 }
 
 export interface AnnotationQueryOperation {
-  query: QueryExpression;
+  query: SceneAnnotationQueryExpression;
   operations: AnnotationOperation[];
 }
 

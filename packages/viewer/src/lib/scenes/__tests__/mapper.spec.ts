@@ -72,7 +72,7 @@ describe(buildSceneElementOperationOnAnnotation, () => {
       )
     ).toMatchObject({
       pmiAnnotationOperation: {
-        queryExpression: { operand: { root: {} } },
+        queryExpression: { operand: { all: {} } },
         operationTypes: [
           { changeVisibility: { visible: false } },
           { changeSelection: { selected: false } },

@@ -11,7 +11,7 @@ import {
   SceneViewStateIdentifier,
 } from '../types';
 import { AnnotationOperation, ItemOperation } from './operations';
-import { QueryExpression } from './queries';
+import { QueryExpression, SceneAnnotationQueryExpression } from './queries';
 import { SceneViewStateFeature } from './scene';
 
 export interface BuildSceneOperationContext {
@@ -45,7 +45,7 @@ export function buildSceneViewStateIdentifier(
 export function buildQueryExpression(
   query: QueryExpression,
   context: BuildSceneOperationContext
-): vertexvis.protobuf.stream.IQueryExpression {
+): vertexvis.protobuf.stream.ISceneItemQueryExpression {
   switch (query.type) {
     case 'and':
     case 'or':
@@ -167,6 +167,55 @@ export function buildQueryExpression(
   }
 }
 
+export function buildAnnotationQueryExpression(
+  query: SceneAnnotationQueryExpression,
+  context: BuildSceneOperationContext
+): vertexvis.protobuf.stream.IPmiAnnotationQueryExpression {
+  switch (query.type) {
+    case 'and':
+      return {
+        and: {
+          first: buildAnnotationQueryExpression(query.expressions[0], context),
+          second: buildAnnotationQueryExpression(query.expressions[1], context),
+        },
+      };
+    case 'or':
+      return {
+        or: {
+          first: buildAnnotationQueryExpression(query.expressions[0], context),
+          second: buildAnnotationQueryExpression(query.expressions[1], context),
+        },
+      };
+    case 'not':
+      return {
+        not: {
+          expression: buildAnnotationQueryExpression(query.query, context),
+        },
+      };
+    case 'annotation-id':
+      const { msb, lsb } = UUID.toMsbLsb(query.value);
+
+      return {
+        operand: {
+          annotation: {
+            id: new vertexvis.protobuf.core.Uuid2l({
+              msb: parseFloat(msb),
+              lsb: parseFloat(lsb),
+            }),
+          },
+        },
+      };
+    case 'all':
+      return {
+        operand: {
+          all: {},
+        },
+      };
+    default:
+      return {};
+  }
+}
+
 export function buildSceneElementOperationOnItem(
   query: QueryExpression,
   operations: ItemOperation[],
@@ -179,12 +228,12 @@ export function buildSceneElementOperationOnItem(
 }
 
 export function buildSceneElementOperationOnAnnotation(
-  query: QueryExpression,
+  query: SceneAnnotationQueryExpression,
   operations: AnnotationOperation[],
   context: BuildSceneOperationContext
 ): vertexvis.protobuf.stream.ISceneElementOperation {
   const operationTypes = buildAnnotationOperationTypes(operations);
-  const queryExpression = buildQueryExpression(query, context);
+  const queryExpression = buildAnnotationQueryExpression(query, context);
 
   return { pmiAnnotationOperation: { queryExpression, operationTypes } };
 }
