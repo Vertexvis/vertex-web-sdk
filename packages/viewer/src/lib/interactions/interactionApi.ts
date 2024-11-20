@@ -236,6 +236,12 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       const frame = this.getFrame();
       const depthBuffer = await frame?.depthBuffer();
 
+      // TODO Remove
+      scene.elements((op) => [
+        op.items.where((q) => q.withItemId('id')).clearTransforms(),
+        op.annotations.where((q) => q.all()).select(),
+      ]);
+
       this.currentCamera =
         this.currentCamera != null && viewport != null && frame != null
           ? t({

@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { SceneItemOperationsBuilder } from './scene';
+import {
+  PmiAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -112,6 +115,12 @@ interface ItemQuery<N> {
 interface BooleanQuery {
   and(): AndQuery;
   or(): OrQuery;
+}
+
+export class PmiAnnotationRootQuery {
+  public all(): AllQuery {
+    return new AllQuery();
+  }
 }
 
 export class RootQuery implements ItemQuery<SingleQuery> {
@@ -588,6 +597,28 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
 
   public and(): AndQuery {
     return this;
+  }
+}
+
+export class SceneElementQueryExecutor {
+  public get items(): SceneItemQueryExecutor {
+    return new SceneItemQueryExecutor();
+  }
+
+  public get annotations(): PmiAnnotationsQueryExecutor {
+    return new PmiAnnotationsQueryExecutor();
+  }
+}
+
+export class PmiAnnotationsQueryExecutor {
+  public where(
+    query: (q: PmiAnnotationRootQuery) => TerminalQuery
+  ): PmiAnnotationOperationsBuilder {
+    const expression: QueryExpression = query(
+      new PmiAnnotationRootQuery()
+    ).build();
+
+    return new PmiAnnotationOperationsBuilder(expression);
   }
 }
 

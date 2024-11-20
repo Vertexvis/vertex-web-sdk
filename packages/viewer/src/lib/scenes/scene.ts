@@ -18,11 +18,17 @@ import { CrossSectioner } from './crossSectioner';
 import { buildSceneElementOperationOnItem } from './mapper';
 import {
   ItemOperation,
+  PmiAnnotationOperationBuilder,
+  PmiAnnotationOperations,
   RepresentationId,
   SceneItemOperations,
   SceneOperationBuilder,
 } from './operations';
-import { QueryExpression, SceneItemQueryExecutor } from './queries';
+import {
+  QueryExpression,
+  SceneElementQueryExecutor,
+  SceneItemQueryExecutor,
+} from './queries';
 import { Raycaster } from './raycaster';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
 
@@ -41,13 +47,20 @@ export interface ResetViewOptions {
   suppliedCorrelationId?: string;
 }
 
+export interface SceneElementOperationsBuilder {
+  isItemBuilder(): this is SceneItemOperationsBuilder;
+  isAnnotationBuilder(): this is PmiAnnotationOperationsBuilder;
+}
+
 /**
  * A class that is responsible for building operations for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in
  * order for the changes to take effect.
  */
 export class SceneItemOperationsBuilder
-  implements SceneItemOperations<SceneItemOperationsBuilder>
+  implements
+    SceneItemOperations<SceneItemOperationsBuilder>,
+    SceneElementOperationsBuilder
 {
   private builder: SceneOperationBuilder;
 
@@ -57,6 +70,14 @@ export class SceneItemOperationsBuilder
   ) {
     this.builder =
       givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
+  }
+
+  public isItemBuilder(): this is SceneItemOperationsBuilder {
+    return true;
+  }
+
+  public isAnnotationBuilder(): this is PmiAnnotationOperationsBuilder {
+    return false;
   }
 
   /**
@@ -545,6 +566,123 @@ export class SceneItemOperationsBuilder
   }
 }
 
+/**
+ * A class that is responsible for building operations for a specific scene.
+ * This executor requires a query, and expects `execute()` to be invoked in
+ * order for the changes to take effect.
+ */
+export class PmiAnnotationOperationsBuilder
+  implements
+    PmiAnnotationOperations<PmiAnnotationOperationsBuilder>,
+    SceneElementOperationsBuilder
+{
+  private builder: PmiAnnotationOperationBuilder;
+
+  public constructor(
+    private query: QueryExpression,
+    givenBuilder?: PmiAnnotationOperationBuilder
+  ) {
+    this.builder =
+      givenBuilder != null ? givenBuilder : new PmiAnnotationOperationBuilder();
+  }
+
+  public isItemBuilder(): this is SceneItemOperationsBuilder {
+    return false;
+  }
+
+  public isAnnotationBuilder(): this is PmiAnnotationOperationsBuilder {
+    return true;
+  }
+
+  /**
+   * Specifies that the items matching the query should be hidden.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide the item with the `item-uuid` ID
+   * await scene.elements((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).hide(),
+   * ]).execute();
+   * ```
+   */
+  public hide(): PmiAnnotationOperationsBuilder {
+    return new PmiAnnotationOperationsBuilder(this.query, this.builder.hide());
+  }
+
+  /**
+   * Specifies that the items matching the query should be shown.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Show the item with the `item-uuid` ID
+   * await scene.elements((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).show(),
+   * ]).execute();
+   * ```
+   */
+  public show(): PmiAnnotationOperationsBuilder {
+    return new PmiAnnotationOperationsBuilder(this.query, this.builder.show());
+  }
+
+  /**
+   * Specifies that the items matching the query should be selected.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Select the item with the `item-uuid` ID
+   * await scene.elements((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).select(),
+   * ]).execute();
+   * ```
+   */
+  public select(): PmiAnnotationOperationsBuilder {
+    return new PmiAnnotationOperationsBuilder(
+      this.query,
+      this.builder.select()
+    );
+  }
+
+  /**
+   * Specifies that the items matching the query should be deselected.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Deselect the item with the `item-uuid` ID
+   * await scene.elements((op) => [
+   *   op.where((q) => q.withItemId('item-uuid')).deselect(),
+   * ]).execute();
+   * ```
+   */
+  public deselect(): PmiAnnotationOperationsBuilder {
+    return new PmiAnnotationOperationsBuilder(
+      this.query,
+      this.builder.deselect()
+    );
+  }
+
+  /**
+   * @internal
+   */
+  public build(): QueryOperation {
+    return {
+      query: this.query,
+      operations: this.builder.build(),
+    };
+  }
+}
+
 export interface QueryOperation {
   query: QueryExpression;
   operations: ItemOperation[];
@@ -555,7 +693,8 @@ export class OperationExecutor {
     private sceneViewId: UUID.UUID,
     private stream: StreamApi,
     private dimensions: Dimensions.Dimensions,
-    private sceneItemQueryOperations: QueryOperation[]
+    private sceneItemQueryOperations: QueryOperation[],
+    private pmiAnnotationQueryOperations: QueryOperation[]
   ) {}
 
   public async execute(
@@ -566,6 +705,13 @@ export class OperationExecutor {
         dimensions: this.dimensions,
       })
     );
+
+    // const pbAnnotationOperations = this.pmiAnnotationQueryOperations.map((op) =>
+    //   buildSceneElementOperationOnAnnotation(op.query, op.operations, {
+    //     dimensions: this.dimensions,
+    //   })
+    // );
+
     const request = {
       sceneViewId: {
         hex: this.sceneViewId,
@@ -584,8 +730,9 @@ export class OperationExecutor {
 }
 
 export type TerminalItemOperationBuilder =
+  | PmiAnnotationOperationsBuilder
   | SceneItemOperationsBuilder
-  | SceneItemOperationsBuilder[];
+  | Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder>;
 
 export type ImageScaleProvider = () => Point.Point | undefined;
 
@@ -706,7 +853,9 @@ export class Scene {
     const ops = Array.isArray(sceneOperations)
       ? sceneOperations
       : [sceneOperations];
-    const operationList = ops.reduce(
+    const itemOps = ops.filter((op) => op.isItemBuilder());
+
+    const operationList = itemOps.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
       [] as QueryOperation[]
     );
@@ -714,7 +863,8 @@ export class Scene {
       this.sceneViewId,
       this.stream,
       this.dimensions,
-      operationList
+      operationList,
+      []
     );
   }
 
@@ -741,15 +891,24 @@ export class Scene {
    * @param itemOperations
    */
   public elements(
-    itemOperations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
+    operations: (q: SceneElementQueryExecutor) => TerminalItemOperationBuilder
   ): OperationExecutor {
     // Operations on scene items
-    const sceneItemOperations = itemOperations(new SceneItemQueryExecutor());
-    const sceneItemOps = Array.isArray(sceneItemOperations)
-      ? sceneItemOperations
-      : [sceneItemOperations];
+    const ops = operations(new SceneElementQueryExecutor());
+    const opsAsArray = Array.isArray(ops) ? ops : [ops];
+
+    const sceneItemOps = opsAsArray.filter((op) => op.isItemBuilder());
+    const pmiAnnotationOps = opsAsArray.filter((op) =>
+      op.isAnnotationBuilder()
+    );
+
     const sceneItemsOperationList = sceneItemOps.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
+      [] as QueryOperation[]
+    );
+    const pmiAnnotationOperationList = pmiAnnotationOps.reduce(
+      (acc, builder: PmiAnnotationOperationsBuilder) =>
+        acc.concat(builder.build()),
       [] as QueryOperation[]
     );
 
@@ -757,7 +916,8 @@ export class Scene {
       this.sceneViewId,
       this.stream,
       this.dimensions,
-      sceneItemsOperationList
+      sceneItemsOperationList,
+      pmiAnnotationOperationList
     );
   }
 

@@ -125,6 +125,13 @@ export interface SceneItemOperations<T> {
   clearRepresentation(): T;
 }
 
+export interface PmiAnnotationOperations<T> {
+  show(): T;
+  hide(): T;
+  select(color: ColorMaterial): T;
+  deselect(): T;
+}
+
 /**
  * A class to handle the building of operations for a scene.
  */
@@ -250,6 +257,47 @@ export class SceneOperationBuilder
   public clearRepresentation(): SceneOperationBuilder {
     return new SceneOperationBuilder(
       this.operations.concat({ type: 'clear-representation' })
+    );
+  }
+}
+
+/**
+ * A class to handle the building of operations for a scene.
+ */
+export class PmiAnnotationOperationBuilder
+  implements PmiAnnotationOperations<PmiAnnotationOperationBuilder>
+{
+  public constructor(private operations: ItemOperation[] = []) {}
+
+  /**
+   * Constructs the scene operations and returns a definition describing each
+   * operation.
+   */
+  public build(): ItemOperation[] {
+    return this.operations.concat();
+  }
+
+  public show(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'show' }])
+    );
+  }
+
+  public hide(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'hide' }])
+    );
+  }
+
+  public select(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'select' }])
+    );
+  }
+
+  public deselect(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'deselect' }])
     );
   }
 }
