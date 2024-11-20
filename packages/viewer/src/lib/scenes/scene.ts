@@ -30,9 +30,8 @@ import {
 } from './operations';
 import {
   QueryExpression,
-  SceneAnnotationQueryExecutor,
   SceneAnnotationQueryExpression,
-  SceneItemQueryExecutor,
+  SceneQueryExecutor,
 } from './queries';
 import { Raycaster } from './raycaster';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
@@ -51,6 +50,13 @@ export interface ResetViewOptions {
   includeCamera?: boolean;
   suppliedCorrelationId?: string;
 }
+
+/**
+ * Represents the sum of all possible types of expressions for scene annotations.
+ */
+export type SceneOperationsBuilder =
+  | SceneItemOperationsBuilder
+  | SceneAnnotationOperationsBuilder;
 
 /**
  * A class that is responsible for building operations for scene items in a specific scene.
@@ -719,6 +725,10 @@ export class OperationExecutor {
   }
 }
 
+export type TerminalOperationBuilder =
+  | TerminalItemOperationBuilder
+  | TerminalAnnotationOperationBuilder;
+
 export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
   | SceneItemOperationsBuilder[];
@@ -832,16 +842,16 @@ export class Scene {
    * ]).execute();
    * ```
    *
-   * @see {@link RootQuery} for more information on available queries.
+   * @see {@link SceneAlterationQuery} for more information on available queries.
    *
    * @see {@link SceneItemOperationsBuilder} for more information on available operations.
    *
    * @param operations
    */
   public items(
-    operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
+    operations: (q: SceneQueryExecutor) => TerminalItemOperationBuilder
   ): OperationExecutor {
-    const sceneOperations = operations(new SceneItemQueryExecutor());
+    const sceneOperations = operations(new SceneQueryExecutor());
 
     const ops = Array.isArray(sceneOperations)
       ? sceneOperations
@@ -875,7 +885,7 @@ export class Scene {
    * ]).execute();
    * ```
    *
-   * @see {@link RootQuery} for more information on available queries.
+   * @see {@link SceneAlterationQuery} for more information on available queries.
    *
    * @see {@link SceneItemOperationsBuilder} and {@link SceneAnnotationOperationsBuilder} for more information on available operations to the scene items.
    *
@@ -883,50 +893,23 @@ export class Scene {
    * @param annotationOperations
    */
   public elements(
-    itemOperations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder,
-    annotationOperations?: (
-      q: SceneAnnotationQueryExecutor
-    ) => TerminalAnnotationOperationBuilder
+    operations: (q: SceneQueryExecutor) => TerminalOperationBuilder
   ): OperationExecutor {
-    // Operations on scene items
-    const sceneItemOperations = itemOperations(new SceneItemQueryExecutor());
-    const sceneItemOps = Array.isArray(sceneItemOperations)
-      ? sceneItemOperations
-      : [sceneItemOperations];
-    const sceneItemsOperationList = sceneItemOps.reduce(
-      (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
+    const sceneOperations = operations(new SceneQueryExecutor());
+    const sceneOps = Array.isArray(sceneOperations)
+      ? sceneOperations
+      : [sceneOperations];
+    const sceneOperationList = sceneOps.reduce(
+      (acc, builder: SceneOperationsBuilder) => acc.concat(builder.build()),
       [] as ItemQueryOperation[]
-    );
-
-    if (annotationOperations == null) {
-      return new OperationExecutor(
-        this.sceneViewId,
-        this.stream,
-        this.dimensions,
-        sceneItemsOperationList,
-        []
-      );
-    }
-
-    // Operations on annotation
-    const pmiAnnotationOperations = annotationOperations(
-      new SceneAnnotationQueryExecutor()
-    );
-    const annotationOps = Array.isArray(pmiAnnotationOperations)
-      ? pmiAnnotationOperations
-      : [pmiAnnotationOperations];
-    const annotationsOperationList = annotationOps.reduce(
-      (acc, builder: SceneAnnotationOperationsBuilder) =>
-        acc.concat(builder.build()),
-      [] as AnnotationQueryOperation[]
     );
 
     return new OperationExecutor(
       this.sceneViewId,
       this.stream,
       this.dimensions,
-      sceneItemsOperationList,
-      annotationsOperationList
+      sceneOperationList,
+      []
     );
   }
 

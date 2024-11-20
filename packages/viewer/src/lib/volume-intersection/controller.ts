@@ -6,14 +6,14 @@ import {
   SceneItemOperationsBuilder,
   TerminalItemOperationBuilder,
 } from '../scenes';
-import { SceneItemQueryExecutor } from '../scenes/queries';
+import { SceneQueryExecutor } from '../scenes/queries';
 import { VolumeIntersectionQueryModel } from './model';
 
 export type OperationTransform = (
   builder: SceneItemOperationsBuilder
 ) => TerminalItemOperationBuilder;
 export type AdditionalTransform = (
-  executor: SceneItemQueryExecutor
+  executor: SceneQueryExecutor
 ) => TerminalItemOperationBuilder;
 
 export interface CompleteExecutionDetails {
@@ -35,7 +35,9 @@ export class VolumeIntersectionQueryController {
     private model: VolumeIntersectionQueryModel,
     private viewer: HTMLVertexViewerElement
   ) {
-    this.additionalTransforms = [(op) => op.where((q) => q.all()).deselect()];
+    this.additionalTransforms = [
+      (op) => op.where((q) => q.items().all()).deselect(),
+    ];
     this.operationTransform = (builder) => builder.select();
   }
 
@@ -99,16 +101,18 @@ export class VolumeIntersectionQueryController {
         this.executeStarted.emit();
 
         const additionalTransforms = (
-          op: SceneItemQueryExecutor
+          op: SceneQueryExecutor
         ): SceneItemOperationsBuilder[] =>
           this.additionalTransforms.map((t) => t(op)).flat();
         const operationTransforms = (
-          op: SceneItemQueryExecutor
+          op: SceneQueryExecutor
         ): SceneItemOperationsBuilder[] =>
           [
             this.operationTransform(
               op.where((q) =>
-                q.withVolumeIntersection(screenBounds, type === 'exclusive')
+                q
+                  .items()
+                  .withVolumeIntersection(screenBounds, type === 'exclusive')
               )
             ),
           ].flat();

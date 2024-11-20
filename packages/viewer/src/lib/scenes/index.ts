@@ -6,17 +6,21 @@ export * from './camera';
 export * from './crossSectioner';
 export { AnnotationOperationBuilder, ItemOperationBuilder } from './operations';
 export {
-  AllQuery,
+  AllAnnotationQuery,
+  AllItemQuery,
   AllSelectedQuery,
   AllVisibleQuery,
-  AndQuery,
+  AndAnnotationQuery,
+  AndItemQuery,
   MetadataQuery,
-  NotQuery,
-  OrQuery,
+  NotAnnotationQuery,
+  NotItemQuery,
+  OrAnnotationQuery,
+  OrItemQuery,
   PointQuery,
-  RootQuery,
-  SceneAnnotationQueryExecutor,
-  SceneItemQueryExecutor,
+  SceneAnnotationQuery,
+  SceneItemQuery,
+  SceneQueryExecutor,
   SceneTreeRangeQuery,
   VolumeIntersectionQuery,
 } from './queries';

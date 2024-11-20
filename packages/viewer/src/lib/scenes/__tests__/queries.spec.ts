@@ -1,14 +1,16 @@
 import { Point } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
 
-import { RootQuery } from '../queries';
+import { SceneAlterationQuery } from '../queries';
 
-describe(RootQuery, () => {
+describe(SceneAlterationQuery, () => {
   const itemId = UUID.create();
   const suppliedId = 'SomeSuppliedId';
 
   it('should support single withItemId selections', () => {
-    const itemQueryBuilder = new RootQuery().withItemId(itemId.toString());
+    const itemQueryBuilder = new SceneAlterationQuery().withItemId(
+      itemId.toString()
+    );
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'item-id',
@@ -17,7 +19,9 @@ describe(RootQuery, () => {
   });
 
   it('should support single withSuppliedId queries', () => {
-    const itemQueryBuilder = new RootQuery().withSuppliedId(suppliedId);
+    const itemQueryBuilder = new SceneAlterationQuery().withSuppliedId(
+      suppliedId
+    );
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'supplied-id',
@@ -26,7 +30,7 @@ describe(RootQuery, () => {
   });
 
   it('should support query by all', () => {
-    const itemQueryBuilder = new RootQuery().all();
+    const itemQueryBuilder = new SceneAlterationQuery().all();
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'all',
@@ -34,7 +38,9 @@ describe(RootQuery, () => {
   });
 
   it('should support not queries', () => {
-    const notWithSelectedQuery = new RootQuery().not().withSelected();
+    const notWithSelectedQuery = new SceneAlterationQuery()
+      .not()
+      .withSelected();
 
     expect(notWithSelectedQuery.build()).toEqual({
       type: 'not',
@@ -45,7 +51,7 @@ describe(RootQuery, () => {
   });
 
   it('should support nested not queries and remove redundancies', () => {
-    const notWithSelectedQuery = new RootQuery()
+    const notWithSelectedQuery = new SceneAlterationQuery()
       .not()
       .not()
       .withSuppliedId(suppliedId);
@@ -55,7 +61,7 @@ describe(RootQuery, () => {
       value: suppliedId,
     });
 
-    const notWithSelectedQueryNot = new RootQuery()
+    const notWithSelectedQueryNot = new SceneAlterationQuery()
       .not()
       .not()
       .not()
@@ -71,7 +77,7 @@ describe(RootQuery, () => {
   });
 
   it('should support single or multiple queries', () => {
-    const itemQueryBuilder = new RootQuery()
+    const itemQueryBuilder = new SceneAlterationQuery()
       .withItemId(itemId.toString())
       .or()
       .withSuppliedId(suppliedId);
@@ -92,7 +98,7 @@ describe(RootQuery, () => {
   });
 
   it('should support and queries', () => {
-    const itemQueryBuilder = new RootQuery()
+    const itemQueryBuilder = new SceneAlterationQuery()
       .withItemId(itemId.toString())
       .and()
       .withSuppliedId(suppliedId);
@@ -113,7 +119,7 @@ describe(RootQuery, () => {
   });
 
   it('should support bulk queries', () => {
-    const itemQueryBuilder = new RootQuery().withItemIds([
+    const itemQueryBuilder = new SceneAlterationQuery().withItemIds([
       itemId.toString(),
       itemId.toString(),
     ]);
@@ -132,10 +138,9 @@ describe(RootQuery, () => {
       ],
     });
 
-    const itemQuerySuppliedBuilder = new RootQuery().withSuppliedIds([
-      suppliedId.toString(),
-      suppliedId.toString(),
-    ]);
+    const itemQuerySuppliedBuilder = new SceneAlterationQuery().withSuppliedIds(
+      [suppliedId.toString(), suppliedId.toString()]
+    );
     expect(itemQuerySuppliedBuilder.build()).toEqual({
       type: 'or',
       expressions: [
@@ -153,7 +158,7 @@ describe(RootQuery, () => {
 
   it('should support point queries', () => {
     const point = Point.create(50, 50);
-    const itemQueryBuilder = new RootQuery().withPoint(point);
+    const itemQueryBuilder = new SceneAlterationQuery().withPoint(point);
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'point',
@@ -162,7 +167,7 @@ describe(RootQuery, () => {
   });
 
   it('should support visibility queries for visible items', () => {
-    const itemQueryBuilder = new RootQuery().withVisible();
+    const itemQueryBuilder = new SceneAlterationQuery().withVisible();
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'all-visible',
