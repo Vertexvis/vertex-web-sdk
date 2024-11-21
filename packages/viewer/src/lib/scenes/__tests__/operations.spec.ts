@@ -2,32 +2,32 @@ import { Color } from '@vertexvis/utils';
 
 import { random } from '../../../testing/random';
 import { ColorMaterial } from '../colorMaterial';
-import { SceneOperationBuilder } from '../operations';
+import { ItemOperationBuilder } from '../operations';
 
-describe(SceneOperationBuilder, () => {
+describe(ItemOperationBuilder, () => {
   it('creates a hide operation', () => {
-    const builder = new SceneOperationBuilder([]);
+    const builder = new ItemOperationBuilder([]);
     const definitions = builder.hide().build();
 
     expect(definitions).toEqual([{ type: 'hide' }]);
   });
 
   it('creates a clear operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.clearMaterialOverrides().build();
 
     expect(definitions).toEqual([{ type: 'clear-override' }]);
   });
 
   it('creates a show operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.show().build();
 
     expect(definitions).toEqual([{ type: 'show' }]);
   });
 
   it('creates a change-material operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const materialOverride: ColorMaterial = {
       opacity: 100,
       glossiness: 100,
@@ -44,28 +44,28 @@ describe(SceneOperationBuilder, () => {
   });
 
   it('create a select operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.select().build();
 
     expect(definitions).toEqual([{ type: 'select' }]);
   });
 
   it('create a deselect operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.deselect().build();
 
     expect(definitions).toEqual([{ type: 'deselect' }]);
   });
 
   it('creates a clear transform operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.clearTransforms().build();
 
     expect(definitions).toEqual([{ type: 'clear-transform', cascade: true }]);
   });
 
   it('creates a change phantom operation with phantomState parameter', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.setPhantom(true).build();
 
     expect(definitions).toEqual([
@@ -74,21 +74,21 @@ describe(SceneOperationBuilder, () => {
   });
 
   it('creates a change phantom operation without parameter', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.setPhantom().build();
 
     expect(definitions).toEqual([{ type: 'change-phantom' }]);
   });
 
   it('creates a clear phantom operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.clearPhantom().build();
 
     expect(definitions).toEqual([{ type: 'clear-phantom' }]);
   });
 
   it('creates a change end item operation with endItemState parameter', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.setEndItem(true).build();
 
     expect(definitions).toEqual([
@@ -97,14 +97,14 @@ describe(SceneOperationBuilder, () => {
   });
 
   it('creates a change end item operation without parameter', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.setEndItem().build();
 
     expect(definitions).toEqual([{ type: 'change-end-item' }]);
   });
 
   it('creates a clear end item operation', () => {
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder.clearEndItem().build();
 
     expect(definitions).toEqual([{ type: 'clear-end-item' }]);
@@ -114,7 +114,7 @@ describe(SceneOperationBuilder, () => {
     const id = random.guid();
     const suppliedId = random.string();
 
-    const builder = new SceneOperationBuilder();
+    const builder = new ItemOperationBuilder();
     const definitions = builder
       .viewRenditionById(id)
       .viewRenditionBySuppliedId(suppliedId)

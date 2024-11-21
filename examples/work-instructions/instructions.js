@@ -13,14 +13,14 @@ import steps from './steps.js';
 export async function applyWorkInstruction(scene, stepNumber) {
   if (stepNumber >= 0 && stepNumber < steps.length) {
     await scene
-      .elements((op) => op.where((q) => q.all()).clearMaterialOverrides())
+      .elements((op) => op.items.where((q) => q.all()).clearMaterialOverrides())
       .execute();
 
     await scene
       .elements((op) =>
         steps[stepNumber].operationSets.map((set) =>
           applyOps(
-            op.where((q) => applyQuery(q, set.query)),
+            op.items.where((q) => applyQuery(q, set.query)),
             set.operations
           )
         )

@@ -72,7 +72,7 @@ async function main() {
     const result = await raycaster.hitItems(position);
 
     if (result.hits && result.hits.length == 0) {
-      await scene.elements((op) => op.where((q) => q.all()).deselect()).execute();
+      await scene.elements((op) => op.items.where((q) => q.all()).deselect()).execute();
 
       resetIndicators();
     } else if (hit1 != null) {
@@ -90,8 +90,8 @@ async function main() {
       hit1 = hit;
       await scene
         .elements((op) => [
-          op.where((q) => q.all()).deselect(),
-          op.where((q) => q.withItemId(hit.itemId.hex)).select(),
+          op.items.where((q) => q.all()).deselect(),
+          op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
         ])
         .execute();
     }

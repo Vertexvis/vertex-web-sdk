@@ -423,7 +423,7 @@ describe(Scene, () => {
       const itemId = random.guid();
 
       scene
-        .elements((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .elements((op) => op.items.where((q) => q.withItemId(itemId)).hide())
         .execute();
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
@@ -460,7 +460,7 @@ describe(Scene, () => {
       const itemId = random.guid();
       const suppliedId = `SuppliedId-${random.guid()}`;
       scene
-        .elements((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .elements((op) => op.items.where((q) => q.withItemId(itemId)).hide())
         .execute({ suppliedCorrelationId: suppliedId });
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
@@ -499,7 +499,7 @@ describe(Scene, () => {
 
     it('should support passing withSelected queries', () => {
       scene
-        .elements((op) => op.where((q) => q.withSelected()).select())
+        .elements((op) => op.items.where((q) => q.withSelected()).select())
         .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
@@ -530,7 +530,7 @@ describe(Scene, () => {
     it('should support passing scene-tree range queries', () => {
       scene
         .elements((op) =>
-          op
+          op.items
             .where((q) =>
               q.withSceneTreeRange({
                 start: 0,
@@ -570,7 +570,7 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .elements((op) =>
-          op.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
+          op.items.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
         )
         .execute();
 
@@ -602,7 +602,7 @@ describe(Scene, () => {
 
     it('should support passing visibility queries', () => {
       scene
-        .elements((op) => op.where((q) => q.withVisible()).select())
+        .elements((op) => op.items.where((q) => q.withVisible()).select())
         .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
@@ -637,11 +637,11 @@ describe(Scene, () => {
       const suppliedId = random.guid();
       scene
         .elements((op) => [
-          op.where((q) => q.all()).hide(),
-          op
+          op.items.where((q) => q.all()).hide(),
+          op.items
             .where((q) => q.withItemId(itemId).or().withSuppliedId(suppliedId))
             .show(),
-          op
+          op.items
             .where((q) => q.all())
             .materialOverride(ColorMaterial.fromHex('#ff1122'))
             .setPhantom(true)
@@ -761,7 +761,7 @@ describe(Scene, () => {
     it('supports selection', () => {
       const itemId = random.guid();
       scene
-        .elements((op) => op.where((q) => q.withItemId(itemId)).select())
+        .elements((op) => op.items.where((q) => q.withItemId(itemId)).select())
         .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({

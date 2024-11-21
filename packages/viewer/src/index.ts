@@ -24,6 +24,7 @@ export * from './lib/pmi';
 export {
   Camera,
   CrossSectioner,
+  ItemOperationBuilder,
   Raycaster,
   RaycasterOptions,
   ResetViewOptions,
@@ -32,7 +33,6 @@ export {
   SceneExecutionOptions,
   SceneItemOperationsBuilder,
   SceneItemQueryExecutor,
-  SceneOperationBuilder,
   SceneViewStateFeature,
   TerminalItemOperationBuilder,
 } from './lib/scenes';
