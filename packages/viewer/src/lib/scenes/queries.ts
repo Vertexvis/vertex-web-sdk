@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { SceneItemOperationsBuilder } from './scene';
+import {
+  PmiAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -114,6 +117,12 @@ interface BooleanQuery {
   or(): OrQuery;
 }
 
+export class PmiAnnotationRootQuery {
+  public all(): AllQuery {
+    return new AllQuery();
+  }
+}
+
 export class RootQuery implements ItemQuery<SingleQuery> {
   public constructor(private inverted: boolean = false) {}
 
@@ -126,7 +135,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Deselect all items in the scene
-   * await scene.elements((op) => [op.where((q) => q.all()).deselect()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.all()).deselect()]).execute();
    * ```
    */
   public all(): AllQuery {
@@ -142,7 +151,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items that are not selected
-   * await scene.elements((op) => [op.where((q) => q.not().withSelected()).hide()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.not().withSelected()).hide()]).execute();
    * ```
    */
   public not(): RootQuery {
@@ -159,7 +168,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Hide the item with the `item-uuid-1` ID and the `item-uuid-2` ID
    * await scene.elements((op) => [
-   *   op.where((q) => q.withItemIds(['item-uuid-1', 'item-uuid-2'])).hide(),
+   *   op.items.where((q) => q.withItemIds(['item-uuid-1', 'item-uuid-2'])).hide(),
    * ]).execute();
    * ```
    */
@@ -179,7 +188,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * // and the `item-supplied-id-2` supplied ID
    * await scene.elements((op) => [
    *   op
-   *     .where((q) => q.withItemIds(['item-supplied-id-1', 'item-supplied-id-2']))
+   *     .items.where((q) => q.withItemIds(['item-supplied-id-1', 'item-supplied-id-2']))
    *     .hide(),
    * ]).execute();
    * ```
@@ -198,7 +207,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Hide the item with the `item-uuid` ID
    * await scene.elements((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).hide(),
+   *   op.items.where((q) => q.withItemId('item-uuid')).hide(),
    * ]).execute();
    * ```
    */
@@ -216,7 +225,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Hide the item with the `item-supplied-id` supplied ID
    * await scene.elements((op) => [
-   *   op.where((q) => q.withSuppliedId('item-supplied-id')).hide(),
+   *   op.items.where((q) => q.withSuppliedId('item-supplied-id')).hide(),
    * ]).execute();
    * ```
    */
@@ -235,7 +244,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * // Hide all items from the 2nd row to the 5th row of the scene-tree
    * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withSceneTreeRange({
    *         start: 2,
    *         end: 5,
@@ -261,12 +270,12 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Hide all items where the `PART_NAME_KEY` includes a value of `PartName`
    * await scene.elements((op) => [
-   *   op.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'])).hide(),
+   *   op.items.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'])).hide(),
    * ]).execute();
    *
    * // Hide all items where the `PART_NAME_KEY` has exactly a value of `PartName`
    * await scene.elements((op) => [
-   *   op.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'], true)).hide(),
+   *   op.items.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'], true)).hide(),
    * ]).execute();
    * ```
    */
@@ -294,7 +303,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items that are selected
-   * await scene.elements((op) => [op.where((q) => q.withSelected()).hide()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.withSelected()).hide()]).execute();
    * ```
    */
   public withSelected(): AllSelectedQuery {
@@ -310,7 +319,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Select all items that are visible
-   * await scene.elements((op) => [op.where((q) => q.withVisible()).select()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.withVisible()).select()]).execute();
    * ```
    */
   public withVisible(): AllVisibleQuery {
@@ -330,7 +339,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Select the item present at the [100, 100] coordinate of the image
    * await scene.elements((op) => [
-   *   op.where((q) => q.withPoint(Point.create(100, 100))).select(),
+   *   op.items.where((q) => q.withPoint(Point.create(100, 100))).select(),
    * ]).execute();
    * ```
    */
@@ -352,7 +361,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * // excluding any elements that are not fully contained by the region
    * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withVolumeIntersection(
    *         Rectangle.create(100, 100, 100, 100),
    *         true
@@ -365,7 +374,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * // including any elements that intersect with the region
    * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withVolumeIntersection(
    *         Rectangle.create(100, 100, 100, 100),
    *         false
@@ -588,6 +597,28 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
 
   public and(): AndQuery {
     return this;
+  }
+}
+
+export class SceneElementQueryExecutor {
+  public get items(): SceneItemQueryExecutor {
+    return new SceneItemQueryExecutor();
+  }
+
+  public get annotations(): PmiAnnotationsQueryExecutor {
+    return new PmiAnnotationsQueryExecutor();
+  }
+}
+
+export class PmiAnnotationsQueryExecutor {
+  public where(
+    query: (q: PmiAnnotationRootQuery) => TerminalQuery
+  ): PmiAnnotationOperationsBuilder {
+    const expression: QueryExpression = query(
+      new PmiAnnotationRootQuery()
+    ).build();
+
+    return new PmiAnnotationOperationsBuilder(expression);
   }
 }
 
