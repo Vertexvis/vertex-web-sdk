@@ -4,15 +4,21 @@
 /* istanbul ignore file */
 export * from './camera';
 export * from './crossSectioner';
-export { ItemOperationBuilder } from './operations';
+export {
+  ItemOperationBuilder,
+  PmiAnnotationOperationBuilder,
+} from './operations';
 export {
   AllQuery,
   AllSelectedQuery,
   AllVisibleQuery,
   AndQuery,
   MetadataQuery,
-  NotQuery,
+  NotPmiAnnotationQuery,
+  NotSceneItemQuery,
   OrQuery,
+  PmiAnnotationRootQuery,
+  PmiAnnotationsQueryExecutor,
   PointQuery,
   RootQuery,
   SceneElementQueryExecutor,

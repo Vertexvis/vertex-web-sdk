@@ -249,3 +249,56 @@ export class ItemOperationBuilder
     );
   }
 }
+
+export type PmiAnnotationOperation =
+  | ShowItemOperation
+  | HideItemOperation
+  | SelectItemOperation
+  | DeselectItemOperation;
+
+export interface PmiAnnotationOperations<T> {
+  show(): T;
+  hide(): T;
+  select(color: ColorMaterial): T;
+  deselect(): T;
+}
+
+/**
+ * A class to handle the building of operations on PMI annotations for a scene.
+ */
+export class PmiAnnotationOperationBuilder
+  implements PmiAnnotationOperations<PmiAnnotationOperationBuilder>
+{
+  public constructor(private operations: PmiAnnotationOperation[] = []) {}
+  /**
+   * Constructs the scene PMI annotation operations and returns a definition describing each
+   * operation.
+   */
+  public build(): PmiAnnotationOperation[] {
+    return this.operations.concat();
+  }
+
+  public show(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'show' }])
+    );
+  }
+
+  public hide(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'hide' }])
+    );
+  }
+
+  public select(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'select' }])
+    );
+  }
+
+  public deselect(): PmiAnnotationOperationBuilder {
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'deselect' }])
+    );
+  }
+}

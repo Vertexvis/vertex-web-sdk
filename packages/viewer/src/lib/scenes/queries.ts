@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { SceneItemOperationsBuilder } from './scene';
+import {
+  PmiAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -9,6 +12,11 @@ interface AllQueryExpression {
 export interface SceneTreeRange {
   start: number;
   end: number;
+}
+
+interface AnnotationQueryExpression {
+  type: 'annotation-id';
+  value: string;
 }
 
 interface ItemQueryExpression {
@@ -68,6 +76,7 @@ interface VolumeIntersectionQueryExpression {
  */
 export type QueryExpression =
   | AllQueryExpression
+  | AnnotationQueryExpression
   | ItemQueryExpression
   | AndExpression
   | OrExpression
@@ -109,9 +118,18 @@ interface ItemQuery<N> {
   withSuppliedId(id: string): N;
 }
 
+interface AnnotationQuery<N> {
+  withAnnotationId(id: string): N;
+}
+
 interface BooleanQuery {
   and(): AndQuery;
   or(): OrQuery;
+}
+
+interface BooleanAnnotationQuery {
+  and(): AndAnnotationQuery;
+  or(): OrAnnotationQuery;
 }
 
 export class RootQuery implements ItemQuery<SingleQuery> {
@@ -146,7 +164,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * ```
    */
   public not(): RootQuery {
-    return new NotQuery(!this.inverted);
+    return new NotSceneItemQuery(!this.inverted);
   }
 
   /**
@@ -383,7 +401,90 @@ export class RootQuery implements ItemQuery<SingleQuery> {
   }
 }
 
-export class NotQuery extends RootQuery {
+export class NotSceneItemQuery extends RootQuery {
+  public constructor(inverted: boolean) {
+    super(inverted);
+  }
+}
+
+export class PmiAnnotationRootQuery
+  implements AnnotationQuery<SingleAnnotationQuery>
+{
+  public constructor(private inverted: boolean = false) {}
+
+  /**
+   * Specifies that the operation should be performed on all PMI annotations in the scene.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Deselect all PMI annotations in the scene
+   * await scene.elements((op) => [op.annotations.where((q) => q.all()).deselect()]).execute();
+   * ```
+   */
+  public all(): AllQuery {
+    return new AllQuery();
+  }
+
+  /**
+   * Specifies that the operation should be performed on all annotations that do not match any following queries.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide all PMI annotations that are not selected
+   * await scene.elements((op) => [op.annotations.where((q) => q.not().withSelected()).hide()]).execute();
+   * ```
+   */
+  public not(): PmiAnnotationRootQuery {
+    return new NotPmiAnnotationQuery(!this.inverted);
+  }
+
+  /**
+   * Specifies that the operation should be performed on any annotation matching any one of the provided IDs.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide the annotation with the `item-uuid-1` ID and the `item-uuid-2` ID
+   * await scene.elements((op) => [
+   *   op.annotations.where((q) => q.withAnnotationIds(['item-uuid-1', 'item-uuid-2'])).hide(),
+   * ]).execute();
+   * ```
+   */
+  public withAnnotationIds(ids: string[]): BulkQuery {
+    return new BulkQuery(ids, 'annotation-id', this.inverted);
+  }
+
+  /**
+   * Specifies that the operation should be performed on any annotation matching the provided ID.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Hide the item with the `item-uuid` ID
+   * await scene.elements((op) => [
+   *   op.annotations.where((q) => q.withAnnotationId('item-uuid')).hide(),
+   * ]).execute();
+   * ```
+   */
+  public withAnnotationId(id: string): SingleAnnotationQuery {
+    return new SingleAnnotationQuery(
+      { type: 'annotation-id', value: id },
+      this.inverted
+    );
+  }
+}
+
+export class NotPmiAnnotationQuery extends PmiAnnotationRootQuery {
   public constructor(inverted: boolean) {
     super(inverted);
   }
@@ -492,7 +593,7 @@ export class VolumeIntersectionQuery extends TerminalQuery {
 export class BulkQuery extends TerminalQuery {
   public constructor(
     private ids: string[],
-    private type: 'item-id' | 'supplied-id',
+    private type: 'item-id' | 'supplied-id' | 'annotation-id',
     inverted: boolean
   ) {
     super(inverted);
@@ -591,9 +692,99 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
   }
 }
 
+class SingleAnnotationQuery
+  extends TerminalQuery
+  implements BooleanAnnotationQuery
+{
+  public constructor(private query: QueryExpression, inverted: boolean) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): QueryExpression {
+    return { ...this.query };
+  }
+
+  public and(): AndAnnotationQuery {
+    return new AndAnnotationQuery([this.query], this.inverted);
+  }
+
+  public or(): OrAnnotationQuery {
+    return new OrAnnotationQuery([this.query], this.inverted);
+  }
+}
+
+export class OrAnnotationQuery
+  extends TerminalQuery
+  implements AnnotationQuery<OrAnnotationQuery>
+{
+  public constructor(
+    private expressions: QueryExpression[],
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): QueryExpression {
+    return { type: 'or', expressions: [...this.expressions] };
+  }
+
+  public withAnnotationId(id: string): OrAnnotationQuery {
+    return new OrAnnotationQuery(
+      [...this.expressions, { type: 'annotation-id', value: id }],
+      this.inverted
+    );
+  }
+
+  public or(): OrAnnotationQuery {
+    return this;
+  }
+}
+
+export class AndAnnotationQuery
+  extends TerminalQuery
+  implements AnnotationQuery<AndAnnotationQuery>
+{
+  public constructor(
+    private expressions: QueryExpression[],
+    inverted: boolean
+  ) {
+    super(inverted);
+  }
+
+  public queryExpressionBuilder(): QueryExpression {
+    return { type: 'and', expressions: [...this.expressions] };
+  }
+
+  public withAnnotationId(id: string): AndAnnotationQuery {
+    return new AndAnnotationQuery(
+      [...this.expressions, { type: 'annotation-id', value: id }],
+      this.inverted
+    );
+  }
+
+  public and(): AndAnnotationQuery {
+    return this;
+  }
+}
+
 export class SceneElementQueryExecutor {
   public get items(): SceneItemQueryExecutor {
     return new SceneItemQueryExecutor();
+  }
+
+  public get annotations(): PmiAnnotationsQueryExecutor {
+    return new PmiAnnotationsQueryExecutor();
+  }
+}
+
+export class PmiAnnotationsQueryExecutor {
+  public where(
+    query: (q: PmiAnnotationRootQuery) => TerminalQuery
+  ): PmiAnnotationOperationsBuilder {
+    const expression: QueryExpression = query(
+      new PmiAnnotationRootQuery()
+    ).build();
+    return new PmiAnnotationOperationsBuilder(expression);
   }
 }
 

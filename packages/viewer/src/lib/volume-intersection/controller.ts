@@ -3,6 +3,7 @@ import { StreamRequestError } from '@vertexvis/stream-api';
 import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import {
+  PmiAnnotationOperationsBuilder,
   SceneItemOperationsBuilder,
   TerminalItemOperationBuilder,
 } from '../scenes';
@@ -102,11 +103,11 @@ export class VolumeIntersectionQueryController {
 
         const additionalTransforms = (
           op: SceneElementQueryExecutor
-        ): SceneItemOperationsBuilder[] =>
+        ): Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder> =>
           this.additionalTransforms.map((t) => t(op)).flat();
         const operationTransforms = (
           op: SceneElementQueryExecutor
-        ): SceneItemOperationsBuilder[] =>
+        ): Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder> =>
           [
             this.operationTransform(
               op.items.where((q) =>

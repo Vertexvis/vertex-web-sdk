@@ -456,6 +456,45 @@ describe(Scene, () => {
       });
     });
 
+    it('should execute commands and query by annotationId', () => {
+      const annotationId = random.guid();
+      const { msb, lsb } = UUID.toMsbLsb(annotationId);
+
+      scene
+        .elements((op) =>
+          op.annotations.where((q) => q.withAnnotationId(annotationId)).hide()
+        )
+        .execute();
+      expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
+        sceneViewId: {
+          hex: sceneViewId,
+        },
+        elementOperations: expect.arrayContaining([
+          {
+            pmiAnnotationOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  annotation: {
+                    id: {
+                      msb: parseFloat(msb),
+                      lsb: parseFloat(lsb),
+                    },
+                  },
+                },
+              },
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: false,
+                  },
+                },
+              ],
+            }),
+          },
+        ]),
+      });
+    });
+
     it('should support passing a supplied correlationId', () => {
       const itemId = random.guid();
       const suppliedId = `SuppliedId-${random.guid()}`;

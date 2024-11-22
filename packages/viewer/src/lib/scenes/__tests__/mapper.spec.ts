@@ -3,16 +3,20 @@ import { Dimensions } from '@vertexvis/geometry';
 import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
 
 import { random } from '../../../testing/random';
-import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
+import {
+  buildSceneElementOperationOnAnnotation,
+  buildSceneElementOperationOnItem,
+  toPbSceneViewStateFeatures,
+} from '../mapper';
 
-describe(buildSceneOperation, () => {
+describe(buildSceneElementOperationOnItem, () => {
   it('maps operations', () => {
     const renId = random.guid();
     const repId = random.guid();
     const renSuppliedId = random.string();
 
     expect(
-      buildSceneOperation(
+      buildSceneElementOperationOnItem(
         { type: 'all' },
         [
           { type: 'clear-transform', cascade: true },
@@ -29,29 +33,51 @@ describe(buildSceneOperation, () => {
         { dimensions: Dimensions.create(100, 100) }
       )
     ).toMatchObject({
-      queryExpression: { operand: { root: {} } },
-      operationTypes: [
-        { clearTransform: { cascade: true } },
-        { viewRendition: { id: { hex: renId } } },
-        { viewRendition: { suppliedId: renSuppliedId } },
-        { viewDefaultRendition: {} },
-        { clearRendition: {} },
-        {
-          viewRepresentation: {
-            predefinedId:
-              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+      sceneItemOperation: {
+        queryExpression: { operand: { root: {} } },
+        operationTypes: [
+          { clearTransform: { cascade: true } },
+          { viewRendition: { id: { hex: renId } } },
+          { viewRendition: { suppliedId: renSuppliedId } },
+          { viewDefaultRendition: {} },
+          { clearRendition: {} },
+          {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+            },
           },
-        },
-        {
-          viewRepresentation: {
-            predefinedId:
-              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+          {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+            },
           },
-        },
-        { viewRepresentation: { id: { hex: repId } } },
-        { clearRepresentation: {} },
-        { clearMaterial: {} },
-      ],
+          { viewRepresentation: { id: { hex: repId } } },
+          { clearRepresentation: {} },
+          { clearMaterial: {} },
+        ],
+      },
+    });
+  });
+});
+
+describe(buildSceneElementOperationOnAnnotation, () => {
+  it('maps operations', () => {
+    expect(
+      buildSceneElementOperationOnAnnotation(
+        { type: 'all' },
+        [{ type: 'hide' }, { type: 'deselect' }],
+        { dimensions: Dimensions.create(100, 100) }
+      )
+    ).toMatchObject({
+      pmiAnnotationOperation: {
+        queryExpression: { operand: { all: {} } },
+        operationTypes: [
+          { changeVisibility: { visible: false } },
+          { changeSelection: { selected: false } },
+        ],
+      },
     });
   });
 });
