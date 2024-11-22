@@ -148,16 +148,19 @@ describe(PmiAnnotationOperationBuilder, () => {
     const definitions = builder.hide().build();
     expect(definitions).toEqual([{ type: 'hide' }]);
   });
+
   it('creates a show operation', () => {
     const builder = new PmiAnnotationOperationBuilder();
     const definitions = builder.show().build();
     expect(definitions).toEqual([{ type: 'show' }]);
   });
+
   it('create a select operation', () => {
     const builder = new PmiAnnotationOperationBuilder();
     const definitions = builder.select().build();
     expect(definitions).toEqual([{ type: 'select' }]);
   });
+
   it('create a deselect operation', () => {
     const builder = new PmiAnnotationOperationBuilder();
     const definitions = builder.deselect().build();

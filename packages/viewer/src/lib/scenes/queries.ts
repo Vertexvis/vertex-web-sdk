@@ -123,8 +123,8 @@ interface AnnotationQuery<N> {
 }
 
 interface BooleanQuery {
-  and(): AndQuery;
-  or(): OrQuery;
+  and(): AndSceneItemQuery;
+  or(): OrSceneItemQuery;
 }
 
 interface BooleanAnnotationQuery {
@@ -132,7 +132,7 @@ interface BooleanAnnotationQuery {
   or(): OrAnnotationQuery;
 }
 
-export class RootQuery implements ItemQuery<SingleQuery> {
+export class RootQuery implements ItemQuery<SingleSceneItemQuery> {
   public constructor(private inverted: boolean = false) {}
 
   /**
@@ -220,8 +220,11 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * ]).execute();
    * ```
    */
-  public withItemId(id: string): SingleQuery {
-    return new SingleQuery({ type: 'item-id', value: id }, this.inverted);
+  public withItemId(id: string): SingleSceneItemQuery {
+    return new SingleSceneItemQuery(
+      { type: 'item-id', value: id },
+      this.inverted
+    );
   }
 
   /**
@@ -238,8 +241,11 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * ]).execute();
    * ```
    */
-  public withSuppliedId(id: string): SingleQuery {
-    return new SingleQuery({ type: 'supplied-id', value: id }, this.inverted);
+  public withSuppliedId(id: string): SingleSceneItemQuery {
+    return new SingleSceneItemQuery(
+      { type: 'supplied-id', value: id },
+      this.inverted
+    );
   }
 
   /**
@@ -441,7 +447,7 @@ export class PmiAnnotationRootQuery
    * ```
    */
   public not(): PmiAnnotationRootQuery {
-    return new NotPmiAnnotationQuery(!this.inverted);
+    return new NotAnnotationQuery(!this.inverted);
   }
 
   /**
@@ -484,7 +490,7 @@ export class PmiAnnotationRootQuery
   }
 }
 
-export class NotPmiAnnotationQuery extends PmiAnnotationRootQuery {
+export class NotAnnotationQuery extends PmiAnnotationRootQuery {
   public constructor(inverted: boolean) {
     super(inverted);
   }
@@ -612,7 +618,7 @@ export class BulkQuery extends TerminalQuery {
   }
 }
 
-class SingleQuery extends TerminalQuery implements BooleanQuery {
+class SingleSceneItemQuery extends TerminalQuery implements BooleanQuery {
   public constructor(private query: QueryExpression, inverted: boolean) {
     super(inverted);
   }
@@ -621,16 +627,19 @@ class SingleQuery extends TerminalQuery implements BooleanQuery {
     return { ...this.query };
   }
 
-  public and(): AndQuery {
-    return new AndQuery([this.query], this.inverted);
+  public and(): AndSceneItemQuery {
+    return new AndSceneItemQuery([this.query], this.inverted);
   }
 
-  public or(): OrQuery {
-    return new OrQuery([this.query], this.inverted);
+  public or(): OrSceneItemQuery {
+    return new OrSceneItemQuery([this.query], this.inverted);
   }
 }
 
-export class OrQuery extends TerminalQuery implements ItemQuery<OrQuery> {
+export class OrSceneItemQuery
+  extends TerminalQuery
+  implements ItemQuery<OrSceneItemQuery>
+{
   public constructor(
     private expressions: QueryExpression[],
     inverted: boolean
@@ -642,26 +651,29 @@ export class OrQuery extends TerminalQuery implements ItemQuery<OrQuery> {
     return { type: 'or', expressions: [...this.expressions] };
   }
 
-  public withItemId(id: string): OrQuery {
-    return new OrQuery(
+  public withItemId(id: string): OrSceneItemQuery {
+    return new OrSceneItemQuery(
       [...this.expressions, { type: 'item-id', value: id }],
       this.inverted
     );
   }
 
-  public withSuppliedId(id: string): OrQuery {
-    return new OrQuery(
+  public withSuppliedId(id: string): OrSceneItemQuery {
+    return new OrSceneItemQuery(
       [...this.expressions, { type: 'supplied-id', value: id }],
       this.inverted
     );
   }
 
-  public or(): OrQuery {
+  public or(): OrSceneItemQuery {
     return this;
   }
 }
 
-export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
+export class AndSceneItemQuery
+  extends TerminalQuery
+  implements ItemQuery<AndSceneItemQuery>
+{
   public constructor(
     private expressions: QueryExpression[],
     inverted: boolean
@@ -673,21 +685,21 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
     return { type: 'and', expressions: [...this.expressions] };
   }
 
-  public withItemId(id: string): AndQuery {
-    return new AndQuery(
+  public withItemId(id: string): AndSceneItemQuery {
+    return new AndSceneItemQuery(
       [...this.expressions, { type: 'item-id', value: id }],
       this.inverted
     );
   }
 
-  public withSuppliedId(id: string): AndQuery {
-    return new AndQuery(
+  public withSuppliedId(id: string): AndSceneItemQuery {
+    return new AndSceneItemQuery(
       [...this.expressions, { type: 'supplied-id', value: id }],
       this.inverted
     );
   }
 
-  public and(): AndQuery {
+  public and(): AndSceneItemQuery {
     return this;
   }
 }

@@ -405,10 +405,10 @@ function buildAnnotationOperationTypes(
 ): vertexvis.protobuf.stream.IOperationType[] {
   return operations.map((op) => {
     switch (op.type) {
-      case 'hide':
-        return { changeVisibility: { visible: false } };
       case 'show':
         return { changeVisibility: { visible: true } };
+      case 'hide':
+        return { changeVisibility: { visible: false } };
       case 'select':
         return { changeSelection: { selected: true } };
       case 'deselect':

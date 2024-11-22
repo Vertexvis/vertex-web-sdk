@@ -841,8 +841,8 @@ export class Scene {
    *
    * // Deselect everything, then select a specific item by ID
    * await scene.items(op => [
-   *   op.where(q => q.all()).deselect(),
-   *   op.where(q => q.withItemId('item-id')).select(),
+   *   op.items.where(q => q.all()).deselect(),
+   *   op.items.where(q => q.withItemId('item-id')).select(),
    * ]).execute();
    * ```
    *
@@ -901,7 +901,7 @@ export class Scene {
    *
    * @see {@link PmiAnnotationRootQuery} for more information on available queries on PMI annotations.
    *
-   * @see {@link PmiAnnotationOperationsBuilder} for more information on available operations to the scene items.
+   * @see {@link PmiAnnotationOperationsBuilder} for more information on available operations to the PMI annotations.
    *
    * @param operations
    */
