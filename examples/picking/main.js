@@ -16,7 +16,7 @@ async function main() {
     // press 'space' to deselect all parts
     if (event.key === ' ') {
       await scene
-        .items((op) => op.where((q) => q.all()).deselect())
+        .elements((op) => op.items.where((q) => q.all()).deselect())
         .execute();
     }
   });
@@ -36,7 +36,7 @@ async function main() {
       if (event.detail.shiftKey) {
         // If the shift key is pressed, add to the current selection without removing existing selection
         await scene
-            .items((op) => op.where((q) => q.withItemId(hit.itemId.hex)).select())
+            .elements((op) => op.items.where((q) => q.withItemId(hit.itemId.hex)).select())
             .execute();
       } else {
         const ancestors = hit.ancestors.reverse();
@@ -48,9 +48,9 @@ async function main() {
             const toSelectId = ancestors[indexOfLastSelectedPartInAncestors + 1].itemId.hex;
 
             await scene
-                .items((op) => [
-                  op.where((q) => q.all()).deselect(),
-                  op.where((q) => q.withItemId(toSelectId)).select(),
+                .elements((op) => [
+                  op.items.where((q) => q.all()).deselect(),
+                  op.items.where((q) => q.withItemId(toSelectId)).select(),
                 ])
                 .execute();
 
@@ -58,9 +58,9 @@ async function main() {
         } else {
             // Select the part and deselect all other parts
             await scene
-                .items((op) => [
-                  op.where((q) => q.all()).deselect(),
-                  op.where((q) => q.withItemId(hit.itemId.hex)).select(),
+                .elements((op) => [
+                  op.items.where((q) => q.all()).deselect(),
+                  op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
                 ])
                 .execute();
 
@@ -70,7 +70,7 @@ async function main() {
     } else {
       // Deselect all parts since the user clicked in the empty space
       await scene
-        .items((op) => [op.where((q) => q.all()).deselect()])
+        .elements((op) => [op.items.where((q) => q.all()).deselect()])
         .execute();
 
       lastSelectedId = "";

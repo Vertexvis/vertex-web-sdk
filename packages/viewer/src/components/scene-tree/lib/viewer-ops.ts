@@ -13,7 +13,7 @@ export async function showItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).show())
+    .elements((op) => op.items.where((q) => q.withItemId(id)).show())
     .execute({ suppliedCorrelationId });
 }
 
@@ -24,7 +24,7 @@ export async function hideItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).hide())
+    .elements((op) => op.items.where((q) => q.withItemId(id)).hide())
     .execute({
       suppliedCorrelationId,
     });
@@ -37,9 +37,9 @@ export async function selectItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
-      ...(append ? [] : [op.where((q) => q.all()).deselect()]),
-      op.where((q) => q.withItemId(id)).select(),
+    .elements((op) => [
+      ...(append ? [] : [op.items.where((q) => q.all()).deselect()]),
+      op.items.where((q) => q.withItemId(id)).select(),
     ])
     .execute({ suppliedCorrelationId });
 }
@@ -52,9 +52,9 @@ export async function selectRangeInSceneTree(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
-      ...(append ? [] : [op.where((q) => q.all()).deselect()]),
-      op.where((q) => q.withSceneTreeRange({ start, end })).select(),
+    .elements((op) => [
+      ...(append ? [] : [op.items.where((q) => q.all()).deselect()]),
+      op.items.where((q) => q.withSceneTreeRange({ start, end })).select(),
     ])
     .execute({
       suppliedCorrelationId,
@@ -71,9 +71,9 @@ export async function selectFilterResults(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => [
-      ...(append ? [] : [op.where((q) => q.all()).deselect()]),
-      op
+    .elements((op) => [
+      ...(append ? [] : [op.items.where((q) => q.all()).deselect()]),
+      op.items
         .where((q) =>
           q.withMetadata(filter, keys, exactMatch, removeHiddenResults)
         )
@@ -91,7 +91,7 @@ export async function deselectItem(
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
-    .items((op) => op.where((q) => q.withItemId(id)).deselect())
+    .elements((op) => op.items.where((q) => q.withItemId(id)).deselect())
     .execute({
       suppliedCorrelationId,
     });

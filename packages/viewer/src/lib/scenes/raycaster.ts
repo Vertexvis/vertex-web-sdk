@@ -44,8 +44,8 @@ export class Raycaster implements RaycasterLike {
    *
    *   if (hit != null) {
    *     // If there was an item present at the position, select it
-   *     await scene.items((op) =>
-   *       op.where((q) => q.withItemId(hit.itemId.hex)).select()
+   *     await scene.elements((op) =>
+   *       op.items.where((q) => q.withItemId(hit.itemId.hex)).select()
    *     );
    *   }
    * });

@@ -43,7 +43,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 
           if (result.hits && result.hits.length == 0) {
             await scene
-              .items((op) => op.where((q) => q.all()).deselect())
+              .elements((op) => op.items.where((q) => q.all()).deselect())
               .execute();
           } else {
             const widget = document.getElementById('transform-widget');
@@ -51,10 +51,10 @@ The widget expects a part selected, which also occurs on a valid hit result.
 
             widget.position = hit.hitPoint;
             await scene
-              .items((op) => [
-                op.where((q) => q.all()).deselect(),
+              .elements((op) => [
+                op.items.where((q) => q.all()).deselect(),
                 op
-                  .where((q) => q.withItemId(hit.itemId.hex))
+                  .items.where((q) => q.withItemId(hit.itemId.hex))
                   .select(),
               ])
               .execute();

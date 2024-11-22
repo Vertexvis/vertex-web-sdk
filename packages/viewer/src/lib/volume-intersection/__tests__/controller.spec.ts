@@ -15,17 +15,20 @@ describe('volume intersection controller', () => {
     deselect: jest.fn(),
     materialOverride: jest.fn(),
   };
-  const mockBuilder = {
+  const mockItemBuilder = {
     where: (fn) => {
       fn(mockQuery);
       return mockOperations;
     },
   };
+  const mockBuilder = {
+    items: mockItemBuilder,
+  };
   const mockExecute = jest.fn();
   const model = new VolumeIntersectionQueryModel();
   const mockViewer = {
     scene: () => ({
-      items: (fn) => {
+      elements: (fn) => {
         fn(mockBuilder);
         return {
           execute: mockExecute,
@@ -96,7 +99,8 @@ describe('volume intersection controller', () => {
     );
 
     controller.setAdditionalTransforms([
-      (op) => op.where((q) => q.withItemId('id')).materialOverride('#00ff00'),
+      (op) =>
+        op.items.where((q) => q.withItemId('id')).materialOverride('#00ff00'),
     ]);
 
     await drag(controller);

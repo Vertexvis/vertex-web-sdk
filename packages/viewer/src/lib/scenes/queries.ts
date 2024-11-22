@@ -126,7 +126,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Deselect all items in the scene
-   * await scene.items((op) => [op.where((q) => q.all()).deselect()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.all()).deselect()]).execute();
    * ```
    */
   public all(): AllQuery {
@@ -142,7 +142,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items that are not selected
-   * await scene.items((op) => [op.where((q) => q.not().withSelected()).hide()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.not().withSelected()).hide()]).execute();
    * ```
    */
   public not(): RootQuery {
@@ -158,8 +158,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide the item with the `item-uuid-1` ID and the `item-uuid-2` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemIds(['item-uuid-1', 'item-uuid-2'])).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemIds(['item-uuid-1', 'item-uuid-2'])).hide(),
    * ]).execute();
    * ```
    */
@@ -177,9 +177,9 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    *
    * // Hide the item with the `item-supplied-id-1` supplied ID
    * // and the `item-supplied-id-2` supplied ID
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) => q.withItemIds(['item-supplied-id-1', 'item-supplied-id-2']))
+   *     .items.where((q) => q.withItemIds(['item-supplied-id-1', 'item-supplied-id-2']))
    *     .hide(),
    * ]).execute();
    * ```
@@ -197,8 +197,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).hide(),
    * ]).execute();
    * ```
    */
@@ -215,8 +215,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide the item with the `item-supplied-id` supplied ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withSuppliedId('item-supplied-id')).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withSuppliedId('item-supplied-id')).hide(),
    * ]).execute();
    * ```
    */
@@ -233,9 +233,9 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items from the 2nd row to the 5th row of the scene-tree
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withSceneTreeRange({
    *         start: 2,
    *         end: 5,
@@ -260,13 +260,13 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items where the `PART_NAME_KEY` includes a value of `PartName`
-   * await scene.items((op) => [
-   *   op.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'])).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'])).hide(),
    * ]).execute();
    *
    * // Hide all items where the `PART_NAME_KEY` has exactly a value of `PartName`
-   * await scene.items((op) => [
-   *   op.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'], true)).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withMetadata('PartName', ['PART_NAME_KEY'], true)).hide(),
    * ]).execute();
    * ```
    */
@@ -294,7 +294,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Hide all items that are selected
-   * await scene.items((op) => [op.where((q) => q.withSelected()).hide()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.withSelected()).hide()]).execute();
    * ```
    */
   public withSelected(): AllSelectedQuery {
@@ -310,7 +310,7 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Select all items that are visible
-   * await scene.items((op) => [op.where((q) => q.withVisible()).select()]).execute();
+   * await scene.elements((op) => [op.items.where((q) => q.withVisible()).select()]).execute();
    * ```
    */
   public withVisible(): AllVisibleQuery {
@@ -329,8 +329,8 @@ export class RootQuery implements ItemQuery<SingleQuery> {
    * const scene = await viewer.scene();
    *
    * // Select the item present at the [100, 100] coordinate of the image
-   * await scene.items((op) => [
-   *   op.where((q) => q.withPoint(Point.create(100, 100))).select(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withPoint(Point.create(100, 100))).select(),
    * ]).execute();
    * ```
    */
@@ -350,9 +350,9 @@ export class RootQuery implements ItemQuery<SingleQuery> {
 
    * // Select all items within the specified 100x100 region of the image
    * // excluding any elements that are not fully contained by the region
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withVolumeIntersection(
    *         Rectangle.create(100, 100, 100, 100),
    *         true
@@ -363,9 +363,9 @@ export class RootQuery implements ItemQuery<SingleQuery> {
 
    * // Select all items within the specified 100x100 region of the image
    * // including any elements that intersect with the region
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) =>
+   *     .items.where((q) =>
    *       q.withVolumeIntersection(
    *         Rectangle.create(100, 100, 100, 100),
    *         false
@@ -588,6 +588,12 @@ export class AndQuery extends TerminalQuery implements ItemQuery<AndQuery> {
 
   public and(): AndQuery {
     return this;
+  }
+}
+
+export class SceneElementQueryExecutor {
+  public get items(): SceneItemQueryExecutor {
+    return new SceneItemQueryExecutor();
   }
 }
 

@@ -13,7 +13,7 @@ async function main() {
     if (event.key === 'e') {
       console.log('setting end item state');
       await scene
-        .items((op) => op.where((q) => q.withSelected()).setEndItem(true))
+        .elements((op) => op.items.where((q) => q.withSelected()).setEndItem(true))
         .execute();
     }
 
@@ -21,7 +21,7 @@ async function main() {
     if (event.key === 'r') {
       console.log('removing end item state');
       await scene
-        .items((op) => op.where((q) => q.withSelected()).setEndItem(false))
+        .elements((op) => op.items.where((q) => q.withSelected()).setEndItem(false))
         .execute();
     }
   });
@@ -46,25 +46,25 @@ async function main() {
             .itemId.hex;
 
         await scene
-            .items((op) => [
-              op.where((q) => q.all()).deselect(),
-              op.where((q) => q.withItemId(toSelectId)).select(),
+            .elements((op) => [
+              op.items.where((q) => q.all()).deselect(),
+              op.items.where((q) => q.withItemId(toSelectId)).select(),
             ])
             .execute();
 
         lastSelectedId = toSelectId;
       } else {
         await scene
-            .items((op) => [
-              op.where((q) => q.all()).deselect(),
-              op.where((q) => q.withItemId(hit.itemId.hex)).select(),
+            .elements((op) => [
+              op.items.where((q) => q.all()).deselect(),
+              op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
             ])
             .execute();
         lastSelectedId = hit.itemId.hex;
       }
     } else {
       await scene
-        .items((op) => [op.where((q) => q.all()).deselect()])
+        .elements((op) => [op.items.where((q) => q.all()).deselect()])
         .execute();
     }
   });

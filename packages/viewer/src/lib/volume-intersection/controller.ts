@@ -6,14 +6,14 @@ import {
   SceneItemOperationsBuilder,
   TerminalItemOperationBuilder,
 } from '../scenes';
-import { SceneItemQueryExecutor } from '../scenes/queries';
+import { SceneElementQueryExecutor } from '../scenes/queries';
 import { VolumeIntersectionQueryModel } from './model';
 
 export type OperationTransform = (
   builder: SceneItemOperationsBuilder
 ) => TerminalItemOperationBuilder;
 export type AdditionalTransform = (
-  executor: SceneItemQueryExecutor
+  executor: SceneElementQueryExecutor
 ) => TerminalItemOperationBuilder;
 
 export interface CompleteExecutionDetails {
@@ -35,7 +35,9 @@ export class VolumeIntersectionQueryController {
     private model: VolumeIntersectionQueryModel,
     private viewer: HTMLVertexViewerElement
   ) {
-    this.additionalTransforms = [(op) => op.where((q) => q.all()).deselect()];
+    this.additionalTransforms = [
+      (op) => op.items.where((q) => q.all()).deselect(),
+    ];
     this.operationTransform = (builder) => builder.select();
   }
 
@@ -64,7 +66,7 @@ export class VolumeIntersectionQueryController {
    * the volume intersection query. This can be used to perform an operation on
    * the entirety of the scene prior to the operation on the result of the
    * volume intersection query.
-   * Defaults to `[(op) => op.where((q) => q.all()).deselect()]`, which will
+   * Defaults to `[(op) => op.items.where((q) => q.all()).deselect()]`, which will
    * clear any prior selection before the default selection.
    */
   public setAdditionalTransforms(
@@ -99,15 +101,15 @@ export class VolumeIntersectionQueryController {
         this.executeStarted.emit();
 
         const additionalTransforms = (
-          op: SceneItemQueryExecutor
+          op: SceneElementQueryExecutor
         ): SceneItemOperationsBuilder[] =>
           this.additionalTransforms.map((t) => t(op)).flat();
         const operationTransforms = (
-          op: SceneItemQueryExecutor
+          op: SceneElementQueryExecutor
         ): SceneItemOperationsBuilder[] =>
           [
             this.operationTransform(
-              op.where((q) =>
+              op.items.where((q) =>
                 q.withVolumeIntersection(screenBounds, type === 'exclusive')
               )
             ),
@@ -115,7 +117,7 @@ export class VolumeIntersectionQueryController {
 
         const scene = await this.viewer.scene();
         await scene
-          .items((op) => [
+          .elements((op) => [
             ...additionalTransforms(op),
             ...operationTransforms(op),
           ])

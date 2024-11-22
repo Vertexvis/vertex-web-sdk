@@ -16,7 +16,7 @@ async function main() {
     // press 'r' to reset phantom state
     if (event.key === 'r') {
       await scene
-        .items((op) => op.where((q) => q.all()).clearPhantom())
+        .elements((op) => op.items.where((q) => q.all()).clearPhantom())
         .execute();
     }
   });
@@ -32,8 +32,8 @@ async function main() {
       const hit = result.hits[0];
 
       await scene
-        .items((op) => [
-          op.where((q) => q.withItemId(hit.itemId.hex)).setPhantom(true),
+        .elements((op) => [
+          op.items.where((q) => q.withItemId(hit.itemId.hex)).setPhantom(true),
         ])
         .execute();
     }

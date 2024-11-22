@@ -15,14 +15,18 @@ import {
 } from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
-import { buildSceneOperation } from './mapper';
+import { buildSceneElementOperationOnItem } from './mapper';
 import {
   ItemOperation,
+  ItemOperationBuilder,
   RepresentationId,
   SceneItemOperations,
-  SceneOperationBuilder,
 } from './operations';
-import { QueryExpression, SceneItemQueryExecutor } from './queries';
+import {
+  QueryExpression,
+  SceneElementQueryExecutor,
+  SceneItemQueryExecutor,
+} from './queries';
 import { Raycaster } from './raycaster';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
 
@@ -41,26 +45,36 @@ export interface ResetViewOptions {
   suppliedCorrelationId?: string;
 }
 
+export interface SceneElementOperationsBuilder {
+  isItemBuilder(): this is SceneItemOperationsBuilder;
+}
+
 /**
- * A class that is responsible for building operations for a specific scene.
+ * A class that is responsible for building operations on scene items for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in
  * order for the changes to take effect.
  */
 export class SceneItemOperationsBuilder
-  implements SceneItemOperations<SceneItemOperationsBuilder>
+  implements
+    SceneItemOperations<SceneItemOperationsBuilder>,
+    SceneElementOperationsBuilder
 {
-  private builder: SceneOperationBuilder;
+  private builder: ItemOperationBuilder;
 
   public constructor(
     private query: QueryExpression,
-    givenBuilder?: SceneOperationBuilder
+    givenBuilder?: ItemOperationBuilder
   ) {
     this.builder =
-      givenBuilder != null ? givenBuilder : new SceneOperationBuilder();
+      givenBuilder != null ? givenBuilder : new ItemOperationBuilder();
+  }
+
+  public isItemBuilder(): this is SceneItemOperationsBuilder {
+    return true;
   }
 
   /**
-   * Specifies that the items matching the query should have their default
+   * Specifies that the scene items matching the query should have their default
    * material overridden to match the specified material.
    *
    * @example
@@ -70,16 +84,16 @@ export class SceneItemOperationsBuilder
    *
    * // Override the material for the item with the `item-uuid` ID to
    * // be red with an opacity of 0.5.
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) => q.withItemId('item-uuid'))
+   *     .items.where((q) => q.withItemId('item-uuid'))
    *     .materialOverride(ColorMaterial.create(255, 0, 0, 0.5)),
    * ]);
    *
    * // Override the material for the item with the `item-uuid` ID to
    * // be red with an opacity of 1.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).materialOverride('#ff0000'),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).materialOverride('#ff0000'),
    * ]).execute();
    * ```
    */
@@ -100,7 +114,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should be hidden.
+   * Specifies that the scene items matching the query should be hidden.
    *
    * @example
    * ```typescript
@@ -108,8 +122,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Hide the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).hide(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).hide(),
    * ]).execute();
    * ```
    */
@@ -118,7 +132,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should be shown.
+   * Specifies that the scene items matching the query should be shown.
    *
    * @example
    * ```typescript
@@ -126,8 +140,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Show the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).show(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).show(),
    * ]).execute();
    * ```
    */
@@ -136,7 +150,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should be selected.
+   * Specifies that the scene items matching the query should be selected.
    *
    * @example
    * ```typescript
@@ -144,8 +158,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Select the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).select(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).select(),
    * ]).execute();
    * ```
    */
@@ -154,7 +168,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should be deselected.
+   * Specifies that the scene items matching the query should be deselected.
    *
    * @example
    * ```typescript
@@ -162,8 +176,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Deselect the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).deselect(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).deselect(),
    * ]).execute();
    * ```
    */
@@ -172,7 +186,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have any overridden
+   * Specifies that the scene items matching the query should have any overridden
    * material removed.
    *
    * @example
@@ -181,8 +195,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Clear the overridden material on the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearMaterialOverrides(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearMaterialOverrides(),
    * ]);
    * ```
    */
@@ -194,7 +208,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their
+   * Specifies that the scene items matching the query should have their
    * transformation matrix overridden to match the specified transformation
    * matrix.
    *
@@ -205,9 +219,9 @@ export class SceneItemOperationsBuilder
    *
    * // Override the transformation matrix for the item with the `item-uuid` ID to
    * // move the element along the x-axis
-   * await scene.items((op) => [
+   * await scene.elements((op) => [
    *   op
-   *     .where((q) => q.withItemId('item-uuid'))
+   *     .items.where((q) => q.withItemId('item-uuid'))
    *     .transform(Matrix4.makeTranslation(Vector3.create(100, 0, 0))),
    * ]);
    * ```
@@ -260,9 +274,9 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden
+   * Specifies that the scene items matching the query should have their overridden
    * transformation matrix removed. The `cascade` flag determines whether
-   * children of the items matching the query should also have their overridden
+   * children of the scene items matching the query should also have their overridden
    * transformation matrix removed, and defaults to `true`.
    *
    * @example
@@ -272,14 +286,14 @@ export class SceneItemOperationsBuilder
    *
    * // Clear the overridden the transformation matrix for the item with the `item-uuid` ID
    * // and do not cascade to preserve transformations on children
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearTransforms(false),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearTransforms(false),
    * ]);
    *
    * // Clear the overridden the transformation matrix for the item with the `item-uuid` ID
    * // and cascade to clear overridden transformations on children
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearTransforms(true),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearTransforms(true),
    * ]);
    * ```
    */
@@ -291,7 +305,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their phantom state
+   * Specifies that the scene items matching the query should have their phantom state
    * overridden to match the specified `phantomState` flag. If the
    * `phantomState` flag is not provided, it will default to `true`.
    *
@@ -301,13 +315,13 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Mark the item with the `item-uuid` ID as phantom
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).setPhantom(true),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).setPhantom(true),
    * ]);
    *
    * // Unmark the item with the `item-uuid` ID as phantom
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).setPhantom(false),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).setPhantom(false),
    * ]);
    * ```
    */
@@ -319,7 +333,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden
+   * Specifies that the scene items matching the query should have their overridden
    * phantom state removed.
    *
    * @example
@@ -328,8 +342,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Clear the overridden phantom state of the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearPhantom(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearPhantom(),
    * ]);
    * ```
    */
@@ -341,7 +355,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their end item
+   * Specifies that the scene items matching the query should have their end item
    * state overridden to match the specified `endItemState` flag. If the
    * `endItemState` flag is not provided, it will default to `true`.
    *
@@ -351,13 +365,13 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Mark the item with the `item-uuid` ID as an end item
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).setEndItem(true),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).setEndItem(true),
    * ]);
    *
    * // Unmark the item with the `item-uuid` ID as an end item
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).setEndItem(false),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).setEndItem(false),
    * ]);
    * ```
    *
@@ -375,7 +389,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Specifies that the items matching the query should have their overridden
+   * Specifies that the scene items matching the query should have their overridden
    * end item state removed.
    *
    * @example
@@ -384,8 +398,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Clear the overridden end item state of the item with the `item-uuid` ID
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearEndItem(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearEndItem(),
    * ]);
    * ```
    */
@@ -397,8 +411,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Changes the rendition of an item matching the query. This operation only
-   * applies to items that reference a revision that contains the given
+   * Changes the rendition of a scene item matching the query. This operation only
+   * applies to scene items that reference a revision that contains the given
    * rendition.
    *
    * @example
@@ -407,8 +421,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the matching item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).viewRenditionById('rendition-uuid'),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).viewRenditionById('rendition-uuid'),
    * ]);
    * ```
    */
@@ -420,8 +434,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Changes the rendition of any item matching the query that contains a
-   * rendition with the given supplied ID. This operation only applies to items
+   * Changes the rendition of any scene item matching the query that contains a
+   * rendition with the given supplied ID. This operation only applies to scene items
    * that reference a revision that contain a rendition with a matching supplied
    * ID.
    *
@@ -431,8 +445,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the given item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).viewRenditionBySuppliedId('rendition-supplied-id'),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).viewRenditionBySuppliedId('rendition-supplied-id'),
    * ]);
    * ```
    */
@@ -446,8 +460,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Changes the rendition of items matching the query back to their revision's
-   * default rendition. This operation only applies to items that reference a
+   * Changes the rendition of scene items matching the query back to their revision's
+   * default rendition. This operation only applies to scene items that reference a
    * revision.
    *
    * @example
@@ -456,8 +470,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the given item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).viewDefaultRendition(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).viewDefaultRendition(),
    * ]);
    * ```
    */
@@ -469,8 +483,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Clears the rendition of items matching the query, which will revert the
-   * item back to the rendition used when creating the item.
+   * Clears the rendition of scene items matching the query, which will revert the
+   * scene item back to the rendition used when creating the item.
    *
    * @example
    * ```typescript
@@ -478,8 +492,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the given item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearRendition(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearRendition(),
    * ]);
    * ```
    */
@@ -491,8 +505,8 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Changes the representation of items matching a query. This operation only
-   * applies to items that reference a rendition with the given representation
+   * Changes the representation of scene items matching a query. This operation only
+   * applies to scene items that reference a rendition with the given representation
    * ID.
    *
    * @example
@@ -501,8 +515,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the given item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).viewRepresentation('rep-id'),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).viewRepresentation('rep-id'),
    * ]);
    * ```
    */
@@ -514,7 +528,7 @@ export class SceneItemOperationsBuilder
   }
 
   /**
-   * Clears the representation for items matching the query.
+   * Clears the representation for scene items matching the query.
    *
    * @example
    * ```typescript
@@ -522,8 +536,8 @@ export class SceneItemOperationsBuilder
    * const scene = await viewer.scene();
    *
    * // Switch the rendition of the given item.
-   * await scene.items((op) => [
-   *   op.where((q) => q.withItemId('item-uuid')).clearRepresentation(),
+   * await scene.elements((op) => [
+   *   op.items.where((q) => q.withItemId('item-uuid')).clearRepresentation(),
    * ]);
    * ```
    */
@@ -550,19 +564,19 @@ export interface QueryOperation {
   operations: ItemOperation[];
 }
 
-export class ItemsOperationExecutor {
+export class OperationExecutor {
   public constructor(
     private sceneViewId: UUID.UUID,
     private stream: StreamApi,
     private dimensions: Dimensions.Dimensions,
-    private queryOperations: QueryOperation[]
+    private sceneItemQueryOperations: QueryOperation[]
   ) {}
 
   public async execute(
     executionOptions?: SceneExecutionOptions
   ): Promise<void> {
-    const pbOperations = this.queryOperations.map((op) =>
-      buildSceneOperation(op.query, op.operations, {
+    const pbItemOperations = this.sceneItemQueryOperations.map((op) =>
+      buildSceneElementOperationOnItem(op.query, op.operations, {
         dimensions: this.dimensions,
       })
     );
@@ -570,7 +584,7 @@ export class ItemsOperationExecutor {
       sceneViewId: {
         hex: this.sceneViewId,
       },
-      operations: pbOperations,
+      elementOperations: pbItemOperations,
       suppliedCorrelationId:
         executionOptions?.suppliedCorrelationId != null
           ? {
@@ -585,7 +599,7 @@ export class ItemsOperationExecutor {
 
 export type TerminalItemOperationBuilder =
   | SceneItemOperationsBuilder
-  | SceneItemOperationsBuilder[];
+  | Array<SceneItemOperationsBuilder>;
 
 export type ImageScaleProvider = () => Point.Point | undefined;
 
@@ -677,7 +691,7 @@ export class Scene {
   }
 
   /**
-   * Returns an executor that accepts a function as a parameter that contains one or many operations to apply
+   * Returns an executor that accepts a function as a parameter that contains one or more operations to apply
    * to the scene view. The operations will be applied transactionally.
    *
    * @example
@@ -687,8 +701,8 @@ export class Scene {
    *
    * // Deselect everything, then select a specific item by ID
    * await scene.items(op => [
-   *   op.where(q => q.all()).deselect(),
-   *   op.where(q => q.withItemId('item-id')).select(),
+   *   op.items.where(q => q.all()).deselect(),
+   *   op.items.where(q => q.withItemId('item-id')).select(),
    * ]).execute();
    * ```
    *
@@ -700,7 +714,7 @@ export class Scene {
    */
   public items(
     operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
-  ): ItemsOperationExecutor {
+  ): OperationExecutor {
     const sceneOperations = operations(new SceneItemQueryExecutor());
 
     const ops = Array.isArray(sceneOperations)
@@ -710,11 +724,56 @@ export class Scene {
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
       [] as QueryOperation[]
     );
-    return new ItemsOperationExecutor(
+    return new OperationExecutor(
       this.sceneViewId,
       this.stream,
       this.dimensions,
       operationList
+    );
+  }
+
+  /**
+   * Returns an executor that accepts a function as a parameter that contains one or more operations to apply
+   * to items or annotations in the scene view. The operations will be applied transactionally.
+   *
+   * @example
+   * ```typescript
+   * const viewer = document.querySelector('vertex-viewer');
+   * const scene = await viewer.scene();
+   *
+   * // Deselect everything, then select a specific item by ID
+   * await scene.elements(op => [
+   *   op.items.where(q => q.all()).deselect(),
+   *   op.items.where(q => q.withItemId('item-id')).select(),
+   * ]).execute();
+   * ```
+   *
+   * @see {@link RootQuery} for more information on available queries.
+   *
+   * @see {@link SceneItemOperationsBuilder} for more information on available operations to the scene items.
+   *
+   * @param itemOperations
+   */
+  public elements(
+    operations: (q: SceneElementQueryExecutor) => TerminalItemOperationBuilder
+  ): OperationExecutor {
+    // Operations on scene items
+    const ops = operations(new SceneElementQueryExecutor());
+    const opsAsArray = Array.isArray(ops) ? ops : [ops];
+
+    const sceneItemOps = opsAsArray.filter((op) =>
+      op.isItemBuilder()
+    ) as Array<SceneItemOperationsBuilder>;
+    const sceneItemsOperationList = sceneItemOps.reduce(
+      (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
+      [] as QueryOperation[]
+    );
+
+    return new OperationExecutor(
+      this.sceneViewId,
+      this.stream,
+      this.dimensions,
+      sceneItemsOperationList
     );
   }
 

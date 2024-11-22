@@ -30,9 +30,9 @@ async function search(viewer, metadataKey, metadataValue) {
   // Enable phantom mode for all items except the items that match the entered
   // metadata key/value.
   await scene
-    .items((op) => [
-      op.where((q) => q.all()).setPhantom(true),
-      op.where((q) => q.withMetadata(value, [key], false)).setPhantom(false),
+    .elements((op) => [
+      op.items.where((q) => q.all()).setPhantom(true),
+      op.items.where((q) => q.withMetadata(value, [key], false)).setPhantom(false),
     ])
     .execute();
 }
@@ -44,6 +44,6 @@ async function clear(viewer, metadataKey, metadataValue) {
   // Clear phantom mode for all scene items.
   const scene = await viewer.scene();
   await scene
-    .items((op) => [op.where((q) => q.all()).clearPhantom()])
+    .elements((op) => [op.items.where((q) => q.all()).clearPhantom()])
     .execute();
 }
