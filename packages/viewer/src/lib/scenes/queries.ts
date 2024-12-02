@@ -14,7 +14,7 @@ export interface SceneTreeRange {
   end: number;
 }
 
-interface AnnotationQueryExpression {
+export interface AnnotationQueryExpression {
   type: 'annotation-id';
   value: string;
 }

@@ -11,7 +11,7 @@ import {
   SceneViewStateIdentifier,
 } from '../types';
 import { ItemOperation, PmiAnnotationOperation } from './operations';
-import { QueryExpression } from './queries';
+import { AnnotationQueryExpression, QueryExpression } from './queries';
 import { SceneViewStateFeature } from './scene';
 
 export interface BuildSceneOperationContext {
@@ -178,10 +178,13 @@ export function buildAnnotationQueryExpression(
       // Exactly one or two expressions should have been provided in the query.
       // If only one expression is given, query only on that expression.
       if (numberOfExpressionsAnd === 1) {
-        return buildAnnotationQueryExpression({
-          type: 'annotation-id',
-          value: query.expressions[0].value,
-        });
+        return buildAnnotationQueryExpression(
+          {
+            type: 'annotation-id',
+            value: (query.expressions[0] as AnnotationQueryExpression).value,
+          },
+          context
+        );
       } else if (numberOfExpressionsAnd !== 2) {
         throw new Error('Incorrect number of query expressions provided.');
       }
@@ -199,10 +202,13 @@ export function buildAnnotationQueryExpression(
       // Exactly one or two expressions should have been provided in the query.
       // If only one expression is given, query only on that expression.
       if (numberOfExpressionsOr === 1) {
-        return buildAnnotationQueryExpression({
-          type: 'annotation-id',
-          value: query.expressions[0].value,
-        });
+        return buildAnnotationQueryExpression(
+          {
+            type: 'annotation-id',
+            value: (query.expressions[0] as AnnotationQueryExpression).value,
+          },
+          context
+        );
       } else if (numberOfExpressionsOr !== 2) {
         throw new Error('Incorrect number of query expressions provided.');
       }
