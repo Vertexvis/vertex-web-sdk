@@ -173,13 +173,40 @@ export function buildAnnotationQueryExpression(
 ): vertexvis.protobuf.stream.IPmiAnnotationQueryExpression {
   switch (query.type) {
     case 'and':
+      const numberOfExpressionsAnd = query.expressions.length;
+
+      // Exactly one or two expressions should have been provided in the query.
+      // If only one expression is given, query only on that expression.
+      if (numberOfExpressionsAnd === 1) {
+        return buildAnnotationQueryExpression({
+          type: 'annotation-id',
+          value: query.expressions[0].value,
+        });
+      } else if (numberOfExpressionsAnd !== 2) {
+        throw new Error('Incorrect number of query expressions provided.');
+      }
+
       return {
         and: {
           first: buildAnnotationQueryExpression(query.expressions[0], context),
           second: buildAnnotationQueryExpression(query.expressions[1], context),
         },
       };
+
     case 'or':
+      const numberOfExpressionsOr = query.expressions.length;
+
+      // Exactly one or two expressions should have been provided in the query.
+      // If only one expression is given, query only on that expression.
+      if (numberOfExpressionsOr === 1) {
+        return buildAnnotationQueryExpression({
+          type: 'annotation-id',
+          value: query.expressions[0].value,
+        });
+      } else if (numberOfExpressionsOr !== 2) {
+        throw new Error('Incorrect number of query expressions provided.');
+      }
+
       return {
         or: {
           first: buildAnnotationQueryExpression(query.expressions[0], context),

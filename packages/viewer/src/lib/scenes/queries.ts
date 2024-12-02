@@ -665,7 +665,7 @@ export class OrSceneItemQuery
     );
   }
 
-  public or(): OrSceneItemQuery {
+  public or(): this {
     return this;
   }
 }
@@ -699,7 +699,7 @@ export class AndSceneItemQuery
     );
   }
 
-  public and(): AndSceneItemQuery {
+  public and(): this {
     return this;
   }
 }
@@ -747,7 +747,7 @@ export class OrAnnotationQuery
     );
   }
 
-  public or(): OrAnnotationQuery {
+  public or(): this {
     return this;
   }
 }
@@ -774,7 +774,7 @@ export class AndAnnotationQuery
     );
   }
 
-  public and(): AndAnnotationQuery {
+  public and(): this {
     return this;
   }
 }

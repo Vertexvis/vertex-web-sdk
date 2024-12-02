@@ -604,9 +604,9 @@ export class PmiAnnotationOperationsBuilder
    * const viewer = document.querySelector('vertex-viewer');
    * const scene = await viewer.scene();
    *
-   * // Hide the item with the `item-uuid` ID
+   * // Hide the annotation with the `annotation-uuid` ID
    * await scene.elements((op) => [
-   *   op.items.where((q) => q.withItemId('item-uuid')).hide(),
+   *   op.annotations.where((q) => q.withAnnotationId('annotation-uuid')).hide(),
    * ]).execute();
    * ```
    */
@@ -622,9 +622,9 @@ export class PmiAnnotationOperationsBuilder
    * const viewer = document.querySelector('vertex-viewer');
    * const scene = await viewer.scene();
    *
-   * // Show the item with the `item-uuid` ID
+   * // Show the annotation with the `annotation-uuid` ID
    * await scene.elements((op) => [
-   *   op.items.where((q) => q.withItemId('item-uuid')).show(),
+   *   op.annotations.where((q) => q.withAnnotationId('annotation-uuid')).show(),
    * ]).execute();
    * ```
    */
@@ -640,9 +640,9 @@ export class PmiAnnotationOperationsBuilder
    * const viewer = document.querySelector('vertex-viewer');
    * const scene = await viewer.scene();
    *
-   * // Select the item with the `item-uuid` ID
+   * // Select the annotation with the `annotation-uuid` ID
    * await scene.elements((op) => [
-   *   op.items.where((q) => q.withItemId('item-uuid')).select(),
+   *   op.annotations.where((q) => q.withAnnotationId('annotation-uuid')).select(),
    * ]).execute();
    * ```
    */
@@ -661,9 +661,9 @@ export class PmiAnnotationOperationsBuilder
    * const viewer = document.querySelector('vertex-viewer');
    * const scene = await viewer.scene();
    *
-   * // Deselect the item with the `item-uuid` ID
+   * // Deselect the annotation with the `annotation-uuid` ID
    * await scene.elements((op) => [
-   *   op.items.where((q) => q.withItemId('item-uuid')).deselect(),
+   *   op.annotations.where((q) => q.withAnnotationId('annotation-uuid')).deselect(),
    * ]).execute();
    * ```
    */
