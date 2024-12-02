@@ -1,7 +1,7 @@
 import { Point } from '@vertexvis/geometry';
 import { UUID } from '@vertexvis/utils';
 
-import { RootQuery } from '../queries';
+import { PmiAnnotationRootQuery, RootQuery } from '../queries';
 
 describe(RootQuery, () => {
   const itemId = UUID.create();
@@ -166,6 +166,133 @@ describe(RootQuery, () => {
 
     expect(itemQueryBuilder.build()).toEqual({
       type: 'all-visible',
+    });
+  });
+});
+
+describe(PmiAnnotationRootQuery, () => {
+  const annotationId = UUID.create().toString();
+  const annotationId2 = UUID.create().toString();
+
+  it('should support single withAnnotationId selections', () => {
+    const annotationQueryBuilder =
+      new PmiAnnotationRootQuery().withAnnotationId(annotationId);
+
+    expect(annotationQueryBuilder.build()).toEqual({
+      type: 'annotation-id',
+      value: annotationId,
+    });
+  });
+
+  it('should support query by all', () => {
+    const annotationQueryBuilder = new PmiAnnotationRootQuery().all();
+
+    expect(annotationQueryBuilder.build()).toEqual({
+      type: 'all',
+    });
+  });
+
+  it('should support not queries', () => {
+    const notWithIddQuery = new PmiAnnotationRootQuery()
+      .not()
+      .withAnnotationId(annotationId);
+
+    expect(notWithIddQuery.build()).toEqual({
+      type: 'not',
+      query: {
+        type: 'annotation-id',
+        value: annotationId,
+      },
+    });
+  });
+
+  it('should support nested not queries and remove redundancies', () => {
+    const notWithIdQuery = new PmiAnnotationRootQuery()
+      .not()
+      .not()
+      .withAnnotationId(annotationId);
+
+    expect(notWithIdQuery.build()).toEqual({
+      type: 'annotation-id',
+      value: annotationId,
+    });
+
+    const notWithIdQueryNot = new PmiAnnotationRootQuery()
+      .not()
+      .not()
+      .not()
+      .withAnnotationId(annotationId);
+
+    expect(notWithIdQueryNot.build()).toEqual({
+      type: 'not',
+      query: {
+        type: 'annotation-id',
+        value: annotationId,
+      },
+    });
+  });
+
+  it('should support single or multiple queries', () => {
+    const annotationQueryBuilder = new PmiAnnotationRootQuery()
+      .withAnnotationId(annotationId)
+      .or()
+      .withAnnotationId(annotationId2);
+
+    expect(annotationQueryBuilder.build()).toEqual({
+      type: 'or',
+      expressions: [
+        {
+          type: 'annotation-id',
+          value: annotationId,
+        },
+        {
+          type: 'annotation-id',
+          value: annotationId2,
+        },
+      ],
+    });
+  });
+
+  it('should support and queries', () => {
+    const annotationQueryBuilder = new PmiAnnotationRootQuery()
+      .withAnnotationId(annotationId)
+      .and()
+      .withAnnotationId(annotationId2);
+
+    expect(annotationQueryBuilder.build()).toEqual({
+      type: 'and',
+      expressions: [
+        {
+          type: 'annotation-id',
+          value: annotationId,
+        },
+        {
+          type: 'annotation-id',
+          value: annotationId2,
+        },
+      ],
+    });
+  });
+
+  it('should support bulk queries', () => {
+    const annotationQueryBuilder =
+      new PmiAnnotationRootQuery().withAnnotationIds([
+        annotationId,
+        annotationId2,
+      ]);
+
+    expect(annotationQueryBuilder.build()).toEqual({
+      type: 'or',
+      expressions: [
+        {
+          type: 'annotation-id',
+          value: annotationId,
+        },
+        {
+          type: 'annotation-id',
+          value: annotationId2,
+        },
+      ],
     });
   });
 });

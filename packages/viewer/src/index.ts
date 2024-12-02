@@ -25,6 +25,7 @@ export {
   Camera,
   CrossSectioner,
   ItemOperationBuilder,
+  PmiAnnotationOperationsBuilder,
   Raycaster,
   RaycasterOptions,
   ResetViewOptions,

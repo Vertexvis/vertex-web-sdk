@@ -1,18 +1,23 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
+import { UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing/random';
-import { buildSceneOperation, toPbSceneViewStateFeatures } from '../mapper';
+import {
+  buildSceneElementOperationOnAnnotation,
+  buildSceneElementOperationOnItem,
+  toPbSceneViewStateFeatures,
+} from '../mapper';
 
-describe(buildSceneOperation, () => {
+describe(buildSceneElementOperationOnItem, () => {
   it('maps operations', () => {
     const renId = random.guid();
     const repId = random.guid();
     const renSuppliedId = random.string();
 
     expect(
-      buildSceneOperation(
+      buildSceneElementOperationOnItem(
         { type: 'all' },
         [
           { type: 'clear-transform', cascade: true },
@@ -29,29 +34,136 @@ describe(buildSceneOperation, () => {
         { dimensions: Dimensions.create(100, 100) }
       )
     ).toMatchObject({
-      queryExpression: { operand: { root: {} } },
-      operationTypes: [
-        { clearTransform: { cascade: true } },
-        { viewRendition: { id: { hex: renId } } },
-        { viewRendition: { suppliedId: renSuppliedId } },
-        { viewDefaultRendition: {} },
-        { clearRendition: {} },
+      sceneItemOperation: {
+        queryExpression: { operand: { root: {} } },
+        operationTypes: [
+          { clearTransform: { cascade: true } },
+          { viewRendition: { id: { hex: renId } } },
+          { viewRendition: { suppliedId: renSuppliedId } },
+          { viewDefaultRendition: {} },
+          { clearRendition: {} },
+          {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+            },
+          },
+          {
+            viewRepresentation: {
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+            },
+          },
+          { viewRepresentation: { id: { hex: repId } } },
+          { clearRepresentation: {} },
+          { clearMaterial: {} },
+        ],
+      },
+    });
+  });
+});
+
+describe(buildSceneElementOperationOnAnnotation, () => {
+  const annotationId1 = 'b728aa62-76c0-4b25-9196-8e5445dc1309';
+  const annotationId2 = 'a276ce62-12c0-4b25-9106-8e5445ab1394';
+
+  const { msb: annotationId1Msb, lsb: annotationId1Lsb } =
+    UUID.toMsbLsb(annotationId1);
+  const { msb: annotationId2Msb, lsb: annotationId2Lsb } =
+    UUID.toMsbLsb(annotationId2);
+
+  it('maps operations on all annotations', () => {
+    expect(
+      buildSceneElementOperationOnAnnotation(
+        { type: 'all' },
+        [{ type: 'hide' }, { type: 'deselect' }],
+        { dimensions: Dimensions.create(100, 100) }
+      )
+    ).toMatchObject({
+      pmiAnnotationOperation: {
+        queryExpression: { operand: { all: {} } },
+        operationTypes: [
+          { changeVisibility: { visible: false } },
+          { changeSelection: { selected: false } },
+        ],
+      },
+    });
+  });
+
+  it('maps operations on specific annotations', () => {
+    expect(
+      buildSceneElementOperationOnAnnotation(
         {
-          viewRepresentation: {
-            predefinedId:
-              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+          type: 'and',
+          expressions: [
+            { type: 'annotation-id', value: annotationId1 },
+            { type: 'annotation-id', value: annotationId2 },
+          ],
+        },
+        [{ type: 'hide' }, { type: 'deselect' }],
+        { dimensions: Dimensions.create(100, 100) }
+      )
+    ).toMatchObject({
+      pmiAnnotationOperation: {
+        queryExpression: {
+          and: {
+            first: {
+              operand: {
+                annotation: {
+                  id: {
+                    msb: parseFloat(annotationId1Msb),
+                    lsb: parseFloat(annotationId1Lsb),
+                  },
+                },
+              },
+            },
+            second: {
+              operand: {
+                annotation: {
+                  id: {
+                    msb: parseFloat(annotationId2Msb),
+                    lsb: parseFloat(annotationId2Lsb),
+                  },
+                },
+              },
+            },
           },
         },
+        operationTypes: [
+          { changeVisibility: { visible: false } },
+          { changeSelection: { selected: false } },
+        ],
+      },
+    });
+  });
+
+  it('maps operations on a single annotation when used with and query', () => {
+    expect(
+      buildSceneElementOperationOnAnnotation(
         {
-          viewRepresentation: {
-            predefinedId:
-              RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_ENTIRE_PART,
+          type: 'and',
+          expressions: [{ type: 'annotation-id', value: annotationId1 }],
+        },
+        [{ type: 'hide' }, { type: 'deselect' }],
+        { dimensions: Dimensions.create(100, 100) }
+      )
+    ).toMatchObject({
+      pmiAnnotationOperation: {
+        queryExpression: {
+          operand: {
+            annotation: {
+              id: {
+                msb: parseFloat(annotationId1Msb),
+                lsb: parseFloat(annotationId1Lsb),
+              },
+            },
           },
         },
-        { viewRepresentation: { id: { hex: repId } } },
-        { clearRepresentation: {} },
-        { clearMaterial: {} },
-      ],
+        operationTypes: [
+          { changeVisibility: { visible: false } },
+          { changeSelection: { selected: false } },
+        ],
+      },
     });
   });
 });
