@@ -73,6 +73,7 @@ import {
   showItem,
 } from './lib/viewer-ops';
 import { SceneTree } from './scene-tree';
+import { SCENE_ITEM_NAME_METADATA_KEY } from './types';
 
 describe('<vertex-scene-tree>', () => {
   const sceneViewId = random.guid();
@@ -1268,7 +1269,7 @@ describe('<vertex-scene-tree>', () => {
       expect(filter).toHaveBeenCalledWith('term', expect.anything());
     });
 
-    it('performs search with metadata columns', async () => {
+    it('performs a name-only search if no metadata search keys are specified', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       const filter = jest.spyOn(controller, 'filter');
@@ -1276,8 +1277,44 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client });
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       tree.metadataKeys = ['foo', 'bar', 'baz'];
-      tree.metadataSearchExactMatch = false;
-      tree.metadataSearchRemoveHiddenItems = false;
+
+      tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
+      expect(filter).toHaveBeenCalledWith('term', {
+        columns: undefined,
+        exactMatch: false,
+        removeHiddenItems: false,
+      });
+    });
+
+    it('performs a metadata-based name search if the exact match flag is set, but no metadata search keys are specified', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const filter = jest.spyOn(controller, 'filter');
+
+      mockGetTree({ client });
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      tree.metadataKeys = ['foo', 'bar', 'baz'];
+      tree.searchOptions = { exactMatch: true };
+
+      tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
+      expect(filter).toHaveBeenCalledWith('term', {
+        columns: [SCENE_ITEM_NAME_METADATA_KEY],
+        exactMatch: true,
+        removeHiddenItems: false,
+      });
+    });
+
+    it('performs a metadata-based search using the provided search keys', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+      const filter = jest.spyOn(controller, 'filter');
+
+      mockGetTree({ client });
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      tree.metadataKeys = ['foo', 'bar', 'baz'];
+      tree.searchOptions = {
+        metadataSearchKeys: tree.metadataKeys,
+      };
 
       tree.dispatchEvent(new CustomEvent('search', { detail: 'term' }));
       expect(filter).toHaveBeenCalledWith('term', {

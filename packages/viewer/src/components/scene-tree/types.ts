@@ -3,6 +3,8 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Row } from './lib';
 import { ViewerSelectItemOptions } from './lib/viewer-ops';
 
+export const SCENE_ITEM_NAME_METADATA_KEY = 'VERTEX_SCENE_ITEM_NAME';
+
 export type MetadataKey = string;
 
 export type RowDataProvider = (row: Row) => Record<string, unknown>;
