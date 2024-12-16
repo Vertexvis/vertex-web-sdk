@@ -45,6 +45,7 @@ import {
   MetadataKey,
   RowArg,
   RowDataProvider,
+  SCENE_ITEM_NAME_METADATA_KEY,
   SceneTreeOperationOptions,
   ScrollToOptions,
   SelectItemOptions,
@@ -188,6 +189,10 @@ export class SceneTree {
   /**
    * A list of part metadata keys that will be made available to each row. This
    * metadata can be used for data binding inside the scene tree's template.
+   *
+   * **Note:** for the values of these metadata keys to be evaluated for search,
+   * they must be provided to the `metadataSearchKeys` specified in the `searchOptions`.
+   * Otherwise the search will only be performed against the item name.
    */
   @Prop()
   public metadataKeys: MetadataKey[] = [];
@@ -550,7 +555,16 @@ export class SceneTree {
     term: string,
     options: FilterTreeOptions = {}
   ): Promise<void> {
-    return this.controller?.filter(term, options);
+    const optionsAsFilterOptions: FilterOptions = {
+      ...options,
+      metadataSearchKeys: options.columns,
+    };
+    const columnsToSearch = this.getMetadataSearchKeys(optionsAsFilterOptions);
+
+    return this.controller?.filter(term, {
+      ...options,
+      columns: columnsToSearch,
+    });
   }
 
   /**
@@ -570,12 +584,6 @@ export class SceneTree {
         this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
       const definedMetadataKeys =
         metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
-
-      if (definedMetadataKeys.length === 0) {
-        console.warn(
-          "No metadata keys were found to perform the selection. Defaulting to ['VERTEX_SCENE_ITEM_NAME']"
-        );
-      }
 
       const columnsToSearch =
         definedMetadataKeys.length > 0
@@ -887,10 +895,7 @@ export class SceneTree {
 
   @Listen('search')
   protected async handleSearch(event: CustomEvent<string>): Promise<void> {
-    const metadataSearchKeys =
-      this.searchOptions?.metadataSearchKeys ?? this.metadataSearchKeys;
-    const columnsToSearch =
-      metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
+    const columnsToSearch = this.getMetadataSearchKeys(this.searchOptions);
 
     const shouldSearchExactMatch =
       this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
@@ -978,5 +983,32 @@ export class SceneTree {
     } else {
       throw new Error('Layout element is undefined');
     }
+  }
+
+  private getMetadataSearchKeys(options: FilterOptions): string[] | undefined {
+    const metadataSearchKeys =
+      options?.metadataSearchKeys ?? this.metadataSearchKeys;
+    const shouldSearchExactMatch =
+      options?.exactMatch ?? this.metadataSearchExactMatch;
+
+    if (shouldSearchExactMatch) {
+      // If we're performing an exact match search, we want to include the searched
+      // metadata keys if provided. In the case that none have been provided, simply
+      // fall back the item name.
+      const definedMetadataKeys =
+        metadataSearchKeys.length > 0
+          ? metadataSearchKeys
+          : [SCENE_ITEM_NAME_METADATA_KEY];
+
+      return definedMetadataKeys;
+    } else if (metadataSearchKeys.length > 0) {
+      // If we're not performing an exact match search, and a set of metadata keys
+      // to search against have been provided, we want to include those in the request.
+      return metadataSearchKeys;
+    }
+
+    // If we're not performing an exact match search, and we have no provided metadata
+    // search keys, we can perform a name-only search, and omit the array of keys.
+    return undefined;
   }
 }
