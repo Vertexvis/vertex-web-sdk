@@ -204,6 +204,11 @@ export namespace Components {
      */
     invalidateRows: () => Promise<void>;
     /**
+     * Performs an API call that will either show only the item associated to the given row or row index and fit the camera to the item's bounding box.
+     * @param row The row, row index, or node to isolate.
+     */
+    isolateItem: (row: RowArg) => Promise<void>;
+    /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
      * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise the search will only be performed against the item name.
@@ -217,6 +222,10 @@ export namespace Components {
      * @deprecated Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.
      */
     metadataSearchKeys: MetadataKey[];
+    /**
+     * The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.
+     */
+    operationAnimationDuration: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
@@ -348,6 +357,14 @@ export namespace Components {
     hoverController?: SceneTreeCellHoverController;
     hovered: boolean;
     isScrolling?: boolean;
+    /**
+     * Indicates whether to display a button for isolating (show only + fly to) the node associated with this cell.
+     */
+    isolateButton?: boolean;
+    /**
+     * An optional handler that will override this cell's default isolate behavior. The registered handler will receive the `pointerup` event, the node data for the row this cell is associated with, and a reference to the parent `<vertex-scene-tree>` element for performing operations.
+     */
+    isolateHandler?: SceneTreeOperationHandler;
     /**
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
@@ -2128,6 +2145,10 @@ declare namespace LocalJSX {
      */
     onFirstRowRendered?: (event: VertexSceneTreeCustomEvent<void>) => void;
     /**
+     * The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.
+     */
+    operationAnimationDuration?: number;
+    /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      */
     overScanCount?: number;
@@ -2207,6 +2228,14 @@ declare namespace LocalJSX {
     hovered?: boolean;
     isScrolling?: boolean;
     /**
+     * Indicates whether to display a button for isolating (show only + fly to) the node associated with this cell.
+     */
+    isolateButton?: boolean;
+    /**
+     * An optional handler that will override this cell's default isolate behavior. The registered handler will receive the `pointerup` event, the node data for the row this cell is associated with, and a reference to the parent `<vertex-scene-tree>` element for performing operations.
+     */
+    isolateHandler?: SceneTreeOperationHandler;
+    /**
      * The node data that is associated to the row that this cell belongs to. Contains information related to if the node is expanded, visible, etc.
      */
     node?: Node.AsObject;
@@ -2219,6 +2248,12 @@ declare namespace LocalJSX {
      * An event that is emitted when a user requests to expand the node. This is emitted even if interactions are disabled.
      */
     onExpandToggled?: (
+      event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
+    ) => void;
+    /**
+     * An event that is emitted when a user requests to isolate the node. This event is emitted even if interactions are disabled.
+     */
+    onIsolatePressed?: (
       event: VertexSceneTreeTableCellCustomEvent<SceneTreeTableCellEventDetails>
     ) => void;
     /**

@@ -1,9 +1,14 @@
+export const DEFAULT_SCENE_TREE_OP_ANIMATION_MS = 500;
+
 export interface ViewerItemOptions {
   suppliedCorrelationId?: string;
 }
 export interface ViewerSelectItemOptions extends ViewerItemOptions {
   append?: boolean;
   range?: boolean;
+}
+export interface ViewerIsolateItemOptions extends ViewerItemOptions {
+  animationDurationMs?: number;
 }
 
 export async function showItem(
@@ -95,4 +100,29 @@ export async function deselectItem(
     .execute({
       suppliedCorrelationId,
     });
+}
+
+export async function isolateItem(
+  viewer: HTMLVertexViewerElement,
+  id: string,
+  { suppliedCorrelationId, animationDurationMs }: ViewerIsolateItemOptions = {}
+): Promise<void> {
+  const scene = await viewer.scene();
+  await scene
+    .elements((op) => [
+      op.items.where((q) => q.all()).hide(),
+      op.items.where((q) => q.withItemId(id)).show(),
+    ])
+    .execute({
+      suppliedCorrelationId,
+    });
+  const renderResult = await scene
+    .camera()
+    .flyTo((q) => q.withItemId(id))
+    .render({
+      animation: {
+        milliseconds: animationDurationMs ?? DEFAULT_SCENE_TREE_OP_ANIMATION_MS,
+      },
+    });
+  await renderResult.onAnimationCompleted.once();
 }

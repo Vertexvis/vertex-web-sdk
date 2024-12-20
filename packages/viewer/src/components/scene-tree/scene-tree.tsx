@@ -35,6 +35,7 @@ import { isLoadedRow, Row } from './lib/row';
 import {
   deselectItem,
   hideItem,
+  isolateItem,
   selectFilterResults,
   selectItem,
   selectRangeInSceneTree,
@@ -196,6 +197,13 @@ export class SceneTree {
    */
   @Prop()
   public metadataKeys: MetadataKey[] = [];
+
+  /**
+   * The duration of operations with animations, in milliseconds, when a user performs
+   * an action that results in an animation such as isolate. Defaults to 500ms.
+   */
+  @Prop()
+  public operationAnimationDuration = 500;
 
   /**
    * An event that is emitted when this <vertex-scene-tree> encounters a connection
@@ -485,6 +493,21 @@ export class SceneTree {
         this.lastSelectedItemId = undefined;
         await deselectItem(viewer, id);
       }
+    });
+  }
+
+  /**
+   * Performs an API call that will either show only the item associated to
+   * the given row or row index and fit the camera to the item's bounding box.
+   *
+   * @param row The row, row index, or node to isolate.
+   */
+  @Method()
+  public async isolateItem(row: RowArg): Promise<void> {
+    await this.performRowOperation(row, async ({ viewer, id }) => {
+      await isolateItem(viewer, id, {
+        animationDurationMs: this.operationAnimationDuration,
+      });
     });
   }
 
@@ -952,7 +975,7 @@ export class SceneTree {
       layout.innerHTML = `
       <vertex-scene-tree-table-column>
         <template>
-        <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle></vertex-scene-tree-table-cell>
+        <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle isolate-button visibility-toggle></vertex-scene-tree-table-cell>
         </template>
       </vertex-scene-tree-table-column>
       `;

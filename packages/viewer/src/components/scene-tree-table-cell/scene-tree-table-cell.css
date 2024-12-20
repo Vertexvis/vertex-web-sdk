@@ -28,6 +28,12 @@
      * padding between the cell's border and content.
      */
    --scene-tree-cell-padding: 0.25rem 0;
+
+   /**
+     * @prop --scene-tree-cell-padding: CSS lengths that specifies the amount of
+     * padding between the cell's border and content.
+     */
+   --scene-tree-cell-icon-fill: ;
 }
 
 :host([is-hovered]) {
@@ -78,18 +84,25 @@
   cursor: default;
 }
 
-.visibility-btn {
+.visibility-btn,
+.isolate-btn {
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .icon {
   width: 14px;
   height: 14px;
+  fill: #444444;
+}
+
+.icon.invisible {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .icon-expanded {
