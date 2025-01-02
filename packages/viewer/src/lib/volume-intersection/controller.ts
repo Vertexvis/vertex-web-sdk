@@ -122,7 +122,9 @@ export class VolumeIntersectionQueryController {
             ...additionalTransforms(op),
             ...operationTransforms(op),
           ])
-          .execute();
+          .execute({
+            skipAwaitCorrelatedDrawFrame: true,
+          });
       } catch (e) {
         if (
           e instanceof StreamRequestError &&

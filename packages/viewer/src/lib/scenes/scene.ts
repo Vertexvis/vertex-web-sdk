@@ -37,12 +37,19 @@ import { Raycaster } from './raycaster';
 import { SceneOperationExecuteResult } from './sceneOperationExecuteResult';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
 
-export interface SceneElementsExecutionOptions {
+export interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
 }
 
-export interface SceneItemsExecutionOptions
-  extends SceneElementsExecutionOptions {
+export interface SceneElementsExecutionOptions extends SceneExecutionOptions {
+  /**
+   * Skips the wait for a frame correlated to this alteration before
+   * completing the Promise returned by the `execute()` method.
+   */
+  skipAwaitCorrelatedDrawFrame?: boolean;
+}
+
+export interface SceneItemsExecutionOptions extends SceneExecutionOptions {
   /**
    * Waits for the frame correlated to this alteration before
    * completing the Promise returned by the `execute()` method.
@@ -705,7 +712,7 @@ export interface QueryAnnotationOperation {
   operations: PmiAnnotationOperation[];
 }
 
-export class OperationExecutor<T extends SceneElementsExecutionOptions> {
+export class OperationExecutor<T extends SceneExecutionOptions> {
   public constructor(
     protected sceneViewId: UUID.UUID,
     protected stream: StreamApi,
@@ -773,19 +780,23 @@ export class SceneElementsOperationExecutor extends OperationExecutor<SceneEleme
   public async execute(
     executionOptions?: SceneElementsExecutionOptions
   ): Promise<void> {
-    const correlationId =
-      executionOptions?.suppliedCorrelationId ?? UUID.create();
-    const executeResult = new SceneOperationExecuteResult(
-      this.stream,
-      this.decodeFrame,
-      correlationId
-    );
+    if (executionOptions?.skipAwaitCorrelatedDrawFrame) {
+      await super.execute(executionOptions);
+    } else {
+      const correlationId =
+        executionOptions?.suppliedCorrelationId ?? UUID.create();
+      const executeResult = new SceneOperationExecuteResult(
+        this.stream,
+        this.decodeFrame,
+        correlationId
+      );
 
-    await super.execute({
-      ...executionOptions,
-      suppliedCorrelationId: correlationId,
-    });
-    await executeResult.onFrameDrawn.once();
+      await super.execute({
+        ...executionOptions,
+        suppliedCorrelationId: correlationId,
+      });
+      await executeResult.onFrameDrawn.once();
+    }
   }
 }
 
@@ -984,7 +995,7 @@ export class Scene {
       [] as QueryAnnotationOperation[]
     );
 
-    return new OperationExecutor(
+    return new SceneElementsOperationExecutor(
       this.sceneViewId,
       this.stream,
       this.decodeFrame,

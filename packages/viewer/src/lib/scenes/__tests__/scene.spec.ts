@@ -484,7 +484,7 @@ describe(Scene, () => {
       });
     });
 
-    it('supports waiting for the alteration to complete if flag is set', async () => {
+    it('supports waiting for the frame correlated to the alteration if flag is set', async () => {
       const itemId = random.guid();
       const correlationId = random.guid();
       const executePromise = scene
@@ -509,7 +509,7 @@ describe(Scene, () => {
       await expect(executePromise).resolves.not.toThrow();
     });
 
-    it('does not wait for the alteration to complete if flag is not set', async () => {
+    it('does not wait for the frame correlated to the alteration if flag is not set', async () => {
       const itemId = random.guid();
       const correlationId = random.guid();
       const executePromise = scene
@@ -963,7 +963,20 @@ describe(Scene, () => {
       });
     });
 
-    it('waits for the alteration to complete', async () => {
+    it('supports skipping the wait for the correlated frame if the flag is set', async () => {
+      const itemId = random.guid();
+      const correlationId = random.guid();
+      const executePromise = scene
+        .elements((op) => op.items.where((q) => q.withItemId(itemId)).select())
+        .execute({
+          suppliedCorrelationId: correlationId,
+          skipAwaitCorrelatedDrawFrame: true,
+        });
+
+      await expect(executePromise).resolves.not.toThrow();
+    });
+
+    it('waits for the frame correlated to the alteration if the flag is not set', async () => {
       const itemId = random.guid();
       const correlationId = random.guid();
       const executePromise = scene
