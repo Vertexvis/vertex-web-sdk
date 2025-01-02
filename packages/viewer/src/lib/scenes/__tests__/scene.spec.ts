@@ -491,7 +491,7 @@ describe(Scene, () => {
         .items((op) => op.where((q) => q.withItemId(itemId)).select())
         .execute({
           suppliedCorrelationId: correlationId,
-          awaitCorrelatedDrawFrame: true,
+          awaitCorrelatedFrame: true,
         });
 
       streamApi.mockReceiveRequest({
@@ -970,7 +970,7 @@ describe(Scene, () => {
         .elements((op) => op.items.where((q) => q.withItemId(itemId)).select())
         .execute({
           suppliedCorrelationId: correlationId,
-          skipAwaitCorrelatedDrawFrame: true,
+          skipAwaitCorrelatedFrame: true,
         });
 
       await expect(executePromise).resolves.not.toThrow();

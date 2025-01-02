@@ -123,7 +123,7 @@ export class VolumeIntersectionQueryController {
             ...operationTransforms(op),
           ])
           .execute({
-            skipAwaitCorrelatedDrawFrame: true,
+            skipAwaitCorrelatedFrame: true,
           });
       } catch (e) {
         if (

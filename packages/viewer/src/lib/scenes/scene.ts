@@ -46,7 +46,7 @@ export interface SceneElementsExecutionOptions extends SceneExecutionOptions {
    * Skips the wait for a frame correlated to this alteration before
    * completing the Promise returned by the `execute()` method.
    */
-  skipAwaitCorrelatedDrawFrame?: boolean;
+  skipAwaitCorrelatedFrame?: boolean;
 }
 
 export interface SceneItemsExecutionOptions extends SceneExecutionOptions {
@@ -54,7 +54,7 @@ export interface SceneItemsExecutionOptions extends SceneExecutionOptions {
    * Waits for the frame correlated to this alteration before
    * completing the Promise returned by the `execute()` method.
    */
-  awaitCorrelatedDrawFrame?: boolean;
+  awaitCorrelatedFrame?: boolean;
 }
 
 export interface ApplySceneViewStateOptions
@@ -756,7 +756,7 @@ export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExe
   public async execute(
     executionOptions?: SceneItemsExecutionOptions
   ): Promise<void> {
-    if (executionOptions?.awaitCorrelatedDrawFrame) {
+    if (executionOptions?.awaitCorrelatedFrame) {
       const correlationId =
         executionOptions.suppliedCorrelationId ?? UUID.create();
       const executeResult = new SceneOperationExecuteResult(
@@ -780,7 +780,7 @@ export class SceneElementsOperationExecutor extends OperationExecutor<SceneEleme
   public async execute(
     executionOptions?: SceneElementsExecutionOptions
   ): Promise<void> {
-    if (executionOptions?.skipAwaitCorrelatedDrawFrame) {
+    if (executionOptions?.skipAwaitCorrelatedFrame) {
       await super.execute(executionOptions);
     } else {
       const correlationId =
