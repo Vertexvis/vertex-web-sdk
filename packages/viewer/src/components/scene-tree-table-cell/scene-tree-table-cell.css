@@ -28,12 +28,6 @@
      * padding between the cell's border and content.
      */
    --scene-tree-cell-padding: 0.25rem 0;
-
-   /**
-     * @prop --scene-tree-cell-padding: CSS lengths that specifies the amount of
-     * padding between the cell's border and content.
-     */
-   --scene-tree-cell-icon-fill: ;
 }
 
 :host([is-hovered]) {

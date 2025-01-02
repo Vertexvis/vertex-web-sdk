@@ -285,7 +285,9 @@ export class SceneTreeTableCell {
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
-          {!this.visibilityToggle && <div class="column-spacer" />}
+          {!this.visibilityToggle && !this.isolateButton && (
+            <div class="column-spacer" />
+          )}
         </div>
       </Host>
     );
@@ -420,15 +422,5 @@ export class SceneTreeTableCell {
     this.longPressTimer = window.setTimeout(() => {
       this.clearLongPressTimer();
     }, Events.defaultEventConfig.longPressThreshold);
-  }
-
-  private getVisibilityIcon(): ViewerIconName | undefined {
-    if (this.hovered && !this.node?.partiallyVisible && this.node?.visible) {
-      return 'eye-open';
-    } else if (!this.node?.partiallyVisible && !this.node?.visible) {
-      return 'eye-half';
-    } else if (this.node.partiallyVisible) {
-      return 'eye-half-dotted';
-    }
   }
 }

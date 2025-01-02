@@ -705,7 +705,7 @@ export interface QueryAnnotationOperation {
   operations: PmiAnnotationOperation[];
 }
 
-export class OperationExecutor {
+export class OperationExecutor<T extends SceneElementsExecutionOptions> {
   public constructor(
     protected sceneViewId: UUID.UUID,
     protected stream: StreamApi,
@@ -715,9 +715,7 @@ export class OperationExecutor {
     protected pmiAnnotationQueryOperations: QueryAnnotationOperation[]
   ) {}
 
-  public async execute(
-    executionOptions?: SceneElementsExecutionOptions
-  ): Promise<void> {
+  public async execute(executionOptions?: T): Promise<void> {
     const pbItemOperations = this.sceneItemQueryOperations.map((op) =>
       buildSceneElementOperationOnItem(op.query, op.operations, {
         dimensions: this.dimensions,
@@ -747,7 +745,7 @@ export class OperationExecutor {
   }
 }
 
-export class SceneItemsOperationExecutor extends OperationExecutor {
+export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExecutionOptions> {
   public async execute(
     executionOptions?: SceneItemsExecutionOptions
   ): Promise<void> {
@@ -771,7 +769,7 @@ export class SceneItemsOperationExecutor extends OperationExecutor {
   }
 }
 
-export class SceneElementsOperationExecutor extends OperationExecutor {
+export class SceneElementsOperationExecutor extends OperationExecutor<SceneElementsExecutionOptions> {
   public async execute(
     executionOptions?: SceneElementsExecutionOptions
   ): Promise<void> {
@@ -909,7 +907,7 @@ export class Scene {
    */
   public items(
     operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
-  ): OperationExecutor {
+  ): SceneItemsOperationExecutor {
     const sceneOperations = operations(new SceneItemQueryExecutor());
 
     const ops: Array<
@@ -924,7 +922,7 @@ export class Scene {
       [] as QueryOperation[]
     );
 
-    return new OperationExecutor(
+    return new SceneItemsOperationExecutor(
       this.sceneViewId,
       this.stream,
       this.decodeFrame,

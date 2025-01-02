@@ -2,20 +2,61 @@ jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { StreamApi } from '@vertexvis/stream-api';
-import { UUID } from '@vertexvis/utils';
+import {
+  RequestMessage,
+  RequestMessageHandler,
+  StreamApi,
+} from '@vertexvis/stream-api';
+import { Disposable, UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
-import { makePerspectiveFrame } from '../../../testing/fixtures';
+import {
+  drawFramePayloadPerspective,
+  makePerspectiveFrame,
+} from '../../../testing/fixtures';
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../colorMaterial';
 import { Scene } from '../scene';
 
+class MockStreamApi extends StreamApi {
+  private requestHandler?: RequestMessageHandler;
+  private requestMessage?: RequestMessage;
+
+  public reset(): void {
+    this.requestHandler = undefined;
+    this.requestMessage = undefined;
+  }
+
+  public onRequest(handler: RequestMessageHandler): Disposable {
+    this.requestHandler = handler;
+
+    if (this.requestMessage != null) {
+      handler(this.requestMessage);
+      this.requestMessage = undefined;
+    }
+
+    return {
+      dispose: () => {
+        this.requestHandler = undefined;
+        this.requestMessage = undefined;
+      },
+    };
+  }
+
+  public mockReceiveRequest(message: RequestMessage): void {
+    if (this.requestHandler != null) {
+      this.requestHandler?.(message);
+    } else {
+      this.requestMessage = message;
+    }
+  }
+}
+
 describe(Scene, () => {
   const sceneId = random.guid();
   const sceneViewId = random.guid();
-  const streamApi = new StreamApi();
+  const streamApi = new MockStreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
   const viewport = new Viewport(50, 50);
   const scene = new Scene(
@@ -30,6 +71,8 @@ describe(Scene, () => {
 
   afterEach(() => {
     jest.resetAllMocks();
+
+    streamApi.reset();
   });
 
   describe(Scene.prototype.camera, () => {
@@ -58,6 +101,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -97,6 +143,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: suppliedId,
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
@@ -121,9 +170,6 @@ describe(Scene, () => {
             }),
           },
         ]),
-        suppliedCorrelationId: {
-          value: suppliedId,
-        },
       });
     });
 
@@ -133,6 +179,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -173,6 +222,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
@@ -198,7 +250,7 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .items((op) =>
-          op.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
+          op.where((q) => q.withMetadata('foo', ['bar', 'baz'], false)).select()
         )
         .execute();
 
@@ -206,12 +258,16 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
               queryExpression: {
                 operand: {
                   metadata: {
+                    exactMatch: false,
                     valueFilter: 'foo',
                     keys: ['bar', 'baz'],
                   },
@@ -234,6 +290,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -279,106 +338,111 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
-            sceneItemOperation: expect.objectContaining(
-              {
-                queryExpression: {
-                  operand: {
-                    root: {},
-                  },
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  root: {},
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: false,
-                    },
-                  },
-                ],
               },
-              {
-                queryExpression: {
-                  operand: {
-                    itemCollection: {
-                      queries: [
-                        {
-                          sceneItemQuery: {
-                            id: {
-                              hex: itemId.toString(),
-                            },
-                          },
-                        },
-                        {
-                          sceneItemQuery: {
-                            suppliedId,
-                          },
-                        },
-                      ],
-                    },
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: false,
                   },
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: true,
-                    },
+              ],
+            }),
+          },
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  itemCollection: {
+                    queries: [
+                      {
+                        sceneItemQuery: {
+                          id: {
+                            hex: itemId.toString(),
+                          },
+                        },
+                      },
+                      {
+                        sceneItemQuery: {
+                          suppliedId,
+                        },
+                      },
+                    ],
                   },
-                ],
+                },
               },
-              {
-                queryExpression: {
-                  operand: {
-                    root: {},
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: true,
                   },
                 },
-                operationTypes: [
-                  {
-                    changeMaterial: {
-                      materialOverride: {
-                        colorMaterial: {
-                          d: 255,
-                          ka: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          kd: {
-                            a: 255,
-                            b: 34,
-                            g: 17,
-                            r: 255,
-                          },
-                          ke: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          ks: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          ns: ColorMaterial.defaultColor.glossiness,
+              ],
+            }),
+          },
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  root: {},
+                },
+              },
+              operationTypes: [
+                {
+                  changeMaterial: {
+                    materialOverride: {
+                      colorMaterial: {
+                        d: 255,
+                        ka: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
                         },
+                        kd: {
+                          a: 255,
+                          b: 34,
+                          g: 17,
+                          r: 255,
+                        },
+                        ke: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
+                        },
+                        ks: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
+                        },
+                        ns: ColorMaterial.defaultColor.glossiness,
                       },
                     },
                   },
-                  {
-                    changePhantom: {
-                      phantom: true,
-                    },
+                },
+                {
+                  changePhantom: {
+                    phantom: true,
                   },
-                  {
-                    changeEndItem: {
-                      endItem: true,
-                    },
+                },
+                {
+                  changeEndItem: {
+                    endItem: true,
                   },
-                ],
-              }
-            ),
+                },
+              ],
+            }),
           },
         ]),
       });
@@ -393,6 +457,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -416,6 +483,43 @@ describe(Scene, () => {
         ]),
       });
     });
+
+    it('supports waiting for the alteration to complete if flag is set', async () => {
+      const itemId = random.guid();
+      const correlationId = random.guid();
+      const executePromise = scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select())
+        .execute({
+          suppliedCorrelationId: correlationId,
+          awaitCorrelatedDrawFrame: true,
+        });
+
+      streamApi.mockReceiveRequest({
+        request: {
+          drawFrame: {
+            ...drawFramePayloadPerspective,
+            frameCorrelationIds: [correlationId],
+          },
+        },
+        sentAtTime: {
+          seconds: 1000,
+        },
+      });
+
+      await expect(executePromise).resolves.not.toThrow();
+    });
+
+    it('does not wait for the alteration to complete if flag is not set', async () => {
+      const itemId = random.guid();
+      const correlationId = random.guid();
+      const executePromise = scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select())
+        .execute({
+          suppliedCorrelationId: correlationId,
+        });
+
+      await expect(executePromise).resolves.not.toThrow();
+    });
   });
 
   describe(Scene.prototype.elements, () => {
@@ -428,6 +532,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -469,6 +576,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
             pmiAnnotationOperation: expect.objectContaining({
@@ -506,6 +616,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: suppliedId,
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
@@ -530,9 +643,6 @@ describe(Scene, () => {
             }),
           },
         ]),
-        suppliedCorrelationId: {
-          value: suppliedId,
-        },
       });
     });
 
@@ -544,6 +654,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -584,6 +697,9 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
@@ -609,7 +725,9 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .elements((op) =>
-          op.items.where((q) => q.withMetadata('foo', ['bar', 'baz'])).select()
+          op.items
+            .where((q) => q.withMetadata('foo', ['bar', 'baz'], false))
+            .select()
         )
         .execute();
 
@@ -617,12 +735,16 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
             sceneItemOperation: expect.objectContaining({
               queryExpression: {
                 operand: {
                   metadata: {
+                    exactMatch: false,
                     valueFilter: 'foo',
                     keys: ['bar', 'baz'],
                   },
@@ -647,6 +769,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -692,106 +817,111 @@ describe(Scene, () => {
         sceneViewId: {
           hex: sceneViewId,
         },
+        suppliedCorrelationId: {
+          value: expect.any(String),
+        },
         elementOperations: expect.arrayContaining([
           {
-            sceneItemOperation: expect.objectContaining(
-              {
-                queryExpression: {
-                  operand: {
-                    root: {},
-                  },
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  root: {},
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: false,
-                    },
-                  },
-                ],
               },
-              {
-                queryExpression: {
-                  operand: {
-                    itemCollection: {
-                      queries: [
-                        {
-                          sceneItemQuery: {
-                            id: {
-                              hex: itemId.toString(),
-                            },
-                          },
-                        },
-                        {
-                          sceneItemQuery: {
-                            suppliedId,
-                          },
-                        },
-                      ],
-                    },
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: false,
                   },
                 },
-                operationTypes: [
-                  {
-                    changeVisibility: {
-                      visible: true,
-                    },
+              ],
+            }),
+          },
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  itemCollection: {
+                    queries: [
+                      {
+                        sceneItemQuery: {
+                          id: {
+                            hex: itemId.toString(),
+                          },
+                        },
+                      },
+                      {
+                        sceneItemQuery: {
+                          suppliedId,
+                        },
+                      },
+                    ],
                   },
-                ],
+                },
               },
-              {
-                queryExpression: {
-                  operand: {
-                    root: {},
+              operationTypes: [
+                {
+                  changeVisibility: {
+                    visible: true,
                   },
                 },
-                operationTypes: [
-                  {
-                    changeMaterial: {
-                      materialOverride: {
-                        colorMaterial: {
-                          d: 255,
-                          ka: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          kd: {
-                            a: 255,
-                            b: 34,
-                            g: 17,
-                            r: 255,
-                          },
-                          ke: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          ks: {
-                            a: 0,
-                            b: 0,
-                            g: 0,
-                            r: 0,
-                          },
-                          ns: ColorMaterial.defaultColor.glossiness,
+              ],
+            }),
+          },
+          {
+            sceneItemOperation: expect.objectContaining({
+              queryExpression: {
+                operand: {
+                  root: {},
+                },
+              },
+              operationTypes: [
+                {
+                  changeMaterial: {
+                    materialOverride: {
+                      colorMaterial: {
+                        d: 255,
+                        ka: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
                         },
+                        kd: {
+                          a: 255,
+                          b: 34,
+                          g: 17,
+                          r: 255,
+                        },
+                        ke: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
+                        },
+                        ks: {
+                          a: 0,
+                          b: 0,
+                          g: 0,
+                          r: 0,
+                        },
+                        ns: ColorMaterial.defaultColor.glossiness,
                       },
                     },
                   },
-                  {
-                    changePhantom: {
-                      phantom: true,
-                    },
+                },
+                {
+                  changePhantom: {
+                    phantom: true,
                   },
-                  {
-                    changeEndItem: {
-                      endItem: true,
-                    },
+                },
+                {
+                  changeEndItem: {
+                    endItem: true,
                   },
-                ],
-              }
-            ),
+                },
+              ],
+            }),
           },
         ]),
       });
@@ -806,6 +936,9 @@ describe(Scene, () => {
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
+        },
+        suppliedCorrelationId: {
+          value: expect.any(String),
         },
         elementOperations: expect.arrayContaining([
           {
@@ -828,6 +961,30 @@ describe(Scene, () => {
           },
         ]),
       });
+    });
+
+    it('waits for the alteration to complete', async () => {
+      const itemId = random.guid();
+      const correlationId = random.guid();
+      const executePromise = scene
+        .elements((op) => op.items.where((q) => q.withItemId(itemId)).select())
+        .execute({
+          suppliedCorrelationId: correlationId,
+        });
+
+      streamApi.mockReceiveRequest({
+        request: {
+          drawFrame: {
+            ...drawFramePayloadPerspective,
+            frameCorrelationIds: [correlationId],
+          },
+        },
+        sentAtTime: {
+          seconds: 1000,
+        },
+      });
+
+      await expect(executePromise).resolves.not.toThrow();
     });
   });
 
