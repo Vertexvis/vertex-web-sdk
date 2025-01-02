@@ -263,9 +263,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const expandBtn = cell.shadowRoot?.querySelector('.isolate-btn');
+    const isolateBtn = cell.shadowRoot?.querySelector('.isolate-btn');
     const originalEvent = new MouseEvent('pointerup');
-    expandBtn?.dispatchEvent(originalEvent);
+    isolateBtn?.dispatchEvent(originalEvent);
 
     expect(tree.isolateItem).toHaveBeenCalled();
   });
@@ -288,8 +288,8 @@ describe('<vertex-scene-tree-table-cell>', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
-    const expandBtn = cell.shadowRoot?.querySelector('.isolate-btn');
-    expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
+    const isolateBtn = cell.shadowRoot?.querySelector('.isolate-btn');
+    isolateBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.isolateItem).not.toHaveBeenCalled();
   });

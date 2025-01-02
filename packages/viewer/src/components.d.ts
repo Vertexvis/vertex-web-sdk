@@ -204,7 +204,7 @@ export namespace Components {
      */
     invalidateRows: () => Promise<void>;
     /**
-     * Performs an API call that will either show only the item associated to the given row or row index and fit the camera to the item's bounding box.
+     * Performs an API call that will show only the item associated to the given row or row index and fit the camera to the item's bounding box.
      * @param row The row, row index, or node to isolate.
      */
     isolateItem: (row: RowArg) => Promise<void>;

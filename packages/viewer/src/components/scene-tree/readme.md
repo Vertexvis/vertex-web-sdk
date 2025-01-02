@@ -744,7 +744,7 @@ Type: `Promise<void>`
 
 ### `isolateItem(row: RowArg) => Promise<void>`
 
-Performs an API call that will either show only the item associated to
+Performs an API call that will show only the item associated to
 the given row or row index and fit the camera to the item's bounding box.
 
 #### Returns
