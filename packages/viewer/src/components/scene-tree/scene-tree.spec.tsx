@@ -67,6 +67,7 @@ import { decodeSceneTreeJwt } from './lib/jwt';
 import {
   deselectItem,
   hideItem,
+  isolateItem,
   selectFilterResults,
   selectItem,
   selectRangeInSceneTree,
@@ -1083,6 +1084,20 @@ describe('<vertex-scene-tree>', () => {
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       await tree.deselectItem(0);
       expect(deselectItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe(SceneTree.prototype.isolateItem, () => {
+    it('isolates a row', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      mockGetTree({ client, transform: (node) => node.setSelected(true) });
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowAtIndex(0);
+      await tree.isolateItem(row);
+      expect(isolateItem).toHaveBeenCalled();
     });
   });
 

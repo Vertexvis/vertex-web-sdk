@@ -80,6 +80,13 @@ export class SceneTreeTableCell {
   public visibilityToggle?: boolean;
 
   /**
+   * Indicates whether to display a button for isolating (show only + fly to)
+   * the node associated with this cell.
+   */
+  @Prop()
+  public isolateButton?: boolean;
+
+  /**
    * An optional handler that will override this cell's default selection
    * behavior. The registered handler will receive the `pointerup` event,
    * the node data for the row this cell is associated with, and a reference
@@ -107,6 +114,15 @@ export class SceneTreeTableCell {
   public expansionHandler?: SceneTreeOperationHandler;
 
   /**
+   * An optional handler that will override this cell's default isolate
+   * behavior. The registered handler will receive the `pointerup` event,
+   * the node data for the row this cell is associated with, and a reference
+   * to the parent `<vertex-scene-tree>` element for performing operations.
+   */
+  @Prop()
+  public isolateHandler?: SceneTreeOperationHandler;
+
+  /**
    * @internal
    */
   @Prop()
@@ -132,6 +148,13 @@ export class SceneTreeTableCell {
    */
   @Event({ bubbles: true })
   public selectionToggled!: EventEmitter<SceneTreeTableCellEventDetails>;
+
+  /**
+   * An event that is emitted when a user requests to isolate the node.
+   * This event is emitted even if interactions are disabled.
+   */
+  @Event({ bubbles: true })
+  public isolatePressed!: EventEmitter<SceneTreeTableCellEventDetails>;
 
   /**
    * Used for internals or testing.
@@ -217,6 +240,25 @@ export class SceneTreeTableCell {
               <slot name="placeholder">{this.placeholder}</slot>
             )}
           </div>
+          {this.isolateButton && (
+            <button
+              class="isolate-btn no-shrink"
+              data-test-id={'isolate-btn-' + this.node?.name}
+              onPointerUp={(event) => {
+                event?.preventDefault();
+                this.isolate(event);
+              }}
+            >
+              <vertex-viewer-icon
+                class={classNames('icon', {
+                  invisible: !this.hovered,
+                  'icon-locate': this.hovered,
+                })}
+                name="locate"
+                size="sm"
+              />
+            </button>
+          )}
           {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
@@ -242,7 +284,9 @@ export class SceneTreeTableCell {
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
-          {!this.visibilityToggle && <div class="column-spacer" />}
+          {!this.visibilityToggle && !this.isolateButton && (
+            <div class="column-spacer" />
+          )}
         </div>
       </Host>
     );
@@ -316,6 +360,17 @@ export class SceneTreeTableCell {
     }
   }
 
+  private isolate(event: PointerEvent): void {
+    if (this.tree != null && this.node != null) {
+      if (this.isolateHandler != null) {
+        this.isolateHandler(event, this.node, this.tree);
+      } else {
+        this.performDefaultIsolateOperation(this.node, this.tree);
+      }
+      this.isolatePressed.emit({ node: this.node, originalEvent: event });
+    }
+  }
+
   private performDefaultSelectionOperation = (event: PointerEvent): void => {
     if (!event.defaultPrevented && event.button === 0) {
       if ((event.ctrlKey || event.metaKey) && this.node?.selected) {
@@ -338,6 +393,13 @@ export class SceneTreeTableCell {
     tree: HTMLVertexSceneTreeElement
   ): void => {
     tree.toggleItemVisibility(node);
+  };
+
+  private performDefaultIsolateOperation = (
+    node: Node.AsObject,
+    tree: HTMLVertexSceneTreeElement
+  ): void => {
+    tree.isolateItem(node);
   };
 
   private performDefaultExpansionOperation = (

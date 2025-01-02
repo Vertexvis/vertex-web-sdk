@@ -34,6 +34,36 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(content?.textContent).toBe(node.name);
   });
 
+  it('renders a column spacer if no right-gutter button is enabled', async () => {
+    const node = createNode();
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.column-spacer')).toBeTruthy();
+  });
+
+  it('does not render a column spacer if the visibility toggle is enabled', async () => {
+    const node = createNode();
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell visibility-toggle></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.column-spacer')).toBeFalsy();
+  });
+
+  it('does not render a column spacer if the isolate button is enabled', async () => {
+    const node = createNode();
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell isolate-button></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.column-spacer')).toBeFalsy();
+  });
+
   it('includes is-filter-hit attribute if the node is a filter hit', async () => {
     const node = createNode({ filterHit: true });
     const { cell } = await newComponentSpec({
@@ -117,6 +147,18 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
     expect(cell).toHaveAttribute('is-partial');
     expect(cell.shadowRoot?.querySelector('.icon-partial')).toBeDefined();
+  });
+
+  it('renders isolate icon if isolate button is true', async () => {
+    const node = createNode();
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell isolate-button></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(
+      cell.shadowRoot?.querySelector('vertex-icon.icon-locate')
+    ).toBeDefined();
   });
 
   it('toggles expansion', async () => {
@@ -206,6 +248,50 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expandBtn?.dispatchEvent(new MouseEvent('pointerup'));
 
     expect(tree.toggleItemVisibility).not.toHaveBeenCalled();
+  });
+
+  it('isolates', async () => {
+    const node = createNode({ visible: false });
+    const { cell } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-table-cell isolate-button></vertex-scene-tree-table-cell>
+      `,
+      node,
+    });
+
+    const tree = { isolateItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cell as any).tree = tree;
+
+    const isolateBtn = cell.shadowRoot?.querySelector('.isolate-btn');
+    const originalEvent = new MouseEvent('pointerup');
+    isolateBtn?.dispatchEvent(originalEvent);
+
+    expect(tree.isolateItem).toHaveBeenCalled();
+  });
+
+  it('supports overriding isolate behavior', async () => {
+    const node = createNode({ visible: false });
+    const { cell } = await newComponentSpec({
+      template: () => (
+        <vertex-scene-tree-table-cell
+          isolateHandler={(event, node, tree) => {
+            // do nothing
+          }}
+          isolate-button
+        ></vertex-scene-tree-table-cell>
+      ),
+      node,
+    });
+
+    const tree = { isolateItem: jest.fn() };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (cell as any).tree = tree;
+
+    const isolateBtn = cell.shadowRoot?.querySelector('.isolate-btn');
+    isolateBtn?.dispatchEvent(new MouseEvent('pointerup'));
+
+    expect(tree.isolateItem).not.toHaveBeenCalled();
   });
 
   it('selects cell if unselected', async () => {

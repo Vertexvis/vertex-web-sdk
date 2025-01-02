@@ -34,14 +34,31 @@ import {
   SceneItemQueryExecutor,
 } from './queries';
 import { Raycaster } from './raycaster';
+import { SceneOperationExecuteResult } from './sceneOperationExecuteResult';
 import { SceneViewStateLoader } from './sceneViewStateLoader';
 
 export interface SceneExecutionOptions {
   suppliedCorrelationId?: string;
 }
 
+export interface SceneElementsExecutionOptions extends SceneExecutionOptions {
+  /**
+   * Skips the wait for a frame correlated to this alteration before
+   * completing the Promise returned by the `execute()` method.
+   */
+  skipAwaitCorrelatedFrame?: boolean;
+}
+
+export interface SceneItemsExecutionOptions extends SceneExecutionOptions {
+  /**
+   * Waits for the frame correlated to this alteration before
+   * completing the Promise returned by the `execute()` method.
+   */
+  awaitCorrelatedFrame?: boolean;
+}
+
 export interface ApplySceneViewStateOptions
-  extends SceneExecutionOptions,
+  extends SceneElementsExecutionOptions,
     CameraRenderOptions {
   waitForAnimation?: boolean;
 }
@@ -695,18 +712,17 @@ export interface QueryAnnotationOperation {
   operations: PmiAnnotationOperation[];
 }
 
-export class OperationExecutor {
+export class OperationExecutor<T extends SceneExecutionOptions> {
   public constructor(
-    private sceneViewId: UUID.UUID,
-    private stream: StreamApi,
-    private dimensions: Dimensions.Dimensions,
-    private sceneItemQueryOperations: QueryOperation[],
-    private pmiAnnotationQueryOperations: QueryAnnotationOperation[]
+    protected sceneViewId: UUID.UUID,
+    protected stream: StreamApi,
+    protected decodeFrame: FrameDecoder,
+    protected dimensions: Dimensions.Dimensions,
+    protected sceneItemQueryOperations: QueryOperation[],
+    protected pmiAnnotationQueryOperations: QueryAnnotationOperation[]
   ) {}
 
-  public async execute(
-    executionOptions?: SceneExecutionOptions
-  ): Promise<void> {
+  public async execute(executionOptions?: T): Promise<void> {
     const pbItemOperations = this.sceneItemQueryOperations.map((op) =>
       buildSceneElementOperationOnItem(op.query, op.operations, {
         dimensions: this.dimensions,
@@ -719,20 +735,68 @@ export class OperationExecutor {
         })
     );
 
+    const requestCorrelationId =
+      executionOptions?.suppliedCorrelationId ?? UUID.create();
+
     const request = {
       sceneViewId: {
         hex: this.sceneViewId,
       },
       elementOperations: [...pbItemOperations, ...pbPmiAnnotationOperations],
-      suppliedCorrelationId:
-        executionOptions?.suppliedCorrelationId != null
-          ? {
-              value: executionOptions?.suppliedCorrelationId,
-            }
-          : undefined,
+      suppliedCorrelationId: {
+        value: requestCorrelationId,
+      },
     };
 
     await this.stream.createSceneAlteration(request);
+  }
+}
+
+export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExecutionOptions> {
+  public async execute(
+    executionOptions?: SceneItemsExecutionOptions
+  ): Promise<void> {
+    if (executionOptions?.awaitCorrelatedFrame) {
+      const correlationId =
+        executionOptions.suppliedCorrelationId ?? UUID.create();
+      const executeResult = new SceneOperationExecuteResult(
+        this.stream,
+        this.decodeFrame,
+        correlationId
+      );
+
+      await super.execute({
+        ...executionOptions,
+        suppliedCorrelationId: correlationId,
+      });
+      await executeResult.onFrameDrawn.once();
+    } else {
+      await super.execute(executionOptions);
+    }
+  }
+}
+
+export class SceneElementsOperationExecutor extends OperationExecutor<SceneElementsExecutionOptions> {
+  public async execute(
+    executionOptions?: SceneElementsExecutionOptions
+  ): Promise<void> {
+    if (executionOptions?.skipAwaitCorrelatedFrame) {
+      await super.execute(executionOptions);
+    } else {
+      const correlationId =
+        executionOptions?.suppliedCorrelationId ?? UUID.create();
+      const executeResult = new SceneOperationExecuteResult(
+        this.stream,
+        this.decodeFrame,
+        correlationId
+      );
+
+      await super.execute({
+        ...executionOptions,
+        suppliedCorrelationId: correlationId,
+      });
+      await executeResult.onFrameDrawn.once();
+    }
   }
 }
 
@@ -854,7 +918,7 @@ export class Scene {
    */
   public items(
     operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
-  ): OperationExecutor {
+  ): SceneItemsOperationExecutor {
     const sceneOperations = operations(new SceneItemQueryExecutor());
 
     const ops: Array<
@@ -869,9 +933,10 @@ export class Scene {
       [] as QueryOperation[]
     );
 
-    return new OperationExecutor(
+    return new SceneItemsOperationExecutor(
       this.sceneViewId,
       this.stream,
+      this.decodeFrame,
       this.dimensions,
       operationList,
       []
@@ -907,7 +972,7 @@ export class Scene {
    */
   public elements(
     operations: (q: SceneElementQueryExecutor) => TerminalItemOperationBuilder
-  ): OperationExecutor {
+  ): SceneElementsOperationExecutor {
     const ops = operations(new SceneElementQueryExecutor());
     const opsAsArray = Array.isArray(ops) ? ops : [ops];
 
@@ -930,9 +995,10 @@ export class Scene {
       [] as QueryAnnotationOperation[]
     );
 
-    return new OperationExecutor(
+    return new SceneElementsOperationExecutor(
       this.sceneViewId,
       this.stream,
+      this.decodeFrame,
       this.dimensions,
       sceneItemsOperationList,
       pmiAnnotationOperationList
