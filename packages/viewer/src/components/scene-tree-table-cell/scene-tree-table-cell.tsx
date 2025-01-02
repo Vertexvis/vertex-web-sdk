@@ -14,7 +14,6 @@ import classNames from 'classnames';
 import { Events } from '../../lib/types';
 import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
-import { ViewerIconName } from '../viewer-icon/viewer-icon';
 
 export interface SceneTreeTableCellEventDetails {
   node?: Node.AsObject;
