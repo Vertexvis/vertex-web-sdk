@@ -1,3 +1,5 @@
+jest.mock('./utils');
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
@@ -7,12 +9,17 @@ import Chance from 'chance';
 
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCell } from './scene-tree-table-cell';
+import { blurElement } from './utils';
 
 const random = new Chance();
 
 describe('<vertex-scene-tree-table-cell>', () => {
   const pointerDownEvent = new MouseEvent('pointerdown', {
     button: 0,
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it('renders empty element if node is undefined', async () => {
@@ -544,6 +551,29 @@ describe('<vertex-scene-tree-table-cell>', () => {
     disposable.dispose();
 
     expect(hovered).toHaveBeenCalledWith(undefined);
+  });
+
+  it('blurs the element when an action button is clicked', async () => {
+    const node = createNode({ selected: true });
+    const { cell } = await newComponentSpec({
+      html: `
+        <vertex-scene-tree-table-cell expand-toggle isolate-button visibility-toggle></vertex-scene-tree-table-cell>
+      `,
+      node,
+    });
+
+    const expand = cell.shadowRoot?.querySelector('.expand-btn');
+    const visibility = cell.shadowRoot?.querySelector('.visibility-btn');
+    const isolate = cell.shadowRoot?.querySelector('.isolate-btn');
+
+    expand?.dispatchEvent(new MouseEvent('pointerup'));
+    expect(blurElement).toHaveBeenCalledTimes(1);
+
+    visibility?.dispatchEvent(new MouseEvent('pointerup'));
+    expect(blurElement).toHaveBeenCalledTimes(2);
+
+    isolate?.dispatchEvent(new MouseEvent('pointerup'));
+    expect(blurElement).toHaveBeenCalledTimes(3);
   });
 });
 

@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import { Events } from '../../lib/types';
 import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
+import { blurElement } from './utils';
 
 export interface SceneTreeTableCellEventDetails {
   node?: Node.AsObject;
@@ -216,10 +217,9 @@ export class SceneTreeTableCell {
             <button
               class="expand-btn no-shrink"
               data-test-id={'expand-' + this.node?.name}
-              onPointerUp={(event) => {
-                event.preventDefault();
-                this.toggleExpansion(event);
-              }}
+              onPointerUp={this.createActionPointerUpHandler(
+                this.toggleExpansion
+              )}
             >
               {!this.node?.isLeaf && !this.node?.endItem && (
                 <div
@@ -244,10 +244,7 @@ export class SceneTreeTableCell {
             <button
               class="isolate-btn no-shrink"
               data-test-id={'isolate-btn-' + this.node?.name}
-              onPointerUp={(event) => {
-                event?.preventDefault();
-                this.isolate(event);
-              }}
+              onPointerUp={this.createActionPointerUpHandler(this.isolate)}
             >
               <vertex-viewer-icon
                 class={classNames('icon', {
@@ -263,10 +260,9 @@ export class SceneTreeTableCell {
             <button
               class="visibility-btn no-shrink"
               data-test-id={'visibility-btn-' + this.node?.name}
-              onPointerUp={(event) => {
-                event?.preventDefault();
-                this.toggleVisibility(event);
-              }}
+              onPointerUp={this.createActionPointerUpHandler(
+                this.toggleVisibility
+              )}
             >
               <div
                 class={classNames('icon', {
@@ -330,6 +326,19 @@ export class SceneTreeTableCell {
     this.restartLongPressTimer();
   };
 
+  private createActionPointerUpHandler = (
+    action: (event: PointerEvent) => void
+  ): ((event: PointerEvent) => void) => {
+    return (event) => {
+      // Blur the `hostEl` after a `preventDefault` to clear focus that
+      // is left on the element after `pointerdown` event.
+      event.preventDefault();
+      blurElement(this.hostEl);
+
+      action(event);
+    };
+  };
+
   private toggleExpansion = (event: PointerEvent): void => {
     if (this.tree != null && this.node != null) {
       if (this.expansionHandler != null) {
@@ -360,7 +369,7 @@ export class SceneTreeTableCell {
     }
   }
 
-  private isolate(event: PointerEvent): void {
+  private isolate = (event: PointerEvent): void => {
     if (this.tree != null && this.node != null) {
       if (this.isolateHandler != null) {
         this.isolateHandler(event, this.node, this.tree);
@@ -369,7 +378,7 @@ export class SceneTreeTableCell {
       }
       this.isolatePressed.emit({ node: this.node, originalEvent: event });
     }
-  }
+  };
 
   private performDefaultSelectionOperation = (event: PointerEvent): void => {
     if (!event.defaultPrevented && event.button === 0) {
