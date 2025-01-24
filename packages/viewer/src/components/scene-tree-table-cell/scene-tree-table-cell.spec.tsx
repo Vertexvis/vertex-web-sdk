@@ -566,8 +566,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const visibility = cell.shadowRoot?.querySelector('.visibility-btn');
     const isolate = cell.shadowRoot?.querySelector('.isolate-btn');
 
-    console.log(expand);
-
     expand?.dispatchEvent(new MouseEvent('pointerup'));
     expect(blurElement).toHaveBeenCalledTimes(1);
 
