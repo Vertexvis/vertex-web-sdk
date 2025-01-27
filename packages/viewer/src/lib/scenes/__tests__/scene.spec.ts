@@ -1,3 +1,5 @@
+import Long from 'long';
+
 jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
@@ -586,8 +588,8 @@ describe(Scene, () => {
                 operand: {
                   annotation: {
                     id: {
-                      msb: parseFloat(msb),
-                      lsb: parseFloat(lsb),
+                      msb: Long.fromString(msb),
+                      lsb: Long.fromString(lsb),
                     },
                   },
                 },
