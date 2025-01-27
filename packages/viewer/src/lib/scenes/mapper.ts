@@ -3,6 +3,7 @@ import { Dimensions } from '@vertexvis/geometry';
 import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
 import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
+import Long from 'long';
 
 import {
   Animation,
@@ -232,8 +233,8 @@ export function buildAnnotationQueryExpression(
         operand: {
           annotation: {
             id: new vertexvis.protobuf.core.Uuid2l({
-              msb: parseFloat(msb),
-              lsb: parseFloat(lsb),
+              msb: Long.fromString(msb),
+              lsb: Long.fromString(lsb),
             }),
           },
         },
