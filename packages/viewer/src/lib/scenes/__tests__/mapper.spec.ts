@@ -2,6 +2,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { RepresentationPredefinedId } from '@vertexvis/scene-view-protos/core/protos/representation_pb';
 import { UUID } from '@vertexvis/utils';
+import Long from 'long';
 
 import { random } from '../../../testing/random';
 import {
@@ -111,8 +112,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
               operand: {
                 annotation: {
                   id: {
-                    msb: parseFloat(annotationId1Msb),
-                    lsb: parseFloat(annotationId1Lsb),
+                    msb: Long.fromString(annotationId1Msb),
+                    lsb: Long.fromString(annotationId1Lsb),
                   },
                 },
               },
@@ -121,8 +122,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
               operand: {
                 annotation: {
                   id: {
-                    msb: parseFloat(annotationId2Msb),
-                    lsb: parseFloat(annotationId2Lsb),
+                    msb: Long.fromString(annotationId2Msb),
+                    lsb: Long.fromString(annotationId2Lsb),
                   },
                 },
               },
@@ -153,8 +154,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
           operand: {
             annotation: {
               id: {
-                msb: parseFloat(annotationId1Msb),
-                lsb: parseFloat(annotationId1Lsb),
+                msb: Long.fromString(annotationId1Msb),
+                lsb: Long.fromString(annotationId1Lsb),
               },
             },
           },

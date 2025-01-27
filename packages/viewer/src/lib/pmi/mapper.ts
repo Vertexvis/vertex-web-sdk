@@ -5,7 +5,7 @@ import { Mapper as M } from '@vertexvis/utils';
 import { fromPbUuid2l, mapCursor } from '../mappers';
 import { PmiAnnotation, PmiAnnotationListResponse } from './types';
 
-const mapModelView: M.Func<PBPmiAnnotation.AsObject, PmiAnnotation> =
+const mapPmiAnnotation: M.Func<PBPmiAnnotation.AsObject, PmiAnnotation> =
   M.defineMapper(
     M.read(M.mapRequiredProp('id', fromPbUuid2l), M.getProp('displayName')),
     ([id, displayName]) => ({ id, displayName })
@@ -16,7 +16,7 @@ const mapListPmiAnnotationsResponse: M.Func<
   PmiAnnotationListResponse
 > = M.defineMapper(
   M.read(
-    M.mapProp('annotationsList', M.mapArray(mapModelView)),
+    M.mapProp('annotationsList', M.mapArray(mapPmiAnnotation)),
     M.mapProp('nextPageCursor', mapCursor)
   ),
   ([annotations, next]) => ({ annotations, paging: { next } })
