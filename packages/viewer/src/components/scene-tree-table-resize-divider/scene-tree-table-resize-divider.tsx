@@ -8,15 +8,22 @@ import classNames from 'classnames';
 })
 export class SceneTreeTableResizeDivider {
   @State()
+  private hovering = false;
+
+  @State()
   private dragging = false;
 
   public render(): h.JSX.IntrinsicElements {
+    const isHighlighted = !!this.hovering || !!this.dragging;
+
     return (
       <Host
         onPointerDown={this.handlePointerDown}
+        onPointerEnter={this.handleCellPointerEnter}
+        onPointerLeave={this.handleCellPointerLeave}
         style={{
-          height: this.dragging ? '100%' : 'var(--header-height)',
-          padding: this.dragging
+          height: isHighlighted ? '100%' : 'var(--header-height)',
+          padding: isHighlighted
             ? '0 calc(var(--scene-tree-table-column-gap) / 2)'
             : 'calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)',
         }}
@@ -24,7 +31,7 @@ export class SceneTreeTableResizeDivider {
         <slot name="divider">
           <div
             class={classNames('divider', {
-              dragging: this.dragging,
+              highlighted: isHighlighted,
             })}
           />
         </slot>
@@ -42,5 +49,13 @@ export class SceneTreeTableResizeDivider {
     this.dragging = false;
 
     window.removeEventListener('pointerup', this.handlePointerUp);
+  };
+
+  private handleCellPointerEnter = (): void => {
+    this.hovering = true;
+  };
+
+  private handleCellPointerLeave = (): void => {
+    this.hovering = false;
   };
 }
