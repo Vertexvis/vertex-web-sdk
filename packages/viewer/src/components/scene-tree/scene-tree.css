@@ -21,31 +21,30 @@
 
   /**
    * @prop --scene-tree-default-font-color: The default font color to use for displaying
-   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
-   * by any depth specific font configuration.
+   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
    */
   --scene-tree-default-font-color: unset;
 
   /**
-   * @prop --scene-tree-selected-row-background-color: The default font color to use when
-   * displaying selected rows. Setting this value will override any other background-color
-   * variables for the row. Defaults to `unset`.
+   * @prop --scene-tree-selected-row-background-color: The background color to use when
+   * displaying selected rows. This value always takes precedence if the row is selected.
+   * Defaults to `unset`.
    */
   --scene-tree-selected-row-background-color: unset;
 
   /**
-   * @prop --scene-tree-hovered-row-background-color: The default font color to use when
-   * displaying hovered rows. Setting this value will override any other background-color
-   * variables for the row. Defaults to `unset`.
+   * @prop --scene-tree-hovered-row-background-color: The background color to use when
+   * displaying hovered rows. This value takes precedence only if the row is not selected.
+   * Defaults to `unset`.
    */
    --scene-tree-hovered-row-background-color: unset;
 
   /**
-   * @prop --scene-tree-row-default-font-color: The default font color to use for displaying
-   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
+   * @prop --scene-tree-row-background-color: The default background color to use for displaying
+   * rows within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
    * by any depth specific background configuration.
    */
-  --scene-tree-default-row-background-color: unset;
+   --scene-tree-row-background-color: unset;
 
   /**
    * @prop --scene-tree-row-background-color-depth-n: The background color to use for n-depth

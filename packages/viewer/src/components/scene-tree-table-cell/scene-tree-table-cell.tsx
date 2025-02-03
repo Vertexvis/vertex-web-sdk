@@ -9,7 +9,6 @@ import {
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
-import classNames from 'classnames';
 
 import { Events } from '../../lib/types';
 import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
@@ -432,16 +431,16 @@ export class SceneTreeTableCell {
 
   private getBackgroundColorStyle(): string {
     const backgroundColorStyle = this.getCssVariableWithFallbacks(
-      `--scene-tree-background-color-depth-${this.node?.depth}`,
-      '--scene-tree-default-background-color'
+      `--scene-tree-row-background-color-depth-${this.node?.depth}`,
+      '--scene-tree-row-background-color'
     );
     const selectedBackgroundColorStyle = this.getCssVariableWithFallbacks(
-      '--scene-tree-selected-background-color',
+      '--scene-tree-selected-row-background-color',
       '--scene-tree-cell-background-selected'
     );
     const hoveredBackgroundColorStyle = this.getCssVariableWithFallbacks(
-      '--scene-tree-hovered-background-color',
-      '--scene-tree-cell-background-hovered'
+      '--scene-tree-hovered-row-background-color',
+      '--scene-tree-cell-background-hover'
     );
 
     if (!!this.node?.selected) {

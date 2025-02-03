@@ -168,6 +168,64 @@ describe('<vertex-scene-tree-table-cell>', () => {
     ).toBeDefined();
   });
 
+  it('renders with depth-based background color variables', async () => {
+    const nodeDepthZero = createNode({ expanded: false });
+    const nodeDepthOne = createNode({ depth: 1, expanded: false });
+    const { page, cell } = await newComponentSpec({
+      template: () => (
+        <vertex-scene-tree-table-cell
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
+      ),
+      node: nodeDepthZero,
+    });
+
+    expect(cell.style.backgroundColor).toBe(
+      'var(--scene-tree-row-background-color-depth-0, var(--scene-tree-row-background-color, unset))'
+    );
+
+    cell.node = nodeDepthOne;
+
+    await page.waitForChanges();
+
+    expect(cell.style.backgroundColor).toBe(
+      'var(--scene-tree-row-background-color-depth-1, var(--scene-tree-row-background-color, unset))'
+    );
+  });
+
+  it('renders with selection background color variables', async () => {
+    const node = createNode({ expanded: false, selected: true });
+    const { cell } = await newComponentSpec({
+      template: () => (
+        <vertex-scene-tree-table-cell
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
+      ),
+      node,
+    });
+
+    expect(cell.style.backgroundColor).toBe(
+      'var(--scene-tree-selected-row-background-color, var(--scene-tree-cell-background-selected, unset))'
+    );
+  });
+
+  it('renders with hover state background color variables', async () => {
+    const node = createNode({ expanded: false });
+    const { cell } = await newComponentSpec({
+      template: () => (
+        <vertex-scene-tree-table-cell
+          hovered
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
+      ),
+      node,
+    });
+
+    expect(cell.style.backgroundColor).toBe(
+      'var(--scene-tree-hovered-row-background-color, var(--scene-tree-cell-background-hover, unset))'
+    );
+  });
+
   it('toggles expansion', async () => {
     const node = createNode({ expanded: false });
     const { cell } = await newComponentSpec({
