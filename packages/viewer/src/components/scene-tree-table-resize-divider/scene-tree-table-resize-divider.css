@@ -9,14 +9,10 @@
 .divider {
   width: 1px;
   height: 100%;
-  background-color: var(--neutral-600);
+  background-color: var(--neutral-300);
   cursor: col-resize;
 }
 
-.divider.dragging {
-  background-color: var(--blue-600);
-}
-
-:host:hover .divider {
+.divider.highlighted {
   background-color: var(--blue-600);
 }
