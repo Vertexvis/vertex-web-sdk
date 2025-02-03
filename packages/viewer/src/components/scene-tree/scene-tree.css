@@ -9,19 +9,19 @@
 
   /**
    * @prop --scene-tree-default-font-family: The default font family to use for displaying
-   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
+   * text within a <vertex-scene-tree>. Defaults to `unset`.
    */
   --scene-tree-default-font-family: unset;
 
   /**
    * @prop --scene-tree-default-font-size: The default font size to use for displaying
-   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
+   * text within a <vertex-scene-tree>. Defaults to `unset`.
    */
   --scene-tree-default-font-size: unset;
 
   /**
    * @prop --scene-tree-default-font-color: The default font color to use for displaying
-   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
+   * text within a <vertex-scene-tree>. Defaults to `unset`.
    */
   --scene-tree-default-font-color: unset;
 
@@ -41,7 +41,7 @@
 
   /**
    * @prop --scene-tree-row-background-color: The default background color to use for displaying
-   * rows within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
+   * rows within a <vertex-scene-tree>. Defaults to `unset`, and will be overridden
    * by any depth specific background configuration.
    */
    --scene-tree-row-background-color: unset;
