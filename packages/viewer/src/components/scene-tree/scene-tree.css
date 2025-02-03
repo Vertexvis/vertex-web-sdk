@@ -7,6 +7,59 @@
    */
   --scene-tree-toolbar-separator: 1px solid var(--neutral-300);
 
+  /**
+   * @prop --scene-tree-default-font-family: The default font family to use for displaying
+   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
+   */
+  --scene-tree-default-font-family: unset;
+
+  /**
+   * @prop --scene-tree-default-font-size: The default font size to use for displaying
+   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`.
+   */
+  --scene-tree-default-font-size: unset;
+
+  /**
+   * @prop --scene-tree-default-font-color: The default font color to use for displaying
+   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
+   * by any depth specific font configuration.
+   */
+  --scene-tree-default-font-color: unset;
+
+  /**
+   * @prop --scene-tree-selected-row-background-color: The default font color to use when
+   * displaying selected rows. Setting this value will override any other background-color
+   * variables for the row. Defaults to `unset`.
+   */
+  --scene-tree-selected-row-background-color: unset;
+
+  /**
+   * @prop --scene-tree-hovered-row-background-color: The default font color to use when
+   * displaying hovered rows. Setting this value will override any other background-color
+   * variables for the row. Defaults to `unset`.
+   */
+   --scene-tree-hovered-row-background-color: unset;
+
+  /**
+   * @prop --scene-tree-row-default-font-color: The default font color to use for displaying
+   * text within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden
+   * by any depth specific background configuration.
+   */
+  --scene-tree-default-row-background-color: unset;
+
+  /**
+   * @prop --scene-tree-row-background-color-depth-n: The background color to use for n-depth
+   * rows, where `n` is replaced with the desired depth. Defaults to `unset` for all
+   * depths.
+   *
+   * @example
+   * The following definition will cause all rows representing items at a depth of 1
+   * to display with a red background, leaving all other depths unchanged.
+   * 
+   * --scene-tree-row-background-color-depth-1: #ff0000
+   */
+  --scene-tree-row-background-color-depth-n: unset;
+
   width: 300px;
   height: 100%;
   user-select: none;

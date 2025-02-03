@@ -847,9 +847,14 @@ Type: `Promise<void>`
 
 ## CSS Custom Properties
 
-| Name                             | Description                                                               |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| `--scene-tree-toolbar-separator` | A CSS border value that specifies the border between scene tree toolbars. |
+| Name                                    | Description                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--scene-tree-background-color-depth-n` | The background color to use for n-depth rows, where `n` is replaced with the desired depth. Defaults to `unset` for all depths. @example The following definition will cause all rows representing items at a depth of 1 to display with a red background, leaving all other depths unchanged. --scene-tree-background-color-depth-1: #ff0000 |
+| `--scene-tree-default-font-color`       | The default font color to use for displaying text within a <vertex-scene-tree-table-cell>. Defaults to `unset`, and will be overridden by any depth specific font configuration.                                                                                                                                                              |
+| `--scene-tree-default-font-family`      | The default font family to use for displaying text within a <vertex-scene-tree-table-cell>. Defaults to `inherit`.                                                                                                                                                                                                                            |
+| `--scene-tree-default-font-size`        | The default font size to use for displaying text within a <vertex-scene-tree-table-cell>. Defaults to `inherit`.                                                                                                                                                                                                                              |
+| `--scene-tree-font-color-depth-n`       | The font color color to use for n-depth rows, where `n` is replaced with the desired depth. Defaults to `unset` for all depths. @example The following definition will cause all rows representing items at a depth of 1 to display with a red font color, leaving all other depths unchanged. --scene-tree-font-color-depth-1: #ff0000       |
+| `--scene-tree-toolbar-separator`        | A CSS border value that specifies the border between scene tree toolbars.                                                                                                                                                                                                                                                                     |
 
 
 ## Dependencies
