@@ -479,6 +479,9 @@ export function toPbSceneViewStateFeatures(
       case 'phantom':
         return vertexvis.protobuf.stream.SceneViewStateFeature
           .SCENE_VIEW_STATE_FEATURE_PHANTOM;
+      case 'shading':
+        return vertexvis.protobuf.stream.SceneViewStateFeature
+          .SCENE_VIEW_STATE_FEATURE_SHADING;
       default:
         return vertexvis.protobuf.stream.SceneViewStateFeature
           .SCENE_VIEW_STATE_FEATURE_INVALID;
