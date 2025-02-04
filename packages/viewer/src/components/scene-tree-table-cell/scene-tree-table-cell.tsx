@@ -9,11 +9,11 @@ import {
 } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
-import classNames from 'classnames';
 
 import { Events } from '../../lib/types';
 import { SceneTreeOperationHandler } from '../scene-tree/lib/handlers';
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
+import { ViewerIconName } from '../viewer-icon/viewer-icon';
 import { blurElement } from './utils';
 
 export interface SceneTreeTableCellEventDetails {
@@ -200,6 +200,11 @@ export class SceneTreeTableCell {
     // Overrides the `.hydrated` visibility when we have nothing to display
     const hiddenStyle =
       this.node == null ? { visibility: 'hidden' } : undefined;
+    const backgroundColorStyle = this.getBackgroundColorStyle();
+
+    const expansionIcon = this.getExpansionIcon();
+    const isolateIcon = this.getIsolateIcon();
+    const visibilityIcon = this.getVisibilityIcon();
 
     return (
       <Host
@@ -207,7 +212,10 @@ export class SceneTreeTableCell {
         onPointerLeave={this.handleCellPointerLeave}
         onPointerUp={this.handleCellPointerUp}
         onPointerDown={this.handleCellPointerDown}
-        style={hiddenStyle}
+        style={{
+          ...hiddenStyle,
+          'background-color': backgroundColorStyle,
+        }}
       >
         <div class="wrapper">
           <div class="no-shrink">
@@ -221,13 +229,11 @@ export class SceneTreeTableCell {
                 this.toggleExpansion
               )}
             >
-              {!this.node?.isLeaf && !this.node?.endItem && (
-                <div
-                  class={classNames('icon', {
-                    'icon-expanded': !this.node?.isLeaf && this.node?.expanded,
-                    'icon-collapsed':
-                      !this.node?.isLeaf && !this.node?.expanded,
-                  })}
+              {expansionIcon && (
+                <vertex-viewer-icon
+                  class="icon"
+                  name={expansionIcon}
+                  size="sm"
                 />
               )}
             </button>
@@ -246,14 +252,9 @@ export class SceneTreeTableCell {
               data-test-id={'isolate-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(this.isolate)}
             >
-              <vertex-viewer-icon
-                class={classNames('icon', {
-                  invisible: !this.hovered,
-                  'icon-locate': this.hovered,
-                })}
-                name="locate"
-                size="sm"
-              />
+              {isolateIcon && (
+                <vertex-viewer-icon class="icon" name="locate" size="sm" />
+              )}
             </button>
           )}
           {this.visibilityToggle && (
@@ -264,17 +265,13 @@ export class SceneTreeTableCell {
                 this.toggleVisibility
               )}
             >
-              <div
-                class={classNames('icon', {
-                  'icon-visible':
-                    this.hovered &&
-                    !this.node?.partiallyVisible &&
-                    this.node?.visible,
-                  'icon-hidden':
-                    !this.node?.partiallyVisible && !this.node?.visible,
-                  'icon-partial': this.node?.partiallyVisible,
-                })}
-              />
+              {visibilityIcon && (
+                <vertex-viewer-icon
+                  class="icon"
+                  name={visibilityIcon}
+                  size="sm"
+                />
+              )}
             </button>
           )}
           <div class="no-shrink">
@@ -430,5 +427,64 @@ export class SceneTreeTableCell {
     this.longPressTimer = window.setTimeout(() => {
       this.clearLongPressTimer();
     }, Events.defaultEventConfig.longPressThreshold);
+  }
+
+  private getBackgroundColorStyle(): string {
+    const backgroundColorStyle = this.getCssVariableWithFallbacks(
+      `--scene-tree-row-background-color-depth-${this.node?.depth}`,
+      '--scene-tree-row-background-color'
+    );
+    const selectedBackgroundColorStyle = this.getCssVariableWithFallbacks(
+      '--scene-tree-selected-row-background-color',
+      '--scene-tree-cell-background-selected'
+    );
+    const hoveredBackgroundColorStyle = this.getCssVariableWithFallbacks(
+      '--scene-tree-hovered-row-background-color',
+      '--scene-tree-cell-background-hover'
+    );
+
+    if (!!this.node?.selected) {
+      return selectedBackgroundColorStyle;
+    } else if (this.hovered) {
+      return hoveredBackgroundColorStyle;
+    }
+    return backgroundColorStyle;
+  }
+
+  private getCssVariableWithFallbacks(
+    variable: string,
+    ...fallbacks: string[]
+  ): string {
+    const sequencedFallbacks = [...fallbacks].reverse();
+
+    return [...sequencedFallbacks, variable].reduce(
+      (res, s) => `var(${s}, ${res})`,
+      'unset'
+    );
+  }
+
+  private getIsolateIcon(): ViewerIconName | undefined {
+    if (this.hovered) {
+      return 'locate';
+    }
+    return undefined;
+  }
+
+  private getExpansionIcon(): ViewerIconName | undefined {
+    if (!this.node?.isLeaf && !this.node?.endItem) {
+      return this.node?.expanded ? 'chevron-down' : 'chevron-right';
+    }
+    return undefined;
+  }
+
+  private getVisibilityIcon(): ViewerIconName | undefined {
+    if (this.hovered && !this.node?.partiallyVisible && this.node?.visible) {
+      return 'eye-open';
+    } else if (!this.node?.partiallyVisible && !this.node?.visible) {
+      return 'eye-half';
+    } else if (this.node?.partiallyVisible) {
+      return 'eye-half-dotted';
+    }
+    return undefined;
   }
 }
