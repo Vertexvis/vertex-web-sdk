@@ -587,6 +587,11 @@ export class SceneItemOperationsBuilder
 }
 
 /**
+ * @ignore
+ * @beta PMI Annotation operations are being actively developed. These APIs
+ * should be considered unstable, and will potentially change with following
+ * releases.
+ *
  * A class that is responsible for building operations on pmi annotations for a specific scene.
  * This executor requires a query, and expects `execute()` to be invoked in
  * order for the changes to take effect.
@@ -614,6 +619,11 @@ export class PmiAnnotationOperationsBuilder
   }
 
   /**
+   * @ignore
+   * @beta PMI Annotation operations are being actively developed. These APIs
+   * should be considered unstable, and will potentially change with following
+   * releases.
+   *
    * Specifies that the PMI annotations matching the query should be hidden.
    *
    * @example
@@ -632,6 +642,11 @@ export class PmiAnnotationOperationsBuilder
   }
 
   /**
+   * @ignore
+   * @beta PMI Annotation operations are being actively developed. These APIs
+   * should be considered unstable, and will potentially change with following
+   * releases.
+   *
    * Specifies that the PMI annotations matching the query should be shown.
    *
    * @example
@@ -650,6 +665,11 @@ export class PmiAnnotationOperationsBuilder
   }
 
   /**
+   * @ignore
+   * @beta PMI Annotation operations are being actively developed. These APIs
+   * should be considered unstable, and will potentially change with following
+   * releases.
+   *
    * Specifies that the PMI annotations matching the query should be selected.
    *
    * @example
@@ -671,6 +691,11 @@ export class PmiAnnotationOperationsBuilder
   }
 
   /**
+   * @ignore
+   * @beta PMI Annotation operations are being actively developed. These APIs
+   * should be considered unstable, and will potentially change with following
+   * releases.
+   *
    * Specifies that the PMI annotations matching the query should be deselected.
    *
    * @example
