@@ -817,7 +817,8 @@ export type SceneViewStateFeature =
   | 'selection'
   | 'transforms'
   | 'visibility'
-  | 'phantom';
+  | 'phantom'
+  | 'shading';
 
 /**
  * A class that represents the `Scene` that has been loaded into the viewer. On
