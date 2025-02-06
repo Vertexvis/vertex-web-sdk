@@ -1,5 +1,5 @@
 import { loadViewerWithQueryParams } from '../helpers.js';
-import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.22.x/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.x/dist/esm/loader.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
   defineCustomElements(window).then(() => main());
