@@ -1,4 +1,4 @@
-import { TransformationDelta } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.22.x/dist/esm/index.mjs';
+import { TransformationDelta } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.x/dist/esm/index.mjs';
 import { loadViewerWithQueryParams } from '../helpers.js';
 
 window.addEventListener('DOMContentLoaded', () => {

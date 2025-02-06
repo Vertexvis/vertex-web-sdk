@@ -1,4 +1,4 @@
-import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.22.x/dist/esm/index.mjs';
+import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.x/dist/esm/index.mjs';
 import steps from './steps.js';
 
 /**
