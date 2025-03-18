@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-<head>
+  <head>
     <title>End Items</title>
 
     <!-- Live reload script -->
@@ -60,31 +60,34 @@
         height: 100%;
       }
     </style>
-</head>
+  </head>
 
-<body>
-<h1>End Item Instructions</h1>
-<ul>
-    <li>Click a part to select it. Hold down shift while clicking a part to select its parent.</li>
-    <li>Press 'e' to set the selected parts as end item. This works best when a subassembly is selected.</li>
-    <li>Press 'r' to remove the end item state from the selected parts.</li>
-</ul>
-<div class="app">
-    <div class="tree">
-        <vertex-scene-tree
-            id="scene-tree"
-            viewer-selector="#viewer"
-        >
+  <body>
+    <h1>End Item Instructions</h1>
+    <ul>
+      <li>
+        Click a part to select it. Hold down shift while clicking a part to
+        select its parent.
+      </li>
+      <li>
+        Press 'e' to set the selected parts as end item. This works best when a
+        subassembly is selected.
+      </li>
+      <li>Press 'r' to remove the end item state from the selected parts.</li>
+    </ul>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree id="scene-tree" viewer-selector="#viewer">
         </vertex-scene-tree>
-    </div>
-    <div class="workarea">
+      </div>
+      <div class="workarea">
         <vertex-viewer
-            id="viewer"
-            class="viewer"
-            src="urn:vertex:stream-key:wzTRPxHgI8ylWKevQIDPA-GhL_8PhWwqLj4w"
+          id="viewer"
+          class="viewer"
+          src="urn:vertex:stream-key:fTHHMa_p9agtpL9MgU3UltLiXvNR0Z7Ogsd2"
         >
         </vertex-viewer>
+      </div>
     </div>
-</div>
-</body>
+  </body>
 </html>
