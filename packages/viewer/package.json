@@ -48,7 +48,6 @@
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
     "@stencil/core": "^2.16.1",
-    "@types/classnames": "^2.3.1",
     "@vertexvis/frame-streaming-protos": "^0.13.16",
     "@vertexvis/geometry": "0.23.1",
     "@vertexvis/html-templates": "0.23.1",
@@ -64,6 +63,7 @@
     "fast-png": "^6.1.0",
     "google-protobuf": "3.19.4",
     "jwt-decode": "^3.1.2",
+    "long": "^5.3.1",
     "param-case": "^3.0.4",
     "protobufjs": "^7.2.4",
     "regl": "^2.1.0",

@@ -1,5 +1,5 @@
+import fastDeepEqual from 'fast-deep-equal';
 import isSimpleObject from 'is-plain-object';
-import areEqual from 'lodash.isequal';
 
 /* eslint-disable padding-line-between-statements */
 /**
@@ -82,7 +82,7 @@ export function isPlainObject(obj: unknown): boolean {
  * @returns `true` if the two objects are equal. Otherwise `false`.
  */
 export function isEqual(a: unknown, b: unknown): boolean {
-  return areEqual(a, b);
+  return fastDeepEqual(a, b);
 }
 
 /* eslint-disable padding-line-between-statements */
