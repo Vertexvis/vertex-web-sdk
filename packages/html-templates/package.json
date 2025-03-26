@@ -40,7 +40,6 @@
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
-    "@types/lodash.isequal": "^4.5.6",
     "@types/uuid": "^8.3.4",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",

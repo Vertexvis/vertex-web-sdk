@@ -37,13 +37,12 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
+    "fast-deep-equal": "^3.1.3",
     "is-plain-object": "^3.0.0",
-    "lodash.isequal": "^4.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
-    "@types/lodash.isequal": "^4.5.6",
     "@types/uuid": "^8.3.4",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
