@@ -5,6 +5,8 @@ export type Color3 = Omit<Color.Color, 'a'> | string | number;
 
 export type FrameType = 'final' | 'all' | undefined;
 
+export type CameraType = 'perspective' | 'orthographic' | undefined;
+
 export interface FeatureLineOptions {
   width: number;
   color?: Color3;

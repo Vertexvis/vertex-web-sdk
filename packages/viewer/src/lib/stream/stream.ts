@@ -32,6 +32,7 @@ import {
   fromPbRefreshTokenResponseOrThrow,
   fromPbStartStreamResponseOrThrow,
   fromPbSyncTimeResponseOrThrow,
+  toPbCameraType,
   toPbRGBi,
   toPbStreamAttributes,
 } from '../mappers';
@@ -43,7 +44,11 @@ import {
   Orientation,
   SynchronizedClock,
 } from '../types';
-import { Resource, SuppliedIdQueryValue } from '../types/loadableResource';
+import {
+  CameraTypeQueryValue,
+  Resource,
+  SuppliedIdQueryValue,
+} from '../types/loadableResource';
 import {
   Connected,
   Connecting,
@@ -425,6 +430,9 @@ export class ViewerStream extends StreamApi {
     const suppliedIdQuery = resource.queries.find(
       (q) => q.type === 'supplied-id'
     ) as SuppliedIdQueryValue | undefined;
+    const cameraTypeQuery = resource.queries.find(
+      (q) => q.type === 'camera-type'
+    ) as CameraTypeQueryValue | undefined;
 
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
@@ -442,6 +450,10 @@ export class ViewerStream extends StreamApi {
           resource.subResource?.type === 'scene-view-state' &&
           suppliedIdQuery != null
             ? { value: suppliedIdQuery.id }
+            : undefined,
+        cameraType:
+          cameraTypeQuery != null
+            ? toPbCameraTypeOrThrow(cameraTypeQuery.camera)
             : undefined,
       })
     );
@@ -651,6 +663,7 @@ export class ViewerStream extends StreamApi {
 
 const toPbStreamAttributesOrThrow = Mapper.ifInvalidThrow(toPbStreamAttributes);
 const toPbColorOrThrow = Mapper.ifInvalidThrow(toPbRGBi);
+const toPbCameraTypeOrThrow = Mapper.ifInvalidThrow(toPbCameraType);
 
 function getStreamSettings(config: Config): Settings {
   return {

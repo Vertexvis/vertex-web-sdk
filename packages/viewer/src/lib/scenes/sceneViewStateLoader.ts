@@ -2,7 +2,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
-import { FrameDecoder } from '../mappers';
+import { CameraTypeEncoder, FrameDecoder } from '../mappers';
 import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import { SceneViewStateIdentifier } from '../types';
 import { ApplySceneViewStateOptions, SceneViewStateFeature } from '.';
@@ -16,6 +16,7 @@ export class SceneViewStateLoader {
   public constructor(
     private stream: StreamApi,
     private decodeFrame: FrameDecoder,
+    private encodeCameraType: CameraTypeEncoder,
     public readonly sceneId: UUID.UUID,
     public readonly sceneViewId: UUID.UUID
   ) {}
@@ -35,6 +36,9 @@ export class SceneViewStateLoader {
         ...pbIdField,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
+          : undefined,
+        cameraType: opts.cameraTypeOverride
+          ? this.encodeCameraType(opts.cameraTypeOverride)
           : undefined,
       },
       true
@@ -62,6 +66,9 @@ export class SceneViewStateLoader {
           ? { value: opts.suppliedCorrelationId }
           : undefined,
         sceneViewStateFeatureSubset: pbFeatures,
+        cameraType: opts.cameraTypeOverride
+          ? this.encodeCameraType(opts.cameraTypeOverride)
+          : undefined,
       },
       true
     );

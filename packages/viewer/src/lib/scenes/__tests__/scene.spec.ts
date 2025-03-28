@@ -16,7 +16,7 @@ import {
   drawFramePayloadPerspective,
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
-import { fromPbFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../mappers';
 import { Orientation, Viewport } from '../../types';
 import * as ColorMaterial from '../colorMaterial';
 import { Scene } from '../scene';
@@ -61,10 +61,13 @@ describe(Scene, () => {
   const streamApi = new MockStreamApi();
   const imageScaleProvider = (): Point.Point => Point.create(1, 1);
   const viewport = new Viewport(50, 50);
+  const cameraTypeMapper = toPbCameraTypeOrThrow();
+
   const scene = new Scene(
     streamApi,
     makePerspectiveFrame(),
     fromPbFrameOrThrow(Orientation.DEFAULT),
+    cameraTypeMapper,
     imageScaleProvider,
     viewport,
     sceneId,
@@ -1042,6 +1045,42 @@ describe(Scene, () => {
         true
       );
     });
+
+    it('should reset with an orthographic camera type override', async () => {
+      await scene.reset({
+        suppliedCorrelationId: 'foo',
+        includeCamera: true,
+        cameraTypeOverride: 'orthographic',
+      });
+
+      expect(streamApi.resetSceneView).toHaveBeenCalledWith(
+        {
+          frameCorrelationId: { value: 'foo' },
+          includeCamera: true,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
+        },
+        true
+      );
+    });
+
+    it('should reset with a perspective camera type override', async () => {
+      await scene.reset({
+        suppliedCorrelationId: 'foo',
+        includeCamera: true,
+        cameraTypeOverride: 'perspective',
+      });
+
+      expect(streamApi.resetSceneView).toHaveBeenCalledWith(
+        {
+          frameCorrelationId: { value: 'foo' },
+          includeCamera: true,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_PERSPECTIVE,
+        },
+        true
+      );
+    });
   });
 
   describe(Scene.prototype.applySceneViewState, () => {
@@ -1055,6 +1094,24 @@ describe(Scene, () => {
         {
           sceneViewStateId: { hex: mockSceneViewStateId },
           frameCorrelationId: { value: 'foo' },
+        },
+        true
+      );
+    });
+
+    it('should applySceneViewState with a camera type override', async () => {
+      const mockSceneViewStateId = UUID.create();
+      await scene.applySceneViewState(mockSceneViewStateId, {
+        suppliedCorrelationId: 'foo',
+        cameraTypeOverride: 'orthographic',
+      });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
         true
       );
@@ -1111,6 +1168,28 @@ describe(Scene, () => {
             vertexvis.protobuf.stream.SceneViewStateFeature
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
+        },
+        true
+      );
+    });
+
+    it('should applyPartialSceneViewState with a camera type override', async () => {
+      const mockSceneViewStateId = UUID.create();
+      await scene.applyPartialSceneViewState(mockSceneViewStateId, ['camera'], {
+        suppliedCorrelationId: 'foo',
+        cameraTypeOverride: 'orthographic',
+      });
+
+      expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
+        {
+          sceneViewStateId: { hex: mockSceneViewStateId },
+          frameCorrelationId: { value: 'foo' },
+          sceneViewStateFeatureSubset: [
+            vertexvis.protobuf.stream.SceneViewStateFeature
+              .SCENE_VIEW_STATE_FEATURE_CAMERA,
+          ],
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
         true
       );

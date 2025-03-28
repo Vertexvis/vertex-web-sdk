@@ -247,7 +247,7 @@ export function isInvalid(obj: unknown): obj is Invalid {
 }
 
 /**
- * Returns a function that throws an error if the input is invalid. Otherwise
+ * Returns a function that throws an error if the input is invalid. Otherwise,
  * returns the result.
  *
  * @param mapper A mapper that will be invoked with the input.

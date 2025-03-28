@@ -55,7 +55,7 @@ import { PointerInteractionHandler } from '../../lib/interactions/pointerInterac
 import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
-import { fromPbFrameOrThrow } from '../../lib/mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../lib/mappers';
 import { paintTime, Timing } from '../../lib/meters';
 import { ModelViewController } from '../../lib/model-views/controller';
 import { PmiController } from '../../lib/pmi';
@@ -1412,12 +1412,15 @@ export class Viewer {
   private async createScene(): Promise<Scene> {
     const state = await this.waitForConnectedState();
 
+    const cameraTypeMapper = toPbCameraTypeOrThrow();
+
     const { frame, sceneId, sceneViewId, worldOrientation } = state;
 
     return new Scene(
       this.getStream(),
       frame,
       fromPbFrameOrThrow(worldOrientation),
+      cameraTypeMapper,
       () => this.getImageScale(),
       this.viewport,
       sceneId,

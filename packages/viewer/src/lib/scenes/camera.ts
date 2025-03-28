@@ -101,7 +101,7 @@ export interface FlyToParams {
  * It also provides utility methods to update orientation of the camera and
  * rerender the scene.
  *
- * This class in intended to treated as an immutable type. Any mutations return
+ * This class in intended to be treated as an immutable type. Any mutations return
  * a new instance of the class with the updated properties.
  */
 export abstract class Camera {
