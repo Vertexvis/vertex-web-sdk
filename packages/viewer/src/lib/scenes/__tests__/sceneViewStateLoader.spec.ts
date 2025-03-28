@@ -4,7 +4,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { random } from '../../../testing';
-import { fromPbFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
 import { SceneViewStateLoader } from '../sceneViewStateLoader';
 
@@ -12,9 +12,12 @@ describe('SceneViewStateLoader', () => {
   const sceneId = random.guid();
   const sceneViewId = random.guid();
   const streamApi = new StreamApi();
+  const cameraTypeMapper = toPbCameraTypeOrThrow();
+
   const loader = new SceneViewStateLoader(
     streamApi,
     fromPbFrameOrThrow(Orientation.DEFAULT),
+    cameraTypeMapper,
     sceneId,
     sceneViewId
   );

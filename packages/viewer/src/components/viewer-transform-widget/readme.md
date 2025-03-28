@@ -68,6 +68,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 
 <!-- Auto Generated Below -->
 
+
 ## Properties
 
 | Property                       | Attribute                                  | Description                                                                                                                                                  | Type                                                                          | Default         |
@@ -88,6 +89,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 | `zRotationDisabled`            | `z-rotation-disabled`                      | Determines whether or not the z-rotation is disabled on the widget                                                                                           | `boolean`                                                                     | `false`         |
 | `zTranslationDisabled`         | `z-translation-disabled`                   | Determines whether or not the z-translation is disabled on the widget                                                                                        | `boolean`                                                                     | `false`         |
 
+
 ## Events
 
 | Event                | Description                                                         | Type                                                                                                                                                         |
@@ -96,6 +98,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
 | `interactionStarted` | An event that is emitted an interaction with the widget has started | `CustomEvent<void>`                                                                                                                                          |
 | `positionChanged`    | An event that is emitted when the position of the widget changes.   | `CustomEvent<Vector3 \| undefined>`                                                                                                                          |
 | `rotationChanged`    | An event that is emitted when the rotation of the widget changes.   | `CustomEvent<Euler \| undefined>`                                                                                                                            |
+
 
 ## Methods
 
@@ -115,6 +118,9 @@ the history is lost.
 
 Type: `Promise<void>`
 
+
+
+
 ## CSS Custom Properties
 
 | Name                                            | Description                                                                               |
@@ -124,6 +130,7 @@ Type: `Promise<void>`
 | `--viewer-transform-widget-x-axis-arrow-color`  | A CSS color for the arrow at the end of the X axis on this widget. Defaults to `#ea3324`. |
 | `--viewer-transform-widget-y-axis-arrow-color`  | A CSS color for the arrow at the end of the Y axis on this widget. Defaults to `#4faf32`. |
 | `--viewer-transform-widget-z-axis-arrow-color`  | A CSS color for the arrow at the end of the Z axis on this widget. Defaults to `#0000ff`. |
+
 
 ----------------------------------------------
 
