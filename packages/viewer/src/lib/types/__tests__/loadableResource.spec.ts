@@ -53,13 +53,13 @@ describe(LoadableResource.fromUrn, () => {
 
   it('parses a camera type override for a URN', () => {
     const urn =
-      'urn:vertex:stream-key:123?scene-view-state=234&camera-type=orthographic';
+      'urn:vertex:stream-key:123?scene-view-state=234&load-camera-type=orthographic';
     const { resource, subResource, queries } = LoadableResource.fromUrn(urn);
     expect(resource).toEqual({ type: 'stream-key', id: '123' });
     expect(subResource).toEqual({ type: 'scene-view-state', id: '234' });
     expect(queries![0]).toEqual({
-      type: 'camera-type',
-      camera: 'orthographic',
+      type: 'load-camera-type',
+      cameraType: 'orthographic',
     });
   });
 });

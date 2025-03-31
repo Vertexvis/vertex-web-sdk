@@ -85,15 +85,15 @@ export interface SuppliedIdQueryValue {
   id: string;
 }
 
-export interface CameraTypeQueryValue {
-  type: 'camera-type';
-  camera: CameraType;
+export interface LoadCameraTypeQueryValue {
+  type: 'load-camera-type';
+  cameraType: CameraType;
 }
 
 export type QueryValue =
   | SceneViewStateResource
   | SuppliedIdQueryValue
-  | CameraTypeQueryValue;
+  | LoadCameraTypeQueryValue;
 
 function fromQuery(query?: string): QueryValue[] {
   if (query != null) {
@@ -105,8 +105,11 @@ function fromQuery(query?: string): QueryValue[] {
           return { type: 'supplied-id', id: resourceId };
         case 'scene-view-state':
           return { type: 'scene-view-state', id: resourceId };
-        case 'camera-type':
-          return { type: 'camera-type', camera: resourceId as CameraType };
+        case 'load-camera-type':
+          return {
+            type: 'load-camera-type',
+            cameraType: resourceId as CameraType,
+          };
         default:
           throw new Error('Invalid URN. Unknown query value type');
       }

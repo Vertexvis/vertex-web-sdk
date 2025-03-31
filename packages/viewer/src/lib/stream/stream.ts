@@ -45,7 +45,7 @@ import {
   SynchronizedClock,
 } from '../types';
 import {
-  CameraTypeQueryValue,
+  LoadCameraTypeQueryValue,
   Resource,
   SuppliedIdQueryValue,
 } from '../types/loadableResource';
@@ -225,9 +225,6 @@ export class ViewerStream extends StreamApi {
     const isConnecting =
       state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
-    const suppliedIdQuery = resource.queries.find(
-      (q) => q.type === 'supplied-id'
-    ) as SuppliedIdQueryValue | undefined;
 
     if (hasResourceChanged || (isConnecting && hasSubResourceChanged)) {
       this.disconnect();
@@ -237,12 +234,22 @@ export class ViewerStream extends StreamApi {
       hasSubResourceChanged &&
       resource.subResource?.type === 'scene-view-state'
     ) {
+      const suppliedIdQuery = resource.queries.find(
+        (q) => q.type === 'supplied-id'
+      ) as SuppliedIdQueryValue | undefined;
+      const cameraTypeQuery = resource.queries.find(
+        (q) => q.type === 'load-camera-type'
+      ) as LoadCameraTypeQueryValue | undefined;
+
       const payload = {
         ...(resource.subResource.id != null
           ? { sceneViewStateId: { hex: resource.subResource.id } }
           : {}),
         ...(suppliedIdQuery != null
           ? { sceneViewStateSuppliedId: { value: suppliedIdQuery.id } }
+          : {}),
+        ...(cameraTypeQuery != null
+          ? { cameraType: toPbCameraTypeOrThrow(cameraTypeQuery.cameraType) }
           : {}),
       };
 
@@ -431,8 +438,8 @@ export class ViewerStream extends StreamApi {
       (q) => q.type === 'supplied-id'
     ) as SuppliedIdQueryValue | undefined;
     const cameraTypeQuery = resource.queries.find(
-      (q) => q.type === 'camera-type'
-    ) as CameraTypeQueryValue | undefined;
+      (q) => q.type === 'load-camera-type'
+    ) as LoadCameraTypeQueryValue | undefined;
 
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
@@ -453,7 +460,7 @@ export class ViewerStream extends StreamApi {
             : undefined,
         cameraType:
           cameraTypeQuery != null
-            ? toPbCameraTypeOrThrow(cameraTypeQuery.camera)
+            ? toPbCameraTypeOrThrow(cameraTypeQuery.cameraType)
             : undefined,
       })
     );
