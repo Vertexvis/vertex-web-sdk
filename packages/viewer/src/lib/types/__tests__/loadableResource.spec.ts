@@ -50,16 +50,4 @@ describe(LoadableResource.fromUrn, () => {
     expect(queries![1]).toEqual({ type: 'supplied-id', id: '345' });
     expect(queries![2]).toEqual({ type: 'supplied-id', id: '456' });
   });
-
-  it('parses a camera type override for a URN', () => {
-    const urn =
-      'urn:vertex:stream-key:123?scene-view-state=234&load-camera-type=orthographic';
-    const { resource, subResource, queries } = LoadableResource.fromUrn(urn);
-    expect(resource).toEqual({ type: 'stream-key', id: '123' });
-    expect(subResource).toEqual({ type: 'scene-view-state', id: '234' });
-    expect(queries![0]).toEqual({
-      type: 'load-camera-type',
-      cameraType: 'orthographic',
-    });
-  });
 });

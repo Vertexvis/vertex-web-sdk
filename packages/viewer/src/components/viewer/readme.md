@@ -112,7 +112,7 @@ Type: `Promise<boolean>`
 
 
 
-### `load(urn: string) => Promise<void>`
+### `load(urn: string, cameraType?: FrameCamera.FrameCameraType | undefined) => Promise<void>`
 
 Loads the given scene into the viewer and return a `Promise` that
 resolves when the scene has been loaded. The specified scene is

@@ -1,6 +1,5 @@
 import { Uri } from '@vertexvis/utils';
 
-import { CameraType } from '../../interfaces';
 import { InvalidResourceUrnError } from '../errors';
 
 interface StreamKeyResource {
@@ -85,15 +84,7 @@ export interface SuppliedIdQueryValue {
   id: string;
 }
 
-export interface LoadCameraTypeQueryValue {
-  type: 'load-camera-type';
-  cameraType: CameraType;
-}
-
-export type QueryValue =
-  | SceneViewStateResource
-  | SuppliedIdQueryValue
-  | LoadCameraTypeQueryValue;
+export type QueryValue = SceneViewStateResource | SuppliedIdQueryValue;
 
 function fromQuery(query?: string): QueryValue[] {
   if (query != null) {
@@ -105,11 +96,6 @@ function fromQuery(query?: string): QueryValue[] {
           return { type: 'supplied-id', id: resourceId };
         case 'scene-view-state':
           return { type: 'scene-view-state', id: resourceId };
-        case 'load-camera-type':
-          return {
-            type: 'load-camera-type',
-            cameraType: resourceId as CameraType,
-          };
         default:
           throw new Error('Invalid URN. Unknown query value type');
       }

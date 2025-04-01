@@ -586,8 +586,12 @@ export namespace Components {
     /**
      * Loads the given scene into the viewer and return a `Promise` that resolves when the scene has been loaded. The specified scene is provided as a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      * @param urn The URN of the resource to load.
+     * @param cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
      */
-    load: (urn: string) => Promise<void>;
+    load: (
+      urn: string,
+      cameraType?: FrameCameraType | undefined
+    ) => Promise<void>;
     /**
      * The controller for accessing model views associated with the scene view.
      * @readonly

@@ -546,7 +546,7 @@ export class Viewer {
     }
 
     if (this.src != null) {
-      this.load(this.src).catch((e) => {
+      this.load(this.src, this.cameraType).catch((e) => {
         console.error('Error loading scene', e);
       });
     }
@@ -768,7 +768,7 @@ export class Viewer {
   @Watch('src')
   public handleSrcChanged(src: string | undefined): void {
     if (src != null) {
-      this.load(src);
+      this.load(src, this.cameraType);
     } else {
       this.unload();
     }
@@ -861,9 +861,10 @@ export class Viewer {
    *  * `urn:vertex:scene:<sceneid>`
    *
    * @param urn The URN of the resource to load.
+   * @param cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
    */
   @Method()
-  public async load(urn: string): Promise<void> {
+  public async load(urn: string, cameraType?: FrameCameraType): Promise<void> {
     if (this.stream != null && this.dimensions != null) {
       const { EXPERIMENTAL_annotationPollingIntervalInMs } =
         this.getResolvedConfig();
@@ -880,7 +881,8 @@ export class Viewer {
         urn,
         this.clientId,
         this.getDeviceId(),
-        this.getResolvedConfig()
+        this.getResolvedConfig(),
+        cameraType
       );
       this.sceneReady.emit();
 

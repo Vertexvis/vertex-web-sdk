@@ -44,11 +44,8 @@ import {
   Orientation,
   SynchronizedClock,
 } from '../types';
-import {
-  LoadCameraTypeQueryValue,
-  Resource,
-  SuppliedIdQueryValue,
-} from '../types/loadableResource';
+import { FrameCameraType } from '../types/frameCamera';
+import { Resource, SuppliedIdQueryValue } from '../types/loadableResource';
 import {
   Connected,
   Connecting,
@@ -152,22 +149,19 @@ export class ViewerStream extends StreamApi {
     urn: string,
     clientId: string | undefined,
     deviceId: string | undefined,
-    config: Config = parseConfig('platprod')
+    config: Config = parseConfig('platprod'),
+    cameraType?: FrameCameraType
   ): Promise<void> {
     this.clientId = clientId;
     this.deviceId = deviceId;
     this.config = config;
 
     if (this.state.type === 'disconnected') {
-      return this.loadIfDisconnected(urn);
+      return this.loadIfDisconnected(urn, cameraType);
     } else if (this.state.type === 'connection-failed') {
-      return this.loadIfDisconnected(urn);
-    } else if (this.state.type === 'reconnecting') {
-      return this.loadIfConnectingOrConnected(urn, this.state);
-    } else if (this.state.type === 'connecting') {
-      return this.loadIfConnectingOrConnected(urn, this.state);
+      return this.loadIfDisconnected(urn, cameraType);
     } else {
-      return this.loadIfConnectingOrConnected(urn, this.state);
+      return this.loadIfConnectingOrConnected(urn, this.state, cameraType);
     }
   }
 
@@ -212,7 +206,8 @@ export class ViewerStream extends StreamApi {
 
   private async loadIfConnectingOrConnected(
     urn: string,
-    state: Connected | Connecting | Reconnecting
+    state: Connected | Connecting | Reconnecting,
+    cameraType?: FrameCameraType
   ): Promise<void> {
     const { resource: pResource, subResource: pSubResource } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
@@ -237,9 +232,6 @@ export class ViewerStream extends StreamApi {
       const suppliedIdQuery = resource.queries.find(
         (q) => q.type === 'supplied-id'
       ) as SuppliedIdQueryValue | undefined;
-      const cameraTypeQuery = resource.queries.find(
-        (q) => q.type === 'load-camera-type'
-      ) as LoadCameraTypeQueryValue | undefined;
 
       const payload = {
         ...(resource.subResource.id != null
@@ -248,8 +240,8 @@ export class ViewerStream extends StreamApi {
         ...(suppliedIdQuery != null
           ? { sceneViewStateSuppliedId: { value: suppliedIdQuery.id } }
           : {}),
-        ...(cameraTypeQuery != null
-          ? { cameraType: toPbCameraTypeOrThrow(cameraTypeQuery.cameraType) }
+        ...(cameraType != null
+          ? { cameraType: toPbCameraTypeOrThrow(cameraType) }
           : {}),
       };
 
@@ -258,9 +250,15 @@ export class ViewerStream extends StreamApi {
     }
   }
 
-  private async loadIfDisconnected(urn: string): Promise<void> {
+  private async loadIfDisconnected(
+    urn: string,
+    cameraType?: FrameCameraType
+  ): Promise<void> {
     try {
-      await this.connectWithNewStream(LoadableResource.fromUrn(urn));
+      await this.connectWithNewStream(
+        LoadableResource.fromUrn(urn),
+        cameraType
+      );
     } catch (e) {
       if (e instanceof CustomError) {
         this.updateState({
@@ -286,9 +284,12 @@ export class ViewerStream extends StreamApi {
     }
   }
 
-  private connectWithNewStream(resource: Resource): Promise<void> {
+  private connectWithNewStream(
+    resource: Resource,
+    cameraType?: FrameCameraType
+  ): Promise<void> {
     return this.openWebsocketStream(resource, 'connecting', () =>
-      this.requestNewStream(resource)
+      this.requestNewStream(resource, cameraType)
     );
   }
 
@@ -433,13 +434,13 @@ export class ViewerStream extends StreamApi {
     });
   }
 
-  private async requestNewStream(resource: Resource): Promise<StreamResult> {
+  private async requestNewStream(
+    resource: Resource,
+    cameraType?: FrameCameraType
+  ): Promise<StreamResult> {
     const suppliedIdQuery = resource.queries.find(
       (q) => q.type === 'supplied-id'
     ) as SuppliedIdQueryValue | undefined;
-    const cameraTypeQuery = resource.queries.find(
-      (q) => q.type === 'load-camera-type'
-    ) as LoadCameraTypeQueryValue | undefined;
 
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
@@ -459,9 +460,7 @@ export class ViewerStream extends StreamApi {
             ? { value: suppliedIdQuery.id }
             : undefined,
         cameraType:
-          cameraTypeQuery != null
-            ? toPbCameraTypeOrThrow(cameraTypeQuery.cameraType)
-            : undefined,
+          cameraType != null ? toPbCameraTypeOrThrow(cameraType) : undefined,
       })
     );
 
