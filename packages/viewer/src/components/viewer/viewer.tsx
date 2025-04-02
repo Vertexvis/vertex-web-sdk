@@ -112,6 +112,10 @@ interface ConnectionFailedStatus {
   errorMessage: string;
 }
 
+export interface LoadOptions {
+  cameraType?: FrameCameraType;
+}
+
 /**
  * Internal state values for the component. Used to preserve values across live
  * reload refreshes.
@@ -546,7 +550,7 @@ export class Viewer {
     }
 
     if (this.src != null) {
-      this.load(this.src, this.cameraType).catch((e) => {
+      this.load(this.src, { cameraType: this.cameraType }).catch((e) => {
         console.error('Error loading scene', e);
       });
     }
@@ -768,7 +772,7 @@ export class Viewer {
   @Watch('src')
   public handleSrcChanged(src: string | undefined): void {
     if (src != null) {
-      this.load(src, this.cameraType);
+      this.load(src, { cameraType: this.cameraType });
     } else {
       this.unload();
     }
@@ -861,10 +865,11 @@ export class Viewer {
    *  * `urn:vertex:scene:<sceneid>`
    *
    * @param urn The URN of the resource to load.
-   * @param cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
+   * @param options Optional configurations when loading the scene.
+   *    cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
    */
   @Method()
-  public async load(urn: string, cameraType?: FrameCameraType): Promise<void> {
+  public async load(urn: string, options?: LoadOptions): Promise<void> {
     if (this.stream != null && this.dimensions != null) {
       const { EXPERIMENTAL_annotationPollingIntervalInMs } =
         this.getResolvedConfig();
@@ -882,7 +887,7 @@ export class Viewer {
         this.clientId,
         this.getDeviceId(),
         this.getResolvedConfig(),
-        cameraType
+        options?.cameraType
       );
       this.sceneReady.emit();
 
