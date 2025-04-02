@@ -416,7 +416,8 @@ describe('vertex-viewer', () => {
         expect.anything(),
         expect.anything(),
         deviceId,
-        expect.anything()
+        expect.anything(),
+        undefined
       );
     });
 
@@ -438,7 +439,8 @@ describe('vertex-viewer', () => {
         expect.anything(),
         expect.anything(),
         viewer.deviceId,
-        expect.anything()
+        expect.anything(),
+        undefined
       );
     });
   });
