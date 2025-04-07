@@ -406,6 +406,8 @@ export class SceneTreeController {
             console.error('Scene tree controller errored connecting.', e);
           });
         }
+      } else {
+        this.log('Scene tree controller was unable to find JWT.');
       }
     };
 
