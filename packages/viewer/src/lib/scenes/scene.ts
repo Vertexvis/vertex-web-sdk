@@ -3,8 +3,9 @@ import { BoundingBox, Dimensions, Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
+import { CameraType } from '../../interfaces';
 import { InvalidArgumentError, InvalidCameraError } from '../errors';
-import { FrameDecoder } from '../mappers';
+import { CameraTypeEncoder, FrameDecoder } from '../mappers';
 import { SceneViewStateIdentifier } from '../types';
 import { Frame } from '../types/frame';
 import {
@@ -61,10 +62,12 @@ export interface ApplySceneViewStateOptions
   extends SceneElementsExecutionOptions,
     CameraRenderOptions {
   waitForAnimation?: boolean;
+  cameraTypeOverride?: CameraType;
 }
 
 export interface ResetViewOptions {
   includeCamera?: boolean;
+  cameraTypeOverride?: CameraType;
   suppliedCorrelationId?: string;
 }
 
@@ -858,6 +861,7 @@ export class Scene {
     private stream: StreamApi,
     private frame: Frame,
     private decodeFrame: FrameDecoder,
+    private encodeCameraType: CameraTypeEncoder,
     private imageScaleProvider: ImageScaleProvider,
     private dimensions: Dimensions.Dimensions,
     public readonly sceneId: UUID.UUID,
@@ -866,6 +870,7 @@ export class Scene {
     this.sceneViewStateLoader = new SceneViewStateLoader(
       stream,
       decodeFrame,
+      encodeCameraType,
       sceneId,
       sceneViewId
     );
@@ -914,6 +919,9 @@ export class Scene {
         includeCamera: opts.includeCamera,
         frameCorrelationId: opts.suppliedCorrelationId
           ? { value: opts.suppliedCorrelationId }
+          : undefined,
+        cameraType: opts.cameraTypeOverride
+          ? this.encodeCameraType(opts.cameraTypeOverride)
           : undefined,
       },
       true

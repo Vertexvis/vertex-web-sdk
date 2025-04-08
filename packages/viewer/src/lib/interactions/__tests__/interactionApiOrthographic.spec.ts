@@ -14,9 +14,8 @@ import { StreamApi } from '@vertexvis/stream-api';
 import { random } from '../../../testing';
 import { makeOrthographicFrame } from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
-import { fromPbFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../mappers';
 import { OrthographicCamera, Scene } from '../../scenes';
-import * as ColorMaterial from '../../scenes/colorMaterial';
 import {
   DepthBuffer,
   FrameCamera,
@@ -40,15 +39,17 @@ describe(InteractionApiOrthographic, () => {
   const sceneViewId = random.guid();
   const frame = makeOrthographicFrame();
   const viewport = new Viewport(100, 100);
+  const cameraTypeMapper = toPbCameraTypeOrThrow();
+
   const scene = new Scene(
     streamApi,
     frame,
     fromPbFrameOrThrow(Orientation.DEFAULT),
+    cameraTypeMapper,
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
-    sceneViewId,
-    ColorMaterial.fromHex('#ffffff')
+    sceneViewId
   );
   const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = (): Scene => scene;

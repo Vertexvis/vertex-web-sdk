@@ -55,7 +55,7 @@ import { PointerInteractionHandler } from '../../lib/interactions/pointerInterac
 import { TapEventDetails } from '../../lib/interactions/tapEventDetails';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
 import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
-import { fromPbFrameOrThrow } from '../../lib/mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../lib/mappers';
 import { paintTime, Timing } from '../../lib/meters';
 import { ModelViewController } from '../../lib/model-views/controller';
 import { PmiController } from '../../lib/pmi';
@@ -110,6 +110,10 @@ interface DisconnectedStatus {
 interface ConnectionFailedStatus {
   status: 'connection-failed';
   errorMessage: string;
+}
+
+export interface LoadOptions {
+  cameraType?: FrameCameraType;
 }
 
 /**
@@ -546,7 +550,7 @@ export class Viewer {
     }
 
     if (this.src != null) {
-      this.load(this.src).catch((e) => {
+      this.load(this.src, { cameraType: this.cameraType }).catch((e) => {
         console.error('Error loading scene', e);
       });
     }
@@ -768,7 +772,7 @@ export class Viewer {
   @Watch('src')
   public handleSrcChanged(src: string | undefined): void {
     if (src != null) {
-      this.load(src);
+      this.load(src, { cameraType: this.cameraType });
     } else {
       this.unload();
     }
@@ -861,9 +865,11 @@ export class Viewer {
    *  * `urn:vertex:scene:<sceneid>`
    *
    * @param urn The URN of the resource to load.
+   * @param options Optional configurations when loading the scene.
+   *    cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
    */
   @Method()
-  public async load(urn: string): Promise<void> {
+  public async load(urn: string, options?: LoadOptions): Promise<void> {
     if (this.stream != null && this.dimensions != null) {
       const { EXPERIMENTAL_annotationPollingIntervalInMs } =
         this.getResolvedConfig();
@@ -880,7 +886,8 @@ export class Viewer {
         urn,
         this.clientId,
         this.getDeviceId(),
-        this.getResolvedConfig()
+        this.getResolvedConfig(),
+        options?.cameraType
       );
       this.sceneReady.emit();
 
@@ -1412,12 +1419,15 @@ export class Viewer {
   private async createScene(): Promise<Scene> {
     const state = await this.waitForConnectedState();
 
+    const cameraTypeMapper = toPbCameraTypeOrThrow();
+
     const { frame, sceneId, sceneViewId, worldOrientation } = state;
 
     return new Scene(
       this.getStream(),
       frame,
       fromPbFrameOrThrow(worldOrientation),
+      cameraTypeMapper,
       () => this.getImageScale(),
       this.viewport,
       sceneId,

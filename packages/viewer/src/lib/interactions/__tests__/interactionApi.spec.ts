@@ -12,7 +12,7 @@ import {
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
 import { CursorManager } from '../../cursors';
-import { fromPbFrameOrThrow } from '../../mappers';
+import { fromPbFrameOrThrow, toPbCameraTypeOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
 import { Interactions, Orientation, Viewport } from '../../types';
 import { Frame } from '../../types/frame';
@@ -36,10 +36,13 @@ describe(InteractionApi, () => {
   const sceneId = random.guid();
   const sceneViewId = random.guid();
   const frame = makePerspectiveFrame();
+  const cameraTypeMapper = toPbCameraTypeOrThrow();
+
   const scene = new Scene(
     streamApi,
     frame,
     fromPbFrameOrThrow(Orientation.DEFAULT),
+    cameraTypeMapper,
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
@@ -272,6 +275,7 @@ describe(InteractionApi, () => {
             streamApi,
             closeFrameX,
             fromPbFrameOrThrow(Orientation.DEFAULT),
+            cameraTypeMapper,
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
@@ -294,6 +298,7 @@ describe(InteractionApi, () => {
             streamApi,
             closeFrameY,
             fromPbFrameOrThrow(Orientation.DEFAULT),
+            cameraTypeMapper,
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
@@ -316,6 +321,7 @@ describe(InteractionApi, () => {
             streamApi,
             closeFrameZ,
             fromPbFrameOrThrow(Orientation.DEFAULT),
+            cameraTypeMapper,
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
