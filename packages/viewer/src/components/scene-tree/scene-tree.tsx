@@ -656,6 +656,13 @@ export class SceneTree {
   /**
    * @ignore
    */
+  protected connectedCallback(): void {
+    this.connectToViewer();
+  }
+
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     if (this.controller == null) {
       const { sceneTreeHost } = this.getConfig().network;
