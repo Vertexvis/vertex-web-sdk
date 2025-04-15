@@ -19,7 +19,13 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
-import { Config, parseConfig, PartialConfig } from '../../lib/config';
+import {
+  Config,
+  parseAndValidateConfig,
+  PartialConfig,
+  sanitizeConfig,
+  validateConfig,
+} from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
@@ -972,7 +978,9 @@ export class SceneTree {
   }
 
   private getConfig(): Config {
-    return parseConfig(this.configEnv, this.config);
+    const parsedConfig = parseAndValidateConfig(this.configEnv, this.config);
+
+    return validateConfig(sanitizeConfig(parsedConfig));
   }
 
   private ensureLayoutDefined(): void {

@@ -30,7 +30,11 @@ import {
   AnnotationController,
   AnnotationState,
 } from '../../lib/annotations/controller';
-import { Config, parseConfig, PartialConfig } from '../../lib/config';
+import {
+  Config,
+  parseAndValidateConfig,
+  PartialConfig,
+} from '../../lib/config';
 import { Cursor, CursorManager } from '../../lib/cursors';
 import { cssCursor } from '../../lib/dom';
 import { Environment } from '../../lib/environment';
@@ -878,7 +882,7 @@ export class Viewer {
 
       this.stream.update({
         streamAttributes: this.getStreamAttributes(),
-        config: parseConfig(this.configEnv, this.config),
+        config: parseAndValidateConfig(this.configEnv, this.config),
         dimensions: this.dimensions,
         frameBgColor: this.getBackgroundColor(),
       });
@@ -1570,7 +1574,7 @@ export class Viewer {
   }
 
   private updateResolvedConfig(): void {
-    this.resolvedConfig = parseConfig(this.configEnv, this.config);
+    this.resolvedConfig = parseAndValidateConfig(this.configEnv, this.config);
   }
 
   private getResolvedConfig(): Config {

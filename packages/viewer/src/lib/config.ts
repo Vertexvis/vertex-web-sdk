@@ -84,6 +84,15 @@ function getEnvironmentConfig(environment: Environment): Config {
   }
 }
 
+export function parseAndValidateConfig(
+  environment: Environment = 'platprod',
+  config?: string | PartialConfig
+): Config {
+  const parsed = parseConfig(environment, config);
+
+  return validateConfig(sanitizeConfig(parsed));
+}
+
 export function parseConfig(
   environment: Environment = 'platprod',
   config?: string | PartialConfig
@@ -98,5 +107,44 @@ export function parseConfig(
     return envConfig;
   } else {
     return Objects.defaults({ ...config }, envConfig);
+  }
+}
+
+export function sanitizeConfig(config: Config): Config {
+  const sanitizedApiHost = config.network.apiHost.trim();
+  const sanitizedRenderingHost = config.network.renderingHost.trim();
+  const sanitizedSceneTreeHost = config.network.sceneTreeHost.trim();
+  const sanitizedSceneViewHost = config.network.sceneViewHost.trim();
+
+  return {
+    ...config,
+    network: {
+      ...config.network,
+      apiHost: sanitizedApiHost,
+      renderingHost: sanitizedRenderingHost,
+      sceneTreeHost: sanitizedSceneTreeHost,
+      sceneViewHost: sanitizedSceneViewHost,
+    },
+  };
+}
+
+export function validateConfig(config: Config): Config {
+  validateUrlScheme(config.network, 'apiHost', 'https://');
+  validateUrlScheme(config.network, 'renderingHost', 'wss://');
+  validateUrlScheme(config.network, 'sceneTreeHost', 'https://');
+  validateUrlScheme(config.network, 'sceneViewHost', 'https://');
+
+  return config;
+}
+
+function validateUrlScheme(
+  networkConfig: NetworkConfig,
+  field: keyof NetworkConfig,
+  expectedScheme: string
+): void {
+  if (!networkConfig[field].startsWith(expectedScheme)) {
+    throw new Error(
+      `Invalid ${field} specified. The URL must start with the ${expectedScheme} scheme.`
+    );
   }
 }
