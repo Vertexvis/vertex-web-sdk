@@ -56,7 +56,9 @@ describe(Config.parseAndValidateConfig, () => {
       )
     ).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid apiHost specified.'),
+        message: expect.stringContaining(
+          `Invalid apiHost "${invalidApiHost}" specified.`
+        ),
       })
     );
     expect(() =>
@@ -66,7 +68,9 @@ describe(Config.parseAndValidateConfig, () => {
       )
     ).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid renderingHost specified.'),
+        message: expect.stringContaining(
+          `Invalid renderingHost "${invalidRenderingHost}" specified.`
+        ),
       })
     );
     expect(() =>
@@ -76,7 +80,9 @@ describe(Config.parseAndValidateConfig, () => {
       )
     ).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid sceneTreeHost specified.'),
+        message: expect.stringContaining(
+          `Invalid sceneTreeHost "${invalidSceneTreeHost}" specified.`
+        ),
       })
     );
     expect(() =>
@@ -86,7 +92,9 @@ describe(Config.parseAndValidateConfig, () => {
       )
     ).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid sceneViewHost specified.'),
+        message: expect.stringContaining(
+          `Invalid sceneViewHost "${invalidSceneViewHost}" specified.`
+        ),
       })
     );
   });
@@ -171,51 +179,61 @@ describe(Config.sanitizeConfig, () => {
 
 describe(Config.validateConfig, () => {
   it('should throw an error for an invalid api host', () => {
+    const invalidHost = `http://invalid-host.vertex3d.com`;
     const json = JSON.stringify({
       network: {
-        apiHost: `http://invalid-host.vertex3d.com`,
+        apiHost: invalidHost,
       },
     });
     const config = Config.parseConfig('platdev', json);
 
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid apiHost specified.'),
+        message: expect.stringContaining(
+          `Invalid apiHost "${invalidHost}" specified.`
+        ),
       })
     );
   });
 
   it('should throw an error for an invalid rendering host', () => {
+    const invalidHost = `https://invalid-host.vertex3d.com`;
     const json = JSON.stringify({
       network: {
-        renderingHost: `https://invalid-host.vertex3d.com`,
+        renderingHost: invalidHost,
       },
     });
     const config = Config.parseConfig('platdev', json);
 
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid renderingHost specified.'),
+        message: expect.stringContaining(
+          `Invalid renderingHost "${invalidHost}" specified.`
+        ),
       })
     );
   });
 
   it('should throw an error for an invalid scene tree host', () => {
+    const invalidHost = `invalid-host.vertex3d.com`;
     const json = JSON.stringify({
       network: {
-        sceneTreeHost: `invalid-host.vertex3d.com`,
+        sceneTreeHost: invalidHost,
       },
     });
     const config = Config.parseConfig('platdev', json);
 
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid sceneTreeHost specified.'),
+        message: expect.stringContaining(
+          `Invalid sceneTreeHost "${invalidHost}" specified.`
+        ),
       })
     );
   });
 
   it('should throw an error for an invalid scene view host', () => {
+    const invalidHost = `https:/invalid-host.vertex3d.com`;
     const json = JSON.stringify({
       network: {
         sceneViewHost: `https:/invalid-host.vertex3d.com`,
@@ -225,7 +243,9 @@ describe(Config.validateConfig, () => {
 
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining('Invalid sceneViewHost specified.'),
+        message: expect.stringContaining(
+          `Invalid sceneViewHost "${invalidHost}" specified.`
+        ),
       })
     );
   });

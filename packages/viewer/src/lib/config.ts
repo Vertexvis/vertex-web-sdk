@@ -144,7 +144,7 @@ function validateUrlScheme(
 ): void {
   if (!networkConfig[field].startsWith(expectedScheme)) {
     throw new Error(
-      `Invalid ${field} specified. The URL must start with the ${expectedScheme} scheme.`
+      `Invalid ${field} "${networkConfig[field]}" specified. The URL must start with the ${expectedScheme} scheme.`
     );
   }
 }
