@@ -3,7 +3,7 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
-import { parseConfig, PartialConfig } from '../../lib/config';
+import { parseAndValidateConfig, PartialConfig } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import {
   MeasurementController,
@@ -143,7 +143,7 @@ export class ViewerMeasurementPrecise {
   }
 
   private setupController(): void {
-    const config = parseConfig(this.configEnv, this.config);
+    const config = parseAndValidateConfig(this.configEnv, this.config);
     const client = new SceneViewAPIClient(config.network.sceneViewHost);
     this.measurementController = new MeasurementController(
       this.measurementModel,

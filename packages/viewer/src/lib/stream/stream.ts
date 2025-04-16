@@ -20,7 +20,7 @@ import {
 import deepEqual from 'fast-deep-equal';
 
 import { Color3, StreamAttributes } from '../../interfaces';
-import { Config, parseConfig } from '../config';
+import { Config, parseAndValidateConfig } from '../config';
 import {
   CustomError,
   SceneRenderError,
@@ -120,7 +120,7 @@ export class ViewerStream extends StreamApi {
     this.streamAttributes = {};
     this.enableTemporalRefinement = opts.enableTemporalRefinement ?? true;
     this.frameBgColor = Color.create(255, 255, 255);
-    this.config = parseConfig('platprod');
+    this.config = parseAndValidateConfig('platprod');
 
     this.options = {
       tokenRefreshOffsetInSeconds: opts.tokenRefreshOffsetInSeconds ?? 30,
@@ -149,7 +149,7 @@ export class ViewerStream extends StreamApi {
     urn: string,
     clientId: string | undefined,
     deviceId: string | undefined,
-    config: Config = parseConfig('platprod'),
+    config: Config = parseAndValidateConfig('platprod'),
     cameraType?: FrameCameraType
   ): Promise<void> {
     this.clientId = clientId;
