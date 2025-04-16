@@ -23,8 +23,6 @@ import {
   Config,
   parseAndValidateConfig,
   PartialConfig,
-  sanitizeConfig,
-  validateConfig,
 } from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
@@ -978,9 +976,7 @@ export class SceneTree {
   }
 
   private getConfig(): Config {
-    const parsedConfig = parseAndValidateConfig(this.configEnv, this.config);
-
-    return validateConfig(sanitizeConfig(parsedConfig));
+    return parseAndValidateConfig(this.configEnv, this.config);
   }
 
   private ensureLayoutDefined(): void {
