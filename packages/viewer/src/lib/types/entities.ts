@@ -6,7 +6,7 @@
  */
 export enum EntityType {
   /**
-   * A value that represents the presence of a cross section.
+   * A value that represents the presence of a cross-section.
    */
   CROSS_SECTION = 0xff, // == 255
 
@@ -26,7 +26,7 @@ export enum EntityType {
   IMPRECISE_EDGE = 0xa0, // == 160
 
   /**
-   * A value that represents the presence of an surface without BREP.
+   * A value that represents the presence of a surface without BREP.
    */
   IMPRECISE_SURFACE = 0x80, // == 128
 
