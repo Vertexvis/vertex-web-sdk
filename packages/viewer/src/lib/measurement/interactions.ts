@@ -94,7 +94,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     this.ifInitialized(async ({ api }) => {
       const pt = getMouseClientPosition(event, this.elementRect);
       const [hit] = await api.hitItems(pt);
-      const entity = MeasurementEntity.fromHit(hit);
+      const entity = hit != null ? MeasurementEntity.fromHit(hit) : undefined;
 
       if (entity != null) {
         await this.controller.addEntity(entity);
