@@ -347,11 +347,11 @@ export class ViewerMeasurementDistance {
   /**
    * @ignore
    */
-  protected componentWillLoad(): void {
+  protected async componentWillLoad(): Promise<void> {
     this.updatePropsFromJson();
     this.model.setMeasurementFromValues(this.start, this.end, !this.invalid);
 
-    this.getStencilBuffer();
+    await this.getStencilBuffer();
     this.updateViewport();
 
     this.handleViewerChanged(this.viewer);
@@ -656,12 +656,12 @@ export class ViewerMeasurementDistance {
   };
 
   private updateStartAnchor = async (event: PointerEvent): Promise<void> => {
-    this.getStencilBuffer();
+    await this.getStencilBuffer();
 
     if (this.interactionCount === 0) {
       const pt = getMouseClientPosition(event, this.elementBounds);
       const snapPt = this.snapPoint(pt, event);
-      this.updateIndicator(snapPt);
+      await this.updateIndicator(snapPt);
     }
   };
 
@@ -694,7 +694,10 @@ export class ViewerMeasurementDistance {
         let downPt: Point.Point = Point.create(0, 0);
 
         const pointerMove = (event: PointerEvent): void => {
-          const dist = Point.distance(downPt, getMouseClientPosition(event));
+          const dist = Point.distance(
+            downPt,
+            getMouseClientPosition(event, this.elementBounds)
+          );
           if (dist >= INTERACTION_THRESHOLD) {
             callback();
           }
@@ -708,7 +711,7 @@ export class ViewerMeasurementDistance {
         const pointerUp = (): void => dispose();
 
         const pointerDown = (event: PointerEvent): void => {
-          downPt = getMouseClientPosition(event);
+          downPt = getMouseClientPosition(event, this.elementBounds);
           window.addEventListener('pointermove', pointerMove);
           window.addEventListener('pointerup', pointerUp);
         };
@@ -775,7 +778,7 @@ export class ViewerMeasurementDistance {
 
   private handleEditAnchor(
     anchor: Anchor
-  ): ((event: PointerEvent) => void) | undefined {
+  ): ((event: PointerEvent) => Promise<void>) | undefined {
     if (this.mode === 'edit' || this.mode === 'replace') {
       const handlePointerMove = this.createInteractionMoveHandler();
       const handlePointerUp = async (event: PointerEvent): Promise<void> => {
@@ -793,8 +796,8 @@ export class ViewerMeasurementDistance {
         }
       };
 
-      return (event) => {
-        this.getStencilBuffer();
+      return async (event) => {
+        await this.getStencilBuffer();
 
         if (event.button === 0) {
           this.beginEditing('edit', anchor);
@@ -808,12 +811,14 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private createInteractionMoveHandler(): (event: PointerEvent) => void {
-    return (event) => {
+  private createInteractionMoveHandler(): (
+    event: PointerEvent
+  ) => Promise<void> {
+    return async (event) => {
       const hits = this.getHitProvider();
       if (this.elementBounds != null && hits != null) {
         event.preventDefault();
-        this.getStencilBuffer();
+        await this.getStencilBuffer();
 
         const pt = getMouseClientPosition(event, this.elementBounds);
         const snapPt = this.snapPoint(pt, event);
@@ -922,14 +927,15 @@ export class ViewerMeasurementDistance {
     this.invalid = measurement != null && !measurement.valid;
   }
 
-  private updateIndicator(pt: Point.Point): void {
+  private async updateIndicator(pt: Point.Point): Promise<void> {
     const hits = this.getHitProvider();
     const clearCursor =
       hits == null || !this.controller.moveIndicator(pt, hits);
+
     if (clearCursor) {
       this.stateMap.hoverCursor?.dispose();
     } else {
-      this.setCursor(measurementCursor);
+      await this.setCursor(measurementCursor);
     }
   }
 

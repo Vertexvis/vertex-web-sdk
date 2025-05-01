@@ -77,7 +77,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
       if (await this.isMeasurableEntityUnderPointer(event)) {
         this.measureEntityUnderPointer(event);
       } else {
-        this.controller.clearEntities();
+        await this.controller.clearEntities();
       }
     });
   };
@@ -94,11 +94,12 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     this.ifInitialized(async ({ api }) => {
       const pt = getMouseClientPosition(event, this.elementRect);
       const [hit] = await api.hitItems(pt);
+      const entity = hit != null ? MeasurementEntity.fromHit(hit) : undefined;
 
-      if (hit != null) {
-        this.controller.addEntity(MeasurementEntity.fromHit(hit));
+      if (entity != null) {
+        await this.controller.addEntity(entity);
       } else {
-        this.controller.clearEntities();
+        await this.controller.clearEntities();
       }
     });
   }

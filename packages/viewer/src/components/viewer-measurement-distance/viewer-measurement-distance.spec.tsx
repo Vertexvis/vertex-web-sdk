@@ -498,6 +498,8 @@ describe('vertex-viewer-measurement-distance', () => {
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
 
+      await page.waitForChanges();
+
       expect(onEditBegin).toHaveBeenCalled();
     });
 
@@ -522,6 +524,7 @@ describe('vertex-viewer-measurement-distance', () => {
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
+      await page.waitForChanges();
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
@@ -560,6 +563,9 @@ describe('vertex-viewer-measurement-distance', () => {
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
+
+      await page.waitForChanges();
+
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 })
       );
@@ -591,6 +597,8 @@ describe('vertex-viewer-measurement-distance', () => {
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 })
       );
+      await page.waitForChanges();
+
       window.dispatchEvent(new MouseEvent('pointerup'));
 
       await page.waitForChanges();
