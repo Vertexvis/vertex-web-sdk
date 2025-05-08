@@ -666,6 +666,10 @@ export namespace Components {
       keyInteraction: KeyInteraction<TapEventDetails>
     ) => Promise<void>;
     /**
+     * Disconnects the websocket and clears the internal state associated with the scene before reconnecting to the same scene.
+     */
+    reload: () => Promise<void>;
+    /**
      * An optional value that will debounce frame updates when resizing this viewer element.
      */
     resizeDebounce: number;
