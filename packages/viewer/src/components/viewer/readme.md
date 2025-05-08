@@ -158,6 +158,17 @@ Type: `Promise<void>`
 
 
 
+### `reload() => Promise<void>`
+
+Disconnects the websocket and clears the internal state associated with
+the scene before reconnecting to the same scene.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `scene() => Promise<Scene>`
 
 Returns an object that is used to perform operations on the `Scene` that's

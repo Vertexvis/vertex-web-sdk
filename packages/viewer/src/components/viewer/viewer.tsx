@@ -933,6 +933,18 @@ export class Viewer {
   }
 
   /**
+   * Disconnects the websocket and clears the internal state associated with
+   * the scene before reconnecting to the same scene.
+   */
+  @Method()
+  public async reload(): Promise<void> {
+    if (this.src != null) {
+      await this.unload();
+      await this.load(this.src, { cameraType: this.cameraType });
+    }
+  }
+
+  /**
    * Returns an object that is used to perform operations on the `Scene` that's
    * currently being viewed. These operations include updating items,
    * positioning the camera and performing hit tests.
@@ -1440,7 +1452,7 @@ export class Viewer {
   }
 
   /**
-   * This function is currently not in use, but will required
+   * This function is currently not in use, but will be required
    * when we want to automatically configure the background color of
    * JPEG images.
    */

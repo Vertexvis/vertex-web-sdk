@@ -47,6 +47,7 @@ export {
   EntityType,
   FrameCameraBase,
   LoadableResource,
+  Orientation,
   Frame as ReceivedFrame,
   FrameImage as ReceivedFrameImage,
   FrameScene as ReceivedFrameScene,
