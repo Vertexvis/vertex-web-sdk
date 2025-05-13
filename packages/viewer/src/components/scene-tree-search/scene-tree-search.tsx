@@ -82,7 +82,7 @@ export class SceneTreeSearch {
   private searchDisposable?: Disposable;
 
   /**
-   * Gives focus to the the component's internal text input.
+   * Gives focus to the component's internal text input.
    */
   @Method()
   public async setFocus(): Promise<void> {
@@ -120,9 +120,10 @@ export class SceneTreeSearch {
    * Clears the current search term and clears any debounced filters.
    */
   @Method()
-  public async clear(): Promise<void> {
+  public clear(): void {
     this.value = '';
     this.searchDisposable?.dispose();
+    this.emitCurrentValue();
   }
 
   /**

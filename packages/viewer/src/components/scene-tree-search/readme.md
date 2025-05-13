@@ -48,7 +48,7 @@ Type: `Promise<void>`
 
 ### `setFocus() => Promise<void>`
 
-Gives focus to the the component's internal text input.
+Gives focus to the component's internal text input.
 
 #### Returns
 
