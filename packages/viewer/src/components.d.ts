@@ -337,7 +337,7 @@ export namespace Components {
      */
     placeholder?: string;
     /**
-     * Gives focus to the the component's internal text input.
+     * Gives focus to the component's internal text input.
      */
     setFocus: () => Promise<void>;
     /**
