@@ -2,7 +2,6 @@
  * Copyright (c) 2025 Vertex Software LLC. All rights reserved.
  */
 import { lerp as lerpNumber } from './math';
-
 /**
  * Returns a new `Point` with the given horizontal and vertical position.
  */
@@ -96,7 +95,8 @@ export function normalizeVector(pt) {
   const magnitudeOfPoint = magnitude(pt);
   if (magnitudeOfPoint === 0) {
     return create(0, 0);
-  } else {
+  }
+  else {
     return scaleProportional(pt, 1 / magnitudeOfPoint);
   }
 }
@@ -115,16 +115,13 @@ export function orthogonalVector(ptA, ptB) {
   if (unitVectorBetweenPoints.x === 0 || unitVectorBetweenPoints.y === 0) {
     return create(-1 * unitVectorBetweenPoints.y, unitVectorBetweenPoints.x);
   }
-  if (
-    Math.abs(unitVectorBetweenPoints.x) > Math.abs(unitVectorBetweenPoints.y)
-  ) {
+  if (Math.abs(unitVectorBetweenPoints.x) > Math.abs(unitVectorBetweenPoints.y)) {
     const vectorXValue = 1 - Math.pow(unitVectorBetweenPoints.x, 2);
-    const vectorYValue =
-      -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
+    const vectorYValue = -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
     return normalizeVector(create(vectorXValue, vectorYValue));
-  } else {
-    const vectorXValue =
-      -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
+  }
+  else {
+    const vectorXValue = -1 * unitVectorBetweenPoints.x * unitVectorBetweenPoints.y;
     const vectorYValue = 1 - Math.pow(unitVectorBetweenPoints.y, 2);
     return normalizeVector(create(vectorXValue, vectorYValue));
   }
@@ -140,7 +137,8 @@ export function fromJson(json) {
   if (Array.isArray(obj)) {
     const [x, y] = obj;
     return create(x, y);
-  } else {
+  }
+  else {
     const { x, y } = obj;
     return create(x, y);
   }

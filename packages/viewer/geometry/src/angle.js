@@ -2,7 +2,6 @@
  * Copyright (c) 2025 Vertex Software LLC. All rights reserved.
  */
 import * as Point from './point';
-
 /**
  * Returns an `Angle` between two points, in radians.
  *
