@@ -68,6 +68,7 @@ import {
   createCanvasRenderer,
   measureCanvasRenderer,
 } from '../../lib/rendering';
+import { SceneItemController } from '../../lib/scene-items/controller';
 import { Scene } from '../../lib/scenes/scene';
 import { writeDOM } from '../../lib/stencil';
 import {
@@ -365,6 +366,15 @@ export class Viewer {
   @Prop({ mutable: true }) public pmi: PmiController | undefined;
 
   /**
+   * The controller for accessing and viewing SceneItems.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true }) public sceneItemController:
+    | SceneItemController
+    | undefined;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -534,6 +544,12 @@ export class Viewer {
     );
 
     this.pmi = new PmiController(
+      client,
+      () => this.token,
+      () => this.deviceId
+    );
+
+    this.sceneItemController = new SceneItemController(
       client,
       () => this.token,
       () => this.deviceId
