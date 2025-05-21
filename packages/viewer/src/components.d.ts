@@ -347,6 +347,10 @@ export namespace Components {
   }
   interface VertexSceneTreeTableCell {
     /**
+     * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
+     */
+    alwaysShowIcons: boolean;
+    /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
@@ -2221,6 +2225,10 @@ declare namespace LocalJSX {
     value?: string;
   }
   interface VertexSceneTreeTableCell {
+    /**
+     * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
+     */
+    alwaysShowIcons?: boolean;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
