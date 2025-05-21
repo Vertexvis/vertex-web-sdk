@@ -52,7 +52,7 @@
     "@vertexvis/geometry": "0.23.4",
     "@vertexvis/html-templates": "0.23.4",
     "@vertexvis/scene-tree-protos": "^0.1.21",
-    "@vertexvis/scene-view-protos": "^0.5.0",
+    "@vertexvis/scene-view-protos": "^0.7.0",
     "@vertexvis/stream-api": "0.23.4",
     "@vertexvis/utils": "0.23.4",
     "@vertexvis/web-workers": "^0.1.0",
