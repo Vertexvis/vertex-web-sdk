@@ -211,7 +211,7 @@ export namespace Components {
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
-     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise the search will only be performed against the item name.
+     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
      */
     metadataKeys: MetadataKey[];
     /**
@@ -2132,7 +2132,7 @@ declare namespace LocalJSX {
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
-     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise the search will only be performed against the item name.
+     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
      */
     metadataKeys?: MetadataKey[];
     /**
