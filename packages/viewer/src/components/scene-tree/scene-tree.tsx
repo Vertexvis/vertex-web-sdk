@@ -197,7 +197,7 @@ export class SceneTree {
    *
    * **Note:** for the values of these metadata keys to be evaluated for search,
    * they must be provided to the `metadataSearchKeys` specified in the `searchOptions`.
-   * Otherwise the search will only be performed against the item name.
+   * Otherwise, the search will only be performed against the item name.
    */
   @Prop()
   public metadataKeys: MetadataKey[] = [];
@@ -286,7 +286,7 @@ export class SceneTree {
 
     const top = this.getScrollToPosition(i, position);
 
-    this.getLayoutElement().scrollToPosition(top, {
+    await this.getLayoutElement().scrollToPosition(top, {
       behavior: animate ? 'smooth' : undefined,
     });
   }

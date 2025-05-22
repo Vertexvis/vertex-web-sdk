@@ -139,6 +139,7 @@
   box-sizing: border-box;
   justify-content: center;
   background-color: white;
+  z-index: 3000;
 }
 
 .error-section {
