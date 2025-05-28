@@ -59,6 +59,13 @@
    */
   --scene-tree-row-background-color-depth-n: unset;
 
+
+  /**
+  * @prop --scene-tree-overlay-z-index: A CSS z-index value that will
+  * set the z-index of the tree overlays. Defaults to 3000.
+  */
+  --scene-tree-overlay-z-index: 3000;
+
   width: 300px;
   height: 100%;
   user-select: none;
@@ -139,6 +146,7 @@
   box-sizing: border-box;
   justify-content: center;
   background-color: white;
+  z-index: var(--scene-tree-overlay-z-index);
 }
 
 .error-section {

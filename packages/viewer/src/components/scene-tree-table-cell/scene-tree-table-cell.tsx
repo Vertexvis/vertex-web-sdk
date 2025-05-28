@@ -55,6 +55,13 @@ export class SceneTreeTableCell {
   public placeholder = '--';
 
   /**
+   * Whether to always show the requested icons in the cell. If false,
+   * the icons will only appear when hovering over the cell.
+   */
+  @Prop()
+  public alwaysShowIcons = false;
+
+  /**
    * @internal
    */
   @Prop({ mutable: true })
@@ -464,7 +471,7 @@ export class SceneTreeTableCell {
   }
 
   private getIsolateIcon(): ViewerIconName | undefined {
-    if (this.hovered) {
+    if (this.hovered || this.alwaysShowIcons) {
       return 'locate';
     }
     return undefined;
@@ -478,7 +485,11 @@ export class SceneTreeTableCell {
   }
 
   private getVisibilityIcon(): ViewerIconName | undefined {
-    if (this.hovered && !this.node?.partiallyVisible && this.node?.visible) {
+    if (
+      (this.hovered || this.alwaysShowIcons) &&
+      !this.node?.partiallyVisible &&
+      this.node?.visible
+    ) {
       return 'eye-open';
     } else if (!this.node?.partiallyVisible && !this.node?.visible) {
       return 'eye-half';
