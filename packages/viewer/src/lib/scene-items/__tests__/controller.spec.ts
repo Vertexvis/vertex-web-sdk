@@ -6,13 +6,8 @@ import { UUID } from '@vertexvis/utils';
 import { mockGrpcUnaryResult } from '../../../testing';
 import { random } from '../../../testing/random';
 import { SceneItemController } from '../controller';
-import {
-  ListSceneItemMetadataResponseBuilder,
-  PropertyEntryBuilder,
-  PropertyKeyBuilder,
-  PropertyValueBuilder,
-} from '../helper';
 import { mapListSceneItemMetadataResponseOrThrow } from '../mapper';
+import { ListSceneItemMetadataResponseBuilder, PropertyEntryBuilder, PropertyKeyBuilder, PropertyValueBuilder } from '../../../testing/scene-items-helper';
 
 function buildListSceneItemMetadataResponse(): ListSceneItemMetadataResponse {
   return new ListSceneItemMetadataResponseBuilder()

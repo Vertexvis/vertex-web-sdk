@@ -370,7 +370,7 @@ export class Viewer {
    *
    * @readonly
    */
-  @Prop({ mutable: true }) public sceneItemController:
+  @Prop({ mutable: true }) public sceneItems:
     | SceneItemController
     | undefined;
 
@@ -549,7 +549,7 @@ export class Viewer {
       () => this.deviceId
     );
 
-    this.sceneItemController = new SceneItemController(
+    this.sceneItems = new SceneItemController(
       client,
       () => this.token,
       () => this.deviceId
