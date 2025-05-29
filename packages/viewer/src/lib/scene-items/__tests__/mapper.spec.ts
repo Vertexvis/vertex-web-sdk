@@ -2,14 +2,9 @@ import { PropertyCategory } from '@vertexvis/scene-view-protos/sceneview/protos/
 import { ListSceneItemMetadataResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
-import { SceneItemMetadataResponse } from '../controller';
-import {
-  ListSceneItemMetadataResponseBuilder,
-  PropertyEntryBuilder,
-  PropertyKeyBuilder,
-  PropertyValueBuilder,
-} from '../helper';
 import { mapListSceneItemMetadataResponseOrThrow } from '../mapper';
+import { ListSceneItemMetadataResponseBuilder, PropertyEntryBuilder, PropertyKeyBuilder, PropertyValueBuilder } from '../../../testing/scene-items-helper';
+import { SceneItemMetadataResponse } from '../types';
 
 const CURSOR_VALUE = 'next';
 const UNDEFINED_CURSOR = '';
