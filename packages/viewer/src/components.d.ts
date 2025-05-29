@@ -212,7 +212,7 @@ export namespace Components {
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
-     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise the search will only be performed against the item name.
+     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
      */
     metadataKeys: MetadataKey[];
     /**
@@ -347,6 +347,10 @@ export namespace Components {
     value: string;
   }
   interface VertexSceneTreeTableCell {
+    /**
+     * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
+     */
+    alwaysShowIcons: boolean;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
@@ -2134,7 +2138,7 @@ declare namespace LocalJSX {
     /**
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
-     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise the search will only be performed against the item name.
+     * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
      */
     metadataKeys?: MetadataKey[];
     /**
@@ -2227,6 +2231,10 @@ declare namespace LocalJSX {
     value?: string;
   }
   interface VertexSceneTreeTableCell {
+    /**
+     * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
+     */
+    alwaysShowIcons?: boolean;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
