@@ -1,6 +1,7 @@
-import { PropertyCategoryMap } from "@vertexvis/scene-view-protos/sceneview/protos/domain_pb";
-import { PagingLinks } from "../types";
-import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
+import { PropertyCategoryMap } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+
+import { PagingLinks } from '../types';
 
 export interface DomainPropertyKey {
   name: string;

@@ -370,9 +370,7 @@ export class Viewer {
    *
    * @readonly
    */
-  @Prop({ mutable: true }) public sceneItems:
-    | SceneItemController
-    | undefined;
+  @Prop({ mutable: true }) public sceneItems: SceneItemController | undefined;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.

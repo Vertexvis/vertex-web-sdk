@@ -9,9 +9,10 @@ import { UUID } from '@vertexvis/utils';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
 import { mapListSceneItemMetadataResponseOrThrow } from './mapper';
-import { ListSceneItemMetadataOptions, SceneItemMetadataResponse } from './types';
-
-
+import {
+  ListSceneItemMetadataOptions,
+  SceneItemMetadataResponse,
+} from './types';
 
 export class SceneItemController {
   public constructor(
