@@ -12,11 +12,10 @@ import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { mapCursor } from '../mappers';
 import {
-  DomainPropertyEntry,
   DomainPropertyKey,
   DomainPropertyValue,
   SceneItemMetadataResponse,
-} from './controller';
+} from './types';
 
 const mapPropertyKey: M.Func<
   PropertyKey.AsObject,
