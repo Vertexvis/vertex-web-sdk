@@ -16,6 +16,7 @@ import * as Quaternion from './quaternion';
 import * as Ray from './ray';
 import * as Rectangle from './rectangle';
 import * as Vector3 from './vector3';
+import * as Vector4 from './vector4';
 
 export * from './math';
 
@@ -35,4 +36,5 @@ export {
   Ray,
   Rectangle,
   Vector3,
+  Vector4,
 };
