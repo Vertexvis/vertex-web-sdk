@@ -55,6 +55,7 @@ import {
 } from './lib/annotations/controller';
 import { ModelViewController } from './lib/model-views/controller';
 import { PmiController } from './lib/pmi';
+import { SceneItemController } from './lib/scene-items/controller';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus, LoadOptions } from './components/viewer/viewer';
 import {
@@ -690,6 +691,11 @@ export namespace Components {
      * Specifies if and how to compare to another scene
      */
     sceneComparison?: SceneComparisonOptions;
+    /**
+     * The controller for accessing and viewing SceneItems.
+     * @readonly
+     */
+    sceneItems: SceneItemController | undefined;
     /**
      * Specifies the halo selection properties. Parameter notes:
      *
@@ -2558,6 +2564,11 @@ declare namespace LocalJSX {
      * Specifies if and how to compare to another scene
      */
     sceneComparison?: SceneComparisonOptions;
+    /**
+     * The controller for accessing and viewing SceneItems.
+     * @readonly
+     */
+    sceneItems?: SceneItemController | undefined;
     /**
      * Specifies the halo selection properties. Parameter notes:
      *

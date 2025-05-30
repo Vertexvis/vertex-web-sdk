@@ -83,3 +83,5 @@ generated/
 
 # Ignore TSDoc directory
 docs/
+
+.tool-versions
