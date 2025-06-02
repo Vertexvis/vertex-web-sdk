@@ -40,11 +40,14 @@ export class SceneItemController {
         const meta = await createMetadata(this.jwtProvider, deviceId);
         const req = new GetSceneViewItemRequest();
 
+        // Set scene item id
         const { msb: itemMsb, lsb: itemLsb } = UUID.toMsbLsb(itemId);
         const itemId2l = new Uuid2l();
         itemId2l.setMsb(itemMsb);
         itemId2l.setLsb(itemLsb);
         req.setSceneItemId(itemId2l);
+
+        // Set scene view id
         const { msb: viewMsb, lsb: viewLsb } = UUID.toMsbLsb(viewId);
         const viewId2l = new Uuid2l();
         viewId2l.setMsb(viewMsb);
