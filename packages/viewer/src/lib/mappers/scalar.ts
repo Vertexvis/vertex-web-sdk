@@ -6,6 +6,8 @@ export const toPbFloatValue = toPbScalarWrapper<number>();
 
 export const toPbStringValue = toPbScalarWrapper<string>();
 
+export const fromPbBoolValue = fromPbScalarWrapper<boolean>();
+
 export const fromPbBytesValue = fromPbScalarWrapper<Uint8Array>();
 
 export const fromPbStringValue = fromPbScalarWrapper<string>();

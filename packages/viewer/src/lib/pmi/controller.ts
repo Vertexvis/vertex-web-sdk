@@ -1,5 +1,4 @@
 import { Pager } from '@vertexvis/scene-view-protos/core/protos/paging_pb';
-import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import {
   ListPmiAnnotationsRequest,
   ListPmiAnnotationsResponse,
@@ -8,6 +7,7 @@ import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/proto
 import { UUID } from '@vertexvis/utils';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { toUuid2l } from '../mappers/uuid';
 import { mapListPmiAnnotationsResponseOrThrow } from './mapper';
 import { PmiAnnotationListResponse } from './types';
 
@@ -36,11 +36,8 @@ export class PmiController {
         const req = new ListPmiAnnotationsRequest();
 
         if (modelViewId != null) {
-          const { msb, lsb } = UUID.toMsbLsb(modelViewId);
-          const id = new Uuid2l();
-          id.setMsb(msb);
-          id.setLsb(lsb);
-          req.setModelViewId(id);
+          const modelViewId2l = toUuid2l(modelViewId);
+          req.setModelViewId(modelViewId2l);
         }
 
         const page = new Pager();

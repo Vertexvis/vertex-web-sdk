@@ -1,7 +1,14 @@
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
+import { ColorMaterial } from './lib/scenes/colorMaterial';
+
 export type Color3 = Omit<Color.Color, 'a'> | string | number;
+
+export interface MaterialOverride {
+  defaultMaterial: ColorMaterial;
+  colorMaterial: ColorMaterial;
+}
 
 export type FrameType = 'final' | 'all' | undefined;
 
