@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+
+<head>
+  <title>Scene Tree Columns</title>
+
+  <!-- Live reload script -->
+  <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <script type="module" src="main.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/viewer/viewer.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/viewer/viewer.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/viewer.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+
+<body class="app">
+  <div class="left-panel">
+    <div class="tree">
+      <vertex-scene-tree id="scene-tree" viewer-selector="#viewer">
+        <vertex-scene-tree-table-layout id="table-layout">
+          <vertex-scene-tree-table-column>
+            <template>
+              <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" event:click="{{row.data.handleClick}}"
+                expand-toggle></vertex-scene-tree-table-cell>
+            </template>
+          </vertex-scene-tree-table-column>
+        </vertex-scene-tree-table-layout>
+      </vertex-scene-tree>
+    </div>
+  </div>
+
+  <div class="center-panel">
+    <vertex-viewer id="viewer" class="viewer">
+      <vertex-viewer-toolbar data-viewer="viewer">
+      </vertex-viewer-toolbar>
+      <div class="viewer-overlay">
+        <button id="expand-all-btn" class="overlay-button">Expand All</button>
+        <button id="collapse-all-btn" class="overlay-button">Collapse All</button>
+        <button id="search-metadata-btn" class="overlay-button search-button">Search Metadata</button>
+      </div>
+    </vertex-viewer>
+
+    <div class="selection-panel">
+      <div class="selection-header">
+        <h4>Selected Item</h4>
+      </div>
+      <div id="selection-content" class="selection-content">
+        <p>No item selected</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="available-columns">
+    <div class="available-columns-header">
+      <h4>Confugre Columns For Tree</h4>
+    </div>
+    <div class="available-columns-body">
+    </div>
+  </div>
+</body>
+
+</html>

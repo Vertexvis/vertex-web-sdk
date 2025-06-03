@@ -1,0 +1,255 @@
+.viewer {
+  display: block;
+  width: 100%;
+  height: 50vh;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  position: relative;
+}
+
+#scene-tree {
+  width: 800px;
+  height: 100vh;
+  border-right: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.app {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  background-color: #f5f5f5;
+}
+
+.left-panel {
+  height: 100vh;
+  background-color: #fff;
+}
+
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+}
+
+.selection-panel {
+  flex: 1;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin: 16px;
+  border-radius: 4px;
+}
+
+.selection-header {
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.selection-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.selection-content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.selection-content p {
+  margin: 0;
+  color: #666;
+}
+
+.item-id {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.metadata-section h5 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.metadata-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.metadata-item {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.metadata-item:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.metadata-key {
+  color: #666;
+  width: 200px;
+  padding: 8px 16px 8px 0;
+  vertical-align: top;
+  border-bottom: 1px solid #eee;
+}
+
+.metadata-value {
+  color: #333;
+  padding: 8px 0;
+  word-break: break-word;
+  border-bottom: 1px solid #eee;
+}
+
+.no-metadata {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 16px;
+}
+
+.tree {
+  height: 100vh;
+  background-color: #fff;
+}
+
+.available-columns {
+  width: 250px;
+  height: 100vh;
+  background-color: #f5f5f5;
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.available-columns-header {
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.available-columns-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.available-columns-body {
+  padding: 16px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.available-column {
+  background-color: white;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: 2px solid transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.available-column:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.available-column.selected {
+  border-color: #4a90e2;
+  background-color: #f8f9ff;
+}
+
+.available-column h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.column-type {
+  font-size: 12px;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.available-columns-footer {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.find-keys-button {
+  padding: 8px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.find-keys-button:hover {
+  background-color: #357abd;
+}
+
+.find-keys-button:active {
+  background-color: #2a5f96;
+}
+
+.viewer-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+}
+
+.overlay-button {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.overlay-button:hover {
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.overlay-button:active {
+  background-color: #f8f9fa;
+  transform: translateY(1px);
+}
+
+.overlay-button.search-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+}
+
+.overlay-button.search-button:hover {
+  background-color: #357abd;
+}
+
+.overlay-button.search-button:active {
+  background-color: #2a5f96;
+}
