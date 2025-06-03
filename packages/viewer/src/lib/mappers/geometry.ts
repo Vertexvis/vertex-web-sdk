@@ -2,9 +2,11 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   BoundingBox,
   Dimensions,
+  Matrix4,
   Plane,
   Rectangle,
   Vector3,
+  Vector4,
 } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
 
@@ -61,3 +63,47 @@ export const fromPbPlane: M.Func<vertexvis.protobuf.core.IPlane, Plane.Plane> =
     M.read(M.requiredProp('d'), M.mapRequiredProp('normal', fromPbVector3f)),
     ([constant, normal]) => Plane.create({ normal, constant })
   );
+
+export const fromPbVector4f: M.Func<
+  vertexvis.protobuf.core.IVector4f,
+  Vector4.Vector4
+> = M.defineMapper(
+  M.read(
+    M.requiredProp('x'),
+    M.requiredProp('y'),
+    M.requiredProp('z'),
+    M.requiredProp('w')
+  ),
+  ([x, y, z, w]) => Vector4.create({ x, y, z, w })
+);
+
+export const fromPbMatrix4f: M.Func<
+  vertexvis.protobuf.core.IMatrix4x4f,
+  Matrix4.Matrix4
+> = M.defineMapper(
+  M.read(
+    M.mapRequiredProp('r0', fromPbVector4f),
+    M.mapRequiredProp('r1', fromPbVector4f),
+    M.mapRequiredProp('r2', fromPbVector4f),
+    M.mapRequiredProp('r3', fromPbVector4f)
+  ),
+  ([r0, r1, r2, r3]) =>
+    Matrix4.fromValues(
+      r0.x,
+      r0.y,
+      r0.z,
+      r0.w,
+      r1.x,
+      r1.y,
+      r1.z,
+      r1.w,
+      r2.x,
+      r2.y,
+      r2.z,
+      r2.w,
+      r3.x,
+      r3.y,
+      r3.z,
+      r3.w
+    )
+);

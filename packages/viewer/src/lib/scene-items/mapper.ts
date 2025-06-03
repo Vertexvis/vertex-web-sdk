@@ -5,17 +5,33 @@ import {
   PropertyValueDate,
   PropertyValueDouble,
   PropertyValueLong,
+  SceneItemOverride as PBSceneItemOverride,
+  SceneViewItem as PBSceneViewItem,
 } from '@vertexvis/scene-view-protos/sceneview/protos/domain_pb';
-import { ListSceneItemMetadataResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
+import {
+  GetSceneViewItemResponse,
+  ListSceneItemMetadataResponse,
+} from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M } from '@vertexvis/utils';
 import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
-import { mapCursor } from '../mappers';
+import {
+  fromPbBoolValue,
+  fromPbBoundingBox3f,
+  fromPbInstant,
+  fromPbMatrix4f,
+  fromPbStringValue,
+  fromPbUuid2l,
+  mapCursor,
+} from '../mappers';
+import { fromPbMaterialOverride } from '../mappers/colorMaterial';
 import {
   DomainPropertyEntry,
   DomainPropertyKey,
   DomainPropertyValue,
   SceneItemMetadataResponse,
+  SceneViewItem,
+  SceneViewItemOverride,
 } from './types';
 
 const mapPropertyKey: M.Func<
@@ -92,7 +108,7 @@ const mapEntriesList: M.Func<PropertyEntry.AsObject, DomainPropertyEntry> =
     ([id, key, value]) => ({ id, key, value })
   );
 
-const mapListSceneItemMetadataResposne: M.Func<
+const mapListSceneItemMetadataResponse: M.Func<
   ListSceneItemMetadataResponse.AsObject,
   SceneItemMetadataResponse
 > = M.defineMapper(
@@ -109,5 +125,83 @@ const mapListSceneItemMetadataResposne: M.Func<
 );
 
 export const mapListSceneItemMetadataResponseOrThrow = M.ifInvalidThrow(
-  mapListSceneItemMetadataResposne
+  mapListSceneItemMetadataResponse
+);
+
+const mapSceneViewItemOverride: M.Func<
+  PBSceneItemOverride.AsObject,
+  SceneViewItemOverride
+> = M.defineMapper(
+  M.read(
+    M.mapRequiredProp('id', fromPbUuid2l),
+    M.mapRequiredProp('createdAt', fromPbInstant),
+    M.mapProp('materialOverride', M.ifDefined(fromPbMaterialOverride)),
+    M.mapProp('transform', M.ifDefined(fromPbMatrix4f)),
+    M.mapProp('isVisible', M.ifDefined(fromPbBoolValue)),
+    M.mapProp('isSelected', M.ifDefined(fromPbBoolValue)),
+    M.mapProp('isPhantom', M.ifDefined(fromPbBoolValue)),
+    M.mapProp('endItem', M.ifDefined(fromPbBoolValue))
+  ),
+  ([
+    id,
+    createdAt,
+    materialOverride,
+    transform,
+    isVisible,
+    isSelected,
+    isPhantom,
+    endItem,
+  ]) => ({
+    id,
+    createdAt,
+    materialOverride,
+    transform,
+    isVisible,
+    isSelected,
+    isPhantom,
+    endItem,
+  })
+);
+
+export const mapSceneViewItem: M.Func<PBSceneViewItem.AsObject, SceneViewItem> =
+  M.defineMapper(
+    M.read(
+      M.mapRequiredProp('id', fromPbUuid2l),
+      M.mapRequiredProp('createdAt', fromPbInstant),
+      M.mapRequiredProp('name', fromPbStringValue),
+      M.mapRequiredProp('parentId', fromPbUuid2l),
+      M.mapProp('suppliedId', M.ifDefined(fromPbStringValue)),
+      M.mapProp('boundingBox', M.ifDefined(fromPbBoundingBox3f)),
+      M.mapProp('worldTransform', M.ifDefined(fromPbMatrix4f)),
+      M.mapProp('override', M.ifDefined(mapSceneViewItemOverride))
+    ),
+    ([
+      id,
+      createdAt,
+      name,
+      parentId,
+      suppliedId,
+      boundingBox,
+      worldTransform,
+      override,
+    ]) => ({
+      id,
+      createdAt,
+      name,
+      parentId,
+      suppliedId,
+      boundingBox,
+      worldTransform,
+      override,
+    })
+  );
+
+export const mapGetSceneViewItemResponseOrThrow: M.ThrowIfInvalidFunc<
+  GetSceneViewItemResponse.AsObject,
+  SceneViewItem | undefined
+> = M.ifInvalidThrow(
+  M.defineMapper(
+    M.read(M.mapProp('item', M.ifDefined(mapSceneViewItem))),
+    ([item]) => item ?? undefined
+  )
 );

@@ -1,3 +1,4 @@
+import { Instant } from '@vertexvis/scene-view-protos/core/protos/instant_pb';
 import type { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import { protoToDate } from '@vertexvis/stream-api';
 import { Mapper as M, UUID } from '@vertexvis/utils';
@@ -11,4 +12,9 @@ export const fromPbUuid2l: M.Func<Uuid2l.AsObject, UUID.UUID> = M.defineMapper(
 export const fromPbTimestamp: M.Func<Timestamp.AsObject, Date> = M.defineMapper(
   M.read(M.requiredProp('seconds'), M.requiredProp('nanos')),
   ([seconds, nanos]) => protoToDate({ seconds, nanos })
+);
+
+export const fromPbInstant: M.Func<Instant.AsObject, Date> = M.defineMapper(
+  M.read(M.requiredProp('iso')),
+  ([iso]) => new Date(iso)
 );
