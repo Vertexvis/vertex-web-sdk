@@ -1,5 +1,4 @@
 import { Pager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
-import { Uuid2l } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import {
   GetSceneViewItemRequest,
   GetSceneViewItemResponse,
@@ -11,6 +10,7 @@ import { UUID } from '@vertexvis/utils';
 import { FieldMask } from 'google-protobuf/google/protobuf/field_mask_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { toUuid2l } from '../mappers/uuid';
 import {
   mapGetSceneViewItemResponseOrThrow,
   mapListSceneItemMetadataResponseOrThrow,
@@ -40,19 +40,9 @@ export class SceneItemController {
         const meta = await createMetadata(this.jwtProvider, deviceId);
         const req = new GetSceneViewItemRequest();
 
-        // Set scene item id
-        const { msb: itemMsb, lsb: itemLsb } = UUID.toMsbLsb(itemId);
-        const itemId2l = new Uuid2l();
-        itemId2l.setMsb(itemMsb);
-        itemId2l.setLsb(itemLsb);
-        req.setSceneItemId(itemId2l);
-
-        // Set scene view id
-        const { msb: viewMsb, lsb: viewLsb } = UUID.toMsbLsb(viewId);
-        const viewId2l = new Uuid2l();
-        viewId2l.setMsb(viewMsb);
-        viewId2l.setLsb(viewLsb);
-        req.setViewId(viewId2l);
+        // Set scene item and scene view ids
+        req.setSceneItemId(toUuid2l(itemId));
+        req.setViewId(toUuid2l(itemId));
 
         const additionalFields = new FieldMask();
 
@@ -84,11 +74,7 @@ export class SceneItemController {
         const meta = await createMetadata(this.jwtProvider, deviceId);
         const req = new ListSceneItemMetadataRequest();
 
-        const { msb, lsb } = UUID.toMsbLsb(itemId);
-        const id = new Uuid2l();
-        id.setMsb(msb);
-        id.setLsb(lsb);
-        req.setItemId(id);
+        req.setItemId(toUuid2l(itemId));
 
         const pager = new Pager();
         if (listByOptions.size != null) {

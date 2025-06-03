@@ -1,5 +1,4 @@
 import { Pager } from '@vertexvis/scene-view-protos/core/protos/paging_pb';
-import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import {
   ListItemModelViewsRequest,
   ListItemModelViewsResponse,
@@ -10,6 +9,7 @@ import { UUID } from '@vertexvis/utils';
 import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
+import { toUuid2l } from '../mappers/uuid';
 import {
   mapItemModelViewOrThrow,
   mapListItemModelViewsResponseOrThrow,
@@ -51,11 +51,8 @@ export class ModelViewController {
         const meta = await createMetadata(this.jwtProvider, deviceId);
         const req = new ListItemModelViewsRequest();
 
-        const { msb, lsb } = UUID.toMsbLsb(itemId);
-        const id = new Uuid2l();
-        id.setMsb(msb);
-        id.setLsb(lsb);
-        req.setItemId(id);
+        const itemId2l = toUuid2l(itemId);
+        req.setItemId(itemId2l);
 
         if (hasAnnotations != null) {
           const hasAnnotationsVal = new BoolValue();

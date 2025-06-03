@@ -1,6 +1,5 @@
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import { Pager } from '@vertexvis/scene-view-protos/core/protos/paging_pb';
-import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import {
   CreateSceneViewAnnotationSetRequest,
   DeleteSceneViewAnnotationSetRequest,
@@ -24,6 +23,7 @@ import {
   fromPbAnnotationOrThrow,
   fromPbAnnotationSetOrThrow,
 } from '../mappers/annotation';
+import { toUuid2l } from '../mappers/uuid';
 import { Annotation, AnnotationSet } from './annotation';
 
 export interface AnnotationState {
@@ -208,14 +208,10 @@ export class AnnotationController {
         const deviceId = this.deviceIdProvider();
         const meta = await createMetadata(this.jwtProvider, deviceId);
 
-        const setIdLong = UUID.toMsbLsb(setId);
-
-        const id = new Uuid2l();
-        id.setMsb(setIdLong.msb);
-        id.setLsb(setIdLong.lsb);
-
         const req = new ListSceneAnnotationsRequest();
-        req.setSceneAnnotationSetId(id);
+
+        const setId2l = toUuid2l(setId);
+        req.setSceneAnnotationSetId(setId2l);
 
         if (cursor != null) {
           const page = new Pager();
