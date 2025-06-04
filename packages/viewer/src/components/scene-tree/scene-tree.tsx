@@ -249,6 +249,12 @@ export class SceneTree {
   private errorDetails: SceneTreeErrorDetails | undefined;
 
   @State()
+  private hasPartialFilterResults = false;
+
+  @State()
+  private refreshingResults = false;
+
+  @State()
   private attemptingRetry = false;
 
   @Element()
@@ -735,6 +741,20 @@ export class SceneTree {
           </slot>
         </div>
 
+        <slot name="partial-filter-results-banner">
+          {this.hasPartialFilterResults && (
+            <vertex-scene-tree-notification-banner
+              message={
+                this.refreshingResults
+                  ? 'Refreshing results...'
+                  : 'Partial results returned. Refresh for more.'
+              }
+              actionLabel="Refresh"
+              onAction={() => this.controller?.refreshFilter()}
+            />
+          )}
+        </slot>
+
         {this.errorDetails != null && this.renderError(this.errorDetails)}
 
         {this.errorDetails == null && (
@@ -880,6 +900,8 @@ export class SceneTree {
     this.showEmptyResults = !!state.shouldShowEmptyResults;
     this.rows = state.rows;
     this.totalRows = state.totalRows;
+    this.hasPartialFilterResults = !!state.isPartialFilterResponse;
+    this.refreshingResults = !!state.isSearching;
 
     if (state.connection.type === 'failure') {
       this.errorDetails = state.connection.details;

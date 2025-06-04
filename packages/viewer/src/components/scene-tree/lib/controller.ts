@@ -1,7 +1,10 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
-import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import {
+  IndexingStatus,
+  Node,
+} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   CollapseAllRequest,
   CollapseNodeRequest,
@@ -61,6 +64,9 @@ export interface SceneTreeState {
   filterTerm?: string;
   handshakeReceived?: boolean;
   firstFetchComplete?: boolean;
+  isPartialFilterResponse?: boolean;
+  isPartialKeysResponse?: boolean;
+  filterOptions?: FilterTreeOptions;
 }
 
 interface Page {
@@ -677,8 +683,23 @@ export class SceneTreeController {
         }
       );
 
+      const indexingStatus = res.getIndexingStatus();
+      this.updateState({
+        ...this.state,
+        isPartialKeysResponse:
+          indexingStatus === IndexingStatus.INDEXING_STATUS_INDEXING,
+      });
+
       return res.getKeysList().map((value) => value.getValue());
     });
+  }
+
+  /**
+   * Refreshes the filter by re-filtering the current filter term.
+   * @returns A promise that resolves when the filter is refreshed.
+   */
+  public async refreshFilter(): Promise<void> {
+    return this.filter(this.state.filterTerm ?? '', this.state.filterOptions);
   }
 
   /**
@@ -697,6 +718,7 @@ export class SceneTreeController {
         ...this.state,
         isSearching: true,
         filterTerm: term !== '' ? term : undefined,
+        filterOptions: options,
       });
 
       // Cancel any in-flight filter requests, and wait for the request
@@ -725,12 +747,14 @@ export class SceneTreeController {
             }
           );
 
-          const { numberOfResults } = res.toObject();
+          const { numberOfResults, indexingStatus } = res.toObject();
 
           this.updateState({
             ...this.state,
             totalFilteredRows: numberOfResults,
             isSearching: false,
+            isPartialFilterResponse:
+              indexingStatus === IndexingStatus.INDEXING_STATUS_INDEXING,
           });
         } catch (e) {
           console.error('Failed to filter search ', e);
