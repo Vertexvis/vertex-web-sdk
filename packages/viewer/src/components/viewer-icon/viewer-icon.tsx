@@ -10,6 +10,7 @@ export type ViewerIconName =
   | 'close-circle'
   | 'comment-filled'
   | 'comment-show'
+  | 'info'
   | 'eye-half'
   | 'eye-half-dotted'
   | 'eye-open'
@@ -73,6 +74,10 @@ export class ViewerIcon {
       case 'comment-show':
         return this.renderSvgIcon(
           <path d="M11.5,8h-7a.5.5,0,0,0,0,1h7a.5.5,0,0,0,0-1Zm0-3h-7a.5.5,0,0,0,0,1h7a.5.5,0,0,0,0-1Zm2-3H2.5A1.5,1.5,0,0,0,1,3.5v7A1.5,1.5,0,0,0,2.5,12H8.29l2.86,2.85a.47.47,0,0,0,.54.11A.5.5,0,0,0,12,14.5V12h1.5A1.5,1.5,0,0,0,15,10.5v-7A1.5,1.5,0,0,0,13.5,2Zm.5,8.5a.5.5,0,0,1-.5.5h-2a.51.51,0,0,0-.5.5v1.79L8.85,11.15A.47.47,0,0,0,8.5,11h-6a.5.5,0,0,1-.5-.5v-7A.5.5,0,0,1,2.5,3h11a.5.5,0,0,1,.5.5Z" />
+        );
+      case 'info':
+        return this.renderSvgIcon(
+          <path d="M8,15A7,7,0,1,0,1,8,7,7,0,0,0,8,15ZM3.73,3.77A6,6,0,1,1,2,8,6,6,0,0,1,3.73,3.77ZM8,12a.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-1,0v5A.5.5,0,0,0,8,12ZM8,5a.51.51,0,1,0-.35-.15A.47.47,0,0,0,8,5Z" />
         );
       case 'eye-half':
         return this.renderSvgIcon(

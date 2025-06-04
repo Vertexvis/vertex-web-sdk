@@ -312,6 +312,16 @@ export namespace Components {
      */
     viewerSelector?: string;
   }
+  interface VertexSceneTreeNotificationBanner {
+    /**
+     * The label of the action button.
+     */
+    actionLabel?: string;
+    /**
+     * The message to display in the banner.
+     */
+    message?: string;
+  }
   interface VertexSceneTreeSearch {
     /**
      * Clears the current search term and clears any debounced filters.
@@ -1718,6 +1728,11 @@ export interface VertexSceneTreeCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeElement;
 }
+export interface VertexSceneTreeNotificationBannerCustomEvent<T>
+  extends CustomEvent<T> {
+  detail: T;
+  target: HTMLVertexSceneTreeNotificationBannerElement;
+}
 export interface VertexSceneTreeSearchCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeSearchElement;
@@ -1797,6 +1812,13 @@ declare global {
   var HTMLVertexSceneTreeElement: {
     prototype: HTMLVertexSceneTreeElement;
     new (): HTMLVertexSceneTreeElement;
+  };
+  interface HTMLVertexSceneTreeNotificationBannerElement
+    extends Components.VertexSceneTreeNotificationBanner,
+      HTMLStencilElement {}
+  var HTMLVertexSceneTreeNotificationBannerElement: {
+    prototype: HTMLVertexSceneTreeNotificationBannerElement;
+    new (): HTMLVertexSceneTreeNotificationBannerElement;
   };
   interface HTMLVertexSceneTreeSearchElement
     extends Components.VertexSceneTreeSearch,
@@ -2080,6 +2102,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'vertex-scene-tree': HTMLVertexSceneTreeElement;
+    'vertex-scene-tree-notification-banner': HTMLVertexSceneTreeNotificationBannerElement;
     'vertex-scene-tree-search': HTMLVertexSceneTreeSearchElement;
     'vertex-scene-tree-table-cell': HTMLVertexSceneTreeTableCellElement;
     'vertex-scene-tree-table-column': HTMLVertexSceneTreeTableColumnElement;
@@ -2199,6 +2222,22 @@ declare namespace LocalJSX {
      * A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.
      */
     viewerSelector?: string;
+  }
+  interface VertexSceneTreeNotificationBanner {
+    /**
+     * The label of the action button.
+     */
+    actionLabel?: string;
+    /**
+     * The message to display in the banner.
+     */
+    message?: string;
+    /**
+     * An event that is emitted when the action button is clicked.
+     */
+    onAction?: (
+      event: VertexSceneTreeNotificationBannerCustomEvent<void>
+    ) => void;
   }
   interface VertexSceneTreeSearch {
     /**
@@ -3691,6 +3730,7 @@ declare namespace LocalJSX {
   }
   interface IntrinsicElements {
     'vertex-scene-tree': VertexSceneTree;
+    'vertex-scene-tree-notification-banner': VertexSceneTreeNotificationBanner;
     'vertex-scene-tree-search': VertexSceneTreeSearch;
     'vertex-scene-tree-table-cell': VertexSceneTreeTableCell;
     'vertex-scene-tree-table-column': VertexSceneTreeTableColumn;
@@ -3739,6 +3779,8 @@ declare module '@stencil/core' {
     interface IntrinsicElements {
       'vertex-scene-tree': LocalJSX.VertexSceneTree &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
+      'vertex-scene-tree-notification-banner': LocalJSX.VertexSceneTreeNotificationBanner &
+        JSXBase.HTMLAttributes<HTMLVertexSceneTreeNotificationBannerElement>;
       'vertex-scene-tree-search': LocalJSX.VertexSceneTreeSearch &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeSearchElement>;
       'vertex-scene-tree-table-cell': LocalJSX.VertexSceneTreeTableCell &

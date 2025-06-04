@@ -1,6 +1,7 @@
 import { OffsetCursor } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
 import { Uuid } from '@vertexvis/scene-tree-protos/core/protos/uuid_pb';
 import {
+  IndexingStatus,
   ListChange,
   Node,
   TreeChangeType,
@@ -83,9 +84,17 @@ export function createGetTreeResponse(
   return res;
 }
 
-export function createFilterTreeResponse(resultCount: number): FilterResponse {
+export function createFilterTreeResponse(
+  resultCount: number,
+  partialResults = false
+): FilterResponse {
   const res = new FilterResponse();
   res.setNumberOfResults(resultCount);
+  res.setIndexingStatus(
+    partialResults
+      ? IndexingStatus.INDEXING_STATUS_INDEXING
+      : IndexingStatus.INDEXING_STATUS_READY
+  );
 
   return res;
 }
