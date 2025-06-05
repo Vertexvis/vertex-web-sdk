@@ -21,6 +21,7 @@ export * from './lib/measurement';
 export * from './lib/model-views';
 export * from './lib/pins';
 export * from './lib/pmi';
+export { SceneViewItem } from './lib/scene-items';
 export {
   Camera,
   CrossSectioner,
