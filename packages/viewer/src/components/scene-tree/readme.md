@@ -866,6 +866,7 @@ Type: `Promise<void>`
 
 - [vertex-scene-tree-toolbar](../scene-tree-toolbar)
 - [vertex-scene-tree-search](../scene-tree-search)
+- [vertex-scene-tree-notification-banner](../scene-tree-notification-banner)
 - [vertex-viewer-spinner](../viewer-spinner)
 - [vertex-scene-tree-table-layout](../scene-tree-table-layout)
 
@@ -874,10 +875,12 @@ Type: `Promise<void>`
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   vertex-scene-tree --> vertex-scene-tree-search
+  vertex-scene-tree --> vertex-scene-tree-notification-banner
   vertex-scene-tree --> vertex-viewer-spinner
   vertex-scene-tree --> vertex-scene-tree-table-layout
   vertex-scene-tree-search --> vertex-viewer-spinner
   vertex-scene-tree-search --> vertex-viewer-icon
+  vertex-scene-tree-notification-banner --> vertex-viewer-icon
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

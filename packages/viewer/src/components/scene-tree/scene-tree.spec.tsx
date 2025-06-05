@@ -287,6 +287,90 @@ describe('<vertex-scene-tree>', () => {
       expect(emptyResults?.innerHTML).toEqual('No Results Found.');
     });
 
+    it('shows a partial results found when the scene', async () => {
+      const subscription = new ResponseStreamMock();
+      const client = mockSceneTreeClient(subscription);
+      mockGetTree({ client });
+      mockFilterTree(client, 0, true);
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller, stream });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await waitForSceneTreeConnected();
+
+      await tree.filterItems('filter');
+
+      mockGetTree({ client, itemCount: 0, totalCount: 0 });
+
+      subscription.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.isPartialFilterResponse) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      const partialResults = tree.shadowRoot?.querySelector(
+        'vertex-scene-tree-notification-banner'
+      );
+
+      expect(partialResults).not.toBeNull();
+    });
+
+    it('refreshes the filter when the action label is clicked', async () => {
+      const subscription = new ResponseStreamMock();
+      const client = mockSceneTreeClient(subscription);
+      mockGetTree({ client });
+      mockFilterTree(client, 0, true);
+
+      const { stream, ws } = makeViewerStream();
+      const controller = new SceneTreeController(client, 100);
+      const { tree, viewer, page, waitForSceneTreeConnected } =
+        await newSceneTreeSpec({ controller, stream });
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      await waitForSceneTreeConnected();
+
+      await tree.filterItems('filter');
+
+      mockGetTree({ client, itemCount: 0, totalCount: 0 });
+
+      subscription.invokeOnData(createSubscribeResponse(createListChange(0)));
+
+      await new Promise<void>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.isPartialFilterResponse) {
+            resolve();
+          }
+        });
+      });
+
+      await page.waitForChanges();
+
+      const partialResults = tree.shadowRoot?.querySelector(
+        'vertex-scene-tree-notification-banner'
+      );
+
+      expect(partialResults).not.toBeNull();
+
+      mockFilterTree(client, 0, false);
+      await controller.refreshFilter();
+
+      await page.waitForChanges();
+      const resultsBanner = tree.shadowRoot?.querySelector(
+        'vertex-scene-tree-notification-banner'
+      );
+
+      expect(resultsBanner).toBeNull();
+    });
+
     it('clears the loading spinner on initial load if it has already appeared', async () => {
       const subscription = new ResponseStreamMock();
       const client = mockSceneTreeClient(subscription);
@@ -1505,8 +1589,12 @@ function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
   );
 }
 
-function mockFilterTree(client: SceneTreeAPIClient, resultCount = 10): void {
-  const res = createFilterTreeResponse(resultCount);
+function mockFilterTree(
+  client: SceneTreeAPIClient,
+  resultCount = 10,
+  partialResults = false
+): void {
+  const res = createFilterTreeResponse(resultCount, partialResults);
   (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
 }
 
