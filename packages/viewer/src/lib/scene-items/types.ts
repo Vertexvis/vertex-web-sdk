@@ -54,7 +54,7 @@ export interface ListSceneItemMetadataOptions {
 export interface GetSceneViewItemOptions {
   includeBoundingBox?: boolean;
   includeWorldTransform?: boolean;
-  includeMaterialOverride?: boolean;
+  includeOverride?: boolean;
 }
 
 export interface SceneViewItemMaterialOverride {
@@ -77,7 +77,7 @@ export interface SceneViewItem {
   id: UUID.UUID;
   suppliedId?: string | null;
   name?: string | null;
-  parentId: UUID.UUID;
+  parentId?: UUID.UUID;
   createdAt: Date;
   boundingBox?: BoundingBox.BoundingBox | null;
   override?: SceneViewItemOverride | null;

@@ -42,7 +42,7 @@ export class SceneItemController {
 
         // Set scene item and scene view ids
         req.setSceneItemId(toUuid2l(itemId));
-        req.setViewId(toUuid2l(itemId));
+        req.setViewId(toUuid2l(viewId));
 
         const additionalFields = new FieldMask();
 
@@ -52,7 +52,7 @@ export class SceneItemController {
         if (getOptions.includeWorldTransform) {
           additionalFields.addPaths('world_transform');
         }
-        if (getOptions.includeMaterialOverride) {
+        if (getOptions.includeOverride) {
           additionalFields.addPaths('override');
         }
 
