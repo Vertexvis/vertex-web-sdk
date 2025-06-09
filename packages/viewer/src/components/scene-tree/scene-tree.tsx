@@ -680,8 +680,8 @@ export class SceneTree {
         sceneTreeHost,
         this.getConfig().flags.grpcUseStreamingWebSocketTransport
           ? {
-            transport: webSocketSubscriptionTransportFactory,
-          }
+              transport: webSocketSubscriptionTransportFactory,
+            }
           : undefined
       );
       this.controller = new SceneTreeController(client, 100);
