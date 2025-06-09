@@ -747,7 +747,7 @@ export class SceneTree {
               message={
                 this.refreshingResults
                   ? 'Refreshing results...'
-                  : 'Partial results returned. Refresh for more.'
+                  : 'Data loading, refresh for more.'
               }
               actionLabel="Refresh"
               onAction={() => this.controller?.refreshFilter()}
