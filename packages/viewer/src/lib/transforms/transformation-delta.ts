@@ -24,14 +24,14 @@ export function calculateOrthogonalCoordinate(
 }
 
 /**
- * Computes the rotation matrix for two normals. If both normals are neither parallel or anti-parallel,
+ * Computes the rotation matrix for two normals. If both normals are neither parallel nor anti-parallel,
  * this will compute the rotation matrix delta based on the angle from both normals.
  * If the normals are anti-parallel, the identity matrix will be returned, as no rotation is necessary in this case.
  * If the normals are parallel, an axis direction based on a chosen orthogonal vector will be used
  * to compute the rotation matrix to rotate the plane 180 degrees.
  * @param normal1
  * @param normal2
- * @returns an anti-parallel rotation Matrix4 betwen the given normals
+ * @returns an anti-parallel rotation Matrix4 between the given normals
  */
 export function computeRotationMatrix(
   normal1: Vector3.Vector3,
