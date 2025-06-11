@@ -141,6 +141,8 @@ function updateFrameCameraPosition(
 
 describe(HitIndicator, () => {
   const canvas = document.createElement('canvas');
+  canvas.width = 1800;
+  canvas.height = 900;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -218,12 +220,12 @@ describe(HitIndicator, () => {
   it('creates meshes for the hit position, normal, and plane with an orthographic camera', async () => {
     const indicator = new HitIndicator(canvas);
     const frame = makeOrthographicFrame();
-    const hithitPositionTransform = Matrix4.makeTranslation(
+    const hitPositionTransform = Matrix4.makeTranslation(
       Vector3.create(1, 1, 1)
     );
     const hitNormal = Vector3.up();
     const meshes = createMeshes(
-      hithitPositionTransform,
+      hitPositionTransform,
       hitNormal,
       frame,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
@@ -232,7 +234,7 @@ describe(HitIndicator, () => {
 
     mockShapeBuilder().createShape.mockClear();
     indicator.updateFrame(frame);
-    indicator.updateTransformAndNormal(hithitPositionTransform, hitNormal);
+    indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.arrow.points),
