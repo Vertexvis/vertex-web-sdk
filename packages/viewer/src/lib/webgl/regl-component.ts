@@ -105,11 +105,17 @@ export abstract class ReglComponent implements Disposable {
     position: Vector3.Vector3,
     frame: Frame
   ): number {
-    return frame.scene.camera.isOrthographic()
+    const baseTriangleSize = frame.scene.camera.isOrthographic()
       ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
       : Vector3.magnitude(
           Vector3.subtract(position, frame.scene.camera.position)
         ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
+
+    // Scale the triangle size for small viewers
+    const canvasArea = this.canvasElement.height * this.canvasElement.width;
+    const screenSizeAdjustment = Math.max(1580000 / (canvasArea + 520000), 1);
+
+    return baseTriangleSize * screenSizeAdjustment;
   }
 
   protected abstract createOrUpdateElements(): void;
