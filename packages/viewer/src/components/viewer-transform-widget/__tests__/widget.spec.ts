@@ -27,6 +27,8 @@ import {
 import {
   DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
   DEFAULT_PERSPECTIVE_MESH_SCALAR,
+  TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR,
+  TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR,
 } from '../../../lib/webgl/regl-component';
 import {
   makeDepthImagePng,
@@ -64,7 +66,11 @@ function createMeshes(
     ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
   const canvasArea = canvas.height * canvas.width;
-  const screenSizeAdjustment = Math.max(1580000 / (canvasArea + 520000), 1);
+  const screenSizeAdjustment = Math.max(
+    TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR /
+      (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR),
+    1
+  );
 
   const expectedTriangleSize = baseExpectedTriangleSize * screenSizeAdjustment;
 

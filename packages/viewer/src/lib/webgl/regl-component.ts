@@ -17,6 +17,16 @@ export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
 // size as zooming occurs.
 export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
 
+// Scalar that is used to increase the relative triangle size
+// in small viewing windows. This attempts to keep the widget
+// approximately the same size for all viewing window sizes.
+export const TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR = 1580000;
+
+// Scalar that is used to increase the relative triangle size
+// in small viewing windows. This attempts to keep the widget
+// approximately the same size for all viewing window sizes.
+export const TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR = 520000;
+
 export abstract class ReglComponent implements Disposable {
   protected reglCommand?: regl.Regl;
   protected reglFrameDisposable?: regl.Cancellable;
@@ -111,11 +121,15 @@ export abstract class ReglComponent implements Disposable {
           Vector3.subtract(position, frame.scene.camera.position)
         ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
-    // Scale the triangle size for small viewers
+    // Increase the triangle size for small viewers
     const canvasArea = this.canvasElement.height * this.canvasElement.width;
-    const screenSizeAdjustment = Math.max(1580000 / (canvasArea + 520000), 1);
+    const canvasSizeAdjustment = Math.max(
+      TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR /
+        (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR),
+      1
+    );
 
-    return baseTriangleSize * screenSizeAdjustment;
+    return baseTriangleSize * canvasSizeAdjustment;
   }
 
   protected abstract createOrUpdateElements(): void;
