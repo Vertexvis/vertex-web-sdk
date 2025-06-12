@@ -163,7 +163,7 @@ describe(TransformWidget, () => {
 
   const smallCanvas = document.createElement('canvas');
   smallCanvas.width = 800;
-  smallCanvas.height = 500;
+  smallCanvas.height = 700;
 
   beforeEach(() => {
     jest.clearAllMocks();
