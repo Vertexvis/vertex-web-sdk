@@ -18,14 +18,24 @@ export const DEFAULT_PERSPECTIVE_MESH_SCALAR = 0.005;
 export const DEFAULT_ORTHOGRAPHIC_MESH_SCALAR = 0.00625;
 
 // Scalar that is used to increase the relative triangle size
-// in small viewing windows. This attempts to keep the widget
+// in viewers with a small area. This attempts to keep the widget
 // approximately the same size for all viewing window sizes.
 export const TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR = 1580000;
 
 // Scalar that is used to increase the relative triangle size
-// in small viewing windows. This attempts to keep the widget
+// in viewers with a small area. This attempts to keep the widget
 // approximately the same size for all viewing window sizes.
 export const TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR = 520000;
+
+// Scalar that is used to increase the relative triangle size
+// in viewers with a small height. This attempts to keep the widget
+// approximately the same size for all viewing window sizes.
+export const TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_NUMERATOR = 950;
+
+// Scalar that is used to increase the relative triangle size
+// in viewers with a small height. This attempts to keep the widget
+// approximately the same size for all viewing window sizes.
+export const TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_DENOMINATOR = 45;
 
 export abstract class ReglComponent implements Disposable {
   protected reglCommand?: regl.Regl;
@@ -123,13 +133,25 @@ export abstract class ReglComponent implements Disposable {
 
     // Increase the triangle size for small viewers
     const canvasArea = this.canvasElement.height * this.canvasElement.width;
-    const canvasSizeAdjustment = Math.max(
+    const canvasAreaAdjustment =
       TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR /
-        (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR),
+      (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR);
+
+    // Increase the triangle size for viewers with a small height and large width
+    const canvasHeightAdjustment =
+      this.canvasElement.height < 650
+        ? TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_NUMERATOR /
+          (this.canvasElement.height +
+            TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_DENOMINATOR)
+        : 1;
+
+    const sizeAdjustment = Math.max(
+      canvasAreaAdjustment,
+      canvasHeightAdjustment,
       1
     );
 
-    return baseTriangleSize * canvasSizeAdjustment;
+    return baseTriangleSize * sizeAdjustment;
   }
 
   protected abstract createOrUpdateElements(): void;
