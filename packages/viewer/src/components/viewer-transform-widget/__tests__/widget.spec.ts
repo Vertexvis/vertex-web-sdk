@@ -27,6 +27,8 @@ import {
 import {
   DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
   DEFAULT_PERSPECTIVE_MESH_SCALAR,
+  TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR,
+  TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR,
 } from '../../../lib/webgl/regl-component';
 import {
   makeDepthImagePng,
@@ -44,6 +46,7 @@ const mockShapeBuilder = shapeBuilder as MockShapeBuilder;
 function createMeshes(
   transform: Matrix4.Matrix4,
   frame: Frame,
+  canvas: HTMLCanvasElement,
   triangleSize?: number
 ): {
   xArrow: TriangleMesh;
@@ -53,7 +56,7 @@ function createMeshes(
   yAxis: AxisLine;
   zAxis: AxisLine;
 } {
-  const expectedTriangleSize =
+  const baseExpectedTriangleSize =
     triangleSize ??
     Vector3.magnitude(
       Vector3.subtract(
@@ -61,6 +64,15 @@ function createMeshes(
         frame.scene.camera.position
       )
     ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
+
+  const canvasArea = canvas.height * canvas.width;
+  const screenSizeAdjustment = Math.max(
+    TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR /
+      (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR),
+    1
+  );
+
+  const expectedTriangleSize = baseExpectedTriangleSize * screenSizeAdjustment;
 
   const xArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
@@ -146,6 +158,12 @@ function updateFrameCameraPosition(
 
 describe(TransformWidget, () => {
   const canvas = document.createElement('canvas');
+  canvas.width = 1800;
+  canvas.height = 900;
+
+  const smallCanvas = document.createElement('canvas');
+  smallCanvas.width = 800;
+  smallCanvas.height = 700;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -171,7 +189,7 @@ describe(TransformWidget, () => {
     const widget = new TransformWidget(canvas);
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
-    const meshes = createMeshes(positionTransform, frame);
+    const meshes = createMeshes(positionTransform, frame, canvas);
 
     mockShapeBuilder().createShape.mockClear();
     widget.updateFrame(frame);
@@ -210,6 +228,49 @@ describe(TransformWidget, () => {
     const meshes = createMeshes(
       positionTransform,
       frame,
+      canvas,
+      (frame.scene.camera as FrameOrthographicCamera).fovHeight *
+        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
+    );
+
+    mockShapeBuilder().createShape.mockClear();
+    widget.updateFrame(frame);
+    widget.updateTransform(positionTransform);
+
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.xArrow.points),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.yArrow.points),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.zArrow.points),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.xAxis.points),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.yAxis.points),
+      expect.anything()
+    );
+    expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
+      createdPaddedFloat64Array(meshes.zAxis.points),
+      expect.anything()
+    );
+  });
+
+  it('creates axis and arrow meshes for orthographic cameras and small canvas', async () => {
+    const widget = new TransformWidget(smallCanvas);
+    const frame = makeOrthographicFrame();
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const meshes = createMeshes(
+      positionTransform,
+      frame,
+      smallCanvas,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
         DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
     );
@@ -336,7 +397,7 @@ describe(TransformWidget, () => {
     });
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
-    const meshes = createMeshes(positionTransform, frame);
+    const meshes = createMeshes(positionTransform, frame, canvas);
     const hoveredListener = jest.fn();
 
     (testDrawable as jest.Mock).mockImplementation(
