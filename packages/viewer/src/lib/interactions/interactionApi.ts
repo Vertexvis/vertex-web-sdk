@@ -13,7 +13,12 @@ import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import { Camera, CameraRenderOptions, Scene } from '../scenes';
+import {
+  Camera,
+  CameraRenderOptions,
+  OrthographicCamera,
+  Scene,
+} from '../scenes';
 import {
   DepthBuffer,
   EntityType,
@@ -460,16 +465,79 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    *  values zoom out.
    */
   public async zoomCamera(delta: number): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector;
-      const v = Vector3.normalize(vv);
+    return this.transformCamera(({ camera, viewport, frame }) => {
+      if (viewport != null && frame != null) {
+        const isPerspective = camera?.toFrameCamera().isPerspective();
 
-      const distance = Vector3.magnitude(vv);
-      const epsilon = (3 * distance * delta) / viewport.height;
+        if (isPerspective) {
+          const vv = camera.viewVector;
+          const v = Vector3.normalize(vv);
 
-      const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
-      const newCamera = camera.update({ position });
-      return newCamera;
+          const distance = Vector3.magnitude(vv);
+          const epsilon = (3 * distance * delta) / viewport.height;
+
+          const position = Vector3.add(
+            camera.position,
+            Vector3.scale(epsilon, v)
+          );
+
+          const newCamera = camera.update({ position });
+          return newCamera;
+        } else {
+          const orthographicCamera = camera as unknown as OrthographicCamera;
+
+          const relativeDelta =
+            3 * (orthographicCamera.fovHeight / viewport.height) * delta;
+          const fovHeight = Math.max(
+            1,
+            orthographicCamera.fovHeight - relativeDelta
+          );
+
+          const frameCam = camera.toFrameCamera();
+          const dir = frameCam.direction;
+          const ray = viewport.transformPointToRay(
+            viewport.center,
+            frame.image,
+            frameCam
+          );
+
+          const planeToZoomTowards = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt
+          );
+          const pointToZoomTowards = Ray.intersectPlane(
+            ray,
+            planeToZoomTowards
+          );
+
+          if (pointToZoomTowards != null) {
+            const projectedLookAt = Plane.projectPoint(
+              planeToZoomTowards,
+              orthographicCamera.lookAt
+            );
+            const diff = Vector3.scale(
+              (orthographicCamera.fovHeight - fovHeight) /
+                orthographicCamera.fovHeight,
+              Vector3.subtract(pointToZoomTowards, projectedLookAt)
+            );
+
+            // Perform update for orthographic camera
+            // rotationPoint should match lookAt after a zoom interaction
+            const updatedLookAt = Vector3.add(orthographicCamera.lookAt, diff);
+            const newCamera = camera.update({
+              lookAt: updatedLookAt,
+              rotationPoint: updatedLookAt,
+              fovHeight: Math.max(
+                1,
+                orthographicCamera.fovHeight - relativeDelta
+              ),
+            });
+            return newCamera;
+          }
+        }
+      }
+
+      return camera;
     });
   }
 
