@@ -472,13 +472,21 @@ export abstract class InteractionApi<T extends Camera = Camera> {
         if (isPerspective) {
           const vv = camera.viewVector;
 
-          // Calculate the scalar determining the amount to zoom
+          // Calculate the unit-less scalar determining the amount to zoom. The delta parameter
+          // is scaled by the viewport height because if the viewport is larger, then the
+          // user should have to perform a bigger action to zoom the model the same amount.
+          // Note that delta and viewport.height both have units of pixels. Further, the
+          // 3 multiplier was chosen to match the desired zoom speed.
           const distance = Vector3.magnitude(vv);
-          const epsilon = (3 * distance * delta) / viewport.height;
+          const relativeDeltaToViewportHeight =
+            3 * distance * (delta / viewport.height);
 
           // Scale the current viewVector by the scalar calculated above to determine how to adjust the camera position
           const v = Vector3.normalize(vv);
-          const positionChange = Vector3.scale(epsilon, v);
+          const positionChange = Vector3.scale(
+            relativeDeltaToViewportHeight,
+            v
+          );
 
           // Calculate the new camera position
           const position = Vector3.add(camera.position, positionChange);
