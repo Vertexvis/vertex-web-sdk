@@ -13,7 +13,12 @@ import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import { Camera, CameraRenderOptions, Scene } from '../scenes';
+import {
+  Camera,
+  CameraRenderOptions,
+  OrthographicCamera,
+  Scene,
+} from '../scenes';
 import {
   DepthBuffer,
   EntityType,
@@ -460,16 +465,112 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    *  values zoom out.
    */
   public async zoomCamera(delta: number): Promise<void> {
-    return this.transformCamera(({ camera, viewport }) => {
-      const vv = camera.viewVector;
-      const v = Vector3.normalize(vv);
+    return this.transformCamera(({ camera, viewport, frame, boundingBox }) => {
+      if (viewport != null && frame != null) {
+        const isPerspective = camera?.toFrameCamera().isPerspective();
 
-      const distance = Vector3.magnitude(vv);
-      const epsilon = (3 * distance * delta) / viewport.height;
+        if (isPerspective) {
+          const vv = camera.viewVector;
 
-      const position = Vector3.add(camera.position, Vector3.scale(epsilon, v));
-      const newCamera = camera.update({ position });
-      return newCamera;
+          // Calculate the unit-less scalar determining the amount to zoom. The delta parameter
+          // is scaled by the viewport height because if the viewport is larger, then the
+          // user should have to perform a bigger action to zoom the model the same amount.
+          // Note that delta and viewport.height both have units of pixels. Further, the
+          // 3 multiplier was chosen to match the desired zoom speed.
+          const distance = Vector3.magnitude(vv);
+          const relativeDeltaToViewportHeight =
+            3 * distance * (delta / viewport.height);
+
+          // Scale the current viewVector by the scalar calculated above to determine how to adjust the camera position
+          const v = Vector3.normalize(vv);
+          const positionChange = Vector3.scale(
+            relativeDeltaToViewportHeight,
+            v
+          );
+
+          // Calculate the new camera position
+          const position = Vector3.add(camera.position, positionChange);
+
+          // Update the camera with the new position
+          const newCamera = camera.update({ position });
+          return newCamera;
+        } else {
+          // Retrieve properties of the current camera
+          const orthographicCamera = camera as unknown as OrthographicCamera;
+          const frameCam = camera.toFrameCamera();
+          const dir = frameCam.direction;
+          const ray = viewport.transformPointToRay(
+            viewport.center,
+            frame.image,
+            frameCam
+          );
+
+          // Calculate the unit-less scalar determining the amount to zoom. The delta parameter
+          // is scaled by the viewport height because if the viewport is larger, then the
+          // user should have to perform a bigger action to zoom the model the same amount.
+          // Note that delta and viewport.height both have units of pixels. Further, the
+          // 4 multiplier was chosen to match the desired zoom speed.
+          const relativeDeltaToViewportHeight = 4 * (delta / viewport.height);
+
+          // Calculate the fovHeight after performing the zoom. zoomedFovHeight has the
+          // same units of camera.fovHeight (the world units). The new fovHeight
+          // has a minimum value, which is a function of the size of the bounding box,
+          // which ensures the new fovHeight is a positive, non-zero number.
+          const minimumFovHeight =
+            Vector3.magnitude(BoundingBox.diagonal(boundingBox)) * 1e-5;
+          const zoomedFovHeight = Math.max(
+            minimumFovHeight,
+            orthographicCamera.fovHeight * (1 - relativeDeltaToViewportHeight)
+          );
+
+          // Calculate the plane and point to zoom relative to
+          const planeToZoomRelativeTo = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt
+          );
+          const pointToZoomRelativeTo = Ray.intersectPlane(
+            ray,
+            planeToZoomRelativeTo
+          );
+
+          if (pointToZoomRelativeTo != null) {
+            // Project the current look at point onto the zoom plane
+            const projectedLookAt = Plane.projectPoint(
+              planeToZoomRelativeTo,
+              orthographicCamera.lookAt
+            );
+
+            // Calculate the vector to determine how to adjust the camera's look at point.
+            // Ensure that the viewVector is scaled to the expected length in order to
+            // ensure other camera calculations are correct, for example, the occlusion
+            // calculations for pins.
+            const fovHeightRelativeChange =
+              (orthographicCamera.fovHeight - zoomedFovHeight) /
+              orthographicCamera.fovHeight;
+            const lookAtChangeVector = Vector3.scale(
+              fovHeightRelativeChange,
+              Vector3.subtract(pointToZoomRelativeTo, projectedLookAt)
+            );
+
+            // Calculate the camera's new look at point
+            const updatedLookAt = Vector3.add(
+              orthographicCamera.lookAt,
+              lookAtChangeVector
+            );
+
+            // Update the orthographic camera
+            // Note rotationPoint should match lookAt after a zoom interaction
+            const newCamera = camera.update({
+              lookAt: updatedLookAt,
+              rotationPoint: updatedLookAt,
+              fovHeight: zoomedFovHeight,
+            });
+            return newCamera;
+          }
+        }
+      }
+
+      return camera;
     });
   }
 
