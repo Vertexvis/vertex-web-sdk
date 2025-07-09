@@ -169,83 +169,91 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     point: Point.Point,
     delta: number
   ): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame, depthBuffer }) => {
-      if (
-        this.orthographicZoomData == null ||
-        Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
-      ) {
-        const frameCam = camera.toFrameCamera();
-        const dir = frameCam.direction;
-        const ray = viewport.transformPointToRay(point, frame.image, frameCam);
-
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
-          dir,
-          frameCam.lookAt
-        );
-        const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
-        if (fallbackPt == null) {
-          console.warn(
-            'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+    return this.transformCamera(
+      ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
+        if (
+          this.orthographicZoomData == null ||
+          Point.distance(point, this.orthographicZoomData.startingScreenPt) > 2
+        ) {
+          const frameCam = camera.toFrameCamera();
+          const dir = frameCam.direction;
+          const ray = viewport.transformPointToRay(
+            point,
+            frame.image,
+            frameCam
           );
-          return camera;
+
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt
+          );
+          const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
+          if (fallbackPt == null) {
+            console.warn(
+              'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+            );
+            return camera;
+          }
+
+          const hitPt =
+            depthBuffer != null
+              ? this.getWorldPoint(point, depthBuffer, fallbackPt)
+              : fallbackPt;
+          const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
+          this.orthographicZoomData = {
+            hitPt,
+            hitPlane,
+            startingScreenPt: point,
+          };
         }
 
-        const hitPt =
-          depthBuffer != null
-            ? this.getWorldPoint(point, depthBuffer, fallbackPt)
-            : fallbackPt;
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(dir, hitPt);
-        this.orthographicZoomData = {
-          hitPt,
-          hitPlane,
-          startingScreenPt: point,
-        };
+        if (this.orthographicZoomData != null) {
+          const { hitPt, hitPlane } = this.orthographicZoomData;
+
+          // Calculate the unit-less scalar determining the amount to zoom. The delta parameter
+          // is scaled by the viewport height because if the viewport is larger, then the
+          // user should have to perform a bigger action to zoom the model the same amount.
+          // Note that delta and viewport.height both have units of pixels. Further, the
+          // 4 multiplier was chosen to match the desired zoom speed.
+          const relativeDeltaToViewportHeight = 4 * (delta / viewport.height);
+
+          // Calculate the fovHeight after performing the zoom. zoomedFovHeight has the
+          // same units of camera.fovHeight (the world units). The new fovHeight
+          // has a minimum value, which is a function of the size of the bounding box,
+          // which ensures the new fovHeight is a positive, non-zero number.
+          const minimumFovHeight =
+            Vector3.magnitude(BoundingBox.diagonal(boundingBox)) * 1e-5;
+          const zoomedFovHeight = Math.max(
+            minimumFovHeight,
+            camera.fovHeight * (1 - relativeDeltaToViewportHeight)
+          );
+
+          // Calculate the vector to determine how to adjust the camera's look at point.
+          // Ensure that the viewVector is scaled to the expected length in order to
+          // ensure other camera calculations are correct, for example, the occlusion
+          // calculations for pins.
+          const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
+          const fovHeightRelativeChange =
+            (camera.fovHeight - zoomedFovHeight) / camera.fovHeight;
+          const lookAtChangeVector = Vector3.scale(
+            fovHeightRelativeChange,
+            Vector3.subtract(hitPt, projectedLookAt)
+          );
+
+          // Calculate the camera's new look at point
+          const updatedLookAt = Vector3.add(camera.lookAt, lookAtChangeVector);
+
+          // Return the updated camera
+          // Note rotationPoint should match lookAt after a zoom interaction
+          return camera.update({
+            lookAt: updatedLookAt,
+            rotationPoint: updatedLookAt,
+            fovHeight: zoomedFovHeight,
+          });
+        }
+        return camera;
       }
-
-      if (this.orthographicZoomData != null) {
-        const { hitPt, hitPlane } = this.orthographicZoomData;
-
-        // Calculate the unit-less scalar determining the amount to zoom. The delta parameter
-        // is scaled by the viewport height because if the viewport is larger, then the
-        // user should have to perform a bigger action to zoom the model the same amount.
-        // Note that delta and viewport.height both have units of pixels. Further, the
-        // 4 multiplier was chosen to match the desired zoom speed.
-        const relativeDeltaToViewportHeight = 4 * (delta / viewport.height);
-
-        // Calculate the fovHeight after performing the zoom. zoomedFovHeight has the
-        // same units of camera.fovHeight (the world units). The new height
-        // has a minimum of 1, which is the maximum zoom level, and prevents problems
-        // when dividing by 0 or very small numbers.
-        const zoomedFovHeight = Math.max(
-          1,
-          camera.fovHeight * (1 - relativeDeltaToViewportHeight)
-        );
-
-        // Calculate the vector to determine how to adjust the camera's look at point.
-        // Ensure that the viewVector is scaled to the expected length in order to
-        // ensure other camera calculations are correct, for example, the occlusion
-        // calculations for pins.
-        const projectedLookAt = Plane.projectPoint(hitPlane, camera.lookAt);
-        const fovHeightRelativeChange =
-          (camera.fovHeight - zoomedFovHeight) / camera.fovHeight;
-        const lookAtChangeVector = Vector3.scale(
-          fovHeightRelativeChange,
-          Vector3.subtract(hitPt, projectedLookAt)
-        );
-
-        // Calculate the camera's new look at point
-        const updatedLookAt = Vector3.add(camera.lookAt, lookAtChangeVector);
-
-        // Return the updated camera
-        // Note rotationPoint should match lookAt after a zoom interaction
-        return camera.update({
-          lookAt: updatedLookAt,
-          rotationPoint: updatedLookAt,
-          fovHeight: zoomedFovHeight,
-        });
-      }
-      return camera;
-    });
+    );
   }
 
   /**

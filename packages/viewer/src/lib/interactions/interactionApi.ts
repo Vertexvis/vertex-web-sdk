@@ -465,7 +465,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    *  values zoom out.
    */
   public async zoomCamera(delta: number): Promise<void> {
-    return this.transformCamera(({ camera, viewport, frame }) => {
+    return this.transformCamera(({ camera, viewport, frame, boundingBox }) => {
       if (viewport != null && frame != null) {
         const isPerspective = camera?.toFrameCamera().isPerspective();
 
@@ -513,11 +513,13 @@ export abstract class InteractionApi<T extends Camera = Camera> {
           const relativeDeltaToViewportHeight = 4 * (delta / viewport.height);
 
           // Calculate the fovHeight after performing the zoom. zoomedFovHeight has the
-          // same units of orthographicCamera.fovHeight (the world units). The new height
-          // has a minimum of 1, which is the maximum zoom level, and prevents problems
-          // when dividing by 0 or very small numbers.
+          // same units of camera.fovHeight (the world units). The new fovHeight
+          // has a minimum value, which is a function of the size of the bounding box,
+          // which ensures the new fovHeight is a positive, non-zero number.
+          const minimumFovHeight =
+            Vector3.magnitude(BoundingBox.diagonal(boundingBox)) * 1e-5;
           const zoomedFovHeight = Math.max(
-            1,
+            minimumFovHeight,
             orthographicCamera.fovHeight * (1 - relativeDeltaToViewportHeight)
           );
 
