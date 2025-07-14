@@ -57,6 +57,7 @@ export const config: Config = {
   extras: {
     dynamicImportShim: true,
     shadowDomShim: true,
+    experimentalImportInjection: true,
   },
 };
 
