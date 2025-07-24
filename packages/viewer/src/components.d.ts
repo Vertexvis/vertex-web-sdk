@@ -362,6 +362,10 @@ export namespace Components {
      */
     alwaysShowIcons: boolean;
     /**
+     * Indicates whether to display an indicator that the node associated with this cell is an end item.
+     */
+    endItemIndicator?: boolean;
+    /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
     expandToggle?: boolean;
@@ -2274,6 +2278,10 @@ declare namespace LocalJSX {
      * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
      */
     alwaysShowIcons?: boolean;
+    /**
+     * Indicates whether to display an indicator that the node associated with this cell is an end item.
+     */
+    endItemIndicator?: boolean;
     /**
      * Indicates whether to display a button for toggling the expanded state of the node associated with this cell.
      */
