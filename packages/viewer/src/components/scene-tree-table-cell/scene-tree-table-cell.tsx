@@ -81,6 +81,13 @@ export class SceneTreeTableCell {
   public expandToggle?: boolean;
 
   /**
+   * Indicates whether to display an indicator that the node associated with
+   * this cell is an end item.
+   */
+  @Prop()
+  public endItemIndicator?: boolean;
+
+  /**
    * Indicates whether to display a button for toggling the visibility state of
    * the node associated with this cell.
    */
@@ -209,9 +216,13 @@ export class SceneTreeTableCell {
       this.node == null ? { visibility: 'hidden' } : undefined;
     const backgroundColorStyle = this.getBackgroundColorStyle();
 
+    const endItemIcon = this.getEndItemIcon();
     const expansionIcon = this.getExpansionIcon();
     const isolateIcon = this.getIsolateIcon();
     const visibilityIcon = this.getVisibilityIcon();
+
+    const showSpaceForExpansionIcon = this.expandToggle && !endItemIcon;
+    const showSpaceForEndItemIcon = endItemIcon && !showSpaceForExpansionIcon;
 
     return (
       <Host
@@ -228,7 +239,7 @@ export class SceneTreeTableCell {
           <div class="no-shrink">
             <slot name="left-gutter" />
           </div>
-          {this.expandToggle && (
+          {showSpaceForExpansionIcon && (
             <button
               class="expand-btn no-shrink"
               data-test-id={'expand-' + this.node?.name}
@@ -242,6 +253,17 @@ export class SceneTreeTableCell {
                   name={expansionIcon}
                   size="sm"
                 />
+              )}
+            </button>
+          )}
+
+          {showSpaceForEndItemIcon && (
+            <button
+              class="end-item-btn no-shrink"
+              data-test-id={'end-item-' + this.node?.name}
+            >
+              {endItemIcon && (
+                <vertex-viewer-icon class="icon" name={endItemIcon} size="sm" />
               )}
             </button>
           )}
@@ -343,23 +365,23 @@ export class SceneTreeTableCell {
     };
   };
 
-  private toggleExpansion = (event: PointerEvent): void => {
+  private toggleExpansion = async (event: PointerEvent): Promise<void> => {
     if (this.tree != null && this.node != null) {
       if (this.expansionHandler != null) {
         this.expansionHandler(event, this.node, this.tree);
       } else {
-        this.performDefaultExpansionOperation(this.node, this.tree);
+        await this.performDefaultExpansionOperation(this.node, this.tree);
       }
       this.expandToggled.emit({ node: this.node, originalEvent: event });
     }
   };
 
-  private toggleVisibility = (event: PointerEvent): void => {
+  private toggleVisibility = async (event: PointerEvent): Promise<void> => {
     if (this.tree != null && this.node != null) {
       if (this.visibilityHandler != null) {
         this.visibilityHandler(event, this.node, this.tree);
       } else {
-        this.performDefaultVisibilityOperation(this.node, this.tree);
+        await this.performDefaultVisibilityOperation(this.node, this.tree);
       }
       this.visibilityToggled.emit({ node: this.node, originalEvent: event });
     }
@@ -373,12 +395,12 @@ export class SceneTreeTableCell {
     }
   }
 
-  private isolate = (event: PointerEvent): void => {
+  private isolate = async (event: PointerEvent): Promise<void> => {
     if (this.tree != null && this.node != null) {
       if (this.isolateHandler != null) {
         this.isolateHandler(event, this.node, this.tree);
       } else {
-        this.performDefaultIsolateOperation(this.node, this.tree);
+        await this.performDefaultIsolateOperation(this.node, this.tree);
       }
       this.isolatePressed.emit({ node: this.node, originalEvent: event });
     }
@@ -401,25 +423,25 @@ export class SceneTreeTableCell {
     }
   };
 
-  private performDefaultVisibilityOperation = (
+  private performDefaultVisibilityOperation = async (
     node: Node.AsObject,
     tree: HTMLVertexSceneTreeElement
-  ): void => {
-    tree.toggleItemVisibility(node);
+  ): Promise<void> => {
+    await tree.toggleItemVisibility(node);
   };
 
-  private performDefaultIsolateOperation = (
+  private performDefaultIsolateOperation = async (
     node: Node.AsObject,
     tree: HTMLVertexSceneTreeElement
-  ): void => {
-    tree.isolateItem(node);
+  ): Promise<void> => {
+    await tree.isolateItem(node);
   };
 
-  private performDefaultExpansionOperation = (
+  private performDefaultExpansionOperation = async (
     node: Node.AsObject,
     tree: HTMLVertexSceneTreeElement
-  ): void => {
-    tree.toggleExpandItem(node);
+  ): Promise<void> => {
+    await tree.toggleExpandItem(node);
   };
 
   private clearLongPressTimer(): void {
@@ -480,6 +502,13 @@ export class SceneTreeTableCell {
   private getExpansionIcon(): ViewerIconName | undefined {
     if (!this.node?.isLeaf && !this.node?.endItem) {
       return this.node?.expanded ? 'chevron-down' : 'chevron-right';
+    }
+    return undefined;
+  }
+
+  private getEndItemIcon(): ViewerIconName | undefined {
+    if (this.endItemIndicator && this.node?.endItem) {
+      return 'lock';
     }
     return undefined;
   }

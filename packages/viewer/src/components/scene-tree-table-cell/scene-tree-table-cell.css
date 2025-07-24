@@ -72,12 +72,26 @@
   min-height: 24px;
 }
 
+:host([is-leaf]) .expand-btn,
+:host([is-end-item]) .expand-btn {
+  visibility: hidden;
+  cursor: default;
+}
+
 .no-shrink {
   flex-shrink: 0;
 }
 
-:host([is-leaf]) .expand-btn,
-:host([is-end-item]) .expand-btn {
+.end-item-btn {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+:host(:not([is-end-item])) .end-item-btn {
   visibility: hidden;
   cursor: default;
 }
