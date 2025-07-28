@@ -115,9 +115,9 @@ export class CursorManager {
     preventDuplicate = false
   ): Disposable {
     if (preventDuplicate) {
-      const hasDuplicate = this.getExistingDuplicateCursor(cursor);
-      if (hasDuplicate != null) {
-        return hasDuplicate;
+      const duplicateCursor = this.getExistingDuplicateCursor(cursor);
+      if (duplicateCursor != null) {
+        return duplicateCursor;
       }
     }
 
