@@ -498,7 +498,8 @@ export namespace Components {
      */
     addCursor: (
       cursor: Cursor,
-      priority?: number | undefined
+      priority?: number | undefined,
+      preventDuplicate?: boolean | undefined
     ) => Promise<Disposable>;
     /**
      * The annotation controller for accessing annotations associated with the scene view.

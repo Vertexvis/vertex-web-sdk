@@ -56,7 +56,7 @@
 
 ## Methods
 
-### `addCursor(cursor: Cursor, priority?: number | undefined) => Promise<Disposable>`
+### `addCursor(cursor: Cursor, priority?: number | undefined, preventDuplicate?: boolean | undefined) => Promise<Disposable>`
 
 Adds a cursor to the viewer, and displays it if the cursor has the highest
 priority.

@@ -354,10 +354,10 @@ export class ViewerMeasurementDistance {
     await this.getStencilBuffer();
     this.updateViewport();
 
-    this.handleViewerChanged(this.viewer);
-    this.handleModeChanged();
+    await this.handleViewerChanged(this.viewer);
+    await this.handleModeChanged();
 
-    this.computePropsAndState();
+    await this.computePropsAndState();
 
     this.model.onIndicatorChanged((pt) => {
       this.indicatorPt = pt;
@@ -375,8 +375,8 @@ export class ViewerMeasurementDistance {
   /**
    * @ignore
    */
-  protected componentWillUpdate(): void {
-    this.computePropsAndState();
+  protected async componentWillUpdate(): Promise<void> {
+    await this.computePropsAndState();
   }
 
   /**
@@ -440,18 +440,18 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   @Watch('viewer')
-  protected handleViewerChanged(
+  protected async handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
     oldViewer?: HTMLVertexViewerElement
-  ): void {
+  ): Promise<void> {
     if (oldViewer != null) {
       oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
-      this.removeInteractionListeners(oldViewer);
+      await this.removeInteractionListeners(oldViewer);
     }
 
     if (newViewer != null) {
       newViewer.addEventListener('frameDrawn', this.handleFrameDrawn);
-      this.addInteractionListeners(newViewer);
+      await this.addInteractionListeners(newViewer);
     }
   }
 
@@ -475,7 +475,7 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   @Watch('mode')
-  protected handleModeChanged(): void {
+  protected async handleModeChanged(): Promise<void> {
     this.warnIfDepthBuffersDisabled();
 
     // If we're not in edit or replace mode, ensure that the measurement
@@ -485,8 +485,8 @@ export class ViewerMeasurementDistance {
     }
 
     if (this.viewer != null) {
-      this.removeInteractionListeners(this.viewer);
-      this.addInteractionListeners(this.viewer);
+      await this.removeInteractionListeners(this.viewer);
+      await this.addInteractionListeners(this.viewer);
     }
   }
 
@@ -514,9 +514,9 @@ export class ViewerMeasurementDistance {
     this.updateInteractionModel();
   }
 
-  private computePropsAndState(): void {
+  private async computePropsAndState(): Promise<void> {
     this.updateCamera();
-    this.updateDepthBuffer();
+    await this.updateDepthBuffer();
     this.updateMeasurementPropsFromModel();
     this.updateOverlays();
   }
@@ -539,7 +539,11 @@ export class ViewerMeasurementDistance {
     this.stateMap.hoverCursor?.dispose();
 
     if (!this.isUserInteractingWithModel) {
-      this.stateMap.hoverCursor = await this.viewer?.addCursor(cursor);
+      this.stateMap.hoverCursor = await this.viewer?.addCursor(
+        cursor,
+        undefined,
+        true
+      );
     }
   }
 
