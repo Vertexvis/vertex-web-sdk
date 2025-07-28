@@ -1,10 +1,52 @@
-import { CursorManager } from '../cursors';
+import { CursorManager, measurementCursor } from '../cursors';
 
 describe(CursorManager, () => {
   it('can add a cursor', () => {
     const cursors = new CursorManager();
+
+    const listener = jest.fn();
+    cursors.onChanged.on(listener);
+
     cursors.add('crosshair');
+
     expect(cursors.getActiveCursor()).toBeDefined();
+    expect(listener).toHaveBeenCalled();
+  });
+
+  it('adds a duplicate cursor when preventDuplicate is false', () => {
+    const cursors = new CursorManager();
+
+    const listener = jest.fn();
+    cursors.onChanged.on(listener);
+
+    cursors.add(measurementCursor);
+
+    expect(cursors.getActiveCursor()).toBeDefined();
+    expect(listener).toHaveBeenCalled();
+
+    listener.mockClear();
+
+    cursors.add(measurementCursor, undefined, false);
+
+    expect(listener).toHaveBeenCalled();
+  });
+
+  it('does not add a duplicate cursor when preventDuplicate is true', () => {
+    const cursors = new CursorManager();
+
+    const listener = jest.fn();
+    cursors.onChanged.on(listener);
+
+    cursors.add(measurementCursor);
+
+    expect(cursors.getActiveCursor()).toBeDefined();
+    expect(listener).toHaveBeenCalled();
+
+    listener.mockClear();
+
+    cursors.add(measurementCursor, undefined, true);
+
+    expect(listener).not.toHaveBeenCalled();
   });
 
   it('can remove a cursor', () => {
