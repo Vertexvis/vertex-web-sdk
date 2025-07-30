@@ -111,14 +111,12 @@ export class CursorManager {
    */
   public add(
     cursor: Cursor,
-    priority = CursorManager.NORMAL_PRIORITY,
-    preventDuplicate = false
+    priority = CursorManager.NORMAL_PRIORITY
   ): Disposable {
-    if (preventDuplicate) {
-      const duplicateCursor = this.getExistingDuplicateCursor(cursor);
-      if (duplicateCursor != null) {
-        return duplicateCursor;
-      }
+    // Do not add a duplicate cursor
+    const duplicateCursor = this.getExistingDuplicateCursor(cursor, priority);
+    if (duplicateCursor != null) {
+      return duplicateCursor;
     }
 
     const id = ++this.nextId;
@@ -142,16 +140,19 @@ export class CursorManager {
   }
 
   /**
-   * Checks to see if an existing cursor matches the provided cursor.
+   * Checks to see if an existing cursor matches the provided cursor and priority level.
    * The matching cursor is returned if found.
    *
    * @param cursorToCheck The cursor to check for duplicates against.
+   * @param priorityToCheck The priority level to check for duplicates against.
    */
   private getExistingDuplicateCursor(
-    cursorToCheck: Cursor
+    cursorToCheck: Cursor,
+    priorityToCheck: number
   ): CursorInstance | undefined {
     const cursorMatches = this.cursors.filter(
-      (cursor) => cursor.cursor === cursorToCheck
+      (cursor) =>
+        cursor.cursor === cursorToCheck && cursor.priority === priorityToCheck
     );
 
     if (cursorMatches.length > 0) {

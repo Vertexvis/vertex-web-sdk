@@ -541,8 +541,7 @@ export class ViewerMeasurementDistance {
     if (!this.isUserInteractingWithModel) {
       this.stateMap.hoverCursor = await this.viewer?.addCursor(
         cursor,
-        undefined,
-        true
+        undefined
       );
     }
   }

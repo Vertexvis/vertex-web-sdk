@@ -751,10 +751,9 @@ export class Viewer {
   @Method()
   public async addCursor(
     cursor: Cursor,
-    priority?: number,
-    preventDuplicate?: boolean
+    priority?: number
   ): Promise<Disposable> {
-    return this.stateMap.cursorManager.add(cursor, priority, preventDuplicate);
+    return this.stateMap.cursorManager.add(cursor, priority);
   }
 
   @Method()
