@@ -10,7 +10,7 @@ describe(CursorManager, () => {
     cursors.add('crosshair');
 
     expect(cursors.getActiveCursor()).toBeDefined();
-    expect(listener).toHaveBeenCalled();
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 
   it('does not add a duplicate cursor', () => {
@@ -22,13 +22,13 @@ describe(CursorManager, () => {
     cursors.add(measurementCursor);
 
     expect(cursors.getActiveCursor()).toBeDefined();
-    expect(listener).toHaveBeenCalled();
+    expect(listener).toHaveBeenCalledTimes(1);
 
     listener.mockClear();
 
     cursors.add(measurementCursor);
 
-    expect(listener).not.toHaveBeenCalled();
+    expect(listener).toHaveBeenCalledTimes(2);
   });
 
   it('can remove a cursor', () => {
