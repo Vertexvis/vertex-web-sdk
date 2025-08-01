@@ -40,6 +40,7 @@ export type DomainPropertyValue =
 export interface DomainPropertyEntry {
   id: string;
   key?: DomainPropertyKey | null;
+  value?: DomainPropertyValue | null;
 }
 export interface SceneItemMetadataResponse {
   paging: PagingLinks;
