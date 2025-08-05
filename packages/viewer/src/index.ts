@@ -19,6 +19,7 @@ export * from './lib/interactions/interactionHandler';
 export * from './lib/interactions/keyInteraction';
 export * from './lib/measurement';
 export * from './lib/model-views';
+export * from './lib/scene-items';
 export * from './lib/pins';
 export * from './lib/pmi';
 export { SceneViewItem } from './lib/scene-items';
