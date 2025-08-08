@@ -375,7 +375,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    *  viewer.
    */
   public async rotateCamera(delta: Point.Point): Promise<void> {
-    return this.transformCamera(({ camera, viewport, boundingBox }) => {
+    return this.transformCamera(({ camera, viewport }) => {
       const upVector = Vector3.normalize(camera.up);
       const directionVector = Vector3.normalize(
         Vector3.subtract(camera.lookAt, camera.position)
@@ -404,57 +404,54 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     delta: Point.Point,
     point: Point.Point
   ): Promise<void> {
-    return this.transformCamera(
-      ({ camera, viewport, boundingBox, depthBuffer }) => {
-        if (this.worldRotationPoint == null) {
-          const worldCenter = BoundingBox.center(boundingBox);
-          this.worldRotationPoint =
-            depthBuffer != null
-              ? this.getWorldPoint(point, depthBuffer, worldCenter)
-              : camera.lookAt;
-        }
-
-        const upVector = Vector3.normalize(camera.up);
-        const vv = Vector3.normalize(
-          Vector3.subtract(camera.lookAt, camera.position)
-        );
-
-        const crossX = Vector3.cross(upVector, vv);
-        const crossY = Vector3.cross(vv, crossX);
-
-        const mouseToWorld = Vector3.normalize({
-          x: delta.x * crossX.x + delta.y * crossY.x,
-          y: delta.x * crossX.y + delta.y * crossY.y,
-          z: delta.x * crossX.z + delta.y * crossY.z,
-        });
-
-        const rotationAxis = Vector3.cross(mouseToWorld, vv);
-
-        // The 9.5 multiplier was chosen to match the desired rotation speed
-        const epsilonX = (9.5 * delta.x) / viewport.width;
-        const epsilonY = (9.5 * delta.y) / viewport.height;
-        const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
-
-        const updated = camera.rotateAroundAxisAtPoint(
-          angle,
-          this.worldRotationPoint,
-          rotationAxis
-        );
-
-        return updated.update({
-          // Scale the lookAt point to the same length as the distance to the
-          // center of the bounding box to maintain zoom and pan behavior.
-          lookAt: Vector3.add(
-            Vector3.scale(
-              Math.abs(camera.signedDistanceToBoundingBoxCenter()) /
-                Vector3.magnitude(updated.viewVector),
-              updated.viewVector
-            ),
-            updated.position
-          ),
-        });
+    return this.transformCamera(({ camera, viewport, depthBuffer }) => {
+      if (this.worldRotationPoint == null) {
+        this.worldRotationPoint =
+          depthBuffer != null
+            ? this.getWorldPoint(point, depthBuffer, camera.lookAt)
+            : camera.lookAt;
       }
-    );
+
+      const upVector = Vector3.normalize(camera.up);
+      const vv = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position)
+      );
+
+      const crossX = Vector3.cross(upVector, vv);
+      const crossY = Vector3.cross(vv, crossX);
+
+      const mouseToWorld = Vector3.normalize({
+        x: delta.x * crossX.x + delta.y * crossY.x,
+        y: delta.x * crossX.y + delta.y * crossY.y,
+        z: delta.x * crossX.z + delta.y * crossY.z,
+      });
+
+      const rotationAxis = Vector3.cross(mouseToWorld, vv);
+
+      // The 9.5 multiplier was chosen to match the desired rotation speed
+      const epsilonX = (9.5 * delta.x) / viewport.width;
+      const epsilonY = (9.5 * delta.y) / viewport.height;
+      const angle = Math.abs(epsilonX) + Math.abs(epsilonY);
+
+      const updated = camera.rotateAroundAxisAtPoint(
+        angle,
+        this.worldRotationPoint,
+        rotationAxis
+      );
+
+      return updated.update({
+        // Scale the lookAt point to the same length as the distance to the
+        // center of the bounding box to maintain zoom and pan behavior.
+        lookAt: Vector3.add(
+          Vector3.scale(
+            Math.abs(camera.signedDistanceToBoundingBoxCenter()) /
+              Vector3.magnitude(updated.viewVector),
+            updated.viewVector
+          ),
+          updated.position
+        ),
+      });
+    });
   }
 
   /**
