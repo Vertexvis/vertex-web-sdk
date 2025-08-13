@@ -1,5 +1,4 @@
 jest.mock('@vertexvis/stream-api');
-jest.mock('@vertexvis/html-templates');
 jest.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
 );
@@ -13,7 +12,6 @@ jest.mock('../scene-tree/lib/dom');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import { generateInstanceFromTemplate } from '@vertexvis/html-templates';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
@@ -610,17 +608,6 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(0);
-    (generateInstanceFromTemplate as jest.Mock).mockReturnValue({
-      bindings: {
-        bind: jest.fn(),
-      },
-      element: {
-        style: {},
-        clientHeight: 0,
-        remove: jest.fn(),
-        childNodes: [],
-      },
-    });
 
     const controller = new SceneTreeController(client, 100);
     const { page, table } = await newSceneTreeTableSpec({
@@ -629,7 +616,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
         <vertex-scene-tree-table-layout row-height="0">
           <vertex-scene-tree-table-column initial-width="100" max-width="100">
             <template>
-              <div></div>
+              <div style="height: 0;"></div>
             </template>
           </vertex-scene-tree-table-column>
         </vertex-scene-tree-table-layout>

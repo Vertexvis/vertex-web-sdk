@@ -354,7 +354,8 @@ export class SceneTreeTableLayout {
       viewportHeight > 0 &&
       !this.isComputingCellHeight;
 
-    if (canComputeIndices) {
+    // if (canComputeIndices) {
+    if (viewportHeight != null) {
       const viewportCount = Math.ceil(viewportHeight / this.rowHeight);
 
       const viewportStartIndex = Math.floor(this.scrollOffset / this.rowHeight);
