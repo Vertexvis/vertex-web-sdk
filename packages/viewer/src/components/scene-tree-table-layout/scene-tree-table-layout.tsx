@@ -284,10 +284,6 @@ export class SceneTreeTableLayout {
   @Watch('totalRows')
   @Watch('rowHeight')
   protected async handleViewportRowsPropsChanged(): Promise<void> {
-    if (this.isComputingCellHeight) {
-      await this.computeCellHeight();
-    }
-
     await this.computeAndUpdateViewportRows();
   }
 
@@ -353,7 +349,12 @@ export class SceneTreeTableLayout {
 
   private computeViewportRows(): void {
     const viewportHeight = this.getLayoutHeight();
-    if (viewportHeight != null) {
+    const canComputeIndices =
+      viewportHeight != null &&
+      viewportHeight > 0 &&
+      !this.isComputingCellHeight;
+
+    if (canComputeIndices) {
       const viewportCount = Math.ceil(viewportHeight / this.rowHeight);
 
       const viewportStartIndex = Math.floor(this.scrollOffset / this.rowHeight);

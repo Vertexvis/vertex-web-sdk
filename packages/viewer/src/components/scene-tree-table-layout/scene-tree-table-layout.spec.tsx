@@ -602,6 +602,53 @@ describe('<vertex-scene-tree-table-layout>', () => {
       tableContainer.querySelector('vertex-scene-tree-table-cell')?.isScrolling
     ).toBeFalsy();
   });
+
+  it('does not compute NaN values for active row indices', async () => {
+    const client = mockSceneTreeClient();
+    mockGetTree({ client });
+
+    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(0);
+
+    const controller = new SceneTreeController(client, 100);
+    const { page, table } = await newSceneTreeTableSpec({
+      controller,
+      html: `
+        <vertex-scene-tree-table-layout row-height="0">
+          <vertex-scene-tree-table-column initial-width="100" max-width="100">
+            <template>
+              <div style="height: 0;"></div>
+            </template>
+          </vertex-scene-tree-table-column>
+        </vertex-scene-tree-table-layout>
+      `,
+    });
+
+    const mockRow = {
+      index: 0,
+      node: createNode(),
+      metadata: {},
+      data: {},
+    };
+    controller.updateState({
+      totalRows: 0,
+      isSearching: false,
+      rows: [mockRow],
+      connection: {
+        type: 'connected',
+        jwtProvider: () => 'jwt',
+        sceneViewId: 'scene-view-id',
+        subscription: { dispose: jest.fn() },
+      },
+    });
+    table.rows = [mockRow];
+    table.totalRows = table.rows.length;
+
+    await page.waitForChanges();
+
+    const activeRowRange = controller.getActiveRowRange();
+    expect(activeRowRange[0]).not.toBeNaN();
+    expect(activeRowRange[1]).not.toBeNaN();
+  });
 });
 
 async function newSceneTreeTableSpec(data?: {
@@ -636,6 +683,8 @@ async function newSceneTreeTableSpec(data?: {
   const table = page.body.querySelector(
     'vertex-scene-tree-table-layout'
   ) as HTMLVertexSceneTreeTableLayoutElement;
+
+  table.controller = data?.controller;
 
   return {
     table,

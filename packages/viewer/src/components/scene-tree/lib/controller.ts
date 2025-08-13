@@ -793,6 +793,16 @@ export class SceneTreeController {
   }
 
   /**
+   * @internal
+   * @ignore
+   *
+   * Visible for testing.
+   */
+  public getActiveRowRange(): number[] {
+    return this.activeRowRange;
+  }
+
+  /**
    * Returns the page at the given index, or `undefined` if one doesn't exist.
    *
    * @param index The index to return.
@@ -1170,7 +1180,13 @@ export class SceneTreeController {
     return false;
   }
 
-  private updateState(newState: SceneTreeState): void {
+  /**
+   * @internal
+   * @ignore
+   *
+   * Visible for testing.
+   */
+  public updateState(newState: SceneTreeState): void {
     const didClearLoadingTimer = this.tryClearLoadingTimer(newState);
 
     this.state = {
@@ -1318,7 +1334,12 @@ export class SceneTreeController {
   }
 
   private constrainRowOffsets(start: number, end: number): [number, number] {
-    return [Math.max(0, start), Math.min(this.state.totalRows - 1, end)];
+    const constrainedStart = !Number.isNaN(start) ? Math.max(0, start) : 0;
+    const constrainedEnd = !Number.isNaN(end)
+      ? Math.min(this.state.totalRows - 1, end)
+      : this.state.totalRows - 1;
+
+    return [constrainedStart, constrainedEnd];
   }
 
   private get maxPages(): number {

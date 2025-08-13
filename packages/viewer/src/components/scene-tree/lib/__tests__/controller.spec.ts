@@ -1415,6 +1415,29 @@ describe(SceneTreeController, () => {
 
       expect(rows.slice(0, 20).every((row) => row != null)).toBe(true);
     });
+
+    it('uses default values for start or end indices if NaN', async () => {
+      const { controller, client } = createController(10);
+      (client.getTree as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+      );
+
+      await controller.connect(jwtProvider);
+
+      const pendingRows = new Promise<Row[]>((resolve) => {
+        controller.onStateChange.on((state) => {
+          if (state.rows.slice(0, 20).every((row) => row != null)) {
+            resolve(state.rows);
+          }
+        });
+      });
+
+      controller.updateActiveRowRange(NaN, NaN);
+
+      const rows = await pendingRows;
+
+      expect(rows.slice(0, 20).every((row) => row != null)).toBe(true);
+    });
   });
 
   describe(SceneTreeController.prototype.fetchMetadataKeys, () => {
