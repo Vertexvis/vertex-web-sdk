@@ -123,6 +123,26 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(cell.shadowRoot?.querySelector('.icon-expanded')).toBeFalsy();
   });
 
+  it('renders end item icon if end item indicator is true and item is an end item', async () => {
+    const node = createNode({ endItem: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell end-item-indicator></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeDefined();
+  });
+
+  it('does not render end item icon if end item indicator is false', async () => {
+    const node = createNode({ endItem: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
+  });
+
   it('renders visible icon if visibility toggle is true and item is visible', async () => {
     const node = createNode({ visible: true });
     const { cell } = await newComponentSpec({

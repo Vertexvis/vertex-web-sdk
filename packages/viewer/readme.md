@@ -27,11 +27,11 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/viewer/viewer.css"
+      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.8/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/viewer/viewer.esm.js"
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.8/dist/viewer/viewer.esm.js"
     ></script>
   </head>
 
@@ -53,7 +53,7 @@ These utilities can be imported from a CDN as shown below:
   </head>
   <body>
     <script type="module">
-      import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.5/dist/esm/index.mjs';
+      import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.8/dist/esm/index.mjs';
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');
@@ -90,7 +90,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^0.23.5"
+    "@vertexvis/viewer": "^0.23.8"
   }
 }
 ```
@@ -236,6 +236,7 @@ See below for the list of components and links to their READMEs:
   - [\<vertex-scene-tree-table-column>](./src/components/scene-tree-table-column)
   - [\<vertex-scene-tree-table-cell>](./src/components/scene-tree-table-cell)
   - [\<vertex-scene-tree-search>](./src/components/scene-tree-search)
+  - [\<vertex-scene-tree-notification-banner>](./src/components/scene-tree-notification-banner)
 
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components

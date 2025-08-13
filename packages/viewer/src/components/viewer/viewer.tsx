@@ -211,8 +211,13 @@ export class Viewer {
   @Prop() public keyboardControls = true;
 
   /**
-   * Enables or disables the default rotation interaction being changed to
-   * rotate around the pointer down location.
+   * Sets the rotation interaction behavior. True by default.
+   *
+   * When rotateAroundTapPoint is true and the user clicks on geometry, then the model will rotate
+   * around the point that was clicked. When rotateAroundTapPoint is true and the user clicks
+   * in empty space (not on geometry), then the model will rotate around the center of the viewport.
+   *
+   * When rotateAroundTapPoint is false, then the model will always rotate around the center of the viewport.
    */
   @Prop() public rotateAroundTapPoint = true;
 
