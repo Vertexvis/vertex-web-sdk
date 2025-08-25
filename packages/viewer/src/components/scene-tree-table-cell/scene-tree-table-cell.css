@@ -96,6 +96,12 @@
   cursor: default;
 }
 
+.end-item-icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--scene-tree-secondary-font-color, var(--neutral-600));
+}
+
 .visibility-btn,
 .isolate-btn {
   cursor: pointer;

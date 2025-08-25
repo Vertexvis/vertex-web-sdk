@@ -263,7 +263,11 @@ export class SceneTreeTableCell {
               data-test-id={'end-item-' + this.node?.name}
             >
               {endItemIcon && (
-                <vertex-viewer-icon class="icon" name={endItemIcon} size="sm" />
+                <vertex-viewer-icon
+                  class="end-item-icon"
+                  name={endItemIcon}
+                  size="sm"
+                />
               )}
             </button>
           )}
@@ -507,7 +511,7 @@ export class SceneTreeTableCell {
   }
 
   private getEndItemIcon(): ViewerIconName | undefined {
-    if (this.endItemIndicator && this.node?.endItem) {
+    if (this.endItemIndicator && this.node?.endItem && !this.node?.isLeaf) {
       return 'lock';
     }
     return undefined;

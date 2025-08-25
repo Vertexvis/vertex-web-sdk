@@ -143,6 +143,16 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
   });
 
+  it('does not render end item icon if item is a leaf', async () => {
+    const node = createNode({ endItem: true, isLeaf: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
+  });
+
   it('renders visible icon if visibility toggle is true and item is visible', async () => {
     const node = createNode({ visible: true });
     const { cell } = await newComponentSpec({
