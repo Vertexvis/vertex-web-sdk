@@ -99,7 +99,7 @@
 .end-item-icon {
   width: 14px;
   height: 14px;
-  fill: var(--neutral-600);
+  fill: var(--scene-tree-secondary-font-color, var(--neutral-600));
 }
 
 .visibility-btn,
