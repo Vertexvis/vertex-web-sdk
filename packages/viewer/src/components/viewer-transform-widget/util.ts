@@ -320,6 +320,58 @@ export function computeInputPosition(
   }
 }
 
+export function calculateNewRotationAngle(
+  event: PointerEvent,
+  angleOfRotation: number, // In radians
+  lastAngle: number, // In radians
+  existingAngle?: number, // In degrees
+  degreeToSnapToWhenRotating?: number // In degrees
+): number {
+  // Check if the widget should snap to a certain angle
+  if (
+    event.shiftKey &&
+    degreeToSnapToWhenRotating != null &&
+    degreeToSnapToWhenRotating > 0 &&
+    Number.isInteger(degreeToSnapToWhenRotating)
+  ) {
+    const angleChangeRelativeToLastAngle = angleOfRotation - lastAngle;
+    const angleChangeRelativeToLastAngleDegrees = Angle.toDegrees(
+      angleChangeRelativeToLastAngle
+    );
+
+    // This method rounds the angle change to the nearest multiple of this.degreeToSnapToWhenRotating
+    const angleChangeRounded =
+      Math.round(
+        angleChangeRelativeToLastAngleDegrees / degreeToSnapToWhenRotating
+      ) * degreeToSnapToWhenRotating;
+
+    // Check if there is already an existing rotation angle
+    if (existingAngle != null) {
+      // If there is an existing angle displayed in the widget, it might not be a multiple of the
+      // desired number, so the difference needs to be accounted for
+      const existingAngleRounded =
+        Math.round(existingAngle / degreeToSnapToWhenRotating) *
+        degreeToSnapToWhenRotating;
+      const neededAdjustmentDueToExistingAngle =
+        existingAngle - existingAngleRounded;
+
+      // Adjust the rounded angle change to account for the existing angle, then
+      // covert the rounded value to radians and return
+      const adjustedAngle =
+        angleChangeRounded - neededAdjustmentDueToExistingAngle;
+      const angleChangeRoundedRadians = Angle.toRadians(adjustedAngle);
+      return angleChangeRoundedRadians + lastAngle;
+    } else {
+      // There isn't an existing angle to account for, so convert the rounded value to radians and return
+      const angleChangeRoundedRadians = Angle.toRadians(angleChangeRounded);
+      return angleChangeRoundedRadians + lastAngle;
+    }
+  } else {
+    // Angle should not be snapped, so return the original angle
+    return angleOfRotation;
+  }
+}
+
 function appliedToCurrent(
   current: Matrix4.Matrix4,
   delta: Matrix4.Matrix4
