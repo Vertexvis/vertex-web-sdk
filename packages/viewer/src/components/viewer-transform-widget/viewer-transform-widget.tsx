@@ -598,7 +598,6 @@ export class ViewerTransformWidget {
         currentCanvas != null
           ? Angle.fromPoints(widgetCenter, currentCanvas)
           : 0;
-      // console.log('this.lastAngle in begin drag = ' + this.lastAngle);
 
       this.lastWorldPosition = convertCanvasPointToWorld(
         currentCanvas,
