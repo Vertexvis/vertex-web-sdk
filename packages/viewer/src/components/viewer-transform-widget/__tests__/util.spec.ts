@@ -10,6 +10,7 @@ import {
 import { Viewport } from '../../../lib/types';
 import { makePerspectiveFrame } from '../../../testing/fixtures';
 import {
+  calculateNewRotationAngle,
   computeHandleDeltaTransform,
   computeInputDeltaTransform,
   computeInputDisplayValue,
@@ -510,6 +511,71 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(topRight.placement).toBe('top-right');
       expect(bottomLeft.placement).toBe('bottom-left');
       expect(bottomRight.placement).toBe('bottom-right');
+    });
+  });
+
+  describe(calculateNewRotationAngle, () => {
+    const pointerMoveWithShift = new MouseEvent('pointermove', {
+      screenX: 110,
+      screenY: 60,
+      buttons: 1,
+      bubbles: true,
+      shiftKey: true,
+    }) as PointerEvent;
+    const pointerMoveWithoutShift = new MouseEvent('pointermove', {
+      screenX: 110,
+      screenY: 60,
+      buttons: 1,
+      bubbles: true,
+      shiftKey: false,
+    }) as PointerEvent;
+
+    it('returns the original angle when degreeToSnapToWhenRotating is undefined', () => {
+      const angleToRotate = calculateNewRotationAngle(
+        pointerMoveWithShift,
+        0.9,
+        0.2,
+        102,
+        undefined
+      );
+
+      expect(angleToRotate).toBe(0.9);
+    });
+
+    it('returns the original angle when shift key is not held', () => {
+      const angleToRotate = calculateNewRotationAngle(
+        pointerMoveWithoutShift,
+        0.9,
+        0.2,
+        102,
+        5
+      );
+
+      expect(angleToRotate).toBe(0.9);
+    });
+
+    it('returns the rounded angle with an existing angle', () => {
+      const angleToRotate = calculateNewRotationAngle(
+        pointerMoveWithShift,
+        0.9,
+        0.2,
+        102,
+        5
+      );
+
+      expect(angleToRotate).toBe(0.8632251157578452);
+    });
+
+    it('returns the rounded angle without an existing angle', () => {
+      const angleToRotate = calculateNewRotationAngle(
+        pointerMoveWithShift,
+        0.9,
+        0.2,
+        0,
+        5
+      );
+
+      expect(angleToRotate).toBe(0.8981317007977319);
     });
   });
 });

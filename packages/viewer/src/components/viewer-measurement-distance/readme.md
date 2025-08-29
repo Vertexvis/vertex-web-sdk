@@ -9,7 +9,8 @@ between the two points.
 
 This demonstrates how to setup the component to perform measurements, and
 passing its `MeasurementModel` to a `vertex-viewer-measurement-details` to
-display its results.
+display its results. The parent `vertex-viewer` component must have **depth-buffers**
+set to either *final* or *all*.
 
 ```html
 <html>
