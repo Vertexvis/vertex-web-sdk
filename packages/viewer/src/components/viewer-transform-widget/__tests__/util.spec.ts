@@ -535,8 +535,7 @@ describe('vertex-viewer-transform-widget utils', () => {
         pointerMoveWithShift,
         0.9,
         0.2,
-        102,
-        undefined
+        102
       );
 
       expect(angleToRotate).toBe(0.9);

@@ -175,7 +175,7 @@ export class ViewerTransformWidget {
    * shift key. Defaults to undefined.
    */
   @Prop()
-  public degreeToSnapToWhenRotating?: number | undefined;
+  public degreeToSnapToWhenRotating?: number;
 
   /**
    * **EXPERIMENTAL.**
