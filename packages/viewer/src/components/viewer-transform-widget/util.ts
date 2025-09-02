@@ -18,6 +18,7 @@ import {
   Frame,
   Viewport,
 } from '../../lib/types';
+import { ModifierKey } from '../../lib/types/keys';
 import { TransformWidgetInputPlacement } from './viewer-transform-widget-components';
 
 export interface PointAndPlacement {
@@ -317,6 +318,63 @@ export function computeInputPosition(
       return { point: closestPoint, placement: 'bottom-left' };
     default:
       return { point: closestPoint, placement: 'bottom-right' };
+  }
+}
+
+export function calculateNewRotationAngle(
+  event: PointerEvent,
+  rotationSnapKey: ModifierKey,
+  angleOfRotation: number, // In radians
+  lastAngle: number, // In radians
+  existingAngle?: number, // In degrees
+  rotationSnapDegrees?: number // In degrees
+): number {
+  const rotationSnapKeyIsHeld =
+    (rotationSnapKey === 'alt' && event.altKey) ||
+    (rotationSnapKey === 'ctrl' && event.ctrlKey) ||
+    (rotationSnapKey === 'meta' && event.metaKey) ||
+    (rotationSnapKey === 'shift' && event.shiftKey);
+
+  // Check if the widget should snap to a certain angle
+  if (
+    rotationSnapKeyIsHeld &&
+    rotationSnapDegrees != null &&
+    rotationSnapDegrees > 0 &&
+    Number.isInteger(rotationSnapDegrees)
+  ) {
+    const angleChangeRelativeToLastAngle = angleOfRotation - lastAngle;
+    const angleChangeRelativeToLastAngleDegrees = Angle.toDegrees(
+      angleChangeRelativeToLastAngle
+    );
+
+    // This method rounds the angle change to the nearest multiple of this.rotationSnapDegrees
+    const angleChangeRounded =
+      Math.round(angleChangeRelativeToLastAngleDegrees / rotationSnapDegrees) *
+      rotationSnapDegrees;
+
+    // Check if there is already an existing rotation angle
+    if (existingAngle != null) {
+      // If there is an existing angle displayed in the widget, it might not be a multiple of the
+      // desired number, so the difference needs to be accounted for
+      const existingAngleRounded =
+        Math.round(existingAngle / rotationSnapDegrees) * rotationSnapDegrees;
+      const neededAdjustmentDueToExistingAngle =
+        existingAngle - existingAngleRounded;
+
+      // Adjust the rounded angle change to account for the existing angle, then
+      // covert the rounded value to radians and return
+      const adjustedAngle =
+        angleChangeRounded - neededAdjustmentDueToExistingAngle;
+      const angleChangeRoundedRadians = Angle.toRadians(adjustedAngle);
+      return angleChangeRoundedRadians + lastAngle;
+    } else {
+      // There isn't an existing angle to account for, so convert the rounded value to radians and return
+      const angleChangeRoundedRadians = Angle.toRadians(angleChangeRounded);
+      return angleChangeRoundedRadians + lastAngle;
+    }
+  } else {
+    // Angle should not be snapped, so return the original angle
+    return angleOfRotation;
   }
 }
 

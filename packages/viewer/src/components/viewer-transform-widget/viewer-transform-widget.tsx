@@ -30,8 +30,10 @@ import {
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
+import { ModifierKey } from '../../lib/types/keys';
 import { focusInputElement } from './dom';
 import {
+  calculateNewRotationAngle,
   computeHandleDeltaTransform,
   computeInputDeltaTransform,
   computeInputDisplayValue,
@@ -167,6 +169,22 @@ export class ViewerTransformWidget {
    */
   @Prop()
   public decimalPlaces = 1;
+
+  /**
+   * When defined, the widget will snap to the degree of the nearest multiple of
+   * the given number when the user is rotating with the widget and holding the
+   * key defined by rotationSnapKey. Defaults to undefined.
+   */
+  @Prop()
+  public rotationSnapDegrees?: number;
+
+  /**
+   * When rotationSnapDegrees is defined, the widget will snap to the degree of the
+   * nearest multiple of the given number when the user is rotating with the widget
+   * and holding the key defined here. Defaults to the shift key.
+   */
+  @Prop()
+  public rotationSnapKey: ModifierKey = 'shift';
 
   /**
    * **EXPERIMENTAL.**
@@ -645,18 +663,26 @@ export class ViewerTransformWidget {
         widgetCenter != null
       ) {
         const angle = Angle.fromPoints(widgetCenter, currentCanvas);
+        const angleToUse = calculateNewRotationAngle(
+          event,
+          this.rotationSnapKey,
+          angle,
+          this.lastAngle,
+          this.getDisplayedAngle(),
+          this.rotationSnapDegrees
+        );
 
         this.transform(
           this.lastWorldPosition,
           currentWorld,
-          angle - this.lastAngle
+          angleToUse - this.lastAngle
         );
 
         this.updateInputPosition();
         this.updateInputValue();
 
         this.lastWorldPosition = currentWorld;
-        this.lastAngle = angle;
+        this.lastAngle = angleToUse;
       }
     }
   };
@@ -699,7 +725,7 @@ export class ViewerTransformWidget {
     this.completeEndTransform();
   };
 
-  private handleInputStep = (step: number): void => {
+  private handleInputStep = async (step: number): Promise<void> => {
     if (this.inputValue != null && this.lastInputValue != null) {
       // If modifying angle units, we want to adjust the step to always
       // perform the equivalent of a 1 degree rotation.
@@ -712,12 +738,12 @@ export class ViewerTransformWidget {
       } else {
         this.inputValue = this.lastInputValue + step;
       }
-      this.updateTransformFromInput(this.inputValue);
+      await this.updateTransformFromInput(this.inputValue);
     }
   };
 
-  private handleInputChange = (value: number): void => {
-    this.updateTransformFromInput(value);
+  private handleInputChange = async (value: number): Promise<void> => {
+    await this.updateTransformFromInput(value);
   };
 
   private updateTransformFromInput = async (value: number): Promise<void> => {
