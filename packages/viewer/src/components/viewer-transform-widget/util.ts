@@ -18,6 +18,7 @@ import {
   Frame,
   Viewport,
 } from '../../lib/types';
+import { ModifierKey } from '../../lib/types/keys';
 import { TransformWidgetInputPlacement } from './viewer-transform-widget-components';
 
 export interface PointAndPlacement {
@@ -322,36 +323,41 @@ export function computeInputPosition(
 
 export function calculateNewRotationAngle(
   event: PointerEvent,
+  rotationSnapKey: ModifierKey,
   angleOfRotation: number, // In radians
   lastAngle: number, // In radians
   existingAngle?: number, // In degrees
-  degreeToSnapToWhenRotating?: number // In degrees
+  rotationSnapDegrees?: number // In degrees
 ): number {
+  const rotationSnapKeyIsHeld =
+    (rotationSnapKey === 'alt' && event.altKey) ||
+    (rotationSnapKey === 'ctrl' && event.ctrlKey) ||
+    (rotationSnapKey === 'meta' && event.metaKey) ||
+    (rotationSnapKey === 'shift' && event.shiftKey);
+
   // Check if the widget should snap to a certain angle
   if (
-    event.shiftKey &&
-    degreeToSnapToWhenRotating != null &&
-    degreeToSnapToWhenRotating > 0 &&
-    Number.isInteger(degreeToSnapToWhenRotating)
+    rotationSnapKeyIsHeld &&
+    rotationSnapDegrees != null &&
+    rotationSnapDegrees > 0 &&
+    Number.isInteger(rotationSnapDegrees)
   ) {
     const angleChangeRelativeToLastAngle = angleOfRotation - lastAngle;
     const angleChangeRelativeToLastAngleDegrees = Angle.toDegrees(
       angleChangeRelativeToLastAngle
     );
 
-    // This method rounds the angle change to the nearest multiple of this.degreeToSnapToWhenRotating
+    // This method rounds the angle change to the nearest multiple of this.rotationSnapDegrees
     const angleChangeRounded =
-      Math.round(
-        angleChangeRelativeToLastAngleDegrees / degreeToSnapToWhenRotating
-      ) * degreeToSnapToWhenRotating;
+      Math.round(angleChangeRelativeToLastAngleDegrees / rotationSnapDegrees) *
+      rotationSnapDegrees;
 
     // Check if there is already an existing rotation angle
     if (existingAngle != null) {
       // If there is an existing angle displayed in the widget, it might not be a multiple of the
       // desired number, so the difference needs to be accounted for
       const existingAngleRounded =
-        Math.round(existingAngle / degreeToSnapToWhenRotating) *
-        degreeToSnapToWhenRotating;
+        Math.round(existingAngle / rotationSnapDegrees) * rotationSnapDegrees;
       const neededAdjustmentDueToExistingAngle =
         existingAngle - existingAngleRounded;
 

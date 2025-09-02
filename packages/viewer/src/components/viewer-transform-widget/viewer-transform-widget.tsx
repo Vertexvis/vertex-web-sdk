@@ -30,6 +30,7 @@ import {
   DistanceUnits,
   DistanceUnitType,
 } from '../../lib/types';
+import { ModifierKey } from '../../lib/types/keys';
 import { focusInputElement } from './dom';
 import {
   calculateNewRotationAngle,
@@ -172,10 +173,18 @@ export class ViewerTransformWidget {
   /**
    * When defined, the widget will snap to the degree of the nearest multiple of
    * the given number when the user is rotating with the widget and holding the
-   * shift key. Defaults to undefined.
+   * key defined by rotationSnapKey. Defaults to undefined.
    */
   @Prop()
-  public degreeToSnapToWhenRotating?: number;
+  public rotationSnapDegrees?: number;
+
+  /**
+   * When rotationSnapDegrees is defined, the widget will snap to the degree of the
+   * nearest multiple of the given number when the user is rotating with the widget
+   * and holding the key defined here. Defaults to the shift key.
+   */
+  @Prop()
+  public rotationSnapKey: ModifierKey = 'shift';
 
   /**
    * **EXPERIMENTAL.**
@@ -656,10 +665,11 @@ export class ViewerTransformWidget {
         const angle = Angle.fromPoints(widgetCenter, currentCanvas);
         const angleToUse = calculateNewRotationAngle(
           event,
+          this.rotationSnapKey,
           angle,
           this.lastAngle,
           this.getDisplayedAngle(),
-          this.degreeToSnapToWhenRotating
+          this.rotationSnapDegrees
         );
 
         this.transform(

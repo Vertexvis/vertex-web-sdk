@@ -522,6 +522,13 @@ describe('vertex-viewer-transform-widget utils', () => {
       bubbles: true,
       shiftKey: true,
     }) as PointerEvent;
+    const pointerMoveWithControl = new MouseEvent('pointermove', {
+      screenX: 110,
+      screenY: 60,
+      buttons: 1,
+      bubbles: true,
+      ctrlKey: true,
+    }) as PointerEvent;
     const pointerMoveWithoutShift = new MouseEvent('pointermove', {
       screenX: 110,
       screenY: 60,
@@ -530,9 +537,10 @@ describe('vertex-viewer-transform-widget utils', () => {
       shiftKey: false,
     }) as PointerEvent;
 
-    it('returns the original angle when degreeToSnapToWhenRotating is undefined', () => {
+    it('returns the original angle when rotationSnapDegrees is undefined', () => {
       const angleToRotate = calculateNewRotationAngle(
         pointerMoveWithShift,
+        'shift',
         0.9,
         0.2,
         102
@@ -544,6 +552,7 @@ describe('vertex-viewer-transform-widget utils', () => {
     it('returns the original angle when shift key is not held', () => {
       const angleToRotate = calculateNewRotationAngle(
         pointerMoveWithoutShift,
+        'shift',
         0.9,
         0.2,
         102,
@@ -553,9 +562,23 @@ describe('vertex-viewer-transform-widget utils', () => {
       expect(angleToRotate).toBe(0.9);
     });
 
-    it('returns the rounded angle with an existing angle', () => {
+    it('returns the rounded angle with an existing angle with the shift key', () => {
       const angleToRotate = calculateNewRotationAngle(
         pointerMoveWithShift,
+        'shift',
+        0.9,
+        0.2,
+        102,
+        5
+      );
+
+      expect(angleToRotate).toBe(0.8632251157578452);
+    });
+
+    it('returns the rounded angle with an existing angle with the control key', () => {
+      const angleToRotate = calculateNewRotationAngle(
+        pointerMoveWithControl,
+        'ctrl',
         0.9,
         0.2,
         102,
@@ -568,6 +591,7 @@ describe('vertex-viewer-transform-widget utils', () => {
     it('returns the rounded angle without an existing angle', () => {
       const angleToRotate = calculateNewRotationAngle(
         pointerMoveWithShift,
+        'shift',
         0.9,
         0.2,
         0,
