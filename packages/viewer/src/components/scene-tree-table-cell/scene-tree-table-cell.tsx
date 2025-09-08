@@ -21,6 +21,9 @@ export interface SceneTreeTableCellEventDetails {
   originalEvent: PointerEvent;
 }
 
+/**
+ * @slot missing-geometry-icon - A slot that replaces the component's default missing geometry icon.
+ */
 @Component({
   tag: 'vertex-scene-tree-table-cell',
   styleUrl: 'scene-tree-table-cell.css',
@@ -86,6 +89,13 @@ export class SceneTreeTableCell {
    */
   @Prop()
   public endItemIndicator?: boolean;
+
+  /**
+   * Indicates whether to display an indicator that the node associated with
+   * this cell has no associated geometry.
+   */
+  @Prop()
+  public missingGeometryIndicator?: boolean;
 
   /**
    * Indicates whether to display a button for toggling the visibility state of
@@ -208,6 +218,7 @@ export class SceneTreeTableCell {
     this.toggleAttribute('is-leaf', !!this.node?.isLeaf);
     this.toggleAttribute('is-end-item', !!this.node?.endItem);
     this.toggleAttribute('is-filter-hit', !!this.node?.filterHit);
+    this.toggleAttribute('has-geometry', !!this.node?.hasGeometry);
   }
 
   public render(): h.JSX.IntrinsicElements {
@@ -219,10 +230,14 @@ export class SceneTreeTableCell {
     const endItemIcon = this.getEndItemIcon();
     const expansionIcon = this.getExpansionIcon();
     const isolateIcon = this.getIsolateIcon();
+    const missingGeometryIcon = this.getMissingGeometryIcon();
     const visibilityIcon = this.getVisibilityIcon();
 
-    const showSpaceForExpansionIcon = this.expandToggle && !endItemIcon;
+    const showSpaceForExpansionIcon =
+      this.expandToggle && !endItemIcon && !missingGeometryIcon;
     const showSpaceForEndItemIcon = endItemIcon && !showSpaceForExpansionIcon;
+    const showSpaceForMissingGeometryIcon =
+      missingGeometryIcon && !showSpaceForExpansionIcon;
 
     return (
       <Host
@@ -260,6 +275,7 @@ export class SceneTreeTableCell {
           {showSpaceForEndItemIcon && (
             <button
               class="end-item-btn no-shrink"
+              id={'end-item-' + this.node?.name}
               data-test-id={'end-item-' + this.node?.name}
             >
               {endItemIcon && (
@@ -272,9 +288,27 @@ export class SceneTreeTableCell {
             </button>
           )}
 
+          {showSpaceForMissingGeometryIcon && (
+              <button
+                  class="missing-geometry-btn no-shrink"
+                  id={'missing-geometry-' + this.node?.name}
+                  data-test-id={'missing-geometry-' + this.node?.name}
+              >
+                {missingGeometryIcon && (
+                    <slot name="missing-geometry-icon">
+                      <vertex-viewer-icon
+                          className="missing-geometry-icon"
+                          name={missingGeometryIcon}
+                          size="sm"
+                      />
+                    </slot>
+                )}
+              </button>
+          )}
+
           <div class="content">
             {this.value != null && this.value.trim() !== '' ? (
-              <slot>{this.displayValue()}</slot>
+                <slot>{this.displayValue()}</slot>
             ) : (
               <slot name="placeholder">{this.placeholder}</slot>
             )}
@@ -513,6 +547,17 @@ export class SceneTreeTableCell {
   private getEndItemIcon(): ViewerIconName | undefined {
     if (this.endItemIndicator && this.node?.endItem && !this.node?.isLeaf) {
       return 'lock';
+    }
+    return undefined;
+  }
+
+  private getMissingGeometryIcon(): ViewerIconName | undefined {
+    if (
+      this.missingGeometryIndicator &&
+      !this.node?.hasGeometry &&
+      this.node?.isLeaf
+    ) {
+      return 'caution';
     }
     return undefined;
   }

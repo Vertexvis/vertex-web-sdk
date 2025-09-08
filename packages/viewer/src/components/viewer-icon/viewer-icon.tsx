@@ -5,6 +5,7 @@ import classname from 'classnames';
  * The names of the icons that the `<vertex-viewer-icon>` element can display.
  */
 export type ViewerIconName =
+  | 'caution'
   | 'chevron-down'
   | 'chevron-right'
   | 'close-circle'
@@ -53,6 +54,10 @@ export class ViewerIcon {
 
   public render(): h.JSX.IntrinsicElements {
     switch (this.name) {
+      case 'caution':
+        return this.renderSvgIcon(
+          <path d="M8 11a.51.51 0 1 0 .35.15A.47.47 0 0 0 8 11Zm0-5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 1 0v-3A.5.5 0 0 0 8 6Zm6.65 6.29L9.32 2.4a1.5 1.5 0 0 0-2.64 0l-5.33 9.89a1.5 1.5 0 0 0 1.32 2.21h10.66a1.5 1.5 0 0 0 1.32-2.21Zm-1 1.06a.47.47 0 0 1-.35.15H2.67a.47.47 0 0 1-.35-.15.51.51 0 0 1-.15-.35l.06-.24 5.33-9.89a.5.5 0 0 1 .88 0l5.33 9.89.06.24a.51.51 0 0 1-.15.35h-.03Z" />
+        );
       case 'chevron-down':
         return this.renderSvgIcon(
           <path

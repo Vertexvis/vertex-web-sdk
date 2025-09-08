@@ -618,6 +618,7 @@ export class SceneTreeTableLayout {
           filterHit: false,
           phantom: false,
           endItem: false,
+          hasGeometry: false,
         },
         metadata: {},
         data: {},

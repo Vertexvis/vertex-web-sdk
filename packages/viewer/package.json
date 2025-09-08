@@ -51,7 +51,7 @@
     "@vertexvis/frame-streaming-protos": "^0.13.17",
     "@vertexvis/geometry": "0.23.8",
     "@vertexvis/html-templates": "0.23.8",
-    "@vertexvis/scene-tree-protos": "^0.1.26",
+    "@vertexvis/scene-tree-protos": "^0.1.27",
     "@vertexvis/scene-view-protos": "^0.7.0",
     "@vertexvis/stream-api": "0.23.8",
     "@vertexvis/utils": "0.23.8",

@@ -102,6 +102,26 @@
   fill: var(--scene-tree-secondary-font-color, var(--neutral-600));
 }
 
+.missing-geometry-btn {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+:host([has-geometry]) .missing-geometry-btn {
+  visibility: hidden;
+  cursor: default;
+}
+
+.missing-geometry-icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--orange-600);
+}
+
 .visibility-btn,
 .isolate-btn {
   cursor: pointer;

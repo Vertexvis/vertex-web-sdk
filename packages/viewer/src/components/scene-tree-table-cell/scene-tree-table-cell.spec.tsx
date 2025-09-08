@@ -124,33 +124,81 @@ describe('<vertex-scene-tree-table-cell>', () => {
   });
 
   it('renders end item icon if end item indicator is true and item is an end item', async () => {
-    const node = createNode({ endItem: true });
+    const node = createNode({ name: 'test-item', endItem: true });
     const { cell } = await newComponentSpec({
       html: `<vertex-scene-tree-table-cell end-item-indicator></vertex-scene-tree-table-cell>`,
       node,
     });
 
-    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeDefined();
+    expect(cell.shadowRoot?.getElementById('end-item-test-item')).toBeTruthy();
   });
 
   it('does not render end item icon if end item indicator is false', async () => {
-    const node = createNode({ endItem: true });
+    const node = createNode({ name: 'test-item', endItem: true });
     const { cell } = await newComponentSpec({
       html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
       node,
     });
 
-    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
+    expect(cell.shadowRoot?.getElementById('end-item-test-item')).toBeFalsy();
   });
 
   it('does not render end item icon if item is a leaf', async () => {
-    const node = createNode({ endItem: true, isLeaf: true });
+    const node = createNode({ name: 'test-item', endItem: true, isLeaf: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell end-item-indicator></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.getElementById('end-item-test-item')).toBeFalsy();
+  });
+
+  it('renders missing geometry icon if missing geometry indicator is true and item does not have geometry', async () => {
+    const node = createNode({
+      name: 'test-item',
+      hasGeometry: false,
+      isLeaf: true,
+    });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell missing-geometry-indicator></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(
+      cell.shadowRoot?.getElementById('missing-geometry-test-item')
+    ).toBeTruthy();
+  });
+
+  it('does not render missing geometry icon if missing geometry indicator is false', async () => {
+    const node = createNode({
+      name: 'test-item',
+      hasGeometry: false,
+      isLeaf: true,
+    });
     const { cell } = await newComponentSpec({
       html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
       node,
     });
 
-    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
+    expect(
+      cell.shadowRoot?.getElementById('missing-geometry-test-item')
+    ).toBeFalsy();
+  });
+
+  it('does not render end item icon if item is not a leaf', async () => {
+    const node = createNode({
+      name: 'test-item',
+      hasGeometry: false,
+      isLeaf: false,
+    });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell missing-geometry-indicator></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(
+      cell.shadowRoot?.getElementById('missing-geometry-test-item')
+    ).toBeFalsy();
   });
 
   it('renders visible icon if visibility toggle is true and item is visible', async () => {
@@ -700,6 +748,7 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     filterHit: false,
     phantom: false,
     endItem: false,
+    hasGeometry: true,
     ...values,
   };
 }
