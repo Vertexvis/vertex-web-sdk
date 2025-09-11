@@ -97,7 +97,7 @@ export class SceneTreeTableLayout {
   public overScanCount = 25;
 
   /**
-   * A callback that is invoked immediately before a row is about to rendered.
+   * A callback that is invoked immediately before a row is about to be rendered.
    * This callback can return additional data that can be bound to in a
    * template.
    *
@@ -242,11 +242,11 @@ export class SceneTreeTableLayout {
     });
   }
 
-  public componentDidLoad(): void {
+  public async componentDidLoad(): Promise<void> {
     this.computeInitialColumnWidths();
     this.computeColumnGridLayout();
     this.ensureDividerTemplateDefined();
-    this.computeCellHeight();
+    await this.computeCellHeight();
     this.computeHeaderHeight();
     this.rebindHeaderData();
 
@@ -269,6 +269,12 @@ export class SceneTreeTableLayout {
     this.layoutColumns();
 
     this.layoutRendered.emit();
+  }
+
+  public async componentDidUpdate(): Promise<void> {
+    if (this.isComputingCellHeight) {
+      await this.computeCellHeight();
+    }
   }
 
   public disconnectedCallback(): void {
@@ -637,14 +643,12 @@ export class SceneTreeTableLayout {
       /* eslint-enable @typescript-eslint/no-explicit-any */
 
       let height = element.clientHeight;
-      let attempts = 0;
-
-      while (height === 0 && attempts < 10) {
+      if (height === 0) {
         height = await new Promise((resolve) => {
           setTimeout(() => resolve(element.getBoundingClientRect().height), 5);
         });
-        attempts = attempts + 1;
       }
+
       this.rowHeight = height ?? this.rowHeight;
       element.remove();
       this.isComputingCellHeight = this.rowHeight === 0;
@@ -862,7 +866,7 @@ export class SceneTreeTableLayout {
     return currentIsValid && nextIsValid;
   };
 
-  private handleScrollChanged = (event: Event): void => {
+  private handleScrollChanged = async (event: Event): Promise<void> => {
     this.isScrolling = true;
 
     this.scrollTimer = restartTimeout(() => {
@@ -870,7 +874,7 @@ export class SceneTreeTableLayout {
     }, this.scrollTimer);
 
     this.scrollOffset = (event.target as HTMLElement).scrollTop;
-    this.computeAndUpdateViewportRows();
+    await this.computeAndUpdateViewportRows();
   };
 
   private getViewportRows(startIndex: number, endIndex: number): Row[] {
