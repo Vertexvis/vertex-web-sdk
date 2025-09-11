@@ -5,6 +5,12 @@
 <!-- Auto Generated Below -->
 
 
+## Overview
+
+The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
+around a model, which is particularly useful for walking through a model.
+This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
+
 ## Properties
 
 | Property             | Attribute             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Type                                                                   | Default               |

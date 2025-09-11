@@ -216,6 +216,7 @@ export class SceneTreeTableLayout {
   private lastStartIndex = 0;
   private resizeObserver?: ResizeObserver;
   private headerResizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
 
   private tableElement?: HTMLDivElement;
   private headerElement?: HTMLDivElement;
@@ -239,6 +240,10 @@ export class SceneTreeTableLayout {
       this.clearLayoutWidth();
       this.recomputeColumnWidths();
       this.computeColumnGridLayout();
+    });
+
+    this.mutationObserver = new MutationObserver(() => {
+      this.computeCellHeight();
     });
   }
 

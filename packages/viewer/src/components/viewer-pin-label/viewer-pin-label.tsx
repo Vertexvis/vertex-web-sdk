@@ -325,9 +325,9 @@ export class VertexPinLabel {
         this.textareaRows = Math.max(
           1,
           Math.ceil(
-            (parseFloat(computedStyles.height) -
-              parseFloat(computedStyles.borderWidth) * 2) /
-              parseFloat(computedStyles.lineHeight)
+            (parseFloat(computedStyles.getPropertyValue('height')) -
+              parseFloat(computedStyles.getPropertyValue('borderWidth')) * 2) /
+              parseFloat(computedStyles.getPropertyValue('lineHeight'))
           )
         );
       }

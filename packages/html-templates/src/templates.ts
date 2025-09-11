@@ -1,11 +1,11 @@
-import { CollectionBinding, generateBindings } from './binding';
+import { BindingDataMap, CollectionBinding, generateBindings } from './binding';
 
 export interface InstancedTemplate<E extends Element> {
   element: E;
   bindings: CollectionBinding;
 }
 
-export function append<E extends Element, D>(
+export function append<E extends Element, D extends BindingDataMap>(
   container: Element,
   element: E,
   data: D

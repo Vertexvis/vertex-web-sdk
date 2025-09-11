@@ -93,6 +93,7 @@ import {
 } from '../../lib/types';
 import { Frame } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
+import { VisibilityObserver } from '../../lib/visibilityObserver';
 import {
   DEFAULT_VIEWER_SCENE_WAIT_MS,
   getElementBoundingClientRect,
@@ -378,6 +379,16 @@ export class Viewer {
   @Prop({ mutable: true }) public sceneItems: SceneItemController | undefined;
 
   /**
+   * Experimental flag indicating that connections to Vertex should
+   * be established if the viewer has its visibility set to `hidden`.
+   *
+   * *Caution:* Setting this flag can result in reduced performance,
+   * and should not be used in a production setting.
+   */
+  @Prop()
+  public experimentalConnectWhileHidden = false;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -471,6 +482,8 @@ export class Viewer {
 
   @State() private cursor?: Cursor;
 
+  @State() private isVisible = true;
+
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -490,6 +503,7 @@ export class Viewer {
   private mutationObserver?: MutationObserver;
   private styleObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
+  private visibilityObserver?: VisibilityObserver;
   private isResizing?: boolean;
   private isResizeUpdate?: boolean;
 
@@ -507,6 +521,7 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
   }
 
   /**
@@ -517,6 +532,9 @@ export class Viewer {
     this.calculateComponentDimensions();
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
+    this.visibilityObserver = new VisibilityObserver(
+      this.handleVisibilityChange
+    );
     this.registerSlotChangeListeners();
 
     const config = this.getResolvedConfig();
@@ -567,6 +585,7 @@ export class Viewer {
    */
   protected async componentDidLoad(): Promise<void> {
     this.interactionApi = this.createInteractionApi();
+    // this.isVisible = this.hostElement;
 
     if (this.canvasContainerElement != null) {
       this.resizeObserver?.observe(this.canvasContainerElement);
@@ -1020,6 +1039,12 @@ export class Viewer {
         }, this.resizeDebounce);
       }
     }
+  }
+
+  private handleVisibilityChange(): void {
+    const checked = this.visibilityObserver?.isVisible();
+
+    console.log(`Detected Visibility Change [visible={${checked}}]`);
   }
 
   private registerSlotChangeListeners(): void {

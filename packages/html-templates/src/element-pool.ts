@@ -1,4 +1,4 @@
-import { Binding } from './binding';
+import { Binding, BindingDataMap } from './binding';
 import { InstancedTemplate } from './templates';
 
 export type ElementFactory = () => InstancedTemplate<HTMLElement>;
@@ -42,7 +42,7 @@ export class ElementPool {
     return this.elements.concat();
   }
 
-  public updateData<D>(f: (index: number) => D): void {
+  public updateData<D extends BindingDataMap>(f: (index: number) => D): void {
     this.elements.forEach((el, i) => {
       const instance = this.instanceMap.get(el);
       const data = f(i);

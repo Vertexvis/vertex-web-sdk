@@ -68,6 +68,25 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
+        const widget = document.getElementById('widget');
+
+        viewer.addEventListener('tap', async () => {
+          const { position } = event.detail;
+          const scene = await viewer.scene();
+          const raycaster = await scene.raycaster();
+
+          const result = await raycaster.hitItems(position);
+
+          if (result.hits && result.hits.length > 0) {
+            const hit = result.hits[0];
+
+            await scene.elements(op => op.items.where(q => q.withItemId(hit.itemId.hex)).select()).execute();
+            widget.position = hit.hitPoint;
+          } else {
+            await scene.elements(op => op.items.where(q => q.all()).deselect()).execute();
+            widget.position = undefined;
+          }
+        })
       }
     </script>
   </head>
@@ -77,6 +96,7 @@
       <div class="tree">
         <vertex-scene-tree
           id="scene-tree"
+          config-env="platdev"
           viewer-selector="#viewer"
         >
         </vertex-scene-tree>
@@ -84,11 +104,14 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+          config-env="platdev"
+          src="urn:vertex:stream-key:ebMrz-J9BSDdijFQfWAQwQRTSTW-1KnrlQJ2"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
           ></vertex-viewer-default-toolbar>
+
+          <vertex-viewer-transform-widget id="widget" degree-to-snap-to-when-rotating="10"></vertex-viewer-transform-widget>
 
           <vertex-viewer-toolbar placement="top-right">
             <vertex-viewer-view-cube

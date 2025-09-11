@@ -2058,9 +2058,9 @@
     "@types/react" "*"
 
 "@types/react@*", "@types/react@^18", "@types/react@^18.2.48":
-  version "18.3.4"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.4.tgz#dfdd534a1d081307144c00e325c06e00312c93a3"
-  integrity sha512-J7W30FTdfCxDDjmfRM+/JqLHBIyl7xUIp9kwK637FGmY7+mkSFSe6L4jpZzhj5QMfLssSDP4/i75AKkrdC7/Jw==
+  version "18.3.24"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.24.tgz#f6a5a4c613242dfe3af0dcee2b4ec47b92d9b6bd"
+  integrity sha512-0dLEBsA1kI3OezMBF8nSsb7Nk19ZnsyE1LLhB8r27KbgU5H4pvuqZLdtE+aUkJVoXgTVuA+iLIwmZ0TuK4tx6A==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
@@ -2185,6 +2185,11 @@
   dependencies:
     "@typescript-eslint/types" "5.9.1"
     eslint-visitor-keys "^3.0.0"
+
+"@typescript/lib-dom@npm:@types/web":
+  version "0.0.266"
+  resolved "https://registry.yarnpkg.com/@types/web/-/web-0.0.266.tgz#2c33a2490918a00892800865a6437008152a0daa"
+  integrity sha512-3Mdr4ddF2Qf8yr5/yEcfEPHp8C5dfO4ZL31xvkNWPNmBxe1+Bn7E2gOHlzQaytGPsMaR6w6XPOTsdvwqMx96FQ==
 
 "@vertexvis/build-tools@^0.10.0":
   version "0.10.0"

@@ -138,7 +138,7 @@ export function requiredProp<T, P extends keyof T>(
     if (value != null) {
       return value as NonNullable<T[P]>;
     } else {
-      return { errors: [`${prop} is required`] };
+      return { errors: [`${String(prop)} is required`] };
     }
   };
 }
