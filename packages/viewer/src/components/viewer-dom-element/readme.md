@@ -14,13 +14,6 @@ information.
 <!-- Auto Generated Below -->
 
 
-## Overview
-
-The `ViewerDomElement` is responsible for managing a
-`<vertex-viewer-dom-element>` element. These elements are intended to be
-added as children to a `<vertex-viewer-dom-renderer>` and represent an
-individual DOM element within a local 3D scene.
-
 ## Properties
 
 | Property          | Attribute          | Description                                                                                                                                                                                                                                     | Type                                                                                                                               | Default                   |

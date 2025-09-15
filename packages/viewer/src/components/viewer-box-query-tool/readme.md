@@ -45,13 +45,6 @@ type of query to be performed on pointer up is populated on the `<vertex-viewer-
 <!-- Auto Generated Below -->
 
 
-## Overview
-
-The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
-a query for items in a specific area of the viewer. This tool then allows for an
-operation to be performed on the items contained (exclusive) by the box or both
-contained by and intersecting with (inclusive) the box.
-
 ## Properties
 
 | Property        | Attribute        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Type                                             | Default            |

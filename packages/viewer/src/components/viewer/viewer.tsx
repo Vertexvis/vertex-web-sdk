@@ -482,8 +482,6 @@ export class Viewer {
 
   @State() private cursor?: Cursor;
 
-  @State() private isVisible = true;
-
   /**
    * This stores internal state that you want to preserve across live-reloads,
    * but shouldn't trigger a refresh if the data changes. Marking this with
@@ -506,6 +504,7 @@ export class Viewer {
   private visibilityObserver?: VisibilityObserver;
   private isResizing?: boolean;
   private isResizeUpdate?: boolean;
+  private isVisible = false;
 
   private resizeTimer?: NodeJS.Timeout;
 
@@ -585,10 +584,14 @@ export class Viewer {
    */
   protected async componentDidLoad(): Promise<void> {
     this.interactionApi = this.createInteractionApi();
-    // this.isVisible = this.hostElement;
+    this.isVisible =
+      this.visibilityObserver?.isVisible(this.hostElement) ?? true;
 
     if (this.canvasContainerElement != null) {
       this.resizeObserver?.observe(this.canvasContainerElement);
+    }
+    if (!this.isVisible) {
+      this.visibilityObserver?.observe(this.hostElement);
     }
 
     if (this.src != null) {
@@ -912,6 +915,17 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string, options?: LoadOptions): Promise<void> {
+    const shouldLoadBasedOnVisibility =
+      this.experimentalConnectWhileHidden || this.isVisible;
+
+    if (!shouldLoadBasedOnVisibility) {
+      console.debug(
+        'Detected the viewer is hidden. Delaying load until visible.'
+      );
+
+      return;
+    }
+
     if (this.stream != null && this.dimensions != null) {
       const { EXPERIMENTAL_annotationPollingIntervalInMs } =
         this.getResolvedConfig();
@@ -1041,10 +1055,16 @@ export class Viewer {
     }
   }
 
-  private handleVisibilityChange(): void {
-    const checked = this.visibilityObserver?.isVisible();
+  private handleVisibilityChange(visible: boolean): void {
+    this.isVisible = visible;
 
-    console.log(`Detected Visibility Change [visible={${checked}}]`);
+    if (this.isVisible) {
+      this.visibilityObserver?.disconnect();
+
+      if (this.src != null) {
+        this.load(this.src, { cameraType: this.cameraType });
+      }
+    }
   }
 
   private registerSlotChangeListeners(): void {
