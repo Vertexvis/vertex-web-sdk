@@ -314,6 +314,7 @@ export class SceneTreeTableLayout {
    * or testing.
    *
    * @internal
+   * @ignore
    */
   @Method()
   public async attemptComputeCellHeight(): Promise<void> {

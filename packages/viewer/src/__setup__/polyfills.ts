@@ -33,3 +33,10 @@ import { ResizeObserver } from 'resize-observer';
   disconnect() {}
   observe() {}
 };
+
+(global as any).IntersectionObserver = class {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+};
