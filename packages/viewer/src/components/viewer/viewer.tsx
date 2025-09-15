@@ -378,14 +378,15 @@ export class Viewer {
   @Prop({ mutable: true }) public sceneItems: SceneItemController | undefined;
 
   /**
-   * Experimental flag indicating that connections to Vertex should
-   * be established if the viewer has its visibility set to `hidden`.
+   * Experimental flag indicating that connections to Vertex should be established
+   * if the viewer is initially hidden through its own style or computed style, or
+   * has not been scrolled into view.
    *
    * *Caution:* Setting this flag can result in reduced performance,
-   * and should not be used in a production setting.
+   * and should generally not be used in a production setting.
    */
   @Prop()
-  public experimentalConnectWhileHidden = false;
+  public experimentalSkipVisibilityCheck = false;
 
   /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
@@ -930,7 +931,7 @@ export class Viewer {
   @Method()
   public async load(urn: string, options?: LoadOptions): Promise<void> {
     const shouldLoadBasedOnVisibility =
-      this.experimentalConnectWhileHidden || this.isVisible;
+      this.experimentalSkipVisibilityCheck || this.isVisible;
 
     if (!shouldLoadBasedOnVisibility) {
       console.debug(
