@@ -363,6 +363,7 @@ export class SceneTreeTableCell {
       // Blur the `hostEl` after a `preventDefault` to clear focus that
       // is left on the element after `pointerdown` event.
       event.preventDefault();
+      event.stopPropagation();
       blurElement(this.hostEl);
 
       action(event);
