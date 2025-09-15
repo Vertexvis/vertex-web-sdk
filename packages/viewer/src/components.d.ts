@@ -429,6 +429,10 @@ export namespace Components {
   }
   interface VertexSceneTreeTableHeader {}
   interface VertexSceneTreeTableLayout {
+    /**
+     * Attempts to compute the height of templated cells. Used for internals or testing.
+     */
+    attemptComputeCellHeight: () => Promise<void>;
     controller?: SceneTreeController;
     layoutHeight?: number;
     layoutOffset: number;
@@ -540,7 +544,6 @@ export namespace Components {
     depthBuffers?: FrameType;
     /**
      * Property used for internals or testing.
-     * @private
      */
     deviceId?: string;
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
@@ -555,7 +558,7 @@ export namespace Components {
      */
     experimentalConnectWhileHidden: boolean;
     /**
-     * @private
+     * Specifies experimental rendering options. For Vertex use only.
      */
     experimentalRenderingOptions: string;
     /**
@@ -2481,7 +2484,6 @@ declare namespace LocalJSX {
     depthBuffers?: FrameType;
     /**
      * Property used for internals or testing.
-     * @private
      */
     deviceId?: string;
     /**
@@ -2495,7 +2497,7 @@ declare namespace LocalJSX {
      */
     experimentalConnectWhileHidden?: boolean;
     /**
-     * @private
+     * Specifies experimental rendering options. For Vertex use only.
      */
     experimentalRenderingOptions?: string;
     /**
@@ -2556,7 +2558,6 @@ declare namespace LocalJSX {
     ) => void;
     /**
      * Used for internals or testing.
-     * @private
      */
     onDeviceIdChange?: (event: VertexViewerCustomEvent<string>) => void;
     onDimensionschange?: (

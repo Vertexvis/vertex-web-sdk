@@ -216,7 +216,6 @@ export class SceneTreeTableLayout {
   private lastStartIndex = 0;
   private resizeObserver?: ResizeObserver;
   private headerResizeObserver?: ResizeObserver;
-  private mutationObserver?: MutationObserver;
 
   private tableElement?: HTMLDivElement;
   private headerElement?: HTMLDivElement;
@@ -240,10 +239,6 @@ export class SceneTreeTableLayout {
       this.clearLayoutWidth();
       this.recomputeColumnWidths();
       this.computeColumnGridLayout();
-    });
-
-    this.mutationObserver = new MutationObserver(() => {
-      this.computeCellHeight();
     });
   }
 
@@ -312,6 +307,17 @@ export class SceneTreeTableLayout {
     if (this.tableElement != null) {
       scrollToTop(this.tableElement, top, options);
     }
+  }
+
+  /**
+   * Attempts to compute the height of templated cells. Used for internals
+   * or testing.
+   *
+   * @internal
+   */
+  @Method()
+  public async attemptComputeCellHeight(): Promise<void> {
+    this.computeCellHeight();
   }
 
   public render(): h.JSX.IntrinsicElements {

@@ -74,6 +74,7 @@ interface StateMap {
   onStateChangeDisposable?: Disposable;
   subscribeDisposable?: Disposable;
   viewerDisposable?: Disposable;
+  viewerSceneReadyDisposable?: Disposable;
 
   elementPool?: ElementPool;
   template?: HTMLTemplateElement;
@@ -660,6 +661,7 @@ export class SceneTree {
    */
   protected disconnectedCallback(): void {
     this.stateMap.viewerDisposable?.dispose();
+    this.stateMap.viewerSceneReadyDisposable?.dispose();
     this.controller?.cancel();
   }
 
@@ -855,6 +857,7 @@ export class SceneTree {
 
   private connectToViewer(): void {
     this.stateMap.viewerDisposable?.dispose();
+    this.stateMap.viewerSceneReadyDisposable?.dispose();
 
     if (this.viewer == null && this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
@@ -863,9 +866,20 @@ export class SceneTree {
     }
 
     if (this.viewer != null) {
+      const handleSceneReady = async (): Promise<void> => {
+        const layoutEl = this.getLayoutElement();
+
+        await layoutEl.attemptComputeCellHeight();
+      };
+
+      this.viewer.addEventListener('sceneReady', handleSceneReady);
       this.stateMap.viewerDisposable = this.controller?.connectToViewer(
         this.viewer
       );
+      this.stateMap.viewerSceneReadyDisposable = {
+        dispose: () =>
+          this.viewer?.removeEventListener('sceneReady', handleSceneReady),
+      };
     } else {
       this.attemptingRetry = false;
     }

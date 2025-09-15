@@ -13,15 +13,11 @@ declare global {
   }
 }
 
-export const DEFAULT_VISIBILITY_POLLING_INTERVAL_MS = 10000;
-
 export class VisibilityObserver {
   private targetElement?: HTMLElement;
 
   private intersectionObserver: IntersectionObserver;
   private mutationObservers: MutationObserver[];
-
-  private timeout?: number;
 
   public constructor(
     private callback: (visible: boolean) => void | Promise<void>
@@ -75,8 +71,6 @@ export class VisibilityObserver {
     this.intersectionObserver.disconnect();
     this.mutationObservers.forEach((obs) => obs.disconnect());
     this.mutationObservers = [];
-
-    // this.stopVisibilityTimer();
   }
 
   private watchElementVisibility(element: HTMLElement | null): void {
@@ -98,39 +92,10 @@ export class VisibilityObserver {
     }
   }
 
-  // private restartVisibilityTimer(): void {
-  //   if (this.timeout != null) {
-  //     this.stopVisibilityTimer();
-  //   }
-
-  //   this.startVisibilityTimer();
-  // }
-
-  // private startVisibilityTimer(): void {
-  //   this.timeout = window.setTimeout(
-  //     () => this.emitVisibilityChange(this.targetElement),
-  //     DEFAULT_VISIBILITY_POLLING_INTERVAL_MS
-  //   );
-  // }
-
-  // private stopVisibilityTimer(): void {
-  //   if (this.timeout != null) {
-  //     clearTimeout(this.timeout);
-  //   }
-
-  //   this.timeout = undefined;
-  // }
-
   private emitVisibilityChange(element?: HTMLElement): void {
     const visible = element != null ? this.isVisible(element) : true;
 
-    // if (visible) {
-    //   this.stopVisibilityTimer();
-    // } else {
-    //   this.restartVisibilityTimer();
-    // }
-
-    console.log(`Detected visibility change [visible={${visible}}]`);
+    console.debug(`Detected visibility change [visible={${visible}}]`);
 
     this.callback(visible);
   }

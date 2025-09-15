@@ -165,7 +165,6 @@ export class Viewer {
   /**
    * Property used for internals or testing.
    *
-   * @private
    * @internal
    */
   @Prop({ mutable: true }) public deviceId?: string;
@@ -263,9 +262,9 @@ export class Viewer {
   @Prop() public enableTemporalRefinement = true;
 
   /**
-   * @private
-   * @internal
    * Specifies experimental rendering options. For Vertex use only.
+   *
+   * @internal
    */
   @Prop() public experimentalRenderingOptions = '';
 
@@ -470,7 +469,7 @@ export class Viewer {
   /**
    * Used for internals or testing.
    *
-   * @private
+   * @internal
    */
   @Event() public deviceIdChange!: EventEmitter<string>;
 
@@ -526,14 +525,25 @@ export class Viewer {
   /**
    * @ignore
    */
+  protected connectedCallback(): void {
+    this.visibilityObserver = new VisibilityObserver(
+      this.handleVisibilityChange
+    );
+    this.isVisible = this.visibilityObserver.isVisible(this.hostElement);
+
+    if (!this.isVisible) {
+      this.visibilityObserver?.observe(this.hostElement);
+    }
+  }
+
+  /**
+   * @ignore
+   */
   protected componentWillLoad(): void {
     this.updateResolvedConfig();
     this.calculateComponentDimensions();
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
-    this.visibilityObserver = new VisibilityObserver(
-      this.handleVisibilityChange
-    );
     this.registerSlotChangeListeners();
 
     const config = this.getResolvedConfig();
@@ -590,9 +600,6 @@ export class Viewer {
     if (this.canvasContainerElement != null) {
       this.resizeObserver?.observe(this.canvasContainerElement);
     }
-    if (!this.isVisible) {
-      this.visibilityObserver?.observe(this.hostElement);
-    }
 
     if (this.src != null) {
       this.load(this.src, { cameraType: this.cameraType }).catch((e) => {
@@ -602,6 +609,13 @@ export class Viewer {
 
     await this.initializeDefaultInteractionHandlers();
     this.injectViewerApi();
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.visibilityObserver?.disconnect();
   }
 
   /**
