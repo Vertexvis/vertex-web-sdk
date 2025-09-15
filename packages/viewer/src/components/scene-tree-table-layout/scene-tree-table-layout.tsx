@@ -246,7 +246,7 @@ export class SceneTreeTableLayout {
     this.computeInitialColumnWidths();
     this.computeColumnGridLayout();
     this.ensureDividerTemplateDefined();
-    await this.computeCellHeight();
+    this.computeCellHeight();
     this.computeHeaderHeight();
     this.rebindHeaderData();
 
