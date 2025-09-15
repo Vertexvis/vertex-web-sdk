@@ -126,6 +126,7 @@ import { SpinnerSize } from './components/viewer-spinner/viewer-spinner';
 import { ViewerTeleportMode, WalkModeModel } from './lib/walk-mode/model';
 import { WalkModeController } from './lib/walk-mode/controller';
 import { TransformController } from './lib/transforms/controller';
+import { ModifierKey } from './lib/types/keys';
 import { Drawable } from './lib/transforms/drawable';
 export namespace Components {
   interface VertexSceneTree {
@@ -431,6 +432,7 @@ export namespace Components {
   interface VertexSceneTreeTableLayout {
     /**
      * Attempts to compute the height of templated cells. Used for internals or testing.
+     * @ignore
      */
     attemptComputeCellHeight: () => Promise<void>;
     controller?: SceneTreeController;
@@ -444,7 +446,7 @@ export namespace Components {
      */
     overScanCount: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      *
      * This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example
@@ -552,15 +554,15 @@ export namespace Components {
      */
     enableTemporalRefinement: boolean;
     /**
-     * Experimental flag indicating that connections to Vertex should be established if the viewer has its visibility set to `hidden`.
-     *
-     * *Caution:* Setting this flag can result in reduced performance, and should not be used in a production setting.
-     */
-    experimentalConnectWhileHidden: boolean;
-    /**
      * Specifies experimental rendering options. For Vertex use only.
      */
     experimentalRenderingOptions: string;
+    /**
+     * Experimental flag indicating that connections to Vertex should be established if the viewer is initially hidden through its own style or computed style, or has not been scrolled into view.
+     *
+     * *Caution:* Setting this flag can result in reduced performance, and should generally not be used in a production setting.
+     */
+    experimentalSkipVisibilityCheck: boolean;
     /**
      * Specifies how selected features should be highlighted.
      */
@@ -1624,6 +1626,14 @@ export namespace Components {
      */
     rotation?: Euler.Euler;
     /**
+     * When defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined by rotationSnapKey. Defaults to undefined.
+     */
+    rotationSnapDegrees?: number;
+    /**
+     * When rotationSnapDegrees is defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined here. Defaults to the shift key.
+     */
+    rotationSnapKey: ModifierKey;
+    /**
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
      */
     showInputs: boolean;
@@ -2408,7 +2418,7 @@ declare namespace LocalJSX {
      */
     overScanCount?: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      *
      * This prop will be automatically populated based on the `rowData` prop specified in the parent `<vertex-scene-tree />` element.
      * @example
@@ -2491,15 +2501,15 @@ declare namespace LocalJSX {
      */
     enableTemporalRefinement?: boolean;
     /**
-     * Experimental flag indicating that connections to Vertex should be established if the viewer has its visibility set to `hidden`.
-     *
-     * *Caution:* Setting this flag can result in reduced performance, and should not be used in a production setting.
-     */
-    experimentalConnectWhileHidden?: boolean;
-    /**
      * Specifies experimental rendering options. For Vertex use only.
      */
     experimentalRenderingOptions?: string;
+    /**
+     * Experimental flag indicating that connections to Vertex should be established if the viewer is initially hidden through its own style or computed style, or has not been scrolled into view.
+     *
+     * *Caution:* Setting this flag can result in reduced performance, and should generally not be used in a production setting.
+     */
+    experimentalSkipVisibilityCheck?: boolean;
     /**
      * Specifies how selected features should be highlighted.
      */
@@ -3634,6 +3644,14 @@ declare namespace LocalJSX {
      * The starting angle for the transform widget. This rotation will be updated as the rotations occur.
      */
     rotation?: Euler.Euler;
+    /**
+     * When defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined by rotationSnapKey. Defaults to undefined.
+     */
+    rotationSnapDegrees?: number;
+    /**
+     * When rotationSnapDegrees is defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined here. Defaults to the shift key.
+     */
+    rotationSnapKey?: ModifierKey;
     /**
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
      */

@@ -16,7 +16,6 @@ declare global {
 export class VisibilityObserver {
   private targetElement?: HTMLElement;
 
-  private intersectionObserver: IntersectionObserver;
   private mutationObservers: MutationObserver[];
 
   public constructor(
@@ -25,14 +24,6 @@ export class VisibilityObserver {
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
     this.emitVisibilityChange = this.emitVisibilityChange.bind(this);
 
-    this.intersectionObserver = new IntersectionObserver(
-      this.handleVisibilityChange,
-      {
-        root: null,
-        threshold: 0,
-        rootMargin: '0px',
-      }
-    );
     this.mutationObservers = [];
   }
 
@@ -53,13 +44,11 @@ export class VisibilityObserver {
   public observe(element: HTMLElement): void {
     this.targetElement = element;
 
-    this.intersectionObserver.observe(element);
     this.watchElementVisibility(element);
   }
 
   public unobserve(): void {
     if (this.targetElement != null) {
-      this.intersectionObserver.unobserve(this.targetElement);
       this.mutationObservers.forEach((obs) => obs.disconnect());
       this.mutationObservers = [];
     }
@@ -68,7 +57,6 @@ export class VisibilityObserver {
   }
 
   public disconnect(): void {
-    this.intersectionObserver.disconnect();
     this.mutationObservers.forEach((obs) => obs.disconnect());
     this.mutationObservers = [];
   }
