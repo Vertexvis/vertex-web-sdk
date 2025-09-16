@@ -331,21 +331,12 @@ export class ViewerStream extends StreamApi {
       },
     });
 
-    console.debug(`Retrieved settings [uri=${descriptor.url}]`);
-
     const connection = await Async.abort(
       controller.signal,
-      Async.retry(
-        () => {
-          console.debug(`Connecting to WS [uri=${descriptor.url}]`);
-
-          return this.connect(descriptor, settings);
-        },
-        {
-          maxRetries,
-          delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
-        }
-      )
+      Async.retry(() => this.connect(descriptor, settings), {
+        maxRetries,
+        delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
+      })
     ).catch((e) => {
       throw new WebsocketConnectionError(
         'Websocket connection failed.',

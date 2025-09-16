@@ -147,6 +147,7 @@ function replaceBindingString(data: BindingDataMap, expr: string): string {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function replaceBinding(data: BindingDataMap, expr: string): any {
   const path = extractBindingPath(expr);
   if (path != null) {
