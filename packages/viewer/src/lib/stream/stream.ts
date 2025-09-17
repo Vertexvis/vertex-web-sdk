@@ -585,8 +585,8 @@ export class ViewerStream extends StreamApi {
     return {
       dispose: () => {
         clearTimer();
-        window.removeEventListener('offline', restartTimer);
-        window.removeEventListener('online', clearTimer);
+        window.removeEventListener('offline', handleOffline);
+        window.removeEventListener('online', handleOnline);
       },
     };
   }
