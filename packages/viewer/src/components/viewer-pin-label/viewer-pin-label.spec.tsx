@@ -3,9 +3,15 @@ jest.mock('../../lib/stencil', () => ({
 }));
 
 const mockGetComputedStyle = jest.fn(() => ({
-  height: '10px',
-  borderWidth: '1px',
-  lineHeight: '1px',
+  getPropertyValue: jest.fn((property: string): string => {
+    const values: Record<string, string> = {
+      height: '10px',
+      borderWidth: '1px',
+      lineHeight: '1px',
+    };
+
+    return values[property];
+  }),
 }));
 jest.mock('./utils', () => ({
   getComputedStyle: mockGetComputedStyle,
@@ -421,9 +427,15 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     mockGetComputedStyle.mockReturnValue({
-      height: '48px',
-      borderWidth: '2px',
-      lineHeight: '16px',
+      getPropertyValue: jest.fn((property: string): string => {
+        const values: Record<string, string> = {
+          height: '48px',
+          borderWidth: '2px',
+          lineHeight: '16px',
+        };
+
+        return values[property];
+      }),
     });
 
     triggerResizeObserver([

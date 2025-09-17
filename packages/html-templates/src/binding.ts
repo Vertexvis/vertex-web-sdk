@@ -3,14 +3,17 @@ import { camelCase } from 'camel-case';
 
 const bindingRegEx = /{{(.+)}}/;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type BindingDataMap = Record<string, any>;
+
 export interface Binding {
-  bind<T>(data: T): void;
+  bind<T extends BindingDataMap>(data: T): void;
 }
 
 export class CollectionBinding implements Binding {
   public constructor(private bindings: Binding[]) {}
 
-  public bind<T>(data: T): void {
+  public bind<T extends BindingDataMap>(data: T): void {
     this.bindings.forEach((binding) => binding.bind(data));
   }
 }
@@ -18,7 +21,7 @@ export class CollectionBinding implements Binding {
 export abstract class NodeBinding<N extends Node> implements Binding {
   protected constructor(protected node: N, protected expr: string) {}
 
-  public abstract bind<T>(data: T): void;
+  public abstract bind<T extends BindingDataMap>(data: T): void;
 }
 
 export class TextNodeBinding extends NodeBinding<Node> {
@@ -26,7 +29,7 @@ export class TextNodeBinding extends NodeBinding<Node> {
     super(node, expr);
   }
 
-  public bind<T>(data: T): void {
+  public bind<T extends BindingDataMap>(data: T): void {
     const newContent = replaceBindingString(data, this.expr);
     if (newContent !== this.node.textContent) {
       this.node.textContent = newContent;
@@ -39,7 +42,7 @@ export class AttributeBinding extends NodeBinding<Element> {
     super(node, expr);
   }
 
-  public bind<T>(data: T): void {
+  public bind<T extends BindingDataMap>(data: T): void {
     const newValue = replaceBindingString(data, this.expr);
     const oldValue = this.node.getAttribute(this.attr);
     if (oldValue !== newValue) {
@@ -53,7 +56,7 @@ export class PropertyBinding extends NodeBinding<Element> {
     super(node, expr);
   }
 
-  public bind<T>(data: T): void {
+  public bind<T extends BindingDataMap>(data: T): void {
     const newValue = replaceBinding(data, this.expr);
     /* eslint-disable @typescript-eslint/no-explicit-any */
     const oldValue = (this.node as any)[this.prop];
@@ -71,7 +74,7 @@ export class EventHandlerBinding extends NodeBinding<Element> {
     super(node, expr);
   }
 
-  public bind<T>(data: T): void {
+  public bind<T extends BindingDataMap>(data: T): void {
     const path = extractBindingPath(this.expr);
     if (path != null) {
       this.disposable?.dispose();
@@ -134,8 +137,7 @@ function extractBindingPath(expr: string): string | undefined {
   return result != null ? result[1] : undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function replaceBindingString(data: Record<string, any>, expr: string): string {
+function replaceBindingString(data: BindingDataMap, expr: string): string {
   const path = extractBindingPath(expr);
   if (path != null) {
     const value = getBindableValue(data, path, true);
@@ -146,7 +148,7 @@ function replaceBindingString(data: Record<string, any>, expr: string): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function replaceBinding(data: Record<string, any>, expr: string): any {
+function replaceBinding(data: BindingDataMap, expr: string): any {
   const path = extractBindingPath(expr);
   if (path != null) {
     const value = getBindableValue(data, path, true);
@@ -157,8 +159,7 @@ function replaceBinding(data: Record<string, any>, expr: string): any {
 }
 
 function getBindableValue(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>,
+  data: BindingDataMap,
   path: string,
   isHead = false
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

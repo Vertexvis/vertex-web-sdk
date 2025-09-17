@@ -93,6 +93,7 @@ import {
 } from '../../lib/types';
 import { Frame } from '../../lib/types/frame';
 import { FrameCameraType } from '../../lib/types/frameCamera';
+import { VisibilityObserver } from '../../lib/visibilityObserver';
 import {
   DEFAULT_VIEWER_SCENE_WAIT_MS,
   getElementBoundingClientRect,
@@ -164,7 +165,6 @@ export class Viewer {
   /**
    * Property used for internals or testing.
    *
-   * @private
    * @internal
    */
   @Prop({ mutable: true }) public deviceId?: string;
@@ -262,9 +262,9 @@ export class Viewer {
   @Prop() public enableTemporalRefinement = true;
 
   /**
-   * @private
-   * @internal
    * Specifies experimental rendering options. For Vertex use only.
+   *
+   * @internal
    */
   @Prop() public experimentalRenderingOptions = '';
 
@@ -378,6 +378,17 @@ export class Viewer {
   @Prop({ mutable: true }) public sceneItems: SceneItemController | undefined;
 
   /**
+   * Experimental flag indicating that connections to Vertex should be established
+   * if the viewer is initially hidden through its own style or computed style, or
+   * has not been scrolled into view.
+   *
+   * *Caution:* Setting this flag can result in reduced performance,
+   * and should generally not be used in a production setting.
+   */
+  @Prop()
+  public experimentalSkipVisibilityCheck = false;
+
+  /**
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
@@ -459,7 +470,7 @@ export class Viewer {
   /**
    * Used for internals or testing.
    *
-   * @private
+   * @internal
    */
   @Event() public deviceIdChange!: EventEmitter<string>;
 
@@ -490,8 +501,10 @@ export class Viewer {
   private mutationObserver?: MutationObserver;
   private styleObserver?: MutationObserver;
   private resizeObserver?: ResizeObserver;
+  private visibilityObserver?: VisibilityObserver;
   private isResizing?: boolean;
   private isResizeUpdate?: boolean;
+  private isVisible = false;
 
   private resizeTimer?: NodeJS.Timeout;
 
@@ -507,6 +520,21 @@ export class Viewer {
 
   public constructor() {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+  }
+
+  /**
+   * @ignore
+   */
+  protected connectedCallback(): void {
+    this.visibilityObserver = new VisibilityObserver(
+      this.handleVisibilityChange
+    );
+    this.isVisible = this.visibilityObserver.isVisible(this.hostElement);
+
+    if (!this.isVisible) {
+      this.visibilityObserver?.observe(this.hostElement);
+    }
   }
 
   /**
@@ -567,6 +595,8 @@ export class Viewer {
    */
   protected async componentDidLoad(): Promise<void> {
     this.interactionApi = this.createInteractionApi();
+    this.isVisible =
+      this.visibilityObserver?.isVisible(this.hostElement) ?? true;
 
     if (this.canvasContainerElement != null) {
       this.resizeObserver?.observe(this.canvasContainerElement);
@@ -580,6 +610,13 @@ export class Viewer {
 
     await this.initializeDefaultInteractionHandlers();
     this.injectViewerApi();
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.visibilityObserver?.disconnect();
   }
 
   /**
@@ -893,6 +930,17 @@ export class Viewer {
    */
   @Method()
   public async load(urn: string, options?: LoadOptions): Promise<void> {
+    const shouldLoadBasedOnVisibility =
+      this.experimentalSkipVisibilityCheck || this.isVisible;
+
+    if (!shouldLoadBasedOnVisibility) {
+      console.debug(
+        'Detected the viewer is hidden. Delaying load until visible.'
+      );
+
+      return;
+    }
+
     if (this.stream != null && this.dimensions != null) {
       const { EXPERIMENTAL_annotationPollingIntervalInMs } =
         this.getResolvedConfig();
@@ -1018,6 +1066,18 @@ export class Viewer {
           this.isResizeUpdate = true;
           this.recalculateComponentDimensions();
         }, this.resizeDebounce);
+      }
+    }
+  }
+
+  private handleVisibilityChange(visible: boolean): void {
+    this.isVisible = visible;
+
+    if (this.isVisible) {
+      this.visibilityObserver?.disconnect();
+
+      if (this.src != null) {
+        this.load(this.src, { cameraType: this.cameraType });
       }
     }
   }
