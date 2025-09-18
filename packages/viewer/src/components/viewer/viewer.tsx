@@ -535,6 +535,8 @@ export class Viewer {
     if (!this.isVisible) {
       this.visibilityObserver?.observe(this.hostElement);
     }
+
+    this.stream?.resume();
   }
 
   /**
@@ -602,11 +604,9 @@ export class Viewer {
       this.resizeObserver?.observe(this.canvasContainerElement);
     }
 
-    if (this.src != null) {
-      this.load(this.src, { cameraType: this.cameraType }).catch((e) => {
-        console.error('Error loading scene', e);
-      });
-    }
+    this.loadOrResumeStream().catch((e) => {
+      console.error('Error loading scene', e);
+    });
 
     await this.initializeDefaultInteractionHandlers();
     this.injectViewerApi();
@@ -617,6 +617,8 @@ export class Viewer {
    */
   protected disconnectedCallback(): void {
     this.visibilityObserver?.disconnect();
+
+    this.stream?.pause();
   }
 
   /**
@@ -1076,9 +1078,17 @@ export class Viewer {
     if (this.isVisible) {
       this.visibilityObserver?.disconnect();
 
-      if (this.src != null) {
-        this.load(this.src, { cameraType: this.cameraType });
-      }
+      this.loadOrResumeStream();
+    }
+  }
+
+  private async loadOrResumeStream(): Promise<void> {
+    const streamPaused = this.stream?.isPaused() ?? false;
+
+    if (this.src != null && !streamPaused) {
+      await this.load(this.src, { cameraType: this.cameraType });
+    } else if (streamPaused) {
+      this.stream?.resume();
     }
   }
 
