@@ -61,7 +61,7 @@ precise measurement to work.
 | `measurementController` | --           | The controller that is responsible for performing measurements and updating the model.                                           | `MeasurementController \| undefined`       | `undefined`                       |
 | `measurementModel`      | --           | The model that contains the entities and outcomes from performing precise measurements.                                          | `MeasurementModel`                         | `new MeasurementModel()`          |
 | `measurementOverlays`   | --           | The manager that is responsible for measurement overlays to present by this component.                                           | `MeasurementOverlayManager`                | `new MeasurementOverlayManager()` |
-| `viewer`                | --           | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `HTMLVertexViewerElement \| undefined`     | `undefined`                       |
+| `viewer`                | `viewer`     | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `any`                                      | `undefined`                       |
 
 
 ## Dependencies

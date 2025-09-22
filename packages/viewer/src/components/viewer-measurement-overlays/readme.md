@@ -7,10 +7,10 @@ Intended for internal use.
 
 ## Properties
 
-| Property              | Attribute | Description                                      | Type                                   | Default                           |
-| --------------------- | --------- | ------------------------------------------------ | -------------------------------------- | --------------------------------- |
-| `measurementOverlays` | --        | The model that contains the overlays to present. | `MeasurementOverlayManager`            | `new MeasurementOverlayManager()` |
-| `viewer`              | --        | The viewer that this component is bound to.      | `HTMLVertexViewerElement \| undefined` | `undefined`                       |
+| Property              | Attribute | Description                                      | Type                        | Default                           |
+| --------------------- | --------- | ------------------------------------------------ | --------------------------- | --------------------------------- |
+| `measurementOverlays` | --        | The model that contains the overlays to present. | `MeasurementOverlayManager` | `new MeasurementOverlayManager()` |
+| `viewer`              | `viewer`  | The viewer that this component is bound to.      | `any`                       | `undefined`                       |
 
 
 ## CSS Custom Properties

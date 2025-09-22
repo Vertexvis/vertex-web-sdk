@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "@stencil/core": "^2.16.1",
+    "@stencil/core": "4.18.3",
     "@vertexvis/frame-streaming-protos": "^0.13.17",
     "@vertexvis/geometry": "0.24.0",
     "@vertexvis/html-templates": "0.24.0",
@@ -97,6 +97,6 @@
     "ts-jest": "^27.1.4",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.22.17",
-    "typescript": "^4.5.4"
+    "typescript": "^5.0.4"
   }
 }

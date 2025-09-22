@@ -1982,33 +1982,260 @@ export interface VertexViewerWalkModeToolCustomEvent<T> extends CustomEvent<T> {
   target: HTMLVertexViewerWalkModeToolElement;
 }
 declare global {
+  interface HTMLVertexSceneTreeElementEventMap {
+    connectionError: SceneTreeErrorDetails;
+    firstRowRendered: void;
+  }
   interface HTMLVertexSceneTreeElement
     extends Components.VertexSceneTree,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexSceneTreeElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeElement,
+        ev: VertexSceneTreeCustomEvent<HTMLVertexSceneTreeElementEventMap[K]>
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLVertexSceneTreeElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeElement,
+        ev: VertexSceneTreeCustomEvent<HTMLVertexSceneTreeElementEventMap[K]>
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexSceneTreeElement: {
     prototype: HTMLVertexSceneTreeElement;
     new (): HTMLVertexSceneTreeElement;
   };
+  interface HTMLVertexSceneTreeNotificationBannerElementEventMap {
+    action: void;
+  }
   /**
    * A notification banner that displays a message and an action button.
    */
   interface HTMLVertexSceneTreeNotificationBannerElement
     extends Components.VertexSceneTreeNotificationBanner,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeNotificationBannerElement,
+        ev: VertexSceneTreeNotificationBannerCustomEvent<
+          HTMLVertexSceneTreeNotificationBannerElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeNotificationBannerElement,
+        ev: VertexSceneTreeNotificationBannerCustomEvent<
+          HTMLVertexSceneTreeNotificationBannerElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexSceneTreeNotificationBannerElement: {
     prototype: HTMLVertexSceneTreeNotificationBannerElement;
     new (): HTMLVertexSceneTreeNotificationBannerElement;
   };
+  interface HTMLVertexSceneTreeSearchElementEventMap {
+    search: string;
+  }
   interface HTMLVertexSceneTreeSearchElement
     extends Components.VertexSceneTreeSearch,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexSceneTreeSearchElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeSearchElement,
+        ev: VertexSceneTreeSearchCustomEvent<
+          HTMLVertexSceneTreeSearchElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexSceneTreeSearchElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeSearchElement,
+        ev: VertexSceneTreeSearchCustomEvent<
+          HTMLVertexSceneTreeSearchElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexSceneTreeSearchElement: {
     prototype: HTMLVertexSceneTreeSearchElement;
     new (): HTMLVertexSceneTreeSearchElement;
   };
+  interface HTMLVertexSceneTreeTableCellElementEventMap {
+    expandToggled: SceneTreeTableCellEventDetails;
+    visibilityToggled: SceneTreeTableCellEventDetails;
+    selectionToggled: SceneTreeTableCellEventDetails;
+    isolatePressed: SceneTreeTableCellEventDetails;
+    cellLoaded: void;
+  }
   interface HTMLVertexSceneTreeTableCellElement
     extends Components.VertexSceneTreeTableCell,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeTableCellElement,
+        ev: VertexSceneTreeTableCellCustomEvent<
+          HTMLVertexSceneTreeTableCellElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeTableCellElement,
+        ev: VertexSceneTreeTableCellCustomEvent<
+          HTMLVertexSceneTreeTableCellElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexSceneTreeTableCellElement: {
     prototype: HTMLVertexSceneTreeTableCellElement;
     new (): HTMLVertexSceneTreeTableCellElement;
@@ -2027,9 +2254,68 @@ declare global {
     prototype: HTMLVertexSceneTreeTableHeaderElement;
     new (): HTMLVertexSceneTreeTableHeaderElement;
   };
+  interface HTMLVertexSceneTreeTableLayoutElementEventMap {
+    layoutRendered: void;
+    columnsResized: number[];
+  }
   interface HTMLVertexSceneTreeTableLayoutElement
     extends Components.VertexSceneTreeTableLayout,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeTableLayoutElement,
+        ev: VertexSceneTreeTableLayoutCustomEvent<
+          HTMLVertexSceneTreeTableLayoutElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexSceneTreeTableLayoutElement,
+        ev: VertexSceneTreeTableLayoutCustomEvent<
+          HTMLVertexSceneTreeTableLayoutElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexSceneTreeTableLayoutElement: {
     prototype: HTMLVertexSceneTreeTableLayoutElement;
     new (): HTMLVertexSceneTreeTableLayoutElement;
@@ -2055,9 +2341,73 @@ declare global {
     prototype: HTMLVertexSceneTreeToolbarGroupElement;
     new (): HTMLVertexSceneTreeToolbarGroupElement;
   };
+  interface HTMLVertexViewerElementEventMap {
+    tap: TapEventDetails;
+    doubletap: TapEventDetails;
+    longpress: TapEventDetails;
+    frameReceived: Frame;
+    frameDrawn: Frame;
+    tokenExpired: void;
+    connectionChange: ConnectionStatus;
+    sceneReady: void;
+    sceneChanged: void;
+    interactionStarted: void;
+    interactionFinished: void;
+    cameraTypeChanged: FrameCameraType;
+    annotationStateChanged: AnnotationState;
+    deviceIdChange: string;
+    dimensionschange: Dimensions.Dimensions;
+  }
   interface HTMLVertexViewerElement
     extends Components.VertexViewer,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerElement,
+        ev: VertexViewerCustomEvent<HTMLVertexViewerElementEventMap[K]>
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLVertexViewerElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerElement,
+        ev: VertexViewerCustomEvent<HTMLVertexViewerElementEventMap[K]>
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerElement: {
     prototype: HTMLVertexViewerElement;
     new (): HTMLVertexViewerElement;
@@ -2069,6 +2419,9 @@ declare global {
     prototype: HTMLVertexViewerAnnotationCalloutElement;
     new (): HTMLVertexViewerAnnotationCalloutElement;
   };
+  interface HTMLVertexViewerBoxQueryToolElementEventMap {
+    controllerChanged: VolumeIntersectionQueryController;
+  }
   /**
    * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
    * a query for items in a specific area of the viewer. This tool then allows for an
@@ -2077,7 +2430,62 @@ declare global {
    */
   interface HTMLVertexViewerBoxQueryToolElement
     extends Components.VertexViewerBoxQueryTool,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerBoxQueryToolElement,
+        ev: VertexViewerBoxQueryToolCustomEvent<
+          HTMLVertexViewerBoxQueryToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerBoxQueryToolElement,
+        ev: VertexViewerBoxQueryToolCustomEvent<
+          HTMLVertexViewerBoxQueryToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerBoxQueryToolElement: {
     prototype: HTMLVertexViewerBoxQueryToolElement;
     new (): HTMLVertexViewerBoxQueryToolElement;
@@ -2096,6 +2504,11 @@ declare global {
     prototype: HTMLVertexViewerDefaultToolbarElement;
     new (): HTMLVertexViewerDefaultToolbarElement;
   };
+  interface HTMLVertexViewerDomElementElementEventMap {
+    occlusionStateChanged: boolean;
+    detachedStateChanged: boolean;
+    propertyChange: void;
+  }
   /**
    * The `ViewerDomElement` is responsible for managing a
    * `<vertex-viewer-dom-element>` element. These elements are intended to be
@@ -2104,14 +2517,123 @@ declare global {
    */
   interface HTMLVertexViewerDomElementElement
     extends Components.VertexViewerDomElement,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerDomElementElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerDomElementElement,
+        ev: VertexViewerDomElementCustomEvent<
+          HTMLVertexViewerDomElementElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerDomElementElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerDomElementElement,
+        ev: VertexViewerDomElementCustomEvent<
+          HTMLVertexViewerDomElementElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerDomElementElement: {
     prototype: HTMLVertexViewerDomElementElement;
     new (): HTMLVertexViewerDomElementElement;
   };
+  interface HTMLVertexViewerDomGroupElementEventMap {
+    propertyChange: void;
+  }
   interface HTMLVertexViewerDomGroupElement
     extends Components.VertexViewerDomGroup,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerDomGroupElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerDomGroupElement,
+        ev: VertexViewerDomGroupCustomEvent<
+          HTMLVertexViewerDomGroupElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerDomGroupElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerDomGroupElement,
+        ev: VertexViewerDomGroupCustomEvent<
+          HTMLVertexViewerDomGroupElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerDomGroupElement: {
     prototype: HTMLVertexViewerDomGroupElement;
     new (): HTMLVertexViewerDomGroupElement;
@@ -2149,37 +2671,344 @@ declare global {
     prototype: HTMLVertexViewerLayerElement;
     new (): HTMLVertexViewerLayerElement;
   };
+  interface HTMLVertexViewerMarkupElementEventMap {
+    markupAdded:
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement;
+    markupChanged:
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement;
+    markupRemoved:
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement;
+    markupSelectionChanged:
+      | HTMLVertexViewerMarkupArrowElement
+      | HTMLVertexViewerMarkupCircleElement
+      | HTMLVertexViewerMarkupFreeformElement
+      | undefined;
+  }
   interface HTMLVertexViewerMarkupElement
     extends Components.VertexViewerMarkup,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerMarkupElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupElement,
+        ev: VertexViewerMarkupCustomEvent<
+          HTMLVertexViewerMarkupElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLVertexViewerMarkupElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupElement,
+        ev: VertexViewerMarkupCustomEvent<
+          HTMLVertexViewerMarkupElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMarkupElement: {
     prototype: HTMLVertexViewerMarkupElement;
     new (): HTMLVertexViewerMarkupElement;
   };
+  interface HTMLVertexViewerMarkupArrowElementEventMap {
+    interactionBegin: void;
+    interactionEnd: MarkupInteraction;
+    viewRendered: void;
+  }
   interface HTMLVertexViewerMarkupArrowElement
     extends Components.VertexViewerMarkupArrow,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupArrowElement,
+        ev: VertexViewerMarkupArrowCustomEvent<
+          HTMLVertexViewerMarkupArrowElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupArrowElement,
+        ev: VertexViewerMarkupArrowCustomEvent<
+          HTMLVertexViewerMarkupArrowElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMarkupArrowElement: {
     prototype: HTMLVertexViewerMarkupArrowElement;
     new (): HTMLVertexViewerMarkupArrowElement;
   };
+  interface HTMLVertexViewerMarkupCircleElementEventMap {
+    interactionBegin: void;
+    interactionEnd: MarkupInteraction;
+    viewRendered: void;
+  }
   interface HTMLVertexViewerMarkupCircleElement
     extends Components.VertexViewerMarkupCircle,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupCircleElement,
+        ev: VertexViewerMarkupCircleCustomEvent<
+          HTMLVertexViewerMarkupCircleElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupCircleElement,
+        ev: VertexViewerMarkupCircleCustomEvent<
+          HTMLVertexViewerMarkupCircleElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMarkupCircleElement: {
     prototype: HTMLVertexViewerMarkupCircleElement;
     new (): HTMLVertexViewerMarkupCircleElement;
   };
+  interface HTMLVertexViewerMarkupFreeformElementEventMap {
+    interactionBegin: void;
+    interactionEnd: MarkupInteraction;
+    viewRendered: void;
+  }
   interface HTMLVertexViewerMarkupFreeformElement
     extends Components.VertexViewerMarkupFreeform,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupFreeformElement,
+        ev: VertexViewerMarkupFreeformCustomEvent<
+          HTMLVertexViewerMarkupFreeformElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupFreeformElement,
+        ev: VertexViewerMarkupFreeformCustomEvent<
+          HTMLVertexViewerMarkupFreeformElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMarkupFreeformElement: {
     prototype: HTMLVertexViewerMarkupFreeformElement;
     new (): HTMLVertexViewerMarkupFreeformElement;
   };
+  interface HTMLVertexViewerMarkupToolElementEventMap {
+    markupBegin: void;
+    markupEnd: Markup;
+  }
   interface HTMLVertexViewerMarkupToolElement
     extends Components.VertexViewerMarkupTool,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerMarkupToolElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupToolElement,
+        ev: VertexViewerMarkupToolCustomEvent<
+          HTMLVertexViewerMarkupToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerMarkupToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMarkupToolElement,
+        ev: VertexViewerMarkupToolCustomEvent<
+          HTMLVertexViewerMarkupToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMarkupToolElement: {
     prototype: HTMLVertexViewerMarkupToolElement;
     new (): HTMLVertexViewerMarkupToolElement;
@@ -2191,9 +3020,68 @@ declare global {
     prototype: HTMLVertexViewerMeasurementDetailsElement;
     new (): HTMLVertexViewerMeasurementDetailsElement;
   };
+  interface HTMLVertexViewerMeasurementDistanceElementEventMap {
+    editBegin: EditBeginEventDetails;
+    editEnd: EditEndEventDetails;
+  }
   interface HTMLVertexViewerMeasurementDistanceElement
     extends Components.VertexViewerMeasurementDistance,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMeasurementDistanceElement,
+        ev: VertexViewerMeasurementDistanceCustomEvent<
+          HTMLVertexViewerMeasurementDistanceElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerMeasurementDistanceElement,
+        ev: VertexViewerMeasurementDistanceCustomEvent<
+          HTMLVertexViewerMeasurementDistanceElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerMeasurementDistanceElement: {
     prototype: HTMLVertexViewerMeasurementDistanceElement;
     new (): HTMLVertexViewerMeasurementDistanceElement;
@@ -2226,9 +3114,67 @@ declare global {
     prototype: HTMLVertexViewerPinGroupElement;
     new (): HTMLVertexViewerPinGroupElement;
   };
+  interface HTMLVertexViewerPinLabelElementEventMap {
+    labelChanged: void;
+    labelFocused: string | undefined;
+    labelBlurred: string | undefined;
+  }
   interface HTMLVertexViewerPinLabelElement
     extends Components.VertexViewerPinLabel,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<K extends keyof HTMLVertexViewerPinLabelElementEventMap>(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerPinLabelElement,
+        ev: VertexViewerPinLabelCustomEvent<
+          HTMLVertexViewerPinLabelElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerPinLabelElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerPinLabelElement,
+        ev: VertexViewerPinLabelCustomEvent<
+          HTMLVertexViewerPinLabelElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerPinLabelElement: {
     prototype: HTMLVertexViewerPinLabelElement;
     new (): HTMLVertexViewerPinLabelElement;
@@ -2254,6 +3200,9 @@ declare global {
     prototype: HTMLVertexViewerSpinnerElement;
     new (): HTMLVertexViewerSpinnerElement;
   };
+  interface HTMLVertexViewerTeleportToolElementEventMap {
+    controllerChanged: WalkModeController;
+  }
   /**
    * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
    * around a model, which is particularly useful for walking through a model.
@@ -2261,7 +3210,62 @@ declare global {
    */
   interface HTMLVertexViewerTeleportToolElement
     extends Components.VertexViewerTeleportTool,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerTeleportToolElement,
+        ev: VertexViewerTeleportToolCustomEvent<
+          HTMLVertexViewerTeleportToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerTeleportToolElement,
+        ev: VertexViewerTeleportToolCustomEvent<
+          HTMLVertexViewerTeleportToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerTeleportToolElement: {
     prototype: HTMLVertexViewerTeleportToolElement;
     new (): HTMLVertexViewerTeleportToolElement;
@@ -2280,9 +3284,70 @@ declare global {
     prototype: HTMLVertexViewerToolbarGroupElement;
     new (): HTMLVertexViewerToolbarGroupElement;
   };
+  interface HTMLVertexViewerTransformWidgetElementEventMap {
+    positionChanged: Vector3.Vector3 | undefined;
+    rotationChanged: Euler.Euler | undefined;
+    interactionEnded: Matrix4.Matrix4 | undefined;
+    interactionStarted: void;
+  }
   interface HTMLVertexViewerTransformWidgetElement
     extends Components.VertexViewerTransformWidget,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerTransformWidgetElement,
+        ev: VertexViewerTransformWidgetCustomEvent<
+          HTMLVertexViewerTransformWidgetElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerTransformWidgetElement,
+        ev: VertexViewerTransformWidgetCustomEvent<
+          HTMLVertexViewerTransformWidgetElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerTransformWidgetElement: {
     prototype: HTMLVertexViewerTransformWidgetElement;
     new (): HTMLVertexViewerTransformWidgetElement;
@@ -2294,13 +3359,71 @@ declare global {
     prototype: HTMLVertexViewerViewCubeElement;
     new (): HTMLVertexViewerViewCubeElement;
   };
+  interface HTMLVertexViewerWalkModeToolElementEventMap {
+    controllerChanged: WalkModeController;
+  }
   /**
    * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
    * intended for walking through a model instead of orbiting a model.
    */
   interface HTMLVertexViewerWalkModeToolElement
     extends Components.VertexViewerWalkModeTool,
-      HTMLStencilElement {}
+      HTMLStencilElement {
+    addEventListener<
+      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerWalkModeToolElement,
+        ev: VertexViewerWalkModeToolCustomEvent<
+          HTMLVertexViewerWalkModeToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ): void;
+    removeEventListener<
+      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
+    >(
+      type: K,
+      listener: (
+        this: HTMLVertexViewerWalkModeToolElement,
+        ev: VertexViewerWalkModeToolCustomEvent<
+          HTMLVertexViewerWalkModeToolElementEventMap[K]
+        >
+      ) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      listener: (this: Document, ev: DocumentEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener<K extends keyof HTMLElementEventMap>(
+      type: K,
+      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+      options?: boolean | EventListenerOptions
+    ): void;
+    removeEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ): void;
+  }
   var HTMLVertexViewerWalkModeToolElement: {
     prototype: HTMLVertexViewerWalkModeToolElement;
     new (): HTMLVertexViewerWalkModeToolElement;

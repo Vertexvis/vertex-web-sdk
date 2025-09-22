@@ -16,7 +16,7 @@
 | `freeformTemplateId`   | `freeform-template-id`    | An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`. | `string \| undefined`                                           | `undefined`        |
 | `startLineAnchorStyle` | `start-line-anchor-style` | The style of the starting anchor. This defaults to none.                                                                                               | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'none'`           |
 | `tool`                 | `tool`                    | The type of markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` element.                                       | `"arrow" \| "circle" \| "freeform"`                             | `'arrow'`          |
-| `viewer`               | --                        | The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.     | `HTMLVertexViewerElement \| undefined`                          | `undefined`        |
+| `viewer`               | `viewer`                  | The viewer to connect to markup.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.     | `any`                                                           | `undefined`        |
 
 
 ## Events
