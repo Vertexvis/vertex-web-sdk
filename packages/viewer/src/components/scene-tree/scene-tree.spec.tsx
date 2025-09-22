@@ -64,6 +64,7 @@ import {
 import { SceneTreeErrorCode } from './lib/errors';
 import { webSocketSubscriptionTransportFactory } from './lib/grpc';
 import { decodeSceneTreeJwt } from './lib/jwt';
+import { Row } from './lib/row';
 import {
   deselectItem,
   hideItem,
@@ -1123,6 +1124,83 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node1.getId()?.getHex(),
+        expect.anything()
+      );
+    });
+
+    it('selects ancestor if node is selected and the immediate parent is not', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      const getTreeRes = mockGetTree({
+        client,
+        transform: (node) => node.setSelected(false),
+      });
+
+      const node1 = getTreeRes.getItemsList()[0].clone();
+      const node2 = getTreeRes.getItemsList()[1].clone();
+      const node3 = getTreeRes.getItemsList()[2].clone();
+      node3.setSelected(true);
+      const ancestry = [node1, node2, node3];
+
+      const res = new GetNodeAncestorsResponse();
+      res.setItemsList(ancestry);
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowAtIndex(2);
+      const selectedRow: Row =
+        row != null
+          ? {
+              ...row,
+              node: {
+                ...row.node,
+                selected: true,
+              },
+            }
+          : row;
+
+      (selectItem as jest.Mock).mockClear();
+      await tree.selectItem(selectedRow, { recurseParent: true });
+      expect(selectItem).toHaveBeenCalledWith(
+        expect.anything(),
+        node1.getId()?.getHex(),
+        expect.anything()
+      );
+    });
+
+    it('does not select ancestor if node and immediate parent are already selected', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      const getTreeRes = mockGetTree({
+        client,
+        transform: (node) => node.setSelected(false),
+      });
+
+      const node1 = getTreeRes.getItemsList()[0].clone();
+      const node2 = getTreeRes.getItemsList()[1].clone();
+      node2.setSelected(true);
+      const node3 = getTreeRes.getItemsList()[2].clone();
+      node3.setSelected(true);
+      const ancestry = [node1, node2, node3];
+
+      const res = new GetNodeAncestorsResponse();
+      res.setItemsList(ancestry);
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowAtIndex(2);
+
+      (selectItem as jest.Mock).mockClear();
+      await tree.selectItem(row, { recurseParent: true });
+      expect(selectItem).toHaveBeenCalledWith(
+        expect.anything(),
+        node3.getId()?.getHex(),
         expect.anything()
       );
     });
