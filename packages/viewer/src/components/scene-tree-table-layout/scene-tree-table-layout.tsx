@@ -309,6 +309,18 @@ export class SceneTreeTableLayout {
     }
   }
 
+  /**
+   * Attempts to compute the height of templated cells. Used for internals
+   * or testing.
+   *
+   * @internal
+   * @ignore
+   */
+  @Method()
+  public async attemptComputeCellHeight(): Promise<void> {
+    this.computeCellHeight();
+  }
+
   public render(): h.JSX.IntrinsicElements {
     return (
       <Host>

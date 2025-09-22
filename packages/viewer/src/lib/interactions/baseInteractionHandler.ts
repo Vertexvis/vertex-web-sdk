@@ -334,25 +334,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     const defaultLineHeight =
-      this.computedBodyStyle.fontSize != null &&
-      this.computedBodyStyle.fontSize !== '' &&
-      !isNaN(parseFloat(this.computedBodyStyle.fontSize))
-        ? parseFloat(this.computedBodyStyle.fontSize) * DEFAULT_LINE_HEIGHT
+      this.computedBodyStyle.getPropertyValue('fontSize') != null &&
+      this.computedBodyStyle.getPropertyValue('fontSize') !== '' &&
+      !isNaN(parseFloat(this.computedBodyStyle.getPropertyValue('fontSize')))
+        ? parseFloat(this.computedBodyStyle.getPropertyValue('fontSize')) *
+          DEFAULT_LINE_HEIGHT
         : DEFAULT_FONT_SIZE * DEFAULT_LINE_HEIGHT;
 
     if (deltaMode === 1) {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
-      return this.computedBodyStyle.lineHeight != null &&
-        this.computedBodyStyle.lineHeight !== '' &&
-        !isNaN(parseFloat(this.computedBodyStyle.lineHeight))
-        ? deltaY * parseFloat(this.computedBodyStyle.lineHeight)
+      return this.computedBodyStyle.getPropertyValue('lineHeight') != null &&
+        this.computedBodyStyle.getPropertyValue('lineHeight') !== '' &&
+        !isNaN(
+          parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
+        )
+        ? deltaY *
+            parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
         : deltaY * defaultLineHeight;
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages
-      return this.computedBodyStyle.height != null &&
-        this.computedBodyStyle.height !== '' &&
-        !isNaN(parseFloat(this.computedBodyStyle.height))
-        ? deltaY * parseFloat(this.computedBodyStyle.height)
+      return this.computedBodyStyle.getPropertyValue('height') != null &&
+        this.computedBodyStyle.getPropertyValue('height') !== '' &&
+        !isNaN(parseFloat(this.computedBodyStyle.getPropertyValue('height')))
+        ? deltaY * parseFloat(this.computedBodyStyle.getPropertyValue('height'))
         : deltaY * window.innerHeight;
     }
     // deltaMode 0 corresponds to DOM_DELTA_PIXEL, which computes deltas in pixels
