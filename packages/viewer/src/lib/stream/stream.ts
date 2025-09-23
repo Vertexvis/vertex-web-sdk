@@ -221,13 +221,15 @@ export class ViewerStream extends StreamApi {
     }
   }
 
-  public resume(): void {
+  public async resume(): Promise<void> {
     if (this.pausedState != null) {
       console.debug(
         `Stream resumed [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`
       );
 
-      this.connectToExistingStream(this.pausedState);
+      await this.connectToExistingStream(this.pausedState);
+
+      this.pausedState = undefined;
     }
   }
 
