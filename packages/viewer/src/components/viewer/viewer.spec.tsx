@@ -337,6 +337,43 @@ describe('vertex-viewer', () => {
     });
   });
 
+  describe('disconnect behavior', () => {
+    it('should pause the stream and close the websocket when disconnected', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+      });
+
+      const close = jest.spyOn(ws, 'close');
+      const pause = jest.spyOn(stream, 'pause');
+      await loadViewerStreamKey(key1, { stream, ws, viewer });
+      viewer.remove();
+
+      expect(close).toHaveBeenCalled();
+      expect(pause).toHaveBeenCalled();
+    });
+  });
+
+  describe('reconnect behavior', () => {
+    it('should reconnect to a paused stream', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+      });
+
+      const pause = jest.spyOn(stream, 'pause');
+      const resume = jest.spyOn(stream, 'resume');
+      const viewerParent = viewer.parentElement;
+      await loadViewerStreamKey(key1, { stream, ws, viewer });
+      viewer.remove();
+
+      viewerParent?.appendChild(viewer);
+
+      expect(pause).toHaveBeenCalled();
+      expect(resume).toHaveBeenCalled();
+    });
+  });
+
   describe('stream attributes', () => {
     it('updates stream when a stream attribute changes', async () => {
       const { stream, ws } = makeViewerStream();

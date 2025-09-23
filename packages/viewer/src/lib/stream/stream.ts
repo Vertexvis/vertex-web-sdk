@@ -109,6 +109,7 @@ export class ViewerStream extends StreamApi {
   private deviceId: string | undefined;
 
   private state: ViewerStreamState = { type: 'disconnected' };
+  private pausedState?: Connected;
   public readonly stateChanged = new EventDispatcher<ViewerStreamState>();
 
   private options: Required<Omit<FrameStreamOptions, 'loggingEnabled'>>;
@@ -128,6 +129,10 @@ export class ViewerStream extends StreamApi {
       loadTimeoutInSeconds: opts.loadTimeoutInSeconds ?? 15,
       enableTemporalRefinement: opts.enableTemporalRefinement ?? true,
     };
+  }
+
+  public isPaused(): boolean {
+    return this.pausedState != null;
   }
 
   public getState(): ViewerStreamState {
@@ -201,6 +206,30 @@ export class ViewerStream extends StreamApi {
       if (this.state.type === 'connected') {
         this.closeAndReconnect(this.state);
       }
+    }
+  }
+
+  public pause(): void {
+    if (this.state.type === 'connected') {
+      this.pausedState = this.state;
+
+      console.debug(
+        `Stream paused [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`
+      );
+
+      this.disconnect();
+    }
+  }
+
+  public async resume(): Promise<void> {
+    if (this.pausedState != null) {
+      console.debug(
+        `Stream resumed [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`
+      );
+
+      await this.connectToExistingStream(this.pausedState);
+
+      this.pausedState = undefined;
     }
   }
 
