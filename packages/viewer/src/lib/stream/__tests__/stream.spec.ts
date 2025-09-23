@@ -604,6 +604,81 @@ describe(ViewerStream, () => {
     });
   });
 
+  describe('pause', () => {
+    it('closes an open connection and captures state', async () => {
+      const { stream, ws } = makeStream();
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+
+      const close = jest.spyOn(ws, 'close');
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+      stream.pause();
+
+      expect(close).toHaveBeenCalled();
+      expect(stream.isPaused()).toBe(true);
+    });
+  });
+
+  describe('resume', () => {
+    it('reconnects to a paused stream', async () => {
+      const { stream, ws } = makeStream();
+      const attributes = {
+        streamAttributes: { featureLines: { width: 1, color: '#ff0000' } },
+      };
+
+      jest
+        .spyOn(stream, 'startStream')
+        .mockResolvedValue(Fixtures.Responses.startStream().response);
+      jest
+        .spyOn(stream, 'syncTime')
+        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      const reconnectSpy = jest
+        .spyOn(stream, 'reconnect')
+        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+
+      const connected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      stream.load(urn123, clientId, deviceId, config);
+      await simulateFrame(ws);
+      await connected123;
+      stream.update(attributes);
+      stream.pause();
+
+      const reconnected123 = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+      );
+      const resumePromise = stream.resume();
+      await reconnected123;
+      await resumePromise;
+      expect(reconnectSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            featureLines: expect.objectContaining({
+              lineWidth: 1,
+              lineColor: {
+                r: 255,
+                g: 0,
+                b: 0,
+              },
+            }),
+          }),
+        })
+      );
+      expect(stream.isPaused()).toBe(false);
+    });
+  });
+
   function makeStream(): { stream: ViewerStream; ws: WebSocketClientMock } {
     const { stream, ws } = makeStreamBase();
     stream.update({ dimensions, streamAttributes, frameBgColor });
