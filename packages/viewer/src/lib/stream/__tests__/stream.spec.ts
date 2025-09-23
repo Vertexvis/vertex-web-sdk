@@ -658,8 +658,9 @@ describe(ViewerStream, () => {
       const reconnected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123'
       );
-      stream.resume();
+      const resumePromise = stream.resume();
       await reconnected123;
+      await resumePromise;
       expect(reconnectSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -674,6 +675,7 @@ describe(ViewerStream, () => {
           }),
         })
       );
+      expect(stream.isPaused()).toBe(false);
     });
   });
 
