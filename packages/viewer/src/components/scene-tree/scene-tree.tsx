@@ -461,9 +461,21 @@ export class SceneTree {
   ): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id }) => {
       const ancestors = (await this.controller?.fetchNodeAncestors(id)) || [];
+
+      // The parent node should be selected if recurseParent is true and either
+      // the given node is in the selection path (so was intentionally selected by clicking in the tree)
+      // or if the given node is selected, but its immediate parent is not. The second case covers the
+      // situation that the given node was selected as part of a previous ancestor selection and the
+      // user wishes to clear the selection list and only select the given node.
       const isInPath = this.stateMap.selectionPath?.includes(id);
 
-      if (recurseParent && isInPath) {
+      const nodeForRow = this.getNodeFromRowOrIndex(row);
+      const immediateParentNodeIsSelected =
+        ancestors.length > 0 ? ancestors[0].selected : true;
+      const nodeIsSelectedAndParentIsUnselected =
+        nodeForRow.selected && !immediateParentNodeIsSelected;
+
+      if (recurseParent && (isInPath || nodeIsSelectedAndParentIsUnselected)) {
         const nextNode = ancestors.find(({ selected }) => !selected);
         if (nextNode != null) {
           await this.selectItem(nextNode, options);
@@ -937,10 +949,9 @@ export class SceneTree {
     }
   }
 
-  private async performRowOperation(
-    rowOrIndex: number | Row | Node.AsObject,
-    op: OperationHandler
-  ): Promise<void> {
+  private getNodeFromRowOrIndex(
+    rowOrIndex: number | Row | Node.AsObject
+  ): Node.AsObject {
     const row =
       typeof rowOrIndex === 'number' ? this.rows[rowOrIndex] : rowOrIndex;
 
@@ -948,7 +959,14 @@ export class SceneTree {
       throw new Error(`Cannot perform scene tree operation. Row not found.`);
     }
 
-    const node = isLoadedRow(row) ? row.node : row;
+    return isLoadedRow(row) ? row.node : row;
+  }
+
+  private async performRowOperation(
+    rowOrIndex: number | Row | Node.AsObject,
+    op: OperationHandler
+  ): Promise<void> {
+    const node = this.getNodeFromRowOrIndex(rowOrIndex);
 
     if (node.id == null) {
       throw new Error(`Cannot perform scene tree operation. ID is undefined.`);
