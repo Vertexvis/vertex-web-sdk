@@ -1205,6 +1205,42 @@ describe('<vertex-scene-tree>', () => {
       );
     });
 
+    it('selects only node if full tree is already selected', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 100);
+
+      const getTreeRes = mockGetTree({
+        client,
+        transform: (node) => node.setSelected(false),
+      });
+
+      const node1 = getTreeRes.getItemsList()[0].clone();
+      node1.setSelected(true);
+      const node2 = getTreeRes.getItemsList()[1].clone();
+      node2.setSelected(true);
+      const node3 = getTreeRes.getItemsList()[2].clone();
+      node3.setSelected(true);
+      const ancestry = [node1, node2, node3];
+
+      const res = new GetNodeAncestorsResponse();
+      res.setItemsList(ancestry);
+      (client.getNodeAncestors as jest.Mock).mockImplementation(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowAtIndex(2);
+      await tree.selectItem(row, { recurseParent: true });
+
+      (selectItem as jest.Mock).mockClear();
+      await tree.selectItem(row, { recurseParent: true });
+      expect(selectItem).toHaveBeenCalledWith(
+        expect.anything(),
+        node3.getId()?.getHex(),
+        expect.anything()
+      );
+    });
+
     it('should support range queries and send the range', async () => {
       const client = mockSceneTreeClient();
       const index = new UInt64Value();

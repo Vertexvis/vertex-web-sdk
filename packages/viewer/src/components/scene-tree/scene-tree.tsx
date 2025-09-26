@@ -480,6 +480,9 @@ export class SceneTree {
         if (nextNode != null) {
           await this.selectItem(nextNode, options);
           this.lastSelectedItemId = id;
+        } else {
+          await selectItem(viewer, id, options);
+          this.lastSelectedItemId = id;
         }
       } else if (options.range && this.lastSelectedItemId != null) {
         const currentRowIndex = await this.controller?.expandParentNodes(id);
