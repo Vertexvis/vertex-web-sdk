@@ -120,11 +120,11 @@ the result of the `Raycaster.hitItems()` method.
 
 ## Properties
 
-| Property   | Attribute | Description                                                                                                                                                                                   | Type                   | Default     |
-| ---------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------- |
-| `normal`   | --        | The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.                                              | `Vector3 \| undefined` | `undefined` |
-| `position` | --        | The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position. | `Vector3 \| undefined` | `undefined` |
-| `viewer`   | `viewer`  | The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.                                                                   | `any`                  | `undefined` |
+| Property   | Attribute | Description                                                                                                                                                                                   | Type                                   | Default     |
+| ---------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `normal`   | --        | The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.                                              | `Vector3 \| undefined`                 | `undefined` |
+| `position` | --        | The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position. | `Vector3 \| undefined`                 | `undefined` |
+| `viewer`   | --        | The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.                                                                   | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 
 ## CSS Custom Properties

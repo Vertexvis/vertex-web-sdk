@@ -164,17 +164,17 @@ be cloned and added to the component.
 | `selectedMarkupId`     | `selected-markup-id`      | The ID of the markup that is selected.                                                                                                                 | `string \| undefined`                                           | `undefined`        |
 | `startLineAnchorStyle` | `start-line-anchor-style` | The style of the starting anchor. This defaults to none.                                                                                               | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'none'`           |
 | `tool`                 | `tool`                    | The type of markup to perform.                                                                                                                         | `"arrow" \| "circle" \| "freeform"`                             | `'arrow'`          |
-| `viewer`               | `viewer`                  | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                    | `any`                                                           | `undefined`        |
+| `viewer`               | --                        | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                    | `HTMLVertexViewerElement \| undefined`                          | `undefined`        |
 
 
 ## Events
 
-| Event                    | Description                                                                                                                         | Type               |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `markupAdded`            | Dispatched when a new markup is added, either through user interaction or programmatically.                                         | `CustomEvent<any>` |
-| `markupChanged`          | Dispatched when an existing piece of markup is changed, either through user interaction or programmatically.                        | `CustomEvent<any>` |
-| `markupRemoved`          | Dispatched when a markup is removed, either through user interaction or programmatically.                                           | `CustomEvent<any>` |
-| `markupSelectionChanged` | Dispatched when markup selection changes. Will either be the selected element or `undefined` indicating that selection was cleared. | `CustomEvent<any>` |
+| Event                    | Description                                                                                                                         | Type                                                                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `markupAdded`            | Dispatched when a new markup is added, either through user interaction or programmatically.                                         | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
+| `markupChanged`          | Dispatched when an existing piece of markup is changed, either through user interaction or programmatically.                        | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
+| `markupRemoved`          | Dispatched when a markup is removed, either through user interaction or programmatically.                                           | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
+| `markupSelectionChanged` | Dispatched when markup selection changes. Will either be the selected element or `undefined` indicating that selection was cleared. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement \| undefined>` |
 
 
 ## Methods
@@ -194,7 +194,7 @@ a default element will be created.
 
 #### Returns
 
-Type: `Promise<any>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
 
 The markup element that was created.
 
@@ -210,7 +210,7 @@ Returns the markup element associated to the given ID.
 
 #### Returns
 
-Type: `Promise<any>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 A markup element, or `undefined`.
 
@@ -220,7 +220,7 @@ Returns a list of markup elements that are children of this component.
 
 #### Returns
 
-Type: `Promise<any[]>`
+Type: `Promise<(HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement)[]>`
 
 A list of all markups.
 
@@ -238,7 +238,7 @@ found.
 
 #### Returns
 
-Type: `Promise<any>`
+Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 The markup element, or undefined.
 
