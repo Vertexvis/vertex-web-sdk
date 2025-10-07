@@ -1626,6 +1626,12 @@ export namespace Components {
      */
     rotation?: Euler.Euler;
     /**
+     * Scalar to increase the size of the rotation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
+     *
+     * Defaults to `1`.
+     */
+    rotationHandleScalar: number;
+    /**
      * When defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined by rotationSnapKey. Defaults to undefined.
      */
     rotationSnapDegrees?: number;
@@ -1637,6 +1643,12 @@ export namespace Components {
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
      */
     showInputs: boolean;
+    /**
+     * Scalar to increase the size of the translation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
+     *
+     * Defaults to `1`.
+     */
+    translationHandleScalar: number;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */
@@ -3645,6 +3657,12 @@ declare namespace LocalJSX {
      */
     rotation?: Euler.Euler;
     /**
+     * Scalar to increase the size of the rotation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
+     *
+     * Defaults to `1`.
+     */
+    rotationHandleScalar?: number;
+    /**
      * When defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined by rotationSnapKey. Defaults to undefined.
      */
     rotationSnapDegrees?: number;
@@ -3656,6 +3674,12 @@ declare namespace LocalJSX {
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
      */
     showInputs?: boolean;
+    /**
+     * Scalar to increase the size of the translation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
+     *
+     * Defaults to `1`.
+     */
+    translationHandleScalar?: number;
     /**
      * The viewer to connect to transforms. If nested within a <vertex-viewer>, this property will be populated automatically.
      */

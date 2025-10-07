@@ -15,6 +15,7 @@ import {
   yAxisArrowPositions,
   zAxisArrowPositions,
 } from '../../../lib/transforms/axis-translation';
+import { Drawable, DrawablePoints } from '../../../lib/transforms/drawable';
 import { testDrawable } from '../../../lib/transforms/hits';
 import { AxisLine } from '../../../lib/transforms/line';
 import { TriangleMesh } from '../../../lib/transforms/mesh';
@@ -149,7 +150,9 @@ function updateFrameCameraPosition(
       baseFrame.scene.boundingBox,
       baseFrame.scene.crossSection,
       baseFrame.scene.worldOrientation,
-      baseFrame.scene.hasChanged
+      baseFrame.scene.hasChanged,
+      baseFrame.scene.sceneViewSummary,
+      baseFrame.scene.modelViewId
     ),
     makeDepthImagePng(100, 50),
     makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))
@@ -393,7 +396,9 @@ describe(TransformWidget, () => {
 
   it('updates and clears the hovered mesh', async () => {
     const widget = new TransformWidget(canvas, {
-      hovered: '#ffff00',
+      colors: {
+        hovered: '#ffff00',
+      },
     });
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
@@ -420,7 +425,9 @@ describe(TransformWidget, () => {
 
   it('updates with the colors provided, and retains existing if undefined', async () => {
     const widget = new TransformWidget(canvas, {
-      zArrow: '#555555',
+      colors: {
+        zArrow: '#555555',
+      },
     });
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
@@ -465,9 +472,11 @@ describe(TransformWidget, () => {
 
   it('uses an opacity if the specific axis are disabled', async () => {
     const widget = new TransformWidget(canvas, {
-      xArrow: '#777777',
-      yArrow: '#888888',
-      zArrow: '#999999',
+      colors: {
+        xArrow: '#777777',
+        yArrow: '#888888',
+        zArrow: '#999999',
+      },
     });
 
     widget.updateDisabledAxis({
@@ -555,9 +564,11 @@ describe(TransformWidget, () => {
     const widget = new TransformWidget(
       canvas,
       {
-        xArrow: '#777777',
-        yArrow: '#888888',
-        zArrow: '#999999',
+        colors: {
+          xArrow: '#777777',
+          yArrow: '#888888',
+          zArrow: '#999999',
+        },
       },
       {
         xRotation: true,
@@ -577,5 +588,90 @@ describe(TransformWidget, () => {
         .getDrawableElements()
         .find((e) => e.disabled && e.identifier.includes('x-rotate'))
     ).toBeDefined();
+  });
+
+  it('supports scaling transform handles', async () => {
+    const sizes = {
+      xTranslation: 1.5,
+      yTranslation: 2,
+      zTranslation: 2.5,
+      xRotation: 1.5,
+      yRotation: 2,
+      zRotation: 2.5,
+    };
+    const unscaled = new TransformWidget(canvas);
+    const scaled = new TransformWidget(canvas, {
+      sizes,
+    });
+
+    const frame = makePerspectiveFrame();
+    const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+
+    unscaled.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+    );
+    unscaled.updateTransform(positionTransform);
+    scaled.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+    );
+    scaled.updateTransform(positionTransform);
+
+    const unscaledDrawableElements = unscaled.getDrawableElements();
+    const scaledDrawableElements = scaled.getDrawableElements();
+
+    function validatePointScaling(
+      identifier: string,
+      scalar: number,
+      unscaled: Drawable<DrawablePoints>[],
+      scaled: Drawable<DrawablePoints>[]
+    ): void {
+      const scaledPoints = scaled
+        .find((e) => e.identifier === identifier)
+        ?.points.toWorldArray() as Vector3.Vector3[];
+      const unscaledPoints = unscaled
+        .find((e) => e.identifier === identifier)
+        ?.points.toWorldArray() as Vector3.Vector3[];
+
+      scaledPoints?.forEach((pt, i) => {
+        expect(Vector3.isEqual(pt, Vector3.scale(scalar, unscaledPoints[i])));
+      });
+    }
+
+    validatePointScaling(
+      'x-translate',
+      sizes.xTranslation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'y-translate',
+      sizes.yTranslation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'z-translate',
+      sizes.zTranslation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'x-rotate',
+      sizes.xRotation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'y-rotate',
+      sizes.yRotation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'z-rotate',
+      sizes.zRotation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
   });
 });

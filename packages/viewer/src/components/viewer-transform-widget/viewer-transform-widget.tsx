@@ -187,6 +187,26 @@ export class ViewerTransformWidget {
   public rotationSnapKey: ModifierKey = 'shift';
 
   /**
+   * Scalar to increase the size of the translation handles of this widget.
+   * Values above zero and below three will result in the best visual representation
+   * of the handles, and values above three may produce unexpected results.
+   *
+   * Defaults to `1`.
+   */
+  @Prop()
+  public translationHandleScalar = 1;
+
+  /**
+   * Scalar to increase the size of the rotation handles of this widget.
+   * Values above zero and below three will result in the best visual representation
+   * of the handles, and values above three may produce unexpected results.
+   *
+   * Defaults to `1`.
+   */
+  @Prop()
+  public rotationHandleScalar = 1;
+
+  /**
    * **EXPERIMENTAL.**
    *
    * Enables Command+Z and Control+Z keybindings to perform an undo of
@@ -363,6 +383,27 @@ export class ViewerTransformWidget {
       xTranslation: this.xTranslationDisabled,
       yTranslation: this.yTranslationDisabled,
       zTranslation: this.zTranslationDisabled,
+    });
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('translationHandleScalar')
+  @Watch('rotationHandleScalar')
+  protected handleTransformHandleScalarChanged(): void {
+    const effectiveTranslationScalar = this.getTranslationScalar();
+    const effectiveRotationScalar = this.getRotationScalar();
+
+    console.log(effectiveRotationScalar, effectiveTranslationScalar);
+
+    this.widget?.updateScalars({
+      xTranslation: effectiveTranslationScalar,
+      yTranslation: effectiveTranslationScalar,
+      zTranslation: effectiveTranslationScalar,
+      xRotation: effectiveRotationScalar,
+      yRotation: effectiveRotationScalar,
+      zRotation: effectiveRotationScalar,
     });
   }
 
@@ -852,11 +893,24 @@ export class ViewerTransformWidget {
       )}, has-initial-frame=${this.viewer?.frame != null}]`
     );
 
+    const effectiveTranslationScalar = this.getTranslationScalar();
+    const effectiveRotationScalar = this.getRotationScalar();
+
     this.widget = new TransformWidget(canvasRef, {
-      xArrow: this.xArrowColor,
-      yArrow: this.yArrowColor,
-      zArrow: this.zArrowColor,
-      hovered: this.hoveredColor,
+      colors: {
+        xArrow: this.xArrowColor,
+        yArrow: this.yArrowColor,
+        zArrow: this.zArrowColor,
+        hovered: this.hoveredColor,
+      },
+      scalars: {
+        xTranslation: effectiveTranslationScalar,
+        yTranslation: effectiveTranslationScalar,
+        zTranslation: effectiveTranslationScalar,
+        xRotation: effectiveRotationScalar,
+        yRotation: effectiveRotationScalar,
+        zRotation: effectiveRotationScalar,
+      },
     });
 
     if (this.rotation != null) {
@@ -991,6 +1045,26 @@ export class ViewerTransformWidget {
       this.dragging?.identifier ?? this.lastDragged?.identifier;
 
     return !!draggingIdentifier?.includes('rotate');
+  };
+
+  private getTranslationScalar = (): number => {
+    if (this.translationHandleScalar > 0) {
+      return this.translationHandleScalar;
+    }
+    console.warn(
+      'Invalid value provided for translation-handle-scalar. Expected a positive value greater than zero.'
+    );
+    return 1;
+  };
+
+  private getRotationScalar = (): number => {
+    if (this.rotationHandleScalar > 0) {
+      return this.rotationHandleScalar;
+    }
+    console.warn(
+      'Invalid value provided for rotation-handle-scalar. Expected a positive value greater than zero.'
+    );
+    return 1;
   };
 
   private getDisplayedUnits = (): AngleUnits | DistanceUnits => {

@@ -37,6 +37,15 @@ export interface DrawableElementColors {
   outline?: Color.Color | string;
 }
 
+export interface DrawableElementSizeScalars {
+  xRotation?: number;
+  yRotation?: number;
+  zRotation?: number;
+  xTranslation?: number;
+  yTranslation?: number;
+  zTranslation?: number;
+}
+
 export interface DisabledAxis {
   xRotation: boolean;
   yRotation: boolean;
@@ -44,6 +53,11 @@ export interface DisabledAxis {
   xTranslation: boolean;
   yTranslation: boolean;
   zTranslation: boolean;
+}
+
+export interface TransformWidgetCustomization {
+  colors?: DrawableElementColors;
+  scalars?: DrawableElementSizeScalars;
 }
 
 export class TransformWidget extends ReglComponent {
@@ -95,16 +109,16 @@ export class TransformWidget extends ReglComponent {
 
   public constructor(
     canvasElement: HTMLCanvasElement,
-    colors: DrawableElementColors = {},
+    private customization: TransformWidgetCustomization = {},
     initialDisabledAxes: Partial<DisabledAxis> = {}
   ) {
     super(canvasElement);
 
-    this.xArrowFillColor = colors.xArrow;
-    this.yArrowFillColor = colors.yArrow;
-    this.zArrowFillColor = colors.zArrow;
-    this.hoveredArrowFillColor = colors.hovered;
-    this.outlineColor = colors.outline;
+    this.xArrowFillColor = customization.colors?.xArrow;
+    this.yArrowFillColor = customization.colors?.yArrow;
+    this.zArrowFillColor = customization.colors?.zArrow;
+    this.hoveredArrowFillColor = customization.colors?.hovered;
+    this.outlineColor = customization.colors?.outline;
 
     this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
     this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
@@ -181,6 +195,17 @@ export class TransformWidget extends ReglComponent {
     this.yRotation?.updateFillColor(this.getYRotationColor(), true);
     this.zRotation?.updateFillColor(this.getZRotationColor(), true);
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
+  }
+
+  public updateScalars(scalars: DrawableElementSizeScalars): void {
+    this.customization = {
+      ...this.customization,
+      scalars,
+    };
+
+    if (this.transform != null && this.frame != null) {
+      this.updateElements(this.transform, this.frame);
+    }
   }
 
   public onHoveredChanged(
@@ -281,7 +306,12 @@ export class TransformWidget extends ReglComponent {
     this.xArrow = new TriangleMesh(
       createShape,
       'x-translate',
-      xAxisArrowPositions(transform, frame.scene.camera, triangleSize),
+      xAxisArrowPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.xTranslation
+      ),
       this.outlineColor,
       this.getXTranslationColor()
     );
@@ -289,7 +319,13 @@ export class TransformWidget extends ReglComponent {
     this.xRotation = new TriangleMesh(
       createShape,
       'x-rotate',
-      xAxisRotationPositions(transform, frame.scene.camera, triangleSize),
+      xAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.xRotation,
+        this.customization.scalars?.xTranslation
+      ),
       this.outlineColor,
       this.getXRotationColor()
     );
@@ -303,7 +339,12 @@ export class TransformWidget extends ReglComponent {
     this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
-      yAxisArrowPositions(transform, frame.scene.camera, triangleSize),
+      yAxisArrowPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.yTranslation
+      ),
       this.outlineColor,
       this.getYTranslationColor()
     );
@@ -311,7 +352,13 @@ export class TransformWidget extends ReglComponent {
     this.yRotation = new TriangleMesh(
       createShape,
       'y-rotate',
-      yAxisRotationPositions(transform, frame.scene.camera, triangleSize),
+      yAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.yRotation,
+        this.customization.scalars?.yTranslation
+      ),
       this.outlineColor,
       this.getYRotationColor()
     );
@@ -325,7 +372,12 @@ export class TransformWidget extends ReglComponent {
     this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
-      zAxisArrowPositions(transform, frame.scene.camera, triangleSize),
+      zAxisArrowPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.zTranslation
+      ),
       this.outlineColor,
       this.getZTranslationColor()
     );
@@ -339,7 +391,13 @@ export class TransformWidget extends ReglComponent {
     this.zRotation = new TriangleMesh(
       createShape,
       'z-rotate',
-      zAxisRotationPositions(transform, frame.scene.camera, triangleSize),
+      zAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.zRotation,
+        this.customization.scalars?.zTranslation
+      ),
       this.outlineColor,
       this.getZRotationColor()
     );
@@ -497,38 +555,71 @@ export class TransformWidget extends ReglComponent {
 
     if (this.xArrow != null) {
       this.xArrow.updatePoints(
-        xAxisArrowPositions(transform, frame.scene.camera, triangleSize)
+        xAxisArrowPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.xTranslation
+        )
       );
       this.xAxis?.updatePoints(
         axisPositions(transform, frame.scene.camera, this.xArrow)
       );
     }
     this.xRotation?.updatePoints(
-      xAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+      xAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.xRotation,
+        this.customization.scalars?.xTranslation
+      )
     );
 
     if (this.yArrow != null) {
       this.yArrow.updatePoints(
-        yAxisArrowPositions(transform, frame.scene.camera, triangleSize)
+        yAxisArrowPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.yTranslation
+        )
       );
       this.yAxis?.updatePoints(
         axisPositions(transform, frame.scene.camera, this.yArrow)
       );
     }
     this.yRotation?.updatePoints(
-      yAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+      yAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.yRotation,
+        this.customization.scalars?.yTranslation
+      )
     );
 
     if (this.zArrow != null) {
       this.zArrow.updatePoints(
-        zAxisArrowPositions(transform, frame.scene.camera, triangleSize)
+        zAxisArrowPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.zTranslation
+        )
       );
       this.zAxis?.updatePoints(
         axisPositions(transform, frame.scene.camera, this.zArrow)
       );
     }
     this.zRotation?.updatePoints(
-      zAxisRotationPositions(transform, frame.scene.camera, triangleSize)
+      zAxisRotationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.zRotation,
+        this.customization.scalars?.zTranslation
+      )
     );
 
     this.xyRotationLine?.updatePoints(
