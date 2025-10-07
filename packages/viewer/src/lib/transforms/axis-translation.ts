@@ -6,39 +6,45 @@ import { TriangleMeshPoints } from './mesh';
 export function xAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  sizeScalar = 1
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.right(),
-    triangleSize
+    triangleSize,
+    sizeScalar
   );
 }
 
 export function yAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  sizeScalar = 1
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.up(),
-    triangleSize
+    triangleSize,
+    sizeScalar
   );
 }
 
 export function zAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  sizeScalar = 1
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.back(),
-    triangleSize
+    triangleSize,
+    sizeScalar
   );
 }
 
@@ -46,7 +52,8 @@ export function computeArrowNdcValues(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
-  triangleSize: number
+  triangleSize: number,
+  sizeScalar = 1
 ): TriangleMeshPoints {
   const transformedDirection = Vector3.transformMatrix(
     direction,
@@ -71,9 +78,9 @@ export function computeArrowNdcValues(
     direction: transformedDirection,
   });
 
-  const left = Ray.at(xRay, -(triangleSize * 1.25));
-  const right = Ray.at(xRay, triangleSize * 1.25);
-  const up = Ray.at(yRay, triangleSize * 3);
+  const left = Ray.at(xRay, -(triangleSize * sizeScalar * 1.25));
+  const right = Ray.at(xRay, triangleSize * sizeScalar * 1.25);
+  const up = Ray.at(yRay, triangleSize * sizeScalar * 3);
 
   return new TriangleMeshPoints(
     !isNaN(worldX.x),

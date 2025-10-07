@@ -853,6 +853,96 @@ describe('vertex-viewer-transform-widget', () => {
     );
   });
 
+  it('supports scaling the transformation handles', async () => {
+    const { stream, ws } = makeViewerStream();
+    const position = Vector3.create(1, 1, 1);
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget
+            position={position}
+          ></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+      Rectangle.create(0, 0, 100, 100)
+    );
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+    widget.translationHandleScalar = 2;
+    widget.rotationHandleScalar = 3;
+
+    await page.waitForChanges();
+
+    expect(mockTransformWidget.updateScalars).toHaveBeenCalledWith({
+      xTranslation: 2,
+      yTranslation: 2,
+      zTranslation: 2,
+      xRotation: 3,
+      yRotation: 3,
+      zRotation: 3,
+    });
+  });
+
+  it('falls back to default scale values for values at or below zero', async () => {
+    const { stream, ws } = makeViewerStream();
+    const position = Vector3.create(1, 1, 1);
+    const page = await newSpecPage({
+      components: [Viewer, ViewerTransformWidget],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-transform-widget
+            position={position}
+          ></vertex-viewer-transform-widget>
+        </vertex-viewer>
+      ),
+    });
+
+    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+      Rectangle.create(0, 0, 100, 100)
+    );
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const widget = page.body.querySelector(
+      'vertex-viewer-transform-widget'
+    ) as HTMLVertexViewerTransformWidgetElement;
+
+    await loadViewerStreamKey(key1, { viewer, stream, ws });
+    await page.waitForChanges();
+
+    const frame = makePerspectiveFrame();
+    viewer.dispatchFrameDrawn(frame);
+    widget.translationHandleScalar = 0;
+    widget.rotationHandleScalar = -1;
+
+    await page.waitForChanges();
+
+    expect(mockTransformWidget.updateScalars).toHaveBeenCalledWith({
+      xTranslation: 1,
+      yTranslation: 1,
+      zTranslation: 1,
+      xRotation: 1,
+      yRotation: 1,
+      zRotation: 1,
+    });
+  });
+
   it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);

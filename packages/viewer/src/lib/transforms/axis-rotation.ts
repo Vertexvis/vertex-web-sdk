@@ -6,42 +6,54 @@ import { TriangleMeshPoints } from './mesh';
 export function xAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  rotationSizeScalar = 1,
+  translationSizeScalar = 1
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
     Vector3.back(),
     Vector3.up(),
-    triangleSize
+    triangleSize,
+    rotationSizeScalar,
+    translationSizeScalar
   );
 }
 
 export function yAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  rotationSizeScalar = 1,
+  translationSizeScalar = 1
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
     Vector3.right(),
     Vector3.back(),
-    triangleSize
+    triangleSize,
+    rotationSizeScalar,
+    translationSizeScalar
   );
 }
 
 export function zAxisRotationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  triangleSize = 3
+  triangleSize = 3,
+  rotationSizeScalar = 1,
+  translationSizeScalar = 1
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
     camera,
     Vector3.right(),
     Vector3.up(),
-    triangleSize
+    triangleSize,
+    rotationSizeScalar,
+    translationSizeScalar
   );
 }
 
@@ -50,7 +62,9 @@ function computeRotationNdcValues(
   camera: FrameCameraBase,
   xDirection: Vector3.Vector3,
   yDirection: Vector3.Vector3,
-  triangleSize: number
+  triangleSize: number,
+  rotationSizeScalar = 1,
+  translationSizeScalar = 1
 ): TriangleMeshPoints {
   const transformedDirection = Vector3.transformMatrix(
     Vector3.add(xDirection, yDirection),
@@ -64,10 +78,16 @@ function computeRotationNdcValues(
     yDirection,
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
+  // Position the rotation handle relative to the translation scale to
+  // ensure that the rotation axis lines are angled inward.
+  // This is a loose line of best fit based on the base scale of
+  // `1` corresponding to a scalar of `10` and some experimentation.
+  const relativePositionScalar = 10 * translationSizeScalar ** 0.25;
+
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
-    Vector3.scale(triangleSize * 10, transformedDirection)
+    Vector3.scale(triangleSize * relativePositionScalar, transformedDirection)
   );
 
   const xRay = Ray.create({
@@ -82,25 +102,25 @@ function computeRotationNdcValues(
 
   const base = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(yRay, -triangleSize),
+    Ray.at(yRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
     position
   );
   const right = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(xRay, triangleSize),
+    Ray.at(xRay, triangleSize * rotationSizeScalar),
     rotationAxis,
     position
   );
   const up = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(yRay, triangleSize),
+    Ray.at(yRay, triangleSize * rotationSizeScalar),
     rotationAxis,
     position
   );
   const left = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
-    Ray.at(xRay, -triangleSize),
+    Ray.at(xRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
     position
   );
