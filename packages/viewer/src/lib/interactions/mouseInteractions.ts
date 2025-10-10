@@ -114,6 +114,10 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
+  // Wheel zoom accumulation for smoother interactions
+  private wheelAccumulator = 0;
+  private wheelAccumulatorTimer: number | undefined;
+
   public constructor(
     private interactionConfigProvider: InteractionConfigProvider
   ) {
@@ -150,6 +154,7 @@ export class ZoomInteraction extends MouseInteraction {
   public endDrag(event: MouseEvent, api: InteractionApi): void {
     super.endDrag(event, api);
     this.stopInteractionTimer();
+    this.stopWheelAccumulator();
     this.didTransformBegin = false;
     this.startPt = undefined;
   }
@@ -165,9 +170,26 @@ export class ZoomInteraction extends MouseInteraction {
     delta: number,
     api: InteractionApi
   ): void {
-    this.operateWithTimer(api, () =>
-      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
-    );
+    // Accumulate wheel deltas over a short time window for smoother zooming
+    this.wheelAccumulator += delta;
+
+    if (this.wheelAccumulatorTimer) {
+      clearTimeout(this.wheelAccumulatorTimer);
+    }
+
+    this.wheelAccumulatorTimer = window.setTimeout(() => {
+      if (Math.abs(this.wheelAccumulator) > 0.1) {
+        // minimum threshold
+        this.operateWithTimer(api, () =>
+          api.zoomCameraToPoint(
+            pt,
+            this.getDirectionalDelta(this.wheelAccumulator)
+          )
+        );
+      }
+      this.wheelAccumulator = 0;
+      this.wheelAccumulatorTimer = undefined;
+    }, 16); // ~60fps for smooth updates
   }
 
   private beginInteraction(api: InteractionApi): void {
@@ -207,6 +229,14 @@ export class ZoomInteraction extends MouseInteraction {
       window.clearTimeout(this.interactionTimer);
       this.interactionTimer = undefined;
     }
+  }
+
+  private stopWheelAccumulator(): void {
+    if (this.wheelAccumulatorTimer != null) {
+      window.clearTimeout(this.wheelAccumulatorTimer);
+      this.wheelAccumulatorTimer = undefined;
+    }
+    this.wheelAccumulator = 0;
   }
 
   private operateWithTimer(
