@@ -24,7 +24,6 @@ export type InteractionType =
   | 'rotate-point'
   | 'pivot';
 
-const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
 
@@ -47,6 +46,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private computedBodyStyle?: CSSStyleDeclaration;
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
+
+  // Mouse wheel batching for smooth zoom
+  private pendingWheelZoom: { point: Point.Point; delta: number } | null = null;
 
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
@@ -226,7 +228,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       event.buttons === 4 &&
       this.interactionApi != null
     ) {
-      this.interactionApi.viewAll();
+      await this.interactionApi.viewAll();
     }
   }
 
@@ -313,18 +315,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
 
-      SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
-        window.setTimeout(() => {
-          if (this.interactionApi != null) {
-            const zoomDelta = delta * percentage;
-            this.zoomInteraction.zoomToPoint(
-              point,
-              zoomDelta,
-              this.interactionApi
-            );
-          }
-        }, index * 2);
-      });
+      // Accumulate wheel input and process on next frame for smooth zooming
+      if (
+        this.pendingWheelZoom &&
+        Point.isEqual(this.pendingWheelZoom.point, point)
+      ) {
+        // The mouse hasn't moved, so add this operation to the previous operation
+        this.pendingWheelZoom.delta += delta;
+      } else {
+        this.pendingWheelZoom = { point, delta };
+        requestAnimationFrame(() => this.processWheelZoom());
+      }
+    }
+  }
+
+  private async processWheelZoom(): Promise<void> {
+    if (this.pendingWheelZoom && this.interactionApi) {
+      console.log('processWheelZoom');
+      await this.zoomInteraction.zoomToPoint(
+        this.pendingWheelZoom.point,
+        this.pendingWheelZoom.delta,
+        this.interactionApi
+      );
+      this.pendingWheelZoom = null;
     }
   }
 
