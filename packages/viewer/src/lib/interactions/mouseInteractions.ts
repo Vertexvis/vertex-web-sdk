@@ -41,7 +41,7 @@ export abstract class MouseInteraction {
     }
   }
 
-  public zoom(delta: number, api: InteractionApi): void {
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
     // noop
   }
 }
