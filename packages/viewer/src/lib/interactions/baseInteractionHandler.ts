@@ -331,7 +331,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   private async processWheelZoom(): Promise<void> {
     if (this.pendingWheelZoom && this.interactionApi) {
-      console.log('processWheelZoom');
       await this.zoomInteraction.zoomToPoint(
         this.pendingWheelZoom.point,
         this.pendingWheelZoom.delta,

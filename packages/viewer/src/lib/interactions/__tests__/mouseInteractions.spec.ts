@@ -209,14 +209,14 @@ describe(ZoomInteraction, () => {
       expect(api.zoomCamera).not.toHaveBeenCalled();
     });
 
-    it('supports customizing the zoom direction by inverting the delta', () => {
+    it('supports customizing the zoom direction by inverting the delta', async () => {
       jest.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
         ...defaultInteractionConfig,
         reverseMouseWheelDirection: true,
       }));
-      interaction.zoom(10, api);
+      await interaction.zoom(10, api);
 
       jest.advanceTimersToNextTimer();
 
@@ -225,7 +225,7 @@ describe(ZoomInteraction, () => {
       jest.useRealTimers();
     });
 
-    it('supports customizing the zoomToPoint direction by inverting the delta', () => {
+    it('supports customizing the zoomToPoint direction by inverting the delta', async () => {
       jest.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
@@ -233,7 +233,7 @@ describe(ZoomInteraction, () => {
         reverseMouseWheelDirection: true,
       }));
       const pt = Point.create(event1.clientX, event1.clientY);
-      interaction.zoomToPoint(pt, 10, api);
+      await interaction.zoomToPoint(pt, 10, api);
 
       jest.advanceTimersToNextTimer();
 
