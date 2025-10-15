@@ -47,9 +47,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
 
-  // Mouse wheel batching for smooth zoom
-  private pendingWheelZoom: { point: Point.Point; delta: number } | null = null;
-
   public constructor(
     protected downEvent: 'mousedown' | 'pointerdown',
     protected upEvent: 'mouseup' | 'pointerup',
@@ -302,7 +299,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
   }
 
-  protected handleMouseWheel(event: WheelEvent): void {
+  protected async handleMouseWheel(event: WheelEvent): Promise<void> {
     event.preventDefault();
 
     if (
@@ -315,28 +312,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
 
-      // Accumulate wheel input and process on next frame for smooth zooming
-      if (
-        this.pendingWheelZoom &&
-        Point.isEqual(this.pendingWheelZoom.point, point)
-      ) {
-        // The mouse hasn't moved, so add this operation to the previous operation
-        this.pendingWheelZoom.delta += delta;
+      if (Math.abs(event.deltaY) < 10) {
+        // For small wheel movements, send a single zoom event.
+        await this.zoomInteraction.zoomToPoint(
+          point,
+          delta,
+          this.interactionApi
+        );
       } else {
-        this.pendingWheelZoom = { point, delta };
-        requestAnimationFrame(() => this.processWheelZoom());
+        // For large wheel movements, divide the delta into 10 equal zoom events.
+        // This results in a smoother zoom experience for the end user.
+        for (let index = 1; index <= 10; index++) {
+          window.setTimeout(() => {
+            if (this.interactionApi != null) {
+              const zoomDelta = delta / 10;
+              this.zoomInteraction.zoomToPoint(
+                point,
+                zoomDelta,
+                this.interactionApi
+              );
+            }
+          }, index * 5);
+        }
       }
-    }
-  }
-
-  private async processWheelZoom(): Promise<void> {
-    if (this.pendingWheelZoom && this.interactionApi) {
-      await this.zoomInteraction.zoomToPoint(
-        this.pendingWheelZoom.point,
-        this.pendingWheelZoom.delta,
-        this.interactionApi
-      );
-      this.pendingWheelZoom = null;
     }
   }
 

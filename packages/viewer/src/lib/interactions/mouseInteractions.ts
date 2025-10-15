@@ -120,28 +120,28 @@ export class ZoomInteraction extends MouseInteraction {
     super();
   }
 
-  public beginDrag(
+  public async beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
     element: HTMLElement
-  ): void {
+  ): Promise<void> {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.clientX, event.clientY);
       const rect = element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
       this.startPt = point;
-      api.beginInteraction();
+      await api.beginInteraction();
     }
   }
 
-  public drag(event: MouseEvent, api: InteractionApi): void {
+  public async drag(event: MouseEvent, api: InteractionApi): Promise<void> {
     if (this.currentPosition != null) {
       const position = Point.create(event.clientX, event.clientY);
       const delta = Point.subtract(position, this.currentPosition);
 
       if (this.startPt != null) {
-        api.zoomCameraToPoint(this.startPt, delta.y);
+        await api.zoomCameraToPoint(this.startPt, delta.y);
         this.currentPosition = position;
       }
     }

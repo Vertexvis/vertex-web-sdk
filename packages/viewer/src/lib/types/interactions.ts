@@ -48,6 +48,6 @@ export const defaultInteractionConfig: InteractionConfig = {
   coarsePointerThreshold: 3,
   interactionDelay: 75,
   useMinimumPerspectiveZoomDistance: true,
-  mouseWheelInteractionEndDebounce: 500,
+  mouseWheelInteractionEndDebounce: 400,
   reverseMouseWheelDirection: false,
 };
