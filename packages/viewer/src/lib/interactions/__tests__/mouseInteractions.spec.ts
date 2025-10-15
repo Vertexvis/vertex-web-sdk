@@ -166,8 +166,8 @@ describe(ZoomInteraction, () => {
     ...defaultInteractionConfig,
   });
 
-  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
-  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
+  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 15 });
   const event3 = new MouseEvent('mousemove', { clientX: 25, clientY: 20 });
 
   const canvasPoint = Point.create(0, 0);
@@ -199,6 +199,7 @@ describe(ZoomInteraction, () => {
       interaction.drag(event3, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(1, pt, 5);
       expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
     });
 
