@@ -24,7 +24,6 @@ export type InteractionType =
   | 'rotate-point'
   | 'pivot';
 
-const SCROLL_WHEEL_DELTA_PERCENTAGES = [0.2, 0.15, 0.25, 0.25, 0.15];
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_LINE_HEIGHT = 1.2;
 
@@ -226,7 +225,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       event.buttons === 4 &&
       this.interactionApi != null
     ) {
-      this.interactionApi.viewAll();
+      await this.interactionApi.viewAll();
     }
   }
 
@@ -300,7 +299,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
   }
 
-  protected handleMouseWheel(event: WheelEvent): void {
+  protected async handleMouseWheel(event: WheelEvent): Promise<void> {
     event.preventDefault();
 
     if (
@@ -313,18 +312,29 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
 
-      SCROLL_WHEEL_DELTA_PERCENTAGES.forEach((percentage, index) => {
-        window.setTimeout(() => {
-          if (this.interactionApi != null) {
-            const zoomDelta = delta * percentage;
-            this.zoomInteraction.zoomToPoint(
-              point,
-              zoomDelta,
-              this.interactionApi
-            );
-          }
-        }, index * 2);
-      });
+      if (Math.abs(event.deltaY) < 10) {
+        // For small wheel movements, send a single zoom event.
+        await this.zoomInteraction.zoomToPoint(
+          point,
+          delta,
+          this.interactionApi
+        );
+      } else {
+        // For large wheel movements, divide the delta into 10 equal zoom events.
+        // This results in a smoother zoom experience for the end user.
+        for (let index = 1; index <= 10; index++) {
+          window.setTimeout(() => {
+            if (this.interactionApi != null) {
+              const zoomDelta = delta / 10;
+              this.zoomInteraction.zoomToPoint(
+                point,
+                zoomDelta,
+                this.interactionApi
+              );
+            }
+          }, index * 5);
+        }
+      }
     }
   }
 

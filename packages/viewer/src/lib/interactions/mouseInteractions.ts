@@ -41,7 +41,7 @@ export abstract class MouseInteraction {
     }
   }
 
-  public zoom(delta: number, api: InteractionApi): void {
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
     // noop
   }
 }
@@ -120,28 +120,28 @@ export class ZoomInteraction extends MouseInteraction {
     super();
   }
 
-  public beginDrag(
+  public async beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
     element: HTMLElement
-  ): void {
+  ): Promise<void> {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.clientX, event.clientY);
       const rect = element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
       this.startPt = point;
-      api.beginInteraction();
+      await api.beginInteraction();
     }
   }
 
-  public drag(event: MouseEvent, api: InteractionApi): void {
+  public async drag(event: MouseEvent, api: InteractionApi): Promise<void> {
     if (this.currentPosition != null) {
       const position = Point.create(event.clientX, event.clientY);
       const delta = Point.subtract(position, this.currentPosition);
 
       if (this.startPt != null) {
-        api.zoomCameraToPoint(this.startPt, delta.y);
+        await api.zoomCameraToPoint(this.startPt, delta.y);
         this.currentPosition = position;
       }
     }
@@ -154,30 +154,30 @@ export class ZoomInteraction extends MouseInteraction {
     this.startPt = undefined;
   }
 
-  public zoom(delta: number, api: InteractionApi): void {
-    this.operateWithTimer(api, () =>
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
+    await this.operateWithTimer(api, () =>
       api.zoomCamera(this.getDirectionalDelta(delta))
     );
   }
 
-  public zoomToPoint(
+  public async zoomToPoint(
     pt: Point.Point,
     delta: number,
     api: InteractionApi
-  ): void {
-    this.operateWithTimer(api, () =>
+  ): Promise<void> {
+    await this.operateWithTimer(api, () =>
       api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
     );
   }
 
-  private beginInteraction(api: InteractionApi): void {
+  private async beginInteraction(api: InteractionApi): Promise<void> {
     this.didTransformBegin = true;
-    api.beginInteraction();
+    await api.beginInteraction();
   }
 
-  private endInteraction(api: InteractionApi): void {
+  private async endInteraction(api: InteractionApi): Promise<void> {
     this.didTransformBegin = false;
-    api.endInteraction();
+    await api.endInteraction();
   }
 
   private resetInteractionTimer(api: InteractionApi): void {
@@ -196,9 +196,9 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   private startInteractionTimer(api: InteractionApi): void {
-    this.interactionTimer = window.setTimeout(() => {
+    this.interactionTimer = window.setTimeout(async () => {
       this.interactionTimer = undefined;
-      this.endInteraction(api);
+      await this.endInteraction(api);
     }, this.getInteractionDelay());
   }
 
@@ -209,12 +209,12 @@ export class ZoomInteraction extends MouseInteraction {
     }
   }
 
-  private operateWithTimer(
+  private async operateWithTimer(
     api: InteractionApi,
     f: () => void | Promise<void>
-  ): void {
+  ): Promise<void> {
     if (!this.didTransformBegin) {
-      this.beginInteraction(api);
+      await this.beginInteraction(api);
     }
 
     this.resetInteractionTimer(api);
