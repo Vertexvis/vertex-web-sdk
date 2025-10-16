@@ -90,6 +90,7 @@ interface StateMap {
   hoverCursor?: Disposable;
   stencil?: StencilBuffer;
   depthBuffer?: DepthBuffer;
+  shouldClearDepthBuffers?: boolean;
 }
 
 const INTERACTION_THRESHOLD = 3;
@@ -339,9 +340,17 @@ export class ViewerMeasurementDistance {
   /**
    * @ignore
    */
+  protected connectedCallback(): void {
+    this.setDepthBuffers();
+  }
+
+  /**
+   * @ignore
+   */
   protected disconnectedCallback(): void {
     this.stateMap.hoverCursor?.dispose();
     this.newInteractionHandler?.dispose();
+    this.resetDepthBuffers();
   }
 
   /**
@@ -353,6 +362,7 @@ export class ViewerMeasurementDistance {
 
     await this.getStencilBuffer();
     this.updateViewport();
+    this.setDepthBuffers();
 
     await this.handleViewerChanged(this.viewer);
     await this.handleModeChanged();
@@ -476,8 +486,6 @@ export class ViewerMeasurementDistance {
    */
   @Watch('mode')
   protected async handleModeChanged(): Promise<void> {
-    this.warnIfDepthBuffersDisabled();
-
     // If we're not in edit or replace mode, ensure that the measurement
     // cursor is removed.
     if (this.mode === '') {
@@ -939,11 +947,21 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private warnIfDepthBuffersDisabled(): void {
-    if (this.viewer != null && this.viewer.depthBuffers == null) {
-      console.warn(
-        'Measurement editing is disabled. <vertex-viewer> must have its `depth-buffers` attribute set.'
-      );
+  private setDepthBuffers(): void {
+    if (
+      this.mode != null &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
+      this.stateMap.shouldClearDepthBuffers = true;
+      this.viewer.depthBuffers = 'final';
+    }
+  }
+
+  private resetDepthBuffers(): void {
+    if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
+      this.viewer.depthBuffers = undefined;
+      this.stateMap.shouldClearDepthBuffers = undefined;
     }
   }
 }

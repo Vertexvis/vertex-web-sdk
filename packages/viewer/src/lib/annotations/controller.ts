@@ -105,7 +105,7 @@ export class AnnotationController {
    * a promise the resolves with the new annotation state.
    *
    * @param opts Options to configure the fetch behavior. If an abort signal is
-   *   given, then this will not emit an change event if the signal is aborted.
+   *   given, then this will not emit a change event if the signal is aborted.
    * @returns A promise that resolves with the new annotation state.
    */
   public async fetch(

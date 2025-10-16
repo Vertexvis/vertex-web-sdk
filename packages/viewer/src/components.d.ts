@@ -541,7 +541,7 @@ export namespace Components {
      *
      * * `all`: A depth buffer is requested for every frame.
      *
-     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance. Some features, like measurement and pins, require that depth buffers are requested and will override an 'undefined' value when the feature is active.
      */
     depthBuffers?: FrameType;
     /**
@@ -2501,7 +2501,7 @@ declare namespace LocalJSX {
      *
      * * `all`: A depth buffer is requested for every frame.
      *
-     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance.
+     * Depth buffers can increase the amount of data that's sent to a client and can impact rendering performance. Values of `undefined` or `final` should be used when needing the highest rendering performance. Some features, like measurement and pins, require that depth buffers are requested and will override an 'undefined' value when the feature is active.
      */
     depthBuffers?: FrameType;
     /**
