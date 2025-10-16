@@ -132,6 +132,7 @@ interface StateMap {
   interactionTarget?: HTMLElement;
   streamState: ViewerStreamState;
   streamListeners?: Disposable;
+  depthBuffersOverrideForAnnotations?: boolean;
 }
 
 /** @internal */
@@ -238,7 +239,9 @@ export class Viewer {
    *
    * Depth buffers can increase the amount of data that's sent to a client and
    * can impact rendering performance. Values of `undefined` or `final` should
-   * be used when needing the highest rendering performance.
+   * be used when needing the highest rendering performance. Some features,
+   * like measurement and pins, require that depth buffers are requested and
+   * will override an 'undefined' value when the feature is active.
    */
   @Prop() public depthBuffers?: FrameType;
 
@@ -557,9 +560,28 @@ export class Viewer {
       () => this.token,
       () => this.deviceId
     );
-    this.annotations.onStateChange.on((state) =>
-      this.annotationStateChanged.emit(state)
-    );
+    this.annotations.onStateChange.on((state: AnnotationState) => {
+      this.annotationStateChanged.emit(state);
+
+      const numberOfAnnotationSets = Object.keys(state.annotations).length;
+      if (
+        numberOfAnnotationSets > 0 &&
+        this.getStreamAttributes().depthBuffers == null
+      ) {
+        // Annotation sets are present in the viewer, but depth buffers are not being requested.
+        // The annotation sets require the depth buffers to render, so turn on depth buffers.
+        this.stateMap.depthBuffersOverrideForAnnotations = true;
+        this.updateStreamAttributes();
+      } else if (
+        numberOfAnnotationSets === 0 &&
+        this.stateMap.depthBuffersOverrideForAnnotations
+      ) {
+        // Depth buffers were turned on because annotation sets were present in the viewer.
+        // However, the annotation sets are no longer present, so the depth buffer override is no longer needed.
+        this.stateMap.depthBuffersOverrideForAnnotations = false;
+        this.updateStreamAttributes();
+      }
+    });
 
     this.stream =
       this.stream ??
@@ -1670,7 +1692,11 @@ export class Viewer {
 
   private getDepthBufferStreamAttributesValue(): FrameType {
     const depthBuffer =
-      this.depthBuffers ?? (this.rotateAroundTapPoint ? 'final' : undefined);
+      this.depthBuffers ??
+      (this.rotateAroundTapPoint ||
+      this.stateMap.depthBuffersOverrideForAnnotations
+        ? 'final'
+        : undefined);
     return depthBuffer;
   }
 

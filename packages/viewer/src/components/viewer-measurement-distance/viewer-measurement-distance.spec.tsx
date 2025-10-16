@@ -383,6 +383,36 @@ describe('vertex-viewer-measurement-distance', () => {
     );
   });
 
+  it('sets the depth buffers when the component loads', async () => {
+    const { stream, ws } = makeViewerStream();
+    const page = await newSpecPage({
+      components: [Viewer, ViewerLayer, ViewerMeasurementDistance],
+      template: () => (
+        <vertex-viewer stream={stream}>
+          <vertex-viewer-measurements>
+            <vertex-viewer-measurement-distance start={start} end={end} />
+          </vertex-viewer-measurements>
+        </vertex-viewer>
+      ),
+    });
+
+    const viewer = page.body.querySelector(
+      'vertex-viewer'
+    ) as HTMLVertexViewerElement;
+    const update = jest.spyOn(stream, 'update');
+
+    await loadViewerStreamKey(key1, { stream, ws, viewer });
+    await page.waitForChanges();
+
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        streamAttributes: expect.objectContaining({
+          depthBuffers: 'final',
+        }),
+      })
+    );
+  });
+
   describe(ViewerMeasurementDistance.prototype.computeElementMetrics, () => {
     it('returns metrics for rendered elements', async () => {
       const page = await newSpecPage({
