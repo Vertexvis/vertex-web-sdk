@@ -1011,7 +1011,7 @@ describe('vertex-viewer', () => {
       expect(connectSpy).not.toHaveBeenCalled();
     });
 
-    it('sets the depth buffers when the annotations are present', async () => {
+    it('sets the depth buffers value depending if annotations are present', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => (
@@ -1029,6 +1029,7 @@ describe('vertex-viewer', () => {
 
       expect(viewer.depthBuffers).toEqual(undefined);
 
+      // Set depthBuffers to 'final' when there are annotations
       viewer.annotations?.onStateChange.emit({
         annotations: {
           annotationSetId: [],
@@ -1039,6 +1040,21 @@ describe('vertex-viewer', () => {
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
             depthBuffers: 'final',
+          }),
+        })
+      );
+
+      update.mockClear();
+
+      // Remove depthBuffers override when there are no annotations
+      viewer.annotations?.onStateChange.emit({
+        annotations: {},
+      });
+
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            depthBuffers: undefined,
           }),
         })
       );
