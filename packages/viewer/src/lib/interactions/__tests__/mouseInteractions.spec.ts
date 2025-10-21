@@ -166,8 +166,8 @@ describe(ZoomInteraction, () => {
     ...defaultInteractionConfig,
   });
 
-  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
-  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 10 });
+  const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 10 });
+  const event2 = new MouseEvent('mousemove', { clientX: 15, clientY: 15 });
   const event3 = new MouseEvent('mousemove', { clientX: 25, clientY: 20 });
 
   const canvasPoint = Point.create(0, 0);
@@ -199,6 +199,7 @@ describe(ZoomInteraction, () => {
       interaction.drag(event3, api);
 
       const pt = Point.create(event1.clientX, event1.clientY);
+      expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(1, pt, 5);
       expect(api.zoomCameraToPoint).toHaveBeenNthCalledWith(2, pt, 10);
     });
 
@@ -209,14 +210,14 @@ describe(ZoomInteraction, () => {
       expect(api.zoomCamera).not.toHaveBeenCalled();
     });
 
-    it('supports customizing the zoom direction by inverting the delta', () => {
+    it('supports customizing the zoom direction by inverting the delta', async () => {
       jest.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
         ...defaultInteractionConfig,
         reverseMouseWheelDirection: true,
       }));
-      interaction.zoom(10, api);
+      await interaction.zoom(10, api);
 
       jest.advanceTimersToNextTimer();
 
@@ -225,7 +226,7 @@ describe(ZoomInteraction, () => {
       jest.useRealTimers();
     });
 
-    it('supports customizing the zoomToPoint direction by inverting the delta', () => {
+    it('supports customizing the zoomToPoint direction by inverting the delta', async () => {
       jest.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
@@ -233,7 +234,7 @@ describe(ZoomInteraction, () => {
         reverseMouseWheelDirection: true,
       }));
       const pt = Point.create(event1.clientX, event1.clientY);
-      interaction.zoomToPoint(pt, 10, api);
+      await interaction.zoomToPoint(pt, 10, api);
 
       jest.advanceTimersToNextTimer();
 
