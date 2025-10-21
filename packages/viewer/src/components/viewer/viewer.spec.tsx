@@ -1,5 +1,3 @@
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
-
 jest.mock('./utils');
 jest.mock('../../lib/rendering/imageLoaders');
 jest.mock('../../workers/png-decoder-pool');
@@ -9,6 +7,7 @@ jest.mock('../../lib/annotations/controller');
 import { h } from '@stencil/core';
 import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { newSpecPage } from '@stencil/core/testing';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { Async, UUID } from '@vertexvis/utils';
 
@@ -1010,6 +1009,39 @@ describe('vertex-viewer', () => {
       await Async.delay(1);
 
       expect(connectSpy).not.toHaveBeenCalled();
+    });
+
+    it('sets the depth buffers when the annotations are present', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => (
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            rotateAroundTapPoint={false}
+          />
+        ),
+      });
+
+      const update = jest.spyOn(stream, 'update');
+
+      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+
+      expect(viewer.depthBuffers).toEqual(undefined);
+
+      viewer.annotations?.onStateChange.emit({
+        annotations: {
+          annotationSetId: [],
+        },
+      });
+
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            depthBuffers: 'final',
+          }),
+        })
+      );
     });
   });
 

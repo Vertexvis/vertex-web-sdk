@@ -564,23 +564,7 @@ export class Viewer {
       this.annotationStateChanged.emit(state);
 
       const numberOfAnnotationSets = Object.keys(state.annotations).length;
-      if (
-        numberOfAnnotationSets > 0 &&
-        this.getStreamAttributes().depthBuffers == null
-      ) {
-        // Annotation sets are present in the viewer, but depth buffers are not being requested.
-        // The annotation sets require the depth buffers to render, so turn on depth buffers.
-        this.stateMap.depthBuffersOverrideForAnnotations = true;
-        this.updateStreamAttributes();
-      } else if (
-        numberOfAnnotationSets === 0 &&
-        this.stateMap.depthBuffersOverrideForAnnotations
-      ) {
-        // Depth buffers were turned on because annotation sets were present in the viewer.
-        // However, the annotation sets are no longer present, so the depth buffer override is no longer needed.
-        this.stateMap.depthBuffersOverrideForAnnotations = false;
-        this.updateStreamAttributes();
-      }
+      this.handleAnnotationSetsChange(numberOfAnnotationSets);
     });
 
     this.stream =
@@ -639,6 +623,7 @@ export class Viewer {
    */
   protected disconnectedCallback(): void {
     this.visibilityObserver?.disconnect();
+    this.annotations?.disconnect();
 
     this.stream?.pause();
   }
@@ -1687,6 +1672,28 @@ export class Viewer {
           ),
         });
       }
+    }
+  }
+
+  private handleAnnotationSetsChange(numberOfAnnotationSets: number): void {
+    console.log('handleAnnotationSetsChange with ' + numberOfAnnotationSets);
+
+    if (
+      numberOfAnnotationSets > 0 &&
+      this.getStreamAttributes().depthBuffers == null
+    ) {
+      // Annotation sets are present in the viewer, but depth buffers are not being requested.
+      // The annotation sets require the depth buffers to render, so turn on depth buffers.
+      this.stateMap.depthBuffersOverrideForAnnotations = true;
+      this.updateStreamAttributes();
+    } else if (
+      numberOfAnnotationSets === 0 &&
+      this.stateMap.depthBuffersOverrideForAnnotations
+    ) {
+      // Depth buffers were turned on because annotation sets were present in the viewer.
+      // However, the annotation sets are no longer present, so the depth buffer override is no longer needed.
+      this.stateMap.depthBuffersOverrideForAnnotations = false;
+      this.updateStreamAttributes();
     }
   }
 

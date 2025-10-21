@@ -343,13 +343,13 @@ describe(getClosestCenterToPoint, () => {
   });
 
   it('should return the point to the right of the box', async () => {
-    const rightofBox = Point.create(50, 55);
+    const rightOfBox = Point.create(50, 55);
 
     const expectedRightOfBox = {
       x: boxPoint.x + dimensions.width / 2,
       y: boxPoint.y + dimensions.height,
     };
-    expect(getClosestCenterToPoint(boxPoint, rightofBox, dimensions)).toEqual(
+    expect(getClosestCenterToPoint(boxPoint, rightOfBox, dimensions)).toEqual(
       expectedRightOfBox
     );
   });

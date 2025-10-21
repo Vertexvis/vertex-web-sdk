@@ -3,24 +3,28 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
-import { TextPin } from '../../lib/pins/model';
-import { viewer } from '../viewer/__mocks__/mocks';
-import { ViewerPinGroup } from '../viewer-pin-group/viewer-pin-group';
-import { ViewerPinTool } from './viewer-pin-tool';
+import { TextPin } from '../../../lib/pins/model';
+import { viewer } from '../../viewer/__mocks__/mocks';
+import { ViewerPinGroup } from '../../viewer-pin-group/viewer-pin-group';
+import { ViewerPinTool } from '../viewer-pin-tool';
 
 describe('vertex-viewer-pin-tool', () => {
-  it('should render a label for a pin and support dragging the label', async () => {
-    const pin: TextPin = {
-      type: 'text',
-      id: 'my-pin-id',
-      worldPosition: Vector3.create(),
-      label: {
-        point: Point.create(0, 0),
-        text: 'My New Pin',
-      },
-    };
-    const addEventListener = jest.fn();
+  const pin: TextPin = {
+    type: 'text',
+    id: 'my-pin-id',
+    worldPosition: Vector3.create(),
+    label: {
+      point: Point.create(0, 0),
+      text: 'My New Pin',
+    },
+  };
+  const addEventListener = jest.fn();
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should render a label for a pin and support dragging the label', async () => {
     const page = await newSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
@@ -66,16 +70,6 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('should setup the projectionViewMatrix when loading with an initialized viewer', async () => {
-    const pin: TextPin = {
-      type: 'text',
-      id: 'my-pin-id',
-      worldPosition: Vector3.create(),
-      label: {
-        point: Point.create(0, 0),
-        text: 'My New Pin',
-      },
-    };
-    const addEventListener = jest.fn();
     /* eslint-disable prettier/prettier */
     const matrix = [
       0, 0.5, 0.5, 0,
@@ -123,5 +117,40 @@ describe('vertex-viewer-pin-tool', () => {
       toolEl.shadowRoot?.querySelector('vertex-viewer-pin-group')
         ?.projectionViewMatrix
     ).toMatchObject(matrix);
+  });
+
+  it('should set depth buffers value when there are pins rendered', async () => {
+    const page = await newSpecPage({
+      components: [ViewerPinTool, ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-tool
+          id="vertex-viewer-pin-tool"
+          mode="edit"
+          tool="pin-text"
+        ></vertex-viewer-pin-tool>
+      ),
+    });
+    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    toolEl.viewer = {
+      ...viewer,
+      addEventListener: jest.fn(),
+      frame: {
+        scene: {
+          camera: {
+            projectionViewMatrix: Matrix4.makeIdentity(),
+          },
+        },
+      },
+      rotateAroundTapPoint: false,
+    } as unknown as HTMLVertexViewerElement;
+
+    expect(toolEl.viewer.depthBuffers).toEqual(undefined);
+
+    toolEl.pinController?.addPin(pin);
+
+    await page.waitForChanges();
+
+    expect(toolEl.viewer.rotateAroundTapPoint).toEqual(false);
+    expect(toolEl.viewer.depthBuffers).toMatch('final');
   });
 });
