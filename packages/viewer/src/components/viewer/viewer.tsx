@@ -1676,8 +1676,6 @@ export class Viewer {
   }
 
   private handleAnnotationSetsChange(numberOfAnnotationSets: number): void {
-    console.log('handleAnnotationSetsChange with ' + numberOfAnnotationSets);
-
     if (
       numberOfAnnotationSets > 0 &&
       this.getStreamAttributes().depthBuffers == null
