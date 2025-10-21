@@ -21,6 +21,10 @@ import {
 } from '../../lib/pins/model';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
+interface StateMap {
+  shouldClearDepthBuffers?: boolean;
+}
+
 @Component({
   tag: 'vertex-viewer-pin-tool',
   styleUrl: 'viewer-pin-tool.css',
@@ -94,6 +98,8 @@ export class ViewerPinTool {
 
   private resizeObserver?: ResizeObserver;
 
+  private stateMap: StateMap = {};
+
   /**
    * @ignore
    */
@@ -133,8 +139,21 @@ export class ViewerPinTool {
   /**
    * @ignore
    */
+  @Watch('pins')
+  protected watchPinsChange(): void {
+    if (this.pins.length > 0) {
+      this.setDepthBuffers();
+    } else {
+      this.resetDepthBuffers();
+    }
+  }
+
+  /**
+   * @ignore
+   */
   protected connectedCallback(): void {
     this.setupInteractionHandler();
+    this.setDepthBuffers();
   }
 
   /**
@@ -144,6 +163,7 @@ export class ViewerPinTool {
     this.updateViewport();
     this.setupController();
     this.setupInteractionHandler();
+    this.setDepthBuffers();
 
     this.pinModel.onEntitiesChanged((entities) => {
       this.pins = entities;
@@ -167,6 +187,7 @@ export class ViewerPinTool {
   protected disconnectedCallback(): void {
     this.clearInteractionHandler();
     this.clearModelListeners();
+    this.resetDepthBuffers();
   }
 
   /**
@@ -178,6 +199,7 @@ export class ViewerPinTool {
     oldViewer?: HTMLVertexViewerElement
   ): void {
     this.setupInteractionHandler();
+    this.setDepthBuffers();
 
     if (oldViewer != null) {
       oldViewer.removeEventListener(
@@ -274,5 +296,23 @@ export class ViewerPinTool {
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
+  }
+
+  private setDepthBuffers(): void {
+    if (
+      this.pins.length > 0 &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
+      this.stateMap.shouldClearDepthBuffers = true;
+      this.viewer.depthBuffers = 'final';
+    }
+  }
+
+  private resetDepthBuffers(): void {
+    if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
+      this.viewer.depthBuffers = undefined;
+      this.stateMap.shouldClearDepthBuffers = undefined;
+    }
   }
 }
