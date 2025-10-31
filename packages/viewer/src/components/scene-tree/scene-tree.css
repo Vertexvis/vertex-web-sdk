@@ -79,6 +79,7 @@
   cursor: default;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .rows-scroll {
