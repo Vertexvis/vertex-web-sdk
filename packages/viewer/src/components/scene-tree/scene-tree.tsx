@@ -550,6 +550,23 @@ export class SceneTree {
   }
 
   /**
+   * Returns the row with the given id. If there is not a row
+   * matching the id, returns `undefined`.
+   *
+   * @param itemId An ID of an item to return the row for.
+   * @returns A row, or `undefined` if a corresponding row doesn't exist
+   */
+  @Method()
+  public async getRowForItemId(itemId: string): Promise<Row | undefined> {
+    const index = await this.controller?.expandParentNodes(itemId);
+    if (index != null) {
+      return this.rows[index];
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
    * Returns the row data from the given mouse or pointer event. The event must
    * originate from a `vertex-scene-tree-table-cell` contained by this element,
    * otherwise `undefined` is returned.

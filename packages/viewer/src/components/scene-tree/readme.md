@@ -716,6 +716,17 @@ Type: `Promise<Row>`
 
 A row, or `undefined` if the row hasn't been loaded.
 
+### `getRowForItemId(itemId: string) => Promise<Row | undefined>`
+
+Returns the row with the given id. If there is not a row
+matching the id, returns `undefined`.
+
+#### Returns
+
+Type: `Promise<Row>`
+
+A row, or `undefined` if a corresponding row doesn't exist
+
 ### `hideItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will hide the item associated to the given row

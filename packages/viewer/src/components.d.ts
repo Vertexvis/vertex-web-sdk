@@ -195,6 +195,12 @@ export namespace Components {
      */
     getRowForEvent: (event: MouseEvent | PointerEvent) => Promise<Row>;
     /**
+     * Returns the row with the given id. If there is not a row matching the id, returns `undefined`.
+     * @param itemId An ID of an item to return the row for.
+     * @returns A row, or `undefined` if a corresponding row doesn't exist
+     */
+    getRowForItemId: (itemId: string) => Promise<Row | undefined>;
+    /**
      * Performs an API call that will hide the item associated to the given row or row index.
      * @param row The row, row index, or node to hide.
      */
