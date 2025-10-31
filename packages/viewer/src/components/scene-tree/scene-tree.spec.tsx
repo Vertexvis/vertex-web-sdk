@@ -724,6 +724,27 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
+  describe(SceneTree.prototype.getRowForItemId, () => {
+    it('returns row matching id', async () => {
+      const client = mockSceneTreeClient();
+      const controller = new SceneTreeController(client, 20);
+
+      const treeResponse = mockGetTree({ client });
+      const index = new UInt64Value();
+      index.setValue(10);
+      const res = new LocateItemResponse();
+      res.setLocatedIndex(index);
+
+      (client.locateItem as jest.Mock).mockImplementationOnce(
+        mockGrpcUnaryResult(res)
+      );
+
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
+      const row = await tree.getRowForItemId('item-id');
+      expect(row?.node.name).toBe(treeResponse.toObject().itemsList[10].name);
+    });
+  });
+
   describe(SceneTree.prototype.getRowForEvent, () => {
     it('returns row for event', async () => {
       const client = mockSceneTreeClient();
