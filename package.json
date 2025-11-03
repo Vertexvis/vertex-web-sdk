@@ -36,7 +36,6 @@
   ],
   "resolutions": {
     "@types/react": "^18",
-    "read-pkg": "^7.1.0",
     "semver": "^7.5.2"
   }
 }
