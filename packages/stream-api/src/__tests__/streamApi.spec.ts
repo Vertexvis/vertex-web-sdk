@@ -143,6 +143,348 @@ describe(StreamApi, () => {
       expect(handler).toHaveBeenCalled();
     });
   });
+
+  describe('replaceCamera', () => {
+    it('sends the request for a valid camera', () => {
+      streamApi.replaceCamera(
+        {
+          camera: {
+            perspective: {
+              lookAt: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              up: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+            },
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid camera', () => {
+      streamApi.replaceCamera(
+        {
+          camera: {
+            perspective: {
+              lookAt: {
+                x: Infinity,
+                y: 2,
+                z: 3,
+              },
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              up: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+            },
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('flyTo', () => {
+    it('sends the request for a valid bounding box', () => {
+      streamApi.flyTo(
+        {
+          boundingBox: {
+            xmax: 5,
+            ymax: 5,
+            zmax: 5,
+            xmin: 1,
+            ymin: 1,
+            zmin: 1,
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid bounding box', () => {
+      streamApi.flyTo(
+        {
+          boundingBox: {
+            xmax: Infinity,
+            ymax: 5,
+            zmax: 5,
+            xmin: 1,
+            ymin: 1,
+            zmin: 1,
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+
+    it('sends the request for a valid camera', () => {
+      streamApi.flyTo(
+        {
+          camera: {
+            perspective: {
+              lookAt: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              up: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+            },
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid camera', () => {
+      streamApi.flyTo(
+        {
+          camera: {
+            perspective: {
+              lookAt: {
+                x: Infinity,
+                y: 2,
+                z: 3,
+              },
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              up: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+            },
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+  });
+
+  it('sends the request for a valid base camera', () => {
+    streamApi.flyTo(
+      {
+        baseCamera: {
+          perspective: {
+            lookAt: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+            position: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+            up: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+          },
+        },
+      },
+      true
+    );
+
+    expect(send).toHaveBeenCalled();
+  });
+
+  it('does not send the request for an invalid base camera', () => {
+    streamApi.flyTo(
+      {
+        baseCamera: {
+          perspective: {
+            lookAt: {
+              x: Infinity,
+              y: 2,
+              z: 3,
+            },
+            position: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+            up: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+          },
+        },
+      },
+      true
+    );
+
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  describe('updateDimensions', () => {
+    it('sends the request for valid dimensions', () => {
+      streamApi.updateDimensions(
+        {
+          dimensions: {
+            height: 5,
+            width: 5,
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for invalid dimensions', () => {
+      streamApi.updateDimensions(
+        {
+          dimensions: {
+            height: 5,
+            width: NaN,
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hitItems', () => {
+    it('sends the request for a valid point', () => {
+      streamApi.hitItems(
+        {
+          point: {
+            x: 5,
+            y: 5,
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid point', () => {
+      streamApi.hitItems(
+        {
+          point: {
+            x: 5,
+            y: NaN,
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateCrossSectioning', () => {
+    it('sends the request for a valid normal and offset', () => {
+      streamApi.updateCrossSectioning(
+        {
+          crossSectioning: {
+            sectionPlanes: [
+              {
+                normal: {
+                  x: 1,
+                  y: 2,
+                  z: 3,
+                },
+                offset: 4,
+              },
+            ],
+          },
+        },
+        true
+      );
+
+      expect(send).toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid normal', () => {
+      streamApi.updateCrossSectioning(
+        {
+          crossSectioning: {
+            sectionPlanes: [
+              {
+                normal: {
+                  x: Infinity,
+                  y: 2,
+                  z: 3,
+                },
+                offset: 4,
+              },
+            ],
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+
+    it('does not send the request for an invalid offset', () => {
+      streamApi.updateCrossSectioning(
+        {
+          crossSectioning: {
+            sectionPlanes: [
+              {
+                normal: {
+                  x: 1,
+                  y: 2,
+                  z: 3,
+                },
+                offset: NaN,
+              },
+            ],
+          },
+        },
+        true
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
+  });
 });
 
 function mockRequestId(): string {

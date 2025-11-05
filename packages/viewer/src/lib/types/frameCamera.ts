@@ -25,6 +25,27 @@ export interface OrthographicFrameCamera {
 
 export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 
+export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
+  if (isPerspectiveFrameCamera(camera)) {
+    const asPerspective = camera as PerspectiveFrameCamera;
+
+    const lookAtValid = Vector3.isValid(asPerspective.lookAt);
+    const positionValid = Vector3.isValid(asPerspective.position);
+    const upValid = Vector3.isValid(asPerspective.up);
+
+    return lookAtValid && positionValid && upValid;
+  } else {
+    const asOrthographic = camera as OrthographicFrameCamera;
+
+    const viewVectorValid = Vector3.isValid(asOrthographic.viewVector);
+    const lookAtValid = Vector3.isValid(asOrthographic.lookAt);
+    const upValid = Vector3.isValid(asOrthographic.up);
+    const fovHeightValid = Number.isFinite(asOrthographic.fovHeight);
+
+    return viewVectorValid && lookAtValid && upValid && fovHeightValid;
+  }
+}
+
 export function isPerspectiveFrameCamera(
   camera: Partial<FrameCamera>
 ): camera is PerspectiveFrameCamera {
