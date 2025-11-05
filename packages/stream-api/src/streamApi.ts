@@ -374,7 +374,7 @@ export class StreamApi {
     // If a section plane is provided, verify it is valid
     if (payload.crossSectioning?.sectionPlanes != null) {
       let invalidSectionPlane = false;
-      payload.crossSectioning.sectionPlanes.forEach((plane) => {
+      for (const plane of payload.crossSectioning.sectionPlanes) {
         const validNormal =
           plane.normal != null && validateVector(plane.normal);
         const validOffset =
@@ -383,7 +383,7 @@ export class StreamApi {
         if (!validNormal || !validOffset) {
           invalidSectionPlane = true;
         }
-      });
+      }
 
       if (invalidSectionPlane) {
         console.warn(

@@ -378,7 +378,7 @@ describe(StreamApi, () => {
         {
           dimensions: {
             height: 5,
-            width: NaN,
+            width: Number.NaN,
           },
         },
         true
@@ -408,7 +408,7 @@ describe(StreamApi, () => {
         {
           point: {
             x: 5,
-            y: NaN,
+            y: Number.NaN,
           },
         },
         true
@@ -474,7 +474,7 @@ describe(StreamApi, () => {
                   y: 2,
                   z: 3,
                 },
-                offset: NaN,
+                offset: Number.NaN,
               },
             ],
           },

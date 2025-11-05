@@ -27,11 +27,9 @@ export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 
 export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
   if (isPerspectiveFrameCamera(camera)) {
-    const asPerspective = camera as PerspectiveFrameCamera;
-
-    const lookAtValid = Vector3.isValid(asPerspective.lookAt);
-    const positionValid = Vector3.isValid(asPerspective.position);
-    const upValid = Vector3.isValid(asPerspective.up);
+    const lookAtValid = Vector3.isValid(camera.lookAt);
+    const positionValid = Vector3.isValid(camera.position);
+    const upValid = Vector3.isValid(camera.up);
 
     return lookAtValid && positionValid && upValid;
   } else {
