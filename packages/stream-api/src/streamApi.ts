@@ -372,25 +372,22 @@ export class StreamApi {
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // If a section plane is provided, verify it is valid
-    if (payload.crossSectioning?.sectionPlanes != null) {
-      let invalidSectionPlane = false;
-      for (const plane of payload.crossSectioning.sectionPlanes) {
+    const invalidSectionPlane = payload.crossSectioning?.sectionPlanes?.some(
+      (plane) => {
         const validNormal =
-          plane.normal != null && validateVector(plane.normal);
+          plane.normal != null && validateVector(plane.normal, true);
         const validOffset =
           plane.offset != null && validateNumber(plane.offset);
 
-        if (!validNormal || !validOffset) {
-          invalidSectionPlane = true;
-        }
+        return !validNormal || !validOffset;
       }
+    );
 
-      if (invalidSectionPlane) {
-        console.warn(
-          'Invalid cross section plane provided. Canceling updateCrossSectioning operation.'
-        );
-        return Promise.resolve({});
-      }
+    if (invalidSectionPlane) {
+      console.warn(
+        'Invalid cross section plane provided. Canceling updateCrossSectioning operation.'
+      );
+      return Promise.resolve({});
     }
 
     return this.sendRequest({ updateCrossSectioning: payload }, withResponse);

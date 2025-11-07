@@ -67,6 +67,12 @@ export function validatePerspectiveCamera(
   const upYValid = camera.up?.y != null && Number.isFinite(camera.up.y);
   const upZValid = camera.up?.z != null && Number.isFinite(camera.up.z);
 
+  // Validate up vector has non-zero length
+  const upVectorValid = validateVector(
+    { x: camera?.up?.x, y: camera?.up?.y, z: camera?.up?.z },
+    true
+  );
+
   return (
     lookAtXValid &&
     lookAtYValid &&
@@ -76,7 +82,8 @@ export function validatePerspectiveCamera(
     positionZValid &&
     upXValid &&
     upYValid &&
-    upZValid
+    upZValid &&
+    upVectorValid
   );
 }
 
@@ -101,6 +108,12 @@ export function validateOrthographicCamera(
   const viewVectorZValid =
     camera.viewVector?.z != null && Number.isFinite(camera.viewVector.z);
 
+  // Validate up vector has non-zero length
+  const upVectorValid = validateVector(
+    { x: camera?.up?.x, y: camera?.up?.y, z: camera?.up?.z },
+    true
+  );
+
   return (
     fovHeightValid &&
     lookAtXValid &&
@@ -111,7 +124,8 @@ export function validateOrthographicCamera(
     viewVectorZValid &&
     upXValid &&
     upYValid &&
-    upZValid
+    upZValid &&
+    upVectorValid
   );
 }
 
@@ -119,9 +133,13 @@ export function validateDimensions(
   dimensions: vertexvis.protobuf.stream.IDimensions
 ): boolean {
   const heightValid =
-    dimensions?.height != null && Number.isFinite(dimensions.height);
+    dimensions?.height != null &&
+    Number.isFinite(dimensions.height) &&
+    dimensions.height > 0;
   const widthValid =
-    dimensions?.width != null && Number.isFinite(dimensions.width);
+    dimensions?.width != null &&
+    Number.isFinite(dimensions.width) &&
+    dimensions.width > 0;
 
   return heightValid && widthValid;
 }
@@ -140,11 +158,27 @@ export function validatePoint(
 }
 
 export function validateVector(
-  vector: vertexvis.protobuf.core.IVector3f
+  vector: vertexvis.protobuf.core.IVector3f,
+  verifyNonZeroLength: boolean
 ): boolean {
   const xValid = vector?.x != null && Number.isFinite(vector.x);
   const yValid = vector?.y != null && Number.isFinite(vector.y);
   const zValid = vector?.z != null && Number.isFinite(vector.z);
 
-  return xValid && yValid && zValid;
+  const vectorComponentsValid = xValid && yValid && zValid;
+
+  if (verifyNonZeroLength) {
+    if (vector?.x != null && vector?.y != null && vector?.z != null) {
+      const vectorMagnitudeSquared =
+        vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
+      const vectorHasNonZeroLength = vectorMagnitudeSquared !== 0;
+
+      return vectorComponentsValid && vectorHasNonZeroLength;
+    } else {
+      // If one or more components are undefined, then the vector does not have non-zero length
+      return false;
+    }
+  }
+
+  return vectorComponentsValid;
 }
