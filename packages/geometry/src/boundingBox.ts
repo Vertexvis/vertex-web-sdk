@@ -96,3 +96,14 @@ export const lengths = (box: BoundingBox): Vector3.Vector3 => {
     box.max.z - box.min.z
   );
 };
+
+/**
+ * Checks if each component of the given bounding box is populated with a numeric
+ * component. A component is invalid if it contains a non-finite or NaN value.
+ */
+export function isValid(boundingBox: BoundingBox): boolean {
+  const maxIsValid = Vector3.isValid(boundingBox.max);
+  const minIsValid = Vector3.isValid(boundingBox.min);
+
+  return maxIsValid && minIsValid;
+}

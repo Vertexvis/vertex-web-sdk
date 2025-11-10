@@ -23,3 +23,33 @@ describe(FrameCamera.toPerspective, () => {
     expect(FrameCamera.toPerspective(orthographic)).toMatchObject(perspective);
   });
 });
+
+describe(FrameCamera.isValidFrameCamera, () => {
+  it('returns true for a valid perspective camera', () => {
+    const perspective = FrameCamera.createPerspective();
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(true);
+  });
+
+  it('returns false for an invalid perspective camera', () => {
+    const invalidPositionVector = Vector3.create(100, 50, Infinity);
+
+    const perspective = FrameCamera.createPerspective({
+      position: invalidPositionVector,
+    });
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
+  });
+
+  it('returns true for a valid orthographic camera', () => {
+    const orthographic = FrameCamera.createOrthographic();
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(true);
+  });
+
+  it('returns false for an invalid orthographic camera', () => {
+    const invalidViewVector = Vector3.create(100, 50, Infinity);
+
+    const perspective = FrameCamera.createOrthographic({
+      viewVector: invalidViewVector,
+    });
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
+  });
+});
