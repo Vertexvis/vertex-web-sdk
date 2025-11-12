@@ -128,3 +128,23 @@ describe(BoundingBox.lengths, () => {
     });
   });
 });
+
+describe(BoundingBox.isValid, () => {
+  it('returns true for a valid bounding box', () => {
+    const box = BoundingBox.create(
+      Vector3.create(-100, -200, -300),
+      Vector3.create(100, 200, 300)
+    );
+
+    expect(BoundingBox.isValid(box)).toEqual(true);
+  });
+
+  it('returns false for an invalid bounding box', () => {
+    const box = BoundingBox.create(
+      Vector3.create(-100, Infinity, -300),
+      Vector3.create(100, 200, 300)
+    );
+
+    expect(BoundingBox.isValid(box)).toEqual(false);
+  });
+});
