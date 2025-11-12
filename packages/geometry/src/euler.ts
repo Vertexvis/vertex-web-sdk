@@ -18,12 +18,12 @@ export interface Euler {
 }
 
 /**
- * Creates a new euler angle where each axis of rotation is defined by an angle,
+ * Creates a new set of Euler angles where each axis of rotation is defined by an angle,
  * in radians. If no value is given, then `{x: 0, y: 0, z: 0, order: 'xyz'}` is
  * returned.
  *
- * @param value The values to populate the euler angle with.
- * @returns A euler angle.
+ * @param value The values to populate the Euler angles with.
+ * @returns A set of Euler angles.
  */
 export function create(value: Partial<Euler> = {}): Euler {
   return {
@@ -35,12 +35,12 @@ export function create(value: Partial<Euler> = {}): Euler {
 }
 
 /**
- * Creates a new euler angle where each axis of rotation is defined by an angle,
+ * Creates a new set of Euler angles where each axis of rotation is defined by an angle,
  * in degrees. If no value is given, then `{x: 0, y: 0, z: 0, order: 'xyz'}` is
  * returned.
  *
- * @param value The values to populate the euler angle with.
- * @returns A euler angle.
+ * @param value The values to populate the Euler angles with.
+ * @returns A set of Euler angles.
  */
 export function fromDegrees(value: Partial<Euler> = {}): Euler {
   const { x = 0, y = 0, z = 0, order } = value;
@@ -53,8 +53,12 @@ export function fromDegrees(value: Partial<Euler> = {}): Euler {
 }
 
 /**
- * Creates a euler angle from the rotation components of a 4x4 matrix. The
+ * Creates a set of Euler angles from the rotation components of a 4x4 matrix. The
  * rotation components are represented by the upper 3x3 of the matrix.
+ *
+ * Note that there are two solutions for the Euler angle of the 2nd applied
+ * rotation (i.e. y for xyz) because sin(theta) = sin(PI-theta).
+ * The returned angle will always be the solution between -PI/2 and PI/2.
  *
  * @param matrix A pure rotation matrix, unscaled.
  * @param order The order that the rotations are applied.
@@ -129,12 +133,12 @@ export function fromRotationMatrix(
 }
 
 /**
- * Returns a euler angle that was decoded from a JSON string. Supports either
+ * Returns a set of Euler angles that was decoded from a JSON string. Supports either
  * extracting values from an array `[x, y, z, order]` or object `{x, y, z,
  * order}`.
  *
  * @param json A JSON object.
- * @returns A euler angle.
+ * @returns A set of Euler angles.
  */
 export function fromJson(json: string): Euler {
   const obj = JSON.parse(json);
@@ -148,7 +152,7 @@ export function fromJson(json: string): Euler {
 }
 
 /**
- * Type guard that checks if the given type is a Euler.
+ * Type guard that checks if the given type is a set of Euler angles.
  */
 export function isType(obj: unknown): obj is Euler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

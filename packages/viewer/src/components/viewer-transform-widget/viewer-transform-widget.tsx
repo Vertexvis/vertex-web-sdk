@@ -268,6 +268,9 @@ export class ViewerTransformWidget {
 
   private hoveredChangeDisposable?: Disposable;
 
+  private interactionTimer?: number;
+  private lastMouseEvent?: PointerEvent;
+
   protected componentDidLoad(): void {
     window.addEventListener('pointermove', this.handlePointerMove);
 
@@ -659,14 +662,32 @@ export class ViewerTransformWidget {
       this.interactionStarted.emit();
 
       window.removeEventListener('pointermove', this.handlePointerMove);
-      window.addEventListener('pointermove', this.handleDrag);
+      window.addEventListener('pointermove', this.handleDragWithTimer);
       window.addEventListener('pointerup', this.handleEndTransform);
     }
   };
 
-  private handleDrag = async (event: PointerEvent): Promise<void> => {
-    // Prevent selection of text and interaction with view cube while dragging the widget
-    event.preventDefault();
+  private handleDragWithTimer = async (event: PointerEvent): Promise<void> => {
+    if (event != null) {
+      // Prevent selection of text and interaction with view cube while dragging the widget
+      event.preventDefault();
+
+      this.lastMouseEvent = event;
+    }
+
+    if (this.interactionTimer == null) {
+      this.interactionTimer = window.setTimeout(async () => {
+        this.interactionTimer = undefined;
+        await this.handleDrag();
+        this.lastMouseEvent = undefined;
+      }, 75);
+    }
+  };
+
+  private handleDrag = async (): Promise<void> => {
+    if (this.lastMouseEvent == null) {
+      return;
+    }
 
     const canvasBounds = this.getCanvasBounds();
 
@@ -683,7 +704,7 @@ export class ViewerTransformWidget {
       await this.controller?.beginTransform();
 
       const currentCanvas = convertPointToCanvas(
-        Point.create(event.clientX, event.clientY),
+        Point.create(this.lastMouseEvent.clientX, this.lastMouseEvent.clientY),
         canvasBounds
       );
       const widgetCenter = this.viewer.viewport.transformWorldToViewport(
@@ -705,7 +726,7 @@ export class ViewerTransformWidget {
       ) {
         const angle = Angle.fromPoints(widgetCenter, currentCanvas);
         const angleToUse = calculateNewRotationAngle(
-          event,
+          this.lastMouseEvent,
           this.rotationSnapKey,
           angle,
           this.lastAngle,
@@ -748,7 +769,7 @@ export class ViewerTransformWidget {
 
     this.beginEndTransform();
 
-    window.removeEventListener('pointermove', this.handleDrag);
+    window.removeEventListener('pointermove', this.handleDragWithTimer);
     window.removeEventListener('pointerup', this.handleEndTransform);
 
     try {
