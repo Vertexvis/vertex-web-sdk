@@ -28,6 +28,14 @@ import {
   UpdateModelViewPayload,
   UpdateStreamPayload,
 } from './types';
+import {
+  validateBoundingBox,
+  validateCamera,
+  validateDimensions,
+  validateNumber,
+  validatePoint,
+  validateVector,
+} from './validators';
 import { WebSocketClient, WebSocketClientImpl } from './webSocketClient';
 
 export type RequestMessageHandler = (msg: RequestMessage) => void;
@@ -219,6 +227,18 @@ export class StreamApi {
     payload: ReplaceCameraPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    // If a camera is provided, verify it is valid
+    if (payload.camera != null) {
+      const cameraIsValid = validateCamera(payload.camera);
+
+      if (!cameraIsValid) {
+        console.warn(
+          'Invalid camera provided. Canceling replaceCamera operation.'
+        );
+        return Promise.resolve({});
+      }
+    }
+
     return this.sendRequest({ updateCamera: payload }, withResponse);
   }
 
@@ -241,6 +261,40 @@ export class StreamApi {
     payload: vertexvis.protobuf.stream.IFlyToPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    // If a bounding box is provided, verify it is valid
+    if (payload.boundingBox != null) {
+      const validBoundingBox = validateBoundingBox(payload.boundingBox);
+
+      if (!validBoundingBox) {
+        console.warn(
+          'Invalid bounding box provided. Canceling flyTo operation.'
+        );
+        return Promise.resolve({});
+      }
+    }
+
+    // If a camera is provided, verify it is valid
+    if (payload.camera != null) {
+      const cameraIsValid = validateCamera(payload.camera);
+
+      if (!cameraIsValid) {
+        console.warn('Invalid camera provided. Canceling flyTo operation.');
+        return Promise.resolve({});
+      }
+    }
+
+    // If a base camera is provided, verify it is valid
+    if (payload.baseCamera != null) {
+      const baseCameraIsValid = validateCamera(payload.baseCamera);
+
+      if (!baseCameraIsValid) {
+        console.warn(
+          'Invalid base camera provided. Canceling flyTo operation.'
+        );
+        return Promise.resolve({});
+      }
+    }
+
     return this.sendRequest({ flyTo: payload }, withResponse);
   }
 
@@ -282,6 +336,18 @@ export class StreamApi {
     payload: UpdateDimensionsPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    // Verify the provided dimensions are valid
+    if (payload.dimensions != null) {
+      const validDimensions = validateDimensions(payload.dimensions);
+
+      if (!validDimensions) {
+        console.warn(
+          'Invalid dimensions provided. Canceling updateDimensions operation.'
+        );
+        return Promise.resolve({});
+      }
+    }
+
     return this.sendRequest({ updateDimensions: payload }, withResponse);
   }
 
@@ -305,6 +371,25 @@ export class StreamApi {
     payload: UpdateCrossSectioningPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    // If a section plane is provided, verify it is valid
+    const invalidSectionPlane = payload.crossSectioning?.sectionPlanes?.some(
+      (plane) => {
+        const validNormal =
+          plane.normal != null && validateVector(plane.normal, true);
+        const validOffset =
+          plane.offset != null && validateNumber(plane.offset);
+
+        return !validNormal || !validOffset;
+      }
+    );
+
+    if (invalidSectionPlane) {
+      console.warn(
+        'Invalid cross section plane provided. Canceling updateCrossSectioning operation.'
+      );
+      return Promise.resolve({});
+    }
+
     return this.sendRequest({ updateCrossSectioning: payload }, withResponse);
   }
 
@@ -346,6 +431,16 @@ export class StreamApi {
     payload: HitItemsPayload,
     withResponse = true
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
+    // If a point is provided, verify it is valid
+    if (payload.point != null) {
+      const validPoint = validatePoint(payload.point);
+
+      if (!validPoint) {
+        console.warn('Invalid point provided. Canceling hitItems operation.');
+        return Promise.resolve({});
+      }
+    }
+
     return this.sendRequest({ hitItems: payload }, withResponse);
   }
 

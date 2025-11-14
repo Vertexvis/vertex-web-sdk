@@ -11,6 +11,7 @@ import {
   FrameCamera,
   SceneViewStateIdentifier,
 } from '../types';
+import { isValidFrameCamera } from '../types/frameCamera';
 import { ItemOperation, PmiAnnotationOperation } from './operations';
 import { AnnotationQueryExpression, QueryExpression } from './queries';
 import { SceneViewStateFeature } from './scene';
@@ -307,7 +308,9 @@ export function buildFlyToOperation(
         }
       : undefined,
     baseCamera:
-      baseCamera != null ? FrameCamera.toProtobuf(baseCamera) : undefined,
+      baseCamera != null && isValidFrameCamera(baseCamera)
+        ? FrameCamera.toProtobuf(baseCamera)
+        : undefined,
   };
 
   switch (options.flyTo.type) {
