@@ -207,13 +207,13 @@ export class ViewerTransformWidget {
   public rotationHandleScalar = 1;
 
   /**
-   * Specifies the delay, in milliseconds, to update the transform after interactions with the widget.
+   * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
    *
    * This delay is used to group events happening in quick succession and results in smoother
    * widget movement.
    */
   @Prop()
-  public interactionDebounce = 75;
+  public interactionThrottle = 75;
 
   /**
    * **EXPERIMENTAL.**
@@ -689,7 +689,7 @@ export class ViewerTransformWidget {
         this.interactionTimer = undefined;
         await this.handleDrag();
         this.lastMouseEvent = undefined;
-      }, this.interactionDebounce);
+      }, this.interactionThrottle);
     }
   };
 

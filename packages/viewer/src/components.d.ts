@@ -1624,11 +1624,11 @@ export namespace Components {
      */
     hovered?: Drawable;
     /**
-     * Specifies the delay, in milliseconds, to update the transform after interactions with the widget.
+     * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
      *
      * This delay is used to group events happening in quick succession and results in smoother widget movement.
      */
-    interactionDebounce: number;
+    interactionThrottle: number;
     /**
      * The starting position of this transform widget. This position will be updated as transforms occur. Setting this value to `undefined` will remove the widget.
      */
@@ -3637,11 +3637,11 @@ declare namespace LocalJSX {
      */
     hovered?: Drawable;
     /**
-     * Specifies the delay, in milliseconds, to update the transform after interactions with the widget.
+     * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
      *
      * This delay is used to group events happening in quick succession and results in smoother widget movement.
      */
-    interactionDebounce?: number;
+    interactionThrottle?: number;
     /**
      * An event that is emitted when the interaction has ended
      */
