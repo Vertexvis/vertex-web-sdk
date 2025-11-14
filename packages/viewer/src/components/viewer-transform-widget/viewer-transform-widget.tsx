@@ -207,6 +207,15 @@ export class ViewerTransformWidget {
   public rotationHandleScalar = 1;
 
   /**
+   * Specifies the delay, in milliseconds, to update the transform after interactions with the widget.
+   *
+   * This delay is used to group events happening in quick succession and results in smoother
+   * widget movement.
+   */
+  @Prop()
+  public interactionDebounce = 75;
+
+  /**
    * **EXPERIMENTAL.**
    *
    * Enables Command+Z and Control+Z keybindings to perform an undo of
@@ -680,15 +689,11 @@ export class ViewerTransformWidget {
         this.interactionTimer = undefined;
         await this.handleDrag();
         this.lastMouseEvent = undefined;
-      }, 75);
+      }, this.interactionDebounce);
     }
   };
 
   private handleDrag = async (): Promise<void> => {
-    if (this.lastMouseEvent == null) {
-      return;
-    }
-
     const canvasBounds = this.getCanvasBounds();
 
     if (
@@ -697,7 +702,8 @@ export class ViewerTransformWidget {
       canvasBounds != null &&
       this.viewer != null &&
       this.viewer.frame != null &&
-      this.position != null
+      this.position != null &&
+      this.lastMouseEvent != null
     ) {
       // Begin the transform on the first `pointermove` event as opposed to the
       // `pointerdown` to prevent accidental no-op transforms (identity matrix).

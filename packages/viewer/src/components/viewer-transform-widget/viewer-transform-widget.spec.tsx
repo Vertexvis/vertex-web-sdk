@@ -28,6 +28,7 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
+import { Async } from '@vertexvis/utils';
 
 import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
@@ -250,7 +251,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    await Async.delay(75);
 
     await page.waitForChanges();
 
@@ -801,7 +802,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    await Async.delay(75);
 
     await page.waitForChanges();
 
@@ -1027,7 +1028,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    await Async.delay(75);
 
     await page.waitForChanges();
 
@@ -1261,7 +1262,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    await Async.delay(75);
 
     await page.waitForChanges();
 
