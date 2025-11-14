@@ -207,6 +207,15 @@ export class ViewerTransformWidget {
   public rotationHandleScalar = 1;
 
   /**
+   * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
+   *
+   * This delay is used to group events happening in quick succession and results in smoother
+   * widget movement.
+   */
+  @Prop()
+  public interactionThrottle = 75;
+
+  /**
    * **EXPERIMENTAL.**
    *
    * Enables Command+Z and Control+Z keybindings to perform an undo of
@@ -267,6 +276,9 @@ export class ViewerTransformWidget {
   private inputRef?: HTMLInputElement;
 
   private hoveredChangeDisposable?: Disposable;
+
+  private interactionTimer?: number;
+  private lastMouseEvent?: PointerEvent;
 
   protected componentDidLoad(): void {
     window.addEventListener('pointermove', this.handlePointerMove);
@@ -659,15 +671,29 @@ export class ViewerTransformWidget {
       this.interactionStarted.emit();
 
       window.removeEventListener('pointermove', this.handlePointerMove);
-      window.addEventListener('pointermove', this.handleDrag);
+      window.addEventListener('pointermove', this.handleDragWithTimer);
       window.addEventListener('pointerup', this.handleEndTransform);
     }
   };
 
-  private handleDrag = async (event: PointerEvent): Promise<void> => {
-    // Prevent selection of text and interaction with view cube while dragging the widget
-    event.preventDefault();
+  private handleDragWithTimer = async (event: PointerEvent): Promise<void> => {
+    if (event != null) {
+      // Prevent selection of text and interaction with view cube while dragging the widget
+      event.preventDefault();
 
+      this.lastMouseEvent = event;
+    }
+
+    if (this.interactionTimer == null) {
+      this.interactionTimer = window.setTimeout(async () => {
+        this.interactionTimer = undefined;
+        await this.handleDrag();
+        this.lastMouseEvent = undefined;
+      }, this.interactionThrottle);
+    }
+  };
+
+  private handleDrag = async (): Promise<void> => {
     const canvasBounds = this.getCanvasBounds();
 
     if (
@@ -676,14 +702,15 @@ export class ViewerTransformWidget {
       canvasBounds != null &&
       this.viewer != null &&
       this.viewer.frame != null &&
-      this.position != null
+      this.position != null &&
+      this.lastMouseEvent != null
     ) {
       // Begin the transform on the first `pointermove` event as opposed to the
       // `pointerdown` to prevent accidental no-op transforms (identity matrix).
       await this.controller?.beginTransform();
 
       const currentCanvas = convertPointToCanvas(
-        Point.create(event.clientX, event.clientY),
+        Point.create(this.lastMouseEvent.clientX, this.lastMouseEvent.clientY),
         canvasBounds
       );
       const widgetCenter = this.viewer.viewport.transformWorldToViewport(
@@ -705,7 +732,7 @@ export class ViewerTransformWidget {
       ) {
         const angle = Angle.fromPoints(widgetCenter, currentCanvas);
         const angleToUse = calculateNewRotationAngle(
-          event,
+          this.lastMouseEvent,
           this.rotationSnapKey,
           angle,
           this.lastAngle,
@@ -748,7 +775,7 @@ export class ViewerTransformWidget {
 
     this.beginEndTransform();
 
-    window.removeEventListener('pointermove', this.handleDrag);
+    window.removeEventListener('pointermove', this.handleDragWithTimer);
     window.removeEventListener('pointerup', this.handleEndTransform);
 
     try {

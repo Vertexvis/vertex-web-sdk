@@ -392,12 +392,40 @@ describe('vertex-viewer-transform-widget utils', () => {
             Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(90))
           ),
           Matrix4.makeRotation(
-            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(45))
+            Quaternion.fromAxisAngle(Vector3.left(), Angle.toRadians(40))
           ),
           'millimeters',
           'degrees'
         )
-      ).toBeCloseTo(45);
+      ).toBeCloseTo(50);
+
+      expect(
+        computeInputDisplayValue(
+          'y-rotate',
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.down(), Angle.toRadians(90))
+          ),
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.down(), Angle.toRadians(40))
+          ),
+          'millimeters',
+          'degrees'
+        )
+      ).toBeCloseTo(50);
+
+      expect(
+        computeInputDisplayValue(
+          'z-rotate',
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.forward(), Angle.toRadians(90))
+          ),
+          Matrix4.makeRotation(
+            Quaternion.fromAxisAngle(Vector3.forward(), Angle.toRadians(40))
+          ),
+          'millimeters',
+          'degrees'
+        )
+      ).toBeCloseTo(50);
     });
 
     it('converts distance units', () => {

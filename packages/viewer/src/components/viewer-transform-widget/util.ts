@@ -137,6 +137,19 @@ function computeInputGlobalTransform(
   }
 }
 
+export function eulerOrderForIdentifier(identifier: string): Euler.EulerOrder {
+  switch (identifier) {
+    case 'x-rotate':
+      return 'xyz';
+    case 'y-rotate':
+      return 'yzx';
+    case 'z-rotate':
+      return 'zxy';
+    default:
+      return 'xyz';
+  }
+}
+
 export function computeInputDisplayValue(
   identifier: string,
   current: Matrix4.Matrix4,
@@ -158,7 +171,8 @@ export function computeInputDisplayValue(
     );
   const relativeRotationDiff = (): Euler.Euler =>
     Euler.fromRotationMatrix(
-      Matrix4.multiply(Matrix4.invert(rotation()), start)
+      Matrix4.multiply(Matrix4.invert(rotation()), start),
+      eulerOrderForIdentifier(identifier)
     );
 
   switch (identifier) {
