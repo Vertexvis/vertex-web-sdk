@@ -335,6 +335,12 @@ export function buildFlyToOperation(
       };
     }
 
+    case 'scene-item-query':
+      return {
+        ...payload,
+        sceneItemQueryExpression: options.flyTo.data,
+      };
+
     case 'bounding-box': {
       return {
         ...payload,
