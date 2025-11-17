@@ -28,6 +28,8 @@ import {
 import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import SceneItemQueryExpression = vertexvis.protobuf.stream.SceneItemQueryExpression;
 
 export interface CameraRenderOptions {
   animation?: Animation.Animation;
@@ -92,6 +94,7 @@ export interface FlyToParams {
   camera?: FrameCamera.FrameCamera;
   boundingBox?: BoundingBox.BoundingBox;
   itemSuppliedId?: string;
+  sceneItemQueryExpression?: SceneItemQueryExpression;
 }
 
 /**
@@ -198,6 +201,19 @@ export abstract class Camera {
    *     },
    *   })
    *   .render({ animation: { milliseconds: 1000 } });
+   *
+   * // Fly to scene items specified by a query
+   * await camera
+   *   .flyTo({
+   *     sceneItemQueryExpression: {
+   *       operand: {
+   *         metadata: {
+   *           valueFilter: 'WheelHub',
+   *           keys: ['ProductName'],
+   *         },
+   *       },
+   *     },
+   *   })
    * ```
    *
    * @param paramsOrQuery An object or query describing how the camera should
@@ -426,6 +442,11 @@ export abstract class Camera {
       return { type: 'internal', data: options.itemId };
     } else if (options.itemSuppliedId != null) {
       return { type: 'supplied', data: options.itemSuppliedId };
+    } else if (options.sceneItemQueryExpression != null) {
+      return {
+        type: 'scene-item-query',
+        data: options.sceneItemQueryExpression,
+      };
     } else {
       throw new Error('Fly to must specify at least one option.');
     }

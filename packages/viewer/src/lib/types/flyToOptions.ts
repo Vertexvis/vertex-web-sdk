@@ -1,6 +1,9 @@
 import { BoundingBox } from '@vertexvis/geometry';
 
 import { FrameCamera } from './frameCamera';
+import { UUID } from '@vertexvis/utils';
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
+import SceneItemQueryExpression = vertexvis.protobuf.stream.SceneItemQueryExpression;
 
 interface FlyToSuppliedId {
   type: 'supplied';
@@ -21,11 +24,18 @@ interface FlyToCamera {
   type: 'camera';
   data: Partial<FrameCamera>;
 }
+
+interface FlyToSceneItemQueryExpression {
+  type: 'scene-item-query';
+  data: SceneItemQueryExpression;
+}
+
 export type FlyToType =
   | FlyToSuppliedId
   | FlyToItemId
   | FlyToBoundingBox
-  | FlyToCamera;
+  | FlyToCamera
+  | FlyToSceneItemQueryExpression;
 
 export interface FlyToOptions {
   flyTo: FlyToType;
