@@ -1,8 +1,7 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { BoundingBox } from '@vertexvis/geometry';
 
 import { FrameCamera } from './frameCamera';
-import { UUID } from '@vertexvis/utils';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import SceneItemQueryExpression = vertexvis.protobuf.stream.SceneItemQueryExpression;
 
 interface FlyToSuppliedId {
