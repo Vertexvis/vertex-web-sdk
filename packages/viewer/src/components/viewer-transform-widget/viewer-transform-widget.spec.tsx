@@ -13,7 +13,6 @@ jest.mock('./util', () => {
     convertPointToCanvas: jest.fn(),
     convertCanvasPointToWorld: jest.fn(),
     computeHandleDeltaTransform: jest.fn(),
-    // computeInputDeltaTransform: jest.fn(),
   };
 });
 jest.mock('./dom');
@@ -29,6 +28,7 @@ import {
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
+import { Async } from '@vertexvis/utils';
 
 import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
@@ -250,6 +250,8 @@ describe('vertex-viewer-transform-widget', () => {
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await Async.delay(75);
 
     await page.waitForChanges();
 
@@ -800,6 +802,8 @@ describe('vertex-viewer-transform-widget', () => {
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
+    await Async.delay(75);
+
     await page.waitForChanges();
 
     expect(beginSpy).toHaveBeenCalled();
@@ -1023,6 +1027,8 @@ describe('vertex-viewer-transform-widget', () => {
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await Async.delay(75);
 
     await page.waitForChanges();
 
@@ -1255,6 +1261,8 @@ describe('vertex-viewer-transform-widget', () => {
       ?.dispatchEvent(new MouseEvent('pointerdown'));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
+
+    await Async.delay(75);
 
     await page.waitForChanges();
 
