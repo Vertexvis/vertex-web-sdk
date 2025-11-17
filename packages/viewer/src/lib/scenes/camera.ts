@@ -1,3 +1,4 @@
+import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   BoundingBox,
   BoundingSphere,
@@ -28,7 +29,6 @@ import {
 import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import SceneItemQueryExpression = vertexvis.protobuf.stream.SceneItemQueryExpression;
 
 export interface CameraRenderOptions {
