@@ -29,7 +29,7 @@ import {
 import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
-import SceneItemQueryExpression = vertexvis.protobuf.stream.SceneItemQueryExpression;
+import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpression;
 
 export interface CameraRenderOptions {
   animation?: Animation.Animation;
@@ -94,7 +94,7 @@ export interface FlyToParams {
   camera?: FrameCamera.FrameCamera;
   boundingBox?: BoundingBox.BoundingBox;
   itemSuppliedId?: string;
-  sceneItemQueryExpression?: SceneItemQueryExpression;
+  sceneItemQueryExpression?: ISceneItemQueryExpression;
 }
 
 /**
