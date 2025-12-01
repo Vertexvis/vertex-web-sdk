@@ -286,14 +286,14 @@ export class ViewerViewCube {
               label={this.xNegativeLabel}
               length={this.boxLength}
               side="left"
-              onPointerDown={this.handleStandardView(StandardView.RIGHT)}
+              onPointerDown={this.handleStandardView(StandardView.LEFT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeSide
               label={this.xPositiveLabel}
               length={this.boxLength}
               side="right"
-              onPointerDown={this.handleStandardView(StandardView.LEFT)}
+              onPointerDown={this.handleStandardView(StandardView.RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeSide
