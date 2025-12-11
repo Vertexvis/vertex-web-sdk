@@ -114,6 +114,45 @@ describe('vertex-viewer-transform-widget utils', () => {
       ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0, -1)));
     });
 
+    it('computes updated xy translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.back()),
+          Vector3.origin(),
+          Vector3.right(),
+          Vector3.back(),
+          0,
+          'xy-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0.5, 0.5, 0)));
+    });
+
+    it('computes updated xz translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.back()),
+          Vector3.origin(),
+          Vector3.right(),
+          Vector3.back(),
+          0,
+          'xz-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0.5, 0, 0.5)));
+    });
+
+    it('computes updated yz translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.back()),
+          Vector3.origin(),
+          Vector3.back(),
+          Vector3.forward(),
+          0,
+          'yz-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0.5, 0.5)));
+    });
+
     it('computes updated x rotation when view vector is closer to parallel with negative x', () => {
       expect(
         computeHandleDeltaTransform(
@@ -262,6 +301,41 @@ describe('vertex-viewer-transform-widget utils', () => {
       ).toMatchObject(Matrix4.makeTranslation(Vector3.create(10, 0, 0)));
     });
 
+    it('computes an updated translation on two axes  based on the difference', () => {
+      expect(
+        computeInputDeltaTransform(
+          Matrix4.makeIdentity(),
+          'xy-translate',
+          100,
+          90,
+          'millimeters',
+          'degrees'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(10, 10, 0)));
+
+      expect(
+        computeInputDeltaTransform(
+          Matrix4.makeIdentity(),
+          'xz-translate',
+          100,
+          90,
+          'millimeters',
+          'degrees'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(10, 0, 10)));
+
+      expect(
+        computeInputDeltaTransform(
+          Matrix4.makeIdentity(),
+          'yz-translate',
+          100,
+          90,
+          'millimeters',
+          'degrees'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 10, 10)));
+    });
+
     it('computes an updated rotation based on the difference', () => {
       expectMatrixCloseTo(
         computeInputDeltaTransform(
@@ -378,6 +452,16 @@ describe('vertex-viewer-transform-widget utils', () => {
           'x-translate',
           Matrix4.makeTranslation(Vector3.create(100, 0, 0)),
           Matrix4.makeTranslation(Vector3.create(90, 0, 0)),
+          'millimeters',
+          'degrees'
+        )
+      ).toBeCloseTo(10);
+
+      expect(
+        computeInputDisplayValue(
+          'xy-translate',
+          Matrix4.makeTranslation(Vector3.create(100, 100, 0)),
+          Matrix4.makeTranslation(Vector3.create(90, 90, 0)),
           'millimeters',
           'degrees'
         )

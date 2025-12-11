@@ -896,6 +896,9 @@ describe('vertex-viewer-transform-widget', () => {
       xTranslation: 2,
       yTranslation: 2,
       zTranslation: 2,
+      xyTranslation: 3,
+      xzTranslation: 3,
+      yzTranslation: 3,
       xRotation: 3,
       yRotation: 3,
       zRotation: 3,
@@ -941,6 +944,9 @@ describe('vertex-viewer-transform-widget', () => {
       xTranslation: 1,
       yTranslation: 1,
       zTranslation: 1,
+      xyTranslation: 1,
+      xzTranslation: 1,
+      yzTranslation: 1,
       xRotation: 1,
       yRotation: 1,
       zRotation: 1,
@@ -1141,6 +1147,9 @@ describe('vertex-viewer-transform-widget', () => {
       xTranslation: true,
       yTranslation: true,
       zTranslation: true,
+      xyTranslation: true,
+      xzTranslation: true,
+      yzTranslation: true,
     });
 
     expect(mockTransformWidget.updateDisabledAxis).toHaveBeenCalledWith({
@@ -1150,6 +1159,9 @@ describe('vertex-viewer-transform-widget', () => {
       xTranslation: false,
       yTranslation: false,
       zTranslation: false,
+      xyTranslation: false,
+      xzTranslation: false,
+      yzTranslation: false,
     });
   });
 
