@@ -345,8 +345,8 @@ describe(TransformWidget, () => {
         'y-axis',
         'xy-rotation-line',
         'x-rotate',
-        'xz-rotation-line',
         'yz-translate',
+        'xz-rotation-line',
         'z-axis',
         'z-translate',
       ].reverse()
@@ -370,8 +370,8 @@ describe(TransformWidget, () => {
         'z-axis',
         'yz-rotation-line',
         'y-rotate',
-        'yx-rotation-line',
         'xz-translate',
+        'yx-rotation-line',
         'x-axis',
         'x-translate',
       ].reverse()
@@ -395,8 +395,8 @@ describe(TransformWidget, () => {
         'x-axis',
         'zx-rotation-line',
         'z-rotate',
-        'zy-rotation-line',
         'xy-translate',
+        'zy-rotation-line',
         'y-axis',
         'y-translate',
       ].reverse()
