@@ -339,10 +339,13 @@ describe(TransformWidget, () => {
         'zy-rotation-line',
         'x-axis',
         'yz-rotation-line',
+        'xy-translate',
+        'xz-translate',
         'y-translate',
         'y-axis',
         'xy-rotation-line',
         'x-rotate',
+        'yz-translate',
         'xz-rotation-line',
         'z-axis',
         'z-translate',
@@ -361,10 +364,13 @@ describe(TransformWidget, () => {
         'xz-rotation-line',
         'y-axis',
         'zx-rotation-line',
+        'yz-translate',
+        'xy-translate',
         'z-translate',
         'z-axis',
         'yz-rotation-line',
         'y-rotate',
+        'xz-translate',
         'yx-rotation-line',
         'x-axis',
         'x-translate',
@@ -383,10 +389,13 @@ describe(TransformWidget, () => {
         'yx-rotation-line',
         'z-axis',
         'xy-rotation-line',
+        'xz-translate',
+        'yz-translate',
         'x-translate',
         'x-axis',
         'zx-rotation-line',
         'z-rotate',
+        'xy-translate',
         'zy-rotation-line',
         'y-axis',
         'y-translate',
@@ -492,7 +501,7 @@ describe(TransformWidget, () => {
     );
     widget.updateTransform(positionTransform);
 
-    // the rotatation meshes should all have the disabled fill color
+    // the rotation meshes should all have the disabled fill color
     expect(
       widget
         .getDrawableElements()
@@ -595,6 +604,9 @@ describe(TransformWidget, () => {
       xTranslation: 1.5,
       yTranslation: 2,
       zTranslation: 2.5,
+      xyTranslation: 1.5,
+      xzTranslation: 2,
+      yzTranslation: 2.5,
       xRotation: 1.5,
       yRotation: 2,
       zRotation: 2.5,
@@ -670,6 +682,24 @@ describe(TransformWidget, () => {
     validatePointScaling(
       'z-rotate',
       sizes.zRotation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'xy-translate',
+      sizes.xyTranslation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'xz-translate',
+      sizes.xzTranslation,
+      unscaledDrawableElements,
+      scaledDrawableElements
+    );
+    validatePointScaling(
+      'yz-translate',
+      sizes.yzTranslation,
       unscaledDrawableElements,
       scaledDrawableElements
     );

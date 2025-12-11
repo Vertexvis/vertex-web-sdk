@@ -106,40 +106,58 @@ export class ViewerTransformWidget {
   public controller?: TransformController;
 
   /**
-   * Determines whether or not the x-rotation is disabled on the widget
+   * Determines whether the x-rotation is disabled on the widget
    */
   @Prop({ mutable: true })
   public xRotationDisabled = false;
 
   /**
-   * Determines whether or not the y-rotation is disabled on the widget
+   * Determines whether the y-rotation is disabled on the widget
    */
   @Prop({ mutable: true })
   public yRotationDisabled = false;
 
   /**
-   * Determines whether or not the z-rotation is disabled on the widget
+   * Determines whether the z-rotation is disabled on the widget
    */
   @Prop({ mutable: true })
   public zRotationDisabled = false;
 
   /**
-   * Determines whether or not the x-translation is disabled on the widget
+   * Determines whether the x-translation is disabled on the widget
    */
   @Prop({ mutable: true })
   public xTranslationDisabled = false;
 
   /**
-   * Determines whether or not the y-translation is disabled on the widget
+   * Determines whether the y-translation is disabled on the widget
    */
   @Prop({ mutable: true })
   public yTranslationDisabled = false;
 
   /**
-   * Determines whether or not the z-translation is disabled on the widget
+   * Determines whether the z-translation is disabled on the widget
    */
   @Prop({ mutable: true })
   public zTranslationDisabled = false;
+
+  /**
+   * Determines whether the xy-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public xyTranslationDisabled = false;
+
+  /**
+   * Determines whether the xz-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public xzTranslationDisabled = false;
+
+  /**
+   * Determines whether the yz-translation is disabled on the widget
+   */
+  @Prop({ mutable: true })
+  public yzTranslationDisabled = false;
 
   /**
    * Whether to show inputs beside the widget handles when they are interacted with.
@@ -257,6 +275,7 @@ export class ViewerTransformWidget {
   private xArrowColor: Color.Color | string = '#ea3324';
   private yArrowColor: Color.Color | string = '#4faf32';
   private zArrowColor: Color.Color | string = '#0000ff';
+  private twoAxesSquareColor: Color.Color | string = '#e0e0e0';
   private hoveredColor: Color.Color | string = '#ffff00';
 
   private widget?: TransformWidget;
@@ -383,6 +402,9 @@ export class ViewerTransformWidget {
   @Watch('xTranslationDisabled')
   @Watch('yTranslationDisabled')
   @Watch('zTranslationDisabled')
+  @Watch('xyTranslationDisabled')
+  @Watch('xzTranslationDisabled')
+  @Watch('yzTranslationDisabled')
   @Watch('xRotationDisabled')
   @Watch('yRotationDisabled')
   @Watch('zRotationDisabled')
@@ -395,6 +417,10 @@ export class ViewerTransformWidget {
       xTranslation: this.xTranslationDisabled,
       yTranslation: this.yTranslationDisabled,
       zTranslation: this.zTranslationDisabled,
+
+      xyTranslation: this.xyTranslationDisabled,
+      xzTranslation: this.xzTranslationDisabled,
+      yzTranslation: this.yzTranslationDisabled,
     });
   }
 
@@ -404,18 +430,19 @@ export class ViewerTransformWidget {
   @Watch('translationHandleScalar')
   @Watch('rotationHandleScalar')
   protected handleTransformHandleScalarChanged(): void {
-    const effectiveTranslationScalar = this.getTranslationScalar();
-    const effectiveRotationScalar = this.getRotationScalar();
-
-    console.log(effectiveRotationScalar, effectiveTranslationScalar);
+    const effectiveArrowScalar = this.getTranslationScalar();
+    const effectiveSquareScalar = this.getRotationScalar();
 
     this.widget?.updateScalars({
-      xTranslation: effectiveTranslationScalar,
-      yTranslation: effectiveTranslationScalar,
-      zTranslation: effectiveTranslationScalar,
-      xRotation: effectiveRotationScalar,
-      yRotation: effectiveRotationScalar,
-      zRotation: effectiveRotationScalar,
+      xTranslation: effectiveArrowScalar,
+      yTranslation: effectiveArrowScalar,
+      zTranslation: effectiveArrowScalar,
+      xyTranslation: effectiveSquareScalar,
+      xzTranslation: effectiveSquareScalar,
+      yzTranslation: effectiveSquareScalar,
+      xRotation: effectiveSquareScalar,
+      yRotation: effectiveSquareScalar,
+      zRotation: effectiveSquareScalar,
     });
   }
 
@@ -597,6 +624,9 @@ export class ViewerTransformWidget {
       this.zArrowColor = hostStyles
         .getPropertyValue('--viewer-transform-widget-z-axis-arrow-color')
         .trim();
+      this.twoAxesSquareColor = hostStyles
+        .getPropertyValue('--viewer-transform-widget-two-axes-square-color')
+        .trim();
       this.hoveredColor = hostStyles
         .getPropertyValue('--viewer-transform-widget-hovered-arrow-color')
         .trim();
@@ -605,6 +635,7 @@ export class ViewerTransformWidget {
         xArrow: this.xArrowColor,
         yArrow: this.yArrowColor,
         zArrow: this.zArrowColor,
+        twoAxesSquare: this.twoAxesSquareColor,
         hovered: this.hoveredColor,
       });
     });
@@ -905,6 +936,9 @@ export class ViewerTransformWidget {
         xTranslation: this.xTranslationDisabled,
         yTranslation: this.yTranslationDisabled,
         zTranslation: this.zTranslationDisabled,
+        xyTranslation: this.xyTranslationDisabled,
+        xzTranslation: this.xzTranslationDisabled,
+        yzTranslation: this.yzTranslationDisabled,
       });
     } else {
       console.warn('Cannot set disabled values - no widget defined');
@@ -920,23 +954,27 @@ export class ViewerTransformWidget {
       )}, has-initial-frame=${this.viewer?.frame != null}]`
     );
 
-    const effectiveTranslationScalar = this.getTranslationScalar();
-    const effectiveRotationScalar = this.getRotationScalar();
+    const effectiveArrowScalar = this.getTranslationScalar();
+    const effectiveSquareScalar = this.getRotationScalar();
 
     this.widget = new TransformWidget(canvasRef, {
       colors: {
         xArrow: this.xArrowColor,
         yArrow: this.yArrowColor,
         zArrow: this.zArrowColor,
+        twoAxesSquare: this.twoAxesSquareColor,
         hovered: this.hoveredColor,
       },
       scalars: {
-        xTranslation: effectiveTranslationScalar,
-        yTranslation: effectiveTranslationScalar,
-        zTranslation: effectiveTranslationScalar,
-        xRotation: effectiveRotationScalar,
-        yRotation: effectiveRotationScalar,
-        zRotation: effectiveRotationScalar,
+        xTranslation: effectiveArrowScalar,
+        yTranslation: effectiveArrowScalar,
+        zTranslation: effectiveArrowScalar,
+        xyTranslation: effectiveSquareScalar,
+        xzTranslation: effectiveSquareScalar,
+        yzTranslation: effectiveSquareScalar,
+        xRotation: effectiveSquareScalar,
+        yRotation: effectiveSquareScalar,
+        zRotation: effectiveSquareScalar,
       },
     });
 
@@ -1040,6 +1078,9 @@ export class ViewerTransformWidget {
       xTranslation: true,
       yTranslation: true,
       zTranslation: true,
+      xyTranslation: true,
+      xzTranslation: true,
+      yzTranslation: true,
     });
 
     this.isEndingTransform = true;
@@ -1056,6 +1097,10 @@ export class ViewerTransformWidget {
       xTranslation: this.xTranslationDisabled,
       yTranslation: this.yTranslationDisabled,
       zTranslation: this.zTranslationDisabled,
+
+      xyTranslation: this.xyTranslationDisabled,
+      xzTranslation: this.xzTranslationDisabled,
+      yzTranslation: this.yzTranslationDisabled,
     });
 
     this.isEndingTransform = false;

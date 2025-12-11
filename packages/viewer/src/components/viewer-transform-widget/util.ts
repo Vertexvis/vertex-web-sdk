@@ -120,6 +120,12 @@ function computeInputGlobalTransform(
       return Matrix4.makeTranslation(Vector3.create(0, position(), 0));
     case 'z-translate':
       return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
+    case 'xy-translate':
+      return Matrix4.makeTranslation(Vector3.create(position(), position(), 0));
+    case 'xz-translate':
+      return Matrix4.makeTranslation(Vector3.create(position(), 0, position()));
+    case 'yz-translate':
+      return Matrix4.makeTranslation(Vector3.create(0, position(), position()));
     case 'x-rotate':
       return Matrix4.makeRotation(
         Quaternion.fromAxisAngle(Vector3.left(), rotation())
@@ -182,6 +188,12 @@ export function computeInputDisplayValue(
       return units.convertWorldValueToReal(relativeTranslationDiff().y);
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
+    case 'xy-translate':
+      return units.convertWorldValueToReal(relativeTranslationDiff().x);
+    case 'xz-translate':
+      return units.convertWorldValueToReal(relativeTranslationDiff().z);
+    case 'yz-translate':
+      return units.convertWorldValueToReal(relativeTranslationDiff().y);
     case 'x-rotate':
       return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().x));
     case 'y-rotate':
@@ -222,11 +234,17 @@ function computeHandleGlobalTransform(
 ): Matrix4.Matrix4 {
   switch (identifier) {
     case 'x-translate':
-      return computeTranslation(current, Vector3.right(), delta);
+      return computeTranslation(current, Vector3.right(), delta, 1);
     case 'y-translate':
-      return computeTranslation(current, Vector3.up(), delta);
+      return computeTranslation(current, Vector3.up(), delta, 1);
     case 'z-translate':
-      return computeTranslation(current, Vector3.back(), delta);
+      return computeTranslation(current, Vector3.back(), delta, 1);
+    case 'xy-translate':
+      return computeTranslation(current, Vector3.create(1, 1, 0), delta, 2);
+    case 'xz-translate':
+      return computeTranslation(current, Vector3.create(1, 0, 1), delta, 2);
+    case 'yz-translate':
+      return computeTranslation(current, Vector3.create(0, 1, 1), delta, 2);
     case 'x-rotate':
       return Matrix4.makeRotation(
         Quaternion.fromAxisAngle(
@@ -244,7 +262,7 @@ function computeHandleGlobalTransform(
     case 'z-rotate':
       return Matrix4.makeRotation(
         Quaternion.fromAxisAngle(
-          computeRotationAxis(current, viewVector, Vector3.forward()),
+          computeRotationAxis(current, viewVector, Vector3.back()),
           angle
         )
       );
@@ -274,11 +292,15 @@ export function computeRotationAxis(
 export function computeTranslation(
   current: Matrix4.Matrix4,
   axis: Vector3.Vector3,
-  delta: Vector3.Vector3
+  delta: Vector3.Vector3,
+  numberOfAxes: number
 ): Matrix4.Matrix4 {
+  // Scale the delta by the number of axes
+  const scaledDelta = Vector3.scale(1 / numberOfAxes, delta);
+
   const rotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
   const rotatedAxis = Vector3.transformMatrix(axis, rotation);
-  const rotatedDelta = Vector3.multiply(rotatedAxis, delta);
+  const rotatedDelta = Vector3.multiply(rotatedAxis, scaledDelta);
 
   return Matrix4.makeTranslation(
     Vector3.scale(rotatedDelta.x + rotatedDelta.y + rotatedDelta.z, axis)
