@@ -120,12 +120,6 @@ function computeInputGlobalTransform(
       return Matrix4.makeTranslation(Vector3.create(0, position(), 0));
     case 'z-translate':
       return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
-    case 'xy-translate':
-      return Matrix4.makeTranslation(Vector3.create(position(), position(), 0));
-    case 'xz-translate':
-      return Matrix4.makeTranslation(Vector3.create(position(), 0, position()));
-    case 'yz-translate':
-      return Matrix4.makeTranslation(Vector3.create(0, position(), position()));
     case 'x-rotate':
       return Matrix4.makeRotation(
         Quaternion.fromAxisAngle(Vector3.left(), rotation())
@@ -188,12 +182,6 @@ export function computeInputDisplayValue(
       return units.convertWorldValueToReal(relativeTranslationDiff().y);
     case 'z-translate':
       return units.convertWorldValueToReal(relativeTranslationDiff().z);
-    case 'xy-translate':
-      return units.convertWorldValueToReal(relativeTranslationDiff().x);
-    case 'xz-translate':
-      return units.convertWorldValueToReal(relativeTranslationDiff().z);
-    case 'yz-translate':
-      return units.convertWorldValueToReal(relativeTranslationDiff().y);
     case 'x-rotate':
       return angles.convertTo(Angle.normalizeRadians(relativeRotationDiff().x));
     case 'y-rotate':
@@ -213,98 +201,215 @@ export function computeHandleDeltaTransform(
   angle: number,
   identifier: string
 ): Matrix4.Matrix4 {
-  return appliedToCurrent(
+  return computeHandleGlobalTransform(
     current,
-    computeHandleGlobalTransform(
-      current,
-      Vector3.subtract(next, previous),
-      viewVector,
-      angle,
-      identifier
-    )
+    Vector3.subtract(next, previous),
+    viewVector,
+    angle,
+    identifier
   );
 }
 
 function computeHandleGlobalTransform(
-  current: Matrix4.Matrix4,
-  delta: Vector3.Vector3,
+  currentTransformationMatrix: Matrix4.Matrix4,
+  translationVectorWorld: Vector3.Vector3,
   viewVector: Vector3.Vector3,
   angle: number,
   identifier: string
 ): Matrix4.Matrix4 {
   switch (identifier) {
     case 'x-translate':
-      return computeTranslation(current, Vector3.right(), delta, 1);
+      return performTranslationConstrainedToAxis(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.right()
+      );
     case 'y-translate':
-      return computeTranslation(current, Vector3.up(), delta, 1);
+      return performTranslationConstrainedToAxis(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.up()
+      );
     case 'z-translate':
-      return computeTranslation(current, Vector3.back(), delta, 1);
+      return performTranslationConstrainedToAxis(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.back()
+      );
     case 'xy-translate':
-      return computeTranslation(current, Vector3.create(1, 1, 0), delta, 2);
+      return performTranslationConstrainedToPlane(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.create(0, 0, 1)
+      );
     case 'xz-translate':
-      return computeTranslation(current, Vector3.create(1, 0, 1), delta, 2);
+      return performTranslationConstrainedToPlane(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.create(0, 1, 0)
+      );
     case 'yz-translate':
-      return computeTranslation(current, Vector3.create(0, 1, 1), delta, 2);
+      return performTranslationConstrainedToPlane(
+        currentTransformationMatrix,
+        translationVectorWorld,
+        Vector3.create(1, 0, 0)
+      );
     case 'x-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          computeRotationAxis(current, viewVector, Vector3.right()),
-          angle
-        )
+      return performRotationAroundAxis(
+        currentTransformationMatrix,
+        viewVector,
+        Vector3.right(),
+        angle
       );
     case 'y-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          computeRotationAxis(current, viewVector, Vector3.up()),
-          angle
-        )
+      return performRotationAroundAxis(
+        currentTransformationMatrix,
+        viewVector,
+        Vector3.up(),
+        angle
       );
     case 'z-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(
-          computeRotationAxis(current, viewVector, Vector3.back()),
-          angle
-        )
+      return performRotationAroundAxis(
+        currentTransformationMatrix,
+        viewVector,
+        Vector3.forward(),
+        angle
       );
     default:
-      return current;
+      return currentTransformationMatrix;
   }
 }
 
-export function computeRotationAxis(
-  current: Matrix4.Matrix4,
+export function performRotationAroundAxis(
+  currentTransformationMatrix: Matrix4.Matrix4,
   viewVector: Vector3.Vector3,
-  axis: Vector3.Vector3
-): Vector3.Vector3 {
-  const rotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
-  const rotatedAxis = Vector3.transformMatrix(axis, rotation);
-  const rotatedNegatedAxis = Vector3.transformMatrix(
-    Vector3.negate(axis),
-    rotation
+  localRotationAxis: Vector3.Vector3,
+  rotationAngle: number
+): Matrix4.Matrix4 {
+  // Determine the rotation axis in world coordinates
+  const worldRotationAxis = computeRotationAxis(
+    currentTransformationMatrix,
+    viewVector,
+    localRotationAxis
   );
 
-  return Vector3.dot(viewVector, rotatedAxis) >
-    Vector3.dot(viewVector, rotatedNegatedAxis)
-    ? axis
-    : Vector3.negate(axis);
+  // Determine the rotation matrix in world coordinates
+  const worldRotationQuaternion = Quaternion.fromAxisAngle(
+    worldRotationAxis,
+    rotationAngle
+  );
+  const worldRotationMatrix = Matrix4.makeRotation(worldRotationQuaternion);
+
+  return Matrix4.multiply(currentTransformationMatrix, worldRotationMatrix);
 }
 
-export function computeTranslation(
-  current: Matrix4.Matrix4,
-  axis: Vector3.Vector3,
-  delta: Vector3.Vector3,
-  numberOfAxes: number
-): Matrix4.Matrix4 {
-  // Scale the delta by the number of axes
-  const scaledDelta = Vector3.scale(1 / numberOfAxes, delta);
-
-  const rotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
-  const rotatedAxis = Vector3.transformMatrix(axis, rotation);
-  const rotatedDelta = Vector3.multiply(rotatedAxis, scaledDelta);
-
-  return Matrix4.makeTranslation(
-    Vector3.scale(rotatedDelta.x + rotatedDelta.y + rotatedDelta.z, axis)
+export function computeRotationAxis(
+  currentTransformationMatrix: Matrix4.Matrix4,
+  viewVector: Vector3.Vector3,
+  localRotationAxis: Vector3.Vector3
+): Vector3.Vector3 {
+  const changeOfBasisToWorld = Matrix4.makeRotation(
+    Quaternion.fromMatrixRotation(currentTransformationMatrix)
   );
+  const worldRotationAxis = Vector3.transformMatrix(
+    localRotationAxis,
+    changeOfBasisToWorld
+  );
+  const worldNegatedRotationAxis = Vector3.transformMatrix(
+    Vector3.negate(localRotationAxis),
+    changeOfBasisToWorld
+  );
+
+  return Vector3.dot(viewVector, worldRotationAxis) >
+    Vector3.dot(viewVector, worldNegatedRotationAxis)
+    ? localRotationAxis
+    : Vector3.negate(localRotationAxis);
+}
+
+export function performTranslationConstrainedToAxis(
+  currentTransformationMatrix: Matrix4.Matrix4,
+  translationVectorWorld: Vector3.Vector3,
+  constrainToLocalAxis: Vector3.Vector3
+): Matrix4.Matrix4 {
+  // Ensure that constrainToLocalAxis is a unit vector
+  const constrainToLocalAxisUnitVector =
+    Vector3.normalize(constrainToLocalAxis);
+
+  // Convert the axis to constrain the translation to from local to world
+  const changeOfBasisToWorld = Matrix4.makeRotation(
+    Quaternion.fromMatrixRotation(currentTransformationMatrix)
+  );
+  const constrainToWorldAxis = Vector3.transformMatrix(
+    constrainToLocalAxisUnitVector,
+    changeOfBasisToWorld
+  );
+
+  // Project the translation vector onto the desired axis for translation
+  const translationVectorProjectedToWorldAxis = Vector3.project(
+    translationVectorWorld,
+    constrainToWorldAxis
+  );
+
+  // Use the projected vector to determine the translation matrix
+  const translationMatrix = Matrix4.makeTranslation(
+    translationVectorProjectedToWorldAxis
+  );
+
+  // Multiply the translation matrix with the current transformation matrix to
+  // determine the new transformation matrix
+  return Matrix4.multiply(translationMatrix, currentTransformationMatrix);
+}
+
+export function performTranslationConstrainedToPlane(
+  currentTransformationMatrix: Matrix4.Matrix4,
+  translationVectorWorld: Vector3.Vector3,
+  localNormalVectorToPlane: Vector3.Vector3
+): Matrix4.Matrix4 {
+  // Ensure that localNormalVectorToPlane is a unit vector
+  const localNormalVectorToPlaneUnitVector = Vector3.normalize(
+    localNormalVectorToPlane
+  );
+
+  // Convert the normal vector from local to world
+  const changeOfBasisToWorld = Matrix4.makeRotation(
+    Quaternion.fromMatrixRotation(currentTransformationMatrix)
+  );
+  const worldNormalVectorToPlane = Vector3.transformMatrix(
+    localNormalVectorToPlaneUnitVector,
+    changeOfBasisToWorld
+  );
+
+  // Use the worldNormalVectorToPlane and the current position of the widget to define the plane to translate on
+  const currentPosition = Vector3.create(
+    currentTransformationMatrix[12],
+    currentTransformationMatrix[13],
+    currentTransformationMatrix[14]
+  );
+  const worldPlaneToConstrainTranslationTo = Plane.fromNormalAndCoplanarPoint(
+    worldNormalVectorToPlane,
+    currentPosition
+  );
+
+  // Project the translation vector onto the desired plane for translation
+  const translationVectorProjectedToWorldPlane = Plane.projectPoint(
+    worldPlaneToConstrainTranslationTo,
+    translationVectorWorld
+  );
+
+  // Account for the plane offset to calculate the position change (the vector to translate by)
+  const constrainedTranslationVector = Vector3.add(
+    translationVectorProjectedToWorldPlane,
+    Vector3.scale(
+      worldPlaneToConstrainTranslationTo.constant,
+      worldPlaneToConstrainTranslationTo.normal
+    )
+  );
+
+  // Use the projected vector to perform the translation and determine the new transformation matrix
+  const translationMatrix = Matrix4.makeTranslation(
+    constrainedTranslationVector
+  );
+  return Matrix4.multiply(translationMatrix, currentTransformationMatrix);
 }
 
 export function computeInputPosition(

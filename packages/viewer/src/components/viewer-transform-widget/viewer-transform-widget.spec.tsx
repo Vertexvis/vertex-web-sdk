@@ -242,7 +242,7 @@ describe('vertex-viewer-transform-widget', () => {
       Vector3.create(1, 1, 1)
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
     );
 
     widget.shadowRoot
@@ -321,9 +321,9 @@ describe('vertex-viewer-transform-widget', () => {
     const onInteractionStarted = jest.fn();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
-    widget.position = Vector3.create(1, 1, 1);
+    widget.position = Vector3.create(0, 0, 0);
     widget.addEventListener('interactionEnded', onInteractionEnded);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
@@ -423,9 +423,9 @@ describe('vertex-viewer-transform-widget', () => {
     const onInteractionStarted = jest.fn();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
-    widget.position = Vector3.create(1, 1, 1);
+    widget.position = Vector3.create(0, 0, 0);
     widget.addEventListener('interactionEnded', onInteractionEnded);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
@@ -639,7 +639,7 @@ describe('vertex-viewer-transform-widget', () => {
     const onInteractionStarted = jest.fn();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
     widget.addEventListener('interactionEnded', onInteractionEnded);
@@ -793,7 +793,7 @@ describe('vertex-viewer-transform-widget', () => {
       Vector3.create(1, 1, 1)
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
     );
 
     widget.shadowRoot
@@ -955,7 +955,7 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
-    const position = Vector3.create(1, 1, 1);
+    const position = Vector3.create(0, 0, 0);
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (

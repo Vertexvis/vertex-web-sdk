@@ -906,15 +906,13 @@ export class ViewerTransformWidget {
       this.viewer != null &&
       this.viewer.frame != null
     ) {
-      this.transformCurrent(
-        computeHandleDeltaTransform(
-          this.currentTransform,
-          previous,
-          next,
-          this.viewer?.frame.scene.camera.viewVector,
-          angle,
-          this.dragging.identifier
-        )
+      this.currentTransform = computeHandleDeltaTransform(
+        this.currentTransform,
+        previous,
+        next,
+        this.viewer?.frame.scene.camera.viewVector,
+        angle,
+        this.dragging.identifier
       );
 
       this.getTransformWidget().updateTransform(this.currentTransform);
@@ -1012,10 +1010,16 @@ export class ViewerTransformWidget {
 
   private updateInputValue = (): void => {
     const dragging = this.dragging ?? this.lastDragged;
+    const isDraggingTwoAxesTranslation =
+      dragging?.identifier === 'xy-translate' ||
+      dragging?.identifier === 'xz-translate' ||
+      dragging?.identifier === 'yz-translate';
+
     if (
       dragging != null &&
       this.currentTransform != null &&
-      this.dragStartTransform != null
+      this.dragStartTransform != null &&
+      !isDraggingTwoAxesTranslation
     ) {
       this.lastInputValue = this.inputValue;
 
@@ -1048,11 +1052,18 @@ export class ViewerTransformWidget {
 
   private updateInputPosition = (): void => {
     const dragging = this.dragging ?? this.lastDragged;
+
+    const isDraggingTwoAxesTranslation =
+      dragging?.identifier === 'xy-translate' ||
+      dragging?.identifier === 'xz-translate' ||
+      dragging?.identifier === 'yz-translate';
+
     if (
       this.showInputs &&
       this.viewer?.frame != null &&
       this.position != null &&
-      dragging != null
+      dragging != null &&
+      !isDraggingTwoAxesTranslation
     ) {
       const widget = this.getTransformWidget();
       const widgetBounds = widget.getFullBounds();
@@ -1065,6 +1076,8 @@ export class ViewerTransformWidget {
               dragging.points.toArray()
             )
           : undefined;
+    } else if (isDraggingTwoAxesTranslation) {
+      this.inputPosition = undefined;
     }
   };
 
