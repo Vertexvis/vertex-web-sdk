@@ -15,7 +15,10 @@ import {
 } from '../../lib/transforms/axis-rotation';
 import {
   xAxisArrowPositions,
+  xyAxisTranslationPositions,
+  xzAxisTranslationPositions,
   yAxisArrowPositions,
+  yzAxisTranslationPositions,
   zAxisArrowPositions,
 } from '../../lib/transforms/axis-translation';
 import {
@@ -33,6 +36,7 @@ export interface DrawableElementColors {
   xArrow?: Color.Color | string;
   yArrow?: Color.Color | string;
   zArrow?: Color.Color | string;
+  twoAxesSquare?: Color.Color | string;
   hovered?: Color.Color | string;
   outline?: Color.Color | string;
 }
@@ -44,6 +48,9 @@ export interface DrawableElementSizeScalars {
   xTranslation?: number;
   yTranslation?: number;
   zTranslation?: number;
+  xyTranslation?: number;
+  xzTranslation?: number;
+  yzTranslation?: number;
 }
 
 export interface DisabledAxis {
@@ -53,6 +60,9 @@ export interface DisabledAxis {
   xTranslation: boolean;
   yTranslation: boolean;
   zTranslation: boolean;
+  xyTranslation: boolean;
+  xzTranslation: boolean;
+  yzTranslation: boolean;
 }
 
 export interface TransformWidgetCustomization {
@@ -66,23 +76,34 @@ export class TransformWidget extends ReglComponent {
   private xAxis?: AxisLine;
   private yAxis?: AxisLine;
   private zAxis?: AxisLine;
+
   private xArrow?: TriangleMesh;
   private yArrow?: TriangleMesh;
   private zArrow?: TriangleMesh;
+
   private xRotation?: TriangleMesh;
   private xyRotationLine?: RotationLine;
   private xzRotationLine?: RotationLine;
+
   private yRotation?: TriangleMesh;
   private yxRotationLine?: RotationLine;
   private yzRotationLine?: RotationLine;
+
   private zRotation?: TriangleMesh;
   private zxRotationLine?: RotationLine;
   private zyRotationLine?: RotationLine;
+
+  private xyTranslation?: TriangleMesh;
+  private xzTranslation?: TriangleMesh;
+  private yzTranslation?: TriangleMesh;
 
   private disabledAxis: DisabledAxis = {
     xTranslation: false,
     yTranslation: false,
     zTranslation: false,
+    xyTranslation: false,
+    xzTranslation: false,
+    yzTranslation: false,
     xRotation: false,
     yRotation: false,
     zRotation: false,
@@ -104,6 +125,8 @@ export class TransformWidget extends ReglComponent {
   private yArrowFillColor?: Color.Color | string;
   private zArrowFillColor?: Color.Color | string;
 
+  private twoAxesSquareFillColor?: Color.Color | string;
+
   private hoveredArrowFillColor?: Color.Color | string;
   private outlineColor?: Color.Color | string;
 
@@ -123,6 +146,12 @@ export class TransformWidget extends ReglComponent {
     this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
     this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
     this.disabledAxis.zTranslation = initialDisabledAxes.zTranslation ?? false;
+    this.disabledAxis.xyTranslation =
+      initialDisabledAxes.xyTranslation ?? false;
+    this.disabledAxis.xzTranslation =
+      initialDisabledAxes.xzTranslation ?? false;
+    this.disabledAxis.yzTranslation =
+      initialDisabledAxes.yzTranslation ?? false;
     this.disabledAxis.xRotation = initialDisabledAxes.xRotation ?? false;
     this.disabledAxis.yRotation = initialDisabledAxes.yRotation ?? false;
     this.disabledAxis.zRotation = initialDisabledAxes.zRotation ?? false;
@@ -185,6 +214,8 @@ export class TransformWidget extends ReglComponent {
     this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
     this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
     this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
+    this.twoAxesSquareFillColor =
+      colors.twoAxesSquare ?? this.twoAxesSquareFillColor;
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
@@ -194,6 +225,19 @@ export class TransformWidget extends ReglComponent {
     this.xRotation?.updateFillColor(this.getXRotationColor(), true);
     this.yRotation?.updateFillColor(this.getYRotationColor(), true);
     this.zRotation?.updateFillColor(this.getZRotationColor(), true);
+    this.xyTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true
+    );
+    this.xzTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true
+    );
+    this.yzTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true
+    );
+
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
 
@@ -231,6 +275,10 @@ export class TransformWidget extends ReglComponent {
     this.yArrow?.setDisabled(this.disabledAxis.yTranslation);
     this.zArrow?.setDisabled(this.disabledAxis.zTranslation);
 
+    this.xyTranslation?.setDisabled(this.disabledAxis.xyTranslation);
+    this.xzTranslation?.setDisabled(this.disabledAxis.xzTranslation);
+    this.yzTranslation?.setDisabled(this.disabledAxis.yzTranslation);
+
     this.updateColors();
   }
 
@@ -250,7 +298,20 @@ export class TransformWidget extends ReglComponent {
       if (this.hoveredElement !== previousHovered) {
         this.hoveredChanged.emit(this.hoveredElement);
         this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
-        previousHovered?.updateFillColor(previousHovered?.initialFillColor);
+        this.clearFillColorOfPreviouslyHovered(previousHovered);
+
+        // Set the corresponding arrows to the hover fill color
+        // when a 2-axes translation square is hovered over
+        if (this.hoveredElement?.identifier === 'xy-translate') {
+          this.xArrow?.updateFillColor(this.hoveredArrowFillColor);
+          this.yArrow?.updateFillColor(this.hoveredArrowFillColor);
+        } else if (this.hoveredElement?.identifier === 'xz-translate') {
+          this.xArrow?.updateFillColor(this.hoveredArrowFillColor);
+          this.zArrow?.updateFillColor(this.hoveredArrowFillColor);
+        } else if (this.hoveredElement?.identifier === 'yz-translate') {
+          this.yArrow?.updateFillColor(this.hoveredArrowFillColor);
+          this.zArrow?.updateFillColor(this.hoveredArrowFillColor);
+        }
       }
     }
   }
@@ -261,7 +322,24 @@ export class TransformWidget extends ReglComponent {
 
     if (this.hoveredElement !== previousHovered) {
       this.hoveredChanged.emit(this.hoveredElement);
-      previousHovered.updateFillColor(previousHovered.initialFillColor);
+      this.clearFillColorOfPreviouslyHovered(previousHovered);
+    }
+  }
+
+  private clearFillColorOfPreviouslyHovered(previousHovered?: Drawable): void {
+    previousHovered?.updateFillColor(previousHovered?.initialFillColor);
+
+    // Also clear the hover fill color from the corresponding arrows
+    // when a 2-axes translation square is no longer hovered over
+    if (previousHovered?.identifier === 'xy-translate') {
+      this.xArrow?.updateFillColor(this.xArrow?.initialFillColor);
+      this.yArrow?.updateFillColor(this.yArrow?.initialFillColor);
+    } else if (previousHovered?.identifier === 'xz-translate') {
+      this.xArrow?.updateFillColor(this.xArrow?.initialFillColor);
+      this.zArrow?.updateFillColor(this.zArrow?.initialFillColor);
+    } else if (previousHovered?.identifier === 'yz-translate') {
+      this.yArrow?.updateFillColor(this.yArrow?.initialFillColor);
+      this.zArrow?.updateFillColor(this.zArrow?.initialFillColor);
     }
   }
 
@@ -315,7 +393,6 @@ export class TransformWidget extends ReglComponent {
       this.outlineColor,
       this.getXTranslationColor()
     );
-
     this.xRotation = new TriangleMesh(
       createShape,
       'x-rotate',
@@ -336,6 +413,7 @@ export class TransformWidget extends ReglComponent {
       this.outlineColor,
       this.getXTranslationColor()
     );
+
     this.yArrow = new TriangleMesh(
       createShape,
       'y-translate',
@@ -348,7 +426,6 @@ export class TransformWidget extends ReglComponent {
       this.outlineColor,
       this.getYTranslationColor()
     );
-
     this.yRotation = new TriangleMesh(
       createShape,
       'y-rotate',
@@ -369,6 +446,7 @@ export class TransformWidget extends ReglComponent {
       this.outlineColor,
       this.getYTranslationColor()
     );
+
     this.zArrow = new TriangleMesh(
       createShape,
       'z-translate',
@@ -402,10 +480,54 @@ export class TransformWidget extends ReglComponent {
       this.getZRotationColor()
     );
 
+    this.xyTranslation = new TriangleMesh(
+      createShape,
+      'xy-translate',
+      xyAxisTranslationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.xyTranslation
+      ),
+      this.outlineColor,
+      this.getTwoAxesTranslationColor()
+    );
+    this.xzTranslation = new TriangleMesh(
+      createShape,
+      'xz-translate',
+      xzAxisTranslationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.xzTranslation
+      ),
+      this.outlineColor,
+      this.getTwoAxesTranslationColor()
+    );
+    this.yzTranslation = new TriangleMesh(
+      createShape,
+      'yz-translate',
+      yzAxisTranslationPositions(
+        transform,
+        frame.scene.camera,
+        triangleSize,
+        this.customization.scalars?.yzTranslation
+      ),
+      this.outlineColor,
+      this.getTwoAxesTranslationColor()
+    );
+
     this.createRotationLines(createShape, transform, frame);
 
     this.axisLines = [this.xAxis, this.yAxis, this.zAxis];
-    this.translationMeshes = [this.xArrow, this.yArrow, this.zArrow];
+    this.translationMeshes = [
+      this.xArrow,
+      this.yArrow,
+      this.zArrow,
+      this.xyTranslation,
+      this.xzTranslation,
+      this.yzTranslation,
+    ];
     this.rotationMeshes = [this.xRotation, this.yRotation, this.zRotation];
     this.updateDisabledOnDrawables();
 
@@ -439,6 +561,10 @@ export class TransformWidget extends ReglComponent {
 
   private getZTranslationColor(): Color.Color | string | undefined {
     return this.zArrowFillColor;
+  }
+
+  private getTwoAxesTranslationColor(): Color.Color | string | undefined {
+    return this.twoAxesSquareFillColor;
   }
 
   private createRotationLines(
@@ -670,5 +796,36 @@ export class TransformWidget extends ReglComponent {
         triangleSize
       )
     );
+
+    if (this.xyTranslation != null) {
+      this.xyTranslation.updatePoints(
+        xyAxisTranslationPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.xyTranslation
+        )
+      );
+    }
+    if (this.xzTranslation != null) {
+      this.xzTranslation.updatePoints(
+        xzAxisTranslationPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.xzTranslation
+        )
+      );
+    }
+    if (this.yzTranslation != null) {
+      this.yzTranslation.updatePoints(
+        yzAxisTranslationPositions(
+          transform,
+          frame.scene.camera,
+          triangleSize,
+          this.customization.scalars?.yzTranslation
+        )
+      );
+    }
   }
 }

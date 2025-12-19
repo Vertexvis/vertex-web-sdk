@@ -23,6 +23,12 @@
   */
   --viewer-transform-widget-z-axis-arrow-color: var(--z-axis-color);
 
+  /**
+  * @prop --viewer-transform-widget-two-axes-square-color: A CSS color for the squares
+  * to translate by two axes at a time. Defaults to `#e0e0e0`.
+  */
+  --viewer-transform-widget-two-axes-square-color: var(--two-axes-color);
+
 
   /**
   * @prop --viewer-transform-widget-hovered-arrow-color: A CSS color for the arrow

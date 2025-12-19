@@ -1666,27 +1666,39 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
     /**
-     * Determines whether or not the x-rotation is disabled on the widget
+     * Determines whether the x-rotation is disabled on the widget
      */
     xRotationDisabled: boolean;
     /**
-     * Determines whether or not the x-translation is disabled on the widget
+     * Determines whether the x-translation is disabled on the widget
      */
     xTranslationDisabled: boolean;
     /**
-     * Determines whether or not the y-rotation is disabled on the widget
+     * Determines whether the xy-translation is disabled on the widget
+     */
+    xyTranslationDisabled: boolean;
+    /**
+     * Determines whether the xz-translation is disabled on the widget
+     */
+    xzTranslationDisabled: boolean;
+    /**
+     * Determines whether the y-rotation is disabled on the widget
      */
     yRotationDisabled: boolean;
     /**
-     * Determines whether or not the y-translation is disabled on the widget
+     * Determines whether the y-translation is disabled on the widget
      */
     yTranslationDisabled: boolean;
     /**
-     * Determines whether or not the z-rotation is disabled on the widget
+     * Determines whether the yz-translation is disabled on the widget
+     */
+    yzTranslationDisabled: boolean;
+    /**
+     * Determines whether the z-rotation is disabled on the widget
      */
     zRotationDisabled: boolean;
     /**
-     * Determines whether or not the z-translation is disabled on the widget
+     * Determines whether the z-translation is disabled on the widget
      */
     zTranslationDisabled: boolean;
   }
@@ -3703,27 +3715,39 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
     /**
-     * Determines whether or not the x-rotation is disabled on the widget
+     * Determines whether the x-rotation is disabled on the widget
      */
     xRotationDisabled?: boolean;
     /**
-     * Determines whether or not the x-translation is disabled on the widget
+     * Determines whether the x-translation is disabled on the widget
      */
     xTranslationDisabled?: boolean;
     /**
-     * Determines whether or not the y-rotation is disabled on the widget
+     * Determines whether the xy-translation is disabled on the widget
+     */
+    xyTranslationDisabled?: boolean;
+    /**
+     * Determines whether the xz-translation is disabled on the widget
+     */
+    xzTranslationDisabled?: boolean;
+    /**
+     * Determines whether the y-rotation is disabled on the widget
      */
     yRotationDisabled?: boolean;
     /**
-     * Determines whether or not the y-translation is disabled on the widget
+     * Determines whether the y-translation is disabled on the widget
      */
     yTranslationDisabled?: boolean;
     /**
-     * Determines whether or not the z-rotation is disabled on the widget
+     * Determines whether the yz-translation is disabled on the widget
+     */
+    yzTranslationDisabled?: boolean;
+    /**
+     * Determines whether the z-rotation is disabled on the widget
      */
     zRotationDisabled?: boolean;
     /**
-     * Determines whether or not the z-translation is disabled on the widget
+     * Determines whether the z-translation is disabled on the widget
      */
     zTranslationDisabled?: boolean;
   }

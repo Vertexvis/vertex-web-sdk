@@ -78,7 +78,7 @@ describe('vertex-viewer-transform-widget utils', () => {
     it('computes updated x translation', () => {
       expect(
         computeHandleDeltaTransform(
-          Matrix4.makeTranslation(Vector3.back()),
+          Matrix4.makeTranslation(Vector3.origin()),
           Vector3.origin(),
           Vector3.right(),
           Vector3.back(),
@@ -91,7 +91,7 @@ describe('vertex-viewer-transform-widget utils', () => {
     it('computes updated y translation', () => {
       expect(
         computeHandleDeltaTransform(
-          Matrix4.makeTranslation(Vector3.back()),
+          Matrix4.makeTranslation(Vector3.origin()),
           Vector3.origin(),
           Vector3.up(),
           Vector3.back(),
@@ -104,14 +104,53 @@ describe('vertex-viewer-transform-widget utils', () => {
     it('computes updated z translation', () => {
       expect(
         computeHandleDeltaTransform(
-          Matrix4.makeTranslation(Vector3.back()),
+          Matrix4.makeTranslation(Vector3.origin()),
           Vector3.origin(),
           Vector3.forward(),
-          Vector3.back(),
+          Vector3.left(),
           0,
           'z-translate'
         )
       ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 0, -1)));
+    });
+
+    it('computes updated xy translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.origin()),
+          Vector3.origin(),
+          Vector3.create(5, 8, 2),
+          Vector3.back(),
+          0,
+          'xy-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(5, 8, 0)));
+    });
+
+    it('computes updated xz translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.origin()),
+          Vector3.origin(),
+          Vector3.create(5, 8, 2),
+          Vector3.back(),
+          0,
+          'xz-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(5, 0, 2)));
+    });
+
+    it('computes updated yz translation', () => {
+      expect(
+        computeHandleDeltaTransform(
+          Matrix4.makeTranslation(Vector3.origin()),
+          Vector3.origin(),
+          Vector3.create(5, 8, 2),
+          Vector3.forward(),
+          0,
+          'yz-translate'
+        )
+      ).toMatchObject(Matrix4.makeTranslation(Vector3.create(0, 8, 2)));
     });
 
     it('computes updated x rotation when view vector is closer to parallel with negative x', () => {
