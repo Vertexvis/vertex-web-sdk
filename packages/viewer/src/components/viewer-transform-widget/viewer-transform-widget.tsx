@@ -852,15 +852,13 @@ export class ViewerTransformWidget {
       this.startingTransform != null &&
       this.lastInputValue != null
     ) {
-      this.transformCurrent(
-        computeInputDeltaTransform(
-          this.currentTransform,
-          this.lastDragged.identifier,
-          value,
-          this.lastInputValue,
-          this.distanceUnit,
-          this.angleUnit
-        )
+      this.currentTransform = computeInputDeltaTransform(
+        this.currentTransform,
+        this.lastDragged.identifier,
+        value,
+        this.lastInputValue,
+        this.distanceUnit,
+        this.angleUnit
       );
 
       this.updateInputValue();
@@ -1041,13 +1039,6 @@ export class ViewerTransformWidget {
         this.inputRef.value = displayValue;
       }
     }
-  };
-
-  private transformCurrent = (transform: Matrix4.Matrix4): void => {
-    this.currentTransform =
-      this.currentTransform != null
-        ? Matrix4.multiply(transform, this.currentTransform)
-        : transform;
   };
 
   private updateInputPosition = (): void => {

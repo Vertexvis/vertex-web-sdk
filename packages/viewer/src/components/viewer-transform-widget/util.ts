@@ -87,7 +87,7 @@ export function computeInputDeltaTransform(
   distanceUnit: DistanceUnitType,
   angleUnit: AngleUnitType
 ): Matrix4.Matrix4 {
-  return appliedToCurrent(
+  return Matrix4.multiply(
     current,
     computeInputGlobalTransform(
       identifier,
@@ -517,14 +517,4 @@ export function calculateNewRotationAngle(
     // Angle should not be snapped, so return the original angle
     return angleOfRotation;
   }
-}
-
-function appliedToCurrent(
-  current: Matrix4.Matrix4,
-  delta: Matrix4.Matrix4
-): Matrix4.Matrix4 {
-  return Matrix4.multiply(
-    Matrix4.multiply(current, delta),
-    Matrix4.invert(current)
-  );
 }
