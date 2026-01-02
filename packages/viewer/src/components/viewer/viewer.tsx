@@ -18,6 +18,7 @@ import { Color, Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import classnames from 'classnames';
 
 import {
+  CrossSectioningOptions,
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
@@ -297,6 +298,12 @@ export class Viewer {
    */
   @Prop({ attribute: null })
   public sceneComparison?: SceneComparisonOptions;
+
+  /**
+   * Specifies some options related to presentation of cross-sections
+   */
+  @Prop({ attribute: null })
+  public crossSectioning?: CrossSectioningOptions;
 
   /**
    * Specifies when a feature map is returned from rendering. Feature maps
@@ -897,6 +904,7 @@ export class Viewer {
   @Watch('noDefaultLights')
   @Watch('phantom')
   @Watch('sceneComparison')
+  @Watch('crossSectioning')
   @Watch('selectionHighlighting')
   protected handleStreamAttributesChanged(): void {
     this.updateStreamAttributes();
@@ -1604,6 +1612,7 @@ export class Viewer {
       phantom: this.phantom,
       sceneComparison: this.sceneComparison,
       selectionHighlighting: this.selectionHighlighting,
+      crossSectioning: this.crossSectioning,
     };
   }
 

@@ -43,6 +43,11 @@ export interface SceneComparisonOptions {
   streamKeyToCompare?: string;
 }
 
+export interface CrossSectioningOptions {
+  endCapEnabled?: boolean;
+  endCapColor?: Color3;
+}
+
 export interface HTMLDomRendererPositionableElement {
   position: Vector3.Vector3;
   positionJson: string;
@@ -66,4 +71,5 @@ export interface StreamAttributes {
   selectionHighlighting?: SelectionHighlightingOptions;
   frames?: FrameOptions;
   sceneComparison?: SceneComparisonOptions;
+  crossSectioning?: CrossSectioningOptions;
 }

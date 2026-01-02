@@ -151,6 +151,23 @@ describe(toPbStreamAttributes, () => {
     });
   });
 
+  describe('cross sectioning', () => {
+    it('should support changing end cap options', () => {
+      const res = toPbStreamAttributes({
+        crossSectioning: {
+          endCapColor: Color.create(1, 2, 3),
+          endCapEnabled: true,
+        },
+      });
+      expect(res).toMatchObject({
+        crossSectioningAttributes: {
+          endCapColor: { r: 1, g: 2, b: 3 },
+          endCapEnabled: true,
+        },
+      });
+    });
+  });
+
   describe('scene comparison', () => {
     it('enables comparing scenes if set', () => {
       const streamKey = 'test';

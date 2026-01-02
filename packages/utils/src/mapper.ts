@@ -356,6 +356,19 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10>(
   i: Func<T, R9>,
   j: Func<T, R10>
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10]>;
+export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11>(
+  a: Func<T, R1>,
+  b: Func<T, R2>,
+  c: Func<T, R3>,
+  d: Func<T, R4>,
+  e: Func<T, R5>,
+  f: Func<T, R6>,
+  g: Func<T, R7>,
+  h: Func<T, R8>,
+  i: Func<T, R9>,
+  j: Func<T, R10>,
+  k: Func<T, R11>
+): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11]>;
 export function read(
   ...mappers: Func<unknown, unknown>[]
 ): Func<unknown, unknown[]> {

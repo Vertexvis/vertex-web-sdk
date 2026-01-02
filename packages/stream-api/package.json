@@ -36,7 +36,7 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.16.0",
+    "@vertexvis/frame-streaming-protos": "^0.17.0",
     "long": "^5.3.1"
   },
   "devDependencies": {

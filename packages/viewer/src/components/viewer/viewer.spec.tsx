@@ -427,6 +427,20 @@ describe('vertex-viewer', () => {
           }),
         })
       );
+
+      viewer.crossSectioning = {};
+      viewer.crossSectioning.endCapEnabled = true;
+      viewer.crossSectioning.endCapColor = '#112233';
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          streamAttributes: expect.objectContaining({
+            crossSectioning: expect.objectContaining({
+              endCapEnabled: true,
+              endCapColor: '#112233',
+            }),
+          }),
+        })
+      );
     });
   });
 
