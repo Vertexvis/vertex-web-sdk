@@ -29,6 +29,7 @@ import { SceneTreeTableCellEventDetails } from './components/scene-tree-table-ce
 import { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
 import { FrameCameraType } from './lib/types/frameCamera';
 import {
+  CrossSectioningOptions,
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameType,
@@ -540,6 +541,10 @@ export namespace Components {
      * @see Viewer.config
      */
     configEnv: Environment;
+    /**
+     * Specifies some options related to presentation of cross-sections
+     */
+    crossSectioning?: CrossSectioningOptions;
     /**
      * Specifies when a depth buffer is requested from rendering. Possible values are:   * `undefined`: A depth buffer is never requested.
      *
@@ -2506,6 +2511,10 @@ declare namespace LocalJSX {
      * @see Viewer.config
      */
     configEnv?: Environment;
+    /**
+     * Specifies some options related to presentation of cross-sections
+     */
+    crossSectioning?: CrossSectioningOptions;
     /**
      * Specifies when a depth buffer is requested from rendering. Possible values are:   * `undefined`: A depth buffer is never requested.
      *
