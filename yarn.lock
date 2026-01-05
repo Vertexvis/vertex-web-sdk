@@ -1892,10 +1892,10 @@
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.1"
 
-"@vertexvis/frame-streaming-protos@^0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.16.0.tgz#7236e712d22f8c04d8d42143fb4132d7f55bac45"
-  integrity sha512-jAi5G1Oqkf/mSJSr28/SC+1O4u38HcFvRcnz8/zoqSNNfqXRlFPIbPIGL0wuAmCqKxBmDfyNeGVj4P+92iW4Ug==
+"@vertexvis/frame-streaming-protos@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.17.0.tgz#eeae9edb1be1558360364a9bbc81e7848730a038"
+  integrity sha512-ih0sYMqysnTh2U3Qu/6QKsfUX6DgB4e3sb2BmiNTaiHLdzaJk5pIhuznw5aN089uKhxQZSzlt6umTyl+jTfYbQ==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.4"
@@ -7796,9 +7796,9 @@ q@^1.5.1:
   integrity sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==
 
 qs@^6.4.0:
-  version "6.14.0"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.14.0.tgz#c63fa40680d2c5c941412a0e899c89af60c0a930"
-  integrity sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==
+  version "6.14.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.14.1.tgz#a41d85b9d3902f31d27861790506294881871159"
+  integrity sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==
   dependencies:
     side-channel "^1.1.0"
 

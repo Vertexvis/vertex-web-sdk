@@ -3,6 +3,7 @@ import { clamp } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
 
 import {
+  CrossSectioningOptions,
   FeatureHighlightOptions,
   FeatureLineOptions,
   FrameOptions,
@@ -128,6 +129,20 @@ const toPbSceneComparison: M.Func<
   })
 );
 
+const toPbCrossSectioning: M.Func<
+  CrossSectioningOptions | undefined,
+  vertexvis.protobuf.stream.ICrossSectioningAttributes
+> = M.defineMapper(
+  M.read(
+    M.ifDefined(M.mapProp('endCapEnabled', (endCapEnabled) => !!endCapEnabled)),
+    M.ifDefined(M.mapProp('endCapColor', M.ifDefined(toPbRGBi)))
+  ),
+  ([endCapEnabled, endCapColor]) => ({
+    endCapEnabled,
+    endCapColor,
+  })
+);
+
 export const toPbStreamAttributes: M.Func<
   StreamAttributes,
   vertexvis.protobuf.stream.IStreamAttributes
@@ -142,9 +157,10 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('experimentalRenderingOptions', toPbExperimentalRenderingOptions),
     M.mapProp('selectionHighlighting', toPbSelectionHighlighting),
     M.mapProp('frames', toPbFrameOptions),
-    M.mapProp('sceneComparison', toPbSceneComparison)
+    M.mapProp('sceneComparison', toPbSceneComparison),
+    M.mapProp('crossSectioning', toPbCrossSectioning)
   ),
-  ([db, pi, ndl, fl, fh, fm, ero, hs, fa, sc]) => {
+  ([db, pi, ndl, fl, fh, fm, ero, hs, fa, sc, cs]) => {
     const value = {
       depthBuffers: db,
       phantomItems: pi,
@@ -156,6 +172,7 @@ export const toPbStreamAttributes: M.Func<
       selectionHighlighting: hs,
       frames: fa,
       sceneComparison: sc,
+      crossSectioningAttributes: cs,
     };
 
     return value;
