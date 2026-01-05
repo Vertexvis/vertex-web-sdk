@@ -380,10 +380,8 @@ export function performTranslationConstrainedToPlane(
   );
 
   // Use the worldNormalVectorToPlane and the current position of the widget to define the plane to translate on
-  const currentPosition = Vector3.create(
-    currentTransformationMatrix[12],
-    currentTransformationMatrix[13],
-    currentTransformationMatrix[14]
+  const currentPosition = Vector3.fromMatrixPosition(
+    currentTransformationMatrix
   );
   const worldPlaneToConstrainTranslationTo = Plane.fromNormalAndCoplanarPoint(
     worldNormalVectorToPlane,
