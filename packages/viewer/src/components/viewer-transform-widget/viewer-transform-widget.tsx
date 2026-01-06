@@ -529,9 +529,11 @@ export class ViewerTransformWidget {
           class={classNames('widget', {
             hovered: this.hovered != null,
           })}
+          tabindex="0"
           width={this.viewer?.viewport.width}
           height={this.viewer?.viewport.height}
           onPointerDown={this.handleBeginDrag}
+          onKeyDown={this.handleKeyDown}
         />
 
         {this.showInputs && this.inputPosition && this.viewer?.viewport && (
@@ -843,6 +845,19 @@ export class ViewerTransformWidget {
 
   private handleInputChange = async (value: number): Promise<void> => {
     await this.updateTransformFromInput(value);
+  };
+
+  private handleKeyDown = async (event: KeyboardEvent): Promise<void> => {
+    const commandOrControlModifier = event.ctrlKey || event.metaKey;
+
+    if (
+      event.key === 'z' &&
+      commandOrControlModifier &&
+      this.EXPERIMENTAL_undoKeybindings
+    ) {
+      event.stopPropagation();
+      await this.EXPERIMENTAL_undo();
+    }
   };
 
   private updateTransformFromInput = async (value: number): Promise<void> => {
