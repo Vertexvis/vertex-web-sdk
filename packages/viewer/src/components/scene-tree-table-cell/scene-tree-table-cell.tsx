@@ -512,7 +512,11 @@ export class SceneTreeTableCell {
   }
 
   private getEndItemIcon(): ViewerIconName | undefined {
-    if (this.endItemIndicator && this.node?.endItem && !this.node?.isLeaf) {
+    if (
+      this.endItemIndicator &&
+      this.node?.endItem &&
+      (!this.node?.isLeaf || this.node?.filterHit)
+    ) {
       return 'lock';
     }
     return undefined;
