@@ -512,6 +512,8 @@ export class SceneTreeTableCell {
   }
 
   private getEndItemIcon(): ViewerIconName | undefined {
+    // return end item icon for end items (grouped) in normal and filter view
+    // does not return end item icon for leaf items that are not end items
     if (
       this.endItemIndicator &&
       this.node?.endItem &&

@@ -153,6 +153,16 @@ describe('<vertex-scene-tree-table-cell>', () => {
     expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeFalsy();
   });
 
+  it('renders end item icon if the item is a filter hit', async () => {
+    const node = createNode({ endItem: true, isLeaf: true, filterHit: true });
+    const { cell } = await newComponentSpec({
+      html: `<vertex-scene-tree-table-cell></vertex-scene-tree-table-cell>`,
+      node,
+    });
+
+    expect(cell.shadowRoot?.querySelector('.icon-end-item')).toBeDefined();
+  });
+
   it('renders visible icon if visibility toggle is true and item is visible', async () => {
     const node = createNode({ visible: true });
     const { cell } = await newComponentSpec({
