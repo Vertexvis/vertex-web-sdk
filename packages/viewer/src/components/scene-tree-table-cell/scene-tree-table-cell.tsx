@@ -512,8 +512,10 @@ export class SceneTreeTableCell {
   }
 
   private getEndItemIcon(): ViewerIconName | undefined {
-    // return end item icon for end items (grouped) in normal and filter view
-    // does not return end item icon for leaf items that are not end items
+    // Return the end item icon for an item if it is set as an end item and either is not a leaf item
+    // or matches the filter. Note that in the filtered view, an end item matching the filter will always be
+    // marked as a leaf node because its children will be excluded from the search results and therefore
+    // not present in the filtered tree.
     if (
       this.endItemIndicator &&
       this.node?.endItem &&
