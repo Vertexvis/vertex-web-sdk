@@ -17,7 +17,8 @@ import { StringValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { AnnotationData } from '../lib/annotations/annotation';
 import { random } from './random';
-import { makeTimestamp, makeUuid2l } from './sceneView';
+import { makeTimestamp } from './sceneView';
+import { makeUuid2l } from './uuid';
 
 export function makeSceneAnnotationSet({
   id = UUID.create(),

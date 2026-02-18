@@ -1,7 +1,4 @@
-import {
-  Plane,
-  Vector3f,
-} from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
+import { Plane } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 import {
   MeasurementOutcome,
   MeasurementResult,
@@ -11,12 +8,11 @@ import {
   PlanePair,
   SurfaceAreaResult,
 } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
-import { Uuid2l } from '@vertexvis/scene-view-protos/core/protos/uuid_pb';
 import { MeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { toProtoTimestamp } from '@vertexvis/stream-api';
-import { UUID } from '@vertexvis/utils';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 
+import { makeVector3f } from './geometry';
 import { random } from './random';
 
 export function makeMeasureResponse(
@@ -51,8 +47,8 @@ export function makeMinimumDistanceResult(): MeasurementResult {
   const result = new MeasurementResult();
   const distance = new MinimumDistanceResult();
   distance.setDistance(random.floating());
-  distance.setClosestPoint1(makeVector3());
-  distance.setClosestPoint2(makeVector3());
+  distance.setClosestPoint1(makeVector3f());
+  distance.setClosestPoint2(makeVector3f());
   result.setMinimumDistance(distance);
   return result;
 }
@@ -68,32 +64,16 @@ export function makeSurfaceAreaResult(): MeasurementResult {
 export function makePlanes(): PlanePair {
   const plane1 = new Plane();
   plane1.setD(random.floating());
-  plane1.setNormal(makeVector3());
+  plane1.setNormal(makeVector3f());
 
   const plane2 = new Plane();
   plane2.setD(random.floating());
-  plane2.setNormal(makeVector3());
+  plane2.setNormal(makeVector3f());
 
   const planes = new PlanePair();
   planes.setStart(plane1);
   planes.setEnd(plane2);
   return planes;
-}
-
-export function makeVector3(): Vector3f {
-  const vector = new Vector3f();
-  vector.setX(random.floating());
-  vector.setY(random.floating());
-  vector.setZ(random.floating());
-  return vector;
-}
-
-export function makeUuid2l(id: UUID.UUID = UUID.create()): Uuid2l {
-  const msbLsb = UUID.toMsbLsb(id);
-  const pb = new Uuid2l();
-  pb.setMsb(msbLsb.msb);
-  pb.setLsb(msbLsb.lsb);
-  return pb;
 }
 
 export function makeTimestamp(date: Date = new Date()): Timestamp {

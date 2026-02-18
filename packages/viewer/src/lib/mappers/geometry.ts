@@ -4,11 +4,19 @@ import {
   Dimensions,
   Matrix4,
   Plane,
+  Point,
   Rectangle,
   Vector3,
   Vector4,
 } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
+
+export const fromPbVector2d: M.Func<
+  vertexvis.protobuf.core.IVector2d,
+  Point.Point
+> = M.defineMapper(M.read(M.requiredProp('x'), M.requiredProp('y')), ([x, y]) =>
+  Point.create(x, y)
+);
 
 export const fromPbDim: M.Func<
   vertexvis.protobuf.stream.IDimensions,

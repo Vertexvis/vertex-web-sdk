@@ -3,7 +3,7 @@ import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/scenevi
 import { UUID } from '@vertexvis/utils';
 
 import { random } from './random';
-import { makeUuid2l } from './sceneView';
+import { makeUuid2l } from './uuid';
 
 export function makeListItemModelViewsResponse(
   modelViews: ModelView[] = [makeModelView(), makeModelView()]
