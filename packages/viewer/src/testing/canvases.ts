@@ -74,8 +74,8 @@ export function makeLine2d(value: Partial<LineItem2d> = {}): CanvasItem {
     makeStrokeStyle(value.stroke?.thickness, value.stroke?.color)
   );
   line2d.setFillStyle(makeFillStyle(value.fill?.color));
-  line2d.setStartShape(makeEndShape(value.startShape));
-  line2d.setEndShape(makeEndShape(value.endShape));
+  line2d.setStartShape(makeLineEndShape(value.startShape));
+  line2d.setEndShape(makeLineEndShape(value.endShape));
   item.setLine2d(line2d);
   return item;
 }
@@ -147,7 +147,7 @@ export function makeCallout(value: Partial<CalloutItem> = {}): CanvasItem {
   return item;
 }
 
-export function makeEndShape(
+export function makeLineEndShape(
   shape: ArrowEndShape | CircleEndShape | DashEndShape = {
     type: 'arrow-end',
     width: 1,
