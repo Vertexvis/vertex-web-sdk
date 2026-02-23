@@ -14,7 +14,7 @@ The widget expects a part selected, which also occurs on a valid hit result.
   <vertex-viewer
     id="viewer"
     config-env="platprod"
-    src="urn:vertex:stream-key:fTHHMa_p9agtpL9MgU3UltLiXvNR0Z7Ogsd2"
+    src="urn:vertex:stream-key:ydD87RtDdJCZQaa6twueZTEtsciQmAWl5qnP"
   >
     <vertex-viewer-transform-widget
       id="transform-widget"
