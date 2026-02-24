@@ -57,6 +57,7 @@ import {
 import { ModelViewController } from './lib/model-views/controller';
 import { PmiController } from './lib/pmi';
 import { SceneItemController } from './lib/scene-items/controller';
+import { CanvasController } from './lib/canvases';
 import { TapEventDetails } from './lib/interactions/tapEventDetails';
 import { ConnectionStatus, LoadOptions } from './components/viewer/viewer';
 import {
@@ -526,6 +527,11 @@ export namespace Components {
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
      */
     cameraType: FrameCameraType;
+    /**
+     * The controller for accessing canvases and their associated markup.
+     * @readonly
+     */
+    canvases: CanvasController | undefined;
     /**
      * The Client ID associated with your Vertex Application.
      */
@@ -2508,6 +2514,11 @@ declare namespace LocalJSX {
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
      */
     cameraType?: FrameCameraType;
+    /**
+     * The controller for accessing canvases and their associated markup.
+     * @readonly
+     */
+    canvases?: CanvasController | undefined;
     /**
      * The Client ID associated with your Vertex Application.
      */

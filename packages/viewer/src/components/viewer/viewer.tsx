@@ -31,6 +31,7 @@ import {
   AnnotationController,
   AnnotationState,
 } from '../../lib/annotations/controller';
+import { CanvasController } from '../../lib/canvases';
 import {
   Config,
   parseAndValidateConfig,
@@ -388,6 +389,13 @@ export class Viewer {
   @Prop({ mutable: true }) public sceneItems: SceneItemController | undefined;
 
   /**
+   * The controller for accessing canvases and their associated markup.
+   *
+   * @readonly
+   */
+  @Prop({ mutable: true }) public canvases: CanvasController | undefined;
+
+  /**
    * Experimental flag indicating that connections to Vertex should be established
    * if the viewer is initially hidden through its own style or computed style, or
    * has not been scrolled into view.
@@ -596,6 +604,12 @@ export class Viewer {
     );
 
     this.sceneItems = new SceneItemController(
+      client,
+      () => this.token,
+      () => this.deviceId
+    );
+
+    this.canvases = new CanvasController(
       client,
       () => this.token,
       () => this.deviceId
