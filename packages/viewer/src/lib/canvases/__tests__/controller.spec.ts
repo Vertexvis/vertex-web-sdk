@@ -3,7 +3,7 @@ jest.mock(
 );
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
-import { UUID } from '@vertexvis/utils';
+import { Color, UUID } from '@vertexvis/utils';
 
 import { mockGrpcUnaryResult, random } from '../../../testing';
 import {
@@ -44,7 +44,7 @@ describe(CanvasController, () => {
 
     it('maps markup present within the canvas', async () => {
       const { controller, client } = makeCanvasController(jwt, deviceId);
-      const primaryColor = '#00ff00';
+      const primaryColor = Color.create(255, 0, 0, 100);
       const accentColor = '#0000ff';
       const stroke = { thickness: 1, color: primaryColor };
       const fill = { color: accentColor };

@@ -14,7 +14,7 @@ import { GetCanvasResponse } from '@vertexvis/scene-view-protos/sceneview/protos
 import { Mapper as M } from '@vertexvis/utils';
 
 import {
-  fromPbRGBi,
+  fromPbRGBAi,
   fromPbUuid2l,
   fromPbVector2d,
   fromPbVector3f,
@@ -35,12 +35,12 @@ import {
 
 const mapStrokeStyle: M.Func<PBStrokeStyle.AsObject, StrokeStyle> =
   M.defineMapper(
-    M.read(M.mapRequiredProp('color', fromPbRGBi), M.getProp('thickness')),
+    M.read(M.mapRequiredProp('color', fromPbRGBAi), M.getProp('thickness')),
     ([color, thickness]) => ({ color, thickness })
   );
 
 const mapFillStyle: M.Func<PBFillStyle.AsObject, FillStyle> = M.defineMapper(
-  M.read(M.mapRequiredProp('color', fromPbRGBi)),
+  M.read(M.mapRequiredProp('color', fromPbRGBAi)),
   ([color]) => ({ color })
 );
 
@@ -127,8 +127,8 @@ const mapFreeformItem2d: M.Func<PBFreeformItem2d.AsObject, FreeformItem2d> =
 
 const mapPinItem2d: M.Func<PBPin2d.AsObject, PinItem2d> = M.defineMapper(
   M.read(
-    M.mapRequiredProp('primaryColor', fromPbRGBi),
-    M.mapRequiredProp('accentColor', fromPbRGBi),
+    M.mapRequiredProp('primaryColor', fromPbRGBAi),
+    M.mapRequiredProp('accentColor', fromPbRGBAi),
     M.mapRequiredProp('position', fromPbVector3f),
     M.mapProp('sceneItemId', M.ifDefined(fromPbUuid2l))
   ),
@@ -144,8 +144,8 @@ const mapPinItem2d: M.Func<PBPin2d.AsObject, PinItem2d> = M.defineMapper(
 const mapCalloutItem: M.Func<PBCalloutItem.AsObject, CalloutItem> =
   M.defineMapper(
     M.read(
-      M.mapRequiredProp('primaryColor', fromPbRGBi),
-      M.mapRequiredProp('accentColor', fromPbRGBi),
+      M.mapRequiredProp('primaryColor', fromPbRGBAi),
+      M.mapRequiredProp('accentColor', fromPbRGBAi),
       M.mapRequiredProp('anchorPosition', fromPbVector3f),
       M.mapRequiredProp('textPosition', fromPbVector2d),
       M.getProp('text'),

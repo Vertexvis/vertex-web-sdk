@@ -1,4 +1,3 @@
-import { RGBAi } from '@vertexvis/scene-view-protos/core/protos/material_pb';
 import {
   ArrowEndShape as ApiArrowEndShape,
   CalloutItem as ApiCalloutItem,
@@ -30,6 +29,7 @@ import {
   PinItem2d,
 } from '../lib/canvases/types';
 import { random } from '.';
+import { makeRGBAi } from './colors';
 import { makeVector2d, makeVector3f } from './geometry';
 import { makeUuid2l } from './uuid';
 
@@ -195,21 +195,4 @@ export function makeFillStyle(
   const s = new ApiFillStyle();
   s.setColor(makeRGBAi(color));
   return s;
-}
-
-export function makeRGBAi(
-  color: Color.Color | string = Color.create(255, 255, 255)
-): RGBAi {
-  const effectiveColor =
-    typeof color === 'string' ? Color.fromHexString(color) : color;
-
-  const c = new RGBAi();
-
-  if (effectiveColor != null) {
-    c.setA(effectiveColor.a);
-    c.setG(effectiveColor.g);
-    c.setB(effectiveColor.b);
-  }
-
-  return c;
 }
