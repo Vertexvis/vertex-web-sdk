@@ -1,4 +1,5 @@
 export * from './camera';
+export * from './color';
 export * from './corePb';
 export * from './corePbJs';
 export * from './frameStreaming';
