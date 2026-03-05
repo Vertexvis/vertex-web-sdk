@@ -108,6 +108,12 @@ export class ViewerPinTool {
   protected watchModeChange(): void {
     this.pinController?.setToolMode(this.mode);
     this.setupInteractionHandler();
+
+    if (this.mode === 'edit') {
+      this.setFeatureMaps();
+    } else {
+      this.resetFeatureMaps();
+    }
   }
 
   /**
@@ -324,7 +330,11 @@ export class ViewerPinTool {
   }
 
   private setFeatureMaps(): void {
-    if (this.viewer != null && this.viewer.featureMaps == null) {
+    if (
+      (this.pins.length > 0 || this.mode === 'edit') &&
+      this.viewer != null &&
+      this.viewer.featureMaps == null
+    ) {
       this.stateMap.shouldClearFeatureMaps = true;
       this.viewer.featureMaps = 'final';
     }
