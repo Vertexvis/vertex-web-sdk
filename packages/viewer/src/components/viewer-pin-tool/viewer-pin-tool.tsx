@@ -96,6 +96,7 @@ export class ViewerPinTool {
 
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
+  private onEntityAddedHandler?: Disposable;
 
   private resizeObserver?: ResizeObserver;
 
@@ -303,6 +304,8 @@ export class ViewerPinTool {
   private clearModelListeners(): void {
     this.onEntitiesChangedHandler?.dispose();
     this.onEntitiesChangedHandler = undefined;
+    this.onEntityAddedHandler?.dispose();
+    this.onEntityAddedHandler = undefined;
     this.resizeObserver?.disconnect();
   }
 

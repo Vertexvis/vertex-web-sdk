@@ -10,7 +10,7 @@
    * @prop --viewer-annotations-pin-label-line-width: A CSS color that
    * specifies the width of the label line
    */
-   --viewer-annotations-pin-label-line-width: 1
+   --viewer-annotations-pin-label-line-width: 1;
 
   overflow: hidden;
   pointer-events: none;
